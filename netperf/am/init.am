@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/13 12:14:50 $
+# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/15 10:34:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/13 12:14:50 $ by $Author: brian $
+# Last Modified $Date: 2005/02/15 10:34:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,50 @@ install-initscripts: $(dist_initrd_SCRIPTS)
 		$(SHELL) $(top_srcdir)/scripts/install_initd $(DESTDIR)$(initrddir)/$$f ; \
 	done
 
+post-initscripts:
+	@if test -z '$(DESTDIR)' ; then \
+		if runlevel >/dev/null 2>&1 ; then \
+			d=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
+			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+				f=`echo $$p | sed -e 's|.*/||'` ; \
+				flist="$$flist $$f" ; \
+				rlist="$$f $$rlist" ; \
+			done ; \
+			for i in $$rlist ; do \
+				echo "test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i" ; \
+				if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i ; then \
+					echo "$(SHELL) $(initrddir)/$$i stop" ; \
+					$(SHELL) $(initrddir)/$$i stop || : ; \
+				fi ; \
+			done ; \
+			for i in $$flist ; do \
+				echo "test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i" ; \
+				if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i ; then \
+					echo "$(SHELL) $(initrddir)/$$i start" ; \
+					$(SHELL) $(initrddir)/$$i start || : ; \
+				fi ; \
+			done ; \
+		fi ; \
+	fi
+
+preun-initscripts:
+	@if test -z '$(DESTDIR)' ; then \
+		if runlevel >/dev/null 2>&1 ; then \
+			d=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
+			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
+				rlist="$$p $$rlist" ; \
+			done ; \
+			for p in $$rlist ; do \
+				f=`echo $$p | sed -e 's|.*/||'` ; \
+				echo "test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f" ; \
+				if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f ; then \
+					echo "$(SHELL) $(srcdir)/$$p stop" ; \
+					$(SHELL) $(srcdir)/$$p stop || : ; \
+				fi ; \
+			done ; \
+		fi ; \
+	fi
+
 uninstall-initscripts:
 	@$(NORMAL_INSTALL)
 	@list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
@@ -68,10 +112,10 @@ uninstall-initscripts:
 
 dist_noinst_SCRIPTS += $(top_srcdir)/scripts/install_initd $(top_srcdir)/scripts/remove_initd
 
-INSTALL_DATA_HOOK += install-initscripts
+INSTALL_DATA_HOOK += install-initscripts post-initscripts
 
-UNINSTALL_LOCAL += uninstall-initscripts
+UNINSTALL_LOCAL += preun-initscripts uninstall-initscripts
 
-.PHONY: install-initscripts uninstall-initscripts
+.PHONY: install-initscripts uninstall-initscripts post-initscripts preun-initscripts
 
 # vim: ft=automake

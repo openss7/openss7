@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/02/13 09:20:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/02/15 10:35:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/13 09:20:18 $ by $Author: brian $
+# Last Modified $Date: 2005/02/15 10:35:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -628,6 +628,9 @@ dist_config_DATA		= \
 				src/util/sysconfig/strace \
 				src/util/sysconfig/streams \
 				src/util/sysconfig/strerr
+
+dist_sysconf_DATA		= \
+				src/util/sysconfig/streams.conf
 
 endif
 
