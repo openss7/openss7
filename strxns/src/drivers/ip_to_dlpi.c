@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/11/08 07:01:19 $ by $Author: brian $
+ Last Modified $Date: 2005/01/10 20:55:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $";
 
 #include "compat.h"
 
@@ -73,7 +73,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -310,8 +310,13 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	} else
 		ip2xinet_numopen = 1;
 
+#ifdef LIS
+	if (q->q_count != 0)
+		printk("ip2x level:q_count is %lu", q->q_count);
+#else				/* LIS */
 	if (q->q_count != 0)
 		printk("ip2x level:q_count is %u", q->q_count);
+#endif				/* LIS */
 
 	/* Set up the flow control parameters and send them up to the stream head.  */
 	minor = getminor(*devp);
