@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.7 2005/02/17 11:34:53 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.8 2005/02/17 22:57:34 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/02/17 11:34:53 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 22:57:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1095,21 +1095,17 @@ tree is rooted at @file{/u5/NexusWare}.)
 @end cartouche
 @end example
 
-Once built and installed in the @cite{NexusWare} directory, you will have to
-(currently) hand edit a @file{.spec} file to include the components you want in
-the @cite{NexusWare} root file system.  If you are cross-building for
-@cite{NexusWare} you should already know what that means.  Objects that you
-might be interested in copying to the root file system are kernel modules that
-were installed in
-@file{@var{$NEXUSWARE_PREFIX}/lib/modules/2.4.18/@value{PACKAGE_LCNAME}}, libraries
-installed in @file{@var{$NEXUSWARE_PREFIX}/usr/lib} and utility functions
-installed in @file{@var{$NEXUSWARE_PREFIX}/usr/bin} and
-@file{@var{$NEXUSWARE_PREFIX}/usr/sbin} and test programs in
-@file{@var{$NEXUSWARE_PREFIX}/usr/libexec}.  If you would prefer that these
-programs be installed in @file{@var{$NEXUSWARE_PREFIX}/lib},
-@file{@var{$NEXUSWARE_PREFIX}/bin}, @file{@var{$NEXUSWARE_PREFIX}/sbin} and
-@file{@var{$NEXUSWARE_PREFIX}/libexec}, (say because you want to remote mount
-the @file{/usr} directory after boot), then specify the @samp{--exec-prefix=/}
+Once built and installed in the @cite{NexusWare} directory, you will have to (currently) hand edit a
+@file{.spec} file to include the components you want in the @cite{NexusWare} root file system.  If
+you are cross-building for @cite{NexusWare} you should already know what that means.  Objects that
+you might be interested in copying to the root file system are kernel modules that were installed in
+@file{@var{$NEXUSWARE_PREFIX}/@-lib/@-modules/@-2.4.18/@-@value{PACKAGE_LCNAME}}, libraries
+installed in @file{@var{$NEXUSWARE_PREFIX}/@-usr/@-lib} and utility functions installed in
+@file{@var{$NEXUSWARE_PREFIX}/@-usr/@-bin} and @file{@var{$NEXUSWARE_PREFIX}/@-usr/@-sbin} and test
+programs in @file{@var{$NEXUSWARE_PREFIX}/@-usr/@-libexec}.  If you would prefer that these programs
+be installed in @file{@var{$NEXUSWARE_PREFIX}/@-lib}, @file{@var{$NEXUSWARE_PREFIX}/@-bin},
+@file{@var{$NEXUSWARE_PREFIX}/@-sbin} and @file{@var{$NEXUSWARE_PREFIX}/@-libexec}, (say because you
+want to remote mount the @file{/usr} directory after boot), then specify the @samp{--exec-prefix=/}
 option to @samp{./configure.nexusware}.
 
 In addition, because @cite{NexusWare} does not include an

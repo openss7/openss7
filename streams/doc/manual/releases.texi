@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.3 2005/02/17 11:34:53 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.4 2005/02/17 22:57:34 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/02/17 11:34:53 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 22:57:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -159,7 +159,7 @@ STREAMS (LiS)} package formerly maintained by Dave Goethe of @uref{http://www.gc
 @section Release Notes
 @cindex release notes
 
-The sections that follow provide information on OpenSS7 releases of the
+The sections that follow provide information on OpenSS7 releases of the @*
 @value{PACKAGE_TITLE} package.
 
 @ifnothtml

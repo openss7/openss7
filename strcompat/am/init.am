@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/17 08:04:13 $
+# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/17 23:02:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/17 08:04:13 $ by $Author: brian $
+# Last Modified $Date: 2005/02/17 23:02:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,7 +69,7 @@ post-initscripts:
 				rlist="$$f $$rlist" ; \
 			done ; \
 			r=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
-			for d in $r S ; do \
+			for d in $$r S ; do \
 				for i in $$rlist ; do \
 					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i ; then \
 						echo "$(SHELL) $(initrddir)/$$i stop" ; \
@@ -77,7 +77,7 @@ post-initscripts:
 					fi ; \
 				done ; \
 			done ; \
-			for d in S $r ; do \
+			for d in S $$r ; do \
 				for i in $$flist ; do \
 					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i ; then \
 						echo "$(SHELL) $(initrddir)/$$i start" ; \
@@ -95,7 +95,7 @@ preun-initscripts:
 				rlist="$$p $$rlist" ; \
 			done ; \
 			r=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
-			for d in $r S ; do \
+			for d in $$r S ; do \
 				for p in $$rlist ; do \
 					f=`echo $$p | sed -e 's|.*/||'` ; \
 					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f ; then \

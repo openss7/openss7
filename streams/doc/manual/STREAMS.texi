@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.11 2005/02/17 11:34:53 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.12 2005/02/17 22:57:34 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/02/17 11:34:53 $ by $Author: brian $
+% Last Modified $Date: 2005/02/17 22:57:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -397,7 +397,7 @@ filesystem for support and debugging.
 @tab Provides limited set of LiS only Linux-derived utilities.
 @item @  @tab @ 
 @item Provides full named-streams device and device filesystem support.
-@tab Provides only character-based node support.
+@tab Provides only character-based node support. @*
 @end multitable
 
 @c ----------------------------------------------------------------------------
@@ -533,12 +533,12 @@ This Manual, SPG, STREAMS Programmer's Guide}.
 @cindex conformance
 
 @menu
-* Compatibility::
+* STREAMS Compatibility::
 * Porting::
 @end menu
 
-@node Compatibility
-@section Compatibility
+@node STREAMS Compatibility
+@section STREAMS Compatibility
 @cindex compatibility
 
 @cite{@value{PACKAGE_TITLE}} provides some degree of compatibility with other @dfn{STREAMS}
@@ -549,55 +549,55 @@ implementation as follows:
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{SVR 4.2 ES/MP}
 to ease portability and common comprehension,
-@pxref{SVR 4.2 MP DDI/DKI Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{SVR 4.2 Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- AIX 5L Version 5.1
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{AIX 5L Version 5.1}
 to ease portability and common comprehension,
-@pxref{AIX 5L Version 5.1 Compatibility Functions , , SPG, STREAMS Programmer's Guide}.
+@pxref{AIX Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- HP-UX 11.0i v2
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{HP-UX 11.0i v2}
 to ease portability and common comprehension,
-@pxref{HP-UX 11.0i v2 Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{HP-UX Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- OSF/1 1.2/Digital UNIX/True 64
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{OSF/1 1.2/Digital UNIX}
 to ease portability and common comprehension,
-@pxref{OSF/1 1.2/Digital UNIX Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{OSF/1 Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- UnixWare 7.1.3 (OpenUnix 8)
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{UnixWare 7.1.3 (OpenUnix 8)}
 to ease portability and common comprehension,
-@pxref{UnixWare 7.1.3 (OpenUnix 8) Compatiblity Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{UnixWare Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- Solaris 9/SunOS 5.9
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{Solaris 9/SunOS 5.9}
 to ease portability and common comprehension,
-@pxref{Solaris 9/SunOS 5.9 Compatiblity Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{Solaris Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- SUPER-UX
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{SUPER-UX}
 to ease portability and common comprehension,
-@pxref{SVR 4.2 MP DDI/DKI Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{SUX Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- UXP/V
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{UXP/V}
 to ease portability and common comprehension,
-@pxref{SVR 4.2 MP DDI/DKI Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{UXP Compatibility, , , SPG, STREAMS Programmer's Guide}.
 
 @item --- LiS-2.16.18
 @cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
 @cite{LiS 2.16}
 to ease portability and common comprehension,
-@pxref{LiS 2.16 Compatiblity Functions, , , SPG, STREAMS Programmer's Guide}.
+@pxref{LiS Compatibility, , , SPG, STREAMS Programmer's Guide}.
 @end table
 
 For additional details,
