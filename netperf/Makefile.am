@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2004/08/06 20:59:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2004/08/08 22:59:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/06 20:59:02 $ by $Author: brian $
+# Last Modified $Date: 2004/08/08 22:59:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -111,6 +111,17 @@ man8_MANS			= netserver.8
 dist_noinst_MANS		= netperf.man netserver.man
 
 include am/man.am
+
+info_TEXINFOS			= netperf.texi
+DVIS				= netperf.dvi
+PSS				= netperf.ps
+PDFS				= netperf.pdf
+HTMLS				= netperf.html
+INFO_DEPS			= $(srcdir)/netperf.info
+
+MAKINFOHTML			= $(MAKEINFO) --html --no-split
+
+EXTRA_DIST			+= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
 
 #
 #   Rules for making rpms

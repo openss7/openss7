@@ -56,158 +56,650 @@
 .\" Last Modified $Date: $ by $Author: $
 .\"
 .\" =========================================================================
-.TH netperf 1L ""
+.so netperf.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database netperf.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH NETPERF 1L "$Date$" "$Name$" "User Commands"
+.\" =========================================================================
+.\" =========================================================================
 .SH NAME
-
-netperf \- a network performance benchmark
-
-.SH SYNOPSIS
-
 .B netperf
-[global options] -- [test specific options]
-
+\- a network performance benchmark
+.\" =========================================================================
+.\" =========================================================================
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBnetperf\fR [\fB-t\fR\ \fITESTNAME\fR] [\fIglobal-test-options\fR] [-- [\fItest-specific-options\fR]]
+.HP 12
+\fBnetperf\fR \fB-h\fR
+.HP 12
+\fBnetperf\fR [\fB-t\fR\ \fITESTNAME\fR]
+[\fB-a\fR\ [\fILOC-SND-ALIGN\fR][\fB,\fR][\fILOC-RCV-ALIGN\fR]]
+[\fB-A\fR\ [\fIREM-SND-ALIGN\fR][\fB,\fR][\fIREM-RCV-ALIGN\fR]]
+[\fB-c\fR\ [\fILOC-RATE\fR]]
+[\fB-C\fR\ [\fIREM-RATE\fR]]
+[\fB-d\fR]
+[\fB-f\fR\ {\ \fBG\fR\ |\ \fBM\fR\ |\ \fBK\fR\ |\ \fBg\fR\ |\ \fBm\fR\ |\ \fBk\fR\ }]
+[\fB-F\fR\ \fIFILL-FILE\fR]
+[\fB-H\fR\ \fIREMOTE-HOST\fR]
+[\fB-i\fR\ \fIMAX\fB,\fIMIN\fR]
+[\fB-I\fR\ \fILEVEL\fR[\fB,\fIWIDTH\fR]]
+[\fB-l\fR\ \fITESTLEN\fR]
+[\fB-n\fR\ \fINUM-CPUS\fR]
+[\fB-o\fR\ [\fILOC-SND-OFFSET\fR][\fB,\fR][\fILOC-RCV-OFFSET\fR]]
+[\fB-O\fR\ [\fIREM-SND-OFFSET\fR][\fB,\fR][\fIREM-RCV-OFFSET\fR]]
+[\fB-p\fR\ \fIPORTNUM\fR]
+[\fB-P\fR\ {\ \fB0\fR\ |\ \fB1\fR\ }]
+[\fB-v\fR\ \fIVERBOSITY\fR]
+[--\ [\fItest-specific-options\fR]]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIsocket-test\fR [\fIglobal-test-options\fR]
+[--
+[\fB-CDVz\fR]
+.br
+[\fB-b\fR\ \fIBURST-SIZE\fR]
+[\fB-I\fR\ [\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]]
+[\fB-m\fR\ \fILOC-MSG-SIZE\fR]
+[\fB-M\fR\ \fIREM-MSG-SIZE\fR]
+[\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]]
+[\fB-P\fR\ [\fILOC-PORTNUM\fR][\fB,\fR][\fIREM-PORTNUM\fR]]
+[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
+[\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
+[\fB-w\fR\ \fIRCV-WIDTH\fR]
+[\fB-W\fR\ \fISND-WIDTH\fR]
+]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIxti-test\fR [\fIglobal-test-options\fR]
+[--
+[\fB-DV\fR]
+.br
+[\fB-I\fR\ [\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]]
+[\fB-m\fR\ \fILOC-MSG-SIZE\fR]
+[\fB-M\fR\ \fIREM-MSG-SIZE\fR]
+[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
+[\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
+[\fB-w\fR\ \fIRCV-WIDTH\fR]
+[\fB-W\fR\ \fISND-WIDTH\fR]
+[\fB-X\fR\ [\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]]
+]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIipv6-test\fR [\fIglobal-test-options\fR]
+[--
+[\fB-DV\fR]
+.br
+[\fB-H\fR\ \fIHOSTNAME\fR]
+[\fB-m\fR\ \fILOC-MSG-SIZE\fR]
+[\fB-M\fR\ \fIREM-MSG-SIZE\fR]
+[\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]]
+[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
+[\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
+[\fB-w\fR\ \fIRCV-WIDTH\fR]
+[\fB-W\fR\ \fISND-WIDTH\fR]
+]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIunix-test\fR [\fIglobal-test-options\fR]
+[--
+.br
+[\fB-m\fR\ \fILOC-MSG-SIZE\fR]
+[\fB-M\fR\ \fIREM-MSG-SIZE\fR]
+[\fB-p\fR\ \fIPATH\fR]
+[\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
+[\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
+[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIdlpi-test\fR [\fIglobal-test-options\fR]
+[--
+.br
+[\fB-D\fR\ [\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]]
+[\fB-m\fR\ \fILOC-MSG-SIZE\fR]
+[\fB-M\fR\ \fIREM-MSG-SIZE\fR]
+[\fB-p\fR\ [\fILOC-PPA\fR][\fB,\fR][\fIREM-PPA\fR]]
+[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-s\fR\ \fISAP\fR]
+[\fB-w\fR\ [\fILOC-SND-WINDOW\fR][\fB,\fR][\fILOC-RCV-WINDOW\fR]]
+[\fB-W\fR\ [\fIREM-SND-WINDOW\fR][\fB,\fR][\fIREM-RCV-WINDOW\fR]]
+]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIdns-test\fR [\fIglobal-test-options\fR]
+[--
+.br
+[\fB-f\fR\ \fIFILENAME\fR]
+[\fB-H\fR\ \fIHOSTNAME\fR]
+]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIatm-test\fR [\fIglobal-test-options\fR]
+[--
+.br
+[\fIatm-options\fR]]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIhippi-test\fR [\fIglobal-test-options\fR]
+[--
+.br
+[\fIhippi-options\fR]]
+.HP 12
+\fBnetperf\fR \fB-t\fR\ \fIlwp-test\fR [\fIglobal-test-options\fR]
+[--
+.br
+[\fIlwp-options\fR]]
+.\" =========================================================================
+.\" =========================================================================
 .SH DESCRIPTION
-.B Netperf
+.PP
+.B netperf
 is a benchmark that can be used to measure various aspects of
 networking performance.
 Currently, its focus is on bulk data transfer and request/response
 performance using SCTP, TCP or UDP, and the Berkeley Sockets
 interface. In addition, tests for DLPI, and Unix Domain
 Sockets, tests for IPv6 may be conditionally compiled-in.
+.\" =========================================================================
+.SS TESTS
+.PP
+.B netperf
+perfoms the following tests:
+.PP
+.TS
+center tab(:);
+lblblblb
+l|l|l|l.
+Test Name:API:Protocol:Test
+_
+SCTP_STREAM:Sockets:SCTP:STREAM
+SCTP_MAERTS:::MAERTS
+SCTP_SENDFILE:::SENDFILE
+SCTP_RR:::RR
+SCTP_NBRR:::NBRR
+SCTP_CRR:::CRR
+SCTP_TRR:::TRR
+SCTP_CC:::CC
+_::_:_
+TCP_STREAM::TCP:STREAM
+TCP_MAERTS:::MAERTS
+TCP_SENDFILE:::SENDFILE
+TCP_RR:::RR
+TCP_NBRR:::NBRR
+TCP_CRR:::CRR
+TCP_TRR:::TRR
+TCP_CC:::CC
+_::_:_
+UDP_STREAM::UDP:STREAM
+UDP_RR:::RR
+_:_:_:_
+XTI_SCTP_STREAM:XTI:SCTP:STREAM
+XTI_SCTP_RR:::RR
+_::_:_
+XTI_TCP_STREAM::TCP:STREAM
+XTI_TCP_RR:::RR
+_::_:_
+XTI_UDP_STREAM::UDP:STREAM
+XTI_UDP_RR:::RR
+_:_:_:_
+SCTPIPV6_STREAM:IPv6 Sockets:SCTP:STREAM
+SCTPIPV6_RR:::RR
+SCTPIPV6_CRR:::CRR
+SCTPIPV6_TRR:::TRR
+_::_:_
+TCPIPV6_STREAM::TCP:STREAM
+TCPIPV6_RR:::RR
+TCPIPV6_CRR:::CRR
+TCPIPV6_TRR:::TRR
+_::_:_
+UDPIPV6_STREAM::UDP:STREAM
+UDPIPV6_RR:::RR
+_:_:_:_
+STREAM_STREAM:Unix Sockets:CO:STREAM
+STREAM_RR:::RR
+LWPSTR_STREAM::STREAM
+LWPSTR_RR::RR
+_::_:_
+DG_STREAM::CL:STREAM
+DG_RR:::RR
+LWPDG_STREAM::STREAM
+LWPDG_RR::RR
+_:_:_:_
+DLCO_STREAM:DLPI:CO:STREAM
+DLCO_RR:::RR
+_::_:_
+DLCL_STREAM::CL:STREAM
+DLCL_RR:::RR
+_:_:_:_
+LOC_CPU:none:none:none
+REM_CPU:::
+_:_:_:_
+.TE
+.\" =========================================================================
+.SS PROTOCOLS
+.PP
+.B netperf
+tests the following protocols:
+.PP
+.TS
+tab(:);
+lbw(12n)lssss.
+SCTP:Stream Control Transmission Protocol
+TCP:Transmission Control Protocol
+UDP:User Datagram Protocol
+UNIX:Unix Domain (CO and CL) Protocols
+ATM:Asynchronous Transfer Mode
+HIPPI:
+.TE
+.\" =========================================================================
+.SS APPLICATION PROGRAMMING INTERFACES
+.PP
+.B netperf
+tests the following APIs:
+.PP
+.TS
+tab(:);
+lbw(12n)lssss.
+BSD:BSD/POSIX Sockets Interface
+XTI:X/Open Transport Interface (XTI/TLI) XNS 5.2 SuSv2
+IPV6:POSIX IPv6 Sockets Interface
+UNIX:Unix Domain Sockets Interface
+DLPI:Data Link Provider Interface
+ATM:FORE ATM Interface
+HiPPI:HP-UX Interface
+.TE
+.\" =========================================================================
+.SS BENCHMARKING PERFORMANCE TESTS
+.PP
+.B netperf
+test the following benchmarks:
+.PP
+.TS
+tab(:);
+lbw(12n)lssss.
+STREAM:Unidirectional Stream Test (Client to Server)
+MAERTS:Unidirectional Stream Test (Server to Client)
+SENDFILE:Unidirectional Stream Test (BSD \fBsendfile\fR(2))
+RR:Blocking Request/Response
+NBRR:Non-blocking Request/Response
+CRR:Connect/Request/Response
+TRR:Transaction Request/Response
+CC:Connect/Close
+CPU:CPU Syncrhonization Tests
+.TE
 
-.SS GLOBAL OPTIONS
+.\" =========================================================================
+.SS Unidirectional Stream Test
+.PP
+The most common used of
+.BR netperf (1)
+is measuring bulk data transfer performance.  This is also referred to as
+\(lqstream\(rq or \(lqunidirectional stream\(rq performance tests.
+Essentially, these tests will measure how fast one system can send data to
+another or how fast the other system can receive it.
+.\" =========================================================================
+.PP
+There are three unidirectional stream tests peformed by
+.BR netperf (1):
+.IB * _STREAM
+tests,
+.IB * _MAERTS
+tests and
+.IB * _SENDFILE
+tests.
+.IB * _STREAM
+tests connect and transfer data in the direction from client to server.
+.IB * _MAERTS
+tests connect and transfer data in the direction from server to client.
+.IB * _SENDFILE
+tests connect and transfer data in the direction from client to server using
+BSD
+.BR sendfile (2).
 
+.\" -------------------------------------------------------------------------
 .TP
-.B \-a sizespec
+.B STREAM \fR\- Unidirectional Stream Test (Client to Server)
+.\" -------------------------------------------------------------------------
+.TP
+.B MAERTS \fR\- Unidirectional Stream Test (Server to Client)
+.RS
+.PP
+These tests are similar to the
+.IB * _STREAM
+tests, except that data is send in the direction from server to client instead
+of the direction from client to server.
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SENDFILE \fR\- Unidirectional Stream Test (BSD \fBsendfile\fR(2))
+
+.\" =========================================================================
+.SS Request/Response Tests
+.PP
+Request/response performance is the second tests that can be investigated with
+.BR netperf (1).
+Generally speaking,
+.BR netperf (1)
+request/response performance is quoted as \(lqtransactions per second\(rq for
+a given request and response size.  A transaction is defined as the exchange
+of a single request and a single response.  From a transaction rate, one can
+infer one way and round-trip average latency.
+
+.\" -------------------------------------------------------------------------
+.TP
+.B RR \fR\- Request, Response
+.\" -------------------------------------------------------------------------
+.TP
+.B NBRR \fR\- Non-blocking Request, Response
+These tests are intended to implement the same as the
+.IB * _RR
+tests, except that they use POSIX-style non-blocking sockets.
+.\" -------------------------------------------------------------------------
+.TP
+.B CRR \fR\- Connect, Request, Response
+.RS
+.PP
+These tests are only applicable to connection-oriented protocols.
+.PP
+These tests are intended to test the performance of establishing a connection,
+exchanging a request/response pair, and repeating.  It is expected that this
+would be a good starting-point for comparison of T/TCP with TCP for
+transactional workloads.  It will also look (can look) much like the
+communication pattern of http for www access.
+.PP
+A difference between the
+.IB * _CRR
+tests and the
+.IB * _TRR
+tests are that in the
+.IB * _CRR
+tests the
+.BR connect (2)
+call is made under the POSIX/BSD Sockets API and no data is sent with the
+.BR t_connect (3)
+or
+.BR t_accept (3)
+call under STREAMS XTI API.
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TRR \fR\- Transaction Request, Response
+.RS
+.PP
+These tests are only applicable to connection-oriented protocols.
+.PP
+These tests are intended to test the performance of establishing a connection,
+exchanging a request/response pair, and repeating.  It is expected that this
+would be a good starting-point for comparison of T/TCP with classic TCP for
+transaction workloads.  It will also look (can look) much like the
+communication pattern of http for www access.  See also, however, the
+.IB * _CRR
+tests above.
+.PP
+There is one significant difference between the way that the
+.IB * _TRR
+tests and the
+.IB * _CRR
+tests are implemented.  On POSIX/BSD Sockets interface, the
+.BR sendto (2)
+call is used instead of
+.BR connect (2)
+and
+.BR send (2).
+Under the STREAMS XTI API, data is sent with the
+.BR t_connect (3)
+call and also with the
+.BR t_accept (3)
+call rather than separate data transmissions.
+.PP
+This means that the connection is established coincident with the sending of
+data.  Implementations of T/TCP might be able to take advantage of this.
+Also, the Linux implementation of TCP might also be able to take advantage of
+this.  One system call is avoided and the calling process will block in a wait
+queue awaiting establishment of the connection and will be able to transfer
+data immediately once the connection is established.
+.PP
+For SCTP there might be some more significant differences.  Unlike T/TCP and
+TCP, SCTP is able to transfer the request data with the COOKIE-ECHO and
+receive the response data with the COOKIE-ACK, reducing two message exchanges.
+When best implemented, SCTP should perform better in the
+.IB * _TRR
+tests than it does in the
+.IB * _CRR
+tests.
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B CC \fR\- Connect, Close
+.RS
+.PP
+These tests are only applicable to connection-oriented protocols.
+.PP
+This test is intended to test the performance of establishing a connection,
+and then closing it again.  This test is of somewhat arcane interest since no
+packets are exchanged between the user-space processes, but it will show the
+raw overhead of establishing an SCTP association.  That service demand could
+them be compared with the sum of the service demands of a
+.I SCTP_CRR
+and
+.I SCTP_RR
+test and presumably there would be a discernable relationship between the
+tests.
+.RE
+
+.\" =========================================================================
+.SS CPU Synchronization Tests
+.\" -------------------------------------------------------------------------
+.TP
+.B LOC_CPU \fR\- Local CPU
+.\" -------------------------------------------------------------------------
+.TP
+.B REM_CPU \fR\- Remote CPU
+
+
+.\" =========================================================================
+.\" =========================================================================
+.SH OPTIONS
+.PP
+.\" =========================================================================
+.SS COMMAND OPTIONS
+.PP
+.\" -------------------------------------------------------------------------
+.TP
+[\ \fB-t\fR\ \fITESTNAME\fR\ ]
+Specify the test to perform.
+Valid testnames are (but not always compiled-in):
+.RS
+.PP
+.BR XTI_SCTP_STREAM ", "
+.BR XTI_SCTP_MAERTS ", "
+.BR XTI_SCTP_RR ", "
+.BR XTI_SCTP_CRR ", "
+.BR XTI_SCTP_TRR ", "
+.BR XTI_TCP_STREAM ", "
+.BR XTI_TCP_MAERTS ", "
+.BR XTI_TCP_RR ", "
+.BR XTI_TCP_CRR ", "
+.BR XTI_TCP_TRR ", "
+.BR XTI_UDP_STREAM ", "
+.BR XTI_UDP_RR ", "
+.BR SCTP_STREAM ", "
+.BR SCTP_MAERTS ", "
+.BR SCTP_RR ", "
+.BR SCTP_CRR ", "
+.BR SCTP_TRR ", "
+.BR TCP_STREAM ", "
+.BR TCP_MAERTS ", "
+.BR TCP_RR ", "
+.BR TCP_CRR ", "
+.BR TCP_TRR ", "
+.BR UDP_STREAM ", "
+.BR UDP_RR ", "
+.BR SCTPIPV6_STREAM ", "
+.BR SCTPIPV6_RR
+.BR SCTPIPV6_CRR ", "
+.BR SCTPIPV6_TRR ", "
+.BR TCPIPV6_STREAM ", "
+.BR TCPIPV6_RR ", "
+.BR TCPIPV6_CRR ", "
+.BR TCPIPV6_TRR ", "
+.BR UDPIPV6_STREAM ", "
+.BR UDPIPV6_RR ", "
+.BR DLCO_STREAM ", "
+.BR DLCO_RR ", "
+.BR DLCL_STREAM ", "
+.BR DLCL_RR ", "
+.BR STREAM_STREAM ", "
+.BR STREAM_RR ", "
+.BR DG_STREAM ", "
+.BR DG_RR ", "
+.BR LOC_CPU ", "
+.BR REM_CPU .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-h\fR
+Display a usage string, and exit.
+
+.\" =========================================================================
+.SS GLOBAL TEST OPTIONS
+.PP
+Global test options are specified on the command line before the first
+double-dash (`--').
+Not all global test options are applicable to all tests.
+The global test options are as follows:
+
+.\" -------------------------------------------------------------------------
+.TP
+\fB-a\fR\ [\fILOC-SND-ALIGN\fR][\fB,\fR][\fILOC-RCV-ALIGN\fR]
 Alter the send and receive buffer alignments on the local system.
+At least one of
+.I LOC-SND-ALIGN
+or
+.I REM-SND-ALIGN
+must be specified.
+If there is no comma (`,') in the option argument, the specified value applies
+to both the send and receive.
 This defaults to 8 bytes.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-A sizespec
+\fB-A\fR\ [\fIREM-SND-ALIGN\fR][\fB,\fR][\fIREM-RCV-ALIGN\fR]
 As -a, but for the remote system.
+At least one of
+.I LOC-SND-ALIGN
+or
+.I REM-SND-ALIGN
+must be specified.
+If there is no comma (`,') in the option argument, the specified value applies
+to both the send and receive.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-c [rate]
+\fB-c\fR\ [\fILOC-RATE\fR]
 Request CPU utilization and service demand calculations for the
 local system. If the optional rate parameter is specified,
 .B netperf
 will use that instead of calculating the rate itself.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-C [rate]
+\fB-C\fR\ [\fIREM-RATE\fR]
 As -c, but for the remote system.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-d
+\fB-d\fR
 Increase the quantity of debugging output displayed during
 a test (possibly at the expense of performance).
+.\" -------------------------------------------------------------------------
 .TP
-.B \-f GMKgmk
+\fB-f\fR\ {\ \fBG\fR\ |\ \fBM\fR\ |\ \fBK\fR\ |\ \fBg\fR\ |\ \fBm\fR\ |\ \fBk\fR\ }
 Change the units of measure for *_STREAM tests. Capital letters are
 powers of two, lowercase are powers of ten.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-F fill_file
+\fB-F\fR\ \fIFILL-FILE\fR
 Pre-fill the send buffers with data from the named file. This is
 intended to provide a means for avoiding buffers that are filled with
 data which is trivially easy to compress. A good choice for a file
 that should be present on any system is this manpage - netperf.man.
 Other files may be provided as part of the distribution.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-h
-Display a usage string, and exit.
-.TP
-.B \-H remote_host
+\fB-H\fR\ \fIREMOTE-HOST\fR
 Set the hostname (or IP address) of the remote system.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-i max,min
+\fB-i\fR\ \fIMAX\fB,\fIMIN\fR
 Set the maximum and minimum number of iterations when trying to reach
 certain confidence levels.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-I lvl,[,intvl]
+\fB-I\fR\ \fILEVEL\fR[\fB,\fIWIDTH\fR]
 Specify the confidence level (either 95 or 99 - 99 is the default) and
 the width of the confidence interval as a percentage (default 10)
+.\" -------------------------------------------------------------------------
 .TP
-.B \-l testlen
+\fB-l\fR\ \fITESTLEN\fR
 Specify the length of the test (default 10 seconds).
 A negative value sets the number of request/response transactions,
 or the number of bytes for a stream test.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-n numcpus
+\fB-n\fR\ \fINUM-CPUS\fR
 Specify the number of CPU's in the system on those systems for which
 netperf has no way to find the number of CPU's programatically. 
+.\" -------------------------------------------------------------------------
 .TP
-.B \-o sizespec
+\fB-o\fR\ [\fILOC-SND-OFFSET\fR][\fB,\fR][\fILOC-RCV-OFFSET\fR]
 Set an offset from the alignment specified with -a.
+At least one of
+.I LOC-SND-OFFSET
+or
+.I REM-SND-OFFSET
+must be specified.
+If there is no comma (`,') in the option argument, the specified offset
+applies to both the local and remote system.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-O sizespec
+\fB-O\fR\ [\fIREM-SND-OFFSET\fR][\fB,\fR][\fIREM-RCV-OFFSET\fR]
 As -o, but for the remote system.
+At least one of
+.I LOC-RCV-OFFSET
+or
+.I REM-RCV-OFFSET
+must be specified.
+If there is no comma (`,') in the option argument, the specified offset
+applies to both the local and remote system.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-p portnum
+\fB-p\fR\ \fIPORTNUM\fR
 Connect to a
 .C netsetver
 listening on the specified port, rather than using /etc/services.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-P 0|1
+\fB-P\fR\ {\ \fB0\fR\ |\ \fB1\fR\ }
 Show (1) or suppress (0) the test banner.
+.\" -------------------------------------------------------------------------
 .TP
-.B \-t testname
-Specify the test to perform.
-Valid testnames are (but not always compiled-in):
-.RS
-.RS
-.nf
-.I XTI_SCTP_STREAM
-.I XTI_SCTP_MAERTS
-.I XTI_SCTP_RR
-.I XTI_SCTP_CRR
-.I XTI_SCTP_TRR
-.I XTI_TCP_STREAM
-.I XTI_TCP_MAERTS
-.I XTI_TCP_RR
-.I XTI_TCP_CRR
-.I XTI_TCP_TRR
-.I XTI_UDP_STREAM
-.I XTI_UDP_RR
-.I SCTP_STREAM
-.I SCTP_MAERTS
-.I SCTP_RR
-.I SCTP_CRR
-.I SCTP_TRR
-.I TCP_STREAM
-.I TCP_MAERTS
-.I TCP_RR
-.I TCP_CRR
-.I TCP_TRR
-.I UDP_STREAM
-.I UDP_RR
-.I SCTPIPV6_STREAM
-.I SCTPIPV6_RR
-.I SCTPIPV6_CRR
-.I SCTPIPV6_TRR
-.I TCPIPV6_STREAM
-.I TCPIPV6_RR
-.I TCPIPV6_CRR
-.I TCPIPV6_TRR
-.I UDPIPV6_STREAM
-.I UDPIPV6_RR
-.I DLCO_STREAM
-.I DLCO_RR
-.I DLCL_STREAM
-.I DLCL_RR
-.I STREAM_STREAM
-.I STREAM_RR
-.I DG_STREAM
-.I DG_RR
-.I LOC_CPU
-.I REM_CPU
-.fi
-.RE
-.RE
-.TP
+\fB-v\fR\ \fIVERBOSITY\fR
 .B \-v verbosity
 Set the verbosity level for the test (only with -P).
+.\" -------------------------------------------------------------------------
 .TP
 .B \-V
 Enable the copy-avoidance features (HP-UX 9.0 and later only).
 
 .SS TEST SPECIFIC OPTIONS
 
+.\" -------------------------------------------------------------------------
 .TP
 .B \-h
 Display a usage string based on the test name set with -t, and exit.
@@ -217,6 +709,1045 @@ Please consult the netperf manual
 Netperf: A Network Performance Benchmark 
 (netperf.ps) for more information. Or you can join and mail to 
 netperf-talk@netperf.org.
+
+.\" =========================================================================
+.SS SOCKETS OPTIONS
+.PP
+These tests include
+.I *
+tests as follows:
+.BI SCTP_ *\fR,
+.BI TCP_ *\fR,
+.BI UDP_ *\fR.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-t\fR\ \fISOCKET-TEST\fR
+Tests available for the POSIX/BSD Sockets Interface consist of the following:
+.BR SCTP_STREAM ,
+.BR SCTP_MAERTS ,
+.BR SCTP_SENDFILE ,
+.BR SCTP_RR ,
+.BR SCTP_NBRR ,
+.BR SCTP_CRR ,
+.BR SCTP_TRR ,
+.BR SCTP_CC ,
+.BR TCP_STREAM ,
+.BR TCP_MAERTS ,
+.BR TCP_SENDFILE ,
+.BR TCP_RR ,
+.BR TCP_NBRR ,
+.BR TCP_CRR ,
+.BR TCP_TRR ,
+.BR TCP_CC ,
+.BR UDP_STREAM ,
+.\".BR UDP_MAERTS ,
+.\".BR UDP_SENDFILE ,
+.BR UDP_RR .
+.\".BR UDP_NBRR ,
+These tests use the BSD/POSIX Sockets API.
+.\" -------------------------------------------------------------------------
+.PP
+Sockets test specific options are specified on the command line following the
+first double-dash (`--').  Not all sockets options are applicable to all
+tests.
+The BSD/POSIX Sockets API test specific options and arguments are as follows:
+.\" -------------------------------------------------------------------------
+.TP
+.B -h
+Prints a usage statement for the specified (or default) test and exits.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -b " BURST-SIZE"
+specifies the initial request burst size.
+.\" -------------------------------------------------------------------------
+.TP
+.B -C
+use option
+.IR TCP_CORK ", " SCTP_CORK ", " T_TCP_CORK " or " T_SCTP_CORK
+to cork the socket or stream when preparing to send for the
+.IB * _SENDFILE
+tests.
+.\" -------------------------------------------------------------------------
+.TP
+.B -D
+use option
+.IR TCP_NODELAY " or " SCTP_NODELAY
+to suppress the Nagle algorithm with (or without) Minshall modifications.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -I " \fR[\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]
+Specify the IP address of the local
+.RI ( LOC-IP-ADDR )
+or remote
+.RI ( REM-IP-ADDR )
+host.  This address is used in a request to
+.BR bind (2)
+or
+.BR t_bind (3)
+on the local or remote machine before the connection is established.
+At least one of
+.I LOC-IP-ADDR
+or
+.I REM-IP-ADDR
+must be specified.
+If no comma (`,') is specified  in the option argument, then the IP address
+applies to both the local and remote IP address.
+The default is
+.B INADDR_ANY
+for both the local and remote addresses.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -m " LOC-MSG-SIZE"
+Specifies the amount of data sent in an individual
+.BR send (2)
+operation.  This also affects the data sent with a
+.BR sendto (2)
+call in the request response tests.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -M " REM-MSG-SIZE"
+Specifies the amount of data received in an individual
+.BR recv (2)
+call.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -p " \fR[\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
+Specify the minimum and maximum port numbers used for the
+.IB * _CRR
+and
+.IB * _TRR
+tests.
+At least one of
+.I MIN-PORTNUM
+or
+.I MAX-PORTNUM
+must be specified.
+If there is no comma (`,') in the option argument, then the specified port
+number applies to both the minimum and maximum.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -P " \fR[\fILOC-PORTNUM\fR][\fB,\fR][\fIREM-PORTNUM\fR]
+Specify the local
+.RI ( LOC-PORTNUM )
+and remote
+.RI ( REM-PORTNUM )
+data port number for the tests to allow them to
+run through port proxies.
+At least one of
+.I LOC-PORTNUM
+or
+.I REM-PORTNUM
+must be specified.  If no comma (`,') is specified in the option argument,
+then the port number specified applies to both the local and remote port.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -r " \fR[\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+Specifies the local
+.RI ( LOC-RR-SIZE )
+or remote
+.RI ( REM-RR-SIZE )
+request/response size.
+At least one of
+.I LOC-RR-SIZE
+or
+.I REM-RR-SIZE
+must be specified.
+If there is no comma (`,') in the option argument, then the specified size
+applies to both the local and remote request/response size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -s " \fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.
+One of
+.I LOC-SNDBUF
+and
+.I LOC-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the local send buffer size as well as the local
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -S " \fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+Sets the remote send
+.RI ( REM-SNDBUF )
+and receive
+.RI ( REM-RCVBUF )
+buffer sizes.
+One of
+.I REM-SNDBUF
+and
+.I REM-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the remote send buffer size as well as the remote
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -V
+Specify send and receive copy avoidance.  This sets the socket options
+.B SO_SND_COPYAVOID
+and
+.B SO_RCV_COPYAVOID
+on the socket if these options are available available locally and will
+attempt to set them remotely.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -w " RCV-WIDTH"
+Ignored.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -W " SND-WIDTH"
+Sets the
+.I SND-WIDTH
+of the user space data buffer.  This will be the number of send sized buffers
+allocated in the
+.IB * _STREAM
+and
+.IB * _MAERTS
+tests.  It may be enhanced to set both send and receive widths, but for now it
+is just the sending socket or stream in the
+.IB * _STREAM
+and
+.IB * _MAERTS
+tests.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -z
+Ignored.
+
+.\" =========================================================================
+.SS XTI OPTIONS
+.PP
+These tests include
+.BI XTI_ *
+tests as follows:
+.BI XTI_SCTP_ *\fR,
+.BI XTI_TCP_ *\fR,
+.BI XTI_UDP_ *\fR.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-t\fR\ \fIXTI-TEST\fR
+Tests available for the X/Open Transport Interface (XTI/TLI) consist of the
+following:
+.BR XTI_SCTP_STREAM ,
+.BR XTI_SCTP_RR ,
+.BR XTI_TCP_STREAM ,
+.BR XTI_TCP_RR ,
+.BR XTI_UDP_STREAM ,
+.BR XTI_UDP_RR .
+These tests use the X/Open Transport Interface (XTI/TLI) API.
+.\" -------------------------------------------------------------------------
+.PP
+XTI test specific optoins are specified on the command line following the
+first double-dash (`--').  Not all XTI options are applicable to all tests.
+The STREAMS XTI API test specific options and arguments are as follows:
+.\" -------------------------------------------------------------------------
+.TP
+.BI -h
+Prints a usage statement for the specified test and exits.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -D
+use option
+.IR T_TCP_NODELAY " or " T_SCTP_NODELAY
+to suppress the Nagle algorithm with (or without) Minshall modifications.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -m " LOC-MSG-SIZE
+Specifies the amount of data sent in an individual
+.BR t_send (2)
+operation.  This also affects the data sent with a
+.BR t_connect (3)
+or
+.BR t_accept (3)
+call in the request response tests.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -M " REM-MSG-SIZE
+Specifies the amount of data received in an individual
+.BR t_rcv (3),
+.BR t_listen (3),
+.BR t_connect (3)
+or
+.BR t_rcvconnect(3)
+call.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -r " \fR[\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+Specifies the local
+.RI ( LOC-RR-SIZE )
+or remote
+.RI ( REM-RR-SIZE )
+request/response size.
+At least one of
+.I LOC-RR-SIZE
+or
+.I REM-RR-SIZE
+must be specified.
+If there is no comma (`,') in the option argument, then the specified size
+applies to both the local and remote request/response size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -s " \fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.
+One of
+.I LOC-SNDBUF
+and
+.I LOC-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the local send buffer size as well as the local
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -S " \fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+Sets the remote send
+.RI ( REM-SNDBUF )
+and receive
+.RI ( REM-RCVBUF )
+buffer sizes.
+One of
+.I REM-SNDBUF
+and
+.I REM-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the remote send buffer size as well as the remote
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -V
+Ignored.
+Specify send and receive copy avoidance.  This feature is not implemented for
+.BI XTI_ *
+tests.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -w " RCV-WIDTH
+Ignored.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -W " SND-WIDTH
+Sets the
+.I SND-WIDTH
+of the user space data buffer.  This will be the number of send sized buffers
+allocated in the
+.IB * _STREAM
+and
+.IB * _MAERTS
+tests.  It may be enhanced to set both send and receive widths, but for now it
+is just the sending socket or stream in the
+.IB * _STREAM
+and
+.IB * _MAERTS
+tests.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -X " \fR[\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]
+Specifies the local
+.RI ( LOC-DEVICE )
+or remote
+.RI ( REM-DEVICE )
+device character special file of the appropriate type to open
+with
+.BR t_open (3).
+At least one of
+.I LOC-DEVICE
+or
+.I REM-DEVICE
+must be specified.
+If there is no comma (`,') in the option argument, the specified device
+character special file applies to both the local and remote device file.
+The default device files are dependent upon the protocol tested and default as
+follows:
+
+.TS
+tab(:);
+l|l
+lb|li.
+Protocol:File
+_
+SCTP:/dev/sctp
+TCP:/dev/tcp
+UDP:/dev/udp
+FORE:/dev/atm
+DLPI:/dev/dlpi
+TICOTSORD:/dev/ticotsord
+TICOTS:/dev/ticots
+TICLTS:/dev/ticlts
+.TE
+
+.\" =========================================================================
+.SS IPV6 OPTIONS
+.PP
+These tests include
+.IB * IPV6_ *
+tests as follows:
+.BI SCTPIPV6_ *\fR,
+.BI TCPIPV6_ *\fR,
+.BI UDPIPV6_ *\fR.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-t\fR\ \fIIPV6-TEST\fR
+Tests available for the POSIX/BSD IPV6 Sockets Interface consist of the following:
+.BR SCTPIPV6_STREAM ", "
+.BR SCTPIPV6_RR
+.BR SCTPIPV6_CRR ", "
+.BR SCTPIPV6_TRR ", "
+.BR TCPIPV6_STREAM ", "
+.BR TCPIPV6_RR ", "
+.BR TCPIPV6_CRR ", "
+.BR TCPIPV6_TRR ", "
+.BR UDPIPV6_STREAM ", "
+.BR UDPIPV6_RR .
+These tests use the BSD/POSIX IPv6 Sockets API.
+.\" -------------------------------------------------------------------------
+.PP
+IPv6 test specific options are specified on the command line following the
+first double-dash (`--').  Not all IPv6 options are applicable to all
+tests.
+The BSD/POSIX IPv6 Sockets API test specific options and arguments are as follows:
+.\" -------------------------------------------------------------------------
+.TP
+\fB-h\fR
+Prints a usage statement for the specified test and exits.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-H\fR\ \fIHOSTNAME\fR
+Specify the remote
+.IR HOSTNAME ;
+this is separate from the global test option that controls the hostname for the
+control connection.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-D\fR
+Use option
+.I TCP_NODELAY
+or
+.I SCTP_NODELAY
+to suppress the Nagle algorithm with (or without) Minshal modifications.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-m\fR\ \fILOC-MSG-SIZE\fR
+Specifies the amount of data sent in an individual
+.BR send (2)
+operation.  This also affects the data sent with a
+.BR sendto (2)
+call in the request response tests.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-M\fR\ \fIREM-MSG-SIZE\fR
+Specifies the amount of data received in an individual
+.BR recv (2)
+call.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
+Specify the minimum and maximum port numbers used for the
+.IB * _CRR
+and
+.IB * _TRR
+tests.
+At least one of
+.I MIN-PORTNUM
+or
+.I MAX-PORTNUM
+must be specified.
+If there is no comma (`,') in the option argument, then the specified port
+number applies to both the minimum and maximum.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.
+One of
+.I LOC-SNDBUF
+and
+.I LOC-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the local send buffer size as well as the local
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.
+One of
+.I LOC-SNDBUF
+and
+.I LOC-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the local send buffer size as well as the local
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+Sets the remote send
+.RI ( REM-SNDBUF )
+and receive
+.RI ( REM-RCVBUF )
+buffer sizes.
+One of
+.I REM-SNDBUF
+and
+.I REM-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the remote send buffer size as well as the remote
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-V\fR
+Specify send and receive copy avoidance.  This sets the socket options
+.B SO_SND_COPYAVOID
+and
+.B SO_RCV_COPYAVOID
+on the socket if these options are available available locally and will
+attempt to set them remotely.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-w\fR\ \fIRCV-WIDTH\fR
+Ignored.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-W\fR\ \fISND-WIDTH\fR
+Sets the
+.I SND-WIDTH
+of the user space data buffer.  This will be the number of send sized buffers
+allocated in the
+.IB * _STREAM
+and
+.IB * _MAERTS
+tests.  It may be enhanced to set both send and receive widths, but for now it
+is just the sending socket or stream in the
+.IB * _STREAM
+and
+.IB * _MAERTS
+tests.
+
+.\" =========================================================================
+.SS UNIX OPTIONS
+.PP
+These tests include
+.I *
+tests as follows:
+.BI STREAM_ *\fR,
+.BI DG_ *\fR,
+.BI LWPSTR_ *\fR,
+.BI LWPDG_ *\fR.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-t\fR\ \fIUNIX-TEST\fR
+Tests available for the POSIX/BSD Unix Domain Sockets Interface consist of the following:
+.BR STREAM_STREAM ,
+.BR STREAM_RR ,
+.BR DG_STREAM ,
+.BR DG_RR ,
+.BR LWPSTR_STREAM ,
+.BR LWPSTR_RR ,
+.BR LWPDG_STREAM ,
+.BR LWPDG_RR .
+These tests use the BSD/POSIX Unix Domain Sockets API.
+.\" -------------------------------------------------------------------------
+.PP
+Unix test specific options are specified on the command line following the
+first double-dash (`--').  Not all Unix options are applicable to all
+tests.
+The BSD/POSIX Unix Domain Sockets API test specific options and arguments are as follows:
+.\" -------------------------------------------------------------------------
+.TP
+\fB-h\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-m\fR\ \fILOC-MSG-SIZE\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-M\fR\ \fIREM-MSG-SIZE\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-p\fR\ \fIPATH\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+.\" -------------------------------------------------------------------------
+.TP
+\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+.\" -------------------------------------------------------------------------
+.TP
+\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+
+
+.\" =========================================================================
+.SS DLPI OPTIONS
+.PP
+These tests include
+.BI DLC ? _ *
+tests as follows:
+.BI DLCO_ *\fR,
+.BI DLCL_ *\fR.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-t\fR\ \fIDLPI-TEST\fR
+Tests available for the DLPI Interface consist of the following:
+.BR DLCO_STREAM ,
+.BR DLCO_RR ,
+.BR DLCL_STREAM ,
+.BR DLCL_RR .
+These tests use the DLPI API.
+.\" -------------------------------------------------------------------------
+.PP
+DLPI test specific options are specified on the command line following the
+first double-dash (`--').  Not all DLPI options are applicable to all tests.
+The DLPI API test specific options are as follows:
+.\" -------------------------------------------------------------------------
+.TP
+\fB-h\fR
+Prints a usage statement for the specified test and exits.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-D\fR\ [\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]
+Specifies the local
+.RI ( LOC-DEVICE )
+or remote
+.RI ( REM-DEVICE )
+device character special file of the appropriate type to open
+with
+.BR open (2).
+At least one of
+.I LOC-DEVICE
+or
+.I REM-DEVICE
+must be specified.
+If there is no comma (`,') in the option argument, the specified device
+character special file applies to both the local and remote device file.
+The default device files are dependent upon the protocol tested and default as
+follows:
+
+.TS
+tab(:);
+l|l
+lb|li.
+Protocol:File
+_
+DLPI-CO:/dev/dlpi_co
+DLPI-CL:/dev/dlpi_cl
+.TE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-m\fR\ \fILOC-MSG-SIZE\fR
+Specifies the amount of data sent in an individual
+.BR send (2)
+operation.  This also affects the data sent with a
+.BR sendto (2)
+call in the request response tests.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-M\fR\ \fIREM-MSG-SIZE\fR
+Specifies the amount of data received in an individual
+.BR recv (2)
+call.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-p\fR\ [\fILOC-PPA\fR][\fB,\fR][\fIREM-PPA\fR]
+.\" -------------------------------------------------------------------------
+.TP
+\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.
+One of
+.I LOC-SNDBUF
+and
+.I LOC-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the local send buffer size as well as the local
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-s\fR\ \fISAP\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-w\fR\ [\fILOC-SND-WINDOW\fR][\fB,\fR][\fILOC-RCV-WINDOW\fR]
+.\" -------------------------------------------------------------------------
+.TP
+\fB-W\fR\ [\fIREM-SND-WINDOW\fR][\fB,\fR][\fIREM-RCV-WINDOW\fR]
+
+.\" =========================================================================
+.SS ATM OPTIONS
+.PP
+.BI FORE_ *
+
+.\" =========================================================================
+.SS HIPPI OPTIONS
+.PP
+.BI HIPPI_ *
+
+.\" =========================================================================
+.SS DNS OPTIONS
+.PP
+.BI DNS_ *
+.\" -------------------------------------------------------------------------
+.TP
+\fB-h\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-f\fR\ \fIFILENAME\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fB-H\fR\ \fIHOSTNAME\fR
+
+.\" =========================================================================
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_STREAM\fR \- \fIUnidirectional Stream Tests\fR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_MAERTS\fR \- \fIUnidirectional Stream Tests\fR
+.\" =========================================================================
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_RR\fR \- \fIRequest, Response Tests\fR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_NBRR\fR \- \fINon-Blocking Request, Response Test\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_CRR\fR \- \fIConnect, Request, Response Tests\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_TRR\fR \- \fITransaction, Request, Response Tests\fR
+.\" -------------------------------------------------------------------------
+.TP
+\fI*\fB_CC\fR \- \fIConnect, Close Tests\fR
+
+.SS SOCKETS API TESTS
+.PP
+The following tests utilize the X/Open XNS 5.2, SuSv2, SuSv3, POSIX 1003
+Sockets interface to SCTP, TCP and UDP.
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_STREAM \- SCTP Unidirectional Stream Test
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_MAERTS
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_SENDFILE \- SCTP Sendfile Test
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_RR \- SCTP Request/Response Test
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_CRR \- SCTP Connect/Request/Response Test
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_CC \- SCTP Connect/Close Test
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_TRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTP_NBRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_MAERTS
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_SENDFILE
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_CRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_CC
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_TRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCP_NBRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B UDP_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B UDP_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B STREAM_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B STREAM_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B DG_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B DG_RR
+.RS
+.RE
+
+.SS LWP TESTS
+.PP
+.\" -------------------------------------------------------------------------
+.TP
+.B LWPSTR_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B LWPSTR_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B LWPDG_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B LWPDG_RR
+.RS
+.RE
+
+.SS IPV6 SOCKETS API TESTS
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTPIPV6_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTPIPV6_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B SCTPIPV6_CRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCPIPV6_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCPIPV6_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B TCPIPV6_CRR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B UDPIPV6_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B UDPIPV6_RR
+.RS
+.RE
+
+.SS XTI API TESTS
+.PP
+The following tests utilize the X/Open XNS 5.2 XTI/TLI interface to SCTP, TCP
+and UDP.
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_SCTP_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_SCTP_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_TCP_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_TCP_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_UDP_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_UDP_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_CO_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_CO_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_CL_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B XTI_CL_RR
+.RS
+.RE
+
+.SS DLPI TESTS
+.PP
+.\" -------------------------------------------------------------------------
+.TP
+.B DLCO_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B DLCO_RR
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B DLCL_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B DLCL_RR
+.RS
+.RE
+
+.SS CPU TESTS
+.\" -------------------------------------------------------------------------
+.TP
+.B LOC_CPU
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B REM_CPU
+.RS
+.RE
+
+.SS FORE TESTS
+.PP
+.\" -------------------------------------------------------------------------
+.TP
+.B FORE_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B FORE_RR
+.RS
+.RE
+
+.SS HIPPI TESTS
+.PP
+.\" -------------------------------------------------------------------------
+.TP
+.B HIPPI_STREAM
+.RS
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+.B HIPPI_RR
+.RS
+.RE
+
+.SS DNS TESTS
+.PP
+.\" -------------------------------------------------------------------------
+.TP
+.B DNS_RR
+.RS
+.RE
+
 
 .SH BUGS 
 There is a fairly large list of known defects and misfeatures in the
