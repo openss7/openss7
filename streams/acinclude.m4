@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/03/17 14:28:06 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/03/18 07:56:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 14:28:06 $ by $Author: brian $
+# Last Modified $Date: 2005/03/18 07:56:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -809,6 +809,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #endif
 #if HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
 #endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #include <linux/ioport.h>	/* for check_region */

@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/03/14 01:15:53 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/18 07:55:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/14 01:15:53 $ by $Author: brian $
+## Last Modified $Date: 2005/03/18 07:55:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -281,7 +281,7 @@ release: $(RELEASE)
 
 release-sign: $(RELEASE_SIGN)
 
-ALL_RECURSIVE_TARGETS += all-release all-release-sign
+ALL_RECURSIVE_TARGETS += all-release all-release-sign all-release-clean
 
 ##
 # Some logging targets for the head makefile targets.
