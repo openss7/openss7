@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2005/01/29 11:22:39 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2005/02/02 10:43:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/29 11:22:39 $ by $Author: brian $
+# Last Modified $Date: 2005/02/02 10:43:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,7 +61,6 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %global fullrelease @PACKAGE_RELEASE@%{extrarelease}
 %global _builddir %{_builddir}/%{extrarelease}
-%global mybuilddir %{_tmppath}/%{extrarelease}/%{_target_platform}-build/%{name}
 
 # a macro to build require one package of the same version as another
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
@@ -180,14 +179,7 @@ fi
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
 
-# in case they were not cleaned
-[ -n "%{mybuilddir}" -a "%{mybuilddir}" != / ] && rm -rf %{mybuilddir}
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
-
-mkdir -p %{mybuilddir}
-cd %{mybuilddir}
-
-%{_builddir}/%{buildsubdir}/configure \
+./configure \
     CC="${CC}" \
     CFLAGS="${CFLAGS:-$preferred_cflags}" \
     LDFLAGS="${LDFLAGS}" \
@@ -234,16 +226,19 @@ make check
 %install
 # ---------------------------------------------------------------------------
 
+# in case it was not cleaned
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+
 %if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
 # we are going to create debug packages, so we need to install unstripped binaries.
-make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
 %else
 # use libtoolized install-strip to strip binaries, modules, shared and static libraries.
-make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 %endif
 
 # copy out our devices list
-#cp -pf %{mybuilddir}/%{makedev} .
+# cp -pf %{mybuilddir}/%{makedev} .
 
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
@@ -270,6 +265,9 @@ make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.13  2005/02/02 10:43:01  brian
+# - Build in builddir again.
+#
 # Revision 1.1.2.12  2005/01/29 11:22:39  brian
 # - Have master build working well.
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/29 11:23:05 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/02 10:44:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/29 11:23:05 $ by $Author: brian $
+# Last Modified $Date: 2005/02/02 10:44:49 $ by $Author: brian $
 #
 # =============================================================================
 
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.9 2005/01/29 11:23:05 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.10 2005/02/02 10:44:49 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7], [0.9.2], [bugs@openss7.org], [openss7])
 
@@ -103,7 +103,7 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-#AM_GNU_GETTEXT_VERSION(0.14.1)
+dnl AM_GNU_GETTEXT_VERSION(0.14.1)
 
 dnl
 dnl Checks for libraries.
@@ -149,7 +149,7 @@ AC_CHECK_TYPES([ptrdiff_t])
 dnl
 dnl Checks for library functions.
 dnl
-AM_GNU_GETTEXT
+dnl AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL

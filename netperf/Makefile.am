@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2005/01/29 11:23:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2005/02/02 10:54:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/29 11:23:37 $ by $Author: brian $
+# Last Modified $Date: 2005/02/02 10:54:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -193,6 +193,8 @@ EXTRA_info_TEXINFOS		= \
 
 netperf_hp.ps:
 	cp -f $(srcdir)/netperf.ps $@
+
+CLEANFILES += netperf_hp.ps
 
 EXTRA_DIST			+= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes netperf_hp.ps
 

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.10 2005/01/14 06:38:47 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.11 2005/02/02 10:49:40 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/02 10:49:40 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -133,7 +133,7 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
     STRCONF_MODCONF="${strconf_cv_modconf:-head/modconf.inc}"
     AC_MSG_RESULT([${STRCONF_MODCONF}])
     AC_MSG_CHECKING([for strconf modules makefile include file name])
-    STRCONF_DRVCONF="${strconf_cv_drvconf:-drvrconf.mk}"
+    STRCONF_DRVCONF="${strconf_cv_drvconf:-drvconf.mk}"
     AC_MSG_RESULT([${STRCONF_DRVCONF}])
     AC_MSG_CHECKING([for strconf kernel modules configuration file name])
     STRCONF_CONFMOD="${strconf_cv_confmod:-conf.modules}"
