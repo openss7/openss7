@@ -1,11 +1,11 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: capi_ioctl.4.man,v 0.9.2.3 2005/01/25 22:37:51 brian Exp $
+.\" @(#) $Id: capi_ioctl.4.man,v 0.9.2.4 2005/01/26 07:57:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/25 22:37:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/26 07:57:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so openss7.macros
+.so strss7.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database openss7.refs
+database strss7.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CAPI-IOCTL 4 "$Date: 2005/01/25 22:37:51 $" "$Name:  $" "OpenSS7 ISDN Device IO Controls"
+.TH CAPI-IOCTL 4 "$Date: 2005/01/26 07:57:42 $" "$Name:  $" "OpenSS7 ISDN Device IO Controls"
 .SH NAME
 .B capi_ioctl
 \- COMMON-ISDN-API (CAPI) \- IO Controls

@@ -2,11 +2,11 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: inet.4.man,v 0.9.2.1 2004/05/12 10:14:53 brian Exp $
+.\" @(#) $Id: inet.4.man,v 0.9.2.2 2005/01/26 07:57:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -54,6 +54,6 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/12 10:14:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/26 07:57:43 $ by $Author: brian $
 .\"
 .\" =========================================================================

@@ -1,4 +1,4 @@
-.TH XXXX 8 "$Date: 2004/04/17 21:18:08 $" "$Name:  $" "Under Construction"
+.TH XXXX 8 "$Date: 2005/01/26 07:58:19 $" "$Name:  $" "Under Construction"
 .SH NAME
 .B xxx
 \- incomplete man page
@@ -8,5 +8,5 @@ none
 This manpage is under construction.
 .SH BUGS
 Not done yet.
-.so openss7.macros
+.so strss7.macros
 .TA

@@ -1,11 +1,11 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sndvudata.3.man,v 0.9.2.2 2004/05/12 10:14:52 brian Exp $
+.\" @(#) $Id: t_sndvudata.3.man,v 0.9.2.3 2005/01/26 07:57:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/12 10:14:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/26 07:57:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so openss7.macros
+.so strss7.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database openss7.refs
+database strss7.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SNDVUDATA 3 "$Date: 2004/05/12 10:14:52 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_SNDVUDATA 3 "$Date: 2005/01/26 07:57:37 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME

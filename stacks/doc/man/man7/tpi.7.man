@@ -1,12 +1,12 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi.7.man,v 0.9.2.2 2004/05/12 10:15:04 brian Exp $
+.\" @(#) $Id: tpi.7.man,v 0.9.2.3 2005/01/26 07:58:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
 .\" Copyright (C) 1992  UNIX International Inc.
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -32,14 +32,14 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/05/12 10:15:04 $ by $Author: brian $
+.\" Modified $Date: 2005/01/26 07:58:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so openss7.macros
+.so strss7.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database openss7.refs
+database strss7.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -50,7 +50,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI 7 "$Date: 2004/05/12 10:15:04 $" "$Name:  $" "Linux STREAMS"
+.TH TPI 7 "$Date: 2005/01/26 07:58:15 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B tpi
 \- Transport Provider Interface

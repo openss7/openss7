@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lmi.7.man,v 0.9.2.2 2004/04/17 23:05:34 brian Exp $
+.\" @(#) $Id: lmi.7.man,v 0.9.2.3 2005/01/26 07:58:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,9 +31,12 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:05:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/26 07:58:14 $ by $Author: brian $
 .\"
 .\" $Log: lmi.7.man,v $
+.\" Revision 0.9.2.3  2005/01/26 07:58:14  brian
+.\" - Changed macro names and updated copyright headers.
+.\"
 .\" Revision 0.9.2.2  2004/04/17 23:05:34  brian
 .\" - Updating manual pages.
 .\"
@@ -101,11 +104,11 @@
 .\" Added man pages for streams drivers.
 .\"
 .\" =========================================================================
-.so openss7.macros
+.so strss7.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database openss7.refs
+database strss7.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -116,7 +119,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LMI 7 "$Date: 2004/04/17 23:05:34 $" "SS7 STREAMS Man Page" "Linux STREAMS Programmer's Manual" 
+.TH LMI 7 "$Date: 2005/01/26 07:58:14 $" "SS7 STREAMS Man Page" "Linux STREAMS Programmer's Manual" 
 .SH "NAME"
 lmi \- Signalling System No. 7 - Local Management Interface (LMI)
 .SH "SYNOPSIS"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:12 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 09:16:05 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/25 16:13:12 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/26 09:16:05 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:12 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 09:16:05 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:12 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 09:16:05 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -76,6 +76,11 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <limits.h>
 #include <stdint.h>
 #include <sys/types.h>
+
+/* Its a weird place to get htonl, but on recent GNU headers, asm/byteorder.h no
+   longer contains the htonl stuff. */
+#include <netinet/in.h>
+/* Need this for __constant_htonl and friends */
 #include <asm/byteorder.h>
 
 #ifdef _GNU_SOURCE

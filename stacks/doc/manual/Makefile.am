@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/11/08 06:55:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/26 08:24:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:55:49 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 08:24:18 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-info_TEXINFOS		= openss7.texi libxnet.texi
+info_TEXINFOS		= strss7.texi libxnet.texi
 
 EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \

@@ -2,11 +2,11 @@
 .\" Don't change the line above, it tells man that tbl is needed.
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mtpi.7.man,v 0.9.2.2 2004/04/17 23:05:34 brian Exp $
+.\" @(#) $Id: mtpi.7.man,v 0.9.2.3 2005/01/26 07:58:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corp. <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corp. <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -32,14 +32,14 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/04/17 23:05:34 $ by $Author: brian $
+.\" Modified $Date: 2005/01/26 07:58:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so openss7.macros
+.so strss7.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database openss7.refs
+database strss7.refs
 accumulate
 move-punctuation
 abbreviate A
