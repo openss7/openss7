@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS exports.c 1.12 4/28/03"
+#ident "@(#) LiS exports.c 1.13 5/19/03"
 
 #ifdef MODVERSIONS
 # ifdef LISMODVERS
@@ -89,6 +89,7 @@ extern volatile unsigned long lis_setqsched_cnts[LIS_NR_CPUS] ;
 extern volatile unsigned long lis_setqsched_isr_cnts[LIS_NR_CPUS] ;
 extern lis_atomic_t	lis_strcount ;
 extern long		lis_max_mem ;
+extern int        	lis_seq_cntr ;
 
 
 
@@ -356,6 +357,7 @@ EXPORT_SYMBOL(lis_sem_alloc);
 EXPORT_SYMBOL(lis_sem_destroy);
 EXPORT_SYMBOL(lis_sem_init);
 EXPORT_SYMBOL(lis_sendfd);
+EXPORT_SYMBOL(lis_seq_cntr);
 EXPORT_SYMBOL(lis_set_file_str);		/* for connld */
 EXPORT_SYMBOL(lis_setq);
 EXPORT_SYMBOL(lis_setqsched);
