@@ -1,0 +1,30 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+r|c
+l|c.
+state:sta_3
+event:idle
+_
+unitdata_req:sta_3
+_
+unitdata_ind:sta_3
+_
+uderror_ind:sta_3
+.TE

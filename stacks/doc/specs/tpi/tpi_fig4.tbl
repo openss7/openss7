@@ -1,0 +1,41 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+center tab(:);
+c|csss
+c|lsss.
+variable:description
+_
+q:T{
+.hy 0
+.ad l
+queue pair pointer of current stream
+T}
+_
+rq:T{
+.hy 0
+.ad l
+queue pair pointer of responding stream as described in the T_CONN_RES primitive
+T}
+_
+outcnt:T{
+.hy 0
+.ad l
+counter for the number of outstanding connection indications not responded to by the transport user
+T}
+.TE

@@ -1,0 +1,76 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center expand tab(:);
+r|c|c|c|c|c|c|c|c|c|c|c|c|c|c
+l|c|c|c|c|c|c|c|c|c|c|c|c|c|c
+l|c|c|c|c|c|c|c|c|c|c|c|c|c|c.
+state:0:3:5:6:7:8:9:10:11:12:13:14:15:16
+event:
+=
+conn_req::5
+_
+conn_res:::::8
+_
+discon_req::::12:13::14:15:16
+_
+data_req:::::::9::11
+_
+exdata_req:::::::9::11
+_
+ordrel_req**:::::::10::3
+_
+conn_ind::7:::7
+_
+conn_con::::9
+_
+data_ind:::::::9:10
+_
+exdata_ind:::::::9:10
+_
+ordrel_ind**:::::::11:3
+_
+discon_ind1::::3:::3:3:3
+_
+discon_ind2:::::3
+::::::[3]
+_
+discon_ind3:::::7
+::::::[3]
+_
+error_ack:::3:::7::::6:7:9:10:11
+_
+ok_ack1:::6:::::::3::3:3:3
+_
+ok_ack2::::::9:::::3
+:::::::[3]:::::[3]
+_
+ok_ack3::::::3:::::3
+:::::::[3]:::::[3]
+:::::::[4]
+_
+ok_ack4::::::7:::::7
+:::::::[3]:::::[3]
+:::::::[4]
+_
+pass_conn:9:9
+_
+.T&
+lssssssssssssss.
+** Only supported if service type T_COTS_ORD.
+.TE

@@ -1,0 +1,203 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+center tab(:);
+c|cs|cs
+l|ls|ls.
+event:description service type
+_
+bind_ack:T{
+.hy 0
+.ad l
+bind acknowledgement
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+optmgmt_ack:T{
+.hy 0
+.ad l
+options mgmt acknowledgement
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+error_ack:T{
+.hy 0
+.ad l
+error acknowledgement
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+ok_ack1:T{
+.hy 0
+.ad l
+ok acknowledgement outcnt == 0
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+ok_ack2:T{
+.hy 0
+.ad l
+ok acknowledgement outcnt == 1, q == rq
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD,
+T}
+_
+ok_ack3:T{
+.hy 0
+.ad l
+ok acknowledgement outcnt == 1, q != rq
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD,
+T}
+_
+ok_ack4:T{
+.hy 0
+.ad l
+ok acknowledgement outcnt > 1
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD,
+T}
+_
+conn_ind:T{
+.hy 0
+.ad l
+connection indication
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+conn_con:T{
+.hy 0
+.ad l
+connection confirmation
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+data_ind:T{
+.hy 0
+.ad l
+data indication
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+exdata_ind:T{
+.hy 0
+.ad l
+expedited data indication
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+ordrel_ind:T{
+.hy 0
+.ad l
+orderly release indication
+T}:T{
+.hy 0
+.ad l
+T_COTS_ORD
+T}
+_
+discon_ind1:T{
+.hy 0
+.ad l
+disconnect indication outcnt == 0
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+discon_ind2:T{
+.hy 0
+.ad l
+disconnect indication outcnt == 1
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+discon_ind3:T{
+.hy 0
+.ad l
+disconnect indication outcnt > 1
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+pass_conn:T{
+.hy 0
+.ad l
+pass connection
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+unitdata_ind:T{
+.hy 0
+.ad l
+unitdata indication
+T}:T{
+.hy 0
+.ad l
+T_CLTS
+T}
+_
+uderror_ind:T{
+.hy 0
+.ad l
+unitdata error indication
+T}:T{
+.hy 0
+.ad l
+T_CLTS
+T}
+.TE

@@ -1,0 +1,193 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+center tab(:);
+csssss
+csssss
+c|c|cs|cs
+l|l|ls|ls.
+Possible States
+
+state:abbreviation:description:service type
+_
+sta_0:unbnd:unbound:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+sta_1:w_ack b_req:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_BIND_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+sta_2:w_ack u_req:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_UNBIND_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+sta_3:idle:T{
+.hy 0
+.ad l
+idle - no connection
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+sta_4:w_ack op_req:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_OPTMGMT_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD, T_CLTS
+T}
+_
+sta_5:w_ack c_req:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_CONN_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_6:w_con c_req:T{
+.hy 0
+.ad l
+awaiting confirmation of T_CONN_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_7:w_res c_ind:T{
+.hy 0
+.ad l
+awaiting response of T_CONN_IND
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_8:w_ack c_res:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_CONN_RES
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_9:data_t:T{
+.hy 0
+.ad l
+data transfer
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_10:w_ind or_rel:T{
+.hy 0
+.ad l
+awaiting T_ORDREL_IND
+T}:T{
+.hy 0
+.ad l
+T_COTS_ORD
+T}
+_
+sta_11:w_req or_rel:T{
+.hy 0
+.ad l
+awaiting T_ORDREL_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS_ORD
+T}
+_
+sta_12:w_ack dreq6:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_DISCON_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_13:w_ack dreq7:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_DISCON_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_14:w_ack dreq9:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_DISCON_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_15:w_ack dreq10:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_DISCON_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+_
+sta_16:w_ack dreq11:T{
+.hy 0
+.ad l
+awaiting acknowledgement of T_DISCON_REQ
+T}:T{
+.hy 0
+.ad l
+T_COTS, T_COTS_ORD
+T}
+.TE

@@ -1,0 +1,86 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+rs|c|c|c|c|c|c|c|c|c|c|c|c
+ls|c|c|c|c|c|c|c|c|c|c|c|c
+nl|c|c|c|c|c|c|c|c|c|c|c|c.
+Object X:1:2:3:4:5:6:7:8:9:10:11:12
+Object Y:
+=
+1:t_addr_req:
+_
+2:t_conn_req::::4
+_
+3:t_conn_res::::3
+_
+4:t_discon_req:
+_
+5:t_data_req::::5:1:2::::::1
+_
+6:t_exdata_req::::5:1:1::::::1
+_
+7:t_bind_req:
+_
+8:t_unbind_req:
+_
+9:t_info_req:
+_
+10:t_unitdata_req::::::::::1
+_
+11:t_optmgmt_req:
+_
+12:t_ordrel_req::::5
+.TE
+
+.TS
+center tab(:);
+nlsss.
+Key
+_
+blank:T{
+.hy 0
+.ad l
+not applicable / queue should be empty
+T}
+1:T{
+.hy 0
+.ad l
+X has no precedence over Y
+T}
+2:T{
+.hy 0
+.ad l
+X has precedence over Y
+T}
+3:T{
+.hy 0
+.ad l
+X has precedence over Y and Y must be removed
+T}
+4:T{
+.hy 0
+.ad l
+X has precedence over Y and both X and Y must be removed
+T}
+5:T{
+.hy 0
+.ad l
+X may have precedence over Y (choice of user) and if X does, then it is the same as 3
+T}
+.TE

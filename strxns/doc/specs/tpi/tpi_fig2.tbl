@@ -1,0 +1,76 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+l|l|l.
+Transport:Stream:ISO 8072 Transport
+Primitives:Message Types:Primitives
+=
+T_CONN_REQ:M_PROTO:T-CONNECT request
+_
+T_CONN_IND:M_PROTO:T-CONNECT indication
+_
+T_CONN_RES:M_PROTO:T-CONNECT response
+_
+T_CONN_CON:M_PROTO:T-CONNECT confirm
+_
+T_DATA_REQ:M_PROTO:T-DATA request
+_
+T_DATA_IND:M_PROTO:T-DATA indication
+_
+T_EXDATA_REQ:M_PROTO:T-EXPEDITED-DATA request
+_
+T_EXDATA_IND:M_PROTO:T-EXPEDITED-DATA indication
+_
+T_DISCON_REQ:M_PROTO:T-DISCONNECT request
+_
+T_DISCON_IND:M_PROTO:T-DISCONNECT indication
+_
+T_UNITDATA_REQ:M_PROTO:T-UNITDATA request
+_
+T_UNITDATA_IND:M_PROTO:T-UNITDATA indication
+_
+T_ORDREL_REQ:M_PROTO:not defined in ISO
+_
+T_ORDREL_IND:M_PROTO:not defined in ISO
+_
+T_BIND_REQ:M_PROTO:not defined in ISO
+_
+T_BIND_ACK:M_PCPROTO:not defined in ISO
+_
+T_UNBIND_REQ:M_PROTO:not defined in ISO
+_
+T_OK_ACK:M_PCPROTO:not defined in ISO
+_
+T_ERROR_ACK:M_PCPROTO:not defined in ISO
+_
+T_INFO_REQ:M_PCPROTO:not defined in ISO
+_
+T_INFO_ACK:M_PCPROTO:not defined in ISO
+_
+T_UDERR_IND:M_PROTO:not defined in ISO
+_
+T_OPTMGMT_REQ:M_PROTO:not defined in ISO
+_
+T_OPTMGMT_ACK:M_PCPROTO:not defined in ISO
+_
+T_ADDR_REQ:M_PROTO:not defined in ISO
+_
+T_ADDR_ACK:M_PCPROTO:not defined in ISO
+.TE

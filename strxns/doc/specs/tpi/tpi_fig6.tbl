@@ -1,0 +1,43 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+center tab(:);
+c|cs|cs
+l|ls|ls.
+event:description:service type
+_
+bind_req:bind request:T_COTS, T_COTS_ORD, T_CLTS
+_
+unbind_req:unbind request:T_COTS, T_COTS_ORD, T_CLTS
+_
+optmgmt_req:options mgmt request:T_COTS, T_COTS_ORD, T_CLTS
+_
+conn_req:connection request:T_COTS, T_COTS_ORD
+_
+conn_res:connection response:T_COTS, T_COTS_ORD
+_
+discon_req:disconnect request:T_COTS, T_COTS_ORD
+_
+data_req:data request:T_COTS, T_COTS_ORD
+_
+exdata_req:expedited data request:T_COTS, T_COTS_ORD
+_
+ordrel_req:orderly release request:T_COTS_ORD
+_
+unitdata_req:unitdata request:T_CLTS
+.TE
