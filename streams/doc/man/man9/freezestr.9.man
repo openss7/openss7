@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.8 2004/04/19 12:03:42 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.9 2004/04/21 17:51:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 12:03:42 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/21 17:51:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FREEZESTR 9 "$Date: 2004/04/19 12:03:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH FREEZESTR 9 "$Date: 2004/04/21 17:51:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -444,7 +444,11 @@ unfreezestr(q);
 .BR strqget (9),
 .BR strqset (9),
 .BR timeout (9),
-.BR unfreezestr (9).
+.BR unfreezestr (9),
+.BR MPSTR_QLOCK (9),
+.BR MPSTR_QRELE (9),
+.BR MPSTR_STPLOCK (9),
+.BR MPSTR_STPRELE (9).
 .\"
 .\"
 .SH BUGS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lbolt.9.man,v 0.9.2.4 2004/04/19 02:58:18 brian Exp $
+.\" @(#) $Id: lbolt.9.man,v 0.9.2.5 2004/04/21 17:51:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:18 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/21 17:51:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LBOLT 9 "$Date: 2004/04/19 02:58:18 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH LBOLT 9 "$Date: 2004/04/21 17:51:11 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -246,7 +246,7 @@ is provided for source level compatibility with
 for the purpose of porting
 .IR "SVR 4.2"
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because internal structures and definitions for
 .B Linux Fast-STREAMS
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_remove_minor_node.9.man,v 0.9.2.3 2004/04/19 02:58:17 brian Exp $
+.\" @(#) $Id: ddi_remove_minor_node.9.man,v 0.9.2.4 2004/04/21 17:51:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:17 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/21 17:51:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_REMOVE_MINOR_NODE 9 "$Date: 2004/04/19 02:58:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_REMOVE_MINOR_NODE 9 "$Date: 2004/04/21 17:51:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -192,7 +192,7 @@ is provided for source level compatibility with
 for the purpose of porting
 .IR Solaris \(rg
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because the
 .B dev_info
 structure for

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xxxosf.9.man,v 0.9.2.7 2004/04/19 12:03:44 brian Exp $
+.\" @(#) $Id: xxxosf.9.man,v 0.9.2.8 2004/04/21 17:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 12:03:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/21 17:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXX 9 "$Date: 2004/04/19 12:03:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH XXX 9 "$Date: 2004/04/21 17:51:12 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -176,7 +176,7 @@ is provided for source level compatibility with
 for the purpose of porting
 .IR OSF/1 \(rg
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because internal structures and definitions for
 .B Linux Fast-STREAMS
 .[

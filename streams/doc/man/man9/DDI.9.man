@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DDI.9.man,v 0.9.2.4 2004/04/19 02:58:15 brian Exp $
+.\" @(#) $Id: DDI.9.man,v 0.9.2.5 2004/04/21 17:51:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:15 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/21 17:51:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI 9 "$Date: 2004/04/19 02:58:15 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI 9 "$Date: 2004/04/21 17:51:09 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -304,9 +304,9 @@ compatibility is selected when building the kernel.
 The following SVR 4 functions are not implemented here although they are
 mentioned in the \fISTREAMS\fR Programming Guide for SVR 4.  Each of these
 functions has a suitable
-.IR Linux \(rg
+.B Linux
 Kernel API function.  Use the 
-.IR Linux \(rg
+.B Linux
 Kernel API function were possible instead:
 .PP
 .BR biodone "(),
