@@ -44,78 +44,61 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
- * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
- * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
- *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
- *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * Socket.cpp
+ * by Ajay Tirumala <tirumala@ncsa.uiuc.edu> 
+ *    and Mark Gates <mgates@nlanr.net>
  * ------------------------------------------------------------------- */
 
 
-#define HEADERS()
+#ifndef SOCKET_ADDR_H
+#define SOCKET_ADDR_H
 
 #include "headers.h"
+#include "Settings.hpp"
 
-#include "PerfSocket.hpp"
-#include "util.h"
 
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* ------------------------------------------------------------------- */
+    void SockAddr_localAddr( thread_Settings *inSettings );
+    void SockAddr_remoteAddr( thread_Settings *inSettings );
 
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
+    void SockAddr_setHostname( const char* inHostname,
+                               iperf_sockaddr *inSockAddr, 
+                               int isIPv6 );          // DNS lookup
+    void SockAddr_getHostname( iperf_sockaddr *inSockAddr,
+                               char* outHostname, 
+                               size_t len );   // reverse DNS lookup
+    void SockAddr_getHostAddress( iperf_sockaddr *inSockAddr, 
+                                  char* outAddress, 
+                                  size_t len ); // dotted decimal
 
-#ifdef IP_TOS
+    void SockAddr_setPort( iperf_sockaddr *inSockAddr, unsigned short inPort );
+    void SockAddr_setPortAny( iperf_sockaddr *inSockAddr );
+    unsigned short SockAddr_getPort( iperf_sockaddr *inSockAddr );
 
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
+    void SockAddr_setAddressAny( iperf_sockaddr *inSockAddr );
+
+    // return pointer to the struct in_addr
+    struct in_addr* SockAddr_get_in_addr( iperf_sockaddr *inSockAddr );
+#ifdef HAVE_IPV6
+    // return pointer to the struct in_addr
+    struct in6_addr* SockAddr_get_in6_addr( iperf_sockaddr *inSockAddr );
+#endif
+    // return the sizeof the addess structure (struct sockaddr_in)
+    Socklen_t SockAddr_get_sizeof_sockaddr( iperf_sockaddr *inSockAddr );
+
+    int SockAddr_isMulticast( iperf_sockaddr *inSockAddr );
+
+    int SockAddr_isIPv6( iperf_sockaddr *inSockAddr );
+
+    int SockAddr_are_Equal( struct sockaddr *first, struct sockaddr *second );
+    int SockAddr_Hostare_Equal( struct sockaddr *first, struct sockaddr *second );
+
+    void SockAddr_zeroAddress( iperf_sockaddr *inSockAddr );
+#ifdef __cplusplus
+} /* end extern "C" */
 #endif
 
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
-
-#ifdef TCP_NODELAY
-
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
-#endif
-    }
-}
-// end SetSocketOptions
+#endif /* SOCKET_ADDR_H */

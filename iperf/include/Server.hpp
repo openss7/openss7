@@ -44,78 +44,42 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
+ * Server.hpp
  * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
  * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
- *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
- *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * A server thread is initiated for each connection accept() returns.
+ * Handles sending and receiving data, and then closes socket.
  * ------------------------------------------------------------------- */
 
+#ifndef SERVER_H
+#define SERVER_H
 
-#define HEADERS()
 
-#include "headers.h"
-
-#include "PerfSocket.hpp"
+#include "Settings.hpp"
 #include "util.h"
+#include "Timestamp.hpp"
 
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
+/* ------------------------------------------------------------------- */
+class Server {
+public:
+    // stores server socket, port and TCP/UDP mode
+    Server( thread_Settings *inSettings );
 
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
+    // destroy the server object
+    ~Server();
 
-#ifdef IP_TOS
+    // accepts connection and receives data
+    void Run( void );
 
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
-#endif
+    void write_UDP_AckFIN( );
 
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
+    static void Sig_Int( int inSigno );
 
-#ifdef TCP_NODELAY
+private:
+    thread_Settings *mSettings;
+    char* mBuf;
+    Timestamp mEndTime;
 
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
-#endif
-    }
-}
-// end SetSocketOptions
+}; // end class Server
+
+#endif // SERVER_H

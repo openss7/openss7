@@ -44,78 +44,15 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
+ * delay.hpp
  * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
  * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
- *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
- *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * accurate microsecond delay
  * ------------------------------------------------------------------- */
 
+#ifndef DELAY_H
+#define DELAY_H
 
-#define HEADERS()
+void delay_loop( unsigned long usecs );
 
-#include "headers.h"
-
-#include "PerfSocket.hpp"
-#include "util.h"
-
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
-
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
-
-#ifdef IP_TOS
-
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
-#endif
-
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
-
-#ifdef TCP_NODELAY
-
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
-#endif
-    }
-}
-// end SetSocketOptions
+#endif /* DELAY_H */

@@ -31,10 +31,10 @@
  * removed some functions we don't use at all
  * add code to start the service immediately after service is installed
  * 
- * $Id: service.c,v 1.2 2002/10/07 20:45:37 kgibbs Exp $
+ * $Id: service.c,v 1.1.1.1 2004/05/18 01:50:44 kgibbs Exp $
  */
 
-
+#ifdef WIN32
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -492,3 +492,4 @@ LPTSTR GetLastErrorText( LPTSTR lpszBuf, DWORD dwSize ) {
     return lpszBuf;
 }
 
+#endif

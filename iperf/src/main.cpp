@@ -62,242 +62,213 @@
 
 #include "headers.h"
 
-#include "Client.hpp"
 #include "Settings.hpp"
+#include "PerfSocket.hpp"
+#include "Locale.h"
+#include "Condition.h"
+#include "Timestamp.hpp"
 #include "Listener.hpp"
-#include "Speaker.hpp"
-#include "Locale.hpp"
-#include "Condition.hpp"
 #include "List.h"
 #include "util.h"
 
 #ifdef WIN32
-    #include "service.h"
+#include "service.h"
 #endif 
 
 /* -------------------------------------------------------------------
  * prototypes
  * ------------------------------------------------------------------- */
-
-void waitUntilQuit( void );
-
-void sig_quit( int inSigno );
-
+// Function called at exit to clean up as much as possible
 void cleanup( void );
 
 /* -------------------------------------------------------------------
  * global variables
  * ------------------------------------------------------------------- */
-#define GLOBAL()
+extern "C" {
+    // Global flag to signal a user interrupt
+    int sInterupted = 0;
+    // Global ID that we increment to be used 
+    // as identifier for SUM reports
+    int groupID = 0;
+    // Mutex to protect access to the above ID
+    Mutex groupCond;
+    // Condition used to signify advances of the current
+    // records being accessed in a report and also to
+    // serialize modification of the report list
+    Condition ReportCond;
+}
 
-Condition gQuit_cond;
+// global variables only accessed within this file
+
+// Thread that received the SIGTERM or SIGINT signal
+// Used to ensure that if multiple threads receive the
+// signal we do not prematurely exit
+nthread_t sThread;
+// The main thread uses this function to wait 
+// for all other threads to complete
+void waitUntilQuit( void );
 
 /* -------------------------------------------------------------------
+ * main()
+ *      Entry point into Iperf
+ *
  * sets up signal handlers
+ * initialize global locks and conditions
  * parses settings from environment and command line
  * starts up server or client thread
  * waits for all threads to complete
  * ------------------------------------------------------------------- */
-
 int main( int argc, char **argv ) {
 
-#ifdef WIN32
-    SERVICE_TABLE_ENTRY dispatchTable[] =
-    {
-        { TEXT(SZSERVICENAME), (LPSERVICE_MAIN_FUNCTION)service_main},
-        { NULL, NULL}
-    };
-#endif
-
-    Listener *theListener = NULL;
-    Speaker  *theSpeaker  = NULL;
-
-    // signal handlers quietly exit on ^C and kill
-    // these are usually remapped later by the client or server
-    my_signal( SIGTERM, sig_exit );
-    my_signal( SIGINT,  sig_exit );
+    // Set SIGTERM and SIGINT to call our user interrupt function
+    my_signal( SIGTERM, Sig_Interupt );
+    my_signal( SIGINT,  Sig_Interupt );
 
 #ifndef WIN32
+    // Ignore broken pipes
     signal(SIGPIPE,SIG_IGN);
 #else
+    // Start winsock
     WSADATA wsaData;
     int rc = WSAStartup( 0x202, &wsaData );
-    FAIL_errno( rc == SOCKET_ERROR, "WSAStartup" );
+    WARN_errno( rc == SOCKET_ERROR, "WSAStartup" );
+	if (rc == SOCKET_ERROR)
+		return 0;
 
+    // Tell windows we want to handle our own signals
     SetConsoleCtrlHandler( sig_dispatcher, true );
 #endif
+
+    // Initialize global mutexes and conditions
+    Condition_Initialize ( &ReportCond );
+    Mutex_Initialize( &groupCond );
+    Mutex_Initialize( &clients_mutex );
+
+    // Initialize the thread subsystem
+    thread_init( );
+
+    // Initialize the interrupt handling thread to 0
+    sThread = thread_zeroid();
 
     // perform any cleanup when quitting Iperf
     atexit( cleanup );
 
-    ext_Settings* ext_gSettings = new ext_Settings;
-    Settings* gSettings = NULL;
+    // Allocate the "global" settings
+    thread_Settings* ext_gSettings = new thread_Settings;
 
-    // read settings from environment variables and command-line interface
-    gSettings = new Settings( ext_gSettings );
-    gSettings->ParseEnvironment();
-    gSettings->ParseCommandLine( argc, argv );
+    // Initialize settings to defaults
+    Settings_Initialize( ext_gSettings );
+    // read settings from environment variables
+    Settings_ParseEnvironment( ext_gSettings );
+    // read settings from command-line parameters
+    Settings_ParseCommandLine( argc, argv, ext_gSettings );
 
-    // start up client or server (listener)
-    if ( gSettings->GetServerMode() == kMode_Server ) {
-        // start up a listener
-        theListener = new Listener( ext_gSettings );
-        theListener->DeleteSelfAfterRun();
-
+    // Check for either having specified client or server
+    if ( ext_gSettings->mThreadMode == kMode_Client 
+         || ext_gSettings->mThreadMode == kMode_Listener ) {
+#ifdef WIN32
         // Start the server as a daemon
-        if ( gSettings->GetDaemonMode() == true ) {
-#ifdef WIN32
+        // Daemon mode for non-windows in handled
+        // in the listener_spawn function
+        if ( isDaemon( ext_gSettings ) ) {
             CmdInstallService(argc, argv);
-            DELETE_PTR( theListener );
-            DELETE_PTR( gSettings );
-
             return 0;
-#else
-            theListener->runAsDaemon(argv[0],LOG_DAEMON);
-#endif
         }
-#ifdef WIN32
-          else {
-            if ( gSettings->GetRemoveService() == true ) {
-                // remove the service and continue to run as a normal process
-                if ( CmdRemoveService() ) {
-                    printf("IPerf Service is removed.\n");
 
-                    DELETE_PTR( theListener );
-                    DELETE_PTR( gSettings );
+        // Remove the Windows service if requested
+        if ( isRemoveService( ext_gSettings ) ) {
+            // remove the service
+            if ( CmdRemoveService() ) {
+                fprintf(stderr, "IPerf Service is removed.\n");
 
-                    return 0;
-                }
-            } else {
-                // try to start the service
-                if ( CmdStartService(argc, argv) ) {
-                    printf("IPerf Service already exists.\n");
-
-                    DELETE_PTR( theListener );
-                    DELETE_PTR( gSettings );
-
-                    return 0;
-                }
+                return 0;
             }
         }
 #endif
-
-        theListener->Start();
-
-        if ( ext_gSettings->mThreads == 0 ) {
-            theListener->SetDaemon();
-
-            // the listener keeps going; we terminate on user input only
-            waitUntilQuit();
-#ifdef HAVE_THREAD
-            if ( Thread::NumUserThreads() > 0 ) {
-                printf( wait_server_threads );
-                fflush( 0 );
-            }
-#endif
+        // initialize client(s)
+        if ( ext_gSettings->mThreadMode == kMode_Client ) {
+            client_init( ext_gSettings );
         }
-    } else if ( gSettings->GetServerMode() == kMode_Client ) {
+
 #ifdef HAVE_THREAD
-        theSpeaker = new Speaker(ext_gSettings);
-        theSpeaker->OwnSettings();
-        theSpeaker->DeleteSelfAfterRun();
-        theSpeaker->Start();
+        // start up the reporter and client(s) or listener
+        {
+            thread_Settings *into = NULL;
+            // Create the settings structure for the reporter thread
+            Settings_Copy( ext_gSettings, &into );
+            into->mThreadMode = kMode_Reporter;
+
+            // Have the reporter launch the client or listener
+            into->runNow = ext_gSettings;
+            
+            // Start all the threads that are ready to go
+            thread_start( into );
+        }
 #else
-        // If we need to start up a listener do it now
-        ext_Settings *temp = NULL;
-        Settings::GenerateListenerSettings( ext_gSettings, &temp );
-        if ( temp != NULL ) {
-            theListener = new Listener( temp );
-            theListener->DeleteSelfAfterRun();
-        }
-        Client* theClient = new Client( ext_gSettings );
-        theClient->InitiateServer();
-        theClient->Start();
-        if ( theListener != NULL ) {
-            theListener->Start();
-        }
+        // No need to make a reporter thread because we don't have threads
+        thread_start( ext_gSettings );
 #endif
     } else {
         // neither server nor client mode was specified
         // print usage and exit
 
 #ifdef WIN32
+        // In Win32 we also attempt to start a previously defined service
+        // Starting in 2.0 to restart a previously defined service
+        // you must call iperf with "iperf -D" or using the environment variable
+        SERVICE_TABLE_ENTRY dispatchTable[] =
+        {
+            { TEXT(SZSERVICENAME), (LPSERVICE_MAIN_FUNCTION)service_main},
+            { NULL, NULL}
+        };
 
-        // starting the service by SCM, there is no arguments will be passed in.
-        // the arguments will pass into Service_Main entry.
-
-        if ( !StartServiceCtrlDispatcher(dispatchTable) )
-            printf(usage_short, argv[0], argv[0]);
-#else    
-        printf( usage_short, argv[0], argv[0] );
+        // Only attempt to start the service if "-D" was specified
+        if ( !isDaemon(ext_gSettings) ||
+             // starting the service by SCM, there is no arguments will be passed in.
+             // the arguments will pass into Service_Main entry.
+             !StartServiceCtrlDispatcher(dispatchTable) )
+            // If the service failed to start then print usage
 #endif
+        fprintf( stderr, usage_short, argv[0], argv[0] );
+
+        return 0;
     }
 
     // wait for other (client, server) threads to complete
-    Thread::Joinall();
-    DELETE_PTR( gSettings );  // modified by qfeng
+    thread_joinall();
+    
     // all done!
     return 0;
 } // end main
 
 /* -------------------------------------------------------------------
- * Blocks the thread until a quit thread signal is sent
+ * Signal handler sets the sInterupted flag, so the object can
+ * respond appropriately.. [static]
  * ------------------------------------------------------------------- */
 
-void waitUntilQuit( void ) {
+void Sig_Interupt( int inSigno ) {
 #ifdef HAVE_THREAD
-
-    // signal handlers send quit signal on ^C and kill
-    gQuit_cond.Lock();
-    my_signal( SIGTERM, sig_quit );
-    my_signal( SIGINT,  sig_quit );
-
-#ifdef HAVE_USLEEP
-
-    // this sleep is a hack to get around an apparent bug? in IRIX
-    // where pthread_cancel doesn't work unless the thread
-    // starts up before the gQuit_cand.Wait() call below.
-    // A better solution is to just use sigwait here, but
-    // then I have to emulate that for Windows...
-    usleep( 10 );
-#endif
-
-    // wait for quit signal
-    gQuit_cond.Wait();
-    gQuit_cond.Unlock();
-#endif
-} // end waitUntilQuit
-
-/* -------------------------------------------------------------------
- * Sends a quit thread signal to let the main thread quit nicely.
- * ------------------------------------------------------------------- */
-
-void sig_quit( int inSigno ) {
-#ifdef HAVE_THREAD
-
-    // if we get a second signal after 1/10 second, exit
-    // some implementations send the signal to all threads, so the 1/10 sec
-    // allows us to ignore multiple receipts of the same signal
-    static Timestamp* first = NULL;
-    if ( first != NULL ) {
-        Timestamp now;
-        if ( now.subSec( *first ) > 0.1 ) {
-            sig_exit( inSigno );
-        }
-    } else {
-        first = new Timestamp();
+    // We try to not allow a single interrupt handled by multiple threads
+    // to completely kill the app so we save off the first thread ID
+    // then that is the only thread that can supply the next interrupt
+    if ( thread_equalid( sThread, thread_zeroid() ) ) {
+        sThread = thread_getid();
+    } else if ( thread_equalid( sThread, thread_getid() ) ) {
+        sig_exit( inSigno );
     }
 
-    // with threads, send a quit signal
-    gQuit_cond.Signal();
+    // global variable used by threads to see if they were interrupted
+    sInterupted = 1;
+
+    // with threads, stop waiting for non-terminating threads
+    // (ie Listener Thread)
+    thread_release_nonterm( 1 );
 
 #else
-
     // without threads, just exit quietly, same as sig_exit()
     sig_exit( inSigno );
-
 #endif
-} // end sig_quit
+}
 
 /* -------------------------------------------------------------------
  * Any necesary cleanup before Iperf quits. Called at program exit,
@@ -306,11 +277,14 @@ void sig_quit( int inSigno ) {
 
 void cleanup( void ) {
 #ifdef WIN32
+    // Shutdown Winsock
     WSACleanup();
 #endif
-    extern Iperf_ListEntry *clients;
+    // clean up the list of clients
     Iperf_destroy ( &clients );
 
+    // shutdown the thread subsystem
+    thread_destroy( );
 } // end cleanup
 
 #ifdef WIN32
@@ -320,11 +294,9 @@ void cleanup( void ) {
  * each time starting the service, this is the entry point of the service.
  * Start the service, certainly it is on server-mode
  * 
- *
  *-------------------------------------------------------------------- */
 VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
-    Listener *theListener = NULL;
-
+    
     // report the status to the service control manager.
     //
     if ( !ReportStatusToSCMgr(
@@ -333,13 +305,14 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
                              3000) )                 // wait hint
         goto clean;
 
-    ext_Settings* ext_gSettings = new ext_Settings;
-    Settings *gSettings;
+    thread_Settings* ext_gSettings = new thread_Settings;
 
-    // read settings from passing by StartService
-    gSettings = new Settings( ext_gSettings );
-    gSettings->ParseEnvironment();
-    gSettings->ParseCommandLine( dwArgc, lpszArgv );
+    // Initialize settings to defaults
+    Settings_Initialize( ext_gSettings );
+    // read settings from environment variables
+    Settings_ParseEnvironment( ext_gSettings );
+    // read settings from command-line parameters
+    Settings_ParseCommandLine( dwArgc, lpszArgv, ext_gSettings );
 
     // report the status to the service control manager.
     //
@@ -350,8 +323,8 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
         goto clean;
 
     // if needed, redirect the output into a specified file
-    if ( gSettings->GetFileOutput() ) {
-        redirect(gSettings->GetOutputFileName());
+    if ( !isSTDOUT( ext_gSettings ) ) {
+        redirect( ext_gSettings->mOutputFileName );
     }
 
     // report the status to the service control manager.
@@ -361,12 +334,25 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
                              NO_ERROR,              // exit code
                              3000) )                 // wait hint
         goto clean;
+    
+    // initialize client(s)
+    if ( ext_gSettings->mThreadMode == kMode_Client ) {
+        client_init( ext_gSettings );
+    }
 
-    theListener = new Listener( ext_gSettings );
-
-    theListener->Start();
-    theListener->SetDaemon();
-
+    // start up the reporter and client(s) or listener
+    {
+        thread_Settings *into = NULL;
+#ifdef HAVE_THREAD
+        Settings_Copy( ext_gSettings, &into );
+        into->mThreadMode = kMode_Reporter;
+        into->runNow = ext_gSettings;
+#else
+        into = ext_gSettings;
+#endif
+        thread_start( into );
+    }
+    
     // report the status to the service control manager.
     //
     if ( !ReportStatusToSCMgr(
@@ -375,22 +361,9 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
                              0) )                    // wait hint
         goto clean;
 
-    // the listener keeps going; we terminate on user input only
-    waitUntilQuit();
-#ifdef HAVE_THREAD
-    if ( Thread::NumUserThreads() > 0 ) {
-        printf( wait_server_threads );
-        fflush( 0 );
-    }
-#endif
-
-
     clean:
     // wait for other (client, server) threads to complete
-    Thread::Joinall();
-    DELETE_PTR( theListener );
-    DELETE_PTR( gSettings );  // modified by qfeng
-    DELETE_PTR( ext_gSettings );  // modified by qfeng
+    thread_joinall();
 }
 
 
@@ -415,7 +388,7 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
 //    
 VOID ServiceStop() {
 #ifdef HAVE_THREAD
-    gQuit_cond.Signal();
+    Sig_Interupt( 1 );
 #else
     sig_exit(1);
 #endif

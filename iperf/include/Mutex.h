@@ -44,78 +44,69 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
+ * Mutex.h
  * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
  * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
- *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
- *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * An abstract class for locking a mutex (mutual exclusion). If
+ * threads are not available, this does nothing.
  * ------------------------------------------------------------------- */
-
-
-#define HEADERS()
+#ifndef MUTEX_H
+#define MUTEX_H
 
 #include "headers.h"
 
-#include "PerfSocket.hpp"
-#include "util.h"
-
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
-
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
-
-#ifdef IP_TOS
-
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
+#if   defined( HAVE_POSIX_THREAD )
+    typedef pthread_mutex_t Mutex;
+#elif defined( HAVE_WIN32_THREAD )
+    typedef HANDLE Mutex;
+#else
+    typedef int Mutex;
 #endif
 
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
-
-#ifdef TCP_NODELAY
-
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
+/* ------------------------------------------------------------------- *
+class Mutex {
+public:*/
+    
+    // initialize mutex
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Initialize( MutexPtr ) pthread_mutex_init( MutexPtr, NULL )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Initialize( MutexPtr ) *MutexPtr = CreateMutex( NULL, false, NULL )
+#else
+    #define Mutex_Initialize( MutexPtr )
 #endif
-    }
-}
-// end SetSocketOptions
+    
+    // lock the mutex variable
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Lock( MutexPtr ) pthread_mutex_lock( MutexPtr )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Lock( MutexPtr ) WaitForSingleObject( *MutexPtr, INFINITE )
+#else
+    #define Mutex_Lock( MutexPtr )
+#endif
+
+    // unlock the mutex variable
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Unlock( MutexPtr ) pthread_mutex_unlock( MutexPtr )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Unlock( MutexPtr ) ReleaseMutex( *MutexPtr )
+#else
+    #define Mutex_Unlock( MutexPtr )
+#endif
+
+    // destroy, making sure mutex is unlocked
+#if   defined( HAVE_POSIX_THREAD )
+    #define Mutex_Destroy( MutexPtr )  do {         \
+        int rc = pthread_mutex_destroy( MutexPtr ); \
+        if ( rc == EBUSY ) {                        \
+            Mutex_Unlock( MutexPtr );               \
+            pthread_mutex_destroy( MutexPtr );      \
+        }                                           \
+    } while ( 0 )
+#elif defined( HAVE_WIN32_THREAD )
+    #define Mutex_Destroy( MutexPtr ) CloseHandle( *MutexPtr )
+#else
+    #define Mutex_Destroy( MutexPtr )
+#endif
+
+#endif // MUTEX_H

@@ -64,11 +64,14 @@
 #include "headers.h"
 
 #include "Settings.hpp"
-#include "Locale.hpp"
+#include "Locale.h"
+#include "SocketAddr.h"
 
 #include "util.h"
 
 #include "gnu_getopt.h"
+
+void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtSettings );
 
 /* -------------------------------------------------------------------
  * command line options
@@ -80,6 +83,7 @@
 
 const struct option long_options[] =
 {
+{"singleclient",     no_argument, NULL, '1'},
 {"bandwidth",  required_argument, NULL, 'b'},
 {"client",     required_argument, NULL, 'c'},
 {"dualtest",         no_argument, NULL, 'd'},
@@ -97,6 +101,8 @@ const struct option long_options[] =
 {"udp",              no_argument, NULL, 'u'},
 {"version",          no_argument, NULL, 'v'},
 {"window",     required_argument, NULL, 'w'},
+{"reportexclude", required_argument, NULL, 'x'},
+{"reportstyle",required_argument, NULL, 'y'},
 
 // more esoteric options
 {"bind",       required_argument, NULL, 'B'},
@@ -108,11 +114,12 @@ const struct option long_options[] =
 {"nodelay",          no_argument, NULL, 'N'},
 {"listenport", required_argument, NULL, 'L'},
 {"parallel",   required_argument, NULL, 'P'},
-{"remove",        no_argument, NULL, 'R'},
+{"remove",           no_argument, NULL, 'R'},
 {"tos",        required_argument, NULL, 'S'},
 {"ttl",        required_argument, NULL, 'T'},
-{"ipv6_domian",       no_argument, NULL, 'V'},
-{"suggest_win_size",  no_argument, NULL, 'W'},
+{"single_udp",       no_argument, NULL, 'U'},
+{"ipv6_domian",      no_argument, NULL, 'V'},
+{"suggest_win_size", no_argument, NULL, 'W'},
 {0, 0, 0, 0}
 };
 
@@ -120,6 +127,7 @@ const struct option long_options[] =
 
 const struct option env_options[] =
 {
+{"IPERF_SINGLECLIENT",     no_argument, NULL, '1'},
 {"IPERF_BANDWIDTH",  required_argument, NULL, 'b'},
 {"IPERF_CLIENT",     required_argument, NULL, 'c'},
 {"IPERF_DUALTEST",         no_argument, NULL, 'd'},
@@ -136,11 +144,13 @@ const struct option env_options[] =
 {"IPERF_UDP",              no_argument, NULL, 'u'},
 // skip version
 {"TCP_WINDOW_SIZE",  required_argument, NULL, 'w'},
+{"IPERF_REPORTEXCLUDE", required_argument, NULL, 'x'},
+{"IPERF_REPORTSTYLE",required_argument, NULL, 'y'},
 
 // more esoteric options
 {"IPERF_BIND",       required_argument, NULL, 'B'},
-{"IPERF_COMPAT",       no_argument, NULL, 'C'},
-{"IPERF_DAEMON",       no_argument, NULL, 'D'},
+{"IPERF_COMPAT",           no_argument, NULL, 'C'},
+{"IPERF_DAEMON",           no_argument, NULL, 'D'},
 {"IPERF_FILE_INPUT", required_argument, NULL, 'F'},
 {"IPERF_STDIN_INPUT",      no_argument, NULL, 'I'},
 {"IPERF_MSS",        required_argument, NULL, 'M'},
@@ -149,6 +159,7 @@ const struct option env_options[] =
 {"IPERF_PARALLEL",   required_argument, NULL, 'P'},
 {"IPERF_TOS",        required_argument, NULL, 'S'},
 {"IPERF_TTL",        required_argument, NULL, 'T'},
+{"IPERF_SINGLE_UDP",       no_argument, NULL, 'U'},
 {"IPERF_IPV6_DOMAIN",      no_argument, NULL, 'V'},
 {"IPERF_SUGGEST_WIN_SIZE", required_argument, NULL, 'W'},
 {0, 0, 0, 0}
@@ -156,7 +167,7 @@ const struct option env_options[] =
 
 #define SHORT_OPTIONS()
 
-const char short_options[] = "b:c:df:hi:l:mn:o:p:rst:uvw:B:CDF:IL:M:NP:RS:T:VW";
+const char short_options[] = "1b:c:df:hi:l:mn:o:p:rst:uvw:x:y:B:CDF:IL:M:NP:RS:T:UVW";
 
 /* -------------------------------------------------------------------
  * defaults
@@ -174,70 +185,101 @@ const int  kDefault_UDPBufLen = 1470;      // -u  if set, read/write 1470 bytes
  * Initialize all settings to defaults.
  * ------------------------------------------------------------------- */
 
-Settings::Settings( ext_Settings *main ) {
-
-    mExtSettings = main;
-
-    // option, default
-    mExtSettings->mUDPRate    = 0;             // -b,  ie. TCP mode
-    mExtSettings->mHost       = NULL;          // -c,  none, required for client
-    mExtSettings->mMode       = kTest_Normal;  // -d,  mMode == kTest_DualTest
-    mExtSettings->mFormat     = 'a';           // -f,  adaptive bits
-    // skip help                               // -h,
-    mExtSettings->mBufLenSet  = false;         // -l,	
-    mExtSettings->mBufLen     = 8 * 1024;      // -l,  8 Kbyte
-    mExtSettings->mInterval   = 0;             // -i,  ie. no periodic bw reports
-    mExtSettings->mPrintMSS   = false;         // -m,  don't print MSS
-    // mAmount is time also                    // -n,  N/A
-    mExtSettings->mOutputFileName = NULL;      // -o,  filename
-    mExtSettings->mPort       = 5001;          // -p,  ttcp port
-    // mMode    = kTest_Normal;                // -r,  mMode == kTest_TradeOff
-    mExtSettings->mServerMode = kMode_Unknown; // -s,  or -c, none
-    mExtSettings->mAmount     = -1000;           // -t,  10 seconds
-    // mUDPRate > 0 means UDP                  // -u,  N/A, see kDefault_UDPRate
-    // skip version                            // -v,
-    mExtSettings->mTCPWin     = 0;             // -w,  ie. don't set window
+void Settings_Initialize( thread_Settings *main ) {
+    // Everything defaults to zero or NULL with
+    // this memset. Only need to set non-zero values
+    // below.
+    memset( main, 0, sizeof(thread_Settings) );
+    main->mSock = INVALID_SOCKET;
+    main->mReportMode = kReport_Default;
+    // option, defaults
+    main->flags         = FLAG_MODETIME | FLAG_STDOUT; // Default time and stdout
+    //main->mUDPRate      = 0;           // -b,  ie. TCP mode
+    //main->mHost         = NULL;        // -c,  none, required for client
+    main->mMode         = kTest_Normal;  // -d,  mMode == kTest_DualTest
+    main->mFormat       = 'a';           // -f,  adaptive bits
+    // skip help                         // -h,
+    //main->mBufLenSet  = false;         // -l,	
+    main->mBufLen       = 8 * 1024;      // -l,  8 Kbyte
+    //main->mInterval     = 0;           // -i,  ie. no periodic bw reports
+    //main->mPrintMSS   = false;         // -m,  don't print MSS
+    // mAmount is time also              // -n,  N/A
+    //main->mOutputFileName = NULL;      // -o,  filename
+    main->mPort         = 5001;          // -p,  ttcp port
+    // mMode    = kTest_Normal;          // -r,  mMode == kTest_TradeOff
+    main->mThreadMode   = kMode_Unknown; // -s,  or -c, none
+    main->mAmount       = 1000;          // -t,  10 seconds
+    // mUDPRate > 0 means UDP            // -u,  N/A, see kDefault_UDPRate
+    // skip version                      // -v,
+    //main->mTCPWin       = 0;           // -w,  ie. don't set window
 
     // more esoteric options
-    mExtSettings->mLocalhost  = NULL;          // -B,  none
-    mExtSettings->mCompat     = false;         // -C,  run in Compatibility mode
-    mExtSettings->mDaemon     = false;         // -D,  run as a daemon
-    mExtSettings->mFileInput  = false;         // -F,
-    mExtSettings->mFileName   = NULL;          // -F,  filename 
-    mExtSettings->mStdin      = false;         // -I,  default not stdin
-    mExtSettings->mListenPort = 0;             // -L,  listen port
-    mExtSettings->mMSS        = 0;             // -M,  ie. don't set MSS
-    mExtSettings->mNodelay    = false;         // -N,  don't set nodelay
-    mExtSettings->mThreads    = 0;             // -P,
-    mExtSettings->mRemoveService = false;      // -R,
-    mExtSettings->mTOS        = 0;             // -S,  ie. don't set type of service
-    mExtSettings->mTTL        = 1;             // -T,  link-local TTL
-    mExtSettings->mDomain     = kMode_IPv4;    // -V,
-    mExtSettings->mSuggestWin = false;         // -W,  Suggest the window size.
-
-    mExtSettings->mStdout = true;              // default stdout
-
+    //main->mLocalhost    = NULL;        // -B,  none
+    //main->mCompat     = false;         // -C,  run in Compatibility mode
+    //main->mDaemon     = false;         // -D,  run as a daemon
+    //main->mFileInput  = false;         // -F,
+    //main->mFileName     = NULL;        // -F,  filename 
+    //main->mStdin      = false;         // -I,  default not stdin
+    //main->mListenPort   = 0;           // -L,  listen port
+    //main->mMSS          = 0;           // -M,  ie. don't set MSS
+    //main->mNodelay    = false;         // -N,  don't set nodelay
+    //main->mThreads      = 0;           // -P,
+    //main->mRemoveService = false;      // -R,
+    //main->mTOS          = 0;           // -S,  ie. don't set type of service
+    main->mTTL          = 1;             // -T,  link-local TTL
+    //main->mDomain     = kMode_IPv4;    // -V,
+    //mian->mSuggestWin = false;         // -W,  Suggest the window size.
 
 } // end Settings
 
+void Settings_Copy( thread_Settings *from, thread_Settings **into ) {
+    *into = new thread_Settings;
+    memcpy( *into, from, sizeof(thread_Settings) );
+    if ( from->mHost != NULL ) {
+        (*into)->mHost = new char[ strlen(from->mHost) + 1];
+        strcpy( (*into)->mHost, from->mHost );
+    }
+    if ( from->mOutputFileName != NULL ) {
+        (*into)->mOutputFileName = new char[ strlen(from->mOutputFileName) + 1];
+        strcpy( (*into)->mOutputFileName, from->mOutputFileName );
+    }
+    if ( from->mLocalhost != NULL ) {
+        (*into)->mLocalhost = new char[ strlen(from->mLocalhost) + 1];
+        strcpy( (*into)->mLocalhost, from->mLocalhost );
+    }
+    if ( from->mFileName != NULL ) {
+        (*into)->mFileName = new char[ strlen(from->mFileName) + 1];
+        strcpy( (*into)->mFileName, from->mFileName );
+    }
+    // Zero out certain entries
+    (*into)->mTID = thread_zeroid();
+    (*into)->runNext = NULL;
+    (*into)->runNow = NULL;
+}
+
 /* -------------------------------------------------------------------
- * Delete memory (hostname string).
+ * Delete memory: Does not clean up open file pointers or ptr_parents
  * ------------------------------------------------------------------- */
 
-Settings::~Settings() {
+void Settings_Destroy( thread_Settings *mSettings) {
+    DELETE_ARRAY( mSettings->mHost      );
+    DELETE_ARRAY( mSettings->mLocalhost );
+    DELETE_ARRAY( mSettings->mFileName  );
+    DELETE_ARRAY( mSettings->mOutputFileName );
+    DELETE_PTR( mSettings );
 } // end ~Settings
 
 /* -------------------------------------------------------------------
  * Parses settings from user's environment variables.
  * ------------------------------------------------------------------- */
-void Settings::ParseEnvironment( void ) {
+void Settings_ParseEnvironment( thread_Settings *mSettings ) {
     char *theVariable;
 
     int i = 0;
     while ( env_options[i].name != NULL ) {
         theVariable = getenv( env_options[i].name );
         if ( theVariable != NULL ) {
-            Interpret( env_options[i].val, theVariable );
+            Settings_Interpret( env_options[i].val, theVariable, mSettings );
         }
         i++;
     }
@@ -247,12 +289,12 @@ void Settings::ParseEnvironment( void ) {
  * Parse settings from app's command line.
  * ------------------------------------------------------------------- */
 
-void Settings::ParseCommandLine( int argc, char **argv ) {
+void Settings_ParseCommandLine( int argc, char **argv, thread_Settings *mSettings ) {
     int option;
     while ( (option =
              gnu_getopt_long( argc, argv, short_options,
                               long_options, NULL )) != EOF ) {
-        Interpret( option, gnu_optarg );
+        Settings_Interpret( option, gnu_optarg, mSettings );
     }
 
     for ( int i = gnu_optind; i < argc; i++ ) {
@@ -265,52 +307,63 @@ void Settings::ParseCommandLine( int argc, char **argv ) {
  * or from environment variables.
  * ------------------------------------------------------------------- */
 
-void Settings::Interpret( char option, const char *optarg ) {
+void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtSettings ) {
     char outarg[100];
 
     switch ( option ) {
+        case '1': // Single Client
+            setSingleClient( mExtSettings );
+            break;
         case 'b': // UDP bandwidth
-            if ( mExtSettings->mUDPRate == 0 ) {
-                printf( warn_implied_udp, option );
+            if ( !isUDP( mExtSettings ) ) {
+                fprintf( stderr, warn_implied_udp, option );
             }
 
-            if ( mExtSettings->mServerMode != kMode_Client ) {
-                printf( warn_invalid_server_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Client ) {
+                fprintf( stderr, warn_invalid_server_option, option );
                 break;
             }
 
-            GetLowerCaseArg(optarg,outarg);
+            Settings_GetLowerCaseArg(optarg,outarg);
             mExtSettings->mUDPRate = byte_atoi(outarg);
+            setUDP( mExtSettings );
 
             // if -l has already been processed, mBufLenSet is true
             // so don't overwrite that value.
-            if ( ! mExtSettings->mBufLenSet ) {
+            if ( !isBuflenSet( mExtSettings ) ) {
                 mExtSettings->mBufLen = kDefault_UDPBufLen;
             }
             break;
 
         case 'c': // client mode w/ server host to connect to
-            if ( mExtSettings->mServerMode == kMode_Unknown ) {
-                mExtSettings->mServerMode = kMode_Client;
-                mExtSettings->mThreads = 1;
-            }
-
             mExtSettings->mHost = new char[ strlen( optarg ) + 1 ];
             strcpy( mExtSettings->mHost, optarg );
+
+            if ( mExtSettings->mThreadMode == kMode_Unknown ) {
+                // Test for Multicast
+                iperf_sockaddr temp;
+                SockAddr_setHostname( mExtSettings->mHost, &temp,
+                                      (isIPV6( mExtSettings ) ? 1 : 0 ));
+                if ( SockAddr_isMulticast( &temp ) ) {
+                    setMulticast( mExtSettings );
+                }
+                mExtSettings->mThreadMode = kMode_Client;
+                mExtSettings->mThreads = 1;
+            }
             break;
 
         case 'd': // Dual-test Mode
-            if ( mExtSettings->mServerMode != kMode_Client ) {
-                printf( warn_invalid_server_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Client ) {
+                fprintf( stderr, warn_invalid_server_option, option );
                 break;
             }
-            if ( mExtSettings->mCompat ) {
-                printf( warn_invalid_compatibility_option, option );
+            if ( isCompat( mExtSettings ) ) {
+                fprintf( stderr, warn_invalid_compatibility_option, option );
             }
 #ifdef HAVE_THREAD
             mExtSettings->mMode = kTest_DualTest;
 #else
-            printf( warn_invalid_single_threaded, option );
+            fprintf( stderr, warn_invalid_single_threaded, option );
             mExtSettings->mMode = kTest_TradeOff;
 #endif
             break;
@@ -332,46 +385,49 @@ void Settings::Interpret( char option, const char *optarg ) {
         case 'i': // specify interval between periodic bw reports
             mExtSettings->mInterval = atof( optarg );
             if ( mExtSettings->mInterval < 0.5 ) {
-                printf (report_interval_small, mExtSettings->mInterval);
+                fprintf (stderr, report_interval_small, mExtSettings->mInterval);
                 mExtSettings->mInterval = 0.5;
             }
             break;
 
         case 'l': // length of each buffer
-            GetUpperCaseArg(optarg,outarg);
+            Settings_GetUpperCaseArg(optarg,outarg);
             mExtSettings->mBufLen = byte_atoi( outarg );
-            mExtSettings->mBufLenSet = true;
-            if ( mExtSettings->mUDPRate == 0 &&
-                 mExtSettings->mBufLen < (int) sizeof( client_hdr ) &&
-                 !mExtSettings->mCompat ) {
-                mExtSettings->mCompat = true;
-                printf( warn_implied_compatibility, option );
-            } else if ( mExtSettings->mUDPRate > 0 ) {
+            setBuflenSet( mExtSettings );
+            if ( !isUDP( mExtSettings ) ) {
+                 if ( mExtSettings->mBufLen < (int) sizeof( client_hdr ) &&
+                      !isCompat( mExtSettings ) ) {
+                    setCompat( mExtSettings );
+                    fprintf( stderr, warn_implied_compatibility, option );
+                 }
+            } else {
                 if ( mExtSettings->mBufLen < (int) sizeof( UDP_datagram ) ) {
                     mExtSettings->mBufLen = sizeof( UDP_datagram );
-                    printf( warn_buffer_too_small, mExtSettings->mBufLen );
-                } else if ( !mExtSettings->mCompat &&
+                    fprintf( stderr, warn_buffer_too_small, mExtSettings->mBufLen );
+                }
+                if ( !isCompat( mExtSettings ) &&
                             mExtSettings->mBufLen < (int) ( sizeof( UDP_datagram )
                             + sizeof( client_hdr ) ) ) {
-                    mExtSettings->mCompat = true;
-                    printf( warn_implied_compatibility, option );
+                    setCompat( mExtSettings );
+                    fprintf( stderr, warn_implied_compatibility, option );
                 }
             }
 
             break;
 
         case 'm': // print TCP MSS
-            mExtSettings->mPrintMSS = true;
+            setPrintMSS( mExtSettings );
             break;
 
         case 'n': // bytes of data
-            // positive indicates amount mode (instead of time mode)
-            GetUpperCaseArg(optarg,outarg);
-            mExtSettings->mAmount = +byte_atoi( outarg );
+            // amount mode (instead of time mode)
+            unsetModeTime( mExtSettings );
+            Settings_GetUpperCaseArg(optarg,outarg);
+            mExtSettings->mAmount = byte_atoi( outarg );
             break;
 
         case 'o' : // output the report and other messages into the file
-            mExtSettings->mStdout = false;
+            unsetSTDOUT( mExtSettings );
             mExtSettings->mOutputFileName = new char[strlen(optarg)+1];
             strcpy( mExtSettings->mOutputFileName, optarg);
             break;
@@ -381,47 +437,49 @@ void Settings::Interpret( char option, const char *optarg ) {
             break;
 
         case 'r': // test mode tradeoff
-            if ( mExtSettings->mServerMode != kMode_Client ) {
-                printf( warn_invalid_server_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Client ) {
+                fprintf( stderr, warn_invalid_server_option, option );
                 break;
             }
-            if ( mExtSettings->mCompat ) {
-                printf( warn_invalid_compatibility_option, option );
+            if ( isCompat( mExtSettings ) ) {
+                fprintf( stderr, warn_invalid_compatibility_option, option );
             }
 
             mExtSettings->mMode = kTest_TradeOff;
             break;
 
         case 's': // server mode
-            if ( mExtSettings->mServerMode != kMode_Unknown ) {
-                printf( warn_invalid_client_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Unknown ) {
+                fprintf( stderr, warn_invalid_client_option, option );
                 break;
             }
 
-            mExtSettings->mServerMode = kMode_Server;
+            mExtSettings->mThreadMode = kMode_Listener;
             break;
 
         case 't': // seconds to write for
-            // negative indicates time mode (instead of amount mode)
-            mExtSettings->mAmount = (int) (-atof( optarg ) * 100);
+            // time mode (instead of amount mode)
+            setModeTime( mExtSettings );
+            mExtSettings->mAmount = (int) (atof( optarg ) * 100.0);
             break;
 
         case 'u': // UDP instead of TCP
             // if -b has already been processed, UDP rate will
             // already be non-zero, so don't overwrite that value
-            if ( mExtSettings->mUDPRate == 0 ) {
+            if ( !isUDP( mExtSettings ) ) {
+                setUDP( mExtSettings );
                 mExtSettings->mUDPRate = kDefault_UDPRate;
             }
 
             // if -l has already been processed, mBufLenSet is true
             // so don't overwrite that value.
-            if ( ! mExtSettings->mBufLenSet ) {
+            if ( !isBuflenSet( mExtSettings ) ) {
                 mExtSettings->mBufLen = kDefault_UDPBufLen;
             } else if ( mExtSettings->mBufLen < (int) ( sizeof( UDP_datagram ) 
                         + sizeof( client_hdr ) ) &&
-                        !mExtSettings->mCompat ) {
-                mExtSettings->mCompat = true;
-                printf( warn_implied_compatibility, option );
+                        !isCompat( mExtSettings ) ) {
+                setCompat( mExtSettings );
+                fprintf( stderr, warn_implied_compatibility, option );
             }
             break;
 
@@ -431,24 +489,73 @@ void Settings::Interpret( char option, const char *optarg ) {
             break;
 
         case 'w': // TCP window size (socket buffer size)
-            GetUpperCaseArg(optarg,outarg);
+            Settings_GetUpperCaseArg(optarg,outarg);
             mExtSettings->mTCPWin = byte_atoi(outarg);
 
             if ( mExtSettings->mTCPWin < 2048 ) {
-                printf( warn_window_small, mExtSettings->mTCPWin );
+                fprintf( stderr, warn_window_small, mExtSettings->mTCPWin );
             }
             break;
+
+        case 'x': // Limit Reports
+            while ( *optarg != '\0' ) {
+                switch ( *optarg ) {
+                    case 's':
+                    case 'S':
+                        setNoSettReport( mExtSettings );
+                        break;
+                    case 'c':
+                    case 'C':
+                        setNoConnReport( mExtSettings );
+                        break;
+                    case 'd':
+                    case 'D':
+                        setNoDataReport( mExtSettings );
+                        break;
+                    case 'v':
+                    case 'V':
+                        setNoServReport( mExtSettings );
+                        break;
+                    case 'm':
+                    case 'M':
+                        setNoMultReport( mExtSettings );
+                        break;
+                    default:
+                        fprintf(stderr, warn_invalid_report, *optarg);
+                }
+                optarg++;
+            }
+            break;
+
+        case 'y': // Reporting Style
+            switch ( *optarg ) {
+                case 'c':
+                case 'C':
+                    mExtSettings->mReportMode = kReport_CSV;
+                    break;
+                default:
+                    fprintf( stderr, warn_invalid_report_style, optarg );
+            }
+            break;
+
 
             // more esoteric options
         case 'B': // specify bind address
             mExtSettings->mLocalhost = new char[ strlen( optarg ) + 1 ];
             strcpy( mExtSettings->mLocalhost, optarg );
+            // Test for Multicast
+            iperf_sockaddr temp;
+            SockAddr_setHostname( mExtSettings->mLocalhost, &temp,
+                                  (isIPV6( mExtSettings ) ? 1 : 0 ));
+            if ( SockAddr_isMulticast( &temp ) ) {
+                setMulticast( mExtSettings );
+            }
             break;
 
         case 'C': // Run in Compatibility Mode
-            mExtSettings->mCompat = true;
+            setCompat( mExtSettings );
             if ( mExtSettings->mMode != kTest_Normal ) {
-                printf( warn_invalid_compatibility_option,
+                fprintf( stderr, warn_invalid_compatibility_option,
                         ( mExtSettings->mMode == kTest_DualTest ?
                           'd' : 'r' ) );
                 mExtSettings->mMode = kTest_Normal;
@@ -456,35 +563,35 @@ void Settings::Interpret( char option, const char *optarg ) {
             break;
 
         case 'D': // Run as a daemon
-            mExtSettings->mDaemon = true;
+            setDaemon( mExtSettings );
             break;
 
         case 'F' : // Get the input for the data stream from a file
-            if ( mExtSettings->mServerMode != kMode_Client ) {
-                printf( warn_invalid_server_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Client ) {
+                fprintf( stderr, warn_invalid_server_option, option );
                 break;
             }
 
-            mExtSettings->mFileInput = true;
+            setFileInput( mExtSettings );
             mExtSettings->mFileName = new char[strlen(optarg)+1];
             strcpy( mExtSettings->mFileName, optarg);
             break;
 
         case 'I' : // Set the stdin as the input source
-            if ( mExtSettings->mServerMode != kMode_Client ) {
-                printf( warn_invalid_server_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Client ) {
+                fprintf( stderr, warn_invalid_server_option, option );
                 break;
             }
 
-            mExtSettings->mFileInput = true;
-            mExtSettings->mStdin     = true;
+            setFileInput( mExtSettings );
+            setSTDIN( mExtSettings );
             mExtSettings->mFileName = new char[strlen("<stdin>")+1];
             strcpy( mExtSettings->mFileName,"<stdin>");
             break;
 
         case 'L': // Listen Port (bidirectional testing client-side)
-            if ( mExtSettings->mServerMode != kMode_Client ) {
-                printf( warn_invalid_server_option, option );
+            if ( mExtSettings->mThreadMode != kMode_Client ) {
+                fprintf( stderr, warn_invalid_server_option, option );
                 break;
             }
 
@@ -492,21 +599,21 @@ void Settings::Interpret( char option, const char *optarg ) {
             break;
 
         case 'M': // specify TCP MSS (maximum segment size)
-            GetUpperCaseArg(optarg,outarg);
+            Settings_GetUpperCaseArg(optarg,outarg);
 
             mExtSettings->mMSS = byte_atoi( outarg );
             break;
 
         case 'N': // specify TCP nodelay option (disable Jacobson's Algorithm)
-            mExtSettings->mNodelay = true;
+            setNoDelay( mExtSettings );
             break;
 
         case 'P': // number of client threads
 #ifdef HAVE_THREAD
             mExtSettings->mThreads = atoi( optarg );
 #else
-            if ( mExtSettings->mServerMode != kMode_Server ) {
-                printf( warn_invalid_single_threaded, option );
+            if ( mExtSettings->mThreadMode != kMode_Server ) {
+                fprintf( stderr, warn_invalid_single_threaded, option );
             } else {
                 mExtSettings->mThreads = atoi( optarg );
             }
@@ -514,7 +621,7 @@ void Settings::Interpret( char option, const char *optarg ) {
             break;
 
         case 'R':
-            mExtSettings->mRemoveService = true;
+            setRemoveService( mExtSettings );
             break;
 
         case 'S': // IP type-of-service
@@ -528,13 +635,33 @@ void Settings::Interpret( char option, const char *optarg ) {
             mExtSettings->mTTL = atoi( optarg );
             break;
 
+        case 'U': // single threaded UDP server
+            setSingleUDP( mExtSettings );
+            break;
+
         case 'V': // IPv6 Domain
-            mExtSettings->mDomain = kMode_IPv6;
+            setIPV6( mExtSettings );
+            if ( mExtSettings->mThreadMode == kMode_Server 
+                 && mExtSettings->mLocalhost != NULL ) {
+                // Test for Multicast
+                iperf_sockaddr temp;
+                SockAddr_setHostname( mExtSettings->mLocalhost, &temp, 1);
+                if ( SockAddr_isMulticast( &temp ) ) {
+                    setMulticast( mExtSettings );
+                }
+            } else if ( mExtSettings->mThreadMode == kMode_Client ) {
+                // Test for Multicast
+                iperf_sockaddr temp;
+                SockAddr_setHostname( mExtSettings->mHost, &temp, 1 );
+                if ( SockAddr_isMulticast( &temp ) ) {
+                    setMulticast( mExtSettings );
+                }
+            }
             break;
 
         case 'W' :
-            mExtSettings->mSuggestWin = false;
-            printf("The -W option is not available in this release\n");
+            setSuggestWin( mExtSettings );
+            fprintf( stderr, "The -W option is not available in this release\n");
             break;
 
         default: // ignore unknown
@@ -542,7 +669,7 @@ void Settings::Interpret( char option, const char *optarg ) {
     }
 } // end Interpret
 
-const void Settings::GetUpperCaseArg(const char *inarg, char *outarg) {
+void Settings_GetUpperCaseArg(const char *inarg, char *outarg) {
 
     int len = strlen(inarg);
     strcpy(outarg,inarg);
@@ -552,7 +679,7 @@ const void Settings::GetUpperCaseArg(const char *inarg, char *outarg) {
         outarg[len-1]= outarg[len-1]+'A'-'a';
 }
 
-const void Settings::GetLowerCaseArg(const char *inarg, char *outarg) {
+void Settings_GetLowerCaseArg(const char *inarg, char *outarg) {
 
     int len = strlen(inarg);
     strcpy(outarg,inarg);
@@ -563,39 +690,38 @@ const void Settings::GetLowerCaseArg(const char *inarg, char *outarg) {
 }
 
 /*
- * Settings::GenerateListenerSettings
+ * Settings_GenerateListenerSettings
  * Called to generate the settings to be passed to the Listener
  * instance that will handle dual testings from the client side
  * this should only return an instance if it was called on 
- * the ext_Settings instance generated from the command line 
+ * the thread_Settings instance generated from the command line 
  * for client side execution 
  */
-void Settings::GenerateListenerSettings( ext_Settings *old, ext_Settings **listener ) {
-
-    if ( !old->mCompat && 
-         (old->mMode == kTest_DualTest || old->mMode == kTest_TradeOff) ) {
-        *listener = new ext_Settings;
-        memcpy(*listener, old, sizeof( ext_Settings ));
-        (*listener)->mCompat     = true;
-        (*listener)->mDaemon     = false;
-        if ( old->mListenPort != 0 ) {
-            (*listener)->mPort   = old->mListenPort;
+void Settings_GenerateListenerSettings( thread_Settings *client, thread_Settings **listener ) {
+    if ( !isCompat( client ) && 
+         (client->mMode == kTest_DualTest || client->mMode == kTest_TradeOff) ) {
+        *listener = new thread_Settings;
+        memcpy(*listener, client, sizeof( thread_Settings ));
+        setCompat( (*listener) );
+        unsetDaemon( (*listener) );
+        if ( client->mListenPort != 0 ) {
+            (*listener)->mPort   = client->mListenPort;
         } else {
-            (*listener)->mPort   = old->mPort;
+            (*listener)->mPort   = client->mPort;
         }
         (*listener)->mFileName   = NULL;
         (*listener)->mHost       = NULL;
         (*listener)->mLocalhost  = NULL;
         (*listener)->mOutputFileName = NULL;
         (*listener)->mMode       = kTest_Normal;
-        (*listener)->mServerMode = kMode_Server;
-        if ( old->mHost != NULL ) {
-            (*listener)->mHost = new char[strlen( old->mHost ) + 1];
-            strcpy( (*listener)->mHost, old->mHost );
+        (*listener)->mThreadMode = kMode_Listener;
+        if ( client->mHost != NULL ) {
+            (*listener)->mHost = new char[strlen( client->mHost ) + 1];
+            strcpy( (*listener)->mHost, client->mHost );
         }
-        if ( old->mLocalhost != NULL ) {
-            (*listener)->mLocalhost = new char[strlen( old->mLocalhost ) + 1];
-            strcpy( (*listener)->mLocalhost, old->mLocalhost );
+        if ( client->mLocalhost != NULL ) {
+            (*listener)->mLocalhost = new char[strlen( client->mLocalhost ) + 1];
+            strcpy( (*listener)->mLocalhost, client->mLocalhost );
         }
     } else {
         *listener = NULL;
@@ -603,92 +729,107 @@ void Settings::GenerateListenerSettings( ext_Settings *old, ext_Settings **liste
 }
 
 /*
- * Settings::GenerateSpeakerSettings
+ * Settings_GenerateSpeakerSettings
  * Called to generate the settings to be passed to the Speaker
  * instance that will handle dual testings from the server side
  * this should only return an instance if it was called on 
- * the ext_Settings instance generated from the command line 
+ * the thread_Settings instance generated from the command line 
  * for server side execution. This should be an inverse operation
  * of GenerateClientHdr. 
  */
-void Settings::GenerateSpeakerSettings( ext_Settings *old, ext_Settings **speaker, 
-                                        client_hdr *hdr, sockaddr* peer ) {
+void Settings_GenerateClientSettings( thread_Settings *server, 
+                                      thread_Settings **client,
+                                      client_hdr *hdr ) {
     int flags = ntohl(hdr->flags);
     if ( (flags & HEADER_VERSION1) != 0 ) {
-        *speaker = new ext_Settings;
-        memcpy(*speaker, old, sizeof( ext_Settings ));
-        (*speaker)->mCompat     = true;
-        (*speaker)->mPort       = (unsigned short) ntohl(hdr->mPort);
-        (*speaker)->mThreads    = ntohl(hdr->numThreads);
+        *client = new thread_Settings;
+        memcpy(*client, server, sizeof( thread_Settings ));
+        setCompat( (*client) );
+        (*client)->mTID = thread_zeroid();
+        (*client)->mPort       = (unsigned short) ntohl(hdr->mPort);
+        (*client)->mThreads    = ntohl(hdr->numThreads);
         if ( hdr->bufferlen != 0 ) {
-            (*speaker)->mBufLen = ntohl(hdr->bufferlen);
+            (*client)->mBufLen = ntohl(hdr->bufferlen);
         }
         if ( hdr->mWinBand != 0 ) {
-            if ( old->mUDPRate == 0 ) {
-                (*speaker)->mTCPWin = ntohl(hdr->mWinBand);
+            if ( isUDP( server ) ) {
+                (*client)->mUDPRate = ntohl(hdr->mWinBand);
             } else {
-                (*speaker)->mUDPRate = ntohl(hdr->mWinBand);
+                (*client)->mTCPWin = ntohl(hdr->mWinBand);
             }
         }
-        (*speaker)->mAmount     = ntohl(hdr->mAmount);
-        (*speaker)->mFileName   = NULL;
-        (*speaker)->mHost       = NULL;
-        (*speaker)->mLocalhost  = NULL;
-        (*speaker)->mOutputFileName = NULL;
-        (*speaker)->mMode       = ((flags & RUN_NOW) == 0 ?
+        (*client)->mAmount     = ntohl(hdr->mAmount);
+        if ( ((*client)->mAmount & 0x80000000) > 0 ) {
+            setModeTime( (*client) );
+#ifndef WIN32
+            (*client)->mAmount |= 0xFFFFFFFF00000000LL;
+#else
+            (*client)->mAmount |= 0xFFFFFFFF00000000;
+#endif
+            (*client)->mAmount = -(*client)->mAmount;
+        }
+        (*client)->mFileName   = NULL;
+        (*client)->mHost       = NULL;
+        (*client)->mLocalhost  = NULL;
+        (*client)->mOutputFileName = NULL;
+        (*client)->mMode       = ((flags & RUN_NOW) == 0 ?
                                    kTest_TradeOff : kTest_DualTest);
-        (*speaker)->mServerMode = kMode_Client;
-        if ( old->mLocalhost != NULL ) {
-            (*speaker)->mLocalhost = new char[strlen( old->mLocalhost ) + 1];
-            strcpy( (*speaker)->mLocalhost, old->mLocalhost );
+        (*client)->mThreadMode = kMode_Client;
+        if ( server->mLocalhost != NULL ) {
+            (*client)->mLocalhost = new char[strlen( server->mLocalhost ) + 1];
+            strcpy( (*client)->mLocalhost, server->mLocalhost );
         }
-        (*speaker)->mHost = new char[REPORT_ADDRLEN];
-        if ( peer->sa_family == AF_INET ) {
-            inet_ntop( AF_INET, &((sockaddr_in*)peer)->sin_addr, 
-                       (*speaker)->mHost, REPORT_ADDRLEN);
+        (*client)->mHost = new char[REPORT_ADDRLEN];
+        if ( ((sockaddr*)&server->peer)->sa_family == AF_INET ) {
+            inet_ntop( AF_INET, &((sockaddr_in*)&server->peer)->sin_addr, 
+                       (*client)->mHost, REPORT_ADDRLEN);
         }
-#ifdef IPV6
+#ifdef HAVE_IPV6
           else {
-            inet_ntop( AF_INET6, &((sockaddr_in6*)peer)->sin6_addr, 
-                       (*speaker)->mHost, REPORT_ADDRLEN);
+            inet_ntop( AF_INET6, &((sockaddr_in6*)&server->peer)->sin6_addr, 
+                       (*client)->mHost, REPORT_ADDRLEN);
         }
 #endif
     } else {
-        *speaker = NULL;
+        *client = NULL;
     }
 }
 
 /*
- * Settings::GenerateClientHdr
+ * Settings_GenerateClientHdr
  * Called to generate the client header to be passed to the
  * server that will handle dual testings from the server side
  * This should be an inverse operation of GenerateSpeakerSettings
  */
-void Settings::GenerateClientHdr( ext_Settings *old, client_hdr *hdr ) {
-    if ( old->mMode != kTest_Normal ) {
+void Settings_GenerateClientHdr( thread_Settings *client, client_hdr *hdr ) {
+    if ( client->mMode != kTest_Normal ) {
         hdr->flags  = htonl(HEADER_VERSION1);
     } else {
         hdr->flags  = 0;
     }
-    if ( old->mBufLenSet ) {
-        hdr->bufferlen = htonl(old->mBufLen);
+    if ( isBuflenSet( client ) ) {
+        hdr->bufferlen = htonl(client->mBufLen);
     } else {
         hdr->bufferlen = 0;
     }
-    if ( old->mUDPRate == 0 ) {
-        hdr->mWinBand  = htonl(old->mTCPWin);
+    if ( isUDP( client ) ) {
+        hdr->mWinBand  = htonl(client->mUDPRate);
     } else {
-        hdr->mWinBand  = htonl(old->mUDPRate);
+        hdr->mWinBand  = htonl(client->mTCPWin);
     }
-    if ( old->mListenPort != 0 ) {
-        hdr->mPort  = htonl(old->mListenPort);
+    if ( client->mListenPort != 0 ) {
+        hdr->mPort  = htonl(client->mListenPort);
     } else {
-        hdr->mPort  = htonl(old->mPort);
+        hdr->mPort  = htonl(client->mPort);
     }
-    hdr->numThreads = htonl(old->mThreads);
-    hdr->mAmount    = htonl(old->mAmount);
-    if ( old->mMode == kTest_DualTest ) {
+    hdr->numThreads = htonl(client->mThreads);
+    if ( isModeTime( client ) ) {
+        hdr->mAmount    = htonl(-(long)client->mAmount);
+    } else {
+        hdr->mAmount    = htonl((long)client->mAmount);
+        hdr->mAmount &= htonl( 0x7FFFFFFF );
+    }
+    if ( client->mMode == kTest_DualTest ) {
         hdr->flags |= htonl(RUN_NOW);
     }
 }
-

@@ -1,9 +1,7 @@
-
-
 <HTML>
 <HEAD>
-<TITLE>Iperf version 1.7.0</TITLE>
-<!-- $Id: index.html,v 1.6 2003/03/12 20:50:58 kgibbs Exp $ -->
+<TITLE>Iperf version 2.0.0</TITLE>
+<!-- $Id: index.html,v 1.1.1.1 2004/05/18 01:50:44 kgibbs Exp $ -->
 </HEAD>
 
 <BODY BGCOLOR="#FFFFFF" LINK="#006633" VLINK="#669900" ALINK="#669966">
@@ -13,9 +11,9 @@
         ALT="Distributed Applications Support Team"></P>
 </CENTER>
 
-<H1>Iperf version 1.7.0</H1>
+<H1>Iperf version 2.0.0</H1>
 
-<H3>March 2003</H3>
+<H3>May 2004</H3>
 
 <HR><!-- ----- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 
@@ -30,17 +28,17 @@
     Jon Dugan<BR>
     Kevin Gibbs<BR> </H4>
 
-March 2003 
+May 2004 
 <P></CENTER>
-[<a href="#compiling">Compiling</A> |&nbsp; 
+[<a href="#compiling">Compiling</A> | 
 <A href="#features">Features</A>&nbsp; | 
 <A href="#tuningtcp">Tuning a TCP connection</A> | 
 <A href="#tuningudp">Tuning a UDP connection</A> | 
+<A href="#multicast">Running multicast servers and clients</A> | 
 <A href="#ipv6">IPv6 Mode</A> | 
-<A href="#representative">Representative Streams</A> |
+<A href="#repmode">Representative Streams</A> |
 <A href="#daemon"> Running Iperf as a daemon</A> |
-<A href="#multiple">Running multiple multicast servers and clients</A> |&nbsp; 
-<A href="#adaptive">Adaptive Window Sizes</A> | 
+<!--<A href="#adaptive">Adaptive Window Sizes</A> | --> 
 <A href="#service">Running Iperf as a Windows Service</A> ] 
 <HR>
 <!-- ----- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -59,13 +57,14 @@ compile the source code.
 
 gunzip -c iperf-&lt;version&gt;.tar.gz | tar -xvf -
 cd iperf-&lt;version&gt;
+./configure
 make
 
 </PRE></BLOCKQUOTE>
 
 To install iperf, use '<TT>make install</TT>', 
 which will ask you where to install it. To recompile, the easiest way is to 
-start over. Do '<TT>make distclean</TT>' then '<TT>make</TT>'. See the Makefile 
+start over. Do '<TT>make distclean</TT>' then '<TT>./configure; make</TT>'. See the Makefile 
 for more options. 
 <P>
 
@@ -109,10 +108,10 @@ we will try to fix them quickly. <BR>
   <LI>Use representative streams to test out how link layer compression affects 
   your achievable bandwidth. 
 
-  <LI>A library of <A 
+<!--  <LI>A library of <A 
   href="lib.html">useful functions and C++ 
   classes.</A> </LI>
-
+-->
 </UL>
 <HR>
 <!-- ----- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- --><BR>&nbsp; 
@@ -609,7 +608,9 @@ UDP buffer size:&nbsp; 128 KByte
 [&nbsp; 3] local &lt;IP Addr node2&gt; port 11303 connected with &lt;IP Addr node1&gt; port 5001
 [ ID] Interval&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Transfer&nbsp;&nbsp;&nbsp;&nbsp; Bandwidth
 [&nbsp; 3]&nbsp; 0.0-10.0 sec&nbsp; 12.5 MBytes&nbsp; 10.0 Mbits/sec
-[&nbsp; 3] Sent 401 datagrams</PRE><PRE></PRE></BLOCKQUOTE><B><FONT size=+1>Multicast</FONT></B> 
+[&nbsp; 3] Sent 401 datagrams</PRE><PRE></PRE></BLOCKQUOTE>
+<P><A name=multicast></A>
+<B><FONT size=+1>Multicast</FONT></B> 
 <P>To test multicast, run several servers with the bind option (-B, --bind) set 
 to the multicast group address. Run the client, connecting to the multicast 
 group address and setting the TTL (-T, --ttl) as needed. Unlike normal TCP and 
@@ -660,6 +661,7 @@ UDP buffer size: 60.0 KByte (default)
 [&nbsp; 3]&nbsp; 2.0- 3.0 sec&nbsp;&nbsp; 128 KBytes&nbsp;&nbsp; 1.0 Mbits/sec&nbsp; 0.264 ms&nbsp;&nbsp;&nbsp; 0/&nbsp;&nbsp; 89 (0%)
 [&nbsp; 3]&nbsp; 3.0- 4.0 sec&nbsp;&nbsp; 128 KBytes&nbsp;&nbsp; 1.0 Mbits/sec&nbsp; 0.248 ms&nbsp;&nbsp;&nbsp; 0/&nbsp;&nbsp; 89 (0%)
 [&nbsp; 3]&nbsp; 0.0- 4.3 sec&nbsp;&nbsp; 554 KBytes&nbsp;&nbsp; 1.0 Mbits/sec&nbsp; 0.298 ms&nbsp;&nbsp; 61/&nbsp; 447 (14%)</PRE><PRE><HR width="100%"></PRE></BLOCKQUOTE>
+<P><A name=ipv6></A>
 <DL>
   <DT><B><FONT size=+2>IPv6 Mode</FONT></B> 
   <DD>Download the IPv6 version of this release.<BR>Get the IPv6 address of the node using the 'ifconfig' command.<BR>Use the <FONT color=#000099>-V</FONT> option to indicate that you are using an IPv6 address Please note that we need to explicitly bind the server address also. 
@@ -679,7 +681,7 @@ UDP buffer size: 60.0 KByte (default)
   <P>The -F option is for file input.<BR>The -I option is for input from stdin. 
   <P>E.g. <BR>Client: $ <FONT color=#000099> iperf -c &lt;server address&gt; -F &lt;file-name&gt;<BR></FONT>
           <BR>Client: $ <FONT color=#000099> iperf -c &lt;server address&gt; -I </FONT></P></DD></DL>
-<P><A name=serverasdaemon></A>
+<P><A name=daemon></A>
 <HR>
 <DL>
   <DT><B><FONT size=+2>Running the server as a daemon</FONT></B> 
@@ -689,7 +691,7 @@ UDP buffer size: 60.0 KByte (default)
   as a daemon and the server messages will be logged in the file iperfLog. 
 </DD></DL>
 <HR>
-<P><A name=win32service></A>
+<P><A name=service></A>
 <DL>
   <DT><B><FONT size=+2>Using Iperf as a Service under Win32</FONT></B> 
   <DD>There are three options for Win32: 
@@ -714,7 +716,7 @@ UDP buffer size: 60.0 KByte (default)
     sure to use the proper OPTION in the service properties dialog. 
   </P></DD></DL></DD></DL>
 <HR>
-<P><A name=multicast></A>
+<!--<P><A name=multicast></A>
 <DL>
   <DT><B><FONT size=+2>Running the multicast server and client</FONT></B> 
   <DD>Use the -B option while starting the server to bind it to a multicast 
@@ -730,7 +732,7 @@ UDP buffer size: 60.0 KByte (default)
   sending data to the same multicast server. (If you have multiple servers 
   listening on the multicast address, each of the servers will be getting the data) 
 </P></DD></DL>
-<HR>
+<HR>-->
 <!--<A name=adaptive></A>
 <DL>
   <DT><B><FONT size=+2>Adaptive window sizes</FONT></B> 
@@ -747,7 +749,7 @@ UDP buffer size: 60.0 KByte (default)
 <HR width="100%">
 --><P><!-- ----- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <CENTER>
-<P>Copyright 1999,2000,2001,2002,2003 <BR>The Board of Trustees of the University of 
+<P>Copyright 1999,2000,2001,2002,2003,2004 <BR>The Board of Trustees of the University of 
 Illinois <BR>All rights reserved <BR>See <A 
 href="ui_license.html">UI License</A> for 
 complete details.</CENTER>

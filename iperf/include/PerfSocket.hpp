@@ -44,78 +44,35 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
+ * PerfSocket.hpp
  * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
+ *  &  Ajay Tirumala <tirumala@ncsa.uiuc.edu>   
  * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
- *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
- *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * Changes in version 1.6
+ *   Incorporates class declarations for fetching data from files 
  * ------------------------------------------------------------------- */
 
 
-#define HEADERS()
+#ifndef PERFSOCKET_H
+#define PERFSOCKET_H
 
-#include "headers.h"
+#include "Mutex.h"
+#include "Settings.hpp"
 
-#include "PerfSocket.hpp"
-#include "util.h"
+    void SetSocketOptions( thread_Settings *inSettings );
 
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
+    // handle interupts
+    void Sig_Interupt( int inSigno );
 
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
+#ifdef __cplusplus
+extern "C" {
+#endif
+    extern int sInterupted;
+    extern int groupID;
+    extern Mutex groupCond;
 
-#ifdef IP_TOS
-
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
+#ifdef __cplusplus
+} /* end extern "C" */
 #endif
 
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
-
-#ifdef TCP_NODELAY
-
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
-#endif
-    }
-}
-// end SetSocketOptions
+#endif // PERFSOCKET_H

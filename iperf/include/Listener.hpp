@@ -44,78 +44,52 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
+ * Listener.hpp
  * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
  * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
- *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
- *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * Listener sets up a socket listening on the server host. For each
+ * connected socket that accept() returns, this creates a Server
+ * socket and spawns a thread for it.
  * ------------------------------------------------------------------- */
 
+#ifndef LISTENER_H
+#define LISTENER_H
 
-#define HEADERS()
+#include "Thread.h"
+#include "Settings.hpp"
 
-#include "headers.h"
+class Listener;
 
-#include "PerfSocket.hpp"
-#include "util.h"
+class Listener {
+public:
+    // stores server port and TCP/UDP mode
+    Listener( thread_Settings *inSettings );
 
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
+    // destroy the server object
+    ~Listener();
 
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
+    // accepts connections and starts Servers
+    void Run( void );
 
-#ifdef IP_TOS
+    // Starts the Servers as a daemon 
+    void runAsDaemon( const char *, int );
 
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
-#endif
+    void Listen( );
 
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
+    void McastJoin( );
 
-#ifdef TCP_NODELAY
+    void McastSetTTL( int val );
 
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
-#endif
-    }
-}
-// end SetSocketOptions
+    void Accept( thread_Settings *server );
+
+    void UDPSingleServer ();
+
+protected:
+    int mClients;
+    char* mBuf;
+    thread_Settings *mSettings;
+    thread_Settings *server;
+
+}; // end class Listener
+
+#endif // LISTENER_H

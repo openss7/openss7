@@ -44,78 +44,80 @@
  * http://www.ncsa.uiuc.edu
  * ________________________________________________________________ 
  *
- * PerfSocket.cpp
- * by Mark Gates <mgates@nlanr.net>
- *    Ajay Tirumala <tirumala@ncsa.uiuc.edu>
+ * Extractor.h
+ * by Ajay Tirumala (tirumala@ncsa.uiuc.edu)
  * -------------------------------------------------------------------
- * Has routines the Client and Server classes use in common for
- * performance testing the network.
- * Changes in version 1.2.0
- *     for extracting data from files
- * -------------------------------------------------------------------
- * headers
- * uses
- *   <stdlib.h>
- *   <stdio.h>
- *   <string.h>
+ * Extract data from a file, used to measure the transfer rates
+ * for various stream formats. 
  *
- *   <sys/types.h>
- *   <sys/socket.h>
- *   <unistd.h>
+ * E.g. Use a gzipped file to measure the transfer rates for 
+ * compressed data
+ * Use an MPEG file to measure the transfer rates of 
+ * Multimedia data formats
+ * Use a plain BMP file to measure the transfer rates of 
+ * Uncompressed data
  *
- *   <arpa/inet.h>
- *   <netdb.h>
- *   <netinet/in.h>
- *   <sys/socket.h>
+ * This is beneficial especially in measuring bandwidth across WAN
+ * links where data compression takes place before data transmission 
  * ------------------------------------------------------------------- */
 
+#ifndef _EXTRACTOR_H
+#define _EXTRACTOR_H
 
-#define HEADERS()
+#include <stdlib.h>
+#include <stdio.h>
+#include "Settings.hpp"
 
-#include "headers.h"
-
-#include "PerfSocket.hpp"
-#include "util.h"
-
-/* -------------------------------------------------------------------
- * Set socket options before the listen() or connect() calls.
- * These are optional performance tuning factors.
- * ------------------------------------------------------------------- */
-
-void SetSocketOptions( thread_Settings *inSettings ) {
-    // set the TCP window size (socket buffer sizes)
-    // also the UDP buffer size
-    // must occur before call to accept() for large window sizes
-    setsock_tcp_windowsize( inSettings->mSock, inSettings->mTCPWin,
-                            (inSettings->mThreadMode == kMode_Client ? 1 : 0) );
-
-#ifdef IP_TOS
-
-    // set IP TOS (type-of-service) field
-    if ( inSettings->mTOS > 0 ) {
-        int  tos = inSettings->mTOS;
-        Socklen_t len = sizeof(tos);
-        int rc = setsockopt( inSettings->mSock, IPPROTO_IP, IP_TOS,
-                             (char*) &tos, len );
-        WARN_errno( rc == SOCKET_ERROR, "setsockopt IP_TOS" );
-    }
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-    if ( !isUDP( inSettings ) ) {
-        // set the TCP maximum segment size
-        setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
+    /**
+     * Constructor
+     * @arg fileName   Name of the file 
+     * @arg size       Block size for reading
+     */
+    void Extractor_Initialize( char *fileName, int size, thread_Settings *mSettings );
 
-#ifdef TCP_NODELAY
+    /**
+     * Constructor
+     * @arg fp         File Pointer 
+     * @arg size       Block size for reading
+     */
+    void Extractor_InitializeFile( FILE *fp, int size, thread_Settings *mSettings );
 
-        // set TCP nodelay option
-        if ( isNoDelay( inSettings ) ) {
-            int nodelay = 1;
-            Socklen_t len = sizeof(nodelay);
-            int rc = setsockopt( inSettings->mSock, IPPROTO_TCP, TCP_NODELAY,
-                                 (char*) &nodelay, len );
-            WARN_errno( rc == SOCKET_ERROR, "setsockopt TCP_NODELAY" );
-        }
+
+    /*
+     * Fetches the next data block from 
+     * the file
+     * @arg block     Pointer to the data read
+     * @return        Number of bytes read
+     */
+    int Extractor_getNextDataBlock( char *block, thread_Settings *mSettings );
+
+
+    /**
+     * Function which determines whether
+     * the file stream is still readable
+     * @return true, if readable; false, if not
+     */
+    int Extractor_canRead( thread_Settings *mSettings );
+
+    /**
+     * This is used to reduce the read size
+     * Used in UDP transfer to accomodate the
+     * the header (timestamp)
+     * @arg delta         Size to reduce
+     */
+    void Extractor_reduceReadSize( int delta, thread_Settings *mSettings );
+
+    /**
+     * Destructor
+     */
+    void Extractor_Destroy( thread_Settings *mSettings ); 
+#ifdef __cplusplus
+} /* end extern "C" */
 #endif
-    }
-}
-// end SetSocketOptions
+
+#endif
+
