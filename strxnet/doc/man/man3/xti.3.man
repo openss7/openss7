@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti.3.man,v 0.9.2.1 2004/04/06 12:33:58 brian Exp $
+.\" @(#) $Id: xti.3.man,v 0.9.2.2 2004/04/07 09:33:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/06 12:33:58 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/07 09:33:28 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -73,12 +73,12 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XNET 3 "$Date: 2004/04/06 12:33:58 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH XNET 3 "$Date: 2004/04/07 09:33:28 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
 .BR xti ", " xnet
-\- XNS 5.2 XTI Library
+\- XNS 5.2 XTI/TLI Library
 .BR "" ( libxnet )
 .\"
 .\"
@@ -156,15 +156,14 @@ sort-adjacent-labels
 .B libxnet
 is an
 .B OpenSS7
-implementation of the XNS 5.2 XTI Library for
+implementation of the XNS 5.2 XTI/TLI Library for
 .B LfS
 (Linux Fast-STREAMS)
 .[
 lfs
 .]
 and
-.B LiS
-(Linux STREAMS).
+.BR LiS .
 .[
 lis
 .]
@@ -431,7 +430,7 @@ underlying transport service provider.
 .\"
 .\"
 .SS "Connection Oriented Endpoints"
-A set of XTI Library calls are provided for performing protocol functions on
+A set of XTI/TLI Library calls are provided for performing protocol functions on
 local transport endpoints for which the transport service provider is of a
 connection oriented service type.  Connection oriented services have three
 phases as follows:
@@ -440,7 +439,7 @@ phases as follows:
 consists of either invoking outgoing connections or listening for and
 accepting incoming connections.  Valid states for this phase are:
 .BR T_IDLE ", " T_INCON ", and " T_OUTCON .
-XTI Library calls used in the Connection Establishment Phare are as follows:
+XTI/TLI Library calls used in the Connection Establishment Phare are as follows:
 .RS
 .sp
 .BR t_listen "(3) - get a connection request"
@@ -466,7 +465,7 @@ states for this phase are:
 (for incoming data) and
 .BR T_INREL
 (for outgoing data).
-XTI Library calls used in the Data Transfer Phare are as follows:
+XTI/TLI Library calls used in the Data Transfer Phare are as follows:
 .RS
 .sp
 .BR t_snd "(3) - send data"
@@ -483,7 +482,7 @@ XTI Library calls used in the Data Transfer Phare are as follows:
 consists of either abortive or orderly release of the transport connection,
 with or without user data.  Valid states for this phase are:
 .BR T_DATAXFER ", " T_OUTREL ", and " T_INREL .
-XTI Library calls used in the Connection Release Phare are as follows:
+XTI/TLI Library calls used in the Connection Release Phare are as follows:
 .RS
 .sp
 .BR t_rcvdis "(3) - receive abortive disconnect"
@@ -501,7 +500,7 @@ XTI Library calls used in the Connection Release Phare are as follows:
 .\"
 .\"
 .SS "Connectionless Endpoints"
-A set of XTI Library calls are provided for performing protocol functions on
+A set of XTI/TLI Library calls are provided for performing protocol functions on
 local transport endpoints for which the transport service provider is of a
 connectionless service type.  Connectionless service has one phase as follows:
 .HP
@@ -509,7 +508,7 @@ connectionless service type.  Connectionless service has one phase as follows:
 consists of transferring data between disconnected transport endpoints.  Valid
 states for this phase are:
 .BR T_IDLE .
-XTI Library calls used in the Data Transfer Phase are as follows:
+XTI/TLI Library calls used in the Data Transfer Phase are as follows:
 .RS
 .sp
 .BR t_rcvudata "(3) - receive unitdata"
@@ -522,14 +521,14 @@ XTI Library calls used in the Data Transfer Phase are as follows:
 .RE
 .\"
 .\"
-.SS "XTI Library functions"
-A set of XTI Library calls are provided for error handling and utility.
+.SS "XTI/TLI Library functions"
+A set of XTI/TLI Library calls are provided for error handling and utility.
 These functions do not operate directly on a transport endpoint.
 .HP
 .B Error Handling
 consists of the global external variable
 .I t_errno
-which holds all XTI Library call error numbers in a similar fashion to
+which holds all XTI/TLI Library call error numbers in a similar fashion to
 .BR errno (3).
 The following Error Handling functions are provided:
 .RS
@@ -569,7 +568,7 @@ to an applicable error number.
 .\"
 .SH ERRORS
 .PP
-The errors that can be returned by XTI Library calls are detailed
+The errors that can be returned by XTI/TLI Library calls are detailed
 in
 .IR t_errno (3).
 .\"
