@@ -29,6 +29,7 @@ driver	spx		spx	*
 driver	socksys		socksys	*
 driver	unix		unix	*
 driver	xnet		xnet	*
+driver	log		log	*
 #
 # this must be 30 for iBCS compatibility
 #
@@ -52,6 +53,7 @@ objname	driver	socksys		socksys
 objname	driver	unix		unix
 objname	driver	xnet		xnet
 objname driver	inet		inet
+objname driver	log		log
 
 #
 # Autopush specifications
@@ -80,6 +82,7 @@ loadable socksys
 loadable unix
 loadable xnet
 loadable inet
+loadable log
 
 #
 # Initialization specifications
@@ -110,14 +113,15 @@ node	/dev/fifo	     c  0666    clone		fifo
 node	/dev/loop	     c  0666    clone		loop
 node	/dev/sad	     c	*	clone		sad
 node	/dev/nsdev	     c	*	nsdev		0
-node	/dev/echo	     c	*	echo		0
-node	/dev/nuls	     c	*	nuls		0
+node	/dev/echo	     c	*	clone		echo
+node	/dev/nuls	     c	*	clone		nuls
 node	/dev/pipe	     c	*	pipe		0
 node	/dev/sfx	     c	*	sfx		0
 node	/dev/spx	     c	*	spx		0
 node	/dev/socksys	     c	*	socksys		0
 node	/dev/unix	     c	*	unix		0
 node	/dev/xnet	     c	*	xnet		0
+node	/dev/strlog	     c	*	clone		log
 #
 # These are iBCS devices that should already be installed on a
 # system that supports the iBCS.  The /dev entries are supposed

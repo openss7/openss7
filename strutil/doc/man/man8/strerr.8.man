@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strerr.8.man,v 0.9.2.1 2004/03/04 23:15:47 brian Exp $
+.\" @(#) $Id: strerr.8.man,v 0.9.2.2 2004/03/07 22:49:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRERR 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRERR 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -82,7 +82,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-.B strerr
+\fBstrerr\fR [{\fB-a\fR|\fB--admin\fR[=]}\fIMAILUID\fR] [{\fB-d\fR|\fB--directory\fR[=]}\fIDIRECTORY\fR]
 .\"
 .\"
 .SH DESCRIPTION
@@ -93,7 +93,8 @@ daemon receives error log messages from the
 .I STREAMS
 log driver and appends them to a log file.  The error log files produced
 reside in the directory
-.BR /var/adm/streams ,
+.BR /var/adm/streams " or " /var/log/streams ,
+or a user-specified directory,
 and are named
 .BI error. mm-dd\fR,
 where
@@ -126,6 +127,86 @@ daemon is executed asynchronously.
 .\"
 .SH OPTIONS
 .PP
+.TP
+\fB-a\fR, \fB--admin\fR \fIMAILUID\fR
+Specifies the mail user or alias to which to send all mail messages.  Mail is
+sent to
+.RB \(lq root \(rq
+by default.
+.TP
+\fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
+Specifies a directory to contain the messages.  Default is to search for
+.RB \(lq /var/adm/streams \(rq
+and then
+.RB \(lq /var/log/streams .\(rq
+.TP
+\fB-n\fR, \fB--nodaemon\fR
+Do not daemonize, run in the foreground, print error logs to
+.BR stderr .
+.TP
+\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
+Specify the log file basename.  Default is
+.RB \(lq error \(rq .
+.TP
+\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
+Specifiy the log file output name.  Default is
+.RI \(lq BASENAME . mm-dd \(rq,
+where
+.I mm-dd
+is the current month and day of month.
+.TP
+\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
+Specify the error file output name.  Default is
+.RI \(lq BASENAME .error\(rq.
+.TP
+\fB-l\fR, \fB--logdev\fR \fILOGDEVICE\fR
+Specifies the log device.  Default is to search
+.RB \(lq /dev/strlog ,\(rq
+.RB \(lq /dev/streams/log \(rq
+and
+.RB \(lq /dev/log .\(rq
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-D\fR, \fB--debug\fR [\fILEVEL\fr]
+Increase or specify the debug output
+.IR LEVEL .
+When a debug
+.I LEVEL
+has been specified,
+.B strerr
+will log to
+.BR stdout ,
+prints debug messages to
+.BR stderr ,
+and will not place itself in the background.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase or specify the verbosity
+.I LEVEL
+of the output.  This option may be repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B scls
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B scls
+displays versions information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B scls
+displays copying and copyright information on
+.I stdout
+and exits.
 .\"
 .\"
 .SH "FILE FORMAT"
@@ -178,6 +259,35 @@ the formatted text itself.
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH SIGNALS
+.PP
+.B strerr
+catches the
+.B SIGHUP
+signal
+.RB "(see " signal (7)).
+.TP
+.B SIGHUP
+When the
+.B SIGHUP
+signal is caught,
+.B strerr
+will close the current log file and open a new (or reopen the existing) log
+file.  This is for use with
+.BR logrotate (8).
 .\"
 .\"
 .SH NOTICES
@@ -194,12 +304,17 @@ log driver amy not be able to deliver some of the messages.  This situation is
 indicated by gaps in the sequence numbering of the messages in the log files.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.BR /dev/strlog ", " /dev/streams/log " or " /dev/log
+the
+.I STREAMS
+logging device.
 .\"
 .\"
 .SH FILES
@@ -210,13 +325,19 @@ contains the
 .B strerr
 command.
 .TP
-.BI /var/adm/streams/error. mm-dd
-Error log file.
+.BR /var/log/streams " or " /var/adm/streams
+directory containing the error log files.
+.TP
+.BI /var/log/streams/error. "mm-dd \fR or " /var/adm/streams/error. mm-dd
+error log file.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .BR log (4),
+.BR strlog (4),
+.BR strlog (9),
+.BR strace (8),
 .BR strclean (8).
 .\"
 .\"
@@ -228,8 +349,114 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
+.B strerr
+is compatible with
+.BR "SVR 4.2" ,
+and systems based on
+.B "SVR 4.2"
+such as
+.BR AIX \(rg,
 .BR HPUX \(rg,
+.BR OSF \(rg,
 .BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR UX/P \(rg
+with the following compatibility considerations:
+.IP \(em
+Options
+.BR -n ", " -b ", " -o ", " -e " and " -l
+and all long options, are specific to this
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation of
+.B strerr
+and should not be used by portable applications.
+.IP \(em
+No other implementation documents the
+.BR -q ", " -D ", " -v ", " -h ", " -V " or " -C
+options.
+They should not be used by portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards.
+.IP \(em
+.BR AIX \(rg,
+.BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR UX/P \(rg
+do not document the
+.BR -a " or " -d
+options;
+.BR HPUX \(rg
+and
+.BR OSF \(rg
+do.
+.IP \(em
+All other implementations document the log file directory as
+.B /var/adm/streams
+instead of
+.BR /var/log/streams .
+.B /var/log/streams
+is used under
+.B Linux
+for compatability with the
+.BR "Linux File Standard" .
+For compatibility,
+.B strerr
+first checks if the directory
+.B /var/adm/streams
+exists, and then creates
+.B /var/log/streams
+if necessary, unless a directory is specified with the
+.B -d
+option.
+.IP \(em
+Under
+.BR "SVR 4.2"
+.[
+svr42cr
+.]
+and
+.BR UnixWare \(rg
+.[
+uw7doc
+.]
+the
+.I STREAMS
+error logger is called
+.B /dev/log
+rather than
+.BR /dev/strlog .
+Under
+.BR OSF \(rg
+.[
+osfdoc
+.]
+the
+.I STREAMS
+error logger is called
+.B /dev/stream/log
+instead of
+.BR /dev/strlog .
+For compatibility with these operating environments,
+.B strerr
+attempts to open
+.BR /dev/streams/log ", " /dev/strlog " and then " /dev/log
+if not specified with the
+.B -l
+option.
+The call to
+.B strerr
+will fail if there is no
+.IR STREAMS -based
+log device in this search sequence, or specified with the
+.B -l
+option.
 .\"
 .\"
 .SH CONFORMANCE
@@ -238,13 +465,42 @@ has no known bugs.
 .[
 svr42cr
 .]
+.BR AIX \(rg,
 .BR HPUX \(rg,
+.BR OSF \(rg,
 .BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR UX/P \(rg
 documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.[
+uxpdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strerr
+first appear in
+.BR "SVR 4" .
+.[
+svr4
+.]
 .\"
 .\"
 .[

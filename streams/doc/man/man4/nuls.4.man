@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: nuls.4.man,v 0.9.2.2 2004/03/06 21:39:46 brian Exp $
+.\" @(#) $Id: nuls.4.man,v 0.9.2.3 2004/03/07 22:49:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/06 21:39:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NULS 4 "$Date: 2004/03/06 21:39:46 $" "$Name:  $" "Linux Fast-STREAMS Modules"
+.TH NULS 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Modules"
 .\"
 .\"
 .SH NAME

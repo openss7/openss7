@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*-
+.\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: fattach.3.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\" @(#) $Id: fattach.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -48,7 +48,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\" Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 3 "$Date: 2004/03/01 02:44:05 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH FATTACH 3 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B fattach
 \- attach a \fISTREAMS\fR open file to a path name in the file system

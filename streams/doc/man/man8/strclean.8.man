@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strclean.8.man,v 0.9.2.1 2004/03/04 23:15:47 brian Exp $
+.\" @(#) $Id: strclean.8.man,v 0.9.2.2 2004/03/07 22:49:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCLEAN 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRCLEAN 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -82,7 +82,9 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBstrclean \fR[\fB-d \fR[\fIdirectory\fR]] [\fB-a \fR[\fIage\fR]]
+\fBstrclean\fR [{\fB-d\fR|\fB--directory\fR[=]}\fIDIRECTORY\fR] [{\fB-a\fR|\fB--age\fR[=]}\fR\fIAGE\fR]
+.HP 12
+\fBstrclean\fR {\fB-h\fR|\fB--help\fR} | {\fB-V\fR|\fB--version\fR} | {\fB-C\fR|\fB--copying\fR}
 .\"
 .\"
 .SH DESCRIPTION
@@ -96,49 +98,114 @@ error-logger directory on a regular basis: for example, by using the
 daemon.  By default, all files with names matching
 .BI error.mm-dd
 in the
-.B /var/adm/streams
+.B /var/log/streams
+.\".B /var/adm/streams
 directory that have not been modified in the last three days are removed.
-.PP
-.B Note:
-The
-.B strclean
-comman is typically run using the
-.BR cron (8)
-daemon on a daily or weekly basis.
 .\"
 .\"
 .SH OPTIONS
 .PP
 .TP
-\fR[\fB-d\fR, \fB--directory\fR \fIdirectory\fR]
+\fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
 Specifies a directory other than
-.BR /var/adm/streams .
+.BR /var/log/streams .
+.\".BR /var/adm/streams .
 If not specified,
-.I directory
+.I DIRECTORY
 defaults to
-.BR /var/adm/streams .
+.BR /var/log/streams .
+.\".BR /var/adm/streams .
 .TP
-\fR[\fB-a\fR, \fB--age\fR \fIage\fR]
+\fB-a\fR, \fB--age\fR \fIAGE\fR
 Specifies the maximum age, in days, other than three (3), for a log file.
 If not specified,
-.I age
+.I AGE
 defaults to three (3).
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-D\fR, \fB--debug\fR [\fILEVEL\fr]
+Increase or specify the debug output
+.IR LEVEL .
+When a debug
+.I LEVEL
+has been specified,
+.B strerr
+will log to
+.BR stdout ,
+prints debug messages to
+.BR stderr ,
+and will not place itself in the background.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase or specify the verbosity
+.I LEVEL
+of the output.  This option may be repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B scls
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B scls
+displays versions information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B scls
+displays copying and copyright information on
+.I stdout
+and exits.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B strclean
+command is typically run using the
+.BR cron (8)
+daemon on a daily or weekly basis.
 .\"
 .\"
 .SH NOTICES
 .PP
+.B strclean
+could easily be implemented as a script.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.BR /dev/strlog ", " /dev/streams/log " or " /dev/log
+the
+.I STREAMS
+logging device.
 .\"
 .\"
 .SH FILES
@@ -148,9 +215,11 @@ defaults to three (3).
 contains the
 .B strclean
 command.
-.\"
 .TP
-.BI /var/adm/streams/error. mm-dd
+.BR /var/log/streams " or " /var/adm/streams
+directory containing the error log files.
+.TP
+.BI /var/log/streams/error. "mm-dd \fR or " /var/adm/streams/error. mm-dd
 contains the
 .I STREAMS
 error log.
@@ -158,22 +227,57 @@ error log.
 .SH "SEE ALSO"
 .PP
 .BR cron (8),
-.BR strerr (8).
+.BR log (4),
+.BR strlog (4),
+.BR strlog (9),
+.BR strerr (8),
+.BR strace (8).
 .\"
 .\"
 .SH BUGS
 .PP
+.B strclean
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B strclean
+is compatible with
 .BR "SVR 4.2" ,
+and systems based on
+.BR "SVR 4.2" ,
+such as
 .BR AIX \(rg,
 .BR HPUX \(rg,
 .BR OSF \(rg,
 .BR Solaris \(rg,
-.BR UnixWare \(rg,
+.BR UnixWare \(rg
+and
 .BR UXP/V \(rg,
+with the following compatibility considerations:
+.IP \(em
+No other implementation documents the
+.BR -q ", " -d ", -v ", " -h ", " -V " or " -C
+options.
+They should not be used by portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards.
+.IP \(em
+Under
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+.B strclean
+will also clean out trace files left in the log directory and which are older
+than
+.IR AGE .
+See
+.BR strace (8)
+for more information on trace log files.
 .\"
 .\"
 .SH CONFORMANCE
@@ -186,13 +290,39 @@ svr42cr
 .BR HPUX \(rg,
 .BR OSF \(rg,
 .BR Solaris \(rg,
-.BR UnixWare \(rg,
-.BR UXP/V \(rg,
+.BR UnixWare \(rg
+and
+.BR UXP/V \(rg
 documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.[
+uxpdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.PP
+.B strclean
+first appear in
+.BR "SVR 4" .
+.[
+svr4
+.]
 .\"
 .\"
 .[

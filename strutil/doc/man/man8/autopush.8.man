@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.3 2004/03/06 21:39:46 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.4 2004/03/07 22:49:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/06 21:39:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH 8 "$Date: 2004/03/06 21:39:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH AUTOPUSH 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME

@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: strace.8.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\" @(#) $Id: strace.8.man,v 0.9.2.2 2004/03/07 22:49:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRACE 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRACE 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -108,6 +108,79 @@ with command-line arguments limits the trace messages received.
 .\"
 .SH OPTIONS
 .PP
+.TP
+\fB-D\fR, \fB--daemon\fR
+Daemonize, run in the background, redirect
+.B stdout
+to
+.I OUTFILE
+and
+.B stderr
+to
+.IR ERRFILE .
+.TP
+\fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
+Only significant when running as a daemon.
+Specifies a directory to contain the messages.  Default is to search for
+.RB \(lq /var/adm/streams \(rq
+and then
+.RB \(lq /var/log/streams .\(rq
+.TP
+\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
+Only significant when running as a daemon.
+Specify the log and error file base name.  Default is
+.RB \(lq trace \(rq.
+.TP
+\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
+Only significant when running as a daemon.
+Specify the log file output name.  Default is
+.RI \(lq BASENAME . pid \(rq,
+where
+.I pid
+is the current process id.
+.TP
+\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
+Only significant when running as a daemon.
+Specify the error file name.  Default is
+.RI \(lq BASENAME . error \(rq.
+.TP
+\fB-l\fR, \fB--logdev\fR \fILOGDEVICE\fR
+Specifies the log device.  Default is to search
+.RB \(lq /dev/strlog ,\(rq
+.RB \(lq /dev/streams/log \(rq
+and
+.RB \(lq /dev/log .\(rq
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-d\fR, \fB--debug\fR [\fIlevel\fR]
+Increase or specify the debug output level.  This option may be repeated.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase or specify the verbosity level of the output.  This option may be
+repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B scls
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B scls
+displays versions information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B scls
+displays copying and copyright information on
+.I stdout
+and exits.
 .\"
 .\"
 .SH ARGUMENTS
@@ -192,9 +265,19 @@ Trace message text.
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.BR stderr ;
+two (2) indicates that the option or argument syntax was in error and a
+diagnostic message is printed to
+.BR stderr .
 .\"
 .\"
 .SH NOTICES
+.PP
+.BR strace (8)
+has no resemblence to the system-call tracing utility of the same name:
+.BR strace (1).
 .PP
 Only one
 .B strace
@@ -217,14 +300,43 @@ may not be able to handle a large number of messages.  If drivers and modules
 return messages to
 .B strace
 too quickly, some may be lost.
-.\"
-.\"
-.SH EXAMPLES
 .PP
+Due to performance considerations, only one
+.B strace
+command is permitted to open the
+.I STREAMS
+.B log
+driver at a time.  The
+.B log
+driver has a list of the triplets specified in the command invocation, and
+compares each potential trace message against this list to decide if it should
+be formatted and sent up to the
+.B strace
+process.  Hence, long lists of triplets have a greater impact on overall
+.I STREAMS
+performance.  Running the
+.B strace
+command has the most impace on the timing of modules and drivers generating
+the trace messages that are sent to the
+.B strace
+process.  If trace message are generated faster than the
+.B strace
+process can handle them, some of the messages will be lost.  This last case
+can be determined by examining the sequence numbers on the trace messages
+output.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.BR /dev/strlog ", " /dev/streams/log " or " /dev/log
+the
+.I STREAMS
+logging device.
 .\"
 .\"
 .SH FILES
@@ -234,20 +346,116 @@ too quickly, some may be lost.
 contains the
 .B strace
 command.
+.TP
+.BR /var/log/streams " or " /var/adm/streams
+directory containing the error log files.
+.TP
+.BI /var/log/streams/trace. "pid \fR or " /var/adm/streams/trace. pid
+trace log file.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR strlog (4),
+.BR strerr (8).
 .\"
 .\"
 .SH BUGS
 .PP
+.B strace
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B strace
+is compatible with systems based on
+.BR "SVR 4.2" ,
+.[
+svr42cr
+.]
+.BR AIX \(rg,
 .BR HPUX \(rg,
+.BR OSF \(rg,
 .BR Solaris \(rg,
+.BR UnixWare \(rg,
+.BR UX/P \(rg,
+with the following compatibility considerations:
+.IP \(em
+Options
+.BI -D ", " -b ", " -o ", " -e " and " -l ,
+and all long options, are specific to this
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation of
+.B strace
+and should not be used by portable applications.
+.IP \(em
+Not other implementation documents the
+.BR -q ", " -d ", " -v ", " -h ", " -V " or " -C
+options.  They should not be used for portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards.
+.IP \(em
+.B "SVR 4.2"
+and system based on
+.B "SVR 4.2"
+permit only on
+.B strace
+process to be active at a time.
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+.B strace
+permits multiple
+.B strace
+processes to be running simultaneously.
+The first process to register for the given trace id filter will receive those
+trace messages and no other trace process will receive them.
+.IP \(em
+Under
+.BR "SVR 4.2"
+.[
+svr42cr
+.]
+and
+.BR UnixWare \(rg
+the
+.I STREAMS
+trace logger is called
+.B /dev/log
+rather than
+.BR /dev/strlog .
+.B Linux
+already has a
+.RB non- STREAMS
+based log mechanism (BSD-style) logging device named
+.BR /dev/log .
+.IP \(em
+Under
+.BR OSF \(rg
+the
+.I STREAMS
+trace logger is called
+.BR /dev/streams/log .
+.IP \(em
+For compatibility with these operating environments,
+.B strace
+attempts to open
+.BR /dev/streams/log ,
+.BR /dev/strlog
+and then
+.BR /dev/log .
+The call to
+.B strace
+will fail if there is no
+.IR STREAMS -based
+log device in this search sequence.
 .\"
 .\"
 .SH CONFORMANCE
@@ -256,13 +464,41 @@ command.
 .[
 svr42cr
 .]
+.BR AIX \(rg,
 .BR HPUX \(rg,
+.BR OSF \(rg,
 .BR Solaris \(rg,
+.BR UnixWare \(rg,
+.BR UX/P \(rg,
 documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.[
+uxpdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strace
+first appeared in
+.BR "SVR 4" .
+.[
+svr42cr
+.]
 .\"
 .\"
 .[

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/03/04 23:15:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/03/08 01:21:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+# Last Modified $Date: 2004/03/08 01:21:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -137,6 +137,12 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/strpipe.h \
 				src/drivers/strsock.c \
 				src/drivers/strsock.h \
+				include/log.h \
+				include/sys/log.h \
+				include/strlog.h \
+				include/sys/strlog.h \
+				src/drivers/log.h \
+				src/drivers/log.c \
 				$(top_builddir)/$(LFS_SC_CONFIG)
 #				src/drivers/strinet.c
 #				src/drivers/strsfx.c
@@ -390,9 +396,6 @@ Config.master: $(lfs_configs)
 		echo "cat $(lfs_configs) > Config.master < /dev/null"; \
 		cat $(lfs_configs) > Config.master < /dev/null; \
 	else exit 1; fi;
-
-clean-local:
-	rm -f @LFS_SC_CONFIG@ @LFS_SC_MODCONF@ @LFS_SC_MKNODES@ @LFS_SC_DRVCONF@ @LFS_SC_CONFMOD@ @LFS_SC_MAKEDEV@ Config.master
 
 nodist_man_MANS = \
 	doc/man/man1/strchg.1 doc/man/man1/strconf.1 doc/man/man1/strreset.1 doc/man/man1/xxx.1 doc/man/man2/fattach.2 \
@@ -1048,6 +1051,13 @@ $(nodist_man_MANS): %: %.man
 #	echo "cat $< | soelim -I $$p -I $$m | ( cd $$p ; refer ) | sed -e '/^\.lf/d' > $@" ; \
 #	set +e ; \
 #	cat $< | soelim -I $$p -I $$m | ( cd $$p ; refer ) | sed -e '/^\.lf/d' > $@ ;
+
+clean-local:
+	rm -f @LFS_SC_CONFIG@ @LFS_SC_MODCONF@ @LFS_SC_MKNODES@ @LFS_SC_DRVCONF@ @LFS_SC_CONFMOD@ @LFS_SC_MAKEDEV@ Config.master
+	@for f in $(nodist_man_MANS) ; do \
+		echo "rm -f $$f" ; \
+		rm -f $$f ; \
+	done
 
 nobase_pkginclude_HEADERS = include/stropts.h include/tihdr.h include/timod.h \
 	include/sys/aixddi.h include/sys/cmn_err.h include/sys/ddi.h include/sys/debug.h include/sys/dki.h \

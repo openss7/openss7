@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strlog.4.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\" @(#) $Id: strlog.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRLOG 4 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH STRLOG 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -83,7 +83,11 @@ sort-adjacent-labels
 .PP
 .B #include <unistd.h>
 .br
-.B #include <sys/stropts.h>
+.B #include <stropts.h>
+.br
+.B #include <strlog.h>
+.br
+.B #include <syslog.h>
 .HP 12
 .BI "int " fd " = open(" /dev/strlog ", " oflag );
 .\"
@@ -101,6 +105,286 @@ This device is accessible to all users.
 The
 .B strlog
 device is characterized by the following behavior:
+.PP
+The
+.B strlog
+driver is a
+.I STREAMS
+software device driver that provides an interface for the
+.I STREAMS
+error logging
+.RB ( strerr (8))
+and event tracing
+.RB ( strace (8))
+processes.
+The
+.B strlog
+driver presents two separate interfaces:
+.IP \(bu
+A function call interface in the kernel
+.RB ( strlog (9))
+through which
+.I STREAMS
+driver and modules submit log messages.
+.IP \(bu
+A subset of ioctl
+.RB ( streamio (7))
+operations and
+.I STREAMS
+messages for interaction with a user-level error logger
+.RB ( strerr (8)),
+a trace logger
+.RB ( strace (8)),
+or processes that need to submit their own log messages
+.RB ( strlog (1)).
+.SS "Kernel Interface"
+.PP
+The log messages are generated within the kernel by calls to the
+.BR strlog (9)
+utility.
+.SS "User Interface"
+.PP
+The
+.B strlog
+driver si opened using the clone interface,
+.BR /dev/strlog .
+Each open of the
+.B /dev/strlog
+device obtains a separate stream to
+.BR strlog .
+To receive log message, a process first notifies the
+.B strlog
+driver whether it is an error logger or a trace logger by using the
+.I I_STR
+.RB ( streamio (7))
+operation.
+.PP
+For the error logger, the
+.I I_STR
+operation has a
+.B ic_cmd
+parameter value of
+.BR I_ERRLOG
+with no accompanying data.
+.PP
+For the trace logger, the
+.I I_STR
+operation has an
+.B ic_cmd
+parameter value of
+.BR I_TRCLOG ,
+and must be accomplished by a data buffer containing an array of one or more
+.B trace_ids
+structures.  Each
+.B trace_ids
+structure specifies a
+.IR mid ", " sid " and " level
+field from which messages are to be accepted.  The
+.BR strlog (9)
+subroutine accepts messages whose values in the
+.IR mid " and " sid
+fields exactly match those in the
+.B trace_ids
+structure, and whose
+.I level
+is less than or equal to the
+.I level
+given in the
+.B trace_ids
+structure.  A value of
+.B -1
+in any of the fields of the
+.B trace_ids
+structure indicates that any value is accepted for that field.
+.PP
+At most, one trace logger and one error logger can be active at a time.  After
+the logger process has identified itself by using the ioctl
+.RB ( streamio (7))
+operation, the
+.B strlog
+driver will begin sendinggn messages, subject to the restrictions previously
+noted.  These messages are obtained by using the
+.BR getmsg (2)
+system call.  The control part of the message contains a
+.B log_ctl
+structure, which specifies the
+.IR mid ", " sid ", " level " and " flags
+fields, as well as the time in ticks since boot that the message was
+submitted, the corresponding time in seconds since Jan. 1, 1970, and a
+sequence number.  The time in seconds since 1970 is p rovided so that the date
+and time of the message can be easily computed; the time in ticks since boot
+is provided so that the relative timing of log messages can be determined.
+.PP
+Different sequence number are maintained for the error logging and trace
+logging streams so that gaps in the sequence of messages can be determined.
+(During times of high message traffic, some message may not be delivered by
+the logger to aviod tying up system resources).  The data part of the message
+contains the unexpanded text of the format string (null-terminated), followed
+by the arguments to the format string (up to the number specified by the
+.B NLOGARGS
+value), aligned on the first word boundary following the format string.
+.PP
+A process may also send a message of the same structure to the log driver,
+even if it is not an error or trace logger.  The only fields of the
+.B log_ctl
+structure in the control part of the message that are accepted are the
+.I level " and " flags
+fields.  All other fields are filled in by the log driver before being
+forwarded to the appropriate logger.  The data portion must conatin a
+null-terminated format string, and any arguments (up to NLOGARGS) must be
+packed one word each, on the next word boundary following the end of the
+format string.
+.PP
+Attempting to issue an
+.I I_TRCLOG
+or
+.I I_ERRLOG
+operation when a logging process of the given type already exists result in
+the
+.RB [ ENXIO ]
+error being returned.  Similarly,
+.RB [ ENXIO ]
+is returned for
+.I I_TRCLOG
+operations without any
+.B trace_ids
+structures, or for any unrecognized
+.I I_STR
+operations.  Incorrectly formatted log messages sent to the driver by a user
+process are silently ignored (no error results).
+.PP
+.RS
+.nf
+\fC\s-1
+struct trace_ids {
+    short   ti_mid;
+    short   ti_sid;
+    char    ti_level;
+    short   ti_flags;
+};
+\s+1\fP
+.fi
+.RE
+.TP
+.I ti_mid
+.TP
+.I ti_sid
+.TP
+.I ti_level
+.TP
+.I ti_flags
+.PP
+If any of the fields of the
+.B trace_ids
+structure contain a value of
+.BR -1,
+.B strlog
+will accept whatever value it receives in that field.  Otherwise,
+.B strlog
+only accepts messages if the values of
+.IR mid " and " sid
+are the same as their counterparts in the
+.B trace_ids
+structure, and if the message's
+.I level
+is equal to or less than the
+.I level
+value in the
+.B trace_ids
+structure.
+.PP
+.RS
+.nf
+\fC\s-1
+struct log_ctl {
+    short   mid;
+    short   sid;
+    char    level;
+    short   flags;
+    long    ltime;
+    long    ttime;
+    int     seq_no;
+    int     pri;
+};
+\s+1\fP
+.fi
+.RE
+.TP
+.I mid
+specifies the
+.I STREAMS
+module ID number for the driver or module submitting the log message.
+.TP
+.I sid
+specifies the sub-ID number of a minor device (unit) associated with the
+.I STREAMS
+module or driver identified by
+.IR mid .
+.TP
+.I level
+specifies the level for screening lower-level event messages from a tracer.
+.TP
+.I flags
+contains several flags that can be set in various combinations.  The flags are
+as follows:
+.RS
+.TP
+.B SL_ERROR
+message is for the error logger.
+.TP
+.B SL_TRACE
+message is for the tracer.
+.TP
+.B SL_CONSOLE
+message will be printed to the console.
+.TP
+.B SL_FATAL
+notification of a fatal error.
+.TP
+.B SL_NOTIFY
+requests to mail a copy of a message to the system administrator.
+.TP
+.B SL_WARN
+message is a warning.
+.TP
+.B SL_NOTE
+message is a note.
+.RE
+.TP
+.I ltime
+tim in seconds since January 1, 1970.
+.TP
+.I ttime
+time in ticks since boot time.
+.TP
+.I seq_no
+a sequence number for the log message.
+.TP
+.I pri
+specifies the priority code and facility code, found in
+.BR <sys/syslog.h> .
+If
+.B SL_CONSOLE
+is set in flags, the priority code is set as follows: If
+.B SL_WARN
+is set, the priority code is set to
+.BR LOG_WARNING ;
+if
+.B SL_FATAL
+is set, the priority code is
+.BR LOG_ERR ;
+.BR SL_NOTE ,
+the priority code is
+.BR LOG_NOTICES ;
+.BR SL_TRACE ,
+.BR LOG_DEBUG ;
+otherwise,
+.BR LOG_INFO .
+Messages originating from the kernel have facility code set to
+.BR LOG_KERN .
+Most message originating from user processes will have the facility code set
+to
+.BR LOG_USER .
 .\"
 .\"
 .SH USAGE
@@ -115,10 +399,95 @@ device.
 .\"
 .SH IOCTLS
 .PP
+.SS I_ERRLOG
+.PP
+Indicates an error logger.  No
+.B trace_ids
+is required.
+.SS I_TRCLOG
+.PP
+Indicates a trace logger.  A data buffer consisting of an array of one or more
+.B trace_ids
+structures must be included.
+.\"
+.\"
+.SH NOTICES
+.PP
+This device is provided as
+.B /dev/strlog
+instead of
+.B /dev/log
+as is the case for
+.BR "SVR 4.2"
+.[
+svr42
+.]
+systems, because
+.B Linux
+already has a
+.RI non- STREAMS
+driver called
+.BR /dev/log .
 .\"
 .\"
 .SH EXAMPLES
 .PP
+.IP 1.
+The following is an example of
+.I I_ERRLOG
+notification:
+.RS
+.nf
+\fC\s-1
+struct strioctl ioc;
+ioc.ic_cmd = I_ERRLOG;
+ioc.ic_timout = 0;	/* default timeout (15 secs.) */
+ioc.ic_len = 0;
+ioc.ic_dp = NULL;
+ioctl(log, I_STR, &ioc);
+\s+1\fP
+.fi
+.RE
+.IP 2.
+The following is an example of
+.I I_TRCLOG
+notification:
+.RS
+.nf
+\fC\s-1
+struct trace_ids tid[2];
+tid[0].ti_mid = 2;
+tid[0].ti_sid = 0;
+tid[0].ti_level = 1;
+tid[1].ti_mid = 1002;
+tid[1].ti_sid = -1;  /* any sub-id will be allowed */
+tid[1].ti_level = -1; /* any level will be allowed */
+ioc.ic_cmd = I_TRCLOG;
+ioc.ic_timout = 0;
+ioc.ic_len = sizeof(tid);
+ioc.ic_dp = (char *) tid;
+ioctl(log, I_STR, &ioc);
+\s+1\fP
+.fi
+.RE
+.IP 3.
+The following is an example of submitting a log message (no arguments):
+.RS
+.nf
+\fC\s-1
+struct strbuf ctl, dat;
+struct log_ctl lc;
+char *message = "Honey, I'm home.";
+ctl.len = ctl.maxlen = sizeof(lc);
+ctl.buf = (char *) &lc;
+dat.len = dat.maxlen = strlen(message);
+dat.buf = message;
+lc.level = 0;
+lc.flags = SL_ERROR;
+putmsg(log, &ctl, &dat, 0);
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH DEVICES
@@ -133,18 +502,92 @@ device.
 .\"
 .SH BUGS
 .PP
+.B strlog
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B strlog
+is compatible with systems based on
+.BR "SVR 4.2",
+.[
+svr42
+.]
+.BR AIX \(rg,
+.BR HPUX \(rg,
+.BR OSF \(rg,
+with the following portability considerations:
+.IP \(em
+.BR AIX \(rg
+does not document the
+.B trace_ids
+and
+.B log_ctl
+structures.
+.IP \(em
+.BR HPUX \(rg
+does not have a
+.I pri
+field in the
+.B log_ctl
+structure.
+.BR HPUX \(rg
+does not support priority or facility codes.
+.IP \(em
+.BR OSF \(rg
+calls this device
+.BR /dev/streams/log .
+.IP \(em
+.BR Solaris \(rg
+does not provide the
+.I ti_flags
+field of the
+.B trace_ids
+structure.
+.IP \(em
+.BR Solaris \(rg
+declards
+.I ltime
+to be
+.BR clock32_t " or " clock_t ,
+and
+.I ttime
+to be
+.BR time32_t " or " time_t ,
+depending on a 64 or 32-bit architecture.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR "SVR 4.2" ,
+.[
+svr42cr
+.]
+.BR AIX \(rg,
+.BR HPUX \(rg
+and
+.BR OSF \(rg
+documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strlog
+first appeared in
+.BR "SVR 4" .
+.[
+svr4
+.]
 .\"
 .\"
 .[

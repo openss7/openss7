@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: bua.4.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\" @(#) $Id: bua.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BUA 4 "$Date: 2004/03/01 02:44:05 $" "$Name:  $" "OpenSS7 SIGTRAN Devices"
+.TH BUA 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "OpenSS7 SIGTRAN Devices"
 .SH NAME
 .B bua
 \- SS7 BICC User Adaptation Layer (BUA)

@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: t_free.3.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\" @(#) $Id: t_free.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_FREE 3 "$Date: 2004/03/01 02:44:05 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_FREE 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
 .SH NAME
 .B t_free
 \- free an XTI library structure

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) stropts.h,v 0.9.2.6 2003/10/28 08:00:07 brian Exp
+ @(#) $Id: stropts.h,v 0.9.2.5 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:07 by brian
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STROPTS_H__
 #define __SYS_STROPTS_H__
+
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:53:43 $"
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS
@@ -59,6 +61,8 @@
 #ifdef __KERNEL__
 #undef STR			/* defined in some asm/hw_irq.h */
 #include <linux/types.h>	/* for pid_t */
+#else
+#include <sys/types.h>		/* for uid_t */
 #endif
 
 #define __SID		('S' << 8)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 00:38:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $"
 
-static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
+static char const ident[] = "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -69,7 +68,6 @@ static char const ident[] =
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <getopt.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -86,10 +84,10 @@ version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
-	fprintf(stderr, "\
+	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
     Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strlog.h,v 0.9.2.1 2003/10/08 23:31:25 brian Exp
+ @(#) $Id: strlog.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/08 23:31:25 by brian
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRLOG_H__
 #define __SYS_STRLOG_H__
+
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -59,9 +61,30 @@
 #define SL_FATAL    0x0010
 #define SL_WARN	    0x0020
 #define SL_NOTE	    0x0040
-#define SL_NOPUTBUF 0x0080    /* uw7 src compatibility (does nothing) */
+#define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
+
+#define I_ERRLOG	(__SID | 65)	/* error log */
+#define I_TRCLOG	(__SID | 66)	/* trace log */
 
 extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
     __attribute__ ((format(printf, 5, 6)));
+
+struct trace_ids {
+	short ti_mid;
+	short ti_sid;
+	char ti_level;
+	short ti_flags;			/* not for Solaris */
+};
+
+struct log_ctl {
+	short mid;
+	short sid;
+	char level;
+	short flags;
+	long ltime;			/* clock32_t or clock_t under Solaris */
+	long ttime;			/* time32_t or time_t under Solaris */
+	int seq_no;
+	int pri;			/* priority = (facility|level) except HPUX */
+};
 
 #endif				/* __SYS_STRLOG_H__ */
