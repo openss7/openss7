@@ -2,7 +2,7 @@
 #
 # Install man pages
 #
-set -x
+#set -x
 MANDIR=${1:-/usr/share/man}
 
 if [ ! -d $MANDIR/man3 ]; then
