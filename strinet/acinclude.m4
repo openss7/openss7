@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/07 12:20:34 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/07 13:46:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 12:20:34 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 13:46:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,23 +150,29 @@ AC_DEFUN([_INET_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/slab.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
     _LINUX_CHECK_MEMBER([struct sock.__sk_common], [:],
 	[AC_DEFINE([HAVE_OLD_SOCK_STRUCTURE], [1], [Define to 1 if you have the older Linux 2.4
-	 style struct sock.  Otherwise leave undefined for the new Linux 2.6 struct sock.)], [
+	 style struct sock.  Otherwise leave undefined for the new Linux 2.6 struct sock.])], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <net/sock.h>
 ])
 ])# _INET_CONFIG_KERNEL

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/05 12:05:43 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/07 13:15:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/05 12:05:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 13:15:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -254,16 +254,16 @@ dnl pull out versions from release number
     AC_SUBST([knumber])dnl
     if test "$linux_cv_k_minor" -eq 4
     then
-	AC_DEFINE_UNQUOTED([LINUX_2_4], [], [Define for the linux 2.4 kernel series.])
+	AC_DEFINE_UNQUOTED([LINUX_2_4], [1], [Define for the linux 2.4 kernel series.])
     fi
     if test "$linux_cv_k_minor" -eq 6
     then
-	AC_DEFINE_UNQUOTED([LINUX_2_6], [], [Define for the linux 2.6 kernel series.])
+	AC_DEFINE_UNQUOTED([LINUX_2_6], [1], [Define for the linux 2.6 kernel series.])
     fi
     if test "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \)
     then
 	linux_cv_k_ko_modules='yes'
-	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [], [Define for linux 2.5.48+ .ko kernel modules.])
+	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [1], [Define for linux 2.5.48+ .ko kernel modules.])
     fi
     AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_minor -eq 4])
     AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_minor -eq 6])
@@ -1418,23 +1418,23 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
     fi
     case "$linux_cv_debug" in
 	(_DEBUG)
-	    AC_DEFINE_UNQUOTED([_DEBUG], [], [Define for kernel symbol
-	    debugging.  This has the effect of defeating inlines, making
-	    static declarations global, and activating all debugging macros.])
+	    AC_DEFINE([_DEBUG], [1], [Define for kernel symbol debugging.  This
+		has the effect of defeating inlines, making static declarations
+		global, and activating all debugging macros.])
 	    ;;
 	(_TEST)
-	    AC_DEFINE_UNQUOTED([_TEST], [], [Define for kernel testing.  This
-	    has the same effect as _DEBUG for now.])
+	    AC_DEFINE([_TEST], [1], [Define for kernel testing.  This has the
+		same effect as _DEBUG for now.])
 	    ;;
 	(_SAFE)
-	    AC_DEFINE_UNQUOTED([_SAFE], [], [Define for kernel safety.  This
-	    has the effect of enabling safety debugging macros.  This is the
-	    default.])
+	    AC_DEFINE([_SAFE], [1], [Define for kernel safety.  This has the
+		effect of enabling safety debugging macros.  This is the
+		default.])
 	    ;;
 	(*)
-	    AC_DEFINE_UNQUOTED([_NONE], [], [Define for maximum performance
-	    and minimum size.  This has the effect of disabling all safety
-	    debugging macros.])
+	    AC_DEFINE([_NONE], [1], [Define for maximum performance and minimum
+		size.  This has the effect of disabling all safety debugging
+		macros.])
 	    ;;
     esac
     AC_MSG_RESULT([${linux_cv_debug:-no}])dnl
@@ -1486,8 +1486,7 @@ AC_DEFUN([_LINUX_CHECK_MEMBERS_internal],
 	 _LINUX_CHECK_MEMBER_internal(LK_Member,
 	    [AC_DEFINE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member), 1)
 $2],
-	    [AC_DEFINE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member), 0)
-$3],
+	    [$3],
 	    [$4])])
 ])# _LINUX_CHECK_MEMBERS_internal
 # =============================================================================
@@ -1548,8 +1547,8 @@ do
     _LINUX_CHECK_FUNC_internal($lk_func,
 	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KFUNC_$lk_func]), 1)
 $2],
-	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KFUNC_$lk_func]), 0)
-$3], [$4])dnl
+	[$3],
+	[$4])dnl
 done
 ])# _LINUX_CHECK_FUNCS_internal
 # =============================================================================
@@ -1608,8 +1607,7 @@ AC_DEFUN([_LINUX_CHECK_TYPES_internal], [dnl
 	 _LINUX_CHECK_TYPE_internal(LK_Type,
 	    [AC_DEFINE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type), 1)
 $2],
-	    [AC_DEFINE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type), 0)
-$3],
+	    [$3],
 	    [$4])])
 ])# _LINUX_CHECK_TYPES_internal
 # =============================================================================
@@ -1661,8 +1659,7 @@ do
     _LINUX_CHECK_HEADER_internal($lk_header,
 	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_KINC_$lk_header), 1)
 $2],
-	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_KINC_$lk_header), 0)
-$3],
+	[$3],
 	[$4])dnl
 done
 ])# _LINUX_CHECK_HEADERS_internal
@@ -1837,7 +1834,7 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
 	AS_VAR_SET([linux_symbol_export], ["$linux_tmp"]) ])
     linux_tmp=AS_VAR_GET([linux_symbol_export])
     if test :"${linux_tmp:-no}" != :no 
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_EXPORT), [], [The symbol $1
+    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_EXPORT), [1], [The symbol $1
 	    is not exported by most kernels.  Define this if the symbol $1
 	    is exported by your kernel so that kernel modules can be supported
 	    properly.])
@@ -1879,7 +1876,7 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL], [dnl
 	AS_VAR_SET([linux_symbol], ['no'])], [dnl
 	AS_VAR_SET([linux_symbol], ['yes'])])
     if test :AS_VAR_GET([linux_symbol]) = :yes
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_SYMBOL), [], [The symbol $1
+    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_SYMBOL), [1], [The symbol $1
 	    is not exported by most kernels.  Define this if the symbol $1 is
 	    either exported by your kernel, or can be stripped from the symbol
 	    map, so that kernel modules can be supported properly.])

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/25 02:16:11 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 12:21:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -93,6 +93,98 @@ static char const ident[] =
 #undef STATIC
 #undef INLINE
 #include <net/sctp.h>
+#endif
+
+/* Compatibility functions between 2.4 and 2.6. */
+
+#if HAVE_OLD_SOCK_STRUCTURE
+
+#define sk_callback_lock	callback_lock
+#define sk_user_data		user_data
+#define sk_state_change		state_change
+#define sk_data_ready		data_ready
+#define sk_write_space		write_space
+#define sk_error_report		error_report
+#define sk_lingertime		lingertime
+#define sk_state		state
+#define sk_rcvbuf		rcvbuf
+#define sk_rcvlowat		rcvlowat
+#define sk_sndbuf		sndbuf
+#define sk_reuse		reuse
+#define sk_localroute		localroute
+#define sk_no_check		no_check
+#define sk_debug		debug
+#define sk_allocation		allocation
+#define sk_priority		priority
+#define sk_ack_backlog		ack_backlog
+#define sk_prot			prot
+#define sk_receive_queue	receive_queue
+#define sk_rmem_alloc		rmem_alloc
+
+#define sock_tst_dead(_sk)	(((struct sock *)_sk)->dead ? 1 : 0)
+#define sock_tst_done(_sk)	(((struct sock *)_sk)->done ? 1 : 0)
+#define sock_tst_urginline(_sk)	(((struct sock *)_sk)->urginline ? 1 : 0)
+#define sock_tst_keepopen(_sk)	(((struct sock *)_sk)->keepopen ? 1 : 0)
+#define sock_tst_linger(_sk)	(((struct sock *)_sk)->linger ? 1 : 0)
+#define sock_tst_destroy(_sk)	(((struct sock *)_sk)->destroy ? 1 : 0)
+#define sock_tst_broadcast(_sk)	(((struct sock *)_sk)->broadcast ? 1 : 0)
+
+#define sock_set_dead(_sk)	(((struct sock *)_sk)->dead = 1)
+#define sock_set_done(_sk)	(((struct sock *)_sk)->done = 1)
+#define sock_set_urginline(_sk)	(((struct sock *)_sk)->urginline = 1)
+#define sock_set_keepopen(_sk)	(((struct sock *)_sk)->keepopen = 1)
+#define sock_set_linger(_sk)	(((struct sock *)_sk)->linger = 1)
+#define sock_set_destroy(_sk)	(((struct sock *)_sk)->destroy = 1)
+#define sock_set_broadcast(_sk)	(((struct sock *)_sk)->broadcast = 1)
+
+#define sock_clr_dead(_sk)	(((struct sock *)_sk)->dead = 0)
+#define sock_clr_done(_sk)	(((struct sock *)_sk)->done = 0)
+#define sock_clr_urginline(_sk)	(((struct sock *)_sk)->urginline = 0)
+#define sock_clr_keepopen(_sk)	(((struct sock *)_sk)->keepopen = 0)
+#define sock_clr_linger(_sk)	(((struct sock *)_sk)->linger = 0)
+#define sock_clr_destroy(_sk)	(((struct sock *)_sk)->destroy = 0)
+#define sock_clr_broadcast(_sk)	(((struct sock *)_sk)->broadcast = 0)
+
+#define inet_sk(_sk)		(&(((struct sock *)_sk)->protinfo.af_inet))
+#define tcp_sk(_sk)		(&(((struct sock *)_sk)->tp_pinfo.af_tcp))
+#define sctp_sk(_sk)		(&(((struct sock *)_sk)->tp_pinfo.af_sctp))
+
+#define sock_saddr(_sk)		(((struct sock *)_sk)->saddr)
+#define sock_sport(_sk)		(((struct sock *)_sk)->sport)
+#define sock_daddr(_sk)		(((struct sock *)_sk)->daddr)
+#define sock_sport(_sk)		(((struct sock *)_sk)->sport)
+
+#else
+
+#define sock_tst_dead(_sk)	(sock_flag(_sk, SOCK_DEAD) ? 1 : 0)
+#define sock_tst_done(_sk)	(sock_flag(_sk, SOCK_DONE) ? 1 : 0)
+#define sock_tst_urginline(_sk)	(sock_flag(_sk, SOCK_URGINLINE) ? 1 : 0)
+#define sock_tst_keepopen(_sk)	(sock_flag(_sk, SOCK_KEEPOPEN) ? 1 : 0)
+#define sock_tst_linger(_sk)	(sock_flag(_sk, SOCK_LINGER) ? 1 : 0)
+#define sock_tst_destroy(_sk)	(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
+#define sock_tst_broadcast(_sk)	(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
+
+#define sock_set_dead(_sk)	(sock_set_flag(_sk, SOCK_DEAD))
+#define sock_set_done(_sk)	(sock_set_flag(_sk, SOCK_DONE))
+#define sock_set_urginline(_sk)	(sock_set_flag(_sk, SOCK_URGINLINE))
+#define sock_set_keepopen(_sk)	(sock_set_flag(_sk, SOCK_KEEPOPEN))
+#define sock_set_linger(_sk)	(sock_set_flag(_sk, SOCK_LINGER))
+#define sock_set_destroy(_sk)	(sock_set_flag(_sk, SOCK_DESTROY))
+#define sock_set_broadcast(_sk)	(sock_set_flag(_sk, SOCK_BROADCAST))
+
+#define sock_clr_dead(_sk)	(sock_reset_flag(_sk, SOCK_DEAD))
+#define sock_clr_done(_sk)	(sock_reset_flag(_sk, SOCK_DONE))
+#define sock_clr_urginline(_sk)	(sock_reset_flag(_sk, SOCK_URGINLINE))
+#define sock_clr_keepopen(_sk)	(sock_reset_flag(_sk, SOCK_KEEPOPEN))
+#define sock_clr_linger(_sk)	(sock_reset_flag(_sk, SOCK_LINGER))
+#define sock_clr_destroy(_sk)	(sock_reset_flag(_sk, SOCK_DESTROY))
+#define sock_clr_broadcast(_sk)	(sock_reset_flag(_sk, SOCK_BROADCAST))
+
+#define sock_saddr(_sk)		(inet_sk(_sk)->saddr)
+#define sock_sport(_sk)		(inet_sk(_sk)->sport)
+#define sock_daddr(_sk)		(inet_sk(_sk)->daddr)
+#define sock_dport(_sk)		(inet_sk(_sk)->dport)
+
 #endif
 
 #ifndef SK_WMEM_MAX
@@ -211,7 +303,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -405,7 +497,11 @@ MODULE_STATIC struct streamtab ss_info = {
  */
 
 typedef struct ss_options {
+#if 0
 	unsigned char flags[12];	/* twelve bytes of flags for 96 flags */
+#else
+	unsigned long flags[3];		/* at least 96 flags */
+#endif
 	struct {
 		t_uscalar_t debug[4];	/* XTI_DEBUG */
 		struct t_linger linger;	/* XTI_LINGER */
@@ -548,10 +644,10 @@ typedef struct inet {
 	int tcp_state;			/* tcp state history */
 	ss_profile_t p;			/* protocol profile */
 	struct {
-		void (*state_change) (struct sock *);
-		void (*data_ready) (struct sock *, int);
-		void (*write_space) (struct sock *);
-		void (*error_report) (struct sock *);
+		void (*sk_state_change) (struct sock *);
+		void (*sk_data_ready) (struct sock *, int);
+		void (*sk_write_space) (struct sock *);
+		void (*sk_error_report) (struct sock *);
 	} cb_save;			/* call back holder */
 	struct sockaddr src;		/* bound address */
 	struct sockaddr dst;		/* connected address */
@@ -563,7 +659,7 @@ typedef struct inet {
 } ss_t;
 
 #define PRIV(__q) ((ss_t *)((__q)->q_ptr))
-#define SOCK_PRIV(__sk) ((ss_t *)(__sk)->user_data)
+#define SOCK_PRIV(__sk) ((ss_t *)(__sk)->sk_user_data)
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
@@ -748,27 +844,27 @@ ss_socket_put(struct socket *sock)
 		/* 
 		   We don't really need to lock out interrupts here, just bottom halves 'cause a
 		   read lock is taken in the callback function itself. */
-		write_lock_bh(&sk->callback_lock);
+		write_lock_bh(&sk->sk_callback_lock);
 		{
 			ss_t *ss;
 			if ((ss = SOCK_PRIV(sk))) {
 				SOCK_PRIV(sk) = NULL;
 				ss->refcnt--;
-				sk->state_change = ss->cb_save.state_change;
-				sk->data_ready = ss->cb_save.data_ready;
-				sk->write_space = ss->cb_save.write_space;
-				sk->error_report = ss->cb_save.error_report;
+				sk->sk_state_change = ss->cb_save.sk_state_change;
+				sk->sk_data_ready = ss->cb_save.sk_data_ready;
+				sk->sk_write_space = ss->cb_save.sk_write_space;
+				sk->sk_error_report = ss->cb_save.sk_error_report;
 			} else
 				assure(ss);
 		}
-		write_unlock_bh(&sock->sk->callback_lock);
+		write_unlock_bh(&sock->sk->sk_callback_lock);
 		/* 
 		   The following will cause the socket to be aborted, particularly for Linux TCP or 
 		   other orderly release sockets.  XXX: Perhaps should check the state of the
 		   socket and call sk->prot->disconnect() first as well.  SCTP will probably behave 
 		   better that way. */
-		sk->linger = 1;
-		sk->lingertime = 0;
+		sock_set_keepopen(sk);
+		sk->sk_lingertime = 0;
 	} else
 		assure(sk);
 	sock_release(sock);
@@ -782,26 +878,26 @@ ss_socket_get(struct socket *sock, ss_t * ss)
 		/* 
 		   We don't really need to lock out interrupts here, just bottom halves 'cause a
 		   read lock is taken in the callback function itself. */
-		write_lock_bh(&sock->sk->callback_lock);
+		write_lock_bh(&sock->sk->sk_callback_lock);
 		{
 			SOCK_PRIV(sk) = ss;
 			ss->refcnt++;
-			ss->cb_save.state_change = sk->state_change;
-			ss->cb_save.data_ready = sk->data_ready;
-			ss->cb_save.write_space = sk->write_space;
-			ss->cb_save.error_report = sk->error_report;
-			sk->state_change = ss_state_change;
-			sk->data_ready = ss_data_ready;
-			sk->write_space = ss_write_space;
-			sk->error_report = ss_error_report;
+			ss->cb_save.sk_state_change = sk->sk_state_change;
+			ss->cb_save.sk_data_ready = sk->sk_data_ready;
+			ss->cb_save.sk_write_space = sk->sk_write_space;
+			ss->cb_save.sk_error_report = sk->sk_error_report;
+			sk->sk_state_change = ss_state_change;
+			sk->sk_data_ready = ss_data_ready;
+			sk->sk_write_space = ss_write_space;
+			sk->sk_error_report = ss_error_report;
 #ifdef LINUX_2_4
-			sk->protinfo.af_inet.recverr = 1;
+			inet_sk(sk)->recverr = 1;
 #else
 			sk->ip_recverr = 1;
 #endif
-			ss->tcp_state = sk->state;	/* initialized tcp state */
+			ss->tcp_state = sk->sk_state;	/* initialized tcp state */
 		}
-		write_unlock_bh(&sock->sk->callback_lock);
+		write_unlock_bh(&sock->sk->sk_callback_lock);
 	} else
 		assure(sk);
 }
@@ -1251,15 +1347,15 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_LINGER;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.linger);
 		oh->status = T_SUCCESS;
-		if ((sk->linger == 1) != (ss->options.xti.linger.l_onoff == T_YES)) {
-			ss->options.xti.linger.l_onoff = sk->linger ? T_YES : T_NO;
+		if ((sock_tst_linger(sk) == 1) != (ss->options.xti.linger.l_onoff == T_YES)) {
+			ss->options.xti.linger.l_onoff = sock_tst_linger(sk) ? T_YES : T_NO;
 		}
 		if (ss->options.xti.linger.l_onoff == T_YES) {
-			if (ss->options.xti.linger.l_linger != sk->lingertime / HZ) {
+			if (ss->options.xti.linger.l_linger != sk->sk_lingertime / HZ) {
 				if (ss->options.xti.linger.l_linger != T_UNSPEC
-				    && ss->options.xti.linger.l_linger < sk->lingertime / HZ)
+				    && ss->options.xti.linger.l_linger < sk->sk_lingertime / HZ)
 					oh->status = T_PARTSUCCESS;
-				ss->options.xti.linger.l_linger = sk->lingertime / HZ;
+				ss->options.xti.linger.l_linger = sk->sk_lingertime / HZ;
 			}
 		} else
 			ss->options.xti.linger.l_linger = T_UNSPEC;
@@ -1271,11 +1367,11 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_RCVBUF;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvbuf);
 		oh->status = T_SUCCESS;
-		if (ss->options.xti.rcvbuf != sk->rcvbuf / 2) {
+		if (ss->options.xti.rcvbuf != sk->sk_rcvbuf / 2) {
 			if (ss->options.xti.rcvbuf != T_UNSPEC
-			    && ss->options.xti.rcvbuf < sk->rcvbuf / 2)
+			    && ss->options.xti.rcvbuf < sk->sk_rcvbuf / 2)
 				oh->status = T_PARTSUCCESS;
-			ss->options.xti.rcvbuf = sk->rcvbuf / 2;
+			ss->options.xti.rcvbuf = sk->sk_rcvbuf / 2;
 		}
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.rcvbuf;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1285,11 +1381,11 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_RCVLOWAT;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvlowat);
 		oh->status = T_SUCCESS;
-		if (ss->options.xti.rcvlowat != sk->rcvlowat) {
+		if (ss->options.xti.rcvlowat != sk->sk_rcvlowat) {
 			if (ss->options.xti.rcvlowat != T_UNSPEC
-			    && ss->options.xti.rcvlowat < sk->rcvlowat)
+			    && ss->options.xti.rcvlowat < sk->sk_rcvlowat)
 				oh->status = T_PARTSUCCESS;
-			ss->options.xti.rcvlowat = sk->rcvlowat;
+			ss->options.xti.rcvlowat = sk->sk_rcvlowat;
 		}
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.rcvlowat;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1299,11 +1395,11 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_SNDBUF;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndbuf);
 		oh->status = T_SUCCESS;
-		if (ss->options.xti.sndbuf != sk->sndbuf / 2) {
+		if (ss->options.xti.sndbuf != sk->sk_sndbuf / 2) {
 			if (ss->options.xti.sndbuf != T_UNSPEC
-			    && ss->options.xti.sndbuf < sk->sndbuf / 2)
+			    && ss->options.xti.sndbuf < sk->sk_sndbuf / 2)
 				oh->status = T_PARTSUCCESS;
-			ss->options.xti.sndbuf = sk->sndbuf / 2;
+			ss->options.xti.sndbuf = sk->sk_sndbuf / 2;
 		}
 		*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.sndbuf;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1322,7 +1418,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (ss->p.prot.family == PF_INET) {
-		struct inet_opt *np = &sk->protinfo.af_inet;
+		struct inet_opt *np = inet_sk(sk);
 		// if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
 		oh->level = T_INET_IP;
 		oh->name = T_IP_OPTIONS;
@@ -1367,9 +1463,9 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh->name = T_IP_REUSEADDR;
 			oh->len = _T_LENGTH_SIZEOF(unsigned int);
 			oh->status = T_SUCCESS;
-			if ((ss->options.ip.reuseaddr == T_NO) != (sk->reuse == 0)) {
+			if ((ss->options.ip.reuseaddr == T_NO) != (sk->sk_reuse == 0)) {
 				oh->status = T_PARTSUCCESS;
-				ss->options.ip.reuseaddr = sk->reuse ? T_YES : T_NO;
+				ss->options.ip.reuseaddr = sk->sk_reuse ? T_YES : T_NO;
 			}
 			*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.reuseaddr;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1379,9 +1475,9 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh->name = T_IP_DONTROUTE;
 			oh->len = _T_LENGTH_SIZEOF(unsigned int);
 			oh->status = T_SUCCESS;
-			if ((ss->options.ip.dontroute == T_NO) != (sk->localroute == 0)) {
+			if ((ss->options.ip.dontroute == T_NO) != (sk->sk_localroute == 0)) {
 				oh->status = T_PARTSUCCESS;
-				ss->options.ip.dontroute = sk->localroute ? T_YES : T_NO;
+				ss->options.ip.dontroute = sk->sk_localroute ? T_YES : T_NO;
 			}
 			*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.dontroute;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1391,9 +1487,9 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh->name = T_IP_BROADCAST;
 			oh->len = _T_LENGTH_SIZEOF(unsigned int);
 			oh->status = T_SUCCESS;
-			if ((ss->options.ip.broadcast == T_NO) != (sk->broadcast == 0)) {
+			if ((ss->options.ip.broadcast == T_NO) != (sock_tst_broadcast(sk) == 0)) {
 				oh->status = T_PARTSUCCESS;
-				ss->options.ip.broadcast = sk->broadcast ? T_YES : T_NO;
+				ss->options.ip.broadcast = sock_tst_broadcast(sk) ? T_YES : T_NO;
 			}
 			*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.broadcast;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1409,7 +1505,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		switch (ss->p.prot.protocol) {
 		case T_INET_TCP:
 		{
-			struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+			struct tcp_opt *tp = tcp_sk(sk);
 			if (ss_tst_bit(_T_BIT_TCP_NODELAY, ss->options.flags)) {
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_NODELAY;
@@ -1441,9 +1537,9 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->len = _T_LENGTH_SIZEOF(struct t_kpalive);
 				oh->status = T_SUCCESS;
 				if ((ss->options.tcp.keepalive.kp_onoff != T_NO) !=
-				    (sk->keepopen != 0)) {
+				    (sock_tst_keepopen(sk) != 0)) {
 					ss->options.tcp.keepalive.kp_onoff =
-					    sk->keepopen ? T_YES : T_NO;
+					    sock_tst_keepopen(sk) ? T_YES : T_NO;
 				}
 				if (ss->options.tcp.keepalive.kp_onoff == T_YES) {
 					if (ss->options.tcp.keepalive.kp_timeout !=
@@ -1589,7 +1685,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #if defined HAVE_OPENSS7_SCTP
 		case T_INET_SCTP:
 		{
-			struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+			struct sctp_opt *sp = sctp_sk(sk);
 			if (ss_tst_bit(_T_BIT_SCTP_NODELAY, ss->options.flags)) {
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_NODELAY;
@@ -2022,11 +2118,11 @@ ss_set_options(ss_t * ss)
 				valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
 		}
 		if (valp->l_onoff == T_YES) {
-			sk->linger = 1;
-			sk->lingertime = valp->l_linger * HZ;
+			sock_set_linger(sk);
+			sk->sk_lingertime = valp->l_linger * HZ;
 		} else {
-			sk->linger = 0;
-			sk->lingertime = 0;
+			sock_clr_linger(sk);
+			sk->sk_lingertime = 0;
 		}
 	}
 	if (ss_tst_bit(_T_BIT_XTI_RCVBUF, ss->options.flags)) {
@@ -2035,7 +2131,7 @@ ss_set_options(ss_t * ss)
 			*valp = sysctl_rmem_max;
 		if (*valp < SOCK_MIN_RCVBUF / 2)
 			*valp = SOCK_MIN_RCVBUF / 2;
-		sk->rcvbuf = *valp * 2;
+		sk->sk_rcvbuf = *valp * 2;
 	}
 	if (ss_tst_bit(_T_BIT_XTI_RCVLOWAT, ss->options.flags)) {
 		t_uscalar_t *valp = &ss->options.xti.rcvlowat;
@@ -2043,7 +2139,7 @@ ss_set_options(ss_t * ss)
 			*valp = 1;
 		if (*valp > INT_MAX)
 			*valp = INT_MAX;
-		sk->rcvlowat = *valp;
+		sk->sk_rcvlowat = *valp;
 	}
 	if (ss_tst_bit(_T_BIT_XTI_SNDBUF, ss->options.flags)) {
 		t_uscalar_t *valp = &ss->options.xti.sndbuf;
@@ -2051,7 +2147,7 @@ ss_set_options(ss_t * ss)
 			*valp = sysctl_wmem_max;
 		if (*valp < SOCK_MIN_SNDBUF / 2)
 			*valp = SOCK_MIN_SNDBUF / 2;
-		sk->sndbuf = *valp * 2;
+		sk->sk_sndbuf = *valp * 2;
 	}
 	if (ss_tst_bit(_T_BIT_XTI_SNDLOWAT, ss->options.flags)) {
 		t_uscalar_t *valp = &ss->options.xti.sndlowat;
@@ -2061,7 +2157,7 @@ ss_set_options(ss_t * ss)
 			*valp = 1;
 	}
 	if (ss->p.prot.family == PF_INET) {
-		struct inet_opt *np = &sk->protinfo.af_inet;
+		struct inet_opt *np = inet_sk(sk);
 		if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags)) {
 			unsigned char *valp = ss->options.ip.options;
 			(void) valp;	// FIXME
@@ -2082,31 +2178,34 @@ ss_set_options(ss_t * ss)
 		}
 		if (ss_tst_bit(_T_BIT_IP_REUSEADDR, ss->options.flags)) {
 			unsigned int *valp = &ss->options.ip.reuseaddr;
-			sk->reuse = (*valp == T_YES) ? 1 : 0;
+			sk->sk_reuse = (*valp == T_YES) ? 1 : 0;
 		}
 		if (ss_tst_bit(_T_BIT_IP_DONTROUTE, ss->options.flags)) {
 			unsigned int *valp = &ss->options.ip.dontroute;
-			sk->localroute = (*valp == T_YES) ? 1 : 0;
+			sk->sk_localroute = (*valp == T_YES) ? 1 : 0;
 		}
 		if (ss_tst_bit(_T_BIT_IP_BROADCAST, ss->options.flags)) {
 			unsigned int *valp = &ss->options.ip.broadcast;
-			sk->broadcast = (*valp == T_YES) ? 1 : 0;
+			if (*valp == T_YES)
+				sock_set_broadcast(sk);
+			else
+				sock_clr_broadcast(sk);
 		}
 		if (ss_tst_bit(_T_BIT_IP_ADDR, ss->options.flags)) {
 			uint32_t *valp = &ss->options.ip.addr;
-			sk->saddr = *valp;
+			sock_saddr(sk) = *valp;
 		}
 		switch (ss->p.prot.protocol) {
 		case T_INET_UDP:
 			if (ss_tst_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.udp.checksum;
-				sk->no_check =
+				sk->sk_no_check =
 				    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
 			}
 			break;
 		case T_INET_TCP:
 		{
-			struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+			struct tcp_opt *tp = tcp_sk(sk);
 			if (ss_tst_bit(_T_BIT_TCP_NODELAY, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.nodelay;
 				tp->nonagle = (*valp == T_YES) ? 1 : 0;
@@ -2137,7 +2236,10 @@ ss_set_options(ss_t * ss)
 #if defined HAVE_TCP_SET_KEEPALIVE_ADDR
 				tcp_set_keepalive(sk, valp->kp_onoff == T_YES ? 1 : 0);
 #endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
-				sk->keepopen = valp->kp_onoff == T_YES ? 1 : 0;
+				if (valp->kp_onoff == T_YES)
+					sock_set_keepopen(sk);
+				else
+					sock_clr_keepopen(sk);
 			}
 			if (ss_tst_bit(_T_BIT_TCP_CORK, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.cork;
@@ -2183,7 +2285,7 @@ ss_set_options(ss_t * ss)
 #if defined HAVE_OPENSS7_SCTP
 		case T_INET_SCTP:
 		{
-			struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+			struct sctp_opt *sp = sctp_sk(sk);
 			if (ss_tst_bit(_T_BIT_SCTP_NODELAY, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.nodelay;
 				(void) *valp;	// TODO: complete this action
@@ -2584,11 +2686,11 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 						valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
 				}
 				if (valp->l_onoff == T_YES) {
-					sk->linger = 1;
-					sk->lingertime = valp->l_linger * HZ;
+					sock_set_linger(sk);
+					sk->sk_lingertime = valp->l_linger * HZ;
 				} else {
-					sk->linger = 0;
-					sk->lingertime = 0;
+					sock_clr_linger(sk);
+					sk->sk_lingertime = 0;
 				}
 				continue;
 			}
@@ -2605,7 +2707,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					*valp = sysctl_rmem_max;
 				if (*valp < SOCK_MIN_RCVBUF / 2)
 					*valp = SOCK_MIN_RCVBUF / 2;
-				sk->rcvbuf = *valp * 2;
+				sk->sk_rcvbuf = *valp * 2;
 				continue;
 			}
 			case XTI_RCVLOWAT:
@@ -2621,7 +2723,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					*valp = 1;
 				if (*valp > INT_MAX)
 					*valp = INT_MAX;
-				sk->rcvlowat = *valp;
+				sk->sk_rcvlowat = *valp;
 				continue;
 			}
 			case XTI_SNDBUF:
@@ -2637,7 +2739,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					*valp = sysctl_wmem_max;
 				if (*valp < SOCK_MIN_SNDBUF / 2)
 					*valp = SOCK_MIN_SNDBUF / 2;
-				sk->sndbuf = *valp * 2;
+				sk->sk_sndbuf = *valp * 2;
 				continue;
 			}
 			case XTI_SNDLOWAT:
@@ -2659,7 +2761,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 			continue;
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
-				struct inet_opt *np = &sk->protinfo.af_inet;
+				struct inet_opt *np = inet_sk(sk);
 				switch (ih->name) {
 				case T_IP_OPTIONS:
 				{
@@ -2709,7 +2811,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					ss_set_bit(_T_BIT_IP_REUSEADDR, ss->options.flags);
 					if (!request)
 						continue;
-					sk->reuse = (*valp == T_YES) ? 1 : 0;
+					sk->sk_reuse = (*valp == T_YES) ? 1 : 0;
 					continue;
 				}
 				case T_IP_DONTROUTE:
@@ -2723,7 +2825,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					ss_set_bit(_T_BIT_IP_DONTROUTE, ss->options.flags);
 					if (!request)
 						continue;
-					sk->localroute = (*valp == T_YES) ? 1 : 0;
+					sk->sk_localroute = (*valp == T_YES) ? 1 : 0;
 					continue;
 				}
 				case T_IP_BROADCAST:
@@ -2737,7 +2839,10 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					ss_set_bit(_T_BIT_IP_BROADCAST, ss->options.flags);
 					if (!request)
 						continue;
-					sk->broadcast = (*valp == T_YES) ? 1 : 0;
+					if (*valp == T_YES)
+						sock_set_broadcast(sk);
+					else
+						sock_clr_broadcast(sk);
 					continue;
 				}
 				case T_IP_ADDR:
@@ -2749,7 +2854,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					ss_set_bit(_T_BIT_IP_ADDR, ss->options.flags);
 					if (!request)
 						continue;
-					sk->saddr = *valp;
+					sock_saddr(sk) = *valp;
 					continue;
 				}
 				}
@@ -2769,7 +2874,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					ss_set_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags);
 					if (!request)
 						continue;
-					sk->no_check =
+					sk->sk_no_check =
 					    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
 					continue;
 				}
@@ -2778,7 +2883,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 			continue;
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
-				struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+				struct tcp_opt *tp = tcp_sk(sk);
 				switch (ih->name) {
 				case T_TCP_NODELAY:
 				{
@@ -2843,7 +2948,10 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 #if defined HAVE_TCP_SET_KEEPALIVE_ADDR
 					tcp_set_keepalive(sk, valp->kp_onoff == T_YES ? 1 : 0);
 #endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
-					sk->keepopen = valp->kp_onoff == T_YES ? 1 : 0;
+					if (valp->kp_onoff == T_YES)
+						sock_set_keepopen(sk);
+					else
+						sock_clr_keepopen(sk);
 					continue;
 				}
 				case T_TCP_CORK:
@@ -2996,7 +3104,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 #if defined HAVE_OPENSS7_SCTP
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
-				struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+				struct sctp_opt *sp = sctp_sk(sk);
 				switch (ih->name) {
 				case T_SCTP_NODELAY:
 				{
@@ -3756,7 +3864,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 		switch (ih->level) {
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
-				struct inet_opt *np = &sk->protinfo.af_inet;
+				struct inet_opt *np = inet_sk(sk);
 				switch (ih->name) {
 				case T_IP_OPTIONS:
 				{
@@ -3855,7 +3963,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 				switch (ih->name) {
 				case T_UDP_CHECKSUM:
 					if (ih->len == sizeof(*ih) + sizeof(t_uscalar_t)) {
-						sk->no_check =
+						sk->sk_no_check =
 						    *((t_uscalar_t *) T_OPT_DATA(ih)) ==
 						    T_NO ? UDP_CSUM_NOXMIT : UDP_CSUM_DEFAULT;
 					}
@@ -6110,7 +6218,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				goto efault;
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
-				struct inet_opt *np = &sk->protinfo.af_inet;
+				struct inet_opt *np = inet_sk(sk);
 				(void) np;
 				switch (ih->name) {
 				default:
@@ -6258,7 +6366,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				goto efault;
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
-				struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+				struct tcp_opt *tp = tcp_sk(sk);
 				(void) tp;
 				switch (ih->name) {
 				default:
@@ -6418,7 +6526,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				goto efault;
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
-				struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+				struct sctp_opt *sp = sctp_sk(sk);
 				(void) sp;
 				switch (ih->name) {
 				default:
@@ -6905,7 +7013,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				goto efault;
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
-				struct inet_opt *np = &sk->protinfo.af_inet;
+				struct inet_opt *np = inet_sk(sk);
 				(void) np;
 				switch (ih->name) {
 				default:
@@ -7059,7 +7167,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				goto efault;
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
-				struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+				struct tcp_opt *tp = tcp_sk(sk);
 				(void) tp;
 				switch (ih->name) {
 				default:
@@ -7211,7 +7319,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				goto efault;
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
-				struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+				struct sctp_opt *sp = sctp_sk(sk);
 				(void) sp;
 				switch (ih->name) {
 				default:
@@ -7801,7 +7909,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				goto efault;
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
-				struct inet_opt *np = &sk->protinfo.af_inet;
+				struct inet_opt *np = inet_sk(sk);
 				(void) np;
 				switch (ih->name) {
 				default:
@@ -7999,7 +8107,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				goto efault;
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
-				struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+				struct tcp_opt *tp = tcp_sk(sk);
 				(void) tp;
 				switch (ih->name) {
 				default:
@@ -8291,7 +8399,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				goto efault;
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
-				struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+				struct sctp_opt *sp = sctp_sk(sk);
 				(void) sp;
 				switch (ih->name) {
 				default:
@@ -9028,7 +9136,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				bzero(ss->options.xti.debug, sizeof(ss->options.xti.debug));
 				if (oh->len > sizeof(*oh))
 					bcopy(valp, ss->options.xti.debug, oh->len - sizeof(*oh));
-				sk->debug = ss->options.xti.debug[0] & 0x01;
+				sk->sk_debug = ss->options.xti.debug[0] & 0x01;
 				break;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -9073,10 +9181,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				ss->options.xti.linger = *valp;
 				if (valp->l_onoff) {
-					sk->linger = 1;
-					sk->lingertime = valp->l_linger * HZ;
+					sock_set_linger(sk);
+					sk->sk_lingertime = valp->l_linger * HZ;
 				} else {
-					sk->linger = 0;
+					sock_clr_linger(sk);
 				}
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -9110,7 +9218,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					}
 				}
 				ss->options.xti.rcvbuf = *valp;
-				sk->rcvbuf = *valp << 1;
+				sk->sk_rcvbuf = *valp << 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9143,7 +9251,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					}
 				}
 				ss->options.xti.rcvlowat = *valp;
-				sk->rcvlowat = *valp;
+				sk->sk_rcvlowat = *valp;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9176,7 +9284,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					}
 				}
 				ss->options.xti.sndbuf = *valp;
-				sk->sndbuf = *valp << 1;
+				sk->sk_sndbuf = *valp << 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9219,7 +9327,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				goto efault;
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
-				struct inet_opt *np = &sk->protinfo.af_inet;
+				struct inet_opt *np = inet_sk(sk);
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
@@ -9287,7 +9395,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					ss->options.ip.tos = *valp;
 					if (np->tos != ss->options.ip.tos) {
 						np->tos = *valp;
-						sk->priority = rt_tos2priority(*valp);
+						sk->sk_priority = rt_tos2priority(*valp);
 						sk_dst_reset(sk);
 					}
 					if (ih->name != T_ALLOPT)
@@ -9365,7 +9473,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							goto einval;
 					}
 					ss->options.ip.reuseaddr = *valp;
-					sk->reuse = (*valp == T_YES) ? 1 : 0;
+					sk->sk_reuse = (*valp == T_YES) ? 1 : 0;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9392,7 +9500,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							goto einval;
 					}
 					ss->options.ip.dontroute = *valp;
-					sk->localroute = (*valp == T_YES) ? 1 : 0;
+					sk->sk_localroute = (*valp == T_YES) ? 1 : 0;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9419,7 +9527,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							goto einval;
 					}
 					ss->options.ip.broadcast = *valp;
-					sk->broadcast = (*valp == T_YES) ? 1 : 0;
+					if (*valp == T_YES)
+						sock_set_broadcast(sk);
+					else
+						sock_clr_broadcast(sk);
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9444,7 +9555,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					}
 					ss->options.ip.addr = *valp;
-					sk->saddr = *valp;
+					sock_saddr(sk) = *valp;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -9499,7 +9610,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							goto einval;
 					}
 					ss->options.udp.checksum = *valp;
-					sk->no_check =
+					sk->sk_no_check =
 					    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -9515,7 +9626,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				goto efault;
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
-				struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+				struct tcp_opt *tp = tcp_sk(sk);
 				switch (ih->name) {
 				default:
 				{
@@ -9635,7 +9746,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 #if defined HAVE_TCP_SET_KEEPALIVE_ADDR
 					tcp_set_keepalive(sk, (valp->kp_onoff == T_YES) ? 1 : 0);
 #endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
-					sk->keepopen = (valp->kp_onoff == T_YES) ? 1 : 0;
+					if (valp->kp_onoff == T_YES)
+						sock_set_keepopen(sk);
+					else
+						sock_clr_keepopen(sk);
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9893,7 +10007,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				goto efault;
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
-				struct sctp_opt *sp = &sk->tp_pinfo.af_sctp;
+				struct sctp_opt *sp = sctp_sk(sk);
 				switch (ih->name) {
 				default:
 				{
@@ -10780,10 +10894,10 @@ ss_socket(ss_t * ss)
 	if (!(err = sock_create(family, type, protocol, &ss->sock))) {
 		ensure(ss->sock, return (-EFAULT));
 		ensure(ss->sock->sk, return (-EFAULT));
-		ss->sock->sk->allocation = GFP_ATOMIC;
+		ss->sock->sk->sk_allocation = GFP_ATOMIC;
 		ss_socket_get(ss->sock, ss);
 		if (ss->p.prot.family == PF_INET)
-			ss->sock->sk->protinfo.af_inet.cmsg_flags |= 0x0f;
+			inet_sk(ss->sock->sk)->cmsg_flags |= 0x0f;
 		return (0);
 	}
 	printd(("%s: %p: ERROR: from sock_create %d\n", DRV_NAME, ss, err));
@@ -10879,7 +10993,7 @@ ss_listen(ss_t * ss, uint cons)
 	printd(("%s: %p: SS_LISTEN %d\n", DRV_NAME, ss, cons));
 	if (!(err = ss->sock->ops->listen(ss->sock, cons))) {
 		ss->conind = cons;
-		ss->tcp_state = ss->sock->sk->state;
+		ss->tcp_state = ss->sock->sk->sk_state;
 		return (0);
 	}
 	printd(("%s: %p: ERROR: from sock->ops->listen %d\n", DRV_NAME, ss, err));
@@ -10925,7 +11039,7 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 	printd(("%s: %p: SS_ACCEPT\n", DRV_NAME, ss));
 	if ((sock = sock_alloc())) {
 		struct sock *sk = ss->sock->sk;
-		struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
+		struct tcp_opt *tp = tcp_sk(sk);
 		struct open_request *req, *req_prev, **reqp;
 		struct sock *ask = ((ss_event_t *) cp->b_rptr)->sk;
 		sock->type = ss->sock->type;
@@ -10939,7 +11053,7 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 			if ((req = *reqp)) {
 				if (!((*reqp) = (*reqp)->dl_next))
 					tp->accept_queue_tail = req_prev;
-				sk->ack_backlog--;
+				sk->sk_ack_backlog--;
 				tcp_openreq_fastfree(req);
 			}
 			release_sock(sk);
@@ -11023,8 +11137,8 @@ ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->sendmsg, return (-EFAULT));
 	ensure(ss->sock->sk, return (-EFAULT));
-	ensure(ss->sock->sk->prot, return (-EFAULT));
-	ensure(ss->sock->sk->prot->sendmsg, return (-EFAULT));
+	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
+	ensure(ss->sock->sk->sk_prot->sendmsg, return (-EFAULT));
 	{
 		mm_segment_t fs = get_fs();
 		set_fs(KERNEL_DS);
@@ -11032,7 +11146,7 @@ ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 		set_fs(fs);
 	}
 	if (res <= 0)
-		printd(("%s: %p: ERROR: from sock->sk->prot->sendmsg %d\n", DRV_NAME, ss, res));
+		printd(("%s: %p: ERROR: from sock->sk->sk_prot->sendmsg %d\n", DRV_NAME, ss, res));
 	return (res);
 }
 
@@ -11050,8 +11164,8 @@ ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->recvmsg, return (-EFAULT));
 	ensure(ss->sock->sk, return (-EFAULT));
-	ensure(ss->sock->sk->prot, return (-EFAULT));
-	ensure(ss->sock->sk->prot->recvmsg, return (-EFAULT));
+	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
+	ensure(ss->sock->sk->sk_prot->recvmsg, return (-EFAULT));
 	{
 		mm_segment_t fs = get_fs();
 		set_fs(KERNEL_DS);
@@ -11080,14 +11194,14 @@ ss_disconnect(ss_t * ss)
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->connect, return (-EFAULT));
 	ensure(ss->sock->sk, return (-EFAULT));
-	ensure(ss->sock->sk->prot, return (-EFAULT));
-	ensure(ss->sock->sk->prot->disconnect, return (-EFAULT));
-	if (!(err = ss->sock->sk->prot->disconnect(ss->sock->sk, O_NONBLOCK))) {
+	ensure(ss->sock->sk->sk_prot, return (-EFAULT));
+	ensure(ss->sock->sk->sk_prot->disconnect, return (-EFAULT));
+	if (!(err = ss->sock->sk->sk_prot->disconnect(ss->sock->sk, O_NONBLOCK))) {
 		ss->sock->state = SS_UNCONNECTED;
 		return (0);
 	}
 	ss->sock->state = SS_DISCONNECTING;
-	printd(("%s: %p: ERROR: from sock->sk->prot->disconnect %d\n", DRV_NAME, ss, err));
+	printd(("%s: %p: ERROR: from sock->sk->sk_prot->disconnect %d\n", DRV_NAME, ss, err));
 	return (err);
 }
 
@@ -11631,7 +11745,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 		case TS_WACK_DREQ7:
 			ensure(cp, goto free_error);
 			if (!(err = ss_accept(ss, &sock, cp))) {
-				if (!sock->sk->prot->disconnect(sock->sk, O_NONBLOCK))
+				if (!sock->sk->sk_prot->disconnect(sock->sk, O_NONBLOCK))
 					sock->state = SS_UNCONNECTED;
 				sock_release(sock);
 			}
@@ -11983,11 +12097,11 @@ ss_conn_ind(queue_t *q, mblk_t *cp)
 	case AF_INET:
 	{
 		struct sockaddr_in *dst_in = (typeof(dst_in)) & dst;
-		if (!ss->conind || ss->sock->sk->state != TCP_LISTEN)
+		if (!ss->conind || ss->sock->sk->sk_state != TCP_LISTEN)
 			goto nolisten;
 		dst_in->sin_family = AF_INET;
-		dst_in->sin_port = sk->dport;
-		dst_in->sin_addr.s_addr = sk->daddr;
+		dst_in->sin_port = sock_dport(sk);
+		dst_in->sin_addr.s_addr = sock_daddr(sk);
 		break;
 	}
 	case AF_UNIX:
@@ -11995,7 +12109,7 @@ ss_conn_ind(queue_t *q, mblk_t *cp)
 		struct sockaddr_un *dst_un = (typeof(dst_un)) & dst;
 		/* 
 		   FIXME: use AF_UNIX states */
-		if (!ss->conind || ss->sock->sk->state != TCP_LISTEN)
+		if (!ss->conind || ss->sock->sk->sk_state != TCP_LISTEN)
 			goto nolisten;
 		break;
 	}
@@ -12133,11 +12247,11 @@ ss_sock_recvmsg(queue_t *q, int flags)
 		case SOCK_RDM:
 		case SOCK_STREAM:
 		{
-			size = (skb = skb_peek(&ss->sock->sk->receive_queue)) ? skb->len : 0;
+			size = (skb = skb_peek(&ss->sock->sk->sk_receive_queue)) ? skb->len : 0;
 			break;
 		}
 		case SOCK_SEQPACKET:
-			size = atomic_read(&ss->sock->sk->rmem_alloc);
+			size = atomic_read(&ss->sock->sk->sk_rmem_alloc);
 			break;
 		}
 		if (!size || size >= oldsize)
@@ -12245,7 +12359,7 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 		mp->b_datap->db_type = type;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sk = sk;
-		p->state = sk->state;	/* capture current state */
+		p->state = sk->sk_state;	/* capture current state */
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
 		return (void) (0);
@@ -12281,15 +12395,15 @@ _ss_sock_state_change(long data)
 	struct sock *sk;
 	ss_t *ss;
 	if ((sk = (struct sock *) data)) {
-		read_lock(&sk->callback_lock);
-		if (sk->state_change == &ss_state_change) {
+		read_lock(&sk->sk_callback_lock);
+		if (sk->sk_state_change == &ss_state_change) {
 			if ((ss = SOCK_PRIV(sk))) {
 				ss_putctl(ss, ss->rq, M_PCRSE, &_ss_sock_state_change, sk);
 			} else
 				assure(ss);
 		} else
-			assure(sk->state_change == &ss_state_change);
-		read_unlock(&sk->callback_lock);
+			assure(sk->sk_state_change == &ss_state_change);
+		read_unlock(&sk->sk_callback_lock);
 	} else
 		assure(sk);
 }
@@ -12309,15 +12423,15 @@ _ss_sock_write_space(long data)
 	struct sock *sk;
 	ss_t *ss;
 	if ((sk = (struct sock *) data)) {
-		read_lock(&sk->callback_lock);
-		if (sk->write_space == &ss_write_space) {
+		read_lock(&sk->sk_callback_lock);
+		if (sk->sk_write_space == &ss_write_space) {
 			if ((ss = SOCK_PRIV(sk))) {
 				ss_putctl(ss, ss->wq, M_READ, &_ss_sock_write_space, sk);
 			} else
 				assure(ss);
 		} else
-			assure(sk->write_space == &ss_write_space);
-		read_unlock(&sk->callback_lock);
+			assure(sk->sk_write_space == &ss_write_space);
+		read_unlock(&sk->sk_callback_lock);
 	} else
 		assure(sk);
 }
@@ -12337,8 +12451,8 @@ _ss_sock_error_report(long data)
 	struct sock *sk;
 	ss_t *ss;
 	if ((sk = (struct sock *) data)) {
-		read_lock(&sk->callback_lock);
-		if (sk->error_report == &ss_error_report) {
+		read_lock(&sk->sk_callback_lock);
+		if (sk->sk_error_report == &ss_error_report) {
 			if ((ss = SOCK_PRIV(sk))) {
 				ss_putctl(ss, ss->rq, M_ERROR, &_ss_sock_error_report, sk);
 			}
@@ -12347,8 +12461,8 @@ _ss_sock_error_report(long data)
 				assure(ss);
 #endif
 		} else
-			assure(sk->error_report == &ss_error_report);
-		read_unlock(&sk->callback_lock);
+			assure(sk->sk_error_report == &ss_error_report);
+		read_unlock(&sk->sk_callback_lock);
 	} else
 		assure(sk);
 }
@@ -12368,15 +12482,15 @@ _ss_sock_data_ready(long data)
 	struct sock *sk;
 	ss_t *ss;
 	if ((sk = (struct sock *) data)) {
-		read_lock(&sk->callback_lock);
-		if (sk->data_ready == &ss_data_ready) {
+		read_lock(&sk->sk_callback_lock);
+		if (sk->sk_data_ready == &ss_data_ready) {
 			if ((ss = SOCK_PRIV(sk))) {
 				ss_putctl(ss, ss->rq, M_READ, &_ss_sock_data_ready, sk);
 			} else
 				assure(ss);
 		} else
-			assure(sk->data_ready == &ss_data_ready);
-		read_unlock(&sk->callback_lock);
+			assure(sk->sk_data_ready == &ss_data_ready);
+		read_unlock(&sk->sk_callback_lock);
 	} else
 		assure(sk);
 }
@@ -13410,7 +13524,7 @@ ss_w_flush(queue_t *q, mblk_t *mp)
  *  M_PCRSE Handling
  *
  *  -------------------------------------------------------------------------
- *  On the read queue, an M_PCRSE is used to indicate a state_change callback
+ *  On the read queue, an M_PCRSE is used to indicate a sk_state_change callback
  *  on the socket.  This can mean that the socket has completed connecting or
  *  has disconnected, or it may signal a connection indication on a listening
  *  socket.
@@ -13432,7 +13546,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	// assure(p->state != oldstate);
-	printd(("%s: %p: state_change [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: sk_state_change [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(oldstate), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
@@ -13556,7 +13670,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
  *  M_READ on the RD(q)
  *  -------------------------------------------------------------------------
  *
- *  On the read queue, an M_READ is used to indicate a data_ready callback on
+ *  On the read queue, an M_READ is used to indicate a sk_data_ready callback on
  *  the socket.  This can mean that the socket is now readable (when it was
  *  blocked before), or it may mean that a socket has completed connecting, or
  *  disconnected, or that a connection indication may be availabel on a
@@ -13578,7 +13692,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
-	printd(("%s: %p: data_ready [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: sk_data_ready [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:	/* TCP */
@@ -13618,7 +13732,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
  *  M_READ on the WR(q)
  *  -------------------------------------------------------------------------
  *
- *  On the write queue, an M_READ is used to indicate a write_space callback
+ *  On the write queue, an M_READ is used to indicate a sk_write_space callback
  *  on the socket.  This can mean that the socket is now writeable (when it
  *  was blocked before).  This can also mean that a connecting socket has
  *  completed connecting (or has disconnected), or that a listening socket has
@@ -13641,7 +13755,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
-	printd(("%s: %p: write_space [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: sk_write_space [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
@@ -13680,7 +13794,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
  *  M_ERROR Handling
  *
  *  -------------------------------------------------------------------------
- *  On the read queue, an M_ERROR is used to indicate an error_report callback
+ *  On the read queue, an M_ERROR is used to indicate an sk_error_report callback
  *  on the socket.  This can mean that the socket has disconected.  We might
  *  not received any other indication of the error.
  *
@@ -13702,7 +13816,7 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	// assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
-	printd(("%s: %p: error_report [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: sk_error_report [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
@@ -14180,18 +14294,14 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	int cminor = getminor(*devp);
 	ss_t *ss, **ipp = &ss_opens;
 	const ss_profile_t *prof;
-	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
-		MOD_DEC_USE_COUNT;
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
 		ptrace(("%s: ERROR: can't push as module\n", DRV_NAME));
-		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
 	if (cmajor != SS__CMAJOR_0 || cminor < FIRST_CMINOR || cminor > LAST_CMINOR) {
-		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
 	prof = &ss_profiles[cminor - FIRST_CMINOR];
@@ -14217,7 +14327,6 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (mindex >= SS__CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
-		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
 	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
@@ -14225,7 +14334,6 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
-		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
 	/* 
@@ -14239,7 +14347,6 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_lock_bh(&ss_lock);
 		ss_free_priv(q);
 		spin_unlock_bh(&ss_lock);
-		MOD_DEC_USE_COUNT;
 		return (-err);
 	}
 	qprocson(q);
@@ -14277,7 +14384,6 @@ ss_close(queue_t *q, int flag, cred_t *crp)
 	spin_lock_bh(&ss_lock);
 	ss_free_priv(q);
 	spin_unlock_bh(&ss_lock);
-	MOD_DEC_USE_COUNT;
 	goto quit;
       quit:
 	return (0);

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.17 $) $Date: 2005/02/20 09:54:40 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.18 $) $Date: 2005/03/07 12:20:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:40 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 12:20:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -307,14 +307,14 @@ AC_DEFUN([_NETPERF_OPTIONS], [dnl
 AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_CHECKING([for netperf dirty])
     if test :"${netperf_cv_dirty:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DIRTY], [], [
+	AC_DEFINE([DIRTY], [1], [
 	  Define to enable code to dirty buffers before calls to send.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_dirty:-no}])
     AC_MSG_CHECKING([for netperf histogram])
     if test :"${netperf_cv_histogram:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([HISTOGRAM], [], [
+	AC_DEFINE([HISTOGRAM], [1], [
 	    Define to enable code to keep a histogram of r/r times or time
 	    spent in send().
 	])dnl
@@ -322,13 +322,13 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([${netperf_cv_histogram:-no}])
     AC_MSG_CHECKING([for netperf old histogram])
     if test :"${netperf_cv_old_histogram:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([OLD_HISTOGRAM], [], [
+	AC_DEFINE([OLD_HISTOGRAM], [1], [
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_old_histogram:-no}])
     AC_MSG_CHECKING([for netperf intervals])
     if test :"${netperf_cv_intervals:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([INTERVALS], [], [
+	AC_DEFINE([INTERVALS], [1], [
 	    Define to enable code to allow pacing of sends in a UDP, TCP or
 	    SCTP test.  This may have unexpected results on non-HPUX systems.
 	])dnl
@@ -339,7 +339,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
 	netperf_cv_do_dlpi=no
     fi
     if test :"${netperf_cv_do_dlpi:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_DLPI], [], [
+	AC_DEFINE([DO_DLPI], [1], [
 	    Define to include code to test the DLPI implementation.
 	])dnl
     fi
@@ -351,27 +351,27 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
 	netperf_cv_do_sctp=no
     fi
     if test :"${netperf_cv_do_sctp:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_SCTP], [], [
+	AC_DEFINE([DO_SCTP], [1], [
 	    Define to include code to test the SCTP implementation.
 	])
     fi
     AC_MSG_RESULT([${netperf_cv_do_sctp:-no}])
     AC_MSG_CHECKING([for netperf do select])
     if test :"${netperf_cv_do_select:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_SELECT], [], [
+	AC_DEFINE([DO_SELECT], [1], [
 	    Define to do select() on receive.
 	])
     fi
     AC_MSG_RESULT([${netperf_cv_do_select:-no}])
     AC_MSG_CHECKING([for netperf do lwp])
     if test :"${netperf_cv_do_lwp:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_LWP], [], [
+	AC_DEFINE([DO_LWP], [1], [
 	])
     fi
     AC_MSG_RESULT([${netperf_cv_do_lwp:-no}])
     AC_MSG_CHECKING([for netperf do nbrr])
     if test :"${netperf_cv_do_nbrr:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_NBRR], [], [
+	AC_DEFINE([DO_NBRR], [1], [
 	    Define to do non-blocking request/response.
 	])
     fi
@@ -384,7 +384,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
 	netperf_cv_do_xti_sctp=no
     fi
     if test :"${netperf_cv_do_xti:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_XTI], [], [
+	AC_DEFINE([DO_XTI], [1], [
 	    Define to include code to test the XTI implementation.
 	])dnl
     fi
@@ -396,28 +396,28 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
 	netperf_cv_do_xti_sctp=no
     fi
     if test :"${netperf_cv_do_xti_sctp:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_XTI_SCTP], [], [
+	AC_DEFINE([DO_XTI_SCTP], [1], [
 	    Define to include code to test the XTI SCTP implementation.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_xti_sctp:-no}])
     AC_MSG_CHECKING([for netperf do unix])
     if test :"${netperf_cv_do_unix:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_UNIX], [], [
+	AC_DEFINE([DO_UNIX], [1], [
 	    Define to include code to test the UNIX domain implementation.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_unix:-no}])
     AC_MSG_CHECKING([for netperf do 1644])
     if test :"${netperf_cv_do_1644:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_1644], [], [
+	AC_DEFINE([DO_1644], [1], [
 	    Define to include code to test T/TCP vs TCP transactions.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_first_burst:-no}])
     AC_MSG_CHECKING([for netperf do first burst])
     if test :"${netperf_cv_do_first_burst:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_FIRST_BURST], [], [
+	AC_DEFINE([DO_FIRST_BURST], [1], [
 	    Define to include code to create an initial burst.
 	])dnl
     fi
@@ -432,7 +432,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([$netperf_cv_debug_log_file])
     AC_MSG_CHECKING([for netperf use looper])
     if test :"${netperf_cv_use_looper:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_LOOPER], [], [
+	AC_DEFINE([USE_LOOPER], [1], [
 	    Define to use looper or soaker processes to measure CPU
 	    utilitization.  There will be forked-off at the beginning.  If you
 	    are running this way, it is important to see how much impact these
@@ -447,7 +447,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([${netperf_cv_use_looper:-no}])
     AC_MSG_CHECKING([for netperf use pstat])
     if test :"${netperf_cv_use_pstat:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_PSTAT], [], [
+	AC_DEFINE([USE_PSTAT], [1], [
 	    If used on HP-UX 10.0 and later, this will make CPU utilization
 	    measurements with some information returned byt he 10.X pstat()
 	    call. This is very accurate, and should have no impact on the
@@ -459,7 +459,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([${netperf_cv_use_pstat:-no}])
     AC_MSG_CHECKING([for netperf use kstat])
     if test :"${netperf_cv_use_kstat:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_KSTAT], [], [
+	AC_DEFINE([USE_KSTAT], [1], [
 	    If used on Solaris 2.mumble, this will make CPU utilization
 	    measurements using the kstat interface.
 	])dnl
@@ -467,7 +467,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([${netperf_cv_use_kstat:-no}])
     AC_MSG_CHECKING([for netperf use /proc/stat])
     if test :"${netperf_cv_use_proc_stat:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_PROC_STAT], [], [
+	AC_DEFINE([USE_PROC_STAT], [1], [
 	    For use on linux systems with CPU utilization info in /proc/stat.
 	    Provides a fairly accurate CPU load measurement without affecting
 	    measurement.
@@ -476,7 +476,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([${netperf_cv_use_proc_stat:-no}])
     AC_MSG_CHECKING([for netperf use sysctl])
     if test :"${netperf_cv_use_sysctl:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_SYSCTL], [], [
+	AC_DEFINE([USE_SYSCTL], [1], [
 	    Use sysctl() on FreeBSD (perhaps other BSDs) to calculate CPU
 	    utilization.
 	])dnl
@@ -484,26 +484,26 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     AC_MSG_RESULT([${netperf_cv_use_sysctl:-no}])
     AC_MSG_CHECKING([for netperf use perfstat])
     if test :"${netperf_cv_use_perfstat:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_PERFSTAT], [], [
+	AC_DEFINE([USE_PERFSTAT], [1], [
 	    Use the perfstat call on AIX to calculate CPU utilization.
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_use_perfstat:-no}])
     AC_MSG_CHECKING([for netperf do ipv6])
     if test :"${netperf_cv_do_ipv6:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_IPV6], [], [
+	AC_DEFINE([DO_IPV6], [1], [
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_ipv6:-no}])
     AC_MSG_CHECKING([for netperf do dns])
     if test :"${netperf_cv_do_dns:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DO_DNS], [], [
+	AC_DEFINE([DO_DNS], [1], [
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_dns:-no}])
     AC_MSG_CHECKING([for netperf dont wait])
     if test :"${netperf_cv_dont_wait:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([DONT_WAIT], [], [
+	AC_DEFINE([DONT_WAIT], [1], [
 	])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_dont_wait:-no}])
