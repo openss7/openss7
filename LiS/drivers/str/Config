@@ -23,7 +23,7 @@ driver	mini-mux	mux_	*
 driver	printk		printk_	*
 driver	link-drvr	ldl_	*
 driver	sad		sad_	*
-
+driver	ip_to_dlpi	ip2xinet	*
 #
 # Pushable module specifications
 #
@@ -49,6 +49,7 @@ objname driver mini-mux        minimux
 objname driver printk          printk
 objname driver link-drvr       ldl
 objname driver sad             sad
+objname driver ip_to_dlpi      ip_to_dlpi
 objname module pipemod         pipemod
 objname module connld          connld
 objname module relay2          relay
@@ -83,6 +84,7 @@ loadable timod
 loadable tirdwr
 loadable ldl
 loadable sad
+loadable ip_to_dlpi
 
 #
 # Initialization specifications
