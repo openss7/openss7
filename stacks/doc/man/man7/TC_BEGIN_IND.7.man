@@ -1,0 +1,172 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_BEGIN_IND.7.man,v 0.9.2.1 2004/10/25 09:16:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_BEGIN_IND 7 "$Date: 2004/10/25 09:16:11 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.BR TC_BEGIN_IND ", " TC_QUERY_IND
+\- Dialogue Begin Indication
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+blocks if any TC user data is associated with the primitive.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_begin_ind {
+    ulong PRIM_type;          /* Always TC_BEGIN_IND */
+    ulong SRC_length;         /* Source address length */
+    ulong SRC_offset;         /* Source address offset */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong OPT_length;         /* Options associated with the primitive */
+    ulong OPT_offset;         /* Options associated wtih the primitive */
+    ulong DIALOG_id;          /* Dialog Identifier */
+    ulong COMP_flags;         /* For use with ANSI QWP/QWOP */
+} TC_begin_ind_t;
+
+typedef struct TC_begin_ind TC_query_ind;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the TC user that an dialogue begin request to the TC user has
+been made by the TC user at the specified source address.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TC_BEGIN_IND .
+.TP
+.I DEST_length
+is the length of the destination address.
+The destination address is indicated where it is different from the bound address associated with
+the
+.I stream
+upon which the indication is issued, or when the
+.I stream
+is bound to more than one address (e.g. a list of application contexts) and the destination address
+is more specific than the binding criteria and equivalent information is not contained in the
+source address.
+.TP
+.I DEST_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the destination address begins.
+.TP
+.I SRC_length
+is the length of the source address.
+.TP
+.I SRC_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the source address begins.
+.TP
+.I OPT_length
+is the length of the requested options associated with the primitive.
+.TP
+.I OPT_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) of the requested options associated with the primitive.
+.TP
+.I DIALOG_id
+is the dialogue identifier assigned by the TC provider to this transaction dialogue.  Dialogue
+identifiers provided by the TC provider always have the high bit set to 1 and are different from -1.
+The begin indication is always the first message to which the TC provider attaches any newly
+assigned dialogue identifier.
+.TP
+.I COMP_flags
+are the component flags for the indication.
+.PP
+The proper alignment of the destination address, source address, and options in the
+.BR M_PROTO (9)
+message block is not guaranteed.
+.SH MODES
+.PP
+Operations class 1, 2, and 3.
+.SH ORIGINATOR
+.PP
+TC provider.
+.SH FILES
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TC_BEGIN_RES (7),
+.BR TC_ABORT_REQ (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tci.7.man,v 0.9.2.2 2004/10/24 11:47:44 brian Exp $
+.\" @(#) $Id: tci.7.man,v 0.9.2.4 2004/10/25 10:31:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/24 11:47:44 $ by $Author: brian $
+.\" Modified $Date: 2004/10/25 10:31:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,14 +49,818 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TCI 7 "$Date: 2004/10/24 11:47:44 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH TCI 7 "$Date: 2004/10/25 10:31:19 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B TCI
 \- Transaction Component Interface
 .SH DESCRIPTION
+.PP
+This document specifies a
+.IR STREAMS (4)-based
+kernel-level instantiation of the ITU-T Q.771 TCAP  TC service definition.
+.[
+q.771
+.]
+The Transaction Component Interace (TCI) enable the user of a TCAP/ROSE service to access and use
+any of a variety of conforming TCAP/ROSE service providers without specific knowledge of the
+provider's protocol.
+The service interface is designed to support any class of remote operations service protocol.
+This interface only specifies access to the TCAP/ROSE layer service providers, and does not address
+issues concerning TCAP/ROSE management, protocol performance and performance analysis tools.
+.PP
+The specification assumes that the reader is facmiliar with SS7 terminology,
+.[
+q.700
+.]
+ISO/OSI reference model terminology,
+.[
+x.210
+.]
+the Transaction Capabilities Application Part (Q.771),
+.[
+q.771
+.]
+ISO/CCITT Remote Operations Service Element (ROSE) service (X.219),
+.[
+x.219
+.]
+and
+.IR STREAMS (4).
+.[
+svid
+.]
+.PP
+.B TCI
+specifies an interface that supports the services provided by the Transaction Capabilities
+Application Part
+.BR "" ( tcap (4))
+for ITU-T applications as described in ITU-T Recommendation Q.771.
+.[
+q.771
+.]
+.B TCI also supportes the Remote Operations Service Element (ROSE) described in ITU-T Recommendation
+X.219.
+.[
+x.219
+.]
+These manual pages are targeted for use by developers and tersters of protocol modules that require
+transaction component service.
+.SS "The Component Sub-Layer"
+.PP
+The Transaction Component Sub-Layer
+.[
+q.771
+.]
+provides a subset of the ROSE services interface.
+.[
+x.219
+.]
+The component sub-layer provides a means to manage transactions between applications.
+It is responsible for the remote operation service execution between application service entities.
+.SS "Model of the TCI"
+.PP
+The
+.B TCI
+defines the services provided by the transaction component sub-layer tot the transaction component
+user at the boundary between the trasnaction component sub-layer and the application or transaction
+component user entity.
+For TCAP, this is the interface between the TC sub-layer and the TC-user.
+.[
+q.771
+.]
+For ISO/OSI, this is the interface between the ROSE
+.[
+x.219
+.]
+and the application.
+.PP
+The interface consists of a set of primitives defined as
+.IR STREAMS (4)
+messages that provide access to the trasnaction componet sub-layer services, and are transferred
+between the transaction component service user entity and the transaction component service
+provider.
+These primitives are of two types: ones that originate from the transaction component service user,
+and others that originate from the transaction component service provider.
+The primitives that originate from the transaction component service user make requests to the
+transaction component service provider, or respond to an indication of an event of the transaction
+component service provider.
+The primitives that originate from the transaction component service provider are either
+confirmations of a user request, or are indications to the transaction component service user that
+an event has occurred.
+.PP
+The
+.B TCI
+allows the transaction component service provider to be configured with any transaction component
+sub-layer (such as any of the TCAP National variants, TUA, or even an OSI ROSE provider) that
+conforms to the
+.BR TCI .
+A transaction component sub-layer user can also be a user program that conforms to the
+.B TCI
+and accesses the transaction component service provider via
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system calls.
+.SS "TCI Services"
+.PP
+The features of the
+.B TCI
+are defined in terms of the services provided by the transaction component service provider, and the
+individual primitives that may flow between the transaction component service user and the
+transaction component service provider.
+.PP
+The services supported by the
+.B TCI
+are based on four distinct classes of operation: operation classes 1, 2, 3 and 4.
+Also, the
+.B TCI
+supports services for local management.
+.TP
+.B Operation Class 1
+The main features of operations class 1 are:
+.RS
+.IP a. 4
+Operation success is reported;
+.IP b.
+operation failure is reported.
+.PP
+There are three phases to each transaction: Transaction Initiation, Transaction Component Transfer,
+and Transaction Termination; however, all three phases in operation class 1 can be combined into a
+single exchange of primitives.
+Transaction components arrive at their destination in the same order as they departed their source
+and the data is protected against duplication or loss of components within some specified quality of
+service.
+.PP
+TCAP operation class 1 corresponds to ROSE protocol class 2.
+.RE
+.TP
+.B Operation Class 2
+The main features of operations class 2 are:
+.RS
+.IP a. 4
+Operation success is
+.I not
+reported;
+.IP b.
+operation failure is reported.
+.PP
+There are three phases to each transaction: Transaction Initiation, Transaction Component Transfer,
+and Transaction Termination; however, all three phases in operation class 2 can be combined into a
+single exchange of primitives.
+Transaction components arrive at their destination in the same order as they departed their source
+and the data is protected against duplication or loss of components within some specified quality of
+service.
+.PP
+TCAP operation class 2 corresponds to ROSE protocol class 3.
+.RE
+.TP
+.B Operation Class 3
+The main features of operations class 3 are:
+.RS
+.IP a. 4
+Operation success is reported;
+.IP b.
+operation failure is
+.I not
+reported.
+.PP
+There are three phases to each transaction: Transaction Initiation, Transaction Component Transfer,
+and Transaction Termination; however, all three phases in operation class 3 can be combined into a
+single exchange of primitives.
+Transaction components arrive at their destination in the same order as they departed their source
+and the data is protected against duplication or loss of components within some specified quality of
+.PP
+TCAP operation class 3 corresponds to ROSE protocol class 4.
+.RE
+.TP
+.B Operation Class 4
+The main features of operations class 4 are:
+.RS
+.IP a. 4
+Operation success is
+.I not
+reported;
+.IP b.
+operation failure is
+.I not
+reported.
+.PP
+Operation class 4 has no structure to the transaction and no separate phases.
+Each transaction component is transmitted from source to destination independently.
+Appropriate addressing information is included with each component sequence.
+As the components are transmitted independently from source to destination, there are, in general no
+guarantees of proper sequencing and completeness of the data transmission.
+.PP
+TCAP operation class 4 corresponds to ROSE protocol class 5.
+.RE
+.TP
+.B Local Management
+The
+.B TCI
+specifications also define a set of local management functions that apply to all operations classes.
+These services have local significance only.
+.PP
+Tables 1, 2, and 3 summarize the
+.B TCI
+service primitives by their state and service.
+.PP
+.TS
+center tab(:);
+cbss.
+Table 1.  Service Primitives for Local Management
+.T&
+|lb|lb|lb|
+|l|l|l|.
+_
+State:Service:Primitives
+=
+T{
+.ad l
+.hy 0
+Local Management
+T}:T{
+.ad l
+.hy 0
+Information Reporting
+T}:T{
+.ad l
+.hy 0
+.BR TC_INFO_REQ (7),
+.BR TC_INFO_ACK (7),
+.BR TC_ERROR_ACK (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Bind
+T}:T{
+.ad l
+.hy 0
+.BR TC_BIND_REQ (7),
+.BR TC_BIND_ACK (7),
+.BR TC_UNBIND_REQ (7),
+.BR TC_OK_ACK (7),
+.BR TC_ERROR_ACK (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Options Manaement
+T}:T{
+.ad l
+.hy 0
+.BR TC_OPTMGMT_REQ (7),
+.BR TC_OPTMGMT_ACK (7),
+.BR TC_ERROR_ACK (7)
+T}
+_
+.T&
+cbss.
+
+Table 2.  Service Primitives for Op Class 1, 2, and 3
+.T&
+|lb|lb|lb|
+|l|l|l|.
+_
+State:Service:Primitives
+=
+T{
+.ad l
+.hy 0
+Transaction Initiation
+T}:T{
+.ad l
+.hy 0
+Transaction Begin
+T}:T{
+.ad l
+.hy 0
+.BR TC_BEGIN_REQ (7),
+.BR TC_BEGIN_IND (7),
+.BR TC_BEGIN_RES (7),
+.BR TC_BEGIN_CON (7),
+.BR TC_OK_ACK (7),
+.BR TC_ERROR_ACK (7).
+T}
+_
+T{
+.ad l
+.hy 0
+Transaction Data Transfer
+T}:T{
+.ad l
+.hy 0
+Transaction Continue
+T}:T{
+.ad l
+.hy 0
+.BR TC_CONT_REQ (7),
+.BR TC_CONT_IND (7)
+T}
+_
+T{
+.ad l
+.hy 0
+Transaction Release
+T}:T{
+.ad l
+.hy 0
+Transaction End
+T}:T{
+.ad l
+.hy 0
+.BR TC_END_REQ (7),
+.BR TC_END_IND (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Transaction Abort
+T}:T{
+.ad l
+.hy 0
+.BR TC_ABORT_REQ (7),
+.BR TC_ABORT_IND (7)
+T}
+_
+.T&
+cbss.
+
+Table 3.  Service Primitives for Op Class 4
+.T&
+|lb|lb|lb|
+|l|l|l|.
+_
+State:Service:Primitives
+=
+T{
+.ad l
+.hy 0
+Transaction Unit Data
+T}:T{
+.ad l
+.hy 0
+Transaction Unidirectional
+T}:T{
+.ad l
+.hy 0
+.BR TC_UNI_REQ (7),
+.BR TC_UNI_IND (7)
+T}
+_
+.T&
+cbss.
+
+Table 4.  Service Primitives for Component Handling
+.T&
+|lb|lb|lb|
+|l|l|l|.
+_
+State:Service:Primitives
+=
+T{
+.ad l
+.hy 0
+Component Handling
+T}:T{
+.ad l
+.hy 0
+Operation Invocation
+T}:T{
+.ad l
+.hy 0
+.BR TC_INVOKE_REQ (7),
+.BR TC_INVOKE_IND (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Operation Result
+T}:T{
+.ad l
+.hy 0
+.BR TC_RESULT_REQ (7),
+.BR TC_RESULT_IND (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Operation Error
+T}:T{
+.ad l
+.hy 0
+.BR TC_ERROR_REQ (7),
+.BR TC_ERROR_IND (7),
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Operation Cancellation
+T}:T{
+.ad l
+.hy 0
+.BR TC_CANCEL_REQ (7),
+.BR TC_CANCEL_IND (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Operation Rejection
+T}:T{
+.ad l
+.hy 0
+.BR TC_REJECT_REQ (7),
+.BR TC_REJECT_IND (7)
+T}
+_
+.TE
+.sp 2
+.SH "TCI Services Definition"
+.PP
+This section describes the services of the
+.B TCI
+primitives.
+Time-sequence diagrams
+.[
+x.210
+.]
+tht illustrate the sequence of primitives are used.
+The format of the primitives are defined in individual manual pages.
+.SS "Local Management Services Definition"
+.PP
+The services defined in this section are outside the scope of the international standards.
+These services apply to all operation classes.
+They are invoked for the intialization or tear down of a
+.I stream
+connected to the TC-provider.
+They are also used to manage options supported by the TC-provider and to report information on the
+supported parameter values.
+.TP
+.B Transaction Information Reporting Service:-
+.PP
+This service provides information on the options supported by the TC-provider.
+The transaction information reporting service uses the following primitives:
+.IP \(em 4
+.BR TC_INFO_REQ (7):
+This primitive requests that the TC-provider return the values of all the supported protocol
+paraemters.
+This request may be invoked during any phase.
+This primtiive requires local acknowledgement using the
+.BR TC_INFO_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TC_INFO_ACK (7):
+This primitive is in reponse to the
+.BR TC_INFO_REQ (7)
+primitive and returns the values of the supported protocol parameters to the TC-user.
+.TP
+.B TC User Bind Service:-
+.PP
+This service allows an originating address to be associated with a
+.IR stream .
+It allow the TC-user to negotiated the number of outstanding transaction begin indications that can
+remain unakcnowledged for that TC-user (a transaction begin indication is considered unacknowledged
+while it is awaiting a corresponding transaction begin response or abort request from the TC-user).
+This service also defines a mechanism that allows a
+.I stream
+(bound to the address of the TC-user) to be reserved to handle incoming transction begin indications
+only.
+This
+.I stream
+is referred to as the
+.IR "" \(lq "listener stream" \(rq.
+The TC user bind service uses the following primitives:
+.IP \(em 4
+.BR TC_BIND_REQ (7):
+This primitive requests that the TC-user be bound to a particular originating address, and
+negotiate the number of allowable outstanding transaction begin indications for that address.
+This primitive requires local acknowledgement using the
+.BR TC_BIND_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TC_BIND_ACK (7):
+This primitive is in response to the
+.BR TC_BIND_REQ (7)
+primitive and indicates to the TC-user that the specified TC-user has been bound to an originating
+address.
+.TP
+.B TC User Unbind Service:-
+.PP
+This service allows the TC-user to be unbound from an originating address.
+The TC user unbind service uses the following primitives:
+.IP \(em 4
+.BR TC_UNBIND_REQ (7):
+This primitive requests that the TC-user be unbound from the originating address to which it had
+been previously bound.
+This primitive requires local acknowledgement using the
+.BR TC_OK_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitive.
+.TP
+.B Receipt Acknowledgement Service:-
+.PP
+This service provides the TC-user with local acknowledgement for primitives that require local
+ackwowledgement.
+The receipt acknowledgement service uses the following primitives:
+.IP \(em 4
+.BR TC_OK_ACK (7):
+This primitive indicates to the TC-user that the previous TC-user originated primitive was received
+successfully by the TC-provider.
+.TP
+.B Error Acknowledgement Service:-
+.PP
+This service provides the TC-user with local error acknowledgement for primitives that require local
+acknowledgement.
+The error acknowledgement service uses the following primitives:
+.IP \(em 4
+.BR TC_ERROR_ACK (7):
+This primitive indicates to the TC-user that a non-fatal error has occured in the last TC-user
+originated request or response primitive (see
+.BR "" \(lq "ERROR HANDLING" \(rq)
+on the
+.IR stream .
+.TP
+.B Options Management Service:-
+.PP
+This service allows the TC-user to manage the protocol option values associated with the
+TC-provider.
+The options management service uses the following primitives:
+.IP \(em 4
+.BR TC_OPTMGMT_REQ (7):
+This primitive allows the TC-user to select default values for protocol options within the range
+supported by the TC-provider, and to indicate the default selection of return option.
+This primtiive requires local acknowledgement using the
+.BR TC_OPTMGMT_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitive.
+.IP \(em
+.BR TC_OPTMGMT_ACK (7):
+This primitive is in response to the
+.BR TC_OPTMGMT_REQ (7)
+primitive and indicats the protocol options negotiated on the
+.I stream .
+.SS "Operation Class 1, 2, and 3 Transaction Services Definition"
+.PP
+This section describes the required transaction service primitives that define the operation class
+1, 2, and 3, structured transaction interface.
+.TP
+.B Transaction Initiation:-
+.TP
+.I User Primitives for Successful Transaction Establishment
+.PP
+The following user primtiives support Operations Class 1, 2, or 3, Phase I (Transaction
+Establishment) services:
+.IP \(em 4
+.BR TC_BEGIN_REQ (7):
+This primitive requests that the TC-provider form a stransaction dialogue with the specified
+destination TC-user.
+This primitive requires local acknowledgement using the
+.BR TC_OK_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitive.
+.IP \(em
+.BR TC_BEGIN_RES (7):
+This primitive requests that the TC-provider accept a previous transaction begin indication.
+This primitive requires local acknowledgement using the
+.BR TC_OK_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitive.
+.TP
+.I Provider Primitives for Successful Transaction Establishment
+.PP
+The following primitives support Operations Class 1, 2, or 3, Phase I (Transaction Establishment)
+servics:
+.IP \(em 4
+.BR TC_BEGIN_IND (7):
+This primitive indicates to the TC-user that a transaction dialogue request has been made at the
+specified originating address, and is assigned the specified dialogue identifier.
+.IP \(em
+.BR TC_BEGIN_CON (7):
+This primitive indicats to the TC-user that a transaction initiation request has been confirmed on
+the specified responding address, and is assigned the specified dialogue identifier.
+.TP
+.B Transaction Component Transfer:-
+.PP
+Flow control on the transaction dialogue is done by management of queue capacify, and by allowin
+primitives of certain types to be inserted into the queues.
+.TP
+.I Primitives for Component Transfer
+.PP
+The following primitives support Operation Class 1, 2, or 3, Phase II (Transaction Component
+Transfer) services:
+.IP \(em 4
+.BR TC_CONT_REQ (7):
+This primitive requests that the TC-provider transfer the specified componets.
+This primitive does not require local acknaowledgement by may generate a fatal error.
+.IP \(em
+.BR TC_CONT_IND (7):
+This primitive indicats to the TC-user that this messag contains components.
+.TP
+.B Transcation Termination:-
+.PP
+The transaction dialogue termination procedure is initialized by insertion of an end or abort
+primitive into the queue.
+.TP
+.I Primitives for Transaction Termination
+.PP
+The following primitives support Operations Class 1, 2, or 3, Phase III (Transaction Termination)
+services:
+.IP \(em 4
+.BR TC_END_REQ (7):
+This primitive requests that the TC-provider terminate an outstanding request for a transaction
+dialogue or normal termination of an existing transaction dialogue.
+This primitive requires local acknowledgement using the
+.BR TC_OK_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitive.
+.IP \(em
+.BR TC_ABORT_REQ (7):
+This primitive requsts that the TC-provider deny an outstanding request for a transaction dialogue
+or abnormal termination of an existing transaction dialogue.
+This primitive requires local acknowledgement using the
+.BR TC_OK_ACK (7)
+or
+.BR TC_ERROR_ACK (7)
+primitive.
+.IP \(em
+.BR TC_END_IND (7):
+This primitive indicates to the TC-user that either a request for transaction dialogue initiation
+has been completed or an existing transaction dialogue has been terminated normally.
+.IP \(em
+.BR TC_ABORT_IND (7):
+This primitive indicates to the TC-user that either a request for transaction dialogue initiation
+has been denied or an existing transaction dialogue has been terminated abnormally.
+.SS "Operation Class 4 Transaction Services Definition"
+.PP
+The operation class 4 service allows for the transfer of transaction components in one and both
+directions simultaneously without establishing a transaction dialogue.  A set of primitives are
+defined that carry transaction components and control information between the TC-user and the
+TC-provider entities.
+The operation class 4 transaction service consists of one phase.
+.TP
+.B Request and Response Primitives:-
+.PP
+The primitives are modelled as requests initiated by the TC-user and indications initiated by the
+TC-provider.  Indication may be initiated by the TC-provider independent from requests by the
+TC-user.
+.IP \(em 4
+.BR TC_UNI_REQ (7):
+This primitive requests that the TC-provider send the transaction components to the specified
+destinaiton.
+This primitive does not require local acknowledgement but may generate a fatal error.
+.IP \(em
+.BR TC_UNI_IND (7):
+This primtiive indicates to the TC-user that a component sequence has been received from the
+specified originating address.
+.IP \(em
+.BR TC_NOTICE_IND (7):
+This primitive indicates ot the TC-user that the components with the specified destination address
+and QoS parameters produced an error.
+This primitive is specific to Operations Class 4.
+.SS "Component Handling Services Definition"
+.PP
+.TP
+.B Operation Invoke Service:-
+.IP \(em 4
+.BR TC_INVOKE_REQ (7):
+This primitive requests that the TC-provider formulate an operation invocation to be included in
+the specified dialogue.
+This primitive does not require local acknowledgement by may generate a fatal error.
+.IP \(em
+.BR TC_INVOKE_IND (7):
+This primitivie indicates the invocation of an operation of the TC user.
+This primitive can be issued in all operation classes.
+.TP
+.B Operation Return Result Serivce:-
+.IP \(em 4
+.BR TC_RESULT_REQ (7):
+This primitive requests that the TC-provider formulate an operation result to be included in the
+specified dialogue.
+This primitive is sent in response to a
+.BR TC_INVOKE_IND (7)
+primitive under operation classes 1 and 3.
+This primitive does not require local acknowledgement by may generate a fatal error.
+.IP \(em
+.BR TC_RESULT_IND (7):
+This primitive indicates the result of an invoked operation to the TC user.
+This primitive can be issued in operation class 1 or 3.
+.TP
+.B Operation Error Service:-
+.IP \(em 4
+.BR TC_ERROR_REQ (7):
+This primitive requests that the TC-provider formulate an operation error to be included in the
+specified dialogue.
+This primitive is sent in response to a
+.BR TC_INVOKE_IND (7)
+primitive under operation classes 1 and 2.
+This primitive does not require local acknowledgement by may generate a fatal error.
+.IP \(em
+.BR TC_ERROR_IND (7):
+This primitive indicates the error in a TC-user invoked operation.
+This primitive can be issued in operation class 1 or 2.
+.TP
+.B Operation Cancel Service:-
+.IP \(em 4
+.BR TC_CANCEL_REQ (7):
+This primitive requests that the TC-provider cancel the specified operation.
+This primitive is sent to cancel a previous
+.BR TC_INVOKE_REQ (7)
+primitive.
+This primitive does not require local acknowledgement by may generate a fatal error.
+.IP \(em
+.BR TC_CANCEL_IND (7):
+This primitive indicates that a previous TC-user invoked operation was cancelled (timed out).
+This primitive can be issued in operation class 1 or 2.
+.TP
+.B Operation Reject Service:-
+.IP \(em 4
+.BR TC_REJECT_REQ (7):
+This primitive requests that the TC-provider reject the specified operation.
+This primitive is sent in response to a
+.BR TC_INVOKE_IND (7)
+primitive under operation classes 1 and 2.
+This primitive does not require local acknowledgement by may generate a fatal error.
+.IP \(em
+.BR TC_REJECT_IND (7):
+This primitive indicates that a previous TC-user invoked operation was rejected.
+This primitive can be issued in operation class 1 or 2.
 .\"
 .\"
 .\"
 .\"
 .\"
 .\"
+.SH FILES
+.PP
+<ss7/tc.h>
+.
+.SH "SEE ALSO"
+.PP
+.BR putmsg (2),
+.BR getmsg (2),
+.BR TC_ABORT_IND (7),
+.BR TC_ABORT_REQ (7),
+.BR TC_ADDR_ACK (7),
+.BR TC_ADDR_REQ (7),
+.BR TC_BEGIN_CON (7),
+.BR TC_BEGIN_IND (7),
+.BR TC_BEGIN_REQ (7),
+.BR TC_BEGIN_RES (7),
+.BR TC_BIND_ACK (7),
+.BR TC_BIND_REQ (7),
+.BR TC_CANCEL_IND (7),
+.BR TC_CANCEL_REQ (7),
+.BR TC_CONT_IND (7),
+.BR TC_CONT_REQ (7),
+.BR TC_END_IND (7),
+.BR TC_END_REQ (7),
+.BR TC_ERROR_ACK (7),
+.BR TC_ERROR_IND (7),
+.BR TC_ERROR_REQ (7),
+.BR TC_INFO_ACK (7),
+.BR TC_INFO_REQ (7),
+.BR TC_INVOKE_IND (7),
+.BR TC_INVOKE_REQ (7),
+.BR TC_NOTICE_IND (7),
+.BR TC_OK_ACK (7),
+.BR TC_OPTMGMT_ACK (7),
+.BR TC_OPTMGMT_REQ (7),
+.BR TC_REJECT_IND (7),
+.BR TC_REJECT_REQ (7),
+.BR TC_RESULT_IND (7),
+.BR TC_RESULT_REQ (7),
+.BR TC_UNBIND_REQ (7),
+.BR TC_UNI_IND (7),
+.BR TC_UNI_REQ (7).
+.
+.SH HISTORY
+.PP
+This interface is new to OpenSS7 for Linux Fast-STREAMS.
+.
+.SH CONFORMANCE
+.PP
+This interface conforms to the TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.
+.[
+$LIST$
+.]
+.TA

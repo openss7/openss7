@@ -1,0 +1,169 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_CONT_REQ.7.man,v 0.9.2.1 2004/10/25 09:16:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_CONT_REQ 7 "$Date: 2004/10/25 09:16:12 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.BR TC_CONT_REQ ", " TC_CONV_REQ
+\- Dialogue Continue Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+message blocks where each
+.BR M_DATA (9)
+message block contains zero or more bytes of data.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_cont_req {
+    ulong PRIM_type;          /* Always TC_CONT_REQ */
+    ulong OPT_length;         /* Options associated with the primitive */
+    ulong OPT_offset;         /* Options associated wtih the primitive */
+    ulong DIALOG_id;          /* Dialog Identifier */
+    ulong COMP_flags;         /* For use with ANSI CWP/CWOP */
+} TC_cont_req_t;
+
+typedef struct TC_cont_req TC_conv_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the TC provider that this message contains components.
+.PP
+Note that the maximum components size allowed by the TC provider is indicated to the TC user with
+the
+.BR TC_INFO_ACK (7)
+primitive.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TC_CONT_REQ .
+.TP
+.I OPT_length
+is the length of the protocol options associated with the data.
+.TP
+.I OPT_offset
+is the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the protocol options begin.
+.TP
+.I DIALOG_id
+is the dialogue identifier assigned by the TC provider for the dialogue to which the components
+belong.
+.TP
+.I COMP_flags
+are the component flags associated with the components.  Component flags are TC provider specific.
+.SH RULES
+.PP
+This primitive does not require any acknowledgments, although it may generate a fatal error.
+This is indicated using a
+.BR M_ERROR (9)
+message type which results in the failure of all operating system service routines on the stream.
+.SH ERRORS
+.PP
+The allowable errors are as follows:
+.TP 16
+.RB [ EPROTO ]
+This indicates one of the following unrecoverable protocol conditions:
+.RS
+.IP - 3
+The transaction service interface was found to be in an incorrect state.
+If the transaction dialogue is in the
+.B TCS_IDLE
+state when the TC provider receives the
+.B TC_CONT_REQ
+primitive, then the TC provider should just drop the message without generating a fatal
+error.
+.IP -
+The amount of TC user data associated with the primitive defines a transaction service data
+unit larger than that allowed by the TC provider.
+.SH MODES
+.PP
+Operation class 1, 2, or 3.
+.SH ORIGINATOR
+.PP
+TC user.
+.SH "FILES"
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR M_ERROR (9),
+.BR TC_INFO_ACK (7),
+.BR TC_CONT_IND (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

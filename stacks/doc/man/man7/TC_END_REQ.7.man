@@ -1,0 +1,151 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_END_REQ.7.man,v 0.9.2.1 2004/10/25 09:16:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_END_REQ 7 "$Date: 2004/10/25 09:16:12 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.BR TC_END_REQ ", " TC_RESP_REQ
+\- Dialogue End Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block
+followed by zero or more
+.BR M_DATA (9)
+blocks if any TC user data is associated with the primitive.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_end_req {
+    ulong PRIM_type;          /* Always TC_END_REQ */
+    ulong OPT_length;         /* Options associated with the primitive */
+    ulong OPT_offset;         /* Options associated wtih the primitive */
+    ulong DIALOG_id;          /* Dialog Identifier */
+    ulong TERM_scenario;      /* Reason for termination */
+} TC_end_req_t;
+
+typedef struct TC_end_req TC_resp_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the TC provider that the TC user is finished sending data.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TC_END_REQ .
+.TP
+.I OPT_length
+is the length of the protocol options associated with the primitive and any TC user data.
+.TP
+.I OPT_offset
+is the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the protocol options begin.
+.TP
+.I DIALOG_id
+is the dialogue identifier for the dialogue to which the request applies.
+.TP
+.I TERM_scenario
+is the termination scenario.  Termination scenarios are TC provider specific.
+.SH RULES
+.PP
+This primitive does not require any acknowledgments, although it may generate a fatal error.
+This is indicated via a
+.BR M_ERROR (9)
+message type which results in the failure of all operating system service routines on the stream.
+.SH ERRORS
+.PP
+.TP 16
+.RB [ EPROTO ]
+This indicates the unrecoverable protocol condition that the primitive would place the interface in
+an incorrect state.
+.SH MODES
+.PP
+Operations class 1, 2, or 3.
+.SH ORIGINATOR
+.PP
+TC user.
+.SH "FILES"
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR M_ERROR (9),
+.BR TC_END_IND (7),
+.BR TC_ABORT_REQ (7),
+.BR TC_ABORT_IND (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tri.7.man,v 0.9.2.2 2004/10/24 11:47:44 brian Exp $
+.\" @(#) $Id: tri.7.man,v 0.9.2.3 2004/10/25 09:16:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/24 11:47:44 $ by $Author: brian $
+.\" Modified $Date: 2004/10/25 09:16:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,8 +49,9 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TRI 7 "$Date: 2004/10/24 11:47:44 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH TRI 7 "$Date: 2004/10/25 09:16:20 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
+.PP
 .B TRI
 \- Transaction Interface
 .SH DESCRIPTION
@@ -662,6 +663,7 @@ Provides indication of errors encountered in the transmission of unidirectional 
 .
 .
 .SH "RULES"
+.PP
 .
 .SS "Note about Structure Elements"
 .PP
@@ -1678,7 +1680,11 @@ _
 .sp 2
 .
 .
+.SH "FILES"
+.PP
+<ss7/tr.h>
 .SH "SEE ALSO"
+.PP
 .BR putmsg (2),
 .BR getmsg (2),
 .BR TR_ABORT_IND (7),
@@ -1712,6 +1718,10 @@ This interface is new to OpenSS7 for Linux Fast-STREAMS.
 .
 .SH "CONFORMANCE"
 .PP
+This interface conforms to the TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
 .
 .
 .

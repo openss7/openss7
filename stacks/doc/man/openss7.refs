@@ -16,6 +16,17 @@
 %I X Programmer's Group
 %U http://www.opengroup.org/onlinepubs/
 
+%L TCI
+%A The\ OpenSS7\ Project
+%Q The\ OpenSS7\ Project
+%R TCI Revision 0.9.2
+%N Draft 1
+%T Transaction Component Interface (TCI) Specification
+%D October 2004
+%C Edmonton, Alberta
+%I OpenSS7\ Corporation
+%U http://www.openss7.org/docs/tci.pdf
+
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
@@ -956,9 +967,7 @@
 %A ETSI
 %R ETSI EN 300 009-1 V1.4.3
 %D February 2001
-%T Intergrated Services Digital Network (ISDN); Signalling System No. 7;
-Signalling Connection Control Part (SCCP); [Connectionless and
-Connection-Oriented] to Support International Interconnection;
+%T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection;
 Part 1: Protocol Specification
 %O (ITU-T Recommendations Q.711 to Q.716 (1996) modified)
 %C Cedex
@@ -973,10 +982,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 009-1
 %N Third Edition
 %D September 1996
-%T Intergrated Services Digital Network (ISDN); Signalling System No. 7;
-Signalling Connection Control Part (SCCP); [Connectionless and
-Connection-Oriented] to Support International Interconnection;
-Part 1: Protocol Specification
+%T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection; Part 1: Protocol Specification
 %O (ITU-T Recommendations Q.711 to Q.714 and Q.716 (1993) modified)
 %C Cedex
 %G RE/SPS-02018-1
@@ -1008,6 +1014,20 @@ Part 1: Protocol Specification
 %I European Telecommunications Standards Institute
 %O (ITU-T Rcommendations Q.761 to Q.764 (1999) modified)
 %U http://www.etsi.org/
+
+%K tcapv2
+%L ETS 300 287
+%A ETSI
+%R ETSI ETS 300 287
+%T Integrated Services Digital Network (ISDN); Signalling System No. 7 (SS7); Transaction Capabilities Application Part (TCAP)
+%D 1993
+%N TCAP Version 2
+%C Cedex
+%G RE/SPS-02003
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+%O (ITU-T Rcommendations Q.771 to Q.774 (1993) modified)
 
 %L M2UA
 %A Ken Morneault

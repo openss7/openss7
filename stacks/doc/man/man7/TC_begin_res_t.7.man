@@ -1,0 +1,1 @@
+.so TC_BEGIN_RES.7.man

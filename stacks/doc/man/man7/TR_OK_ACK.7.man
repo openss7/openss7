@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TR_OK_ACK.7.man,v 0.9.2.1 2004/10/24 11:47:39 brian Exp $
+.\" @(#) $Id: TR_OK_ACK.7.man,v 0.9.2.2 2004/10/25 09:16:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/24 11:47:39 $ by $Author: brian $
+.\" Modified $Date: 2004/10/25 09:16:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,11 +49,13 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TR_OK_ACK 7 "$Date: 2004/10/24 11:47:39 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TR_OK_ACK 7 "$Date: 2004/10/25 09:16:19 $" "$Name:  $" "Transaction Interface (TRI)"
 .SH NAME
+.PP
 .B TR_OK_ACK
 \- Success Acknowledgment
 .SH SYNOPSIS
+.PP
 This message consists of one
 .BR M_PCPROTO (9)
 message block formatted as follows:
@@ -67,12 +69,14 @@ typedef struct TR_ok_ack {
 \fR\s+1
 .fi
 .SH DESCRIPTION
+.PP
 This primitive indicates to the transaction user that the previous transaction-user-originated
 primitive was received successfully by the transaction provider.
 It does not indicate to the transaction user any transaction protocol action taken due to issuing
 the primitive.
 This may only be initiated as an acknowledgment for those primitives that require one.
 .SH PARAMETERS
+.PP
 .TP 16
 .I PRIM_type
 identifies the primitive.
@@ -80,10 +84,16 @@ identifies the primitive.
 .I CORRECT_prim
 contains the successfully received primitive type.
 .SH MODES
+.PP
 Both connection-mode and connectionless-mode.
 .SH ORIGINATOR
+.PP
 Transaction provider.
+.SH "FILES"
+.PP
+<ss7/tr.h>
 .SH "SEE ALSO"
+.PP
 .BR tri (7),
 .BR M_PCPROTO (9),
 .BR TR_ERROR_ACK (7).

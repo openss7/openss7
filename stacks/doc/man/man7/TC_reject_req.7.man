@@ -1,0 +1,1 @@
+.so TC_REJECT_REQ.7.man

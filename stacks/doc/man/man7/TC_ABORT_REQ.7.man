@@ -1,0 +1,169 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_ABORT_REQ.7.man,v 0.9.2.1 2004/10/25 09:16:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_ABORT_REQ 7 "$Date: 2004/10/25 09:16:11 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.B TC_ABORT_REQ
+\- Abort Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by one or more
+.BR M_DATA (9)
+message blocks if there is any user data specified by the TC user.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_abort_req {
+    ulong PRIM_type;          /* Always TC_ABORT_REQ */
+    ulong OPT_length;         /* Options associated with the primitive */
+    ulong OPT_offset;         /* Options associated wtih the primitive */
+    ulong DIALOG_id;          /* Dialog Identifier */
+    ulong ABORT_reason;       /* Abort reason */
+} TC_abort_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive requests that the TC provider deny a request for dialogue, or abort an
+existing dialogue.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TC_ABORT_REQ .
+.TP
+.I OPT_length
+specifies the length of the protocol options associated with the abort.
+.TP
+.I OPT_offset
+specifies the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the protocol options begin.
+.TP
+.I DIALOG_id
+specifies the indentifier of the existing transaction dialogue or incoming transaction
+dialogue attempt being aborted.
+.TP
+.I ABORT_reason
+specifies the (user) reason for the abort.
+.SH RULES
+.PP
+This primitive requires the TC provider to generate the following acknowledgment on receipt
+of the primitive, and the TC user must wait for the acknowledgment before issuing any other
+primitives:
+.SS Successful
+Correct acknowledgment of the primitive is indicated via the
+.BR TC_OK_ACK (7)
+primitive.
+.SS Non-fatal errors
+These errors will be indicated via the
+.BR TC_ERROR_ACK (7)
+primitive.
+.SH ERRORS
+.PP
+The allowable errors are as follows:
+.TP 16
+.RB [ TCBADDATA ]
+The amount of TC user data specified was invalid.
+.TP
+.RB [ TCBADID ]
+The transaction identifier specified in the primitive was incorrect or invalid.
+.TP
+.RB [ TCNOTSUPPORT ]
+This primitive is not supported by the TC provider.
+.TP
+.RB [ TCOUTSTATE ]
+The primitive would place the transaction interface out of state.
+.TP
+.RB [ TCSYSERR ]
+A system error has occurred and the Linux system error is indicated in
+the primitive.
+.SH MODES
+.PP
+Operation classes 1, 2, or 3.
+.SH ORIGINATOR
+.PP
+Transaction component user.
+.SH FILES
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TC_ABORT_IND (7),
+.BR TC_BEGIN_IND (7),
+.BR TC_END_REQ (7),
+.BR TC_END_IND (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA

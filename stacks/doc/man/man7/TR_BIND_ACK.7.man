@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TR_BIND_ACK.7.man,v 0.9.2.1 2004/10/24 11:47:38 brian Exp $
+.\" @(#) $Id: TR_BIND_ACK.7.man,v 0.9.2.2 2004/10/25 09:16:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/24 11:47:38 $ by $Author: brian $
+.\" Modified $Date: 2004/10/25 09:16:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,11 +49,13 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TR_BIND_ACK 7 "$Date: 2004/10/24 11:47:38 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TR_BIND_ACK 7 "$Date: 2004/10/25 09:16:18 $" "$Name:  $" "Transaction Interface (TRI)"
 .SH NAME
+.PP
 .B TR_BIND_ACK
 \- Bind Protocol Address Acknowledgment
 .SH SYNOPSIS
+.PP
 This message consists of one
 .BR M_PCPROTO (9)
 message block formatted as follows:
@@ -70,6 +72,7 @@ typedef struct TR_bind_ack {
 \fR\s+1
 .fi
 .SH DESCRIPTION
+.PP
 This primitive indicates to the transaction user that the specified protocol address has been bound
 to the
 .IR stream ,
@@ -78,6 +81,7 @@ provider for the specified protocol address, and that the
 .I stream
 associated with the specified protocol address has been activated.
 .SH PARAMETERS
+.PP
 .TP 16
 .I PRIM_type
 indicates the primitive type.
@@ -105,6 +109,7 @@ The proper alignment of the address in the
 .BR M_PCPROTO (9)
 message block is not guaranteed.
 .SH RULES
+.PP
 The following rules apply to the binding of the specified protocol address to the
 .IR stream :
 .IP \- 3
@@ -156,16 +161,23 @@ with a negotiated
 greater than zero may generate transaction association begin requests or accept transaction
 association begin indications.
 .SH ERRORS
+.PP
 If the above rules result in an error condition, then the transaction provider must issue an
 .BR TR_ERROR_ACK (7)
 primitive to the transaction user specifying the error as defined in the description of the
 .BR TR_BIND_REQ (7)
 primitive.
 .SH MODES
+.PP
 Both connection-mode and connectionless-mode.
 .SH ORIGINATOR
+.PP
 Transaction provider.
+.SH "FILES"
+.PP
+<ss7/tr.h>
 .SH "SEE ALSO"
+.PP
 .BR tri (7),
 .BR M_PCPROTO (9),
 .BR TR_BIND_REQ (7).

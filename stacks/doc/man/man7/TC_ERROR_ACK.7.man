@@ -1,0 +1,189 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_ERROR_ACK.7.man,v 0.9.2.1 2004/10/25 09:16:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_ERROR_ACK 7 "$Date: 2004/10/25 09:16:12 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.B TC_ERROR_ACK
+\- Error Acknowledgment
+.SH SYNOPSIS
+.PP
+This message consists of a
+.BR M_PCPROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_error_ack {
+    ulong PRIM_type;
+    ulong ERROR_prim;
+    ulong TCI_error;
+    ulong UNIX_error;
+    ulong DIALOG_id;
+    ulong INVOKE_id;
+} TC_error_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the TC user that a non-fatal error has occurred in the last
+TC-user-originated primitive.
+.PP
+For an overview of the error handling capabilities available to the TC provider see
+.BR tci (7).
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive.
+Always
+.BR TC_ERROR_ACK .
+.TP
+.I ERROR_prim
+identifies the primitive type that caused the error
+.TP
+.I TCI_error
+contains the Transaction Component Interface error code.
+.TP
+.I UNIX_error
+contains the Linux system error code.
+This may only be non zero if
+.I TCI_error
+is equal to
+.BR TCSYSERR .
+.TP
+.I DIALOG_id
+is the dialogue identifier for the dialogue upon which the primitive caused an error.
+.TP
+.I INVOKE_id
+is the invoke identifier for the operation for which the primtiive cuase and error.
+.SH RULES
+.PP
+This may only be initiated as an acknowledgment for those primitives that require one.
+It also indicates to the TC user that no action was taken on the primitive that caused the error.
+.SH ERRORS
+.PP
+The list of Transaction Interface error codes follows:
+.TP 16
+.BR "" [ TCBADADDR ]
+Incorrect address format/illegal address information.
+.TP
+.BR "" [ TCBADOPT ]
+Options in incorrect format or contain illegal information.
+.TP
+.BR "" [ TCACCESS ]
+User did not have proper permissions.
+.TP
+.BR "" [ TCNOADDR ]
+TC Provider could not allocate address.
+.TP
+.BR "" [ TCOUTSTATE ]
+Primitive was issues in wrong sequence.
+.TP
+.BR "" [ TCBADSEQ ]
+Sequence number in primitive was incorrect/illegal.
+.TP
+.BR "" [ TCSYSERR ]
+UNIX system error occurred.
+.TP
+.BR "" [ TCBADDATA ]
+User data spec. outside range supported by TC provider.
+.TP
+.BR "" [ TCBADFLAG ]
+Flags specified in primitive were illegal/incorrect.
+.TP
+.BR "" [ TCNOTSUPPORT ]
+Primitive type not supported by the TC provider.
+.TP
+.BR "" [ TCBOUND ]
+Illegal second attempt to bind listener or default listener.
+.TP
+.BR "" [ TCBADQOSPARAM ]
+QOS values specified are outside the range supported by the TC provider.
+.TP
+.BR "" [ TCBADQOSTYPE ]
+QOS structure type specified is not supported by the TC provider.
+.TP
+.BR "" [ TCBADTOKEN ]
+Token used is not associated with an open stream.
+.TP
+.BR "" [ TCNOPROTOID ]
+Protocol id could not be allocated.
+.SH MODES
+.PP
+Operation class 1, 2, 3, and 4.
+.SH ORIGINATOR
+.PP
+TC provider.
+.SH "FILES"
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PCPROTO (9),
+.BR TC_OK_ACK (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

@@ -1,0 +1,203 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_BIND_ACK.7.man,v 0.9.2.1 2004/10/25 09:16:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_BIND_ACK 7 "$Date: 2004/10/25 09:16:11 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.B TC_BIND_ACK
+\- Bind Protocol Address Acknowledgment
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PCPROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_bind_ack {
+    ulong PRIM_type;
+    ulong ADDR_length;
+    ulong ADDR_offset;
+    ulong XACT_number;
+    ulong TOKEN_value;
+} TC_bind_ack_t;
+
+typedef struct TC_subs_bind_ack {
+    ulong PRIM_type;
+} TC_subs_bind_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the TC user that the specified protocol address has been bound
+to the
+.IR stream ,
+that the specified number of transaction association begin indications are allowed to be queued by the TC
+provider for the specified protocol address, and that the
+.I stream
+associated with the specified protocol address has been activated.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+indicates the primitive type.
+Always
+.BR TC_BIND_ACK .
+.TP
+.I ADDR_length
+is the length of the protocol address that was bound to the
+.IR stream .
+.TP
+.I ADDR_offset
+is the offset from the beginning of the
+.BR M_PCPROTO (9)
+block where the protocol address begins.
+.TP
+.I XACT_number
+is the accepted number of transaction association begin indications allowed to be outstanding by the
+TC provider for the specified protocol address.
+Note that this field does not apply to connectionless (only) TC providers.
+.TP
+.I TOKEN_value
+is unused.
+.PP
+The proper alignment of the address in the
+.BR M_PCPROTO (9)
+message block is not guaranteed.
+.SH RULES
+.PP
+The following rules apply to the binding of the specified protocol address to the
+.IR stream :
+.IP \- 3
+If the
+.I ADDR_length
+field in the
+.BR TC_BIND_REQ (7)
+primitive is 0, then the TC provider is to assign a transaction protocol address to the
+TC user.
+If the TC provider cannot assign a transaction protocol address, the TC provider will return
+.BR "" [ TCNOADDR ] .
+.IP \-
+The TC provider is to bind the transaction protocol address as specified in the
+.BR TC_BIND_REQ (7)
+primitive.
+.IP \-
+If the TC provider cannot bind the specified address the TC provider will return
+.BR "" [ TCADDRBUSY ].
+.PP
+The following rules apply to negotiating the
+.I XACT_number
+argument:
+.IP \- 3
+The returned value must be less than or equal to the corresponding requested number as indicated in
+the
+.BR TC_BIND_REQ (7)
+primitive.
+.IP \-
+If the requested value is greater than zero, the returned value must also be greater than zero.
+.IP \-
+Only one
+.I stream
+that is bound to the indicated protocol address may have a negotiated accepted number of maximum
+transaction association begin requests greater than zero.
+.IP \-
+A
+.I stream
+requesting a
+.I XACT_number
+of zero should always be valid.
+This indicates to the TC provider that the
+.I stream
+is to be used to request transaction associations only.
+.IP \-
+A
+.I stream
+with a negotiated
+.I XACT_number
+greater than zero may generate transaction association begin requests or accept transaction
+association begin indications.
+.SH ERRORS
+.PP
+If the above rules result in an error condition, then the TC provider must issue an
+.BR TC_ERROR_ACK (7)
+primitive to the TC user specifying the error as defined in the description of the
+.BR TC_BIND_REQ (7)
+primitive.
+.SH MODES
+.PP
+Operation class 1, 2, 3, and 4.
+.SH ORIGINATOR
+.PP
+TC provider.
+.SH FILES
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PCPROTO (9),
+.BR TC_BIND_REQ (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

@@ -1,0 +1,183 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_UNI_REQ.7.man,v 0.9.2.1 2004/10/25 09:16:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_UNI_REQ 7 "$Date: 2004/10/25 09:16:14 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.B TC_UNI_REQ
+\- Unidirectional Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+message blocks where each
+.BR M_DATA (9)
+message block contains zero or more bytes of data.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_uni_req {
+    ulong PRIM_type;          /* Always TC_UNI_REQ */
+    ulong SRC_length;         /* Source address length */
+    ulong SRC_offset;         /* Source address offset */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong OPT_length;         /* Options associated with the primitive */
+    ulong OPT_offset;         /* Options associated wtih the primitive */
+    ulong DIALOG_id;          /* Dialog Identifier */
+} TC_uni_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive requests that the TC provider send the specified unidirectional to the
+specified destination.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TC_UNI_REQ .
+.TP
+.I SRC_length
+is the length of the source address
+.TP
+.I SRC_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the source address begins.
+.TP
+.I DEST_length
+is the length of the destination address
+.TP
+.I DEST_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the destination address begins.
+.TP
+.I OPT_length
+is the length of the requested options associated with the primitive.
+.TP
+.I OPT_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) of the requested options associated with the primitive.
+.TP
+.I DIALOG_id
+is the dialogue identifier.
+.PP
+The proper alignment of the destination address, source address and options in the
+.BR M_PROTO (9)
+message block is not guaranteed.
+The destination address and options in the
+.BR M_PROTO (9)
+message block are, however, aligned the same as they were received from the TC user.
+.PP
+This primitive does not require any acknowledgment.
+If a non-fatal error occurs, it is the responsibility of the TC provider to report it using
+the
+.BR TC_NOTICE_IND (7)
+indication.
+Fatal errors are indicated using a
+.BR M_ERROR (9)
+message type which results in the failure of all operating system service routines on the stream. 
+.SH ERRORS
+.PP
+The allowable fatal errors are as follows:
+.TP 16
+.RB [ EPROTO ]
+This indicates one of the following unrecoverable protocol conditions:
+.RS
+.IP - 3
+The transaction service interface was found to be in an incorrect state.
+.IP -
+The amount of TC user data associated with the primitive defines an transaction service
+data unit larger than that allowed by the TC provider.
+.RE
+.SH MODES
+.PP
+Operation class 4.
+.SH ORIGINATOR
+.PP
+TC user.
+.SH "FILES"
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR M_ERROR (9),
+.BR TC_UNI_IND (7),
+.BR TC_NOTICE_IND (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

@@ -1,0 +1,182 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_OPTMGMT_REQ.7.man,v 0.9.2.1 2004/10/25 09:16:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:13 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_OPTMGMT_REQ 7 "$Date: 2004/10/25 09:16:13 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.B TC_OPTMGMT_REQ
+\- Options Management
+.SH SYNOPSIS
+.PP
+This message consists of a
+.BR M_PROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_optmgmt_req {
+    ulong PRIM_type;          /* Always TC_OPTMGMT_REQ */
+    ulong OPT_length;         /* options length */
+    ulong OPT_offset;         /* options offset */
+    ulong MGMT_flags;         /* options data flags */
+} TC_optmgmt_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive allows the TC user to manage the options associated with the
+.IR stream .
+The format of the message is one
+.BR M_PROTO (9)
+message block.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+indicates the primitive type
+.TP
+.I OPT_length
+is the length of the protocol options associated with the primitive
+.TP
+.I OPT_offset
+is the offset from the beginning of the
+.BR M_PROTO (9)
+block where the options begin.
+.TP
+.I MGMT_flags
+are the flags which define the request made by the TC user.
+The allowable flags are:
+.RS
+.TP 12
+.B TC_NEGOTIATE
+Negotiate and set the options with the TC provider
+.TP
+.B TC_CHECK
+Check the validity of the specified options
+.TP
+.B TC_DEFAULT
+Return the default options
+.TP
+.B TC_CURRENT
+Return the currently effective option values.
+.RE
+.PP
+The proper alignment of the options is not guaranteed.
+The options are, however, aligned the same as received from the TC user.
+.SH RULES
+.PP
+For the rules governing the requests made by this primitive see the
+.BR TC_OPTMGMT_ACK (7)
+primitive.
+.PP
+This primitive requires the TC provider to generate one of the following acknowledgments on
+receipt of the primitive, and that the TC user wait for the acknowledgment before issuing
+any other primitives:
+.SS Successful
+Acknowledgment of the primitive via the
+.BR TC_OPTMGMT_ACK (7).
+.SS Non-fatal errors
+These errors will be indicated via the
+.BR TC_ERROR_ACK (7)
+primitive.
+.SH ERRORS
+.PP
+The allowable errors are as follows:
+.TP 16
+.RB [ TCACCES ]
+The TC user did not have proper permissions for the use of the requested options.
+.TP
+.RB [ TCBADFLAG ]
+The flags as specified were incorrect or invalid.
+.TP
+.RB [ TCBADOPT ]
+The options as specified were in an incorrect format, or they contained
+invalid information.
+.TP
+.RB [ TCOUTSTATE ]
+The primitive would place the transaction interface out of state.
+.TP
+.RB [ TCNOTSUPPORT ]
+This primitive is not supported by the TC provider.
+.TP
+.RB [ TCSYSERR ]
+A system error has occurred and the Linux system error is indicated in the primitive.
+.SH MODES
+.PP
+Both connection-mode and connectionless-mode.
+.SH ORIGINATOR
+.PP
+TC user.
+.SH FILES
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR TC_OPTMGMT_ACK (7),
+.BR TC_ERROR_ACK (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA
+

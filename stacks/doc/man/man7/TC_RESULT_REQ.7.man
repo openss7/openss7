@@ -1,0 +1,216 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TC_RESULT_REQ.7.man,v 0.9.2.1 2004/10/25 09:16:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/25 09:16:13 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TC_RESULT_REQ 7 "$Date: 2004/10/25 09:16:13 $" "$Name:  $" "Transaction Component Interface (TCI)"
+.SH NAME
+.PP
+.B TC_RESULT_REQ
+\- Operation Return Result Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+messae blocks if any TC user operation parameters are specified by the TC user.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TC_result_req {
+    ulong PRIM_type;          /* Always TC_RESULT_REQ */
+    ulong DIALOG_id;          /* Dialog Identifier */
+    ulong INVOKE_id;          /* Invoke Identifier */
+    ulong OPERATION;          /* Requested operation result */
+    ulong MORE_flag;          /* Not last */
+} TC_result_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive returns a result for an operation in a subsequent dialogue handling message.
+.PP
+The primitive has a mechanism for specifying whether this is the last group of parameters associated
+with the operation.  Multiple
+.B TC_RESULT_REQ
+primitives that make up the same operation are the same in all respects except for the
+.IR MORE_flag .
+The
+.I MORE_flag
+on the last
+.B TC_RESULT_REQ
+is set to non-zero to indicate that the primitive is the last of a sequence of primitives making up
+the same operation.
+Not all TC providers support this mechanism.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+is the primitive type.
+Always
+.BR TC_RESULT_REQ .
+.TP
+.I DIALOG_id
+is the dialogue identifier to which the component will belong.
+This must be the same as the
+.I DIALOG_id
+from the corresponding
+.BR TC_INVOKE_IND
+primitive.
+.TP
+.I INVOKE_id
+is the TC user assigned invocation identifier for this operation.
+This must be the same as the
+.I INVOKE_id
+from the corresponding
+.BR TC_INVOKE_IND
+primitive.
+.TP
+.I OPERATION
+is the operation code.  Operation codes are TC provider specific.
+.TP
+.I MORE_flag
+is a flag indicating if this is the last return result in the operation.  When this field is
+non-zero, it indicates that this is the last sequence of parameters in the operation result.
+.SH RULES
+.PP
+Not all operations required
+.BR M_DATA (9)
+blocks.
+If an operation result has no parameters, no
+.BR M_DATA (9)
+blocks need be appended to the primitive.
+If the
+.I MORE_flag
+is set to zero, the first
+.BR M_PROTO (9)
+message block does not need to have
+.BR M_DATA (9)
+blocks appended.
+.PP
+The
+.I DIALOG_id
+and
+.I INVOKE_id
+is used by the TC provider to correlate the result to the invocation.
+The
+.I DIALOG_id
+and
+.I INVOKE_id
+must be the same as those from the corresponding
+.BR TC_INVOKE_IND (7)
+primitive.
+.PP
+Component handling request primitives are issued before the corresponding Dialogue handling
+primitives that transmit the accumulated components.  See
+.BR tci (7)
+for more detail.
+.PP
+This primitive does not require any acknowledgement.
+If a non-fatal error occurs, it is the responsibility of the TC provider to report it using the
+.BR TR_ERROR_IND (7),
+.BR TR_NOTICE_IND (7),
+or
+.BR TR_ABORT_IND (7)
+primitives.
+Fatal errors are indicated using a
+.BR M_ERROR (9)
+message type which results in the failure of all operating system service routines on the
+.IR stream .
+.SH ERRORS
+.PP
+The allowable fatal errors are as follows:
+.TP 16
+.BR "" [ EPROTO ]
+This indicates one of the following unrecoverable protocol conditions:
+.RS
+.IP \- 3
+The transaction component interface was found to be in an incorrect state.
+.IP \-
+The amount of TC user data associated with the primitive defines a component larger than that
+allowed by the TC provider.
+(See
+.BR TC_INFO_ACK (7)).
+.RE
+.SH MODES
+.PP
+Operation class 1 or 3.
+.SH ORIGINATOR
+.PP
+TC user.
+.SH FILES
+.TP
+.B <ss7/tc.h>
+\- the transaction component interface header file.
+.SH "SEE ALSO"
+.PP
+.BR tci (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TC_RESULT_IND (7),
+.BR TC_INVOKE_IND (7),
+.BR TC_ERROR_IND (7).
+.SH HISTORY
+.PP
+The Transaction Component Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TCI Revision 0.9.2, Draft 1.
+.[
+tci
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,1 @@
+.so TC_QUERY_REQ.7.man

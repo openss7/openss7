@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/10/24 11:47:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/10/25 10:33:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/24 11:47:36 $ by $Author: brian $
+# Last Modified $Date: 2004/10/25 10:33:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -758,6 +758,105 @@ ss7_man_MANS = \
 	man7/tcapi.7 \
 	man7/tcap_socket.7 \
 	man7/tci.7 \
+	man7/tci_itut.7 \
+	man7/tci_ansi.7 \
+	man7/tci_etsi.7 \
+	man7/TC_ABORT_IND.7 \
+	man7/TC_ABORT_REQ.7 \
+	man7/TC_BEGIN_CON.7 \
+	man7/TC_BEGIN_IND.7 \
+	man7/TC_BEGIN_REQ.7 \
+	man7/TC_BEGIN_RES.7 \
+	man7/TC_BIND_ACK.7 \
+	man7/TC_BIND_REQ.7 \
+	man7/TC_CANCEL_IND.7 \
+	man7/TC_CANCEL_REQ.7 \
+	man7/TC_CONT_IND.7 \
+	man7/TC_CONT_REQ.7 \
+	man7/TC_END_IND.7 \
+	man7/TC_END_REQ.7 \
+	man7/TC_ERROR_ACK.7 \
+	man7/TC_ERROR_IND.7 \
+	man7/TC_ERROR_REQ.7 \
+	man7/TC_INFO_ACK.7 \
+	man7/TC_INFO_REQ.7 \
+	man7/TC_INVOKE_IND.7 \
+	man7/TC_INVOKE_REQ.7 \
+	man7/TC_NOTICE_IND.7 \
+	man7/TC_OK_ACK.7 \
+	man7/TC_OPTMGMT_ACK.7 \
+	man7/TC_OPTMGMT_REQ.7 \
+	man7/TC_REJECT_IND.7 \
+	man7/TC_REJECT_REQ.7 \
+	man7/TC_RESULT_IND.7 \
+	man7/TC_RESULT_REQ.7 \
+	man7/TC_UNBIND_REQ.7 \
+	man7/TC_UNI_IND.7 \
+	man7/TC_UNI_REQ.7 \
+	man7/TC_abort_ind.7 \
+	man7/TC_abort_ind_t.7 \
+	man7/TC_abort_req.7 \
+	man7/TC_abort_req_t.7 \
+	man7/TC_begin_con.7 \
+	man7/TC_begin_con_t.7 \
+	man7/TC_begin_ind.7 \
+	man7/TC_begin_ind_t.7 \
+	man7/TC_begin_req.7 \
+	man7/TC_begin_req_t.7 \
+	man7/TC_begin_res.7 \
+	man7/TC_begin_res_t.7 \
+	man7/TC_bind_ack.7 \
+	man7/TC_bind_ack_t.7 \
+	man7/TC_bind_req.7 \
+	man7/TC_bind_req_t.7 \
+	man7/TC_cancel_ind.7 \
+	man7/TC_cancel_ind_t.7 \
+	man7/TC_cancel_req.7 \
+	man7/TC_cancel_req_t.7 \
+	man7/TC_cont_ind.7 \
+	man7/TC_cont_ind_t.7 \
+	man7/TC_cont_req.7 \
+	man7/TC_cont_req_t.7 \
+	man7/TC_end_ind.7 \
+	man7/TC_end_ind_t.7 \
+	man7/TC_end_req.7 \
+	man7/TC_end_req_t.7 \
+	man7/TC_error_ack.7 \
+	man7/TC_error_ack_t.7 \
+	man7/TC_error_ind.7 \
+	man7/TC_error_ind_t.7 \
+	man7/TC_error_req.7 \
+	man7/TC_error_req_t.7 \
+	man7/TC_info_ack.7 \
+	man7/TC_info_ack_t.7 \
+	man7/TC_info_req.7 \
+	man7/TC_info_req_t.7 \
+	man7/TC_invoke_ind.7 \
+	man7/TC_invoke_ind_t.7 \
+	man7/TC_invoke_req.7 \
+	man7/TC_invoke_req_t.7 \
+	man7/TC_notice_ind.7 \
+	man7/TC_notice_ind_t.7 \
+	man7/TC_ok_ack.7 \
+	man7/TC_ok_ack_t.7 \
+	man7/TC_optmgmt_ack.7 \
+	man7/TC_optmgmt_ack_t.7 \
+	man7/TC_optmgmt_req.7 \
+	man7/TC_optmgmt_req_t.7 \
+	man7/TC_reject_ind.7 \
+	man7/TC_reject_ind_t.7 \
+	man7/TC_reject_req.7 \
+	man7/TC_reject_req_t.7 \
+	man7/TC_result_ind.7 \
+	man7/TC_result_ind_t.7 \
+	man7/TC_result_req.7 \
+	man7/TC_result_req_t.7 \
+	man7/TC_unbind_req.7 \
+	man7/TC_unbind_req_t.7 \
+	man7/TC_uni_ind.7 \
+	man7/TC_uni_ind_t.7 \
+	man7/TC_uni_req.7 \
+	man7/TC_uni_req_t.7 \
 	man7/tpi_mtp.7 \
 	man7/tpi_sccp.7 \
 	man7/tpi_ss7.7 \
@@ -1971,6 +2070,105 @@ ss7_dist_noinst_MANS = \
 	man7/tcapi.7.man \
 	man7/tcap_socket.7.man \
 	man7/tci.7.man \
+	man7/tci_itut.7.man \
+	man7/tci_ansi.7.man \
+	man7/tci_etsi.7.man \
+	man7/TC_ABORT_IND.7.man \
+	man7/TC_ABORT_REQ.7.man \
+	man7/TC_BEGIN_CON.7.man \
+	man7/TC_BEGIN_IND.7.man \
+	man7/TC_BEGIN_REQ.7.man \
+	man7/TC_BEGIN_RES.7.man \
+	man7/TC_BIND_ACK.7.man \
+	man7/TC_BIND_REQ.7.man \
+	man7/TC_CANCEL_IND.7.man \
+	man7/TC_CANCEL_REQ.7.man \
+	man7/TC_CONT_IND.7.man \
+	man7/TC_CONT_REQ.7.man \
+	man7/TC_END_IND.7.man \
+	man7/TC_END_REQ.7.man \
+	man7/TC_ERROR_ACK.7.man \
+	man7/TC_ERROR_IND.7.man \
+	man7/TC_ERROR_REQ.7.man \
+	man7/TC_INFO_ACK.7.man \
+	man7/TC_INFO_REQ.7.man \
+	man7/TC_INVOKE_IND.7.man \
+	man7/TC_INVOKE_REQ.7.man \
+	man7/TC_NOTICE_IND.7.man \
+	man7/TC_OK_ACK.7.man \
+	man7/TC_OPTMGMT_ACK.7.man \
+	man7/TC_OPTMGMT_REQ.7.man \
+	man7/TC_REJECT_IND.7.man \
+	man7/TC_REJECT_REQ.7.man \
+	man7/TC_RESULT_IND.7.man \
+	man7/TC_RESULT_REQ.7.man \
+	man7/TC_UNBIND_REQ.7.man \
+	man7/TC_UNI_IND.7.man \
+	man7/TC_UNI_REQ.7.man \
+	man7/TC_abort_ind.7.man \
+	man7/TC_abort_ind_t.7.man \
+	man7/TC_abort_req.7.man \
+	man7/TC_abort_req_t.7.man \
+	man7/TC_begin_con.7.man \
+	man7/TC_begin_con_t.7.man \
+	man7/TC_begin_ind.7.man \
+	man7/TC_begin_ind_t.7.man \
+	man7/TC_begin_req.7.man \
+	man7/TC_begin_req_t.7.man \
+	man7/TC_begin_res.7.man \
+	man7/TC_begin_res_t.7.man \
+	man7/TC_bind_ack.7.man \
+	man7/TC_bind_ack_t.7.man \
+	man7/TC_bind_req.7.man \
+	man7/TC_bind_req_t.7.man \
+	man7/TC_cancel_ind.7.man \
+	man7/TC_cancel_ind_t.7.man \
+	man7/TC_cancel_req.7.man \
+	man7/TC_cancel_req_t.7.man \
+	man7/TC_cont_ind.7.man \
+	man7/TC_cont_ind_t.7.man \
+	man7/TC_cont_req.7.man \
+	man7/TC_cont_req_t.7.man \
+	man7/TC_end_ind.7.man \
+	man7/TC_end_ind_t.7.man \
+	man7/TC_end_req.7.man \
+	man7/TC_end_req_t.7.man \
+	man7/TC_error_ack.7.man \
+	man7/TC_error_ack_t.7.man \
+	man7/TC_error_ind.7.man \
+	man7/TC_error_ind_t.7.man \
+	man7/TC_error_req.7.man \
+	man7/TC_error_req_t.7.man \
+	man7/TC_info_ack.7.man \
+	man7/TC_info_ack_t.7.man \
+	man7/TC_info_req.7.man \
+	man7/TC_info_req_t.7.man \
+	man7/TC_invoke_ind.7.man \
+	man7/TC_invoke_ind_t.7.man \
+	man7/TC_invoke_req.7.man \
+	man7/TC_invoke_req_t.7.man \
+	man7/TC_notice_ind.7.man \
+	man7/TC_notice_ind_t.7.man \
+	man7/TC_ok_ack.7.man \
+	man7/TC_ok_ack_t.7.man \
+	man7/TC_optmgmt_ack.7.man \
+	man7/TC_optmgmt_ack_t.7.man \
+	man7/TC_optmgmt_req.7.man \
+	man7/TC_optmgmt_req_t.7.man \
+	man7/TC_reject_ind.7.man \
+	man7/TC_reject_ind_t.7.man \
+	man7/TC_reject_req.7.man \
+	man7/TC_reject_req_t.7.man \
+	man7/TC_result_ind.7.man \
+	man7/TC_result_ind_t.7.man \
+	man7/TC_result_req.7.man \
+	man7/TC_result_req_t.7.man \
+	man7/TC_unbind_req.7.man \
+	man7/TC_unbind_req_t.7.man \
+	man7/TC_uni_ind.7.man \
+	man7/TC_uni_ind_t.7.man \
+	man7/TC_uni_req.7.man \
+	man7/TC_uni_req_t.7.man \
 	man7/tpi_mtp.7.man \
 	man7/tpi_sccp.7.man \
 	man7/tpi_ss7.7.man \

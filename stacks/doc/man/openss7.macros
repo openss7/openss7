@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: openss7.macros,v 0.9.2.2 2004/10/24 11:47:36 brian Exp $
+.\" @(#) $Id: openss7.macros,v 0.9.2.3 2004/10/25 09:16:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/10/24 11:47:36 $ by $Author: brian $
+.\" Last Modified $Date: 2004/10/25 09:16:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -264,7 +264,7 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/10/24 11:47:36 $.
+OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.3 $); $Date: 2004/10/25 09:16:09 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -277,7 +277,7 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/10/24 11:47:36 $.
+OpenSS7 X/Open Networking for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.3 $); $Date: 2004/10/25 09:16:09 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -292,7 +292,7 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/10/24 11:47:36 $.
+OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.3 $); $Date: 2004/10/25 09:16:09 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -307,7 +307,7 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/10/24 11:47:36 $.
+OpenSS7 X/Open Networking for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.3 $); $Date: 2004/10/25 09:16:09 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -320,7 +320,7 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $) Date: 2004/04/17 20:39:24 $.
+OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.3 $) Date: 2004/04/17 20:39:24 $.
 ..
 .de AU
 .SH "AUTHOR"
@@ -384,6 +384,11 @@ Other trademarks are the property of their respective owners.
 .if !r LL .nr LL \n(.lu
 .if !r LT .nr LT \n(.lu
 .ev 1
+.lt \n(LTu
+.xl \n(LLu
+.ll \n(LLu
+.ev
+.ev 0
 .lt \n(LTu
 .xl \n(LLu
 .ll \n(LLu
