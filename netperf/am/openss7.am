@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/01/27 06:43:57 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/01/28 09:59:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/27 06:43:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/28 09:59:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,7 +73,6 @@ DIST_HOOK		=
 CHECK_LOCAL		=
 INSTALLCHECK_LOCAL	=
 DISTCHECK_HOOK		=
-OPENSS7_RECURSIVE	=
 
 #
 # In cas we only need the files version:
@@ -180,49 +179,9 @@ installcheck-local: $(INSTALLCHECK_LOCAL)
 
 distcheck-hook: $(DISTCHECK_HOOK)
 
-$(OPENSS7_RECURSIVE):
-	@set fnord $$MAKEFLAGS ; \
-	amf=$$2 ; \
-	dot_seen=no ; \
-	target=`echo $@ | sed -e 's|-recursive||'` ; \
-	list='$(SUBDIRS)' ; for subdir in $$list ; do \
-		case " intl po m4 " in (*" $$subdir "*) \
-			echo "Skipping $$target in $$subdir" ; \
-			continue ;; esac ; \
-		if test "$$subdir" = "." ; then \
-			local_target="$$target-am" ; dot_seen='yes' ; \
-		else \
-			local_target="$$target" ; \
-		fi ; \
-		test "$$subdir" = "." && dot_seen=yes ; \
-		echo "Making $$target in $$subdir" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-		    || case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; \
-	if test "$$dot_seen" = "no" ; then \
-		$(MAKE) $(AM_MAKEFLAGS) $$target-am || exit 1 ; \
-	fi ; \
-	test -z "$$fail"
-
-srpm: srpm-recursive
-
-rpms: rpms-recursive
-
-rebuild: rebuild-recursive
-
-sign: sign-recursive
-
-resign: resign-recursive
-
-*:
-
-OPENSS7_RECURSIVE += srpm-recursive rpms-recursive rebuild-recursive sign-recursive resign-recursive
-
 #
 # Collected phonys from other automake fragments.
 #
-.PHONY: ifnames \
-	srpm-recursive rpms-recursive rebuild-recursive sign-recursive resign-recursive \
-	srpm-am rpms-am rebuild-am sign-am resign-am
+.PHONY: ifnames
 
 # vim: ft=automake
