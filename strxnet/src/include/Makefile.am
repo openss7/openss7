@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/16 04:12:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/17 08:31:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,21 +46,30 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
+# Last Modified $Date: 2004/05/17 08:31:34 $ by $Author: brian $
 #
 # =============================================================================
 
 xti_headers	=
 
-xns_headers	=
+xns_headers	= \
+	sys/cdi.h \
+	sys/dlpi.h \
+	sys/npi.h
 
 tli_headers	= \
+	sys/ticlts.h \
+	sys/ticots.h \
+	sys/ticotsord.h \
 	sys/tihdr.h \
 	sys/timod.h \
 	sys/tirdwr.h \
 	sys/tiuser.h \
 	sys/tli.h \
 	sys/tpi.h \
+	ticlts.h \
+	ticots.h \
+	ticotsord.h \
 	tihdr.h \
 	timod.h \
 	tirdwr.h \
@@ -69,9 +78,6 @@ tli_headers	= \
 inet_headers	=
 
 xnet_headers	= \
-	sys/ticlts.h \
-	sys/ticots.h \
-	sys/ticotsord.h \
 	sys/xti_atm.h \
 	sys/xti.h \
 	sys/xti_inet.h \
@@ -83,13 +89,11 @@ xnet_headers	= \
 	sys/xti_tcp.h \
 	sys/xti_udp.h \
 	sys/xti_xti.h \
-	ticlts.h \
-	ticots.h \
-	ticotsord.h \
 	xti.h \
 	xti_inet.h
 
-sock_headers	=
+sock_headers	= \
+	sys/sockmod.h
 
 nobase_pkginclude_HEADERS = $(xti_headers)
 

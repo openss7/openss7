@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/16 19:19:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/17 08:33:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 19:19:27 $ by $Author: brian $
+# Last Modified $Date: 2004/05/17 08:33:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -86,7 +86,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
-@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= @XNET_INCLUDES@ @USER_CPPFLAGS@
 @PACKAGE_TARNAME@_mknod_CFLAGS		= @USER_CFLAGS@
 
@@ -121,12 +121,12 @@ endif
 
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDFLAGS		= -lLiS -lxnet
+test_xnet_LDFLAGS		= libxnet.la -lLiS
 test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
 test_xnet_CFLAGS		= @USER_CFLAGS@
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDFLAGS		= -lLiS -lpthread -lxnet
+test_xnet_thr_LDFLAGS		= libxnet.la -lLiS -lpthread
 test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT
 test_xnet_thr_CFLAGS		= @USER_CFLAGS@
 endif
@@ -211,7 +211,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
-@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= @XNET_INCLUDES@ @USER_CPPFLAGS@
 @PACKAGE_TARNAME@_mknod_CFLAGS		= @USER_CFLAGS@
 
@@ -246,12 +246,12 @@ endif
 
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDFLAGS		= -lLiS -lxnet
+test_xnet_LDFLAGS		= libxnet.la -lLiS
 test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
 test_xnet_CFLAGS		= @USER_CFLAGS@
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDFLAGS		= -lLiS -lpthread -lxnet
+test_xnet_thr_LDFLAGS		= libxnet.la -lLiS -lpthread
 test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT
 test_xnet_thr_CFLAGS		= @USER_CFLAGS@
 endif
@@ -331,7 +331,7 @@ GENKSYMS_CPPFLAGS = \
 
 include am/genksyms.am
 
-STRMAKENODES			= ./@PACKAGE_TARNAME@_mknod
+STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
 

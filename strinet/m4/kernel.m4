@@ -893,10 +893,10 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [
     AC_ARG_ENABLE([k-safe],
         AS_HELP_STRING([--enable-k-safe],
             [enable kernel module run-time safety checks.
-            @<:@default=yes@:>@]),
+            @<:@default=no@:>@]),
         [enable_k_safe=$enableval],
-        [enable_k_safe='yes'])
-    if test :"${enable_k_safe:-yes}" != :no ; then
+        [enable_k_safe='no'])
+    if test :"${enable_k_safe:-no}" != :no ; then
         linux_cv_debug='_SAFE'
     fi
     AC_ARG_ENABLE([k-test],

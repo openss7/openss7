@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/16 19:19:27 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/17 08:33:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 19:19:27 $ by $Author: brian $
+# Last Modified $Date: 2004/05/17 08:33:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -499,6 +499,7 @@ fi
 
 Summary:        OpenSS7 STREAMS INET LiS kernel modules.
 Group:          System Environment/Kernel
+Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       kernel = %{kernel_version}
 Requires:       LiS-core-%{kernel_version} >= 2.16.18-15
 Autoreq:        true
@@ -731,6 +732,8 @@ applications programs and utilities developed for OpenSS7 STREAMS INET.
 
 Summary:        OpenSS7 STREAMS INET run-time libraries.
 Group:          System Environment/Libraries
+Prefix:         %{_libdir}
+Prefix:         %{_datadir}/locale
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -794,6 +797,7 @@ Group:          Documentation
 Conflicts:      texinfo < 3.11
 Prereq:         /sbin/install-info
 Prefix:         %{_docdir}
+Prefix:         %{_infodir}
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -826,7 +830,7 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
         if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} $n
         fi
-    fi
+    done
 fi
 
 %postun doc
@@ -952,6 +956,7 @@ Requires:       %{name}-lib = %{version}-%{base_release}
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
+Prefix:         %{_libexecdir}
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -995,9 +1000,13 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.6  2004/05/16 19:19:27  brian
-# - Reworking install.
+# Revision 0.9.2.7  2004/05/17 08:33:33  brian
+# - More relocations and script typo.
 #
+
+* Sun May 16 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.6  2004/05/16 19:19:27  brian
+- Reworking install.
 
 * Sun May 16 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.5  2004/05/16 04:12:30  brian

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/05/16 04:12:30 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/05/17 08:32:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/16 04:12:30 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/17 08:32:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -97,12 +97,14 @@ AM_GNU_GETTEXT_VERSION(0.14.1)
 dnl
 dnl Checks for libraries.
 dnl
-AC_CHECK_LIB([LiS], [fattach])
-AC_CHECK_LIB([streams], [fattach])
+xnet_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([LiS], [fattach])
+AC_CHECK_LIB([streams], [fattach])
 AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
+LIBS="$xnet_save_LIBS"
 
 dnl
 dnl Checks for header files.

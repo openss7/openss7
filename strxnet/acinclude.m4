@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.3 2004/05/16 02:35:32 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.4 2004/05/17 08:32:51 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/16 02:35:32 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/17 08:32:51 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -464,7 +464,7 @@ dnl strconf_cv_input='Config.master'
     strconf_cv_drvconf='drvconf.mk'
     strconf_cv_confmod='confg.modules'
     strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes='xnet_mknods.c'
+    strconf_cv_mknodes='strxnet_mknod.c'
     strconf_cv_strsetup='xnetsetup.conf'
     strconf_cv_strload='xnetload.conf'
     _STRCONF
