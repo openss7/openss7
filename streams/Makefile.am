@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2004/05/14 12:15:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2004/05/20 18:20:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/14 12:15:08 $ by $Author: brian $
+# Last Modified $Date: 2004/05/20 18:20:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,7 +65,7 @@ sbin_PROGRAMS			= \
 				strerr \
 				strinfo \
 				strvf \
-				strmakenodes
+				@PACKAGE_TARNAME@_mknod
 
 dist_sbin_SCRIPTS		= \
 				$(srcdir)/src/util/strclean \
@@ -100,7 +100,7 @@ libexec_PROGRAMS		+= \
 endif
 
 #LFS_EXTRA_TESTS		= 
-#LFS_EXTRA_TOOLS		= strmakenodes
+#LFS_EXTRA_TOOLS		= @PACKAGE_TARNAME@_mknod
 
 LDADD				= libstreams.la
 
@@ -294,7 +294,7 @@ libxnet_la_LIBADD		= libstreams.la
 
 endif
 
-EXTRA_PROGRAMS			= strmakenodes
+EXTRA_PROGRAMS			= @PACKAGE_TARNAME@_mknod
 
 #bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
@@ -407,26 +407,26 @@ strvf_LDFLAGS			= -static libstreams.la
 strvf_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 strvf_CFLAGS			= $(USER_CFLAGS)
 
-strmakenodes_SOURCES		= src/util/strmakenodes.c include/sys/config.h
-strmakenodes_DEPENDENCIES	= include/sys/config.h
-strmakenodes_LDADD		=
-strmakenodes_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-strmakenodes_CFLAGS		= $(USER_CFLAGS)
+@PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c include/sys/config.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= include/sys/config.h
+@PACKAGE_TARNAME@_mknod_LDADD		=
+@PACKAGE_TARNAME@_mknod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_INET
 
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
-test_inet_raw_LDFLAGS		= -lstreams
+test_inet_raw_LDFLAGS		= libstreams.la
 test_inet_raw_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDFLAGS		= -lstreams
+test_inet_udp_LDFLAGS		= libstreams.la
 test_inet_udp_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
-test_inet_tcp_LDFLAGS		= -lstreams
+test_inet_tcp_LDFLAGS		= libstreams.la
 test_inet_tcp_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
@@ -435,12 +435,12 @@ endif
 if WITH_TLI
 
 test_timod_SOURCES		= src/test/test-timod.c
-test_timod_LDFLAGS		= -lstreams
+test_timod_LDFLAGS		= libstreams.la
 test_timod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_LDFLAGS		= -lstreams
+test_tirdwr_LDFLAGS		= libstreams.la
 test_tirdwr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
@@ -449,12 +449,12 @@ endif
 if WITH_XNET
 
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDFLAGS		= -lstreams -lxnet
+test_xnet_LDFLAGS		= libxnet.la libstreams.la
 test_xnet_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDFLAGS		= -lstreams -lpthread -lxnet
+test_xnet_thr_LDFLAGS		= libxnet.la libstreams.la -lpthread
 test_xnet_thr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
@@ -507,7 +507,7 @@ GENKSYMS_CPPFLAGS = \
 
 include am/genksyms.am
 
-STRMAKENODES			= ./strmakenodes
+STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
 

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:16 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/20 18:21:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/03 12:44:16 $ by $Author: brian $
+# Last Modified $Date: 2004/05/20 18:21:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -209,7 +209,6 @@ preferred_cflags="-freorder-blocks"
     %{?_without_public:     --disable-public}
 
 make
-#make pdf
 
 %install
 # ---------------------------------------------------------------------------
@@ -231,9 +230,9 @@ mkdir -p $RPM_BUILD_ROOT/dev/inet
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
 %if %__debug_package
-(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" make install)
+(cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" install)
 %else
-(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" make install-strip)
+(cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" install-strip)
 %endif
 
 # get the installed info directory out of the build root
@@ -723,6 +722,9 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.1  2004/05/20 18:21:43  brian
+# - make before DESTDIR on install
+#
 # Revision 0.9  2004/04/03 12:44:16  brian
 # - Initial cut of new strinet package.
 #
