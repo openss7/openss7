@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/20 13:29:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 13:29:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -196,6 +196,14 @@ AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     if test :"${DPKG_BUILDPACKAGE:-no}" = :no ; then
 	AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
     fi
+    AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
+    AC_ARG_VAR([DEB_BUILD_GNU_CPU], [Debian build cpu])
+    AC_ARG_VAR([DEB_BUILD_GNU_SYSTEM], [Debian build os])
+    AC_ARG_VAR([DEB_BUILD_GNU_TYPE], [Debian build alias])
+    AC_ARG_VAR([DEB_HOST_ARCH], [Debian host/target architecture])
+    AC_ARG_VAR([DEB_HOST_GNU_CPU], [Debian host/target cpu])
+    AC_ARG_VAR([DEB_HOST_GNU_SYSTEM], [Debian host/target os])
+    AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
     AM_CONDITIONAL([BUILD_DPKG], [test :"${DPKG_SOURCE:-no}" != :no -a :"${DPKG_BUILDPACKAGE:-no}" != :no])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
