@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2005/02/22 08:32:03 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2005/02/25 10:56:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/22 08:32:03 $ by $Author: brian $
+# Last Modified $Date: 2005/02/25 10:56:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -251,7 +251,6 @@ fi
     CXXCPP="${CXXCPP:-$CPP}" \
     CONFIG_SITE="%{csite_file}" \
     --cache-file="%{cache_file}" \
-    --build=%{_build} \
     --host=%{_target_platform} \
     --prefix=%{_prefix} \
     --exec-prefix=%{_exec_prefix} \
@@ -373,6 +372,9 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.11  2005/02/25 10:56:40  brian
+# - Don't specify build architecture.
+#
 # Revision 1.1.2.10  2005/02/22 08:32:03  brian
 # - spec changes for updated makefile fragments
 #

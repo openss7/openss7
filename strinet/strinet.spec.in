@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/02/22 08:32:03 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/02/25 10:56:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/22 08:32:03 $ by $Author: brian $
+# Last Modified $Date: 2005/02/25 10:56:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -273,7 +273,6 @@ fi
     CXXCPP="${CXXCPP:-$CPP}" \
     CONFIG_SITE="%{csite_file}" \
     --cache-file="%{cache_file}" \
-    --build=%{_build} \
     --host=%{_target_platform} \
     --prefix=%{_prefix} \
     --exec-prefix=%{_exec_prefix} \
@@ -941,6 +940,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.49  2005/02/25 10:56:40  brian
+# - Don't specify build architecture.
+#
 # Revision 0.9.2.48  2005/02/22 08:32:03  brian
 # - spec changes for updated makefile fragments
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/22 08:32:02 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/25 10:56:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/22 08:32:02 $ by $Author: brian $
+# Last Modified $Date: 2005/02/25 10:56:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -268,7 +268,6 @@ fi
     CXXCPP="${CXXCPP:-$CPP}" \
     CONFIG_SITE="%{csite_file}" \
     --cache-file="%{cache_file}" \
-    --build=%{_build} \
     --host=%{_target_platform} \
     --prefix=%{_prefix} \
     --exec-prefix=%{_exec_prefix} \
@@ -1260,6 +1259,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 0.9.2.11  2005/02/25 10:56:39  brian
+# - Don't specify build architecture.
+#
 # Revision 0.9.2.10  2005/02/22 08:32:02  brian
 # - spec changes for updated makefile fragments
 #
