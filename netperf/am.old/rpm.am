@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/05 10:50:14 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/06 14:35:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/05 10:50:14 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 14:35:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,7 +76,6 @@ RPMOPTS = -vv \
 	--define "__binary_payload w9.bzdio" \
 	--define "_topdir `(cd $(top_builddir); pwd)`" \
 	--define "_icon openss7-logo-small.gif" \
-	--define "_kversion $(PACKAGE_KVERSION)" \
 	$(PACKAGE_OPTIONS)
 
 RPMBOPTS = -vv \
@@ -150,8 +149,8 @@ rebuild:
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define \"_kversion $$k\" --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
-				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define "_kversion $$k" --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
+				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
 			fi ; \
 		done ; \
 		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
