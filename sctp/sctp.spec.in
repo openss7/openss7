@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/10 18:59:16 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/01/13 12:18:06 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/10 18:59:16 $ by $Author: brian $
+# Last Modified $Date: 2005/01/13 12:18:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -277,7 +277,7 @@ fi
     %{?_without_compat_hpux:     %disable%_without_compat_hpux} \
     %{?_with_compat_lis:         %enable %_with_compat_lis} \
     %{?_without_compat_lis:      %disable%_without_compat_lis} \
-    || rm -f %{cache_file}
+    || { rm -f %{cache_file} ; exit 1 ; }
 
 make
 
@@ -321,7 +321,7 @@ ln -sf %{name}-%{version}-%{fullrelease} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}/kernel/net
-Requires:       %(rpm -q --whatprovides /lib/modules/%{kernel_version} --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
 Conflicts:      %{_conflict}-%{core_name}
 Prereq:         /sbin/depmod
 Prereq:         /sbin/lsmod
@@ -641,14 +641,21 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.12  2005/01/10 18:59:16  brian
-# - mandrake places libexec files in /usr/lib, correct globbing
-# - updated change logs
+# Revision 0.9.2.14  2005/01/13 12:18:06  brian
+# *** empty log message ***
 #
-# Revision 1.12  2005/01/10 18:59:16  brian
-# - mandrake places libexec files in /usr/lib, correct globbing
-# - updated change logs
+# Revision 1.14  2005/01/13 12:18:06  brian
+# *** empty log message ***
 #
+
+* Thu Jan 13 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.13  2005/01/13 11:45:28  brian
+- EL3 provides two kernel packages, get the right one.
+
+* Mon Jan 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.12  2005/01/10 18:59:16  brian
+- mandrake places libexec files in /usr/lib, correct globbing
+- updated change logs
 
 * Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.11  2004/12/30 21:22:21  brian
