@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:39:53 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/24 22:09:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2002/05/20 05:39:53 $ by $Author: brian $
+# Last Modified $Date: 2002/05/24 22:09:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,18 +54,21 @@ MANS = $(wildcard *.7)
 TXTS = $(MANS:.7=.txt)
 PSSS = $(MANS:.7=.ps)
 PDFS = $(MANS:.7=.pdf)
+HTML = $(MANS:.7=.html)
 
-all:: $(TXTS) $(PSSS) $(PDFS)
+all:: $(TXTS) $(PSSS) $(PDFS) $(HTML)
 
 ps:: $(PSSS)
 pdf:: $(PDFS)
 txt:: $(TXTS)
+html:: $(HTML)
 
 $(TXTS) : %.txt : %.7 ; groff -R -s -p -t -e -Tlatin1 -mandoc $< > $@
 $(PSSS) : %.ps  : %.7 ; groff -R -s -p -t -e -Tps     -mandoc $< > $@
 $(PDFS) : %.pdf : %.ps ; ps2pdf $< $@
+$(HTML) : %.html : %.7 ; cat $< | man2html > $@
 
 clean::
-	rm -f $(TXTS) $(PSSS) $(PDFS)
+	rm -f $(TXTS) $(PSSS) $(PDFS) $(HTML)
 
 %::
