@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/25 16:11:31 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/04 16:43:18 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/25 16:11:31 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/04/04 16:43:18 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/25 16:11:31 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/04 16:43:18 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/25 16:11:31 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/04 16:43:18 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -214,135 +214,9 @@ enum {
 	t30, t31, t32, t33, t34, t35, t36, t37, t38, tmax
 };
 
-#undef HZ
-#define HZ 1000
-
-#if 0
-/* *INDENT-OFF* */
-static timer_range_t timer[tmax] = {
-	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
-	{(3 * 60 * HZ),		(3 * 60 * HZ)},		/* T2 3 minutes */
-	{(2 * 60 * HZ),		(2 * 60 * HZ)},		/* T3 2 minutes */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T4 5-15 minutes */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T5 5-15 minutes */
-	{(10 * HZ),		(32 * HZ)},		/* T6 10-32 seconds (specified in Q.118) */
-	{(20 * HZ),		(30 * HZ)},		/* T7 20-30 seconds */
-	{(10 * HZ),		(15 * HZ)},		/* T8 10-15 seconds */
-	{(2 * 60 * HZ),		(4 * 60 * HZ)},		/* T9 2-4 minutes (specified in Q.118) */
-	{(4 * HZ),		(6 * HZ)},		/* T10 4-6 seconds */
-	{(15 * HZ),		(20 * HZ)},		/* T11 15-20 seconds */
-	{(15 * HZ),		(60 * HZ)},		/* T12 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T13 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T14 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T15 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T16 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T17 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T18 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T19 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T20 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T21 5-15 minutes */
-	{(15 * HZ),		(60 * HZ)},		/* T22 15-60 seconds */
-	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T23 5-15 minutes */
-	{(1 * HZ),		(2 * HZ)},		/* T24 < 2 seconds */
-	{(1 * HZ),		(10 * HZ)},		/* T25 1-10 seconds */
-	{(1 * 60 * HZ),		(3 * 60 * HZ)},		/* T26 1-3 minutes */
-	{(4 * 60 * HZ),		(4 * 60 * HZ)},		/* T27 4 minutes */
-	{(10 * HZ),		(10 * HZ)},		/* T28 10 seconds */
-	{(300 * HZ / 1000),	(600 * HZ / 1000)},	/* T29 300-600 milliseconds */
-	{(5 * HZ),		(10 * HZ)},		/* T30 5-10 seconds */
-	{(6 * 60 * HZ),		(7 * 60 * HZ)},		/* T31 > 6 minutes */
-	{(3 * HZ),		(5 * HZ)},		/* T32 3-5 seconds */
-	{(12 * HZ),		(15 * HZ)},		/* T33 12-15 seconds */
-	{(12 * HZ),		(15 * HZ)},		/* T34 12-15 seconds */
-	{(15 * HZ),		(20 * HZ)},		/* T35 15-20 seconds */
-	{(15 * HZ),		(20 * HZ)},		/* T36 15-20 seconds */
-	{(2 * HZ),		(4 * HZ)},		/* T37 2-4 seconds */
-	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
-};
-/* *INDENT-ON* */
-#endif
-
 long test_start = 0;
 
 static int state;
-
-#if 0
-/* 
- *  Return the current time in milliseconds.
- */
-static long now(void)
-{
-	long ret;
-	struct timeval now;
-	if (gettimeofday(&now, NULL)) {
-		last_errno = errno;
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
-		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
-		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
-		return (0);
-	}
-	if (!test_start)	/* avoid blowing over precision */
-		test_start = now.tv_sec;
-	ret = (now.tv_sec - test_start) * 1000L;
-	ret += (now.tv_usec + 999L) / 1000L;
-	return ret;
-}
-static long milliseconds(char *t)
-{
-	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    .               :               .  .                    \n");
-		fprintf(stdout, "                    .             %6s            .  .                    <%d>\n", t, state);
-		fprintf(stdout, "                    .               :               .  .                    \n");
-		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
-	}
-	return now();
-}
-static long milliseconds_2nd(char *t)
-{
-	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    .               :   :           .  .                    \n");
-		fprintf(stdout, "                    .               : %6s        .  .                    <%d>\n", t, state);
-		fprintf(stdout, "                    .               :   :           .  .                    \n");
-		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
-	}
-	return now();
-}
-
-/* 
- *  Check the current time against the beginning time provided as an argnument
- *  and see if the time inverval falls between the low and high values for the
- *  timer as specified by arguments.  Return SUCCESS if the interval is within
- *  the allowable range and FAILURE otherwise.
- */
-static int check_time(const char *t, long i, long lo, long hi)
-{
-	float tol, dlo, dhi, itv;
-	itv = i * timer_scale;
-	dlo = lo;
-	dhi = hi;
-	tol = 100 * timer_scale;
-	itv = itv / 1000;
-	dlo = dlo / 1000;
-	dhi = dhi / 1000;
-	tol = tol / 1000;
-	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n", dlo - tol, itv, dhi + tol, t, state);
-		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
-	}
-	if (dlo - tol <= itv && itv <= dhi + tol)
-		return __RESULT_SUCCESS;
-	else
-		return __RESULT_FAILURE;
-}
-#endif
 
 static int time_event(int event)
 {
