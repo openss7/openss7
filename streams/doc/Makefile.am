@@ -1,3 +1,3 @@
 
-SUBDIRS = manual
+SUBDIRS = man manual
 

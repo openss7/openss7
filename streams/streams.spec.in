@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/23 10:04:42 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/04/24 21:27:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/23 10:04:42 $ by $Author: brian $
+# Last Modified $Date: 2004/04/24 21:27:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -234,10 +234,10 @@ preferred_cflags="-freorder-blocks"
     %{?_with_compat_lis:          --enable-compat-lis} \
     %{?_without_compat_lis:       --disable-compat-lis}
 
-make dep
+#make dep
 make
-make pdf
-make @STRCONF_MAKEDEV@
+#make pdf
+#make @STRCONF_MAKEDEV@
 
 %install
 # ---------------------------------------------------------------------------
@@ -595,11 +595,12 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc ABOUT-NLS AUTHORS COPYING ChangeLog INSTALL NEWS README THANKS
+%doc doc/manual/*.pdf
 #%doc doc/manual/*.texi
 #%doc doc/drafts/*/*.txt
 #%doc doc/drafts/*/*.pdf
-%{_datadir}/doc/%{name}-%{version}/*
+#%{_datadir}/doc/%{name}-%{version}/*
 %{_infodir}/*
 %endif
 
@@ -786,8 +787,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.11  2004/04/23 10:04:42  brian
-# - Touched up spec file for latest build.
+# Revision 0.9.2.12  2004/04/24 21:27:04  brian
+# - Updates for new autoconf and new build process.
+#
+# Revision 1.12  2004/04/24 21:27:04  brian
+# - Updates for new autoconf and new build process.
 #
 # Revision 1.11  2004/04/23 10:04:42  brian
 # - Touched up spec file for latest build.
