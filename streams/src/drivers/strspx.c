@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.5
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -166,14 +166,9 @@ static mblk_t *spxwaitread(struct stdata *sd, long *timeo)
 	goto out;
 }
 #endif
-static ssize_t spxreadv(struct file *file, const struct iovec *iov, unsigned long len,
-			loff_t *ppos);
 static ssize_t spxread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
-	struct iovec iov;
-	iov.iov_base = (void *) buf;
-	iov.iov_len = len;
-	return spxreadv(file, &iov, 1, ppos);
+	return pipe_f_ops.read(file, buf, len, ppos);
 }
 
 /* 
@@ -432,8 +427,10 @@ struct file_operations spx_f_ops __cacheline_aligned = {
 	readv:spxreadv,
 	writev:spxwritev,
 	sendpage:spxsendpage,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
 	getpmsg:spxgetpmsg,
 	putpmsg:spxputpmsg,
+#endif
 };
 
 /* 

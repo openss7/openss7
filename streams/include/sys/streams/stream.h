@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.5 2004/03/08 12:17:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 12:17:48 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -778,6 +778,8 @@ struct wantio {
 	ssize_t (*readv) (struct file *, const struct iovec *, unsigned long, loff_t *);
 	ssize_t (*writev) (struct file *, const struct iovec *, unsigned long, loff_t *);
 	ssize_t (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
+	int (*getpmsg)(struct file *, struct strbuf *, struct strbuf *, int *, int *);
+	int (*putpmsg)(struct file *, struct strbuf *, struct strbuf *, int, int);
 };
 
 typedef int bcid_t;

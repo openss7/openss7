@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.5
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -166,14 +166,9 @@ static mblk_t *sfxwaitread(struct stdata *sd, long *timeo)
 	goto out;
 }
 #endif
-static ssize_t sfxreadv(struct file *file, const struct iovec *iov, unsigned long len,
-			loff_t *ppos);
 static ssize_t sfxread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
-	struct iovec iov;
-	iov.iov_base = (void *) buf;
-	iov.iov_len = len;
-	return sfxreadv(file, &iov, 1, ppos);
+	return pipe_f_ops.read(file, buf, len, ppos);
 }
 
 /* 
@@ -397,6 +392,7 @@ static ssize_t sfxsendpage(struct file *file, struct page *page, int offset, siz
 	return pipe_f_ops.sendpage(file, page, offset, size, ppos, more);
 }
 
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
 /* 
  *  SFXPUTPMSG
  *  -------------------------------------
@@ -416,6 +412,7 @@ static int sfxgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 {
 	return pipe_f_ops.getpmsg(file, ctlp, datp, band, flagsp);
 }
+#endif
 
 struct file_operations sfx_f_ops __cacheline_aligned = {
 	owner:THIS_MODULE,
@@ -432,8 +429,10 @@ struct file_operations sfx_f_ops __cacheline_aligned = {
 	readv:sfxreadv,
 	writev:sfxwritev,
 	sendpage:sfxsendpage,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
 	getpmsg:sfxgetpmsg,
 	putpmsg:sfxputpmsg,
+#endif
 };
 
 /* 

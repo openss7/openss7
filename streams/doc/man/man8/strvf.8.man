@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: strvf.8.man,v 0.9.2.3 2004/03/07 22:49:11 brian Exp $
+.\" @(#) $Id: strvf.8.man,v 0.9.2.4 2004/03/08 12:17:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRVF 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRVF 8 "$Date: 2004/03/08 12:17:48 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -118,6 +118,38 @@ can be performed on
 .\"
 .SH OPTIONS
 .PP
+.TP
+\fB-n\fR, \fB--nologging\fR
+Suppress logging, send output to
+.B stdout
+and errors to
+.BR stderr .
+Default: off.
+.TP
+\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
+Only significant when logging.
+Set the base name of logging and error files.  Default:
+.RB \(lq strvf \(rq.
+.TP
+\fB-O\fR, \fB--directory\fR \fIDIRECTORY\fR
+Only significant when logging.
+Set the directory to which log and error files are written.  Default:
+.RB \(lq /var/log/streams \(rq.
+.TP
+\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
+Only significant when logging.
+Set the output file name for logging.  Default:
+\(lq\fIBASENAME\fB.log\fR\(rq.
+.TP
+\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
+Only significant when logging.
+Set the output file name for errors.  Default:
+\(lq\fIBASENAME\fB.err\fR\(rq.
+.TP
+\fB-D\fR, \fB--devname\fR \fIDEVNAME\fR
+Only significant when logging.
+Set the device name to perform test upon.  Default:
+.RB \(lq /dev/echo \(rq.
 .TP
 \fB-q\fR, \fB--quiet\fR
 Suppress normal output.
@@ -174,13 +206,14 @@ Sample output:
 \fC\s-1
 .\"-> Logging results to /var/adm/streams/strvf.log
 -> Logging results to /var/log/streams/strvf.log
---------------------------------------------------------
--> Verify HP Streams installation. Verify open, putmsg  <-
--> getmg, ioctl, and close can be performed on a stream.<-
---------------------------------------------------------
----------------------------------------------
--> HP Streams is installed and operational <-
----------------------------------------------
+--------------------------------------------------
+-> Verify Linux Fast-STREAMS installation.
+-> Verify open, putmsg, getmsg, ioctl, and close
+-> can be performed on a stream.
+--------------------------------------------------
+--------------------------------------------------
+-> Linux Fast-STREAMS is installed and operational
+--------------------------------------------------
 \s+1\fP
 .fi
 .RE

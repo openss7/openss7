@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $";
 
 #define __NO_VERSION__
 
@@ -1998,10 +1998,28 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
  *  STRREAD
  *  -------------------------------------------------------------------------
  */
+int strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
 ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
 	struct stdata *sd = stri_lookup(file);
+#if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		int err;
+		struct strpmsg *sg = (typeof(sg)) buf;
+		if ((err = verify_area(VERIFY_WRITE, buf, sizeof(*sg))) < 0)
+			goto error;
+		if (sg->ctlbuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg->ctlbuf.buf, sg->ctlbuf.maxlen)) < 0)
+			goto error;
+		if (sg->databuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
+			goto error;
+		return strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
+	      error:
+		return (err);
+	}
+#endif
 	if (sd->sd_directio && sd->sd_directio->read)
 		return sd->sd_directio->read(file, buf, len, ppos);
 	iov.iov_base = (void *) buf;
@@ -2081,10 +2099,28 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
  *  STRWRITE
  *  -------------------------------------------------------------------------
  */
+int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
 ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
 	struct stdata *sd = stri_lookup(file);
+#if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		int err;
+		struct strpmsg *sp = (typeof(sp)) buf;
+		if ((err = verify_area(VERIFY_READ, buf, sizeof(*sp))))
+			goto error;
+		if (sp->ctlbuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp->ctlbuf.buf, sp->ctlbuf.len)) < 0)
+			goto error;
+		if (sp->databuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
+			goto error;
+		return strputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
+	      error:
+		return (err);
+	}
+#endif
 	if (sd->sd_directio && sd->sd_directio->write)
 		return sd->sd_directio->write(file, buf, len, ppos);
 	iov.iov_base = (void *) buf;
@@ -2181,6 +2217,8 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	mblk_t *mp = NULL, *dp;
 	ssize_t clen, dlen;
 	int err;
+	if (sd->sd_directio && sd->sd_directio->putpmsg)
+		return sd->sd_directio->putpmsg(file, ctlp, datp, band, flags);
 	if ((err = check_stream_wr(file, sd)))
 		goto exit;
 	if (band != -1) {
@@ -2268,6 +2306,8 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 {
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp = NULL, *dp;
+	if (sd->sd_directio && sd->sd_directio->getpmsg)
+		return sd->sd_directio->getpmsg(file, ctlp, datp, bandp, flagsp);
 	if (!flagsp)
 		goto einval;
 	ctlp->len = datp->len = 0;
@@ -2389,63 +2429,38 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
-	struct {
-		struct strbuf *ctl;
-		struct strbuf *dat;
-		int band;
-		int flags;
-	} *sp = (typeof(sp)) arg;
+	struct strpmsg *sp = (typeof(sp)) arg;
 	/* verify all areas */
 	if ((err = verify_area(VERIFY_READ, sp, sizeof(*sp))))
 		goto error;
-	if (sp->ctl) {
-		if ((err = verify_area(VERIFY_READ, sp->ctl, sizeof(*sp->ctl))) < 0)
-			goto error;
-		if ((err = verify_area(VERIFY_READ, sp->ctl->buf, sp->ctl->len)) < 0)
-			goto error;
-	}
-	if (sp->dat) {
-		if ((err = verify_area(VERIFY_READ, sp->dat, sizeof(*sp->dat))) < 0)
-			goto error;
-		if ((err = verify_area(VERIFY_READ, sp->dat->buf, sp->dat->len)))
-			goto error;
-	}
-	return strputpmsg(file, sp->ctl, sp->dat, sp->band, sp->flags);
+	if (sp->ctlbuf.len > 0
+	    && (err = verify_area(VERIFY_READ, sp->ctlbuf.buf, sp->ctlbuf.len)) < 0)
+		goto error;
+	if (sp->databuf.len > 0
+	    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
+		goto error;
+	return strputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
       error:
 	return (err);
 }
 static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
-	struct {
-		struct strbuf *ctl;
-		struct strbuf *dat;
-		int *band;
-		int *flags;
-	} *sg = (typeof(sg)) arg;
+	struct strpmsg *sg = (typeof(sg)) arg;
 	/* verify all areas */
-	if ((err = verify_area(VERIFY_READ, sg, sizeof(*sg))))
+	if ((err = verify_area(VERIFY_WRITE, sg, sizeof(*sg))))
 		goto error;
-	if (sg->ctl) {
-		if ((err = verify_area(VERIFY_WRITE, sg->ctl, sizeof(*sg->ctl))) < 0)
-			goto error;
-		if ((err = verify_area(VERIFY_WRITE, sg->ctl->buf, sg->ctl->maxlen)) < 0)
-			goto error;
-	}
-	if (sg->dat) {
-		if ((err = verify_area(VERIFY_WRITE, sg->dat, sizeof(*sg->dat))) < 0)
-			goto error;
-		if ((err = verify_area(VERIFY_WRITE, sg->dat->buf, sg->dat->maxlen)) < 0)
-			goto error;
-	}
-	if ((err = verify_area(VERIFY_WRITE, sg->band, sizeof(*sg->band))))
+	if (sg->ctlbuf.maxlen > 0
+	    && (err = verify_area(VERIFY_WRITE, sg->ctlbuf.buf, sg->ctlbuf.maxlen)) < 0)
 		goto error;
-	if ((err = verify_area(VERIFY_WRITE, sg->flags, sizeof(*sg->flags))))
+	if (sg->databuf.maxlen > 0
+	    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
 		goto error;
-	return strgetpmsg(file, sg->ctl, sg->dat, sg->band, sg->flags);
+	return strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
       error:
 	return (err);
 }
+
 static int strfattach(struct file *file, const char *path)
 {
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
@@ -3004,8 +3019,10 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 	readv:strreadv,
 	writev:strwritev,
 	sendpage:strsendpage,
-//	getpmsg:strgetpmsg,
-//	putpmsg:strputpmsg,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
+	getpmsg:strgetpmsg,
+	putpmsg:strputpmsg,
+#endif
 };
 
 /* Note: we do not register stream heads - the above operations are exported and used by all

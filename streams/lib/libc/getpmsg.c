@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 09:59:43 $
+ @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/01 09:59:43 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 09:59:43 $"
+#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 09:59:43 $";
+static char const ident[] = "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 12:17:48 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -98,22 +98,23 @@ pthread_testcancel(void)
 static int
 __getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
 {
-	struct __lis_getpmsg_args {
-		int fd;
-		struct strbuf *ctlptr;
-		struct strbuf *datptr;
-		int *bandp;
-		int *flagsp;
-	};
-	struct __lis_getpmsg_args args = {
-		fd:fd,
-		ctlptr:ctlptr,
-		datptr:datptr,
-		bandp:bandp,
-		flagsp:flagsp,
-	};
-
-	return (read(fd, &args, LFS_GETMSG_PUTMSG_ULEN));
+	int err;
+	struct strpmsg args;
+	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) { -1, -1, NULL});
+	args.databuf = datptr ? *datptr : ((struct strbuf) { -1, -1, NULL});
+	args.band = bandp ? *bandp : 0;
+	args.flags = flagsp ? *flagsp : 0;
+	if ((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0) {
+		if (ctlptr)
+			ctlptr->len = args.ctlbuf.len;
+		if (datptr)
+			datptr->len = args.databuf.len;
+		if (bandp)
+			*bandp = args.band;
+		if (flagsp)
+			*flagsp = args.flags;
+	}
+	return (err);
 }
 
 int

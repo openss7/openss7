@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -254,8 +254,10 @@ struct file_operations pipe_f_ops ____cacheline_aligned = {
 	readv:strreadv,
 	writev:strwritev,
 	sendpage:strsendpage,
-//	getpmsg:strgetpmsg,
-//	putpmsg:strputpmsg,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
+	getpmsg:strgetpmsg,
+	putpmsg:strputpmsg,
+#endif
 };
 
 static int pipe_rput(queue_t *q, mblk_t *mp)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -164,9 +164,27 @@ static mblk_t *fifowaitread(struct stdata *sd, long *timeo)
 #define sdev_lookup(__i) ((struct cdevsw *)(__i)->i_cdev->data)
 
 static ssize_t fiforeadv(struct file *file, const struct iovec *, unsigned long len, loff_t *ppos);
+static int fifogetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
 static ssize_t fiforead(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
+#if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		int err;
+		struct strpmsg *sg = (typeof(sg)) buf;
+		if ((err = verify_area(VERIFY_WRITE, buf, sizeof(*sg))) < 0)
+			goto error;
+		if (sg->ctlbuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg->ctlbuf.buf, sg->ctlbuf.maxlen)) < 0)
+			goto error;
+		if (sg->databuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
+			goto error;
+		return fifogetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
+	      error:
+		return (err);
+	}
+#endif
 	iov.iov_base = (void *) buf;
 	iov.iov_len = len;
 	return fiforeadv(file, &iov, 1, ppos);
@@ -174,9 +192,27 @@ static ssize_t fiforead(struct file *file, char *buf, size_t len, loff_t *ppos)
 
 static ssize_t fifowritev(struct file *file, const struct iovec *iov, unsigned long count,
 			  loff_t *ppos);
+static int fifoputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
 static ssize_t fifowrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
+#if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		int err;
+		struct strpmsg *sp = (typeof(sp)) buf;
+		if ((err = verify_area(VERIFY_READ, buf, sizeof(*sp))))
+			goto error;
+		if (sp->ctlbuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp->ctlbuf.buf, sp->ctlbuf.len)) < 0)
+			goto error;
+		if (sp->databuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
+			goto error;
+		return fifoputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
+	      error:
+		return (err);
+	}
+#endif
 	iov.iov_base = (void *) buf;
 	iov.iov_len = len;
 	return fifowritev(file, &iov, 1, ppos);
@@ -561,6 +597,14 @@ static ssize_t fifosendpage(struct file *file, struct page *page, int offset, si
 {
 	return strsendpage(file, page, offset, size, ppos, more);
 }
+static int fifogetpmsg(struct file *file, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
+{
+	return strgetpmsg(file, ctlptr, datptr, bandp, flagsp);
+}
+static int fifoputpmsg(struct file *file, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+{
+	return strputpmsg(file, ctlptr, datptr, band, flags);
+}
 
 static struct file_operations fifo_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
@@ -576,8 +620,10 @@ static struct file_operations fifo_f_ops ____cacheline_aligned = {
 	readv:fiforeadv,
 	writev:fifowritev,
 	sendpage:fifosendpage,
-//	getpmsg:strgetpmsg,
-//	putpmsg:strputpmsg,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
+	getpmsg:fifogetpmsg,
+	putpmsg:fifoputpmsg,
+#endif
 };
 
 /* 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 09:59:43 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/01 09:59:43 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 09:59:43 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 09:59:43 $";
+static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 12:17:48 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -97,21 +97,11 @@ pthread_testcancel(void)
 static int
 __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
 {
-	struct __lis_putpmsg_args {
-		int fd;
-		struct strbuf *ctlptr;
-		struct strbuf *datptr;
-		int band;
-		int flags;
-	};
-	struct __lis_putpmsg_args args = {
-		fd:fd,
-		ctlptr:ctlptr,
-		datptr:datptr,
-		band:band,
-		flags:flags,
-	};
-
+	struct strpmsg args;
+	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) { -1, -1, NULL});
+	args.databuf = datptr ? *datptr : ((struct strbuf) { -1, -1, NULL});
+	args.band = band;
+	args.flags = flags;
 	return (write(fd, &args, LFS_GETMSG_PUTMSG_ULEN));
 }
 

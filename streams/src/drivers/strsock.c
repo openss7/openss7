@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $"
 
-static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Library (SOCKSYS) Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -447,12 +447,30 @@ static loff_t socksys_llseek(struct file *f, loff_t off, int whence)
 	return (-ESPIPE);
 }
 
+static int socksysgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
 static ssize_t socksys_read(struct file *f, char *buf, size_t len, loff_t *ppos)
 {
 	struct socket *sock;
 	struct iovec iov;
 	struct msghdr msg;
 	int flags;
+#if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		int err;
+		struct strpmsg *sg = (typeof(sg)) buf;
+		if ((err = verify_area(VERIFY_WRITE, buf, sizeof(*sg))) < 0)
+			goto error;
+		if (sg->ctlbuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg->ctlbuf.buf, sg->ctlbuf.maxlen)) < 0)
+			goto error;
+		if (sg->databuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
+			goto error;
+		return socksysgetpmsg(f, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
+	      error:
+		return (err);
+	}
+#endif
 	if (ppos != &f->f_pos)
 		return -ESPIPE;
 	if (len == 0)		/* Match SYS5 behaviour */
@@ -470,11 +488,29 @@ static ssize_t socksys_read(struct file *f, char *buf, size_t len, loff_t *ppos)
 	return sock_recvmsg(sock, &msg, len, flags);
 }
 
+static int socksysputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
 static ssize_t socksys_write(struct file *f, const char *buf, size_t len, loff_t *ppos)
 {
 	struct socket *sock;
 	struct msghdr msg;
 	struct iovec iov;
+#if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	if (len == LFS_GETMSG_PUTMSG_ULEN) {
+		int err;
+		struct strpmsg *sp = (typeof(sp)) buf;
+		if ((err = verify_area(VERIFY_READ, buf, sizeof(*sp))))
+			goto error;
+		if (sp->ctlbuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp->ctlbuf.buf, sp->ctlbuf.len)) < 0)
+			goto error;
+		if (sp->databuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
+			goto error;
+		return socksysputpmsg(f, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
+	      error:
+		return (err);
+	}
+#endif
 	if (ppos != &f->f_pos)
 		return -ESPIPE;
 	if (len == 0)		/* Match SYS5 behaviour */
@@ -584,7 +620,6 @@ static ssize_t socksys_sendpage(struct file *f, struct page *page, int offset, s
 	return sock->ops->sendpage(sock, page, offset, size, flags);
 }
 
-#if 0
 static int socksysputpmsg(struct file *f, struct strbuf *ctlp, struct strbuf *datp, int band,
 			  int flags)
 {
@@ -596,7 +631,6 @@ static int socksysgetpmsg(struct file *f, struct strbuf *ctlp, struct strbuf *da
 {
 	return (-ENOSYS);
 }
-#endif
 
 //extern struct proto_ops *sock_p_ops;
 
@@ -636,8 +670,10 @@ struct file_operations socksys_f_ops ____cacheline_aligned = {
 	readv:socksys_readv,
 	writev:socksys_writev,
 	sendpage:socksys_sendpage,
-//	getpmsg:socksysgetpmsg,
-//	putpmsg:socksysputpmsg,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
+	getpmsg:socksysgetpmsg,
+	putpmsg:socksysputpmsg,
+#endif
 };
 
 static int __init socksys_init(void)
