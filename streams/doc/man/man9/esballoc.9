@@ -1,0 +1,464 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: esballoc.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ESBALLOC 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B esballoc
+\- allocate a \fISTREAMS\fP message and data block with a caller supplied data buffer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "mblk_t *esballoc(unsigned char *" base ", int " size, ", int " priority ", frtn_t *" freeinfo );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I base
+the base of the user supplied message buffer.
+.TP
+.I size
+the size of the user supplied message buffer.
+.TP
+.I priority
+the priority of the request.
+.TP
+.I freeinfo
+a pointer to a free routine description structure.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ESBALLOC
+is used where the
+.IR STREAMS (4)
+driver needs control over the location, allocation and deallocation of data
+buffers.  This may be because the data buffers are subject to some physical
+contraints (e.g. must be allocated in DMA-able memory, or must exist in
+dual-ported RAM or in a decriptor ring).  This may also be because some other
+mechanism outside of
+.IR STREAMS (4)
+has already allocated and passed the data buffer to a
+.IR STREAMS (4)
+driver.
+.PP
+Where it is not necessary that the caller provide the data buffer,
+.BR allocb (9)
+is more appropriate.
+.PP
+.B ESBALLOC
+allocates a message block and a data block using the caller supplied data
+buffer at
+.I base
+of the specified
+.IR size " and " priority .
+.PP
+The
+.I priority
+can be one of the following values:
+.TP
+.B BPRI_LO
+The caller requests a low priority message buffer.
+.TP
+.B BPRI_MED
+The caller requests a medium priority message buffer.
+.TP
+.B BPRI_HI
+The caller requests a high priority message buffer.
+.TP
+.B BPRI_HI
+The caller requests a low priority message buffer and can block.
+.PP
+If
+.BR esballoc ()
+is called with a
+.I priority
+other than
+.BR BPRI_HI ", " BPRI_MED " or " BPRI_LO ,
+the request will be treated as
+.BR BPRI_LO .
+.PP
+The data buffer of length
+.I size
+and with the necessary physical memory type has already been allocated by the
+caller and is pointed to by the argument
+.IR base .
+In addition,
+.B ESBALLOC
+accepts a pointer to a
+.B free_rtn
+structure that contains the following elements:
+.TP
+.BI "void (*" free_func ")(char *)"
+A function pointer
+.I free_func
+to a function returning void and taking a single character
+pointer argument.  This function should perform whatever actions are necessary
+to free the buffer pointed to by
+.I base
+in the call to
+.BR ESBALLOC .
+.TP
+.BI "char *" free_arg
+A character pointer argument
+.I free_arg
+that will be passed to a call to
+.I free_func
+when the message block returned by
+.B ESBALLOC
+is freed with
+.BR freeb "(9) or " freemsg (9).
+.PP
+The allocated message block will have a data block type of
+.BR M_DATA .
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.B ESBALLOC
+returns a pointer to the allocated message block.
+.PP
+Upon failure,
+.B ESBALLOC
+returns a
+.B NULL
+message pointer.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR esballoc ()
+fails to allocate a message or data block,
+it returns
+.BR NULL .
+Failure to allocate a message block will typically be followed by a call to
+.BR esbbcall (9).
+.PP
+.BR esballoc ()
+will always fail to allocate a message block when the number of outstanding
+combined message data blocks allocated by the system exceeds the system
+control
+.BR sysctl_str_nstrmsgs .
+.BR esballoc ()
+will also fail if
+.I size
+is greater than system control
+.BR sysctl_str_strmsgsz ,
+the maximum
+.I STREAMS
+message size.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR esballoc ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR esballoc ()
+is MP-safe.  The caller has exclusive access to the returned message.
+.\"
+.\"
+.SH NOTICES
+.PP
+Many post-SVR 4.2
+.[
+svr42
+.]
+compliant
+.IR STREAMS (4)
+implementations ignore the
+.I priority
+argument to
+.BR ESBALLOC .
+The message block
+.I priority
+was an SVR 3
+.[
+svr3
+.]
+concept which was found not to be useful, primarily due to priority inversion.
+For a history of the
+.I priority
+mechanism and a discussion as to why the mechanism was abandonned in SVR 4.2,
+.[
+svr42
+.]
+see \*(lqThe Magic Garden\*(rq section 7.2.2.
+.[
+magic
+%P Section 7.2.2
+.]
+.PP
+.B Linux Fast-STREAMS
+keeps two stores for combined message data blocks
+.RB ( mdbblock s):
+a per-CPU free block list that is maintained during the 
+.BR runqueues (9)
+pass to hold freed message blocks (but freed to the memory cache at the end of
+the pass), and an
+.B mdbblock
+memory cache.
+.PP
+In consideration of
+.IR priority ,
+.BR esballoc ()
+uses the following allocation differences based on the value of
+.IR priority :
+.TP
+.B BPRI_LO
+The message block will be allocated from the
+.I STREAMS
+.B mdbblock
+memory cache.
+.BR kmem_cache_alloc (9)
+will not be permitted to grow the
+.B mdbblock
+memory cache to meet the request.
+When speed is not criticial and a lower degree of immediate success is acceptable, use
+.BR BPRI_LO .
+.TP
+.B BPRI_MED
+The message block will be allocated from the
+.I STREAMS
+.B mdbblock
+memory cache.
+.BR kmem_cache_alloc (9)
+will be permitted to grow the
+.B mdbblock
+memory cache as necessary to allocate the block.
+Where speed is not so critical, but a higher probability of immediate success is needed, use
+.BR BPRI_MED .
+.TP
+.B BPRI_HI
+The message block will be allocated from the per-CPU
+.B STREAMS
+scheduler fast free chain, or if there is no message block in the fast free
+chain, it will be allocated from the
+.B mdbblock
+memory cache.
+.BR kmem_cache_alloc (9)
+will be permitted to grow the
+.B mdbblock
+memory cache as necessary to allocate the block.
+Where speed is critical, and a high degree of immediate success is also needed, use
+.BR BPRI_HI .
+When
+.BR esballoc (9)
+is called immediately following
+.BR freeb (9),
+use
+.B BPRI_HI
+to obtain the same block that was freed.
+.PP
+In this way, the
+.I priority
+argument determines the delay in satisfying the request rather than the
+ultimate probability of success, permitting low latency tasks to specify
+.B BPRI_HI
+and high-latency tasks to specify
+.BR BPRI_LO .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following examples shows how a data buffer suitable for use by Direct
+Memory Access is allocated:
+.nf
+\fC\s-2
+void xxx_free_func(char *buf)
+{
+    kfree(buf);
+}
+
+mblk_t *xxx_alloc_dma_buf(size_t bufsize)
+{
+    unsigned char *buf;
+    if ((buf = kmalloc(bufsize, GFP_ATOMIC | GFP_DMA))) {
+        mblk_t *mp;
+        frtn_t freertn = {
+            free_func:&xxx_free_func,
+            free_arg:(char *) buf,
+        };
+        if (!(mp = esballoc(buf, bufsize, BPRI_MED, &freertn)))
+            xxx_free_func(buf);
+        return (mp);
+    }
+    return (NULL);
+}
+\s+2\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freeb (9),
+.BR freemsg (9),
+.BR bufcall "(9), and "
+.BR esbbcall (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR esballoc ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR esballoc ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+and LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.BR esballoc ()
+uses the priority mechanism described above under
+.IR \*(lqNOTICES\*(rq .
+SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+and
+LiS ignore the
+.I priority
+argument as also described above under
+.IR \*(lqNOTICES\*(rq .
+.IP \(bu
+.BR esballoc ()
+will return
+.B NULL
+only if the allocation fails.
+Under LiS,
+.BR esballoc ()
+will return
+.B NULL
+if
+.IR base " or " freeinfo
+is
+.BR NULL .
+.IP \(bu
+.BR esballoc ()
+will panic when
+.IR base " or " freeinfo
+are
+.BR NULL .
+Under LiS, the same conditions will return
+.BR NULL .
+.PP
+Symbol
+.BR lis_esballoc ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_esballoc ()
+simply calls
+.BR esballoc ()
+directly.
+Binary compatibility to SVR 4.2 MP DDI/DKI and
+.IR Solaris \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ESBALLOC
+first appeared in SVR 4 DDI/DKI.
+.[
+svr4dk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

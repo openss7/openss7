@@ -1,0 +1,278 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: rmvq.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH RMVQ 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B rmvq
+\- remove a message from a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void rmvq(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue from which to remove the message.
+.TP
+.I mp
+the message to remove from the queue.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR rmvq ()
+removes the message pointed to by
+.I mp
+from the queue pointed to by
+.IR q .
+The message can be removed from the middle of the queue and does not need to
+be at the head or tail of the queue.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR rmvq ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR rmvq ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR rmvq ()
+can be called from any context including user context, queue procedures,
+callouts, callbacks and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR rmvq ()
+is MP-safe; however, the caller is responsible for ensuring exclusive access
+to the passed in message pointer,
+.IR mp .
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR rmvq ()
+uses a
+.BR queue (9)
+structure pointer in the
+.BR msgb (9)
+structure to determine to which queue (if any)
+.I mp
+belongs.  This increases the performance of the
+.BR rmvq ()
+function dramatically.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR insq (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR rmvq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR rmvq ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+and LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.BR rmvq ()
+is always successful.
+.IP "" 4
+Under LiS,
+.BR rmvq ()
+silently fails if
+the message pointer
+.I mp
+is
+.BR NULL ;
+the queue pointer
+.I q
+is
+.BR NULL ;
+the queue pointer
+.I q
+does not point to a valid queue structure;
+.I q
+is closing;
+.I q
+has put and service procedures turned off (e.g. with
+.BR qprocsoff (9));
+the message pointed to by
+.I mp
+does not exist on the queue
+.IR q .
+.IP \(bu
+.B Linux Fast-STREAMS
+mainatins a queue pointer within the
+.BR msgb (9)
+structure.  This permits immediate determination of whether the passed in
+message pointer,
+.IR mp ,
+is a member of the queue,
+.IR q .
+It even permits ignoring the passed in
+.I q
+pointer.
+.IP "" 4
+LiS does not maintain a pointer in the
+.BR msgb (9)
+structure to the queue to which a given message currently belongs.  This means
+that LiS must search the queue pointed to by
+.I q
+for the message pointed to by
+.I mp
+using a linear search.  This is inefficient if
+.BR rmvq ()
+is called often by a
+.IR STREAMS (4)
+module or driver.
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR rmvq ().
+.PP
+Symbol
+.BR lis_rmvq ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_rmvq ()
+simply calls
+.BR rmvq ().
+.PP
+Binary compatiblity with SVR 4.2 MP DDI/DKI and
+.IR Solaris \(rg
+are not guarantted.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI.
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR rmvq ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

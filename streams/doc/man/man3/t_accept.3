@@ -1,0 +1,358 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: t_accept.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_ACCEPT 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_accept
+\- accept a connection request
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_accept(int" fd ", int " resfd ", struct t_call *" call );
+.SH ARGUMENTS
+.PP
+.TP 12
+.I fd
+the transport endpoint upon which a connection indication was received.
+.TP
+.I resfd
+the transport endpoint upon which to accept the connection.
+.TP
+.I call
+a pointer to a 
+.B t_call
+structure containing information about the responding endpoint and any data to
+be transferred in response.
+.SH DESCRIPTION
+.PP
+The
+.I fd
+argument is an integer file descriptor specifying the stream upon which a
+previous connection indication was received with
+.BR t_listen (3),
+and for which the connection indication is to now be accepted.
+.PP
+The
+.I resfd
+argument is an integer file descriptor specifying the stream upon which to
+accept the transport connection.
+.I resfd
+can be the same as
+.I fd
+or different.
+When
+.I resfd
+is different from
+.IR fd ,
+the caller specifies that the connection is to be accepted on the stream
+associated with
+.IR resfd .
+When
+.I resfd
+is different from
+.IR fd ,
+the stream associated with
+.I resfd
+must be an XTI/TLI
+.[
+XTI
+.]
+.[
+TPI Revision 2.0.0
+.]
+.[
+XNS
+.]
+stream on the same transport provider that is either in the
+.B T_UNBND
+state, or is in the
+.B T_IDLE
+state and bound to the same address as the responding address.
+.PP
+The
+.I call
+argument is a pointer to a
+.B t_call
+structure,
+specifying the responding address,
+.IR addr ,
+the response options,
+.IR opt ,
+and any response user data,
+.IR udata .
+formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_call {
+        struct netbuf addr;     /* address              */
+        struct netbuf opt;      /* options              */
+        struct netbuf udata;    /* data                 */
+        int sequence;           /* identification       */
+};
+\fR\s+1
+.fi
+.PP
+The
+.IR addr ", " opt " and " udata
+members of the
+.B t_call
+structure are
+.BR netbuf (3)
+structures, each formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct netbuf {
+        unsigned int maxlen;    /* max length           */
+        unsigned int len;       /* current length       */
+        char *buf;              /* data                 */
+};
+\fR\s+1
+.fi
+.TP 12
+.I addr
+A
+.BR netbuf (3)
+structure that specifies the responding address.  The reponding address is the
+address accepting the connection.
+.I call->addr.maxlen
+is set to zero (0) by the caller and ignored by the provider.
+.I call->addr.len
+is set to the length of the responding address.  If the length of the
+responding address is zero (0) then the destination address of the connection
+indication is used as the responding address.
+.I call->addr.buf
+points to the responding address.
+.TP 12
+.I opt
+A
+.BR netbuf (3)
+structure that specifies the responding options.  The responding options can be
+both end-to-end and local transport options.
+.I call->opt.maxlen
+is set to zero (0) by the caller and is ignored by the provider.
+.I call->opt.len
+is set to the length of the options.  If the length of the responding options
+is zero (0) no options are specified.
+.I call->opt.buf
+points to the options.
+.TP 12
+.I udata
+A
+.BR netbuf (3)
+structure that specifies the data to send with the connection
+response.
+.I call->udata.maxlen
+is set to zero (0) by the caller and is ignored by the provider.
+.I call->udata.len
+is set to the length of the data.  If the length of the data is zero (0) no
+data is included in the response message.
+.I call->udata.buf
+points to the data.
+.TP 12
+.I sequence
+specifies a sequence number of the connection indication that is to be
+accepted.  This value was returned by a previous call to
+.BR t_listen (3).
+.SH CAVEATS
+.PP
+.BR t_accept ()
+is only valid in state
+.B T_INCON
+with an outstanding number of connection indications greater than zero (0).
+.PP
+.BR t_accept ()
+is only valid for transport service providers of service type
+.BR T_COTS " or " T_COTS_ORD .
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_accept ()
+returns zero (0).
+Upon failure,
+.BR t_accept ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_accept ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ TACCES ]
+The caller did not have sufficient permissions to accept a connection on the
+.I resfd
+file descriptor, or did not have sufficient permissions to use the responding
+address specified in
+.IR call->addr .
+.TP 12
+.RB [ TBADADDR ]
+The address specified was of an invalid format or contained invalid information.
+This error is returned from the transport service provider.
+.TP 12
+.RB [ TBADDATA ]
+The amount of data specified for the call and underlying transport service
+provider was invalid (i.e. was outside the protocol limits).  See
+\fBt_getinfo\fR(3) and \fBt_open\fR(3) for more information.
+.TP 12
+.RB [ TBADF ]
+The
+.IR fd " or " resfd
+file descriptor was invalid.
+.TP 12
+.RB [ TBADOPT ]
+The options specified were of an invalid format or contained invalid information.
+This error is returned from the transport service provider.
+See
+.BR t_optmgmt (3)
+for more information on option formats.
+.TP 12
+.RB [ TBADSEQ ]
+The
+.I sequence
+number provided was invalid, or is not associated with an outstanding
+connection indication.
+.TP 12
+.RB [ TINDOUT ]
+The file descriptor
+.I resfd
+has outstanding connection indications.
+.TP 12
+.RB [ TLOOK ]
+An asynchronous event occured before the call could complete.  See \fBt_look\fR(3) for more information.
+.TP 12
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+.TP 12
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP 12
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP 12
+.RB [ TPROVMISMATCH ]
+The transport provider associated with
+.I resfd
+is not the same as the transport provider associated with
+.IR fd .
+.TP 12
+.RB [ TRESADDR ]
+The file descriptor
+.I resfd
+was bound to a different address than the responding address.
+.TP 12
+.RB [ TRESQLEN ]
+The file descriptor
+.I resfd
+is listening (i.e. it was bound with a
+.I qlen
+> 0).
+.TP 12
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.SH "SEE ALSO"
+.PP
+.BR netbuf (3),
+.BR t_listen (3).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

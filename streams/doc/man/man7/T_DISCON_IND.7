@@ -1,0 +1,150 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: T_DISCON_IND.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH T_DISCON_IND 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.SH NAME
+.B T_DISCON_IND
+\- Disconnect Indication
+.SH SYNOPSIS
+This message consists of a
+.B M_PROTO
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_discon_ind {
+    t_scalar_t   PRIM_type;      /* Always T_DISCON_IND */
+    t_scalar_t   DISCON_reason;
+    t_scalar_t   SEQ_number;
+};
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This primitive indicates to the user that either a request for connection has
+been denied or an existing connection has been disconnected.  The format of
+this message is one
+.B M_PROTO
+message block possibly followed by one or more
+.B M_DATA
+message blocks if there is any user data associated with the primitive.
+.SH PARAMETERS
+.TP 16
+.I PRIM_type
+identifies the primitive type
+.TP
+.I DISCON_reason
+is the reason for disconnect.  The reason codes are protocol specific.
+.TP
+.I SEQ_number
+is the sequence number which identifies which connect indication was denied,
+or it is -1 if the provider is disconnecting an existing connection.
+.TP
+.I RULES
+The
+.I SEQ_number
+is only meaningful when this primitive is sent to a passive user who has the
+corresponding connect indication outstanding.  It allows the transport user to
+identify which of its outstanding connect indications is associated with the
+disconnect.
+.SH MODES
+Only connection-mode.
+.SH ORIGINATOR
+Transport provider.
+.SH "SEE ALSO"
+.SH T_CONN_REQ (7),
+.SH T_DISCON_REQ (7),
+.SH T_ORDREL_REQ (7),
+.SH T_ORDREL_IND (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to TPI Version 2, Draft 2.
+.[
+TPI Revision 2.0.0
+.]
+.SH "HISTORY"
+.PP
+The Transport Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

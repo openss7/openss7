@@ -1,0 +1,287 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: t_bind.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_BIND 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_bind
+\- bind to a transport endpoint
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_bind(int " fd ", struct t_bind *" req ", struct t_bind *" ret );
+.SH ARGUMENTS
+.PP
+.TP 12
+.I fd
+the transport endpoint to bind.
+.TP
+.I req
+a pointer to a
+.B t_bind
+structure containing the address to which the transport endpoint is requested
+to be bound.
+.TP
+.I ret
+a pointer to a
+.B t_bind
+structure returning the address to which the transport endpoint was actually
+bound.
+.SH DESCRIPTION
+.PP
+.BR t_bind ()
+requests that the local transport endpoint,
+.IR fd ,
+be bound to the requested address and connection indication queue length,
+.IR req ,
+and return the resulting bound address and connection indication queue length,
+.IR ret.
+.PP
+.I fd
+specifies the local transport endpoint to bind.
+.I req
+specifies the requested address and queue length.
+.I ret
+returns the resulting address and queue length.
+.IR req " and " ret
+are
+.BR t_bind ()
+structures formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_bind {
+        struct netbuf addr;
+        unsigned int qlen;
+};
+\fR\s+1
+.fi
+.TP 12
+.I addr
+A
+.BR netbuf (3)
+structure.
+On call,
+.I req->addr
+specifies the address to bind.
+If
+.I req->addr.len
+is zero, or
+.I req
+is
+.BR NULL ,
+it specifies that the transport service provider should assign, if
+possible, a local transport endpoint address.
+On return,
+.I ret->addr
+specifies the bound address.
+.TP 12
+.I qlen
+The permitted number of outstanding connection indications that have been
+delivered with
+.BR t_listen (3)
+but have not yet been accepted with
+.BR t_accept (3)
+or disconnected with
+.BR t_snddis (3).
+On call,
+.I req->qlen
+is the requested value.
+If
+.I req
+is
+.BR NULL ,
+.I qlen
+take on the value zero (0).
+On return,
+.I ret->qlen
+is the transport provider assigned value.
+
+Connectionless protocols do not support a non-zero
+.IR qlen .
+For connection oriented protocols,
+when a non-zero
+.I qlen
+results from a call to
+.BR t_bind (),
+the endpoint
+.I fd
+can begin receiving connection indications that can be retrieved with
+.BR t_listen (3).
+.SH CAVEATS
+.PP
+A call to
+.BR t_bind ()
+is only valid in state
+.BR T_UNBND .
+Upon success, the resulting state is
+.BR T_IDLE .
+.PP
+If the resulting transport endpoint adress is the same as the provided
+transport endpoint address, then it is permitted that
+.I ret
+not specify an address (i.e.
+.I ret->addr.len
+is set to zero).
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_bind ()
+returns zero (0).
+Upon failure,
+.BR t_bind ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_bind ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ TACCES ]
+The caller did not have sufficient permissions to use the address specified in
+.IR req->addr .
+.TP 12
+.RB [ TADDRBUSY ]
+The address specificed was already in use by another transport endpoint.
+.TP 12
+.RB [ TBADADDR ]
+The address specified was of an invalid format or contained invalid information.
+.TP 12
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP 12
+.RB [ TBUFOVFLW ]
+The
+.I ret->addr.maxlen
+field of a
+.BR netbuf (3)
+structure passed to the call was non-zero, but insufficient to hold the
+available bound address information.  See,
+.BR netbuf (3)
+for more information.
+.TP 12
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP 12
+.RB [ TNOADDR ]
+No
+.I req->addr
+was specified
+.IR "" ( req->addr.len " is zero)"
+and the transport service
+provider could not allocate an address.
+.TP 12
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP 12
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.SH "SEE ALSO"
+.PP
+.BR netbuf (3),
+.BR t_listen (3),
+.BR t_accept (3),
+.BR t_snddis (3),
+.BR t_errno (3).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

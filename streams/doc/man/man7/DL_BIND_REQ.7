@@ -1,0 +1,402 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: DL_BIND_REQ.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DL_BIND_REQ 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B DL_BIND_REQ (dl_bind_req_t)
+\- requests the DLS provider bind a DLSAP to the stream.
+.SH SYNOPSIS
+The message consists of one
+.B M_PROTO
+message block, which contains the following structure.
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_sap;
+    t_uscalar_t  dl_max_conind;
+    ushort       dl_service_mode;
+    ushort       dl_conn_mgmt;
+    t_uscalar_t  dl_xidtest_flg;
+} dl_bind_req_t;
+\fC\s+1
+.fi
+.SH DECRIPTION
+.B DL_BIND_REQ
+requests the DLS provider bind a DLSAP to the stream.  The DLS user must
+identify the address of the DLSAP to be bound to the stream.
+Forconnection-mode service, the DLS user also indicates whether it will accept
+incoming connection requests on the stream.  Finally, the request directs the
+DLS provider to activate the stream associated with the DLSAP.
+.PP
+A stream is viewed as active when the DLS provider may transmit and receive
+protocol data units destined to or originating from the stream.  The PPA
+associated with each stream must be initialized upon completion of the
+processing of the
+.B DL_BIND_REQ
+(see PPA Initialization/De-initialization
+.BR dlpi (7)).
+More specifically, the DLS user is ensured that the PPA is initialized
+when the
+.BR DL_BIND_ACK (7)
+is received.  If the PPA cannot be initialized, the
+.B DL_BIND_REQ
+will fail.
+.PP
+A stream may be bound as a "connection management" stream, such that it will
+receive all connect requests that arrive through a given PPA (see
+Connection Management Stream
+.BR dlpi (7)).
+In this case, the
+.I dl_sap
+will be ignored.
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_BIND_REQ .
+.TP
+.I dl_sap
+conveys sufficient information to identify the DLSAP that will be bound to
+the DLPI stream (see DLPI Addressing
+.BR dlpi (7)
+for a description of DLSAP
+addresses).  The format of this information is specific to a given DLS
+provider, and may contain the full DLSAP address or some portion of that
+address sufficient to uniquely identify the DLSAP in question.  The full
+address of the bound DLSAP will be returned in the
+.BR DL_BIND_ACK (7).
+.RS
+.PP
+The following rules are used by the DLS provider when binding a DLSAP address:
+.IP - 3
+The DLS provider must define and manage its DLSAP address space.
+.IP -
+DLPI allows the same DLSAP to be bound to multiple streams, but a given DLS
+provider may need to restrict its address space to allow one stream per DLSAP.
+.IP -
+The DLS provider may not be able to bind the specified DLSAP address for one
+of the following reasons:
+.RS
+.IP "1." 4
+the DLS provider may statically associate a specific DLSAP with each
+stream
+.IP 2.
+the DLS provider may only support one stream per DLSAP and the DLS user
+attempted to bind a DLSAP that was already bound to another stream.
+.RS
+.PP
+In case of reason 1, the value of
+.I dl_sap
+is ignored by the DLS provider
+and the
+.BR DL_BIND_ACK (7)
+returns the DLSAP address that is already associated with
+the stream.  In case of reason 2, if the DLS provider cannot bind the given
+DLSAP to the stream, it may attempt to choose an alternate DLSAP and
+return that on the
+.BR DL_BIND_ACK (7).
+If an alternate DLSAP cannot be chosen, the
+DLS provider will return a
+.BR DL_ERROR_ACK (7)
+and set
+.I dl_errno
+to
+.BR DL_NOADDR .
+.RE
+.PP
+Because of the provider-specific nature of the DLSAP address, DLS user
+software that is to be protocol independent should avoid hard-coding this
+value.  The DLS user should retrieve the necessary DLSAP address from some
+other entity (such as a management entity or higher layer protocol entity)
+and insert it without inspection into the
+.BR DL_BIND_REQ .
+.RE
+.RE
+.TP
+.I dl_max_conind
+conveys the maximum number of outstanding
+.BR DL_CONNECT_IND (7)
+messages
+allowed on the DLPI stream.  If the value is zero, the stream cannot accept
+any
+.BR DL_CONNECT_IND (7)
+messages.  If greater than zero, the DLS user will accept
+.BR DL_CONNECT_IND (7)
+messages up to the given value before having to
+respond with a
+.BR DL_CONNECT_RES (7)
+or a
+.BR DL_DISCONNECT_REQ (7)
+(see Multi-threaded Connection Establishment
+.BR dpli (7)
+for details on how this value is used to support multi-threaded connect
+processing).  The DLS provider may not be able to support the value supplied in
+.IR dl_max_conind ,
+as specified by the following rules:
+.RS
+.IP - 3
+If the provider cannot support the specified number of outstanding
+connect indications, it should set the value down to a number it can support.
+.IP -
+Only one stream that is bound to the indicated DLSAP may have an allowed
+number of maximum outstanding connect indications greater than zero.  If a
+.BR DL_BIND_REQ (7)
+specifies a value greater than zero, but another stream has already bound
+itself to the DLSAP with a value greater than zero, the DLS provider will fail
+the request, setting
+.I dl_errno
+to
+.B DL_BOUND
+on the
+.BR DL_ERROR_ACK (7).
+.IP -
+If a stream with
+.I dl_max_conind
+greater than zero is used to accept a connection, the stream will be found
+busy during the duration of the connection, and no other streams may be bound
+to the same DLSAP with a value
+of
+.I dl_max_conind
+greater than zero.  This restriction prevents more than one stream bound to
+the same DLSAP from receiving connect indications and accepting connections.
+Accepting a connection on such a stream is only allowed if there is just a
+single outstanding connect indication being processed.
+.IP -
+A DLS user should always be able to request a
+.I dl_max_conind
+value of zero, since this indicates to the DLS provider that the stream will
+only be used to originate connect requests.
+.IP -
+A stream with a negotiated value of
+.I dl_max_conind
+that is greater than zero may not originate connect requests.  This field is
+ignored in connectionless-mode service.
+.RE
+.TP
+.I dl_service_mode
+conveys the desired mode of service for this stream, and may contain one of
+the following:
+.RS
+.TP
+.B DL_CODLS
+connection-oriented data link service
+.TP
+.B DL_CLDLS
+connectionless data link service
+.TP
+.B DL_ACLDLS
+acknowledged connectionless data link service.
+.PP
+If the DLS provider does not support the requested service mode, a
+.BR DL_ERROR_ACK (7)
+will be generated, specifying
+.BR DL_UNSUPPORTED .
+.RE
+.TP
+.I dl_conn_mgmt
+if non-zero, indicates that the stream is the "connection management"
+stream for the PPA to which the stream is attached.  When an incoming connect
+request arrives, the DLS provider will first look for a stream bound with
+.I dl_max_conind
+greater than zero that is associated with the destination DLSAP.  If such a
+stream is found, the connect indication will be issued on that stream.
+Otherwise, the DLS provider will issue the connect indication on the
+"connection management" stream for that PPA, if one exists.  Only one
+"connection management" stream is allowed per PPA, so an attempt to bind a
+second connection management stream on a PPA will fail with the DLPI error set
+to
+.BR DL_BOUND .
+When
+.I dl_conn_mgmt
+is non-zero, the
+value of
+.I dl_sap
+will be ignored.  In connectionless-mode service,
+.I dl_conn_mgmt
+is ignored by the DLS provider.
+.TP
+.I dl_xidtest_flg
+indicates to the DLS Provider that XID and/or TEST responses for this
+stream are to be automatically generated by the DLS Provider.  The DLS
+Provider will not generate
+.BR DL_XID_IND (7)
+and/or
+.BR DL_TEST_IND (7),
+and will error a
+.BR DL_XID_REQ (7)
+and/or
+.BR DL_TEST_REQ (7).
+If the DLS Provider does not support automatic handling of XID and/or TEST
+responses, a
+.BR DL_ERROR_ACK (7)
+will be generated, specifying
+.BR DL_NOAUTO ", " DL_NOXIDAUTO " or " DL_NOTESTAUTO .
+If the Provider receives an XID or TEST request from the DLS User, a
+.BR DL_ERROR_ACK (7)
+will be generated specifying
+.BR DL_XIDAUTO " or " DL_TESTAUTO
+respectively.
+.RS
+.PP
+The dl_xidtest_flg contains a bit-mask specifying zero or more of the
+following values:
+.TP
+.B DL_AUTO_XID
+automatically respond to XID commands
+.TP
+.B DL_AUTO_TEST
+automatically respond to TEST commands.
+.RE
+.SH STATE
+The message is valid in state
+.BR DL_UNBOUND .
+.SH "NEW STATE"
+The resulting state is
+.BR DL_BIND_PENDING .
+.SH RESPONSE
+If the bind request is successful,
+.BR DL_BIND_ACK (7)
+is sent to the DLS user
+resulting in state
+.BR DL_IDLE .
+.PP
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting
+state is unchanged.
+.SH ERRORS
+.TP 16
+.B DL_ACCESS
+The DLS user did not have proper permission to use the requested
+DLSAP address.
+.TP
+.B DL_BADADDR
+The DLSAP address information was invalid or was in an incorrect
+format.
+.TP
+.B DL_BOUND
+The DLS user attempted to bind a second stream to a DLSAP with
+.I dl_max_conind
+greater than zero, or the DLS user attempted to bind a second
+"connectionmanagement" stream to a PPA.
+.TP
+.B DL_INITFAILED
+Automatic initialization of the PPAfailed.
+.TP
+.B DL_NOTINIT
+The PPA had not been initialized prior to this request.
+.TP
+.B DL_NOADDR
+The DLS provider could not allocate a DLSAP address for this stream.
+.TP
+.B DL_NOAUTO
+Automatic handling of XID and TEST responses not supported.
+.TP
+.B DL_NOTESTAUTO
+Automatic handling of TEST response not supported.
+.TP
+.B DL_NOXIDAUTO
+Automatic handling of XID response not supported.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR, DL_UNSUPPORTED
+The DLS provider does not support requested service mode on this stream.
+A system error has occurred and the Linux system error is indicated in the
+.BR DL_ERROR_ACK (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi
+.]
+.SH "HISTORY"
+.PP
+The Data Link Provider Interface first appeared in SVR4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

@@ -1,0 +1,383 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: unfreezestr.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNFREEZESTR 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B unfreezestr
+\- thaw the state of a stream queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.PP
+.PD 0
+.HP
+.BI "void unfreezestr(queue_t *" q );
+.HP
+.BI "void unfreezestr(queue_t *" q ", pl_t " pl );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue within the stream to thaw.
+.TP
+.I pl
+the interrupt priority level to restore.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR unfreezestr ()
+thaws the state of the stream containing
+.I q
+and unlocks
+.IR q .
+Streams are normally in the thawed state and queues are normally in the
+unlocked state.
+The purpose of
+.BR unfreezestr ()
+is to thaw the state of the stream containing
+.I q
+and unlocking
+.I q
+after freezing them with
+.BR freezestr (9).
+.PP
+.BR unfreezestr ()
+must be called before returning in the same thread in which
+.BR freezestr (9)
+was called.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR unfreezestr ()
+returns
+.BR void .
+.\"
+.\"
+.SH "ERRORS"
+.PP
+.BR unfreezestr ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unfreezestr ()
+can be calle from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH "MP-STREAMS"
+.PP
+.BR unfreezestr ()
+is MP-safe; however, the caller is responsible for the validity of the
+reference
+.IR q .
+References to
+.I q
+from a procedure, callout or callback predicated on the queue pair to which
+.I q
+belongs are guaranteed valid.  The caller must guarantee the validity from
+call outs, callbacks, soft interrupts and interrupt service routines not
+predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH "NOTICES"
+.PP
+.BR unfreezestr ()
+called with with an invalid
+.I q
+pointer will have undefined results.
+.PP
+.BR unfreezestr ()
+called with a private queue pair allocated with
+.BR allocq (9)
+will only unlock the queue.  It is the caller's responsibility to unlock any
+private queue linkage protection.
+.PP
+If
+.BR unfreezestr ()
+is called twice for the same queue, or is called without first calling
+.BR freezestr (9),
+results will be undefined.
+(Acutally,
+.B Linux Fast-STREAMS
+protects against this and will issue a bug report and leave the stream in the
+unfrozen state.)
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR freezestr (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freezestr (9),
+.BR allocq (9)
+.BR appq (9),
+.BR bcanget (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bufcall (9),
+.BR canget (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR esbbcall (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR insq (9),
+.BR noenable (9),
+.BR put (9)
+.BR putbq (9),
+.BR putq (9),
+.BR qbufcall (9)
+.BR qclose (9),
+.BR qcountstrm (9),
+.BR qenable (9),
+.BR qopen (9),
+.BR qprocsoff (9)
+.BR qprocson (9)
+.BR qreply (9),
+.BR qsize (9),
+.BR qtimeout (9)
+.BR qwriter (9)
+.BR rmvq (9),
+.BR SAMESTR (9).
+.BR setq (9),
+.BR srv (9),
+.BR STREAMS (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR timeout (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR unfreezestr ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unfreezestr ()
+is compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4" ,
+with the following portability considerations:
+.IP \(bu
+.BR Solaris \(rg,
+.[
+solspg
+.]
+.BR SUPER-UX \(rg,
+.[
+suxspg
+.]
+and
+.BR UnixWare \(rg,
+.[
+uw7spg
+.]
+provide this function.
+.IP \(bu
+.BR AIX \(rg,
+.[
+aixspg
+.]
+.BR HP-UP \(rg,
+.[
+hpuxspg
+.]
+.BR OSF \(rg,
+.[
+osfspg
+.]
+.BR UXP/V \(rg
+.[
+uxpspg
+.]
+and
+.BR LiS
+.[
+lis
+.]
+do not provide this function.
+.RB ( HP-UX \(rg
+provides the symbols, but they do nothing.)
+.IP \(bu
+LiS
+.[
+LiS
+.]
+does not provide this DDI/DKI function.
+.IP \(bu
+.BR Solaris \(rg
+.[
+solspg
+.]
+provides the function prototype:
+.BI "void unfreezestr(queue_t *" q ).
+.BR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+provide the prototype
+.BR "void unfreezestr(queue_t *" q ", pl_t " pl ).
+.IP \(bu
+.B "SVR 4.2 MP DDI/DKI"
+specifies that the following functions cannot be called on a frozen stream:
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR noenable (9),
+.BR put (9),
+.BR putb (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR SAMESTR (9).
+.IP \(bu
+.BR "SVR 4.2 MP DDI/DKI"
+specifies that the following functions must have the stream frozen across the
+call:
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9).
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH "HISTORY"
+.PP
+A version of
+.BR freezestr ()
+first appeared in SVR 4 MP DDI/DKI.
+.[
+svr4dk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

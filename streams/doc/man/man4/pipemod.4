@@ -1,0 +1,261 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: pipemod.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH PIPEMOD 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "Linux Fast-STREAMS Modules"
+.\"
+.\"
+.SH NAME
+.B pipemod
+\- \fISTREAMS\fR-based pipe module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+.BI "int " pfds[2] ;
+.HP 8
+.BI "int pipe(" pfds );
+.HP 8
+.BI "int ioctl(" pfds[0] ", " I_PUSH ", " \*(lqpipemod\*(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B pipemod
+is a
+.I STREAMS
+module that is pushed over one end of a
+.IR STREAMS -based
+bidirectional pipe, or pushed over a FIFO,
+to reverse the send of the
+.B M_FLUSH
+command.  (See the
+.I I_FLUSH
+command to
+.BR streamio (7)).
+.PP
+Pipes and FIFOs have a twist in the stream at their midpoints.  At their
+midpoints, the read-side stream becomes the write-side stream and visa versa.
+As an
+.B M_FLUSH
+message traverses the twist, the sense of read-side and write-side must be
+reversed within the message (as indicated by the
+.BR FLUSHW
+and
+.BR FLUSHR
+flags).
+.B pipemod
+accomplishes this swapping of the read and write side flush flags across the
+twist at the midpoint in a
+.I STREAMS -based
+pipe or FIFO.
+.\"
+.\"
+.SH USAGE
+.PP
+.B pipemod
+should be pushed over one end of a newly created
+.IR STREAMS -based
+pipe, or pushed over a FIFO, before any other modules are pushed on either end
+of the pipe, or onto the FIFO.  This ensures that
+.B pipemod
+sits at the midpoint of the pipe or FIFO, the necessary position for reversing the
+send of the
+.B M_FLUSH
+message.
+.\"
+.\"
+.SH NOTICES
+.PP
+It is not necessary to use
+.B pipemod
+if all flushes flush both read and write queues at the same time,
+or if the
+.I I_FLUSH
+command is never issued on the pipe for one side of the stream,
+or the
+.B M_FLUSH
+command is never send by a pushed module for one side of the stream.
+.PP
+Note that the stream head normally flushes the stream on final close of the
+stream.  This flush is performed on both the read and write side of the stream
+at the same time, so the stream head does not require
+.BR pipemod .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of the
+.B s_pipe
+function which generates a
+.IR STREAMS -based
+software pipe and pushes the
+.B pipemod
+module on one end:
+.nf
+\fC\s-2
+int s_pipe(int fds[2])
+{
+        int err;
+        if ((err = pipe(fds)) != 0)
+                return (err);
+        if ((err = ioctl(fds[0], I_PUSH, "pipemod")) < 0) {
+                close(fds[0]);
+                close(fds[1]);
+                return (err);
+        }
+        return (0);
+}
+\s+2\fP
+.fi
+.\"
+.\"
+.SH MODULES
+.PP
+.B pipemod
+is a
+.I STREAMS
+module named
+.IR \*(lqpipemod\*(rq .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR pipe (2),
+.BR spx (4),
+.BR pipe (4),
+.BR sfx (4),
+.BR fifo (4),
+.BR streamio (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B pipemod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B pipemod
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+.IR UnixWare \(rg,
+.IR Solaris \(rg,
+and
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2,
+.[
+svr42
+.]
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B pipemod
+first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

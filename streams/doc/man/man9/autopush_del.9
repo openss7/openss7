@@ -1,0 +1,307 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: autopush_del.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH AUTOPUSH_DEL 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B autopush_del
+\- finds an autopush list entry for a given STREAMS device number
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/sad.h>
+.HP
+.BI "int autopush_del(struct strapush *" sap );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I sap
+a pointer to a
+.B strapush
+structure describing the autopush list to delete.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR autopush_del ()
+performs the same function within the kernel as is provided to user space via
+the
+.B SAD_GAP
+IO control to the
+.BR sad (4)
+STREAMS Adminstrative Driver.
+This function finds and returns a pointer to the autopush list associated with
+the
+.IR STREAMS (4)
+character major device specified by
+.IR cdev ,
+and the character minor device specified by
+.IR minor .
+The autopush list is described by a pointer to a
+.B strapush
+structure formatted as follows:
+.nf
+\fC\s-1
+struct strapush {
+        unit_t ap_cmd;
+        major_t sap_major;
+        minor_t sap_minor;
+        minor_t sap_lastminor;
+        unit_t sap_npush;
+        unit_t sap_list[MAXAPUSH][FMNAMESZ + 1];
+};
+\s+1\fP
+.fi
+.TP
+.I ap_cmd
+Not meaningful.  The caller should ignore the value returned in this field.
+.TP
+.I sap_major
+The character major device number associated with the
+.IR STREAMS (4)
+device to which
+this autopush list belongs.
+.TP
+.I sap_minor
+The first character minor device number in a range associated with the
+.IR STREAMS (4)
+device to which this autopush list belongs.  This value will be less than or
+equal to the
+.I minor
+argument.
+.TP
+.I sap_lastminor
+The last character minor device number in a rnage associated with the
+.IR STREAMS (4)
+device to which this autopush list belongs.  This value will be greater than
+or equal to the
+.I minor
+argument.
+.TP
+.I sap_npush
+The number of modules in the autopush list.  This number will be greater than
+or equal to one and less than or equal to
+.BR MAXAPUSH .
+.TP
+.I sap_list
+The array of module names that contains
+.I sap_npush
+module names representing the module autopush list.
+.\"
+.\"
+.PP
+.BR autopush_del ()
+is useful along with
+.BR autopush_add (9)
+and
+.BR autopush_del (9)
+when registering
+.IR STREAMS (4)
+character devices with
+.BR register_strdev (9).
+.BR autopush_del ()
+permits a kernel module to find the autopush list within a
+.BR cdevsw
+table entry.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR autopush_del ()
+returns a pointer to the
+.B strapush
+structure describing the autopush list for the requested
+.IR STREAMS (4)
+device.
+Upon failure,
+.BR autopush_del ()
+returns
+.BR NULL .
+.\"
+.\"
+.SH "ERRORS"
+.PP
+.BR autopush_del ()
+fails and returns
+.B NULL
+when the autopush list associated with
+.I cdev
+is empty, or does not contain an entry for the character minor device number
+.IR minor .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR autopush_del ()
+is a
+.BR "Linux Fast-STREAMS" -specific
+function.
+.BR autopush_del ()
+should not be used by portable
+.I STREAMS
+drivers or modules.  Instead, the
+user-space
+.I STREAMS
+autopush utility
+.BR sad (8)
+should be used instead.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR autopush_del ()
+can only be called from user context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR autopush_del ()
+is MP-safe.  The caller is responsible to ensure exclusive access to the
+passed in
+.B strapush
+structure
+.IR sap .
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR autopush_del ()
+simply locates the
+.B strapush
+structure associated with the
+.I cdev
+and
+.I minor
+arguments.  The module name list is neither validated, nor are any kernel
+modules loaded as a side-effect of the lookup.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR STREAMS (4),
+.BR sad (4),
+.BR autopush_add (9),
+.BR autopush_del (9),
+.BR register_strdev (9),
+.BR unregsiter_strdev (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR autopush_del ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR autopush_del ()
+is a
+.B Linux Fast-STREAMS
+specific function.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR autopush_del ()
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+specific function and should not be used by portable
+.I STREAMS 
+modules and drivers.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR autopush_del ()
+is new for
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

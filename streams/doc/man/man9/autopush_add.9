@@ -1,0 +1,373 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: autopush_add.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH AUTOPUSH_ADD 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B autopush_add
+\- add an autopush list entry for a given \fISTREAMS\fP device number
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/sad.h>
+.HP
+.BI "int autopush_add(struct strapush *" sap );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR autopush_add ()
+performs the same function within the kernel as is provided to user space via
+the
+.B SAD_SAP
+IO control to the
+.IR "STREAMS Adminstrative Driver" ,
+.BR sad (4).
+This function adds an autopush list to a \fISTREAMS\fP character device.  The
+character device and autopush list is specified by
+.IR sap ,
+which is a pointer to a
+.B strapush
+structure formatted as follows:
+.nf
+\fC\s-1
+struct strapush {
+        unit_t ap_cmd;
+        major_t sap_major;
+        minor_t sap_minor;
+        minor_t sap_lastminor;
+        unit_t sap_npush;
+        unit_t sap_list[MAXAPUSH][FMNAMESZ + 1];
+};
+\s+1\fP
+.fi
+.TP
+.I ap_cmd
+Not meaningful.
+.BR autopush_add ()
+ignores the value in this member.
+.I ap_cmd
+must be one of the following values:
+.RS
+.TP
+.B SAD_ONE
+the single character minor device number with which to associate the autopush list is
+specified in
+.IR sap_minor .
+In this case
+.I sap_lastminor
+will always be set to the same value as
+.IR sap_minor .
+.TP
+.B SAD_RANGE
+the range of character minor device numbers with which to associate the
+autopush list is specified in
+.IR sap_minor " and " sap_lastminor .
+.TP
+.B SAD_ALL
+the range of character minor device numbers with which to associated the
+autopush list is the range of all minor devices.  In this case,
+.I sap_minor
+will always be set to zero (0) and
+.I sap_lastminor
+will always be set to
+.BR MAX_CHRDEV .
+.RE
+.TP
+.I sap_major
+The character major device number associated with the \fISTREAMS\fP device to
+which this autopush list is to be added.
+.TP
+.I sap_minor
+The first character minor device number in a range associated with the
+\fISTREAMS\fP device to which this autopush list belongs.  This value is only
+significant if
+.I ap_cmd
+is
+.BR SAD_ONE " or " SAD_RANGE .
+.TP
+.I sap_lastminor
+The last character minor device number in a range associated with the
+\fISTREAMS\fP device to which this autopush list belongs.  This value is only
+significant if
+.I ap_cmd
+is
+.BR SAD_RANGE .
+When significant, the value of
+.I sap_lastminor
+must be greater than or equal to the value of
+.IR sap_minor .
+.TP
+.I sap_npush
+The number of modules in the autopush list.  This number must be greater than
+or equal to one and less than or equal to
+.BR MAXAPUSH .
+.TP
+.I sap_list
+The array of module names that contains
+.I sap_npush
+module names representing the module autopush list.
+.\"
+.\"
+.PP
+.BR autopush_add ()
+is useful along with
+.BR autopush_del (9)
+and
+.BR autopush_find (9)
+when registering \fISTREAMS\fP character devices with
+.BR register_strdev (9).
+.BR autopush_add ()
+permits a kernel module to add an autopush list to a \fISTREAMS\fP device.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR autopush_add ()
+adds the autopush list
+specified by
+.I sap
+and returns zero (0).
+Upon failure,
+.BR autopush_add ()
+does not add the specified autopush list
+.I sap
+and returns a negative error number.
+.\"
+.\"
+.SH "ERRORS"
+.PP
+When
+.BR autopush_add ()
+fails, it returns an appropriate negative error number as follows:
+.TP
+.RB [ EINVAL ]
+.I sap_major
+was invalid.
+.I sap_major
+must be in the range from zero (0) to
+.BR MAX_CHRDEV .
+.TP
+.RB [ EINVAL ]
+.I sap_minor
+was invalid.
+.I sap_minor
+must be in the range from zero (0) to 255.
+.TP
+.RB [ EINVAL ]
+.I sap_npush
+is less than one (1) or greater than
+.BR MAXAPUSH .
+.TP
+.RB [ EINVAL ]
+.I sap_list
+contains invalid information (e.g. zero length names or names that are not
+null terminated after
+.BR FMNAMESZ
+characters).
+.TP
+.RB [ ERANGE ]
+.I sap_lastminor
+was significant, yet less than
+.IR sap_minor .
+.TP
+.RB [ ENOSTR ]
+.IR sap_major ", " sap_minor " and " sap_lastminor
+specify a character device minor node that is not associated with a
+\fISTREAMS\fP device.
+.TP
+.RB [ EEXIST ]
+an autopush entry for the specified minor device number
+.RI ( sap_minor ),
+or a subset of the specified range of minor device numbers
+.RI ( sap_minor " and " sap_lastminor ),
+already exists.
+.TP
+.RB [ ENOSR ]
+insufficient \fISTREAMS\fP resources were available to succesfully complete
+the call.  This is caused by the inability to allocate cache storage to hold
+the autopush description.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR autopush_add ()
+is a
+.BR "Linux Fast-STREAMS" -specific
+function.
+.BR autopush_add ()
+should not be used by portable
+.I STREAMS
+drivers or modules.  Instead, the
+user-space
+.I STREAMS
+autopush utility
+.BR sad (8)
+should be used instead.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR autopush_add ()
+can only be called from user context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR autopush_add ()
+is MP-safe.  The caller is responsible to ensure exclusive access to the
+passed in
+.B strapush
+structure
+.IR sap .
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR autopush_add ()
+simply adds the
+.B strapush
+structure
+specified by
+.I sap
+to the specified \fISTREAMS\fP character device.  The module name list added
+is not validated, and no modules are loaded as a side-effect of the addition.
+.BR autopush_add ()
+will, however, attempt to load a kernel module associated with the character
+major device number specified by
+.IR sap_major ,
+if the associated kernel module has not been loaded.  See
+.BR register_strdev (9)
+for more information.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sad (4),
+.BR autopush_del (9),
+.BR autopush_find (9),
+.BR register_strdev (9),
+.BR unregsiter_strdev (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR autopush_add ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR autopush_add ()
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+specific function.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR autopush_add ()
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+specific function and should not be used by portable
+.I STREAMS 
+modules and drivers.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR autopush_add ()
+is new for
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

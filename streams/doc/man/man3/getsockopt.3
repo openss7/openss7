@@ -1,0 +1,386 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: getsockopt.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH GETSOCKOPT 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.SH NAME
+.B getsockopt
+\- get the socket options
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.HP
+.BI "int getsockopt(int " socket ", int " level ", int " option_name ", void *" option_value ", socklen_t *" option_len );
+.SH DESCRIPTION
+.PP
+The
+.BR getsockopt ()
+function retrieves the value for the option
+specified by the
+.I option_name
+argument for the socket specified by
+the
+.I socket
+argument.  If the size of the option value is greater
+than
+.IR option_len ,
+the value stored in the object pointed to by the
+.I option_value
+argument will be silently truncated.  Otherwise, the
+object pointed to by the
+.I option_len
+argument will be modified to
+indicate the actual length of the value.
+.PP
+The
+.I level
+argument specifies the protocol level at which the option
+resides.  To retrieve options at the socket level, specify the
+.I level
+argument as
+.BR SOL_SOCKET .
+To retrieve options at other levels, supply
+the appropriate
+.I level
+identifier for the protocol controlling the
+option.  For example, to indicate that an option will be interpreted
+by the TCP (Transmission Control Protocol), set
+.I level
+to
+.B IPPROTO_TCP
+as defined in the <netinet/in.h> header.
+.PP
+The socket in use may require the process to have appropriate
+privileges to use the
+.BR getsockopt ()
+function.
+.PP
+The
+.I option_name
+argument specifies a single option to be retrieved.
+It can be one of the following values defined in <sys/socket.h>:
+.TP 12
+.B SO_DEBUG
+Reports whether debugging information is being recorded.  This
+option stores an
+.B int
+value.  This is a boolean option.
+.TP 12
+.B SO_ACCEPTCONN
+Reports whether socket listening is enabled.  This option stores
+an
+.B int
+value.  This is a boolean option.
+.TP 12
+.B SO_BROADCAST
+Reports whether transmission of broadcast messages is
+supported, if this is supported by the protocol.  This option
+stores an
+.B int
+value.  This is a boolean option.
+.TP 12
+.B SO_REUSEADDR
+Reports whether the rules used in validating addresses supplied
+to
+.BR bind (3)
+should allow reuse of local addresses, if this is
+supported by the protocol.  This option stores an
+.B int
+value.
+This is a boolean option.
+.TP 12
+.B SO_KEEPALIVE
+Reports whether connections are kept active with periodic
+transmission of messages, if this is supported by the protocol.
+If the connected socket fails to respond to these messages, the
+connection is broken and processes writing to that socket are
+notified with a
+.B SIGPIPE
+signal.  This option stores an
+.B int
+value.
+This is a boolean option.
+.TP 12
+.B SO_LINGER
+Reports whether the socket lingers on
+.BR close (2)
+if data is
+present.  If
+.B SO_LINGER
+is set, the system blocks the process
+during
+.BR close (2)
+until it can transmit the data or until the
+end of the interval indicated by the
+.I l_linger
+member, whichever
+comes first.  If
+.B SO_LINGER
+is not specified, and
+.BR close (2)
+is
+issued, the system handles the call in a way that allows the
+process to continue as quickly as possible.  This option stores
+a
+.B linger
+structure.
+.TP 12
+.B SO_OOBINLINE
+Reports whether the socket leaves received out-of-band data
+(data marked urgent) in line.  This option stores an
+.B int
+value.
+This is a boolean option.
+.TP 12
+.B SO_SNDBUF
+Reports send buffer size information.  This option stores an
+.B int
+value.
+.TP 12
+.B SO_RCVBUF
+Reports receive buffer size information.  This option stores an
+.B int
+value.
+.TP 12
+.B SO_ERROR
+Reports information about error status and clears it.  This
+option stores an
+.B int
+value.
+.TP 12
+.B SO_TYPE
+Reports the socket type.  This option stores an
+.B int
+value.
+.TP 12
+.B SO_DONTROUTE
+Reports whether outgoing messages bypass the standard routing
+facilities.  The destination must be on a directly-connected
+network, and messages are directed to the appropriate network
+interface according to the destination address.  The effect, if
+any, of this option depends on what protocol is in use.  This
+option stores an
+.B int
+value.  This is a boolean option.
+.TP 12
+.B SO_RCVLOWAT
+Reports the minimum number of bytes to process for socket input
+operations.  The default value for
+.B SO_RCVLOWAT
+is 1.  If
+.TP 12
+.B SO_RCVLOWAT is set to a larger value, blocking receive calls
+normally wait until they have received the smaller of the low
+water mark value or the requested amount.  (They may return less
+than the low water mark if an error occurs, a signal is caught,
+or the type of data next in the receive queue is different than
+that returned, e.g.  out of band data).  This option stores an
+.B int
+value.  Note that not all implementations allow this option
+to be retrieved.
+.TP 12
+.B SO_RCVTIMEO
+Reports the timeout value for input operations.  This option
+stores a
+.B timeval
+structure with the number of seconds and
+microseconds specifying the limit on how long to wait for an
+input operation to complete.  If a receive operation has blocked
+for this much time without receiving additional data, it
+returns with a partial count or errno set to
+.RB [ EAGAIN ]
+or
+.RB [ EWOULDBLOCK ]
+if no data were received.  The default for this
+option is zero, which indicates that a receive operation will
+not time out.  Note that not all implementations allow this
+option to be retrieved.
+.TP 12
+.B SO_SNDLOWAT
+Reports the minimum number of bytes to process for socket
+output operations.  Non-blocking output operations will process
+no data if flow control does not allow the smaller of the send
+low water mark value or the entire request to be processed.
+This option stores an
+.B int
+value.  Note that not all
+implementations allow this option to be retrieved.
+.TP 12
+.B SO_SNDTIMEO
+Reports the timeout value specifying the amount of time that an
+output function blocks because flow control prevents data from
+being sent.  If a send operation has blocked for this time, it
+returns with a partial count or with errno set to
+.RB [ EAGAIN ]
+or
+.RB [ EWOULDBLOCK ]
+if no data were sent.  The default for this option
+is zero, which indicates that a send operation will not time
+out.  The option stores a
+.B timeval
+structure.  Note that not all
+implementations allow this option to be retrieved.
+.PP
+For boolean options, a zero value indicates that the option is
+disabled and a non-zero value indicates that the option is enabled.
+.PP
+Options at other protocol levels vary in format and name.
+.PP
+The socket in use may require the process to have appropriate
+privileges to use the
+.BR getsockopt ()
+function.
+.SH CAVEATS
+.PP
+This system call is implemented as a
+.B SIOCSOCKSYS
+IOCTL.  See
+.BR socksys (4)
+for more information.
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR getsockopt ()
+returns 0.  Otherwise, -1
+is returned and errno is set to indicate the error.
+.SH ERRORS
+.PP
+The
+.BR getsockopt ()
+function will fail if:
+.TP 12
+.RB [ EBADF ]
+The
+.I socket
+argument is not a valid file descriptor.
+.TP 12
+.RB [ EFAULT ]
+The
+.I option_value
+or
+.I option_len
+parameter can not be accessed or
+written.
+.TP 12
+.RB [ EINVAL ]
+The specified option is invalid at the specified socket
+.IR level .
+.TP 12
+.RB [ ENOPROTOOPT ]
+The option is not supported by the protocol.
+.TP 12
+.RB [ ENOTSOCK ]
+The
+.I socket
+argument does not refer to a socket.
+
+The
+.BR getsockopt ()
+function may fail if:
+.TP 12
+.RB [ EACCES ]
+The calling process does not have the appropriate privileges.
+.TP 12
+.RB [ EINVAL ]
+The socket has been shut down.
+.TP 12
+.RB [ ENOBUFS ]
+Insufficient resources are available in the system to complete
+the call.
+.TP 12
+.RB [ ENOSR ]
+There were insufficient
+.IR STREAMS (4)
+resources available for the
+operation to complete.
+.SH "SEE ALSO"
+.PP
+.BR bind (3),
+.BR close (2),
+.BR endprotoent (2),
+.BR setsockopt (3),
+.BR socket (3),
+.BR <sys/socket.h> .
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

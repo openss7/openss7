@@ -1,0 +1,197 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: sfx.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SFX 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "Under Construction"
+.\"
+.\"
+.SH NAME
+.B sfx, fifo
+\- \fISTREAMS\fR FIFO Device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+none
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The named pipe obtained by opening a special device node created with the
+.BR mkfifo (1)
+command are not necessarily \fISTREAMS\fR devices.  The
+.B sfx
+.I STREAMS
+pseudo-device driver provides a mechanism for assigning
+.IR STREAMS -based
+fifos within the filesystem.
+.PP
+The
+.B sfx
+pseudo-device driver is a regular
+.I STREAMS
+character special device driver with the following exceptions:
+.NP
+.NP
+.\"
+.\"
+.SH NOTICES
+.PP
+Normally a
+.I STREAMS
+special file is associated with a device number.  For
+.BR sfx ,
+the
+.I STREAMS
+special file is associated with the inode in the file system in which the
+character special node was created.  This acts identically to a FIFO created
+with
+.BR mkfifo (1),
+with the exception that a
+.BR stat (2)
+on the device node will say that it is an
+.B S_IFCHR
+device node.  A
+.BR fstat (2)
+on a file descriptor opening this device node in the file system will say that
+the file descriptor is of type
+.BR S_IFIFO .
+.PP
+It may be necessary to push the
+.BR pipemod (4)
+module on one end of the FIFO to maintain the sense of
+.BR M_FLUSH .
+.\"
+.\"
+.SH DEVICES
+.PP
+.BR /dev/sfx .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mkfifo (1),
+.BR stat (2),
+.BR fstat (2),
+.BR pipe (2),
+.BR pipe (4),
+.BR spx (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B sfx
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B sfx
+is a character special node based replacement for fifos.  See
+.BR mkfifo (1).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B fifos
+first appeared in SVR 3,
+.[
+SVR 3
+.]
+but were not implemented using
+.IR STREAMS .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

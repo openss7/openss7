@@ -1,0 +1,248 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: copyb.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH COPYB 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B copyb
+\- copy a \fISTREAMS\fR message block
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "mblk_t *copyb(mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I mp
+the message block to copy.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR copyb ()
+generates a new copy of the message block and data block and buffer indicated
+by
+.IR mp ,
+and returns a pointer to the new message block.
+The new data block has the same type as the copied data block and the
+.IR b_rptr " and " b_wptr
+in the new message block are set to the beginning and end of the copied data
+in the new data block and buffer.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR copyb ()
+returns a pointer to the new message block.
+.PP
+Upon failure,
+.BR copyb ()
+returns a
+.B NULL
+pointer.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR copyb ()
+fails, it returns a
+.B NULL
+pointer.
+.BR copyb ()
+can fail because the passed in message pointer,
+.IR mp ,
+is
+.BR NULL ;
+the size of the data buffer is negative;
+the size of the data indicated by
+.IR b_rptr " and " b_wptr
+of the message block to be copied is negative;
+or memory allocation failed.
+Normally if
+.B copyb
+fails,
+.BR bufcall (9)
+should be called with the
+.I size
+of the data block necessary and the
+.I priority
+associated with the operation.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR copyb ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR copyb ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+message block.  On return, the caller has the only reference to the returned
+message block.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B LiS
+.[
+LiS
+.]
+implementation of
+.BR copyb ()
+will fail if the block to be copied has a negative message length (i.e. the
+.I b_wptr
+is less than the
+.IR b_rptr ),
+or if the data block is mangled (i.e.  the 
+.I db_lim
+pointer is less than the
+.IR db_base ).
+.PP
+This does not appear consistent with SVR 4.2 STREAMS.
+.[
+svr42
+.]
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR bufcall (9),
+.BR copymsg (9),
+.BR dupb "(9) and "
+.BR dupmsg (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR copyb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR copyb ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+and LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.PP
+Symbol
+.BR lis_copyb ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_copyb ()
+calls
+.BR copyb ()
+directly.
+.PP
+Binary compatibility with SVR 4.2 MP DDI/DKI and
+.IR Solaris \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR copyb ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

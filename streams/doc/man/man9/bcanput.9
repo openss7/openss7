@@ -1,0 +1,348 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: bcanput.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BCANPUT 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH "NAME"
+.B bcanput
+\- test flow control on a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH "SYNOPSIS"
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int bcanput(queue_t *" q ", int " band );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue from which to begin testing for flow control.
+.TP
+.I band
+the priority band within which to test for flow control.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+It is the responsibility of a
+.I STREAMS
+module puting a banded non-priority data message
+.RB ( M_PROTO ", " M_DATA )
+to a subsequent message queue to check for flow control using
+.BR bcanput ()
+for the band associated with the message before placing a message on the queue
+with
+.BR putq (9).
+.PP
+.BR bcanput ()
+checks whether the stream is flow controlled starting at the specified queue,
+.IR q ,
+and for the specified 
+.IR band .
+Starting at
+.IR q ,
+and for
+.IR band ,
+.BR bcanput ()
+looks for the next forward queue which has a service routine or which has no
+further forward queue.
+.PP
+If this forward queue has the
+.B QB_FULL
+flag clear indicating that it is not full for the specified
+.IR band ,
+.BR bcanput ()
+will return true (1).
+.PP
+If this forward queue has the
+.B QB_FULL
+flag set indicating that it is full for the specified
+.IR band ,
+.BR bcanput ()
+will return false (0).
+.PP
+When
+.BR bcanput ()
+returns false (0), it also sets the
+.B QB_WANTW
+flag for the specified
+.IR band ,
+indicating that the
+.I STREAMS
+scheduler should backenable service
+procedures backwards up the queues when the flow controlled
+.I band
+is no longer full.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR bcanput ()
+will return false (0) when the specified
+.I STREAMS
+message queue is flow
+controlled for the specified band, and return true (1) when the specified
+.I STREAMS
+message queue is not flow controlled for the specified band.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR bcanput ()
+always succeed.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bcanput ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bcanput ()
+is MP-safe; however, the caller perform an unprotected pointer dereference.
+That is,
+.BR bcanputnext (9)
+should always be called in preference to
+.BI bcanput( q->q_next ).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B Linux Fast-STREAMS
+provides the additional feature that
+.I band
+can be specified as
+.BR ANYBAND .
+When
+.I band
+is
+.BR ANYBAND ,
+.BR bcanput ()
+checks whether any band (other than band zero), is not flow controlled.  If a
+band exists that is not flow controlled,
+.BR bcanput ()
+with
+.B ANYBAND
+returns one (1).
+If all existing bands are flow controlled,
+.BR bcanput ()
+returns zero (0).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putq (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR bcanputnext (9),
+.BR noenable "(9), and "
+.BR enableok (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bcanput ()
+is source-level compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4" ,
+with the following portability considerations:
+.IP \(bu
+.BR AIX \(rg
+.[
+aixdoc
+.]
+indicates that if a
+.BR qband (9)
+structure does not exist for
+.I band
+that
+.BR bcanput ()
+returns true (1).
+.IP \(bu
+.BR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR bcanput ()
+as a function that can only be passed a queue pointer in the queue pair within
+a queue's procedure.
+.IP \(bu
+.BR SUPER-UX \(rg
+.[
+suxdoc
+.]
+indicates that the stream cannot be frozen when calling
+.BR bcanput (9)
+and that private locks cannot be held across the call.
+.IP \(bu
+.BR bcanput ()
+always succeeds.  Under
+.BR LiS ,
+.BR bcabput ()
+will return zero (0 - flow controlled) if an internal error occurs, without
+setting the
+.BR QWANTW " or " QB_WANTW
+flag for the queue or band.  This means that, although flow controlled, no
+backenable procedure will be run.  This can lead to indefinite postponement of
+a queue service procedure under
+.BR LiS .
+.B Linux Fast-STREAMS
+.BR bcanput ()
+does not have this problem.
+.IP \(bu
+The declaration for
+.BR bcanput ()
+provides that
+.I band
+is of type
+.BR int .
+Under
+.BR "SVR 4.2 DDI/DKI" ,
+.[
+usldk
+.]
+and other systems based on
+.BR "SVR 4",
+.I band
+is
+.BR "unsigned char" .
+.IP \(bu
+Symbol
+.BR lis_bcanput ()
+and
+.BR lis_bcanput_anyband ()
+are provided for compatibility with
+.BR LiS .
+See
+.BR lisbcm (9).
+.BR lis_bcanput ()
+and
+.BR lis_bcanput_anyband ()
+simply call
+.BR bcanput ()
+directly.
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR bcanput ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR bcanput ()
+first appeared in
+.BR "SVR 4.0 DDI/DKI" .
+.[
+svr4dk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

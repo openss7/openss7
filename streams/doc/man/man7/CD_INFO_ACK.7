@@ -1,0 +1,323 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: CD_INFO_ACK.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CD_INFO_ACK 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B CD_INFO_ACK
+\- information acknowledgment
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+or
+.B M_PCPROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    cd_ulong cd_primitive;
+    cd_ulong cd_state;
+    cd_ulong cd_max_sdu;
+    cd_ulong cd_min_sdu;
+    cd_ulong cd_class;
+    cd_ulong cd_duplex;
+    cd_ulong cd_output_style;
+    cd_ulong cd_features;
+    cd_ulong cd_addr_length;
+    cd_ulong cd_ppa_style;
+} cd_info_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This provider originated primitives acknowledges a previously issued
+.BR CD_INFO_REQ (7)
+primitive, and provide protocol and limits information for the stream upon
+which the primitive is issued.
+.PP
+If the stream is in state
+.BR CD_UNATTACHED ,
+the information returned by
+.B CD_INFO_ACK
+might be different after a successful
+.BR CD_ATTACH_REQ (7)
+than it was before the attach was completed.
+This is because the CD provider might not yet have all protocol information
+concerning the underlying communications device until after it has been
+attached to a specific Physical Point of Attachment.
+.SS Parameters
+This primitive contains the following parameters:
+.TP
+.I cd_primitive
+Indicates the primitives type.
+.TP
+.I cd_state
+Indicates the state of the CDI provider.  The
+.I cd_state
+can be one of the following values:
+.RS
+.TP
+.B CD_UNATTACHED
+No Physical Point of Attachment (PPA) is associated with the stream.  Only
+Style 2 communications devices (streams that return
+.B CD_STYLE2
+in the
+.I cd_ppa_style
+field) can exist in this state.
+.B CD_STYLE2
+communications devices start in this state after
+.BR open (2).
+.TP
+.B CD_UNUSABLE
+PPA cannot be used.
+.TP
+.B CD_DISABLED
+A Physical Point of Attachment (PPA) is associated with the stream, but the
+communications device is disabled.
+Style 1 communications devices (streams that return
+.B CD_STYLE1
+in the
+.I cd_ppa_style
+filed) start in this state after
+.BR open (2).
+.TP
+.B CD_ENABLE_PENDING
+A
+.BR CD_ENABLE_REQ (7)
+has been issued and is pending.  The provider is waiting for enabling of the
+communications device to complete before confirmation with
+.BR CD_ENABLE_CON (7)
+or error acknowledgement with
+.BR CD_ERROR_ACK (7).
+.TP
+.B CD_ENABLED
+The communications device is enabled and is awaiting use.  Either the input or
+output must be active or allowed before data can be transferred.
+.TP
+.B CD_READ_ACTIVE
+The input section is temporarily enabled and will be disabled after data arrives.
+.TP
+.B CD_INPUT_ALLOWED
+The input section is permanently enabled.
+.TP
+.B CD_DISABLE_PENDING
+A
+.BR CD_DISABLE_REQ (7)
+has been issued and is pending.  The provider is waiting for disabling of the
+communications device to complete before confirmation with
+.BR CD_DISABLE_CON (7)
+or error acknowledgement with
+.BR CD_ERROR_ACK (7).
+.TP
+.B CD_OUTPUT_ACTIVE
+Output section active only.
+.TP
+.B CD_XRAY
+Xray-ing another ppa.
+.RE
+.TP
+.I cd_max_sdu
+The maximum size of a Signalling Data Unit (SDU) in octets.
+.TP
+.I cd_min_sdu
+The minimum size of a Signalling Data Unit (SDU) in octets.
+.TP
+.I cd_class
+Indicates the class of the communications device.
+.I cd_class
+can be one of the following values:
+.RS
+.TP
+.B CD_HDLC
+Bit-synchronous.
+.TP
+.B CD_BISYNC
+Character-synchronous.
+.TP
+.B CD_LAN
+ISO 8802-3,4,5 local-area network MAC.
+.TP
+.B CD_NODEV
+No device, PPA used for X-ray.
+.RE
+.TP
+.I cd_duplex
+Indicates full or half duplex operation.
+.I cd_duplex
+can be one of the following values:
+.RS
+.TP
+.B CD_FULLDUPLEX
+Full duplex; allow input supported.
+.TP
+.B CD_HALFDUPLEX
+Half duplex; read write/read supported.
+.RE
+.TP
+.I cd_output_style
+Indicates the output style.
+.I cd_output_style
+can be one of the following values:
+.RS
+.TP
+.B CD_UNACKEDOUTPUT
+The communications device does not issue
+.BR CD_UNITDATA_ACK (7)
+primitives.
+.TP
+.B CD_ACKEDOUTPUT
+The communications device issues
+.BR CD_UNITDATA_ACK (7)
+primitives in acknowledgement of
+.BR CD_UNITDATA_REQ (7)
+primitives.
+.TP
+.B CD_PACEDOUTPUT
+The communications device issues
+.BR CD_UNITDATA_ACK (7)
+primitives only as output timing hints.
+.RE
+.TP
+.I cd_features
+Indicates the features supported by the communications device.
+.I cd_features
+can be a bitwise OR of the following flags:
+.RS
+.TP
+.B CD_CANREAD
+Read request supported on full duplex.
+.TP
+.B CD_CANDIAL
+Dial information supported.
+.TP
+.B CD_AUTOALLOW
+.B CD_INPUT_ALLOWED
+as soon as enabled.
+.TP
+.B CD_KEEPALIVE
+Don't send off at
+.BR CD_DISABLED_REQ (7).
+This is a Gcom extension.
+.RE
+.TP
+.I cd_addr_length
+The maximum size of an address for use with
+.BR CD_UNITDATA_REQ (7),
+.BR CD_UNITDATA_IND (7).
+.TP
+.I cd_ppa_style
+Indicates the physical point of appearance style.
+.I cd_ppa_style
+can be one of the following values:
+.RS
+.TP
+.B CD_STYLE1
+The communications device is already attached to the physical point of
+appearance at
+.BR open (2).
+The device starts in the
+.B CD_DISABLED
+state.
+.TP
+.B CD_STYLE2
+The communications is not attached to a physical point of appearance at
+.BR open (2),
+and must be attached with
+.BR CD_ATTACH_REQ (7).
+The device starts in the
+.B CD_UNATTACHED
+state.
+.RE
+.SS State
+This primitive is valid in any state where a local acknowledgement
+(requiring response with a
+.BR CD_OK_ACK (7))
+is not pending, and only in response to a
+.BR CD_INFO_REQ (7)
+primitive.
+.SH FILES
+<sys/cdi.h>
+.SH "SEE ALSO"
+.BR CD_ATTACH_REQ (7),
+.BR CD_ENABLE_REQ (7),
+.BR CD_ERROR_ACK (7),
+.BR CD_INFO_REQ (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to CDI with Gcom extensions.
+.SH "HISTORY"
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.TA

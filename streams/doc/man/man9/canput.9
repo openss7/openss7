@@ -1,0 +1,322 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: canput.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CANPUT 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH "NAME"
+.B canput
+\- test flow control on a message queue
+.\"
+.\"
+.SH "SYNOPSIS"
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int canput(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue to check for flow control.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR canput ()
+checks whether the stream is flow controlled starting at the
+specified queue,
+.IR q .
+.BR canput ()
+looks for the next queue which has a service routine or which has no
+next queue.
+.PP
+If the next queue has the
+.B QFULL
+flag is clear indicating that the queue is not full, then
+.BR canput ()
+will return true (1).
+.PP
+If the next queue has the the
+.B QFULL
+flag is set indicating that the queue is full,
+then
+.BR canput ()
+will return false (0).
+.PP
+When
+.BR canput ()
+returns false (0), it also sets the
+.B QWANTW
+flag for the queue upon which
+.BR canput ()
+stopped, indicating that the
+.I STREAMS
+scheduler should backenable
+service procedures when the flow controlled queue is
+no longer full.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR canput ()
+returns false (0) when the specified
+.I STREAMS
+message queue is flow controlled
+and returns true (1) when the specified
+.I STREAMS
+message queue is not flow
+controlled.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR canput ()
+always succeeds for a valid
+.IR q .
+If
+.I q
+is invalid, the result is undefined.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR canput ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR canput ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+It is the responsibility of a
+.I STREAMS
+module putting a band zero (0)
+non-priority message to a message queue to check for flow control using
+.BR canput ()
+before placing a message on the queue with
+.BR putq (9).
+.\"
+.\"
+.SH "EXAMPLES"
+.PP
+.BR canput ()
+is normally called before a call to
+.BR putq (9)
+as follows:
+.sp
+.nf
+\fC\s-1\
+void
+example_putp(queue_t *q, mblk_t *mp)
+{
+	priv_t p = (priv_t *)q->q_ptr;
+	queue_t *uq = p->upper_queue;
+	if (!q->q_count && (mp->b_datap->db_type >= QPCTL
+		            || canput(uq))) {
+		/* put to upper if we are empty and
+		   upper is not flow controlled */
+		putq(uq, mp);
+	} else {
+		/* put to our own queue otherwise */
+		putq(q, mp);
+	}
+}
+\s+1\fR
+.fi
+.PP
+Above, the example uses
+.BR canput ()
+from the lower queue put procedure to test the upper queue for flow control.
+If the upper queue is flow controlled, the message is placed on the lower
+queue.  Otherwise, if the lower queue is empty and the upper queue is not flow
+controlled, the example places the message directly on the upper queue.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putq (9),
+.BR canputnext (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR noenable "(9) and "
+.BR enableok (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR canput ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR canput ()
+is compatible with
+SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+and LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.BR canput ()
+called with a
+.B NULL
+or invalid
+.I q
+pointer will have undefined results and may crash or destabilize the kernel.
+Under LiS, if
+.BR canput ()
+suffers an internal error,
+.I q
+is
+.BR NULL ,
+or points to a structure other than a
+.B queue_t 
+structure,
+it will return false (0).
+.IP \(bu
+Although a call to
+.BI bcanput( q ", " 0 )
+is functionally equivalent to
+.BI canput( q ),
+.BR canput ()
+is implemented separately from
+.BR bcanput ()
+for speed.
+LiS implements
+.BI canput( q ),
+.BI canputnext( q )
+and
+.BI bcanputnext( q ", " band )
+with macros that call
+.BI bcanput( q ", " band ).
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR canput ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.PP
+Symbol
+.BR lis_canput ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_canput ()
+calls
+.BR canput ()
+directly.
+.PP
+Binary compatibility with SVR 4.2 DDI/DKI and
+.IR Solaris \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+docmentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR canput ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

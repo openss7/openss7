@@ -1,0 +1,388 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: t_open.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_OPEN 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_open
+\- open a transport endpoint
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int " fd " = t_open(char *" path ", int " oflag ", struct t_info *" info );
+.SH ARGUMENTS
+.PP
+.TP 12
+.I path
+a character string specifying the path to the device to open.
+.TP
+.I oflag
+open flags.
+.TP
+.I info
+a pointer to a
+.B t_info
+structure to contain returned information about the transport provider.
+.SH DESCRIPTION
+.PP
+.BR t_open ()
+opens a local transport endpoint and returns a file descriptor for use in
+other XTI library calls as well as information about the transport provider
+for the local transport endpoint.
+.PP
+.I path
+is a
+.B Linux
+filesystem path to a STREAMS character special file that once opened will
+provide the necessary capabilities to the XTI Library (TPI interface and
+.BR timod (4)
+module pushable).
+.PP
+.I oflag
+are open flags, defined in
+.BR open (2),
+which are a bitwise OR of
+.B O_RDWR
+and any of the following flags:
+.TP 12
+.B O_RDWR
+open the STREAMS character special file read-write.
+XTI does not support or permit
+.BR O_RDONLY " or " O_WRONLY
+flags.
+.TP 12
+.BR O_NONBLOCK " or " O_NDELAY
+specifies that the file is to be opened for asynchronous operation.  When
+opened for asynchronous operation, XTI library calls, 
+.BR t_addleaf (3),
+.BR t_connect (3),
+.BR t_listen (3),
+.BR t_rcv (3),
+.BR t_rcvconnect (3),
+.BR t_rcvdis (3),
+.BR t_rcvleafchange (3),
+.BR t_rcvudata (3),
+.BR t_rcvv (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3),
+.BR t_snd (3),
+.BR t_sndrel (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndv (3),
+.BR t_sndvudata (3),
+will not block and will fail, return -1 and set
+.IR t_errno (3)
+to
+.BR TNODATA ", " TNODIS " or " TFLOW
+if they would have otherwise blocked.
+.TP 12
+.BR O_NOFOLLOW
+tells
+.BR t_open ()
+not to follow symbolic links if
+.I path
+is a symbolic link to a STREAMS character special file.
+.PP
+The other
+.BR open (2)
+flags,
+.BR O_RDONLY ,
+.BR O_WRONLY ,
+.BR O_CREAT ,
+.BR O_NOCTTY ,
+.BR O_TRUNC ,
+.BR O_APPEND ,
+.BR O_SYNC ,
+.BR O_DIRECTORY ,
+.BR O_LARGEFILE,
+are not applicable to XTI/TLI STREAMS and should not be included.
+.PP
+.I info
+is a pointer to a
+.B t_info
+structure that will return protocol information about the transport service
+provider associated with the local transport endpoint.
+The
+.B t_info
+contains the same information and follows the same rules as in the
+.BR t_getinfo (3)
+call.
+The
+.B t_info
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_info {
+    t_scalar_t addr;
+    t_scalar_t options;
+    t_scalar_t tsdu;
+    t_scalar_t etsdu;
+    t_scalar_t connect;
+    t_scalar_t discon;
+    t_scalar_t servtype;
+    t_scalar_t flags;
+};
+\fR\s+1
+.fi
+.PP
+The
+.B t_info
+structure contains the following members and protocol information:
+.TP 12
+.I addr
+the maximum size of a transport endpoint address.  This can be used to
+determine the
+.I addr->maxlen
+size when passing
+.BR netbuf (3)
+structures to XTI Library calls.
+.TP 12
+.I options
+the maximum size of the options parameter.  This can be used to determine the
+.I opt->maxlen
+size when passing
+.BR netbuf (3)
+structures to XTI Library calls.
+.TP 12
+.I tsdu
+the maximum size of the transport service data unit.  This can be used to
+determine the
+.I udata->maxlen
+size when passing
+.BR netbuf (3)
+structures to XTI Library calls.
+.TP 12
+.I etsdu
+the maximum size of the expedited transport service data unit.  This can be used to
+determine the
+.I udata->maxlen
+size when passing
+.BR netbuf (3)
+structures to XTI Library calls.
+.TP 12
+.I connect
+the maximum size of connection data.  This can be used to determine the
+.I udata->maxlen
+size when passing
+.BR netbuf (3)
+structures to
+.BR t_connect "(3) or " t_accept (3).
+.TP 12
+.I discon
+the maximum size of disconnection data.  This can be used to determine the
+.I udata->maxlen
+size when passing
+.BR netbuf (3)
+structures to
+.BR t_snddis "(3) or " t_rcvdis (3),
+or, when
+.B T_ORDRELDATA
+is set in
+.IR flags ,
+.BR t_sndreldata "(3) or" t_rcvreldata (3).
+.RS 12
+.PP
+Any of the size parameters returned can also be one of the following values:
+.TP 12
+.B T_INFINITE
+the size of the parameter is unlimited.
+.TP 12
+.B T_INVALID
+the transport service provider has no concept of the parameter in question.
+.RE
+.TP 12
+.I servtype
+the service type of the underlying transport service provider.  The service
+type can be one of the following values:
+.RS
+.TP 12
+.B T_CLTS
+connectionless transport service.
+.TP 12
+.B T_COTS
+connection oriented transport service.
+.TP 12
+.B T_COTS_ORD
+connection oriented transport service with orderly release.
+.RE
+.TP 12
+.I flags
+contains other option information about the transport service provider and may
+be a bitwise OR of any of the following flags:
+.RS
+.TP 12
+.B T_ORDRELDATA
+when set, this flag indicates that the transport service provider will accept
+data with orderly release.
+.TP 12
+.B T_SNDZERO
+when set, this flag indicates that the transport service provider will accept
+the transmission of zero-length data.
+.TP 12
+.B XPG4_1
+when set, this flag indicates that the transport service provider supports the
+XPG4 primitives
+.BR T_ADDR_REQ " and " T_ADDR_ACK .
+.RE
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_open ()
+returns a positive integer file descriptor
+.I fd
+and a completed
+.B t_info
+structure.
+Upon failure,
+.BR t_open ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_open ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ TBADFLAG ]
+The argument
+.I oflag
+contains invalid flags.
+.TP 12
+.RB [ TBADNAME ]
+The transport provider name (\fIpath\fR to the device) is invalid.
+.TP 12
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP 12
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR netbuf (3),
+.BR open (2),
+.BR t_accept (3),
+.BR t_addleaf (3),
+.BR t_close (3),
+.BR t_connect (3),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR timod (4),
+.BR t_listen (3),
+.BR t_rcv (3),
+.BR t_rcvconnect (3),
+.BR t_rcvdis (3),
+.BR t_rcvleafchange (3),
+.BR t_rcvreldata (3),
+.BR t_rcvudata (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3),
+.BR t_snd (3),
+.BR t_snddis (3),
+.BR t_sndrel (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndv (3),
+.BR t_sndvudata (3).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

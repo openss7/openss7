@@ -1,0 +1,257 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: CD_HALT_INPUT_REQ.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CD_HALT_INPUT_REQ 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B CD_HALT_INPUT_REQ
+\- halt input
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+or
+.B M_PCPROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    cd_ulong cd_primitive;
+    cd_ulong cd_disposal;
+} cd_halt_input_req_t;
+
+/* Actions to take with undelivered data */
+#define CD_FLUSH        0x00    /* Discard undelivered data */
+#define CD_WAIT         0x01    /* Attempt to deliver unsent
+                                   data */
+#define CD_DELIVER      0x02
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This user originated primitive requests that the input section be halted.
+.PP
+When a stream is enabled with
+.BR CD_ENABLED_REQ (7),
+it can be used immediately for transmission.  If the stream returns
+.B CD_AUTOALLOW
+in the
+.I cd_features
+field of the
+.BR CD_INFO_ACK (7),
+the device automatically allows input and there is no need to call
+.BR CD_ALLOW_INPUT_REQ (7)
+for the device.  However,
+.B CD_HALT_INPUT_REQ
+will halt input on such a device.
+.PP
+In addition, if the input section is temporarily enabled with
+.BR CD_READ_REQ (7),
+on a half-duplex communications device,
+then
+.B CD_HALT_INPUT_REQ
+will abort the read operation.
+.SS Parameters
+This primitive contains the following parameters:
+.TP
+.I cd_primitive
+Specifies the primitives type.
+.TP
+.I cd_disposal
+Specifies how unsent messages are to be disposed.  This field can be one of
+the following values:
+.RS
+.TP
+.B CD_FLUSH
+Discard undeliverable data.
+All data that is unsent at the time that the
+.B CD_DISABLE_REQ
+primitive is received will be discarded.  Any data awaiting transmission the
+the device's write queue will be flushed.
+.TP
+.B CD_WAIT
+Attempt to deliver unsent data.
+All data that is unsent at the time that the
+.B CD_DISABLE_REQ
+primitive is received the provider will attempt to send before acknowledging the
+primitive.  The provider will not wait for acknowledgment of sent messages.
+.TP
+.B CD_DELIVER
+Deliver unsent data.
+All data that is unsent at the time that the
+.B CD_DISABLE_REQ
+primitive is received the provider will deliver before acknowledging the
+primitive.  The provider will wait for acknowledgment of sent messages.
+.RE
+.SS State
+This primitive is valid in state
+.BR CD_ENABLED ,
+.BR CD_INPUT_ALLOWED ", or "
+.BR CD_READ_ACTIVE .
+The new state is
+.BR CD_ENABLED .
+.SH RESPONSE
+This primitive requires that the CD provider acknowledge receipt of the
+primitive as follows:
+.PP
+.B "Successful:"
+Upon success, the provider will acknowledge receipt of the primitive with the
+.BR CD_OK_ACK (7)
+primitive.  The new state is
+.BR CD_ENABLED .
+.PP
+.B "Unsuccessful (non-fatal errors):"
+Upon failure, the provider will acknowledge receipt of the primitive with the
+.BR CD_ERROR_ACK (7)
+primitive with the error inidcated in the primitive.  The new state remains
+unchanged.
+.SH ERRORS
+.B "Non-Fatal Errors:"
+applicable non-fatal errors are as follows:
+.\".TP
+.\".RB [ CD_BADADDRESS ]
+.\"Address was invalid.
+.\".TP
+.\".RB [ CD_BADADDRTYPE ]
+.\"Invalid address type.
+.\".TP
+.\".RB [ CD_BADDIAL ]
+.\"Dial information was invalid.
+.\".TP
+.\".RB [ CD_BADDIALTYPE ]
+.\"Invalid dial information type.
+.TP
+.RB [ CD_BADDISPOSAL ]
+Invalid disposal parameter.
+.\".TP
+.\".RB [ CD_BADFRAME ]
+.\"Defective SDU received.
+.\".TP
+.\".RB [ CD_BADPPA ]
+.\"Invalid PPA identifier.
+.TP
+.RB [ CD_BADPRIM ]
+Unrecognized primitive.
+.TP
+.RB [ CD_DISC ]
+Disconnected.
+.TP
+.RB [ CD_EVENT ]
+Protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+Device has become unusable.
+.\".TP
+.\".RB [ CD_INITFAILED ]
+.\"Line initialization failed.
+.TP
+.RB [ CD_NOTSUPP ]
+Primitive not supported by this device.
+.TP
+.RB [ CD_OUTSTATE ]
+Primitive was issued from an invalid state.
+.TP
+.RB [ CD_PROTOSHORT ]
+M_PROTO block too short.
+.\".TP
+.\".RB [ CD_READTIMEOUT ]
+.\"Read request timed out before data arrived.
+.TP
+.RB [ CD_SYSERR ]
+UNIX system error.
+.\".TP
+.\".RB [ CD_WRITEFAIL ]
+.\"Unitdata request failed.
+.PP
+.B Note:
+if the communications device is in the
+.B CD_ENABLED
+state and the input section is not active, the
+.B CD_HALT_INPUT_REQ
+primitive should be ignored and no non-fatal error generated.
+.SH FILES
+<sys/cdi.h>
+.SH "SEE ALSO"
+.BR CD_ALLOW_INPUT_REQ (7),
+.BR CD_ENABLE_REQ (7),
+.BR CD_ERROR_ACK (7),
+.BR CD_INFO_ACK (7),
+.BR CD_OK_ACK (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to CDI with Gcom extensions.
+.SH "HISTORY"
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.TA

@@ -1,0 +1,240 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: dupmsg.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DUPMSG 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B dupmsg
+\- duplicate a \fISTREAMS\fR message
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "mblk_t *dupmsg(mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I mp
+a pointer to a message to duplicate.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR dupmsg ()
+duplicates all of the message blocks of a message, keeping the same data
+blocks.
+The data blocks are reused.  Each data block will have its reference counter
+incremented.  If one duplicate message alters the data in a data block, the
+change affects all duplicate messages.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR dupmsg ()
+returns a pointer to the duplicate message.
+.PP
+Upon failure,
+.BR dupmsg ()
+returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR dupmsg ()
+fails it returns
+.BR NULL .
+.BR dupmsg ()
+fails when the passed in message pointer
+.I mp
+is
+.BR NULL ;
+or an allocation failure occurs ona message block while duplicating.
+.PP
+Normally, if
+.BR dupmsg ()
+fails and
+.I mp
+is not
+.BR NULL ,
+.BR esbbcall(9) 
+should be called with the
+.I priority
+associated with the message for which duplication failed.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR dupmsg ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR dupmsg ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B LiS
+.[
+LiS
+.]
+implements
+.BR dupmsg ()
+as a looping call to
+.BR dupb (9).
+One call is to
+.BR dupb (9)
+is made for each message block.  If
+.BR dupb (9)
+fails, the partially duplicated message is freed using
+.BR freemsg (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR dupb (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR freemsg (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR dupmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR dupmsg ()
+is compatible with LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+When
+.BR dupmsg ()
+is passed a
+.B NULL
+.I mp
+pointer, the results are undefined.  When LiS
+.BR dupmsg ()
+is passed a
+.B NULL
+.I mp
+pointer, it returns
+.BR NULL .
+.IP \(bu
+LiS used to have some problems serializing access to the reference count in
+data blocks which caused inconsistencies in the reference count when duplicate
+messages were freed.
+.PP
+Symbol
+.BR lis_dupmsg ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR dupmsg ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

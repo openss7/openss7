@@ -1,0 +1,413 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: SS7.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SS7 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "OpenSS7 SS7 Devices"
+.SH NAME
+.B SS7
+\- OpenSS7 SS7 Devices
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int " ss7_stream " = open(" ss7_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ss7_stream ", " \fRI_PUSH\fI ", " ss7_module );
+.SH DESCRIPTION
+.PP
+.SS "Devices"
+.PP
+.PP
+.B SS7
+.[
+q700
+.]
+provides the following
+.I STREAMS
+pseudo-device drivers:
+.TP
+.BR isup (4)
+.I SS7 Integrated Services Digital Network (ISDN) User Part (ISUP)
+.[
+q761
+.]
+.[
+q762
+.]
+.[
+q763
+.]
+.[
+q764
+.]
+protocol layer
+that provides a Call Control Interface,
+.BR cci (7),
+for ISUP operation,
+.BR cci_isup (7),
+and an IO Control Interface,
+.BR lmi_ioctl (4),
+for ISUP operation,
+.BR isup_ioctl (4).
+.TP
+.BR bicc (4)
+.I SS7 Bearer Independent Call Control (BICC)
+.[
+q1902
+.]
+protocol layer
+that provides a Call Control Interface,
+.BR cci (7),
+for BICC operation,
+.BR cci_bicc (7),
+and an IO Control Interface,
+.BR lmi_ioctl (4),
+for BICC operation,
+.BR bicc_ioctl (4).
+.TP
+.BR tcap (4)
+.I SS7 Transaction Capabilities Application Part (TCAP)
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+protocol layer
+that provides a TCAP,
+.BR tcapi (7),
+TPI interface,
+.BR tpi (7),
+for TCAP operation,
+.BR tpi_tcap (7),
+and XTI interface,
+.BR xti (3),
+for TCAP operation,
+.BR xti_tcap (3),
+and an IO Control Interface,
+.BR lmi_ioctl (4),
+for TCAP operation,
+.BR tcap_ioctl (4).
+.TP
+.BR sccp (4)
+.I SS7 Signalling Connection Control Part (SCCP)
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+protocol layer
+that provides an SCCP,
+.\"
+.BR sccpi (7),
+NPI interface,
+.BR npi (7),
+for SCCP operation,
+.BR npi_sccp (7),
+TPI interface,
+.BR tpi (7),
+for SCCP operation,
+.BR tpi_sccp (7),
+and XTI interface,
+.BR xti (3),
+for SCCP operation,
+.BR xti_sccp (3),
+.\"
+and an IO Control Interface,
+.BR lmi_ioctl (4),
+for SCCP operation,
+.BR sccp_ioctl (4).
+.TP
+.BR mtp (4)
+.I SS7 Message Transfer Part (MTP) Level 3
+.[
+q704
+.]
+protocol layer
+that provides an MTP,
+.\"
+.BR mtpi (7),
+NPI interface,
+.BR npi (7),
+for MTP operation,
+.BR npi_mtp (7),
+TPI interface,
+.BR tpi (7),
+for MTP operation,
+.BR tpi_mtp (7),
+and XTI interface,
+.BR xti (3),
+for MTP operation,
+.BR xti_mtp (3),
+.\"
+and an IO Control Interface,
+.BR lmi_ioctl (4),
+for MTP operation,
+.BR mtp_ioctl (4).
+.SS Modules
+.PP
+.PP
+.B SS7
+.[
+q700
+.]
+provides the following pushable
+.I STREAMS
+modules:
+.TP
+.BR sl (4)
+.IR "Signalling Link Interface" ,
+.[
+q703
+.]
+.BR sli (7),
+module that can be pushed on a stream that conforms to the
+Signalling Data Terminal Interface,
+.BR sdti (7).
+It also provides a
+Communications Device Interface,
+.BR cdi (7),
+or Data Link Provider Interface,
+.BR dlpi (7).
+for SS7 MTP2 Links.
+.\"
+.TP
+.BR sdt (4)
+.IR "Signalling Data Terminal Interface" ,
+.[
+q702
+.]
+.BR sdti (7),
+module that can be pushed on a stream that conforms to the
+Signalling Data Link Interface,
+.BR sdli (7).
+.\"
+.TP
+.BR sdl (4)
+.IR "Signalling Data Link Interface" ,
+.[
+q701
+.]
+.BR sdli (7),
+module that can be pushed on a stream that conforms to the
+Channel Interface,
+.BR chi (7).
+.\"
+.SS "Drivers"
+.PP
+.PP
+.B SS7
+.[
+q700
+.]
+support is provided for the following
+.I STREAMS
+device drivers:
+.TP
+.BR acb56 (4)
+.I ACB56 V.35
+card driver that provides a Signalling Data Terminal,
+.BR sdti (7),
+interface.
+.BR sl (4),
+modules can be pushed over this device to provide the MTP Level 3 Signalling
+Link,
+.BR sli (7),
+interface.
+.TP
+.BR x400p (4)
+.I T400P-SS7 and E400P-SS7 4-span T1/E1
+card driver that provides a Channel,
+.BR chi (7),
+Multiplex,
+.BR mxi (7),
+Signalling Data Link,
+.BR sdli (7),
+Signalling Data Terminal,
+.BR sdti (7),
+and Signalling Link,
+.BR sli (7)
+interface.
+.BR sdt (4),
+and
+.BR sl (4)
+modules can be pushed over the
+.BR sdli (7)
+device to form a complete SS7 MTP Level 2 signalling link, or the
+.BR sli (7)
+interface can be used directly.
+.TP
+.BR x100p (4)
+.I T100P-SS7 and E100P-SS7 1-span T1/E1
+card driver that provides a Channel,
+.BR chi (7),
+Multiplex,
+.BR mxi (7),
+Signalling Data Link,
+.BR sdli (7),
+Signalling Data Terminal,
+.BR sdti (7),
+and Signalling Link,
+.BR sli (7)
+interface.
+.BR sdt (4),
+and
+.BR sl (4)
+modules can be pushed over the
+.BR sdli (7)
+device to form a complete SS7 MTP Level 2 signalling link, or the
+.BR sli (7)
+interface can be used directly.
+.SH NOTICES
+.PP
+The devices
+.BR isup (4),
+.BR bicc (4),
+.BR tcap (4),
+.BR sccp (4),
+and
+.BR mtp (4)
+might be opened indirectly when opening any of the
+.BR SIGTRAN (4)
+equivalents:
+.BR isua (4),
+.BR bua (4),
+.BR tua (4),
+.BR sua (4),
+or
+.BR m3ua (4).
+.\".SH BUGS
+.PP
+.\".SH FILES
+.PP
+.SH DEVICES
+.PP
+.IR /dev/isup ,
+.IR /dev/bicc ,
+.IR /dev/tacp ,
+.IR /dev/tcap-tpi-cl ,
+.IR /dev/tcap-tpi-co ,
+.IR /dev/sccp ,
+.IR /dev/sccp-npi ,
+.IR /dev/sccp-tpi-cl ,
+.IR /dev/sccp-tpi-co ,
+.IR /dev/mtp ,
+.IR /dev/mtp-npi ,
+.IR /dev/mtp-tpi-cl ,
+.IR /dev/mtp-tpi-co ,
+.IR /dev/acb56 ,
+.IR /dev/x400p ,
+.IR /dev/x400p-ch ,
+.IR /dev/x400p-mx ,
+.IR /dev/x100p ,
+.IR /dev/x100p-ch ,
+.IR /dev/x100p-mx .
+.SH "SEE ALSO"
+.PP
+.BR ss7confd (8),
+.BR SIGTRAN (4),
+.BR ISDN (4),
+.BR MG (4).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B strss7
+release $Name:  $($Revision: 0.9.2.1 $).
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

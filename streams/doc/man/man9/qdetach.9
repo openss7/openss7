@@ -1,0 +1,234 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qdetach.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QDETACH 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qdetach
+\- detach a module from a \fISTREAMS\fR file.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.sp
+.PD 0
+.HP
+.BI "int qdetach(queue_t *" rq ", int " flags ", cred_t *" crp );
+.HP
+.BI "lis_qdetach(queue_t *" q ", int " do_close ", int " flag ", cred_t *" credp );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I rq
+a pointer to the read queue of the queue pair for the module or drvier being
+detached.
+.TP
+.I flags
+the close flags.
+.TP
+.I crp
+a pointer to the credentials of the closing user.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qdetach ()
+is called when the
+.B I_POP
+command is issued to a
+.IR STREAMS (4)
+character special file.  See
+.BR streamio (7)
+for more information on
+.BR I_POP .
+.PP
+.BR qdetach ()
+is responsible for calling the module's
+.BR qclose (9)
+routine, unlinking the queue pair from the stream, and calling
+.BR freeq (9)
+to deallocate the queue pair.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon succes,
+.BR qdetach ()
+returns zero (0).  Upon failure,
+.BR qdetach ()
+returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR qdetach ()
+fails, it returns an appropriate negative error number as follows:
+.PP
+In addition, any error returned by the module's
+.BR qclose (9)
+function can be returned by
+.BR qdetach ().
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qdetach ()
+should only be called from user context or from within a
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qdetach ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qdetach ()
+is an internal
+.I STREAMS
+function which was not intended to be called by the
+.I STREAMS
+module or driver writer.
+.BR qdetach ()
+is not part of the DDI/DKI adn should not be called by portable programs.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qattach (9),
+.BR qopen (9),
+.BR qclose (9),
+.BR open (2s),
+.BR close (2s),
+.BR streamio (7).
+.\"
+.\"
+.SH BUGS
+.BR qdetach ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Symbol
+.BR lis_qdetach ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_qdetach ()
+simply calls
+.BR qdetach ().
+SVR 4.2 and
+.IR Solaris \(rg
+do not export this function.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR qdetach ()
+is consistent with the description of the internal
+.BR qdetach ()
+function of
+SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qdetach ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,268 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: lis_register_strmod.9lis,v 0.9 2004/02/29 19:07:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LIS_REGISTER_STRMOD 9 "$Date: 2004/02/29 19:07:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.SH NAME
+.B lis_register_strmod
+\- register a \fISTREAMS\fR module
+.SH SYNOPSIS
+.PP
+.B #include <linux/stream.h>
+.HP 8
+.BI "modID_t " modid " = lis_register_strmod(struct streamtab *" strtab ", const char *" name );
+.SH DESCRIPTION
+.PP
+.BR lis_register_strmod ()
+registers a new
+.IR STREAMS (4)
+module identified by
+.I name
+and allocates a module identifier to the module.
+Once a
+.IR STREAMS (4)
+module is registered, it can be pushed on other streams by
+.I name
+with
+.B I_PUSH ,
+see
+.BR streamio (7).
+.PP
+.BR lis_register_strmod ()
+is an
+.BR LiS -specific
+function.
+.[
+LiS
+.]
+.IR STREAMS (4)
+modules registered with
+.BR lis_register_strmod ()
+can be deregistered with
+.BR lis_unregister_strmod (9).
+.SS "Linux Kernel Module Loading"
+.PP
+When compiled with
+.B LIS_LOADABLE_SUPPORT
+indicating that
+.B LiS
+.[
+LiS
+.]
+has loadable
+.IR STREAMS (4)
+module support,
+.B LiS
+.[
+LiS
+.]
+has the feature that if a module name is unassigned and an attempt is made to
+push a module with the name,
+.B LiS
+.[
+LiS
+.]
+attempts to load the
+.B Linux
+kernel module
+\fB\)streams-\fI\)MODNAME\fR\),
+where
+.I MODNAME
+is the name of the module which is being pushed.
+If loading the
+.B Linux
+kernel module
+\fB\)streams-\fI\)MODNAME\fR\),
+is successful and the loaded
+.B Linux
+kernel module registers the
+.I MODNAME
+.IR STREAMS (4)
+module using
+.BR lis_register_strmod () ,
+the push operation that initiated the loading of the
+.B Linux
+kernel module will succeed.
+.SH RETURN
+.PP
+Upon success,
+.BR lis_register_strmod ()
+returns a positive integer module identifier.
+.PP
+Upon failure,
+.BR lis_register_strmod ()
+returns a
+.BR LIS_NULL_MID .
+.SH ERRORS
+.PP
+When
+.BR lis_register_strmod ()
+fails, it returns
+.B LIS_NULL_MID
+and does not return an informative error number.
+.BR lis_register_strmod ()
+fails when
+.I name
+is
+.BR NULL ;
+.I name
+is already used by another registered
+.IR STREAMS (4)
+module; or,
+.B LiS
+.[
+LiS
+.]
+cannot allocate a free module identifier.
+.SH NOTICES
+.PP
+.BR lis_register_strmod ()
+should return an informative error number instead of just returning
+.B LIS_NULL_MID
+on failure.
+.PP
+.BR lis_regsiter_strmod ()
+currently uses a fixed-size table for modules.  Once the table is full, any
+attempt to register an additional module will fail.
+.B LiS
+.[
+LiS
+.]
+should implement the module switch table as a linked list and allocate module
+structures dynamically.
+.SH EXAMPLES
+.PP
+The following is an example of a
+.IR STREAMS (4)
+module which dynamically registers
+using
+.BR lis_register_strdmod ().
+.sp
+.nf
+\fC\s-2\
+#define X_MOD_NAME "example"
+
+int x_initialized = 0;
+
+void x_init(void)
+{
+    unless(x_initialized > 0, return);
+    if ((x_initialized = lis_register_strmod(&x_info, X_MOD_NAME))
+	== LIS_NULL_MID) {
+	cmn_err(CE_WARN, "%s: couldn't register module", X_MOD_NAME);
+    }
+    return;
+}
+void x_terminate(void)
+{
+    ensure(x_initialized > 0, return);
+    if ((x_initialized = lis_unregister_strmod(&x_info)) < 0) {
+	cmn_err(CE_PANIC, "%s: couldn't unregister module", X_MOD_NAME);
+    }
+    return;
+}
+\s+2\fR
+.fi
+.SH "SEE ALSO"
+.PP
+.BR lis_register_strdev (9),
+.BR lis_unregister_strmod (9),
+.BR lis_unregister_strdev (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR lis_regsiter_strmod ()
+is an
+.BR LiS -specific
+function which first appeared in early versions of
+.BR LiS .
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.TI

@@ -1,0 +1,253 @@
+/*****************************************************************************
+
+ @(#) stropts.h,v 0.9.2.6 2003/10/28 08:00:07 brian Exp
+
+ -----------------------------------------------------------------------------
+
+ Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified 2003/10/28 08:00:07 by brian
+
+ *****************************************************************************/
+
+#ifndef __STROPTS_H__
+#define __STROPTS_H__
+
+#ifndef HAVE_LINUX_FAST_STREAMS
+#define HAVE_LINUX_FAST_STREAMS
+#endif				/* HAVE_LINUX_FAST_STREAMS */
+
+#ifdef __KERNEL__
+#undef STR			/* defined in some asm/hw_irq.h */
+#include <linux/types.h>	/* for pid_t */
+#endif
+
+#define __SID		('S' << 8)
+#define STR		('S'<<8)	/* for UnixWare/Solaris compatibility */
+#define I_NREAD		(__SID | 1)
+#define I_PUSH		(__SID | 2)
+#define I_POP		(__SID | 3)
+#define I_LOOK		(__SID | 4)
+#define I_FLUSH		(__SID | 5)
+#define I_SRDOPT	(__SID | 6)
+#define I_GRDOPT	(__SID | 7)
+#define I_STR		(__SID | 8)
+#define I_SETSIG	(__SID | 9)
+#define I_GETSIG	(__SID |10)
+#define I_FIND		(__SID |11)
+#define I_LINK		(__SID |12)
+#define I_UNLINK	(__SID |13)
+#define I_RECVFD	(__SID |14)	/* non-EFT definition */
+#define I_PEEK		(__SID |15)
+#define I_FDINSERT	(__SID |16)
+#define I_SENDFD	(__SID |17)
+#define I_E_RECVFD	(__SID |18)	/* Unixware: EFT definition */
+#define I_SWROPT	(__SID |19)
+#define I_GWROPT	(__SID |20)
+#define I_LIST		(__SID |21)
+#define I_PLINK		(__SID |22)
+#define I_PUNLINK	(__SID |23)
+
+#define I_FLUSHBAND	(__SID |28)
+#define I_CKBAND	(__SID |29)
+#define I_GETBAND	(__SID |30)
+#define I_ATMARK	(__SID |31)
+#define I_SETCLTIME	(__SID |32)
+#define I_GETCLTIME	(__SID |33)
+#define I_CANPUT	(__SID |34)
+
+#define I_SERROPT	(__SID |35)	/* Solaris */
+#define I_GERROPT	(__SID |36)	/* Solaris */
+#define I_ANCHOR	(__SID |37)	/* Solaris */
+
+#define I_S_RECVFD	(__SID |35)	/* UnixWare */
+#define I_STATS		(__SID |36)	/* UnixWare */
+#define I_BIGPIPE	(__SID |37)	/* UnixWare */
+#define I_GETTP		(__SID |38)	/* UnixWare */
+
+#define I_AUTOPUSH	(__SID |48)	/* Mac OT */
+#define I_HEAP_REPORT	(__SID |50)	/* Mac OT */
+#define I_FIFO		(__SID |51)	/* Mac OT */
+
+#define I_PUTPMSG	(__SID |250)	/* LiS, 41 on Mac OT */
+#define I_GETPMSG	(__SID |251)	/* LiS, 40 on Mac OT */
+#define I_FATTACH	(__SID |252)	/* LiS */
+#define I_FDETACH	(__SID |253)	/* LiS */
+#define I_PIPE		(__SID |254)	/* LiS, 49 on Mac OT */
+
+#define INFTIM		(-1UL)
+
+#define FMNAMESZ	8	/* compatibility w/UnixWare/Solaris.  */
+
+#define FLUSHR		(1<<0)	/* Flush read queues.  */
+#define FLUSHW		(1<<1)	/* Flush write queues.  */
+#define FLUSHRW		(FLUSHR|FLUSHW)	/* Flush read and write queues.  */
+#define FLUSHBAND	(1<<2)	/* Flush only specified band.  */
+
+#ifdef __KERNEL__
+#define S_INPUT_BIT	0
+#define S_HIPRI_BIT	1
+#define S_OUTPUT_BIT	2
+#define S_MSG_BIT	3
+#define S_ERROR_BIT	4
+#define S_HANGUP_BIT	5
+#define S_RDNORM_BIT	6
+#define S_WRNORM_BIT	S_OUTPUT_BIT
+#define S_RDBAND_BIT	7
+#define S_WRBAND_BIT	8
+#define S_BANDURG_BIT	9
+#endif
+
+/* SIGPOLL bits */
+#define S_INPUT		(1<<0)
+#define S_HIPRI		(1<<1)
+#define S_OUTPUT	(1<<2)
+#define S_MSG		(1<<3)
+#define S_ERROR		(1<<4)
+#define S_HANGUP	(1<<5)
+#define S_RDNORM	(1<<6)
+#define S_WRNORM	S_OUTPUT
+#define S_RDBAND	(1<<7)
+#define S_WRBAND	(1<<8)
+#define S_BANDURG	(1<<9)
+
+#define RS_HIPRI	(1<<0)	/* only read hi priority messages */
+#define RS_EXDATA	(1<<5)	/* Mac OT */
+#define RS_ALLOWAGAIN	(1<<6)	/* Mac OT */
+#define RS_DELIMITMSG	(1<<7)	/* Mac OT */
+
+/* Mac OT gets these wrong */
+#define RNORM		(0)	/* byte-stream mode */
+#define RMSGD		(1<<0)	/* message discard mode */
+#define RMSGN		(1<<1)	/* message non-discard mode */
+#define RMODEMASK	(RNORM|RMSGD|RMSGN)	/* mode mask */
+#define RPROTDAT	(1<<2)	/* proto part as data */
+#define RPROTDIS	(1<<3)	/* proto part discarded */
+#define RPROTNORM	(1<<4)	/* proto part fail read EBADMSG */
+#define RPROTMASK	(RPROTDAT|RPROTDIS|RPROTNORM)	/* proto bit mask */
+
+#define SNDZERO		(1<<0)
+#define SNDPIPE		(1<<1)
+#define SNDHOLD		(1<<2)
+
+#define RERRNORM	(0<<0)
+#define RERRNONPERSIST	(1<<0)
+#define WERRNORM	(0<<1)
+#define WERRNONPERSIST	(1<<1)
+
+#define ANYMARK		(1<<0)
+#define LASTMARK	(1<<2)
+
+#define MUXID_ALL	(-1UL)
+
+#define MSG_HIPRI	(1<<0)
+#define MSG_ANY		(1<<1)
+#define MSG_BAND	(1<<2)
+#define MSG_DISCARD	(1<<3)	/* UnixWare */
+#define MSG_PEEKIOCTL	(1<<4)	/* UnixWare */
+
+#define MORECTL		1
+#define MOREDATA	2
+
+struct bandinfo {
+	unsigned char bi_pri;
+	int bi_flag;
+};
+
+struct strbuf {
+	int maxlen;
+	int len;
+	char *buf;
+};
+
+struct strpeek {
+	struct strbuf ctlbuf;
+	struct strbuf databuf;
+	long flags;
+};
+
+struct strfdinsert {
+	struct strbuf ctlbuf;		/* ctrl part for putmsg(2) */
+	struct strbuf databuf;		/* data part for putmsg(2) */
+	long flags;			/* flags for putmsg(2) */
+	int fildes;			/* file descriptor to insert *//* Mac OT has long here */
+	int offset;			/* offset within control part for insertion */
+};
+
+struct strioctl {
+	int ic_cmd;			/* command to perform */
+	int ic_timout;			/* ioctl timeout period */
+	int ic_len;			/* size of data buffer */
+	char *ic_dp;			/* addr of data buffer */
+};
+
+struct strrecvfd {
+	int fd;
+	uid_t uid;
+	gid_t gid;
+	char __fill[8];			/* UnixWare/Solaris compatibility */
+};
+
+struct str_mlist {
+	char l_name[FMNAMESZ + 1];
+};
+
+struct str_list {
+	int sl_nmods;
+	struct str_mlist *sl_modlist;
+};
+
+struct strsigset {
+	pid_t ss_pid;
+	long ss_events;
+};
+
+/* for ioctl emulation of getmsg() getpmsg() putmsg() putpmsg() */
+/* matches Mac OT */
+struct strpmsg {
+	struct strbuf ctlbuf;
+	struct strbuf databuf;
+	int band;
+	long flags;
+};
+
+#endif				/* __STROPTS_H__ */

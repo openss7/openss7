@@ -1,0 +1,1028 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: isdn_ioctl.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ISDN 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "OpenSS7 ISDN Devices"
+.\"
+.\"
+.SH NAME
+.B IDSN
+\- Integrated Services Digital Network (ISDN) Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/isdni.h>
+.br
+.B #include <ss7/isdni_ioctl.h>
+.\"
+.\"
+.HP
+.BI "int " isdn_stream " = open(" device ", " flag );
+.\"
+.\"
+.HP
+.BI "int " isdn_xtistr " = t_open(" device ", " flag );
+.\"
+.\"
+.HP
+.BI "int " isdn_socket " = socket(" \fRPF_ISDN\fR ", " socket_type ", " \fRSS7PROTO_ISDN\fI );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ISDN
+is an implementation of the Integrated Services Digital Network (ISDN) Layer 3
+as defined in ITU-T Recommendation Q.931.
+.B ISDN
+provides a reliable sequenced delivery of call control messages over a
+connection oriented data link between an ISDN User and an ISDN Network.
+.B ISDN
+provides strong assurances that the data arrives in order on a stream and
+performs retransmission of lost packets.  It generates an checks a per-packet
+checksum to catch transmission errors.
+.\"
+.\"
+.PP
+.B ISDN
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver.
+.BR dl "(4) or " iua (4)
+streams are linked under the
+.B ISDN
+multiplexing driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide data link services to
+.BR ISDN .
+Once linked, the streams are configured using
+.BR isdn_ioctl (4).
+.\"
+.\"
+.PP
+.B ISDN
+provides the stream types listed below.  To select a stream,
+.I device
+can be selected from the following:
+.\"
+.\"
+.TP
+.I /dev/isdn
+This device provides the
+.B ISDN
+protocol service interface using the Call Control Interface (CCI) described in
+.BR cci (7).
+This interface is suitable for use with other SS7 modules and the
+.B OpenSwitch
+call control libraries.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SS Options
+.PP
+.\"
+.\"
+.PP
+Options can be got and set using the
+.B isdn_option
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  OPTIONS
+.\" */
+typedef struct isdn_option {
+    ulong type;                 /* object type */
+    ulong id;                   /* object id */
+    /* followed by object-specific options structure */
+} isdn_option_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.TP
+.B ISDN_IOCGOPTIONS
+Get the options for the object of type
+.I type
+and identifier
+.IR id .
+.I arg
+is a pointer to a
+.B isdn_option
+structure.
+.\"
+.\"
+.TP
+.B ISDN_IOCSOPTIONS
+Set the options for the object of type
+.I type
+and identifier
+.IR id .
+.I arg
+is a pointer to a
+.B isdn_option
+structure.
+.\"
+.\"
+.SS Configuration
+.PP
+.\"
+.\"
+.PP
+Configuration can be managed using the IO controls described here.  For
+configuration IO controls,
+.I arg
+points to a
+.B isdn_config
+structure followed by an object type specific configuration structure
+described under
+.BR \*(lqOBJECTS\*(rq ,
+below.
+.\"
+.\"
+.TP
+.B ISDN_IOCGCONFIG
+Get the configuration for the specified object and as many children as will
+fit in the provided buffer.
+.\"
+.\"
+.TP
+.B ISDN_IOCSCONFIG
+Set the configuration for the specified object.
+.\"
+.\"
+.TP
+.B ISDN_IOCTCONFIG
+Test the configuration for the specified object.
+.\"
+.\"
+.TP
+.B ISDN_IOCCCONFIG
+Commit the configuration for the specified object.
+.\"
+.\"
+.PP
+The
+.B isdn_config
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  CONFIGURATION
+.\" */
+typedef struct isdn_config {
+    ulong type;                 /* object type */
+    ulong id;                   /* object id */
+    ulong cmd;                  /* object command */
+    /* followed by object-specific configuration structure */
+} isdn_config_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+In the
+.B isdn_config
+structure,
+.IR id ,
+is an identifier for the object or zero (0) on
+.B ISDN_ADD
+if the driver should assign a unique object identifier;
+.IR type ,
+specifies the object type to which the identifier applies;
+and
+.IR cmd ,
+is the action to perform on the object.
+.I cmd
+can be one of the following values:
+.BR ISDN_GET ,
+gets the object configuration and as many children of the object as will fit
+in the supplied buffer;
+.BR ISDN_ADD ,
+adds an object with the given
+.IR id ,
+or if the
+.I id
+is zero (0), assigns a new identifier for the newly created object;
+.BR ISDN_CHA ,
+changes the configuration of the specified object; and
+.BR ISDN_DEL ,
+deletes the specified object.
+.\"
+.\"
+.SS State
+.PP
+.\"
+.\"
+.PP
+.I arg
+points to a
+.B isdn_statem
+structure followed by an object type specific state structure described under
+.BR \*(lqOPTIONS\*(rq ,
+below.
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  STATE
+.\" */
+typedef struct isdn_statem {
+    ulong type;                 /* object type */
+    ulong id;                   /* object id */
+    ulong flags;                /* object primary flags */
+    ulong state;                /* object primary state */
+    /* followed by object-specific state structure */
+} isdn_statem_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+In the
+.B isdn_statem
+structure,
+.IR id ,
+is an identifier for the object or zero (0) for all objects of a type;
+.IR type ,
+is the object type as described in
+.BR \*(lqOBJECTS\*(rq ,
+below;
+.IR flags ,
+are the state flags associated with the object;
+.IR state ,
+is the primary state of the object.
+.IR flags " and " state
+are specific to the object and are described under
+.BR \*(lqOBJECTS\*(rq ,
+below.
+.\"
+.\"
+.TP
+.B ISDN_IOCGSTATEM
+.\"
+.\"
+.TP
+.B ISDN_IOCCMRESET
+.\"
+.\"
+.SS Statistics
+.PP
+.\"
+.\"
+.PP
+.I arg
+points to a
+.B isdn_stats
+structure followed by an object type specific statistics structure described
+under
+.BR \*(lqOPTIONS\*(rq ,
+below.
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  STATISTICS
+.\" */
+typedef struct isdn_stats {
+    ulong type;                 /* object type */
+    ulong id;                   /* object id */
+    ulong header;               /* object stats header */
+    /* followed by object-specific stats structure */
+} isdn_stats_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+In the
+.B isdn_stats
+structure,
+.IR id ,
+is the object identifier;
+.IR type ,
+is the type of the object;
+.IR header ,
+is a timestamp indicating the time of the statistics report.
+.\"
+.\"
+.TP
+.B ISDN_IOCGSTATSP
+Get the statistics periods.
+.\"
+.\"
+.TP
+.B ISDN_IOCSSTATSP
+Set the statistics periods.
+.\"
+.\"
+.TP
+.B ISDN_IOCGSTATS
+Collect statistics.
+.\"
+.\"
+.TP
+.B ISDN_IOCCSTATS
+Clear statistics.
+.\"
+.\"
+.SS Events
+.PP
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  EVENTS
+.\" */
+typedef struct isdn_notify {
+    ulong type;                 /* object type */
+    ulong id;                   /* object id */
+    lmi_notify_t notify;        /* notifications */
+} isdn_notify_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+In the
+.B isdn_notify
+structure,
+.IR id ,
+is the object identifier; and
+.IR type ,
+is the type of the object.
+.\"
+.\"
+.TP
+.B ISDN_IOCGNOTIFY
+.\"
+.\"
+.TP
+.B ISDN_IOCSNOTIFY
+.\"
+.\"
+.TP
+.B ISDN_IOCCNOTIFY
+.\"
+.\"
+.SS Management
+.PP
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  ISDN MANAGEMENT
+.\" */
+typedef struct isdn_mgmt {
+    ulong type;                 /* object type */
+    ulong id;                   /* object id */
+    ulong cmd;                  /* command */
+} isdn_mgmt_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+In the
+.B isdn_mgmt
+structure,
+.IR id ,
+is the object identifier;
+.IR type ,
+is the type of the object; and
+.IR cmd ,
+is the management action to perform on the object.
+.I cmd
+can be one of the following:
+.RS
+.\"
+.\"
+.TP
+.B ISDN_MGMT_BLOCK
+Applicable to all objects, this action will have the effect of blocking all
+B-channels that are children of the object.
+.\"
+.\"
+.TP
+.B ISDN_MGMT_UNBLOCK
+Applicable to all objects, this action will have the effect of unblocking all
+B-channels that are children of the object.
+.\"
+.\"
+.TP
+.B ISDN_MGMT_RESET
+Applicable to all objects, this action will have the effect of resetting all
+B-channels that are children of the object.
+.\"
+.\"
+.TP
+.B ISDN_MGMT_QUERY
+Applicable to all object, this action will have the effect of querying all
+B-channels that are children of the object.
+.RE
+.\"
+.\"
+.TP
+.B ISDN_IOCCMGMT
+.\"
+.\"
+.SS Passalong
+.PP
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  CONTROL LOWER
+.\" */
+typedef struct isdn_pass {
+    ulong muxid;                /* mux index of lower DL to
+                                   pass message to */
+    ulong type;                 /* type of message block */
+    ulong band;                 /* band of message block */
+    ulong ctl_length;           /* length of cntl part */
+    ulong dat_length;           /* length of data part */
+    /* followed by cntl and data part of message to pass to DL */
+} isdn_pass_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.TP
+.B ISDN_IOCCPASS
+.\"
+.\"
+.SH OBJECTS
+.PP
+.B ISDN
+provides for management of a number of managed objects.  These objects are of
+a number of types as follows:
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_DF
+The default object.
+.RS
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Data Link specific structures
+ *  -----------------------------------
+ */
+typedef struct isdn_conf_dl {
+    ulong muxid;                /* lower multiplexer id */
+    ulong fgid;                 /* facility group controlled by 
+                                   this data link */
+    ulong tgid;                 /* transmission group for data
+                                   link */
+    ulong ts;                   /* timeslot in transmission
+                                   group */
+    struct dl_addr loc;         /* local address */
+    struct dl_addr rem;         /* remote address */
+    lmi_option_t proto;         /* protocol options */
+} isdn_conf_dl_t;
+
+typedef struct isdn_opt_conf_dl {
+} isdn_opt_conf_dl_t;
+
+typedef struct isdn_timers_dl {
+} isdn_timers_dl_t;
+
+typedef struct isdn_statem_dl {
+    isdn_timers_dl_t timers;
+    ulong mgm_actv;
+    ulong xry_actv;
+} isdn_statem_dl_t;
+
+typedef struct isdn_stats_dl {
+} isdn_stats_dl_t;
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_CC
+Call Control User.  A call control user is an ISDN user object.  This object
+refers to an ISDN user object.  For example, an open
+.B ISDN
+stream is an ISDN User object.  ISDN User objects are identified by their
+ISDN-SAP.
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_CR
+Call Reference.  A call reference is a reference to a call independent of the
+B-channel that the call corresponds to.  This is to support network
+suspend/resume where the call is detached from the B-channel and then
+associated with a new B-channel when it is resumed.  Calls belong to a
+facility group and a call control interface and call management interface.  A
+call has a list of channels which are being used for the call.
+.RS
+.sp
+.nf
+\fC\s-1\
+.\"/*
+.\" *  Call specific structures
+.\" *  -----------------------------------
+.\" *  Calls belong to a facility group and a call control interface and call
+.\" *  management interface.  A call has a list of channels which are being used
+.\" *  for the call.
+.\" */
+typedef struct isdn_conf_cr {
+    ulong fgid;                 /* facility group identifier */
+    ulong ccid;                 /* call control idenitifer */
+    ulong cmid;                 /* call management identifier */
+    /* followed by a list channel configurations */
+} isdn_conf_cr_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.TP
+.I fgid
+.\"
+.\"
+.TP
+.I ccid
+.\"
+.\"
+.TP
+.I cmid
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-1\
+typedef struct isdn_opt_conf_cr {
+} isdn_opt_conf_cr_t;
+\fR\s+1
+.fi
+.sp
+.nf
+\fC\s-1\
+typedef struct isdn_timers_cr {
+    ulong t301;                 /* ISDN T301 timer */
+    ulong t302;                 /* ISDN T302 timer */
+    ulong t303;                 /* ISDN T303 timer */
+    ulong t304;                 /* ISDN T304 timer */
+    ulong t305;                 /* ISDN T305 timer */
+    ulong t306;                 /* ISDN T306 timer */
+    ulong t307;                 /* ISDN T307 timer */
+    ulong t308;                 /* ISDN T308 timer */
+    ulong t309;                 /* ISDN T309 timer */
+    ulong t310;                 /* ISDN T310 timer */
+    ulong t312;                 /* ISDN T312 timer */
+    ulong t313;                 /* ISDN T313 timer */
+    ulong t314;                 /* ISDN T314 timer */
+    ulong t316;                 /* ISDN T316 timer */
+    ulong t317;                 /* ISDN T317 timer */
+    ulong t318;                 /* ISDN T318 timer */
+    ulong t319;                 /* ISDN T319 timer */
+    ulong t320;                 /* ISDN T320 timer */
+    ulong t321;                 /* ISDN T321 timer */
+    ulong t322;                 /* ISDN T322 timer */
+} isdn_timers_cr_t;
+
+typedef struct isdn_statem_cr_t {
+    isdn_timers_cr_t timers;
+    ulong t303_count;           /* count of T303 timeouts */
+    ulong t308_count;           /* count of T308 timeouts */
+} isdn_statem_cr_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.TP
+.I timers
+.\"
+.\"
+.TP
+.I t303_count
+.\"
+.\"
+.TP
+.I t308_count
+.\"
+.\"
+.PP
+.sp
+.nf
+\fC\s-1\
+typedef struct isdn_stats_cr {
+} isdn_stats_cr_t;
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_CH
+A Channel (B-Channel).  Each channel object corresponds to a single B-Channel
+for which call processing is being performed.  Each B-Channel can be engaged
+in a call with a Call Control User and can be engaged in B-Channel Management
+with a Management User.  Each channel belongs to a Channel (B-Channel) Group
+and a Signalling (D-Channel) Group.
+.RS
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Channel specific structures
+ *  -----------------------------------
+ *  Channels belong to an tranmission group (all channels and data links
+ *  sharing the same transmission facility: i.e. PRI span) and a facility
+ *  group whose d-channels are responsible for call control for this
+ *  channel.
+ */
+typedef struct isdn_conf_ch {
+	ulong fgid;				/* facility group identifier */
+	ulong tgid;				/* transmission group identifier */
+	ulong ts;				/* timeslot in transmission group */
+	/* followed by a null list */
+} isdn_conf_ch_t;
+
+typedef struct isdn_opt_conf_ch {
+} isdn_opt_conf_ch_t;
+
+typedef struct isdn_timers_ch {
+} isdn_timers_ch_t;
+
+typedef struct isdn_statem_ch {
+	isdn_timers_ch_t timers;
+	ulong mgm_bind;
+	ulong mnt_bind;
+	ulong xry_bind;
+	ulong icc_bind;
+	ulong ogc_bind[0];
+} isdn_statem_ch_t;
+
+typedef struct isdn_stats_ch {
+} isdn_stats_ch_t;
+
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_TG
+Transmission Group.  A transmission group is a set of B-Channels and
+D-Channels that share the same tranmission facility (i.e. are time-slots in
+the same PRI interface).  Each transmission group consists of a set of
+channels and data links that use the transmission facility.  Each transmission
+group can be engaged in transmission group management with a Management User.
+Each transmission group belongs to a remote Equipment Group.
+.RS
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Transmission Group specific structures
+ *  -----------------------------------
+ *  Each transmission group belongs to an equipment group (all equipment
+ *  connecting the same two endpoints).
+ */
+typedef struct isdn_conf_tg {
+	ulong egid;				/* equipment group identifier */
+	lmi_option_t proto;			/* protocol options */
+	/* followed by list of data link configurations */
+	/* followed by list of channel configurations */
+} isdn_conf_tg_t;
+
+typedef struct isdn_opt_conf_tg {
+} isdn_opt_conf_tg_t;
+
+typedef struct isdn_timers_tg {
+} isdn_timers_tg_t;
+
+typedef struct isdn_statem_tg {
+	isdn_timers_tg_t timers;
+	ulong mgm_actv;
+	ulong mgm_bind;
+	ulong mnt_bind;
+	ulong xry_bind;
+	ulong icc_bind;
+	ulong ogc_bind[0];
+} isdn_statem_tg_t;
+
+typedef struct isdn_stats_tg {
+} isdn_stats_tg_t;
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_FG
+Facility Group.  A facility group is a set of B-channels and a set of
+D-channels which provide signalling for the B-channels.  Typically there is
+only one D-channel in a facility group.  Where multiple D-channels are used as
+primary-backup or using some other redundancy scheme, the facility group
+contains more than one D-channel.  Each facility group consists of a list of
+data links (D-channels) and a list of B-channels that are controlled by
+D-channels in the facility group.  Each facility group can be engaged in
+facility group management with a Management user.  Each facility group belongs
+to a local Equipment Group.
+.RS
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Facility Group specific structures
+ *  -----------------------------------
+ *  Each facility group belongs to an equipment group (all equipment
+ *  connecting the same two endpoints).
+ */
+typedef struct isdn_conf_fg {
+	ulong egid;				/* equipment group identifier */
+	lmi_option_t proto;			/* protocol options */
+	/* followed by list of data link configurations */
+	/* followed by list of channel configurations */
+} isdn_conf_fg_t;
+
+typedef struct isdn_opt_conf_fg {
+	ulong t301;				/* ISDN T301 timer */
+	ulong t302;				/* ISDN T302 timer */
+	ulong t303;				/* ISDN T303 timer */
+	ulong t304;				/* ISDN T304 timer */
+	ulong t305;				/* ISDN T305 timer */
+	ulong t306;				/* ISDN T306 timer */
+	ulong t307;				/* ISDN T307 timer */
+	ulong t308;				/* ISDN T308 timer */
+	ulong t309;				/* ISDN T309 timer */
+	ulong t310;				/* ISDN T310 timer */
+	ulong t312;				/* ISDN T312 timer */
+	ulong t313;				/* ISDN T313 timer */
+	ulong t314;				/* ISDN T314 timer */
+	ulong t316;				/* ISDN T316 timer */
+	ulong t317;				/* ISDN T317 timer */
+	ulong t318;				/* ISDN T318 timer */
+	ulong t319;				/* ISDN T319 timer */
+	ulong t320;				/* ISDN T320 timer */
+	ulong t321;				/* ISDN T321 timer */
+	ulong t322;				/* ISDN T322 timer */
+} isdn_opt_conf_fg_t;
+
+typedef struct isdn_timers_fg {
+} isdn_timers_fg_t;
+
+typedef struct isdn_statem_fg {
+	isdn_timers_fg_t timers;
+	ulong mgm_actv;
+	ulong xry_actv;
+	ulong mgm_bind;
+	ulong mnt_bind;
+	ulong xry_bind;
+	ulong icc_bind;
+	ulong ogc_bind[0];
+} isdn_statem_fg_t;
+
+typedef struct isdn_stats_fg {
+} isdn_stats_fg_t;
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_EG
+Equipment Group.  An equipment group is a set of transmission groups and
+facility groups attached to the same network switching equipment (for User
+mode interfaces) or attached to the same customer premises equipment (Network
+mode ineterfaces).  Each equipment group is a set of transmission and facility
+groups all attached to the same remote equipment.
+.RS
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Equipment Group specific structures
+ *  -----------------------------------
+ */
+typedef struct isdn_conf_eg {
+	ulong xgid;				/* exchange group identifier */
+	lmi_option_t proto;			/* protocol options */
+	/* followed by list of facility group configurations */
+	/* followed by list of transmission group configurations */
+} isdn_conf_eg_t;
+
+typedef struct isdn_opt_conf_eg {
+} isdn_opt_conf_eg_t;
+
+typedef struct isdn_timers_eg {
+} isdn_timers_eg_t;
+
+typedef struct isdn_statem_eg {
+	isdn_timers_eg_t timers;
+	ulong mgm_actv;
+	ulong mgm_bind;
+	ulong mnt_bind;
+	ulong xry_bind;
+	ulong icc_bind;
+	ulong ogc_bind[0];
+} isdn_statem_eg_t;
+
+typedef struct isdn_stats_eg {
+} isdn_stats_eg_t;
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_XG
+Exchange Group.  A exchange group is a set of equipment groups attached to the
+same provider (for User mode interfaces) or customer (for Network mode
+interfaces).  Each exchange group is a set of equipment groups.
+.RS
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Exchange Group specific structures
+ *  -----------------------------------
+ */
+typedef struct isdn_conf_xg {
+	lmi_option_t proto;			/* protocol options */
+	/* followed by list of equipment group configurations */
+} isdn_conf_xg_t;
+
+typedef struct isdn_opt_conf_xg {
+} isdn_opt_conf_xg_t;
+
+typedef struct isdn_timers_xg {
+} isdn_timers_xg_t;
+
+typedef struct isdn_statem_xg {
+	isdn_timers_xg_t timers;
+	ulong mgm_actv;
+	ulong mgm_bind;
+	ulong mnt_bind;
+	ulong xry_bind;
+	ulong icc_bind;
+	ulong ogc_bind[0];
+} isdn_statem_xg_t;
+
+typedef struct isdn_stats_xg {
+} isdn_stats_xg_t;
+\fR\s+1
+.fi
+.RE
+.\"
+.\"
+.TP
+.B ISDN_OBJ_TYPE_DL
+Data Link (D-Channel).  A Data Link represents the interface to the lower layer
+Data Link Provider (D-Channel).  Each data link corresponds to one data link
+connection for signalling.  Multiple data links may control signalling for a
+facility group.  Each data link can be engaged in data link management with a
+Management user and can be monitored by a Monitor user.  Each Data Link
+(D-Channel) belongs to a facility group and a transmission group.
+.RS
+.sp
+.nf
+\fC\s-1\
+/*
+ *  Data Link specific structures
+ *  -----------------------------------
+ */
+typedef struct isdn_conf_dl {
+	ulong muxid;				/* lower multiplexer id */
+	ulong fgid;				/* facility group controlled by this data link */
+	ulong tgid;				/* transmission group for data link */
+	ulong ts;				/* timeslot in transmission group */
+	struct dl_addr loc;			/* local address */
+	struct dl_addr rem;			/* remote address */
+	lmi_option_t proto;			/* protocol options */
+} isdn_conf_dl_t;
+
+typedef struct isdn_opt_conf_dl {
+} isdn_opt_conf_dl_t;
+
+typedef struct isdn_timers_dl {
+} isdn_timers_dl_t;
+
+typedef struct isdn_statem_dl {
+	isdn_timers_dl_t timers;
+	ulong mgm_actv;
+	ulong xry_actv;
+} isdn_statem_dl_t;
+
+typedef struct isdn_stats_dl {
+} isdn_stats_dl_t;
+\fR\s+1
+.fi
+.RE
+
+.\"
+.\"
+.SH IOCTLS
+.PP
+
+.\"
+.\"
+.XX
+.[
+q931
+.]
+.[
+q932
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

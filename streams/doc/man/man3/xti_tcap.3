@@ -1,0 +1,326 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: xti_tcap.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH XTI-TCAP 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "X/Open Transport Interface"
+.\"
+.\"
+.SH "NAME"
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ss7.h>
+.br
+.B #include <xti_mtp.h>
+.br
+.B #include <xti_sccp.h>
+.br
+.B #include <xti_tcap.h>
+.\"
+.\"
+.HP
+.BI "int " tcap_xistr " = t_open(" device ", " flags );
+.\"
+.\"
+.SH "DESCRIPTION"
+.PP
+This section describes the protocol-sepcific information that is relevant of
+TCAP transport providers.  This section also described the protoocl-specific
+information that is relevant when TCAP services are provider over an IP
+network using SUA or TALI.
+.\"
+.\"
+.PP
+This section also defines the data structure and constants required for TCAP
+transport provider that are exposed through the
+.B <xti_tcap.h>
+header file.
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+The TCAP address format is a
+.B t_sccp_addr_t
+structure as defined in
+.BR xti_sccp (3).
+.\"
+.\"
+.SH "OPTIONS"
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+A TCAP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offerming them only in the priviledged or
+read-only mode.  TUA transport providers only support a subset of the options
+defined here.
+.\"
+.\"
+.PP
+A TCAP conforming transport provider supports four levels of options.  These
+four level are described below.
+.\"
+.\"
+.SS T_SS7_SS7
+.PP
+Options within this level are specific to Signalling System No. 7 (SS7) and
+are common to all the protocol levels in SS7.  For more information see
+.BR xti_ss7 (3).
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR
+.TP 12
+.B T_SS7_MPLEV
+.TP 12
+.B T_SS7_DEBUG
+.TP 12
+.B T_SS7_CLUSTER
+.\"
+.\"
+.SS T_SS7_MTP
+.PP
+Options within this level are specific to the Message Transfer Part (MTP), yet
+are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.TP 12
+.B T_MTP_SLS
+.TP 12
+.B T_MTP_MP
+.\"
+.\"
+.SS T_SS7_SCCP
+.PP
+Options within this level are specific to the Signalling Connection Control
+Part (SCCP), yet are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.TP 12
+.B T_SCCP_SEQ_CTRL
+.TP 12
+.B T_SCCP_PRIORITY
+.TP 12
+.B T_SCCP_PCLASS
+.TP 12
+.B T_SCCP_IMPORTANCE
+.TP 12
+.B T_SCCP_RET_ERROR
+.\"
+.\"
+.SS T_SS7_TCAP
+.PP
+Options within this level are specific to the Transaction Capabilities
+Application Part, yeat are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.TP 12
+.B T_TCAP_OPCLASS
+.TP 12
+.B T_TCAP_APPCTX
+.\"
+.\"
+.SH "FUNCTIONS"
+.PP
+.\"
+.\"
+.SS t_accept\fR(3)
+.PP
+.\"
+.\"
+.SS t_bind\fR(3)
+.PP
+.\"
+.\"
+.SS t_close\fR(3)
+.PP
+.\"
+.\"
+.SS t_connect\fR(3)
+.PP
+.\"
+.\"
+.SS t_getinfo\fR(3)
+.PP
+.\"
+.\"
+.SS t_listen\fR(3)
+.PP
+.\"
+.\"
+.SS t_open\fR(3)
+.PP
+.\"
+.\"
+.SS t_optmgmt\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvconnect\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvdis\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcv\fR(3), \fBt_rcvv\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvreldata\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvuderr\fR(3)
+.PP
+.\"
+.\"
+.SS t_snddis\fR(3)
+.PP
+.\"
+.\"
+.SS t_snd\fR(3), \fBt_sndv\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndreldata\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndrel\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndudata\fR(3), \fBt_sndvudata\fR(3)
+.PP
+.\"
+.\"
+.SS t_unbind\fR(3)
+.PP
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ss7 (3),
+.BR xti_mtp (3),
+.BR xti_sccp (3).
+.\"
+.\"
+.SH "DEVICES"
+.PP
+There are number of TCAP devices providing the Transport Provider Interface
+that provide TCAP conforming TPI devices as follows:
+.\"
+.\"
+.TP 12
+.I /dev/tcap-tpi-cl ", " /dev/tcap-tpi-co
+For more information on the SS7 TCAP device, see
+.BR tcap (4).
+.\"
+.\"
+.TP 12
+.I /dev/tua-tpi-cl ", " /dev/tua-tpi-co
+For more information on the SIGTRAN TUA device, see
+.BR tua (4).
+.\"
+.\"
+.SH "VERSIONS"
+.PP
+The
+.B TCAP-TPI
+driver is specific to the
+.BR OpenSS7
+stack.  This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

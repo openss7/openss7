@@ -1,0 +1,293 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: isua.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ISUA 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "OpenSS7 SIGTRAN Devices"
+.\"
+.\"
+.SH NAME
+.B ISUA
+\- SS7 ISUP User Adaptation Layer (ISUA)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/isupi.h>
+.br
+.B #include <ss7/isupi_ioctl.h>
+.br
+.B #include <ss7/isua_ioctl.h>
+.HP
+.BI "int " isua_stream " = open(" device ", " flag );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ISUA
+is an implementation of the SS7 ISUP User Adaptation Layer (ISUA) defined in
+draft-bidulock-sigtran-isua-01.txt.
+.B ISUA
+provides a back haul of the serivces of
+.BR isup (4)
+over an IP network using Stream Control Transmission Protocol,
+.BR sctp (4),
+as defined in RFC 2960.
+.[
+RFC 2960
+.]
+In addition it provides a building block of redundant
+and distributed SS7 systems.  (See
+.IR \*(lqNOTICES\*(rq ,
+below.)
+.\"
+.\"
+.PP
+.B ISUA
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver for
+.BR LiS (9)\c
+.
+.[
+LiS
+.]
+.BR isup "(4), " bicc "(4) or " sctp (4)
+streams are linked under the
+.B ISUA
+multiplexing driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide transport or direct
+.B ISUP
+services to
+.BR ISUA .
+Once linked, the streams must be configured using
+.BR isua_ioctl (4).
+This procedure is normally performed by the SS7 Configuration Daemon,
+.BR ss7confd (8).
+.\"
+.\"
+.PP
+.B ISUA
+provides the following stream types that are directly compatible with the
+stream types provided by
+.BR isup (4).
+To select one of these stream types,
+.I device
+can be selected from the following:
+.\"
+.\"
+.TP
+.I /dev/isua
+This device provides
+.B ISUP
+protocol service interfce using the Call Control Interface (CCI)
+.[
+cci
+.]
+described in
+.BR cci (7).
+This interface is suitable for use with other SS7 modules and drivers, as well
+as with user-level programs such as the
+.BR cframe (3)
+library using the
+.B OpenSwitch
+call framework.
+.\"
+.\"
+.SH NOTICES
+.PP
+Unlike other SS7 protocol modules and drivers providing transport services,
+.B ISUA
+does not provide a
+.BR sockets (3)
+interface.  This is because the special needs of call control are divorced
+from the sockets paradigm.
+.\"
+.\"
+.PP
+.B ISUA
+can be configured on a system as a drop in transparent replacement for
+.BR isup (4).
+In such a configuration, users opening streams or sockets as defined in
+.BR isup (4)
+will be opening
+.B isua
+streams and sockets, but will be unaware of the difference.  In
+.BR OpenSS7 ,
+.B isua
+is used as the primary mechanism of redundancy and distribution at the
+.B ISUP
+level, and, when properly configured (see
+.BR ss7confd (8)),
+.B isua
+functions transparently to the ISUP-User.
+.\"
+.\"
+.PP
+Also, opening and binding a
+.B isua
+stream or socket may result in the opening and binding of an
+.B isup (4)
+stream on the local or remote host in direct support of the local ISUP-User.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+system call on the
+.I isua_stream
+file descriptor or socket.  These management controls are documented in
+.BR isua_ioctl (4).
+.\"
+.\"
+.PP
+In addition,
+.B isua
+supports
+.BR isup (4)
+IO controls.
+See
+.BR isup_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> ,
+.BR <ss7/isupi.h> ,
+.BR <ss7/isupi_ioctl.h> ,
+.BR <ss7/isua_ioctl.h> ,
+.BR <sys/tpi.h> ,
+.BR <sys/tpi_ss7.h> ,
+.BR <sys/tpi_mtp.h> ,
+.BR <sys/tpi_isup.h> ,
+.BR <xti.h> ,
+.BR <xti_isup.h> ,
+.BR <sys/socket.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/isua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SS7 (4),
+.BR ss7confd (8),
+.BR cci (7),
+.BR isupi (7),
+.BR isup_tpi (7),
+.BR isup_xti (7),
+.BR isup_socket (7),
+.BR sockets (3),
+.BR xnet (3),
+.BR isua_ioctl (4),
+.BR isup_ioctl (4).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B ISUA
+driver is specific to the
+.B OpenSS7
+stack.
+This is Version 2 of the interface.
+.\"
+.\"
+.XX
+.[
+isua
+.]
+.[
+q761
+.]
+.[
+q762
+.]
+.[
+q763
+.]
+.[
+q764
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

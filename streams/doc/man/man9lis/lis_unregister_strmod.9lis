@@ -1,0 +1,266 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: lis_unregister_strmod.9lis,v 0.9 2004/02/29 19:07:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LIS_UNREGISTER_STRMOD 9 "$Date: 2004/02/29 19:07:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.SH NAME
+.B lis_unregister_strmod
+\- deregister a \fISTREAMS\fR module
+.SH SYNOPSIS
+.PP
+.B #include <linux/stream.h>
+.HP 8
+.BI "int lis_unregister_strmod(struct streamtab *" strtab );
+.SH DESCRIPTION
+.PP
+.BR lis_unregister_strmod ()
+deregisters a
+.IR STREAMS (4)
+module previoulsy registered with
+.BR lis_register_strmod (9).
+.PP
+.BR lis_unregister_strmod ()
+removes the
+.IR STREAMS (4)
+module identified by
+.I strtab
+from all autopush lists, and removes the module from the
+.IR STREAMS (4)
+module switch
+table.
+Subsequent attempts to push the module will fail unless the module is
+configured for demand loading (see
+.IR "\*(lqNOTICES\*(rq" ,
+below).
+.PP
+For demand loaded
+.IR STREAMS (4)
+modules,
+.BR lis_unregister_strmod ()
+is normally and properly called from within the
+.B Linux
+kernel module's
+.B init_module
+routine.
+.SH RETURN
+.PP
+Upon success,
+.BR lis_unregister_strmod ()
+returns zero (0).
+Upon failure,
+.BR lis_unregister_strmod ()
+returns a negative error number.
+.SH ERRORS
+.PP
+When
+.BR lis_unregister_strmod ()
+fails, it returns the negative of one of the following errors:
+.TP 12
+.RB [ EINVAL ]
+.I strtab
+does not refer to an existing registered
+.IR STREAMS (4)
+module.
+.TP 12
+.RB [ EBUSY ]
+The
+.IR STREAMS (4)
+module indicated by
+.I strtab
+is currently pushed on an open stream.
+.SH NOTICES
+.PP
+There are some interactions between the
+demand
+.B Linux
+kernel module loading described in
+.BR lis_register_strmod (9)
+and unloading of the driver.
+.B LiS
+.[
+LiS
+.]
+does not attempt to unload a kernel module that calls
+.BR lis_unregister_strmod .
+One reason for this is that
+.BR lis_unregister_strmod ()
+is normally called during kernel module unloading.  If the kernel module does
+not unload, a subsequent attempt to
+.B I_PUSH
+the module by name will result in a failed attempt to reload the kernel module
+\fB\)streams-\fI\)name\fB.o\fR.  (This attempt will fail because the kernel
+module is already loaded.)
+.PP
+Therefore, demand loaded
+.B Linux
+kernel modules that provide
+.B LiS
+.[
+LiS
+.]
+.IR STREAMS (4)
+modules should only call
+.BR lis_register_strmod (9)
+from their kernel module intialization routines, and should only call
+.BR lis_unregister_strmod (9)
+from their kernel module cleanup routines.  See
+.IR "\*(lqEXAMPLES\*(rq" ,
+below.
+.SH EXAMPLES
+.PP
+Following is an example of a
+.IR STREAMS (4)
+module which is dynamically registered
+and deregistered from the
+.B LiS
+.[
+LiS
+.]
+.IR STREAMS (4)
+subsystem:
+.sp
+.in +4
+.nf
+\fC\s-2\
+#define X_MOD_NAME "example"
+
+int x_initialized = 0;
+
+void x_init(void)
+{
+    unless(x_initialized > 0, return);
+    if ((x_initialized = lis_register_strmod(&x_info, X_MOD_NAME))
+        == LIS_NULL_MID) {
+        cmn_err(CE_WARN, "%s: couldn't register module", X_MOD_NAME);
+    }
+    return;
+}
+void x_terminate(void)
+{
+    ensure(x_initialized > 0, return);
+    if ((x_initialized = lis_unregister_strmod(&x_info)) < 0) {
+        cmn_err(CE_PANIC, "%s: couldn't unregister module", X_MOD_NAME);
+    }
+    return;
+}
+\s+2\fR
+.fi
+.PP
+Because of interactions between demand
+.B Linux
+kernel module loading and unloading and
+.B LiS
+.[
+LiS
+.]
+.IR STREAMS (4)
+module registration and deregistration,
+.BR lis_register_strmod "(9) and " lis_uregister_strmod (9)
+should only be called from within the kernel module init and cleanup routines
+as illustrated below:
+.sp
+.in +4
+.nf
+\fC\s-2\
+int init_module(void)
+{
+    x_init();
+    if (x_initialized < 0)
+        return x_initialized;
+    return (0);
+}
+void cleanup_module(void)
+{
+    x_terminate();
+}
+\s+2\fR
+.fi
+.SH "SEE ALSO"
+.PP
+.BR lis_register_strdev (9),
+.BR lis_register_strmod (9),
+.BR lis_unregister_strdev (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR lis_unregister_strdev ()
+is an LiS-specific function that first appeared in early version of
+.BR LiS .
+.\"
+.\"
+.TI

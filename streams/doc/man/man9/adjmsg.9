@@ -1,0 +1,315 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: adjmsg.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ADJMSG 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B adjmsg
+\- trim bytes from the front or back of a \fISTREAMS\fR message
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int adjmsg(mblk_t *" mp ", ssize_t " len );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+a pointer to the
+.I STREAMS
+initial message block representing the message to adjust.
+.TP
+.I len
+the number of bytes to trim and the direction from which to trim.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR adjmsg ()
+trims
+.IR "" abs( len )
+bytes from a
+.I STREAMS
+message pointed to by
+.IR mp .
+.PP
+If
+.I len
+is less than zero,
+.BR adjmsg ()
+will trim bytes from the head of the message.
+.PP
+If
+.I len
+is greater than zero,
+.BR adjmsg ()
+will trim bytes from the tail of the message.
+.PP
+If
+.I len
+is zero,
+.BR adjmsg ()
+succeeds but does nothing.
+.PP
+During the trimming process, blocks are trimmed by advancing the
+.I b_rptr
+for head trims
+.RI ( len "> 0), or ,
+decreasing the
+.I b_wptr
+for tail trims
+.RI ( len "< 0),
+by the number of bytes trimmed from the block.  If an entire block is trimmed
+(its
+.I b_rptr
+meeets its
+.IR b_wptr ),
+the block is not removed from the chain, but is left as a zero length block.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR adjmsg ()
+trims the requested number of bytes from the head or tail of the message and
+returns true (1).
+.PP
+Upon failure,
+.BR adjmsg ()
+returns false (0),
+and the passed in message remains unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+If
+.I mp
+is a null pointer,
+.I len
+is greater that the message size, or if the bytes to trim crosses message blocks of
+differing types,
+.BR adjmsg ()
+will fail and return false (0).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR adjmsg ()
+is typically used to trim headers and footers off of protocol messages on the
+read side of a 
+.I STREAMS
+module.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR adjmsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR adjmsg ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+message,
+.IR mp .
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that
+.BR adjmsg ()
+will not fail due to allocation errors.  Failures depend only on the
+characteristics of the passed in message referenced by
+.I mp
+and the provided
+.IR len .
+.PP
+If the passed in length,
+.IR len ,
+is zero,
+.BR adjmsg ()
+will not alter the passed in message and will return true (1).
+.PP
+Any message blocks that are completely trimmed by
+.BR adjmsg ()
+are not removed from the message, but have their
+.IR b_wptr 's
+set to their
+.IR b_rptr 's;
+that is, the length of the data they contain is set to zero (0).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR msgpullup (9),
+.BR pullupmsg (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR adjmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR adjmsg ()
+is compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4" ,
+with the following portability considerations:
+.IP \(bu
+.BR adjmsg ()
+does nothing and returns success (1) if the passed in length,
+.IR len ,
+is zero (0).
+.BR AIX \(rg
+.[
+aixdoc
+.]
+does nothing if
+.I len
+is zero.
+.IP \(bu
+.BR adjmsg ()
+does not free zero length message blocks created or encountered during the
+trimming process.
+.BR Solaris \(rg
+.[
+soldoc
+.]
+may free zero length message blocks created or encountered during the trimming process.
+.IP \(bu
+.BR adjmsg ()
+does not free zero length message blocks created or encountered during the
+trimming process.
+.BR UnixWare \(rg
+.[
+uw7doc
+.]
+does not free zero length message blocks encountered during the trimming
+process.
+.IP \(bu
+.BR adjmsg ()
+does not free zero length message blocks created or encountered during the
+trimming process, and returns success (1) when
+.I len
+is zero (0).
+.B LiS
+.[
+LiS
+.]
+does not free zero length message blocks created or encountered during the
+trimming process, and returns success (1) when
+.I len
+is zero (0).
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR adjmsg ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

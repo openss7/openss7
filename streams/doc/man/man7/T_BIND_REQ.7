@@ -1,0 +1,212 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: T_BIND_REQ.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH T_BIND_REQ 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.SH NAME
+.B T_BIND_REQ
+\- Bind Protocol Address Request
+.SH SYNOPSIS
+These messages consist of one
+.B M_PROTO
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_bind_req {
+    t_scalar_t    PRIM_type;      /* Always T_BIND_REQ */
+    t_scalar_t    ADDR_length;
+    t_scalar_t    ADDR_offset;
+    t_uscalar_t   CONIND_number;
+};
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This primitive requests that the transport provider bind a protocol address to
+the stream, negotiate the number of connect indications allowed
+to be outstanding by the transport provider for the specified protocol
+address, and activate the stream associated with the protocol address.
+.IP - 3
+Note that a stream is viewed as active when the transport provider may
+receive and transmit TPDUs (transport protocol data units) associated with
+the stream.
+.SH PARAMETERS
+.TP 16
+.I PRIM_type
+indicates the primitive type.
+.TP
+.I ADDR_length
+is the length of the protocol address to be bound to the stream.
+.TP
+.I ADDR_offset
+is the offset from the beginning of the
+.B M_PROTO
+block where the protocol
+address begins.  Note that all lengths, offsets, and sizes in all
+structures refer to the number of bytes.
+.TP
+.I CONIND_number
+is the requested number of connect indications allowed to be outstanding
+by the transport provider for the specified protocol address.
+
+Note that the
+.I CONIND_number
+should be ignored by those providing a
+connectionless transport service.  Also note that if the number of outstanding
+connect indications equals
+.IR CONIND_number ,
+the transport provider need not
+discard further incoming connect indications, but may choose to queue them
+internally until the number of outstanding connect indications drops
+below
+.IR CONIND_number .
+.PP
+The proper alignment of the address in the
+.B M_PROTO
+message block is not
+guaranteed.  The address in the
+.B M_PROTO
+message block is however,
+aligned the same as it was received from the transport user. 
+.SH RULES
+For rules governing the requests made by these primitives, see the
+.BR T_BIND_ACK (7)
+primitive. 
+.PP
+These primitives require the transport provider to generate one of the
+following acknowledgments on receipt of the primitive, and the transport user
+must wait for the acknowledgment before issuing any other primitives:
+.TP
+.B Successful
+Correct acknowledgment of the primitive is indicated via the
+.BR T_BIND_ACK (7)
+primitive.
+.TP
+.B Non-fatal errors
+These errors will be indicated via the
+.BR T_ERROR_ACK (7)
+primitive described in
+reference TPI-SMD.
+.SH ERRORS
+The allowable errors are as follows:
+.TP
+.RB [ TACCES ]
+This indicates that the user did not have proper permissions for the use of
+the requested address.
+.TP
+.RB [ TADDRBUSY ]
+This indicates that the requested address is in use.
+.TP
+.RB [ TBADADDR ]
+This indicates that the protocol address was in an incorrect format or the
+address contained invalid information.  It is not intended to indicate protocol
+errors.
+.TP
+.RB [ TNOADDR ]
+This indicates that the transport provider could not allocate an address.
+.TP
+.RB [ TOUTSTATE ]
+The primitive would place the transport interface out of state.
+.TP
+.RB [ TSYSERR ]
+A system error has occurred and the Linux system error is indicated in
+the primitive.
+.SH MODES
+Both connection-mode and connectionless-mode.
+.SH ORIGINATOR
+Transport user.
+.SH "SEE ALSO"
+.BR T_BIND_ACK (7),
+.BR T_ERROR_ACK (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to TPI Version 2, Draft 2.
+.[
+TPI Revision 2.0.0
+.]
+.SH "HISTORY"
+.PP
+The Transport Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

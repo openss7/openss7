@@ -1,0 +1,229 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: DL_CONNECT_IND.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DL_CONN_IND 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B DL_CONNECT_IND (dl_connect_ind_t)
+\- conveys to the local DLS user that a remote (calling) DLS user wishes to
+establish a data link connection.
+
+.SH SYNOPSIS
+The message consists of one
+.B M_PROTO
+message block containing the structure shown below.
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_correlation;
+    t_uscalar_t  dl_called_addr_length;
+    t_uscalar_t  dl_called_addr_offset;
+    t_uscalar_t  dl_calling_addr_length;
+    t_uscalar_t  dl_calling_addr_offset;
+    t_uscalar_t  dl_qos_length;
+    t_uscalar_t  dl_qos_offset;
+    t_uscalar_t  dl_growth;
+} dl_connect_ind_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.B DL_CONNECT_IND
+conveys to the local DLS user that a remote (calling) DLS user wishes to
+establish a data link connection.  The indication contains the DLSAP address
+of the calling and called DLS user, and the quality of service parameters as
+specified by the calling DLS user and negotiated by the DLS provider.
+.PP
+The
+.B DL_CONNECT_IND
+also contains a number that allows the DLS user to correlate a subsequent
+.BR DL_CONNECT_RES "(7), " DL_DISCONNECT_REQ "(7), or " DL_DISCONNECT_IND (7)
+with the indication (see Multi-threaded Connection Establishment
+.BR dlpi (7)).
+.PP
+The number of outstanding
+.B DL_CONNECT_IND
+primitives issued by the DLS
+provider must not exceed the value of
+.I dl_max_conind
+as returned on the
+.BR DL_BIND_ACK (7).
+If this limit is reached and an additional connect request arrives, the DLS
+provider must not pass the corresponding connect indication to the DLS user
+until a response is received for an already outstanding indication.
+.SH PARAMETERS
+.TP 16
+.I dl_primitive
+conveys
+.BR DL_CONNECT_IND .
+.TP
+.I dl_correlation
+conveys the correlation number to be used by the DLS user to associate this
+message with the
+.BR DL_CONNECT_RES "(7), " DL_DISCONNECT_REQ "(7), or " DL_DISCONNECT_IND
+that is to follow.  This value, then, enables the DLS user to multi-thread
+connect indications and responses.  All outstanding connect indications must
+have a distinct, non-zero correlation value set by the DLS provider.
+.TP
+.I dl_called_addr_length
+conveys the length of the address of the DLSAP for which this
+.B DL_CONNECT_IND
+primitive is intended.  This address is the full DLSAP address specified by
+the calling DLS user and is typically the value returned on the
+.BR DL_BIND_ACK (7)
+associated with the given stream.
+.TP
+.I dl_called_addr_offset
+conveys the offset from the beginning of the
+.B M_PROTO
+message block where the called DLSAP address begins.
+.TP
+.I dl_calling_addr_length
+conveys the length of the address of the DLSAP from which the
+.BR DL_CONNECT_REQ (7)
+primitive was sent.
+.TP
+.I dl_calling_addr_offset
+conveys the offset from the beginning of the
+.B M_PROTO
+message block where the calling DLSAP address begins.
+.TP
+.I dl_qos_length
+conveys the range of quality of service parameter values desired by
+the calling DLS user and negotiated by the DLS provider.  The range of
+QOS values is conveyed in the appropriate structure defined in
+.IR "\*(lqQOS Data Structures" , \*(rq
+.BR dlpi (7).
+A full specification of these QOS parameters and rules for negotiating their
+values is presented in
+.IR "\*(lqQuality of Data Link Service" , \*(rq
+.BR dlpi (7).
+For any parameter the DLS provider does not support or cannot determine,
+the corresponding parameter values will be set to
+.BR DL_UNKNOWN .
+If the DLS provider does not support any QOS parameters, this length field
+will be set to zero.
+.TP
+.I dl_qos_offset
+conveys the offset from the beginning of the
+.B M_PROTO
+message block where the quality of service parameters begin.
+.TP
+.I dl_growth
+defines a growth field for future enhancements to this primitive.  Its
+value will be set to zero.
+.SH STATE
+The message is valid in state
+.BR DL_IDLE ,
+or state
+.B DL_INCON_PENDING
+when the maximum number of outstanding
+.B DL_CONNECT_IND
+primitives has not been reached on this stream.
+.SH "NEW STATE"
+The resulting state is
+.BR DL_INCON_PENDING ,
+regardless of the current state.
+.SH RESPONSE
+The DLS user must eventually send either
+.B DL_CONNECT_RES
+to accept the connect request or
+.BR DL_DISCONNECT_REQ (7)
+to reject the connect request.  In either case, the responding message must
+convey the correlation number received in the
+.BR DL_CONNECT_IND .
+The DLS provider will use the correlation number to identify the connect
+request to which the DLS user is responding.
+.SH "CONFORMING TO"
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi
+.]
+.SH "HISTORY"
+.PP
+The Data Link Provider Interface first appeared in SVR4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

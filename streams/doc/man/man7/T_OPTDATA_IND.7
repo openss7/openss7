@@ -1,0 +1,179 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: T_OPTDATA_IND.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH T_OPTDATA_IND 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.SH NAME
+.B T_OPTDATA_IND
+\- Data indication with options
+.SH SYNOPSIS
+The message consists of one
+.B M_PROTO
+message block followed by zero or more
+message blocks, where each
+.B M_DATA
+message block contains one or more bytes
+of data.  The format of the
+.B M_PROTO
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_optdata_ind {
+    t_scalar_t PRIM_type;      /* always T_OPTDATA_IND           */
+    t_scalar_t DATA_flag;      /* flag bits associated with data */
+    t_scalar_t OPT_length;     /* options length                 */
+    t_scalar_t OPT_offset;     /* options offset                 */
+};
+\fR\s+1
+.fi
+.SH DESCRIPTION
+The primitive indicates to the transport user that the message contains
+a transport interface data unit.  One or more transport interface data units
+form a transport service data unit (TSDU).
+.PP
+Note that the maximum transport service and data unit sizes allowed by a
+transport provider is indicated to the user by the
+.BR T_INFO_ACK (7)
+primitive.
+.PP
+This primitive has a mechanism that indicates the beginning and end of a
+transport service data unit.  However not all transport providers support
+the concept of a transport service data unit.
+.PP
+This primitive also provides mechanisms to have options associated with the
+data being transferred.
+.SH PARAMETERS
+The fields of this message have the following semantics:
+.TP 16
+.I PRIM_type
+identifies the primitive type
+.TP
+.I DATA_flag
+specifiesbit fields specific general properties associated with the
+data being transferred.  The following settings are currently defined:
+.RS
+.TP
+.B T_ODF_MORE
+When set, this bit indicates that the next
+.BR T_OPTDATA_IND (7)
+primitive is also part of this transport service data unit.
+.RE
+.TP
+.I OPT_length
+the length of the requested options asociated with the primitive
+.TP
+.I OPT_offset
+the offset (from the beginning of the M_PROTO message block) where the
+options asociated with this primitive begin.
+.SH RULES
+If a TSDU spans multiple
+.BR T_OPTDATA_IND (7)
+message blocks, then an ETSDU may be placed between two
+.BR T_DATA_IND (7)
+message blocks.  Once an ETSDU is started, then the ETSDU must be completed
+before any
+.BR T_OPTDATA_IND (7)
+message blocks defining a TSDU are resumed.
+.SH MODES
+Only connection mode.
+.SH ORIGINATOR
+Transport provider.
+.SH "SEE ALSO"
+.BR T_OPTDATA_REQ (7),
+.BR T_DATA_REQ (7),
+.BR T_DATA_IND (7),
+.BR T_EXDATA_REQ (7),
+.BR T_EXDATA_IND (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to TPI Version 2, Draft 2.
+.[
+TPI Revision 2.0.0
+.]
+.SH "HISTORY"
+.PP
+The Transport Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

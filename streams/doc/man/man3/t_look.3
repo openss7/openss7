@@ -1,0 +1,239 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: t_look.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_LOOK 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_look
+\- look for a transport event
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_look(int " fd );
+.SH ARGUMENTS
+.PP
+.TP 12
+.I fd
+the transport endpoint upon which to look for events.
+.SH DESCRIPTION
+.PP
+.BR t_look ()
+looks for a pending asynchronous event on the local transport endpoint
+specified by
+.IR fd .
+.PP
+.I fd
+specifies the local transport endpoint upon which to look for a pending
+asynchronous event.
+.SH CAVEATS
+.PP
+When an XTI library call is expecting a specific response from the transport
+service provider, such as in
+.BR t_accept (3),
+.BR t_addleaf (3),
+.BR t_connect (3),
+.BR t_listen (3),
+.BR t_rcv (3),
+.BR t_rcvconnect (3),
+.BR t_rcvleafchange (3),
+.BR t_rcvrel (3),
+.BR t_rcvreldata (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3),
+.BR t_removeleaf (3),
+.BR t_snd (3),
+.BR t_snddis (3),
+.BR t_sndrel (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndv (3),
+.BR t_sndvudata (3),
+and
+.BR t_unbind (3),
+an asynchronous event is received other than the expected event, the above
+calls will fail, return -1 and set
+.IR t_errno (3)
+to
+.BR TLOOK .
+When such a failure occurs,
+.BR t_look ()
+can be used to determine which asynchronous event occured and determine the
+next course of action.
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_look ()
+returns a positive integer reflecting the asynchronous event received and is one of the
+following values:
+.TP 12
+.B T_LISTEN
+connection indication received.
+.TP 12
+.B T_CONNECT
+connection confirmation received.
+.TP 12
+.B T_DATA
+normal data received.
+.TP 12
+.B T_EXDATA
+expedited data received.
+.TP 12
+.B T_DISCONNECT
+disconnection received.
+.TP 12
+.B T_UDERR
+datagram error indication received.
+.TP 12
+.B T_ORDREL
+orderly release indication received.
+.TP 12
+.B T_GODATA
+sending normal data is again possible.
+.TP 12
+.B T_GOEXDATA
+sending expedited data is again possible.
+.PP
+Upon failure,
+.BR t_look ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_look ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP 12
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP 12
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in
+.IR errno (3).
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR t_accept (3),
+.BR t_addleaf (3),
+.BR t_connect (3),
+.BR t_errno (3).
+.BR t_listen (3),
+.BR t_rcv (3),
+.BR t_rcvconnect (3),
+.BR t_rcvleafchange (3),
+.BR t_rcvrel (3),
+.BR t_rcvreldata (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3),
+.BR t_removeleaf (3),
+.BR t_snd (3),
+.BR t_snddis (3),
+.BR t_sndrel (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndv (3),
+.BR t_sndvudata (3),
+.BR t_unbind (3).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

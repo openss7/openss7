@@ -1,0 +1,408 @@
+'\" rtp
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: fattach.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH FATTACH 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B fattach
+\- attach a \fISTREAMS\fR open file to a path name in the file system
+.SH SYNOPSIS
+.PP
+.B "#include <stropts.h> "
+.HP
+.BI "int fattach( int " filedes ", const char *" path " ); "
+.SH DESCRIPTION
+.PP
+.BR fattach "() "
+attaches an open
+.I STREAMS
+file to a path name in the file system.
+While the file is attached to the path name, opens (see
+.BR open "(2)) "
+of the path name will instead open the
+.I STREAMS
+file.
+.sp
+The process calling
+.BR fattach "() "
+may immediately close the
+.I STREAMS
+file thereafter; the
+.BR fattach "() "
+operation effectively causes the file to remain open until
+it is explicitly detached via
+.BR fdetach "(3).  "
+.sp
+Note that a single
+.I STREAMS
+file may be attached to several path names (via several calls to
+.BR fattach "), "
+but a path name may only be attached to a single
+.I STREAMS
+file.
+.sp
+The process does not affect pre-existing opens either of the underlying path
+name or the
+.I STREAMS
+file, and subsequent operations on the path name (until a corresponding
+.BR fdetach "(3)) "
+apply only to the attached
+.I STREAMS
+file.
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR fattach "() "
+returns 0.  Upon failure,
+.BR fattach "() "
+return -1, and
+.BR errno "(3) "
+is set to indicate the error causing the failure (see below).
+.SH ERRORS
+.PP
+.BR fattach "() "
+may fail at least with the following error indications:
+.TP 12
+.B "[EBADF]"
+The
+.I filedes
+argument is not a valid open file descriptor.
+.TP 12
+.B "[EINVAL]"
+The
+.I filedes
+argument does not refer to a valid
+.I STREAMS
+file.
+.TP 12
+.B "[EISDIR]"
+The
+.I path
+argument refers to a directory.
+.TP 12
+.B "[EBUSY]"
+The
+.I path
+argument is currently a mount point, or already has a
+.I STREAMS
+file attached to it.
+.SH "APPLICATION USAGE"
+.PP
+Both conceptually and mechanically,
+.BR fattach "() "
+is similar to the more typical
+.I mounting
+of a file system on a path name representing a directory (see
+.BR mount "(8)).  "
+Both cause the process of searching for the path name to
+use an altenative file system node when the point of mounting or
+attachment is reached; i.e., the attached file or mounted file system
+covers and hides the underlying path name.
+They differ in that mounting applies to directory names and attaches
+block devices that contain whole file systems;
+.BR fattach "() "
+is intended to apply to non-directory names and attaches only a single
+.I STREAMS
+file.
+.sp
+.BR fattach "() "
+is intended to allow client processes a means to communicate with
+a server process via a
+.I "well-known"
+path name.
+E.g., a server process might open a
+.I STREAMS
+.I pipe
+and attach one end to an existing path name, thus providing a
+means for clients to communicate with the server.
+When the server is not running, the path name identifies a
+.RB "non-" STREAMS
+file name, but when the server is running, it identifies the end of the
+pipe to be used to communicate with the server.  A client process can
+distinguish these two states by using the
+.BR isastream "(3) "
+function.
+.sp
+Moreover, since an attached
+.I STREAMS
+file is effectively open, a
+.I STREAMS
+file which is only attached but not otherwise open may be the target
+of file descriptor passing via the
+.B I_SENDFD
+.I ioctl
+and
+.B M_PASSFP
+messages, to be received once opened via the
+.B I_RECVFD
+.IR ioctl ". "
+(Note that this means of file descriptor passing is only supported for
+.I STREAMS
+.B pipes
+and
+.BR fifos ".) "
+E.g., a
+.B pipe
+may be opened, a path attached to one end, and a file descriptor passed
+to that end, after which the pipe end receiving the file descriptor may
+be closed.
+Subsequent opens of that end will be able to receive the passed file
+descriptor(s) in the usual manner and detach the attached path
+thereafter.
+This eases the synchronization requirements between servers and clients
+intending to use a
+.B pipe
+only for passing file descriptors.
+.sp
+See
+.BR connld "(9) "
+for related applications of
+.BR fattach "(). "
+.sp
+Under Linux,
+.BR fattach "() "
+also coincidentally provides a means to dynamically substitute a
+.I STREAMS
+file
+for a kernel
+.I fifo
+(see
+.BR fifo "(4) "
+and
+.BR pipe "(3)) "
+without having to change existing applications (see also
+.BR fattach (8)).  "
+.sp
+Applications wishing to use the version of the
+.BR fattach "() "
+function described herein must link with the
+.B LiS
+.[
+LiS
+.]
+library, which
+provides it.  The
+Linux/GNU C library otherwise provides a stub supporting calls to
+.B fattach
+which only generates an error indicating that it is not implemented.
+.SH WARNINGS
+.PP
+The operation of
+.BR fattach "() "
+depends on how the underlying operating system implements the mechanism
+of
+.IR mounting .
+In Linux kernels since 2.1.x, mounting does not happen at
+.IR inodes ,
+but at a higher level called the
+.IR dcache .
+Because of this implementation, attaching to a path name which has hard
+links in the underlying file system does not involve other path names
+which are hard links to the given path name.  I.e., the
+.I STREAMS
+file is only attached to the given path names, and not to any others
+which would otherwise be treated as
+.I aliases
+for that path name.
+.sp
+At the same time, it should again be noted that a
+.I STREAMS
+file may be attached to more than one path, including to such aliases,
+if their path names are known.
+The fact that these names are not easy to determine is the predominant
+reason that they are not attached to automatically.
+.sp
+It should be noted that in this implementation, an attachment is
+undone automatically if the attached
+.I STREAMS
+file receives a
+.I hangup
+indication from its driver (or from its
+.IR peer ,
+if it is a pipe end) without received file descriptors pending
+(i.e., without
+.B M_PASSFP
+messages queued at its stream head),
+i.e., if the effect of the stream head receiving an
+.B M_HANGUP
+message occurs.
+In this state, a
+.I STREAMS
+file is unusable for normal message traffic, and
+this automatic detachment ensures that an otherwise inactive stream
+will be closed and its resources released.
+In the case of a
+.BR pipe ", "
+an end is given a
+.I hangup
+indication if its peer is closed completely and dismantled.
+If
+.B M_PASSFP
+messages are queued at the remaining end (which is thus in this
+.I hangup
+state), it may still be opened (if already open or if only attached)
+in order to receive these messages via the
+.B I_RECVFD
+.IR ioctl ". "
+.sp
+The behavior of automatically detaching a
+.I STREAMS
+file which has received a
+.I hangup
+indication is not common to other
+.ISTREAMS
+implementations and should be considered a non-standard extension.
+.sp
+It should also be noted that this implementation does not change
+the access permissions (see
+.BR chmod "(2) "
+and
+.BR fchmod "(2)) "
+of the attached
+.I STREAMS
+file.  If such behavior is desired, the path's mode should be determined
+.I before
+attaching, and applied to the
+.I STREAMS
+file (via
+.BR chmod "(2) "
+or the equivalent). (See
+.BR fattach "(8) "
+for examples.)  Note that doing so alters the
+.I STREAMS
+file permanently; i.e., such changes will not be undone by an effective
+subsequent
+.BR fdetach "(3)."
+.SH "FUTURE DIRECTIONS"
+.PP
+In the current implementation,
+.BR fattach "() "
+will not attach to a directory name, to avoid conflict with the normal
+process of mounting file systems on directory mount points.  Though
+we foresee no need to allow attachment to directory path names at
+the time of this writing, this is subject to change in the future.
+.sp
+.BR fattach "() "
+is currently implemented as an IOCTL operation on the given file.
+Should
+.B LiS
+.[
+LiS
+.]
+ever become part of the Linux kernel, it may become a
+system call; a system call implementation is in fact already
+included within
+.B LiS\
+.
+.[
+LiS
+.]
+.SH "SEE ALSO"
+.PP
+.BR chmod "(2), "
+.BR connld "(9), "
+.BR errno "(3), "
+.BR fattach "(8), "
+.BR fchmod "(2), "
+.BR fdetach "(3), "
+.BR fdetach "(8), "
+.BR fifo "(4), "
+.BR mount "(8), "
+.BR open "(2), "
+.BR pipe "(2), "
+.BR STREAMS "(4) "
+.SH HISTORY
+.PP
+UNIX\(rg\ System V Release 4 (SVR4)
+.[
+svr4
+.]
+.SH AUTHOR
+.PP
+John Boyd, protologos LLC.
+.[
+$LIST$
+.]
+.TA

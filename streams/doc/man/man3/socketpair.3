@@ -1,0 +1,252 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: socketpair.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH SOCKETPAIR 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.SH NAME
+.B socketpair
+\- create a pair of connected sockets
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.HP
+.BI "int socketpair(int " domain ", int " type ", int " protocol ", int " socket_vector[2] );
+.SH DESCRIPTION
+.PP
+The
+.BR socketpair ()
+function creates an unbound pair of connected
+sockets in a specified
+.IR domain ,
+of a specified
+.IR type ,
+under the
+protocol optionally specified by the
+.I protocol
+argument.  The two
+sockets are identical.  The file descriptors used in referencing the
+created sockets are returned in
+.I socket_vector[0]
+and
+.IR socket_vector[1] .
+.TP 12
+.I domain
+Specifies the communications domain in which the sockets are to
+be created.
+.TP 12
+.I type
+Specifies the type of sockets to be created.
+.TP 12
+.I protocol
+Specifies a particular protocol to be used with the sockets.
+Specifying a
+.I protocol
+of 0 causes
+.BR socketpair ()
+to use an
+unspecified default protocol appropriate for the requested
+socket type.
+.TP 12
+.I socket_vector
+Specifies a 2-integer array to hold the file descriptors of the
+created socket pair.
+.PP
+The
+.I type
+argument specifies the socket type, which determines the
+semantics of communications over the socket.  The socket types
+supported by the system are implementation-dependent.  Possible
+socket types include:
+.TP 12
+.B SOCK_STREAM
+Provides sequenced, reliable, bidirectional, connection-mode
+byte streams, and may provide a transmission mechanism for
+out-of-band data.
+.TP 12
+.B SOCK_DGRAM
+Provides datagrams, which are connectionless-mode, unreliable
+messages of fixed maximum length.
+.TP 12
+.B SOCK_SEQPACKET
+Provides sequenced, reliable, bidirectional, connection-mode
+transmission path for records.  A record can be sent using one
+or more output operations and received using one or more input
+operations, but a single operation never transfers part of more
+than one record.  Record boundaries are visible to the receiver
+via the
+.B MSG_EOR
+flag.
+.PP
+If the
+.I protocol
+argument is non-zero, it must specify a protocol
+that is supported by the address family.  The protocols supported by
+the system are implementation-dependent.
+.PP
+The process may need to have appropriate privileges to use the
+.BR socketpair ()
+function or to create some sockets.
+.SH NOTES
+.PP
+The documentation for specific address families specifies which
+protocols each address family supports.  The documentation for
+specific protocols specifies which socket types each
+.I protocol
+supports.
+.PP
+The
+.BR socketpair ()
+function is used primarily with UNIX domain
+sockets and need not be supported for other domains.
+.SH CAVEATS
+.PP
+This system call is implemented as a
+.B SIOCSOCKSYS
+IOCTL.  See
+.BR socksys (4)
+for more information.
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, this function returns 0.  Otherwise, -1
+is returned and errno is set to indicate the error.
+.SH ERRORS
+.PP
+The
+.BR socketpair ()
+function will fail if:
+.TP 12
+.RB [ EAFNOSUPPORT ]
+The implementation does not support the specified address
+family.
+.TP 12
+.RB [ EMFILE ]
+No more file descriptors are available for this process.
+.TP 12
+.RB [ ENFILE ]
+No more file descriptors are available for the system.
+.TP 12
+.RB [ EOPNOTSUPP ]
+The specified
+.I protocol
+does not permit creation of socket
+pairs.
+.TP 12
+.RB [ EPROTONOSUPPORT ]
+The
+.I protocol
+is not supported by the address family, or the
+.I protocol
+is not supported by the implementation.
+.TP 12
+.RB [ EPROTOTYPE ]
+The socket
+.I type
+is not supported by the
+.IR protocol .
+.PP
+The
+.BR socketpair ()
+function may fail if:
+.TP 12
+.RB [ EACCES ]
+The process does not have appropriate privileges.
+.TP 12
+.RB [ ENOBUFS ]
+Insufficient resources were available in the system to perform
+the operation.
+.TP 12
+.RB [ ENOMEM ]
+Insufficient memory was available to fulfill the request.
+.TP 12
+.RB [ ENOSR ]
+There were insufficient
+.IR STREAMS (4)
+resources available for the
+operation to complete.
+.SH "SEE ALSO"
+.PP
+.BR socket(3),
+.BR <sys/socket.h> .
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

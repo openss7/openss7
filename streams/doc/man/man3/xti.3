@@ -1,0 +1,380 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: xti.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH XNET 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.BR xti ", " xnet
+\- XNS 5.2 XTI Library
+.BR "" ( libxnet )
+.SH SYNOPSIS
+.PP
+.B #include <sys/xti.h>
+.HP 8
+.BI "int t_accept(int " fd ", int " connfd ", struct t_call *" call );
+.HP 8
+.BI "void *t_alloc(int " fd ", int " type ", int " fields );
+.HP 8
+.BI "int t_bind(int " fd ", struct t_bind *" req ", struct t_bind *" ret );
+.HP 8
+.BI "int t_close(int " fd );
+.HP 8
+.BI "int t_connect(int " fd ", struct t_call *" sndcall ", struct t_call *" rcvcall );
+.HP 8
+.BI "extern int t_errno;"
+.HP 8
+.BI "void t_error(char *" errmsg ) ;
+.HP 8
+.BI "int t_free(void *" ptr ", int " type );
+.HP 8
+.BI "int t_getinfo(int " fd ", struct t_info *" info );
+.HP 8
+.BI "int t_getstate(int " fd );
+.HP 8
+.BI "int t_listen(int " fd ", struct t_call *" call );
+.HP 8
+.BI "int t_look(int " fd );
+.HP 8
+.BI "int t_open(char *" path ", int " oflag ", struct t_info *" info );
+.HP 8
+.BI "int t_optmgmt(int " fd ", const struct t_optmgmt *" req ", struct t_optmgmt *" ret );
+.HP 8
+.BI "int t_rcvconnect(int " fd ", struct t_call *" call );
+.HP 8
+.BI "int t_rcvdis(int " fd ", struct t_discon *" dis );
+.HP 8
+.BI "int t_rcv(int " fd ", char *" buf ", unsigned int " nbytes ", int *" flags );
+.HP 8
+.BI "int t_rcvreldata(int " fd ", struct t_discon *" discon );
+.HP 8
+.BI "int t_rcvrel(int " fd );
+.HP 8
+.BI "int t_rcvudata(int " fd ", struct t_unitdata *" data ", int *" flags );
+.HP 8
+.BI "int t_rcvuderr(int " fd ", struct t_uderr *" err );
+.HP 8
+.BI "int t_rcvv(int " fd ", struct t_iovec *" iov ", unsigned int " iovcnt ", int *" flags );
+.HP 8
+.BI "int t_rcvvudata(int " fd ", struct t_unitdata *" data ", struct t_iovec *" iov ", unsigned int " iovcnt ", int *" flags );
+.HP 8
+.BI "int t_snddis(int " fd ", const struct t_call *" call );
+.HP 8
+.BI "int t_snd(int " fd ", char *" buf ", unsigned int " nbytes ", int " flags );
+.HP 8
+.BI "int t_sndreldata(int " fd ", struct t_discon *" discon );
+.HP 8
+.BI "int t_sndrel(int " fd );
+.HP 8
+.BI "int t_sndudata(int " fd ", struct t_unitdata *" data );
+.HP 8
+.BI "int t_sndv(int " fd ", struct t_iovec *" iov ", unsigned int " iovcnt ", int " flags );
+.HP 8
+.BI "int t_sndvudata(int " fd ", struct t_unitdata *" data ", struct t_iovec *" iov ", unsigned int " iovcnt ", int " flags );
+.HP 8
+.BI "int t_sync(int " fd );
+.HP 8
+.BI "int t_unbind(int " fd );
+.SH DESCRIPTION
+.PP
+.B libxnet
+is an
+.B OpenSS7
+implementation of the XNS 5.2 XTI Library for
+.B LiS
+(Linux STREAMS).
+
+.SS "Local Transport Endpoint Management"
+.HP
+.B Local Endpoint Management
+functions are applicable to all transport service provider service types and
+include functions to open and close a file descriptor associated, bind and
+unbind a file descriptor from a local transport endpoint, manage options and
+get information about the state, bound and connecting addresses, protocol
+parameter limits of a local transport endpoint.
+.RS
+.sp
+.BR t_open "(3) - open an endpoint"
+.br
+.BR t_close "(3) - close an endpoint"
+.br
+.BR t_bind "(3) - bind to an address"
+.br
+.BR t_unbind "(3) - unbind from an address"
+.br
+.BR t_optmgmt "(3) - manage options"
+.br
+.BR t_getinfo "(3) - return protocol information"
+.br
+.BR t_getprotaddr "(3) - get protocol addresses"
+.br
+.BR t_getstate "(3) - return the current state"
+.RE
+
+.HP
+.B Local Event Management
+functions are responsible for handling asynchronous events of the underlying
+transport service provider and resynchronizing the XTI library with the
+underlying transport service provider.
+.RS
+.sp
+.BR t_sync "(3) - synchronize library with provider"
+.br
+.BR t_look "(3) - look at the current event"
+.RE
+.SS "Connection Oriented Endpoints"
+A set of XTI Library calls are provided for performing protocol functions on
+local transport endpoints for which the transport service provider is of a
+connection oriented service type.  Connection oriented services have three
+phases as follows:
+.HP
+.B Connection Establishement Phase
+consists of either invoking outgoing connections or listening for and
+accepting incoming connections.  Valid states for this phase are:
+.BR T_IDLE ", " T_INCON ", and " T_OUTCON .
+XTI Library calls used in the Connection Establishment Phare are as follows:
+.RS
+.sp
+.BR t_listen "(3) - get a connection request"
+.br
+.BR t_accept "(3) - accept a connection request"
+.br
+.BR t_connect "(3) - establish a connection"
+.br
+.BR t_rcvconnect "(3) - receive connect request confirmation"
+.br
+.BR t_addleaf "(3) - add a point to a point to multipoint connection"
+.br
+.BR t_removeleaf "(3) - remove point from point to multipoint connection"
+.br
+.BR t_rcvleafchange "(3) - receive point added to point to multipoint connection"
+.RE
+
+.HP
+.B Data Transfer Phase
+consist of transfering data between connected transport endpoints.  Valid
+states for this phase are:
+.BR T_DATAXFER ", " T_OUTREL
+(for incoming data) and
+.BR T_INREL
+(for outgoing data).
+XTI Library calls used in the Data Transfer Phare are as follows:
+.RS
+.sp
+.BR t_snd "(3) - send data"
+.br
+.BR t_sndv "(3) - gather and send data"
+.br
+.BR t_rcv "(3) - receive data"
+.br
+.BR t_rcvv "(3) - receive data and scatter"
+.RE
+
+.HP
+.B Connection Release Phase
+consists of either abortive or orderly release of the transport connection,
+with or without user data.  Valid states for this phase are:
+.BR T_DATAXFER ", " T_OUTREL ", and " T_INREL .
+XTI Library calls used in the Connection Release Phare are as follows:
+.RS
+.sp
+.BR t_rcvdis "(3) - receive abortive disconnect"
+.br
+.BR t_snddis "(3) - send abortive disconnect request"
+.br
+.BR t_rcvrel "(3) - acknowledge orderly release request"
+.br
+.BR t_sndrel "(3) - send orderly release request"
+.br
+.BR t_rcvreldata "(3) - acknowledge orderly release request with data"
+.br
+.BR t_sndreldata "(3) - send orderly release request with data"
+.RE
+.SS "Connectionless Endpoints"
+A set of XTI Library calls are provided for performing protocol functions on
+local transport endpoints for which the transport service provider is of a
+connectionless service type.  Connectionless service has one phase as follows:
+.HP
+.B Data Transfer Phase
+consists of transferring data between disconnected transport endpoints.  Valid
+states for this phase are:
+.BR T_IDLE .
+XTI Library calls used in the Data Transfer Phase are as follows:
+.RS
+.sp
+.BR t_rcvudata "(3) - receive unitdata"
+.br
+.BR t_rcvvudata "(3) - receive unitdata and scatter"
+.br
+.BR t_sndudata "(3) - send unitdata"
+.br
+.BR t_sndvudata "(3) - gather and send unitdata"
+.RE
+.SS "XTI Library functions"
+A set of XTI Library calls are provided for error handling and utility.
+These functions do not operate directly on a transport endpoint.
+.HP
+.B Error Handling
+consists of the global external variable
+.I t_errno
+which holds all XTI Library call error numbers in a similar fashion to
+.BR errno (3).
+The following Error Handling functions are provided:
+.RS
+.sp
+.BR t_errno "(3) - error number"
+.br
+.BR t_error "(3) - print an error message"
+.br
+.BR t_strerror "(3) - describe an XTI library error"
+.RE
+
+.HP
+.B Utility Functions
+provide for the allocation and deallocation of XTI library datastructures, and
+equiry concerning XTI system confiruation parameters.
+The following Utility Functions are provided:
+.RS
+.sp
+.BR t_alloc "(3) - allocate a library structure"
+.br
+.BR t_free "(3) - free a library structure"
+.br
+.BR t_sysconf "(3) - configure XTI system parameters"
+.RE
+.SH "RETURN VALUES"
+.PP
+Upon success,
+most XTI library functions return zero (0) or a positive integer reflecting a
+returned paramter value.
+Upon failure,
+XTI library functions return -1 and set
+.IR t_errno (3)
+to an applicable error number.
+.SH ERRORS
+.PP
+The errors that can be returned by XTI Library calls are detailed
+in
+.IR t_errno (3).
+.SH "SEE ALSO"
+.PP
+.BR t_accept (3),
+.BR t_addleaf (3),
+.BR t_alloc (3),
+.BR t_bind (3),
+.BR t_close (3),
+.BR t_connect (3),
+.BR t_errno (3),
+.BR t_error (3),
+.BR t_free (3),
+.BR t_getinfo (3),
+.BR t_getprotaddr (3),
+.BR t_getstate (3),
+.BR t_listen (3),
+.BR t_look (3),
+.BR t_open (3),
+.BR t_optmgmt (3),
+.BR t_rcv (3),
+.BR t_rcvconnect (3),
+.BR t_rcvdis (3),
+.BR t_rcvleafchange (3),
+.BR t_rcvrel (3),
+.BR t_rcvreldata (3),
+.BR t_rcvudata (3),
+.BR t_rcvuderr (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3),
+.BR t_removeleaf (3),
+.BR t_snd (3),
+.BR t_snddis (3),
+.BR t_sndrel (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndv (3),
+.BR t_sndvudata (3),
+.BR t_strerror (3),
+.BR t_sync (3),
+.BR t_sysconf (3),
+.BR t_unbind (3).
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

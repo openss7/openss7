@@ -1,0 +1,280 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: canenable.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CANENABLE 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH "NAME"
+.B canenable
+\- test whether a message queue can be scheduled.
+.\"
+.\"
+.SH "SYNOPSIS"
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int canenable(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue to test whether a subsequent
+.BR qenable (9)
+can be successful.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR canenable ()
+tests whether the queue pointed to by
+.I q
+can be enabled (service procedure scheduled for execution by
+.BR runqueues (9))
+by
+.BR qenable (9).
+.PP
+This function is typically called before a call to
+.BR qenable (9)
+when the caller wishes to determine whether
+.BR qenable (9)
+will indeed result in the scheduling of the queue's
+service procedure.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR canenable ()
+returns true (1) if the queue pointed to by
+.I q
+can be enabled with
+.BR qenable (9).
+.PP
+.BR canenable ()
+returns false (0) if the queue pointed to by
+.I q
+cannot be enabled with
+.BR qenable (9).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR canenable ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR canenable ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR canenable ()
+is MP-safe.
+.PP
+Consideration should be given that the return may change before the condition
+is tested if
+.BR noenable (9)
+or
+.BR qprocsoff (9)
+are allowed to execute concurrent with
+.BR canenable ().
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR canenable ()
+simply returns the result of testing the
+.B QNOENB
+bit.
+.PP
+Although it is MP-safe, it is questionable whether
+.BR canenable ()
+is usable in a Multiprocessor (MP) environment.
+.BR canenable ()
+tests atomic flags in the
+.BR queue (9)
+structure flags word that can be altered by other processors immediately
+prior to, or subsequent to, the call to
+.BR canenable ().
+Therefore, there is always a race condition possible between
+.BR canenable ()
+and
+.BR noenable (9),
+.BR qprocsoff (9),
+(or other utilities affecting the
+.B QNOENB
+flag in the
+.BR queue (9)
+flags word) on MP systems.
+.PP
+.BR canenable ()
+might have some limited use on UP systems where interrupts can be locked out
+across the call.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qenable (9),
+.BR qdisable (9),
+.BR noenable (9),
+.BR enableok (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR canenable ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR canenable ()
+is compatible with
+.BR "SVR 3 SPG"
+.[
+svr3spg
+.]
+and
+.BR LiS,
+.[
+LiS
+.]
+with the following considerations:
+.IP \(bu
+A call to
+.BR canenable ()
+with a
+.B NULL
+.I q
+or with a
+.RB non- NULL
+.I q
+that points to other than a valid
+.B queue_t
+structure is invalid and the result in undefined.
+.IP ""
+When LiS
+.BR qenable ()
+encounters such an error, it will return false (0).
+.IP \(bu
+Symbol
+.BR lis_safe_canenable ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_safe_canenable ()
+simply calls
+.BR canenable ()
+directly.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.IP \(bu
+None of
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg
+or
+.BR UnixWare \(rg
+provide this function.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 3 SPG" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR canenable ()
+first appeared in
+.BR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

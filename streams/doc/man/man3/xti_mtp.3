@@ -1,0 +1,929 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: xti_mtp.3,v 0.9.2.1 2004/02/29 19:06:48 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:48 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR [\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH XTI-MTP 3 "$Date: 2004/02/29 19:06:48 $" "$Name:  $" "X/Open Transport Interface"
+.\"
+.\"
+.SH NAME
+.B XTI-MTP
+\- X/Open Transport Interface \- Corrigendum for Message Transfer Part (MTP) Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ss7.h>
+.br
+.B #include <xti_mtp.h>
+.\"
+.\"
+.HP
+.BI "int " mtp_xtistr " = t_open(" \fR/dev/mtp-tpi-cl\fI ", " flags );
+.\"
+.\"
+.HP
+.BI "int " mtp_xtistr " = t_open(" \fR/dev/mtp-tpi-co\fI ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual section describes the protocol-specific information that is
+relevant for MTP
+.[
+q704
+.]
+.[
+mtpv1
+.]
+.[
+t1.111
+.]
+.[
+jtq704
+.]
+transport providers.  This section also describes the
+protocol-specific information that is relevant when MTP services
+.[
+q701
+.]
+are provided over an IP network using M3UA
+.[
+rfc3332
+.]
+.RB ( m3ua (4))
+or TALI
+.[
+TALI
+.]
+.RB ( tali (4)).
+.\"
+.\"
+.PP
+This section also defines the data structures and constants required for MTP
+transport providers that are exposed through the XTI
+.[
+xti
+.]
+.[
+xns
+.]
+.B <xti_mtp.h>
+header file.
+.\"
+.\"
+.SH "ADDRESS FORMAT"
+.PP
+The MTP address format is structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct sockaddr_mtp {
+    sa_family_t mtp_family;     /* Address family */
+    uint16_t mtp_ni;            /* Network indicator */
+    uint16_t mtp_si;            /* Service indicator */
+    uint32_t mtp_pc;            /* Point code */
+    uint8_t mtp_zero[sizeof(struct sockaddr) -
+                     sizeof(sa_family_t) -
+                     sizeof(uint16_t) * 2 - sizeof(uint32_t)];
+} t_mtp_addr_t;
+\fR\s+1
+.fi
+The MTP address format is a
+.B t_mtp_addr_t
+structure containing the following members:
+.\"
+.\"
+.TP 12
+.I mtp_family
+This field is for compatability with the
+.BR sockets (3)
+library and is not used by XTI and is ignored by the MTP provider.
+.\"
+.\"
+.TP 12
+.I mtp_ni
+conveys the Network Indicator.  The Network Indicator is an implementation
+specific indication of the numbering space in which the
+.I mtp_pc
+is relevant.  Network Indicators are assigned by the system adminstrator.
+.\"
+.\"
+.TP 12
+.I mtp_pc
+conveys the MTP Signalling Point Code.  The format of the signalling point
+code is network dependent.  Signalling Point Codes are least significant bit
+aligned in a 32-bit long word.
+.\"
+.\"
+.TP 12
+.I mtp_si
+conveys the MTP Service Indicator.  The specific numbering of service
+indicators is implementation and protocol variant specific.
+.\"
+.\"
+.TP 12
+.I mtp_zero
+This field is for comaptability with the
+.BR sockets (3)
+library and is not used by XTI and is ignored by the MTP provider.
+.\"
+.\"
+.PP
+The combination of
+.IR mtp_ni ", " mtp_pc " and " mtp_si
+define the MTP Service Access Point (MTP-SAP).
+.\"
+.\"
+.PP
+The network indicator can be \*(lqwildcarded\*(rq by setting
+.I mtp_ni
+to -1.
+The signalling point code can be \*(lqwildcarded\*(rq by setting
+.I mtp_pc
+to -1.
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An MTP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in the privileged or
+read-only mode.  M3UA
+.RB ( m3ua (4))
+and TALI
+.RB ( tali (4))
+transport providers only support a subset of
+the options defined here.
+.\"
+.\"
+.PP
+An MTP conforming transport provider supports two levels of options.  These
+two levels are described below.
+.SS T_SS7_SS7
+.PP
+Options within this level are specific to Signalling System No. 7 (SS7) and
+are common to the all protocol levels in SS7.  For more information see
+.BR xti_ss7 (3).
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_SS7_SS7
+are as follows:
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR
+the protocol variant provided by the MTP provider.  This option has a
+.B t_uscalar_t
+option value.  The option value can be one of the following values:
+.RS
+.\"
+.\"
+.TP 12
+.B T_INVALID
+The protocol variant is not known because the stream is not bound to a
+specific network indicator.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ITUT88
+The protocol supported by the MTP transport provider on the stream conforms to
+ITU-T Recommendation Q.704, CCITT Blue Book, 1988
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ITUT93
+The protocol supported by the MTP transport provider on the stream conforms to
+ITU-T Recommendation Q.704, CCITT White Book, 1993
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ITUT96
+The protocol supported by the MTP transport provider on the stream conforms to
+ITU-T Recommendation Q.704, 1996
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ITUT00
+The protocol supported by the MTP transport provider on the stream conforms to
+ITU-T Recommendation Q.704, 2000
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ETSI88
+The protocol supported by the MTP transport provider on the stream conforms to
+ETSI ETS 300 008-1, 1988.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ETSI93
+The protocol supported by the MTP transport provider on the stream conforms to
+ETSI ETS 300 008-1, 1993.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ETSI96
+The protocol supported by the MTP transport provider on the stream conforms to
+ETSI ETS 300 008-1, 1996.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ETSI00
+The protocol supported by the MTP transport provider on the stream conforms to
+ETSI ETS 300 008-1, 2000.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ANSI88
+The protocol supported by the MTP transport provider on the stream conforms to
+ANSI T1.111.4/1988.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ANSI92
+The protocol supported by the MTP transport provider on the stream conforms to
+ANSI T1.111.4/1992.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ANSI96
+The protocol supported by the MTP transport provider on the stream conforms to
+ANSI T1.111.4/1996.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_ANSI00
+The protocol supported by the MTP transport provider on the stream conforms to
+ANSI T1.111.4/2000.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_JTTC94
+The protocol supported by the MTP transport provider on the stream conforms to
+JTTC JQ.704 1994.
+.\"
+.\"
+.TP 12
+.B T_SS7_PVAR_NICC00
+The protocol supported by the MTP transport provider on the stream conforms to
+NICC ND1005:2000/08.
+.RE
+.\"
+.\"
+.TP 12
+.B T_SS7_MPLEV
+This option indicates whether the MTP transport provider supports multiple
+levels of message priority.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.\"
+.\"
+.TP 12
+.B T_SS7_DEBUG
+This option indicates the debug settings.
+The option value is a
+.B t_uscalar_t
+representing the debug level and flags.  The valid values are implementation
+specific.
+.\"
+.\"
+.TP 12
+.B T_SS7_PCR
+This option indicates whether the MTP transport provider supports signalling
+links that provide Preventative Cyclic Retransmission.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.\"
+.\"
+.TP 12
+.B T_SS7_HSL
+This option indicates whether the MTP transport provider supports High-Speed
+Links.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.\"
+.\"
+.TP 12
+.B T_SS7_XSN
+This option indicates whether the MTP transport provider supports Extended
+Sequence Numbers.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.\"
+.\"
+.TP 12
+.B T_SS7_CLUSTER
+This option indicates whether the MTP transport provider supports Cluster
+Routing.
+The option value is a
+.B t_uscalar_t
+that can have the value
+.BR T_YES " or " T_NO .
+.SS T_SS7_MTP
+.PP
+Options within this level are specific to the Message Transfer Part (MTP) yet
+are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_SS7_MTP
+are as follows:
+.\"
+.\"
+.TP 12
+.B T_MTP_SLS
+This option is the Signalling Link Selection value.
+The option value is formatted as a
+.BR t_uscalar_t .
+Depending on the protocol variant, the signalling link selection can have a
+value within the range 0 to 15, 0 to 31, or 0 to 255.  Values specified
+outside the allowable range for a specific protocol variant will be bit masked
+to a valid value by the MTP provider.
+This option is used with
+.BR t_sndudata "(3) and " t_sndvudata (3).
+.\"
+.\"
+.TP 12
+.B T_MTP_MP
+This option is the Message Priority value.
+The option value is formatted as a
+.BR t_uscalar_t .
+Depending on the protocol variant and the setting of the
+.BR T_SS7_MPLEV
+option, the range of this value can be from 0 to 3.  Values specified outside
+the allowable range for a specific protocol variant will be limited to a valid
+value by the MTP provider.  The value 3 may be a priviledged value.
+This option is used with
+.BR t_sndudata "(3) and " t_sndvudata (3).
+.\"
+.\"
+.TP 12
+.B T_MTP_DEBUG
+This option indicates the debug settings.
+The option value is a
+.B t_uscalar_t
+representing the debug level and flags.  The valid values are implementation
+specific.
+This option is used with
+.BR t_optmgmt (3).
+.\"
+.\"
+.TP 12
+.B T_MTP_SRC_ADDR
+This option is the source address of the sent message.
+The option valid is formatted as a
+.BR t_mtp_addr_t .
+The option value is the value of the source address for the sent message.
+This option is used with
+.BR t_sndudata "(3) and " t_sndvudata (3).
+.\"
+.\"
+.TP 12
+.B T_MTP_DST_ADDR
+This option is the destination address of the received message.
+The option valid is formatted as a
+.BR t_mtp_addr_t .
+The option value is the value of the source address for the received message.
+This option is used with
+.BR t_rcvudata "(3) and " t_rcvvudata (3).
+When used with
+.BR t_optmgmt (3),
+the option value is a
+.B t_uscalar_t
+that can take on the values
+.BR T_YES " or " T_NO ,
+indicating whether the option should be passed to
+.BR t_rcvudata "(3) and " t_rcvvudata (3).
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.SS \fB\)t_accept\fR(3)
+.PP
+.B MTP
+does not support connection indications.  The
+.BR t_accept (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_bind\fR(3)
+.PP
+For MTP conforming transport providers, the
+.I req->addr
+field contains an MTP-SAP address as described above under
+.IR "\*(lqADDRESS FORMAT\*(rq" .
+If either the
+.I mtp_ni
+or
+.I mtp_pc
+components of the address are \*(lqwildcarded\*(rq, the MTP conforming
+transport provider may assign a value to the \*(lqwildcarded\*(rq fields.  If
+the MTP conforming transport provider completes a \*(lqwildcarded\*(rq field,
+it must return the resulting bound address in the
+.I ret->addr
+parameter.
+.\"
+.\"
+.PP
+MTP supports a connectionless and pseudo connection oriented mode.  To bind a
+connectionless stream,
+.I req->qlen
+should be set to zero (0).
+To bind a pseudo connection oriented stream,
+.I req->qlen
+should be set to a non-zero positive integer.
+Because MTP does not support connection indications,
+on return from
+.BR t_bind (3),
+MTP conforming transport providers will return a
+.I ret->qlen
+of zero (0) regardless of the setting of
+.IR req->qlen .
+.SS \fB\)t_close\fR(3)
+.PP
+This function operates as described in
+.BR t_close (3)
+without change.
+.\"
+.\"
+.SS \fB\)t_connect\fR(3)
+.PP
+For pseudo-connection oriented service providers, this XTI call associates the
+local MTP endpoint with a remote MTP endpoint to form a signalling relation.
+No protocol messages are exchanged and the association is a local relationship
+only.
+For connectionless service providers, this XTI call will fail, return -1 and
+set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS \fB\)t_getinfo\fR(3)
+.PP
+.\"
+.\"
+.TP 12
+.I addr
+For compatability with the
+.BR sockets (3)
+library, the MTP uses a
+.B sockaddr
+structured address.  This size will always be the size of a
+.B sockaddr
+structure.
+.\"
+.\"
+.TP 12
+.I options
+The maximum size of options is provider specific.  The
+.B OpenSS7
+MTP implementation
+.RB ( mtp (4))
+returns the maximum size of an options structure containing all
+MTP options.
+.\"
+.\"
+.TP 12
+.I tsdu
+The maximum size of a transport service data unit.  For MTP this is the
+maximum size of the payload of User Part MSU.  This varies depending on the
+protocol variant and options supported.  Also, for a specific MTP provider,
+this value may be different depending on the limitations of underlying SS7
+links.  The maximum value that will be reported here for MTP is guaranteed to
+be less than 3094.  For a typical MTP provider using narrow band SS7 links,
+this value will be as small as 272.  For
+.BR m3ua (4),
+or
+.BR tali (4),
+this value could be
+.BR T_INFINITE .
+.\"
+.\"
+.TP 12
+.I etsdu
+MTP does not support the concept of expedited data.
+MTP conforming transport providers always return
+.BR T_INVALID .
+.\"
+.\"
+.TP 12
+.I connect
+MTP does not support the concept of connection data.
+MTP conforming transport providers always return
+.BR T_INVALID .
+.\"
+.\"
+.TP 12
+.I discon
+MTP does not support the concept of disconnection data.
+MTP conforming transport providers always return
+.BR T_INVALID .
+.\"
+.\"
+.TP 12
+.I servtype
+MTP supports a true connectionless mode and a pseudo connection-oriented mode
+without connection indications.
+MTP conforming transport providers may return
+.BR T_CLTS " or " T_COTS .
+MTP conforming transport providers will not return
+.BR T_COTS_ORD .
+.\"
+.\"
+.TP 12
+.I flags
+MTP does not support orderly release or disconnection data.  MTP conforming
+transport providers will not return
+.BR T_ORDRELDATA " or " T_SNDZERO
+flags.
+MTP conforming providers may return
+.BR XPG4_1 .
+.SS \fB\)t_listen\fR(3)
+.PP
+.B MTP
+does not support connection indications.  The
+.BR t_listen (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ],
+.RB [ TBADQLEN ],
+.RB [ TLOOK ],
+.RB [ TNODATA ],
+.RB [ TOUTSTATE ],
+.RB [ TQFULL ]
+or
+.RB [ TSYSERR ].
+.SS \fB\)t_open\fR(3)
+.PP
+MTP conforming transport providers will return in the
+.B t_info
+structure the same information as returned to the
+.BR t_getinfo (3)
+library call as described above.
+Otherwise this function operates as described in
+.BR t_open (3).
+.SS \fB\)t_optmgmt\fR(3)
+.PP
+MTP conforming transport providers support the options described under
+.IR \*(lqOPTIONS\*(rq ,
+above.
+.SS \fB\)t_rcvconnect\fR(3)
+.PP
+.B MTP
+does not support connection indications.  The
+.BR t_rcvconnect (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_rcvdis\fR(3)
+.PP
+.B MTP
+does not support disconnect indications.  The
+.BR t_rcvdis (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_rcv\fR(3), \fB\)t_rcvv\fR(3)
+.PP
+For pseudo-connection oriented service providers, these XTI calls receive data
+transferred from the remote MTP peer on a connected stream.
+For connectionless service providers, these XTI calls will fail, return -1 and
+set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_rcvreldata\fR(3)
+.PP
+.B MTP
+does not support release indications.  The
+.BR t_rcvreldata (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_rcvrel\fR(3)
+.PP
+.B MTP
+does not support release indications.  The
+.BR t_rcvrel (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_rcvudata\fR(3), \fB\)t_rcvvudata\fR(3)
+.PP
+For connectionless service providers, this XTI call sends a unit data to the
+MTP peer with the specified options, described under
+.I \*(lqOPTIONS\*(rq
+above.
+For pseudo-connection oriented services providers, these XTI calls will fail,
+return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_rcvuderr\fR(3)
+.PP
+.B MTP
+will return the options specified under
+.I \*(lqOPTIONS\*(rq ,
+above.
+.\"
+.\"
+.PP
+MTP defines the the following protocol dependent error codes:
+.\"
+.\"
+.TP 12
+.B T_MTP_USER_PART_UNKNOWN
+A previous unit data was sent to an MTP user part that was unknown to the
+destination node.  This error is returned from the remote peer MTP provider.
+.\"
+.\"
+.TP 12
+.B T_MTP_USER_PART_UNEQUIPPED
+A previous unit data was sent to an MTP user part that is unequipped at the
+destination node.  This error is returned from the remote peer MTP provider.
+.\"
+.\"
+.TP 12
+.B T_MTP_USER_PART_UNAVAILABLE
+A previous unit data was sent to an MTP user part that is known and equipped,
+but is currently unavailable at the destination node.  This error is returned
+from the remote peer MTP provider.
+.\"
+.\"
+.TP 12
+.B T_MTP_DEST_AVAILABLE
+A destination node that was previously unavailable is now available.
+.\"
+.\"
+.TP 12
+.B T_MTP_DEST_PROHIBITED
+A previous unit data was sent to an MTP user at a destination node that is
+currently inaccessible.  This error is returned by the local MTP provider or
+by a relay node in the SS7 network.
+.\"
+.\"
+.TP 12
+.B T_MTP_DEST_CONGESTED[n]
+A previous unit data was sent to an MTP user at a destination node with a
+priority less than the current congestion level in the SS7 network toward that
+node.  This error is returned by the local MTP provider or by a relay node in
+the SS7 network.  This error is returned even if the previous unit data did
+not originate from the MTP user associated with this stream.
+.I n
+indicates the congestion level.
+.\"
+.\"
+.TP 12
+.B T_MTP_CLUS_AVAILABLE
+A destination cluster that was previously unavailable is now available.
+.\"
+.\"
+.TP 12
+.B T_MTP_CLUS_PROHIBITED
+A previous unit data was sent to an MTP user at a destination node within a
+cluster that is currently inaccessible.  This error is returned by the local
+MTP provider or by a relay node in the SS7 network.
+.\"
+.\"
+.TP 12
+.B T_MTP_CLUS_CONGESTED[n]
+A previous unit data was sent to an MTP user at a destination node within a
+cluster with a priority less than the current congestion level in the SS7
+network toward that cluster.  This error is returned by the local MTP provider
+or by a relay node in the SS7 network.  This error is returned even if the
+previous unit data did not originate from the MTP user associated with this
+stream.
+.I n
+indicates the congestion level.
+.\"
+.\"
+.TP 12
+.B T_MTP_RESTARTED
+The local MTP provider has completed restart.
+.\"
+.\"
+.TP 12
+.B T_MTP_RESTARTING
+A previous unit data was sent and the MTP provider is restarting with respect
+to the SS7 network.  This error is returned by the local MTP provider.  This
+error is returned even if no unit data originated from the MTP user associated
+with this stream.
+.\"
+.\"
+.SS \fB\)t_snddis\fR(3)
+.PP
+For pseudo-connection oriented service providers, this XTI library call releases
+the signallling relation associated with the requesting stream.  For
+connectionless service providers, this XTI library call fails, returns -1, and
+sets
+.IR t_errno (3)
+to
+.RB [ TNOSUPPORT ].
+.SS \fB\)t_snd\fR(3), \fB\)t_sndv\fR(3)
+.PP
+For connected pseudo-connection service privders, these XTI library calls are
+used to send data, with or without gather, to the peer on the signalling
+relation.
+.SS \fB\)t_sndreldata\fR(3)
+.PP
+.B MTP
+does not support orderly release with data.  The
+.BR t_sndreldata (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_sndrel\fR(3)
+.PP
+.B MTP
+does not support orderly release.  The
+.BR t_sndrel (3)
+XTI call will fail, return -1, and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.SS \fB\)t_sndudata\fR(3), \fB\)t_sndvudata\fR(3)
+.PP
+For connectionless service providers, this XTI call sends a unit data to the
+MTP peer with the specified options, described under
+.I \*(lqOPTIONS\*(rq
+above.
+For pseudo-connection oriented services providers, these XTI calls will fail,
+return -1 and set
+.IR t_errno (3)
+to
+.BR [ TNOTSUPPORT ].
+.SS \fB\)t_unbind\fR(3)
+.PP
+This function operates as described in
+.BR t_unbind (3).
+.\"
+.\"
+.SH CAVEATS
+.PP
+MTP does not support a true connection-oriented mode, but supports the concept
+of the establishment of a signalling relation between two endpoints in the SS7
+network.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m3ua (4),
+.BR mtp (4),
+.BR tali (4),
+.BR sockets (3),
+.BR t_errno (3),
+.BR t_optmgmt (3),
+.BR t_rcvudata (3),
+.BR t_rcvvudata (3),
+.BR t_sndudata (3),
+.BR t_sndvudata (3),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ss7 (3).
+.\"
+.\"
+.SH "DEVICES"
+.PP
+.\"
+.\"
+.PP
+There are a number of MTP devices providing the Transport Provider Interface
+that provide MTP conforming TPI devices as follows:
+.\"
+.\"
+.TP 12
+.IR /dev/mtp-tpi-cl ", " /dev/mtp-tpi-co
+These devices provide connectionless and pseudo-connection oriented MTP
+transport providers.
+For more information on the SS7 MTP device, see
+.BR mtp (4).
+.\"
+.\"
+.TP 12
+.IR /dev/tali-mtp-tpi-cl ", " /dev/tali-mtp-tpi-co
+These devices provide connectionless and pseudo-connection oriented MTP
+transport providers.
+For more information on the TALI MTP device, see
+.BR tali (4).
+.\"
+.\"
+.TP 12
+.IR /dev/m3ua-tpi-cl ", " /dev/m3ua-tpi-co
+These devices provide connectionless and pseudo-connection oriented MTP
+transport providers.
+For more information on the SIGTRAN M3UA device, see
+.BR m3ua (4).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B MTP-TPI
+driver is specific to the
+.B OpenSS7
+stack.
+This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,296 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: ip.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH IP 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "Under Construction"
+.\"
+.\"
+.SH NAME
+.B ip
+\- Internet Protocol
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/ip.h>
+.br
+.B #include <sys/tpi_ip.h>
+.br
+.B #include <sys/xti_ip.h>
+.HP 8
+.BI "int " ip_stream " = open(" \fR\*(lq/dev/ip\*(rq\fP ", " oflags );
+.HP 8
+.BI "int " ip_xtistr " = t_open(" \fR\*(lq/dev/ip\*(rq\fP ", " oflags );
+.HP 8
+.BI "int " ip_socket " = socket(" \fRPF_INET\fP ", " \fRSOCK_RAW\fP ", " \fRIPPROTO_IP\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B IP
+is an implementation of the Internet Protocol
+.RB ( IP )
+defined in RFC XXXX.
+It implements a datagrams, best effort packet service.  Packets may be
+reordered or duplicated in the network before they arrive.
+.B IP
+generates and checks checksums to catch transmission errors.
+.PP
+.B IP
+is implemented as a
+.IR STREAMS (4)
+pseudo-driver using the
+.BR INET (4)
+.B strinet
+packet for
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+The
+.B strinet
+packet translates Linux native
+.BR ip (7)
+sockets into TPI
+.[
+TPI Revision 2.0.0
+.]
+transport provider streams suitable for use with XTI,
+.[
+xti
+.]
+.[
+xns
+.]
+(see
+.BR xti (3)).
+.PP
+.B IP
+provides one connectionless TPI stream type.  To select the stream,
+.I ip_device
+can be one of the following:
+.TP
+.IR /dev/ip " or " /dev/inet/ip
+This device provides the
+.B IP
+protocol services using the T-primitives of the Transport Provider Interface,
+.[
+TPI Revision 2.0.0
+.]
+.BR tpi (7),
+used for Internet Protocol, as described in
+.BR tpi_ip (7).
+The
+.BR tpi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR xnet (3)
+or
+.BR xti (3)
+library and provides
+.B IP
+interface using XTI
+.[
+xti
+.]
+.[
+xns
+.]
+as described in
+.BR xti_ip (3).
+.PP
+.B IP
+provides one socket type for use by the
+.BR sockets (3)
+library
+.BR socket (7)
+calls.
+.B IP
+provides sockets in the protocol family
+.BR PF_INET " and " PF_INET6
+using the protocol number
+.BR IPPROTO_IP .
+The
+.I socket_type
+can be one of the following:
+.TP
+.B SOCK_PACKET
+A standard
+.I SOCK_PACKET
+socket that preserves message boundaries, does not Nagle, and provides only
+best effort unreliable delivery in a connectionless association.  This socket
+uses the underlying
+.BR Linux \(rg
+.B IP
+socket implementation,
+.BR ip (7),
+directly.  See
+.BR packet (7)
+for more information.
+.\"
+.\"
+.SH USAGE
+.PP
+.PP
+The following entries in
+.B /etc/protosw
+provides the information for
+.BR socksys (4)
+to use the devices:
+.sp
+.TS
+tab(:);
+lllllll.
+PF_INET:SOCK_PACKET:IPPROTO_IP:/dev/ip:tpi:clts
+PF_INET6:SOCK_PACKET:IPPROTO_IP:/dev/ip:tpi:clts
+.TE
+.PP
+For additional information, see
+.BR socksys "(4) and " protosw (5).
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+and
+.BR streamio (7)
+.I I_STR
+system calls on the
+.IR ip_stream ", " ip_xtistr " or " ip_socket .
+These management controls are described in
+.BR timod (4),
+.BR sockmod (4)
+and
+.BR socksys (4).
+See also
+.BR ip (7)
+for sockets.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B IP
+has several implementation.  THis manpage is for
+.BR INET (4)
+implementation that provides
+.BR tpi (7)
+access to the
+.BR Linux \(rg
+NET4 version of
+.BR IP .
+For more information on the
+.BR Linux \(rg
+NET4 version, see
+.BR ip (7).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <sys/socket.h> ,
+.BR <netinet/ip.h> ,
+.BR <sys/tpi.h> ,
+.BR <sys/tpi_ip.h> ,
+.BR <sys/xti.h> ,
+.BR <sys/xti_ip.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.BR /dev/ip ,
+.BR /dev/inet/ip .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR INET (4),
+.BR ioctl (2),
+.BR ip (7),
+.BR protosw (5),
+.BR socket (7),
+.BR sockets (3),
+.BR sockmod (4),
+.BR socksys (4),
+.BR STREAMS (4),
+.BR ip_ioctl (4),
+.BR timod (4),
+.BR xnet (3),
+.BR xti (3),
+.BR xit_ip (3).
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

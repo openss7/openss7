@@ -1,0 +1,1240 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: tpi_sccp.7,v 0.9.2.1 2004/02/29 19:07:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TPI-SCCP 7 "$Date: 2004/02/29 19:07:16 $" "$Name:  $" "Transport Provider Interface"
+.SH NAME
+.B TPI-SCCP
+\- Transport Provider Interface \- Corrigendum for SCCP Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/tpi.h>
+.br
+.B #include <sys/tpi_ss7.h>
+.br
+.B #include <sys/tpi_mtp.h>
+.br
+.B #include <sys/tpi_sccp.h>
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TPI-SCCP
+provides a stream supporting the Transport Provider Interface
+.RB ( tpi (7))
+to the Signalling Connection Control Part
+.RB ( sccp (4)).
+This
+.IR STREAMS (4)
+interface provides the
+.BR sccp (4)
+protocol service interface using the T-primitives of the
+.BR tpi (7).
+This interface is intended solely for use by user programs or protocol modules
+requiring the common
+.BR tpi (7)
+interface such as the
+.BR xti (3)
+.BR timod (4)
+and the
+.BR sockets (3)
+.BR sockmod (4)
+or
+.BR socksys (4).
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+The
+.B TPI-SCCP
+address is formatted as a socket address for compatability with the
+.BR sockets (3)
+library for
+.BR tpi (7).
+The address is formattted as follows:
+.\"
+.\"
+.sp
+.nf
+\fC\s-1\
+typedef struct sockaddr_sccp {
+    sa_family_t sccp_family;	/* Address family */
+    uint16_t sccp_ni;		/* Network indicator */
+    uint16_t sccp_ri;		/* Routing indicator */
+    uint32_t sccp_pc;		/* Point code */
+    uint8_t sccp_ssn;		/* Subsystem number (0 not present) */
+    uint8_t sccp_gtt;		/* Global title translation type */
+    uint8_t sccp_tt;		/* Translation type */
+    uint8_t sccp_es;		/* Encoding scheme */
+    uint8_t sccp_nplan;		/* Numbering plan */
+    uint8_t sccp_nai;		/* Nature of address indicator */
+    uint8_t sccp_alen;		/* Address length */
+    uint8_t sccp_addr[T_SCCP_MAX_SADDR_LENGTH];	/* address digits */
+    uint8_t sccp_zero[sizeof(struct sockaddr) -
+		      sizeof(sa_family_t) -
+		      sizeof(uint16_t) * 2 -
+		      sizeof(uint32_t) -
+		      sizeof(uint8_t) *
+		      (7 + T_SCCP_MAX_SADDR_LENGTH)];
+} t_sccp_addr_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+The
+.BR TPI-SCCP
+address contains the following fields:
+.\"
+.\"
+.TP
+.I sccp_family
+This field is for compatability with
+.BR sockets (3)
+library and is not used by XTI and is ignored by the SCCP provider.
+.\"
+.\"
+.TP
+.I sccp_ni
+conveys the Network Indicator.  The Network Indicator is an implementation
+specific indication of the numbering space in which the
+.I sccp_pc
+is relevant.  Network Indicators are assigned by the system administrator.
+.\"
+.\"
+.TP
+.I sccp_ri
+conveys the Routing Indicator.  The Routing Indicator determines which
+elements of the SCCP address will be used for routing and can be one of the
+following values:
+.\"
+.\"
+.RS
+.TP
+.B T_SCCP_RI_DPC_SSN
+route on DPC/SSN.
+.\"
+.\"
+.TP
+.B T_SCCP_RI_GT
+route of Global Title.
+.RE
+.\"
+.\"
+.TP
+.I sccp_pc
+conveys the SCCP Signalling Point Code.  The format of the signalling point
+code is network dependent.  Signalling Point Codes are least significant bit
+aligned in a 32-bit long word.
+.\"
+.\"
+.TP
+.I sccp_ssn
+.\"
+.\"
+.RS
+.TP
+.B T_SCCP_SSN_UNKNOWN
+.TP
+.B T_SCCP_SSN_SCMG
+.TP
+.B T_SCCP_SSN_RESERVED
+.TP
+.B T_SCCP_SSN_ISUP
+.TP
+.B T_SCCP_SSN_OMAP
+.TP
+.B T_SCCP_SSN_MAP
+.TP
+.B T_SCCP_SSN_HLR
+.TP
+.B T_SCCP_SSN_VLR
+.TP
+.B T_SCCP_SSN_MSC
+.TP
+.B T_SCCP_SSN_EIC
+.TP
+.B T_SCCP_SSN_AUC
+.TP
+.B T_SCCP_SSN_ISDN_SS
+.TP
+.B T_SCCP_SSN_RESERVED2
+.TP
+.B T_SCCP_SSN_BISDN
+.TP
+.B T_SCCP_SSN_TC_TEST
+.RE
+.\"
+.\"
+.TP
+.I sccp_gtt
+conveys the Global Title type.
+.\"
+.\"
+.RS
+.TP
+.B T_SCCP_GTTTYPE_NONE
+no GT.
+.TP
+.B T_SCCP_GTTTYPE_NAI
+NAI only.
+.TP
+.B T_SCCP_GTTTYPE_TT
+TT only.
+.TP
+.B T_SCCP_GTTTYPE_NP
+TT, ES and NPLAN.
+.TP
+.B T_SCCP_GTTTYPE_NP_NAI
+TT, ES, NPLAN and NAI.
+.RE
+.\"
+.\"
+.TP
+.I sccp_tt
+conveys the Translation type.
+.\"
+.\"
+.TP
+.I sccp_es
+conveys the Encoding Scheme.
+.\"
+.\"
+.RS
+.TP
+.B T_SCCP_ES_UNKNOWN
+.TP
+.B T_SCCP_ES_BCD_ODD
+.TP
+.B T_SCCP_ES_BCD_EVEN
+.TP
+.B T_SCCP_ES_NATIONAL
+.RE
+.\"
+.\"
+.TP
+.I sccp_nplan
+conveys the Numbering Plan.
+.\"
+.\"
+.RS
+.TP
+.B T_SCCP_NPLAN_UNKNOWN
+.TP
+.B T_SCCP_NPLAN_ISDN
+.TP
+.B T_SCCP_NPLAN_GENERIC
+.TP
+.B T_SCCP_NPLAN_DATA
+.TP
+.B T_SCCP_NPLAN_TELEX
+.TP
+.B T_SCCP_NPLAN_MARITIME
+.TP
+.B T_SCCP_NPLAN_LAND_MOBILE
+.TP
+.B T_SCCP_NPLAN_ISDN_MOBILE
+.TP
+.B T_SCCP_NPLAN_PRIVATE
+.RE
+.\"
+.\"
+.TP
+.I sccp_nai
+conveys the Nature of Address Indicator.
+.\"
+.\"
+.TP
+.I sccp_alen
+conveys the address length.
+.\"
+.\"
+.TP
+.I sccp_addr
+conveys the address.
+.\"
+.\"
+.TP
+.I sccp_zero
+This field is for compatability with the
+.BR sockets (3)
+library and is not used by XTI and is ignored by the SCCP provider.
+.\"
+.\"
+.SS "OPTIONS"
+.PP
+.B TPI-SCCP
+provides options at the
+.B T_SS7_SCCP
+option level as described in the sections which follow.  Of the
+.B T_SS7_SCCP
+level protocol options,
+.BR T_SCCPSEQ_CTRL ,
+.BR T_SCCP_PRIORITY ,
+.BR T_SCCP_PCLASS ,
+.BR T_SCCP_IMPORTANCE ,
+and
+.BR T_SCCP_RET_ERROR ,
+are of end-to-end significance.
+.\"
+.\"
+.TP
+.B T_SCCP_SEQ_CTRL
+This option sets or gets the Sequence Control value associated with a message
+or stream.  The option argument is one
+.B t_uscalar_t
+value that represents the value of the sequence control parameter.  When used
+in the
+.BR T_OPTDATA_REQ "(7), " T_OPTDATA_IND "(7), " T_UNITDATA_REQ "(7) or " T_UNITDATA_IND (7)
+primitives, this option sets or gets the sequence control value associated
+with a message.  When used in the
+.BR T_OPTMGMT_REQ "(7) or " T_OPTMGMT_ACK (7)
+primitives, this option sets or gets the sequence control value associated
+with a stream.
+.sp
+This option is of end-to-end significance.  When the
+.B T_SCCP_SEQ_CTRL
+value is set on outgoing data, with
+.BR T_OPTDATA_REQ "(7) or " T_UNITDATA_REQ (7),
+the same
+.B T_SCCP_SEQ_CTRL
+value will be indicated in the
+.BR T_OPTDATA_IND (7) or " T_UNITDATA_IND (7)
+primitive at the transport peer.
+.TP
+.B T_SCCP_PRIORITY
+.TP
+.B T_SCCP_PCLASS
+.RS
+.TP
+.B T_SCCP_PCLASS_0
+.TP
+.B T_SCCP_PCLASS_1
+.TP
+.B T_SCCP_PCLASS_2
+.TP
+.B T_SCCP_PCLASS_3
+.TP
+.B T_SCCP_PCLASS_ALL
+.RE
+.TP
+.B T_SCCP_IMPORTANCE
+.TP
+.B T_SCCP_RET_ERROR
+.TP
+.B T_SCCP_DEBUG
+.\"
+.\"
+.SH "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+.\"
+.\"
+.SS T_INFO_REQ
+.PP
+This primitive is intepreted as in
+.BR T_INFO_REQ (7).
+.\"
+.\"
+.SS T_INFO_ACK
+.PP
+This primitive has the following interpretations:
+.\"
+.\"
+.TP
+.I TSDU_size
+If the connectionless protocol variant supports SCCP [LX]UDT[S] messages with
+segmentation and reassembly, this number could be
+.B T_INFINITE
+or very large.
+For the most part, connection oriented SDUs in SCCP can't be larger than about
+4096 bytes.
+.\"
+.\"
+.TP
+.I ETSDU_size
+Expedited data is only supported in protocol class 3: other protocol classes
+will return
+.B T_INVALID
+in this field.
+Expedited data can be of indefinite size.  Protocol class 3 will return
+.B T_INFINITE
+in this field.
+.\"
+.\"
+.TP
+.I CDATA_size
+Connection data is only supported in connection oriented protocol classes.
+Connectionless protocol classes 0 and 1 will return
+.B T_INVALID
+in this field.
+Connection data in connection oriented protocol classes is limited to one
+SCCP packet.  For these protocol classes this field will return the same value
+as is returned in
+.I TIDU_size
+below.
+.\"
+.\"
+.TP
+.I DDATA_size
+Disconnection data is only supported in connection oriented protocol classes.
+Connectionless protocol classes 0 and 1 will return
+.B T_INVALID
+in this field.
+Disconnection data in connection oriented protocol classes is limited to one
+SCCP packet.  For these protocol classes this field will return the same value
+as is returned in
+.I TIDU_size
+below.
+.\"
+.\"
+.TP
+.I ADDR_size
+This field will be the size of the
+.B sockaddr
+structure.
+.\"
+.\"
+.TP
+.I OPT_size
+This field is interpreted as described in
+.BR T_INFO_ACK (7).
+Care should eb taken that the SCCP conforming transport provider not return
+too large a value: this value is used for reserving buffer using
+.BR t_alloc (3)
+in
+.BR xti (3).
+Therefore, this value should not be greater thatn the sum of the sizes of all
+of the options described under
+.IR \*(lqOPTIONS\*(rq ,
+above, plus the size of the
+.B t_opthdr
+structure for each option.
+.\"
+.\"
+.TP
+.I TIDU_size
+The transport interface data unit size is the maximum size of data that can be
+transferred across the TPI interface for the given stream.  For SCCP, this is
+the maximum amount of payload that can fit into an [XL]UDT[S], DT1 or DT2.
+.\"
+.\"
+.TP
+.I SERV_type
+For protocol classes 0 and 1 the service type is
+.BR T_CLTS ;
+for protocol casses 2 and 3 it is
+.BR T_COTS .
+The
+.B TPI-SCCP
+transport service provider could refuse to permit protocol classes to be
+changed from connectionless to connection oriented using
+.BR T_OPTMGMT_REQ (7).
+.\"
+.\"
+.TP
+.I CURRENT_state
+This field is interpreted as described in
+.BR T_INFO_ACK (7).
+.\"
+.\"
+.TP
+.I PROVIDER_flag
+The
+.B TPI-SCCP
+transprot service provider can set
+.BR T_SNDZERO " or " XPG4_1 .
+.\"
+.\"
+.SS T_ADDR_REQ
+.PP
+This primitive is interpreted as in
+.BR T_ADDR_REQ (7).
+.\"
+.\"
+.SS T_ADDR_ACK
+.PP
+.\"
+.\"
+.TP
+.IR LOCADDR_length ", " LOCADDR_offset
+The length and offset from the start of the primitive message block of the
+.B sockaddr_sccp
+structure which describes the SCCP address to which the stream is bound.  If
+the stream is not in a bound state, then
+.IR LOCADDR_length " and " LOCADDR_offset
+return zero (0).
+.\"
+.\"
+.TP
+.IR REMADDR_length ", " REMADDR_offset
+The length and offset from the start of the primitive message block of the
+.B sockaddr_sccp
+structure which describes the SCCP addres to which the setream is connected.
+If the stream is not in a connected state, or if the stream is a
+connectionless stream, the
+.IR REMADDR_length " adn " REMADDR_offset
+return zero (0).
+.\"
+.\"
+.PP
+.B Additional rules for local and remote addresses:
+.\"
+.\"
+.IP \(em 4
+Each address, when present, must specify an SCCP-SAP or wildcard SCCP-SAP.
+That is, the
+.I sccp_ri
+field of the address must contain
+.BR T_SCCP_RI_DPC_SSN .
+.\"
+.\"
+.IP \(em
+The address cannot contain a Global Title.  That is, the
+.I sccp_gtt
+field of the address must contain
+.BR T_SCCP_GTT_NONE .
+.\"
+.\"
+.IP \(em
+If the stream is bound as a default destination or a default listener, an
+adress will be included in
+.IR LOCADDR_length " and " LOCADDR_offset
+butthe
+.IR sccp_pc " and " sccp_ssn
+fields of the address will be \*(lqwildcarded\*(rq.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SS T_CAPABILITY_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_CAPABILITY_REQ (7).
+.\"
+.\"
+.SS T_CAPABILITY_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_CAPABILITY_ACK (7),
+and returns the
+.I T_info_ack
+structure interpreted as described under
+.IR \*(lqT_INFO_ACK\*(rq ,
+above.
+.\"
+.\"
+.SS T_BIND_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_BIND_REQ (7).
+.\"
+.\"
+.SS T_BIND_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_BIND_ACK (7),
+with the following additional rules:
+.\"
+.\"
+.TP
+.IR ADDR_length ", " ADDR_offset
+The length and offset from the beginning of the primitive message block of the
+.B sockaddr_sccp
+structure that contains the SCCP addresss that was bound.
+.\"
+.\"
+.PP
+.B Additional rules for binding the TSAP:
+.\"
+.\"
+.IP \(em 4
+The address specified must contain an SCCP-SAP.
+That is, the
+.I sccp_ri
+field must be set to
+.BR T_SCCP_RI_DPC_SSN .
+Otherwise, the TCAP conforming provider will return
+.RB [ TBADADDR ].
+.\"
+.\"
+.IP \(em
+The address cannot contain a Global Title: the
+.I sccp_gtt
+field of the address must contain
+.BR T_SCCP_GTT_NONE .
+Otherwise, the TCAP conforming provider will return
+.RB [ TBADADDR ].
+.\"
+.\"
+.IP \(em
+If no address is specified (the
+.I ADDR_length
+field is zero (0)), or if an address is specified but both the
+.IR sccp_pc " and " sccp_ssn
+fields are \*(lqwildcarded\*(rq, it is assumed that the user wishes to
+perform a \*(lqwildcard\*(rq bind.  For such a bind, the SCCP provider
+observes the following rules:
+.\"
+.\"
+.RS
+.IP \(em 4
+If an application context has been specified for the stream with
+.BR T_OPTMGMT_REQ (7),
+the SCCP provider will bind the stream as a default destination for
+connectionless classes or default listener for connection oriented classes on
+the specified application context.
+.\"
+.\"
+.IP \(em
+If no application context has been provided, the SCCP provider will
+bind the stream to the default destination for connectionless classes or as
+the default listener for connection oriented classes.
+.\"
+.\"
+.IP \(em
+A stream bound to the default destination will receive all connectionless
+packets that have no other bind match.  A stream bound as a default listener
+will receive all connection indications that have no other stream listening.
+Onlly one stream may be bound as a default destination and one stream bound as
+a default listener.
+.RE
+.\"
+.\"
+.PP
+.B Additional rules for the number of connection indications:
+.\"
+.\"
+.IP \(em 4
+The SCCP protocol classes 0 and 1 are connectionless and will not accept a
+non-zero number in the
+.I CONIND_number
+field.
+SCCP protocol classes 2 and 3 are connection oriented and will permit a
+non-zero
+.IR CONIND_number .
+.\"
+.\"
+.SS T_UNBIND_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_UNBIND_REQ (7).
+.\"
+.\"
+.SS T_OK_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_OK_ACK (7).
+.\"
+.\"
+.SS T_ERROR_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_ERROR_ACK (7).
+.\"
+.\"
+.SS T_OPTMGMT_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_OPTMGMT_REQ (7),
+with the options described under
+.IR \*(lqOPTIONS\*(rq ,
+above.
+.\"
+.\"
+.SS T_OPTMGMT_ACK
+.PP
+This primitive is interpreted as described in
+.BR T_OPTMGMT_ACK (7),
+with the options described under
+.IR \*(lqOPTIONS\*(rq ,
+above.
+.\"
+.\"
+.SH "PROTOCOL SERVICE PRIMITIVES"
+.PP
+.\"
+.\"
+.SS T_UNITDATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_UNITDATA_REQ (7).
+.\"
+.\"
+.PP
+For
+.B T_CLTS
+service type providers, the
+.BR T_UNITDATA_REQ (7)
+primitive is used to request the N-UNITDATA-REQUEST primitive of SCCP.
+Because there is no source address in the
+.BR T_UNITDATA_REQ (7)
+primitive, when the stream is bound to a
+\*(lqwildcard\*(rq
+address it is necessary to specify the source address for the message using
+the
+.B T_SCCP_SRCE_ADDR
+option in the
+.I OPT_length " and " OPT_offset
+fields, or using
+.BR T_OPTMGMT_REQ (7),
+before sending connectionless data from a
+\*(lqwildcard\*(rq
+bound stream.
+.\"
+.\"
+.PP
+Options used with the
+.BR T_UNITDATA_REQ (7)
+primitive are as follows:
+.\"
+.\"
+.TP
+.B T_SCCP_SRCE_ADDR
+.\"
+.\"
+.TP
+.BR T_MTP_SLS " or " T_SCCP_SEQ_CTRL
+.\"
+.\"
+.TP
+.BR T_MTP_MP ", " T_SCCP_PRIORITY " or " T_SCCP_IMPORTANCE
+.\"
+.\"
+.\"
+.\"
+.SS T_UNITDATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_UNITDATA_IND (7).
+.\"
+.\"
+.SS T_UDERROR_IND
+.PP
+This primitive is interpreted as described in
+.BR T_UDERROR_IND (7).
+.B TPI-SCCP
+defines a number of protocol specific errors.  See
+.IR \*(lqERRORS\*(rq ,
+below.
+.\"
+.\"
+.TP
+.B T_SCCP_INFR_P_FAILURE
+.TP
+.B T_SCCP_INFR_P_CONGESTION
+.TP
+.B T_SCCP_INFR_P_QOS_CHANGE
+.TP
+.B T_SCCP_INFR_U_FAILURE
+.TP
+.B T_SCCP_INFR_U_CONGESTION
+.TP
+.B T_SCCP_INFR_U_QOS_CHANGE
+.TP
+.B T_SCCP_INFR_UNSPECIFIED
+.TP
+.B T_SCCP_STATUS_USER_IN_SERVICE
+.TP
+.B T_SCCP_STATUS_USER_OUT_OF_SERVICE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_AVAILABLE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE
+.TP
+.B T_SCCP_STATUS_REMOTE_SCCP_CONGESTED[_x]
+.TP
+.B T_SCCP_STATUS_SIGNALLING_POINT_INACCESSIBLE
+.TP
+.B T_SCCP_STATUS_SIGNALLING_POINT_CONGESTED[_x]
+.TP
+.B T_SCCP_STATUS_SIGNALLING_POINT_ACCESSIBLE
+
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SS T_CONN_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_REQ (7).
+.\"
+.\"
+.SS T_CONN_CON
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_CON (7).
+.\"
+.\"
+.SS T_CONN_IND
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_IND (7).
+.\"
+.\"
+.SS T_CONN_RES
+.PP
+This primitive is interpreted as described in
+.BR T_CONN_RES (7).
+.\"
+.\"
+.SS T_DATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_DATA_REQ (7).
+.\"
+.\"
+.SS T_DATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_DATA_IND (7).
+.\"
+.\"
+.SS T_EXDATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_EXDATA_REQ (7).
+.\"
+.\"
+.SS T_EXDATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_EXDATA_IND (7).
+.\"
+.\"
+.SS T_OPTDATA_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_OPTDATA_REQ (7).
+.\"
+.\"
+.SS T_OPTDATA_IND
+.PP
+This primitive is interpreted as described in
+.BR T_OPTDATA_IND (7).
+.\"
+.\"
+.SS T_DISCON_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_DISCON_REQ (7).
+.\"
+.\"
+.SS T_DISCON_IND
+.PP
+This primitive is interpreted as described in
+.BR T_DISCON_IND (7).
+.\"
+.\"
+.SS T_ORDREL_REQ
+.PP
+This primitive is interpreted as described in
+.BR T_ORDREL_REQ (7).
+.\"
+.\"
+.SS T_ORDREL_IND
+.PP
+This primitive is interpreted as described in
+.BR T_ORDREL_IND (7).
+.\"
+.\"
+.SH "IOCTLS"
+.PP
+.B TPI-SCCP
+supports the
+.BR timod (4)
+I/O Controls when the
+.BR timod (4)
+module is pushed over the stream.
+.B TPI-SCCP
+supports the
+.BR sockmod (4)
+I/O Controls when the
+.BR sockmod (4)
+module is pushed over the stream.
+.\"
+.\"
+.PP
+In addition
+.B TPI-SCCP
+supports the I/O controls that are specific to the MTP implementation such as
+those descibed under
+.BR mtp "(4), " m3ua "(4) and " tali (4).
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+Protocol errors are handled using the
+.BR T_UDERROR_IND "(7) and " T_DISCON_IND (7)
+primitives described above.
+.\"
+.\"
+.PP
+Non-fatal errors are handled using the
+.BR T_ERROR_ACK (7)
+primitive as described for
+.BR tpi (7).
+.\"
+.\"
+.PP
+Fatal errors are handled using the
+.IR STREAMS (4)
+.BR M_ERROR " or " M_HANGUP
+primities which results in the failure of all subsequent operations on the
+stream.
+.\"
+.\"
+.SH "ERRORS"
+.PP
+The following protocol errors can be returned in the
+.I ERROR_type
+field of the
+.BR T_UDERROR_IND (7)
+primitive:
+.\"
+.\"
+.TP
+.B T_SCCP_RETC_NO_ADDRESS_TYPE_TRANSLATION
+.TP
+.B T_SCCP_RETC_NO_ADDRESS_TRANSLATION
+.TP
+.B T_SCCP_RETC_SUBSYSTEM_CONGESTION
+.TP
+.B T_SCCP_RETC_SUBSYSTEM_FAILURE
+.TP
+.B T_SCCP_RETC_UNEQUIPPED_USER
+.TP
+.B T_SCCP_RETC_MTP_FAILURE
+.TP
+.B T_SCCP_RETC_NETWORK_CONGESTION
+.TP
+.B T_SCCP_RETC_UNQUALIFIED
+.TP
+.B T_SCCP_RETC_MESSAGE_TRANSPORT_ERROR
+.TP
+.B T_SCCP_RETC_LOCAL_PROCESSING_ERROR
+.TP
+.B T_SCCP_RETC_NO_REASSEMBLY_AT_DESTINATION
+.TP
+.B T_SCCP_RETC_SCCP_FAILURE
+.TP
+.B T_SCCP_RETC_SCCP_HOP_COUNTER_VIOLATION
+.TP
+.B T_SCCP_RETC_SEGMENTATION_NOT_SUPPORTED
+.TP
+.B T_SCCP_RETC_SEGMENTATION_FAILURE
+.TP
+.B T_SCCP_RETC_MESSAGE_CHANGE_FAILURE
+.TP
+.B T_SCCP_RETC_INVALID_INS_ROUTING_REQUEST
+.TP
+.B T_SCCP_RETC_INVALID_INSI_ROUTING_REQUEST
+.TP
+.B T_SCCP_RETC_UNAUTHORIZED_MESSAGE
+.TP
+.B T_SCCP_RETC_MESSAGE_INCOMPATIBILITY
+.TP
+.B T_SCCP_RETC_CANNOT_PERFORM_ISNI_CONSTRAINED_ROUTING
+.TP
+.B T_SCCP_RETC_REDUNDANT_ISNI_CONSTRAINED_ROUTING_INFO
+.TP
+.B T_SCCP_RETC_UNABLE_TO_PERFORM_ISNI_IDENTIFICATION
+.TP
+.B T_SCCP_RESC_END_USER_ORIGINATED
+.TP
+.B T_SCCP_RESC_SCCP_USER_ORIGINATED
+.TP
+.B T_SCCP_RESC_MESSAGE_OUT_OF_ORDER_INCORRECT_PS
+.TP
+.B T_SCCP_RESC_MESSAGE_OUT_OF_ORDER_INCORRECT_PR
+.TP
+.B T_SCCP_RESC_REMOTE_PROC_ERROR_MESSAGE_OUT_OF_WINDOW
+.TP
+.B T_SCCP_RESC_REMOTE_PROC_ERROR_INCORRECT_PS_AFTER_INIT
+.TP
+.B T_SCCP_RESC_REMOTE_PROC_ERROR_GENERAL
+.TP
+.B T_SCCP_RESC_REMOTE_END_USER_OPERATIONAL
+.TP
+.B T_SCCP_RESC_NETWORK_OPERATIONAL
+.TP
+.B T_SCCP_RESC_ACCESS_OPERATIONAL
+.TP
+.B T_SCCP_RESC_NETWORK_CONGESTION
+.TP
+.B T_SCCP_RESC_NOT_OBTAINABLE
+.TP
+.B T_SCCP_RESC_UNQUALIFIED
+.TP
+.B T_SCCP_ERRC_LRN_MISMATCH_UNASSIGNED_DEST_LRN
+.TP
+.B T_SCCP_ERRC_LRN_MISMATCH_INCONSISTENT_SOURCE_LRN
+.TP
+.B T_SCCP_ERRC_POINT_CODE_MISMATCH
+.TP
+.B T_SCCP_ERRC_SERVICE_CLASS_MISMATCH
+.TP
+.B T_SCCP_ERRC_UNQUALIFIED
+.\"
+.\"
+.PP
+The following protocol errors can be returned in the
+.I DISCON_reason
+field of the
+.BR T_DISCON_IND (7)
+primitive:
+.\"
+.\"
+.TP
+.B T_SCCP_RELC_END_USER_ORIGINATED
+.TP
+.B T_SCCP_RELC_END_USER_BUSY
+.TP
+.B T_SCCP_RELC_END_USER_FAILURE
+.TP
+.B T_SCCP_RELC_SCCP_USER_ORIGINATED
+.TP
+.B T_SCCP_RELC_REMOTE_PROCEDURE_ERROR
+.TP
+.B T_SCCP_RELC_INCONSISTENT_CONNECTION_DATA
+.TP
+.B T_SCCP_RELC_ACCESS_FAILURE
+.TP
+.B T_SCCP_RELC_ACCESS_CONGESTION
+.TP
+.B T_SCCP_RELC_SUBSYSTEM_FAILURE
+.TP
+.B T_SCCP_RELC_SUBSYSTEM_CONGESTION
+.TP
+.B T_SCCP_RELC_MTP_FAILURE
+.TP
+.B T_SCCP_RELC_NETWORK_CONGESTION
+.TP
+.B T_SCCP_RELC_EXPIRATION_OF_RESET_TIMER
+.TP
+.B T_SCCP_RELC_EXPIRATION_OF_RECEIVE_INACTIVITY_TIMER
+.TP
+.B T_SCCP_RELC_RESERVED
+.TP
+.B T_SCCP_RELC_UNQUALIFIED
+.TP
+.B T_SCCP_RELC_SCCP_FAILURE
+.TP
+.B T_SCCP_REFC_END_USER_ORIGINATED
+.TP
+.B T_SCCP_REFC_END_USER_CONGESTION
+.TP
+.B T_SCCP_REFC_END_USER_FAILURE
+.TP
+.B T_SCCP_REFC_SCCP_USER_ORIGINATED
+.TP
+.B T_SCCP_REFC_DESTINATION_ADDRESS_UNKNOWN
+.TP
+.B T_SCCP_REFC_DESTINATION_INACCESSIBLE
+.TP
+.B T_SCCP_REFC_NETWORK_RESOURCE_QOS_NOT_AVAIL_PERM
+.TP
+.B T_SCCP_REFC_NETWORK_RESOURCE_QOS_NOT_AVAIL_TRANS
+.TP
+.B T_SCCP_REFC_ACCESS_FAILURE
+.TP
+.B T_SCCP_REFC_ACCESS_CONGESTION
+.TP
+.B T_SCCP_REFC_SUBSYSTEM_FAILURE
+.TP
+.B T_SCCP_REFC_SUBSYSTEM_CONGESTION
+.TP
+.B T_SCCP_REFC_EXPIRATION_OF_NC_ESTAB_TIMER
+.TP
+.B T_SCCP_REFC_INCOMPATIBLE_USER_DATA
+.TP
+.B T_SCCP_REFC_RESERVED
+.TP
+.B T_SCCP_REFC_UNQUALIFIED
+.TP
+.B T_SCCP_REFC_SCCP_HOP_COUNTER_VIOLATION
+.TP
+.B T_SCCP_REFC_SCCP_FAILURE
+.TP
+.B T_SCCP_REFC_NO_ADDRESS_TYPE_TRANSLATION
+.TP
+.B T_SCCP_REFC_UNEQUIPPED_USER
+.\"
+.\"
+.\"
+.TP
+.BR T_SCCP_DEST_PROHIBITED ", " T_SCCP_CLUS_PROHIBITED
+.TP
+.BR T_SCCP_DEST_CONGESTED ", " T_SCCP_CLUS_CONGESTED
+.TP
+.B T_SCCP_RESTARTING
+.TP
+.B T_SCCP_USER_PART_UNKNOWN
+.TP
+.B T_SCCP_USER_PART_UNEQUIPPED
+.TP
+.B T_SCCP_USER_PART_UNAVAILABLE
+.\"
+.\"
+.PP
+Any of the non-fatal errors described in
+.BR tpi (7)
+may also be returned in a
+.BR T_ERROR_ACK (7)
+primitive by
+.BR TPI-SCCP .
+.\"
+.\"
+.PP
+Any of the fatal errors described in
+.BR tpi (7)
+may also be returned in an
+.IR errno (3)
+value in reponse to a read or write operation on the stream.
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+.\"
+.\"
+.SH AUTHOR
+.PP
+Brian F. G. Bidulock <bidulock@openss7.org>
+.br
+The OpenSS7 Project http://www.openss7.org
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage describes Version 2 of the
+.BR TPI-SCCP
+interface.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sccp (4),
+.BR sua (4),
+.BR tali (4),
+.BR tpi (7),
+.BR streamio (2),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR putpmsg (2),
+.BR getpmsg (2),
+.BR read (2),
+.BR write (2).
+.\"
+.\"
+.XX
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+.[
+t1.112
+.]
+.[
+TPI Revision 2.0.0
+.]
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.TA

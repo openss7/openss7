@@ -1,0 +1,334 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: SAMESTR.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SAMESTR 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B SAMESTR
+\- test for \fISTREAMS\fR pipe or fifo
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int SAMESTR(" q );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR SAMESTR ()
+tests whether the next queue belongs to the same stream as the specified
+queue
+.IR q .
+.BR SAMESTR ()
+can be used to detect whether or not
+.I q
+belongs to a
+.BR pipe (4)
+or a
+.BR fifo (4).
+.\"
+.\"
+.SH RETURN
+.PP
+.BR SAMESTR ()
+returns true (1) if the next queue from the specified queue,
+.IR q->q_next ,
+belongs to the same stream (read or write) as the specified queue
+.IR q .
+In this case, the queue
+.I q
+is above the midpoint of a
+.BR pipe (4)
+or
+.BR fifo (4).
+.PP
+.BR SAMESTR ()
+returns false (0) if the next queue from the specified queue,
+.IR q->q_next ,
+belongs to a different stream (read or write) as the specified queue
+.IR q .
+In this case, the queue
+.I q
+is above the midpoint of a
+.BR pipe (4)
+or
+.BR fifo (4).
+.PP
+.BR SAMESTR ()
+also returns false (0) if the next queue from the specified queue,
+.IR q->q_next ,
+is
+.BR NULL .
+In this case, the queue
+.I q
+is a stream end (stream head or driver).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR SAMESTR ()
+fails, it returns
+zero (0).
+.BR SAMESTR ()
+fails when the queue pointer
+.I q->q_next
+is
+.BR NULL .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR SAMESTR ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.PP
+.BR SAMESTR ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, callout or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from callouts, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH NOTICES
+.PP
+If the passed in queue pointer,
+.IR q ,
+is invalid, the result is undefined.
+.PP
+If the passed in queue pointer,
+.IR q ,
+is
+.BR NULL ,
+a kernel panic may occur.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR RD (9),
+.BR WR (9),
+.BR OTHER (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR SAMESTR ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR SAMESTR ()
+is compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4 MP" ,
+with the following portability considerations:
+.IP \(bu 3
+.BR SAMESTR ()
+is defined for
+.BR UnixWare \(rg,
+.[
+uw7spg
+.]
+.BR Solaris \(rg,
+.[
+solspg
+.]
+.BR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.BR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.BR LiS .
+.[
+lis
+.]
+These systems also support
+.IR STREAMS -based
+.BR pipe "(4) and " fifo (4).
+.IP \(bu
+.BR UnixWare \(rg,
+.[
+uw7spg
+.]
+.BR Solaris \(rg
+.[
+solspg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR SAMESTR ()
+to be called on a stream frozen with
+.BR freezestr (9).
+This is presumably because
+.BR UnixWare \(rg
+and
+.BR Solaris \(rg
+allows frozen streams to manipulate the
+.I q->q_next
+pointers directly.
+.BR HP-UX \(rg
+on the other hand, does not allow
+.I q->q_next
+pointers to be manipulated directly and provides the
+.BR weldq (9)
+function to perform that action.
+.BR
+.IP \(bu
+.BR SAMESTR ()
+is not defined for
+.BR AIX \(rg,
+.[
+aixspg
+.]
+.BR OSF \(rg,
+.[
+osfspg
+.]
+.BR UXP/V \(rg.
+.[
+uxpspg
+.]
+These systems do not support
+.IR STREAMS -based
+.BR pipe "(4) and " fifo (4).
+.IP \(bu
+.BR SAMESTR ()
+is not very useful on systems that do not support
+.IR STREAMS -based
+.BR pipe (4)
+or
+.BR fifo (4).
+.IP \(bu
+.B Linux Fast-STREAMS
+supports
+.IR STREAMS -based
+.BR pipe "(4) and " fifo (4).
+.IP \(bu
+Binary compatiblity is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR SAMESTR ()
+first appeared in
+.BR "SVR 4" .
+.[
+svr4spg
+.]
+where it was implemented as a macro.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,307 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: putq.9,v 0.9.2.1 2004/02/29 19:07:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:07:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH PUTQ 9 "$Date: 2004/02/29 19:07:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B putq
+\- puts a message on a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int putq(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue on which the place the message.
+.TP
+.I mp
+the message to place on the queue.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR putq ()
+places the message pointed to by
+.I mp
+on the queue
+.I q
+without invoking the queue's put procedure.
+.PP
+After placing the message on queue
+.IR q ,
+.BR putq ()
+adjusts the queue's flags and byte counts appropriately and schedules the
+queue service procedure when necessary.
+.PP
+It is the responsibility of a procedure calling
+.BR putq ()
+with a low priority message pointed to by
+.I mp
+to first call
+.BR canput (9)
+for the queue to check for flow control.
+If
+.BR canput (9)
+fails for queue
+.IR q ,
+the procedure should not normally invoke
+.BR putq ()
+with a low priority message for the flow controlled queue
+.IR q .
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR putq ()
+returns true (1) and places the message pointed to by
+.I mp
+on the queue pointed to by
+.IR q .
+Upon failure,
+.BR putq ()
+returns false (0) and does not alter the passed in queue or message.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR putq ()
+fails, it returns false (0).
+.BR putq ()
+only fails when a
+.BR qband (9)
+structure could not be allocated for a banded message arriving at a first use
+empty band.
+.BR putq ()
+always succeeds for priority and normal band zero (0) messages.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR putq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.PP
+.BR putq ()
+called on a queue frozen by
+.BR freezestr (9)
+will result in single-party deadlock.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putq ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+It can be guaranteed that
+.BR putq ()
+will always succeed, even for banded messages, by calling
+.BR strqset (9)
+to set the high and low water marks and packet sizes for all bands used by the
+driver or module.
+.PP
+When
+.BR putq ()
+fails and returns zero (0), it is the callers responsibility to address the
+disposition of the passed in message,
+.IR mp .
+A typical response would be to free the message using
+.BR freemsg (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR canput (9),
+.BR putnext (9),
+.BR getq (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR putq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR putq ()
+is compatible with 
+.BR "SVR 4.2 MP DDI/DKI" ,
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR LiS ,
+with the following porting considerations:
+.IP \(bu
+.BR putq ()
+is not bug for bug compatible with 
+.BR LiS .
+For more information on
+.BR LiS
+bugs in
+.BR putq (),
+see
+.BR lis_putq (9lis).
+Symbol
+.BR lis_putq ()
+is provided for compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_putq ()
+simply calls
+.BR putq ().
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR putq ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR UnixWare \(rg
+.NR Solaris \(rg
+documentation;
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+uw7doc
+.]
+.[
+soldoc
+.]
+.B LiS
+source code
+.[
+LiS
+.]
+(but see
+.RI \*(lq COMPATIBILITY \*(rq,
+above).
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR putq ()
+first appeared in
+.BR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

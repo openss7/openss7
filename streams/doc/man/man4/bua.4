@@ -1,0 +1,262 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: bua.4,v 0.9.2.1 2004/02/29 19:06:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/02/29 19:06:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BUA 4 "$Date: 2004/02/29 19:06:54 $" "$Name:  $" "OpenSS7 SIGTRAN Devices"
+.SH NAME
+.B bua
+\- SS7 BICC User Adaptation Layer (BUA)
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/bicci.h>
+.br
+.B #include <ss7/bicci_ioctl.h>
+.br
+.B #include <ss7/bua_ioctl.h>
+.HP
+.BI "int " bicc_stream " = open(" device ", " flags );
+.SH DESCRIPTION
+.PP
+.B BUA
+is an implementation of the SS7 BICC User Adaptation Layer (BUA) defined in
+.BR draft-bidulock-sigrran-bua-00.txt .
+.B BUA
+provides a back haul of the services of
+.BR bicc (4)
+over an IP network using Stream Control Transmission Protocol,
+.BR sctp (4),
+as defined in
+.BR RFC 2960\c
+.
+.[
+RFC 2960
+.]
+In addition it provide a building block of redundant and distributed SS7
+systems.  (See
+.IR "\*(lqNOTICES\*(rq" ,
+below).
+.PP
+.B BUA
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver for
+.BR LiS (9)\c
+.
+.[
+LiS
+.]
+.BR bicc (4)
+or
+.BR sctp (4)
+streams are linked under the
+.B BUA
+multiplexing driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide transport or direct
+.B BICC
+services to
+.BR BUA .
+Once linked, the streams must be configured using
+.BR bua_ioctl (4).
+This procedure is normally performed by the SS7 Configuration Daemon,
+.BR ss7confd (8).
+.PP
+.B BUA
+provides the following sttream types that are directly compatible with stream
+types provided by
+.BR bicc (4).
+To select one of these stream types,
+.I device
+can be selected from the following:
+.TP
+.I /dev/bua
+This device provides
+.B BICC
+protocol service interface using the Call Control Interface (CCI)
+.[
+cci
+.]
+described in
+.BR cci (7),
+as integrated for use with
+.BR bicc (4),
+as described in
+.BR cci_bicc (7).
+This interface is suitable both for use with other SS7 modules and drivers, as
+well as with the
+.BR cframe (3)
+library using the
+.B OpenSwitch
+call framework.
+.PP
+Unlike other SS7 protocol modules and drivers at the transport level,
+.B BUA
+does not provide a
+.BR sockets (3)
+interface.  This is because the special needs of call control are divorced
+from the sockets paradigm.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B BUA
+can be configured on a system as a drop in transparent replacement for
+.BR bicc (4).
+IN such a configuration, users opening streams or sockets defined in
+.BR bicc (4)
+will be opening
+.B bua
+streams and sockets, but will be unaware of the difference.  In
+.BR OpenSS7 ,
+.B bua
+is used as the primary mechanism of redundancy and distribution are the
+.B BICC
+level, and, when properly configured
+.RB "(see " ss7confd (8)),
+.B bua
+functions transparently to the BICC-User.
+.PP
+Also, opening and binding a
+.B bua
+stream or socket may result in the opening and binding of a
+.BR bicc (4)
+stream on the local or remote host in direct support of the local BICC-User.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of Local Management Interface IO controls using
+.BR ioctl (2)
+and
+.I I_STR
+.BR streamio (7)
+system calls on the
+.B bua_stream
+file descriptor.  The common Local Management Interface IO commands are
+described in
+.BR lmi_ioctl (4).
+The management structure and constant definitions for
+.B BUA
+are described in
+.BR bua_ioctl (4).
+.B BUA
+also supports the
+.B BICC
+IO commands, management structures and contants defined in
+.BR bicc_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/lmi.h> ,
+.BR <ss7/cci.h> ,
+.BR <ss7/bicci.h> ,
+.BR <ss7/lmi_ioctl.h> ,
+.BR <ss7/bicci_ioctl.h> ,
+.BR <ss7/bua_ioctl.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR lmi (7),
+.BR lmi_ioctl (4),
+.BR bua_ioctl (4),
+.BR bicc_ioctl (4),
+.BR cci (7),
+.BR cci_bicc (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B BUA
+driver is specific to the
+.B OpenSS7
+.BR SIGTRAN (4)
+stack.
+This is Version 2 of the interface.
+.\"
+.\"
+.XX
+.[
+bua
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
