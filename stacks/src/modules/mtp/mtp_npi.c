@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $"
 
-static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $";
+static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9 $)
 #define INLINE			/* let compiler do its job */
 
 #define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -380,7 +380,7 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -426,7 +426,7 @@ n_conn_con(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_addr *res,
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -465,7 +465,7 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq,
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -494,7 +494,7 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -522,7 +522,7 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -598,7 +598,7 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -638,7 +638,7 @@ n_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -690,7 +690,7 @@ n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long etype)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -750,7 +750,7 @@ n_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -792,7 +792,7 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -828,7 +828,7 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, mblk_t *dp, ulo
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -855,7 +855,7 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -884,7 +884,7 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -911,7 +911,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %d: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);

@@ -184,7 +184,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [
 # _LINUX_CHECK_KERNEL_RELEASE
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
-    AC_CACHE_CHECK([for kernel release], [linux_cv_k_release], [dnl
+    AC_CACHE_CHECK([for kernel release], [linux_cv_k_release], [
         if test :"${with_k_release:-no}" = :no
         then
             if test :"${cross_compilling:-no}" != :yes
@@ -211,7 +211,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
         ])
     fi
     # pull out versions from release number
-    AC_CACHE_CHECK([for kernel major release number], [linux_cv_k_major], [dnl
+    AC_CACHE_CHECK([for kernel major release number], [linux_cv_k_major], [
         linux_cv_k_major="`echo $linux_cv_k_release | sed -e 's|[[^0-9]].*||'`"
     ])
     if test ${linux_cv_k_major:-0} -ne 2; then
@@ -226,7 +226,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
 *** 
         ])
     fi
-    AC_CACHE_CHECK([for kernel minor release number], [linux_cv_k_minor], [dnl
+    AC_CACHE_CHECK([for kernel minor release number], [linux_cv_k_minor], [
         linux_cv_k_minor="`echo $linux_cv_k_release | sed -e 's|[[0-9]]*\.||;s|[[^0-9]].*||'`"
     ])
     if test ${linux_cv_k_minor:-0} -ne 4; then
@@ -240,7 +240,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
 *** 
         ])
     fi
-    AC_CACHE_CHECK([for kernel patch release number], [linux_cv_k_patch], [dnl
+    AC_CACHE_CHECK([for kernel patch release number], [linux_cv_k_patch], [
         linux_cv_k_patch="`echo $linux_cv_k_release | sed -e 's|[[0-9]]*\.[[0-9]]*\.||;s|[[^0-9]].*||'`"
     ])
     if test ${linux_cv_k_patch:-0} -le 10; then
@@ -251,7 +251,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
 *** 
         ])
     fi
-    AC_CACHE_CHECK([for kernel extra release number], [linux_cv_k_extra], [dnl
+    AC_CACHE_CHECK([for kernel extra release number], [linux_cv_k_extra], [
         linux_cv_k_extra="`echo $linux_cv_k_release | sed -e 's|[[^-]]*-||'`"
     ])
     kversion="${linux_cv_k_release}"
@@ -263,7 +263,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
 # _LINUX_CHECK_KERNEL_MODULES
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
-    AC_CACHE_CHECK([for kernel modules directory], [linux_cv_k_modules], [dnl
+    AC_CACHE_CHECK([for kernel modules directory], [linux_cv_k_modules], [
         if test :"$prefix" = :NONE
         then
             linux_cv_module_prefix="${ac_default_prefix}"
@@ -345,7 +345,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
 # _LINUX_CHECK_KERNEL_BUILD
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [
-    AC_CACHE_CHECK([for kernel build directory], [linux_cv_k_build], [dnl
+    AC_CACHE_CHECK([for kernel build directory], [linux_cv_k_build], [
         if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
         then
             eval "k_build_search_path=\"
@@ -411,7 +411,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [
 # _LINUX_CHECK_KERNEL_SYSMAP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [
-    AC_CACHE_CHECK([for kernel system map], [linux_cv_k_sysmap], [dnl
+    AC_CACHE_CHECK([for kernel system map], [linux_cv_k_sysmap], [
         if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
         then
             eval "k_sysmap_search_path=\"
@@ -448,7 +448,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [
 # _LINUX_CHECK_KERNEL_HEADERS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [
-    AC_CACHE_CHECK([for kernel headers], [linux_cv_k_includes], [dnl
+    AC_CACHE_CHECK([for kernel headers], [linux_cv_k_includes], [
         if test :"${with_k_includes:-no}" = :no
         then
             linux_cv_k_includes="${linux_cv_k_build}/include"
@@ -474,7 +474,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [
 # _LINUX_CHECK_KERNEL_MARCH
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [
-    AC_CACHE_CHECK([for kernel machine], [linux_cv_march], [dnl
+    AC_CACHE_CHECK([for kernel machine], [linux_cv_march], [
         linux_cv_march="$target_cpu"
         case "$target_cpu" in
             i586)
@@ -502,7 +502,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [
 # _LINUX_CHECK_KERNEL_RHBOOT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [
-    AC_CACHE_CHECK([for kernel Red Hat boot], [linux_cv_rh_boot_kernel], [dnl
+    AC_CACHE_CHECK([for kernel Red Hat boot], [linux_cv_rh_boot_kernel], [
         linux_cv_rh_boot_kernel=no
         if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
         then
@@ -567,7 +567,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [
 # _LINUX_CHECK_KERNEL_ARCHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [
-    AC_CACHE_CHECK([for kernel arch directory], [linux_cv_k_archdir], [dnl
+    AC_CACHE_CHECK([for kernel arch directory], [linux_cv_k_archdir], [
         if test :"${with_k_archdir:-no}" = :no
         then
             linux_cv_k_archdir="${linux_cv_k_build}/arch"
@@ -590,7 +590,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [
 # _LINUX_CHECK_KERNEL_MACHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [
-    AC_CACHE_CHECK([for kernel mach directory], [linux_cv_k_machdir], [dnl
+    AC_CACHE_CHECK([for kernel mach directory], [linux_cv_k_machdir], [
         if test :"${with_k_machdir:-no}" = :no
         then
             case "$linux_cv_march" in
@@ -839,7 +839,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [
 # _LINUX_CHECK_KERNEL_VERSIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [
-    AC_CACHE_CHECK([for kernel symbol versioning], [linux_cv_k_versions], [dnl
+    AC_CACHE_CHECK([for kernel symbol versioning], [linux_cv_k_versions], [
         AC_EGREP_CPP([\<yes_we_have_kernel_versions\>], [
 #include <linux/version.h>
 #include <linux/config.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdi_daed.h,v 0.9 2004/01/17 08:08:42 brian Exp $
+ @(#) $Id: cdi_daed.h,v 0.9.2.1 2004/04/14 18:49:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:42 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:28 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __CDI_DAED_H__
 #define __CDI_DAED_H__
+
+#ifndef CD_DAED
+/*
+ * CDI device classes
+ */
+#define CD_DAED		0x04	/* SS7 Delimitation Alignment and Error Detection */
+#endif				/* CD_DAED */
 
 #endif				/* __CDI_DAED_H__ */

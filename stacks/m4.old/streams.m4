@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.1 2004/04/14 10:33:04 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.2 2004/04/14 18:49:28 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/14 10:33:04 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/14 18:49:28 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -101,6 +101,12 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS],
             directory. @<:@default=INCLUDEDIR/LfS@:>@]),
             [with_lfs=$withval],
             [with_lfs=''])
+    AC_ARG_WITH([base-major],
+        AC_HELP_STRING([--with-base-major=MAJOR], [specify the base major
+            device number for static major device numbering.
+            @<:@default=185@:>@]),
+            [with_base_major=$withval],
+            [with_base_major=''])
 ])# _LINUX_STREAMS_OPTIONS
 # =========================================================================
 
@@ -109,7 +115,7 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS],
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_SETUP],
 [
-    AC_CACHE_CHECK([for kernel STREAMS header files], [streams_cv_includes], [dnl
+    AC_CACHE_CHECK([for kernel STREAMS header files], [streams_cv_includes], [
         streams_cv_package=
         streams_cv_includes=
         if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
@@ -168,12 +174,11 @@ AC_DEFUN([_LINUX_STREAMS_SETUP],
 # =========================================================================
 # _LINUX_STREAMS_LIS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-# Test for the existence of Linux STREAMS header files.  The package normally
-# requires either Linux STREAMS or Linux Fast-STREAMS header files (or both)
-# to compile.
-# -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
 [
+    # Test for the existence of Linux STREAMS header files.  The package
+    # normally requires either Linux STREAMS or Linux Fast-STREAMS header files
+    # (or both) to compile.
     streams_cv_lis_includes=
     if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
     then
@@ -207,13 +212,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
             break
         fi
     done
-    # -------------------------------------------------------------------------
     # Some of our older RPM releases of LiS put the xti header files into their
     # own subdirectory (/usr/include/xti/).  The current version places them in
     # with the LiS header files.  This tests whether we need an additional
-    # -I/usr/include/xti in the streams includes line.  This check can be dropped
-    # when the older RPM releases of LiS fall out of favor.
-    # -------------------------------------------------------------------------
+    # -I/usr/include/xti in the streams includes line.  This check can be
+    # dropped when the older RPM releases of LiS fall out of favor.
     streams_cv_xti_includes=
     streams_dir=`echo "$streams_cv_lis_includes" | sed -e 's|/*$||;s|usr/src/LiS/include|usr/src/LiS/include/LiS|;s|LiS$|xti|'`
     if test -d $streams_dir -a -r $streams_dir/xti.h ; then
@@ -225,12 +228,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
 # =========================================================================
 # _LINUX_STREAMS_LFS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-# Test for the existence of Linux Fast-STREAMS header files.  The package
-# normally requires either Linux STREAMS or Linux Fast-STREAMS header files
-# (or both) to compile.
-# -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS],
 [
+    # Test for the existence of Linux Fast-STREAMS header files.  The package
+    # normally requires either Linux STREAMS or Linux Fast-STREAMS header files
+    # (or both) to compile.
     streams_cv_lfs_includes=
     if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no ; then
         # compiling for the running kernel
@@ -263,10 +265,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS],
             break
         fi
     done
-    # -------------------------------------------------------------------------
     # For Linux Fast-STREAMS, xti includes are part of the release
     # /usr/include/streams subdirectory.
-    # -------------------------------------------------------------------------
     streams_cv_xti_includes=
 ])# _LINUX_STREAMS_LFS_CHECK_HEADERS
 # =========================================================================
@@ -314,7 +314,6 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # "head/mod.c" to determine whether to define struct pt_regs; and in
             # <LiS/include/sys/lislocks.h> to determine the size of semaphore
             # memory.
-            #
             STREAMS_CPPFLAGS="-D_PPC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390x*)			
@@ -328,14 +327,12 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # determine whether a bunch of PCI DMA mapping functions are
             # available; "include/sys/osif.h" to determine whether a bunch of
             # PCI DMA mapping functions are available.
-            #
             STREAMS_CPPFLAGS="-D_S390X_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390*)			
             # Define when compiling for S390.  Strangely enough, _S390_LIS_ is
             # never checked without _S390X_LIS_.  Rendering it as an alias for
             # the above.
-            #
             STREAMS_CPPFLAGS="-D_S390_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sh*)			: ;;
@@ -347,7 +344,6 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # define is used to determine when ioremap functions are not
             # available <LiS/include/osif.h>.  Strangely enough, none of the
             # other checks are performed as for _SPARC_LIS_ below.
-	    #
             STREAMS_CPPFLAGS="-D_SPARC64_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sparc*)			
@@ -359,7 +355,6 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # available <LiS/include/osif.h>, when PCI BIOS is not present
             # (head/osif.c), and when <linux/poll.h> is missing POLLMSG
             # <LiS/include/sys/poll.h>
-            #
             STREAMS_CPPFLAGS="-D_SPARC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	*)			: ;;

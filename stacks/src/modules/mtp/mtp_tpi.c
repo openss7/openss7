@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:13 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $"
 
-static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $";
+static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.
 #define INLINE			/* let compiler do its job */
 
 #define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2000,7 +2000,6 @@ t_addr_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 STATIC int
 t_capability_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
-	int err;
 	const struct T_capability_req *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;

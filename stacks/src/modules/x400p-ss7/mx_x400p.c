@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:24:35 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -2500,7 +2500,7 @@ static struct mx *mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t
 static void mx_free_priv(queue_t *q)
 {
 	struct mx *mx = MX_PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	ensure(mx, return);
 	lis_spin_lock_irqsave(&mx->lock, &flags);
 	{

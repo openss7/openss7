@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:06 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $"
 
-static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $";
+static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9531,7 +9531,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 {
 	struct cc *cc = CC_PRIV(q);
 	struct cr *cr = NULL;		/* FIXME */
-	struct ch *ch;
+	struct ch *ch = NULL;		/* FIXME: Just to shut up compiler */
 	unsigned char *cdpn_ptr, *opt_ptr, *add_ptr;
 	size_t cdpn_len, opt_len, add_len;
 	struct CC_setup_req *p = (typeof(p)) mp->b_rptr;

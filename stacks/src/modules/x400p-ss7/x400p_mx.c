@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:39 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:31 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:24:39 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:39 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:31 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:39 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:31 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -9212,7 +9212,7 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		ptrace(("%s: ERROR: No IRQ allocated for device\n", XP_DRV_NAME));
 		return (-ENXIO);
 	}
-	printd(("%s: device allocated IRQ %ld\n", XP_DRV_NAME, dev->irq));
+	printd(("%s: device allocated IRQ %d\n", XP_DRV_NAME, dev->irq));
 	if (pci_enable_device(dev)) {
 		ptrace(("%s: ERROR: Could not enable pci device\n", XP_DRV_NAME));
 		return (-ENODEV);
@@ -9327,7 +9327,7 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
 		if (request_irq(dev->irq, xp_e1_interrupt, SA_INTERRUPT | SA_SHIRQ, "x400p-ss7", cd)) {
-			ptrace(("%s: ERROR: Unable to request IRQ %ld\n", XP_DRV_NAME, dev->irq));
+			ptrace(("%s: ERROR: Unable to request IRQ %d\n", XP_DRV_NAME, dev->irq));
 			goto error_remove;
 		}
 		cd->irq = dev->irq;
@@ -9346,7 +9346,7 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		/* setup T1 card defaults */
 		cd->config = sdl_default_t1_chan;
 		if (request_irq(dev->irq, xp_t1_interrupt, SA_INTERRUPT | SA_SHIRQ, "x400p-ss7", cd)) {
-			ptrace(("%s: ERROR: Unable to request IRQ %ld\n", XP_DRV_NAME, dev->irq));
+			ptrace(("%s: ERROR: Unable to request IRQ %d\n", XP_DRV_NAME, dev->irq));
 			goto error_remove;
 		}
 		cd->irq = dev->irq;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:40 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:40 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 18:49:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:40 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:30 $"
 
-static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:40 $";
+static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:30 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -104,7 +104,7 @@ static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9 $)
 
 #define SS7IP_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SS7IP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SS7IP_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:40 $"
+#define SS7IP_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:30 $"
 #define SS7IP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS7IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS7IP_LICENSE	"GPL"
@@ -3923,7 +3923,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 	case SDL_IOC_MAGIC:
 	{
 		if (count < size || sdt->i_state == LMI_UNATTACHED) {
-			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %d\n",
+			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %lu\n",
 				SDT_TPI_MOD_NAME, count, size, sdt->i_state));
 			ret = -EINVAL;
 			break;
