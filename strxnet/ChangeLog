@@ -1,6 +1,6 @@
 # $Log: ChangeLog,v $
-# Revision 0.9.2.4  2004/06/22 19:46:31  brian
-# - Made SCTP manpages conditional on OpenSS7 SCTP kernel.
+# Revision 0.9.2.5  2004/06/27 04:24:23  brian
+# - Updated.
 #
 
 2004-06-22 brian <bidulock@openss7.org>

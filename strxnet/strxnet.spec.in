@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/21 18:08:37 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/27 10:12:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,9 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/21 18:08:37 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 10:12:38 $ by $Author: brian $
 #
 # =============================================================================
-
-%define base_release @PACKAGE_RELEASE@
 
 # default is to build kernel modules and tools
 # conditional builds of binary rpms relies on the sneaky spec trick that
@@ -75,6 +73,8 @@
 %define kernel_source %(echo %{_kversion} | sed -e 's|BOOT||')
 %define kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %define kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
+%define core_name core-%{_kversion}
+%define epoch @PACKAGE_EPOCH@
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -94,19 +94,21 @@
 %{?_with_lfs:        %{expand: %%define BUILD_lis     0}}
 
 %define _streams lis
-%define _ksubdir misc
+%define _ksubdir lis
 %if %{BUILD_lfs}
-%define _streams lfs
+%define _STREAMS LfS
+%define _streams streams
 %define _ksubdir streams
 %endif
 %if %{BUILD_lis}
-%define _streams lis
-%define _ksubdir misc
+%define _STREAMS LiS
+%define _streams LiS
+%define _ksubdir lis
 %endif
 
 # we have some more options that control configure for the build
 
-Summary:        OpenSS7 STREAMS INET for Linux
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET for Linux
 Name:           @PACKAGE_TARNAME@
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
@@ -129,7 +131,7 @@ ExclusiveArch:  i386 i686 i586 athlon x86_64 s390 s390x ppc ppciseries ppcpserie
 ExclusiveOs:    Linux
 Source:         %{name}-%{version}-%{release}.tar.bz2
 Obsoletes:      %{name}
-Obsoletes:      INET
+Obsoletes:      XNET
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
@@ -137,9 +139,9 @@ Requires:       kernel < 2.5
 Requires:       streams >= 0.7a
 %endif
 %if %{BUILD_lis}
-Requires:       LiS >= 2.16.18-15
+Requires:       LiS >= 2:2.16.18
 %endif
-Provides:       INET
+Provides:       XNET
 BuildRequires:  kernel-source >= 2.4
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
@@ -152,7 +154,7 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 BuildRequires:  gcc >= 2.96
 %if %{BUILD_lis}
-BuildRequires:  LiS-devel >= 2.16.18
+BuildRequires:  LiS-devel >= 2:2.16.18
 %endif
 %if %{BUILD_lfs}
 BuildRequires:  streams-devel >= 0.7a
@@ -161,12 +163,13 @@ Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package includes kernel modules, STREAMS drivers, modules,
-libraries, utilities, test programs, daemons, and development environment for
-the development and execution of Internet Protocols (INET) protocol stack
-components and applications for the STREAMS environment.  This distribution is
-only currently applicable to 2.4 kernels and was targetted at ix86 and ppc
-architectures, but should build and install for other architectures as well.
+The %{name} package includes kernel modules, %{_STREAMS} STREAMS drivers,
+modules, libraries, utilities, test programs, daemons, and development
+environment for the development and execution of Internet Protocols (INET)
+protocol stack components and applications for the %{_STREAMS} STREAMS
+environment.  This distribution is only currently applicable to 2.4 kernels
+and was targetted at ix86 and ppc architectures, but should build and install
+for other architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -236,8 +239,8 @@ preferred_cflags="-freorder-blocks"
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
-    --with-rpm-epoch=@PACKAGE_EPOCH@ \
-    --with-rpm-release=@PACKAGE_RELEASE@ \
+    --with-rpm-epoch=%{epoch} \
+    --with-rpm-release=%{release} \
     --with-base-major=@STRCONF_MAJBASE@ \
     %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
     %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
@@ -271,7 +274,7 @@ mkdir -p $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
 
 # add a directory for our devices
-mkdir -p $RPM_BUILD_ROOT/dev/%{name}
+#mkdir -p $RPM_BUILD_ROOT/dev/inet
 
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
@@ -285,7 +288,10 @@ mkdir -p $RPM_BUILD_ROOT/dev/%{name}
 [ -e "$RPM_BUILD_ROOT/%{_infodir}/dir" ] && rm -f "$RPM_BUILD_ROOT/%{_infodir}/dir"
 
 # create a device list
-sh scripts/strconf-sh -b190 --strmknods=devices.lst build-%{_target_cpu}/Config.master
+# sh scripts/strconf-sh -b@STRCONF_MAJBASE@ --strmknods=devices.lst build-%{_target_cpu}/Config.master
+
+# copy up device list
+[ -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ ] && cp -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ .
 
 rm -rf build-%{_target_cpu}
 
@@ -305,17 +311,17 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 
 
 # ===========================================================================
-%package %{_streams}-core-%{_kversion}
+%package %{_streams}-%{core_name}
 
-Summary:        OpenSS7 STREAMS INET LfS kernel modules.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       kernel = %{kernel_version}
 %if %{BUILD_lis}
-Requires:       LiS-core-%{kernel_version} >= 2.16.18-15
+Requires:       LiS-%{core_name} >= 2:2.16.18
 %endif
 %if %{BUILD_lfs}
-Requires:       streams-core-%{kernel_version} >= 0.7a
+Requires:       streams-%{core_name} >= 0.7a
 %endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
@@ -323,15 +329,16 @@ Icon:           %{_icon}
 %endif
 
 # ---------------------------------------------------------------------------
-%description %{_streams}-core-%{_kversion}
-The %{name}-%{_streams}-core-%{_kversion} package contains the kernel modules that provide
-the Linux kernel INET STREAMS drivers and modules.  This also includes
-assorted drivers and modules for additional protocol stacks such as SCTP.
-This package is heavily tied to the kernel for which it and the Linux STREAMS
-facility was compiled.  This package applies to kernel version %{kernel_version}
-and requires a STREAMS package compiled for the same kernel.
+%description %{_streams}-%{core_name}
+The %{name}-%{_streams}-%{core_name} package contains the kernel modules
+that provide the Linux kernel INET %{_STREAMS} STREAMS drivers and modules.
+This also includes assorted drivers and modules for additional protocol stacks
+such as SCTP.  This package is heavily tied to the kernel for which it and the
+Linux %{_STREAMS} STREAMS facility was compiled.  This package applies to
+kernel version %{kernel_version} and requires a STREAMS package compiled for
+the same kernel.
 
-%pre %{_streams}-core-%{_kversion}
+%pre %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
@@ -358,7 +365,7 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
     exit 1
 fi
 
-%post %{_streams}-core-%{_kversion}
+%post %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
@@ -422,7 +429,7 @@ elif [ -r /boot/System.map-%{kernel_version} ] ; then
     depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
 fi
 
-%preun %{_streams}-core-%{_kversion}
+%preun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
@@ -448,7 +455,7 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
     exit 1
 fi
 
-%postun %{_streams}-core-%{_kversion}
+%postun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 
 if [ $1 = 0 ]; then
@@ -510,7 +517,7 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 fi
 
 %if %{BUILD_modules}
-%files %{_streams}-core-%{_kversion}
+%files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/%{name}
@@ -521,7 +528,7 @@ fi
 # ===========================================================================
 %package dev
 
-Summary:        OpenSS7 STREAMS INET devices.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET devices.
 Group:          System Environment/Base
 Requires:       dev >= 3.3
 Autoreq:        true
@@ -532,7 +539,8 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description dev
 The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for OpenSS7 STREAMS INET.
+applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
+INET.
 
 %if %{BUILD_tools}
 # ---------------------------------------------------------------------------
@@ -543,15 +551,15 @@ applications programs and utilities developed for OpenSS7 STREAMS INET.
 # ===========================================================================
 %package %{_streams}-lib
 
-Summary:        OpenSS7 STREAMS INET run-time libraries.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_datadir}/locale
 %if %{BUILD_lis}
-Requires:       LiS-lib-%{kernel_version} >= 2.16.18-15
+Requires:       LiS-lib >= 2:2.16.18
 %endif
 %if %{BUILD_lfs}
-Requires:       streams-lib-%{kernel_version} >= 0.7a
+Requires:       streams-lib >= 0.7a
 %endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
@@ -560,8 +568,9 @@ Icon:           %{_icon}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-lib
-The %{name}-%{_streams}-lib package contains the run-time shared libraries necessary to
-run applications programs and utilities developed for OpenSS7 STREAMS INET.
+The %{name}-%{_streams}-lib package contains the run-time shared libraries
+necessary to run applications programs and utilities developed for OpenSS7
+%{_STREAMS} STREAMS INET.
 
 %pre %{_streams}-lib
 # ---------------------------------------------------------------------------
@@ -611,7 +620,7 @@ ldconfig
 # ===========================================================================
 %package doc
 
-Summary:        OpenSS7 STREAMS INET manpages and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET manpages and doc.
 Group:          Documentation
 Conflicts:      texinfo < 3.11
 Prereq:         /sbin/install-info
@@ -625,7 +634,7 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description doc
 The %{name}-doc package contains html documentation for the development of
-OpenSS7 STREAMS INET applications, modules and drivers.
+OpenSS7 %{_STREAMS} STREAMS INET applications, modules and drivers.
 
 %pre doc
 # ---------------------------------------------------------------------------
@@ -675,12 +684,12 @@ fi
 # ===========================================================================
 %package devel
 
-Summary:        OpenSS7 STREAMS INET headers, lib and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET headers, lib and doc.
 Group:          Development/System
-Requires:       %{name}-lib = @PACKAGE_EPOCH@:%{version}-%{base_release}
-Requires:       %{name}-doc = @PACKAGE_EPOCH@:%{version}-%{base_release}
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
+Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
 %if %{BUILD_lis}
-Requires:       LiS-devel >= 2.16.18
+Requires:       LiS-devel >= 2:2.16.18
 %endif
 %if %{BUILD_lfs}
 Requires:       streams-devel >= 0.7a
@@ -696,10 +705,11 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description devel
 The %{name}-devel package contains library archives for static compilation,
-and headers files to develop OpenSS7 STREAMS INET applications.  This also
-includes the header files and static libraries required to compile OpenSS7
-STREAMS INET applications programs.  In addition it contains all of the manual
-pages necessary for developing OpenSS7 STREAMS INET application programs.
+and headers files to develop OpenSS7 %{_STREAMS} STREAMS INET applications.
+This also includes the header files and static libraries required to compile
+OpenSS7 %{_STREAMS} STREAMS INET applications programs.  In addition it
+contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
+STREAMS INET application programs.
 
 %pre devel
 # ---------------------------------------------------------------------------
@@ -737,7 +747,7 @@ pages necessary for developing OpenSS7 STREAMS INET application programs.
 # ===========================================================================
 %package source
 
-Summary:        OpenSS7 STREAMS INET source package.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
@@ -778,18 +788,18 @@ necessary to create and distribute this rpm.
 # ===========================================================================
 %package %{_streams}-util
 
-Summary:        OpenSS7 STREAMS INET admin utilities.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET admin utilities.
 Group:          System Environment/Base
-Requires:       %{name}-lib = @PACKAGE_EPOCH@:%{version}-%{base_release}
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
 Prefix:         %{_libexecdir}
 %if %{BUILD_lis}
-Requires:       LiS-lib-%{kernel_version} >= 2.16.18-15
+Requires:       LiS-lib >= 2:2.16.18
 %endif
 %if %{BUILD_lfs}
-Requires:       streams-lib-%{kernel_version} >= 0.7a
+Requires:       streams-lib >= 0.7a
 %endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
@@ -798,8 +808,9 @@ Icon:           %{_icon}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-util
-The %{name}-%{_streams}-util package provides adminstrative and configuration test
-utilities and commands associated with the OpenSS7 STREAMS INET package.
+The %{name}-%{_streams}-util package provides adminstrative and configuration
+test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
+INET package.
 
 %pre %{_streams}-util
 # ---------------------------------------------------------------------------
@@ -834,9 +845,25 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.18  2004/06/21 18:08:37  brian
-# - RPM 4.2.1 and up set default epoch to 0.
+# Revision 0.9.2.22  2004/06/27 10:12:38  brian
+# - Updated changelog.
 #
+
+* Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.21  2004/06/27 10:11:41  brian
+- Some rpm fixes.
+
+* Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.20  2004/06/27 08:21:50  brian
+- Finalizing separate xnet release.
+
+* Sat Jun 26 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.19  2004/06/27 04:24:12  brian
+- Parameterized major base.
+
+* Mon Jun 21 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.18  2004/06/21 18:08:37  brian
+- RPM 4.2.1 and up set default epoch to 0.
 
 * Sun Jun 20 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.17  2004/06/20 20:22:21  brian
