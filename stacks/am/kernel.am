@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/07 08:38:55 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/07 22:23:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/07 08:38:55 $ by $Author: brian $
+# Last Modified $Date: 2004/04/07 22:23:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,8 +57,7 @@ all-am: $(KERNEL_MODULES)
 install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
-	@list='$(KERNEL_MODULES)'; \
-	for p in $$list; do \
+	@list='$(KERNEL_MODULES)'; for p in $$list; do \
 		if test -f $$p; then \
 			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
 			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
@@ -77,39 +76,33 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 install-exec-local: install-modules
 
 #
-# This is equivalent to the kernel modules package rpm %post scriptlet.  It is
-# only executed when the install directory is fully configured for kernel
-# modules.  That is, this does not run when building an rpm because the binaries
-# are install in a temporary, unconfigured directory.  Autoconf has no
-# post-install targets, so we hook this into the install target with
-# install-exec-hook that runs after install-exec has completed.
+# The post-modules target checks for a fully configured install directory by
+# checking for the existence of the /etc/modules.conf file in the target install
+# directory $(DESTDIR)$(krootdir).  If it exists, then we are doing a non-rpm
+# (autoconf) install and need to configure /etc/modules.conf in the target
+# directory.  First we check if modules.conf has already been patched by looking
+# for our include statement.  If we have already patched up the modules.conf
+# file, we just leave it.  If an adjustment needs to be made, we next check for
+# an older non-rpm LiS distribution by checking for the tell-tale 'BEGIN LiS'
+# string in modules.conf.  If there is an older non-rpm LiS, we remove any
+# reference to any of our installable modules that may have previously been
+# referenced in the modules.conf by LiS before proceeding.  We also need to
+# force remove any kernel modules left by LiS in the misc modules subdirectory.
+# Lastly, we add our prune and include lines to the modules.conf file.  If we
+# have a usable system map file and an executable depmod, we perform the depmod.
+# Finally we invoke installation of any necessary devices.
 #
-# Some explanaion is in order: the post-modules target checks for a fully
-# configured install directory by checking for the existence of the
-# /etc/modules.conf file in the target install directory.  If it exists, then we
-# are doing a non-rpm install and need to configure /etc/modules.conf in the
-# target directory.  First we check if modules.conf has already been inserted by
-# us by looking for our include statement.  If we have already patched up the
-# modules.conf file, we just leave it.  If an adjustment needs to be made, we
-# next check for an older non-rpm LiS distribution by checking for the tell-tale
-# 'BEGIN LiS' string in modules.conf.  If there is an older non-rpm LiS, we
-# remove any reference to any of our installable modules that may have
-# previously been referenced in the modules.conf by LiS before proceeding.  We
-# also need to force remove any kernel modules left by LiS in the misc modules
-# subdirectory.  Next, if there is an older LiS autoconf installation that
-# included these drivers and modules, we need to remove references to them from
-# the modules.streams file and the streams subdirectory.  Lastly, we add our
-# prune and include lines to the modules.conf file.  If we have a usable system
-# map file and an executable depmod, we perform the depmod.  Finally we invoke
-# installation of any necessary devices.
+# Note that if there is an older LiS autoconf installation that included these
+# drivers and modules, we remove references to them from the modules.streams
+# file and remove the modules from the streams subdirectory.
 #
 post-modules:
-	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
-		conf_old='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
-		if ( grep -q 'include.*modules.$(KMODCONF_EXT)' $$conf_old ) ; then :; else \
+	@conf_fil='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
+	if test -r $$conf_fil ; then \
+		if ( grep -q 'include.*modules.$(KMODCONF_EXT)' $$conf_fil ) ; then :; else \
 			conf_new='$(DESTDIR)$(krootdir)/etc/modules.conf.new.$$$$' ; \
-			cp -f $$conf_old $$conf_new ; \
-			if ( grep -q 'BEGIN LiS' $$conf_old ) ; then \
+			cp -f $$conf_fil $$conf_new ; \
+			if ( grep -q 'BEGIN LiS' $$conf_fil ) ; then \
 				conf_tmp='$(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$' ; \
 				list='$(KERNEL_MODULES)'; for p in $$list; do \
 					m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\.o||'`" ; \
@@ -138,18 +131,27 @@ post-modules:
 			echo 'if -f /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
 			echo 'include /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
 			echo 'endif' >> $$conf_new ; \
-			chmod --reference=$$conf_old $$conf_new ; \
-			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_old ; \
+			chmod --reference=$$conf_fil $$conf_new ; \
+			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
 			rm -f $$conf_new ; \
 		fi ; \
 		sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
 		if test -r $$sysmap -a -x /sbin/depmod ; then \
-			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_old -F $$sysmap $(kversion)" ; \
-			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_old -F $$sysmap $(kversion) ; \
+			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
+			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
 		fi ; \
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-devices ; \
 	fi
 
+#
+# This is equivalent to the kernel modules package rpm %post scriptlet for
+# non-rpm (autoconf) installs.  It is only executed when the install directory
+# is fully configured for kernel modules.  That is, this does not run when
+# building an rpm because the binaries are installed in a temporary,
+# unconfigured directory.  Autoconf has no post-install targets, so we hook this
+# into the install target with install-exec-hook that runs after install-exec
+# has completed.
+#
 install-exec-hook: post-modules
 
 uninstall-modules:
@@ -164,42 +166,50 @@ uninstall-modules:
 uninstall-local: uninstall-modules
 
 #
-# This is equivalent to the kernel modules package rpm %postun scriptlet.  It
-# is only executed when the uninstall directory is fully configured for kernel
-# modules.  That is, this does not run when building an rpm because the
-# binaries are not uninstalled (they are usually just removed wholesale).
-# Autoconf has no post-uninstall targets, so we hook this into the
-# uninstall-hook that runs after uninstall has completed.
+# The postun-modules target checks for a fully configured uninstall directory by
+# checking for the existence of the /etc/modules.conf file in the target
+# uninstall directory $(DESTDIR)$(krootdir).  It it exists, then we are doing a
+# non-rpm (autoconf) uninstall and need to unconfigure modules.conf in the
+# target directory.  First which check if there are any remaning modules.ext
+# files that belong to other kernel releases.  If there are, we do not remove
+# the patch from modules.conf because it is still needed by the other kernels.
+# If there are not, the prune and include patch is removed from the modules.conf
+# file.  If we have a usable system map file and an executable depmod, we
+# perform the depmod.  Finally we invoke removal of any installed devices.
+#
+# It is not possible to restore any modules or associated modules.conf entries
+# for non-rpm or old LiS releases.  You need to reinstall those packages (if
+# desired) to restore the removed modules and entries.
 #
 postun-modules:
-	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+	@conf_fil='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
+	if test -r $$conf_fil ; then \
 		r=yes ; \
 		for f in $(DESTDIR)$(krootdir)/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
 			if test -f $$f ; then r=no ; break ; fi ; \
 		done ; \
-		conf_old='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
 		if test ":$$r" = :yes ; then \
 			conf_new='$(DESTDIR)$(krootdir)/etc/modules.conf.new.$$$$' ; \
-			sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_old > $$conf_new ; \
-			chmod --reference=$$conf_old $$conf_new ; \
-			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_old ; \
+			sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_fil > $$conf_new ; \
+			chmod --reference=$$conf_fil $$conf_new ; \
+			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
 			rm -f $$conf_new ; \
 		fi ; \
 		sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
 		if test -r $$sysmap -a -x /sbin/depmod ; then \
-			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_old -F $$sysmap $(kversion)" ; \
-			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_old -F $$sysmap $(kversion) ; \
+			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
+			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
 		fi ; \
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
 	fi
 
 #
-# The uninstall-hook target is run after the files have been removed.  It is
-# essentially equivalent to the rpm %postun, but it is only executed when the
-# uninstall directory is fully configured for kernel modules.  (That is, this
-# does not run when building an rpm, because the binaries are installed in a
-# temporary, unconfigured directory.)  This is for alien systems and embedded
-# targets that cannot build from packages.
+# This is equivalent to the kernel modules package rpm %postun scriptlet.  It is
+# only executed when the uninstall directory is fully configured for kernel
+# modules.  That is, this does not run when building an rpm because the binaries
+# are not uninstalled (they are usually just removed wholesale).  Autoconf has
+# no post-uninstall targets, so we hook this into the uninstall-hook that runs
+# after uninstall has completed.
 #
 uninstall-hook: postun-modules
 
