@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.10 2004/08/24 08:42:36 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.11 2005/01/21 10:09:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMIO 7 "$Date: 2004/08/24 08:42:36 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH STREAMIO 7 "$Date: 2005/01/21 10:09:18 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
 .B streamio
-\- STREAMS ioctl commands 
+\- \fISTREAMS\fP ioctl commands 
 .\"
 .\"
 .SH SYNOPSIS   
@@ -90,19 +90,31 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-STREAMS I/O control commands are ioctl commands that are defined to operate on
-all STREAMS character special devices.  All of these commands are interpreted
-by the stream head.  Some commands are passed to the STREAMS module or driver.
+.I STREAMS
+I/O control commands are ioctl commands that are defined to operate on
+all
+.I STREAMS
+character special devices.  All of these commands are interpreted
+by the stream head.  Some commands are passed to the
+.I STREAMS
+module or driver.
 .PP
-STREAMS I/O control commands are invoked using the normal
+.I STREAMS
+I/O control commands are invoked using the normal
 .BR ioctl (2)
-system call, but are defined only for STREAMS character special files.
+system call, but are defined only for
+.I STREAMS
+character special files.
 .TP
 .I fd
-is an open file descriptor for a STREAMS character special file.
+is an open file descriptor for a
+.I STREAMS
+character special file.
 .TP
 .I command
-is the STREAMS I/O control function that the caller requests be performed.
+is the
+.I STREAMS
+I/O control function that the caller requests be performed.
 .TP
 .I arg
 provides additional information required by the particular I/O
@@ -800,7 +812,7 @@ on
 and
 .BR putmsg (2)
 if the stream head has received a write error
-.BR "" ( M_ERROR )
+.RB ( M_ERROR )
 message.
 .TP
 .B SNDHOLD
@@ -818,7 +830,9 @@ integer pointed to by
 will return zero or more flags from the following flags:
 (These flags alter the operations of
 .BR write "(2) and " putmsg (2)
-on a STREAMS character special file.)
+on a
+.I STREAMS
+character special file.)
 .TP
 .B SNDZERO
 send a zero-length message downstream when a write of zero bytes occurs.
@@ -831,7 +845,7 @@ on
 and
 .BR putmsg (2)
 if the stream head has received a write error
-.BR "" ( M_ERROR )
+.RB ( M_ERROR )
 message.
 .TP
 .B SNDHOLD
@@ -1018,7 +1032,9 @@ has no lower multiplexing driver definition.
 .TP
 .RB [ EINVAL ]
 .I arg
-is already linked under a multiplexer or is not a STREAMS character special
+is already linked under a multiplexer or is not a
+.I STREAMS
+character special
 file.
 .PP
 In addition, any error received in an error message will be returned in
@@ -1310,7 +1326,9 @@ has no lower multiplexing driver definition.
 .TP
 .RB [ EINVAL ]
 .I arg
-is already linked under a multiplexer or is not a STREAMS character special
+is already linked under a multiplexer or is not a
+.I STREAMS
+character special
 file.
 .PP
 In addition, any error received in an error message will be returned in
@@ -1323,7 +1341,9 @@ negative acknowledgement message will also be returned in
 .\"
 .SS I_POP
 .PP
-Pops the STREAMS module just beneath the stream head from
+Pops the
+.I STREAMS
+module just beneath the stream head from
 .IR fd .
 .I arg
 is ignored.
@@ -1436,7 +1456,9 @@ negative acknowledgement message will also be returned in
 .\"
 .SS I_PUSH
 .PP
-Pushes a STREAMS module by name on the stream specified by
+Pushes a
+.I STREAMS
+module by name on the stream specified by
 .IR fd .
 .I arg
 is a pointer to a string that contains the name of the module to push.
@@ -1577,7 +1599,7 @@ is not a stream.
 .TP
 .RB [ EAGAIN ]
 no file descriptor message
-.BR "" ( M_PASSFP )
+.RB ( M_PASSFP )
 is waiting.
 .TP
 .RB [ ENFILE ]
@@ -1586,7 +1608,7 @@ no remaining file descriptors could be allocated for the receiving process.
 .RB [ EBADMSG ]
 the message on the top of the stream head read queue is not a passed file
 descriptor
-.BR "" ( M_PASSFD )
+.RB ( M_PASSFD )
 message.
 .\"
 .\"
@@ -1607,7 +1629,9 @@ to an appropriate error number as follows:
 .TP
 .RB [ EINVAL ]
 .I fd
-is not a STREAMS based pipe.
+is not a
+.I STREAMS
+based pipe.
 .TP
 .RB [ EIO ]
 .I fd
@@ -1711,7 +1735,9 @@ all flags.
 .\"
 .SS I_STR
 .PP
-Generates an internal STREAMS ioctl message and places it on the stream head's
+Generates an internal
+.I STREAMS
+ioctl message and places it on the stream head's
 write queue for processing by the module or driver and returns the response.
 .I arg
 is a pointer to a
@@ -1942,7 +1968,9 @@ device that accepts I/O controls.
 .TP
 .RB [ ENODEV ]
 .I fd
-refers to a STREAMS device that does not support the
+refers to a
+.I STREAMS
+device that does not support the
 .BR ioctl (2)
 system call.
 .TP
@@ -1959,7 +1987,9 @@ refers to a pipe and the other end of the pipe is closed.
 .TP
 .RB [ ESTRPIPE ]
 .I fd
-refers to a STREAMS-based pipe and a write operation was attempted with no
+refers to a
+.IR STREAMS -based
+pipe and a write operation was attempted with no
 readers at the other end, or a read operation was attempted, the pipe is
 empty, and there are no readers at the other end.
 .TP
@@ -2013,7 +2043,7 @@ ioctl can be returned in
 .\"
 .SH NOTICES
 .PP
-STREAMS
+.I STREAMS
 .B ioctl()
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
@@ -2044,7 +2074,7 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .B streamio
 has no known bugs.
 .PP
-STREAMS
+.I STREAMS
 .B ioctl()
 calls are complex and there is much conflicting documentation in specific
 areas of behaviour.  Not all bugs are bugs and not all features are features.
@@ -2109,10 +2139,12 @@ susv3
 POSIX.
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 .B ioctl()
-for STREAMS first appeared in SVR 3.
+for
+.I STREAMS
+first appeared in SVR 3.
 .[
 svr3
 .]

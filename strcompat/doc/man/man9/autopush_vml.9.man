@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush_vml.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: autopush_vml.9.man,v 0.9.2.2 2005/01/21 10:09:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH_VML 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH AUTOPUSH_VML 9 "$Date: 2005/01/21 10:09:50 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -111,7 +111,8 @@ the
 .B SAD_VML
 IO control to the
 .BR sad (4)
-STREAMS Adminstrative Driver.
+.I STREAMS
+Adminstrative Driver.
 This function verifies that a module list is valid (loaded on the system).
 .\"
 .\"
@@ -144,7 +145,7 @@ returns one (1) if an invalid name is present in the list, or returns a
 negative error number.
 .\"
 .\"
-.SH "ERRORS"
+.SH ERRORS
 .PP
 .BR autopush_vml ()
 fails and returns a negative error number as follows:

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qtimeout.9.man,v 0.9.2.2 2004/08/24 08:42:46 brian Exp $
+.\" @(#) $Id: qtimeout.9.man,v 0.9.2.3 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QTIMEOUT 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QTIMEOUT 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .SH NAME
 .B qtimeout
 \- start a timer associated with a queue
@@ -179,7 +179,7 @@ can be called from any context including user context, queue procedures,
 call-outs, callbacks and interrupt service routines.
 .\"
 .\"
-.SH "MP-STREAMS"
+.SH MP-STREAMS
 .PP
 .BR qtimeout ()
 is MP-safe.
@@ -386,7 +386,7 @@ solspg
 .]
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 .BR qtimeout ()
 is a 

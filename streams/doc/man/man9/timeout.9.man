@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timeout.9.man,v 0.9.2.9 2004/08/24 08:42:47 brian Exp $
+.\" @(#) $Id: timeout.9.man,v 0.9.2.10 2005/01/21 10:09:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIMEOUT 9 "$Date: 2004/08/24 08:42:47 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH TIMEOUT 9 "$Date: 2005/01/21 10:09:52 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -112,7 +112,7 @@ timeout function callback
 (if the
 .I timo_fcn
 function pointer is
-.BR "" non- NULL )
+.RB non- NULL )
 with the supplied argument
 .IR arg .
 The timeout callback function
@@ -186,7 +186,7 @@ callbacks,
 and interrupt service routines.
 .\"
 .\"
-.SH "MP-STREAMS"
+.SH MP-STREAMS
 .PP
 .BR timeout ()
 is MP-safe.
@@ -441,7 +441,7 @@ usldk
 documentation.
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 .BR timeout ()
 first appeared in SVR 2.

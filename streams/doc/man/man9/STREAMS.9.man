@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.10 2005/01/20 11:08:02 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.11 2005/01/21 10:09:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/20 11:08:02 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS 9 "$Date: 2005/01/20 11:08:02 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STREAMS 9 "$Date: 2005/01/21 10:09:49 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -1115,7 +1115,9 @@ after the stream is opened and before the stream is closed.
 .TP
 .B sys.streams.max_apush
 Defines the maximum number of modules that can be configured for autopush onto
-a STREAMS driver.
+a
+.I STREAMS
+driver.
 Valid values are zero (0) or greater (MAXINT).
 The default value is the traditional UNIX value of 8 modules.
 This system control defines the maximum for all new autopush configurations.
@@ -1178,7 +1180,8 @@ Valid values are zero (0) or greater (MAXINT).
 The default value is 2^12.
 Changing this value may have a positive or negative impact on system
 performance.  Setting this value to a small number may be useful for debugging
-STREAMS drivers and modules.
+.I STREAMS
+drivers and modules.
 .TP
 .B sys.streams.nstrpush
 Defines the maximum number of modules that can be pushed on a stream.  This
@@ -1289,7 +1292,8 @@ and
 .TP
 .B sys.streams.strthresh
 Defines the maximum amount of memory that will be allocated for use by the
-STREAMS subsystem via
+.I STREAMS
+subsystem via
 .BR kmem_alloc (9)
 or
 .BR kmem_zalloc (9),

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/21 00:20:07 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/21 12:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 00:20:07 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 12:17:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,17 +58,29 @@ ACLOCAL_AMFLAGS = -I m4
 #
 # Accumulate these 'till the end
 #
-INSTALL_EXEC_LOCAL	=
-INSTALL_DATA_LOCAL	=
-UNINSTALL_LOCAL		=
 ALL_LOCAL		=
+INSTALL_DATA_LOCAL	=
+INSTALL_DATA_HOOK	=
+INSTALL_EXEC_LOCAL	=
+INSTALL_EXEC_HOOK	=
+UNINSTALL_LOCAL		=
+UNINSTALL_HOOK		=
+MOSTLYCLEAN_LOCAL	=
 CLEAN_LOCAL		=
 DISTCLEAN_LOCAL		=
-INSTALL_EXEC_HOOK	=
-INSTALL_DATA_HOOK	=
-UNINSTALL_HOOK		=
+MAINTAINER_CLEAN_LOCAL	=
+DIST_HOOK		=
+CHECK_LOCAL		=
+INSTALLCHECK_LOCAL	=
 DISTCHECK_HOOK		=
-CHECK_HOOK		=
+
+#
+# In cas we only need the files version:
+#
+MOSTLYCLEANFILES	=
+CLEANFILES		=
+DISTCLEANFILES		=
+MAINTAINERCLEANFILES	=
 
 @MAINTAINER_MODE_TRUE@MAINTAINER_MODE = yes
 @MAINTAINER_MODE_FALSE@MAINTAINER_MODE = no
@@ -113,39 +125,43 @@ CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SY
 ifnames:
 	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
 
-distclean-logs:
-	rm -f *.log
+DISTCLEANFILES += *.log config.site
 
-distclean-site:
-	rm -f config.site
+MAINTAINERCLEANFILES += $(srcdir)/Makefile.in
 
-DISTCLEAN_LOCAL += distclean-logs distclean-site
-
-install-exec-local: $(INSTALL_EXEC_LOCAL)
+all-local: $(ALL_LOCAL)
 
 install-data-local: $(INSTALL_DATA_LOCAL)
 
+install-data-hook: $(INSTALL_DATA_HOOK)
+
+install-exec-local: $(INSTALL_EXEC_LOCAL)
+
+install-exec-hook: $(INSTALL_EXEC_HOOK)
+
 uninstall-local: $(UNINSTALL_LOCAL)
 
-all-local: $(ALL_LOCAL)
+uninstall-hook: $(UNINSTALL_HOOK)
+
+mostlyclean-local: $(MOSTLYCLEAN_LOCAL)
 
 clean-local: $(CLEAN_LOCAL)
 
 distclean-local: $(DISTCLEAN_LOCAL)
 
-install-exec-hook: $(INSTALL_EXEC_HOOK)
+maintainer-clean-local: $(MAINTAINER_CLEAN_LOCAL)
 
-install-data-hook: $(INSTALL_DATA_HOOK)
+dist-hook: $(DIST_HOOK)
 
-uninstall-hook: $(UNINSTALL_HOOK)
+check-local: $(CHECK_LOCAL)
+
+installcheck-local: $(INSTALLCHECK_LOCAL)
 
 distcheck-hook: $(DISTCHECK_HOOK)
-
-check-hook: $(CHECK_HOOK)
 
 #
 # Collected phonys from other automake fragments.
 #
-.PHONY: ifnames distclean-logs distclean-site
+.PHONY: ifnames
 
 # vim: ft=automake

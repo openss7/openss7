@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipe.2s.man,v 0.9.2.8 2005/01/21 00:14:06 brian Exp $
+.\" @(#) $Id: pipe.2s.man,v 0.9.2.9 2005/01/21 10:08:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/21 00:14:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:08:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PIPE 2 "$Date: 2005/01/21 00:14:06 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PIPE 2 "$Date: 2005/01/21 10:08:22 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -99,9 +99,9 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B "#include <unistd.h> "
+.B #include <unistd.h>
 .HP
-.BI "int pipe( int " filedes "[2] ); "
+.BI int pipe( int " filedes "[2] );
 .\"
 .\"
 .SH ARGUMENTS
@@ -119,9 +119,9 @@ creates a
 .I STREAMS
 .B pipe
 (see
-.BR fifo "(4) "
+.BR fifo (4)
 and
-.IR STREAMS "(4)), "
+.IR STREAMS (4)),
 and provides access to its ends as a pair of file descriptors
 returned in the
 .I filedes
@@ -134,7 +134,7 @@ independently in each direction;  i.e.,
 pipes are not just
 .IR bidirectional ,
 but
-.IR "full-duplex" .
+.IR full-duplex .
 .sp
 Structurally, a
 .I STREAMS
@@ -185,7 +185,7 @@ returns 0.
 Upon failure,
 .BR pipe ()
 returns -1, and
-.BR errno "(3) "
+.BR errno (3)
 is set to indicate the error causing the failure.
 .\"
 .\"
@@ -200,7 +200,7 @@ svr4
 used
 .I STREAMS
 to implement them (see 
-.BR pipe "(2)). "
+.BR pipe (2)).
 Although the interface is identical, the two are quite different
 otherwise.
 .I STREAMS
@@ -216,13 +216,13 @@ to augment the processing of data.  Moreover, such processing may
 be
 .IR message \- oriented :
 message boundaries may be established and respected by using the
-.BR getmsg "(2)/" getpmsg "(2s) "
+.BR getmsg (2)/ getpmsg (2s)
 and
-.BR putmsg "(2)/" putpmsg "(2s) "
+.BR putmsg (2)/ putpmsg (2s)
 primitives instead of
-.BR read "(2) "
+.BR read (2)
 and
-.BR write "(2). "
+.BR write (2).
 .SH NOTICES
 .PP
 Applications wishing to use the
@@ -265,11 +265,11 @@ hopefully in the near future.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR pipemod "(4), "
-.BR connld "(4), "
-.BR errno "(3), "
-.BR fifo "(4), "
-.BR STREAMS "(4) "
+.BR pipemod (4),
+.BR connld (4),
+.BR errno (3),
+.BR fifo (4),
+.BR STREAMS (4)
 .\"
 .\"
 .SH COMPATAIBILITY

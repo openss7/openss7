@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xxx.8.man,v 0.9.2.5 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: xxx.8.man,v 0.9.2.6 2005/01/21 10:09:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,10 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXX 8 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH XXX 8 "$Date: 2005/01/21 10:09:34 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
+.B xxx
+\- incomplete man page
 .\"
 .\"
 .SH SYNOPSIS

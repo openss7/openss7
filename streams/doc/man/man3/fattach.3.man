@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.3.man,v 0.9.2.8 2005/01/21 00:14:06 brian Exp $
+.\" @(#) $Id: fattach.3.man,v 0.9.2.9 2005/01/21 10:08:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/21 00:14:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:08:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 3 "$Date: 2005/01/21 00:14:06 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH FATTACH 3 "$Date: 2005/01/21 10:08:36 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
@@ -81,9 +81,9 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B "#include <stropts.h> "
+.B #include <stropts.h>
 .HP
-.BI "int fattach( int " filedes ", const char *" path " ); "
+.BI int fattach( int " filedes ", const char *" path " );
 .\"
 .\"
 .SH ARGUMENTS
@@ -98,30 +98,30 @@ The path to which to attach the file.
 .\"
 .SH DESCRIPTION
 .PP
-.BR fattach "() "
+.BR fattach ()
 attaches an open
 .I STREAMS
 file to a path name in the file system.
 While the file is attached to the path name, opens (see
-.BR open "(2)) "
+.BR open (2))
 of the path name will instead open the
 .I STREAMS
 file.
 .sp
 The process calling
-.BR fattach "() "
+.BR fattach ()
 may immediately close the
 .I STREAMS
 file thereafter; the
-.BR fattach "() "
+.BR fattach ()
 operation effectively causes the file to remain open until
 it is explicitly detached via
-.BR fdetach "(3).  "
+.BR fdetach (3).
 .sp
 Note that a single
 .I STREAMS
 file may be attached to several path names (via several calls to
-.BR fattach "), "
+.BR fattach ),
 but a path name may only be attached to a single
 .I STREAMS
 file.
@@ -130,7 +130,7 @@ The process does not affect pre-existing opens either of the underlying path
 name or the
 .I STREAMS
 file, and subsequent operations on the path name (until a corresponding
-.BR fdetach "(3)) "
+.BR fdetach (3))
 apply only to the attached
 .I STREAMS
 file.
@@ -139,37 +139,37 @@ file.
 .SH "RETURN VALUE"
 .PP
 Upon successful completion,
-.BR fattach "() "
+.BR fattach ()
 returns 0.  Upon failure,
-.BR fattach "() "
+.BR fattach ()
 return -1, and
-.BR errno "(3) "
+.BR errno (3)
 is set to indicate the error causing the failure (see below).
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR fattach "() "
+.BR fattach ()
 may fail at least with the following error indications:
 .TP \w'[TNOTSUPPORT]\(em'u
-.B "[EBADF]"
+.RB [ EBADF ]
 The
 .I filedes
 argument is not a valid open file descriptor.
 .TP
-.B "[EINVAL]"
+.RB [ EINVAL ]
 The
 .I filedes
 argument does not refer to a valid
 .I STREAMS
 file.
 .TP
-.B "[EISDIR]"
+.RB [ EISDIR ]
 The
 .I path
 argument refers to a directory.
 .TP
-.B "[EBUSY]"
+.RB [ EBUSY ]
 The
 .I path
 argument is currently a mount point, or already has a
@@ -180,26 +180,26 @@ file attached to it.
 .SH "APPLICATION USAGE"
 .PP
 Both conceptually and mechanically,
-.BR fattach "() "
+.BR fattach ()
 is similar to the more typical
 .I mounting
 of a file system on a path name representing a directory (see
-.BR mount "(8)).  "
+.BR mount (8)).
 Both cause the process of searching for the path name to
 use an alternative file system node when the point of mounting or
 attachment is reached; i.e., the attached file or mounted file system
 covers and hides the underlying path name.
 They differ in that mounting applies to directory names and attaches
 block devices that contain whole file systems;
-.BR fattach "() "
+.BR fattach ()
 is intended to apply to non-directory names and attaches only a single
 .I STREAMS
 file.
 .sp
-.BR fattach "() "
+.BR fattach ()
 is intended to allow client processes a means to communicate with
 a server process via a
-.I "well-known"
+.I well-known
 path name.
 E.g., a server process might open a
 .I STREAMS
@@ -207,11 +207,11 @@ E.g., a server process might open a
 and attach one end to an existing path name, thus providing a
 means for clients to communicate with the server.
 When the server is not running, the path name identifies a
-.RB "non-" STREAMS
+.RB non- STREAMS
 file name, but when the server is running, it identifies the end of the
 pipe to be used to communicate with the server.  A client process can
 distinguish these two states by using the
-.BR isastream "(3) "
+.BR isastream (3)
 function.
 .sp
 Moreover, since an attached
@@ -226,12 +226,12 @@ and
 .B M_PASSFP
 messages, to be received once opened via the
 .B I_RECVFD
-.IR ioctl ". "
+.IR ioctl .
 (Note that this means of file descriptor passing is only supported for
 .I STREAMS
 .B pipes
 and
-.BR fifos ".) "
+.BR fifos .)
 E.g., a
 .B pipe
 may be opened, a path attached to one end, and a file descriptor passed
@@ -246,27 +246,27 @@ intending to use a
 only for passing file descriptors.
 .sp
 See
-.BR connld "(9) "
+.BR connld (9)
 for related applications of
-.BR fattach "(). "
+.BR fattach ().
 .sp
 Under Linux,
-.BR fattach "() "
+.BR fattach ()
 also coincidentally provides a means to dynamically substitute a
 .I STREAMS
 file
 for a kernel
 .I fifo
 (see
-.BR fifo "(4) "
+.BR fifo (4)
 and
-.BR pipe "(3)) "
+.BR pipe (3))
 without having to change existing applications (see also
-.BR fattach (8)).  "
+.BR fattach (8)).
 .SH NOTICES
 .PP
 Applications wishing to use the version of the
-.BR fattach "() "
+.BR fattach ()
 function described herein must link with the
 .B LiS
 .[
@@ -282,7 +282,7 @@ which only generates an error indicating that it is not implemented.
 .SH WARNINGS
 .PP
 The operation of
-.BR fattach "() "
+.BR fattach ()
 depends on how the underlying operating system implements the mechanism
 of
 .IR mounting .
@@ -326,7 +326,7 @@ file is unusable for normal message traffic, and
 this automatic detachment ensures that an otherwise inactive stream
 will be closed and its resources released.
 In the case of a
-.BR pipe ", "
+.BR pipe ,
 an end is given a
 .I hangup
 indication if its peer is closed completely and dismantled.
@@ -337,7 +337,7 @@ messages are queued at the remaining end (which is thus in this
 state), it may still be opened (if already open or if only attached)
 in order to receive these messages via the
 .B I_RECVFD
-.IR ioctl ". "
+.IR ioctl .
 .sp
 The behaviour of automatically detaching a
 .I STREAMS
@@ -349,9 +349,9 @@ implementations and should be considered a non-standard extension.
 .sp
 It should also be noted that this implementation does not change
 the access permissions (see
-.BR chmod "(2) "
+.BR chmod (2)
 and
-.BR fchmod "(2)) "
+.BR fchmod (2))
 of the attached
 .I STREAMS
 file.  If such behaviour is desired, the path's mode should be determined
@@ -359,26 +359,26 @@ file.  If such behaviour is desired, the path's mode should be determined
 attaching, and applied to the
 .I STREAMS
 file (via
-.BR chmod "(2) "
+.BR chmod (2)
 or the equivalent). (See
-.BR fattach "(8) "
+.BR fattach (8)
 for examples.)  Note that doing so alters the
 .I STREAMS
 file permanently; i.e., such changes will not be undone by an effective
 subsequent
-.BR fdetach "(3)."
+.BR fdetach (3).
 .\"
 .\"
 .SH "FUTURE DIRECTIONS"
 .PP
 In the current implementation,
-.BR fattach "() "
+.BR fattach ()
 will not attach to a directory name, to avoid conflict with the normal
 process of mounting file systems on directory mount points.  Though
 we foresee no need to allow attachment to directory path names at
 the time of this writing, this is subject to change in the future.
 .sp
-.BR fattach "() "
+.BR fattach ()
 is currently implemented as an IOCTL operation on the given file.
 Should
 .B LiS
@@ -397,18 +397,18 @@ LiS
 .\"
 .SH "SEE ALSO"
 .PP
-.BR chmod "(2), "
-.BR connld "(9), "
-.BR errno "(3), "
-.BR fattach "(8), "
-.BR fchmod "(2), "
-.BR fdetach "(3), "
-.BR fdetach "(8), "
-.BR fifo "(4), "
-.BR mount "(8), "
-.BR open "(2), "
-.BR pipe "(2), "
-.BR STREAMS "(4) "
+.BR chmod (2),
+.BR connld (9),
+.BR errno (3),
+.BR fattach (8),
+.BR fchmod (2),
+.BR fdetach (3),
+.BR fdetach (8),
+.BR fifo (4),
+.BR mount (8),
+.BR open (2),
+.BR pipe (2),
+.BR STREAMS (4).
 .\"
 .\"
 .SH COMPATIBILITY

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.8 2004/08/24 08:42:40 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.9 2005/01/21 10:09:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SPG 9 "$Date: 2004/08/24 08:42:40 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
+.TH SPG 9 "$Date: 2005/01/21 10:09:49 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
 .\"
 .\"
 .SH NAME
 .B spg
-\- Linux Fast-STREAMS Programmers Guide
+\- \fBLinux Fast-STREAMS\fP Programmers Guide
 .\"
 .\"
 .SH SYNOPSIS
@@ -318,7 +318,7 @@ sort-adjacent-labels
 .BR setq (9)
 .PD
 .PP
-.B "Miscellaneous"
+.B Miscellaneous
 .TP
 .BR appq (9)
 .PD 0
@@ -625,7 +625,9 @@ The latter approach is often easier to use.
 .PP
 The
 .BR nsdev (4)
-driver provides for a Named STREAMS device.  This is a device numbering
+driver provides for a Named
+.I STREAMS
+device.  This is a device numbering
 approach unique to
 .BR "Linux Fast-STREAMS" .
 The

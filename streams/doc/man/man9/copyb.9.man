@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyb.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: copyb.9.man,v 0.9.2.8 2005/01/21 10:09:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH COPYB 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH COPYB 9 "$Date: 2005/01/21 10:09:50 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -192,7 +192,8 @@ or if the data block is mangled (i.e.  the
 pointer is less than the
 .IR db_base ).
 .PP
-This does not appear consistent with SVR 4.2 STREAMS.
+This does not appear consistent with SVR 4.2
+.IR STREAMS .
 .[
 svr42
 .]
@@ -202,7 +203,7 @@ svr42
 .PP
 .BR bufcall (9),
 .BR copymsg (9),
-.BR dupb "(9) and "
+.BR dupb "(9) and
 .BR dupmsg (9).
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lisbcm.9lis.man,v 0.9.2.1 2005/01/17 12:38:30 brian Exp $
+.\" @(#) $Id: lisbcm.9lis.man,v 0.9.2.2 2005/01/21 10:10:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/17 12:38:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:10:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LiSBCM 9 "$Date: 2005/01/17 12:38:30 $" "$Name:  $" "Linux Fast-STREAMS LiS BCM"
+.TH LiSBCM 9 "$Date: 2005/01/21 10:10:18 $" "$Name:  $" "Linux Fast-STREAMS LiS BCM"
 .\"
 .\"
 .SH NAME
 .B lisbcm
-\- Linux Fast-STREAMS LiS Binary Compatibility Module
+\- \fBLinux Fast-STREAMS\fP LiS Binary Compatibility Module
 .\"
 .\"
 .SH SYNOPSIS
@@ -101,7 +101,9 @@ LiS
 .]
 The
 .I LiS BCM
-is provided for binary compatibility with STREAMS drivers and modules compiled
+is provided for binary compatibility with
+.I STREAMS
+drivers and modules compiled
 as
 .B Linux
 kernel modules.
@@ -123,7 +125,9 @@ LiS
 are inefficient wrappers for
 .B Linux
 kernel functions.
-New STREAMS drivers and modules should always be compiled against
+New
+.I STREAMS
+drivers and modules should always be compiled against
 .B Linux Fast-STREAMS
 and
 .I Linux
@@ -131,7 +135,9 @@ symbols for performance and efficiency.
 .\"
 .\"
 .PP
-Many of the SVR 4.2 STREAMS functions provided by
+Many of the SVR 4.2
+.I STREAMS
+functions provided by
 .I LiS
 .[
 LiS
@@ -144,7 +150,9 @@ are not bug-for-bug compatible with
 .[
 LiS
 .]
-This means that incorrect STREAMS drivers and modules that appear to run
+This means that incorrect
+.I STREAMS
+drivers and modules that appear to run
 correctly under
 .I LiS
 .[
@@ -156,14 +164,18 @@ may fail to operate with the
 .\"
 .PP
 .I LiS
-can permit erroneous STREAMS functions to appear to run correctly.
+can permit erroneous
+.I STREAMS
+functions to appear to run correctly.
 The equivalent
 .B Linux Fast-STREAMS
 .I LiS BCM
 functions are unforgiving of being passed
 .B NULL
 pointers and out of range arguments.
-This means that incorrect STREAMS drivers and modules that appear to run
+This means that incorrect
+.I STREAMS
+drivers and modules that appear to run
 correctly under
 .I LiS
 .[
@@ -297,7 +309,7 @@ New programs should allocate memory meeting the requirements and then call
 .PP
 .BR lis_allocq ()
 has no known bugs but has a different argument declaration that the SVR 4.2
-STREAMS
+.I STREAMS
 .[
 svr42
 .]

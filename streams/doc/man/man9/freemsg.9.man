@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freemsg.9.man,v 0.9.2.8 2004/08/24 08:42:43 brian Exp $
+.\" @(#) $Id: freemsg.9.man,v 0.9.2.9 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FREEMSG 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH FREEMSG 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -184,7 +184,7 @@ those that do not understand kernel memory caching mechanisms.
 .SH "SEE ALSO"
 .PP
 .BR allocb (9),
-.BR esballoc "(9) and "
+.BR esballoc "(9) and
 .BR freeb (9).
 .\"
 .\"

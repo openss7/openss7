@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.10 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.11 2005/01/21 10:09:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DRV_GETPARM 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DRV_GETPARM 9 "$Date: 2005/01/21 10:09:50 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -163,7 +163,7 @@ The task structure returned by
 is only valid when called in user context.
 .\"
 .\"
-.SH "MP-STREAMS"
+.SH MP-STREAMS
 .PP
 .BR drv_getparm ()
 is MP-safe.
@@ -299,7 +299,7 @@ and
 documentation.
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 A version of
 .BR drv_getparm ()

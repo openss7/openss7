@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/01/14 06:20:57 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/01/21 12:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/14 06:20:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 12:17:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,8 +122,8 @@ EXTRA_DIST += $(PACKAGE_TARNAME).spec $(PACKAGE_TARNAME).gif $(PACKAGE_TARNAME).
 srpm:
 	$(MAKE) $(AM_MAKEFLAGS) distdir='$(tardir)' dist
 	$(mkinstalldirs) $(PACKAGE_RPMTOPDIR)/BUILD $(PACKAGE_RPMTOPDIR)/SRPMS $(PACKAGE_RPMTOPDIR)/SPECS $(PACKAGE_RPMTOPDIR)/SOURCES $(PACKAGE_RPMTOPDIR)/RPMS
-	/bin/cp -f $(top_srcdir)/$(PACKAGE_TARNAME).gif .
-	/bin/cp -f $(top_srcdir)/$(PACKAGE_TARNAME).xpm .
+	cp -f $(top_srcdir)/$(PACKAGE_TARNAME).gif .
+	cp -f $(top_srcdir)/$(PACKAGE_TARNAME).xpm .
 	$(RPMBUILD) -ts $(SRPMFLAGS) $(AM_SRPMFLAGS) $(RPMOPTS) $(RPMICONS) --target $(target) -- $(tardir).tar.bz2
 
 #
@@ -285,6 +285,14 @@ resign: sign
 
 endif
 
+clean-lsms:
+
+clean-archives:
+
+clean-rpms:
+
+clean-sign:
+
 distclean-lsms:
 	@if test -n "$(LSM)" ; then \
 		echo "rm -f $(LSM)" ; \
@@ -314,8 +322,23 @@ distclean-sign:
 		rm -f $$f.asc ; \
 	done
 
+maintainer-clean-lsms:
+
+maintainer-clean-archives:
+
+maintainer-clean-rpms:
+
+maintainer-clean-sign:
+
+CLEAN_LOCAL += clean-lsms clean-archives clean-rpms clean-sign
+
 DISTCLEAN_LOCAL += distclean-lsms distclean-archives distclean-rpms distclean-sign
 
-.PHONY: srpm rpms am-rpms lis-rpms lfs-rpms sign rebuild am-rebuild lis-rebuild lfs-rebuild resign distclean-lsms distclean-archives distclean-rpms distclean-sign
+MAINTAINER_CLEAN_LOCAL += maintainer-clean-lsms maintainer-clean-archives maintainer-clean-rpms maintainer-clean-sign
+
+.PHONY: srpm rpms am-rpms lis-rpms lfs-rpms sign rebuild am-rebuild lis-rebuild lfs-rebuild resign \
+	clean-lsms clean-archives clean-rpms clean-sign \
+	distclean-lsms distclean-archives distclean-rpms distclean-sign \
+	maintainer-clean-lsms maintainer-clean-archives maintainer-clean-rpms maintainer-clean-sign
 
 # vim: ft=automake

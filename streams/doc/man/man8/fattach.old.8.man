@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.old.8.man,v 0.9.2.6 2004/08/24 08:42:36 brian Exp $
+.\" @(#) $Id: fattach.old.8.man,v 0.9.2.7 2005/01/21 10:09:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,24 +89,24 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 8 "$Date: 2004/08/24 08:42:36 $" "$Name:  $" "Linux STREAMS"
+.TH FATTACH 8 "$Date: 2005/01/21 10:09:34 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B fattach
 \- attach a \fISTREAMS\fR file to a path name in the file system
 .SH SYNOPSIS
-.BI "fattach [-v] [-m|-u|-M" "<mode>" "] [-p|-c|" "<STREAMS path>" "] " "<path> ..."
+.BI "fattach [-v] [-m|-u|-M" <mode> "] [-p|-c|" "<STREAMS path>" "] " "<path> ..."
 .br
 .B  "fattach -?"
 .SH DESCRIPTION
 The
 .B fattach
 program provides a command-line interface to the underlying
-.BR fattach "(3) "
+.BR fattach (3)
 function.
 If the
-.B "\-p"
+.B \-p
 and/or the
-.B "\-c"
+.B \-c
 option is specified, a
 .I STREAMS
 .I pipe
@@ -116,9 +116,9 @@ but there need not be an even number of path names (i.e., the pipe ends
 need not be attached to the same number of paths).
 .sp
 If the
-.B "\-p"
+.B \-p
 and
-.B "\-c"
+.B \-c
 options are not specified, the first path name given must identify
 a
 .I STREAMS
@@ -127,7 +127,7 @@ to each of the path names subsequently specified (of which there must
 be at least one).
 .SH OPTIONS
 .TP
-.B "\-p"
+.B \-p
 Create a
 .I STREAMS
 pipe, to which to attach the subsequently specified path names.
@@ -138,46 +138,46 @@ of path names is exhausted.
 By default, the 
 .IR umask
 (see
-.BR umask "(2)) "
+.BR umask (2))
 is also applied to each end of the pipe after attaching. (See
-.BR fattach "(3))."
+.BR fattach (3)).
 .TP
-.B "\-c"
+.B \-c
 Like
-.B "\-p" (both may be given), but additionally pushes the
+.B \-p (both may be given), but additionally pushes the
 .B connld
 module onto the first end of the pipe.  This conveniently creates a
 free-standing
-.I "pipe-serving"
+.I pipe-serving
 pipe (see
-.BR connld "(9), "
+.BR connld (9),
 and below).
 .TP
-.B "\-m"
+.B \-m
 Apply the mode of the last-specified path(s) to the attached
 .I STREAMS
 file(s) after attaching.  (See
-.BR fattach "(3)."
+.BR fattach (3).
 .TP
-.B "\-u"
+.B \-u
 Apply the
 .IR umask
 (see
-.BR umask "(2)) "
+.BR umask (2))
 the
 .I STREAMS
 file after attaching. (See
-.BR fattach "(3))."
+.BR fattach (3)).
 This is done by default when a pipe is created via
-.BR "\-p" .
+.BR \-p .
 .TP
-.BI "\-M" " <mode>"
+.BI \-M " <mode>"
 Apply the given mode to the
 .I STREAMS
 file(s) after attaching.  (See
-.BR fattach "(3))."
+.BR fattach (3)).
 .TP
-.B "\-v"
+.B \-v
 Operate in a "verbose" manner.  This causes
 .B fattach
 to report its progress via message output to
@@ -185,7 +185,7 @@ to report its progress via message output to
 or
 .BR stderr .
 .TP
-.B "\-?"
+.B \-?
 Provide a usage summary.
 .SH "RETURN VALUE"
 Upon successful completion, i.e., if all given path names are attached
@@ -200,18 +200,18 @@ may have succeeded if that is the desired behaviour in the event of any
 failures.
 .SH "APPLICATION USAGE"
 The
-.B "\-p"
+.B \-p
 and
-.B "\-c"
+.B \-c
 options provide a convenient means for creating free-standing
 .I mounted
-.BR pipes ". "
+.BR pipes .
 The openers of the paths attached via
-.B "\-p"
+.B \-p
 will share a single pipe, while the openers of the paths attached via
-.B "\-c"
+.B \-c
 will have access to a
-.I "pipe-serving"
+.I pipe-serving
 pipe.  I.e., each open of the first end (e.g., the
 .I client
 end) will generate a new pipe, one end of which will be given to the
@@ -221,10 +221,10 @@ opener, and the other end of which will be passed as if by the
 to the path attached to the other end (e.g., the
 .I server
 end).  Each opener of the server path could
-.BR poll "(2) "
+.BR poll (2)
 for input, receive a new pipe end using the
 .B I_RECVFD
-.IR ioctl ", "
+.IR ioctl ,
 and then close the server path, thereafter using the new pipe end to
 communicate with the corresponding opener of the client path (note that
 the sense of
@@ -237,12 +237,12 @@ only be aware of whether or not an
 .I ioctl
 must be performed).
 .SH "SEE ALSO"
-.BR connld "(9), "
-.BR fattach "(3), "
-.BR fdetach "(3), "
-.BR fdetach "(8), "
-.BR STREAMS "(4), "
-.BR umask "(2)"
+.BR connld (9),
+.BR fattach (3),
+.BR fdetach (3),
+.BR fdetach (8),
+.BR STREAMS (4),
+.BR umask (2).
 .SH HISTORY
 An
 .B fdetach

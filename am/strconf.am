@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/14 06:20:57 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/21 10:11:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/14 06:20:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 10:11:33 $ by $Author: brian $
 #
 # =============================================================================
 
 if RPM_BUILD_KERNEL
+
+$(STRCONF_INPUT): $(CONFIG_CLEAN_FILES) $(STRCONF_CONFIGS)
+	$(SHELL) ./config.status strconf
 
 $(STRCONF_CONFIG): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(STRCONF) --hconfig=$(STRCONF_CONFIG) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
@@ -76,10 +79,9 @@ $(STRCONF_STSETUP): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 #$(STRCONF_STRLOAD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 #	$(STRCONF) --strload=$(STRCONF_STRLOAD) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-$(STRCONF_INPUT): $(CONFIG_CLEAN_FILES) $(STRCONF_CONFIGS)
-	$(SHELL) ./config.status strconf
-
 EXTRA_DIST += $(STRCONF_CONFIGS)
+
+clean-strconf:
 
 distclean-strconf:
 	rm -f $(STRCONF_INPUT)
@@ -92,17 +94,27 @@ distclean-strconf:
 	rm -f $(STRCONF_STSETUP)
 #	rm -f $(STRCONF_STRLOAD)
 
+maintainer-clean-strconf:
+
 dist_noinst_SCRIPTS += $(STRCONF_SCRIPT)
 EXTRA_SCRIPTS += scripts/strconf-sh
 
 else
 
+clean-strconf:
+
 distclean-strconf:
+
+maintainer-clean-strconf:
 
 endif
 
+CLEAN_LOCAL += clean-strconf
+
 DISTCLEAN_LOCAL += distclean-strconf
 
-.PHONY: distclean-strconf
+MAINTAINER_CLEAN_LOCAL += maintainer-clean-strconf
+
+.PHONY: clean-strconf distclean-strconf maintainer-clean-strconf
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_alloc.9.man,v 0.9.2.8 2004/08/24 08:42:44 brian Exp $
+.\" @(#) $Id: kmem_alloc.9.man,v 0.9.2.9 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH KMEM_ALLOC 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH KMEM_ALLOC 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -175,7 +175,7 @@ depending on the value of
 .BR kmem_free (9).
 .\"
 .\"
-.SH "BUGS"
+.SH BUGS
 .PP
 .BR kmem_alloc ()
 has no known bugs.
@@ -240,7 +240,7 @@ usldk
 documentation.
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 .BR kmem_alloc ()
 first appeared in SVR 3.

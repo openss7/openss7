@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unfreezestr.9.man,v 0.9.2.2 2004/08/24 08:42:48 brian Exp $
+.\" @(#) $Id: unfreezestr.9.man,v 0.9.2.3 2005/01/21 10:09:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNFREEZESTR 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNFREEZESTR 9 "$Date: 2005/01/21 10:09:52 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -141,7 +141,7 @@ returns
 .BR void .
 .\"
 .\"
-.SH "ERRORS"
+.SH ERRORS
 .PP
 .BR unfreezestr ()
 always succeeds.
@@ -154,7 +154,7 @@ can be called from any context, including user context, module procedures,
 call outs, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
-.SH "MP-STREAMS"
+.SH MP-STREAMS
 .PP
 .BR unfreezestr ()
 is MP-safe; however, the caller is responsible for the validity of the
@@ -171,7 +171,7 @@ predicated on the queue pair to which
 belongs.
 .\"
 .\"
-.SH "NOTICES"
+.SH NOTICES
 .PP
 .BR unfreezestr ()
 called with with an invalid
@@ -374,7 +374,7 @@ usldk
 .]
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 A version of
 .BR freezestr ()

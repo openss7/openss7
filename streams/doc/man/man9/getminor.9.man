@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getminor.9.man,v 0.9.2.9 2004/08/24 08:42:44 brian Exp $
+.\" @(#) $Id: getminor.9.man,v 0.9.2.10 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,15 +71,15 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMINOR 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETMINOR 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
-.SH "NAME"
+.SH NAME
 .B getminor, minor
 \- get the extended minor device number for a device.
 .\"
 .\"
-.SH "SYNOPSIS"
+.SH SYNOPSIS
 .PP
 .B #include <sys/streams.h>
 .br
@@ -94,7 +94,7 @@ sort-adjacent-labels
 the device number from which to extract the internal minor device number.
 .\"
 .\"
-.SH "DESCRIPTION"
+.SH DESCRIPTION
 .PP
 .BR getmajor (9),
 .BR getminor (9)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.9 2004/08/24 08:42:46 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.10 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QUEUE 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QUEUE 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -592,8 +592,8 @@ structure
 not supported by
 .B Linux-Fast STREAMS
 as follows:
-.BR QPAIR ", " QPERQ ", " QPERMOD ", " QMTSAFE ", " QMTOUTPERIM ", " QEND ", "
-.BR QWANTWSYNC ", " QSYNCSTR ", " QISDRV ", " QHOT ", " QNEXTHOT ", "
+.BR QPAIR ", " QPERQ ", " QPERMOD ", " QMTSAFE ", " QMTOUTPERIM ", " QEND ",
+.BR QWANTWSYNC ", " QSYNCSTR ", " QISDRV ", " QHOT ", " QNEXTHOT ",
 .BR _QINSERTING " and " _QREMOVING .
 .IR Solaris \(rg
 does not document the

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freeq.9.man,v 0.9.2.6 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: freeq.9.man,v 0.9.2.7 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FREEQ 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH FREEQ 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -197,7 +197,9 @@ magic
 .SH HISTORY
 .PP
 .BR freeq ()
-is an internal SVR 4 STREAMS function described in
+is an internal SVR 4
+.I STREAMS
+function described in
 .IR "\*(lqThe Magic Garden\*(rq" .
 .[
 magic

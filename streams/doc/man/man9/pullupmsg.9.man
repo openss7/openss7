@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.6 2004/08/24 08:42:45 brian Exp $
+.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.7 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PULLUPMSG 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PULLUPMSG 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -115,8 +115,7 @@ into a single data block.
 .PP
 If there is nothing to alter (that is, the initial data block contains greater than or 
 equal to
-.I
-len
+.I len
 bytes, or there is only one data block in the message),
 .BR pullupmsg ()
 returns success without altering the message.

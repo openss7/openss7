@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgutil.9.man,v 0.9.2.6 2004/08/24 08:42:45 brian Exp $
+.\" @(#) $Id: msgutil.9.man,v 0.9.2.7 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,15 +71,15 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MSGUTIL 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MSGUTIL 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
-.SH "NAME"
+.SH NAME
 .B msgutil
 \- \fISTREAMS\fR message utilities
 .\"
 .\"
-.SH "SYNOPSIS"
+.SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .sp
@@ -113,9 +113,11 @@ sort-adjacent-labels
 .PD
 .\"
 .\"
-.SH "DESCRIPTION"
+.SH DESCRIPTION
 .PP
-This man page describes the STREAMS message utility functions.
+This man page describes the
+.I STREAMS
+message utility functions.
 .TP
 \fBmsgsize\fR
 calculates and returns the aggregated sizes of all of the
@@ -188,7 +190,7 @@ returns zero.
 \fBadjmsg\fR returns non-zero on success and zero on failure.
 .\"
 .\"
-.SH "ERRORS"
+.SH ERRORS
 .PP
 \fBmsgsize\fR, \fBmsgdsize\fR and \fBxmsgsize\fR always succeed.
 .\"
@@ -227,7 +229,7 @@ procedure.
 .BR rmvb (9)
 .\"
 .\"
-.SH "BUGS"
+.SH BUGS
 .PP
 These functions should probably return \fIsize_t\fR instead of \fIint\fR.
 .\"
@@ -272,7 +274,7 @@ xbd5
 .]
 .\"
 .\"
-.SH "HISTORY"
+.SH HISTORY
 .PP
 Most of these message utility functions first appeared
 in SVR 4 DDI/DKI.

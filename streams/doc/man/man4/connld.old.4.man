@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: connld.old.4.man,v 0.9.2.4 2004/08/22 06:17:41 brian Exp $
+.\" @(#) $Id: connld.old.4.man,v 0.9.2.5 2005/01/21 10:08:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:41 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:08:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CONNLD 4 "$Date: 2004/08/22 06:17:41 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH CONNLD 4 "$Date: 2005/01/21 10:08:49 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -106,7 +106,7 @@ When first
 .IR pushed ,
 .B connld
 does nothing; on each subsequent
-.BR open "(2), "
+.BR open (2),
 .B connld
 will generate a unique
 .I STREAMS
@@ -134,7 +134,7 @@ and independently connect client processes to a server process.
 The point of access for such clients is expected to be a path
 name known to all such clients and to which a pipe end may be
 connected (via
-.BR fattach "(3)) "
+.BR fattach (3))
 by the server process.
 The server establishes the original pipe, pushes
 .B connld
@@ -142,12 +142,12 @@ onto the client end, and then listens via
 .B I_RECVFD
 for new connections on the server end.
 A client wishing to connect to the server will
-.BR open "(2) "
+.BR open (2)
 the path name representing the client end, and can determine via
-.BR isastream "(3) "
+.BR isastream (3)
 whether or not the server process is active and attached.  If 
 it is, the
-.BR open "() "
+.BR open ()
 call returns one end of a unique new pipe that thus connects
 the client to the server.
 .sp
@@ -158,11 +158,11 @@ on the original pipe, and for communicating with clients so
 connected via the received pipe ends.
 It would also be reasonable for such a server process to invalidate
 the point of access by calling
-.BR fdetach "(3) "
+.BR fdetach (3)
 before terminating.
 .sp
 It should be noted that the
-.BR poll "(2) "
+.BR poll (2)
 primitive may be used to indicate when an 
 .B M_PASSFP
 representing a newly passed file is available on the original server
@@ -179,9 +179,9 @@ structure.
 Moreover, any attempt to read an
 .B M_PASSFP
 message via the data-receiving primitives (i.e., 
-.BR read "(2), " getmsg "(3), and " getpmsg "(3)) "
+.BR read "(2), " getmsg "(3), and " getpmsg (3))
 will fail with
-.BR errno "(3) "
+.BR errno (3)
 returning an
 .RB [ EBADMSG ]
 indication without discarding the message.
@@ -211,17 +211,17 @@ so that the original creator of the
 can close both ends after attaching paths to them, and the
 process of passing file descriptors can still be carried out via
 new
-.BR open "()'s "
+.BR open ()'s
 as long as both ends remain attached.
 .\"
 .\"
 .SH "SEE ALSO"
-.BR fattach "(3), "
-.BR fattach "(8), "
-.BR fdetach "(3), "
-.BR fifo "(4), "
-.BR pipe "(3), "
-.BR STREAMS "(4) "
+.BR fattach (3),
+.BR fattach (8),
+.BR fdetach (3),
+.BR fifo (4),
+.BR pipe (3),
+.BR STREAMS (4).
 .\"
 .\"
 .SH HISTORY

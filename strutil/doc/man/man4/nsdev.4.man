@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: nsdev.4.man,v 0.9.2.9 2005/01/20 23:41:58 brian Exp $
+.\" @(#) $Id: nsdev.4.man,v 0.9.2.10 2005/01/21 10:08:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/20 23:41:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:08:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NSDEV 4 "$Date: 2005/01/20 23:41:58 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH NSDEV 4 "$Date: 2005/01/21 10:08:49 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -89,7 +89,9 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 .B nsdev
-is a \*(lqNamed STREAMS Device\*(rq pseudo-device driver similar in some
+is a \*(lqNamed
+.I STREAMS
+Device\*(rq pseudo-device driver similar in some
 respects to
 .BR clone (4).
 .B nsdev
@@ -136,7 +138,8 @@ requests that the kernel load the module named
 where
 .I xxx
 is the longest initial substring of the device name that does not contain a
-period (\(lq.\(rq) character.  This makes it possible to create Named STREAMS
+period (\(lq.\(rq) character.  This makes it possible to create Named
+.I STREAMS
 Devices knowing only the character major device number associated with the
 .B nsdev
 driver and demand load other
@@ -174,7 +177,9 @@ with the
 .B CLONEOPEN
 flag set in
 .IR sflag .
-The Named STREAMS Device then chains the open to the device number derived
+The Named
+.I STREAMS
+Device then chains the open to the device number derived
 from the device name and the minor device number (in this case zero (0)) as
 normal.
 .\"
@@ -269,12 +274,18 @@ magic
 .SH EXAMPLES
 .PP
 Following are some examples of how to use the
-Named STREAMS Device:
+Named
+.I STREAMS
+Device:
 .SS
-Named STREAMS Device Example
+Named
+.I STREAMS
+Device Example
 .PP
 If the following is performed to create the device (assuming that major device
-number 56 is the major device number of the Named STREAMS Device):
+number 56 is the major device number of the Named
+.I STREAMS
+Device):
 .sp
 .nf
 \fC\s-1\
@@ -303,7 +314,8 @@ during registration of the major or minor device nodes (see
 or unless
 .BR SAP_CLONE
 was set using the
-STREAMS Administrative Driver
+.I STREAMS
+Administrative Driver
 .BR sad (4)
 for the ultimate device node.  In either of these later cases, the device will
 be opened with a
@@ -342,7 +354,8 @@ argument to
 being set to
 .BR CLONEOPEN .
 For additional information on the super cloning technique using the Named
-STREAMS Device, see
+.I STREAMS
+Device, see
 .BR clone (4).
 .\"
 .\"
@@ -419,7 +432,9 @@ device driver itself.
 When the
 .B nsdev
 is opened directly, the driver has no indication that it has been opened via
-the Named STREAMS Device and, for all intents and purposes, appears to the
+the Named
+.I STREAMS
+Device and, for all intents and purposes, appears to the
 driver as having been opened as a direct minor node of the driver.
 .PP
 See

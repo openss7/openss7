@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 0.9.2.8 2005/01/20 11:08:02 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 0.9.2.9 2005/01/21 10:09:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/20 11:08:02 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,9 +71,9 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LiS 9 "$Date: 2005/01/20 11:08:02 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH LiS 9 "$Date: 2005/01/21 10:09:49 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .SH NAME
-.I LiS
+.B LiS
 \- introduction to \fISTREAMS\fR kernel functions
 .SH SYNOPSIS
 .B #include <sys/stropts.h>
@@ -109,68 +109,100 @@ first-in first-out special file, named pipe
 .HP
 .BR clone (4)
 \-
-the STREAMS clone driver
+the
+.I STREAMS
+clone driver
 .HP
 .BR sad (4)
 \-
-the STREAMS administrative driver
+the
+.I STREAMS
+administrative driver
 .SS "Common Modules"
 .PP
 .HP
 .BR pipemod (4)
 \-
-STREAMS module supporting flush handling in STREAMS fifos and pipes
+.I STREAMS
+module supporting flush handling in
+.I STREAMS
+fifos and pipes
 .HP
 .BR ldl (4)
 \-
-a STREAMS DLPI interface to Linux network devices
+a
+.I STREAMS
+DLPI interface to Linux network devices
 .HP
 .BR connld (4)
 \-
-STREAMS module supporting the generation of unique new STREAMS pipes from
+.I STREAMS
+module supporting the generation of unique new
+.I STREAMS
+pipes from
 an existing pipe end
 .HP
 .BR timod (4)
 \-
-a STREAMS XTI/TLI compatibility interface
+a
+.I STREAMS
+XTI/TLI compatibility interface
 .HP
 .BR tirdwr (4)
 \-
-a STREAMS XTI/TLI read write compatibility interface
+a
+.I STREAMS
+XTI/TLI read write compatibility interface
 .SS "System Calls"
 .PP
 .HP
 .BR getmsg (2)
 \-
-get next message from a STREAMS character device
+get next message from a
+.I STREAMS
+character device
 .HP
 .BR getpmsg (2s)
 \-
-get next message from a STREAMS character device
+get next message from a
+.I STREAMS
+character device
 .HP
 .BR putmsg (2)
 \-
-put a message to a STREAMS character device
+put a message to a
+.I STREAMS
+character device
 .HP
 .BR putpmsg (2s)
 \-
-put a message to a STREAMS character device
+put a message to a
+.I STREAMS
+character device
 .HP
 .BR poll (2)
 \-
-wait for some event on a STREAMS character device
+wait for some event on a
+.I STREAMS
+character device
 .HP
 .BR fattach (3)
 \-
-attach a STREAMS open file to a path name in the file system
+attach a
+.I STREAMS
+open file to a path name in the file system
 .HP
 .BR fdetach (3)
 \-
-detach a STREAMS file from a path name in the file system
+detach a
+.I STREAMS
+file from a path name in the file system
 .HP
 .BR isastream (2)
 \-
-determine whether an open file is a STREAMS character device
+determine whether an open file is a
+.I STREAMS
+character device
 .HP
 .BR open (2)
 \-
@@ -190,32 +222,41 @@ write to a file descriptor
 .HP
 .BR pipe (2)
 \-
-create a STREAMS pipe
+create a
+.I STREAMS
+pipe
 .HP
 .BR ioctl (2)
 \-
 control device
 .HP
 .BR streamio (7)
-\-
-STREAMS ioctl commands
+\- \fISTREAMS\fP ioctl commands
 .SS "Module and Driver Registration Functions"
 .HP
 .BR lis_register_strmod (9)
 \-
-register a STREAMS module
+register a
+.I STREAMS
+module
 .HP
 .BR lis_unregister_strmod (9)
 \-
-unregister a STREAMS module
+unregister a
+.I STREAMS
+module
 .HP
 .BR lis_register_strdev (9)
 \-
-register a STREAMS device
+register a
+.I STREAMS
+device
 .HP
 .BR lis_unregister_strdev (9)
 \-
-unregister a STREAMS device
+unregister a
+.I STREAMS
+device
 .HP
 .BR lis_find_strdev (9)
 \-
@@ -225,233 +266,347 @@ finds a streamtab entry for a device
 .HP
 .BR adjmsg (9)
 \-
-trim bytes from the front or back of a STREAMS message
+trim bytes from the front or back of a
+.I STREAMS
+message
 .HP
 .BR allocb (9)
 \-
-allocate a STREAMS message and data block
+allocate a
+.I STREAMS
+message and data block
 .HP
 .BR allocb_physreq (9)
 \-
-allocate a STREAMS message and data block
+allocate a
+.I STREAMS
+message and data block
 .HP
 .BR allocq (9)
 \-
-allocate a STREAMS queue pair
+allocate a
+.I STREAMS
+queue pair
 .HP
 .BR bufcall (9)
 \-
-install a STREAMS buffer callback
+install a
+.I STREAMS
+buffer callback
 .HP
 .BR copyb (9)
 \-
-copy a STREAMS message block
+copy a
+.I STREAMS
+message block
 .HP
 .BR copymsg (9)
 \-
-copy a STREAMS message
+copy a
+.I STREAMS
+message
 .HP
 .BR datamsg (9)
 \-
-tests a STREAMS message type for data
+tests a
+.I STREAMS
+message type for data
 .HP
 .BR dupb (9)
 \-
-duplicate a STREAMS message block
+duplicate a
+.I STREAMS
+message block
 .HP
 .BR dupmsg (9)
 \-
-duplicate a STREAMS message
+duplicate a
+.I STREAMS
+message
 .HP
 .BR esballoc (9)
 \-
-allocate a STREAMS message and data block with a caller supplied data buffer
+allocate a
+.I STREAMS
+message and data block with a caller supplied data buffer
 .HP
 .BR esbbcall (9)
 \-
-installs a buffer callback for an extended STREAMS message block
+installs a buffer callback for an extended
+.I STREAMS
+message block
 .HP
 .BR freeb (9)
 \-
-frees a STREAMS message block
+frees a
+.I STREAMS
+message block
 .HP
 .BR freemsg (9)
 \-
-frees a STREAMS message
+frees a
+.I STREAMS
+message
 .HP
 .BR isdatablk (9)
 \-
-tests a STREAMS data block for data type
+tests a
+.I STREAMS
+data block for data type
 .HP
 .BR isdatamsg (9)
 \-
-tests a STREAMS data block for data type
+tests a
+.I STREAMS
+data block for data type
 .HP
 .BR linkb (9)
 \-
-link a message block to a STREAMS message
+link a message block to a
+.I STREAMS
+message
 .HP
 .BR msgdsize (9)
 \-
-calculate the size of the data in a STREAMS message
+calculate the size of the data in a
+.I STREAMS
+message
 .HP
 .BR msgpullup (9)
 \-
-pull up bytes in a STREAMS message
+pull up bytes in a
+.I STREAMS
+message
 .HP
 .BR msgsize (9)
 \-
-calculate the size of the message blocks in a STREAMS message
+calculate the size of the message blocks in a
+.I STREAMS
+message
 .HP
 .BR pullupmsg (9)
 \-
-pull up the bytes in a STREAMS message
+pull up the bytes in a
+.I STREAMS
+message
 .HP
 .BR rmvb (9)
 \-
-remove a message block from a STREAMS message
+remove a message block from a
+.I STREAMS
+message
 .HP
 .BR testb (9)
 \-
-test is a STREAMS message can be allocated
+test is a
+.I STREAMS
+message can be allocated
 .HP
 .BR unbufcall (9)
 \-
-removes a STREAMS buffer callback
+removes a
+.I STREAMS
+buffer callback
 .HP
 .BR unlinkb (9)
 \-
-unlink a message block from a STREAMS message
+unlink a message block from a
+.I STREAMS
+message
 .HP
 .BR xmsgsize (9)
 \-
-calculate the size of message blocks in a STREAMS message
+calculate the size of message blocks in a
+.I STREAMS
+message
 .SS "Queue Handling Functions"
 .PP
 .HP
 .BR appq (9)
 \-
-append a STREAMS message after another
+append a
+.I STREAMS
+message after another
 .HP
 .BR backq (9)
 \-
-find the upstream or downstream STREAMS queue
+find the upstream or downstream
+.I STREAMS
+queue
 .HP
 .BR bcanput (9)
 \-
-test flow control on a STREAMS message queue
+test flow control on a
+.I STREAMS
+message queue
 .HP
 .BR bcanputnext (9)
 \-
-test flow control on a STREAMS message queue
+test flow control on a
+.I STREAMS
+message queue
 .HP
 .BR canenable (9)
 \-
-test whether a STREAMS message queue can be scheduled
+test whether a
+.I STREAMS
+message queue can be scheduled
 .HP
 .BR canput (9)
 \-
-test flow control on a STREAMS message queue
+test flow control on a
+.I STREAMS
+message queue
 .HP
 .BR canputnext (9)
 \-
-test flow control on a STREAMS message queue
+test flow control on a
+.I STREAMS
+message queue
 .HP
 .BR enableok (9)
 \-
-allows a STREAMS message queue to be scheduled
+allows a
+.I STREAMS
+message queue to be scheduled
 .HP
 .BR flushband (9)
 \-
-flushes band STREAMS messages from a message queue
+flushes band
+.I STREAMS
+messages from a message queue
 .HP
 .BR flushq (9)
 \-
-flushes messages from a STREAMS message queue
+flushes messages from a
+.I STREAMS
+message queue
 .HP
 .BR freeq (9)
 \-
-deallocate a STREAMS queue pair
+deallocate a
+.I STREAMS
+queue pair
 .HP
 .BR getq (9)
 \-
-gets a message from a STREAMS message queue
+gets a message from a
+.I STREAMS
+message queue
 .HP
 .BR insq (9)
 \-
-inserts a message into a STREAMS message queue
+inserts a message into a
+.I STREAMS
+message queue
 .HP
 .BR noenable (9)
 \-
-disables a STREAMS message queue from being scheduled
+disables a
+.I STREAMS
+message queue from being scheduled
 .HP
 .BR OTHER (9)
 \-
-return the other queue of a STREAMS queue pair
+return the other queue of a
+.I STREAMS
+queue pair
 .HP
 .BR OTHERQ (9)
 \-
-return the other queue of a STREAMS queue pair
+return the other queue of a
+.I STREAMS
+queue pair
 .HP
 .BR putbq (9)
 \-
-puts a message back on a STREAMS message queue
+puts a message back on a
+.I STREAMS
+message queue
 .HP
 .BR putctl1 (9)
 \-
-puts a 1 byte control message on a STREAMS message queue
+puts a 1 byte control message on a
+.I STREAMS
+message queue
 .HP
 .BR putctl (9)
 \-
-puts a control message on a STREAMS message queue
+puts a control message on a
+.I STREAMS
+message queue
 .HP
 .BR putnext (9)
 \-
-puts a message on the downstream STREAMS message queue
+puts a message on the downstream
+.I STREAMS
+message queue
 .HP
 .BR putnextctl1 (9)
 \-
-puts a 1 byte control message on the downstream STREAMS message queue
+puts a 1 byte control message on the downstream
+.I STREAMS
+message queue
 .HP
 .BR putnextctl (9)
 \-
-puts a control message on the downstream STREAMS message queue
+puts a control message on the downstream
+.I STREAMS
+message queue
 .HP
 .BR putq (9)
 \-
-puts a message on a STREAMS message queue
+puts a message on a
+.I STREAMS
+message queue
 .HP
 .BR qattach (9)
 \-
-attach a module onto a STREAMS file
+attach a module onto a
+.I STREAMS
+file
 .HP
 .BR qclose (9)
 \-
-closes a STREAMS module or driver
+closes a
+.I STREAMS
+module or driver
 .HP
 .BR qdetach (9)
 \-
-detach a module from a STREAMS file
+detach a module from a
+.I STREAMS
+file
 .HP
 .BR qenable (9)
 \-
-schedules a STREAMS message queue service routine
+schedules a
+.I STREAMS
+message queue service routine
 .HP
 .BR qopen (9)
 \-
-call a STREAMS module or driver open routine
+call a
+.I STREAMS
+module or driver open routine
 .HP
 .BR qprocsoff (9)
 \-
-disables STREAMS message queue processing for multi-processing
+disables
+.I STREAMS
+message queue processing for multi-processing
 .HP
 .BR qprocson (9)
 \-
-enables a STREAMS message queue for multi-processing
+enables a
+.I STREAMS
+message queue for multi-processing
 .HP
 .BR qreply (9)
 \-
-replys to a message from a STREAMS message queue
+replys to a message from a
+.I STREAMS
+message queue
 .HP
 .BR qsize (9)
 \-
@@ -459,27 +614,39 @@ return the number of messages on a queue
 .HP
 .BR RD (9)
 \-
-return the read queue of a STREAMS queue pair
+return the read queue of a
+.I STREAMS
+queue pair
 .HP
 .BR rmvq (9)
 \-
-remove a message from a STREAMS message queue
+remove a message from a
+.I STREAMS
+message queue
 .HP
 .BR SAMESTR (9)
 \-
-test for STREAMS pipe or fifo
+test for
+.I STREAMS
+pipe or fifo
 .HP
 .BR strqget (9)
 \-
-gets information about a STREAMS message queue
+gets information about a
+.I STREAMS
+message queue
 .HP
 .BR strqset (9)
 \-
-sets attributes of a STREAMS message queue
+sets attributes of a
+.I STREAMS
+message queue
 .HP
 .BR WR (9)
 \-
-return the write queue of a STREAMS queue pair
+return the write queue of a
+.I STREAMS
+queue pair
 .SS "Miscellaneous Functions"
 .PP
 .HP
@@ -537,7 +704,9 @@ mount a file system
 .HP
 .BR strlog (9)
 \-
-pass a message to the STREAMS logger
+pass a message to the
+.I STREAMS
+logger
 .HP
 .BR timeout (9)
 \-

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: stream_utils.9.man,v 0.9.2.3 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: stream_utils.9.man,v 0.9.2.4 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,11 +71,11 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH "STREAM UTILS" 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "STREAMS"
-.SH "NAME"
+.TH "STREAM UTILS" 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" STREAMS
+.SH NAME
 .B link, unlink
 \- link or unlink \fISTREAMS\fR message blocks.
-.SH "SYNOPSIS"
+.SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .sp
@@ -85,7 +85,7 @@ sort-adjacent-labels
 .HP
 \fRmblk_t *\fBunlinkb\fR(mblk_t *\fImp\fR);
 .PD
-.SH "DESCRIPTION"
+.SH DESCRIPTION
 .B linkb
 concatenates the message block of \fImp1\fR and \fImp2\fR.
 
@@ -101,12 +101,12 @@ always succeeds and has no return value.
 always success.  If the provided \fImp\fR is \fBNULL\fR or there is only one
 block in the message, \fBunlinkb\fR returns \fBNULL\fR.
 
-.SH "ERRORS"
+.SH ERRORS
 \fBlinkb\fR and \fBunlinkb\fR always succeed and do not return errors.
 
 .SH "SEE ALSO"
 
-.SH "NOTICES"
+.SH NOTICES
 .\"
 .\"
 .TI

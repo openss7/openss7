@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fifo.old.4.man,v 0.9.2.5 2004/08/24 08:42:35 brian Exp $
+.\" @(#) $Id: fifo.old.4.man,v 0.9.2.6 2005/01/21 10:08:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:08:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FIFO 4 "$Date: 2004/08/24 08:42:35 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH FIFO 4 "$Date: 2005/01/21 10:08:49 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -160,7 +160,7 @@ as single character special files, and
 .I STREAMS
 .I pipes
 as pairs of character special files which are interconnected (see
-.BR pipe "(3)).  "
+.BR pipe (3)).
 .sp
 .I STREAMS
 .I fifos
@@ -185,14 +185,14 @@ the write queue is directed to the read queue of the pair.
 A
 .I pipe
 comprises a pair of
-.IR fifos ", "
+.IR fifos ,
 with the write queue of each pair directed to the read queue of the other.
 The two
 .B fifos
 comprising a
 .B pipe
 are referred to as
-.IR peers ", "
+.IR peers ,
 and each somewhat represents a
 .I driver
 to the other.
@@ -205,16 +205,16 @@ is its own peer.
 may be pushed onto
 .B fifos
 and
-.BR pipes ", "
+.BR pipes ,
 but should not expect a
 .I driver
 below them; instead, the
-.BR SAMESTR "()"
+.BR SAMESTR ()
 function should be used from the write queue of a pair to determine if
 the module is the lowest in the
 .I STREAMS
 file (this is called the
-.IR midpoint "). "
+.IR midpoint ).
 The structure of a
 .B fifo
 or
@@ -223,7 +223,7 @@ is preserved when modules are pushed (and popped); i.e., the write
 queue at the
 .I midpoint
 will always be directed at the read queue of the
-.IR peer "."
+.IR peer .
 .sp
 Input and output are handled at a
 .B fifo
@@ -234,11 +234,11 @@ LiS,
 LiS
 .]
 an
-.BR "fifo open" "() "
+.BR "fifo open" ()
 entry point exists to assign minor device numbers to new opens under the
 .B fifo
 major device number, and a
-.BR close "() "
+.BR close ()
 entry point is used correspondingly to release them.  These functions
 are kept in a
 .I streamtab
@@ -276,10 +276,10 @@ by specifying the number of "units" in the appropriate
 file.  Enough major device numbers will be allocated to cover the
 requested number of minor devices (if available, else an error will
 occur in 
-.BR strconf "(8)). "
+.BR strconf (8)).
 The number allocated will include one minor device per major number
 to be used as a
-.BR fifo "\-specific"
+.BR fifo \-specific
 .I clone
 minor device (specifically, minor number 0), which exhibits special behaviour.
 .sp
@@ -289,20 +289,20 @@ pseudo-driver, the
 .B clone
 major device number is used, along with the desired actual major number
 as the minor device number.  When an
-.BR open "() "
+.BR open ()
 is performed on such a device, the
-.BR "clone open" "() "
+.BR "clone open" ()
 routine in turn calls the appropriate driver's
-.BR open "(), "
+.BR open (),
 with the
 .I sflag
 parameter set to
 .BR CLONEOPEN .
 The driver's
-.BR open "() "
+.BR open ()
 is expected in this case to allocate an unused minor device number,
 and return it via an entirely new device number in the
-.I "devp" 
+.I devp 
 parameter.  In this way, a driver can change the device number to be
 used for a
 .I STREAMS
@@ -318,7 +318,7 @@ LiS
 opens
 .B fifo
 devices differently; specifically, when an already-opened
-.BR fifo "\-specific"
+.BR fifo \-specific
 clone minor device is reopened, the new and subsequent opens will use
 the already-opened clone.
 Thus, using minor device 0 for a
@@ -340,7 +340,7 @@ when it is desired.
 .sp
 It is in fact recommended that only two forms of file system nodes be used for
 .I STREAMS
-.BR fifos ": "
+.BR fifos :
 the
 .B clone
 major number as major number with a
@@ -348,25 +348,25 @@ major number as major number with a
 major number as minor number, to be used when
 .I every
 open of the associated path must clone a new
-.BR fifo ", "
+.BR fifo ,
 and a
 .B fifo
 major number as major number with 0 as the minor number, to be used
 when new opens are to clone a new
 .B fifo
 but subsequent concurrent opens are to use the already opened
-.BR fifo ". "
+.BR fifo .
 These are represented by two device special file paths created when LiS
 .[
 LiS
 .]
 is installed:
-.RB "/" dev "/" fifo
+.RB / dev / fifo
 for the former, and
-.RB "/" dev "/" fifo.0
+.RB / dev / fifo.0
 for the latter.  It is recommended that these be used, possibly
 along with the equivalent of
-.BR stat "(2) "
+.BR stat (2)
 to determine appropriate major device numbers for the
 .B clone
 and
@@ -401,9 +401,9 @@ and
 are implemented as character special devices, they do not appear as
 .B pipe
 devices when examined with
-.BR stat "(2) "
+.BR stat (2)
 or the equivalent (e.g., 
-.BR ls "(1)); "
+.BR ls (1));
 i.e. the
 .B S_IFIFO
 indication is not set in the mode -
@@ -438,15 +438,15 @@ having the same major device number.
 .\"
 .\"
 .SH "SEE ALSO"
-.BR clone "(4), "
-.BR connld "(4), "
-.BR fifo "(4), "
-.BR ls "(1), "
-.BR pipe "(3), "
-.BR pipemod "(4), "
-.BR STREAMS "(4), "
-.BR stat "(2), "
-.BR strconf "(8)"
+.BR clone (4),
+.BR connld (4),
+.BR fifo (4),
+.BR ls (1),
+.BR pipe (3),
+.BR pipemod (4),
+.BR STREAMS (4),
+.BR stat (2),
+.BR strconf (8).
 .\"
 .\"
 .SH HISTORY

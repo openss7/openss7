@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bzero.9.man,v 0.9.2.7 2004/08/24 08:42:42 brian Exp $
+.\" @(#) $Id: bzero.9.man,v 0.9.2.8 2005/01/21 10:09:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,22 +71,22 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BZERO 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH BZERO 9 "$Date: 2005/01/21 10:09:50 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
-.SH "NAME"
-.B bzero
+.SH NAME
+.B zero
 \- zero a byte string
 .\"
 .\"
-.SH "SYNOPSIS"
+.SH SYNOPSIS
 .PP
 .B #include <string.h>
 .HP
 .BI "void bzero(void *" str ", size_t " len );
 .\"
 .\"
-.SH "ARGUMENTS"
+.SH ARGUMENTS
 .PP
 .TP
 .I str
@@ -97,7 +97,7 @@ the number of bytes to zero starting at
 .IR str .
 .\"
 .\"
-.SH "DESCRIPTION"
+.SH DESCRIPTION
 .PP
 .BR bzero ()
 zeros
@@ -116,7 +116,7 @@ returns
 .BR void .
 .\"
 .\"
-.SH "ERRORS"
+.SH ERRORS
 .PP
 .BR bzero ()
 always succeeds.
@@ -135,7 +135,7 @@ call-outs, callbacks, soft interrupts and interrupt service routines.
 is MP-safe.
 .\"
 .\"
-.SH "NOTICES"
+.SH NOTICES
 .PP
 Linux preserves this deprecated function.
 .BR memset (9)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.2 2004/08/24 08:42:44 brian Exp $
+.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.3 2005/01/21 10:09:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_BUFCALL 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
+.TH MI_BUFCALL 9 "$Date: 2005/01/21 10:09:51 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -103,7 +103,8 @@ Specifies the queue which is to be passed to
 Specifies the required buffer size.
 .TP
 .I priority
-Specifies the priority as used by the standard STREAMS
+Specifies the priority as used by the standard
+.I STREAMS
 .BR bufcall (9)
 mechanism.
 .\"

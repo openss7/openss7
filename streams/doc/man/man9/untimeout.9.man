@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: untimeout.9.man,v 0.9.2.8 2004/08/24 08:42:48 brian Exp $
+.\" @(#) $Id: untimeout.9.man,v 0.9.2.9 2005/01/21 10:09:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNTIMEOUT 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNTIMEOUT 9 "$Date: 2005/01/21 10:09:52 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -140,7 +140,7 @@ is undefined and ignored.
 .PP
 .BR untimeout ()
 fails silently
-.IR "" ( retval
+.RI ( retval
 is ignored) when
 the timer associated with the timer identifier
 .I toid
@@ -166,7 +166,7 @@ callback functions,
 or interrupt service routines.
 .\"
 .\"
-.SH "MP-STREAMS"
+.SH MP-STREAMS
 .PP
 .BR untimeout ()
 is MP-safe; however, the caller of

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.11 2005/01/17 05:33:18 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.12 2005/01/21 10:09:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/17 05:33:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:09:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH 8 "$Date: 2005/01/17 05:33:18 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH AUTOPUSH 8 "$Date: 2005/01/21 10:09:34 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -161,7 +161,7 @@ If
 .BR -m
 is not specified, it is assumed to be zero (0).
 The display format is illustrated under
-.IR "\*(lqEXAMPLES\*(rq" ,
+.IR \*(lqEXAMPLES\*(rq ,
 below.
 .TP
 .BI -r ", " --reset

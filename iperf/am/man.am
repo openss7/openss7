@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/01/21 00:20:07 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/01/21 10:11:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 00:20:07 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 10:11:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,78 +64,61 @@ EXTRA_DIST += \
 
 if COOKED_MANPAGES
 
-all-manpages:
-
-$(man_MANS):: %: %.man
+$(man_MANS):: %: %.man $(man_MACROS)
 	@p=`echo $@ | sed -e 's|/[^/]*$$||'` ; \
 	$(mkdir_p) $$p ; \
 	echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
-$(man1_MANS):: %.1: %.man
+$(man1_MANS):: %.1: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
 
-$(man2_MANS):: %.2: %.man
+$(man2_MANS):: %.2: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
 
-$(man3_MANS):: %.3: %.man
+$(man3_MANS):: %.3: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
 
-$(man4_MANS):: %.4: %.man
+$(man4_MANS):: %.4: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
 
-$(man5_MANS):: %.5: %.man
+$(man5_MANS):: %.5: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
 
-$(man6_MANS):: %.6: %.man
+$(man6_MANS):: %.6: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
 
-$(man7_MANS):: %.7: %.man
+$(man7_MANS):: %.7: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
 
-$(man8_MANS):: %.8: %.man
+$(man8_MANS):: %.8: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
 
-$(man9_MANS):: %.9: %.man
+$(man9_MANS):: %.9: %.man $(man_MACROS)
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.9/' > $@ ;
 
-$(man_MANS):: $(man_MACROS)
-$(man1_MANS):: $(man_MACROS)
-$(man2_MANS):: $(man_MACROS)
-$(man3_MANS):: $(man_MACROS)
-$(man4_MANS):: $(man_MACROS)
-$(man5_MANS):: $(man_MACROS)
-$(man6_MANS):: $(man_MACROS)
-$(man7_MANS):: $(man_MACROS)
-$(man8_MANS):: $(man_MACROS)
-$(man9_MANS):: $(man_MACROS)
+all-manmacros:
 
-install-manpages:
+install-manmacros:
 
-uninstall-manpages:
+uninstall-manmacros:
 
-#EXTRA_DIST += \
-#	$(man_MANS)
+clean-manmacros:
+
+distclean-manmacros:
+
+maintainer-clean-manmacros:
 
 else
-
-#
-# When manpages are uncooked, we need macro files in the build directory for tests.
-#
-all-manpages:
-	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
-		echo "cp -pf $(srcdir)/$$macro ." ; \
-		cp -pf $(srcdir)/$$macro . ; \
-	done
 
 $(man_MANS): %: %.man
 	@p=`echo $@ | sed -e 's|/[^/]*$$||'` ; \
@@ -179,21 +162,60 @@ $(man9_MANS): %.9: %.man
 	@echo "converting manpage $< to $@" ; \
 	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.9/' > $@ ;
 
-install-manpages: $(man_MANS) $(man_MACROS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) $(man5_MANS) $(man6_MANS) $(man7_MANS) $(man8_MANS) $(man9_MANS)
+#
+# When manpages are uncooked, we need macro files in the build directory for
+# tests.
+#
+all-manmacros:
+	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
+		if test ! -e $$macro -o $(srcdir)/$$macro -nt $$macro ; then \
+			echo "cp -pf $(srcdir)/$$macro ." ; \
+			cp -pf $(srcdir)/$$macro . ; \
+		fi ; \
+	done
+
+#
+# When manpages are uncooked, we need to install the macros and references
+# file in the mandir to be referenced by the uncooked manual pages.
+#
+install-manmacros: $(man_MACROS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(mandir)
 	@list="$(man_MACROS)" ; for f in $$list ; do \
-		if test -x $$f ; then d=; else d=$(srcdir)/ ; fi ; \
+		if test -e $$f ; then d=; else d=$(srcdir)/ ; fi ; \
 		echo "$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir)" ; \
 		$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir) ; \
 	done
 
-uninstall-manpages:
+uninstall-manmacros:
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
 	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
 
+clean-manmacros:
+	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
+		echo "rm -f $$macro" ;  \
+		rm -f $$macro ; \
+	done
+
+distclean-manmacros:
+
+maintainer-clean-manmacros:
+
 endif
+
+all-manpages: $(man_MANS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) \
+	$(man5_MANS) $(man6_MANS) $(man7_MANS) $(man8_MANS) $(man8_MANS)
+
+#
+# This is handled by automake.
+#
+install-manpages:
+
+#
+# This is handled by automake.
+#
+uninstall-manpages:
 
 clean-manpages:
 	@if test -n "$(man_MANS)" ; then \
@@ -235,19 +257,23 @@ clean-manpages:
 	if test -n "$(man9_MANS)" ; then \
 		echo "rm -f $(man9_MANS)" ; \
 		rm -f $(man9_MANS) ; \
-	fi ; \
-	if test -n "$(man_MACROS)" ; then \
-		echo "rm -f $(man_MACROS)" ; \
-		rm -f $(man_MACROS) ; \
-	fi
+	fi ;
 
-INSTALL_DATA_LOCAL += install-manpages
+distclean-manpages:
 
-UNINSTALL_LOCAL += uninstall-manpages
+maintainer-clean-manpages:
 
-CLEAN_LOCAL += clean-manpages
+ALL_LOCAL += all-manmacros all-manpages
 
-ALL_LOCAL += all-manpages
+INSTALL_DATA_LOCAL += install-manmacros install-manpages
+
+UNINSTALL_LOCAL += uninstall-manmacros uninstall-manpages
+
+CLEAN_LOCAL += clean-manmacros clean-manpages
+
+DISTCLEAN_LOCAL += distclean-manmacros distclean-manpages
+
+MAINTAINER_CLEAN_LOCAL += maintainer-clean-manmacros maintainer-clean-manpages
 
 if COMPRESS_MANPAGES
 
@@ -328,12 +354,12 @@ post-manpages:
 					fi ; \
 				done ; \
 			fi ; \
-		fi ;\
-	done
-	@if test -n '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
+		fi ; \
+	done ; \
+	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		if test -n '$(mandir)' ; then \
-			echo "$(MAKEWHATIS) -u $(mandir)" ; \
-			$(MAKEWHATIS) -u $(mandir) ; \
+			echo "$(MAKEWHATIS) -u $(DESTDIR)$(mandir)" ; \
+			$(MAKEWHATIS) -u $(DESTDIR)$(mandir) ; \
 		else \
 			echo "$(MAKEWHATIS) -u -w" ; \
 			$(MAKEWHATIS) -u -w ; \
@@ -414,11 +440,11 @@ postun-manpages:
 				done ; \
 			fi ; \
 		fi ; \
-	done
-	@if test -n '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
-		if test -n '$(mandir)' ; then \
-			echo "$(MAKEWHATIS) -u $(mandir)" ; \
-			$(MAKEWHATIS) -u $(mandir) ; \
+	done ; \
+	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		if test -n "$(mandir)" ; then \
+			echo "$(MAKEWHATIS) -u $(DESTDIR)$(mandir)" ; \
+			$(MAKEWHATIS) -u $(DESTDIR)$(mandir) ; \
 		else \
 			echo "$(MAKEWHATIS) -u -w" ; \
 			$(MAKEWHATIS) -u -w ; \
@@ -428,10 +454,10 @@ postun-manpages:
 else
 
 post-manpages:
-	@if test -n '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
-		if test -n '$(mandir)' ; then \
-			echo "$(MAKEWHATIS) -u $(mandir)" ; \
-			$(MAKEWHATIS) -u $(mandir) ; \
+	@if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		if test -n "$(mandir)" ; then \
+			echo "$(MAKEWHATIS) -u $(DESTDIR)$(mandir)" ; \
+			$(MAKEWHATIS) -u $(DESTDIR)$(mandir) ; \
 		else \
 			echo "$(MAKEWHATIS) -u -w" ; \
 			$(MAKEWHATIS) -u -w ; \
@@ -439,7 +465,7 @@ post-manpages:
 	fi
 
 postun-manpages:
-	@if test -n '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
+	@if test -z '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
 		if test -n '$(mandir)' ; then \
 			echo "$(MAKEWHATIS) -u $(mandir)" ; \
 			$(MAKEWHATIS) -u $(mandir) ; \
@@ -474,6 +500,8 @@ dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_mans
 TESTS_ENVIRONMENT	+= MANS='$(MANS)'
 endif
 
-.PHONY: all-manpages clean-manpages install-manpages uninstall-manpages post-manpages postun-manpages
+.PHONY: all-manpages install-manpages uninstall-manpages clean-manpages distclean-manpages \
+	maintainer-clean-manpages all-manmacros install-manmacros uninstall-manmacros \
+	clean-manmacros distclean-manmacros maintainer-clean-manmacros post-manpages postun-manpages
 
 # vim: ft=automake

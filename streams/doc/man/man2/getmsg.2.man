@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmsg.2.man,v 0.9.2.8 2004/08/24 08:42:33 brian Exp $
+.\" @(#) $Id: getmsg.2.man,v 0.9.2.9 2005/01/21 10:08:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 10:08:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,11 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMSG 2 "$Date: 2004/08/24 08:42:33 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH GETMSG 2 "$Date: 2005/01/21 10:08:22 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
-getmsg \- get next message off a stream
+.B getmsg
+\- get next message off a stream
 .\"
 .\"
 .SH SYNOPSIS
@@ -108,15 +109,21 @@ a pointer to a integer containing passed in and returned flags.
 .SH DESCRIPTION
 .PP
 .B getmsg
-reads a STREAMS message from the read queue of a stream head into the
+reads a
+.I STREAMS
+message from the read queue of a stream head into the
 caller supplied buffers.  The read messages will contain a control part or a
 data part or both.  The data and control parts of the message are handled
 separately by
 .BR getmsg() .
 .PP
 The meaning and interpretation of the contents of the control part and data
-part are specific to the STREAMS module to which the stream head is attached.
-The semantics of these contents forms a necessary part of the STREAMS module
+part are specific to the
+.I STREAMS
+module to which the stream head is attached.
+The semantics of these contents forms a necessary part of the
+.I STREAMS
+module
 documentation.
 .PP
 The arguments to
@@ -236,7 +243,7 @@ Upon failure,
 will return -1 and set
 .I errno
 as described under
-.BR "\*(lqERRORS\*(rq" ,
+.BR \*(lqERRORS\*(rq ,
 below.
 .PP
 Upon success,
@@ -305,7 +312,7 @@ only
 bytes are retrieved and the remaining bytes of the corresponding part are left
 on the stream head read queue.  In the return value
 the corresponding more flag
-.BR "" ( MORECTL " or " MOREDATA )
+.RB ( MORECTL " or " MOREDATA )
 is set.
 The
 .I buf
@@ -408,21 +415,27 @@ as specified by
 .PP
 Other errors may be returned by
 .BR getmsg() .
-If the STREAMS module sends a
+If the
+.I STREAMS
+module sends a
 .B M_ERROR
 message to the stream head, the error returned on all subsequent read
 operations, including
 .BR getmsg() ,
 is specified in the
 .B M_ERROR
-message by the STREAMS module.
+message by the
+.I STREAMS
+module.
 Which errors are returned under which conditions form part of the
-necessary documentation of the STREAMS module.
+necessary documentation of the
+.I STREAMS
+module.
 .\"
 .\"
 .SH NOTICES
 .PP
-.SS "Multi-Threading"
+.SS Multi-Threading
 .PP
 .BR getmsg ()
 is thread-safe; however, multiple threads performing concurrent partial reads
@@ -537,7 +550,7 @@ instead of
 when
 .I q->q_first
 yeilds a
-.BR "" non- NULL
+.RB non- NULL
 message pointer, but
 .B getq()
 later cannot retrieve a message.
