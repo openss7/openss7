@@ -1,7 +1,19 @@
 # $Log: ChangeLog,v $
-# Revision 0.9.2.1  2004/06/06 03:48:44  brian
-# - Updated change logs.
+# Revision 0.9.2.2  2004/06/10 09:45:17  brian
+# - Updated ChangeLog and NEWS.
 #
+
+2004-06-10 brian <bidulock@openss7.org>
+	* (.rpmrelease):
+	- bumped rpm release to 18
+	* (Makefile.am):
+	- corrected autoconf device installation from separate build directory
+	* (m4/genksyms.m4):
+	- added check an prefix for CONFIG_REGPARM for SuSE
+	* (m4/kernel.m4):
+	- added check and CFLAGS for CONFIG_REGPARM for SuSE
+	- corrected exported symbol caching
+	- added ability to supress exported symbol versioning
 
 2004-06-05 brian <bidulock@openss7.org>
 	* (am/rpm.am):

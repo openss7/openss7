@@ -58,6 +58,16 @@ All Rights Reserved.
 
 =========================================================================
 
+* Major changes in strxnet-0.9.2-3
+
+  Added check for CONFIG_REGPARM, addition of -mregparm=3 CFLAGS, addition
+  of regparm_ prefix for exported ksyms.
+
+  Minor corretions to separate build directory install of devices and caching
+  of detected ksyms.
+
+  Added option for suppression of exported symbol versioning.
+
 * Major changes in strxnet-0.9.2-2
 
   A couple of corrections to the build process reported by Gurol.  Changed
