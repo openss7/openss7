@@ -1,0 +1,355 @@
+/*****************************************************************************
+
+ @(#) $Id: hooks.h.in,v 0.9.2.4 2004/12/21 00:40:59 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/12/21 00:40:59 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ifndef __LOCAL_LINUX_HOOKS_H__
+#define __LOCAL_LINUX_HOOKS_H__
+
+/* This symbol should be defined by newer kernels, however, since the protocol
+   value is always 132, we double check the definition for those kernels that
+   haven't defined it yet.  */
+#ifndef SOL_SCTP
+#define SOL_SCTP 132
+#endif
+
+/* This symbol should be defined by newer kernels, however, since the protocol
+   value is always 132, we double check the definition for those kernels that
+   haven't defined it yet.  */
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+
+#ifndef HAVE_ICMP_ERR_CONVERT_ADDR
+#undef HAVE_ICMP_ERR_CONVERT_ADDR
+#endif
+extern struct icmp_err icmp_err_convert[];
+#ifdef HAVE_ICMP_ERR_CONVERT_ADDR
+struct icmp_err *icmp_err_convert___ = (void *) HAVE_ICMP_ERR_CONVERT_ADDR;
+#define icmp_err_convert icmp_err_convert___
+#else
+#define icmp_err_convert icmp_err_convert
+#endif
+
+#ifndef HAVE_ICMP_STATISTICS_ADDR
+#undef HAVE_ICMP_STATISTICS_ADDR
+#endif
+extern struct icmp_mib icmp_statistic[];
+#ifdef HAVE_ICMP_STATISTICS_ADDR
+struct icmp_mib *icmp_statistic___ = (void *) HAVE_ICMP_STATISTICS_ADDR;
+#define icmp_statistic icmp_statistic___
+#else
+#define icmp_statistic icmp_statistic
+#endif
+
+#ifndef HAVE_IP_CMSG_RECV_ADDR
+#undef HAVE_IP_CMSG_RECV_ADDR
+#endif
+#ifdef HAVE_IP_CMSG_RECV_ADDR
+void
+ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb)
+{
+	void (*func) (struct msghdr * msg, struct sk_buff * skb) = (void *) HAVE_IP_CMSG_RECV_ADDR;
+	return (*func) (msg, skb);
+}
+#endif
+
+#ifndef HAVE_IP_CMSG_SEND_ADDR
+#undef HAVE_IP_CMSG_SEND_ADDR
+#endif
+#ifdef HAVE_IP_CMSG_SEND_ADDR
+int
+ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc)
+{
+	int (*func) (struct msghdr * msg, struct ipcm_cookie * ipc) =
+	    (void *) HAVE_IP_CMSG_SEND_ADDR;
+	return (*func) (msg, ipc);
+}
+#endif
+
+#ifndef HAVE_IP_GETSOCKOPT_ADDR
+#undef HAVE_IP_GETSOCKOPT_ADDR
+#endif
+#ifdef HAVE_IP_GETSOCKOPT_ADDR
+int
+ip_getsockopt(struct sock *sk, int level, int optname, char *optval, int *optlen)
+{
+	int (*func) (struct sock * sk, int level, int optname, char *optval, int *optlen) =
+	    (void *) HAVE_IP_GETSOCKOPT_ADDR;
+	return (*func) (sk, level, optname, optval, optlen);
+}
+#endif
+
+#ifndef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+#endif
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+int
+ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
+{
+	int (*func) (struct rtable ** rp, struct flowi * flp, struct sock * sk, int flags) =
+	    (void *) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
+	return (*func) (rp, flp, sk, flags);
+}
+#endif
+
+#ifndef HAVE_IP_RT_MIN_PMTU_ADDR
+#undef HAVE_IP_RT_MIN_PMTU_ADDR
+#endif
+extern int ip_rt_min_pmtu;
+#ifdef HAVE_IP_RT_MIN_PMTU_ADDR
+static int *ip_rt_min_pmtu_addr = (void *) HAVE_IP_RT_MIN_PMTU_ADDR;
+#define ip_rt_min_pmtu (*ip_rt_min_pmtu_addr)
+#else
+#define ip_rt_min_pmtu ip_rt_min_pmtu
+#endif
+
+#ifndef HAVE_IP_RT_MTU_EXPIRES_ADDR
+#undef HAVE_IP_RT_MTU_EXPIRES_ADDR
+#endif
+extern int ip_rt_mtu_expires;
+#ifdef HAVE_IP_RT_MTU_EXPIRES_ADDR
+static int *ip_rt_mtu_expires_addr = (void *) HAVE_IP_RT_MTU_EXPIRES_ADDR;
+#define ip_rt_mtu_expires (*ip_rt_mtu_expires_addr)
+#else
+#define ip_rt_mtu_expires ip_rt_mtu_expires
+#endif
+
+#ifndef HAVE_IP_RT_UPDATE_PMTU_ADDR
+#undef HAVE_IP_RT_UPDATE_PMTU_ADDR
+#endif
+#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
+void
+ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu)
+{
+	void (*func) (struct dst_entry * dst, unsigned mtu) = (void *) HAVE_IP_RT_UPDATE_PMTU_ADDR;
+	return (*func) (dst, mtu);
+}
+#endif
+
+#ifndef HAVE_IP_SETSOCKOPT_ADDR
+#undef HAVE_IP_SETSOCKOPT_ADDR
+#endif
+#ifdef HAVE_IP_SETSOCKOPT_ADDR
+int
+ip_setsockopt(struct sock *sk, int level, int optname, char *optval, int optlen)
+{
+	int (*func) (struct sock * sk, int level, int optname, char *optval, int optlen) =
+	    (void *) HAVE_IP_SETSOCKOPT_ADDR;
+	return (*func) (sk, level, optname, optval, optlen);
+}
+#endif
+
+#ifndef HAVE_SYSCTL_IP_DYNADDR_ADDR
+#undef HAVE_SYSCTL_IP_DYNADDR_ADDR
+#endif
+extern int sysctl_ip_dynaddr;
+#ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
+static int *sysctl_ip_dynaddr_addr = (void *) HAVE_SYSCTL_IP_DYNADDR_ADDR;
+#define sysctl_ip_dynaddr (*sysctl_ip_dynaddr_addr)
+#else
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr
+#endif
+
+#ifndef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+#endif
+extern int sysctl_ip_nonlocal_bind;
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+static int *sysctl_ip_nonlocal_bind_addr = (void *) HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR;
+#define sysctl_ip_nonlocal_bind (*sysctl_ip_nonlocal_bind_addr)
+#else
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind
+#endif
+
+#ifndef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+#endif
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+int
+__ip_route_output_key(struct rtable **rp, const struct flowi *flp)
+{
+	int (*func) (struct rtable ** rp, const struct flowi * flp) =
+	    (void *) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
+	return (*func) (rp, flp);
+}
+#endif
+
+#ifndef HAVE_INET_BIND_ADDR
+#undef HAVE_INET_BIND_ADDR
+#endif
+#ifdef HAVE_INET_BIND_ADDR
+static int
+inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+{
+	int (*func) (struct socket * sock, struct sockaddr * uaddr, int addr_len) =
+	    (void *) HAVE_INET_BIND_ADDR;
+	return (*func) (sock, uaddr, addr_len);
+}
+#endif
+
+#ifndef HAVE_INET_IOCTL_ADDR
+#undef HAVE_INET_IOCTL_ADDR
+#endif
+#ifdef HAVE_INET_IOCTL_ADDR
+static int
+inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+{
+	int (*func) (struct socket * sock, unsigned int cmd, unsigned long arg) =
+	    (void *) HAVE_INET_IOCTL_ADDR;
+	return (*func) (sock, cmd, arg);
+}
+#endif
+
+#ifndef HAVE_INET_GETNAME_ADDR
+#undef HAVE_INET_GETNAME_ADDR
+#endif
+#ifdef HAVE_INET_GETNAME_ADDR
+static int
+inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer)
+{
+	int (*func) (struct socket * sock, struct sockaddr * uaddr, int *uaddr_len, int peer) =
+	    (void *) HAVE_INET_GETNAME_ADDR;
+	return (*func) (sock, uaddr, uaddr_len, peer);
+}
+#endif
+
+#ifndef HAVE_INET_MULTI_GETNAME_ADDR
+#undef HAVE_INET_MULTI_GETNAME_ADDR
+#endif
+#ifdef HAVE_INET_MULTI_GETNAME_ADDR
+static int
+inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer)
+{
+	int (*func) (struct socket * sock, struct sockaddr * uaddr, int *uaddr_len, int peer) =
+	    (void *) HAVE_INET_MULTI_GETNAME_ADDR;
+	return (*func) (sock, uaddr, uaddr_len, peer);
+}
+#endif
+
+#ifndef HAVE_STRUCT_DST_ENTRY_PATH
+#undef HAVE_STRUCT_DST_ENTRY_PATH
+#endif
+#ifdef HAVE_STRUCT_DST_ENTRY_PATH
+/* dst_pmtu should be already defined */
+static void
+dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	if (dst->ops->update_pmtu)
+		dst->ops->update_pmtu(dst, mtu);
+}
+#else
+static inline u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+static void
+dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	dst->pmtu = mtu;
+}
+#endif
+
+#ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+#undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+#endif
+#ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
+static inline int
+ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+	struct flowi fl = {.oif = oif,
+		.nl_u = {.ip4_u = {.daddr = daddr,
+				   .saddr = saddr,
+				   .tos = tos}},
+		.proto = IPPROTO_SCTP,
+		.uli_u = {.ports = {.sport = 0,.dport = 0}}
+	};
+	return ip_route_output_key(rp, &fl);
+}
+#endif
+
+#ifndef HAVE___XFRM_POLICY_CHECK_ADDR
+#undef HAVE___XFRM_POLICY_CHECK_ADDR
+#endif
+#ifdef HAVE___XFRM_POLICY_CHECK_ADDR
+int
+__xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family)
+{
+	int (*func) (struct sock * sk, int dir, struct sk_buff * skb, unsigned short family) =
+	    (void *) HAVE___XFRM_POLICY_CHECK_ADDR;
+	return (*func) (sk, dir, skb, family);
+}
+#endif
+
+#ifndef HAVE___XFRM_SK_CLONE_POLICY_ADDR
+#undef HAVE___XFRM_SK_CLONE_POLICY_ADDR
+#endif
+#ifdef HAVE___XFRM_SK_CLONE_POLICY_ADDR
+int
+__xfrm_sk_clone_policy(struct sock *sk)
+{
+	int (*func) (struct sock * sk) = (void *) HAVE___XFRM_SK_CLONE_POLICY_ADDR;
+	return (*func) (sk);
+}
+#endif				/* __LOCAL_LINUX_HOOKS_H__ */
+
+#ifndef HAVE_XFRM_POLICY_DELETE_ADDR
+#undef HAVE_XFRM_POLICY_DELETE_ADDR
+#endif
+#ifdef HAVE_XFRM_POLICY_DELETE_ADDR
+void
+xfrm_policy_delete(struct xfrm_policy *pol, int dir)
+{
+	void (*func) (struct xfrm_policy * pol, int dir) = (void *) HAVE_XFRM_POLICY_DELETE_ADDR;
+	return (*func) (pol, dir);
+}
+#endif
+
+#endif				/* __LOCAL_LINUX_HOOKS_H__ */
