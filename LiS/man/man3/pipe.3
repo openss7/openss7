@@ -1,0 +1,157 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH PIPE 2 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B pipe
+\- create a
+.BR STREAMS "\-based"
+.IR pipe .
+.SH SYNOPSIS
+.B "#include <unistd.h> "
+.sp
+.BI "int pipe( int " filedes "[2] ); "
+.SH DESCRIPTION
+.BR pipe "() "
+creates a
+.BR STREAMS "\-based"
+.I pipe
+(see
+.BR fifo "(4) "
+and
+.BR STREAMS "(4)), "
+and provides access to its ends as a pair of file descriptors
+returned in the
+.I filedes
+argument.
+.sp
+The file descriptors returned allow both read and write access
+to the pipe.  Data written to one end is readable at the other,
+independently in each direction;  i.e.,
+.BR STREAMS "\-based"
+pipes are not just
+.IR bidirectional ,
+but
+.IR "full-duplex" .
+.sp
+Structurally, a
+.BR STREAMS "\-based"
+.I pipe
+consists of a pair of
+.IR "stream heads" ,
+each comprising a read/write queue pair, with the write queue of each
+end directed to the read queue of the other end.
+The point at which this occurs is referred to as the
+.I midpoint
+of the pipe.
+.sp
+Generally otherwise, a
+.BR STREAMS "\-based"
+.I pipe
+behaves as a pair of
+.BR STREAMS "\-based"
+files; e.g.,
+.B STREAMS
+.I modules
+may be pushed onto either end, etc..
+.sp
+A notable exception is that
+.BR STREAMS "\-based"
+.I pipes
+provide the (only) means for passing open file descriptors via the
+.B "STREAMS I_SENDFD"
+and
+.B I_RECVFD
+.I ioctl
+mechanisms.  Specifically, a file descriptor can (and must) be sent
+on one end of a pipe via
+.B I_SENDFD
+to the other end, where it may be received via
+.BR I_RECVFD .
+.SH "RETURN VALUE"
+Upon successful completion,
+.BR pipe "() "
+returns 0.
+Upon failure,
+.BR pipe "() "
+returns -1, and
+.BR errno "(3) "
+is set to indicate the error causing the failure.
+.SH "APPLICATION USAGE"
+The Linux kernel provides an independent implementation of
+.IR pipes ,
+corresponding to that provided before SVR4 used
+.B STREAMS
+to implement them (see 
+.BR pipe "(2)). "
+Although the interface is identical, the two are quite different
+otherwise.
+.BR STREAMS "\-based"
+provide significant additional capability, but possibly at a lower
+level of performance.
+Notably,
+.BR STREAMS "\-based"
+pipes are full duplex (i.e., both ends support both read and write
+access independently), and allow the use of
+.B STREAMS
+.I modules
+to augment the processing of data.  Moreover, such processing may
+be
+.IR message \- oriented :
+message boundaries may be established and respected by using the
+.BR getmsg "(3)/" getpmsg "(3) "
+and
+.BR putmsg "(3)/" putpmsg "(3) "
+primitives instead of
+.BR read "(2) "
+and
+.BR write "(2). "
+.sp
+Applications wishing to use the
+.B STREAMS
+version of the
+.I pipe
+function must link with the LiS library which provides it; otherwise,
+the Linux kernel version will be used via the Linux/GNU C library.
+.SH "FUTURE DIRECTIONS"
+Under Linux,
+.BR pipe "() "
+is implemented as an
+.I ioctl
+operation on an anonymous
+.BR STREAMS "\-based"
+file.
+An alternative system call implementation may be used in the future,
+and is fact already supported within LiS.
+.sp
+It should be noted that no attention has yet been given to the issue
+of atomic reads and writes in
+.BR STREAMS "\-based"
+pipes and fifos, common to most
+implementations of these mechanisms.  This issue will be addressed
+hopefully in the near future.
+.SH HISTORY
+Unix System V Release 4 (SVR4)
+.SH "SEE ALSO"
+.BR pipemod "(2), "
+.BR connld "(2), "
+.BR errno "(3), "
+.BR fifo "(4), "
+.BR STREAMS "(4) "
+.SH AUTHOR
+John Boyd, protologos LLC.

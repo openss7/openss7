@@ -1,0 +1,74 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH PIPEMOD 9 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B pipemod
+\- 
+.B STREAMS
+module supporting flush handling in
+.BR STREAMS "\-based"
+.I fifos
+and
+.I pipes
+.SH DESCRIPTION
+The
+.B pipemod
+module has the relatively simple task of reversing the sense of the
+.B FLUSH
+flag bits in
+.B M_FLUSH
+messages sent in
+.BR STREAMS "\-based"
+.I fifos
+and
+.IR pipes .
+This must happen at the
+.I midpoint
+of a
+.I fifo
+or
+.IR pipe ,
+so that
+.B FLUSHR
+becomes
+.BR FLUSHW ,
+and
+.B FLUSHW
+becomes
+.BR FLUSHR .
+.B pipemod
+does this, and has no other function.
+.sp
+To be used appropriately, then,
+.B pipemod
+must be the first module pushed onto a pipe end or a fifo, but it is
+only necessary on one end of a pipe.
+.sp
+.B pipemod
+is not needed if flush handling need not be supported, or if it its
+function is supported by other means.
+.SH "SEE ALSO"
+.BR fifo "(9), "
+.BR pipe "(3), "
+.BR fifo "(4), "
+.BR STREAMS "(4) "
+.SH HISTORY
+Unix System V Release 4 (SVR4)
+.SH AUTHOR
+John Boyd, protologos LLC.

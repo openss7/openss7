@@ -1,0 +1,110 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH FDETACH 3 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B fdetach
+\- detach any
+.BR STREAMS "\-based"
+file from a path name in the file system
+.SH SYNOPSIS
+.B "#include <stropts.h> "
+.sp
+.BI "int fdetach( const char *" path " ); "
+.SH DESCRIPTION
+.BR fdetach "() "
+detaches an open
+.BR STREAMS "\-based"
+file from a path name in the file system.
+.BR fdetach "() "
+will also
+.BR close "(2) "
+the
+.BR STREAMS "\-based"
+file if it represents the last
+.BR open "(2) "
+of that file.
+.SH "RETURN VALUE"
+Upon successful completion,
+.BR fdetach "() "
+returns 0.  Upon failure,
+.B fattach
+return -1, and
+.BR errno "(3) "
+is set to indicate the error causing the failure (see below).
+.SH ERRORS
+.BR fdetach "() "
+may fail with at least the following error indications:
+.TP
+.B "[EINVAL]"
+No
+.BR STREAMS "\-based"
+file is currently attached to the
+.I path
+given as an argument.
+.SH "APPLICATION USAGE"
+Applications wishing to use the version of the
+.BR fdetach "() "
+function described herein must link with the LiS library which
+provides it.  The
+Linux/GNU C library otherwise provides a stub supporting calls to
+.BR fdetach "() "
+which only generates an error indicating that it is not implemented.
+.SH WARNINGS
+The effect of calling
+.BR fdetach "() "
+on an attached
+.BR STREAMS "\-based"
+file occurs automatically when a
+.I hangup
+indication is received, unless passed file descriptors (in the form of
+.B M_PASSFP
+messages) are pending receipt via the
+.B I_RECVFD
+.I ioctl.
+This will occur normally in two situations: when the file is a
+pipe end and the other end is closed for the last time and released;
+and when a driver sends an
+.B M_HANGUP
+message upward to the stream head.
+In this state, the
+.BR STREAMS "\-based"
+file becomes unusable for normal message traffic, and
+the automatic detachment ensures that it will be closed and its
+resources released.
+It should be noted, however, that this behavior is not common to
+other
+.B STREAMS
+implementations and should be considered a non-standard extension.
+.SH "FUTURE DIRECTIONS"
+.BR fdetach "() "
+is currently implemented as an IOCTL operation on an anonymous
+.BR STREAMS "\-based"
+file.
+Should LiS ever become part of the Linux kernel, it may become a
+system call; a system call implementation is in fact already
+included within LiS.
+.SH "SEE ALSO"
+.BR fattach "(3), "
+.BR fattach "(8), "
+.BR fdetach "(8), "
+.BR STREAMS "(4) "
+.SH HISTORY
+Unix System V Release 4 (SVR4)
+.SH AUTHOR
+John Boyd, protologos LLC.

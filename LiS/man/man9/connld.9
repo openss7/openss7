@@ -1,0 +1,162 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH CONNLD 9 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B connld
+\- 
+.B STREAMS
+module supporting the generation of unique new
+.BR STREAMS "\-based"
+.I pipes
+from an existing pipe end.
+.SH DESCRIPTION
+The
+.B connld
+module provides a means to generate multiple unique
+.BR STREAMS "\-based"
+.I pipes
+from a single existing
+.I pipe
+end.
+.sb
+.B connld
+may only be
+.I pushed
+(via the
+.B "STREAMS I_PUSH"
+.IR ioctl )
+onto a
+.BR STREAMS "\-based"
+.IR pipe .
+When first
+.IR pushed ,
+.B connld
+does nothing; on each subsequent
+.BR open "(2), "
+.B connld
+will generate a unique
+.BR STREAMS "\-based"
+.IR pipe .
+One end of each new pipe replaces the original pipe end from the
+perspective of the
+.B open
+call.
+The other end of each new pipe is sent, effectively as if by
+the
+.B I_SENDFD
+.IR ioctl ,
+to the other end of the original pipe, ostensibly to be received
+by a subsequent
+.B I_RECVFD
+.I ioctl
+operation.
+.SH "APPLICATION USAGE"
+The intent of
+.B connld
+is to provide a means to generate unique pipes which separately
+and independently connect client processes to a server process.
+The point of access for such clients is expected to be a path
+name known to all such clients and to which a pipe end may be
+connected (via
+.BR fattach "(3)) "
+by the server process.
+The server establishes the original pipe, pushes
+.B connld
+onto the client end, and then listens via
+.B I_RECVFD
+for new connections on the server end.
+A client wishing to connect to the server will
+.BR open "(2) "
+the path name representing the client end, and can determine via
+.BR isastream "(3) "
+whether or not the server process is active and attached.  If 
+it is, the
+.BR open "() "
+call returns one end of a unique new pipe that thus connects
+the client to the server.
+.sp
+Such a server is responsible both for accepting new connections
+via
+.B I_RECVFD
+on the original pipe, and for communicating with clients so
+connected via the received pipe ends.
+It would also be reasonable for such a server process to invalidate
+the point of access by calling
+.BR fdetach "(3) "
+before terminating.
+.sp
+It should be noted that the
+.BR poll "(2) "
+primitive may be used to indicate when an 
+.B M_PASSFP
+representing a newly passed file is available on the original server
+pipe end.
+This is reflected by the
+.B POLLIN
+status setting in the
+.B events
+and
+.B revents
+fields of a
+.B pollfd
+structure.
+Moreover, any attempt to read an
+.B M_PASSFP
+message via the data-receiving primitives (i.e., 
+.BR read "(2), " getmsg "(3), and " getpmsg "(3)) "
+will fail with
+.BR errno "(3) "
+returning an
+.B EBADMSG
+indication without discarding the message.
+.sp
+Even so, it should be reasonable to expect only
+.B M_PASSFP
+messages will be received on the original server pipe end,
+since it is not possible to carry on normal data traffic which
+has
+.B connld
+on one end, since
+.B connld
+does not support such traffic.
+.sp
+The use of
+.B connld
+can be made entirely free-standing by attaching well-known paths to
+.I both
+ends of the original pipe.  The relevant capabilities are implemented
+in LiS so that the original creator of the
+.B pipe
+can close both ends after attaching paths to them, and the
+process of passing file descriptors can still be carried out via
+new
+.BR open "()'s "
+as long as both ends remain attached.
+.SH "SEE ALSO"
+.BR fattach "(3), "
+.BR fattach "(8), "
+.BR fdetach "(3), "
+.BR fifo "(4), "
+.BR fifo "(9), "
+.BR pipe "(3), "
+.BR STREAMS "(4) "
+.SH HISTORY
+Unix System V Release 4 (SVR4)
+.SH AUTHOR
+John Boyd, protologos LLC.

@@ -1,0 +1,289 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH FIFO 9 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B fifo
+\- pseudo-driver for
+.BR STREAMS "\-based"
+.I fifos
+.SH DESCRIPTION
+The
+.B fifo
+pseudo-driver
+(which is internal to LiS) provides
+.BR STREAMS "\-based" 
+.I fifos
+as single character special files, and
+.BR STREAMS "\-based" 
+.I pipes
+as pairs of character special files which are interconnected (see
+.BR pipe "(3)).  "
+.sp
+.BR STREAMS "\-based"
+.I fifos
+differ from typical
+.BR STREAMS "\-based"
+character special files in that there are not separate
+.I "stream head"
+and
+.I driver
+queue pair within the
+.BR STREAMS "\-based"
+file.  Instead, a
+.I fifo
+is created with only a single queue pair for the
+.IR "stream head" .
+Moreover, in a typical
+.I driver
+queue pair, the write queue is not connected to a next queue.
+In a
+.IR fifo ,
+the write queue is directed to the read queue of the pair.
+A
+.I pipe
+comprises a pair of
+.IR fifos ", "
+with the write queue of each pair directed to the read queue of the other.
+The two
+.B fifos
+comprising a
+.B pipe
+are referred to as
+.IR peers ", "
+and each somewhat represents a
+.I driver
+to the other.
+As a degenerate case, a
+.B fifo
+is its own peer.
+.sp
+.B STREAMS
+.I modules
+may be pushed onto
+.B fifos
+and
+.BR pipes ", "
+but should not expect a
+.I driver
+below them; instead, the
+.BR SAMESTR "()"
+function should be used from the write queue of a pair to determine if
+the module is the lowest in the
+.BR STREAMS "\-based"
+file (this is called the
+.IR midpoint "). "
+The structure of a
+.B fifo
+or
+.B pipe
+is preserved when modules are pushed (and popped); i.e., the write
+queue at the
+.I midpoint
+will always be directed at the read queue of the
+.IR peer "."
+.sp
+Input and output are handled at a
+.B fifo
+stream head as they would normally be handled
+at a stream head.  In LiS, an
+.BR "fifo open" "() "
+entry point exists to assign minor device numbers to new opens under the
+.B fifo
+major device number, and a
+.BR close "() "
+entry point is used correspondingly to release them.  These functions
+are kept in a
+.I streamtab
+data structure (as they would normally be for any
+.B STREAMS
+driver or module) which is private to the LiS implementation.
+.SH "APPLICATION USAGE"
+In the current Linux kernels, character special major numbers are limited
+to 16 bits, and major and minor device numbers to 8 bis each.  This limits
+a system to 256 total major device numbers and 256 total minor devices
+per major device number.  This is a rather severe limitation where
+mechanisms like
+.B fifos
+and
+.B pipes
+are concerned.
+.sp
+However, a driver may handle more than one major device number.  The
+.B fifo
+pseudo-driver uses this to overcome this limitation, by supporting the
+automatic allocation and use of multiple major device numbers for
+.B fifos
+and
+.BR pipes .
+Specifying more than 256 minor devices is done in the usual manner, i.e.,
+by specifying the number of "units" in the appropriate
+.B Config
+file.  Enough major device numbers will be allocated to cover the
+requested number of minor devices (if available, else an error will
+occur in 
+.BR strconf "(8)). "
+The number allocated will include one minor device per major number
+to be used as a
+.BR fifo "\-specific"
+.I clone
+minor device (specifically, minor number 0), which exhibits special behavior.
+.sp
+Normally, when cloning is done via the
+.B clone
+pseudo-driver, the
+.B clone
+major device number is used, along with the desired actual major number
+as the minor device number.  When an
+.BR open "() "
+is performed on such a device, the
+.BR "clone open" "() "
+routine in turn calls the appropriate driver's
+.BR open "(), "
+with the
+.I sflag
+parameter set to
+.BR CLONEOPEN .
+The driver's
+.BR open "() "
+is expected in this case to allocate an unused minor device number,
+and return it via an entirely new device number in the
+.I "devp" 
+parameter.  In this way, a driver can change the device number to be
+used for a
+.BR STREAMS "\-based"
+file.
+When minor device 0 for a specified for a
+.B fifo
+major device, the driver will also clone a new minor device number.
+However, LiS opens
+.B fifo
+devices differently; specifically, when an already-opened
+.BR fifo "\-specific"
+clone minor device is reopened, the new and subsequent opens will use
+the already-opened clone.
+Thus, using minor device 0 for a
+.B fifo
+when creating a file system node will ensure that all concurrent
+opens of the associated path name will use the same
+.BR STREAMS "\-based"
+file; at the same time, opens of different file system nodes via
+different paths will open their respectively different
+.BR STREAMS "\-based"
+files.
+This is essentially how kernel-based
+.B fifos
+behave -applications and users of
+.BR STREAMS "\-based"
+.B fifos
+don't have to keep track of minor numbers to achieve this same behavior
+when it is desired.
+.sp
+It is in fact recommended that only two forms of file system nodes be used for
+.BR STREAMS "\-based " fifos ": "
+the
+.B clone
+major number as major number with a
+.B fifo
+major number as minor number, to be used when
+.I every
+open of the associated path must clone a new
+.BR fifo ", "
+and a
+.B fifo
+major number as major number with 0 as the minor number, to be used
+when new opens are to clone a new
+.B fifo
+but subsequent concurrent opens are to use the already opened
+.BR fifo ". "
+These are represented by two device special file paths created when LiS
+is installed:
+.RB "/" dev "/" fifo
+for the former, and
+.RB "/" dev "/" fifo.0
+for the latter.  It is recommended that these be used, possibly
+along with the equivalent of
+.BR stat "(2) "
+to determine appropriate major device numbers for the
+.B clone
+and
+.B fifo
+pseudo-drivers, which are also determined when LiS is installed.
+It can be noted that
+.B pipes
+are actually created as instances of the former, after which the write
+queues are peer-connected.
+.sp
+The
+.B fifo
+pseudo-driver allocates minor devices in
+.I round-robin
+fashion; i.e., a list of available minor devices is kept, and once a
+minor number is finally closed, it is put at the end of this list.
+Thus, a
+.B fifo
+minor device which is opened and closed will not be immediately reused.
+.SH WARNINGS
+Because
+.BR STREAMS "\-based"
+.B fifos
+and
+.B pipes
+are implemented as character special devices, they do not appear as
+.B pipe
+devices when examined with
+.BR stat "(2) "
+or the equivalent (e.g., 
+.BR ls "(1)); "
+i.e. the
+.B S_IFIFO
+indication is not set in the mode -
+.B S_IFCHR
+is set instead, and the actual device number is indicated in the
+.I st_rdev
+field of the
+.I stat
+data structure.
+.sp
+Because of the potential use of multiple major numbers, applications
+should not depend on a
+.B fifo
+or
+.B pipe
+having a specific major device number, nor should an application depend on
+all
+.B fifos
+and
+.B pipes
+having the same major device number.
+.SH "SEE ALSO"
+.BR clone "(9), "
+.BR connld "(9), "
+.BR fifo "(4), "
+.BR ls "(1), "
+.BR pipe "(3), "
+.BR pipemod "(9), "
+.BR STREAMS "(4), "
+.BR stat "(2), "
+.BR strconf "(8)"
+.SH HISTORY
+Unix System V Release 4 (SVR4)
+.SH BUGS
+Please report bugs (and/or comments and suggestions) to the LiS mailing list.
+.SH AUTHOR
+John Boyd, protologos LLC.

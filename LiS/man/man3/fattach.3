@@ -1,0 +1,313 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH FATTACH 3 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B fattach
+\- attach a
+.BR STREAMS "\-based"
+open file to a path name in the file system
+.SH SYNOPSIS
+.B "#include <stropts.h> "
+.sp
+.BI "int fattach( int " filedes ", const char *" path " ); "
+.SH DESCRIPTION
+.BR fattach "() "
+attaches an open
+.BR STREAMS "\-based"
+file to a path name in the file system.
+While the file is attached to the path name, opens (see
+.BR open "(2)) "
+of the path name will instead open the
+.BR STREAMS "\-based"
+file.
+.sp
+The process calling
+.BR fattach "() "
+may immediately close the
+.BR STREAMS "\-based"
+file thereafter; the
+.BR fattach "() "
+operation effectively causes the file to remain open until
+it is explicitly detached via
+.BR fdetach "(3).  "
+.sp
+Note that a single
+.BR STREAMS "\-based"
+file may be attached to several path names (via several calls to
+.BR fattach "), "
+but a path name may only be attached to a single
+.BR STREAMS "\-based"
+file.
+.sp
+The process does not affect pre-existing opens either of the underlying path
+name or the
+.BR STREAMS "\-based"
+file, and subsequent operations on the path name (until a corresponding
+.BR fdetach "(3)) "
+apply only to the attached
+.BR STREAMS "\-based"
+file.
+.SH "RETURN VALUE"
+Upon successful completion,
+.BR fattach "() "
+returns 0.  Upon failure,
+.BR fattach "() "
+return -1, and
+.BR errno "(3) "
+is set to indicate the error causing the failure (see below).
+.SH ERRORS
+.BR fattach "() "
+may fail at least with the following error indications:
+.TP
+.B "[EBADF]"
+The
+.I filedes
+argument is not a valid open file descriptor.
+.TP
+.B "[EINVAL]"
+The
+.I filedes
+argument does not refer to a valid
+.BR STREAMS "\-based"
+file.
+.TP
+.B "[EISDIR]"
+The
+.I path
+argument refers to a directory.
+.TP
+.B "[EBUSY]"
+The
+.I path
+argument is currently a mount point, or already has a
+.BR STREAMS "\-based"
+file attached to it.
+.SH "APPLICATION USAGE"
+Both conceptually and mechanically,
+.BR fattach "() "
+is similar to the more typical
+.I mounting
+of a file system on a path name representing a directory (see
+.BR mount "(8)).  "
+Both cause the process of searching for the path name to
+use an altenative file system node when the point of mounting or
+attachment is reached; i.e., the attached file or mounted file system
+covers and hides the underlying path name.
+They differ in that mounting applies to directory names and attaches
+block devices that contain whole file systems;
+.BR fattach "() "
+is intended to apply to non-directory names and attaches only a single
+.BR STREAMS "\-based"
+file.
+.sp
+.BR fattach "() "
+is intended to allow client processes a means to communicate with
+a server process via a
+.I "well-known"
+path name.
+E.g., a server process might open a
+.BR STREAMS "\-based"
+.I pipe
+and attach one end to an existing path name, thus providing a
+means for clients to communicate with the server.
+When the server is not running, the path name identifies a
+.RB "non-" STREAMS
+file name, but when the server is running, it identifies the end of the
+pipe to be used to communicate with the server.  A client process can
+distinguish these two states by using the
+.BR isastream "(3) "
+function.
+.sp
+Moreover, since an attached
+.BR STREAMS "\-based"
+file is effectively open, a
+.BR STREAMS "\-based"
+file which is only attached but not otherwise open may be the target
+of file descriptor passing via the
+.B I_SENDFD
+.I ioctl
+and
+.B M_PASSFP
+messages, to be received once opened via the
+.B I_RECVFD
+.IR ioctl ". "
+(Note that this means of file descriptor passing is only supported for
+.BR STREAMS "\-based"
+.B pipes
+and
+.BR fifos ".) "
+E.g., a
+.B pipe
+may be opened, a path attached to one end, and a file descriptor passed
+to that end, after which the pipe end receiving the file descriptor may
+be closed.
+Subsequent opens of that end will be able to receive the passed file
+descriptor(s) in the usual manner and detach the attached path
+thereafter.
+This eases the synchronization requirements between servers and clients
+intending to use a
+.B pipe
+only for passing file descriptors.
+.sp
+See
+.BR connld "(9) "
+for related applications of
+.BR fattach "(). "
+.sp
+Under Linux,
+.BR fattach "() "
+also coincidentally provides a means to dynamically substitute a
+.BR STREAMS "\-based"
+file
+for a kernel-based
+.I fifo
+(see
+.BR fifo "(4) "
+and
+.BR pipe "(3)) "
+without having to change existing applications (see also
+.BR fattach (8)).  "
+.sp
+Applications wishing to use the version of the
+.BR fattach "() "
+function described herein must link with the LiS library, which
+provides it.  The
+Linux/GNU C library otherwise provides a stub supporting calls to
+.B fattach
+which only generates an error indicating that it is not implemented.
+.SH WARNINGS
+The operation of
+.BR fattach "() "
+depends on how the underlying operating system implements the mechanism
+of
+.IR mounting .
+In Linux kernels since 2.1.x, mounting does not happen at
+.IR inodes ,
+but at a higher level called the
+.IR dcache .
+Because of this implementation, attaching to a path name which has hard
+links in the underlying file system does not involve other path names
+which are hard links to the given path name.  I.e., the
+.BR STREAMS "\-based"
+file is only attached to the given path names, and not to any others
+which would otherwise be treated as
+.I aliases
+for that path name.
+.sp
+At the same time, it should again be noted that a
+.BR STREAMS "\-based"
+file may be attached to more than one path, including to such aliases,
+if their path names are known.
+The fact that these names are not easy to determine is the predominant
+reason that they are not attached to automatically.
+.sp
+It should be noted that in this implementation, an attachment is
+undone automatically if the attached
+.BR STREAMS "\-based"
+file receives a
+.I hangup
+indication from its driver (or from its
+.IR peer ,
+if it is a pipe end) without received file descriptors pending
+(i.e., without
+.B M_PASSFP
+messages queued at its stream head),
+i.e., if the effect of the stream head receiving an
+.B M_HANGUP
+message occurs.
+In this state, a
+.BR STREAMS "\-based"
+file is unusable for normal message traffic, and
+this automatic detachment ensures that an otherwise inactive stream
+will be closed and its resources released.
+In the case of a
+.BR pipe ", "
+an end is given a
+.I hangup
+indication if its peer is closed completely and dismantled.
+If
+.B M_PASSFP
+messages are queued at the remaining end (which is thus in this
+.I hangup
+state), it may still be opened (if already open or if only attached)
+in order to receive these messages via the
+.B I_RECVFD
+.IR ioctl ". "
+.sp
+The behavior of automatically detaching a
+.BR STREAMS "\-based"
+file which has received a
+.I hangup
+indication is not common to other
+.B STREAMS
+implementations and should be considered a non-standard extension.
+.sp
+It should also be noted that this implementation does not change
+the access permissions (see
+.BR chmod "(2) "
+and
+.BR fchmod "(2)) "
+of the attached
+.BR STREAMS "\-based"
+file.  If such behavior is desired, the path's mode should be determined
+.I before
+attaching, and applied to the
+.BR STREAMS "\-based"
+file (via
+.BR chmod "(2) "
+or the equivalent). (See
+.BR fattach "(8) "
+for examples.)  Note that doing so alters the
+.BR STREAMS "\-based"
+file permanently; i.e., such changes will not be undone by an effective
+subsequent
+.BR fdetach "(3)."
+.SH "FUTURE DIRECTIONS"
+In the current implementation,
+.BR fattach "() "
+will not attach to a directory name, to avoid conflict with the normal
+process of mounting file systems on directory mount points.  Though
+we foresee no need to allow attachment to directory path names at
+the time of this writing, this is subject to change in the future.
+.sp
+.BR fattach "() "
+is currently implemented as an IOCTL operation on the given file.
+Should LiS ever become part of the Linux kernel, it may become a
+system call; a system call implementation is in fact already
+included within LiS.
+.SH BUGS
+This is an initial release of this function.
+Should bugs be found, please report them via the LiS mailing list.
+.SH "SEE ALSO"
+.BR chmod "(2), "
+.BR connld "(9), "
+.BR errno "(3), "
+.BR fattach "(8), "
+.BR fchmod "(2), "
+.BR fdetach "(3), "
+.BR fdetach "(8), "
+.BR fifo "(4), "
+.BR mount "(8), "
+.BR open "(2), "
+.BR pipe "(2), "
+.BR STREAMS "(4) "
+.SH HISTORY
+Unix System V Release 4 (SVR4)
+.SH AUTHOR
+John Boyd, protologos LLC.

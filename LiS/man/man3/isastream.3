@@ -1,0 +1,95 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH ISASTREAM 3 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B isastream
+\- determine whether an open file is 
+.BR STREAMS "\-based"
+.SH SYNOPSIS
+.B "#include <stropts.h> "
+.sp
+.BI "int isastream( int " filedes " ); "
+.SH DESCRIPTION
+.BR isastream "() "
+may be used to test whether or not an open file descriptor is for a
+.BR STREAMS "\-based"
+file (see
+.BR STREAMS "(4)).  "
+.SH "RETURN VALUE"
+Upon successful completion,
+.BR isastream "() "
+returns 1 if the indicated file is a
+.IR STREAM ,
+and 0 if it is not.
+If
+.I filedes
+does not identify a valid open file,
+.BR isastream "() "
+should return -1 with
+.I errno
+set to
+.BR EBADF .
+.SH "APPLICATION USAGE"
+.BR isastream "() " 
+is convenient under Linux for determining or at least estimating
+a file's behavior, since (with Linux
+.B STREAMS
+being available) there are both
+.I STREAMS
+and
+.RI "non-" STREAMS
+implementations for, e.g.,
+.I fifos
+(also known as
+.I "named pipes"
+- see
+.BR fifo "(4)) "
+and
+.I pipes
+(see
+.BR pipe "(2)).  "
+.sp
+.BR isastream "() "
+is also useful in conjunction with
+.BR fattach "(3) "
+and
+.BR fdetach "(3) "
+to determine whether or not a
+.BR STREAMS "\-based"
+file has been attached to a path name.
+.sp
+Applications wishing to use the version of the
+.BR isastream "() "
+function described herein must link with the LiS library which
+provides it.  The
+Linux/GNU C library otherwise provides a stub supporting calls to
+.BR isastream "() "
+which only generates an error indicating that it is not implemented.
+.SH "CONFORMING TO"
+Unix System V Release 4 (SVR4)
+.SH "SEE ALSO"
+.BR pipe "(2), "
+.BR fattach "(3), "
+.BR fdetach "(3), "
+.BR fattach "(8), "
+.BR fdetach "(8), "
+.BR fifo "(4), "
+.BR STREAMS "(4) "
+.SH AUTHOR
+John Boyd, protologos LLC.
