@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 10:58:16 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/02 10:58:16 $ by $Author: brian $
+ Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 10:58:16 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $"
 
 static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 10:58:16 $";
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $";
 
 /* 
  *  autopush(8)
+ *
+ *  AIX Utility: autopush - Configures lists of automatically pushed STREAMS
+ *  modules.
  */
 
 #include <stdlib.h>

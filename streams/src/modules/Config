@@ -15,6 +15,7 @@ module	connld		connld
 module	timod		timod
 module	tirdwr		tirdwr
 module	sockmod		sockmod
+module	sc		sc
 
 #
 # Object name specifications
@@ -25,6 +26,7 @@ objname module	connld		connld
 objname module	timod		timod
 objname module	tirdwr		tirdwr
 objname	module	sockmod		sockmod
+objname	module	sc		sc
 
 #
 # Loadable specifications
@@ -41,6 +43,7 @@ loadable connld
 loadable timod
 loadable tirdwr
 loadable sockmod
+loadable sc
 
 #
 # Initialization specifications

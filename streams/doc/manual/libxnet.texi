@@ -1,0 +1,1065 @@
+% -*- texinfo -*- vim: ft=texinfo
+% =========================================================================
+%
+% @(#) $Id: libxnet.texi,v 0.9.2.1 2004/03/04 23:15:47 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename libxnet.info
+@settitle OpenSS7 XTI Library
+@setchapternewpage odd
+
+@dircategory GNU libraries
+@direntry
+* Libxnet: (libxnet).           An XTI/TLI library for STREAMS.
+@end direntry
+
+@set xref-automatic-section-title
+
+@set EDITION 0.9.1
+@set VERSION 0.9.1
+@set UPDATED 2003-11-13
+
+@defindex op
+
+@ifinfo
+This file documents the OpenSS7 XNS/XTI Library.
+
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{The OpenSS7 XNS/XTI Library Reference Manual}, for Version
+@value{VERSION}.
+
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant ot the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@iftex
+@shorttitlepage The OpenSS7 XNS/XTI Library Reference Manual
+@end iftex
+@titlepage
+@title OpenSS7 XNS/XTI Library
+@subtitle Edition @value{EDITION} for XTI version @value{VERSION}
+@subtitle @value{UPDATED}
+@author Brian Bidulock  @cite{@email{bidulock@@openss7.org}}
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+All Rights Reserved. @*
+
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+@end titlepage
+@page
+
+@node Top, Acknowledgements, (dir), (dir)
+@top Main Menu
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{The OpenSS7 XNS/XTI Library Reference Manual}, for Version
+@value{VERSION} of the OpenSS7 XTI Library.
+
+@menu
+* Acknowledgements::
+* Introduction::
+* Reference::
+* Conformance::
+* Multi-Threading::
+* Error Handling::
+* Installation::
+* Bugs::
+* Copying::
+* Documentation License::
+* Concept Index::
+* Type Index::
+* Function Index::
+* Variable Index::
+* File Index::
+
+ --- The Detailed Node Listing ---
+
+Acknowledgements
+
+* Sponsors::                    Sponsors of the XTI Library
+* Contributors::                People who contributed to development of the XTI Library
+
+Reference
+
+* Overview::                    An overview of XTI Functions and Header Files
+* XTI Function Reference::      Reference manual of XTI Functions
+* XTI Header File Reference::   Reference manual of XTI Header Files
+
+XTI Function Reference
+
+* t_accept::                    Accept a connection request.
+* t_addleaf::                   Add a leaf to a point-multipoint connection.
+* t_alloc::                     Allocate an XTI library structure.
+* t_bind::                      Bind a transport endpoint to a transport address.
+* t_close::                     Close a transport endpoint.
+* t_connect::                   Connect a transport endpoint to a transport address.
+* t_errno::                     Report XTI library errors.
+* t_error::                     Generate an XTI error message.
+* t_free::                      Free an XTI library structure.
+* t_getinfo::                   Get protocol-specific transport endpoint information.
+* t_getprotaddr::               Get local and remote transport addresses.
+* t_getstate::                  Get the state of the transport endpoint.
+* t_listen::                    Listen for connection requests.
+* t_look::                      Retrieve an asynchronous event.
+* t_open::                      Open a transport endpoint.
+* t_optmgmt::                   Perform options management for a transport endpoint.
+* t_rcv::                       Receive data on a connection-oriented transport endpoint.
+* t_rcvconnect::                Receive connection confirmation.
+* t_rcvdis::                    Receive disconnect indication.
+* t_rcvleafchange::             Receive a leaf change on a point-multipoint connection.
+* t_rcvrel::                    Receive an orderly release indication.
+* t_rcvreldata::                Receive an orderly release indication with user data.
+* t_rcvudata::                  Receive a unit data indication.
+* t_rcvuderr::                  Receive a unit data error indication.
+* t_rcvv::                      Receive data a place in gather buffers.
+* t_rcvvudata::                 Receive a unit data indication an place in gather buffers.
+* t_removeleaf::                Remove a leaf from a point-to-multipoint connection.
+* t_snd::                       Send data.
+* t_snddis::                    Send disconnect request.
+* t_sndrel::                    Send an orderly release request.
+* t_sndreldata::                Send an orderly release request with data.
+* t_sndudata::                  Send a unit data.
+* t_sndv::                      Send data from non-contiguous buffers.
+* t_sndvudata::                 Send a unit data from non-contiguous buffers.
+* t_strerror::                  Provide a descriptive string for an XTI error.
+* t_sync::                      Synchronize the XTI library to a new file descriptor.
+* t_sysconf::                   Examine XTI library system configuration parameters.
+* t_unbind::                    Unbind a transport endpoint from a transport adddress.
+
+XTI Header File Reference
+
+* xti::                         XTI Library header file.
+* xti_ip::                      Internet Protocol header file.
+* xti_mtp::                     SS7 Message Transfer Part header file.
+* xti_sccp::                    SS7 Signalling Connection Control Part header file.
+* xti_sctp::                    Stream Control Transmission Protocol header file.
+* xti_ss7::                     SS7 header file.
+* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
+* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
+* xti_tcp::                     Transmission Control Protocol header file.
+* xti_udp::                     User Datagram Protocol header file.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@iftex
+@node Acknowledgements
+@end iftex
+@ifnottex
+@node Acknowledgements, Introduction, Top, Top
+@end ifnottex
+@unnumbered Acknowledgements
+@cindex credits
+
+@menu
+* Sponsors::                    Sponsors of the XTI Library
+* Contributors::                People who contributed to development of the XTI Library
+@end menu
+
+@node Sponsors,  ,  , Acknowledgements
+@unnumberedsec Sponsors of the OpenSS7 XTI Library
+@cindex sponsors
+
+Funding for completion of the OpenSS7 XTI Library was provided by:
+
+HOB International.
+
+Additional funding for The OpenSS7 Project was provided by:
+
+@node Contributors,  ,  , Acknowledgements
+@unnumberedsec Contributors to the OpenSS7 XTI Library
+@cindex contributors
+
+The primary contributor to the OpenSS7 XTI Library is Brian F. G. Bidulock.
+
+
+@node Introduction, Reference, Acknowledgements, Top
+@chapter Introduction to the XTI Library
+@cindex introduction
+
+This manual documents how to run, install and port the OpenSS7 XTI Library,
+and how to report bugs.
+
+
+@node Reference, Conformance, Introduction, Top
+@chapter Reference
+@cpindex reference
+
+@menu
+* Overview::                    An overview of XTI Functions and Header Files
+* XTI Function Reference::      Reference manual of XTI Functions
+* XTI Header File Reference::   Reference manual of XTI Header Files
+
+XTI Function Reference
+
+* t_accept::                    Accept a connection request.
+* t_addleaf::                   Add a leaf to a point-multipoint connection.
+* t_alloc::                     Allocate an XTI library structure.
+* t_bind::                      Bind a transport endpoint to a transport address.
+* t_close::                     Close a transport endpoint.
+* t_connect::                   Connect a transport endpoint to a transport address.
+* t_errno::                     Report XTI library errors.
+* t_error::                     Generate an XTI error message.
+* t_free::                      Free an XTI library structure.
+* t_getinfo::                   Get protocol-specific transport endpoint information.
+* t_getprotaddr::               Get local and remote transport addresses.
+* t_getstate::                  Get the state of the transport endpoint.
+* t_listen::                    Listen for connection requests.
+* t_look::                      Retrieve an asynchronous event.
+* t_open::                      Open a transport endpoint.
+* t_optmgmt::                   Perform options management for a transport endpoint.
+* t_rcv::                       Receive data on a connection-oriented transport endpoint.
+* t_rcvconnect::                Receive connection confirmation.
+* t_rcvdis::                    Receive disconnect indication.
+* t_rcvleafchange::             Receive a leaf change on a point-multipoint connection.
+* t_rcvrel::                    Receive an orderly release indication.
+* t_rcvreldata::                Receive an orderly release indication with user data.
+* t_rcvudata::                  Receive a unit data indication.
+* t_rcvuderr::                  Receive a unit data error indication.
+* t_rcvv::                      Receive data a place in gather buffers.
+* t_rcvvudata::                 Receive a unit data indication an place in gather buffers.
+* t_removeleaf::                Remove a leaf from a point-to-multipoint connection.
+* t_snd::                       Send data.
+* t_snddis::                    Send disconnect request.
+* t_sndrel::                    Send an orderly release request.
+* t_sndreldata::                Send an orderly release request with data.
+* t_sndudata::                  Send a unit data.
+* t_sndv::                      Send data from non-contiguous buffers.
+* t_sndvudata::                 Send a unit data from non-contiguous buffers.
+* t_strerror::                  Provide a descriptive string for an XTI error.
+* t_sync::                      Synchronize the XTI library to a new file descriptor.
+* t_sysconf::                   Examine XTI library system configuration parameters.
+* t_unbind::                    Unbind a transport endpoint from a transport adddress.
+
+XTI Header File Reference
+
+* xti::                         XTI Library header file.
+* xti_ip::                      Internet Protocol header file.
+* xti_mtp::                     SS7 Message Transfer Part header file.
+* xti_sccp::                    SS7 Signalling Connection Control Part header file.
+* xti_sctp::                    Stream Control Transmission Protocol header file.
+* xti_ss7::                     SS7 header file.
+* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
+* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
+* xti_tcp::                     Transmission Control Protocol header file.
+* xti_udp::                     User Datagram Protocol header file.
+
+@end menu
+
+@node Overview,  ,  , Reference
+@section Overview
+@cpindex overview
+
+@node XTI Function Reference,  ,  , Reference
+@section XTI Function Reference
+@cpindex functions
+
+@page
+@node t_accept,  ,  , Reference
+@unnumberedsubsec t_accept
+@fnindex t_accept
+
+@subsubheading NAME
+
+@strong{t_accept} - accept a connection request
+
+@subsubheading SYNOPSIS
+@example
+#include <xti.h>
+
+int t_accept(int @var{fd}, int @var{resfd}, struct t_call *@var{call});
+@end example
+
+@subsubheading ARGUMENTS
+@table @var
+@item fd
+the transport endpoint upon which a connection indication was received.
+
+@item resfd
+the transport endpoint upon which to accept the connection.
+
+@item call
+a pointer to a t_call structure containing information about the responding
+endpoint and any data to be transferred in response.
+@end table
+
+@subsubheading DESCRIPTION
+The @var{fd} argument is an integer file descriptor specifying the stream upon
+which a previous connection indication was received with t_listen(3), and for
+which the connection indication is to now be accepted.
+
+The @var{resfd} argument is an integer file descriptor specifying the stream
+upon which to accept the transport connection. @var{resfd} can be the same as
+@var{fd} or different. When @var{resfd} is different from @var{fd}, the caller
+specifies that the connection is to be accepted on the stream associated with
+@var{resfd}. When @var{resfd} is different from @var{fd}, the stream
+associated with @var{resfd} must be an XTI/TLI[1..3] stream on the same
+transport provider that is either in the @code{T_UNBND} state, or is in the
+@code{T_IDLE} state and bound to the same address as the responding address.
+
+@vindex T_IDLE
+@vindex T_UNBND
+
+The @var{call} argument is a pointer to a t_call structure, specifying the
+responding address, @var{addr}, the response options, @var{opt}, and any response user
+data, @var{udata}. format­ ted as follows:
+
+@example
+struct t_call @{
+        struct netbuf addr;             /* address */
+        struct netbuf opt;              /* options */
+        struct netbuf udata;            /* data */
+        int sequence;                   /* identification */
+@};
+@end example
+
+The @var{addr}, @var{opt} and @var{udata} members of the t_call structure are netbuf(3)
+structures, each formatted as follows:
+
+@example
+struct netbuf @{
+        unsigned int maxlen;            /* max length */
+        unsigned int len;               /* current length */
+        char *buf;                      /* data */
+@};
+@end example
+
+@table @var
+@item addr
+A netbuf(3) structure that specifies the responding address. The responding
+address is the address accepting the connection.
+@code{@var{call}->addr.maxlen} is set to zero (0) by the caller and ignored by
+the provider.  @code{@var{call}->addr.len} is set to the length of the
+responding address.  If the length of the responding address is zero (0) then
+the destination address of the connection indication is used as the responding
+address.  @code{@var{call}->addr}.  @var{buf} points to the responding
+address.
+
+@item opt
+A netbuf(3) structure that specifies the responding options. The responding
+options can be both end-to-end and local transport options.
+@code{@var{call}->opt.maxlen} is set to zero (0) by the caller and is ignored
+by the provider.  @code{@var{call}->opt.len} is set to the length of the
+options. If the length of the responding options is zero (0) no options are
+specified.  @code{@var{call}->opt.buf} points to the options.
+
+@item udata
+A netbuf(3) structure that specifies the data to send with the connection
+response. @code{@var{call}->udata.maxlen} is set to zero (0) by the caller and
+is ignored by the provider. @code{@var{call}->udata.len} is set to the length
+of the data. If the length of the data is zero (0) no data is included in the
+response message.  @code{@var{call}->udata.buf} points to the data.
+
+@item sequence
+specifies a sequence number of the connection indication that is to be
+accepted. This value was returned by a previous @var{call} to t_lis­ ten(3).
+@end table
+
+@subsubheading CAVEATS
+t_accept() is only valid in state @code{T_INCON} with an out­ standing number
+of connection indications greater than zero (0).
+
+@vindex T_INCON
+
+t_accept() is only valid for transport service providers of service type
+@code{T_COTS} or @code{T_COTS_ORD}.
+
+@vindex T_COTS
+@vindex T_COTS_ORD
+
+@subsubheading RETURN VALUE
+Upon success, t_accept() returns zero (0). Upon failure, t_accept() returns -1
+and sets t_errno(3) to an appropriate error number.
+
+@subsubheading ERRORS
+When t_accept() fails, it returns -1 and sets t_errno(3) to an appropriate
+error number as follows:
+
+@vtable @error
+@item TACCES
+The caller did not have sufficient permissions to accept a connection on the
+@var{resfd} file descriptor, or did not have sufficient permissions to use the
+responding address specified in @code{@var{call}->addr}.  
+
+@item TBADADDR
+The address specified was of an invalid format or contained invalid
+information. This error is returned from the transport service provider.
+
+@item TBADDATA
+The amount of data specified for the @var{call} and underlying transport
+service provider was invalid (i.e. was outside the protocol limits). See
+t_getinfo(3) and t_open(3) for more information.
+
+@item TBADF
+The @var{fd} or @var{resfd} file descriptor was invalid.
+
+@item TBADOPT
+The options specified were of an invalid for­ mat or contained invalid
+information. This error is returned from the transport service provider.  See
+t_optmgmt(3) for more information on option formats.
+
+@item TBADSEQ
+The sequence number provided was invalid, or is not associated with an
+outstanding connec­ tion indication.
+
+@item TINDOUT
+The file descriptor @var{resfd} has outstanding connection indications.
+
+@item TLOOK
+An asynchronous event occured before the @var{call} could complete. See
+t_look(3) for more information.
+
+@item TNOTSUPPORT
+The @var{call} requires the use of a TLI primitive not supported by the
+underlying transport provider.
+
+@item TOUTSTATE
+The @var{call} was issued with the interface in an incorrect state.
+
+@item TPROTO
+A protocol error occured between the XTI library and the underlying transport
+provider.
+
+@item TPROVMISMATCH
+The transport provider associated with @var{resfd} is not the same as the
+transport provider associated with @var{fd}.
+
+@item TRESADDR
+The file descriptor @var{resfd} was bound to a different address than the
+responding address.
+
+@item TRESQLEN
+The file descriptor @var{resfd} is listening (i.e. it was bound with a
+@var{qlen} > 0).
+
+@vindex qlen
+
+@item TSYSERR
+A Linux system error occurred and the Linux error number is set in errno(3).
+@end vtable
+
+@subsubheading SEE ALSO
+netbuf(3), t_listen(3).
+
+@subsubheading CONFORMING TO
+XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
+
+@subsubheading REFERENCES
+
+Trademarks mentioned are the property of their owners.
+
+@subsubheading VERSIONS
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/03/04 23:15:47 $.
+
+@subsubheading AUTHOR
+@format
+@flushleft
+Brian F. G. Bidulock @email{bidulock@@openss7.org}
+The OpenSS7 Project @uref{http://www.openss7.org/}
+@end flushleft
+@end format
+
+@subsubheading COPYRIGHT
+@format
+@flushleft
+Copyright @copyright{} 1997-2004 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
+All Rights Reserved.
+(See roff source for permission notice.)
+@end flushleft
+@end format
+
+@subsubheading TRADEMARKS
+@format
+@flushleft
+Linux® is a registered trademark of Linus Torvalds
+UNIX® is a registered trademark of The Open Group.
+OpenSS7tm is a trademark of OpenSS7 Corporation.
+Other trademarks are the property of their respective owners.
+@end flushleft
+@end format
+
+
+@page
+@node t_addleaf,  ,  , Reference
+@subsection t_addleaf
+@fnindex t_addleaf
+
+@subsubheading NAME
+@emph{t_addleaf} - add a point to a point to multipoint connection
+
+@subsubheading SYNOPSIS
+@example
+#include <@file{xti.h}>
+
+int t_addleaf(int @var{fd}, int @var{leafid}, struct netbuf *@var{addr});
+@end example
+
+@subsubheading ARGUMENTS
+@table @var
+@item fd
+the transport endpoint to which to add a leaf.
+
+@item leafid
+the identifier for the leaf.
+
+@item addr
+a pointer to a netbuf(3) structure containing the address of the leaf.
+@end table
+
+@subsubheading DESCRIPTION
+Requests that an endpoint be added to a point to multipoint connection.
+
+@var{fd} is the file descriptor of the local transport endpoint.
+
+@var{leafid}  is  a transport user assigned integer value which will be used
+to identify the point added to the point to multipoint connection in
+subsequent interactions with the transport user.
+
+@var{addr} is a netbuf(3) structure specifying on call the address of the
+local point being  added  to  the point  to multipoint connection.  No
+information is returned in @var{addr}.  @samp{@var{addr}->maxlen} is ignored
+by the call.  @samp{@var{addr}->len} is the length of the address.  If
+@samp{@var{addr}->len} is zero, it indicates that no  address  is provided.
+@samp{@var{addr}->buf} is a pointer to the user buffer containing the address.
+
+@subsubheading CAVEATS
+@emph{t_addleaf()} is only valid in the @dfn{T_DATAXFER} state.
+
+@emph{t_addleaf()}  is  only valid for transport service providers of service
+type @dfn{T_COTS} or @dfn{T_COTS_ORD} that support point to multipoint
+connection management.
+
+In synchronous mode, @emph{t_addleaf()} blocks until a leaf  change
+confirmation  is  received.   In  asynchronous  mode where no leaf change
+confirmation is immediately avaialble, @emph{t_addleaf()} fails, returns -1
+and sets t_errno(3) to @error{TNODATA}.
+
+@subsubheading RETURN VALUE
+Upon success, @emph{t_addleaf()} returns zero (0) and confirms the addition of
+the requested  leaf.   Upon failure, @emph{t_addleaf()} returns -1 and sets
+t_errno(3) to an appropriate error number.
+
+@subsubheading ERRORS
+When @emph{t_addleaf()} fails, it returns -1 and sets t_errno(3) to an
+appropriate error number as follows:
+
+@table @error
+@item TBADF
+@var{fd} is invalid.
+
+@item TADDRBUSY
+address specificed was already in use by another transport endpoint.
+
+@item TBADADDR
+address specified was of an invalid format or contained invalid information.
+
+@item TLOOK
+asynchronous  event  occured  before the call could complete.  See
+@ref{t_look}, for more information.
+
+@item TNOADDR
+address was not specified and the transport provider could not assign one.
+
+@item TNODATA
+attempt was made to read the add leaf confirmation but no add  leaf
+confirmation  was available.
+
+@item TNOTSUPPORT
+call  requires  the use of a TLI primitive not supported by the underlying
+transport provider.
+
+@item TOUTSTATE
+call was issued with the interface in an incorrect state.
+
+@item TPROTO
+protocol error occured between the XTI library and the underlying transport
+provider.
+
+@item TSYSERR
+Linux system error occured and the Linux error number is set in errno(3).
+@end table
+
+@subsubheading SEE ALSO
+netbuf(3), t_rcvleafchange(3), t_removeleaf(3).
+
+@subsubheading CONFORMING TO
+XTI/TLI[1], TPI[2], XPG5, XNS 5.2[3], SUSv2[4].
+
+@subsubheading REFERENCES
+
+@enumerate
+@item
+XOpen Transport Interface, n.d., XPG, X Programmer's Group.  <http://www.open-
+group.org/onlinepubs/>
+
+@item
+Transport Provider Interface (TPI) Specification, Draft 2, 1999, (Parsippany,
+New Jersey), Open Group, Open Group Publication.
+<http://www.opengroup.org/onlinepubs/>
+
+@item
+Technical Standard: Network Services (XNS), 1999, Open Group, Open Group
+Publication. [ISBN 1-85912-241-8] <http://www.opengroup.org/onlinepubs/>
+
+@item
+Single UNIX Specification, Open Group, Open Group Publication.
+<http://www.open- group.org/onlinepubs/>
+
+@end enumerate
+
+@*
+Trademarks mentioned are the property of their owners.
+
+@subsubheading VERSIONS
+@format
+@flushleft
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/03/04 23:15:47 $.
+@end flushleft
+@end format
+
+@subsubheading AUTHOR
+@format
+@flushleft
+Brian F. G. Bidulock <bidulock@@openss7.org>
+The OpenSS7 Project http://www.openss7.org/
+@end flushleft
+@end format
+
+@subsubheading COPYRIGHT
+@format
+@flushleft
+Copyright (C) 1997-2004 OpenSS7 Corporation.
+All Rights Reserved.
+(See roff source for permission notice.)
+@end flushleft
+@end format
+
+@subsubheading TRADEMARKS
+@format
+@flushleft
+OpenSS7tm  is a trademark of OpenSS7 Corporation.
+Linux(R)  is a registered trademark of Linus Torvalds.
+UNIX(R)  is a registered trademark of The Open Group.
+Solaris(R)  is a registered trademark of Sun Microsystems.
+Other trademarks are the property of their respective owners.
+@end flushleft
+@end format
+
+@page
+@node t_alloc,  ,  , Reference
+@subsection t_alloc
+@fnindex t_alloc
+
+@page
+@node t_bind,  ,  , Reference
+@subsection t_bind
+@fnindex t_bind
+
+@page
+@node t_close,  ,  , Reference
+@subsection t_close
+@fnindex t_close
+
+@page
+@node t_connect,  ,  , Reference
+@subsection t_connect
+@fnindex t_connect
+
+@page
+@node t_errno,  ,  , Reference
+@subsection t_errno
+@fnindex t_errno
+
+@page
+@node t_error,  ,  , Reference
+@subsection t_error
+@fnindex t_error
+
+@page
+@node t_free,  ,  , Reference
+@subsection t_free
+@fnindex t_free
+
+@page
+@node t_getinfo,  ,  , Reference
+@subsection t_getinfo
+@fnindex t_getinfo
+
+@page
+@node t_getprotaddr,  ,  , Reference
+@subsection t_geprotaddr
+@fnindex t_geprotaddr
+
+@page
+@node t_getstate,  ,  , Reference
+@subsection t_getstate
+@fnindex t_getstate
+
+@page
+@node t_listen,  ,  , Reference
+@subsection t_listen
+@fnindex t_listen
+
+@page
+@node t_look,  ,  , Reference
+@subsection t_look
+@fnindex t_look
+
+@page
+@node t_open,  ,  , Reference
+@subsection t_open
+@fnindex t_open
+
+@page
+@node t_optmgmt,  ,  , Reference
+@subsection t_optmgmt
+@fnindex t_optmgmt
+
+@page
+@node t_rcv,  ,  , Reference
+@subsection t_rcv
+@fnindex t_rcv
+
+@page
+@node t_rcvconnect,  ,  , Reference
+@subsection t_rcvconnect
+@fnindex t_rcvconnect
+
+@page
+@node t_rcvdis,  ,  , Reference
+@subsection t_rcvdis
+@fnindex t_rcvdis
+
+@page
+@node t_rcvleafchange,  ,  , Reference
+@subsection t_rcvleafchange
+@fnindex t_rcvleafchange
+
+@page
+@node t_rcvrel,  ,  , Reference
+@subsection t_rcvrel
+@fnindex t_rcvrel
+
+@page
+@node t_rcvreldata,  ,  , Reference
+@subsection t_rcvreldata
+@fnindex t_rcvreldata
+
+@page
+@node t_rcvudata,  ,  , Reference
+@subsection t_rcvudata
+@fnindex t_rcvudata
+
+@page
+@node t_rcvuderr,  ,  , Reference
+@subsection t_rcvuderr
+@fnindex t_rcvuderr
+
+@page
+@node t_rcvv,  ,  , Reference
+@subsection t_rcvv
+@fnindex t_rcvv
+
+@page
+@node t_rcvvudata,  ,  , Reference
+@subsection t_rcvvudata
+@fnindex t_rcvvudata
+
+@page
+@node t_removeleaf,  ,  , Reference
+@subsection t_removeleaf
+@fnindex t_removeleaf
+
+@page
+@node t_snd,  ,  , Reference
+@subsection t_snd
+@fnindex t_snd
+
+@page
+@node t_snddis,  ,  , Reference
+@subsection t_snddis
+@fnindex t_snddis
+
+@page
+@node t_sndrel,  ,  , Reference
+@subsection t_sndrel
+@fnindex t_sndrel
+
+@page
+@node t_sndreldata,  ,  , Reference
+@subsection t_sndreldata
+@fnindex t_sndreldata
+
+@page
+@node t_sndudata,  ,  , Reference
+@subsection t_sndudata
+@fnindex t_sndudata
+
+@page
+@node t_sndv,  ,  , Reference
+@subsection t_sndv
+@fnindex t_sndv
+
+@page
+@node t_sndvudata,  ,  , Reference
+@subsection t_sndvudata
+@fnindex t_sndvudata
+
+@page
+@node t_strerror,  ,  , Reference
+@subsection t_strerror
+@fnindex t_strerror
+
+@page
+@node t_sync,  ,  , Reference
+@subsection t_sync
+@fnindex t_sync
+
+@page
+@node t_sysconf,  ,  , Reference
+@subsection t_sysconf
+@fnindex t_sysconf
+
+@page
+@node t_unbind,  ,  , Reference
+@subsection t_unbind
+@fnindex t_unbind
+
+
+@page
+@node XTI Header File Reference,  ,  , Reference
+@section XTI Header File Reference
+
+@cpindex header files
+
+@page
+@node xti,  ,  , Reference
+@subsection xti
+@pgindex xti
+
+@cpindex header files, xti
+@cpindex xti header file
+
+@page
+@node xti_ip,  ,  , Reference
+@subsection xti_ip
+@pgindex xti_ip
+
+@cpindex header files, xti ip
+@cpindex xti ip header file
+@cpindex ip, xti header file
+
+@page
+@node xti_mtp,  ,  , Reference
+@subsection xti_mtp
+@pgindex xti_mtp
+
+@page
+@node xti_sccp,  ,  , Reference
+@subsection xti_sccp
+@pgindex xti_sccp
+
+@page
+@node xti_sctp,  ,  , Reference
+@subsection xti_sctp
+@pgindex xti_sctp
+
+@page
+@node xti_ss7,  ,  , Reference
+@subsection xti_ss7
+@pgindex xti_ss7
+
+@page
+@node xti_sscop,  ,  , Reference
+@subsection xti_sccop
+@pgindex xti_sccop
+
+@page
+@node xti_tcap,  ,  , Reference
+@subsection xti_tcap
+@pgindex xti_tcap
+
+@page
+@node xti_tcp,  ,  , Reference
+@subsection xti_tcp
+@pgindex xti_tcp
+
+@page
+@node xti_udp,  ,  , Reference
+@subsection xti_udp
+@pgindex xti_udp
+
+
+
+
+@page
+@node Conformance, Multi-Threading, Reference, Top
+@chapter Conformance
+@cindex conformance
+
+This section lists the standards conformance of the OpenSS7 XTI Library.
+
+
+
+
+@node Multi-Threading, Error Handling, Conformance, Top
+@chapter Multi-Threading
+@cindex thread safety
+
+
+@node Error Handling, Installation, Multi-Threading, Top
+@chapter Error Handling
+@cindex error handling
+
+This chapter describes error handling in the XTI Library.
+
+
+
+@node Installation, Bugs, Error Handling, Top
+@chapter Installation
+@cindex installation
+
+This chapter describes configuration, compilation and installation of the XTI
+library.
+
+
+
+@node Bugs, Copying, Installation, Top
+@chapter Bugs
+@cindex bugs
+
+This is a description of the known bugs, installation troubles, known causes of
+trouble, troubleshooting.
+
+@appendix Appendices
+
+@node Copying, Documentation License, Bugs, Top
+@unnumbered Copying
+@include lesser.texi
+
+@node Documentation License, Concept Index, Copying, Top
+@unnumbered Dcoumentation License
+@include fdl.texi
+
+@node Concept Index, Type Index, Documentation License, Top
+@unnumbered Concept Index
+
+@printindex cp
+
+@node Type Index, Function Index, Concept Index, Top
+@unnumbered Type Index
+
+@printindex tp
+
+@node Function Index, Variable Index, Type Index, Top
+@unnumbered Function and Macro Index
+
+@printindex fn
+
+@node Variable Index, File Index, Function Index, Top
+@unnumbered Variable and Constant Macro Index
+
+@printindex vr
+
+@node File Index, , Variable Index, Top
+@unnumbered Program and File Index
+
+@printindex pg
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $
+ @(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,30 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/02 12:04:52 $ by $Author: brian $
+ Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $"
+#ident "@(#) $RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $"
 
-static char const ident[] = "$RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $";
+static char const ident[] = "$RCSfile: insf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $";
 
+#define _XOPEN_SOURCE 600
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <getopt.h>
+
+#include <stropts.h>
+
+int
+main(int argc, char *argv[])
+{
+	exit(0);
+}

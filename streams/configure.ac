@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/03/01 11:55:29 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/03/04 23:15:46 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/01 11:55:29 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.4 2004/03/01 11:55:29 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.5 2004/03/04 23:15:46 brian Exp $])
 AC_PREREQ(2.57)
 AC_INIT([streams],[0.9.2],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/timod.c])
@@ -99,7 +99,7 @@ AC_CHECK_LIB([c], [main])
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_CHECK_HEADERS([argz.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h unistd.h wchar.h])
+AC_CHECK_HEADERS([argz.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h unistd.h wchar.h arpa/inet.h netinet/in.h sys/time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STAT
@@ -120,6 +120,8 @@ AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
 AM_GNU_GETTEXT
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_FORK
 AC_PROG_GCC_TRADITIONAL
 AC_HEADER_MAJOR
 if test :"${cross_compiling-no}" != :yes ; then
@@ -127,7 +129,6 @@ if test :"${cross_compiling-no}" != :yes ; then
 	AC_FUNC_MALLOC
 	AC_FUNC_SETPGRP
 fi
-AC_FUNC_FORK
 AC_FUNC_MEMCMP
 AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_MMAP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strinfo.8.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: strinfo.8.man,v 0.9.2.2 2004/03/04 23:15:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRINFO 8 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRINFO 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -126,6 +126,34 @@ fails, it returns a non-zero exit status and displays a diagnostic on
 .\"
 .SH EXAMPLES
 .PP
+Example output of
+.B strinfo -m
+.RS
+.nf
+\fC\s-1
+Device: 'sad', dcookie 0xf, flags:0x4, str 0x19a69e8
+Device: 'slog', dcookie 0x10, flags:0x4, str 0x19a6c18
+Device: 'rs', dcookie 0x11, flags:0x4, str 0x19bcb00
+Module: 'bufcall', flags:0x1, str 0x19a5c00
+Module: 'ldterm', flags:0x0, str 0x19cc858
+\s+1\fP
+.fi
+.RE
+.PP
+Example output of
+.B strinfo -q
+.RS
+.nf
+\fC\s-1
+Active Stream Heads
+sth      sth_dev  sth_rq   sth_wq   sth_flag rq->q_first
+05a7ee00 00110001 05ad7000 05ad7074 00000818 00000000
+
+STREAMS Service Queue
+Queue 0x5ad7000 Flags 0x10
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH DEVICES
@@ -151,10 +179,21 @@ command.
 .\"
 .SH COMPATIBILITY
 .PP
+.B strinfo
+is an
+.BR AIX \(rg-specific
+command.
+.B Linux Fast-STREAMS
+provide
+.B strinfo
+for compatibility with
+.BR AIX \(rg.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR AIX \(rg
+documentation.
 .\"
 .\"
 .SH HISTORY

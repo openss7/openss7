@@ -1,0 +1,253 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: strerr.8.man,v 0.9.2.1 2004/03/04 23:15:47 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRERR 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.\"
+.\"
+.SH NAME
+.B strerr
+\- receives error log messages from the \fISTREAMS\fR \fBlog\fR(4) driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+.B strerr
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strerr
+daemon receives error log messages from the
+.I STREAMS
+log driver and appends them to a log file.  The error log files produced
+reside in the directory
+.BR /var/adm/streams ,
+and are named
+.BI error. mm-dd\fR,
+where
+.I mm
+is the month and
+.I dd
+is the day of the messages comtained in each log file.
+.PP
+Messages that appear in the error log are intended to report exceptional
+conditions that require the attention of the person who administers your
+system.  Those messages indicating the total failure of a
+.I STREAMS
+driver or module should have the
+.B F
+flag set.  Those messages requiring the immediate attention of the
+administrator should have the
+.B N
+flag set, which causes the error logger to send the message to that person by
+way of the
+.BR mail (1)
+command.  The priority level usually has no meaning in the error log, but does
+have meaning if the message is also sent to the tracer process.
+.PP
+Once initiated, the
+.B strerr
+daemon continues to execute until terminated by the user.  Usually, the
+.B strerr
+daemon is executed asynchronously.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The format of an error log message is:
+.RB < seq "> <" time "> <" ticks "> <" flags "> <" mid "> <" sud "> <" text >
+These fields are defined as follows:
+.TP
+.RB < seq >
+Error sequence number.
+.TP
+.RB < time >
+Time of the message in hh:mm:ss.
+.TP
+.RB < ticks >
+Time of the message in machine ticks since boot priority level.
+.TP
+.RB < flags >
+One of the following values:
+.RS
+.TP
+.B T
+The message was also sent to a tracing process.
+.TP
+.B F
+Indicates a fatal error.
+.TP
+.B N
+Send mail to the person who administers your system.
+.RE
+.TP
+.RB < mid >
+Module ID number of source.
+.TP
+.RB < sud >
+Sub-ID number of source.
+.TP
+.RB < text >
+Formatted text of the error message.
+On multiprocessor systems,
+.RB < text >
+is composed of two parts:
+.RS
+.IP \(bu
+the number of processors where the owner of the message has sent it.
+.IP \(bu
+the formatted text itself.
+.RE
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+Only one
+.BR strerr
+daemon at a time is permitted to open the
+.I STREAMS
+log driver.  If a module or driver is generating a large number of error
+messages, running the error logeer causes a degradation in
+.I STREAMS
+performance.  If a large number of messages are generated in a short time, the
+log driver amy not be able to deliver some of the messages.  This situation is
+indicated by gaps in the sequence numbering of the messages in the log files.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strerr
+contains the
+.B strerr
+command.
+.TP
+.BI /var/adm/streams/error. mm-dd
+Error log file.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR log (4),
+.BR strclean (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B strerr
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR HPUX \(rg,
+.BR Solaris \(rg,
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2" ;
+.[
+svr42cr
+.]
+.BR HPUX \(rg,
+.BR Solaris \(rg,
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

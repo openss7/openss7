@@ -599,7 +599,7 @@ static int socksysgetpmsg(struct file *f, struct strbuf *ctlp, struct strbuf *da
 }
 #endif
 
-extern struct proto_ops *sock_p_ops;
+//extern struct proto_ops *sock_p_ops;
 
 static struct proto_ops socksys_p_ops ____cacheline_aligned = {
 	family:0,
@@ -621,7 +621,7 @@ static struct proto_ops socksys_p_ops ____cacheline_aligned = {
 	sendpage:tli_sendpage,
 };
 
-extern struct file_operations *sock_f_ops;
+//extern struct file_operations *sock_f_ops;
 
 struct file_operations socksys_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
@@ -648,14 +648,16 @@ static int __init socksys_init(void)
 #else
 	printk(KERN_INFO SOCKSYS_SPLASH);
 #endif
-	xchg(&sock_f_ops, &socksys_f_ops);
-	xchg(&sock_p_ops, &socksys_p_ops);
+	(void) socksys_f_ops;
+	(void) socksys_p_ops;
+//	xchg(&sock_f_ops, &socksys_f_ops);
+//	xchg(&sock_p_ops, &socksys_p_ops);
 	return (0);
 };
 static void __exit socksys_exit(void)
 {
-	xchg(&sock_f_ops, NULL);
-	xchg(&sock_p_ops, NULL);
+//	xchg(&sock_f_ops, NULL);
+//	xchg(&sock_p_ops, NULL);
 	return (void) (0);
 };
 

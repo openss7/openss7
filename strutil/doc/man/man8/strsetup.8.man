@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strsetup.8.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: strsetup.8.man,v 0.9.2.2 2004/03/04 23:15:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRSETUP 8 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRSETUP 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -129,6 +129,95 @@ By default, this uses the configuration file
 If no file exists or is specified, only clone devices will be created.
 .\"
 .\"
+.SH "FILE FORMAT"
+.PP
+Each line in the configuration file is of the format:
+.RB < driver_name "> <" filename "> <" file_mode "> <" minor_number >.
+.TP
+.RB < driver_name >
+Specifies the name of the driver as reported by the
+.B strsetup -c
+command.  This field is used to match the names read by the
+.B strsetup
+comand from the kernel and must match exactly (the match is case sensistive).
+.TP
+.RB < filename >
+Specifies the full path name of the character special file or files to be
+created when
+.B driver_name
+is configured into the kernel.  The
+.I filename
+can contain one conversion specifier in the style of
+.BR printf (3).
+This conversion specifier is used to include a minor device number in the
+filename.  The permitted conversions are the following:
+.RS
+.IP \fB%d\fR
+Prints the minor number as a signed decimal.
+.IP \fB%x\fR
+Prints the minor number as hexadecimal with lower case letters.
+.IP \fB%X\fR
+Prints the minor number as hexadecimal with upper case letters.
+.IP \fB%o\fR
+Prints the minor number as octal.
+.IP \fB%u\fR
+Prints the minor number as an unsigned decimal.
+.IP \fB%i\fR
+Prints the minor number as a signed decimal.
+.PP
+Note that you must use a double percent sign (%%) to include a percent sign in
+the filename.  Optionally, each of these conversions can include a
+specification for some number of leading 0's.  This is done by following %
+with a 0 and one or more digits specifying the total number of digits to be
+printed.  The 0 must appear after the %.  See
+.BR printf (3)
+for more information.  Any directories in the path of the filename that do not
+exist are created.
+.RE
+.TP
+.RB < file_mode >
+Specifies the file mode assigned to the file when it is created.  The
+.I file_mode
+field must be in octal.
+.TP
+.RB < minor_number >
+Specifies the minor device number field.  The
+.B strsetup
+command reads the major device numbers from the kernel.  This field indicates
+to the
+.B strsetup
+command how to assign minor device numbers.  The
+.I minor_number
+field can contain one of the following values:
+.RS
+.TP
+.B clone
+Indicates that the device should be created as a clone device.  In this case
+the major number becomes that of the special
+.BR clone (4)
+pseudo-device driver and the minor device number becomes the device's major
+number.  Note that the word \(lqclone\(rq must be lower case.
+.TP
+.B N
+Creates a single device with the minor device number
+.IR N .
+Note that
+.I N
+is a decimal number.
+.TP
+.B M-N
+Creates
+.IR M - N
+nodes with the devices' major numbers and minor numbers between
+.IR M " and " N .
+Note that
+.IR M " and " N
+are decimal numbers.  When a range of minor numbers is specified, a filename
+conversion specifier can be used to make certain that each node created is
+unique.
+.RE
+.\"
+.\"
 .SH DIAGNOSTICS
 .PP
 .\"
@@ -136,11 +225,84 @@ If no file exists or is specified, only clone devices will be created.
 .SH NOTICES
 .PP
 .B strsetup -i
-should be run by the system at boot time.
+should be run by the system at boot time.  This creates the device special
+files for any new STREAMS modules.
 .\"
 .\"
 .SH EXAMPLES
 .PP
+An example
+.B strsetup
+configuration file for use with the command
+.BI "strsetup -f " filename
+is as follows:
+.RS
+.nf
+\fC\s-2
+#
+# strsetup - sample configuration file
+#
+
+# driver name   filename                file mode       minor number
+
+ptm             /dev/ptmx               0666            clone
+log             /dev/streams/log        0666            clone
+nuls            /dev/streams/nuls       0666            clone
+echo            /dev/streams/echo       0666            clone
+sad             /dev/sad/admin          0666            clone
+pts             /dev/pts/%d             0666            0-127
+\s+2\fP
+.fi
+.RE
+.PP
+The following is sample output from the
+.B strsetup
+command:
+.RS
+.nf
+\fC\s-2
+#> /usr/sbin/strsetup -c
+
+STREAMS Configuration Information...Fri Nov  3 14:23:36 1995
+
+           Name       Type   Major  Module ID
+           ----       ----   -----  ---------
+          clone     device      32          0
+            dlb     device      52       5010
+          kinfo     device      53       5020
+            log     device      54         44
+           nuls     device      55       5001
+           echo     device      56       5000
+            sad     device      57         45
+           pipe     device      58       5304
+       xtisoUDP     device      59       5010
+       xtisoTCP     device      60       5010
+      xtisoUDP+     device      61       5010
+      xtisoTCP+     device      62       5010
+            ptm     device      63       7609
+            pts     device       6       7608
+            bba     device      64      24880
+            lat     device       5          5
+          pppif     module               6002
+       pppasync     module               6000
+        pppcomp     module               6001
+        bufcall     module                  0
+           null     module               5002
+           pass     module               5003
+           errm     module               5003
+           ptem     module               5003
+          spass     module               5007
+         rspass     module               5008
+        pipemod     module               5303
+          timod     module               5006
+         tirdwr     module                  0
+          ldtty     module               7701
+          ifnet     module               5501
+
+        Configured devices = 15, modules = 15
+\s+2\fP
+.fi
+.RE
 .\"
 .\"
 .SH DEVICES
@@ -164,6 +326,7 @@ the default configuration file.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR strsetup.conf (5),
 .\"
 .\"
 .SH BUGS
@@ -172,10 +335,20 @@ the default configuration file.
 .\"
 .SH COMPATIBILITY
 .PP
+.B strsetup
+is an
+.BR OSF \(rg-specific function.
+.B Linux Fast-STREAMS
+provides
+.B strsetup
+for compatibility with
+.BR OSF \(rg.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR OSF \(rg
+documentation.
 .\"
 .\"
 .SH HISTORY

@@ -1,0 +1,271 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocindent
+.\"
+.\" @(#) $Id: strace.8.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRACE 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.\"
+.\"
+.SH NAME
+.B strace
+\- write \fISTREAMS\fR event trace messages to the standard output
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrace\fR [ \fImod\fR \fIsub\fR \fIpri\fR ] ...
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strace
+command gets
+.I STREAMS
+event trace messages from
+.I STREAMS
+drivers and modules via the
+.I STREAMS
+log driver
+.RB ( strlog (4)),
+and writes these messages to standard output.  By default,
+.B strace
+without arguments writes all
+.I STREAMS
+trace messages from all drivers and modules.
+.B strace
+with command-line arguments limits the trace messages received.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The arguments, which must be specified in groups of three, are:
+.TP
+.B mod
+Specifies the
+.I STREAMS
+module identification number from the
+.B streamtab
+entry.
+.TP
+.B sub
+Specifies a subidentification number (often corresponding to a minor device).
+.TP
+.B pri
+Specifies a tracing priority level.
+.B strace
+gets messages of a level equal to or less than the value specified by
+.BR pri .
+Only positive integer values are allowed.
+.PP
+The value
+.RI \*(lq all \*(rq
+can be used for any argument in the
+.B strace
+command line to indicate that there are no restrictions for that argument.
+.PP
+Multiple sets of the three arguments can be specified to obtain the messages
+from more than one driver or module.
+When
+.B strace
+is invoked, the log driver compares the sets of command line arguments with
+actual trace message, returning only messages that satisfy the specified
+criteria.
+.\"
+.\"
+.SH FORMAT
+.PP
+.I STREAMS
+trace event messages have the following format:
+.HP
+.RB < seq "> <" time "> <" tick "> <" pri "> <" ind "> <" mod "> <" sub "> <" text >
+.PP
+Components are interpreted as follows:
+.TP
+.RB < seq >
+Trace event sequence number.
+.TP
+.RB < time >
+Time the message was sent expressed in hh:mm:ss.
+.TP
+.RB < tick >
+Time the message was sent express in machine ticks since last boot.
+.TP
+.RB < pri >
+Tracing priority level as defined by the
+.I STREAMS
+driver or module that originates the messages.
+.TP
+.RB < ind >
+Any combination of the following three message indicators:
+.RS
+.IP \fBE\fP 3
+The message has also been saved in the error log.
+.IP \fBF\fP
+The message signalled a fatal error.
+.IP \fBN\fP
+The message has also been mailed to the system administrator.
+.RE
+.TP
+.RB < mod >
+Module identification number of the trace message source.
+.TP
+.RB < sub >
+Subidentification number of the trace message source.
+.TP
+.RB < text >
+Trace message text.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+Only one
+.B strace
+process can open the
+.I STREAMS
+log driver at a time.
+.PP
+.B strace
+runs until terminated by the caller.
+.PP
+Running
+.B strace
+with several sets of arguments can impair
+.I STREAMS
+performance, particularly for those modules and drivers that are sending the
+messages.
+Also be aware that
+.B strace
+may not be able to handle a large number of messages.  If drivers and modules
+return messages to
+.B strace
+too quickly, some may be lost.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strace
+contains the
+.B strace
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR HPUX \(rg,
+.BR Solaris \(rg,
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2" ;
+.[
+svr42cr
+.]
+.BR HPUX \(rg,
+.BR Solaris \(rg,
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

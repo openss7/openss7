@@ -1,0 +1,211 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: strvf.8.man,v 0.9.2.1 2004/03/04 23:15:47 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRVF 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.\"
+.\"
+.SH NAME
+.B strvf
+\- \fISTREAMS\fR verification tool
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrvf\fR [\fIoptions\fR]
+.HP 12
+\fBstrvf\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrvf\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrvf\fR {\fB-C\fR|\fB--copying\fR}
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strvf
+command executes a series of subcommands that verify whether or not
+.I STREAMS
+is currently installed and configured on your system.  All output is sent to
+.IR stdout .
+Verbose output is always sent to the logfile
+.BR /var/adm/streams/strvf.log .
+.PP
+These subcommands make sure that the
+.I STREAMS
+kernel daemons are running and that
+.BR open (2),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR ioctl (2)
+and
+.BR close (2)
+can be performed on
+.BR /dev/echo .
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase, or specify the verbosity of the output.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppress normal output.
+.TP
+\fB-h\fR, \fB--help\fR
+Print usage information and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+Print version information and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+Print copying information and exit.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Sample output:
+.RS
+.nf
+\fC\s-1
+-> Logging results to /var/adm/streams/strvf.log
+--------------------------------------------------------
+-> Verify HP Streams installation. Verify open, putmsg  <-
+-> getmg, ioctl, and close can be performed on a stream.<-
+--------------------------------------------------------
+---------------------------------------------
+-> HP Streams is installed and operational <-
+---------------------------------------------
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.B /dev/echo
+Loopback
+.I STREAMS
+driver used by
+.BR strvf .
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strvf
+contains the
+.B strvf
+command.
+.TP
+.B /var/adm/streams/strvf.log
+contains a verbose description and status of all sub-commands.
+.TP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR HPUX \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR HPUX \(rg.
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.2 2004/03/04 23:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH 8 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH AUTOPUSH 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -428,7 +428,7 @@ field is
 An exit status of two (2) indicates that option syntax was in error.
 .TP
 .BR -f " or " --file
-An exit status of zero (0) indicates that all entries the
+An exit status of zero (0) indicates that all entries in the
 provided file were configurated as specified; one (1) indicates that at least
 one entry was not configured.  Diagnostics concerning the line of the file
 that failed is printed on
@@ -449,13 +449,13 @@ configured with an autopush list and a diagnostic is printed on
 .IR stderr .
 .TP
 .BR -s " or " --set
-An exist status of zero (0) indicates that the autopush module
+An exit status of zero (0) indicates that the autopush module
 list was configured as specified; one (1) indicates that an error occured and
 the autopush list was not configured.  A diagnostic is printed on
 .IR stderr .
 .TP
 .BR -c " or " --clone
-An exist status of zero (0) indicates that the clonable minor
+An exit status of zero (0) indicates that the clonable minor
 was configured as specified; one (1) indicates that an error occured and
 the clonable minor was not configured.  A diagnostic is printed on
 .IR stderr .
@@ -758,7 +758,7 @@ should be avoided.
 .PP
 .BR "SVR 4" ;
 .[
-svr4
+svr4cr
 .]
 .BR UnixWare \(rg,
 .BR Solaris \(rg,

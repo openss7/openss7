@@ -1,0 +1,233 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocindent
+.\"
+.\" @(#) $Id: strconf.1.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRCONF 1 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
+.\"
+.\"
+.SH NAME
+.B strconf
+\- queries stream configuration
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrconf\fR [\fIoptions\fR]
+.HP 12
+\fBstrconf\fR [\fIoptions\fR] {\fB-t\fR|\fB--topmost\fR}
+.HP 12
+\fBstrconf\fR [\fIoptions\fR] {\fB-m\fR|\fB--module\fR} \fImodule\fR
+.HP 12
+\fBstrconf\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrconf\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrconf\fR {\fB-C\fR|\fB--copying\fR}
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strconf
+command is used to query the configuration of a stream.  When used without any
+options, it prints a list of all the modules in the stream as well as the
+topmost driver.  The list is printed with one name per line, where the first
+name printed is the topmost modules on the stream and the last item printed is
+the name of the driver.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+[\fB-t\fR, \fB--topmost\fR]
+Prints only the topmost module of the stream (if one exists).
+.TP
+\fB-m\fR, \fB--module\fR \fImodule\fR
+Determines if the specified
+.I module
+is present on the stream.  If the module is present, the
+.B strconf
+command prints the message \(lqyes\(rq
+and returns a value of zero (0).  If it is not present, the
+.B strconf
+command prints the message \(lqno\(rq
+and returns a nonzero value.
+.TP
+\fB-V\fR, \fB--version\fR
+.TP
+\fB-C\fR, \fB--copying\fR
+.TP
+\fB-q\fR, \fB--quiet\fR
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+.TP
+\fB-h\fR, \fB--help\fR
+.TP
+\fB-V\fR, \fB--version\fR
+.TP
+\fB-C\fR, \fB--copying\fR
+.PP
+The
+.BR -t " and " -m
+options are mutually exclusive.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.B strconf
+returns zero on success (for the
+.BR -m " or " -t
+options, \*(lqsuccess\*(rq means the named or topmost module is present).  It
+returns a non-zero status if invoked with the
+.BR -m " or " -t
+option and the module is not present.  It prints an error message and returns
+non-zero status for various error conditions, including usage error or failure
+of an ioctl on the stream.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B strconf
+only operates on the stream representing standard input to the command.
+.PP
+If the caller does not have read permissions on the
+stream and is not the superuser, the
+.B strconf
+command will fail.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/bin/strconf
+contains the
+.B strconf
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR strchg (1),
+.BR strreset (1).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR "SVR 4.2" ,
+.BR AIX \(rg,
+.BR HPUX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR SuperUX \(rg,
+.BR UnixWare \(rg
+and
+.BR UX/P \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2" ;
+.[
+svr42cr
+.]
+.BR AIX \(rg,
+.BR HPUX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR SuperUX \(rg,
+.BR UnixWare \(rg,
+and
+.BR UX/P \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

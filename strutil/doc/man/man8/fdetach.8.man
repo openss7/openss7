@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: fdetach.8.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: fdetach.8.man,v 0.9.2.2 2004/03/04 23:15:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FDETACH 8 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH FDETACH 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -110,11 +110,37 @@ name, a short usage summary is printed.
 .\"
 .SH DESCRIPTION
 .PP
+The
 .B fdetach
+command detaches or disassociates a file descriptor for an open
+.I STREAMS
+device or pipe from its filename in the file system.  The path argument is the
+path that was previously associated with the file descriptor with the
+.BR fattach (3)
+function.
+.PP
+Operations on path will subsequently affect the file system node, not the
+.I STREAMS
+device or pipe.  The permission and status of the node are returned to the
+state that they were in before the
+.I STREAMS
+device or pipe was attached.  Any other paths that the
+.I STREAMS
+device or pipe may be attached to are not affected.
+.PP
+To successfully issue the
+.B fdetach
+command, the caller must be superuser or must be the owner of the file and
+have write permission.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+.B fdetach
+returns 0 (zero) on success.  If
+.B fdetach
+fails, it returns 1 and prints a message to
+.IR stderr .
 .\"
 .\"
 .SH NOTICES
@@ -144,17 +170,26 @@ has no known bugs.
 is compatible with
 .BR "SVR 4.2" ,
 .[
-svr42
+svr42cr
 .]
+.BR HPUX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
 .BR UnixWare \(rg,
-.BR Solaris \(rg
+.BR UXP/V \(rg
 and
 .BR LiS ,
 .[
 LiS
 .]
-with the following exceptions:
+with the following considerations:
 .IP \(em 4
+.BR AIX \(rg
+does not support the
+.B fdetach
+command.  However,
+.BR umount (1)
+may be used in its stead.
 .IP \(em 4
 .IP \(em 4
 .IP \(em 4
@@ -163,9 +198,15 @@ with the following exceptions:
 .SH CONFORMANCE
 .PP
 .BR "SVR 4.2" ;
+.[
+svr42cr
+.]
+.BR HPUX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
 .BR UnixWare \(rg
 and
-.BR Solaris \(rg
+.BR UXP/V \(rg
 documentation.
 .\"
 .\"

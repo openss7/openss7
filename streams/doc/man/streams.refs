@@ -2821,6 +2821,15 @@ Part 1: Protocol Specification
 %I Addison Wesley
 %G ISBN 0-201-56317-7
 
+%L SVR42CR
+%K svr42cr
+%R SVR 4.2 CR
+%T UNIX\(rg System V Release 4.2 Command Reference Manual
+%D 1992
+%Q AT&T UNIX System Laboratories, Inc.
+%I Prentice Hall
+%C Englewood Cliffs, New Jersey
+
 %L SVR42
 %K svr42
 %R SVR 4.2
@@ -3200,11 +3209,11 @@ Part 1: Protocol Specification
 %U http://www.gcom.com/
 
 %K lfs
-%L LfS 0.9
-%R LfS 0.9
+%L LfS 0.9.2
+%R LfS 0.9.2
 %A OpenSS7
 %Q OpenSS7
-%T Linux Fast-STREAMS (LfS) 0.9 Source Code
+%T Linux Fast-STREAMS (LfS) 0.9.2 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/

@@ -1,0 +1,257 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: strchg.1.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRCHG 1 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
+.\"
+.\"
+.SH NAME
+.B strchg
+\- changes stream configuration
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrchg\fR [\fIoptions\fR] \fB-h\fR, \fB--push\fI module\fR[,\fImodule\fR ...]
+.HP 12
+\fBstrchg\fR [\fIoptions\fR] \fB-p\fR, \fB--pop\fR [\fB-a\fR, \fB--all\fR | \fB-u\fR, \fB--upto\fI module\fR]
+.HP 12
+\fBstrchg\fR [\fIoptions\fR] \fB-f\fR, \fB--file\fI filename\fR
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strchg
+command is used to alter the configuration of the stream associated with the
+caller's standard input.  The
+.B strchg
+command pushes modules on the stream, pops modules off of the stream, or both.
+Only the root user or owner of the
+.I STREAMS
+device can alter the configuration of that stream.  If another user attempts
+to alter the configuration, the
+.B strchg
+command will fail.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-h\fR, \fB--push\fI module\fR[,\fImodule\fR ...]
+.TP
+\fB-p\fR, \fB--pop\fR
+Pops a module off of a stream.  Used along, the
+.B -p
+option pops the topmost module from the stream.  May also be combined with the
+.BR -u " or " -a
+options below.
+.TP
+\fB-u\fR, \fB--upto\fI module\fR
+Pops all modules above the specified
+.I module
+off of a stream.
+The
+.B -p
+option must be used in front of the
+.B -u
+flag.
+.TP
+\fB-a\fR, \fB--all\fR
+Pops all modules above the topmost driver off of a stream.
+The
+.B -p
+option must be used in front of the
+.B -a
+flag.
+.TP
+\fB-f\fR, \fB--file\fI filename\fR
+Pushes and pops the necessary modules to conform the stream to the
+configuration given in the specified file.
+.PP
+Only one of
+.BR -h ", " -p " or " -f
+options may be specified.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The
+.B strchg
+configuration file contains a list of modules representing the desired
+configuration of the stream.  Each module must appear on a separate line,
+where the first name represents the topmost module and the last name
+represents the module that is closest to the driver.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+On successful completion, the
+.B strchg
+command returns a value of zero (0).
+Otherwise, it returns a nonzero value and prints an error message indicating
+usage error, a bad module name, too many modules to push, failure of a
+.BR streamio (7)
+operation on the stream, or failure to open the file specified by the
+.I filename
+argument.
+.PP
+.B strchg
+returns zero on success.  It prints an error message and returns non-zero
+status for various error conditions, including usage error, bad module name,
+too many modules to push, failure of an ioctl on n the stream, or failure to
+open file from the
+.B -f
+option.
+.\"
+.\"
+.SH NOTICES
+.PP
+If modules are pushed in the wrong order, the stream might not function as
+expected.
+.PP
+If the caller is neither the owner of the stream nor the superuser, the
+.B strchg
+command will fail.
+.PP
+If modules are pushed in the wrong order, one could end up with a stream that
+does not function as expected.  For ttys, if the line discipline modules is
+not pushed in the correct place, one could have a terminal that does not
+respond to any commands.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/bin/strchg
+contains the
+.B strchg
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR strconf (1),
+.BR strreset (1).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR "SVR 4.2" ,
+.BR AIX \(rg,
+.BR HPUX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR SuperUX \(rg,
+.BR UnixWare \(rg
+and
+.BR UX/P \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2" ; 
+.[
+svr42cr
+.]
+.BR AIX \(rg,
+.BR HPUX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR SuperUX \(rg,
+.BR UnixWare \(rg,
+and
+.BR UX/P \(rg,
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

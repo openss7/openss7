@@ -1,0 +1,110 @@
+# *****************************************************************************
+# 
+# $Id: README,v 0.9.2.2 2004/03/04 23:15:46 brian Exp $
+# 
+# *****************************************************************************
+# 
+# Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# 
+# All Rights Reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+# 
+# *****************************************************************************
+# 
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+# 
+# *****************************************************************************
+# 
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+# 
+# *****************************************************************************
+# 
+# Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+# 
+# *****************************************************************************
+
+Linux Fast-STREAMS
+------------------
+
+Linux Fast-STREAMS is intendeed as a high-performance, production replacement
+for Linux STREAMS (LiS).  In contrast, Linux Fast-STREAMS has the following
+features in contrast to Linux Fast-STREAMS:
+
+Linux Fast-STREAMS			Linux STREAMS (LiS)
+======================================  ======================================
+Provided and optimized for Linux only.  Maintain portability across Linux,    
+                                        User Space, QNX, DOS and other ports. 
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Promotes mainstream kernel adoption.    Places portability concerns before    
+                                        mainstream kernel adoption.           
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Lindented and follows normal kernel     Non-lindented, does not follow normal 
+formatting and coding practices.        kernel formatting and coding practice.
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Provides compatibility modes for AIX,   Provides some compatibility interfaces
+HPUX, OSF, Solaris, UnixWare, SVR 4.2   but also many Linux-derived inetrfaces
+and LiS.  Supports all majjor SVR 4.2   specific to LiS.                      
+variants.                                                                     
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Licensed under GPL with commercial      Dubiously licensed under LGPL.        
+licensing avaliable.                                                          
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Supports full SVR4.2 MP sychronization  Supports only a single, Linux derived 
+models.                                 synchronization model.                
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Runs at SoftIRQ.                        Separate kernel threads.              
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Provides common SVR4.2 system tunable   Provides only log based debugging.    
+parameters as sysctls as well as /proc                                        
+filesystem support for debugging.                                             
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Provides support for all SVR4.2 and     Provides a limited set of LiS only    
+utilities.                              Linux-derived utlities.               
+--------------------------------------  --------------------------------------
+
+--------------------------------------  --------------------------------------
+Provides full named-streams device and  Provides only character-based node    
+device filesystem support.              support.                              
+--------------------------------------  --------------------------------------

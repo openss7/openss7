@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: strload.8.man,v 0.9.2.2 2004/03/02 10:58:15 brian Exp $
+.\" @(#) $Id: strload.8.man,v 0.9.2.3 2004/03/04 23:15:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/02 10:58:15 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRLOAD 8 "$Date: 2004/03/02 10:58:15 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRLOAD 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -178,22 +178,293 @@ are permitted.
 .\"
 .SH "FILE FORMAT"
 .PP
+When the
+.B -f
+or
+.B --file
+.I filename
+options is specified, the format of the supplied file contains
+.B strload
+specified entires.
+.IP \- 3
+Each line in the file contains one entry or comment per line.
+.IP \-
+Each entry consists of a number of fields delimited by whitespace (see
+.BR ispace (3)).
+.IP \-
+Any field that begins with a \*(lq#\*(rq character is a comment that continues
+to the end of the line.
+.IP \-
+Any line containing only a comment (beginning with optional whitespace and a
+\*(lq#\*(rq character) is ignored.
+.PP
+Each line containing a
+.B strload
+specification entry consists of the following fields:
+.TP
+(1) \fIattributes\fP
+Describes the module to load.  The acceptable values are:
+.RS
+.TP 4
+.B d
+Specifies a driver.
+.TP
+.B m
+Specifies a module.
+.TP
+.B s
+Creates the node as a standard (not cloned) device.
+.TP
+.B +
+Specifies that the module can be configured more than once.  This value must
+be specified for all lines containing the module file name.
+.RE
+.TP
+(2) \fIfilename\fP
+Specifies the object file containing the kernel module.  If the filename contains
+a \*(lq/\*(rq (slash) in the filename, the
+.B strload
+command uses the value in the filename field explicitly, looking first in the
+current directory and, upon failure, in the
+.BI /lib/module/ \`uname\ -r\` /streams
+directory.
+.TP
+(3) [\fIargument\fP]
+Has not meaning for the strload command.  This field is optional.  It is
+passed to the kernel module when its configuration routine is called.  Its
+interpretation is specific to that kernel module.  The default argument is the
+value of the filename field.
+.TP
+(4) [\fInode\fP]
+Specifies the name of the node to create.  This field is optional.  It applies
+only to drivers and is used as the created node name when the driver is
+loaded.  By default, the created node is \fB/dev/\fIfilename\fR.
+.TP
+(5+) [\fIminor\fP \fI...\fP]
+Specifies additional, non clone nodes to create for this driver.  This field
+is optional.  The node names are created by appending the minor number to the
+cloned driver node name.  No more than five minor numbers can be given (from 0
+to 4), and a node is created for each one.
+.\"
+.\"
+.SH "STREAMS TUNABLE PARAMETERS"
+.PP
+On
+.BR AIX \(rg
+when the
+.B strload
+command is used to load the
+.I STREAMS
+executive,
+.B strload
+also reads
+.I STREAMS
+system tunable parameters from the file
+.BR /etc/pse_tune.conf .
+.TP
+.B strmsgsz
+A run-time parameter that specifies the maximum number of bytes that a single
+system call can pass to a stream to be placed inot the data part of a message
+(in
+.BR M_DATA (9)
+blocks).  Any write subroutine exceeding this size will be broken into
+multiple messages.  A
+.BR putmsg (2)
+subroutine with a data part exceeding this size will fail returning a
+.RB [ ERANGE ]
+error code.  The default value is 0.
+.TP
+.B strctlsz
+A run-time parameter that specifies the maximum number of bytes that a single
+system call can pass to a stream to be placed into the control part of a
+message (in an
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+block).  A
+.BR putmsg (2)
+subroutine with a control part exceeding this size will fail returning an
+.RB [ ERANGE ]
+error code.  The default is 1024.
+.TP
+.B nstrpush
+A load-time parameter that indicates the maximum number of modules that can be
+pushed onto a single stream.  The default value is 8.
+.TP
+.B psetimers
+A run-time parameter that specifies the maximum number of timers allocated.
+In the operating system, the
+.I STREAMS
+subsystem allocates a certain number of timer structures at initialization
+time, so the
+.I STREAMS
+driver or module can register the timeout requests.  Lowering this value is
+not allowed until the system reboots, at which time it returns to its default
+value.  The default value is 20.
+.TP
+.B psebufcalls
+A run-time parameter that specifies the maximum number of bufcalls allocated.
+In the operating system, the
+.I STREAMS
+subssytem allocates a certain number of bufcall structures at initialization
+time.  When an allocb subroutine fails, the user can register request for the
+bufcall subroutine.  Lowering this value is not allowed until the system
+reboots, at which time it returns to its default value.  The default value is
+20.
+.TP
+.B strturncnt
+A run-time parameter the specifies the maximum number of requests handled by
+the currently running thread for module- or elsewhere-level
+.I STREAMS
+synchronization.  The module-level synchronization works in such a way that
+only one thread can run in the module at any given time, and all other threads
+trying to acquire the same module enqueue their requests and exit.  After the
+currently running thread completes its work, it dequeues all the previously
+enqueued requests one at a time and starts them.  If there are large numbers
+of requests enqueued in the list, the currently running thread must serve
+everyone.  To eliminate this problem, , the currently running thread serves
+only the
+.B strturncnt
+number of threads.  After that, a separate kernel thread starts all the
+pending requests.  The default value is 15.
+.TP
+.B strthresh
+A run-time parameter that specifies the maximum number of bytes
+.I STREAMS
+is allowed to allocate.  When the threshold is passed, users without the
+appropriate privilege will not be allowed to open streams, push modules, or
+write to
+.I STREAMS
+devices.  The
+.RB [ ENOSR ]
+error code will be returned.  The threshold applies only to the output side;
+therefore, data coming into the system is not affected and continues to work
+properly.  A value of 0 indicates there is no threshold.
+.IP ""
+The strthresh parameter represents a percentage of the value of the thewall
+parameter, and its value can be set between 0 and 100.  The thewall parameter
+indicates the maximum number of bytes that can be allocated by
+.I STREAMS
+and sockets using the net_malloc subroutine.  The user can changgne the value
+of thewall parameter using the no command.  When the user changes the value of
+the thewall parameter, the threshold gets updated accordingly.  The default
+value is 85, indicating the threshold is 85% of the value of the thewall
+parameter.
+.TP
+.B lowthresh
+A run-time parameter that specifies the maximum number of bytes (in
+percentage) allocated by thewall parameter using allocb for the
+.B BPRI_LO
+priority.  When the total amount of memory allocated by the net_malloc
+subroutine reaches this threshold, the allocb request for the
+.B BPRI_LO
+priority returns 0.  The lowthresh parameter can be set to any value between 0
+and 100.  The default value is 90, indicating the threshold is at 90% of the
+value of thewall parameter.
+.TP
+.B medthresh
+A run-time parameter that specifies the maximum number of bytes (in
+percentage) allocated by thewall parameter using allocb for the
+.B BPRI_MED
+priority.  When the total amount of memory allocated by the net_malloc
+subroutine reaches this threshold, the allocb request for the
+.B BPRI_MED
+priority returns 0.  The lowthresh parameter can be set to any value between 0
+and 100.  The default value is 95, indicating the threshold is at 95% of the
+value of thewall parameter.
+.TP
+.B pseintrstack
+A load-time parameter that indicates the maximum number of the interrupt stack
+size alloed by
+.I STREAMS
+while running in the offlevel.  Sometimes when a process running other than
+INTBASE level enters a stream, it encounters stack overflow problems because
+of not enough interrupt stack size.  Tuning this parameter properly reduces
+the changes of stack overflow problems.  The default value is 0x3000 (decimal
+12288).
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of two (2) indicates that option syntax was in error.
+.TP
+.BR -f " or " --file
+An exit status of zero (0) indicates that all entries in the
+provided file were loaded, unloaded or queried; one (1) indicates that at
+least one entry was not processed.  Diagnostics concerning the line of the
+file that failed is printed on
+.IR stderr .
+.TP
+.BR -d " or " --driver
+An exit status of zero (0) indicates that all entries in the provided driver
+list were loaded, unloaded or queried; one (1) indicates that at least one
+driver was not processed.  Diagnostics concerning the driver that failed is
+printed on
+.IR stderr .
+.TP
+.BR -m " or " --module
+An exit status of zero (0) indicates that all entries in the provided module
+list were loaded, unloaded or queried; one (1) indicates that at least one
+module was not processed.  Diagnostics concerning the module that failed is
+printed on
+.IR stderr .
+.PP
+All other failures result in an exit status of one (1) and a diagnostic is
+printed on
+.IR stderr .
 .\"
 .\"
 .SH NOTICES
 .PP
+.B strload
+does not check the credentials of the user.  Any user with permission to the
+access the
+.BR nuls (4)
+null device and push the
+.BR sc (4)
+.I STREAMS
+Configuration Module,
+can execute all options.
+For security,
+.B strload
+should never be setuid root.
 .\"
 .\"
 .SH EXAMPLES
 .PP
+An example
+.B strload
+configuration file for use with the command
+.BI "strload -f " filename
+is as follows:
+.RS
+.nf
+\fC\s-2
+#
+# strload - sample configuration file
+#
+
+# Attr Filename Argument Node    Minors
+
+d      dgb                               #line 1
+d      mux      -        -       0       #line 2
+ds     foo                               #line 3
+d+     xtiso    tcp      /dev/xti/tcp    #line 4
+d+     xtiso    udp      /dev/xti/udp    #line 5
+m      aoot                              #line 6
+\s+2\fP
+.fi
+.RE
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.BR sc (4)
+.I STREAMS
+configuration module.
+.TP
+.B /dev/nuls
+.I STREAMS
+null device.
 .\"
 .\"
 .SH FILES
@@ -207,7 +478,7 @@ command.
 .B /etc/sysconfig/streams/streams.conf
 contains the default configuration file.
 .TP
-.BI /lib/modules/ UTS_RELEASE /kernel/drivers/streams/*.o
+.BI /lib/modules/ \`uname\ -r\` /kernel/drivers/streams/*.o
 contains
 .I STREAMS
 driver and module loadable kernel modules.
@@ -215,6 +486,7 @@ driver and module loadable kernel modules.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR sc (4),
 .BR modprobe (8),
 .BR insmod (8),
 .BR rmmod (8),
@@ -222,18 +494,48 @@ driver and module loadable kernel modules.
 .\"
 .SH BUGS
 .PP
+.B strload
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B strload
+is compatible with
+.BR AIX \(rg
+with the following caveats:
+.IP \(em 4
+.B strload
+options
+.BR -f ", " -d ", " -m ", " -q " and " -u
+are compatible with
+.BR AIX \(rg.
+.BR AIX \(rg
+does not document long options formats, nor the
+.BR -V ", " -h " or " -v
+flags.
+.IP \(em 4
+.IP \(em 4
+.B strload
+.BI -f " filename"
+file formats are compatible with
+.BR AIX \(rg.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR AIX \(rg
+documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strload
+first appeared in
+.BR AIX \(rg.
+.[
+aixspg
+.]
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/01 11:32:21 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/04 23:15:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/01 11:32:21 $ by $Author: brian $
+# Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -764,12 +764,12 @@ fi
 %files util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%{_bindir}/*
+%{_bindir}/*
 %{_sbindir}/*
-#%{_libexecdir}/*
+%{_libexecdir}/*
 %{_mandir}/%{name}.refs
 %{_mandir}/%{name}.macros
-#%{_mandir}/man1/*
+%{_mandir}/man1/*
 %{_mandir}/man8/*
 %endif
 
@@ -777,22 +777,39 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.5  2004/03/01 11:32:21  brian
+# Revision 0.9.2.6  2004/03/04 23:15:46  brian
 # - working up release directory
-# - collapsed compatibility modules into single file
+# - updated base files
+# - added manual pages
+# - added texi manual files
+# - added (rough) sc module
+# - added inet and libxnet test programs
+# - added utility programs and user commands
 #
-# Revision 1.5  2004/03/01 11:32:21  brian
+# Revision 1.6  2004/03/04 23:15:46  brian
 # - working up release directory
-# - collapsed compatibility modules into single file
+# - updated base files
+# - added manual pages
+# - added texi manual files
+# - added (rough) sc module
+# - added inet and libxnet test programs
+# - added utility programs and user commands
 #
-# Revision 1.4  2004/03/01 09:59:42  brian
-# - working up release directory
-# - added libraries (libstreams, libxnet)
-# - internationalization
-#
-# Revision 1.3  2004/03/01 07:45:13  brian
-# - First successful build.
-#
+
+* Mon Mar  1 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.5  2004/03/01 11:32:21  brian
+- working up release directory
+- collapsed compatibility modules into single file
+
+* Mon Mar  1 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.4  2004/03/01 09:59:42  brian
+- working up release directory
+- added libraries (libstreams, libxnet)
+- internationalization
+
+* Mon Mar  1 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.3  2004/03/01 07:45:13  brian
+- First successful build.
 
 * Mon Mar  1 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.2  2004/03/01 06:26:59  brian

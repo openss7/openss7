@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $
+ @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/02 12:04:52 $ by $Author: brian $
+ Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $"
+#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $"
 
-static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $";
+static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $";
+
+/*
+ * AIX Utility: Loads and configures STREAMS.
+ */
 
 #include <unistd.h>
 #include <stdlib.h>

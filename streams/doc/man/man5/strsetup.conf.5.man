@@ -1,0 +1,268 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocindent
+.\"
+.\" @(#) $Id: strsetup.conf.5.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRSETUP.CONF 5 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS System File Formats"
+.\"
+.\"
+.SH NAME
+.B strsetup.conf
+\- configuration file for \fISTREAMS\fR drivers
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B /etc/strsetup.conf
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B /etc/strsetup.conf
+file is the configuration file for
+.I STREAMS
+drivers. The
+.B strsetup.conf
+file specifies one or more character special files (or nodes) to be created
+when a
+.I STREAMS
+driver is configured into the kernel.  If the driver is not configured, no
+character special files are created for it.  If an old version of the file
+exists, the
+.BR strsetup (8)
+command removes it before the new one is created.
+.\"
+.\"
+.SS "FILE FORMAT"
+.PP
+Each entry in the
+.B strsetup.conf
+file specifies a driver name, device special file name, file mode and minor
+number.  See the \*(lq\fIEXAMPLES\fP\*(rq section for a sample
+.B strsetup.conf
+file.
+.PP
+Each line in the file is of the form:
+.HP
+.RB < driver_name "> <" filename "> <" file_mode "> <" minor_number >
+.PP
+The fields have the following meanings:
+.TP
+.RB < driver_name >
+Specifies the name of the driver as reported by the
+.BR strsetup (8)
+command.  This field is used to match the names read by the
+.BR strsetup (8)
+command from the kernel and must match exactly (the match is case sensitive).
+.TP
+.RB < filename >
+Specifies the full path name of the character special file or files to be
+created when
+.RI < driver_name >
+is configured into the kernel.
+The filename can contain one conversion specifier in the style of
+.BR printf (3).
+This conversion is used to include a minor device number in the filename.  The
+permitted conversions are the following:
+.RS
+.IP \fB%d\fR
+Prints the minor number as a signed decimal.
+.IP \fB%x\fR
+Prints the minor number as hexadecimal with lower case letters.
+.IP \fB%X\fR
+Prints the minor number as hexadecimal with upper case letters.
+.IP \fB%o\fR
+Prints the minor number as octal.
+.IP \fB%u\fR
+Prints the minor number as an unsigned decimal.
+.IP \fB%i\fR
+Prints the minor number as a signed decimal.
+.PP
+Note that you must use a double percent sign (%%) to include a percent sign in
+the filename.  Optionally, each of these conversions can include a
+specification for some number of leading 0's.  This is done by following %
+with a 0 and one or more digits specifying the total number of digits to be
+printed.  The 0 must appear after the %.  See
+.BR printf (3)
+for more information.  Any directories in the path of the filename that do not
+exist are created.
+.RE
+.TP
+.RB < file_mode >
+Specifies the file mode assigned to the file when it is created.  The
+.I file_mode
+field must be in octal.
+.TP
+.RB < minor_number >
+Specifies the minor device number field.  The
+.B strsetup
+command reads the major device numbers from the kernel.  This field indicates
+to the
+.B strsetup
+command how to assign minor device numbers.  The
+.I minor_number
+field can contain one of the following values:
+.RS
+.TP
+.B clone
+Indicates that the device should be created as a clone device.  In this case
+the major number becomes that of the special
+.BR clone (4)
+pseudo-device driver and the minor device number becomes the device's major
+number.  Note that the word \(lqclone\(rq must be lower case.
+.TP
+.B N
+Creates a single device with the minor device number
+.IR N .
+Note that
+.I N
+is a decimal number.
+.TP
+.B M-N
+Creates
+.IR M - N
+nodes with the devices' major numbers and minor numbers between
+.IR M " and " N .
+Note that
+.IR M " and " N
+are decimal numbers.  When a range of minor numbers is specified, a filename
+conversion specifier can be used to make certain that each node created is
+unique.
+.RE
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+An example
+.B strsetup
+configuration file for use with the command
+.BI "strsetup -f " filename
+is as follows:
+.RS
+.nf
+\fC\s-2
+#
+# strsetup - sample configuration file
+#
+
+# driver name	filename		file mode	minor number
+
+ptm		/dev/ptmx		0666		clone
+log		/dev/streams/log	0666		clone
+nuls		/dev/streams/nuls	0666		clone
+echo		/dev/streams/echo	0666		clone
+sad		/dev/sad/admin		0666		clone
+pts		/dev/pts/%d		0666		0-127
+\s+2\fP
+.fi
+.RE
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/strsetup.conf
+contains the
+.B strsetup
+configuration.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR printf (3),
+.BR strsetup (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
