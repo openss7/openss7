@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/21 11:15:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/03/21 11:15:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -105,11 +105,11 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    sctp_here=`pwd`
-	    sctp_where="strsctp/src/include"
-	    for sctp_d in . .. ; do
-		sctp_dir="$srcdir/$sctp_d/$sctp_where"
-		sctp_bld=`echo "$sctp_here/$sctp_d/$sctp_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		if test -d $sctp_dir -a -r $sctp_dir/$sctp_what ; then
+	    for sctp_dir in $srcdir/strsctp*/src/include $srcdir/../strsctp*/src/include
+	    do
+		if test -d $sctp_dir -a -r $sctp_dir/$sctp_what
+		then
+		    sctp_bld=`echo $sctp_dir | sed -e "s|^$srcdir/|$sctp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    sctp_dir=`(cd $sctp_dir; pwd)`
 		    sctp_cv_includes="$sctp_dir $sctp_bld"
 		    break

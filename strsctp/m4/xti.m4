@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/02/19 11:49:59 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/21 11:15:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:59 $ by $Author: brian $
+# Last Modified $Date: 2005/03/21 11:15:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,16 +104,14 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xti_here=`pwd`
-	    xti_where="strxnet/src/include"
-	    for xti_d in . .. 
+	    for xti_dir in $srcdir/strxnet*/src/include $srcdir/../strxnet*/src/include
 	    do
-		xti_dir="$srcdir/$xti_d/$xti_where"
-		xti_bld=`echo "$xti_here/$xti_d/$xti_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		if test -d $xti_dir -a -r $xti_dir/$xti_what 
 		then
+		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xti_dir=`(cd $xti_dir; pwd)`
 		    xti_cv_includes="$xti_dir $xti_bld"
-		    xti_cv_ldadd=`echo "$xti_here/$xti_d/strxnet/libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/14 01:16:23 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/21 11:17:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 01:16:23 $ by $Author: brian $
+# Last Modified $Date: 2005/03/21 11:17:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -252,18 +252,16 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
-	    streams_where="LiS/include"
-	    for streams_d in . .. 
+	    for streams_dir in $srcdir/LiS*/include $srcdir/lis*/include $srcdir/../LiS*/include $srcdir/../lis*/include
 	    do
-		streams_dir="$srcdir/$streams_d/$streams_where"
-		streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		if test -d $streams_dir -a -r $streams_dir/$streams_what 
 		then
+		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_dir=`(cd $streams_dir; pwd)`
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
-		    streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_modmap=`echo "$streams_here/$streams_d/LiS/Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_symver=`echo "$streams_here/$streamd_d/LiS/Modules.symver" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_symver=`echo "$streams_bld/../Modules.symver" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -400,18 +398,16 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
-	    streams_where="streams/include"
-	    for streams_d in . .. 
+	    for streams_dir in $srcdir/streams*/include $srcdir/../streams*/include
 	    do
-		streams_dir="$srcdir/$streams_d/$streams_where"
-		streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		if test -d $streams_dir -a -r $streams_dir/$streams_what 
 		then
+		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_dir=`(cd $streams_dir; pwd)`
 		    streams_cv_lfs_includes="$streams_dir $streams_bld"
-		    streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_modmap=`echo "$streams_here/$streams_d/streams/Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_symver=`echo "$streams_here/$streams_d/streams/Modules.symver" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_symver=`echo "$streams_bld/../Modules.symver" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done

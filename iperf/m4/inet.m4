@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/21 11:15:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/03/21 11:15:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -105,11 +105,11 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    inet_here=`pwd`
-	    inet_where="strinet/src/include"
-	    for inet_d in . .. ; do
-		inet_dir="$srcdir/$inet_d/$inet_where"
-		inet_bld=`echo "$inet_here/$inet_d/$inet_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		if test -d $inet_dir -a -r $inet_dir/$inet_what ; then
+	    for inet_dir in $srcdir/strinet*/src/include $srcdir/../strinet*/src/include
+	    do
+		if test -d $inet_dir -a -r $inet_dir/$inet_what
+		then
+		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    inet_dir=`(cd $inet_dir; pwd)`
 		    inet_cv_includes="$inet_dir $inet_bld"
 		    break

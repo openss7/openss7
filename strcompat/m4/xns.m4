@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/02/19 11:49:59 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/21 11:15:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:59 $ by $Author: brian $
+# Last Modified $Date: 2005/03/21 11:15:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -105,11 +105,11 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xns_here=`pwd`
-	    xns_where="strxns/src/include"
-	    for xns_d in . .. ; do
-		xns_dir="$srcdir/$xns_d/$xns_where"
-		xns_bld=`echo "$xns_here/$xns_d/$xns_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
+	    for xns_dir in $srcdir/strxns*/src/include $srcdir/../strxns*/src/include
+	    do
+		if test -d $xns_dir -a -r $xns_dir/$xns_what
+		then
+		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xns_dir=`(cd $xns_dir; pwd)`
 		    xns_cv_includes="$xns_dir $xns_bld"
 		    break
