@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/04/05 04:28:04 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/04/06 00:40:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/05 04:28:04 $ by $Author: brian $
+## Last Modified $Date: 2005/04/06 00:40:40 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -275,52 +275,59 @@ endif
 # kernel modules, so they could be anywhere.  This pre-installation scriptlet searches for any
 # kernel modules by the same name as ours and simply removes them.
 ##
-# A better and more thourough approach if a current modules.dep file exists is to walk through the
-# dependency graph from each module and remove all modules that depend on that module as well.
+# Next, the better and more thourough approach: if a current modules.dep file exists, walk through
+# the dependency graph from each conflicting module and remove all modules that depend on that
+# conflicting module as well.
 ##
 pre-modules:
-	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; \
-	for dir in $(DESTDIR)$(kmoduledir)/ $(DESTDIR)$(kmoduledir)/../preferred $(DESTDIR)$(kmoduledir)/../default $(DESTDIR)$(kmoduledir)/../boot ; do \
-		test -d $$dir || continue ; \
-		for m in `find $$dir \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do \
-			b=`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'` ; \
-			case " $$list " in (*" $$b "*) $(ECHO) "rm -f -- $$m" ; rm -f -- $$m ;; (*) continue ;; esac ; \
+	@function remove_depmods() { \
+		local t ; \
+		test $$# -gt 0 || return 0 ; \
+		echo "$$*" ; \
+		for t in $$* ; do \
+			prereq=prereq_`echo $$t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
+			eval "remove_depmods \$$$$prereq" ; \
 		done ; \
-		if test -f $$dir/modules.dep ; then \
-			dep= ; while read line ; do \
-				case $$line in \
-					(*\\)	line="`echo $$line | sed -e 's|\\$$||'`" ; \
-						dep="$${dep:+$$dep }$$line" ; continue ;; \
-					(*)	dep="$${dep:+$$dep }$$line" ;; \
-				esac ; \
-				set dummy $$dep ; \
-				if test "$${2+set}" = "set" ; then \
-					t=$$1 ; \
-					target=target_`echo $$t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
-					shift ; \
-					for p in $$* ; do \
-						prereq=prereq_`echo $$p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
-						eval "$$prereq=\"\$${$$prereq:+\$$$$prereq }$$t" ; \
-						eval "$$target=\"\$${$$target:+\$$$$target }$$p" ; \
-					done ; \
-				fi ; \
-			done < $$dir/modules.dep ; \
-		fi ; \
+	} ; \
+	list=`$(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; \
+	for m in `find $(DESTDIR)$(kmoduledir) \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do \
+		b=`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'` ; \
+		case " $$list " in (*" $$b "*) ;; (*) continue ;; esac ; \
+		modl_mods="$${modl_mods:+$$modl_mods }$$m" ; \
+		modl_list="$${modl_list:+$$modl_list }$$b" ; \
 	done ; \
-	expanded=0 ; \
-	while test $$expanded != 0 ; do \
+	if test -f $(DESTDIR)$(kmoduledir)/modules.dep ; then \
+		dep= ; while read line ; do \
+			case $$line in \
+				(*\\)	line="`echo $$line | sed -e 's|\\$$||'`" ; \
+					dep="$${dep:+$$dep }$$line" ; continue ;; \
+				(*)	dep="$${dep:+$$dep }$$line" ;; \
+			esac ; \
+			set dummy $$dep ; \
+			if test "$${3+set}" = "set" ; then \
+				t=`echo $$1 | sed -e 's|:$$||'` ; \
+				target=target_`echo $$t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
+				shift 2 ; \
+				for p in $$* ; do \
+					prereq=prereq_`echo $$p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
+					eval "$$prereq=\"\$${$$prereq:+\$$$$prereq }$$t\"" ; \
+					eval "$$target=\"\$${$$target:+\$$$$target }$$p\"" ; \
+				done ; \
+			fi ; \
+			dep = ; \
+		done < $(DESTDIR)$(kmoduledir)/modules.dep ; \
+	fi ; \
+	if test -n "$$modl_mods" ; then \
+		$(ECHO) "rm -f -- $$modl_mods" ; \
+		rm -f -- $$modl_mods ; \
 		for m in $$list ; do \
-			for p in eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`" ; do \
-				case " $$list " in \
-					(*" $$p "*) continue ;; \
-					(*) list="$$list $$p" ; expanded=1 ;; \
-				esac ; \
-			done ; \
+			prereq=prereq_`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
+			eval "modl_deps=\"\`remove_depmods \$$$$prereq\`\"" ; \
+			test -n "$$modl_deps" || continue ; \
+			$(ECHO) "rm -f -- $$modl_deps" ; \
+			rm -f -- $$modl_deps ; \
 		done ; \
-	done ; \
-	for m in $$list ; do \
-		rm -f -- `find $(DESTDIR)$(kmoduledir)/.. \( -name $m.o -o -name $m.ko -o -name $m.o.gz -o -name $m.ko.gz \) 2>/dev/null` ; \
-	done
+	fi
 
 pre-modconf:
 
