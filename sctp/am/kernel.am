@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/26 20:10:30 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/02/04 22:55:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 20:10:30 $ by $Author: brian $
+# Last Modified $Date: 2005/02/04 22:55:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -108,8 +108,7 @@ INSTALL_EXEC_LOCAL += install-modules
 # that have the same name as our installable modules.
 #
 # Lastly, we add our prune and include lines to the modules.conf file.  If we have a usable system
-# map file and an executable depmod, we perform the depmod.  Finally we invoke installation of any
-# necessary devices.
+# map file and an executable depmod, we perform the depmod.
 #
 # This autoconf installation process has the side effect that upon uninstall of this package, any
 # modules replaced from LiS or LfS will be lost.  A fresh install of the older LiS or LfS may be
@@ -174,7 +173,6 @@ post-modules:
 				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \
-		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-devices ; \
 		u="$$r/usr/src" ; \
 		if test -d $$u ; then \
 			p="$$u/$(PACKAGE_TARNAME)" ; \
@@ -223,8 +221,7 @@ UNINSTALL_LOCAL += uninstall-modules
 # by the other kernels.  If there are not, the prune and include patch is removed from the
 # modules.conf file.
 #
-# If we have a usable system map file and an executable depmod, we perform the depmod.  Finally we
-# invoke removal of any installed devices.
+# If we have a usable system map file and an executable depmod, we perform the depmod.
 #
 # It is not possible to restore any modules or associated modules.conf entries for non-rpm or older
 # rpm LiS or LfS releases.  You need to reinstall those packages (if desired) to restore the removed
@@ -252,7 +249,6 @@ postun-modules:
 				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \
-		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
 		p="$$r/usr/src/$(PACKAGE_TARNAME)" ; \
 		echo "rm -f -- $$p" ; \
 		rm -f -- "$$p" ; \

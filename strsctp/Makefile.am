@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/01 18:59:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/04 22:56:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/01 18:59:42 $ by $Author: brian $
+# Last Modified $Date: 2005/02/04 22:56:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -403,15 +403,7 @@ KERNEL_MODMAPS				= $(STREAMS_MODMAP)
 
 include am/kernel.am
 
-SCTPMAKENODES				= @PACKAGE_TARNAME@_mknod
-
 include am/strconf.am
-
-install-devices: $(SCTPMAKENODES)
-	./$(SCTPMAKENODES)
-
-uninstall-devices: $(SCTPMAKENODES)
-	./$(SCTPMAKENODES) --remove
 
 if RPM_BUILD_USER
 

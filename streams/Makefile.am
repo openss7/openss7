@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/02/04 08:57:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/02/04 22:56:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/04 08:57:36 $ by $Author: brian $
+# Last Modified $Date: 2005/02/04 22:56:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -606,19 +606,7 @@ GENKSYMS_CPPFLAGS		= \
 
 include am/genksyms.am
 
-STRMAKENODES			= @PACKAGE_TARNAME@_mknod
-
 include am/strconf.am
-
-if RPM_BUILD_KERNEL
-
-install-devices: $(STRMAKENODES)
-	./$(STRMAKENODES)
-
-uninstall-devices: $(STRMAKENODES)
-	./$(STRMAKENODES) --remove
-
-endif
 
 if RPM_BUILD_USER
 

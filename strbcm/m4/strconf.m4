@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.11 2005/02/02 10:49:40 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.13 2005/02/04 23:26:52 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/02 10:49:40 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/04 23:26:52 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -143,6 +143,7 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
     AC_MSG_RESULT([${STRCONF_MAKEDEV}])
     AC_MSG_CHECKING([for strconf makenodes source file name])
     STRCONF_MKNODES="${strconf_cv_mknodes:-util/linux/strmakenodes.c}"
+    STRMAKENODES=`basename "$STRCONF_MKNODES" .c`
     AC_MSG_RESULT([${STRCONF_MKNODES}])
     AC_MSG_CHECKING([for strconf strsetup configuration file name])
     STRCONF_STSETUP="${strconf_cv_stsetup:-strsetup.conf}"
@@ -257,6 +258,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
         AC_SUBST([STRCONF_STSETUP])dnl
         AC_SUBST([STRCONF_STRLOAD])dnl
         AC_SUBST([STRCONF_PACKAGE])dnl
+        AC_SUBST([STRMAKENODES])dnl
         _STRCONF_OUTPUT_CONFIG
 ])# _STRCONF_OUTPUT
 # =========================================================================

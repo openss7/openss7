@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/02/01 18:59:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/02/04 23:45:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/01 18:59:42 $ by $Author: brian $
+# Last Modified $Date: 2005/02/04 23:45:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -886,35 +886,35 @@ endif
 
 endif
 
+include am/strconf.am
+
 INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
 
-STRMAKENODES			= @PACKAGE_TARNAME@_mknod
-
-include am/strconf.am
+dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV) 
 
 if WITH_INET
 
-install-devices: $(STRMAKENODES) $(INET_MKDEV)
-	./$(STRMAKENODES)
-	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)
+install-inet-devices: $(INET_MKDEV)
+	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)' ; \
+		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV) ; \
+	fi
 
-uninstall-devices:
-	./$(STRMAKENODES) --remove
-	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)
+uninstall-inet-devices:
+	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)' ; \
+		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
+	fi
 
-else
+INSTALL_EXEC_HOOK += install-inet-devices
 
-install-devices: $(STRMAKENODES)
-	./$(STRMAKENODES)
+UNINSTALL_HOOK += uninstall-inet-devices
 
-uninstall-devices:
-	./$(STRMAKENODES) --remove
+.PHONY: install-inet-devices uninstall-inet-devices
 
 endif
-
-dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV) 
 
 SUBDIRS = doc src
 
