@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/08 00:58:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/08 11:55:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:58:56 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,24 +77,24 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(INET_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
 test_inet_raw_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_raw_CPPFLAGS		= $(INET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_tcp_CPPFLAGS		= $(INET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
 test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_udp_CPPFLAGS		= $(INET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
 endif
@@ -118,25 +118,14 @@ nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  src/include/os7/timer.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
-libINETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libINETmods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -I./src/drivers \
-				  -I$(srcdir)/src/drivers \
-				  -imacros strconf.h \
-				  $(INET_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -161,24 +150,24 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(INET_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
 test_inet_raw_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_raw_CPPFLAGS		= $(INET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_tcp_CPPFLAGS		= $(INET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
 test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_udp_CPPFLAGS		= $(INET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
 endif
@@ -202,25 +191,14 @@ nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  src/include/os7/timer.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
-libINETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libINETmods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -I./src/drivers \
-				  -I$(srcdir)/src/drivers \
-				  -imacros strconf.h \
-				  $(INET_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -275,10 +253,7 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules \
-				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/08 00:58:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/08 11:55:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:58:56 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,19 +75,19 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 ldlconfig_SOURCES		= src/util/ldlconfig.c
 ldlconfig_LDADD			= $(STREAMS_LDADD)
-ldlconfig_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+ldlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD)
-ldltest_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
 endif
@@ -112,23 +112,14 @@ nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  config.h strconf.h
+				  src/include/os7/timer.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
-libXNSmods_a_DEPENDENCIES	= config.h strconf.h
-libXNSmods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -imacros strconf.h \
-				  $(XNS_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libXNSmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
@@ -142,23 +133,14 @@ nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  config.h strconf.h
+				  src/include/os7/timer.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libXNSdrvs_a_DEPENDENCIES	= config.h strconf.h
-libXNSdrvs_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/drivers \
-				  -I$(srcdir)/src/drivers \
-				  -imacros strconf.h \
-				  $(XNS_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
@@ -182,19 +164,19 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 ldlconfig_SOURCES		= src/util/ldlconfig.c
 ldlconfig_LDADD			= $(STREAMS_LDADD)
-ldlconfig_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+ldlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD)
-ldltest_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
 endif
@@ -219,23 +201,14 @@ nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  strconf.h
+				  src/include/os7/timer.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
-libXNSmods_a_DEPENDENCIES	= config.h strconf.h
-libXNSmods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -imacros strconf.h \
-				  $(XNS_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libXNSmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
@@ -249,23 +222,14 @@ nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  strconf.h
+				  src/include/os7/timer.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libXNSdrvs_a_DEPENDENCIES	= config.h strconf.h
-libXNSdrvs_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/drivers \
-				  -I$(srcdir)/src/drivers \
-				  -imacros strconf.h \
-				  $(XNS_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -318,10 +282,7 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules \
-				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

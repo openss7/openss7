@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/03/07 06:09:26 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/03/08 10:52:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 06:09:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 10:52:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,7 @@
 %global modules     specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-liscompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat
 %global preloads    specfs streams
 %global libraries   streams
-%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes
+%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
 %global infofiles   %{name} STREAMS SPG porting
 %global initfiles   specfs strace streams strerr
 
@@ -1073,8 +1073,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.78  2005/03/07 06:09:26  brian
-# - More spec changes for 2.6.
+# Revision 0.9.2.79  2005/03/08 10:52:58  brian
+# - Correction to modules and tools in spec files.
+#
+# Revision 0.9.2.47  2005/03/08 10:52:58  brian
+# - Correction to modules and tools in spec files.
 #
 # Revision 0.9.2.46  2005/03/07 06:09:26  brian
 # - More spec changes for 2.6.

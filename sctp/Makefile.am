@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/08 00:58:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 11:55:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:58:55 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,122 +83,90 @@ libexec_PROGRAMS		= \
 
 test_tcps_SOURCES		= test/test-tcps.c
 test_tcps_DEPENDENCIES		= $(CONFIG_HEADER)
-test_tcps_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcps_CFLAGS		= $(USER_CFLAGS)
 
 
 test_tcpc_SOURCES		= test/test-tcpc.c
 test_tcpc_DEPENDENCIES		= $(CONFIG_HEADER)
-test_tcpc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcpc_CFLAGS		= $(USER_CFLAGS)
 
 test_udps_SOURCES		= test/test-udps.c
 test_udps_DEPENDENCIES		= $(CONFIG_HEADER)
-test_udps_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udps_CFLAGS		= $(USER_CFLAGS)
 
 
 test_udpc_SOURCES		= test/test-udpc.c
 test_udpc_DEPENDENCIES		= $(CONFIG_HEADER)
-test_udpc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udpc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctps_SOURCES		= test/test-sctps.c
 test_sctps_DEPENDENCIES		= $(CONFIG_HEADER)
-test_sctps_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctps_CFLAGS		= $(USER_CFLAGS)
 
 
 test_sctpc_SOURCES		= test/test-sctpc.c
 test_sctpc_DEPENDENCIES		= $(CONFIG_HEADER)
-test_sctpc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctpc_CFLAGS		= $(USER_CFLAGS)
 
 test_tcp_ds_SOURCES		= test/test-tcp-ds.c
 test_tcp_ds_DEPENDENCIES	= $(CONFIG_HEADER)
-test_tcp_ds_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_tcp_ds_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcp_ds_CFLAGS		= $(USER_CFLAGS)
 
 
 test_tcp_dc_SOURCES		= test/test-tcp-dc.c
 test_tcp_dc_DEPENDENCIES	= $(CONFIG_HEADER)
-test_tcp_dc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_tcp_dc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcp_dc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ds_SOURCES		= test/test-sctp-ds.c
 test_sctp_ds_DEPENDENCIES	= $(CONFIG_HEADER)
-test_sctp_ds_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctp_ds_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ds_CFLAGS		= $(USER_CFLAGS)
 
 
 test_sctp_dc_SOURCES		= test/test-sctp-dc.c
 test_sctp_dc_DEPENDENCIES	= $(CONFIG_HEADER)
-test_sctp_dc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctp_dc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_dc_CFLAGS		= $(USER_CFLAGS)
 
 test_tcp_ts_SOURCES		= test/test-tcp-ts.c
 test_tcp_ts_DEPENDENCIES	= $(CONFIG_HEADER)
-test_tcp_ts_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_tcp_ts_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcp_ts_CFLAGS		= $(USER_CFLAGS)
 
 
 test_tcp_tc_SOURCES		= test/test-tcp-tc.c
 test_tcp_tc_DEPENDENCIES	= $(CONFIG_HEADER)
-test_tcp_tc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_tcp_tc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcp_tc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ts_SOURCES		= test/test-sctp-ts.c
 test_sctp_ts_DEPENDENCIES	= $(CONFIG_HEADER)
-test_sctp_ts_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctp_ts_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ts_CFLAGS		= $(USER_CFLAGS)
 
 
 test_sctp_tc_SOURCES		= test/test-sctp-tc.c
 test_sctp_tc_DEPENDENCIES	= $(CONFIG_HEADER)
-test_sctp_tc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctp_tc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_tc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ss_SOURCES		= test/test-sctp-ss.c
 test_sctp_ss_DEPENDENCIES	= $(CONFIG_HEADER)
-test_sctp_ss_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctp_ss_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ss_CFLAGS		= $(USER_CFLAGS)
 
 
 test_sctp_sc_SOURCES		= test/test-sctp-sc.c
 test_sctp_sc_DEPENDENCIES	= $(CONFIG_HEADER)
-test_sctp_sc_CPPFLAGS		= $(SCTP_INCLUDES) \
-				  -I./include -I$(srcdir)/include \
-				  $(USER_CPPFLAGS)
+test_sctp_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_sc_CFLAGS		= $(USER_CFLAGS)
 
 sbin_PROGRAMS			=
@@ -236,11 +204,8 @@ sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)
 nodist_libSCTPmodl_a_SOURCES	= $(sctp_source_FILES)
 
 libSCTPmodl_a_DEPENDENCIES	= $(CONFIG_HEADER)
-libSCTPmodl_a_CPPFLAGS		= -I./src -I$(srcdir)/src \
-				  -I./include -I$(srcdir)/include \
-				  $(SCTP_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSCTPmodl_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+				  $(KERNEL_NOVERSION)
 libSCTPmodl_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPmodl_a_OBJECTS: $(libSCTPmodl_a_DEPENDENCIES)
@@ -296,9 +261,7 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				-I./src -I$(srcdir)/src \
-				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols
@@ -308,8 +271,8 @@ include am/genksyms.am
 ##
 ## Rules for generating STREAMS configuration
 ##
-include am/strconf.am
-
+##include am/strconf.am
+##
 if RPM_BUILD_USER
 
 SUBDIRS = include doc tests

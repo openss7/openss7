@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/03/08 00:58:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/03/08 11:55:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:58:56 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,39 +85,39 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
-test_tirdwr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD)
-test_timod_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 endif
 
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
-test_xnet_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
-test_xnet_thr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
+test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
 lib_LTLIBRARIES			+= libxnet.la
 
 libxnet_la_SOURCES		= src/lib/xnet.c gettext.h
 libxnet_la_LDFLAGS		= -version-info 0:0:0
-libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(XNET_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
 endif
@@ -144,24 +144,14 @@ nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  src/include/os7/timer.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
-libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -imacros \
-				  ./strconf.h \
-				  $(XNET_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libXNETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -194,39 +184,39 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
-test_tirdwr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD)
-test_timod_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 endif
 
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
-test_xnet_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
-test_xnet_thr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
+test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
 lib_LTLIBRARIES			+= libxnet.la
 
 libxnet_la_SOURCES		= src/lib/xnet.c gettext.h
 libxnet_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0
-libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(XNET_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
 endif
@@ -253,23 +243,14 @@ nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  src/include/os7/timer.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
-libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -imacros ./strconf.h \
-				  $(XNET_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libXNETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
@@ -324,10 +305,7 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules \
-				$(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

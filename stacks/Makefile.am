@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/03/07 23:20:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/08 11:55:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 23:20:14 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -103,104 +103,104 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= config.h strconf.h
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDFLAGS		= $(STREAMS_LDADD)
-test_tcpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcpc_CFLAGS		= $(USER_CFLAGS)
 
 test_tcps_SOURCES		= src/test/inet/test-tcps.c
 test_tcps_LDFLAGS		= $(STREAMS_LDADD)
-test_tcps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcps_CFLAGS		= $(USER_CFLAGS)
 
 test_udpc_SOURCES		= src/test/inet/test-udpc.c
 test_udpc_LDFLAGS		= $(STREAMS_LDADD)
-test_udpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udpc_CFLAGS		= $(USER_CFLAGS)
 
 test_udps_SOURCES		= src/test/inet/test-udps.c
 test_udps_LDFLAGS		= $(STREAMS_LDADD)
-test_udps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udps_CFLAGS		= $(USER_CFLAGS)
 
 #test_q784_SOURCES		= src/test/isup/test-q784.c
 #test_q784_LDFLAGS		= $(STREAMS_LDADD)
-#test_q784_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_q784_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_q784_CFLAGS		= $(USER_CFLAGS)
 
 test_m2pa_SOURCES		= src/test/m2pa/test-m2pa.c
 test_m2pa_LDFLAGS		= $(STREAMS_LDADD)
-test_m2pa_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS)
 
 #perftest_SOURCES		= src/test/perftest.c
 #perftest_LDFLAGS		= $(STREAMS_LDADD)
-#perftest_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #perftest_CFLAGS		= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
 test_q781_LDFLAGS		= $(STREAMS_LDADD)
-test_q781_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_q781_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_q781_CFLAGS		= $(USER_CFLAGS)
 
 #test_q781_pipe_SOURCES		= src/test/sl/test-q781-pipe.c
 #test_q781_pipe_LDFLAGS		= $(STREAMS_LDADD)
-#test_q781_pipe_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_q781_pipe_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_q781_pipe_CFLAGS		= $(USER_CFLAGS)
 
 test_x100p_SOURCES		= src/test/x400p-ss7/test-x100p.c
 test_x100p_LDFLAGS		= $(STREAMS_LDADD)
-test_x100p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x100p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x100p_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_SOURCES		= src/test/x400p-ss7/test-x400p.c
 test_x400p_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_cap2_SOURCES	= src/test/x400p-ss7/test-x400p-cap2.c
 #test_x400p_cap2_LDFLAGS	= $(STREAMS_LDADD)
-#test_x400p_cap2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_cap2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_cap2_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_cap_SOURCES		= src/test/x400p-ss7/test-x400p-cap.c
 #test_x400p_cap_LDFLAGS		= $(STREAMS_LDADD)
-#test_x400p_cap_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_cap_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_cap_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_hsl_SOURCES		= src/test/x400p-ss7/test-x400p-hsl.c
 #test_x400p_hsl_LDFLAGS		= $(STREAMS_LDADD)
-#test_x400p_hsl_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_hsl_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_hsl_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_perf_SOURCES	= src/test/x400p-ss7/test-x400p-perf.c
 #test_x400p_perf_LDFLAGS	= $(STREAMS_LDADD)
-#test_x400p_perf_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_perf_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_perf_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sdl_SOURCES		= src/test/x400p-ss7/test-x400p-sdl.c
 #test_x400p_sdl_LDFLAGS		= $(STREAMS_LDADD)
-#test_x400p_sdl_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_sdl_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sdl_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sdt2_SOURCES	= src/test/x400p-ss7/test-x400p-sdt2.c
 #test_x400p_sdt2_LDFLAGS	= $(STREAMS_LDADD)
-#test_x400p_sdt2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_sdt2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sdt_SOURCES		= src/test/x400p-ss7/test-x400p-sdt.c
 #test_x400p_sdt_LDFLAGS		= $(STREAMS_LDADD)
-#test_x400p_sdt_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_sdt_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sdt_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sl_SOURCES		= src/test/x400p-ss7/test-x400p-sl.c
 #test_x400p_sl_LDFLAGS		= $(STREAMS_LDADD)
-#test_x400p_sl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+#test_x400p_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
 
 endif
@@ -244,7 +244,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
 				  src/include/os7/compat.h \
-				  strconf.h
+				  config.h strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
 
@@ -305,15 +305,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -378,104 +370,104 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= config.h strconf.h
 @PACKAGE_TARNAME@_mknod_LDDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDFLAGS		= $(STREAMS_LDADD)
-test_tcpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcpc_CFLAGS		= $(USER_CFLAGS)
 
 test_tcps_SOURCES		= src/test/inet/test-tcps.c
 test_tcps_LDFLAGS		= $(STREAMS_LDADD)
-test_tcps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tcps_CFLAGS		= $(USER_CFLAGS)
 
 test_udpc_SOURCES		= src/test/inet/test-udpc.c
 test_udpc_LDFLAGS		= $(STREAMS_LDADD)
-test_udpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udpc_CFLAGS		= $(USER_CFLAGS)
 
 test_udps_SOURCES		= src/test/inet/test-udps.c
 test_udps_LDFLAGS		= $(STREAMS_LDADD)
-test_udps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udps_CFLAGS		= $(USER_CFLAGS)
 
 test_q784_SOURCES		= src/test/isup/test-q784.c
 test_q784_LDFLAGS		= $(STREAMS_LDADD)
-test_q784_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_q784_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_q784_CFLAGS		= $(USER_CFLAGS)
 
 test_m2pa_SOURCES		= src/test/m2pa/test-m2pa.c
 test_m2pa_LDFLAGS		= $(STREAMS_LDADD)
-test_m2pa_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS)
 
 perftest_SOURCES		= src/test/perftest.c
 perftest_LDFLAGS		= $(STREAMS_LDADD)
-perftest_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
 test_q781_LDFLAGS		= $(STREAMS_LDADD)
-test_q781_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_q781_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_q781_CFLAGS		= $(USER_CFLAGS)
 
 test_q781_pipe_SOURCES		= src/test/sl/test-q781-pipe.c
 test_q781_pipe_LDFLAGS		= $(STREAMS_LDADD)
-test_q781_pipe_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_q781_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_q781_pipe_CFLAGS		= $(USER_CFLAGS)
 
 test_x100p_SOURCES		= src/test/x400p-ss7/test-x100p.c
 test_x100p_LDFLAGS		= $(STREAMS_LDADD)
-test_x100p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x100p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x100p_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_SOURCES		= src/test/x400p-ss7/test-x400p.c
 test_x400p_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_cap2_SOURCES		= src/test/x400p-ss7/test-x400p-cap2.c
 test_x400p_cap2_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_cap2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_cap2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_cap2_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_cap_SOURCES		= src/test/x400p-ss7/test-x400p-cap.c
 test_x400p_cap_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_cap_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_cap_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_cap_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_hsl_SOURCES		= src/test/x400p-ss7/test-x400p-hsl.c
 test_x400p_hsl_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_hsl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_hsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_hsl_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_perf_SOURCES		= src/test/x400p-ss7/test-x400p-perf.c
 test_x400p_perf_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_perf_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_perf_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_perf_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sdl_SOURCES		= src/test/x400p-ss7/test-x400p-sdl.c
 test_x400p_sdl_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_sdl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sdl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sdl_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sdt2_SOURCES		= src/test/x400p-ss7/test-x400p-sdt2.c
 test_x400p_sdt2_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_sdt2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sdt2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sdt_SOURCES		= src/test/x400p-ss7/test-x400p-sdt.c
 test_x400p_sdt_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_sdt_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sdt_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sdt_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sl_SOURCES		= src/test/x400p-ss7/test-x400p-sl.c
 test_x400p_sl_LDFLAGS		= $(STREAMS_LDADD)
-test_x400p_sl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
 
 endif
@@ -553,7 +545,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
-				  strconf.h
+				  config.h strconf.h
 
 if WITH_LIS
 nodist_EXTRA_libSS7mods_a_SOURCES	+= \
@@ -583,15 +575,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules \
-				  -I$(srcdir)/src/modules \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -620,20 +604,12 @@ nodist_EXTRA_libSS7m3ua_a_SOURCES = \
 				  src/modules/m3ua/m3ua_mtp.h \
 				  src/modules/m3ua/m3ua_nsp.h \
 				  src/modules/m3ua/m3ua_tsp.h \
-				  strconf.h
+				  config.h strconf.h
 m3ua_source_FILES		= $(nodist_EXTRA_libSS7m3ua_a_SOURCES)
 nodist_libSS7m3ua_a_SOURCES	= $(m3ua_source_FILES)
 
 libSS7m3ua_a_DEPENDENCIES	= config.h strconf.h
-libSS7m3ua_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules/m3ua \
-				  -I$(srcdir)/src/modules/m3ua \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7m3ua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7m3ua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7m3ua_a_OBJECTS:		$(libSS7m3ua_a_DEPENDENCIES)
 
@@ -659,20 +635,12 @@ nodist_EXTRA_libSS7sscop_a_SOURCES = \
 				  src/modules/sscop/sscop_time.h \
 				  src/modules/sscop/sscop_t_prov.h \
 				  src/modules/sscop/sscop_user.h \
-				  strconf.h
+				  config.h strconf.h
 sscop_source_FILES		= $(nodist_EXTRA_libSS7sscop_a_SOURCES)
 nodist_libSS7sscop_a_SOURCES	= $(sscop_source_FILES)
 
 libSS7sscop_a_DEPENDENCIES	= config.h strconf.h
-libSS7sscop_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules/sscop \
-				  -I$(srcdir)/src/modules/sscop \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7sscop_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7sscop_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sscop_a_OBJECTS:		$(libSS7sscop_a_DEPENDENCIES)
 
@@ -702,20 +670,12 @@ nodist_EXTRA_libSS7sua_a_SOURCES = \
 				  src/modules/sua/sua_sccp.h \
 				  src/modules/sua/sua_send.h \
 				  src/modules/sua/sua_tsp.h \
-				  strconf.h
+				  config.h strconf.h
 sua_source_FILES		= $(nodist_EXTRA_libSS7sua_a_SOURCES)
 nodist_libSS7sua_a_SOURCES	= $(sua_source_FILES)
 
 libSS7sua_a_DEPENDENCIES	= config.h strconf.h
-libSS7sua_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules/sua \
-				  -I$(srcdir)/src/modules/sua \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7sua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7sua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sua_a_OBJECTS:		$(libSS7sua_a_DEPENDENCIES)
 
@@ -732,20 +692,12 @@ nodist_EXTRA_libSS7tua_a_SOURCES = \
 				  src/modules/tua/tua_data.h \
 				  src/modules/tua/tua.h \
 				  src/modules/tua/tua_msg.h \
-				  strconf.h
+				  config.h strconf.h
 tua_source_FILES		= $(nodist_EXTRA_libSS7tua_a_SOURCES)
 nodist_libSS7tua_a_SOURCES	= $(tua_source_FILES)
 
 libSS7tua_a_DEPENDENCIES	= config.h strconf.h
-libSS7tua_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules/tua \
-				  -I$(srcdir)/src/modules/tua \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7tua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7tua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tua_a_OBJECTS:		$(libSS7tua_a_DEPENDENCIES)
 
@@ -761,20 +713,12 @@ nodist_EXTRA_libSS7tali_a_SOURCES = \
 				  src/modules/tali/tali_data.h \
 				  src/modules/tali/tali.h \
 				  src/modules/tali/tali_msgs.h \
-				  strconf.h
+				  config.h strconf.h
 tali_source_FILES		= $(nodist_EXTRA_libSS7tali_a_SOURCES)
 nodist_libSS7tali_a_SOURCES	= $(tali_source_FILES)
 
 libSS7tali_a_DEPENDENCIES	= config.h strconf.h
-libSS7tali_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/modules/tali \
-				  -I$(srcdir)/src/modules/tali \
-				  -imacros strconf.h \
-				  $(SS7_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSS7tali_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSS7tali_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tali_a_OBJECTS:		$(libSS7tali_a_DEPENDENCIES)
 
@@ -791,12 +735,12 @@ if RPM_BUILD_USER
 
 test_timod_SOURCES		= src/test/tli/test-timod.c
 test_timod_LDFLAGS		= $(STREAMS_LDADD) -lxnet
-test_timod_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 
 test_tirdwr_SOURCES		= src/test/tli/test-tirdwr.c
 test_tirdwr_LDFLAGS		= $(STREAMS_LDADD) -lxnet
-test_tirdwr_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
@@ -807,27 +751,27 @@ endif
 
 test_inet_raw_SOURCES		= src/test/inet/test-inet_raw.c
 test_inet_raw_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_raw_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/inet/test-inet_tcp.c
 test_inet_tcp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_tcp_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/inet/test-inet_udp.c
 test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_udp_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_SOURCES		= src/test/xnet/test-xnet.c
 test_xnet_LDFLAGS		= $(STREAMS_LDADD) -lxnet
-test_xnet_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/xnet/test-xnet.c
 test_xnet_thr_LDFLAGS		= $(STREAMS_LDADD) -lpthread -lxnet
-test_xnet_thr_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_INET
@@ -943,14 +887,12 @@ libexec_PROGRAMS		+= \
 				  test-xnet_thr
 libxnet_la_SOURCES		= src/lib/libxnet/xnet.c gettext.h
 libxnet_la_LDFLAGS		= -no-undefined -version-info 0:0:0
-libxnet_la_CPPFLAGS		= -I$(srcdir)/src/lib/libxnet -I./src/lib/libxnet $(SS7_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/xti -I./src/include/xti
+libxnet_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/xti -I./src/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= $(STREAMS_LDADD)
 endif
 
 endif
-
-include am/strconf.am
 
 INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
@@ -988,18 +930,15 @@ UNINSTALL_HOOK += uninstall-inet-devices
 
 PKGINCL				= include/sys/$(PACKAGE_NAME)
 
-AUTOCONFIG_H			= $(PKGINCL)/config.h
-
-EXTRA_DIST			+= $(AUTOCONFIG_H).in
-
+##AUTOCONFIG_H			= $(PKGINCL)/config.h
+##
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
+##
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules \
-				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

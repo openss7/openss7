@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:26 $
+ @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 10:54:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 04:23:26 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 10:54:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:26 $"
+#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 10:54:41 $"
 
-static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:26 $";
+static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 10:54:41 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
@@ -139,7 +139,7 @@ static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2
 #   include <net/sctp.h>
 #endif
 
-#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
 #define _SS_MAXSIZE     128
 #define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/07 23:20:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/08 11:55:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 23:20:14 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,34 +81,34 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_SOURCES		= src/test/test-sctp.c
 test_sctp_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
 test_sctp_n_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_n_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_nc_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
 test_sctp_ns_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_ns_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
 test_sctp_t_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_t_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
 endif
@@ -162,8 +162,7 @@ sctp_source_FILES		= \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  strconf.h
+				  src/include/os7/timer.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
 				  src/include/os7/allocb.h \
@@ -174,8 +173,7 @@ sctp2_source_FILES		= \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  strconf.h
+				  src/include/os7/timer.h
 if WITH_HMAC_MD5
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_md5.c \
@@ -206,16 +204,8 @@ endif
 if WITH_SCTP2
 nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
 endif
-libSCTPsctp_a_DEPENDENCIES	= config.h strconf.h
-libSCTPsctp_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/drivers \
-				  -I$(srcdir)/src/drivers \
-				  -imacros strconf.h \
-				  $(SCTP_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
@@ -248,34 +238,34 @@ sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		= 
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_SOURCES		= src/test/test-sctp.c
 test_sctp_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
 test_sctp_n_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_n_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_nc_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_nc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
 test_sctp_ns_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_ns_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_ns_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
 test_sctp_t_LDFLAGS		= $(STREAMS_LDADD)
-test_sctp_t_CPPFLAGS		= $(SCTP_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
 endif
@@ -329,8 +319,7 @@ sctp_source_FILES		= \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  strconf.h
+				  src/include/os7/timer.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
 				  src/include/os7/allocb.h \
@@ -341,8 +330,7 @@ sctp2_source_FILES		= \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  strconf.h
+				  src/include/os7/timer.h
 if WITH_HMAC_MD5
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_md5.c \
@@ -373,16 +361,8 @@ endif
 if WITH_SCTP2
 nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
 endif
-libSCTPsctp_a_DEPENDENCIES	= config.h strconf.h
-libSCTPsctp_a_CPPFLAGS		= \
-				  -I./src/include/os7 \
-				  -I$(srcdir)/src/include/os7 \
-				  -I./src/drivers \
-				  -I$(srcdir)/src/drivers \
-				  -imacros strconf.h \
-				  $(SCTP_INCLUDES) \
-				  $(KERNEL_CPPFLAGS) \
-				  $(KERNEL_MODFLAGS)
+libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
@@ -427,22 +407,19 @@ include am/kernel.am
 ##
 ## Rules for building libraries
 ##
-include am/libraries.am
-
+##include am/libraries.am
+##
 PKGINCL				= include/sys/$(PACKAGE_NAME)
 
-AUTOCONFIG_H			= $(PKGINCL)/config.h
-
-EXTRA_DIST			+= $(AUTOCONFIG_H).in
-
+##AUTOCONFIG_H			= $(PKGINCL)/config.h
+##
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
+##
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules \
-				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

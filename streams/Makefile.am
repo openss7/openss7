@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/03/07 13:27:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/03/08 11:55:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 13:27:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:55:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,12 +119,6 @@ noinst_LIBRARIES		= \
 				libLfS-modules.a \
 				libLfS-compat.a
 
-LOCAL_INCLUDES			= \
-				-I./src/compat -I$(srcdir)/src/compat \
-				-I./src/kernel -I$(srcdir)/src/kernel \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules
-				
 libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.c \
 				src/kernel/strspecfs.h \
@@ -138,8 +132,8 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strpipe.h \
 				src/kernel/strargs.h
 
-libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_specfs_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_specfs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libLfS_specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
@@ -230,8 +224,8 @@ endif
 #libLfS_streams_a_SOURCES	+= src/drivers/spx.c
 #endif
 
-libLfS_streams_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_streams_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_streams_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libLfS_streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_streams_a_OBJECTS): $(libLfS_streams_a_DEPENDENCIES)
@@ -273,8 +267,8 @@ endif
 #libLfS_drivers_a_SOURCES		+= src/drivers/spx.c
 #endif
 
-libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_drivers_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_drivers_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_drivers_a_OBJECTS): $(libLfS_drivers_a_DEPENDENCIES)
@@ -294,8 +288,8 @@ if CONFIG_STREAMS_SC_MODULE
 libLfS_modules_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
 endif
 
-libLfS_modules_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_modules_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_modules_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_modules_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_modules_a_OBJECTS): $(libLfS_modules_a_DEPENDENCIES)
@@ -324,8 +318,8 @@ if CONFIG_STREAMS_COMPAT_LIS_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/lis/liscompat.c
 endif
 
-libLfS_compat_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_compat_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_compat_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libLfS_compat_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libLfS_compat_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_compat_a_OBJECTS): $(libLfS_compat_a_DEPENDENCIES)
@@ -386,7 +380,7 @@ libstreams_la_SOURCES		= \
 				lib/libc/putmsg.c \
 				lib/libc/putpmsg.c
 libstreams_la_LDFLAGS		= -no-undefined -version-info 0:0:0
-libstreams_la_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
 
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
@@ -394,64 +388,64 @@ EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 #bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
 
-strchg_SOURCES			= src/util/strchg.c include/sys/config.h
-strchg_DEPENDENCIES		= include/sys/config.h
+strchg_SOURCES			= src/util/strchg.c
+strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strchg_LDADD			= libstreams.la
-strchg_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strchg_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strchg_CFLAGS			= $(USER_CFLAGS)
 
-strconf_SOURCES			= src/util/strconf.c include/sys/config.h
-strconf_DEPENDENCIES		= include/sys/config.h
+strconf_SOURCES			= src/util/strconf.c
+strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strconf_LDADD			= libstreams.la
-strconf_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
 
-strreset_SOURCES		= src/util/strreset.c include/sys/config.h
-strreset_DEPENDENCIES		= include/sys/config.h
+strreset_SOURCES		= src/util/strreset.c
+strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strreset_LDADD			= libstreams.la
-strreset_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strreset_CFLAGS			= $(USER_CFLAGS)
 
-autopush_SOURCES		= src/util/autopush.c include/sys/config.h
-autopush_DEPENDENCIES		= include/sys/config.h
+autopush_SOURCES		= src/util/autopush.c
+autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 autopush_LDFLAGS		= -static libstreams.la
-autopush_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+autopush_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 autopush_CFLAGS			= $(USER_CFLAGS)
 
-fattach_SOURCES			= src/util/fattach.c include/sys/config.h
-fattach_DEPENDENCIES		= include/sys/config.h
+fattach_SOURCES			= src/util/fattach.c
+fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 fattach_LDFLAGS			= -static libstreams.la
-fattach_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+fattach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fattach_CFLAGS			= $(USER_CFLAGS)
 
-fdetach_SOURCES			= src/util/fdetach.c include/sys/config.h
-fdetach_DEPENDENCIES		= include/sys/config.h
+fdetach_SOURCES			= src/util/fdetach.c 
+fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 fdetach_LDFLAGS			= -static libstreams.la
-fdetach_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+fdetach_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 fdetach_CFLAGS			= $(USER_CFLAGS)
 
-insf_SOURCES			= src/util/insf.c include/sys/config.h
-insf_DEPENDENCIES		= include/sys/config.h
+insf_SOURCES			= src/util/insf.c
+insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 insf_LDFLAGS			= -static libstreams.la
-insf_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+insf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 insf_CFLAGS			= $(USER_CFLAGS)
 
-scls_SOURCES			= src/util/scls.c include/sys/config.h
-scls_DEPENDENCIES		= include/sys/config.h
+scls_SOURCES			= src/util/scls.c
+scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 scls_LDFLAGS			= -static libstreams.la
-scls_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+scls_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 scls_CFLAGS			= $(USER_CFLAGS)
 
-strace_SOURCES			= src/util/strace.c include/sys/config.h
-strace_DEPENDENCIES		= include/sys/config.h
+strace_SOURCES			= src/util/strace.c
+strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strace_LDFLAGS			= -static libstreams.la
-strace_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strace_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strace_CFLAGS			= $(USER_CFLAGS)
 
-#strclean_SOURCES		= src/util/strclean.c include/sys/config.h
-#strclean_DEPENDENCIES		= include/sys/config.h
+#strclean_SOURCES		= src/util/strclean.c
+#strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #strclean_LDFLAGS		= -static libstreams.la
-#strclean_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+#strclean_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #strclean_CFLAGS		= $(USER_CFLAGS)
 
 #@srcdir@/src/util/strclean.c:
@@ -460,22 +454,22 @@ strace_CFLAGS			= $(USER_CFLAGS)
 #@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
 #	touch $@
 
-strerr_SOURCES			= src/util/strerr.c include/sys/config.h
-strerr_DEPENDENCIES		= include/sys/config.h
+strerr_SOURCES			= src/util/strerr.c
+strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strerr_LDFLAGS			= -static libstreams.la
-strerr_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strerr_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strerr_CFLAGS			= $(USER_CFLAGS)
 
-strinfo_SOURCES			= src/util/strinfo.c include/sys/config.h
-strinfo_DEPENDENCIES		= include/sys/config.h
+strinfo_SOURCES			= src/util/strinfo.c
+strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strinfo_LDFLAGS			= -static libstreams.la
-strinfo_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strinfo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strinfo_CFLAGS			= $(USER_CFLAGS)
 
-#strload_SOURCES		= src/util/strload.c include/sys/config.h
-#strload_DEPENDENCIES		= include/sys/config.h
+#strload_SOURCES		= src/util/strload.c
+#strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #strload_LDFLAGS		= -static libstreams.la
-#strload_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+#strload_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #strload_CFLAGS			= $(USER_CFLAGS)
 
 #@srcdir@/src/util/strload.c:
@@ -484,10 +478,10 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 #@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
 #	touch $@
 
-#strsetup_SOURCES		= src/util/strsetup.c include/sys/config.h
-#strsetup_DEPENDENCIES		= include/sys/config.h
+#strsetup_SOURCES		= src/util/strsetup.c
+#strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 #strsetup_LDFLAGS		= -static libstreams.la
-#strsetup_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+#strsetup_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #strsetup_CFLAGS		= $(USER_CFLAGS)
 
 #@srcdir@/src/util/strsetup.c:
@@ -496,83 +490,83 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 #@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
 #	touch $@
 
-strvf_SOURCES			= src/util/strvf.c include/sys/config.h
-strvf_DEPENDENCIES		= include/sys/config.h
+strvf_SOURCES			= src/util/strvf.c
+strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 strvf_LDFLAGS			= -static libstreams.la
-strvf_CPPFLAGS			= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+strvf_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strvf_CFLAGS			= $(USER_CFLAGS)
 
-@PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c include/sys/config.h
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= include/sys/config.h
+@PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDFLAGS		= libstreams.la
-test_clone_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS)
 
 test_connld_SOURCES		= src/test/test-connld.c
 test_connld_LDFLAGS		= libstreams.la
-test_connld_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS)
 
 test_echo_SOURCES		= src/test/test-echo.c
 test_echo_LDFLAGS		= libstreams.la
-test_echo_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS)
 
 test_fifo_SOURCES		= src/test/test-fifo.c
 test_fifo_LDFLAGS		= libstreams.la
-test_fifo_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS)
 
 test_log_SOURCES		= src/test/test-log.c
 test_log_LDFLAGS		= libstreams.la
-test_log_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS)
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_LDFLAGS		= libstreams.la
-test_nsdev_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS)
 
 test_nuls_SOURCES		= src/test/test-nuls.c
 test_nuls_LDFLAGS		= libstreams.la
-test_nuls_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipe_SOURCES		= src/test/test-pipe.c
 test_pipe_LDFLAGS		= libstreams.la
-test_pipe_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
 test_pipemod_LDFLAGS		= libstreams.la
-test_pipemod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS)
 
 test_sad_SOURCES		= src/test/test-sad.c
 test_sad_LDFLAGS		= libstreams.la
-test_sad_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS)
 
 test_sc_SOURCES			= src/test/test-sc.c
 test_sc_LDFLAGS			= libstreams.la
-test_sc_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS)
 
 test_streams_SOURCES		= src/test/test-streams.c
 test_streams_LDFLAGS		= libstreams.la
-test_streams_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
 
 endif
 
 PKGINCL				= include/sys/$(PACKAGE_NAME)
 
-AUTOCONFIG_H			= $(PKGINCL)/config.h
+AUTOCONFIG_H			= include/sys/config.h
 
 EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
@@ -623,7 +617,7 @@ GENKSYMS_CPPFLAGS		= \
 				-I./src/kernel -I$(srcdir)/src/kernel \
 				-I./src/drivers -I$(srcdir)/src/drivers \
 				-I./src/modules -I$(srcdir)/src/modules \
-				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+				$(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

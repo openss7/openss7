@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/04 08:59:35 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/04 08:59:35 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 10:54:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/04 08:59:35 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/04 08:59:35 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $";
 
 #include "compat.h"
 
@@ -160,7 +160,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/04 08:59:35 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4582,15 +4582,15 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			sd->saddr = 0;
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
-#if defined HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
+#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
-#elif defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY
+#elif defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 			err =
 			    ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
 					     sp->sport, sp->dport, NULL);
-#else				/* defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY */
-#error One of HAVE_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
-#endif				/* defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY */
+#else				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
+#error One of HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+#endif				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 			if (err < 0 || !rt || rt->u.dst.obsolete) {
 				rare();
 				if (rt)
@@ -4651,15 +4651,15 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		if (sysctl_ip_dynaddr && sp->state == SCTP_COOKIE_WAIT && sd == sp->daddr) {
 			/* see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
-#if defined HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
+#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif))
-#elif defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY
+#elif defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 			if (!ip_route_connect
 			    (&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP,
 			     sp->sport, sp->dport, NULL))
-#else				/* defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY */
-#error One of HAVE_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
-#endif				/* defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY */
+#else				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
+#error One of HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+#endif				/* defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 			{
 				if (rt2->rt_src != rt->rt_src) {
 					rare();
@@ -4892,11 +4892,11 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
-#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
-#elif HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			iph->ttl = ip->uc_ttl;
-#endif				/* HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = sp->protocol;
@@ -5020,11 +5020,11 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
-#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
-#elif HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		iph->ttl = ip->uc_ttl;
-#endif				/* HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		iph->daddr = sd->daddr;	/* XXX */
 		iph->saddr = sd->saddr;
 		iph->protocol = sp->protocol;
@@ -11664,9 +11664,9 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 				size_t mtu = ntohs(icmph->un.frag.mtu);
 				ip_rt_update_pmtu(sd->dst_cache, mtu);
 				if (dst_pmtu(sd->dst_cache) > mtu && mtu && mtu >= 68
-#ifdef HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 				    && !(sd->dst_cache->mxlock & (1 << RTAX_MTU))
-#endif				/* HAVE_STRUCT_INET_PROTOCOL_PROTOCOL */
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL */
 				    ) {
 					dst_update_pmtu(sd->dst_cache, mtu);
 					dst_set_expires(sd->dst_cache, ip_rt_mtu_expires);
@@ -12762,11 +12762,11 @@ sctp_init_struct(struct sctp *sp)
 	sctp_change_state(sp, SCTP_CLOSED);
 	/* ip defaults */
 	sp->inet.tos = sctp_defaults.ip.tos;
-#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 	sp->inet.ttl = sysctl_ip_default_ttl;
-#elif HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 	sp->inet.uc_ttl = sysctl_ip_default_ttl;
-#endif				/* HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 	sp->protocol = IPPROTO_SCTP;
 	sp->localroute = sctp_defaults.ip.dontroute;
 	sp->broadcast = sctp_defaults.ip.broadcast;
@@ -15507,9 +15507,9 @@ sctp_parse_conn_opts(struct sctp *sp, unsigned char *ip, size_t ilen, int reques
 					continue;
 				if (*valp < 1)
 					*valp = 1;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 				np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 				np->uc_ttl = *valp;
 #endif
 				continue;
@@ -18141,19 +18141,19 @@ sctp_build_conn_con_opts(struct sctp *sp, unsigned char *op, size_t olen)
 		oh->name = T_IP_TTL;
 		oh->len = _T_LENGTH_SIZEOF(sp->options.ip.ttl);
 		oh->status = T_SUCCESS;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		if (sp->options.ip.ttl != np->ttl) {
 			if (sp->options.ip.ttl > np->ttl)
 				oh->status = T_PARTSUCCESS;
 			sp->options.ip.ttl = np->ttl;
 		}
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		if (sp->options.ip.ttl != np->uc_ttl) {
 			if (sp->options.ip.ttl > np->uc_ttl)
 				oh->status = T_PARTSUCCESS;
 			sp->options.ip.ttl = np->uc_ttl;
 		}
-#endif				/* HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		*((unsigned char *) T_OPT_DATA(oh)) = sp->options.ip.ttl;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
@@ -21486,9 +21486,9 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 #endif
 				}
 				sp->options.ip.ttl = *valp;
-#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
+#if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 				np->ttl = *valp;
-#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
+#elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 				np->uc_ttl = *valp;
 #endif
 				if (ih->name != T_ALLOPT)
@@ -25942,7 +25942,7 @@ sctp_v4_init(struct net_proto_family *ops)
 
 
 /* *INDENT-OFF* */
-#ifdef HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 STATIC struct inet_protocol sctp_protocol = {
 	.handler = sctp_v4_rcv,		/* SCTP data handler */
 	.err_handler = sctp_v4_err,	/* SCTP error control */
@@ -25959,9 +25959,9 @@ sctp_term_proto(void)
 {
 	inet_del_protocol(&sctp_protocol);
 }
-#endif				/* HAVE_STRUCT_INET_PROTOCOL_PROTOCOL */
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL */
 
-#ifdef HAVE_STRUCT_INET_PROTOCOL_NO_POLICY
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
 STATIC struct inet_protocol sctp_protocol = {
 	.handler = sctp_v4_rcv,		/* SCTP data handler */
 	.err_handler = sctp_v4_err,	/* SCTP error control */
@@ -25976,7 +25976,7 @@ sctp_term_proto(void)
 {
 	inet_del_protocol(&sctp_protocol, IPPROTO_SCTP);
 }
-#endif				/* HAVE_STRUCT_INET_PROTOCOL_NO_POLICY */
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 /* *INDENT-ON* */
 
 STATIC void

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/07 13:46:33 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:51:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 13:46:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 10:51:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,13 +83,18 @@ AC_DEFUN([AC_XNS], [dnl
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _XNS_SETUP
-    XNS_INCLUDES="-imacros ./config.h"
-    XNS_INCLUDES="${XNS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    XNS_INCLUDES="${XNS_INCLUDES} -I./src/include -I${srcdir}/src/include"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(CONFIG_HEADER)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
+    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
+    fi
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $XNS_INCLUDES])
+    AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
+    AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
@@ -99,7 +104,8 @@ AC_DEFUN([AC_XNS], [dnl
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl
-    AC_SUBST([XNS_INCLUDES])dnl
+    AC_SUBST([PKG_INCLUDES])dnl
+    AC_SUBST([PKG_MODFLAGS])dnl
     CPPFLAGS=
     CFLAGS=
     _XNS_OUTPUT

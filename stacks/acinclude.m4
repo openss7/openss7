@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/07 06:10:04 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/08 10:51:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 06:10:04 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 10:51:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,15 +83,20 @@ AC_DEFUN([AC_SS7], [dnl
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _SS7_SETUP
-    SS7_INCLUDES="-imacros ./config.h"
-    SS7_INCLUDES="${SS7_INCLUDES}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}"
-    SS7_INCLUDES="${SS7_INCLUDES}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}"
-    SS7_INCLUDES="${SS7_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    SS7_INCLUDES="${SS7_INCLUDES} -I./src/include -I${srcdir}/src/include"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(CONFIG_HEADER)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
+    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
+    fi
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $SS7_INCLUDES])
+    AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
+    AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
@@ -101,7 +106,8 @@ AC_DEFUN([AC_SS7], [dnl
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl
-    AC_SUBST([SS7_INCLUDES])dnl
+    AC_SUBST([PKG_INCLUDES])dnl
+    AC_SUBST([PKG_MODFLAGS])dnl
     CPPFLAGS=
     CFLAGS=
     _SS7_OUTPUT

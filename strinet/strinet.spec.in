@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/03/07 06:09:26 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/08 10:52:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 06:09:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 10:52:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@
 %global title       @PACKAGE_TITLE@
 %global stitle      @PACKAGE_SHORTTITLE@
 
-%global modules     @KERNEL_MODULES@
+%global modules     streams-inet
 #global preloads    
 %global libraries   inet
 %global tools       strinet_mknod test-inet_raw test-inet_udp test-inet_tcp
@@ -428,8 +428,7 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
 #   installing new on the running kernel, we have to worry about previous
 #   loaded modules for the old version or a non-rpm version
-    mods="%{modules}" ; for p in $mods ; do
-        m=`echo $p | sed -r -e 's|^.*/||;s|lib.*_a-|streams-|;s|.(k)?o(.gz)?$||'`
+    mods="%{modules}" ; for m in $mods ; do
         if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           module running, kick the stack
             /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
@@ -536,8 +535,7 @@ if [ $1 = 1 ] ; then
 %endif
     if [ -f /etc/$preloads ] ; then
         cp -f /etc/$preloads %{_tmppath}/$preloads.new.$$
-        pres="%{preloads}" ; for p in $pres ; do
-            m=`echo $p | sed -r -e 's|^.*/||;s|.(k)?o(.gz)?$||'`
+        pres="%{preloads}" ; for m in $pres ; do
             sed -e "/^$m\>/d" %{_tmppath}/$preloads.new.$$ > %{_tmppath}/$preloads.tmp.$$
             mv -f %{_tmppath}/$preloads.tmp.$$ %{_tmppath}/$preloads.new.$$
         done
@@ -561,8 +559,7 @@ fi
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
 #   worry about which modules are running
-    mods="%{modules}" ; for p in $mods ; do
-        m=`echo $p | sed -r -e 's|^.*/||;s|lib.*_a-|streams-|;s|.(k)?o(.gz)?$||'`
+    mods="%{modules}" ; for m in $mods ; do
         if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           modules running, kick the stack
             /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
@@ -624,8 +621,7 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   one more kick at killing any loaded modules on uninstall, last stage of
 #   the upgrade on a running kernel for upgrade.
     reboot='no'
-    mods="%{modules}" ; for p in $mods ; do
-        m=`echo $p | sed -r -e 's|^.*/||;s|lib.*_a-|streams-|;s|.(k)?o(.gz)?$||'`
+    mods="%{modules}" ; for m in $mods ; do
         if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           modules running, kick the stack
             /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
@@ -1025,6 +1021,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.51  2005/03/08 10:52:58  brian
+# - Correction to modules and tools in spec files.
+#
 # Revision 0.9.2.50  2005/03/07 06:09:26  brian
 # - More spec changes for 2.6.
 #

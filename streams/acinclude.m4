@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/03/07 23:42:12 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/03/08 11:56:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 23:42:12 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:56:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,16 +81,18 @@ AC_DEFUN([AC_LFS], [dnl
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _LFS_SETUP
-    LFS_INCLUDES="-DLFS=1 -imacros ./config.h"
-dnl LFS_INCLUDES="${LFS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    LFS_INCLUDES="${LFS_INCLUDES} -I./include -I${srcdir}/include"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-DLFS=1'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/include -I$(top_srcdir)/include'
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-	KERNEL_MODFLAGS="$KERNEL_MODFLAGS -include ./include/sys/streams/modversions.h"
+	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
     fi
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $LFS_INCLUDES])
+    AC_MSG_NOTICE([final package INCLUDES  = $PKG_INCLUDES])
+    AC_MSG_NOTICE([final package MODFLAGS  = $PKG_MODFLAGS])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
@@ -100,7 +102,8 @@ dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl
-    AC_SUBST([LFS_INCLUDES])dnl
+    AC_SUBST([PKG_INCLUDES])dnl
+    AC_SUBST([PKG_MODFLAGS])dnl
     CPPFLAGS=
     CFLAGS=
     _LFS_OUTPUT
