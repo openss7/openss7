@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $
+ @(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $"
+#ident "@(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $";
+    "$RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $";
 
 #define __NO_VERSION__
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include "m3ua.h"
 #include "m3ua_data.h"

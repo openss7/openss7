@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:18 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:18 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:18 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
 
-static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:18 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -62,17 +62,7 @@ static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $
  *  protocol layer for SS7.
  */
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -96,36 +86,53 @@ static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <sys/xti_tr.h>
 #include <sys/xti_tc.h>
 
-#include "../debug.h"
-#include "../bufq.h"
-#include "../priv.h"
-#include "../lock.h"
-#include "../queue.h"
-#include "../allocb.h"
-#include "../timer.h"
-
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
-#define TCAP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TCAP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define TCAP_REVISION	"LfS $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
+#define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TCAP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCAP_LICENSE	"GPL"
 #define TCAP_BANNER	TCAP_DESCRIP	"\n" \
+			TCAP_REVISION	"\n" \
 			TCAP_COPYRIGHT	"\n" \
 			TCAP_DEVICE	"\n" \
-			TCAP_CONTACT
+			TCAP_CONTACT	"\n"
+#define TCAP_SPLASH	TCAP_DEVICE	" - " \
+			TCAP_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(TCAP_CONTACT);
 MODULE_DESCRIPTION(TCAP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TCAP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TCAP_LICENSE);
 #endif
+#endif				/* LINUX */
 
-#ifndef TCAP_CMAJOR
-#error "TCAP_CMAJOR must be defined\n"
+#ifdef LFS
+#define TCAP_DRV_ID		CONFIG_STREAMS_TCAP_MODID
+#define TCAP_DRV_NAME		CONFIG_STREAMS_TCAP_NAME
+#define TCAP_CMAJORS		CONFIG_STREAMS_TCAP_NMAJORS
+#define TCAP_CMAJOR_0		CONFIG_STREAMS_TCAP_MAJOR
+#define TCAP_NMINORS		CONFIG_STREAMS_TCAP_NMINORS
 #endif
-#define TCAP_NMAJOR 1
-#define TCAP_NMINOR 255
+
+#ifndef TCAP_DRV_ID
+#define TCAP_DRV_ID	TCAP_IOC_MAGIC
+#endif
+#ifndef TCAP_DRV_NAME
+#define TCAP_DRV_NAME	"tcap"
+#endif
+#ifndef TCAP_NMINORS
+#define TCAP_NMINORS 255
+#endif
+
+#ifndef TCAP_CMINOR_TRI
+#define TCAP_CMINOR_TRI		1
+#define TCAP_CMINOR_TCI		2
+#define TCAP_CMINOR_TPI		3
+#define TCAP_CMINOR_MGMT	4
+#endif
 
 #define TCAP_STYLE_TRI	TCAP_CMINOR_TRI
 #define TCAP_STYLE_TCI	TCAP_CMINOR_TCI
@@ -139,9 +146,6 @@ MODULE_LICENSE(TCAP_LICENSE);
  *
  *  =========================================================================
  */
-
-#define TCAP_DRV_ID	TCAP_IOC_MAGIC
-#define TCAP_DRV_NAME	"tcap"
 
 STATIC struct module_info tcap_winfo = {
 	mi_idnum:TCAP_DRV_ID,			/* Module ID number */
@@ -413,7 +417,7 @@ STATIC void sccp_put(struct sccp *);
  *  -----------------------------------------------------------
  */
 typedef struct df {
-	lis_spin_lock_t lock;
+	spinlock_t lock;
 	SLIST_HEAD (tcap, tcap);		/* master list of TCAP users */
 	SLIST_HEAD (tr, tr);			/* master list of transactions */
 	SLIST_HEAD (sp, sp);			/* master list of SCCP-SAPs */
@@ -8701,19 +8705,19 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_LINK):
 			ptrace(("%s: %p: I_LINK\n", TCAP_DRV_NAME, tcap));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			{
 				/* place in list in ascending index order */
 				for (sccpp = &master.sccp.list; *sccpp && (*sccpp)->u.mux.index < lb->l_index;
 				     sccpp = &(*sccpp)->next) ;
 				if ((sccp = tcap_alloc_sccp(lb->l_qbot, sccpp, lb->l_index, iocp->ioc_cr))) {
-					lis_spin_unlock_irqrestore(&master.lock, &flags);
+					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
 				MOD_DEC_USE_COUNT;
 				ret = -ENOMEM;
 			}
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
 			ptrace(("%s: %p: I_PUNLINK\n", TCAP_DRV_NAME, tcap));
@@ -8724,7 +8728,7 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 			}
 		case _IOC_NR(I_UNLINK):
 			ptrace(("%s: %p: I_UNLINK\n", TCAP_DRV_NAME, tcap));
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			{
 				for (sccp = master.sccp.list; sccp; sccp = sccp->next)
 					if (sccp->u.mux.index == lb->l_index)
@@ -8733,13 +8737,13 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 					ret = -EINVAL;
 					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", TCAP_DRV_NAME,
 						tcap));
-					lis_spin_unlock_irqrestore(&master.lock, &flags);
+					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
 				tcap_free_sccp(sccp->iq);
 				MOD_DEC_USE_COUNT;
 			}
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		default:
 		case _IOC_NR(I_STR):
@@ -9294,7 +9298,7 @@ STATIC INLINE int sccp_w_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int tcap_majors[TCAP_NMAJOR] = { TCAP_CMAJOR, };
+STATIC int tcap_majors[TCAP_CMAJORS] = { TCAP_CMAJOR_0, };
 STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int flags, mindex = 0;
@@ -9312,13 +9316,13 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
-	if (cmajor != TCAP_CMAJOR || cminor >= TCAP_CMINOR_FREE) {
+	if (cmajor != TCAP_CMAJOR_0 || cminor >= TCAP_CMINOR_FREE) {
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
 	/* allocate a new device */
 	cminor = TCAP_CMINOR_FREE;
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	for (; *tcapp; tcapp = &(*tcapp)->next) {
 		ushort dmajor = (*tcapp)->u.dev.cmajor;
 		if (cmajor != dmajor)
@@ -9330,8 +9334,8 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= TCAP_NMINOR) {
-					if (++mindex >= TCAP_NMAJOR || !(cmajor = tcap_majors[mindex]))
+				if (++cminor >= TCAP_NMINORS) {
+					if (++mindex >= TCAP_CMAJORS || !(cmajor = tcap_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -9339,9 +9343,9 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (mindex >= TCAP_NMAJOR || !cmajor) {
+	if (mindex >= TCAP_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", TCAP_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -9349,11 +9353,11 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(tcap = tcap_alloc_priv(q, tcapp, devp, crp, bminor))) {
 		ptrace(("%s: ERROR: no memory\n", TCAP_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (0);
 }
 
@@ -9369,9 +9373,9 @@ STATIC int tcap_close(queue_t *q, int flag, cred_t *crp)
 	(void) crp;
 	(void) tcap;
 	printd(("%s: closing character device %d:%d\n", TCAP_DRV_NAME, tcap->u.dev.cmajor, tcap->u.dev.cminor));
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	tcap_free_priv(tcap);
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -9394,8 +9398,8 @@ STATIC void tcap_init(void)
 		tcap_initialized = rtn;
 		return;
 	}
-	for (major = 0; major < TCAP_NMAJOR; major++) {
-		if ((rtn = lis_register_strdev(tcap_majors[major], &tcap_info, TCAP_NMINOR, TCAP_DRV_NAME)) <= 0) {
+	for (major = 0; major < TCAP_CMAJORS; major++) {
+		if ((rtn = lis_register_strdev(tcap_majors[major], &tcap_info, TCAP_NMINORS, TCAP_DRV_NAME)) <= 0) {
 			if (!major) {
 				cmn_err(CE_PANIC, "%s: Can't register 1'st major %d", TCAP_DRV_NAME,
 					tcap_majors[0]);
@@ -9408,14 +9412,14 @@ STATIC void tcap_init(void)
 		} else if (major)
 			tcap_majors[major] = rtn;
 	}
-	lis_spin_lock_init(&master.lock, "tcap-open-list-lock");
+	spin_lock_init(&master.lock); /* "tcap-open-list-lock" */
 	tcap_initialized = 1;
 	return;
 }
 STATIC void tcap_terminate(void)
 {
 	int rtn, major;
-	for (major = 0; major < TCAP_NMAJOR; major++) {
+	for (major = 0; major < TCAP_CMAJORS; major++) {
 		if (tcap_majors[major]) {
 			if ((rtn = lis_unregister_strdev(tcap_majors[major])))
 				cmn_err(CE_PANIC, "%s: Can't unregister major %d\n", TCAP_DRV_NAME,

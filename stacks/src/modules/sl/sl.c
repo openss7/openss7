@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 
-static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $";
+static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -60,18 +60,7 @@ static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
  *  Having the SL state machines separate permits live upgrade and allows this
  *  state machine to be rigorously conformance tested only once.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -80,16 +69,8 @@ static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -100,12 +81,23 @@ static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 			SL_DEVICE	"\n" \
 			SL_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(SL_CONTACT);
 MODULE_DESCRIPTION(SL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SL_LICENSE);
 #endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SL_MOD_ID CONFIG_STREAMS_SL_MODID
+#define SL_MOD_NAME CONFIG_STREAMS_SL_NAME
+#endif
+
+unsigned short modid = SL_MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SL module.  (0 for allocation.)");
 
 /*
  *  =========================================================================
@@ -1239,17 +1231,17 @@ STATIC INLINE void
 sl_timer_stop(struct sl *sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 }
 STATIC INLINE void
 sl_timer_start(struct sl *sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
 		switch (t) {
@@ -1279,7 +1271,7 @@ sl_timer_start(struct sl *sl, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 }
 
 /*
@@ -1900,7 +1892,7 @@ sl_txc_transmission_request(queue_t *q, struct sl *sl)
 		}
 		return (mp);
 	} else {
-		lis_spin_lock(&sl->tb.q_lock);
+		spin_lock(&sl->tb.q_lock);
 		if ((mp = bufq_head(&sl->tb)) && (mp = dupmsg(mp))) {
 			mblk_t *bp = bufq_dequeue(&sl->tb);
 			sl->statem.Cm--;
@@ -1931,7 +1923,7 @@ sl_txc_transmission_request(queue_t *q, struct sl *sl)
 			// sl->statem.tx.N.fib = sl->statem.tx.N.fib;
 			sl_daedt_msu(q, sl, mp);
 		}
-		lis_spin_unlock(&sl->tb.q_lock);
+		spin_unlock(&sl->tb.q_lock);
 		return (mp);
 	}
 }
@@ -4673,11 +4665,11 @@ lmi_iocgoptions(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = QR_PASSALONG;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4691,11 +4683,11 @@ lmi_iocsoptions(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = QR_PASSALONG;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4709,12 +4701,12 @@ lmi_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			arg->version = sl->i_version;
 			arg->style = sl->i_style;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4728,12 +4720,12 @@ lmi_iocsconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->i_version = arg->version;
 			sl->i_style = arg->style;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4747,11 +4739,11 @@ lmi_ioctconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4765,11 +4757,11 @@ lmi_ioccconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4783,11 +4775,11 @@ lmi_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			arg->state = sl->i_state;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4801,11 +4793,11 @@ lmi_ioccmreset(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->i_state = LMI_UNUSABLE;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4819,11 +4811,11 @@ lmi_iocgstatsp(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = QR_PASSALONG;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->statsp;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4837,11 +4829,11 @@ lmi_iocsstatsp(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = QR_PASSALONG;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4855,11 +4847,11 @@ lmi_iocgstats(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4873,11 +4865,11 @@ lmi_ioccstats(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4891,11 +4883,11 @@ lmi_iocgnotify(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4909,11 +4901,11 @@ lmi_iocsnotify(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4927,11 +4919,11 @@ lmi_ioccnotify(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4965,11 +4957,11 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4983,11 +4975,11 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5001,11 +4993,11 @@ sl_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5019,11 +5011,11 @@ sl_iocsconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->config = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5037,11 +5029,11 @@ sl_ioctconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5055,11 +5047,11 @@ sl_ioccconfig(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5073,11 +5065,11 @@ sl_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->statem;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5091,11 +5083,11 @@ sl_ioccmreset(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->statem = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5109,11 +5101,11 @@ sl_iocgstatsp(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->statsp;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5127,11 +5119,11 @@ sl_iocsstatsp(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5145,11 +5137,11 @@ sl_iocgstats(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->stats;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5163,11 +5155,11 @@ sl_ioccstats(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->stats, sizeof(sl->stats));
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5181,11 +5173,11 @@ sl_iocgnotify(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->notify;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5199,11 +5191,11 @@ sl_iocsnotify(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->notify.events |= arg->events;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5217,11 +5209,11 @@ sl_ioccnotify(queue_t *q, mblk_t *mp)
 		struct sl *sl = SL_PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->notify.events &= ~(arg->events);
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5829,7 +5821,7 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->cred = *crp;
 		(sl->oq = RD(q))->q_ptr = sl_get(sl);
 		(sl->iq = WR(q))->q_ptr = sl_get(sl);
-		lis_spin_lock_init(&sl->qlock, "sl-queue-lock");
+		spin_lock_init(&sl->qlock); /* "sl-queue-lock" */
 		sl->o_prim = &sl_r_prim;
 		sl->i_prim = &sl_w_prim;
 		sl->o_wakeup = &sl_rx_wakeup;
@@ -5837,7 +5829,7 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->i_state = LMI_UNUSABLE;
 		sl->i_style = LMI_STYLE1;
 		sl->i_version = 1;
-		lis_spin_lock_init(&sl->lock, "sl-priv-lock");
+		spin_lock_init(&sl->lock); /* "sl-priv-lock" */
 		if ((sl->next = *slp))
 			sl->next->prev = &sl->next;
 		sl->prev = slp;
@@ -5862,7 +5854,7 @@ sl_free_priv(queue_t *q)
 	struct sl *sl = SL_PRIV(q);
 	psw_t flags;
 	ensure(sl, return);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ss7_unbufcall((str_t *) sl);
 		sl_timer_stop(sl, tall);
@@ -5883,7 +5875,7 @@ sl_free_priv(queue_t *q)
 		sl->iq = NULL;
 		sl_put(sl);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	sl_put(sl);		/* final put */
 }
 STATIC struct sl *

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:06 $"
 
-static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:06 $";
 
 /*
  *  This file contains all the algorithms for generating MAC for SCTP cookies
@@ -63,21 +63,9 @@ static char const ident[] = "$RCSfile: sctp_cookie.c,v $ $Name:  $($Revision: 0.
 
 #define __NO_VERSION__
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
-
-#include "debug.h"
-#include "bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
 
-static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $";
+static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
+#include "compat.h"
+/*
+ *  It is not necessary to use this module for Linux Fast-STREAMS.  Linux
+ *  Fast-STREAMS has the Named STREAMS Device which, among other mechanisms,
+ *  obviates the need for this driver.
+ */
 
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-#include <sys/ddi.h>
-#include <sys/osif.h>
-
-#include "debug.h"
-
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.1 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.2 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -81,11 +73,16 @@ static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 			DL_DEVICE	"\n" \
 			DL_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(DL_CONTACT);
 MODULE_DESCRIPTION(DL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(DL_DEVICE);
-#ifdef MODULE_LICENSE
 MODULE_LICENSE(DL_LICENSE);
+#endif				/* LINUX */
+
+#ifdef LFS
+#define DL_DRV_ID	CONFIG_STREAMS_DL_MODID
+#define DL_DRV_NAME	CONFIG_STREAMS_DL_NAME
 #endif
 
 /*
@@ -126,7 +123,7 @@ STATIC struct streamtab dl_info = {
  *
  *  =========================================================================
  */
-STATIC char drvname[LIS_NAMESZ + 9];
+STATIC char drvname[FMNAMESZ + 9];
 STATIC int dl_majors[256];
 STATIC const char *dl_modules[256] = {
 	"dl",
@@ -156,7 +153,7 @@ dl_find_strdev(const char *devname)
 	int i;
 	for (i = 0; i < MAX_STRDEV; i++)
 		if (lis_fstr_sw[i].f_str)
-			if (strncmp(devname, lis_fstr_sw[i].f_name, LIS_NAMESZ) == 0)
+			if (strncmp(devname, lis_fstr_sw[i].f_name, FMNAMESZ) == 0)
 				return (i);
 	return (-1);
 }
@@ -182,7 +179,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if ((cmajor = dl_majors[cminor])) {
 		if (!(stab = lis_find_strdev(dl_majors[cminor])))
 			cmajor = dl_majors[cminor] = 0;
-		else if (strncmp(dl_modules[cminor], lis_fstr_sw[cmajor].f_name, LIS_NAMESZ) != 0) {
+		else if (strncmp(dl_modules[cminor], lis_fstr_sw[cmajor].f_name, FMNAMESZ) != 0) {
 			/*
 			   name changed 
 			 */
@@ -233,7 +230,6 @@ dl_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-#define MODULE_STATIC STATIC
 STATIC int dl_initialized = 0;
 MODULE_STATIC void
 dl_init(void)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -78,24 +78,12 @@ static char const ident[] =
  *  SDTI/SDLI (Signalling Data Terminal Identifier/Signalling Data Link
  *  Identifier) before being enabled.
  */
+#include "compat.h"
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
+#ifdef LINUX
 #include <linux/errno.h>
 #include <linux/types.h>
-
-#include "debug.h"
-#include "bufq.h"
+#endif				/* LINUX */
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -109,7 +97,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -119,12 +107,23 @@ static char const ident[] =
 			SLM_COPYRIGHT	"\n" \
 			SLM_DEVICE	"\n" \
 			SLM_CONTACT
+#define SLM_SPLASH	SLM_DEVICE	" - " \
+			SLM_REVISION	"\n" \
 
+#ifdef LINUX
 MODULE_AUTHOR(SLM_CONTACT);
 MODULE_DESCRIPTION(SLM_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SLM_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SLM_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SLM_DRV_ID		CONFIG_STREAMS_SLM_MODID
+#define SLM_DRV_NAME		CONFIG_STREAMS_SLM_NAME
+#define SLM_CMAJORS		CONFIG_STREAMS_SLM_NMAJORS
+#define SLM_CMAJOR_0		CONFIG_STREAMS_SLM_MAJOR
 #endif
 
 #define SLM_CMINORS 256
@@ -202,7 +201,7 @@ typedef struct pp {
 	struct pp **prev;		/* list linkage */
 	struct pp *links;		/* structures we have I_LINKed */
 	size_t refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	union {
 		struct {
 			ushort cmajor;	/* major device number */
@@ -213,7 +212,7 @@ typedef struct pp {
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
 	queue_t *mq;			/* mgmt queue */
-	lis_spin_lock_t qlock;		/* queue lock */
+	spinlock_t qlock;		/* queue lock */
 	queue_t *userq;			/* queue using the queue lock */
 	queue_t *waitq;			/* queue waiting on the queue lock */
 	uint rbid;			/* rd bufcall id */
@@ -279,7 +278,7 @@ typedef struct xp {
 	struct xp *next;		/* list linkage */
 	struct xp **prev;		/* list linkage */
 	uint refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	struct pp *pp;			/* stream structure for this XP */
 	struct gp *gp;			/* graph of SP for this XP */
 	struct sp *sp;			/* SP for this XP */
@@ -319,7 +318,7 @@ typedef struct gp {
 		struct gp **prev;	/* prev SP associated with this SP */
 	} sp;
 	uint refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	uint state;			/* state of this XP in this SP */
 	uint loadshare;			/* loadshare selector (stripe) */
 	uint broadcast;			/* broadcast selector (mirror) */
@@ -341,7 +340,7 @@ typedef struct np {
 		struct np **prev;	/* prev SG associated with this AS */
 	} sg;
 	uint refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	uint id;			/* id for this AS in this SG (RC/IID) */
 	uint state;			/* state of this SG serving this AS */
 	uint loadshare;			/* loadshare selector (stripe) */
@@ -354,7 +353,7 @@ typedef struct sp {
 	struct sp *next;		/* list linkage */
 	struct sp **prev;		/* list linkage */
 	uint refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	struct np *np;			/* graph of peer nodes for this node */
 	struct gp *gp;			/* graph of AS/SG for this node */
 	struct pp *pp;			/* list of SS7U/SS7P for this node */
@@ -499,7 +498,7 @@ slm_alloc_priv(queue_t *q, queue_t *mq, pp_t ** ppp, uint index, cred_t *crp, ui
 		pp->rq = RD(q);
 		pp->wq = WR(q);
 		pp->mq = mq;
-		lis_spin_lock_init(&pp->qlock, "pp-queue-lock");
+		spin_lock_init(&pp->qlock); /* "pp-queue-lock" */
 		pp->userq = NULL;
 		pp->waitq = NULL;
 		pp->rbid = 0;
@@ -507,7 +506,7 @@ slm_alloc_priv(queue_t *q, queue_t *mq, pp_t ** ppp, uint index, cred_t *crp, ui
 		pp->state = LMI_UNATTACHED;
 		pp->version = 1;
 		pp->type = type;
-		lis_spin_lock_init(&pp->lock, "pp-priv-lock");
+		spin_lock_init(&pp->lock); /* "pp-priv-lock" */
 		if ((pp->next = *ppp)) {
 			pp->next->prev = &pp->next;
 			pp->refcnt++;
@@ -525,7 +524,7 @@ slm_free_priv(queue_t *q)
 	pp_t *pp = PRIV(q);
 	psw_t flags;
 	ensure(pp, return);
-	lis_spin_lock_irqsave(&pp->lock, &flags);
+	spin_lock_irqsave(&pp->lock, flags);
 	{
 		if (pp->rbid) {
 			unbufcall(xchg(&pp->rbid, 0));
@@ -547,7 +546,7 @@ slm_free_priv(queue_t *q)
 		WR(q)->q_ptr = NULL;
 		pp->refcnt--;
 	}
-	lis_spin_unlock_irqrestore(&pp->lock, &flags);
+	spin_unlock_irqrestore(&pp->lock, flags);
 	printd(("SLM: unlinked device private structure\n"));
 	if (pp->refcnt) {
 		assure(pp->refcnt == 0);
@@ -587,7 +586,7 @@ slm_alloc_np(sp_t * as, sp_t * sg)
 		np->sg.sg = sg;
 		sg->refcnt++;
 		np->sg.prev = &sg->np;
-		lis_spin_lock_init(&np->lock);
+		spin_lock_init(&np->lock);
 		np->state = AS_DOWN;
 		printd(("SLM: setting np structure defaults\n"));
 	} else
@@ -599,7 +598,7 @@ slm_free_np(np_t * np)
 {
 	psw_t flags;
 	ensure(np, return);
-	lis_spin_lock_irqsave(&np->lock, &flags);
+	spin_lock_irqsave(&np->lock, flags);
 	{
 		if ((*np->as.prev = np->as.next)) {
 			np->as.next->as.prev = np->as.prev;
@@ -618,7 +617,7 @@ slm_free_np(np_t * np)
 		np->sg.next = NULL;
 		np->sg.prev = NULL;
 	}
-	lis_spin_unlock_irqrestore(&np->lock, &flags);
+	spin_unlock_irqrestore(&np->lock, flags);
 	printd(("SLM unlinked np structure\n"));
 	if (np->refcnt) {
 		assure(np->refcnt == 0);
@@ -658,7 +657,7 @@ slm_alloc_gp(sp_t * sp, xp_t * xp)
 		gp->sp.sp = sp;
 		sp->refcnt++;
 		gp->sp.prev = &sp->gp;
-		lis_spin_lock_init(&gp->lock);
+		spin_lock_init(&gp->lock);
 		printd(("SLM: setting gp structure defaults\n"));
 		gp->state = AS_DOWN;
 	} else
@@ -670,7 +669,7 @@ slm_free_gp(gp_t * gp)
 {
 	psw_t flags;
 	ensure(gp, return);
-	lis_spin_lock_irqsave(&gp->lock, &flags);
+	spin_lock_irqsave(&gp->lock, flags);
 	{
 		if ((*gp->xp.prev = gp->xp.next)) {
 			gp->xp.next->xp.prev = gp->xp.prev;
@@ -689,7 +688,7 @@ slm_free_gp(gp_t * gp)
 		gp->sp.next = NULL;
 		gp->sp.prev = NULL;
 	}
-	lis_spin_unlock_irqrestore(&gp->lock, &flags);
+	spin_unlock_irqrestore(&gp->lock, flags);
 	printd(("SLM unlinked gp structure\n"));
 	if (gp->refcnt) {
 		assure(gp->refcnt == 0);
@@ -718,7 +717,7 @@ slm_alloc_sp(sp_t ** spp)
 		*spp = sp;
 		sp->refcnt++;
 		sp->prev = spp;
-		lis_spin_lock_init(&sp->lock);
+		spin_lock_init(&sp->lock);
 		printd(("SLM: setting sp structure defaults\n"));
 		sp->state = AS_DOWN;
 		// sp->tmode = UA_TMODE_OVERRIDE;
@@ -733,7 +732,7 @@ slm_free_sp(sp_t * sp)
 {
 	psw_t flags;
 	ensure(sp, return);
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_irqsave(&sp->lock, flags);
 	{
 		if ((*sp->prev = sp->next)) {
 			sp->next->prev = sp->prev;
@@ -748,7 +747,7 @@ slm_free_sp(sp_t * sp)
 		while (sp->pp)
 			slm_free_pp(sp->pp);
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_irqrestore(&sp->lock, flags);
 	printd(("SLM: unlinked sp structure\n"));
 	if (sp->refcnt) {
 		assure(sp->refcnt == 0);
@@ -779,7 +778,7 @@ slm_alloc_xp(sp_t * sp)
 		xp->prev = xpp;
 		xp->sp = sp;
 		sp->refcnt++;
-		lis_spin_lock_init(&xp->lock);
+		spin_lock_init(&xp->lock);
 		bufq_init(&xp->buf);
 		printd(("SLM: setting xp structure defaults\n"));
 		xp->state = ASP_DOWN;
@@ -792,7 +791,7 @@ slm_free_xp(xp_t * xp)
 {
 	psw_t flags;
 	ensure(xp, return);
-	lis_spin_lock_irqsave(&xp->lock, &flags);
+	spin_lock_irqsave(&xp->lock, flags);
 	{
 		if ((*xp->prev = xp->next)) {
 			xp->next->prev = xp->prev;
@@ -815,7 +814,7 @@ slm_free_xp(xp_t * xp)
 			sp->refcnt--;
 		}
 	}
-	lis_spin_unlock_irqrestore(&xp->lock, &flags);
+	spin_unlock_irqrestore(&xp->lock, flags);
 	printd(("SLM: unlinked xp structure\n"));
 	if (xp->refcnt) {
 		assure(xp->refcnt == 0);
@@ -838,7 +837,7 @@ slm_trylockq(queue_t *q)
 {
 	int res;
 	pp_t *pp = PRIV(q);
-	if (!(res = lis_spin_trylock(&pp->qlock))) {
+	if (!(res = spin_trylock(&pp->qlock))) {
 		if (q == pp->rq)
 			pp->rwait = q;
 		if (q == pp->wq)
@@ -850,7 +849,7 @@ STATIC INLINE void
 slm_unlockq(queue_t *q)
 {
 	pp_t *pp = PRIV(q);
-	lis_spin_unlock(&pp->qlock);
+	spin_unlock(&pp->qlock);
 	if (pp->rwait)
 		qenable(xchg(&pp->rwait, NULL));
 	if (pp->wwait)
@@ -2856,7 +2855,7 @@ slm_timer_stop(queue_t *q, const uint t)
 {
 	pp_t *pp = PRIV(q);
 	psw_t flags;
-	lis_spin_lock_irqsave(&pp->lock, &flags);
+	spin_lock_irqsave(&pp->lock, flags);
 	{
 		switch (t) {
 		case t1:
@@ -2891,14 +2890,14 @@ slm_timer_stop(queue_t *q, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&pp->lock, &flags);
+	spin_unlock_irqrestore(&pp->lock, flags);
 }
 STATIC INLINE void
 slm_timer_start(queue_t *q, const uint t)
 {
 	pp_t *pp = PRIV(q);
 	psw_t flags;
-	lis_spin_lock_irqsave(&pp->lock, &flags);
+	spin_lock_irqsave(&pp->lock, flags);
 	{
 		slm_timer_stop(q, t);
 		switch (t) {
@@ -2924,7 +2923,7 @@ slm_timer_start(queue_t *q, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&pp->lock, &flags);
+	spin_unlock_irqrestore(&pp->lock, flags);
 }
 
 /*
@@ -3661,7 +3660,7 @@ slm_r_pcrse(queue_t *q, mblk_t *mp)
 	pp_t *pp = PRIV(q);
 	int rtn;
 	psw_t flags;
-	lis_spin_lock_irqsave(&pp->lock, &flags);
+	spin_lock_irqsave(&pp->lock, flags);
 	switch (*(ulong *) mp->b_rptr) {
 	case t1:
 		printd(("SLM: t1 expiry at %lu\n", jiffies));
@@ -3687,7 +3686,7 @@ slm_r_pcrse(queue_t *q, mblk_t *mp)
 		rtn = -EFAULT;
 		break;
 	}
-	lis_spin_unlock_irqrestore(&pp->lock, &flags);
+	spin_unlock_irqrestore(&pp->lock, flags);
 	return (rtn);
 }
 
@@ -3703,12 +3702,12 @@ slm_w_flush(queue_t *q, mblk_t *mp)
 	if (*mp->b_rptr & FLUSHW) {
 		if (pp) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&pp->lock, &flags);
+			spin_lock_irqsave(&pp->lock, flags);
 			if (pp->tx.cmp) {
 				pp->tx.cmp = NULL;
 				pp->tx.repeat = 0;
 			}
-			lis_spin_unlock_irqrestore(&pp->lock, &flags);
+			spin_unlock_irqrestore(&pp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHALL);
@@ -3719,18 +3718,18 @@ slm_w_flush(queue_t *q, mblk_t *mp)
 	if (*mp->b_rptr & FLUSHR) {
 		if (pp) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&pp->lock, &flags);
+			spin_lock_irqsave(&pp->lock, flags);
 			if (pp->rx.cmp) {
 				freeb(pp->rx.cmp);
 				pp->rx.cmp = NULL;
 				pp->rx.repeat = 0;
 			}
-			lis_spin_unlock_irqrestore(&pp->lock, &flags);
+			spin_unlock_irqrestore(&pp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHER(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
 		else
-			flushq(OTHER(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHALL);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,26 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:24:35 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 00:53:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -74,30 +64,33 @@ static char const ident[] =
 #include <ss7/chi.h>
 #include <ss7/chi_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
+#define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
+#define CH_SDL_REVISION		"LfS $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $"
+#define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define CH_SDL_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define CH_SDL_LICENSE		"GPL"
+#define CH_SDL_BANNER		CH_SDL_DESCRIP		"\n" \
+				CH_SDL_REVISION		"\n" \
+				CH_SDL_COPYRIGHT	"\n" \
+				CH_SDL_DEVICE		"\n" \
+				CH_SDL_CONTACT		"\n"
+#define CH_SDL_SPLASH		CH_SDL_DEVICE		" - " \
+				CH_SDL_REVISION		"\n"
 
-#define CH_DESCRIP	"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
-#define CH_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define CH_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CH_LICENSE	"GPL"
-#define CH_BANNER	CH_DESCRIP	"\n" \
-			CH_COPYRIGHT	"\n" \
-			CH_DEVICE	"\n" \
-			CH_CONTACT
-
-MODULE_AUTHOR(CH_CONTACT);
-MODULE_DESCRIPTION(CH_DESCRIP);
-MODULE_SUPPORTED_DEVICE(CH_DEVICE);
+#ifdef LINUX
+MODULE_AUTHOR(CH_SDL_CONTACT);
+MODULE_DESCRIPTION(CH_SDL_DESCRIP);
+MODULE_SUPPORTED_DEVICE(CH_SDL_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(CH_LICENSE);
+MODULE_LICENSE(CH_SDL_LICENSE);
 #endif
+#endif				/* LINUX */
 
+#ifdef LFS
+#define CH_SDL_MOD_ID	CONFIG_STREAMS_CH_SDL_MODID
+#define CH_SDL_MOD_NAME	CONFIG_STREAMS_CH_SDL_NAME
+#endif
 /*
  *  =========================================================================
  *
@@ -106,36 +99,33 @@ MODULE_LICENSE(CH_LICENSE);
  *  =========================================================================
  */
 
-#define CH_MOD_ID   CH__MOD_ID
-#define CH_MOD_NAME CH__MOD_NAME
-
 static struct module_info ch_minfo = {
-	mi_idnum:CH_MOD_ID,			/* Module ID number */
-	mi_idname:CH_MOD_NAME,			/* Module ID name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,			/* Max packet size accepted */
-	mi_hiwat:1,				/* Hi water mark */
-	mi_lowat:0,				/* Lo water mark */
+	mi_idnum:CH_SDL_MOD_ID,		/* Module ID number */
+	mi_idname:CH_SDL_MOD_NAME,	/* Module ID name */
+	mi_minpsz:1,			/* Min packet size accepted */
+	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
+	mi_hiwat:1,			/* Hi water mark */
+	mi_lowat:0,			/* Lo water mark */
 };
 
 static int ch_open(queue_t *, dev_t *, int, int, cred_t *);
 static int ch_close(queue_t *, int, cred_t *);
 
 static struct qinit ch_rinit = {
-	qi_putp:ss7_oput,			/* Read put (message from below) */
-	qi_qopen:ch_open,			/* Each open */
-	qi_qclose:ch_close,			/* Last close */
-	qi_minfo:&ch_minfo,			/* Information */
+	qi_putp:ss7_oput,		/* Read put (message from below) */
+	qi_qopen:ch_open,		/* Each open */
+	qi_qclose:ch_close,		/* Last close */
+	qi_minfo:&ch_minfo,		/* Information */
 };
 
 static struct qinit ch_winit = {
-	qi_putp:ss7_iput,			/* Write put (message from above) */
-	qi_minfo:&ch_minfo,			/* Information */
+	qi_putp:ss7_iput,		/* Write put (message from above) */
+	qi_minfo:&ch_minfo,		/* Information */
 };
 
 static struct streamtab ch_info = {
-	st_rdinit:&ch_rinit,			/* Upper read queue */
-	st_wrinit:&ch_winit,			/* Upper write queue */
+	st_rdinit:&ch_rinit,		/* Upper read queue */
+	st_wrinit:&ch_winit,		/* Upper write queue */
 };
 
 /*
@@ -148,26 +138,26 @@ static struct streamtab ch_info = {
 
 /* channel structure */
 typedef struct ch {
-	STR_DECLARATION (struct ch);		/* stream declaration */
-	struct ch_config config;		/* configuration */
-	struct ch_stats statsp;			/* stats periods */
-	struct ch_stats stats;			/* statistics */
-	struct ch_notify notify;		/* notifications */
-	uchar add_ptr[32];			/* attached address */
-	size_t add_len;				/* attached address length */
-	uchar rem_ptr[32];			/* remote address */
-	size_t rem_len;				/* remote address length */
+	STR_DECLARATION (struct ch);	/* stream declaration */
+	struct ch_config config;	/* configuration */
+	struct ch_stats statsp;		/* stats periods */
+	struct ch_stats stats;		/* statistics */
+	struct ch_notify notify;	/* notifications */
+	uchar add_ptr[32];		/* attached address */
+	size_t add_len;			/* attached address length */
+	uchar rem_ptr[32];		/* remote address */
+	size_t rem_len;			/* remote address length */
 } ch_t;
 #define CH_PRIV(__q) ((struct ch *)(__q)->q_ptr)
 
 struct ch_config ch_default = {
-	block_size:64,				/* 64 bits per block */
-	encoding:CH_ENCODING_NONE,		/* sample block encoding */
-	sample_size:8,				/* sample size */
-	rate:8000,				/* clock rate */
-	tx_channels:1,				/* tx channels */
-	rx_channels:1,				/* tx channels */
-	opt_flags:CH_PARM_OPT_CLRCH,		/* option flags */
+	block_size:64,			/* 64 bits per block */
+	encoding:CH_ENCODING_NONE,	/* sample block encoding */
+	sample_size:8,			/* sample size */
+	rate:8000,			/* clock rate */
+	tx_channels:1,			/* tx channels */
+	rx_channels:1,			/* tx channels */
+	opt_flags:CH_PARM_OPT_CLRCH,	/* option flags */
 };
 
 static struct ch *ch_opens = NULL;
@@ -217,7 +207,7 @@ static int m_error(queue_t *q, struct ch *ch, int error)
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
 			ch->i_state = CHS_UNUSABLE;
-			printd(("%s: %p: <- M_HANGUP\n", CH_MOD_NAME, ch));
+			printd(("%s: %p: <- M_HANGUP\n", CH_SDL_MOD_NAME, ch));
 			putnext(ch->oq, mp);
 			return (-error);
 		} else {
@@ -225,7 +215,7 @@ static int m_error(queue_t *q, struct ch *ch, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			ch->i_state = CHS_UNUSABLE;
-			printd(("%s: %p: <- M_ERROR\n", CH_MOD_NAME, ch));
+			printd(("%s: %p: <- M_ERROR\n", CH_SDL_MOD_NAME, ch));
 			putnext(ch->oq, mp);
 			return (QR_DONE);
 		}
@@ -270,7 +260,7 @@ static inline int ch_info_ack(queue_t *q, struct ch *ch)
 		o->cp_tx_channels = ch->config.tx_channels;
 		o->cp_rx_channels = ch->config.rx_channels;
 		o->cp_opt_flags = ch->config.opt_flags;
-		printd(("%s: %p: <- CH_INFO_ACK\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_INFO_ACK\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -282,7 +272,8 @@ static inline int ch_info_ack(queue_t *q, struct ch *ch)
  *  CH_OPTMGMT_ACK
  *  -----------------------------------
  */
-static inline int ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len, ulong flags)
+static inline int ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len,
+				 ulong flags)
 {
 	mblk_t *mp;
 	struct CH_optmgmt_ack *p;
@@ -297,7 +288,7 @@ static inline int ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- CH_OPTMGMT_ACK\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_OPTMGMT_ACK\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -338,7 +329,7 @@ static inline int ch_ok_ack(queue_t *q, struct ch *ch)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_OK_ACK\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_OK_ACK\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -404,7 +395,7 @@ static inline int ch_error_ack(queue_t *q, struct ch *ch, ulong prim, long error
 			p->ch_state = ch->i_state;
 			break;
 		}
-		printd(("%s: %p: <- CH_ERROR_ACK\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_ERROR_ACK\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -436,7 +427,7 @@ static inline int ch_enable_con(queue_t *q, struct ch *ch)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_ENABLE_CON\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_ENABLE_CON\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -469,7 +460,7 @@ static inline int ch_connect_con(queue_t *q, struct ch *ch, ulong flags)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_CONNECT_CON\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_CONNECT_CON\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -492,7 +483,7 @@ static inline int ch_data_ind(queue_t *q, struct ch *ch)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->ch_primitive = CH_DATA_IND;
-		printd(("%s: %p: <- CH_DATA_IND\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DATA_IND\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -532,7 +523,7 @@ static inline int ch_disconnect_ind(queue_t *q, struct ch *ch, ulong flags)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_DISCONNECT_IND\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISCONNECT_IND\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -571,7 +562,7 @@ static inline int ch_disconnect_con(queue_t *q, struct ch *ch, ulong flags)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_DISCONNECT_CON\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISCONNECT_CON\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -597,7 +588,7 @@ static inline int ch_disable_ind(queue_t *q, struct ch *ch, long cause)
 		p->ch_primitive = CH_DISABLE_IND;
 		p->ch_cause = cause;
 		ch->i_state = CHS_UNUSABLE;
-		printd(("%s: %p: <- CH_DISABLE_IND\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISABLE_IND\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -632,7 +623,7 @@ static inline int ch_disable_con(queue_t *q, struct ch *ch)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_DISABLE_CON\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISABLE_CON\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -659,7 +650,7 @@ static inline int lmi_info_req(queue_t *q, struct ch *ch)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -686,7 +677,7 @@ static inline int lmi_attach_req(queue_t *q, struct ch *ch, uchar *ppa_ptr, size
 			mp->b_wptr += ppa_len;
 		}
 		ch->i_state = CHS_WACK_AREQ;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -709,7 +700,7 @@ static inline int lmi_detach_req(queue_t *q, struct ch *ch)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
 		ch->i_state = CHS_WACK_UREQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -737,7 +728,7 @@ static inline int lmi_enable_req(queue_t *q, struct ch *ch)
 			mp->b_wptr += ch->rem_len;
 		}
 		ch->i_state = CHS_WCON_EREQ;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -760,7 +751,7 @@ static inline int lmi_disable_req(queue_t *q, struct ch *ch)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		ch->i_state = CHS_WCON_RREQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -773,7 +764,8 @@ static inline int lmi_disable_req(queue_t *q, struct ch *ch)
  *  -----------------------------------
  *  Requests that the provider get, set or negotiate the specified options.
  */
-static inline int lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len, ulong flags)
+static inline int lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len,
+				  ulong flags)
 {
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
@@ -788,7 +780,7 @@ static inline int lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, siz
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -812,7 +804,7 @@ static inline int sdl_bits_for_transmission_req(queue_t *q, struct ch *ch, mblk_
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_BITS_FOR_TRANSMISSION_REQ;
 		mp->b_cont = dp;
-		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -835,7 +827,7 @@ static inline int sdl_connect_req(queue_t *q, struct ch *ch, ulong flags)
 		p->sdl_primitive = SDL_CONNECT_REQ;
 		p->sdl_flags = flags;
 		ch->i_state = CHS_WCON_CREQ;
-		printd(("%s: %p: SDL_CONNECT_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: SDL_CONNECT_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -857,7 +849,7 @@ static inline int sdl_disconnect_req(queue_t *q, struct ch *ch, ulong flags)
 		p->sdl_primitive = SDL_DISCONNECT_REQ;
 		p->sdl_flags = flags;
 		ch->i_state = CHS_WCON_DREQ;
-		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", CH_SDL_MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -1086,7 +1078,8 @@ static int sdl_disconnect_ind(queue_t *q, mblk_t *mp)
 	sdl_disconnect_ind_t *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
-	if (ch->i_state != CHS_CONNECTED && ch->i_state != CHS_WACK_CREQ && ch->i_state != CHS_WCON_CREQ)
+	if (ch->i_state != CHS_CONNECTED && ch->i_state != CHS_WACK_CREQ
+	    && ch->i_state != CHS_WCON_CREQ)
 		goto outstate;
 	return ch_disconnect_ind(q, ch, CHF_BOTH_DIR);
       emsgsize:
@@ -1204,7 +1197,8 @@ static int ch_optmgmt_req(queue_t *q, mblk_t *mp)
 				ch->config.tx_channels = o->circuit.cp_tx_channels;
 				ch->config.rx_channels = o->circuit.cp_rx_channels;
 				ch->config.opt_flags = o->circuit.cp_opt_flags;
-				return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit), p->ch_mgmt_flags);
+				return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit),
+						      p->ch_mgmt_flags);
 			case CH_DEFAULT:
 				/* set default */
 				ch_default.block_size = o->circuit.cp_block_size;
@@ -1214,7 +1208,8 @@ static int ch_optmgmt_req(queue_t *q, mblk_t *mp)
 				ch_default.tx_channels = o->circuit.cp_tx_channels;
 				ch_default.rx_channels = o->circuit.cp_rx_channels;
 				ch_default.opt_flags = o->circuit.cp_opt_flags;
-				return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit), p->ch_mgmt_flags);
+				return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit),
+						      p->ch_mgmt_flags);
 			}
 		}
 		goto badparmtype;
@@ -1233,7 +1228,8 @@ static int ch_optmgmt_req(queue_t *q, mblk_t *mp)
 			o->circuit.cp_tx_channels = ch->config.tx_channels;
 			o->circuit.cp_rx_channels = ch->config.rx_channels;
 			o->circuit.cp_opt_flags = ch->config.opt_flags;
-			return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit), p->ch_mgmt_flags);
+			return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit),
+					      p->ch_mgmt_flags);
 		case 0:
 		case CH_DEFAULT:
 			/* get default */
@@ -1245,7 +1241,8 @@ static int ch_optmgmt_req(queue_t *q, mblk_t *mp)
 			o->circuit.cp_tx_channels = ch_default.tx_channels;
 			o->circuit.cp_rx_channels = ch_default.rx_channels;
 			o->circuit.cp_opt_flags = ch_default.opt_flags;
-			return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit), p->ch_mgmt_flags);
+			return ch_optmgmt_ack(q, ch, (uchar *) o, sizeof(o->circuit),
+					      p->ch_mgmt_flags);
 		}
 	}
 	goto badflag;
@@ -2002,7 +1999,7 @@ static int ch_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = ch_ioccnotify(ch, arg);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported CH ioctl %d\n", CH_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported CH ioctl %d\n", CH_SDL_MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -2138,43 +2135,43 @@ static int ch_w_proto(queue_t *q, mblk_t *mp)
 	(void) ch;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case CH_INFO_REQ:
-		printd(("%s: %p: -> CH_INFO_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_INFO_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_info_req(q, mp);
 		break;
 	case CH_OPTMGMT_REQ:
-		printd(("%s: %p: -> CH_OPTMGMT_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_OPTMGMT_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_optmgmt_req(q, mp);
 		break;
 	case CH_ATTACH_REQ:
-		printd(("%s: %p: -> CH_ATTACH_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_ATTACH_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_attach_req(q, mp);
 		break;
 	case CH_ENABLE_REQ:
-		printd(("%s: %p: -> CH_ENABLE_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_ENABLE_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_enable_req(q, mp);
 		break;
 	case CH_CONNECT_REQ:
-		printd(("%s: %p: -> CH_CONNECT_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_CONNECT_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_connect_req(q, mp);
 		break;
 	case CH_DATA_REQ:
-		printd(("%s: %p: -> CH_DATA_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DATA_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_data_req(q, mp);
 		break;
 	case CH_DISCONNECT_REQ:
-		printd(("%s: %p: -> CH_DISCONNECT_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DISCONNECT_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_disconnect_req(q, mp);
 		break;
 	case CH_DISABLE_REQ:
-		printd(("%s: %p: -> CH_DISABLE_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DISABLE_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_disable_req(q, mp);
 		break;
 	case CH_DETACH_REQ:
-		printd(("%s: %p: -> CH_DETACH_REQ\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DETACH_REQ\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_detach_req(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> CH_????\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_????\n", CH_SDL_MOD_NAME, ch));
 		rtn = ch_error_ack(q, ch, prim, CHNOTSUPP);
 		break;
 	}
@@ -2192,51 +2189,51 @@ static int ch_r_proto(queue_t *q, mblk_t *mp)
 	(void) ch;
 	switch (*((ulong *) mp->b_rptr)) {
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_OK_ACK <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_STATS_IND <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = lmi_event_ind(q, mp);
 		break;
 	case SDL_RECEIVED_BITS_IND:
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = sdl_received_bits_ind(q, mp);
 		break;
 	case SDL_DISCONNECT_IND:
-		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", CH_SDL_MOD_NAME, ch));
 		rtn = sdl_disconnect_ind(q, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? %lu <-\n", CH_MOD_NAME, ch, *(ulong *) mp->b_rptr));
+		printd(("%s: %p: ???? %lu <-\n", CH_SDL_MOD_NAME, ch, *(ulong *) mp->b_rptr));
 		rtn = -EFAULT;
 		break;
 	}
@@ -2253,13 +2250,13 @@ static int ch_r_proto(queue_t *q, mblk_t *mp)
 static int ch_w_data(queue_t *q, mblk_t *mp)
 {
 	/* data from above */
-	printd(("%s: %p: -> M_DATA\n", CH_MOD_NAME, CH_PRIV(q)));
+	printd(("%s: %p: -> M_DATA\n", CH_SDL_MOD_NAME, CH_PRIV(q)));
 	return ch_write(q, mp);
 }
 static int ch_r_data(queue_t *q, mblk_t *mp)
 {
 	/* data from below */
-	printd(("%s: %p: M_DATA <-\n", CH_MOD_NAME, CH_PRIV(q)));
+	printd(("%s: %p: M_DATA <-\n", CH_SDL_MOD_NAME, CH_PRIV(q)));
 	return ch_read(q, mp);
 }
 
@@ -2414,11 +2411,12 @@ static int ch_init_caches(void)
 {
 	if (!ch_priv_cachep &&
 	    !(ch_priv_cachep =
-	      kmem_cache_create("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", CH_MOD_NAME);
+	      kmem_cache_create("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", CH_SDL_MOD_NAME);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized ch private structure cache\n", CH_MOD_NAME));
+		printd(("%s: initialized ch private structure cache\n", CH_SDL_MOD_NAME));
 	return (0);
 }
 static void ch_term_caches(void)
@@ -2427,7 +2425,7 @@ static void ch_term_caches(void)
 		if (kmem_cache_destroy(ch_priv_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy ch_priv_cachep", __FUNCTION__);
 		else
-			printd(("%s: destroyed ch_priv_cachep\n", CH_MOD_NAME));
+			printd(("%s: destroyed ch_priv_cachep\n", CH_SDL_MOD_NAME));
 	}
 	return;
 }
@@ -2440,7 +2438,7 @@ static struct ch *ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t
 {
 	struct ch *ch;
 	if ((ch = kmem_cache_alloc(ch_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated ch private structure\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: allocated ch private structure\n", CH_SDL_MOD_NAME, ch));
 		bzero(ch, sizeof(*ch));
 		ch_get(ch);	/* first get */
 		ch->u.dev.cmajor = getmajor(*devp);
@@ -2452,19 +2450,19 @@ static struct ch *ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t
 		ch->i_wakeup = NULL;
 		(ch->oq = RD(q))->q_ptr = ch_get(ch);
 		(ch->iq = WR(q))->q_ptr = ch_get(ch);
-		lis_spin_lock_init(&ch->qlock, "ch-queue-lock");
+		spin_lock_init(&ch->qlock);	/* "ch-queue-lock" */
 		ch->i_state = CHS_UNINIT;	/* unitialized */
 		ch->i_version = 1;
 		ch->i_style = 0;
-		lis_spin_lock_init(&ch->lock, "ch-priv-lock");
+		spin_lock_init(&ch->lock);	/* "ch-priv-lock" */
 		if ((ch->next = *chp))
 			ch->next->prev = &ch->next;
 		ch->prev = chp;
 		*chp = ch_get(ch);
-		printd(("%s: %p: linked ch private structure\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: linked ch private structure\n", CH_SDL_MOD_NAME, ch));
 		ch->config = ch_default;
 	} else
-		ptrace(("%s: ERROR: Could not allocate ch private structure\n", CH_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate ch private structure\n", CH_SDL_MOD_NAME));
 	return (ch);
 }
 static void ch_free_priv(queue_t *q)
@@ -2472,7 +2470,7 @@ static void ch_free_priv(queue_t *q)
 	struct ch *ch = CH_PRIV(q);
 	psw_t flags = 0;
 	ensure(ch, return);
-	lis_spin_lock_irqsave(&ch->lock, &flags);
+	spin_lock_irqsave(&ch->lock, flags);
 	{
 		ss7_unbufcall((str_t *) ch);
 		if ((*ch->prev = ch->next))
@@ -2489,7 +2487,7 @@ static void ch_free_priv(queue_t *q)
 		ch->iq = NULL;
 		ch_put(ch);
 	}
-	lis_spin_unlock_irqrestore(&ch->lock, &flags);
+	spin_unlock_irqrestore(&ch->lock, flags);
 	ch_put(ch);		/* final put */
 	return;
 }
@@ -2502,7 +2500,7 @@ static void ch_put(struct ch *ch)
 {
 	if (atomic_dec_and_test(&ch->refcnt)) {
 		kmem_cache_free(ch_priv_cachep, ch);
-		printd(("%s: %p: freed ch private structure\n", CH_MOD_NAME, ch));
+		printd(("%s: %p: freed ch private structure\n", CH_SDL_MOD_NAME, ch));
 	}
 }
 
@@ -2517,11 +2515,11 @@ static int ch_initialized = 0;
 static void ch_init(void)
 {
 	unless(ch_initialized > 0, return);
-	cmn_err(CE_NOTE, CH_BANNER);	/* console splash */
+	cmn_err(CE_NOTE, CH_SDL_BANNER);	/* console splash */
 	if ((ch_initialized = ch_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", CH_MOD_NAME);
-	} else if ((ch_initialized = lis_register_strmod(&ch_info, CH_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: could not register module", CH_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", CH_SDL_MOD_NAME);
+	} else if ((ch_initialized = lis_register_strmod(&ch_info, CH_SDL_MOD_NAME)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register module", CH_SDL_MOD_NAME);
 		ch_term_caches();
 	}
 	return;
@@ -2530,7 +2528,7 @@ static void ch_terminate(void)
 {
 	ensure(ch_initialized > 0, return);
 	if ((ch_initialized = lis_unregister_strmod(&ch_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: could not unregister module", CH_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: could not unregister module", CH_SDL_MOD_NAME);
 	} else {
 		ch_term_caches();
 	}

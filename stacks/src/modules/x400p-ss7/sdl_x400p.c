@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:45 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -60,35 +60,14 @@ static char const ident[] =
 #define _DEBUG 1
 #define X400P_DOWNLOAD_FIRMWARE
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <linux/modversions.h>
-#include <linux/init.h>
+#include "compat.h"
 
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
-#include <linux/errno.h>
-#include <linux/types.h>
-
+#ifdef LINUX
 #include <linux/ioport.h>
 #include <asm/io.h>
 #include <asm/dma.h>
 #include <linux/pci.h>
-
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
+#endif				/* LINUX */
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -96,27 +75,43 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
-#include "x400p-ss7/x400pfw.h"		/* X400P-SS7 firmware load */
+#include "x400p-ss7/x400pfw.h"	/* X400P-SS7 firmware load */
 #endif
 
-#define X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
-#define X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
-#define X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define X400P_LICENSE	"GPL"
-#define X400P_BANNER	X400P_DESCRIP	"\n" \
-			X400P_COPYRIGHT	"\n" \
-			X400P_DEVICE	"\n" \
-			X400P_CONTACT	"\n"
+#define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
+#define SDL_X400P_REVISION	"LfS $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $"
+#define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
+#define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SDL_X400P_LICENSE	"GPL"
+#define SDL_X400P_BANNER	SDL_X400P_DESCRIP	"\n" \
+				SDL_X400P_REVISION	"\n" \
+				SDL_X400P_COPYRIGHT	"\n" \
+				SDL_X400P_DEVICE	"\n" \
+				SDL_X400P_CONTACT	"\n"
+#define SDL_X400P_SPLASH	SDL_X400P_DEVICE	" - " \
+				SDL_X400P_REVISION	"\n"
 
-MODULE_AUTHOR(X400P_CONTACT);
-MODULE_DESCRIPTION(X400P_DESCRIP);
-MODULE_SUPPORTED_DEVICE(X400P_DEVICE);
+#ifdef LINUX
+MODULE_AUTHOR(SDL_X400P_CONTACT);
+MODULE_DESCRIPTION(SDL_X400P_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SDL_X400P_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(X400P_LICENSE);
+MODULE_LICENSE(SDL_X400P_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SDL_X400P_DRV_ID	CONFIG_STREAMS_SDL_X400P_MODID
+#define SDL_X400P_DRV_NAME	CONFIG_STREAMS_SDL_X400P_NAME
+#define SDL_X400P_CMAJORS	CONFIG_STREAMS_SDL_X400P_NMAJORS
+#define SDL_X400P_CMAJOR_0	CONFIG_STREAMS_SDL_X400P_MAJOR
+#define SDL_X400P_NMINOR	CONFIG_STREAMS_SDL_X400P_NMINORS
 #endif
 
-#define X400P_SDL_NMINOR 255
+#ifndef SDL_X400P_NMINOR
+#define SDL_X400P_NMINOR	255
+#endif
 
 /*
  *  =======================================================================
@@ -126,51 +121,51 @@ MODULE_LICENSE(X400P_LICENSE);
  *  =======================================================================
  */
 
-#ifndef X400P_DRV_ID
-#define X400P_DRV_ID	SDL_X400P_DRV_ID
+#ifndef SDL_X400P_DRV_ID
+#define SDL_X400P_DRV_ID	SDL_X400P_DRV_ID
 #endif
-#ifndef X400P_DRV_NAME
-#define X400P_DRV_NAME	SDL_X400P_DRV_NAME
+#ifndef SDL_X400P_DRV_NAME
+#define SDL_X400P_DRV_NAME	SDL_X400P_DRV_NAME
 #endif
 
 STATIC struct module_info xp_rinfo = {
-	mi_idnum:X400P_DRV_ID,			/* Module ID number */
-	mi_idname:X400P_DRV_NAME "-rd",		/* Module name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:128,				/* Max packet size accepted */
-	mi_hiwat:1,				/* Hi water mark */
-	mi_lowat:0,				/* Lo water mark */
+	mi_idnum:SDL_X400P_DRV_ID,	/* Module ID number */
+	mi_idname:SDL_X400P_DRV_NAME "-rd",	/* Module name */
+	mi_minpsz:1,			/* Min packet size accepted */
+	mi_maxpsz:128,			/* Max packet size accepted */
+	mi_hiwat:1,			/* Hi water mark */
+	mi_lowat:0,			/* Lo water mark */
 };
 
 STATIC struct module_info xp_winfo = {
-	mi_idnum:X400P_DRV_ID,			/* Module ID number */
-	mi_idname:X400P_DRV_NAME "-wr",		/* Module name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:280,				/* Max packet size accepted */
-	mi_hiwat:1,				/* Hi water mark */
-	mi_lowat:0,				/* Lo water mark */
+	mi_idnum:SDL_X400P_DRV_ID,	/* Module ID number */
+	mi_idname:SDL_X400P_DRV_NAME "-wr",	/* Module name */
+	mi_minpsz:1,			/* Min packet size accepted */
+	mi_maxpsz:280,			/* Max packet size accepted */
+	mi_hiwat:1,			/* Hi water mark */
+	mi_lowat:0,			/* Lo water mark */
 };
 
 STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
-	qi_putp:ss7_oput,			/* Read put (message from below) */
-	qi_srvp:ss7_osrv,			/* Read queue service */
-	qi_qopen:xp_open,			/* Each open */
-	qi_qclose:xp_close,			/* Last close */
-	qi_minfo:&xp_rinfo,			/* Information */
+	qi_putp:ss7_oput,		/* Read put (message from below) */
+	qi_srvp:ss7_osrv,		/* Read queue service */
+	qi_qopen:xp_open,		/* Each open */
+	qi_qclose:xp_close,		/* Last close */
+	qi_minfo:&xp_rinfo,		/* Information */
 };
 
 STATIC struct qinit xp_winit = {
-	qi_putp:ss7_iput,			/* Write put (message from above) */
-	qi_srvp:ss7_isrv,			/* Write queue service */
-	qi_minfo:&xp_winfo,			/* Information */
+	qi_putp:ss7_iput,		/* Write put (message from above) */
+	qi_srvp:ss7_isrv,		/* Write queue service */
+	qi_minfo:&xp_winfo,		/* Information */
 };
 
 STATIC struct streamtab xp_info = {
-	st_rdinit:&xp_rinit,			/* Upper read queue */
-	st_wrinit:&xp_winit,			/* Upper write queue */
+	st_rdinit:&xp_rinit,		/* Upper read queue */
+	st_wrinit:&xp_winit,		/* Upper write queue */
 };
 
 /*
@@ -185,23 +180,23 @@ struct cd;
 struct sp;
 
 typedef struct xp {
-	STR_DECLARATION (struct xp);		/* stream declaration */
-	struct cd *cd;				/* card for this channel */
-	struct sp *sp;				/* span for this channel */
-	int card;				/* index (card) */
-	int span;				/* index (span) */
-	int chan;				/* index (chan) */
-	int slot;				/* index (slot) */
-	uchar *tx_base;				/* chan tx base */
-	uchar *rx_base;				/* chan rx base */
-	volatile mblk_t *tx_msg;		/* chan tx message */
-	lmi_option_t option;			/* LMI protocol and variant options */
-	volatile sdl_config_t config;		/* SDT configuration */
-	sdl_statem_t statem;			/* SDT state machine variables */
-	sdl_notify_t notify;			/* SDT notification options */
-	sdl_stats_t stats;			/* SDT statistics */
-	sdl_stats_t stamp;			/* SDT statistics timestamps */
-	sdl_stats_t statsp;			/* SDT statistics periods */
+	STR_DECLARATION (struct xp);	/* stream declaration */
+	struct cd *cd;			/* card for this channel */
+	struct sp *sp;			/* span for this channel */
+	int card;			/* index (card) */
+	int span;			/* index (span) */
+	int chan;			/* index (chan) */
+	int slot;			/* index (slot) */
+	uchar *tx_base;			/* chan tx base */
+	uchar *rx_base;			/* chan rx base */
+	volatile mblk_t *tx_msg;	/* chan tx message */
+	lmi_option_t option;		/* LMI protocol and variant options */
+	volatile sdl_config_t config;	/* SDT configuration */
+	sdl_statem_t statem;		/* SDT state machine variables */
+	sdl_notify_t notify;		/* SDT notification options */
+	sdl_stats_t stats;		/* SDT statistics */
+	sdl_stats_t stamp;		/* SDT statistics timestamps */
+	sdl_stats_t statsp;		/* SDT statistics periods */
 } xp_t;
 #define XP_PRIV(__q) ((struct xp *)(__q)->q_ptr)
 
@@ -211,14 +206,14 @@ STATIC struct xp *xp_get(struct xp *);
 STATIC void xp_put(struct xp *);
 
 typedef struct sp {
-	HEAD_DECLARATION (struct sp);		/* head declaration */
-	struct cd *cd;				/* card for this span */
-	struct xp *slots[32];			/* timeslot structures */
-	ulong recovertime;			/* alarm recover time */
-	ulong iobase;				/* span iobase */
-	int card;				/* index (card) */
-	int span;				/* index (span) */
-	volatile sdl_config_t config;		/* span configuration */
+	HEAD_DECLARATION (struct sp);	/* head declaration */
+	struct cd *cd;			/* card for this span */
+	struct xp *slots[32];		/* timeslot structures */
+	ulong recovertime;		/* alarm recover time */
+	ulong iobase;			/* span iobase */
+	int card;			/* index (card) */
+	int span;			/* index (span) */
+	volatile sdl_config_t config;	/* span configuration */
 } sp_t;
 
 STATIC struct sp *xp_alloc_sp(struct cd *, uint8_t);
@@ -227,27 +222,27 @@ STATIC struct sp *sp_get(struct sp *);
 STATIC void sp_put(struct sp *);
 
 typedef struct cd {
-	HEAD_DECLARATION (struct cd);		/* head declaration */
-	ulong xll_region;			/* Xilinx 32-bit memory region */
-	ulong xll_length;			/* Xilinx 32-bit memory length */
-	volatile uint32_t *xll;			/* Xilinx 32-bit memory map */
-	ulong xlb_region;			/* Xilinx 8-bit memory region */
-	ulong xlb_length;			/* Xilinx 8-bit memory lenght */
-	volatile uint8_t *xlb;			/* Xilinx 8-bit memory map */
-	ulong plx_region;			/* PLX 9030 memory region */
-	ulong plx_length;			/* PLX 9030 memory length */
-	volatile uint16_t *plx;			/* PLX 9030 memory map */
-	uint frame;				/* frame number */
-	struct sp *spans[4];			/* structures for spans */
-	volatile uint32_t *wbuf;		/* wr buffer */
-	volatile uint32_t *rbuf;		/* rd buffer */
-	volatile int eval_syncsrc;		/* need to reevaluate sync src */
-	volatile int leds;			/* leds on the card */
-	int card;				/* index (card) */
-	ulong irq;				/* card irq */
-	ulong iobase;				/* card iobase */
-	struct tasklet_struct tasklet;		/* card tasklet */
-	volatile sdl_config_t config;		/* card configuration */
+	HEAD_DECLARATION (struct cd);	/* head declaration */
+	ulong xll_region;		/* Xilinx 32-bit memory region */
+	ulong xll_length;		/* Xilinx 32-bit memory length */
+	volatile uint32_t *xll;		/* Xilinx 32-bit memory map */
+	ulong xlb_region;		/* Xilinx 8-bit memory region */
+	ulong xlb_length;		/* Xilinx 8-bit memory lenght */
+	volatile uint8_t *xlb;		/* Xilinx 8-bit memory map */
+	ulong plx_region;		/* PLX 9030 memory region */
+	ulong plx_length;		/* PLX 9030 memory length */
+	volatile uint16_t *plx;		/* PLX 9030 memory map */
+	uint frame;			/* frame number */
+	struct sp *spans[4];		/* structures for spans */
+	volatile uint32_t *wbuf;	/* wr buffer */
+	volatile uint32_t *rbuf;	/* rd buffer */
+	volatile int eval_syncsrc;	/* need to reevaluate sync src */
+	volatile int leds;		/* leds on the card */
+	int card;			/* index (card) */
+	ulong irq;			/* card irq */
+	ulong iobase;			/* card iobase */
+	struct tasklet_struct tasklet;	/* card tasklet */
+	volatile sdl_config_t config;	/* card configuration */
 } cd_t;
 
 STATIC struct cd *xp_alloc_cd(void);
@@ -376,7 +371,8 @@ STATIC struct cd *x400p_cards;
  *  M_ERROR
  *  -----------------------------------
  */
-STATIC int m_error(queue_t *q, struct xp *xp, int err)
+STATIC int
+m_error(queue_t *q, struct xp *xp, int err)
 {
 	mblk_t *mp;
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
@@ -395,7 +391,8 @@ STATIC int m_error(queue_t *q, struct xp *xp, int err)
  *  -----------------------------------
  *  Actually, we never want to use this function: we want to just send M_DATA.
  */
-STATIC INLINE int sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
+STATIC INLINE int
+sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 {
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
@@ -419,7 +416,8 @@ STATIC INLINE int sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
  *  SDL_DISCONNECT_IND
  *  -----------------------------------
  */
-STATIC INLINE int sdl_disconnect_ind(queue_t *q, struct xp *xp)
+STATIC INLINE int
+sdl_disconnect_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
 	sdl_disconnect_ind_t *p;
@@ -438,7 +436,8 @@ STATIC INLINE int sdl_disconnect_ind(queue_t *q, struct xp *xp)
  *  LMI_INFO_ACK
  *  -----------------------------------
  */
-STATIC INLINE int lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
+STATIC INLINE int
+lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
@@ -465,7 +464,8 @@ STATIC INLINE int lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_
  *  LMI_OK_ACK
  *  -----------------------------------
  */
-STATIC INLINE int lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
+STATIC INLINE int
+lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
@@ -486,7 +486,8 @@ STATIC INLINE int lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
  *  LMI_ERROR_ACK
  *  -----------------------------------
  */
-STATIC INLINE int lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ulong reason)
+STATIC INLINE int
+lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
@@ -509,7 +510,8 @@ STATIC INLINE int lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long pri
  *  LMI_ENABLE_CON
  *  -----------------------------------
  */
-STATIC INLINE int lmi_enable_con(queue_t *q, struct xp *xp)
+STATIC INLINE int
+lmi_enable_con(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
@@ -529,7 +531,8 @@ STATIC INLINE int lmi_enable_con(queue_t *q, struct xp *xp)
  *  LMI_DISABLE_CON
  *  -----------------------------------
  */
-STATIC INLINE int lmi_disable_con(queue_t *q, struct xp *xp)
+STATIC INLINE int
+lmi_disable_con(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
@@ -550,7 +553,8 @@ STATIC INLINE int lmi_disable_con(queue_t *q, struct xp *xp)
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
  */
-STATIC INLINE int lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t opt_len)
+STATIC INLINE int
+lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
@@ -572,7 +576,8 @@ STATIC INLINE int lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_
  *  LMI_ERROR_IND
  *  -----------------------------------
  */
-STATIC INLINE int lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
+STATIC INLINE int
+lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
@@ -594,7 +599,8 @@ STATIC INLINE int lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong re
  *  LMI_STATS_IND
  *  -----------------------------------
  */
-STATIC INLINE int lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
+STATIC INLINE int
+lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
 {
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
@@ -619,7 +625,8 @@ STATIC INLINE int lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
  *  LMI_EVENT_IND
  *  -----------------------------------
  */
-STATIC INLINE int lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
+STATIC INLINE int
+lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 {
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
@@ -655,7 +662,8 @@ STATIC INLINE int lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong leve
  *  It is preffered to just send M_DATA here.  We just strip the proto block
  *  off and put it back on the queue.
  */
-STATIC int sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -666,7 +674,8 @@ STATIC int sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
  *  SDL_CONNECT_REQ
  *  -----------------------------------
  */
-STATIC int sdl_connect_req(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_connect_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	if (xp->i_state != LMI_ENABLED)
@@ -679,7 +688,8 @@ STATIC int sdl_connect_req(queue_t *q, mblk_t *mp)
  *  SDL_DISCONNECT_REQ
  *  -----------------------------------
  */
-STATIC int sdl_disconnect_req(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_disconnect_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	if (xp->i_state != LMI_ENABLED)
@@ -692,18 +702,20 @@ STATIC int sdl_disconnect_req(queue_t *q, mblk_t *mp)
  *  LMI_INFO_REQ
  *  -----------------------------------
  */
-STATIC int lmi_info_req(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_info_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	uint16_t ppa = (xp->chan & 0xff) | ((xp->span & 0x0f) << 8) | ((xp->card & 0x0f) << 12);
-	return lmi_info_ack(q, xp, (caddr_t) & ppa, sizeof(ppa));
+	return lmi_info_ack(q, xp, (caddr_t) &ppa, sizeof(ppa));
 }
 
 /*
  *  LMI_ATTACH_REQ
  *  -----------------------------------
  */
-STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	int err, card, span, chan, slot, byte, span_allocated = 0;
 	struct cd *cd;
@@ -712,7 +724,8 @@ STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
-		ptrace(("X400P-SS7: ERROR: primitive too small = %d bytes\n", mp->b_wptr - mp->b_rptr));
+		ptrace(("X400P-SS7: ERROR: primitive too small = %d bytes\n",
+			mp->b_wptr - mp->b_rptr));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
@@ -773,8 +786,8 @@ STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				goto error;
 			/* commit attach */
-			printd(("E400P-SS7: attaching card %d, span %d, chan %d, slot %d\n", card, span, chan,
-				slot));
+			printd(("E400P-SS7: attaching card %d, span %d, chan %d, slot %d\n", card,
+				span, chan, slot));
 			sp->slots[slot] = xp_get(xp);
 			xp->slot = slot;
 			xp->tx_base = ((uchar *) cd->wbuf) + (slot << 2) + byte;
@@ -795,8 +808,8 @@ STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				goto error;
 			/* commit attach */
-			printd(("T400P-SS7: attaching card %d, span %d, chan %d, slot %d\n", card, span, chan,
-				slot));
+			printd(("T400P-SS7: attaching card %d, span %d, chan %d, slot %d\n", card,
+				span, chan, slot));
 			sp->slots[slot] = xp_get(xp);
 			xp->slot = slot;
 			xp->tx_base = ((uchar *) cd->wbuf) + (slot << 2) + byte;
@@ -897,7 +910,8 @@ STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
  *  LMI_DETACH_REQ
  *  -----------------------------------
  */
-STATIC int lmi_detach_req(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int err;
@@ -955,7 +969,8 @@ STATIC int lmi_detach_req(queue_t *q, mblk_t *mp)
  *  LMI_ENABLE_REQ
  *  -----------------------------------
  */
-STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_enable_req(queue_t *q, mblk_t *mp)
 {
 	int err, offset, slot = 0;
 	struct xp *xp = XP_PRIV(q);
@@ -993,7 +1008,7 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_E1:
 		{
 			printd(("E400P-SS7: performing enable on E1 span %d\n", span));
-			lis_spin_lock_irq(&cd->lock);
+			spin_lock_irq(&cd->lock);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
 			cd->eval_syncsrc = 1;
@@ -1055,15 +1070,15 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 			for (offset = 0x22; offset <= 0x25; offset++)
 				cd->xlb[base + offset] = 0xff;
 			timeout = jiffies + 100 * HZ / 1000;
-			lis_spin_unlock_irq(&cd->lock);
+			spin_unlock_irq(&cd->lock);
 			while (jiffies < timeout) ;
-			lis_spin_lock_irq(&cd->lock);
+			spin_lock_irq(&cd->lock);
 			cd->xlb[base + 0x1b] = 0x9a;	/* CRC3: set ESR as well */
 			cd->xlb[base + 0x1b] = 0x82;	/* CRC3: TSCLKM only */
 			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 			/* enable interrupts */
 			cd->xlb[CTLREG] = (INTENA | E1DIV);
-			lis_spin_unlock_irq(&cd->lock);
+			spin_unlock_irq(&cd->lock);
 		}
 			break;
 		case SDL_GTYPE_T1:
@@ -1071,7 +1086,7 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 			int byte, val, c;
 			unsigned short mask = 0;
 			printd(("T400P-SS7: performing enable on T1 span %d\n", span));
-			lis_spin_lock_irq(&cd->lock);
+			spin_lock_irq(&cd->lock);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
 			cd->eval_syncsrc = 1;
@@ -1088,9 +1103,10 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 			cd->xlb[base + 0x2c] = 0x08;	/* RSYNC is an input (RCR2) */
 			cd->xlb[base + 0x35] = 0x10;	/* RBS enable (TCR1) */
 			cd->xlb[base + 0x36] = 0x04;	/* TSYNC to be output (TCR2) */
-			cd->xlb[base + 0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048 mhz, loopback
-							   controls (CCR1) */
-			cd->xlb[base + 0x12] = 0x22;	/* Set up received loopup and loopdown codes */
+			cd->xlb[base + 0x37] = 0x9c;	/* Tx & Rx Elastic stor, sysclk(s) = 2.048
+							   mhz, loopback controls (CCR1) */
+			cd->xlb[base + 0x12] = 0x22;	/* Set up received loopup and loopdown
+							   codes */
 			cd->xlb[base + 0x14] = 0x80;
 			cd->xlb[base + 0x15] = 0x80;
 			/* Enable F bits pattern */
@@ -1117,19 +1133,21 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 			cd->xlb[base + 0x7c] = sp->config.iftxlevel << 5;	/* LBO */
 			cd->xlb[base + 0x0a] = 0x80;	/* LIRST to reset line interface */
 			timeout = jiffies + 100 * HZ / 1000;
-			lis_spin_unlock_irq(&cd->lock);
+			spin_unlock_irq(&cd->lock);
 			while (jiffies < timeout) ;
-			lis_spin_lock_irq(&cd->lock);
-			cd->xlb[base + 0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic buffers */
+			spin_lock_irq(&cd->lock);
+			cd->xlb[base + 0x0a] = 0x30;	/* LIRST bask to normal, Resetting elastic
+							   buffers */
 			sp->config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 			/* enable interrupts */
 			cd->xlb[CTLREG] = (INTENA);
-			lis_spin_unlock_irq(&cd->lock);
+			spin_unlock_irq(&cd->lock);
 			/* establish which channels are clear channel */
 			for (c = 0; c < 24; c++) {
 				byte = c >> 3;
 				if (!cd->spans[span]->slots[xp_t1_chan_map[c]]
-				    || cd->spans[span]->slots[xp_t1_chan_map[c]]->config.iftype != SDL_TYPE_DS0A)
+				    || cd->spans[span]->slots[xp_t1_chan_map[c]]->config.iftype !=
+				    SDL_TYPE_DS0A)
 					mask |= 1 << (c % 8);
 				if ((c % 8) == 7)
 					cd->xlb[base + 0x39 + byte] = mask;
@@ -1168,7 +1186,8 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
  *  LMI_DISABLE_REQ
  *  -----------------------------------
  */
-STATIC int lmi_disable_req(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int err;
@@ -1190,7 +1209,8 @@ STATIC int lmi_disable_req(queue_t *q, mblk_t *mp)
  *  LMI_OPTMGMT_REQ
  *  -----------------------------------
  */
-STATIC int lmi_optmgmt_req(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -1209,7 +1229,8 @@ STATIC int lmi_optmgmt_req(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int sdl_test_config(struct xp *xp, sdl_config_t * arg)
+STATIC int
+sdl_test_config(struct xp *xp, sdl_config_t * arg)
 {
 	if (xp) {
 		if (arg->ifflags) {
@@ -1397,7 +1418,8 @@ STATIC int sdl_test_config(struct xp *xp, sdl_config_t * arg)
 	}
 	return (0);
 }
-STATIC void sdl_commit_config(struct xp *xp, sdl_config_t * arg)
+STATIC void
+sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 {
 	int chan_reconfig = 0, span_reconfig = 0, card_reconfig = 0;
 	if (xp) {
@@ -1476,7 +1498,8 @@ STATIC void sdl_commit_config(struct xp *xp, sdl_config_t * arg)
  *  SDL_IOCGOPTIONS:	lmi_option_t
  *  -----------------------------------
  */
-STATIC int sdl_iocgoptions(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1492,7 +1515,8 @@ STATIC int sdl_iocgoptions(queue_t *q, mblk_t *mp)
  *  SDL_IOCSOPTIONS:	lmi_option_t
  *  -----------------------------------
  */
-STATIC int sdl_iocsoptions(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1508,7 +1532,8 @@ STATIC int sdl_iocsoptions(queue_t *q, mblk_t *mp)
  *  SDL_IOCGCONFIG:	sdl_config_t
  *  -----------------------------------
  */
-STATIC int sdl_iocgconfig(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1549,7 +1574,8 @@ STATIC int sdl_iocgconfig(queue_t *q, mblk_t *mp)
  *  SDL_IOCSCONFIG:	sdl_config_t
  *  -----------------------------------
  */
-STATIC int sdl_iocsconfig(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocsconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		int ret;
@@ -1568,7 +1594,8 @@ STATIC int sdl_iocsconfig(queue_t *q, mblk_t *mp)
  *  SDL_IOCTCONFIG:	sdl_config_t
  *  -----------------------------------
  */
-STATIC int sdl_ioctconfig(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioctconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1583,7 +1610,8 @@ STATIC int sdl_ioctconfig(queue_t *q, mblk_t *mp)
  *  SDL_IOCCCONFIG:	sdl_config_t
  *  -----------------------------------
  */
-STATIC int sdl_ioccconfig(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioccconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1599,7 +1627,8 @@ STATIC int sdl_ioccconfig(queue_t *q, mblk_t *mp)
  *  SDL_IOCGSTATEM:	sdl_statem_t
  *  -----------------------------------
  */
-STATIC int sdl_iocgstatem(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1615,7 +1644,8 @@ STATIC int sdl_iocgstatem(queue_t *q, mblk_t *mp)
  *  SDL_IOCCMRESET:	sdl_statem_t
  *  -----------------------------------
  */
-STATIC int sdl_ioccmreset(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
@@ -1629,7 +1659,8 @@ STATIC int sdl_ioccmreset(queue_t *q, mblk_t *mp)
  *  SDL_IOCGSTATSP:	sdl_stats_t
  *  -----------------------------------
  */
-STATIC int sdl_iocgstatsp(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1645,7 +1676,8 @@ STATIC int sdl_iocgstatsp(queue_t *q, mblk_t *mp)
  *  SDL_IOCSSTATSP:	sdl_stats_t
  *  -----------------------------------
  */
-STATIC int sdl_iocsstatsp(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1662,7 +1694,8 @@ STATIC int sdl_iocsstatsp(queue_t *q, mblk_t *mp)
  *  SDL_IOCGSTATS:	sdl_stats_t
  *  -----------------------------------
  */
-STATIC int sdl_iocgstats(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocgstats(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1678,7 +1711,8 @@ STATIC int sdl_iocgstats(queue_t *q, mblk_t *mp)
  *  SDL_IOCCSTATS:	sdl_stats_t
  *  -----------------------------------
  */
-STATIC int sdl_ioccstats(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	(void) mp;
@@ -1690,7 +1724,8 @@ STATIC int sdl_ioccstats(queue_t *q, mblk_t *mp)
  *  SDL_IOCGNOTIFY:	sdl_notify_t
  *  -----------------------------------
  */
-STATIC int sdl_iocgnotify(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1706,7 +1741,8 @@ STATIC int sdl_iocgnotify(queue_t *q, mblk_t *mp)
  *  SDL_IOCSNOTIFY:	sdl_notify_t
  *  -----------------------------------
  */
-STATIC int sdl_iocsnotify(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1722,7 +1758,8 @@ STATIC int sdl_iocsnotify(queue_t *q, mblk_t *mp)
  *  SDL_IOCCNOTIFY:	sdl_notify_t
  *  -----------------------------------
  */
-STATIC int sdl_ioccnotify(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
@@ -1738,7 +1775,8 @@ STATIC int sdl_ioccnotify(queue_t *q, mblk_t *mp)
  *  SDL_IOCCDISCTX:	
  *  -----------------------------------
  */
-STATIC int sdl_ioccdisctx(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	(void) mp;
@@ -1750,7 +1788,8 @@ STATIC int sdl_ioccdisctx(queue_t *q, mblk_t *mp)
  *  SDL_IOCCONNTX:	
  *  -----------------------------------
  */
-STATIC int sdl_ioccconntx(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	(void) mp;
@@ -1765,7 +1804,8 @@ STATIC int sdl_ioccconntx(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE void xp_rx_chan_block(struct xp *xp)
+STATIC INLINE void
+xp_rx_chan_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_RX_RUNNING) {
 		mblk_t *mp;
@@ -1782,7 +1822,8 @@ STATIC INLINE void xp_rx_chan_block(struct xp *xp)
 		xp->stats.rx_octets += 8;
 	}
 }
-STATIC INLINE void xp_tx_chan_block(struct xp *xp)
+STATIC INLINE void
+xp_tx_chan_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_TX_RUNNING) {
 		mblk_t *mp;
@@ -1806,7 +1847,8 @@ STATIC INLINE void xp_tx_chan_block(struct xp *xp)
 		xp->stats.tx_octets += 8;
 	}
 }
-STATIC INLINE void xp_rx_t1_span_block(struct xp *xp)
+STATIC INLINE void
+xp_rx_t1_span_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_RX_RUNNING) {
 		mblk_t *mp;
@@ -1826,7 +1868,8 @@ STATIC INLINE void xp_rx_t1_span_block(struct xp *xp)
 		xp->stats.rx_octets += 8 * 24;
 	}
 }
-STATIC INLINE void xp_tx_t1_span_block(struct xp *xp)
+STATIC INLINE void
+xp_tx_t1_span_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_TX_RUNNING) {
 		mblk_t *mp;
@@ -1854,7 +1897,8 @@ STATIC INLINE void xp_tx_t1_span_block(struct xp *xp)
 		xp->stats.tx_octets += 8 * 24;
 	}
 }
-STATIC INLINE void xp_rx_e1_span_block(struct xp *xp)
+STATIC INLINE void
+xp_rx_e1_span_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_RX_RUNNING) {
 		mblk_t *mp;
@@ -1874,7 +1918,8 @@ STATIC INLINE void xp_rx_e1_span_block(struct xp *xp)
 		xp->stats.rx_octets += 8 * 31;
 	}
 }
-STATIC INLINE void xp_tx_e1_span_block(struct xp *xp)
+STATIC INLINE void
+xp_tx_e1_span_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_TX_RUNNING) {
 		mblk_t *mp;
@@ -1922,7 +1967,8 @@ STATIC INLINE void xp_tx_e1_span_block(struct xp *xp)
  *  buffer.  This will run the soft-HDLC on each channel for 8 more bytes, or
  *  if full span will run the soft-HDLC for 192 bytes (T1) or 256 bytes (E1).
  */
-STATIC void xp_e1_card_tasklet(unsigned long data)
+STATIC void
+xp_e1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
 	int span;
@@ -1972,9 +2018,12 @@ STATIC void xp_e1_card_tasklet(unsigned long data)
 				if (status & 0x02)
 					alarms |= SDL_ALARM_BLU;
 				if (alarms) {
-					if (!(sp->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+					if (!
+					    (sp->config.
+					     ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 						/* alarms have just begun */
-						cd->xlb[base + 0x21] = 0x7f;	/* set yellow alarm */
+						cd->xlb[base + 0x21] = 0x7f;	/* set yellow alarm 
+										 */
 						cd->eval_syncsrc = 1;
 					}
 				} else {
@@ -1999,7 +2048,8 @@ STATIC void xp_e1_card_tasklet(unsigned long data)
 				cd->xlb[LEDREG] = cd->leds;
 			}
 			if (((cd->frame - 8) % 8000))
-				sp->config.ifbpv += cd->xlb[base + 0x01] + (cd->xlb[base + 0x00] << 8);
+				sp->config.ifbpv +=
+				    cd->xlb[base + 0x01] + (cd->xlb[base + 0x00] << 8);
 		}
 	}
 	if (cd->eval_syncsrc) {
@@ -2007,7 +2057,8 @@ STATIC void xp_e1_card_tasklet(unsigned long data)
 		for (src = 0; src < SDL_SYNCS; src++) {
 			if (cd->config.ifsyncsrc[src] && cd->spans[syncsrc - 1]
 			    && !(cd->spans[syncsrc - 1]->config.ifclock == SDL_CLOCK_LOOP)
-			    && !(cd->spans[syncsrc - 1]->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+			    && !(cd->spans[syncsrc - 1]->config.
+				 ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 				syncsrc = cd->config.ifsyncsrc[src];
 				break;
 			}
@@ -2017,7 +2068,8 @@ STATIC void xp_e1_card_tasklet(unsigned long data)
 		cd->eval_syncsrc = 0;
 	}
 }
-STATIC void xp_t1_card_tasklet(unsigned long data)
+STATIC void
+xp_t1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
 	int span;
@@ -2068,9 +2120,12 @@ STATIC void xp_t1_card_tasklet(unsigned long data)
 				if (status & 0x08)
 					alarms |= SDL_ALARM_BLU;
 				if (alarms) {
-					if (!(sp->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+					if (!
+					    (sp->config.
+					     ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 						/* alarms have just begun */
-						cd->xlb[base + 0x35] = 0x11;	/* set yellow alarm */
+						cd->xlb[base + 0x35] = 0x11;	/* set yellow alarm 
+										 */
 						cd->eval_syncsrc = 1;
 					}
 				} else {
@@ -2095,7 +2150,8 @@ STATIC void xp_t1_card_tasklet(unsigned long data)
 				cd->xlb[LEDREG] = cd->leds;
 			}
 			if (((cd->frame - 8) % 8000))
-				sp->config.ifbpv += cd->xlb[base + 0x24] + (cd->xlb[base + 0x23] << 8);
+				sp->config.ifbpv +=
+				    cd->xlb[base + 0x24] + (cd->xlb[base + 0x23] << 8);
 		}
 	}
 	if (cd->eval_syncsrc) {
@@ -2103,7 +2159,8 @@ STATIC void xp_t1_card_tasklet(unsigned long data)
 		for (src = 0; src < SDL_SYNCS; src++) {
 			if (cd->config.ifsyncsrc[src] && cd->spans[syncsrc - 1]
 			    && !(cd->spans[syncsrc - 1]->config.ifclock == SDL_CLOCK_LOOP)
-			    && !(cd->spans[syncsrc - 1]->config.ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
+			    && !(cd->spans[syncsrc - 1]->config.
+				 ifalarms & (SDL_ALARM_RED | SDL_ALARM_BLU))) {
 				syncsrc = cd->config.ifsyncsrc[src];
 				break;
 			}
@@ -2113,7 +2170,8 @@ STATIC void xp_t1_card_tasklet(unsigned long data)
 		cd->eval_syncsrc = 0;
 	}
 }
-STATIC void xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+STATIC void
+xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
 	/* active interrupt (otherwise spurious or shared) */
@@ -2132,7 +2190,8 @@ STATIC void xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 	}
 	return;
 }
-STATIC void xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+STATIC void
+xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
 	/* active interrupt (otherwise spurious or shared) */
@@ -2162,7 +2221,8 @@ STATIC void xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  M_IOCTL Handling
  *  -------------------------------------------------------------------------
  */
-STATIC int xp_w_ioctl(queue_t *q, mblk_t *mp)
+STATIC int
+xp_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2192,8 +2252,8 @@ STATIC int xp_w_ioctl(queue_t *q, mblk_t *mp)
 		break;
 	case SDL_IOC_MAGIC:
 		if (count < size || xp->i_state == LMI_UNATTACHED) {
-			ptrace(("X400P-SS7: ERROR: ioctl count = %d, size = %d, state = %ld\n", count, size,
-				xp->i_state));
+			ptrace(("X400P-SS7: ERROR: ioctl count = %d, size = %d, state = %ld\n",
+				count, size, xp->i_state));
 			ret = -EINVAL;
 			break;
 		}
@@ -2275,7 +2335,8 @@ STATIC int xp_w_ioctl(queue_t *q, mblk_t *mp)
  *  M_PROTO, M_PCPROTO Handling
  *  -------------------------------------------------------------------------
  */
-STATIC int xp_w_proto(queue_t *q, mblk_t *mp)
+STATIC int
+xp_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	ulong prim;
@@ -2323,7 +2384,8 @@ STATIC int xp_w_proto(queue_t *q, mblk_t *mp)
  *  M_DATA Handling
  *  -------------------------------------------------------------------------
  */
-STATIC int xp_w_data(queue_t *q, mblk_t *mp)
+STATIC int
+xp_w_data(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	if (xp->tx_msg) {
@@ -2333,7 +2395,8 @@ STATIC int xp_w_data(queue_t *q, mblk_t *mp)
 	xp->tx_msg = mp;
 	return (QR_ABSORBED);
 }
-STATIC int xp_r_data(queue_t *q, mblk_t *mp)
+STATIC int
+xp_r_data(queue_t *q, mblk_t *mp)
 {
 	/* pass it along (but really an error) */
 	return (QR_PASSFLOW);
@@ -2346,7 +2409,8 @@ STATIC int xp_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int xp_w_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+xp_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -2364,7 +2428,8 @@ STATIC INLINE int xp_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int xp_r_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+xp_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -2389,7 +2454,8 @@ STATIC INLINE int xp_r_prim(queue_t *q, mblk_t *mp)
  */
 struct xp *x400p_list = NULL;
 
-STATIC int xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int
+xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int cmajor = getmajor(*devp);
 	int cminor = getminor(*devp);
@@ -2412,7 +2478,7 @@ STATIC int xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 1;
 	}
 	for (; *xpp && (*xpp)->u.dev.cmajor < cmajor; xpp = &(*xpp)->next) ;
-	for (; *xpp && cminor <= X400P_SDL_NMINOR; xpp = &(*xpp)->next) {
+	for (; *xpp && cminor <= SDL_X400P_NMINOR; xpp = &(*xpp)->next) {
 		ushort dminor = (*xpp)->u.dev.cminor;
 		if (cminor < dminor)
 			break;
@@ -2425,7 +2491,7 @@ STATIC int xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			cminor++;
 		}
 	}
-	if (cminor > X400P_SDL_NMINOR) {
+	if (cminor > SDL_X400P_NMINOR) {
 		ptrace(("X400P-SS7: ERROR: No device minors left\n"));
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
@@ -2439,7 +2505,8 @@ STATIC int xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	return (0);
 }
-STATIC int xp_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);
 	(void) flag;
@@ -2468,18 +2535,21 @@ STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
  *  Cache allocation
  *  -------------------------------------------------------------------------
  */
-STATIC int xp_init_caches(void)
+STATIC int
+xp_init_caches(void)
 {
 	if (!xp_priv_cachep &&
 	    !(xp_priv_cachep =
-	      kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	      kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
 		printd(("X400P-SS7: initialized device private structure cache\n"));
 	if (!xp_span_cachep &&
 	    !(xp_span_cachep =
-	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
 		return (-ENOMEM);
@@ -2487,7 +2557,8 @@ STATIC int xp_init_caches(void)
 		printd(("X400P-SS7: initialized span private structure cache\n"));
 	if (!xp_card_cachep &&
 	    !(xp_card_cachep =
-	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
@@ -2495,7 +2566,8 @@ STATIC int xp_init_caches(void)
 	} else
 		printd(("X400P-SS7: initialized card private structure cache\n"));
 	if (!xp_xbuf_cachep &&
-	    !(xp_xbuf_cachep = kmem_cache_create("xp_xbuf_cachep", 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	    !(xp_xbuf_cachep =
+	      kmem_cache_create("xp_xbuf_cachep", 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_card_cachep, NULL));
 		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
@@ -2505,7 +2577,8 @@ STATIC int xp_init_caches(void)
 		printd(("X400P-SS7: initialized card read/write buffer cache\n"));
 	return (0);
 }
-STATIC void xp_term_caches(void)
+STATIC void
+xp_term_caches(void)
 {
 	if (xp_xbuf_cachep) {
 		if (kmem_cache_destroy(xp_xbuf_cachep))
@@ -2538,7 +2611,8 @@ STATIC void xp_term_caches(void)
  *  Private structure allocation
  *  -------------------------------------------------------------------------
  */
-STATIC struct xp *xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
+STATIC struct xp *
+xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 {
 	struct xp *xp;
 	if ((xp = kmem_cache_alloc(xp_priv_cachep, SLAB_ATOMIC))) {
@@ -2554,11 +2628,11 @@ STATIC struct xp *xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t
 		xp->i_wakeup = NULL;
 		(xp->oq = RD(q))->q_ptr = xp_get(xp);
 		(xp->iq = WR(q))->q_ptr = xp_get(xp);
-		lis_spin_lock_init(&xp->qlock, "xp-queue-lock");
+		spin_lock_init(&xp->qlock);	/* "xp-queue-lock" */
 		xp->i_version = 1;
 		xp->i_style = LMI_STYLE2;
 		xp->i_state = LMI_UNATTACHED;
-		lis_spin_lock_init(&xp->lock, "xp-priv-lock");
+		spin_lock_init(&xp->lock);	/* "xp-priv-lock" */
 		if ((xp->next = *xpp))
 			xp->next->prev = &xp->next;
 		xp->prev = xpp;
@@ -2582,11 +2656,12 @@ STATIC struct xp *xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t
 	return (xp);
 }
 
-STATIC void xp_free_priv(struct xp *xp)
+STATIC void
+xp_free_priv(struct xp *xp)
 {
 	psw_t flags = 0;
 	ensure(xp, return);
-	lis_spin_lock_irqsave(&xp->lock, &flags);
+	spin_lock_irqsave(&xp->lock, flags);
 	{
 		struct sp *sp;
 		ss7_unbufcall((str_t *) xp);
@@ -2616,19 +2691,21 @@ STATIC void xp_free_priv(struct xp *xp)
 		flushq(xchg(&xp->iq, NULL), FLUSHALL);
 		printd(("X400P-SS7: unlinked device private structure\n"));
 	}
-	lis_spin_unlock_irqrestore(&xp->lock, &flags);
+	spin_unlock_irqrestore(&xp->lock, flags);
 	xp_put(xp);		/* final put */
 	return;
 }
 
-STATIC struct xp *xp_get(struct xp *xp)
+STATIC struct xp *
+xp_get(struct xp *xp)
 {
 	if (xp)
 		atomic_inc(&xp->refcnt);
 	return (xp);
 }
 
-STATIC void xp_put(struct xp *xp)
+STATIC void
+xp_put(struct xp *xp)
 {
 	if (atomic_dec_and_test(&xp->refcnt)) {
 		kmem_cache_free(xp_priv_cachep, xp);
@@ -2640,7 +2717,8 @@ STATIC void xp_put(struct xp *xp)
  *  Span allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-STATIC struct sp *xp_alloc_sp(struct cd *cd, uint8_t span)
+STATIC struct sp *
+xp_alloc_sp(struct cd *cd, uint8_t span)
 {
 	struct sp *sp;
 	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
@@ -2650,7 +2728,7 @@ STATIC struct sp *xp_alloc_sp(struct cd *cd, uint8_t span)
 		/* create linkage */
 		cd->spans[span] = sp_get(sp);
 		sp->cd = cd_get(cd);
-		lis_spin_lock_init(&sp->lock, "sp-priv-lock");
+		spin_lock_init(&sp->lock);	/* "sp-priv-lock" */
 		/* fill out span structure */
 		printd(("X400P-SS7: linked span private structure\n"));
 		sp->iobase = cd->iobase + (span << 8);
@@ -2677,7 +2755,8 @@ STATIC struct sp *xp_alloc_sp(struct cd *cd, uint8_t span)
 }
 
 /* Note: called with card interrupts disabled */
-STATIC void xp_free_sp(struct sp *sp)
+STATIC void
+xp_free_sp(struct sp *sp)
 {
 	struct cd *cd;
 	ensure(sp, return);
@@ -2701,13 +2780,15 @@ STATIC void xp_free_sp(struct sp *sp)
 	} else
 		ptrace(("X400P-SS7: ERROR: spans cannot exist without cards\n"));
 }
-STATIC struct sp *sp_get(struct sp *sp)
+STATIC struct sp *
+sp_get(struct sp *sp)
 {
 	if (sp)
 		atomic_inc(&sp->refcnt);
 	return (sp);
 }
-STATIC void sp_put(struct sp *sp)
+STATIC void
+sp_put(struct sp *sp)
 {
 	if (atomic_dec_and_test(&sp->refcnt)) {
 		printd(("X400P-SS7: freed span private structure\n"));
@@ -2719,7 +2800,8 @@ STATIC void sp_put(struct sp *sp)
  *  Card allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-STATIC struct cd *xp_alloc_cd(void)
+STATIC struct cd *
+xp_alloc_cd(void)
 {
 	struct cd *cd;
 	if ((cd = kmem_cache_alloc(xp_card_cachep, SLAB_ATOMIC))) {
@@ -2751,10 +2833,11 @@ STATIC struct cd *xp_alloc_cd(void)
 		ptrace(("X400P-SS7: ERROR: Could not allocate card private structure\n"));
 	return (cd);
 }
-STATIC void xp_free_cd(struct cd *cd)
+STATIC void
+xp_free_cd(struct cd *cd)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&cd->lock, &flags);
+	spin_lock_irqsave(&cd->lock, flags);
 	{
 		int span;
 		ensure(cd, return);
@@ -2775,16 +2858,18 @@ STATIC void xp_free_cd(struct cd *cd)
 		kmem_cache_free(xp_xbuf_cachep, (uint32_t *) xchg(&cd->rbuf, NULL));
 		kmem_cache_free(xp_xbuf_cachep, (uint32_t *) xchg(&cd->wbuf, NULL));
 	}
-	lis_spin_unlock_irqrestore(&cd->lock, &flags);
+	spin_unlock_irqrestore(&cd->lock, flags);
 	cd_put(cd);		/* final put */
 }
-STATIC struct cd *cd_get(struct cd *cd)
+STATIC struct cd *
+cd_get(struct cd *cd)
 {
 	if (cd)
 		atomic_inc(&cd->refcnt);
 	return (cd);
 }
-STATIC void cd_put(struct cd *cd)
+STATIC void
+cd_put(struct cd *cd)
 {
 	if (atomic_dec_and_test(&cd->refcnt)) {
 		kmem_cache_free(xp_card_cachep, cd);
@@ -2806,7 +2891,8 @@ STATIC void cd_put(struct cd *cd)
  *  init time (module load).  Successful return from the probe function will
  *  have the device configured for operation.
  */
-STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
+STATIC int __devinit
+xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	int byte, span;
 	struct cd *cd;
@@ -2815,7 +2901,8 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		return (-ENXIO);
 	}
 	if (id->driver_data != X400PSS7 && id->driver_data != X400P) {
-		ptrace(("X400P-SS7: ERROR: Driver does not support device type %ld\n", id->driver_data));
+		ptrace(("X400P-SS7: ERROR: Driver does not support device type %ld\n",
+			id->driver_data));
 		return (-ENXIO);
 	}
 	if (pci_enable_device(dev)) {
@@ -2837,8 +2924,8 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		ptrace(("X400P-SS7: ERROR: Invalid PLX 9030 base resource\n"));
 		goto error_free;
 	}
-	printd(("X400P-SS7: plx region %ld bytes at %lx, remapped %p\n", cd->plx_length, cd->plx_region,
-		cd->plx));
+	printd(("X400P-SS7: plx region %ld bytes at %lx, remapped %p\n", cd->plx_length,
+		cd->plx_region, cd->plx));
 	if ((pci_resource_flags(dev, 2) & IORESOURCE_IO)
 	    || !(cd->xll_region = pci_resource_start(dev, 2))
 	    || !(cd->xll_length = pci_resource_len(dev, 2))
@@ -2846,8 +2933,8 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		ptrace(("X400P-SS7: ERROR: Invalid Xilinx 32-bit base resource\n"));
 		goto error_free;
 	}
-	printd(("X400P-SS7: xll region %ld bytes at %lx, remapped %p\n", cd->xll_length, cd->xll_region,
-		cd->xll));
+	printd(("X400P-SS7: xll region %ld bytes at %lx, remapped %p\n", cd->xll_length,
+		cd->xll_region, cd->xll));
 	if ((pci_resource_flags(dev, 3) & IORESOURCE_IO)
 	    || !(cd->xlb_region = pci_resource_start(dev, 3))
 	    || !(cd->xlb_length = pci_resource_len(dev, 3))
@@ -2855,8 +2942,8 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		ptrace(("X400P-SS7: ERROR: Invalid Xilinx 8-bit base resource\n"));
 		goto error_free;
 	}
-	printd(("X400P-SS7: xlb region %ld bytes at %lx, remapped %p\n", cd->xlb_length, cd->xlb_region,
-		cd->xlb));
+	printd(("X400P-SS7: xlb region %ld bytes at %lx, remapped %p\n", cd->xlb_length,
+		cd->xlb_region, cd->xlb));
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
 		ptrace(("X400P-SS7: ERROR: Unable to reserve PLX memory\n"));
@@ -2874,8 +2961,8 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 	}
 	printd(("X400P-SS7: xlb region %lx reserved %ld bytes\n", cd->xlb_region, cd->xlb_length));
 	pci_set_drvdata(dev, cd);
-	__printd(("X400P-SS7: detected %s at 0x%lx/0x%lx irq %ld\n", cd->config.ifname, cd->xll_region,
-		  cd->xlb_region, cd->irq));
+	__printd(("X400P-SS7: detected %s at 0x%lx/0x%lx irq %ld\n", cd->config.ifname,
+		  cd->xll_region, cd->xlb_region, cd->irq));
 #ifdef X400P_DOWNLOAD_FIRMWARE
 	{
 		uint8_t *f = (uint8_t *) x400pfw;
@@ -2939,7 +3026,7 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		cd->config.ifclock = SDL_CLOCK_SLAVE;
 		cd->config.ifcoding = SDL_CODING_HDB3;
 		cd->config.ifframing = SDL_FRAMING_CCS;
-		lis_spin_lock_init(&cd->lock, "cd-priv-lock");
+		spin_lock_init(&cd->lock);	/* "cd-priv-lock" */
 		if (request_irq(cd->irq, xp_e1_interrupt, SA_INTERRUPT | SA_SHIRQ, "x400p-ss7", cd)) {
 			ptrace(("E400P-SS7: ERROR: Unable to request IRQ %ld\n", cd->irq));
 			goto error_free_all;
@@ -2965,7 +3052,7 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 		cd->config.ifclock = SDL_CLOCK_SLAVE;
 		cd->config.ifcoding = SDL_CODING_AMI;
 		cd->config.ifframing = SDL_FRAMING_SF;
-		lis_spin_lock_init(&cd->lock, "cd-priv-lock");
+		spin_lock_init(&cd->lock);	/* "cd-priv-lock" */
 		if (request_irq(cd->irq, xp_t1_interrupt, SA_INTERRUPT | SA_SHIRQ, "x400p-ss7", cd)) {
 			ptrace(("T400P-SS7: ERROR: Unable to request IRQ %ld\n", cd->irq));
 			goto error_free_all;
@@ -3004,7 +3091,8 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
  *  deallocate board-level resources.  Nevertheless, if we get a hot removal
  *  of a card, we must be prepared to deallocate the span structures.
  */
-STATIC void __devexit xp_remove(struct pci_dev *dev)
+STATIC void __devexit
+xp_remove(struct pci_dev *dev)
 {
 	struct cd *cd = pci_get_drvdata(dev);
 	struct sp *sp;
@@ -3029,13 +3117,15 @@ STATIC void __devexit xp_remove(struct pci_dev *dev)
 	}
 	if (cd->xlb_length) {
 		release_mem_region(cd->xlb_region, cd->xlb_length);
-		printd(("X400P-SS7: released xlb region %lx length %ld\n", cd->xlb_region, cd->xlb_length));
+		printd(("X400P-SS7: released xlb region %lx length %ld\n", cd->xlb_region,
+			cd->xlb_length));
 		cd->xlb_region = 0;
 		cd->xlb_length = 0;
 	}
 	if (cd->xll_length) {
 		release_mem_region(cd->xll_region, cd->xll_length);
-		printd(("X400P-SS7: released xll region %lx length %ld\n", cd->xll_region, cd->xll_length));
+		printd(("X400P-SS7: released xll region %lx length %ld\n", cd->xll_region,
+			cd->xll_length));
 		cd->xll_region = 0;
 		cd->xll_length = 0;
 	}
@@ -3043,7 +3133,8 @@ STATIC void __devexit xp_remove(struct pci_dev *dev)
 		release_mem_region(cd->plx_region, cd->plx_length);
 		cd->plx_region = 0;
 		cd->plx_length = 0;
-		printd(("X400P-SS7: released plx region %lx length %ld\n", cd->plx_region, cd->plx_length));
+		printd(("X400P-SS7: released plx region %lx length %ld\n", cd->plx_region,
+			cd->plx_length));
 	}
 	if (cd->xlb) {
 		iounmap((void *) cd->xlb);
@@ -3067,7 +3158,8 @@ STATIC void __devexit xp_remove(struct pci_dev *dev)
  *  X400P-SS7 Suspend
  *  -----------------------------------
  */
-STATIC int xp_suspend(struct pci_dev *pdev, u32 state)
+STATIC int
+xp_suspend(struct pci_dev *pdev, u32 state)
 {
 	fixme(("Write a suspend routine.\n"));
 	return 0;
@@ -3077,7 +3169,8 @@ STATIC int xp_suspend(struct pci_dev *pdev, u32 state)
  *  X400P-SS7 Resume
  *  -----------------------------------
  */
-STATIC int xp_resume(struct pci_dev *pdev)
+STATIC int
+xp_resume(struct pci_dev *pdev)
 {
 	fixme(("Write a resume routine.\n"));
 	return 0;
@@ -3096,7 +3189,8 @@ STATIC int xp_resume(struct pci_dev *pdev)
  *  power-on sequence completed and each channel will idle SIOS.  Closing
  *  channels will result in the transmitters resuming idle SIOS operation.
  */
-STATIC INLINE int xp_pci_init(void)
+STATIC INLINE int
+xp_pci_init(void)
 {
 	return pci_module_init(&xp_driver);
 }
@@ -3108,7 +3202,8 @@ STATIC INLINE int xp_pci_init(void)
  *  configured, we need to stop the boards and deallocate the board-level
  *  resources and structures.
  */
-STATIC INLINE void xp_pci_cleanup(void)
+STATIC INLINE void
+xp_pci_cleanup(void)
 {
 	return pci_unregister_driver(&xp_driver);
 }
@@ -3122,11 +3217,12 @@ STATIC INLINE void xp_pci_cleanup(void)
  */
 STATIC int xp_initialized = 0;
 STATIC int xp_majors[SDL_X400P_CMAJORS] = { 0, };
-STATIC void xp_init(void)
+STATIC void
+xp_init(void)
 {
 	int err, major;
 	unless(xp_initialized, return);
-	cmn_err(CE_NOTE, X400P_BANNER);	/* console splash */
+	cmn_err(CE_NOTE, SDL_X400P_BANNER);	/* console splash */
 	if ((err = xp_init_caches())) {
 		cmn_err(CE_PANIC, "X400P-SS7: ERROR: Could not allocate caches");
 		xp_initialized = err;
@@ -3140,8 +3236,8 @@ STATIC void xp_init(void)
 	}
 	for (major = 0; major < SDL_X400P_CMAJORS; major++) {
 		if ((err =
-		     lis_register_strdev(SDL_X400P_CMAJOR_0 + major, &xp_info, X400P_SDL_NMINOR,
-					 X400P_DRV_NAME)) <= 0) {
+		     lis_register_strdev(SDL_X400P_CMAJOR_0 + major, &xp_info, SDL_X400P_NMINOR,
+					 SDL_X400P_DRV_NAME)) <= 0) {
 			cmn_err(CE_WARN, "X400P-SS7: ERROR: couldn't register driver for major %d",
 				major + SDL_X400P_CMAJOR_0);
 			xp_initialized = err;
@@ -3156,14 +3252,16 @@ STATIC void xp_init(void)
 	xp_initialized = SDL_X400P_CMAJOR_0;
 	return;
 }
-STATIC void xp_terminate(void)
+STATIC void
+xp_terminate(void)
 {
 	int err, major;
 	ensure(xp_initialized, return);
 	for (major = 0; major < SDL_X400P_CMAJORS; major++) {
 		if (xp_majors[major]) {
 			if ((err = lis_unregister_strdev(xp_majors[major])))
-				cmn_err(CE_PANIC, "X400P-SS7: couldn't unregister driver for major %d\n",
+				cmn_err(CE_PANIC,
+					"X400P-SS7: couldn't unregister driver for major %d\n",
 					xp_majors[major]);
 			else
 				xp_majors[major] = err;
@@ -3182,14 +3280,17 @@ STATIC void xp_terminate(void)
  *
  *  =========================================================================
  */
-int init_module(void)
+int
+init_module(void)
 {
 	xp_init();
 	if (xp_initialized < 0)
 		return xp_initialized;
 	return (0);
 }
-void cleanup_module(void)
+
+void
+cleanup_module(void)
 {
 	xp_terminate();
 }

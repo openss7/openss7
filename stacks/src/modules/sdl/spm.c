@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -62,16 +62,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 
 #define _DEBUG 1
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -79,32 +70,46 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SPM_DEVICES	"Provides OpenSS7 SDL pipe driver."
+#define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SPM_LICENSE	"GPL"
 #define SPM_BANNER	SPM_DESCRIP	"\n" \
 			SPM_REVISION	"\n" \
 			SPM_COPYRIGHT	"\n" \
-			SPM_DEVICES	"\n" \
+			SPM_DEVICE	"\n" \
 			SPM_CONTACT	"\n"
-#define SPM_LICENSE	"GPL"
+#define SPM_SPLASH	SPM_DEVICE	" - " \
+			SPM_REVISION
 
 MODULE_AUTHOR(SPM_CONTACT);
 MODULE_DESCRIPTION(SPM_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SPM_DEVICES);
+MODULE_SUPPORTED_DEVICE(SPM_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SPM_LICENSE);
 #endif
+
+#ifndef SPM_MOD_NAME
+#   ifdef CONFIG_STREAMS_SPM_NAME
+#	define SPM_MOD_NAME CONFIG_STREAMS_SPM_NAME
+#   else
+#	define SPM_MOD_NAME "spm"
+#   endif
+#endif
+
+#ifndef SPM_MOD_ID
+#   ifdef CONFIG_STREAMS_SPM_MODID
+#	define SPM_MOD_ID CONFIG_STREAMS_SPM_MODID
+#   else
+#	define SPM_MOD_ID 0
+#   endif
+#endif
+
+unsigned short modid = SPM_MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for SDL Pipe Module. (0 for allocation.)");
 
 /*
  *  =======================================================================
@@ -184,7 +189,7 @@ typedef struct spm {
 	queue_t *wq;			/* wr queue */
 	uint rbid;			/* rd bufcall id */
 	uint wbid;			/* wr bufcall id */
-	lis_spin_lock_t lock;		/* queue lock */
+	spinlock_t lock;		/* queue lock */
 	uint nest;			/* nest of this queue lock */
 	void *user;			/* user of this queue lock */
 	uint state;			/* interface state */
@@ -262,7 +267,7 @@ spm_alloc_priv(queue_t *q, spm_t ** sp, ushort cmajor, ushort cminor)
 		s->rq->q_ptr = s->wq->q_ptr = s;
 		s->cmajor = cmajor;
 		s->cminor = cminor;
-		lis_spin_lock_init(&s->lock, "spm-queue-lock");
+		spin_lock_init(&s->lock);	/* "spm-queue-lock" */
 		s->state = LMI_DISABLED;	/* Style 1 */
 		s->version = 1;
 		s->wts = jiffies;
@@ -1332,6 +1337,9 @@ spm_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
+STATIC int spm_initialized = 0;
+
+#ifdef LFS
 /*
  *  =======================================================================
  *
@@ -1339,12 +1347,51 @@ spm_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =======================================================================
  */
-STATIC int spm_initialized = 0;
+STATIC struct fmodsw spm_fmod = {
+	.f_name = SPM_MOD_NAME,
+	.f_str = &spm_info,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
 STATIC void
 spm_init(void)
 {
 	unless(spm_initialized > 0, return);
-	cmn_err(CE_NOTE, SPM_BANNER);	/* console splash */
+	spm_init_caches();
+	if ((spm_initialized = register_strmod(&spm_fmod)) < 0) {
+		cmn_err(CE_WARN, "spm: could not register module\n");
+		spm_free_caches();
+		return;
+	}
+	spm_initialized = 1;
+	return;
+}
+STATIC void
+spm_terminate(void)
+{
+	ensure(spm_initialized > 0, return);
+	if ((spm_initialized = unregister_strmod(&spm_fmod)) < 0) {
+		cmn_err(CE_WARN, "spm: could not unregister module\n");
+		return;
+	}
+	spm_free_caches();
+	spm_initialized = 0;
+	return;
+}
+
+#elif defined LIS
+/*
+ *  =======================================================================
+ *
+ *  LiS Module Initialization (For unregistered driver.)
+ *
+ *  =======================================================================
+ */
+STATIC void
+spm_init(void)
+{
+	unless(spm_initialized > 0, return);
 	spm_init_caches();
 	if ((spm_initialized = lis_register_strmod(&spm_info, SPM_MOD_NAME)) < 0) {
 		cmn_err(CE_WARN, "spm: couldn't register module\n");
@@ -1366,6 +1413,7 @@ spm_terminate(void)
 	spm_initialized = 0;
 	return;
 }
+#endif
 
 /*
  *  =======================================================================
@@ -1374,17 +1422,26 @@ spm_terminate(void)
  *
  *  =======================================================================
  */
-int
-init_module(void)
+int __init
+_spm_init(void)
 {
+#ifdef MODULE
+	cmn_err(CE_NOTE, SPM_BANNER);	/* message banner */
+#else
+	cmn_err(CE_NOTE, SPM_SPLASH);	/* console splash */
+#endif
 	spm_init();
 	if (spm_initialized < 0)
 		return spm_initialized;
 	return (0);
 }
 
-void
-cleanup_module(void)
+void __exit
+_spm_exit(void)
 {
+	(void) m_error;
 	spm_terminate();
 }
+
+module_init(_spm_init);
+module_exit(_spm_exit);

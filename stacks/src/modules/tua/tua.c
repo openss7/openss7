@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -46,25 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:15:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:15 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:15 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include "tua.h"
 #include "tua_data.h"
@@ -84,32 +75,39 @@ static char const ident[] =
  */
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
-#define TUA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define TUA_REVISION	"LfS $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:15 $"
+#define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TUA_LICENSE	"GPL"
 #define TUA_BANNER	TUA_DESCRIP	"\n" \
+			TUA_REVISION	"\n" \
 			TUA_COPYRIGHT	"\n" \
 			TUA_DEVICE	"\n" \
 			TUA_CONTACT	"\n"
+#define TUA_SPLASH	TUA_DEVICE	" - " \
+			TUA_REVISION	"\n"
 
-#ifdef MODULE
+#ifdef LINUX
 MODULE_AUTHOR(TUA_CONTACT);
 MODULE_DESCRIPTION(TUA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TUA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TUA_LICENSE);
 #endif
-#define MODULE_STATIC static
-#else
-#define MOD_INC_USE_COUNT
-#define MOD_DEC_USE_COUNT
-#define MODULE_STATIC
+#endif				/* LINUX */
+
+#ifdef LFS
+#define TUA_DRV_ID	CONFIG_STREAMS_TUA_MODID
+#define TUA_DRV_NAME	CONFIG_STREAMS_TUA_NAME
+#define TUA_CMAJORS	CONFIG_STREAMS_TUA_NMAJORS
+#define TUA_CMAJOR_0	CONFIG_STREAMS_TUA_MAJOR
+#define TUA_NMINOR	CONFIG_STREAMS_TUA_NMINORS
 #endif
 
 static struct module_info tua_minfo = {
-	TUA_MODULE_ID,			/* Module ID number */
-	"tua",				/* Module name */
+	TUA_DRV_ID,			/* Module ID number */
+	TUA_DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted *//* XXX */
 	512,				/* Max packet size accepted *//* XXX */
 	8 * 512,			/* Hi water mark *//* XXX */
@@ -152,7 +150,7 @@ static dp_t *tua_opens_list = NULL;
 static lp_t *tua_links_list = NULL;
 
 static struct ua_driver tua_dinfo = {
-	TUA_CMAJOR,			/* Major device number */
+	TUA_CMAJOR_0,			/* Major device number */
 	TUA_NMINOR,			/* Number of minor devices */
 	sizeof(tcap_t),			/* Private structure size */
 	NULL,				/* Current control queue */
@@ -173,7 +171,8 @@ static struct ua_driver tua_dinfo = {
 static tua_initialized = 0;
 
 #ifndef LiS_REGISTERED
-static inline void tua_init(void)
+static inline void
+tua_init(void)
 #else
 __initfunc(void tua_init(void))
 #endif
@@ -182,17 +181,18 @@ __initfunc(void tua_init(void))
 		return;
 	printk(KERN_INFO TUA_BANNER);	/* console splash */
 #ifndef LIS_REGISTERED
-	if (lis_register_strdev(TUA_CMAJOR, &tua_info, TUA_NMINOR, tua_minfo.mi_idname) < 0) {
+	if (lis_register_strdev(TUA_CMAJOR_0, &tua_info, TUA_NMINOR, tua_minfo.mi_idname) < 0) {
 		cmn_err(CE_NOTE, "tua: couldn't register driver!\n");
 		tua_minfo.mi_idnum = 0;
 	}
-	tua_minfo.mi_idnum = TUA_MODULE_ID;
+	tua_minfo.mi_idnum = TUA_DRV_ID;
 #endif
 	tua_driver = &tua_dinfo;
 }
 
 #ifndef LIS_REGISTERED
-static inline void tua_terminate(void)
+static inline void
+tua_terminate(void)
 #else
 __initfunc(void tua_terminate(void))
 #endif
@@ -217,12 +217,15 @@ __initfunc(void tua_terminate(void))
  */
 
 #ifdef MODULE
-int init_module(void)
+int
+init_module(void)
 {
 	tua_init();
 	return (0);
 }
-void cleanup_module(void)
+
+void
+cleanup_module(void)
 {
 	tua_terminate();
 	return;

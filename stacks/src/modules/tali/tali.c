@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:00 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:15:00 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:00 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:00 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
-#include "../debug.h"
-#include "../bufq.h"
+#include "compat.h"
 
 #include "tali.h"
 #include "tali_data.h"
@@ -83,20 +70,33 @@ static char const ident[] =
  */
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER."
-#define TALI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define TALI_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define TALI_REVISION	"LfS $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $"
+#define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TALI_LICENSE	"GPL"
 #define TALI_BANNER	TALI_DESCRIP	"\n" \
+			TALI_REVISION	"\n" \
 			TALI_COPYRIGHT	"\n" \
 			TALI_DEVICE	"\n" \
 			TALI_CONTACT	"\n"
+#define TALI_SPLASH	TALI_DEVICE	" - " \
+			TALI_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(TALI_CONTACT);
 MODULE_DESCRIPTION(TALI_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TALI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TALI_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define TALI_DRV_ID	CONFIG_STREAMS_TALI_MODID
+#define TALI_DRV_NAME	CONFIG_STREAMS_TALI_NAME
+#define TALI_CMAJORS	CONFIG_STREAMS_TALI_NMAJORS
+#define TALI_CMAJOR_0	CONFIG_STREAMS_TALI_MAJOR
 #endif
 
 #ifndef INT
@@ -120,8 +120,8 @@ static INT tali_wput(queue_t *, mblk_t *);
 static INT tali_wsrv(queue_t *);
 
 static struct module_info tali_minfo = {
-	0,				/* Module ID number */
-	"tali",				/* Module name */
+	TALI_DRV_ID,			/* Module ID number */
+	TALI_DRV_NAME,			/* Module name */
 	0,				/* Min packet size accepted */
 	INFPSZ,				/* Max packet size accepted */
 	1,				/* Hi water mark */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:55 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:55 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
  *  SCTP association.  It is similar to the M2TP/UDP driver except that it has
  *  different path characteristics.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <sys/tpi.h>
 #include <sys/tpi_sctp.h>
@@ -84,16 +74,8 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <ss7/sli_ioctl.h>
 #include <ss7/m2tp_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -103,19 +85,17 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.1 $
 			M2TP_COPYRIGHT	"\n" \
 			M2TP_DEVICE	"\n" \
 			M2TP_CONTACT	"\n"
+#define M2TP_SPLASH	M2TP_DEVICE	" - " \
+			M2TP_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(M2TP_CONTACT);
 MODULE_DESCRIPTION(M2TP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M2TP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2TP_LICENSE);
 #endif
-
-#ifdef MODULE
-#define MODULE_STATIC static
-#else
-#define MODULE_STATIC
-#endif
+#endif				/* LINUX */
 
 /*
  *  =========================================================================

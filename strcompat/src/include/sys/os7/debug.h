@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.1 2004/08/21 10:14:38 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __DEBUG_H__
-#define __DEBUG_H__
+#ifndef __OS7_DEBUG_H__
+#define __OS7_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:38 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:42 $"
+
+#ifdef LFS
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#else
 
 #if 1
 #define DDTRACE          do { printk("%s [%s %d] trace\n",__FUNCTION__,__FILE__, __LINE__); } while(0)
@@ -197,4 +202,6 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #endif
 
-#endif				/* __DEBUG_H__ */
+#endif				/* LFS */
+
+#endif				/* __OS7_DEBUG_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:26:23 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/21 09:26:23 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:26:23 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:06 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:26:23 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:06 $";
 
 #define __NO_VERSION__
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
-#include "debug.h"
-#include "bufq.h"
+#include "compat.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:41 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include <sys/cdi.h>
 #include <sys/cdi_daed.h>
@@ -73,18 +65,10 @@ static char const ident[] =
 #include <ss7/lmi_ioctl.h>
 #include <ss7/hdlc_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #include "cd/cd.h"
 
 #define DAED_DESCRIP	"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
-#define DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $"
+#define DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
 #define DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define DAED_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define DAED_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -95,11 +79,16 @@ static char const ident[] =
 			DAED_DEVICES	"\n" \
 			DAED_CONTACT	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(DAED_CONTACT);
 MODULE_DESCRIPTION(DAED_DESCRIP);
 MODULE_SUPPORTED_DEVICE(DAED_DEVICES);
-#ifdef MODULE_LICENSE
 MODULE_LICENSE(DAED_LICENSE);
+#endif				/* LINUX */
+
+#ifdef LFS
+#define DAED_MOD_ID	CONFIG_STREAMS_DAED_MODID
+#define DAED_MOD_NAME	CONFIG_STREAMS_DAED_NAME
 #endif
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:41 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $"
 
-static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $";
+static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -61,25 +61,7 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $
  *  this state machine to be rigorously conformance tested once for all
  *  D-channel drivers.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/ddi.h>
-#include <sys/dki.h>
-
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -90,7 +72,7 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -101,11 +83,20 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $
 			ISDN_DEVICE	"\n" \
 			ISDN_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(ISDN_CONTACT);
 MODULE_DESCRIPTION(ISDN_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ISDN_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ISDN_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define ISDN_DRV_ID		CONFIG_STREAMS_ISDN_MODID
+#define ISDN_DRV_NAME		CONFIG_STREAMS_ISDN_NAME
+#define ISDN_CMAJORS		CONFIG_STREAMS_ISDN_NMAJORS
+#define ISDN_CMAJOR_0		CONFIG_STREAMS_ISDN_MAJOR
 #endif
 
 #define ISDN_CMINORS 255
@@ -565,7 +556,7 @@ STATIC ulong dl_get_id(ulong);
    default 
  */
 typedef struct df {
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	struct cc_bind bind;		/* bindings */
 	SLIST_HEAD (cc, cc);		/* master list of call control users */
 	SLIST_HEAD (cr, cr);		/* master list of call references */
@@ -5055,13 +5046,13 @@ cr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 {
 	struct cr *cr = (struct cr *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&cr->lock)) {
+		if (spin_trylock(&cr->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", ISDN_DRV_NAME, cr, timer, jiffies));
 			switch (to_fnc(cr)) {
 			default:
 			case QR_DONE:
 				cr_put(cr);
-				lis_spin_unlock(&cr->lock);
+				spin_unlock(&cr->lock);
 				return;
 			case -ENOMEM:
 			case -ENOBUFS:
@@ -5069,7 +5060,7 @@ cr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&cr->lock);
+			spin_unlock(&cr->lock);
 		} else
 			printd(("%s: %p: %s timeout collision at %lu\n", ISDN_DRV_NAME, cr, timer,
 				jiffies));
@@ -5276,18 +5267,18 @@ STATIC INLINE void
 cr_timer_stop(struct cr *cr, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&cr->lock, &flags);
+	spin_lock_irqsave(&cr->lock, flags);
 	{
 		__cr_timer_stop(cr, t);
 	}
-	lis_spin_unlock_irqrestore(&cr->lock, &flags);
+	spin_unlock_irqrestore(&cr->lock, flags);
 }
 
 STATIC INLINE void
 cr_timer_start(struct cr *cr, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&cr->lock, &flags);
+	spin_lock_irqsave(&cr->lock, flags);
 	{
 		__cr_timer_stop(cr, t);
 		switch (t) {
@@ -5356,7 +5347,7 @@ cr_timer_start(struct cr *cr, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&cr->lock, &flags);
+	spin_unlock_irqrestore(&cr->lock, flags);
 }
 
 /*
@@ -13469,7 +13460,7 @@ isdn_iocgstatem(queue_t *q, mblk_t *mp)
 		isdn_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			return isdn_sta_ch(arg, ch_lookup(arg->id), size);
@@ -13495,7 +13486,7 @@ isdn_iocgstatem(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13534,7 +13525,7 @@ isdn_iocgstatsp(queue_t *q, mblk_t *mp)
 		isdn_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			return isdn_statp_get_ch(arg, ch_lookup(arg->id), size);
@@ -13560,7 +13551,7 @@ isdn_iocgstatsp(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13582,7 +13573,7 @@ isdn_iocsstatsp(queue_t *q, mblk_t *mp)
 		isdn_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			return isdn_statp_set_ch(arg, ch_lookup(arg->id), size);
@@ -13608,7 +13599,7 @@ isdn_iocsstatsp(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13630,7 +13621,7 @@ isdn_iocgstats(queue_t *q, mblk_t *mp)
 		isdn_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			return isdn_stat_get_ch(arg, ch_lookup(arg->id), size);
@@ -13656,7 +13647,7 @@ isdn_iocgstats(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13678,7 +13669,7 @@ isdn_ioccstats(queue_t *q, mblk_t *mp)
 		isdn_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			return isdn_stat_clr_ch(arg, ch_lookup(arg->id), size);
@@ -13704,7 +13695,7 @@ isdn_ioccstats(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13723,7 +13714,7 @@ isdn_iocgnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isdn_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			ret = isdn_not_get_ch(arg, ch_lookup(arg->id));
@@ -13753,7 +13744,7 @@ isdn_iocgnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13772,7 +13763,7 @@ isdn_iocsnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isdn_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			ret = isdn_not_set_ch(arg, ch_lookup(arg->id));
@@ -13802,7 +13793,7 @@ isdn_iocsnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13821,7 +13812,7 @@ isdn_ioccnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isdn_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
 			ret = isdn_not_clr_ch(arg, ch_lookup(arg->id));
@@ -13851,7 +13842,7 @@ isdn_ioccnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14647,7 +14638,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 // STATIC isdn_t *isdn_list = NULL;
-STATIC lis_spin_lock_t isdn_lock;
+STATIC spinlock_t isdn_lock;
 STATIC ushort isdn_majors[ISDN_CMAJORS] = { ISDN_CMAJOR_0, };
 
 /*
@@ -14676,7 +14667,7 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	lis_spin_lock_irqsave(&isdn_lock, &flags);
+	spin_lock_irqsave(&isdn_lock, flags);
 	for (; *ip; ip = (typeof(ip)) & (*ip)->next) {
 		ushort dmajor = (*ip)->u.dev.cmajor;
 		if (cmajor != dmajor)
@@ -14696,7 +14687,7 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= ISDN_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", ISDN_DRV_NAME));
-		lis_spin_unlock_irqrestore(&isdn_lock, &flags);
+		spin_unlock_irqrestore(&isdn_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -14704,11 +14695,11 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(cc = isdn_alloc_cc(q, ip, devp, crp))) {
 		ptrace(("%s: ERROR: no memory\n", ISDN_DRV_NAME));
-		lis_spin_unlock_irqrestore(&isdn_lock, &flags);
+		spin_unlock_irqrestore(&isdn_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	lis_spin_unlock_irqrestore(&isdn_lock, &flags);
+	spin_unlock_irqrestore(&isdn_lock, flags);
 	return (0);
 }
 
@@ -14729,9 +14720,9 @@ isdn_close(queue_t *q, int flag, cred_t *crp)
 	(void) s;
 	printd(("%s: %p: closing character device %d:%d\n", ISDN_DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
-	lis_spin_lock_irqsave(&isdn_lock, &flags);
+	spin_lock_irqsave(&isdn_lock, flags);
 	isdn_free_cc(q);
-	lis_spin_unlock_irqrestore(&isdn_lock, &flags);
+	spin_unlock_irqrestore(&isdn_lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -14927,7 +14918,7 @@ isdn_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->u.dev.cmajor = getmajor(*devp);
 		cc->u.dev.cminor = getminor(*devp);
 		cc->cred = *crp;
-		lis_spin_lock_init(&cc->qlock, "cc-queue-lock");
+		spin_lock_init(&cc->qlock); /* "cc-queue-lock" */
 		(cc->oq = RD(q))->q_ptr = cc_get(cc);
 		(cc->iq = WR(q))->q_ptr = cc_get(cc);
 		cc->o_prim = &cc_r_prim;
@@ -14937,7 +14928,7 @@ isdn_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->i_state = LMI_UNUSABLE;
 		cc->i_style = LMI_STYLE1;
 		cc->i_version = 1;
-		lis_spin_lock_init(&cc->lock, "cc-lock");
+		spin_lock_init(&cc->lock); /* "cc-lock" */
 		/*
 		   initialize bind list 
 		 */
@@ -14969,7 +14960,7 @@ isdn_free_cc(queue_t *q)
 	ensure(cc, return);
 	printd(("%s: %s: %p: free cc %d:%d\n", ISDN_DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
-	lis_spin_lock_irqsave(&cc->lock, &flags);
+	spin_lock_irqsave(&cc->lock, flags);
 	{
 		struct cr *cr;
 		struct tg *tg;
@@ -15067,7 +15058,7 @@ isdn_free_cc(queue_t *q)
 			atomic_set(&cc->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&cc->lock, &flags);
+	spin_unlock_irqrestore(&cc->lock, flags);
 	cc_put(cc);		/* final put */
 	return;
 }
@@ -15103,7 +15094,7 @@ isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 	if ((cr = kmem_cache_alloc(isdn_cr_cachep, SLAB_ATOMIC))) {
 		bzero(cr, sizeof(*cr));
 		cr_get(cr);	/* first get */
-		lis_spin_lock_init(&cr->lock, "cr-lock");
+		spin_lock_init(&cr->lock); /* "cr-lock" */
 		cr->id = cr_get_id(id, fg);
 		cr->cref = cr->id;
 		cr->uref = id;
@@ -15184,7 +15175,7 @@ isdn_free_cr(struct cr *cr)
 	psw_t flags;
 	ensure(cr, return);
 	printd(("%s: %s: %p free cr->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, cr, cr->id));
-	lis_spin_lock_irqsave(&cr->lock, &flags);
+	spin_lock_irqsave(&cr->lock, flags);
 	{
 		struct ch *ch;
 		struct fg *fg;
@@ -15286,7 +15277,7 @@ isdn_free_cr(struct cr *cr)
 		cr_put(cr);
 		master.cr.numb--;
 	}
-	lis_spin_unlock_irqrestore(&cr->lock, &flags);
+	spin_unlock_irqrestore(&cr->lock, flags);
 	cr_put(cr);		/* final put */
 	return;
 }
@@ -15353,7 +15344,7 @@ isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 	if ((ch = kmem_cache_alloc(isdn_ch_cachep, SLAB_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
 		ch_get(ch);	/* first get */
-		lis_spin_lock_init(&ch->lock, "ch-lock");
+		spin_lock_init(&ch->lock); /* "ch-lock" */
 		ch->id = id;
 		ch->ts = ts;
 		/*
@@ -15412,7 +15403,7 @@ isdn_free_ch(struct ch *ch)
 	psw_t flags;
 	ensure(ch, return);
 	printd(("%s: %s: %p free ch->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, ch, ch->id));
-	lis_spin_lock_irqsave(&ch->lock, &flags);
+	spin_lock_irqsave(&ch->lock, flags);
 	{
 		assure(!ch->cr.cr);
 		/*
@@ -15531,7 +15522,7 @@ isdn_free_ch(struct ch *ch)
 			atomic_set(&ch->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&ch->lock, &flags);
+	spin_unlock_irqrestore(&ch->lock, flags);
 	ch_put(ch);		/* final put */
 	return;
 }
@@ -15591,7 +15582,7 @@ isdn_alloc_tg(ulong id, struct eg *eg)
 	if ((tg = kmem_cache_alloc(isdn_tg_cachep, SLAB_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
 		tg_get(tg);	/* first get */
-		lis_spin_lock_init(&tg->lock, "tg-lock");
+		spin_lock_init(&tg->lock); /* "tg-lock" */
 		if (tg->proto.popt & ISDN_POPT_USER) {
 			switch (eg->proto.pvar & SS7_PVAR_MASK) {
 			default:
@@ -15648,7 +15639,7 @@ isdn_free_tg(struct tg *tg)
 	psw_t flags;
 	ensure(tg, return);
 	printd(("%s: %s: %p free tg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, tg, tg->id));
-	lis_spin_lock_irqsave(&tg->lock, &flags);
+	spin_lock_irqsave(&tg->lock, flags);
 	{
 		/*
 		   free all circuits 
@@ -15753,7 +15744,7 @@ isdn_free_tg(struct tg *tg)
 			atomic_set(&tg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&tg->lock, &flags);
+	spin_unlock_irqrestore(&tg->lock, flags);
 	tg_put(tg);		/* final put */
 	return;
 }
@@ -15813,7 +15804,7 @@ isdn_alloc_fg(ulong id, struct eg *eg)
 	if ((fg = kmem_cache_alloc(isdn_fg_cachep, SLAB_ATOMIC))) {
 		bzero(fg, sizeof(*fg));
 		fg_get(fg);	/* first get */
-		lis_spin_lock_init(&fg->lock, "fg-lock");
+		spin_lock_init(&fg->lock); /* "fg-lock" */
 		fg->proto = eg->proto;	/* as a default */
 		if (fg->proto.popt & ISDN_POPT_USER) {
 			switch (fg->proto.pvar & SS7_PVAR_MASK) {
@@ -15867,7 +15858,7 @@ isdn_free_fg(struct fg *fg)
 	psw_t flags;
 	ensure(fg, return);
 	printd(("%s: %s: %p free fg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, fg, fg->id));
-	lis_spin_lock_irqsave(&fg->lock, &flags);
+	spin_lock_irqsave(&fg->lock, flags);
 	{
 		/*
 		   free all call references 
@@ -15966,7 +15957,7 @@ isdn_free_fg(struct fg *fg)
 			atomic_set(&fg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&fg->lock, &flags);
+	spin_unlock_irqrestore(&fg->lock, flags);
 	fg_put(fg);		/* final put */
 	return;
 }
@@ -16026,7 +16017,7 @@ isdn_alloc_eg(ulong id, struct xg *xg)
 	if ((eg = kmem_cache_alloc(isdn_eg_cachep, SLAB_ATOMIC))) {
 		bzero(eg, sizeof(*eg));
 		eg_get(eg);	/* first get */
-		lis_spin_lock_init(&eg->lock, "eg-lock");
+		spin_lock_init(&eg->lock); /* "eg-lock" */
 		eg->proto = xg->proto;	/* as a default */
 		if (eg->proto.popt & ISDN_POPT_USER) {
 			switch (eg->proto.pvar & SS7_PVAR_MASK) {
@@ -16080,7 +16071,7 @@ isdn_free_eg(struct eg *eg)
 	psw_t flags;
 	ensure(eg, return);
 	printd(("%s: %s: %p free eg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, eg, eg->id));
-	lis_spin_lock_irqsave(&eg->lock, &flags);
+	spin_lock_irqsave(&eg->lock, flags);
 	{
 		/*
 		   free all transmission groups 
@@ -16172,7 +16163,7 @@ isdn_free_eg(struct eg *eg)
 			atomic_set(&eg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&eg->lock, &flags);
+	spin_unlock_irqrestore(&eg->lock, flags);
 	eg_put(eg);		/* final put */
 }
 STATIC struct eg *
@@ -16232,7 +16223,7 @@ isdn_alloc_xg(ulong id)
 	if ((xg = kmem_cache_alloc(isdn_xg_cachep, SLAB_ATOMIC))) {
 		bzero(xg, sizeof(*xg));
 		xg_get(xg);	/* first get */
-		lis_spin_lock_init(&xg->lock, "xg-lock");
+		spin_lock_init(&xg->lock); /* "xg-lock" */
 		xg->proto = df->proto;	/* as a default */
 		if (xg->proto.popt & ISDN_POPT_USER) {
 			switch (xg->proto.pvar & SS7_PVAR_MASK) {
@@ -16281,7 +16272,7 @@ isdn_free_xg(struct xg *xg)
 	psw_t flags;
 	ensure(xg, return);
 	printd(("%s: %s: %p free xg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, xg, xg->id));
-	lis_spin_lock_irqsave(&xg->lock, &flags);
+	spin_lock_irqsave(&xg->lock, flags);
 	{
 		/*
 		   freeing all equipment groups 
@@ -16355,7 +16346,7 @@ isdn_free_xg(struct xg *xg)
 			atomic_set(&xg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&xg->lock, &flags);
+	spin_unlock_irqrestore(&xg->lock, flags);
 	xg_put(xg);		/* final put */
 }
 STATIC struct xg *
@@ -16415,7 +16406,7 @@ isdn_alloc_dc(ulong id, struct fg *fg, struct tg *tg)
 		struct dc **dcp;
 		bzero(dc, sizeof(*dc));
 		dc_get(dc);	/* first get */
-		lis_spin_lock_init(&dc->lock, "dc-lock");
+		spin_lock_init(&dc->lock); /* "dc-lock" */
 		/*
 		   add to master list (ascending id order) 
 		 */
@@ -16455,7 +16446,7 @@ isdn_free_dc(struct dc *dc)
 	psw_t flags;
 	ensure(dc, return);
 	printd(("%s: %s: %p free dc->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, dc, dc->id));
-	lis_spin_lock_irqsave(&dc->lock, &flags);
+	spin_lock_irqsave(&dc->lock, flags);
 	{
 #if 0
 		/*
@@ -16509,7 +16500,7 @@ isdn_free_dc(struct dc *dc)
 			atomic_set(&dc->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&dc->lock, &flags);
+	spin_unlock_irqrestore(&dc->lock, flags);
 	dc_put(dc);		/* final put */
 	return;
 }
@@ -16571,7 +16562,7 @@ isdn_alloc_dl(queue_t *q, struct dl **mpp, ulong index, cred_t *crp)
 		dl_get(dl);	/* first get */
 		dl->u.mux.index = index;
 		dl->cred = *crp;
-		lis_spin_lock_init(&dl->qlock, "dl-queue-lock");
+		spin_lock_init(&dl->qlock); /* "dl-queue-lock" */
 		(dl->iq = RD(q))->q_ptr = dl_get(dl);
 		(dl->oq = WR(q))->q_ptr = dl_get(dl);
 		dl->o_prim = dl_w_prim;
@@ -16581,7 +16572,7 @@ isdn_alloc_dl(queue_t *q, struct dl **mpp, ulong index, cred_t *crp)
 		dl->i_state = LMI_UNUSABLE;
 		dl->i_style = LMI_STYLE1;
 		dl->i_version = 1;
-		lis_spin_lock_init(&dl->lock, "dl-lock");
+		spin_lock_init(&dl->lock); /* "dl-lock" */
 		/*
 		   place in master list 
 		 */
@@ -16635,7 +16626,7 @@ isdn_free_dl(queue_t *q)
 	ensure(dl, return);
 	printd(("%s: %s: %p free dl index = %lu\n", ISDN_DRV_NAME, __FUNCTION__, dl,
 		dl->u.mux.index));
-	lis_spin_lock_irqsave(&dl->lock, &flags);
+	spin_lock_irqsave(&dl->lock, flags);
 	{
 		/*
 		   flushing buffers 
@@ -16674,7 +16665,7 @@ isdn_free_dl(queue_t *q)
 			atomic_set(&dl->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&dl->lock, &flags);
+	spin_unlock_irqrestore(&dl->lock, flags);
 	dl_put(dl);		/* final put */
 }
 STATIC struct dl *
@@ -16750,7 +16741,7 @@ isdn_init(void)
 		} else
 			isdn_majors[mindex] = err;
 	}
-	lis_spin_lock_init(&isdn_lock, "isdn-open-list-lock");
+	spin_lock_init(&isdn_lock); /* "isdn-open-list-lock" */
 	isdn_initialized = 1;
 	return;
 }

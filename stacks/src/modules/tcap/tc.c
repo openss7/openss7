@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:15:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -66,6 +66,8 @@ static char const ident[] =
  *  management.
  */
 
+#include "compat.h"
+
 #define TC_DESCRIP	"TC STREAMS MULTIPLEXING DRIVER."
 #define TC_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
@@ -76,19 +78,14 @@ static char const ident[] =
 			TC_DEVICE	"\n" \
 			TC_CONTACT	"\n"
 
-#ifdef MODULE
+#ifdef LINUX
 MODULE_AUTHOR(TC_CONTACT);
 MODULE_DESCRIPTION(TC_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TC_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TC_LICENSE);
 #endif
-#define MODULE_STATIC static
-#else
-#define MOD_INC_USE_COUNT
-#define MOD_DEC_USE_COUNT
-#define MODULE_STATIC
-#endif
+#endif				/* LINUX */
 
 #ifdef TC_DEBUG
 static int tc_debug = TC_DEBUG;
@@ -96,18 +93,22 @@ static int tc_debug = TC_DEBUG;
 static int tc_debug = 2;
 #endif
 
-#ifndef TC_CMAJOR
-#define TC_CMAJOR 210
+#ifdef LFS
+#define TC_DRV_ID		CONFIG_STREAMS_TC_MODID
+#define TC_DRV_NAME		CONFIG_STREAMS_TC_NAME
+#define TC_CMAJORS		CONFIG_STREAMS_TC_NMAJORS
+#define TC_CMAJOR_0		CONFIG_STREAMS_TC_MAJOR
 #endif
+
+#ifndef TC_CMAJOR_0
+#define TC_CMAJOR_0 210
+#endif
+#ifndef TC_NMINOR
 #define TC_NMINOR 255
-
-#define TC_MODULE_ID ('s'<<24|'s'<<16|'7'<<8|TC_IOC_MAGIC)
-
-#ifdef LIS_2_12
-#define INT int
-#else
-#define INT void
 #endif
+
+#ifndef TC_DRV_ID
+#define TC_DRV_ID ('s'<<24|'s'<<16|'7'<<8|TC_IOC_MAGIC)
 
 /*
  *  =========================================================================
@@ -118,8 +119,8 @@ static int tc_debug = 2;
  */
 
 static struct module_info tc_minfo = {
-	TC_MODULE_ID,			/* Module ID number */
-	"tcap",				/* Module name */
+	TC_DRV_ID,			/* Module ID number */
+	TC_DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted *//* XXX */
 	254,				/* Max packet size accepted *//* XXX */
 	8 * 512,			/* Hi water mark *//* XXX */

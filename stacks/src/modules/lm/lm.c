@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $
+ @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,28 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $"
+#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $"
 
 static char const ident[] =
-    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $";
+    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $";
 
 #define __NO_VERSION__
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-
-#include "debug.h"
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $"
 
-static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $";
+static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -74,15 +65,8 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <sys/xti.h>
 #include <sys/xti_sctp.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -93,11 +77,20 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $
 			M2UA_DEVICE	"\n" \
 			M2UA_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(M2UA_CONTACT);
 MODULE_DESCRIPTION(M2UA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M2UA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2UA_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define M2UA_DRV_ID		CONFIG_STREAMS_M2UA_MODID
+#define M2UA_DRV_NAME		CONFIG_STREAMS_M2UA_NAME
+#define M2UA_CMAJORS		CONFIG_STREAMS_M2UA_NMAJORS
+#define M2UA_CMAJOR_0		CONFIG_STREAMS_M2UA_MAJOR
 #endif
 
 #define M2UA_CMINORS 255
@@ -445,7 +438,7 @@ typedef union link {
  *  -----------------------------------
  */
 typedef struct df {
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	struct lm *lm;			/* management stream */
 	SLIST_HEAD (as, as);		/* master list of */
 	SLIST_HEAD (sp, sp);		/* master list of */
@@ -3996,12 +3989,12 @@ spp_do_timeout(caddr_t data, const char *timer,
 {
 	spp_t *spp = (spp_t *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&spp->lock)) {
+		if (spin_trylock(&spp->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, spp, timer, jiffies));
 			switch (to_fnc(spp)) {
 			default:
 			case QR_DONE:
-				lis_spin_unlock(&spp->lock);
+				spin_unlock(&spp->lock);
 				spp_put(spp);
 				return;
 			case -ENOMEM:
@@ -4010,7 +4003,7 @@ spp_do_timeout(caddr_t data, const char *timer,
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&spp->lock);
+			spin_unlock(&spp->lock);
 		} else
 			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, spp, timer,
 				jiffies));
@@ -4084,17 +4077,17 @@ STATIC INLINE void
 spp_timer_stop(spp_t * spp, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&spp->lock, &flags);
+	spin_lock_irqsave(&spp->lock, flags);
 	{
 		__spp_timer_stop(spp, t);
 	}
-	lis_spin_unlock_irqrestore(&spp->lock, &flags);
+	spin_unlock_irqrestore(&spp->lock, flags);
 }
 STATIC INLINE void
 spp_timer_start(spp_t * spp, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&spp->lock, &flags);
+	spin_lock_irqsave(&spp->lock, flags);
 	{
 		__spp_timer_stop(spp, t);
 		switch (t) {
@@ -4112,7 +4105,7 @@ spp_timer_start(spp_t * spp, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&spp->lock, &flags);
+	spin_unlock_irqrestore(&spp->lock, flags);
 }
 
 /*
@@ -4128,12 +4121,12 @@ as_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 {
 	as_t *as = (as_t *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&as->lock)) {
+		if (spin_trylock(&as->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, as, timer, jiffies));
 			switch (to_fnc(as)) {
 			default:
 			case QR_DONE:
-				lis_spin_unlock(&as->lock);
+				spin_unlock(&as->lock);
 				as_put(as);
 				return;
 			case -ENOMEM:
@@ -4142,7 +4135,7 @@ as_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&as->lock);
+			spin_unlock(&as->lock);
 		} else
 			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, as, timer,
 				jiffies));
@@ -4200,17 +4193,17 @@ STATIC INLINE void
 as_timer_stop(as_t * as, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&as->lock, &flags);
+	spin_lock_irqsave(&as->lock, flags);
 	{
 		__as_timer_stop(as, t);
 	}
-	lis_spin_unlock_irqrestore(&as->lock, &flags);
+	spin_unlock_irqrestore(&as->lock, flags);
 }
 STATIC INLINE void
 as_timer_start(as_t * as, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&as->lock, &flags);
+	spin_lock_irqsave(&as->lock, flags);
 	{
 		__as_timer_stop(as, t);
 		switch (t) {
@@ -4222,7 +4215,7 @@ as_timer_start(as_t * as, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&as->lock, &flags);
+	spin_unlock_irqrestore(&as->lock, flags);
 }
 
 /*
@@ -4238,12 +4231,12 @@ sp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 {
 	sp_t *sp = (sp_t *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&sp->lock)) {
+		if (spin_trylock(&sp->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, sp, timer, jiffies));
 			switch (to_fnc(sp)) {
 			default:
 			case QR_DONE:
-				lis_spin_unlock(&sp->lock);
+				spin_unlock(&sp->lock);
 				sp_put(sp);
 				return;
 			case -ENOMEM:
@@ -4252,7 +4245,7 @@ sp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&sp->lock);
+			spin_unlock(&sp->lock);
 		} else
 			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, sp, timer,
 				jiffies));
@@ -4309,17 +4302,17 @@ STATIC INLINE void
 sp_timer_stop(sp_t * sp, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_irqsave(&sp->lock, flags);
 	{
 		__sp_timer_stop(sp, t);
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_irqrestore(&sp->lock, flags);
 }
 STATIC INLINE void
 sp_timer_start(sp_t * sp, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_irqsave(&sp->lock, flags);
 	{
 		__sp_timer_stop(sp, t);
 		switch (t) {
@@ -4331,7 +4324,7 @@ sp_timer_start(sp_t * sp, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_irqrestore(&sp->lock, flags);
 }
 
 /*
@@ -4347,12 +4340,12 @@ sl_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 {
 	sl_t *sl = (sl_t *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&sl->lock)) {
+		if (spin_trylock(&sl->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, sl, timer, jiffies));
 			switch (to_fnc(sl)) {
 			default:
 			case QR_DONE:
-				lis_spin_unlock(&sl->lock);
+				spin_unlock(&sl->lock);
 				sl_put(sl);
 				return;
 			case -ENOMEM:
@@ -4361,7 +4354,7 @@ sl_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&sl->lock);
+			spin_unlock(&sl->lock);
 		} else
 			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, sl, timer,
 				jiffies));
@@ -4418,17 +4411,17 @@ STATIC INLINE void
 sl_timer_stop(sl_t * sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 }
 STATIC INLINE void
 sl_timer_start(sl_t * sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
 		switch (t) {
@@ -4440,7 +4433,7 @@ sl_timer_start(sl_t * sl, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 }
 
 /*
@@ -4456,12 +4449,12 @@ xp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 {
 	xp_t *xp = (xp_t *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&xp->lock)) {
+		if (spin_trylock(&xp->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, xp, timer, jiffies));
 			switch (to_fnc(xp)) {
 			default:
 			case QR_DONE:
-				lis_spin_unlock(&xp->lock);
+				spin_unlock(&xp->lock);
 				xp_put(xp);
 				return;
 			case -ENOMEM:
@@ -4470,7 +4463,7 @@ xp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&xp->lock);
+			spin_unlock(&xp->lock);
 		} else
 			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, xp, timer,
 				jiffies));
@@ -4527,17 +4520,17 @@ STATIC INLINE void
 xp_timer_stop(xp_t * xp, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&xp->lock, &flags);
+	spin_lock_irqsave(&xp->lock, flags);
 	{
 		__xp_timer_stop(xp, t);
 	}
-	lis_spin_unlock_irqrestore(&xp->lock, &flags);
+	spin_unlock_irqrestore(&xp->lock, flags);
 }
 STATIC INLINE void
 xp_timer_start(xp_t * xp, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&xp->lock, &flags);
+	spin_lock_irqsave(&xp->lock, flags);
 	{
 		__xp_timer_stop(xp, t);
 		switch (t) {
@@ -4549,7 +4542,7 @@ xp_timer_start(xp_t * xp, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&xp->lock, &flags);
+	spin_unlock_irqrestore(&xp->lock, flags);
 }
 
 /*
@@ -11552,7 +11545,7 @@ sl_iocpass(queue_t *q, mblk_t *mp)
 	struct sl *sl_u = SL_PRIV(q), *sl_p = NULL;
 	struct as *as_u, *as_p;
 	struct ap *ap;
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	{
 		if ((as_u = sl_u->as.as))
 			for (ap = as_u->ap.list; ap; ap = ap->p.next)
@@ -11571,7 +11564,7 @@ sl_iocpass(queue_t *q, mblk_t *mp)
 			ret = -EOPNOTSUPP;
 		}
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (ret);
 }
 STATIC int
@@ -11605,7 +11598,7 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 		struct as *as_u, *as_p;
 		struct ap *ap;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		{
 			if ((as_u = sl_u->as.as))
 				for (ap = as_u->ap.list; ap; ap = ap->p.next)
@@ -11624,7 +11617,7 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 				*arg = sl_u->proto;
 			}
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -11663,7 +11656,7 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 		struct as *as_u, *as_p;
 		struct ap *ap;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		{
 			if ((as_u = sl_u->as.as))
 				for (ap = as_u->ap.list; ap; ap = ap->p.next)
@@ -11682,7 +11675,7 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 				sl_u->proto = *arg;
 			}
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13843,7 +13836,7 @@ m2ua_iocgstatem(queue_t *q, mblk_t *mp)
 		m2ua_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -13871,7 +13864,7 @@ m2ua_iocgstatem(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13910,7 +13903,7 @@ m2ua_iocgstatsp(queue_t *q, mblk_t *mp)
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -13938,7 +13931,7 @@ m2ua_iocgstatsp(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -13960,7 +13953,7 @@ m2ua_iocsstatsp(queue_t *q, mblk_t *mp)
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -13988,7 +13981,7 @@ m2ua_iocsstatsp(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14009,7 +14002,7 @@ m2ua_iocgstats(queue_t *q, mblk_t *mp)
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -14037,7 +14030,7 @@ m2ua_iocgstats(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14058,7 +14051,7 @@ m2ua_ioccstats(queue_t *q, mblk_t *mp)
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -14086,7 +14079,7 @@ m2ua_ioccstats(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14107,7 +14100,7 @@ m2ua_iocgnotify(queue_t *q, mblk_t *mp)
 		m2ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -14135,7 +14128,7 @@ m2ua_iocgnotify(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14156,7 +14149,7 @@ m2ua_iocsnotify(queue_t *q, mblk_t *mp)
 		m2ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -14184,7 +14177,7 @@ m2ua_iocsnotify(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14205,7 +14198,7 @@ m2ua_ioccnotify(queue_t *q, mblk_t *mp)
 		m2ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case M2UA_OBJ_TYPE_AS_U:
 		case M2UA_OBJ_TYPE_AS_P:
@@ -14233,7 +14226,7 @@ m2ua_ioccnotify(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -14529,7 +14522,7 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 			}
 		case _IOC_NR(I_LINK):
 			ptrace(("%s: %p: I_LINK\n", M2UA_DRV_NAME, s));
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			/*
 			   place in list in ascending index order 
 			 */
@@ -14537,12 +14530,12 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 			     *lkp && (*lkp)->str.u.mux.index < lb->l_index;
 			     lkp = (union link **) &(*lkp)->str.next) ;
 			if ((lk = m2ua_alloc_link(lb->l_qbot, lkp, lb->l_index, iocp->ioc_cr))) {
-				lis_spin_unlock_irqrestore(&master.lock, &flags);
+				spin_unlock_irqrestore(&master.lock, flags);
 				break;
 			}
 			ret = -ENOMEM;
 			MOD_DEC_USE_COUNT;
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
 			ptrace(("%s: %p: I_PUNLINK\n", M2UA_DRV_NAME, s));
@@ -14562,18 +14555,18 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 			}
 		case _IOC_NR(I_UNLINK):
 			ptrace(("%s: %p: I_UNLINK\n", M2UA_DRV_NAME, s));
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			if ((lk = link_lookup(lb->l_index))) {
 				m2ua_free_link(lk->str.iq);
 				MOD_DEC_USE_COUNT;
 				MOD_DEC_USE_COUNT;
-				lis_spin_unlock_irqrestore(&master.lock, &flags);
+				spin_unlock_irqrestore(&master.lock, flags);
 				break;
 			}
 			ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", M2UA_DRV_NAME, s));
 			ret = -EINVAL;
 			MOD_DEC_USE_COUNT;
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		default:
 		case _IOC_NR(I_STR):
@@ -15361,7 +15354,7 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	   allocate a new device 
 	 */
 	cminor = 2;
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	for (; *pp; pp = (union priv **) &(*pp)->str.next) {
 		ushort dmajor = (*pp)->str.u.dev.cmajor;
 		if (cmajor != dmajor)
@@ -15385,7 +15378,7 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= M2UA_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", M2UA_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -15393,11 +15386,11 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(p = m2ua_alloc_priv(q, pp, devp, crp, bminor))) {
 		ptrace(("%s: ERROR: no memory\n", M2UA_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (0);
 }
 
@@ -15413,11 +15406,11 @@ m2ua_close(queue_t *q, int flag, cred_t *crp)
 	(void) s;
 	printd(("%s: %p: closing character device %d:%d\n", M2UA_DRV_NAME, s, s->u.dev.cmajor,
 		s->u.dev.cminor));
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	{
 		m2ua_free_priv(q);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -15778,7 +15771,7 @@ m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, ushort bm
 		s->u.dev.cmajor = getmajor(*devp);
 		s->u.dev.cminor = getminor(*devp);
 		s->cred = *crp;
-		lis_spin_lock_init(&s->qlock, "priv-queue-lock");
+		spin_lock_init(&s->qlock); /* "priv-queue-lock" */
 		(s->oq = RD(q))->q_ptr = priv_get(p);
 		(s->iq = WR(q))->q_ptr = priv_get(p);
 		switch (bminor) {
@@ -15796,7 +15789,7 @@ m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, ushort bm
 		s->i_state = LMI_UNUSABLE;
 		s->i_style = LMI_STYLE2;
 		s->i_version = 1;
-		lis_spin_lock_init(&s->lock, "priv-lock");
+		spin_lock_init(&s->lock); /* "priv-lock" */
 		/*
 		   place in master list 
 		 */
@@ -15819,7 +15812,7 @@ m2ua_free_priv(queue_t *q)
 	ensure(p, return);
 	printd(("%s: %s: %p: free priv %d:%d\n", M2UA_DRV_NAME, __FUNCTION__, s, s->u.dev.cmajor,
 		s->u.dev.cminor));
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		noenable(s->oq);
 		noenable(s->iq);
@@ -15861,7 +15854,7 @@ m2ua_free_priv(queue_t *q)
 			atomic_set(&s->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	priv_put(p);		/* final put */
 	return;
 }
@@ -15905,7 +15898,7 @@ m2ua_alloc_as(ulong id, ulong type, struct sp *sp, uint32_t iid, m2ua_addr_t * a
 		struct np *np;
 		bzero(as, sizeof(*as));
 		as_get(as);	/* first get */
-		lis_spin_lock_init(&as->lock, "as-lock");
+		spin_lock_init(&as->lock); /* "as-lock" */
 		as->id = id;
 		as->type = type;
 		as->iid = iid;
@@ -15975,7 +15968,7 @@ m2ua_free_as(struct as *as)
 	psw_t flags;
 	ensure(as, return);
 	printd(("%s: %s: %p free as->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, as, as->id));
-	lis_spin_lock_irqsave(&as->lock, &flags);
+	spin_lock_irqsave(&as->lock, flags);
 	{
 		struct sl *sl;
 		struct ap *ap;
@@ -16029,7 +16022,7 @@ m2ua_free_as(struct as *as)
 			atomic_set(&as->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&as->lock, &flags);
+	spin_unlock_irqrestore(&as->lock, flags);
 	as_put(as);		/* final put */
 }
 STATIC struct as *
@@ -16091,7 +16084,7 @@ m2ua_alloc_sp(ulong id, ulong type, struct sp *osp, ulong cost, ulong tmode)
 	if ((sp = kmem_cache_alloc(m2ua_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
-		lis_spin_lock_init(&sp->lock, "sp-lock");
+		spin_lock_init(&sp->lock); /* "sp-lock" */
 		sp->id = id;
 		sp->type = type;
 		sp->cost = cost;
@@ -16129,7 +16122,7 @@ m2ua_free_sp(struct sp *sp)
 	psw_t flags;
 	ensure(sp, return);
 	printd(("%s: %s: %p free sp->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, sp, sp->id));
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_irqsave(&sp->lock, flags);
 	{
 		/*
 		   unlink from as 
@@ -16166,7 +16159,7 @@ m2ua_free_sp(struct sp *sp)
 			atomic_set(&sp->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_irqrestore(&sp->lock, flags);
 	sp_put(sp);		/* final put */
 }
 STATIC struct sp *
@@ -16229,7 +16222,7 @@ m2ua_alloc_spp(ulong id, ulong type, struct sp *sp, ulong aspid, ulong cost)
 		struct as *as;
 		bzero(spp, sizeof(*spp));
 		spp_get(spp);	/* first get */
-		lis_spin_lock_init(&spp->lock, "spp-lock");
+		spin_lock_init(&spp->lock); /* "spp-lock" */
 		spp->id = id;
 		spp->type = type;
 		spp->aspid = aspid;
@@ -16275,7 +16268,7 @@ m2ua_free_spp(struct spp *spp)
 	psw_t flags;
 	ensure(spp, return);
 	printd(("%s: %s: %p free spp->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, spp, spp->id));
-	lis_spin_lock_irqsave(&spp->lock, &flags);
+	spin_lock_irqsave(&spp->lock, flags);
 	{
 		struct xp *xp;
 		struct gp *gp;
@@ -16323,7 +16316,7 @@ m2ua_free_spp(struct spp *spp)
 			atomic_set(&spp->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&spp->lock, &flags);
+	spin_unlock_irqrestore(&spp->lock, flags);
 	spp_put(spp);		/* final put */
 }
 STATIC struct spp *
@@ -16407,7 +16400,7 @@ m2ua_free_sl(struct sl *sl)
 	psw_t flags;
 	ensure(sl, return);
 	printd(("%s: %s: %p free sl index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, sl, sl->u.mux.index));
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		noenable(sl->oq);
 		noenable(sl->iq);
@@ -16461,7 +16454,7 @@ m2ua_free_sl(struct sl *sl)
 			atomic_set(&sl->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	sl_put(sl);		/* final put */
 }
 STATIC struct sl *
@@ -16557,7 +16550,7 @@ m2ua_free_xp(struct xp *xp)
 	psw_t flags;
 	ensure(xp, return);
 	printd(("%s: %s: %p free xp index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, xp, xp->u.mux.index));
-	lis_spin_lock_irqsave(&xp->lock, &flags);
+	spin_lock_irqsave(&xp->lock, flags);
 	{
 		mblk_t *b_next, *bp;
 		noenable(xp->iq);
@@ -16631,7 +16624,7 @@ m2ua_free_xp(struct xp *xp)
 			atomic_set(&xp->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&xp->lock, &flags);
+	spin_unlock_irqrestore(&xp->lock, flags);
 	xp_put(xp);		/* final put */
 }
 STATIC struct xp *
@@ -16694,13 +16687,13 @@ m2ua_alloc_link(queue_t *q, union link **lkp, ulong index, cred_t *crp)
 		link_get(lk);	/* first get */
 		lk->str.u.mux.index = index;
 		lk->str.cred = *crp;
-		lis_spin_lock_init(&lk->str.qlock, "link-queue_lock");
+		spin_lock_init(&lk->str.qlock); /* "link-queue_lock" */
 		(lk->str.iq = RD(q))->q_ptr = link_get(lk);
 		(lk->str.oq = WR(q))->q_ptr = link_get(lk);
 		lk->str.i_state = LMI_UNUSABLE;
 		lk->str.i_style = LMI_STYLE2;
 		lk->str.i_version = 1;
-		lis_spin_lock_init(&lk->str.lock, "link-lock");
+		spin_lock_init(&lk->str.lock); /* "link-lock" */
 		/*
 		   place in master list 
 		 */
@@ -16744,7 +16737,7 @@ m2ua_free_link(queue_t *q)
 	 */
 	printd(("%s: %s: %p free link index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, lk,
 		lk->str.u.mux.index));
-	lis_spin_lock_irqsave(&lk->str.lock, &flags);
+	spin_lock_irqsave(&lk->str.lock, flags);
 	{
 		noenable(lk->str.iq);
 		noenable(lk->str.oq);
@@ -16781,7 +16774,7 @@ m2ua_free_link(queue_t *q)
 			atomic_set(&lk->str.refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&lk->str.lock, &flags);
+	spin_unlock_irqrestore(&lk->str.lock, flags);
 	link_put(lk);		/* final put */
 }
 STATIC union link *
@@ -16852,7 +16845,7 @@ m2ua_init(void)
 		} else
 			m2ua_majors[mindex] = err;
 	}
-	lis_spin_lock_init(&master.lock, "m2ua-master-list-lock");
+	spin_lock_init(&master.lock); /* "m2ua-master-list-lock" */
 	m2ua_initialized = 1;
 	return;
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 21:32:28 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -65,44 +65,25 @@ static char const ident[] =
  *  library has superior syncrhonization across a fork() and provides a
  *  conforming t_sync() library call.
  */
-
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if defined(LIS) && !defined(MODULE)
-#   error ****
-#   error ****  timod can only compile as a module under LiS.
-#   error ****  This is normally because LiS has been grossly misconfigured.
-#   error ****  Report bugs to <bugs@openss7.org>.
-#   error ****
-#endif
-
-#ifdef LINUX
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/modversions.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#endif
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 /*
    These are for TPI definitions 
  */
-#include <sys/tihdr.h>
-#include <sys/timod.h>
+#if defined HAVE_TIHDR_H
+#   include <tihdr.h>
+#else
+#   include <sys/tihdr.h>
+#endif
+#if defined HAVE_TIMOD_H
+#   include <timod.h>
+#else
+#   include <sys/timod.h>
+#endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $"
+#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -135,8 +116,8 @@ MODULE_LICENSE(TIMOD_LICENSE);
 #   endif
 #endif
 
-static modID_t modid = TIMOD_MOD_ID;
-MODULE_PARM(modid, "b");
+modID_t modid = TIMOD_MOD_ID;
+MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for TIMOD.");
 
 static struct module_info timod_minfo = {
@@ -300,7 +281,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 #if defined LIS
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			TIMOD_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
@@ -553,7 +534,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 #if defined LIS
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			TIMOD_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
@@ -984,7 +965,7 @@ timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
       quit:
 	MOD_DEC_USE_COUNT;
-	return (ENXIO);
+	return (err);
 }
 
 static int
@@ -1001,7 +982,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 			__FUNCTION__);
 		goto quit;
 	}
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			TIMOD_MOD_NAME, __FUNCTION__);
 		goto skip_pop;
@@ -1027,7 +1008,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  */
 #if defined LFS
 static struct fmodsw timod_fmod = {
-	f_name:CONFIG_STREAMS_TIMOD_NAME,
+	f_name:TIMOD_MOD_NAME,
 	f_str:&timod_info,
 	f_flag:0,
 	f_kmod:THIS_MODULE,
@@ -1037,7 +1018,7 @@ static int
 timod_register_module(void)
 {
 	int err;
-	if ((err = register_strmod(modid, &timod_fmod)) < 0)
+	if ((err = register_strmod(&timod_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -1046,7 +1027,7 @@ timod_register_module(void)
 static void
 timod_unregister_module(void)
 {
-	return (void) unregister_strmod(modid, &timod_fmod);
+	return (void) unregister_strmod(&timod_fmod);
 }
 
 #elif defined LIS
@@ -1074,11 +1055,6 @@ timod_unregister_module(void)
 	return (void) lis_unregister_strmod(&timod_info);
 }
 
-#else
-#   error ****
-#   error ****  One of LFS or LIS must be defined
-#   error ****  to compile the timod module.
-#   error ****
 #endif
 
 static int __init

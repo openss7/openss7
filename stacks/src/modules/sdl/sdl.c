@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,59 +46,57 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
 
-static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] =
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
  *  capabilities of the SDL to any pipe.  Its principal purpose is testing.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDL_DEVICES	"Supports STREAMS pipes."
+#define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SDL_LICENSE	"GPL"
 #define SDL_BANNER	SDL_DESCRIP	"\n" \
 			SDL_REVISION	"\n" \
 			SDL_COPYRIGHT	"\n" \
-			SDL_DEVICES	"\n" \
+			SDL_DEVICE	"\n" \
 			SDL_CONTACT	"\n"
-#define SDL_LICENSE	"GPL"
+#define SDL_SPLASH	SDL_DEVICE	" - " \
+			SDL_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(SDL_CONTACT);
 MODULE_DESCRIPTION(SDL_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SDL_DEVICES);
+MODULE_SUPPORTED_DEVICE(SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDL_LICENSE);
 #endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SDL_MOD_ID	CONFIG_STREAMS_SDL_MODID
+#define SDL_MOD_NAME	CONFIG_STREAMS_SDL_NAME
+#endif
+
+unsigned short modid = SDL_MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for SDL module. (0 for allocation)");
 
 /*
  *  =======================================================================
@@ -602,16 +600,14 @@ __sdl_timer_stop(struct sdl *s, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t9:
 		sdl_stop_timer_t9(s);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -622,17 +618,17 @@ STATIC INLINE void
 sdl_timer_stop(struct sdl *s, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		__sdl_timer_stop(s, t);
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 }
 STATIC INLINE void
 sdl_timer_start(struct sdl *s, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		__sdl_timer_stop(s, t);
 		switch (t) {
@@ -644,7 +640,7 @@ sdl_timer_start(struct sdl *s, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 }
 
 /*
@@ -676,9 +672,8 @@ sdl_timer_start(struct sdl *s, const uint t)
 STATIC int
 sdl_t9_timeout(struct sdl *s)
 {
-	/*
-	   wakeup the write queue 
-	 */
+	/* 
+	   wakeup the write queue */
 	qenable(s->iq);
 	return (QR_DONE);
 }
@@ -886,9 +881,8 @@ sdl_send_data(queue_t *q, mblk_t *mp)
 	if (s->statem.tx_state != SDL_STATE_IDLE) {
 		size = msgdsize(mp);
 	} else {
-		/*
-		   idle when transmitter shut down 
-		 */
+		/* 
+		   idle when transmitter shut down */
 		mblk_t *dp;
 		for (size = 0, dp = mp; dp; dp = dp->b_cont) {
 			if (dp->b_wptr > dp->b_rptr) {
@@ -1026,9 +1020,8 @@ sdl_recv_data(queue_t *q, mblk_t *mp)
 	if (s->statem.rx_state != SDL_STATE_IDLE) {
 		size = msgdsize(mp);
 	} else {
-		/*
-		   idle when receiver shut down 
-		 */
+		/* 
+		   idle when receiver shut down */
 		mblk_t *dp;
 		for (size = 0, dp = mp; dp; dp = dp->b_cont) {
 			if (dp->b_wptr > dp->b_rptr) {
@@ -1074,11 +1067,11 @@ lmi_iocgoptions(queue_t *q, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->option;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1092,11 +1085,11 @@ lmi_iocsoptions(queue_t *q, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1109,12 +1102,12 @@ lmi_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			arg->version = s->i_version;
 			arg->style = s->i_style;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1127,12 +1120,12 @@ lmi_iocsconfig(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->i_version = arg->version;
 			s->i_style = arg->style;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1167,11 +1160,11 @@ lmi_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			arg->state = s->i_state;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1185,11 +1178,11 @@ lmi_ioccmreset(queue_t *q, mblk_t *mp)
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->i_state = LMI_UNUSABLE;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1203,11 +1196,11 @@ lmi_iocgstatsp(queue_t *q, mblk_t *mp)
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->statsp;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1221,11 +1214,11 @@ lmi_iocsstatsp(queue_t *q, mblk_t *mp)
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1239,11 +1232,11 @@ lmi_iocgstats(queue_t *q, mblk_t *mp)
 		lmi_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1256,11 +1249,11 @@ lmi_ioccstats(queue_t *q, mblk_t *mp)
 	int ret;
 	psw_t flags;
 	(void) mp;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		ret = -EOPNOTSUPP;
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	return (ret);
 }
 STATIC int
@@ -1271,11 +1264,11 @@ lmi_iocgnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1289,11 +1282,11 @@ lmi_iocsnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1307,11 +1300,11 @@ lmi_ioccnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1337,9 +1330,8 @@ STATIC void
 sdl_commit_config(struct sdl *s, sdl_config_t * arg)
 {
 	s->config = *arg;
-	/*
-	   reshape traffic 
-	 */
+	/* 
+	   reshape traffic */
 	if (s->timestamp > jiffies) {
 		sdl_timer_stop(s, t9);
 		s->bytecount += s->tickbytes * (s->timestamp - jiffies);
@@ -1368,11 +1360,11 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->option;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1385,11 +1377,11 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1402,11 +1394,11 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->config;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1420,12 +1412,12 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		int ret;
 		psw_t flags;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			if (!(ret = sdl_test_config(s, arg)))
 				sdl_commit_config(s, arg);
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1439,11 +1431,11 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			ret = sdl_test_config(s, arg);
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -1456,11 +1448,11 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			sdl_commit_config(s, arg);
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1473,11 +1465,11 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->statem;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1499,11 +1491,11 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->statsp;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1516,11 +1508,11 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1533,11 +1525,11 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->stats;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1549,11 +1541,11 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	struct sdl *s = SDL_PRIV(q);
 	(void) mp;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		bzero(&s->stats, sizeof(s->stats));
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	return (0);
 }
 STATIC int
@@ -1563,11 +1555,11 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			*arg = s->notify;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1580,11 +1572,11 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->notify = *arg;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1597,11 +1589,11 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 		struct sdl *s = SDL_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&s->lock, &flags);
+		spin_lock_irqsave(&s->lock, flags);
 		{
 			s->notify.events &= ~arg->events;
 		}
-		lis_spin_unlock_irqrestore(&s->lock, &flags);
+		spin_unlock_irqrestore(&s->lock, flags);
 		return (0);
 	}
 	rare();
@@ -1612,12 +1604,12 @@ sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	struct sdl *s = SDL_PRIV(q);
 	psw_t flags;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		s->config.ifflags &= ~SDL_IF_TX_RUNNING;
 		s->statem.tx_state = SDL_STATE_IDLE;
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	return (0);
 }
 STATIC int
@@ -1625,12 +1617,12 @@ sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	struct sdl *s = SDL_PRIV(q);
 	psw_t flags;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		s->config.ifflags |= SDL_IF_TX_RUNNING;
 		s->statem.tx_state = SDL_STATE_IN_SERVICE;
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	return (0);
 }
 
@@ -1664,11 +1656,13 @@ sdl_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_UNLINK):
 		case _IOC_NR(I_PUNLINK):
 			(void) lp;
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDL_MOD_NAME, s, nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDL_MOD_NAME, s,
+				nr));
 			ret = (-EINVAL);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDL_MOD_NAME, s, nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDL_MOD_NAME, s,
+				nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -1881,9 +1875,8 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 		rtn = lmi_optmgmt_req(q, mp);
 		break;
 	default:
-		/*
-		   discard anything we don't recognize 
-		 */
+		/* 
+		   discard anything we don't recognize */
 		swerr();
 		rtn = (-EOPNOTSUPP);
 		break;
@@ -1927,9 +1920,8 @@ sdl_r_data(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sdl_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sdl_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -1948,9 +1940,8 @@ sdl_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sdl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sdl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -1981,9 +1972,8 @@ sdl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct sdl *s;
-		/*
-		   test for multiple push 
-		 */
+		/* 
+		   test for multiple push */
 		for (s = sdl_opens; s; s = s->next) {
 			if (s->u.dev.cmajor == cmajor && s->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -2054,7 +2044,7 @@ sdl_alloc_priv(queue_t *q, struct sdl **sp, dev_t *devp, cred_t *crp)
 		s->cred = *crp;
 		(s->oq = RD(q))->q_ptr = sdl_get(s);
 		(s->iq = WR(q))->q_ptr = sdl_get(s);
-		lis_spin_lock_init(&s->qlock, "sdl-queue-lock");
+		spin_lock_init(&s->qlock);	/* "sdl-queue-lock" */
 		s->o_prim = &sdl_r_prim;
 		s->i_prim = &sdl_w_prim;
 		s->o_wakeup = NULL;	// &sdl_rx_wakeup;
@@ -2062,7 +2052,7 @@ sdl_alloc_priv(queue_t *q, struct sdl **sp, dev_t *devp, cred_t *crp)
 		s->i_state = LMI_DISABLED;
 		s->i_style = LMI_STYLE1;
 		s->i_version = 1;
-		lis_spin_lock_init(&s->qlock, "sdl-priv_lock");
+		spin_lock_init(&s->qlock);	/* "sdl-priv_lock" */
 		if ((s->next = *sp))
 			s->next->prev = &s->next;
 		s->prev = sp;
@@ -2071,9 +2061,8 @@ sdl_alloc_priv(queue_t *q, struct sdl **sp, dev_t *devp, cred_t *crp)
 		s->timestamp = jiffies;
 		s->tickbytes = s->config.ifrate / HZ / 8;
 		s->bytecount = 0;
-		/*
-		   configuration defaults 
-		 */
+		/* 
+		   configuration defaults */
 		s->option = lmi_default;
 		s->config = sdl_default;
 		printd(("%s: %p: setting module private structure defaults\n", SDL_MOD_NAME, s));
@@ -2087,7 +2076,7 @@ sdl_free_priv(queue_t *q)
 	struct sdl *s = SDL_PRIV(q);
 	psw_t flags;
 	ensure(s, return);
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		ss7_unbufcall((str_t *) s);
 		sdl_timer_stop(s, tall);
@@ -2105,7 +2094,7 @@ sdl_free_priv(queue_t *q)
 		s->iq = NULL;
 		sdl_put(s);
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	sdl_put(s);		/* final put */
 }
 STATIC struct sdl *
@@ -2123,6 +2112,42 @@ sdl_put(struct sdl *s)
 	}
 }
 
+STATIC int sdl_initialized = 0;
+
+#if defined LFS
+/*
+ *  =======================================================================
+ *
+ *  Linux Fast-STREAMS Kernel Module Initialization
+ *
+ *  =======================================================================
+ */
+
+STATIC struct fmodsw sdl_fmod = {
+	.f_name = SDL_MOD_NAME,
+	.f_str = &sdl_info,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sdl_register_module(void)
+{
+	int err;
+	if ((err = register_strmod(&sdl_fmod)) < 0)
+		return (err);
+	if (modid == 0 && err > 0)
+		modid = err;
+	return (0);
+}
+
+STATIC void
+sdl_unregister_module(void)
+{
+	return (void) unregister_strmod(&sdl_fmod);
+}
+
+#elif defined LIS
 /*
  *  =======================================================================
  *
@@ -2130,29 +2155,55 @@ sdl_put(struct sdl *s)
  *
  *  =======================================================================
  */
-STATIC int sdl_initialized = 0;
-STATIC void
+STATIC int
+sdl_register_module(void)
+{
+	int ret;
+	if ((ret = lis_register_strmod(&sdl_info, SDL_MOD_NAME)) != LIS_NULL_MID) {
+		if (modid == 0)
+			modid = ret;
+		return (0);
+	}
+	/* LiS is not too good on giving informative errors here. */
+	return (EIO);
+}
+
+STATIC int
+sdl_unregister_module(void)
+{
+	/* LiS provides detailed errors here when they are discarded */
+	return (void) lis_unregister_strmod(&sdl_info);
+}
+#endif
+
+void
 sdl_init(void)
 {
+	int err;
 	unless(sdl_initialized > 0, return);
 	cmn_err(CE_NOTE, SDL_BANNER);	/* console splash */
-	if ((sdl_initialized = sdl_init_caches())) {
+	if ((err = sdl_init_caches())) {
 		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", SDL_MOD_NAME);
-	} else if ((sdl_initialized = lis_register_strmod(&sdl_info, SDL_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: couldn't register module", SDL_MOD_NAME);
-		sdl_free_caches();
+		sdl_initialized = err < 0 ? err : -err;
+		return;
 	}
+	if ((err = sdl_register_module())) {
+		sdl_free_caches();
+		cmn_err(CE_WARN, "%s: ERROR: couldn't register module", SDL_MOD_NAME);
+		sdl_initialized = err < 0 ? err : -err;
+		return;
+	}
+	sdl_initialized = 1;
 	return;
 }
-STATIC void
+
+void
 sdl_terminate(void)
 {
 	ensure(sdl_initialized > 0, return);
-	if ((sdl_initialized = lis_unregister_strmod(&sdl_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", SDL_MOD_NAME);
-	} else {
-		sdl_free_caches();
-	}
+	sdl_unregister_module();
+	sdl_free_caches();
+	sdl_initialized = 0;
 	return;
 }
 
@@ -2163,8 +2214,8 @@ sdl_terminate(void)
  *
  *  =======================================================================
  */
-int
-init_module(void)
+int __init
+_sdl_init(void)
 {
 	sdl_init();
 	if (sdl_initialized < 0)
@@ -2172,11 +2223,14 @@ init_module(void)
 	return (0);
 }
 
-void
-cleanup_module(void)
+void __exit
+_sdl_exit(void)
 {
 	sdl_terminate();
 	(void) ss7_oput;
 	(void) ss7_iput;
 	(void) ss7_unbufcall;
 }
+
+module_init(_sdl_init);
+module_exit(_sdl_exit);

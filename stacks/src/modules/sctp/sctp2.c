@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:16 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #undef sctp_addr
 #define sctp_addr n_sctp_addr
@@ -82,11 +73,10 @@ static char const ident[] =
 #include <sys/xti_ip.h>
 #include <sys/xti_sctp.h>
 
-#include "debug.h"
-#include "bufq.h"
-
+#ifdef LINUX
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
+#endif				/* LINUX */
 
 #undef min			/* LiS should not have defined these */
 #define min lis_min
@@ -113,13 +103,15 @@ static char const ident[] =
 #undef ASSERT
 #endif
 
+#ifdef LINUX
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
+#endif				/* LINUX */
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -130,12 +122,14 @@ static char const ident[] =
 			SCTP_DEVICE	"\n" \
 			SCTP_CONTACT	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(SCTP_CONTACT);
 MODULE_DESCRIPTION(SCTP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SCTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCTP_LICENSE);
 #endif
+#endif				/* LINUX */
 
 #ifndef tid_t
 typedef int tid_t;

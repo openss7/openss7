@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 18:49:29 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $"
 
-static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $";
+static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -60,17 +60,7 @@ static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.
  *  This module is intended to be used by application programs or by upper
  *  modules that expect an NPI connectionless service provider.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -80,19 +70,11 @@ static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #undef INLINE
 #define INLINE			/* let compiler do its job */
 
 #define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 18:49:29 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -103,11 +85,18 @@ static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.
 			MTP_DEVICE	"\n" \
 			MTP_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(MTP_CONTACT);
 MODULE_DESCRIPTION(MTP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define MTP_NPI_MOD_ID		CONFIG_STREAMS_MTP_NPI_MODID
+#define MTP_NPI_MOD_NAME	CONFIG_STREAMS_MTP_NPI_NAME
 #endif
 
 /*
@@ -2634,7 +2623,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		mtp->cred = *crp;
 		(mtp->oq = RD(q))->q_ptr = mtp_get(mtp);
 		(mtp->iq = WR(q))->q_ptr = mtp_get(mtp);
-		lis_spin_lock_init(&mtp->qlock, "mtp-queue-lock");
+		spin_lock_init(&mtp->qlock); /* "mtp-queue-lock" */
 		mtp->o_prim = &mtp_r_prim;
 		mtp->i_prim = &mtp_w_prim;
 		mtp->o_wakeup = NULL;
@@ -2642,7 +2631,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		mtp->i_state = NS_UNBND;
 		mtp->i_style = LMI_STYLE1;
 		mtp->i_version = 1;
-		lis_spin_lock_init(&mtp->lock, "mtp-priv-lock");
+		spin_lock_init(&mtp->lock); /* "mtp-priv-lock" */
 		if ((mtp->next = *mtpp))
 			mtp->next->prev = &mtp->next;
 		mtp->prev = mtpp;
@@ -2672,7 +2661,7 @@ mtp_free_priv(queue_t *q)
 	struct mtp *mtp = MTP_PRIV(q);
 	psw_t flags;
 	ensure(mtp, return);
-	lis_spin_lock_irqsave(&mtp->lock, &flags);
+	spin_lock_irqsave(&mtp->lock, flags);
 	{
 		ss7_unbufcall((str_t *) mtp);
 		if ((*mtp->prev = mtp->next))
@@ -2689,7 +2678,7 @@ mtp_free_priv(queue_t *q)
 		mtp->iq = NULL;
 		mtp_put(mtp);
 	}
-	lis_spin_unlock_irqrestore(&mtp->lock, &flags);
+	spin_unlock_irqrestore(&mtp->lock, flags);
 	mtp_put(mtp);		/* final put */
 }
 STATIC struct mtp *

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.1 2004/08/21 10:14:38 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __BUFQ_H__
-#define __BUFQ_H__
+#ifndef __OS7_BUFQ_H__
+#define __OS7_BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:38 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:42 $"
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -63,7 +63,7 @@
 #endif
 
 typedef struct bufq {
-	lis_spin_lock_t q_lock;
+	spinlock_t q_lock;
 	mblk_t *q_head;
 	mblk_t *q_tail;
 	size_t q_msgs;
@@ -73,7 +73,7 @@ typedef struct bufq {
 static inline void
 bufq_init(bufq_t * q)
 {
-	lis_spin_lock_init(&q->q_lock, "bufq-lock");
+	spin_lock_init(&q->q_lock);
 	q->q_head = NULL;
 	q->q_tail = NULL;
 	q->q_msgs = 0;
@@ -82,12 +82,12 @@ bufq_init(bufq_t * q)
 static inline void
 bufq_lock(bufq_t * q, psw_t *flags)
 {
-	lis_spin_lock_irqsave(&q->q_lock, flags);
+	spin_lock_irqsave(&q->q_lock, *flags);
 }
 static inline void
 bufq_unlock(bufq_t * q, psw_t *flags)
 {
-	lis_spin_unlock_irqrestore(&q->q_lock, flags);
+	spin_unlock_irqrestore(&q->q_lock, *flags);
 }
 
 static inline size_t
@@ -392,4 +392,4 @@ freechunks(mblk_t *mp)
 	for (dp = mp; dp; dp_next = dp->b_next, freemsg(dp), dp = dp_next) ;
 }
 
-#endif				/* __BUFQ_H__ */
+#endif				/* __OS7_BUFQ_H__ */

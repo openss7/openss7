@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $
+ @(#) $Id: compat.h,v 0.9.2.2 2004/08/27 00:53:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -46,50 +45,90 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:08 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 00:53:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
+#ifndef __LOCAL_COMPAT_H__
+#define __LOCAL_COMPAT_H__
 
-static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $";
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
 
 /*
- *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
- *  SDT lower streams for provisioning and automatic allocation of Signalling
- *  Data Terminals.  It translates between Type I SDT streams or attached Type
- *  II SDT streams on the lower boundary to Type II SDT streams on the upper
- *  boundary.  Another purpose for the SDT mux is the ability to perform SDT
- *  monitoring, testing, management, statistics collection and event
- *  collection.
+ *  Unfortunately this is necessary for older non-rpm LIS releases.
  */
-#include "compat.h"
-
-#include <ss7/lmi.h>
-#include <ss7/lmi_ioctl.h>
-#include <ss7/sdli.h>
-#include <ss7/sdli_ioctl.h>
-#include <ss7/sdti.h>
-#include <ss7/sdti_ioctl.h>
-
-#define SDTM_DESCRIP	"SIGNALLING DATA TERMINAL (SDT) STREAMS MULTIPLEXING DRIVER."
-#define SDTM_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SDTM_DEVICE	"Part of the OpenSS7 Stack for STREAMS."
-#define SDTM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDTM_LICENSE	"GPL"
-#define SDTM_BANNER	SDTM_DESCRIP	"\n" \
-			SDTM_COPYRIGHT	"\n" \
-			SDTM_DEVICE	"\n" \
-			SDTM_CONTACT
-#define SDTM_SPLASH	SDTM_DEVICE	" - " \
-			SDTM_REVISION	"\n" \
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	ifdef MODVERSIONS
+#	    include <linux/modversions.h>
+#	endif
+#	include <linux/module.h>
+#	include <linux/modversions.h>
+#	ifndef __GENKSYMS__
+#	    if defined HAVE_SYS_LIS_MODVERSIONS_H
+#		include <sys/LiS/modversions.h>
+#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#		include <sys/streams/modversions.h>
+#	    endif
+#	endif
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
 
 #ifdef LINUX
-MODULE_AUTHOR(SDTM_CONTACT);
-MODULE_DESCRIPTION(SDTM_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SDTM_DEVICE);
-#ifdef MODULE_LICENSE
-MODULE_LICENSE(SDTM_LICENSE);
-#endif
+#include <linux/errno.h>
+#include <linux/types.h>
+#include <linux/interrupt.h>
 #endif				/* LINUX */
 
+#include <sys/stream.h>
+#include <sys/cmn_err.h>
+#include <sys/kmem.h>
+#include <sys/dki.h>
+#include <sys/ddi.h>
+
+#ifdef LFS
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
+#endif
+
+#ifdef LIS
+#include <sys/osif.h>
+typedef void (*bufcall_fnc_t) (long);
+#ifdef LIS_2_12
+#define INT int
+#else
+#define INT void
+#endif
+#else
+#define INT int
+#endif
+#endif
+
+#include "debug.h"		/* generic debugging macros */
+#include "bufq.h"		/* generic buffer queues */
+#include "priv.h"		/* generic data structures */
+#include "lock.h"		/* generic queue locking functions */
+#include "queue.h"		/* generic put and srv routines */
+#include "allocb.h"		/* generic buffer allocation routines */
+#include "timer.h"		/* generic timer handling */
+
+//#ifdef LINUX
+//#include <linux/interrupt.h>
+//#include "bufpool.h"		/* generic buffer pooling */
+//#endif
+
+#ifdef LINUX
+#ifdef MODULE
+#define MODULE_STATIC STATIC
+#else				/* LINUX */
+#define MODULE_STATIC
+#endif				/* LINUX */
+
+#endif				/* __LOCAL_COMPAT_H__ */

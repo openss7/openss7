@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,34 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/mtpi.h>
 
-#include "debug.h"
-
 #define SM_DESCRIP	"SIMPLE SINGLE LINK MTP."
-#define SM_REVISION	"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#define SM_REVISION	"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 #define SM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -84,11 +72,18 @@ static char const ident[] =
 			SM_DEVICE	"\n" \
 			SM_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(SM_CONTACT);
 MODULE_DESCRIPTION(SM_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SM_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SM_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SM_MOD_MOD_ID CONFIG_STREAMS_SM_MOD_MODID
+#define SM_MOD_MOD_NAME CONFIG_STREAMS_SM_MOD_NAME
 #endif
 
 static struct module_info sm_minfo = {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:15:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -66,29 +66,30 @@ static char const ident[] =
  *  management.
  */
 
+#include "compat.h"
+
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define TR_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date"
+#define TR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TR_LICENSE	"GPL"
 #define TR_BANNER	TR_DESCRIP	"\n" \
+			TR_REVISION	"\n" \
 			TR_COPYRIGHT	"\n" \
 			TR_DEVICE	"\n" \
 			TR_CONTACT	"\n"
+#define TR_SPLASH	TR_DEVICE	" - " \
+			TR_REVISION	"\n"
 
-#ifdef MODULE
+#ifdef LINUX
 MODULE_AUTHOR(TR_CONTACT);
 MODULE_DESCRIPTION(TR_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TR_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TR_LICENSE);
 #endif
-#define MODULE_STATIC static
-#else
-#define MOD_INC_USE_COUNT
-#define MOD_DEC_USE_COUNT
-#define MODULE_STATIC
-#endif
+#endif				/* LINUX */
 
 #ifdef TR_DEBUG
 static int tr_debug = TR_DEBUG;
@@ -96,17 +97,25 @@ static int tr_debug = TR_DEBUG;
 static int tr_debug = 2;
 #endif
 
-#ifndef TR_CMAJOR
-#define TR_CMAJOR 210
+#ifdef LFS
+#define TR_DRV_ID	CONFIG_STREAMS_TR_MODID
+#define TR_DRV_NAME	CONFIG_STREAMS_TR_NAME
+#define TR_CMAJORS	CONFIG_STREAMS_TR_NMAJORS
+#define TR_CMAJOR_0	CONFIG_STREAMS_TR_MAJOR
+#define TR_NMINOR	CONFIG_STREAMS_TR_NMINORS
 #endif
-#define TR_NMINOR 255
 
-#define TR_MODULE_ID ('s'<<24|'s'<<16|'7'<<8|TR_IOC_MAGIC)
-
-#ifdef LIS_2_12
-#define INT int
-#else
-#define INT void
+#ifndef TR_CMAJOR_0
+#define TR_CMAJOR_0	210
+#endif
+#ifndef TR_NMINOR
+#define TR_NMINOR	255
+#endif
+#ifndef TR_DRV_ID
+#define TR_DRV_ID	('s'<<24|'s'<<16|'7'<<8|TR_IOC_MAGIC)
+#endif
+#ifndef TR_DRV_NAME
+#define TR_DRV_NAME	"tcap-tr"
 #endif
 
 /*
@@ -118,8 +127,8 @@ static int tr_debug = 2;
  */
 
 static struct module_info tr_minfo = {
-	TR_MODULE_ID,			/* Module ID number */
-	"tcap-tr",			/* Module name */
+	TR_DRV_ID,			/* Module ID number */
+	TR_DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted *//* XXX */
 	254,				/* Max packet size accepted *//* XXX */
 	8 * 512,			/* Hi water mark *//* XXX */

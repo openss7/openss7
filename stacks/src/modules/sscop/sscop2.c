@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dlk.h>
+#include "compat.h"
 
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
-
-#include "../debug.h"
-#include "../bufq.h"
 
 #define SSCOP_DESCRIP	"SSCOP STREAMS MODULE."
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
@@ -82,19 +69,24 @@ static char const ident[] =
 			SSCOP_COPYRIGHT	"\n" \
 			SSCOP_DEVICE	"\n" \
 			SSCOP_CONTACT	"\n"
+#define SSCOP_SPLASH	SSCOP_DEVICE	" - " \
+			SSCOP_REVISION	"\n" \
 
+#ifdef LINUX
 MODULE_AUTHOR(SSCOP_CONTACT);
 MODULE_DESCRIPTION(SSCOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SSCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
 #endif
+#endif				/* LINUX */
 
-#ifndef INT
-#define INT void
+#ifdef LFS
+#define SSCOP_DRV_ID		CONFIG_STREAMS_SSCOP_MODID
+#define SSCOP_DRV_NAME		CONFIG_STREAMS_SSCOP_NAME
+#define SSCOP_CMAJORS		CONFIG_STREAMS_SSCOP_NMAJORS
+#define SSCOP_CMAJOR_0		CONFIG_STREAMS_SSCOP_MAJOR
 #endif
-
-typedef void (*bufcall_fnc_t) (long);
 
 /*
  *  =========================================================================

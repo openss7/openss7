@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lock.h,v 0.9.2.1 2004/08/21 10:14:38 brian Exp $
+ @(#) $Id: lock.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LOCK_H__
-#define __LOCK_H__
+#ifndef __OS7_LOCK_H__
+#define __OS7_LOCK_H__
 
 STATIC int ss7_osrv(queue_t *);
 STATIC int ss7_isrv(queue_t *);
@@ -60,7 +60,7 @@ ss7_trylockq(queue_t *q)
 {
 	int res;
 	str_t *s = STR_PRIV(q);
-	if (!(res = lis_spin_trylock(&s->qlock))) {
+	if (!(res = spin_trylock(&s->qlock))) {
 		if (q == s->iq)
 			s->iwait = q;
 		if (q == s->oq)
@@ -72,7 +72,7 @@ STATIC INLINE void
 ss7_unlockq(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
-	lis_spin_unlock(&s->qlock);
+	spin_unlock(&s->qlock);
 	if (s->iwait) {
 		if (s->iwait->q_qinfo && s->iwait->q_qinfo->qi_srvp)
 			qenable(xchg(&s->iwait, NULL));
@@ -87,4 +87,4 @@ ss7_unlockq(queue_t *q)
 	}
 }
 
-#endif				/* __LOCK_H__ */
+#endif				/* __OS7_LOCK_H__ */

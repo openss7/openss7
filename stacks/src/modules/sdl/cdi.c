@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
 
-static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $";
 
 #define __NO_VERSION__
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <sys/cdi.h>
 
@@ -75,10 +66,6 @@ static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #include <ss7/devi_ioctl.h>
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
-
-#include "lock.h"
-#include "debug.h"
-#include "bufq.h"
 
 /*
  *  =========================================================================

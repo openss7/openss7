@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,33 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
 
-static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <sys/cdi.h>
 
-#include "lock.h"
-#include "debug.h"
-#include "bufq.h"
-
 #define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
 #define CDI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -82,13 +69,17 @@ static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.
 			CDI_COPYRIGHT	"\n" \
 			CDI_DEVICE	"\n" \
 			CDI_CONTACT	"\n"
+#define CDI_SPLASH	CDI_DEVICE	" - " \
+			CDI_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(CDI_CONTACT);
 MODULE_DESCRIPTION(CDI_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CDI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(CDI_LICENSE);
 #endif
+#endif				/* LINUX */
 
 /*
  *  =======================================================================

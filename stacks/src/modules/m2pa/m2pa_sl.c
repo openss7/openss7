@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:23:03 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:54 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:54 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
@@ -80,16 +71,8 @@ static char const ident[] =
 
 // #define _DEBUG
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define M2PA_DESCRIP	"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $"
+#define M2PA_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:54 $"
 #define M2PA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -99,13 +82,26 @@ static char const ident[] =
 			M2PA_COPYRIGHT	"\n" \
 			M2PA_DEVICE	"\n" \
 			M2PA_CONTACT	"\n"
+#define M2PA_SPLASH	M2PA_DEVICE	" - " \
+			M2PA_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(M2PA_CONTACT);
 MODULE_DESCRIPTION(M2PA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M2PA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2PA_LICENSE);
 #endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define M2PA_SL_MOD_ID		CONFIG_STREAMS_M2PA_SL_MODID
+#define M2PA_SL_MOD_NAME	CONFIG_STREAMS_M2PA_SL_NAME
+#endif
+
+unsigned short modid = M2PA_SL_MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for M2PA SL driver (0 for allocation)");
 
 /*
  *  =========================================================================
@@ -116,35 +112,32 @@ MODULE_LICENSE(M2PA_LICENSE);
  */
 
 STATIC struct module_info sl_minfo = {
-      mi_idnum:M2PA_SL_MOD_ID,	/* Module ID number */
-      mi_idname:M2PA_SL_MOD_NAME,
-	/*
-	   Module name 
-	 */
-      mi_minpsz:1,		/* Min packet size accepted */
-      mi_maxpsz:INFPSZ,	/* Max packet size accepted */
-      mi_hiwat:1 << 15,	/* Hi water mark */
-      mi_lowat:1 << 10,	/* Lo water mark */
+	.mi_idnum = M2PA_SL_MOD_ID,	/* Module ID number */
+	.mi_idname = M2PA_SL_MOD_NAME,	/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = (1 << 15),		/* Hi water mark */
+	.mi_lowat = (1 << 10),		/* Lo water mark */
 };
 
 STATIC int sl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sl_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit sl_rinit = {
-      qi_putp:ss7_oput,	/* Read put (msg from below) */
-      qi_qopen:sl_open,	/* Each open */
-      qi_qclose:sl_close,	/* Last close */
-      qi_minfo:&sl_minfo,	/* Information */
+	.qi_putp = ss7_oput,		/* Read put (msg from below) */
+	.qi_qopen = sl_open,		/* Each open */
+	.qi_qclose = sl_close,		/* Last close */
+	.qi_minfo = &sl_minfo,		/* Information */
 };
 
 STATIC struct qinit sl_winit = {
-      qi_putp:ss7_iput,	/* Write put (msg from above) */
-      qi_minfo:&sl_minfo,	/* Information */
+	.qi_putp = ss7_iput,		/* Write put (msg from above) */
+	.qi_minfo = &sl_minfo,		/* Information */
 };
 
-STATIC struct streamtab sl_info = {
-      st_rdinit:&sl_rinit,	/* Upper read queue */
-      st_wrinit:&sl_winit,	/* Upper write queue */
+struct streamtab m2pa_sl_info = {
+	.st_rdinit = &sl_rinit,		/* Upper read queue */
+	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
 
 /*
@@ -309,9 +302,8 @@ lmi_ok_ack(queue_t *q, struct sl *sl, long prim)
 		case LMI_DETACH_PENDING:
 			sl->i_state = LMI_UNATTACHED;
 			break;
-			/*
-			   default is don't change state 
-			 */
+			/* 
+			   default is don't change state */
 		}
 		p->lmi_state = sl->i_state;
 		printd(("%s: %p: <- LMI_OK_ACK\n", M2PA_SL_MOD_NAME, sl));
@@ -366,7 +358,7 @@ lmi_error_ack(queue_t *q, struct sl *sl, long prim, long err)
 		case LMI_DISABLE_PENDING:
 			sl->i_state = LMI_ENABLED;
 			break;
-			/*
+			/* 
 			 *  Default is not to change state.
 			 */
 		}
@@ -1001,10 +993,9 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
-		/*
+		/* 
 		   draft-ietf-sigtran-m2pa-04.txt does not have a separate Proving message: it uses 
-		   the status proving message for sending proving data will fill bytes. 
-		 */
+		   the status proving message for sending proving data will fill bytes. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
@@ -1026,9 +1017,8 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
 	default:
-		/*
-		   It looks like the sequence numbers stuck. 
-		 */
+		/* 
+		   It looks like the sequence numbers stuck. */
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
@@ -1048,10 +1038,9 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT6_9:
-		/*
+		/* 
 		   It is anticipated that draft 7 will not include FSN or BSN in the status
-		   messages. 
-		 */
+		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
@@ -1095,9 +1084,8 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
-		/*
-		   draft-ietf-sigtran-m2pa-04.txt has sequence numbers in an M2PA-specific header. 
-		 */
+		/* 
+		   draft-ietf-sigtran-m2pa-04.txt has sequence numbers in an M2PA-specific header. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
@@ -1129,10 +1117,9 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT6_9:
-		/*
+		/* 
 		   It is anticipated that draft 7 will not include FSN or BSN in the status
-		   messages. 
-		 */
+		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
@@ -1162,10 +1149,9 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			case M2PA_STATUS_IN_SERVICE:
 				switch (sl_get_state(sl)) {
 				case MS_PROCESSOR_OUTAGE:
-					/*
+					/* 
 					   Should only really be sent on data stream when used for
-					   processor outage resynchronization. 
-					 */
+					   processor outage resynchronization. */
 					qos.sid = M2PA_DATA_STREAM;
 					break;
 				default:
@@ -1200,10 +1186,9 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		return (0);
 	switch (sl->i_version) {
 	case M2PA_VERSION_DRAFT3:
-		/*
+		/* 
 		   draft-ietf-sigtran-m2pa-03.txt does not have a separate acknowledgement message. 
-		   Acknowledgement is done at the SCTP level only. 
-		 */
+		   Acknowledgement is done at the SCTP level only. */
 		return (0);
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
@@ -1220,20 +1205,18 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4:
-		/*
+		/* 
 		   draft-ietf-sigtran-m2pa-04.txt again does not have a separate acknowledgement
 		   message.  There is no way to acknowledge data without sending status or data in
-		   M2PA-04. 
-		 */
+		   M2PA-04. */
 		return (0);
 	case M2PA_VERSION_DRAFT4_1:
-		/*
+		/* 
 		   This extension uses the otherwise useless "In Service" state message from
 		   draft-ietf-sigtran-m2pa-04.txt as an acknowledgement message (like a FISU).
 		   These messages are sent expedited to speed them up, but that means they may
 		   arrive out of order and, therefore, some sequence numbers should be ignored by
-		   the receiver. 
-		 */
+		   the receiver. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
@@ -1250,10 +1233,9 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		}
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT4_9:
-		/*
+		/* 
 		   This is the same as extension 4.1, except that it uses the larger 32-bit
-		   sequence numbers expected to appear in draft-ietf-sigtran-m2pa-05.txt. 
-		 */
+		   sequence numbers expected to appear in draft-ietf-sigtran-m2pa-05.txt. */
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
@@ -1271,10 +1253,9 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		return (-ENOBUFS);
 	case M2PA_VERSION_DRAFT5:
 	case M2PA_VERSION_DRAFT5_1:
-		/*
+		/* 
 		   Draft 5 allows acknowledgement with DATA as well as STATUS IN_SERVICE message.
-		   Draft 5 incorrectly indicates that the FSN is to be incremented. 
-		 */
+		   Draft 5 incorrectly indicates that the FSN is to be incremented. */
 		if (sl->tb.q_msgs && (sl->flags & MF_SEND_MSU) && !(sl->flags & MF_RTB_FULL)) {
 			printd(("%s: %p: Delaying ack for piggyback\n", M2PA_SL_MOD_NAME, sl));
 			return (QR_DONE);	/* piggyback ack on outgoing message */
@@ -1298,11 +1279,10 @@ sl_send_ack(queue_t *q, struct sl *sl)
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
 	case M2PA_VERSION_DRAFT6_9:
-		/*
+		/* 
 		   draft-ietf-signtran-m2pa-06.txt and the anticipated draft 7 wil acknowledge
 		   messages with an empty data message.  Draft 6 incorrectly indicatest that the
-		   FSN is to be incremented. 
-		 */
+		   FSN is to be incremented. */
 		if (sl->tb.q_msgs && (sl->flags & MF_SEND_MSU) && !(sl->flags & MF_RTB_FULL)) {
 			printd(("%s: %p: Delaying ack for piggyback\n", M2PA_SL_MOD_NAME, sl));
 			return (QR_DONE);	/* piggyback ack on outgoing message */
@@ -1325,15 +1305,14 @@ sl_send_ack(queue_t *q, struct sl *sl)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/*
+		/* 
 		   Acknowledgements must be sent immediately on the next outgoing message.  We
 		   check to see if there is a pending MSU waiting to be sent that will actually be
 		   sent during this pass of the state machine.  If there is one, we will piggyback
 		   so we return now.  If there is not an MSU that will be sent on this pass, we
 		   send the separate ack.  Note that we do not delay whatsoever waiting for an MSU: 
 		   either one is ready now or we will generate a separate ack immediately.  Let
-		   SCTP worry about Nagling and bundling. 
-		 */
+		   SCTP worry about Nagling and bundling. */
 		if (sl->tb.q_msgs && (sl->flags & MF_SEND_MSU) && !(sl->flags & MF_RTB_FULL)) {
 			printd(("%s: %p: Delaying ack for piggyback\n", M2PA_SL_MOD_NAME, sl));
 			return (QR_DONE);	/* piggyback ack on outgoing message */
@@ -1621,76 +1600,66 @@ __sl_timer_stop(struct sl *sl, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t1:
 		sl_stop_timer_t1(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t2:
 		sl_stop_timer_t2(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t3:
 		sl_stop_timer_t3(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t4:
 		sl_stop_timer_t4(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 #if 0
 	case t5:
 		sl_stop_timer_t5(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 #endif
 	case t6:
 		sl_stop_timer_t6(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t7:
 		sl_stop_timer_t7(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 #if 0
 	case t8:
 		sl_stop_timer_t8(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 #endif
 	case t9:
 		sl_stop_timer_t9(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -1701,17 +1670,17 @@ STATIC INLINE void
 sl_timer_stop(struct sl *sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 }
 STATIC INLINE void
 sl_timer_start(struct sl *sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
 		switch (t) {
@@ -1751,7 +1720,7 @@ sl_timer_start(struct sl *sl, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 }
 
 /*
@@ -1764,18 +1733,16 @@ sl_timer_start(struct sl *sl, const uint t)
 STATIC INLINE void
 sl_suerm_start(queue_t *q, struct sl *sl)
 {
-	/*
-	   SCTP does this for us 
-	 */
+	/* 
+	   SCTP does this for us */
 	return;
 }
 
 STATIC INLINE void
 sl_suerm_stop(queue_t *q, struct sl *sl)
 {
-	/*
-	   SCTP does this for us 
-	 */
+	/* 
+	   SCTP does this for us */
 	return;
 }
 
@@ -1800,12 +1767,11 @@ sl_t9_timeout(struct sl *sl)
 	if (sl_get_state(sl) == MS_PROVING) {
 		int err;
 		queue_t *q = sl->iq;
-		/*
+		/* 
 		   We use the t9 tick timer to determine how fast to send proving messages.  We
 		   send a proving message once every t9 during the proving period.  To adjust the
 		   bandwidth of the proving messages, adjust the t9 timer or the size of the
-		   filler. 
-		 */
+		   filler. */
 		if (proving) {
 			if (sl->flags & MF_LOC_EMERG)
 				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
@@ -2151,7 +2117,7 @@ sl_lsc_emergency(queue_t *q, struct sl *sl)
 	if (proving) {
 		switch (sl_get_state(sl)) {
 		case MS_PROVING:
-			/*
+			/* 
 			   For a normal Q.703 link, when we received an emergency signal in the
 			   proving state, we would stop sending normal proving messages and being
 			   sending emergency proving messages.  The problem is if we have already
@@ -2159,8 +2125,7 @@ sl_lsc_emergency(queue_t *q, struct sl *sl)
 			   difficult.  MTP2 normally paces output of SIN so that the switch to SIE
 			   can be made at any time.  The only way that we can change mid-burst is
 			   to send proving messages in smaller chunks or on some sort of timed
-			   basis. 
-			 */
+			   basis. */
 			if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
 				return (err);
 			sl_timer_stop(sl, t4);
@@ -2204,9 +2169,8 @@ sl_lsc_status_proving_normal(queue_t *q, struct sl *sl)
 			sl_timer_start(sl, t3);
 			sl_set_state(sl, MS_ALIGNED);
 		}
-		/*
-		   fall thru 
-		 */
+		/* 
+		   fall thru */
 	case MS_ALIGNED:
 		sl->flags &= ~MF_REM_EMERG;
 		if (proving) {
@@ -2251,9 +2215,8 @@ sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
 			sl_timer_start(sl, t3);
 			sl_set_state(sl, MS_ALIGNED);
 		}
-		/*
-		   fall thru 
-		 */
+		/* 
+		   fall thru */
 	case MS_ALIGNED:
 		if (proving) {
 			sl->flags |= MF_REM_EMERG;
@@ -2373,11 +2336,10 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->i_version >= M2PA_VERSION_DRAFT10) {
-			/*
+			/* 
 			   In the final, when we receive a READY in the in service or processor
 			   outage states, we use the BSN in the message to synchronize when
-			   synchronization was required. 
-			 */
+			   synchronization was required. */
 			if (sl->flags & MF_WAIT_SYNC) {
 				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
 				sl->flags &= ~MF_WAIT_SYNC;
@@ -3059,9 +3021,8 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 	case MS_NOT_ALIGNED:
 	case MS_ALIGNED:
 	case MS_PROVING:
-		/*
-		   just remember for later 
-		 */
+		/* 
+		   just remember for later */
 		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
 		return (0);
@@ -3303,11 +3264,10 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->flags & MF_RPO) {
 			if (sl->i_version >= M2PA_VERSION_DRAFT10) {
-				/*
+				/* 
 				   In the final, when we receive PROCESSOR_RECOVERED, we need to
 				   send READY, and also use the BSN from the received message to
-				   synchronize FSN. 
-				 */
+				   synchronize FSN. */
 				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
 				if ((err = sl_send_status(q, sl, M2PA_STATUS_IN_SERVICE)))
 					return (err);
@@ -3325,16 +3285,14 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 		default:
 		case SS7_PVAR_ITUT_93:
 		case SS7_PVAR_ITUT_96:
-			/*
-			   auto recover 
-			 */
+			/* 
+			   auto recover */
 			if (!(sl->flags & MF_LPO))
 				sl_lsc_no_processor_outage(q, sl);
 			break;
 		case SS7_PVAR_ANSI_92:
-			/*
-			   leave state latched 
-			 */
+			/* 
+			   leave state latched */
 			break;
 		}
 		return (QR_DONE);
@@ -3353,9 +3311,8 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 	case MS_NOT_ALIGNED:
 	case MS_ALIGNED:
 	case MS_PROVING:
-		/*
-		   remember for later 
-		 */
+		/* 
+		   remember for later */
 		sl->flags &= ~MF_LPO;
 		return (0);
 	case MS_ALIGNED_READY:
@@ -3382,9 +3339,8 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 		sl_set_state(sl, MS_ALIGNED_READY);
 		return (0);
 	case MS_PROCESSOR_OUTAGE:
-		/*
-		   This is where the really wierd behavior begins... 
-		 */
+		/* 
+		   This is where the really wierd behavior begins... */
 		switch (sl->option.pvar) {
 		default:
 		case SS7_PVAR_ITUT_93:
@@ -3411,9 +3367,8 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 			sl->flags &= ~MF_SEND_MSU;
 			return (0);
 		case SS7_PVAR_ANSI_92:
-			/*
-			   XXX do we do this now??? 
-			 */
+			/* 
+			   XXX do we do this now??? */
 			if (sl->flags & MF_LPO) {
 				if ((err =
 				     sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
@@ -3511,7 +3466,7 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
 	switch (sl_get_state(sl)) {
 	case MS_OUT_OF_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
-		/*
+		/* 
 		 *  FIXME: Q.704/5.7.2 states:
 		 *
 		 *  5.7.2   If a changeover order or acknowledgement
@@ -3525,9 +3480,8 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
 		 *  indication with a return code of "unreasonable FSNC".
 		 */
 		fixme(("%s: %p: FIXME: Fix this check...\n", M2PA_SL_MOD_NAME, sl));
-		/*
-		   this will pretty much clear the rtb if there is a problem with the FSNC 
-		 */
+		/* 
+		   this will pretty much clear the rtb if there is a problem with the FSNC */
 		while (sl->rtb.q_msgs && sl->fsnt != fsnc) {
 			freemsg(bufq_dequeue(&sl->rtb));
 			sl->fsnt--;
@@ -3848,9 +3802,8 @@ sl_recv_proving(queue_t *q, struct sl *sl, mblk_t *mp)
 	switch (sl->i_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
-		/*
-		   just ignore proving packets 
-		 */
+		/* 
+		   just ignore proving packets */
 		return (QR_DONE);
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
@@ -3893,9 +3846,8 @@ sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/*
-		   In the final analysis, sequence numbers are included in status messages. 
-		 */
+		/* 
+		   In the final analysis, sequence numbers are included in status messages. */
 		hlen = 2 * sizeof(uint32_t);
 		break;
 	}
@@ -3957,9 +3909,8 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/*
-		   In the final, sequence numbers are 24 bit values in a 32 bit field. 
-		 */
+		/* 
+		   In the final, sequence numbers are 24 bit values in a 32 bit field. */
 		hlen = 2 * sizeof(uint32_t);
 		break;
 	}
@@ -3995,17 +3946,15 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 		break;
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
-		/*
+		/* 
 		   draft6 and anticipated draft7 permit acknowledgement using zero payload data
-		   messages. 
-		 */
+		   messages. */
 	case M2PA_VERSION_DRAFT6_9:
 	default:
 	case M2PA_VERSION_DRAFT10:
 	case M2PA_VERSION_DRAFT11:
-		/*
-		   In the final, zero-length data messages are used as spearate acknowledgements. 
-		 */
+		/* 
+		   In the final, zero-length data messages are used as spearate acknowledgements. */
 		if (mlen > hlen + rlen || mlen == hlen || mlen == 0)
 			return sl_rc_signal_unit(q, sl, mp);
 		break;
@@ -4554,25 +4503,21 @@ sl_power_on_req(queue_t *q, struct sl *sl, mblk_t *mp)
 STATIC int
 n_data_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp, ulong more)
 {
-	/*
+	/* 
 	   Normally we receive data unfragmented and in a singled M_DATA block.  This slower
 	   routine handles the circumstance where we receive fragmented data or data that is
-	   chained together in multiple M_DATA blocks. 
-	 */
+	   chained together in multiple M_DATA blocks. */
 	mblk_t *newp = NULL;
 	seldom();
 	if (dp->b_cont) {
-		/*
-		   We have chained M_DATA blocks: pull them up. 
-		 */
+		/* 
+		   We have chained M_DATA blocks: pull them up. */
 		if (!pullupmsg(dp, -1)) {
-			/*
-			   normall only fail because of dup'ed blocks 
-			 */
+			/* 
+			   normall only fail because of dup'ed blocks */
 			if (!(newp = msgpullup(dp, -1))) {
-				/*
-				   normaly only fail because of no buffer 
-				 */
+				/* 
+				   normaly only fail because of no buffer */
 				ss7_bufcall(q, xmsgsize(dp), BPRI_MED);
 				return (-ENOBUFS);
 			}
@@ -4580,11 +4525,10 @@ n_data_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp, ulong more)
 		}
 	}
 	if (more) {
-		/*
+		/* 
 		   We have a partial delivery.  Chain normal message together.  We might have a
 		   problem with messages split over multiple streams? Treat normal and expedited
-		   separately. 
-		 */
+		   separately. */
 		if (sl->rbuf)
 			linkb(sl->rbuf, dp);
 		else
@@ -4641,26 +4585,22 @@ n_data_ind(queue_t *q, struct sl *sl, mblk_t *mp)
 STATIC int
 n_exdata_ind_slow(queue_t *q, struct sl *sl, mblk_t *dp)
 {
-	/*
+	/* 
 	   Normally we receive data unfragmented and in a singled M_DATA block.  This slower
 	   routine handles the circumstance where we receive fragmented data or data that is
-	   chained together in multiple M_DATA blocks. 
-	 */
+	   chained together in multiple M_DATA blocks. */
 	int err;
 	mblk_t *newp = NULL;
 	seldom();
 	if (dp->b_cont) {
-		/*
-		   We have chained M_DATA blocks: pull them up. 
-		 */
+		/* 
+		   We have chained M_DATA blocks: pull them up. */
 		if (!pullupmsg(dp, -1)) {
-			/*
-			   normall only fail because of dup'ed blocks 
-			 */
+			/* 
+			   normall only fail because of dup'ed blocks */
 			if (!(newp = msgpullup(dp, -1))) {
-				/*
-				   normaly only fail because of no buffer 
-				 */
+				/* 
+				   normaly only fail because of no buffer */
 				ss7_bufcall(q, xmsgsize(dp), BPRI_MED);
 				return (-ENOBUFS);
 			}
@@ -4788,11 +4728,11 @@ sl_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4805,11 +4745,11 @@ sl_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4822,11 +4762,11 @@ sl_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4839,11 +4779,11 @@ sl_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.config = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4856,12 +4796,12 @@ sl_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4874,12 +4814,12 @@ sl_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4892,11 +4832,11 @@ sl_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statem;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4909,11 +4849,11 @@ sl_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->sl.statem, sizeof(sl->sl.statem));
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4926,11 +4866,11 @@ sl_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statsp;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4943,11 +4883,11 @@ sl_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4960,11 +4900,11 @@ sl_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.stats;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4977,11 +4917,11 @@ sl_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->sl.stats, sizeof(sl->sl.stats));
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -4994,11 +4934,11 @@ sl_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.notify;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5011,11 +4951,11 @@ sl_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events |= arg->events;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5028,11 +4968,11 @@ sl_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events &= ~(arg->events);
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5051,7 +4991,7 @@ sdt_test_config(struct sl *sl, sdt_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	do {
 		if (!arg->t8)
 			arg->t8 = sl->sdt.config.t8;
@@ -5078,19 +5018,19 @@ sdt_test_config(struct sl *sl, sdt_config_t * arg)
 		if (!arg->f)
 			arg->f = sl->sdt.config.f;
 	} while (0);
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 STATIC int
 sdt_commit_config(struct sl *sl, sdt_config_t * arg)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sdt_test_config(sl, arg);
 		sl->sdt.config = *arg;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 STATIC int
@@ -5100,11 +5040,11 @@ sdt_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5117,11 +5057,11 @@ sdt_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5134,11 +5074,11 @@ sdt_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5151,11 +5091,11 @@ sdt_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.config = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5188,12 +5128,12 @@ sdt_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5206,12 +5146,12 @@ sdt_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5224,12 +5164,12 @@ sdt_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5242,12 +5182,12 @@ sdt_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5260,12 +5200,12 @@ sdt_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5278,12 +5218,12 @@ sdt_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5296,12 +5236,12 @@ sdt_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5314,12 +5254,12 @@ sdt_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5332,12 +5272,12 @@ sdt_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5350,12 +5290,12 @@ sdt_ioccabort(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		void *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5376,11 +5316,11 @@ sdl_iocgoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5393,11 +5333,11 @@ sdl_iocsoptions(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5410,11 +5350,11 @@ sdl_iocgconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5427,11 +5367,11 @@ sdl_iocsconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.config = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5444,12 +5384,12 @@ sdl_ioctconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5462,12 +5402,12 @@ sdl_ioccconfig(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5480,12 +5420,12 @@ sdl_iocgstatem(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5498,12 +5438,12 @@ sdl_ioccmreset(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5516,12 +5456,12 @@ sdl_iocgstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5534,12 +5474,12 @@ sdl_iocsstatsp(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5552,12 +5492,12 @@ sdl_iocgstats(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5570,12 +5510,12 @@ sdl_ioccstats(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5588,12 +5528,12 @@ sdl_iocgnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5606,12 +5546,12 @@ sdl_iocsnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5624,12 +5564,12 @@ sdl_ioccnotify(queue_t *q, struct sl *sl, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5640,11 +5580,11 @@ sdl_ioccdisctx(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	int ret = 0;
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ret = -EOPNOTSUPP;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 STATIC int
@@ -5652,11 +5592,11 @@ sdl_ioccconntx(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	int ret = 0;
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ret = -EOPNOTSUPP;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 
@@ -5923,9 +5863,8 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct sl *sl = SL_PRIV(q);
 	ulong oldstate = sl->i_state;
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_REQ) {
 		printd(("%s: %p: -> SL_PDU_REQ\n", M2PA_SL_MOD_NAME, sl));
 		if ((rtn = sl_pdu_req(q, sl, mp)) < 0)
@@ -6130,9 +6069,8 @@ sl_r_data(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6149,9 +6087,8 @@ sl_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sl_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6183,7 +6120,7 @@ sl_init_caches(void)
 	    && !(sl_priv_cachep =
 		 kmem_cache_create("sl_priv_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: Cannot allocat sl_priv_cachep", __FUNCTION__);
+		cmn_err(CE_PANIC, "%s: Cannot allocate sl_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
 		printd(("%s: initialized module private structure cache\n", M2PA_SL_MOD_NAME));
@@ -6215,28 +6152,26 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->i_prim = &sl_w_prim;
 		sl->o_wakeup = &sl_rx_wakeup;
 		sl->i_wakeup = &sl_tx_wakeup;
-		sl->put = &sl_put;
-		sl->get = &sl_get;
+		sl->priv_put = &sl_put;
+		sl->priv_get = &sl_get;
 		(sl->oq = RD(q))->q_ptr = sl_get(sl);
 		(sl->iq = WR(q))->q_ptr = sl_get(sl);
-		lis_spin_lock_init(&sl->qlock, "m2pa-queue-lock");
+		spin_lock_init(&sl->qlock);	/* m2pa-queue-lock */
 		sl->i_version = M2PA_VERSION_DEFAULT;
 		sl->i_state = LMI_DISABLED;
 		sl->i_style = 0;
-		lis_spin_lock_init(&sl->lock, "m2pa-priv-lock");
+		spin_lock_init(&sl->lock);	/* m2pa-priv-lock */
 		if ((sl->next = *slp))
 			sl->next->prev = &sl->next;
 		sl->prev = slp;
 		*slp = sl_get(sl);
 		printd(("%s: %p: linked module private structure\n", M2PA_SL_MOD_NAME, sl));
-		/*
-		   LMI configuraiton defaults 
-		 */
+		/* 
+		   LMI configuraiton defaults */
 		sl->option.pvar = SS7_PVAR_ITUT_88;
 		sl->option.popt = 0;
-		/*
-		   SDL configuration defaults 
-		 */
+		/* 
+		   SDL configuration defaults */
 		sl->sdl.config.ifflags = 0;
 		sl->sdl.config.iftype = SDL_TYPE_PACKET;
 		sl->sdl.config.ifrate = 10000000;
@@ -6248,12 +6183,10 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sdl.config.ifclock = SDL_CLOCK_NONE;
 		sl->sdl.config.ifcoding = SDL_CODING_NONE;
 		sl->sdl.config.ifframing = SDL_FRAMING_NONE;
-		/*
-		   rest zero 
-		 */
-		/*
-		   SDT configuration defaults 
-		 */
+		/* 
+		   rest zero */
+		/* 
+		   SDT configuration defaults */
 		sl->sdt.config.Tin = 4;
 		sl->sdt.config.Tie = 1;
 		sl->sdt.config.T = 64;
@@ -6266,9 +6199,8 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sdt.config.m = 272;
 		sl->sdt.config.b = 8;
 		sl->sdt.config.f = SDT_FLAGS_ONE;
-		/*
-		   SL configuration defaults 
-		 */
+		/* 
+		   SL configuration defaults */
 		bufq_init(&sl->rb);
 		bufq_init(&sl->tb);
 		bufq_init(&sl->rtb);
@@ -6310,7 +6242,7 @@ sl_free_priv(queue_t *q)
 	struct sl *sl = SL_PRIV(q);
 	psw_t flags;
 	ensure(sl, return);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ss7_unbufcall((str_t *) sl);
 		sl_timer_stop(sl, tall);
@@ -6335,16 +6267,15 @@ sl_free_priv(queue_t *q)
 		sl->iq = NULL;
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
 		sl_put(sl);
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sl->refcnt) != 1) {
 			printd(("%s: %s: %p: ERROR: sl lingering refereice count = %d\n",
 				M2PA_SL_MOD_NAME, __FUNCTION__, sl, atomic_read(&sl->refcnt)));
 			atomic_set(&sl->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	sl_put(sl);		/* final put */
 	return;
 }
@@ -6406,35 +6337,89 @@ sl_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  Lis Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int sl_initialized = 0;
-STATIC void
-sl_init(void)
+#if defined LFS
+
+STATIC struct fmodsw sl_fmod = {
+	.f_name = M2PA_SL_MOD_NAME,
+	.f_str = &m2pa_sl_info,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sl_register_module(void)
 {
+	int err;
+	if ((err = register_strmod(&sl_fmod)) < 0)
+		return (err);
+	if (modid == 0 && err > 0)
+		modid = err;
+	return (0);
+}
+
+STATIC void
+sl_unregister_module(void)
+{
+	return (void) unregister_strmod(&sl_fmod);
+}
+
+#elif defined LIS
+
+STATIC int sl_register_module(void)
+{
+	int ret;
+	if ((ret = lis_register_strmod(&m2pa_sl_info, M2PA_SL_MOD_NAME)) != LIS_NULL_MID) {
+		if (modid == 0)
+			modid = ret;
+		return (0);
+	}
+	/* LiS is not too good on giving informative errors here. */
+	return (EIO);
+}
+
+STATIC void sl_unregister_module(void)
+{
+	/* LiS provides detailed errors here when they are discarded. */
+	return (void) lis_unregister_strmod(&m2pa_sl_info);
+}
+
+#endif
+
+STATIC int sl_initialized = 0;
+void m2pa_sl_init(void)
+{
+	int err;
 	unless(sl_initialized, return);
-	cmn_err(CE_NOTE, M2PA_BANNER);	/* console splash */
-	if ((sl_initialized = sl_init_caches()))
+#ifdef MODULE
+	cmn_err(CE_NOTE, M2PA_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, M2PA_SPLASH);	/* console splash */
+#endif
+	if ((err = sl_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", M2PA_SL_MOD_NAME, err);
+		sl_initialized = err > 0 ? -err : err;
 		return;
-	if (!(sl_initialized = lis_register_strmod(&sl_info, M2PA_SL_MOD_NAME))) {
+	}
+	if ((err = sl_register_module())) {
 		sl_term_caches();
-		cmn_err(CE_NOTE, "%s: couldn't register module", M2PA_SL_MOD_NAME);
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", M2PA_SL_MOD_NAME, err);
+		sl_initialized = err > 0 ? -err : err;
 		return;
 	}
 	sl_initialized = 1;
 	return;
 }
-STATIC void
-sl_terminate(void)
+
+void m2pa_sl_terminate(void)
 {
-	int err;
 	ensure(sl_initialized, return);
-	if ((err = lis_unregister_strmod(&sl_info)))
-		cmn_err(CE_WARN, "%s: couldn't unregister module", M2PA_SL_MOD_NAME);
-	sl_initialized = 0;
+	sl_unregister_module();
 	sl_term_caches();
+	sl_initialized = 0;
 	return;
 }
 
@@ -6445,18 +6430,19 @@ sl_terminate(void)
  *
  *  =========================================================================
  */
-int
-init_module(void)
+
+int __init sl_init(void)
 {
-	sl_init();
+	m2pa_sl_init();
 	if (sl_initialized < 0)
 		return sl_initialized;
 	return (0);
 }
 
-void
-cleanup_module(void)
+void __exit sl_exit(void)
 {
-	sl_terminate();
-	return;
+	return m2pa_sl_terminate();
 }
+
+module_init(sl_init);
+module_exit(sl_exit);

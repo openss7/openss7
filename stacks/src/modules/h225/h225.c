@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:45 $"
 
-static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $";
+static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:45 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -62,17 +62,7 @@ static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $
  *  D-channel drivers.
  */
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/ddi.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -82,15 +72,8 @@ static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <ss7/isdni.h>
 #include <ss7/isdni_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:45 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -101,11 +84,20 @@ static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $
 			ISDN_DEVICE	"\n" \
 			ISDN_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(ISDN_CONTACT);
 MODULE_DESCRIPTION(ISDN_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ISDN_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ISDN_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define H225_DRV_ID		CONFIG_STREAMS_H225_MODID
+#define H225_DRV_NAME		CONFIG_STREAMS_H225_NAME
+#define H225_CMAJORS		CONFIG_STREAMS_H225_NMAJORS
+#define H225_CMAJOR_0		CONFIG_STREAMS_H225_MAJOR
 #endif
 
 #define H225_CMINORS 255

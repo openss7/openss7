@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/24 18:29:44 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/24 18:29:44 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $"
 
-static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/24 18:29:44 $";
+static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
@@ -77,16 +68,8 @@ static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2
 #include <ss7/sdti.h>
 #include <ss7/sdti_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define SDT_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/24 18:29:44 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -96,12 +79,21 @@ static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2
 			SDT_COPYRIGHT	"\n" \
 			SDT_DEVICE	"\n" \
 			SDT_CONTACT	"\n"
+#define SDT_SPLASH	SDT_DEVICE	" - " \
+			SDT_REVISION	"\n" \
 
+#ifdef LINUX
 MODULE_AUTHOR(SDT_CONTACT);
 MODULE_DESCRIPTION(SDT_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SDT_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDT_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SDT_SCTP_MOD_ID		CONFIG_STREAMS_SDT_SCTP_MODID
+#define SDT_SCTP_MOD_NAME	CONFIG_STREAMS_SDT_SCTP_NAME
 #endif
 
 // #define SDT_RX_COMPRESSION
@@ -2126,7 +2118,7 @@ sdt_alloc_priv(queue_t *q)
 		sp->iq = RD(q);
 		sp->oq = WR(q);
 		sp->state = LMI_DISABLED;
-		lis_spin_lock_init(&sp->lock, "ss7sctp-private");
+		spin_lock_init(&sp->lock); /* "ss7sctp-private" */
 	}
 	return (sp);
 }

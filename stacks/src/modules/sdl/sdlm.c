@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -63,16 +63,7 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $
  *  bottom side of the multiplexor.  A binding operation is performed to bind
  *  an upper stream to a lower stream.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -81,16 +72,8 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
 #define DL_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define DL_DEVICE	"Supportes OpenSS7 SDL Drivers."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -100,13 +83,61 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $
 			DL_COPYRIGHT	"\n" \
 			DL_DEVICE	"\n" \
 			DL_CONTACT	"\n"
+#define DL_SPLASH	DL_DEVICE	" - " \
+			DL_REVISION	"\n"
 
 MODULE_AUTHOR(DL_CONTACT);
 MODULE_DESCRIPTION(DL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(DL_DEVICE);
-#ifdef MODULE_LICENSE
 MODULE_LICENSE(DL_LICENSE);
+
+#ifndef SDLM_DRV_NAME
+#   ifdef CONFIG_STREAMS_SDLM_NAME
+#	define SDLM_DRV_NAME CONFIG_STREAMS_SDLM_NAME
+#   else
+#	define SDLM_DRV_NAME "sdl-mux"
+#   endif
 #endif
+
+#ifndef SDLM_DRV_ID
+#   ifdef CONFIG_STREAMS_SDLM_MODID
+#	define SDLM_DRV_ID CONFIG_STREAMS_SDLM_MODID
+#   else
+#	define SDLM_DRV_ID 0
+#   endif
+#endif
+
+#ifndef SDLM_CMAJORS
+#   ifdef CONFIG_STREAMS_SDLM_NMAJORS
+#	define SDLM_CMAJORS CONFIG_STREAMS_SDLM_NMAJORS
+#   else
+#	define SDLM_CMAJORS 2
+#   endif
+#endif
+
+#ifndef SDLM_CMAJOR_0
+#   ifdef CONFIG_STREAMS_SDLM_MAJOR
+#	define SDLM_CMAJOR_0 CONFIG_STREAMS_SDLM_MAJOR
+#   else
+#	define SDLM_CMAJOR_0 0
+#   endif
+#endif
+
+#ifndef SDLM_CMAJOR_1
+#   ifdef CONFIG_STREAMS_SDLM_MAJOR_1
+#	define SDLM_CMAJOR_1 CONFIG_STREAMS_SDLM_MAJOR_1
+#   else
+#	define SDLM_CMAJOR_1 0
+#   endif
+#endif
+
+unsigned short modid = SDLM_DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for SDL Multiplexer. (0 for allocation)");
+
+unsigned short major = SDLM_CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Major device number for SDL Multiplexer. (0 for allocation)");
 
 #define DL_NMAJOR (SDLM_CMAJORS - 1)
 #define LM_NMAJOR 1
@@ -807,6 +838,78 @@ dl_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
+STATIC int dl_initialized = 0;
+
+#ifdef LFS
+/*
+ *  =========================================================================
+ *
+ *  Linux Fast-STREAMS Module Initialization
+ *
+ *  =========================================================================
+ */
+STATIC struct cdevsw dl_u_cdev = {
+	.d_name = SDLM_DRV_NAME,
+	.d_str = &dl_u_info,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC struct cdevsw dl_m_cdev = {
+	.d_name = SDLM_DRV_NAME,
+	.d_str = &dl_m_info,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC void
+dl_init(void)
+{
+	int i, err;
+	ensure(dl_initialized == 0, return);
+	for (i = 0; i < DL_NMAJOR; i++) {
+		if ((err = register_strdev(&dl_u_cdev, SDLM_CMAJOR_0 + i)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
+				SDLM_CMAJOR_0 + i);
+		}
+	}
+	for (i = 0; i < LM_NMAJOR; i++) {
+		if ((err = register_strdev(&dl_m_cdev, SDLM_CMAJOR_1 + i)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
+				SDLM_CMAJOR_1 + i);
+		}
+	}
+	dl_init_caches();
+	dl_initialized = 1;
+	return;
+}
+STATIC void
+dl_terminate(void)
+{
+	int i, err;
+	unless(dl_initialized == 0, return);
+	for (i = 0; i < DL_NMAJOR; i++) {
+		if ((err = unregister_strdev(&dl_u_cdev, SDLM_CMAJOR_0 + i)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
+				SDLM_DRV_NAME, SDLM_CMAJOR_0 + i);
+		}
+	}
+	for (i = 0; i < LM_NMAJOR; i++) {
+		if ((err = unregister_strdev(&dl_m_cdev, SDLM_CMAJOR_1 + i)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
+				SDLM_DRV_NAME, SDLM_CMAJOR_0 + i);
+		}
+	}
+	dl_term_caches();
+	dl_initialized = 0;
+	return;
+}
+
+#elif defined LIS
 /*
  *  =========================================================================
  *
@@ -814,56 +917,52 @@ dl_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC int dl_initialized = 0;
-STATIC int
+void
 dl_init(void)
 {
-	if (!dl_initialized) {
-		int i;
-		int err;
-		for (i = 0; i < DL_NMAJOR; i++) {
-			if ((err =
-			     lis_register_strdev(SDLM_CMAJOR_0 + i, &dl_u_info, SDLM_CMINORS,
-						 dl_minfo.mi_idname)) < 0) {
-				cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n",
-					SDLM_DRV_NAME, SDLM_CMAJOR_0);
-			}
+	int i, err;
+	unless(dl_initialized > 0, return);
+	for (i = 0; i < DL_NMAJOR; i++) {
+		if ((err = lis_register_strdev(SDLM_CMAJOR_0 + i, &dl_u_info, SDLM_CMINORS,
+					       dl_minfo.mi_idname)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
+				SDLM_CMAJOR_0);
 		}
-		for (i = 0; i < LM_NMAJOR; i++) {
-			if ((err =
-			     lis_register_strdev(SDLM_CMAJOR_1 + i, &dl_m_info, SDLM_CMINORS,
-						 dl_minfo.mi_idname)) < 0) {
-				cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n",
-					SDLM_DRV_NAME, SDLM_CMAJOR_1);
-			}
-		}
-		dl_init_caches();
-		dl_initialized = 1;
 	}
-	return (0);
-}
-STATIC void
-dl_terminate(void)
-{
-	if (dl_initialized) {
-		int i, err;
-		for (i = 0; i < DL_NMAJOR; i++) {
-			if ((err = lis_unregister_strdev(SDLM_CMAJOR_0 + i)) < 0) {
-				cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
-					SDLM_DRV_NAME, SDLM_CMAJOR_0);
-			}
+	for (i = 0; i < LM_NMAJOR; i++) {
+		if ((err = lis_register_strdev(SDLM_CMAJOR_1 + i, &dl_m_info, SDLM_CMINORS,
+					       dl_minfo.mi_idname)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
+				SDLM_CMAJOR_1);
 		}
-		for (i = 0; i < LM_NMAJOR; i++) {
-			if ((err = lis_unregister_strdev(SDLM_CMAJOR_1 + i)) < 0) {
-				cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
-					SDLM_DRV_NAME, SDLM_CMAJOR_1);
-			}
-		}
-		dl_term_caches();
-		dl_initialized = 0;
 	}
+	dl_init_caches();
+	dl_initialized = 1;
 	return;
 }
+
+void
+dl_terminate(void)
+{
+	int i, err;
+	ensure(dl_initialized > 0, return);
+	for (i = 0; i < DL_NMAJOR; i++) {
+		if ((err = lis_unregister_strdev(SDLM_CMAJOR_0 + i)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
+				SDLM_DRV_NAME, SDLM_CMAJOR_0);
+		}
+	}
+	for (i = 0; i < LM_NMAJOR; i++) {
+		if ((err = lis_unregister_strdev(SDLM_CMAJOR_1 + i)) < 0) {
+			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
+				SDLM_DRV_NAME, SDLM_CMAJOR_1);
+		}
+	}
+	dl_term_caches();
+	dl_initialized = 0;
+	return;
+}
+#endif
 
 /*
  *  =======================================================================
@@ -873,18 +972,28 @@ dl_terminate(void)
  *  =======================================================================
  */
 
-int
-init_module(void)
+int __init
+_dl_init(void)
 {
+#ifdef MODULE
 	cmn_err(CE_NOTE, DL_BANNER);
-	return dl_init();
+#else
+	cmn_err(CE_NOTE, DL_SPLASH);
+#endif
+	dl_init();
+	if (dl_initialized < 0)
+		return (dl_initialized);
+	return (0);
 }
 
-void
-cleanup_module(void)
+void __exit
+_dl_exit(void)
 {
 	(void) ss7_oput;
 	(void) ss7_iput;
 	(void) ss7_unbufcall;
 	return dl_terminate();
 }
+
+module_init(_dl_init);
+module_exit(_dl_exit);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:05 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
 
-static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $";
+static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-#include <sys/ddi.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -75,16 +65,8 @@ static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/lapd_ioctl.h>
 #include <ss7/hdlc_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-#include "timer.h"
-
-#define LAPD_DESCRIP	"LAPD Data Link (DL-LAPD) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.1 $)"
-#define LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $"
+#define LAPD_DESCRIP	"LAPD Data Link (DL-LAPD) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.2 $)"
+#define LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
 #define LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
 #define LAPD_DEVICE	"OpenSS7 CDI Devices."
 #define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -95,16 +77,21 @@ static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.
 			LAPD_DEVICE	"\n" \
 			LAPD_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(LAPD_CONTACT);
 MODULE_DESCRIPTION(LAPD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LAPD_DEVICE);
-#ifdef MODULE_LICENSE
 MODULE_LICENSE(LAPD_LICENSE);
+#endif				/* LINUX */
+
+#ifdef LFS
+#define DL_LAPD_DRV_ID		CONFIG_STREAMS_DL_LAPD_MODID
+#define DL_LAPD_DRV_NAME	CONFIG_STREAMS_DL_LAPD_NAME
+#define DL_LAPD_CMAJORS		CONFIG_STREAMS_DL_LAPD_NMAJORS
+#define DL_LAPD_CMAJOR_0	CONFIG_STREAMS_DL_LAPD_MAJOR
 #endif
 
 #define DL_LAPD_CMINORS 255
-
-#define MODULE_STATIC STATIC
 
 /*
  *  =========================================================================
@@ -211,7 +198,7 @@ struct cd;				/* CD provider */
    default 
  */
 struct df {
-	lis_spin_lock_t lock;		/* master list lock */
+	spinlock_t lock;		/* master list lock */
 	SLIST_HEAD (dl, dl);		/* list of DL structures */
 	SLIST_HEAD (cd, cd);		/* list of CD structures */
 	struct lapd_proto proto;	/* default protocol variant and options */
@@ -790,17 +777,17 @@ STATIC INLINE void
 dl_timer_stop(struct dl *dl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&dl->lock, &flags);
+	spin_lock_irqsave(&dl->lock, flags);
 	{
 		__dl_timer_stop(dl, t);
 	}
-	lis_spin_unlock_irqrestore(&dl->lock, &flags);
+	spin_unlock_irqrestore(&dl->lock, flags);
 }
 STATIC INLINE void
 dl_timer_start(struct dl *dl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&dl->lock, &flags);
+	spin_lock_irqsave(&dl->lock, flags);
 	{
 		__dl_timer_stop(dl, t);
 		switch (t) {
@@ -821,7 +808,7 @@ dl_timer_start(struct dl *dl, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&dl->lock, &flags);
+	spin_unlock_irqrestore(&dl->lock, flags);
 }
 
 /*
@@ -864,17 +851,17 @@ STATIC INLINE void
 cd_timer_stop(struct cd *cd, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&cd->lock, &flags);
+	spin_lock_irqsave(&cd->lock, flags);
 	{
 		__cd_timer_stop(cd, t);
 	}
-	lis_spin_unlock_irqrestore(&cd->lock, &flags);
+	spin_unlock_irqrestore(&cd->lock, flags);
 }
 STATIC INLINE void
 cd_timer_start(struct cd *cd, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&cd->lock, &flags);
+	spin_lock_irqsave(&cd->lock, flags);
 	{
 		__cd_timer_stop(cd, t);
 		switch (t) {
@@ -889,7 +876,7 @@ cd_timer_start(struct cd *cd, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&cd->lock, &flags);
+	spin_unlock_irqrestore(&cd->lock, flags);
 }
 
 /*
@@ -3488,9 +3475,9 @@ dl_lookup(ulong id)
 {
 	struct dl *dl;
 	psw_t flags;
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	dl = __dl_lookup(id);
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (dl);
 }
 STATIC INLINE struct dl *
@@ -3516,10 +3503,10 @@ dl_get_id(ulong id)
 	if (!id) {
 		static ulong sequence = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		while (__dl_lookup(++sequence)) ;
 		id = sequence;
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 	}
 	return (id);
 }
@@ -3536,7 +3523,7 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 		dl->u.dev.cmajor = cmajor;
 		dl->u.dev.cminor = cminor;
 		dl->cred = *crp;
-		lis_spin_lock_init(&dl->qlock, "dl-queue-lock");
+		spin_lock_init(&dl->qlock); /* "dl-queue-lock" */
 		(dl->oq = RD(q))->q_ptr = dl_get(dl);
 		(dl->iq = WR(q))->q_ptr = dl_get(dl);
 		dl->o_prim = &dl_r_prim;
@@ -3546,7 +3533,7 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 		dl->i_state = DL_UNATTACHED;
 		dl->i_style = DL_STYLE2;
 		dl->i_version = DL_CURRENT_VERSION;
-		lis_spin_lock_init(&dl->lock, "dl-lock");
+		spin_lock_init(&dl->lock); /* "dl-lock" */
 		/*
 		   place in master list - open holds the master list lock 
 		 */
@@ -3587,7 +3574,7 @@ dl_free_priv(struct dl *dl)
 	ensure(dl, return);
 	printd(("%s: %p: free dl dev = %d:%d\n", DL_LAPD_DRV_NAME, dl, dl->u.dev.cmajor,
 		dl->u.dev.cminor));
-	lis_spin_lock_irqsave(&dl->lock, &flags);
+	spin_lock_irqsave(&dl->lock, flags);
 	{
 		ss7_unbufcall((struct str *) dl);
 		flushq(dl->oq, FLUSHALL);
@@ -3640,7 +3627,7 @@ dl_free_priv(struct dl *dl)
 		dl->oq = NULL;
 		dl->iq = NULL;
 	}
-	lis_spin_unlock_irqrestore(&dl->lock, &flags);
+	spin_unlock_irqrestore(&dl->lock, flags);
 	dl_put(dl);		/* final put */
 	return;
 }
@@ -3662,9 +3649,9 @@ cd_lookup(ulong id)
 	struct cd *cd = NULL;
 	if (id) {
 		psw_t flags;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		cd = __cd_lookup(id);
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 	}
 	return (cd);
 }
@@ -3691,10 +3678,10 @@ cd_get_id(ulong id)
 	if (!id) {
 		static ulong sequence = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		while (__cd_lookup(++sequence)) ;
 		id = sequence;
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 	}
 	return (id);
 }
@@ -3708,7 +3695,7 @@ dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 		cd_get(cd);	/* first get */
 		cd->u.mux.index = index;
 		cd->cred = *crp;
-		lis_spin_lock_init(&cd->qlock, "cd-queue-lock");
+		spin_lock_init(&cd->qlock); /* "cd-queue-lock" */
 		(cd->iq = RD(q))->q_ptr = cd_get(cd);
 		(cd->oq = WR(q))->q_ptr = cd_get(cd);
 		cd->o_prim = cd_w_prim;
@@ -3718,7 +3705,7 @@ dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 		cd->i_state = CD_UNATTACHED;
 		cd->i_style = CD_STYLE2;
 		cd->i_version = 1;
-		lis_spin_lock_init(&cd->lock, "cd-lock");
+		spin_lock_init(&cd->lock); /* "cd-lock" */
 		/*
 		   place in master list - link holds the master list lock 
 		 */
@@ -3747,7 +3734,7 @@ dl_free_link(struct cd *cd)
 	psw_t flags;
 	ensure(cd, return);
 	printd(("%s: %p: free cd mux = %lu\n", DL_LAPD_DRV_NAME, cd, cd->u.mux.index));
-	lis_spin_lock_irqsave(&cd->lock, &flags);
+	spin_lock_irqsave(&cd->lock, flags);
 	{
 		int i;
 		struct dl *dl;
@@ -3807,7 +3794,7 @@ dl_free_link(struct cd *cd)
 		cd->oq = NULL;
 		cd->iq = NULL;
 	}
-	lis_spin_unlock_irqrestore(&cd->lock, &flags);
+	spin_unlock_irqrestore(&cd->lock, flags);
 	cd_put(cd);		/* final put */
 	return;
 }
@@ -5987,7 +5974,7 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_LINK):
 			ptrace(("%s: %p: -> I_LINK\n", DL_LAPD_DRV_NAME, dl));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			{
 				/*
 				   place in list in ascending index order 
@@ -5997,13 +5984,13 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 				     cdp = &(*cdp)->next) ;
 				if ((cd =
 				     dl_alloc_link(lb->l_qbot, cdp, lb->l_index, iocp->ioc_cr))) {
-					lis_spin_unlock_irqrestore(&master.lock, &flags);
+					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
 				MOD_DEC_USE_COUNT;
 				ret = (-ENOMEM);
 			}
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
 			ptrace(("%s: %p: -> I_PUNLINK\n", DL_LAPD_DRV_NAME, dl));
@@ -6015,20 +6002,20 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 			}
 		case _IOC_NR(I_UNLINK):
 			ptrace(("%s: %p: -> I_UNLINK\n", DL_LAPD_DRV_NAME, dl));
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			{
 				for (cd = master.cd.list; cd; cd = cd->next)
 					if (cd->u.mux.index == lb->l_index)
 						break;
 				if (!cd) {
 					ret = (-EINVAL);
-					lis_spin_unlock_irqrestore(&master.lock, &flags);
+					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
 				dl_free_link(cd);
 				MOD_DEC_USE_COUNT;
 			}
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		default:
 			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n",
@@ -6565,7 +6552,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	   allocate a new device 
 	 */
 	cminor = 1;
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	for (dlp = &master.dl.list; *dlp; dlp = &(*dlp)->next) {
 		ushort dmajor = (*dlp)->u.dev.cmajor;
 		ushort dminor = (*dlp)->u.dev.cminor;
@@ -6583,13 +6570,15 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 						 DL_LAPD_DRV_NAME)) <= 0)
 				break;
 			lapd_majors[mindex] = cmajor;
+#ifdef LIS
 			LIS_DEVFLAGS(cmajor) |= LIS_MODFLG_CLONE;
+#endif
 		}
 		cminor = 0;
 	}
 	if (mindex >= DL_LAPD_CMAJORS || !lapd_majors[mindex]) {
 		ptrace(("%s: ERROR: no device numbers available\n", DL_LAPD_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -6597,11 +6586,11 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(dl = dl_alloc_priv(q, dlp, devp, crp, bminor))) {
 		ptrace(("%s: ERROR: no memory\n", DL_LAPD_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (0);
 }
 
@@ -6618,9 +6607,9 @@ dl_close(queue_t *q, int flag, cred_t *crp)
 	(void) crp;
 	printd(("%s: closing character device %d:%d\n", DL_LAPD_DRV_NAME, dl->u.dev.cmajor,
 		dl->u.dev.cminor));
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	dl_free_priv(dl);
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -6687,8 +6676,10 @@ lapd_init(void)
 	}
 #endif
 	lapd_majors[mindex] = rtn;
+#ifdef LIS
 	LIS_DEVFLAGS(rtn) |= LIS_MODFLG_CLONE;
-	lis_spin_lock_init(&master.lock, "dl-open-list-lock");
+#endif
+	spin_lock_init(&master.lock); /* "dl-open-list-lock" */
 	lapd_initialized = 1;
 	return;
       error:

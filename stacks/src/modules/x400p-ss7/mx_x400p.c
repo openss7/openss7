@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:45 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,28 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:45 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 00:53:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:45 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:45 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <linux/modversions.h>
-#include <linux/init.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -76,28 +64,32 @@ static char const ident[] =
 #include <ss7/mxi.h>
 #include <ss7/mxi_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
+#define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
+#define MX_SDL_REVISION		"LfS $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $"
+#define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define MX_SDL_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define MX_SDL_LICENSE		"GPL"
+#define MX_SDL_BANNER		MX_SDL_DESCRIP		"\n" \
+				MX_SDL_REVISION		"\n" \
+				MX_SDL_COPYRIGHT	"\n" \
+				MX_SDL_DEVICE		"\n" \
+				MX_SDL_CONTACT		"\n"
+#define MX_SDL_SPLASH		MX_SDL_DEVICE		" - " \
+				MX_SDL_REVISION		"\n"
 
-#define MX_DESCRIP	"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
-#define MX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define MX_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MX_LICENSE	"GPL"
-#define MX_BANNER	MX_DESCRIP	"\n" \
-			MX_COPYRIGHT	"\n" \
-			MX_DEVICE	"\n" \
-			MX_CONTACT
-
-MODULE_AUTHOR(MX_CONTACT);
-MODULE_DESCRIPTION(MX_DESCRIP);
-MODULE_SUPPORTED_DEVICE(MX_DEVICE);
+#ifdef LINUX
+MODULE_AUTHOR(MX_SDL_CONTACT);
+MODULE_DESCRIPTION(MX_SDL_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MX_SDL_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(MX_LICENSE);
+MODULE_LICENSE(MX_SDL_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define MX_SDL_MOD_ID	CONFIG_STREAMS_MX_SDL_MODID
+#define MX_SDL_MOD_NAME	CONFIG_STREAMS_MX_SDL_NAME
 #endif
 
 /*
@@ -121,40 +113,33 @@ MODULE_LICENSE(MX_LICENSE);
  *  =========================================================================
  */
 
-#ifndef MX_MOD_ID
-#define MX_MOD_ID   MX__MOD_ID
-#endif
-#ifndef MX_MOD_NAME
-#define MX_MOD_NAME MX__MOD_NAME
-#endif
-
 static struct module_info mx_minfo = {
-	mi_idnum:MX_MOD_ID,			/* Module ID number */
-	mi_idname:MX_MOD_NAME,			/* Module ID name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,			/* Max packet size accepted */
-	mi_hiwat:1,				/* Hi water mark */
-	mi_lowat:0,				/* Lo water mark */
+	mi_idnum:MX_SDL_MOD_ID,		/* Module ID number */
+	mi_idname:MX_SDL_MOD_NAME,	/* Module ID name */
+	mi_minpsz:1,			/* Min packet size accepted */
+	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
+	mi_hiwat:1,			/* Hi water mark */
+	mi_lowat:0,			/* Lo water mark */
 };
 
 static int mx_open(queue_t *, dev_t *, int, int, cred_t *);
 static int mx_close(queue_t *, int, cred_t *);
 
 static struct qinit mx_rinit = {
-	qi_putp:ss7_oput,			/* Read put (message from below) */
-	qi_qopen:mx_open,			/* Each open */
-	qi_qclose:mx_close,			/* Last close */
-	qi_minfo:&mx_minfo,			/* Information */
+	qi_putp:ss7_oput,		/* Read put (message from below) */
+	qi_qopen:mx_open,		/* Each open */
+	qi_qclose:mx_close,		/* Last close */
+	qi_minfo:&mx_minfo,		/* Information */
 };
 
 static struct qinit mx_winit = {
-	qi_putp:ss7_iput,			/* Write put (message from above) */
-	qi_minfo:&mx_minfo,			/* Information */
+	qi_putp:ss7_iput,		/* Write put (message from above) */
+	qi_minfo:&mx_minfo,		/* Information */
 };
 
 static struct streamtab mx_info = {
-	st_rdinit:&mx_rinit,			/* Upper read queue */
-	st_wrinit:&mx_winit,			/* Upper write queue */
+	st_rdinit:&mx_rinit,		/* Upper read queue */
+	st_wrinit:&mx_winit,		/* Upper write queue */
 };
 
 /*
@@ -167,26 +152,26 @@ static struct streamtab mx_info = {
 
 /* multiplex structure */
 typedef struct mx {
-	STR_DECLARATION (struct mx);		/* stream declaration */
-	struct mx_config config;		/* configuration */
-	struct mx_stats statsp;			/* stats periods */
-	struct mx_stats stats;			/* statistics */
-	struct mx_notify notify;		/* notifications */
-	uchar add_ptr[32];			/* attached address */
-	size_t add_len;				/* attached address length */
-	uchar rem_ptr[32];			/* remote address */
-	size_t rem_len;				/* remote address length */
+	STR_DECLARATION (struct mx);	/* stream declaration */
+	struct mx_config config;	/* configuration */
+	struct mx_stats statsp;		/* stats periods */
+	struct mx_stats stats;		/* statistics */
+	struct mx_notify notify;	/* notifications */
+	uchar add_ptr[32];		/* attached address */
+	size_t add_len;			/* attached address length */
+	uchar rem_ptr[32];		/* remote address */
+	size_t rem_len;			/* remote address length */
 } mx_t;
 #define MX_PRIV(__q) ((struct mx *)(__q)->q_ptr)
 
 struct mx_config mx_default = {
-	block_size:64,				/* 64 bits per block */
-	encoding:MX_ENCODING_NONE,		/* sample block encoding */
-	sample_size:8,				/* sample size */
-	rate:8000,				/* clock rate */
-	tx_channels:1,				/* tx channels */
-	rx_channels:1,				/* tx channels */
-	opt_flags:MX_PARM_OPT_CLRCH,		/* option flags */
+	block_size:64,			/* 64 bits per block */
+	encoding:MX_ENCODING_NONE,	/* sample block encoding */
+	sample_size:8,			/* sample size */
+	rate:8000,			/* clock rate */
+	tx_channels:1,			/* tx channels */
+	rx_channels:1,			/* tx channels */
+	opt_flags:MX_PARM_OPT_CLRCH,	/* option flags */
 };
 
 static struct mx *mx_opens = NULL;
@@ -236,7 +221,7 @@ static int m_error(queue_t *q, struct mx *mx, int error)
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
 			mx->state = MXS_UNUSABLE;
-			printd(("%s: %p: <- M_HANGUP\n", MX_MOD_NAME, mx));
+			printd(("%s: %p: <- M_HANGUP\n", MX_SDL_MOD_NAME, mx));
 			putnext(mx->oq, mp);
 			return (-error);
 		} else {
@@ -244,7 +229,7 @@ static int m_error(queue_t *q, struct mx *mx, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			mx->state = MXS_UNUSABLE;
-			printd(("%s: %p: <- M_ERROR\n", MX_MOD_NAME, mx));
+			printd(("%s: %p: <- M_ERROR\n", MX_SDL_MOD_NAME, mx));
 			putnext(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -289,7 +274,7 @@ static inline int mx_info_ack(queue_t *q, struct mx *mx)
 		o->cp_tx_channels = mx->config.tx_channels;
 		o->cp_rx_channels = mx->config.rx_channels;
 		o->cp_opt_flags = mx->config.opt_flags;
-		printd(("%s: %p: <- MX_INFO_ACK\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_INFO_ACK\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -301,7 +286,8 @@ static inline int mx_info_ack(queue_t *q, struct mx *mx)
  *  MX_OPTMGMT_ACK
  *  -----------------------------------
  */
-static inline int mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len, ulong flags)
+static inline int mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len,
+				 ulong flags)
 {
 	mblk_t *mp;
 	struct MX_optmgmt_ack *p;
@@ -316,7 +302,7 @@ static inline int mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- MX_OPTMGMT_ACK\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_OPTMGMT_ACK\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -357,7 +343,7 @@ static inline int mx_ok_ack(queue_t *q, struct mx *mx)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_OK_ACK\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_OK_ACK\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -423,7 +409,7 @@ static inline int mx_error_ack(queue_t *q, struct mx *mx, ulong prim, long error
 			p->mx_state = mx->state;
 			break;
 		}
-		printd(("%s: %p: <- MX_ERROR_ACK\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_ERROR_ACK\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -455,7 +441,7 @@ static inline int mx_enable_con(queue_t *q, struct mx *mx)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_ENABLE_CON\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_ENABLE_CON\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -489,7 +475,7 @@ static inline int mx_connect_con(queue_t *q, struct mx *mx, ulong flags, ulong s
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_CONNECT_CON\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_CONNECT_CON\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -513,7 +499,7 @@ static inline int mx_data_ind(queue_t *q, struct mx *mx)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mx_primitive = MX_DATA_IND;
 		p->mx_slot = 0;
-		printd(("%s: %p: <- MX_DATA_IND\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DATA_IND\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -554,7 +540,7 @@ static inline int mx_disconnect_ind(queue_t *q, struct mx *mx, ulong flags, ulon
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_DISCONNECT_IND\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISCONNECT_IND\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -594,7 +580,7 @@ static inline int mx_disconnect_con(queue_t *q, struct mx *mx, ulong flags, ulon
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_DISCONNECT_CON\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISCONNECT_CON\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -620,7 +606,7 @@ static inline int mx_disable_ind(queue_t *q, struct mx *mx, long cause)
 		p->mx_primitive = MX_DISABLE_IND;
 		p->mx_cause = cause;
 		mx->state = MXS_UNUSABLE;
-		printd(("%s: %p: <- MX_DISABLE_IND\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISABLE_IND\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -655,7 +641,7 @@ static inline int mx_disable_con(queue_t *q, struct mx *mx)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_DISABLE_CON\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISABLE_CON\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -682,7 +668,7 @@ static inline int lmi_info_req(queue_t *q, struct mx *mx)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -709,7 +695,7 @@ static inline int lmi_attach_req(queue_t *q, struct mx *mx, uchar *ppa_ptr, size
 			mp->b_wptr += ppa_len;
 		}
 		mx->state = MXS_WACK_AREQ;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -732,7 +718,7 @@ static inline int lmi_detach_req(queue_t *q, struct mx *mx)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
 		mx->state = MXS_WACK_UREQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -760,7 +746,7 @@ static inline int lmi_enable_req(queue_t *q, struct mx *mx)
 			mp->b_wptr += mx->rem_len;
 		}
 		mx->state = MXS_WCON_EREQ;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -783,7 +769,7 @@ static inline int lmi_disable_req(queue_t *q, struct mx *mx)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		mx->state = MXS_WCON_RREQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -796,7 +782,8 @@ static inline int lmi_disable_req(queue_t *q, struct mx *mx)
  *  -----------------------------------
  *  Requests that the provider get, set or negotiate the specified options.
  */
-static inline int lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len, ulong flags)
+static inline int lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len,
+				  ulong flags)
 {
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
@@ -811,7 +798,7 @@ static inline int lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, siz
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -835,7 +822,7 @@ static inline int sdl_bits_for_transmission_req(queue_t *q, struct mx *mx, mblk_
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_BITS_FOR_TRANSMISSION_REQ;
 		mp->b_cont = dp;
-		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -858,7 +845,7 @@ static inline int sdl_connect_req(queue_t *q, struct mx *mx, ulong flags)
 		p->sdl_primitive = SDL_CONNECT_REQ;
 		p->sdl_flags = flags;
 		mx->state = MXS_WCON_CREQ;
-		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -880,7 +867,7 @@ static inline int sdl_disconnect_req(queue_t *q, struct mx *mx, ulong flags)
 		p->sdl_primitive = SDL_DISCONNECT_REQ;
 		p->sdl_flags = flags;
 		mx->state = MXS_WCON_DREQ;
-		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MX_SDL_MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -1227,7 +1214,8 @@ static int mx_optmgmt_req(queue_t *q, mblk_t *mp)
 				mx->config.tx_channels = o->circuit.cp_tx_channels;
 				mx->config.rx_channels = o->circuit.cp_rx_channels;
 				mx->config.opt_flags = o->circuit.cp_opt_flags;
-				return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit), p->mx_mgmt_flags);
+				return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit),
+						      p->mx_mgmt_flags);
 			case MX_DEFAULT:
 				/* set default */
 				mx_default.block_size = o->circuit.cp_block_size;
@@ -1237,7 +1225,8 @@ static int mx_optmgmt_req(queue_t *q, mblk_t *mp)
 				mx_default.tx_channels = o->circuit.cp_tx_channels;
 				mx_default.rx_channels = o->circuit.cp_rx_channels;
 				mx_default.opt_flags = o->circuit.cp_opt_flags;
-				return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit), p->mx_mgmt_flags);
+				return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit),
+						      p->mx_mgmt_flags);
 			}
 		}
 		goto badparmtype;
@@ -1256,7 +1245,8 @@ static int mx_optmgmt_req(queue_t *q, mblk_t *mp)
 			o->circuit.cp_tx_channels = mx->config.tx_channels;
 			o->circuit.cp_rx_channels = mx->config.rx_channels;
 			o->circuit.cp_opt_flags = mx->config.opt_flags;
-			return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit), p->mx_mgmt_flags);
+			return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit),
+					      p->mx_mgmt_flags);
 		case 0:
 		case MX_DEFAULT:
 			/* get default */
@@ -1268,7 +1258,8 @@ static int mx_optmgmt_req(queue_t *q, mblk_t *mp)
 			o->circuit.cp_tx_channels = mx_default.tx_channels;
 			o->circuit.cp_rx_channels = mx_default.rx_channels;
 			o->circuit.cp_opt_flags = mx_default.opt_flags;
-			return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit), p->mx_mgmt_flags);
+			return mx_optmgmt_ack(q, mx, (uchar *) o, sizeof(o->circuit),
+					      p->mx_mgmt_flags);
 		}
 	}
 	goto badflag;
@@ -2036,7 +2027,7 @@ static int mx_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = mx_ioccnotify(mx, arg);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported MX ioctl %d\n", MX_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported MX ioctl %d\n", MX_SDL_MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -2172,43 +2163,43 @@ static int mx_w_proto(queue_t *q, mblk_t *mp)
 	(void) mx;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MX_INFO_REQ:
-		printd(("%s: %p: -> MX_INFO_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_INFO_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_info_req(q, mp);
 		break;
 	case MX_OPTMGMT_REQ:
-		printd(("%s: %p: -> MX_OPTMGMT_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_OPTMGMT_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_optmgmt_req(q, mp);
 		break;
 	case MX_ATTACH_REQ:
-		printd(("%s: %p: -> MX_ATTACH_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_ATTACH_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_attach_req(q, mp);
 		break;
 	case MX_ENABLE_REQ:
-		printd(("%s: %p: -> MX_ENABLE_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_ENABLE_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_enable_req(q, mp);
 		break;
 	case MX_CONNECT_REQ:
-		printd(("%s: %p: -> MX_CONNECT_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_CONNECT_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_connect_req(q, mp);
 		break;
 	case MX_DATA_REQ:
-		printd(("%s: %p: -> MX_DATA_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DATA_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_data_req(q, mp);
 		break;
 	case MX_DISCONNECT_REQ:
-		printd(("%s: %p: -> MX_DISCONNECT_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DISCONNECT_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_disconnect_req(q, mp);
 		break;
 	case MX_DISABLE_REQ:
-		printd(("%s: %p: -> MX_DISABLE_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DISABLE_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_disable_req(q, mp);
 		break;
 	case MX_DETACH_REQ:
-		printd(("%s: %p: -> MX_DETACH_REQ\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DETACH_REQ\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_detach_req(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> MX_????\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_????\n", MX_SDL_MOD_NAME, mx));
 		rtn = mx_error_ack(q, mx, prim, MXNOTSUPP);
 		break;
 	}
@@ -2226,51 +2217,51 @@ static int mx_r_proto(queue_t *q, mblk_t *mp)
 	(void) mx;
 	switch (*((ulong *) mp->b_rptr)) {
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_OK_ACK <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_STATS_IND <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = lmi_event_ind(q, mp);
 		break;
 	case SDL_RECEIVED_BITS_IND:
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = sdl_received_bits_ind(q, mp);
 		break;
 	case SDL_DISCONNECT_IND:
-		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", MX_SDL_MOD_NAME, mx));
 		rtn = sdl_disconnect_ind(q, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? %lu <-\n", MX_MOD_NAME, mx, *(ulong *) mp->b_rptr));
+		printd(("%s: %p: ???? %lu <-\n", MX_SDL_MOD_NAME, mx, *(ulong *) mp->b_rptr));
 		rtn = -EFAULT;
 		break;
 	}
@@ -2287,13 +2278,13 @@ static int mx_r_proto(queue_t *q, mblk_t *mp)
 static int mx_w_data(queue_t *q, mblk_t *mp)
 {
 	/* data from above */
-	printd(("%s: %p: -> M_DATA\n", MX_MOD_NAME, MX_PRIV(q)));
+	printd(("%s: %p: -> M_DATA\n", MX_SDL_MOD_NAME, MX_PRIV(q)));
 	return mx_write(q, mp);
 }
 static int mx_r_data(queue_t *q, mblk_t *mp)
 {
 	/* data from below */
-	printd(("%s: %p: M_DATA <-\n", MX_MOD_NAME, MX_PRIV(q)));
+	printd(("%s: %p: M_DATA <-\n", MX_SDL_MOD_NAME, MX_PRIV(q)));
 	return mx_read(q, mp);
 }
 
@@ -2453,11 +2444,12 @@ static int mx_init_caches(void)
 {
 	if (!mx_priv_cachep &&
 	    !(mx_priv_cachep =
-	      kmem_cache_create("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", MX_MOD_NAME);
+	      kmem_cache_create("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", MX_SDL_MOD_NAME);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized mx private structure cache\n", MX_MOD_NAME));
+		printd(("%s: initialized mx private structure cache\n", MX_SDL_MOD_NAME));
 	return (0);
 }
 static void mx_term_caches(void)
@@ -2466,7 +2458,7 @@ static void mx_term_caches(void)
 		if (kmem_cache_destroy(mx_priv_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy mx_priv_cachep", __FUNCTION__);
 		else
-			printd(("%s: destroyed mx_priv_cachep\n", MX_MOD_NAME));
+			printd(("%s: destroyed mx_priv_cachep\n", MX_SDL_MOD_NAME));
 	}
 	return;
 }
@@ -2479,28 +2471,28 @@ static struct mx *mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t
 {
 	struct mx *mx;
 	if ((mx = kmem_cache_alloc(mx_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated mx private structure\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: allocated mx private structure\n", MX_SDL_MOD_NAME, mx));
 		bzero(mx, sizeof(*mx));
 		mx->u.dev.cmajor = getmajor(*devp);
 		mx->u.dev.cminor = getminor(*devp);
 		mx->cred = *crp;
 		(mx->oq = RD(q))->q_ptr = mx_get(mx);
 		(mx->iq = WR(q))->q_ptr = mx_get(mx);
-		lis_spin_lock_init(&mx->qlock, "mx-queue-lock");
+		spin_lock_init(&mx->qlock);	/* "mx-queue-lock" */
 		mx->o_prim = &mx_r_prim;
 		mx->i_prim = &mx_w_prim;
 		mx->o_wakeup = NULL;
 		mx->i_wakeup = NULL;
 		mx->state = MXS_UNINIT;	/* unitialized */
-		lis_spin_lock_init(&mx->lock, "mx-priv-lock");
+		spin_lock_init(&mx->lock);	/* "mx-priv-lock" */
 		if ((mx->next = *chp))
 			mx->next->prev = &mx->next;
 		mx->prev = chp;
 		*chp = mx_get(mx);
-		printd(("%s: %p: linked mx private structure\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: linked mx private structure\n", MX_SDL_MOD_NAME, mx));
 		mx->config = mx_default;
 	} else
-		ptrace(("%s: ERROR: Could not allocate mx private structure\n", MX_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate mx private structure\n", MX_SDL_MOD_NAME));
 	return (mx);
 }
 static void mx_free_priv(queue_t *q)
@@ -2508,7 +2500,7 @@ static void mx_free_priv(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	psw_t flags = 0;
 	ensure(mx, return);
-	lis_spin_lock_irqsave(&mx->lock, &flags);
+	spin_lock_irqsave(&mx->lock, flags);
 	{
 		ss7_unbufcall((str_t *) mx);
 		if ((*mx->prev = mx->next))
@@ -2524,7 +2516,7 @@ static void mx_free_priv(queue_t *q)
 		flushq(mx->iq, FLUSHALL);
 		mx->iq = NULL;
 	}
-	lis_spin_unlock_irqrestore(&mx->lock, &flags);
+	spin_unlock_irqrestore(&mx->lock, flags);
 	mx_put(mx);		/* final put */
 	return;
 }
@@ -2537,7 +2529,7 @@ static void mx_put(struct mx *mx)
 {
 	if (atomic_dec_and_test(&mx->refcnt)) {
 		kmem_cache_free(mx_priv_cachep, mx);
-		printd(("%s: %p: freed mx private structure\n", MX_MOD_NAME, mx));
+		printd(("%s: %p: freed mx private structure\n", MX_SDL_MOD_NAME, mx));
 	}
 }
 
@@ -2552,11 +2544,11 @@ static int mx_initialized = 0;
 static void mx_init(void)
 {
 	unless(mx_initialized > 0, return);
-	cmn_err(CE_NOTE, MX_BANNER);	/* console splash */
+	cmn_err(CE_NOTE, MX_SDL_BANNER);	/* console splash */
 	if ((mx_initialized = mx_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", MX_MOD_NAME);
-	} else if ((mx_initialized = lis_register_strmod(&mx_info, MX_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: could not register module", MX_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", MX_SDL_MOD_NAME);
+	} else if ((mx_initialized = lis_register_strmod(&mx_info, MX_SDL_MOD_NAME)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register module", MX_SDL_MOD_NAME);
 		mx_term_caches();
 	}
 	return;
@@ -2565,7 +2557,7 @@ static void mx_terminate(void)
 {
 	ensure(mx_initialized > 0, return);
 	if ((mx_initialized = lis_unregister_strmod(&mx_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: could not unregister module", MX_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: could not unregister module", MX_SDL_MOD_NAME);
 	} else {
 		mx_term_caches();
 	}

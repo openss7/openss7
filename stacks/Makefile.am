@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/08/04 06:03:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/08/26 23:37:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/04 06:03:00 $ by $Author: brian $
+# Last Modified $Date: 2004/08/26 23:37:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,97 +102,97 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
-test_tcpc_LDFLAGS		= -lLiS
+test_tcpc_LDFLAGS		= $(STREAMS_LDADD)
 test_tcpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_tcpc_CFLAGS		= $(USER_CFLAGS)
 
 test_tcps_SOURCES		= src/test/inet/test-tcps.c
-test_tcps_LDFLAGS		= -lLiS
+test_tcps_LDFLAGS		= $(STREAMS_LDADD)
 test_tcps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_tcps_CFLAGS		= $(USER_CFLAGS)
 
 test_udpc_SOURCES		= src/test/inet/test-udpc.c
-test_udpc_LDFLAGS		= -lLiS
+test_udpc_LDFLAGS		= $(STREAMS_LDADD)
 test_udpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_udpc_CFLAGS		= $(USER_CFLAGS)
 
 test_udps_SOURCES		= src/test/inet/test-udps.c
-test_udps_LDFLAGS		= -lLiS
+test_udps_LDFLAGS		= $(STREAMS_LDADD)
 test_udps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_udps_CFLAGS		= $(USER_CFLAGS)
 
 #test_q784_SOURCES		= src/test/isup/test-q784.c
-#test_q784_LDFLAGS		= -lLiS
+#test_q784_LDFLAGS		= $(STREAMS_LDADD)
 #test_q784_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_q784_CFLAGS		= $(USER_CFLAGS)
 
 test_m2pa_SOURCES		= src/test/m2pa/test-m2pa.c
-test_m2pa_LDFLAGS		= -lLiS
+test_m2pa_LDFLAGS		= $(STREAMS_LDADD)
 test_m2pa_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS)
 
 #perftest_SOURCES		= src/test/perftest.c
-#perftest_LDFLAGS		= -lLiS
+#perftest_LDFLAGS		= $(STREAMS_LDADD)
 #perftest_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #perftest_CFLAGS		= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
-test_q781_LDFLAGS		= -lLiS
+test_q781_LDFLAGS		= $(STREAMS_LDADD)
 test_q781_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_q781_CFLAGS		= $(USER_CFLAGS)
 
 #test_q781_pipe_SOURCES		= src/test/sl/test-q781-pipe.c
-#test_q781_pipe_LDFLAGS		= -lLiS
+#test_q781_pipe_LDFLAGS		= $(STREAMS_LDADD)
 #test_q781_pipe_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_q781_pipe_CFLAGS		= $(USER_CFLAGS)
 
 test_x100p_SOURCES		= src/test/x400p-ss7/test-x100p.c
-test_x100p_LDFLAGS		= -lLiS
+test_x100p_LDFLAGS		= $(STREAMS_LDADD)
 test_x100p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x100p_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_SOURCES		= src/test/x400p-ss7/test-x400p.c
-test_x400p_LDFLAGS		= -lLiS
+test_x400p_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_cap2_SOURCES	= src/test/x400p-ss7/test-x400p-cap2.c
-#test_x400p_cap2_LDFLAGS	= -lLiS
+#test_x400p_cap2_LDFLAGS	= $(STREAMS_LDADD)
 #test_x400p_cap2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_cap2_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_cap_SOURCES		= src/test/x400p-ss7/test-x400p-cap.c
-#test_x400p_cap_LDFLAGS		= -lLiS
+#test_x400p_cap_LDFLAGS		= $(STREAMS_LDADD)
 #test_x400p_cap_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_cap_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_hsl_SOURCES		= src/test/x400p-ss7/test-x400p-hsl.c
-#test_x400p_hsl_LDFLAGS		= -lLiS
+#test_x400p_hsl_LDFLAGS		= $(STREAMS_LDADD)
 #test_x400p_hsl_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_hsl_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_perf_SOURCES	= src/test/x400p-ss7/test-x400p-perf.c
-#test_x400p_perf_LDFLAGS	= -lLiS
+#test_x400p_perf_LDFLAGS	= $(STREAMS_LDADD)
 #test_x400p_perf_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_perf_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sdl_SOURCES		= src/test/x400p-ss7/test-x400p-sdl.c
-#test_x400p_sdl_LDFLAGS		= -lLiS
+#test_x400p_sdl_LDFLAGS		= $(STREAMS_LDADD)
 #test_x400p_sdl_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sdl_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sdt2_SOURCES	= src/test/x400p-ss7/test-x400p-sdt2.c
-#test_x400p_sdt2_LDFLAGS	= -lLiS
+#test_x400p_sdt2_LDFLAGS	= $(STREAMS_LDADD)
 #test_x400p_sdt2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sdt_SOURCES		= src/test/x400p-ss7/test-x400p-sdt.c
-#test_x400p_sdt_LDFLAGS		= -lLiS
+#test_x400p_sdt_LDFLAGS		= $(STREAMS_LDADD)
 #test_x400p_sdt_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sdt_CFLAGS		= $(USER_CFLAGS)
 
 #test_x400p_sl_SOURCES		= src/test/x400p-ss7/test-x400p-sl.c
-#test_x400p_sl_LDFLAGS		= -lLiS
+#test_x400p_sl_LDFLAGS		= $(STREAMS_LDADD)
 #test_x400p_sl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
 
@@ -368,97 +368,97 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
-test_tcpc_LDFLAGS		= -lLiS
+test_tcpc_LDFLAGS		= $(STREAMS_LDADD)
 test_tcpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_tcpc_CFLAGS		= $(USER_CFLAGS)
 
 test_tcps_SOURCES		= src/test/inet/test-tcps.c
-test_tcps_LDFLAGS		= -lLiS
+test_tcps_LDFLAGS		= $(STREAMS_LDADD)
 test_tcps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_tcps_CFLAGS		= $(USER_CFLAGS)
 
 test_udpc_SOURCES		= src/test/inet/test-udpc.c
-test_udpc_LDFLAGS		= -lLiS
+test_udpc_LDFLAGS		= $(STREAMS_LDADD)
 test_udpc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_udpc_CFLAGS		= $(USER_CFLAGS)
 
 test_udps_SOURCES		= src/test/inet/test-udps.c
-test_udps_LDFLAGS		= -lLiS
+test_udps_LDFLAGS		= $(STREAMS_LDADD)
 test_udps_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_udps_CFLAGS		= $(USER_CFLAGS)
 
 test_q784_SOURCES		= src/test/isup/test-q784.c
-test_q784_LDFLAGS		= -lLiS
+test_q784_LDFLAGS		= $(STREAMS_LDADD)
 test_q784_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_q784_CFLAGS		= $(USER_CFLAGS)
 
 test_m2pa_SOURCES		= src/test/m2pa/test-m2pa.c
-test_m2pa_LDFLAGS		= -lLiS
+test_m2pa_LDFLAGS		= $(STREAMS_LDADD)
 test_m2pa_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS)
 
 perftest_SOURCES		= src/test/perftest.c
-perftest_LDFLAGS		= -lLiS
+perftest_LDFLAGS		= $(STREAMS_LDADD)
 perftest_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
-test_q781_LDFLAGS		= -lLiS
+test_q781_LDFLAGS		= $(STREAMS_LDADD)
 test_q781_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_q781_CFLAGS		= $(USER_CFLAGS)
 
 test_q781_pipe_SOURCES		= src/test/sl/test-q781-pipe.c
-test_q781_pipe_LDFLAGS		= -lLiS
+test_q781_pipe_LDFLAGS		= $(STREAMS_LDADD)
 test_q781_pipe_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_q781_pipe_CFLAGS		= $(USER_CFLAGS)
 
 test_x100p_SOURCES		= src/test/x400p-ss7/test-x100p.c
-test_x100p_LDFLAGS		= -lLiS
+test_x100p_LDFLAGS		= $(STREAMS_LDADD)
 test_x100p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x100p_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_SOURCES		= src/test/x400p-ss7/test-x400p.c
-test_x400p_LDFLAGS		= -lLiS
+test_x400p_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_cap2_SOURCES		= src/test/x400p-ss7/test-x400p-cap2.c
-test_x400p_cap2_LDFLAGS		= -lLiS
+test_x400p_cap2_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_cap2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_cap2_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_cap_SOURCES		= src/test/x400p-ss7/test-x400p-cap.c
-test_x400p_cap_LDFLAGS		= -lLiS
+test_x400p_cap_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_cap_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_cap_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_hsl_SOURCES		= src/test/x400p-ss7/test-x400p-hsl.c
-test_x400p_hsl_LDFLAGS		= -lLiS
+test_x400p_hsl_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_hsl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_hsl_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_perf_SOURCES		= src/test/x400p-ss7/test-x400p-perf.c
-test_x400p_perf_LDFLAGS		= -lLiS
+test_x400p_perf_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_perf_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_perf_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sdl_SOURCES		= src/test/x400p-ss7/test-x400p-sdl.c
-test_x400p_sdl_LDFLAGS		= -lLiS
+test_x400p_sdl_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_sdl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sdl_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sdt2_SOURCES		= src/test/x400p-ss7/test-x400p-sdt2.c
-test_x400p_sdt2_LDFLAGS		= -lLiS
+test_x400p_sdt2_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_sdt2_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sdt_SOURCES		= src/test/x400p-ss7/test-x400p-sdt.c
-test_x400p_sdt_LDFLAGS		= -lLiS
+test_x400p_sdt_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_sdt_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sdt_CFLAGS		= $(USER_CFLAGS)
 
 test_x400p_sl_SOURCES		= src/test/x400p-ss7/test-x400p-sl.c
-test_x400p_sl_LDFLAGS		= -lLiS
+test_x400p_sl_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_sl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
 
@@ -476,7 +476,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/cd/cd.c \
 				  src/modules/cd/cd_daed.c \
 				  src/modules/cd/cd_hdlc.c \
-				  src/modules/dl/dl.c \
 				  src/modules/dl/dl_dua.c \
 				  src/modules/dl/dl_gr303.c \
 				  src/modules/dl/dl_gr303ua.c \
@@ -537,6 +536,11 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
 				  strconf.h
+
+if WITH_LIS
+nodist_EXTRA_libSS7mods_a_SOURCES	+= \
+				  src/modules/dl/dl.c
+endif
 
 mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
 
@@ -721,12 +725,12 @@ endif
 if RPM_BUILD_USER
 
 test_timod_SOURCES		= src/test/tli/test-timod.c
-test_timod_LDFLAGS		= -lLiS -lxnet
+test_timod_LDFLAGS		= $(STREAMS_LDADD) -lxnet
 test_timod_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 
 test_tirdwr_SOURCES		= src/test/tli/test-tirdwr.c
-test_tirdwr_LDFLAGS		= -lLiS -lxnet
+test_tirdwr_LDFLAGS		= $(STREAMS_LDADD) -lxnet
 test_tirdwr_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
@@ -737,27 +741,27 @@ libexec_PROGRAMS		+= \
 endif
 
 test_inet_raw_SOURCES		= src/test/inet/test-inet_raw.c
-test_inet_raw_LDFLAGS		= -lLiS
+test_inet_raw_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_raw_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/inet/test-inet_tcp.c
-test_inet_tcp_LDFLAGS		= -lLiS
+test_inet_tcp_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_tcp_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/inet/test-inet_udp.c
-test_inet_udp_LDFLAGS		= -lLiS
+test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_udp_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_SOURCES		= src/test/xnet/test-xnet.c
-test_xnet_LDFLAGS		= -lLiS -lxnet
+test_xnet_LDFLAGS		= $(STREAMS_LDADD) -lxnet
 test_xnet_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/xnet/test-xnet.c
-test_xnet_thr_LDFLAGS		= -lLiS -lpthread -lxnet
+test_xnet_thr_LDFLAGS		= $(STREAMS_LDADD) -lpthread -lxnet
 test_xnet_thr_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
@@ -852,7 +856,7 @@ libxnet_la_SOURCES		= src/lib/libxnet/xnet.c gettext.h
 libxnet_la_LDFLAGS		= -no-undefined -version-info 0:0:0
 libxnet_la_CPPFLAGS		= -I$(srcdir)/src/lib/libxnet -I./src/lib/libxnet $(SS7_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/xti -I./src/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
-libxnet_la_LIBADD		= -lLiS
+libxnet_la_LIBADD		= $(STREAMS_LDADD)
 endif
 
 endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include "sua.h"
 #include "sua_data.h"
@@ -92,18 +83,28 @@ static char const ident[] =
 			SUA_COPYRIGHT	"\n" \
 			SUA_DEVICE	"\n" \
 			SUA_CONTACT	"\n"
+#define SUA_SPLASH	SUA_DEVICE	" - " \
+			SUA_COPYRIGHT	"\n"
 
-#ifdef MODULE
+#ifdef LINUX
 MODULE_AUTHOR(SUA_CONTACT);
 MODULE_DESCRIPTION(SUA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SUA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SUA_LICENSE);
 #endif
-#define MODULE_STATIC static
-#else
-#define MOD_INC_USE_COUNT
-#define MOD_DEC_USE_COUNT
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SUA_DRV_ID	CONFIG_STREAMS_SUA_MODID
+#define SUA_DRV_NAME	CONFIG_STREAMS_SUA_NAME
+#define SUA_CMAJORS	CONFIG_STREAMS_SUA_NMAJORS
+#define SUA_CMAJOR_0	CONFIG_STREAMS_SUA_MAJOR
+#define SUA_NMINOR	CONFIG_STREAMS_SUA_NMINORS
+#endif
+
+#ifndef SUA_NMINOR
+#define SUA_NMINOR	255
 #endif
 
 /*
@@ -115,8 +116,8 @@ MODULE_LICENSE(SUA_LICENSE);
  */
 
 static struct module_info sua_minfo = {
-	SUA_MODULE_ID,			/* Module ID number */
-	"sua",				/* Module name */
+	SUA_DRV_ID,			/* Module ID number */
+	SUA_DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted *//* XXX */
 	512,				/* Max packet size accepted *//* XXX */
 	8 * 512,			/* Hi water mark *//* XXX */
@@ -179,7 +180,7 @@ static dp_t *sua_opens_list = NULL;
 static lp_t *sua_links_list = NULL;
 
 static struct ua_driver sua_dinfo = {
-	SUA_CMAJOR,			/* Major device number */
+	SUA_CMAJOR_0,			/* Major device number */
 	SUA_CMINOR,			/* Number of minor devices */
 	sizeof(sccp_t),			/* Private structure size */
 	NULL,				/* Current control queue */
@@ -209,11 +210,11 @@ __initfunc(void sua_init(void))
 		return;
 	printk(KERN_INFO SUA_BANNER);	/* console splash */
 #ifndef LIS_REGISTERED
-	if (lis_register_strdev(SUA_CMAJOR, &sua_info, SUA_NMINOR, sua_minfo.mi_idname) < 0) {
+	if (lis_register_strdev(SUA_CMAJOR_0, &sua_info, SUA_NMINOR, sua_minfo.mi_idname) < 0) {
 		cmn_err(CE_NOTE, "sua: couldn't register driver!\n");
 		sua_minfo.mi_idnum = 0;
 	}
-	sua_minfo.mi_idnum = SUA_CMAJOR;
+	sua_minfo.mi_idnum = SUA_CMAJOR_0;
 #endif
 	sua_driver = &sua_dinfo;
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:43 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:43 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $"
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:43 $";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -65,23 +65,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $
  *  Subsequent binds are permitted to bind additional CIC ranges to the stream.  After binding, the connectionless
  *  data transfer mechanisms of the MTP are used.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
-#include "debug.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
+#include "compat.h"
 
 // #undef INLINE
 // #define INLINE
@@ -95,7 +79,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:43 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -106,22 +90,23 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.1 $
 			ISUP_DEVICE	"\n" \
 			ISUP_CONTACT	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(ISUP_CONTACT);
 MODULE_DESCRIPTION(ISUP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ISUP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ISUP_LICENSE);
 #endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define ISUP_DRV_ID		CONFIG_STREAMS_ISUP_MODID
+#define ISUP_DRV_NAME		CONFIG_STREAMS_ISUP_NAME
+#define ISUP_CMAJORS		CONFIG_STREAMS_ISUP_NMAJORS
+#define ISUP_CMAJOR_0		CONFIG_STREAMS_ISUP_MAJOR
+#endif
 
 #define ISUP_CMINORS 255
-
-#ifndef psw_t
-#ifdef INT_PSW
-#define psw_t int
-#else
-#define psw_t unsigned long
-#endif
-#endif
 
 /*
  *  =========================================================================
@@ -399,7 +384,7 @@ typedef struct mtp {
 #define MTP_PRIV(__q) ((struct mtp *)(__q)->q_ptr)
 
 typedef struct df {
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	struct cc_bind bind;		/* bindings */
 	SLIST_HEAD (cc, cc);		/* master list of isup */
 	SLIST_HEAD (ct, ct);		/* master list of circuits */
@@ -9472,13 +9457,13 @@ ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 {
 	struct ct *ct = (struct ct *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&ct->lock)) {
+		if (spin_trylock(&ct->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", ISUP_DRV_NAME, ct, timer, jiffies));
 			switch (to_fnc(ct)) {
 			default:
 			case QR_DONE:
 				ct_put(ct);
-				lis_spin_unlock(&ct->lock);
+				spin_unlock(&ct->lock);
 				return;
 			case -ENOMEM:
 			case -ENOBUFS:
@@ -9486,7 +9471,7 @@ ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&ct->lock);
+			spin_unlock(&ct->lock);
 		} else
 			printd(("%s: %p: %s timeout collision at %lu\n", ISUP_DRV_NAME, ct, timer,
 				jiffies));
@@ -10172,11 +10157,11 @@ STATIC INLINE void
 ct_timer_stop(struct ct *ct, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&ct->lock, &flags);
+	spin_lock_irqsave(&ct->lock, flags);
 	{
 		__ct_timer_stop(ct, t);
 	}
-	lis_spin_unlock_irqrestore(&ct->lock, &flags);
+	spin_unlock_irqrestore(&ct->lock, flags);
 }
 
 STATIC INLINE void
@@ -10185,7 +10170,7 @@ ct_timer_start(struct ct *ct, const uint t)
 	psw_t flags;
 	struct tg *tg = ct->tg.tg;
 	ensure(tg, return);
-	lis_spin_lock_irqsave(&ct->lock, &flags);
+	spin_lock_irqsave(&ct->lock, flags);
 	{
 		__ct_timer_stop(ct, t);
 		switch (t) {
@@ -10396,7 +10381,7 @@ ct_timer_start(struct ct *ct, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&ct->lock, &flags);
+	spin_unlock_irqrestore(&ct->lock, flags);
 }
 
 /*
@@ -10412,13 +10397,13 @@ cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 {
 	struct cg *cg = (struct cg *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&cg->lock)) {
+		if (spin_trylock(&cg->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", ISUP_DRV_NAME, cg, timer, jiffies));
 			switch (to_fnc(cg)) {
 			default:
 			case QR_DONE:
 				cg_put(cg);
-				lis_spin_unlock(&cg->lock);
+				spin_unlock(&cg->lock);
 				return;
 			case -ENOMEM:
 			case -ENOBUFS:
@@ -10426,7 +10411,7 @@ cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&cg->lock);
+			spin_unlock(&cg->lock);
 		} else
 			printd(("%s: %p: %s timeout collision at %lu\n", ISUP_DRV_NAME, cg, timer,
 				jiffies));
@@ -10683,11 +10668,11 @@ STATIC INLINE void
 cg_timer_stop(struct cg *cg, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&cg->lock, &flags);
+	spin_lock_irqsave(&cg->lock, flags);
 	{
 		__cg_timer_stop(cg, t);
 	}
-	lis_spin_unlock_irqrestore(&cg->lock, &flags);
+	spin_unlock_irqrestore(&cg->lock, flags);
 }
 
 STATIC INLINE void
@@ -10695,7 +10680,7 @@ cg_timer_start(struct cg *cg, const uint t)
 {
 	psw_t flags;
 	struct sr *sr = cg->sr.sr;
-	lis_spin_lock_irqsave(&cg->lock, &flags);
+	spin_lock_irqsave(&cg->lock, flags);
 	{
 		__cg_timer_stop(cg, t);
 		switch (t) {
@@ -10776,7 +10761,7 @@ cg_timer_start(struct cg *cg, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&cg->lock, &flags);
+	spin_unlock_irqrestore(&cg->lock, flags);
 }
 
 /*
@@ -10792,13 +10777,13 @@ sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 {
 	struct sr *sr = (struct sr *) data;
 	if (xchg(timeo, 0)) {
-		if (lis_spin_trylock(&sr->lock)) {
+		if (spin_trylock(&sr->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", ISUP_DRV_NAME, sr, timer, jiffies));
 			switch (to_fnc(sr)) {
 			default:
 			case QR_DONE:
 				sr_put(sr);
-				lis_spin_unlock(&sr->lock);
+				spin_unlock(&sr->lock);
 				return;
 			case -ENOMEM:
 			case -ENOBUFS:
@@ -10806,7 +10791,7 @@ sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			case -EAGAIN:
 				break;
 			}
-			lis_spin_unlock(&sr->lock);
+			spin_unlock(&sr->lock);
 		} else
 			printd(("%s: %p: %s timeout collision at %lu\n", ISUP_DRV_NAME, sr, timer,
 				jiffies));
@@ -10885,18 +10870,18 @@ STATIC INLINE void
 sr_timer_stop(struct sr *sr, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sr->lock, &flags);
+	spin_lock_irqsave(&sr->lock, flags);
 	{
 		__sr_timer_stop(sr, t);
 	}
-	lis_spin_unlock_irqrestore(&sr->lock, &flags);
+	spin_unlock_irqrestore(&sr->lock, flags);
 }
 
 STATIC INLINE void
 sr_timer_start(struct sr *sr, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sr->lock, &flags);
+	spin_lock_irqsave(&sr->lock, flags);
 	{
 		__sr_timer_stop(sr, t);
 		switch (t) {
@@ -10922,7 +10907,7 @@ sr_timer_start(struct sr *sr, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sr->lock, &flags);
+	spin_unlock_irqrestore(&sr->lock, flags);
 }
 
 /*
@@ -24560,7 +24545,7 @@ isup_iocgstatem(queue_t *q, mblk_t *mp)
 		isup_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			return isup_sta_ct(arg, ct_lookup(arg->id), size);
@@ -24584,7 +24569,7 @@ isup_iocgstatem(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24623,7 +24608,7 @@ isup_iocgstatsp(queue_t *q, mblk_t *mp)
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			return isup_statp_get_ct(arg, ct_lookup(arg->id), size);
@@ -24647,7 +24632,7 @@ isup_iocgstatsp(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24669,7 +24654,7 @@ isup_iocsstatsp(queue_t *q, mblk_t *mp)
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			return isup_statp_set_ct(arg, ct_lookup(arg->id), size);
@@ -24693,7 +24678,7 @@ isup_iocsstatsp(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24715,7 +24700,7 @@ isup_iocgstats(queue_t *q, mblk_t *mp)
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			return isup_stat_get_ct(arg, ct_lookup(arg->id), size);
@@ -24739,7 +24724,7 @@ isup_iocgstats(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24761,7 +24746,7 @@ isup_ioccstats(queue_t *q, mblk_t *mp)
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			return isup_stat_clr_ct(arg, ct_lookup(arg->id), size);
@@ -24785,7 +24770,7 @@ isup_ioccstats(queue_t *q, mblk_t *mp)
 		ret = -EINVAL;
 		goto exit;
 	      exit:
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24804,7 +24789,7 @@ isup_iocgnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isup_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			ret = isup_not_get_ct(arg, ct_lookup(arg->id));
@@ -24831,7 +24816,7 @@ isup_iocgnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24850,7 +24835,7 @@ isup_iocsnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isup_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			ret = isup_not_set_ct(arg, ct_lookup(arg->id));
@@ -24877,7 +24862,7 @@ isup_iocsnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -24896,7 +24881,7 @@ isup_ioccnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isup_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
 			ret = isup_not_clr_ct(arg, ct_lookup(arg->id));
@@ -24923,7 +24908,7 @@ isup_ioccnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -25103,7 +25088,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_LINK):
 			ptrace(("%s: %p: I_LINK\n", ISUP_DRV_NAME, cc));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			{
 				/*
 				   place in list in ascending index order 
@@ -25113,13 +25098,13 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 				     mtpp = &(*mtpp)->next) ;
 				if ((mtp =
 				     isup_alloc_mtp(lb->l_qbot, mtpp, lb->l_index, iocp->ioc_cr))) {
-					lis_spin_unlock_irqrestore(&master.lock, &flags);
+					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
 				MOD_DEC_USE_COUNT;
 				ret = -ENOMEM;
 			}
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
 			ptrace(("%s: %p: I_PUNLINK\n", ISUP_DRV_NAME, cc));
@@ -25131,7 +25116,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 			}
 		case _IOC_NR(I_UNLINK):
 			ptrace(("%s: %p: I_UNLINK\n", ISUP_DRV_NAME, cc));
-			lis_spin_lock_irqsave(&master.lock, &flags);
+			spin_lock_irqsave(&master.lock, flags);
 			{
 				for (mtp = master.mtp.list; mtp; mtp = mtp->next)
 					if (mtp->u.mux.index == lb->l_index)
@@ -25140,13 +25125,13 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 					ret = -EINVAL;
 					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
 						ISUP_DRV_NAME, cc));
-					lis_spin_unlock_irqrestore(&master.lock, &flags);
+					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
 				isup_free_mtp(mtp->iq);
 				MOD_DEC_USE_COUNT;
 			}
-			lis_spin_unlock_irqrestore(&master.lock, &flags);
+			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		default:
 		case _IOC_NR(I_STR):
@@ -25666,7 +25651,7 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	   allocate a new device 
 	 */
 	cminor = 1;
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	for (; *ccp; ccp = &(*ccp)->next) {
 		ushort dmajor = (*ccp)->u.dev.cmajor;
 		if (cmajor != dmajor)
@@ -25690,7 +25675,7 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= ISUP_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", ISUP_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -25698,11 +25683,11 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(cc = isup_alloc_cc(q, ccp, devp, crp))) {
 		ptrace(("%s: ERROR: no memory\n", ISUP_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (0);
 }
 
@@ -25723,11 +25708,11 @@ isup_close(queue_t *q, int flag, cred_t *crp)
 	(void) h;
 	printd(("%s: %p: closing character device %d:%d\n", ISUP_DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	{
 		isup_free_cc(q);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -25888,7 +25873,7 @@ isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->u.dev.cmajor = getmajor(*devp);
 		cc->u.dev.cminor = getminor(*devp);
 		cc->cred = *crp;
-		lis_spin_lock_init(&cc->qlock, "cc-queue-lock");
+		spin_lock_init(&cc->qlock); /* "cc-queue-lock" */
 		(cc->oq = RD(q))->q_ptr = cc_get(cc);
 		(cc->iq = WR(q))->q_ptr = cc_get(cc);
 		cc->o_prim = &isup_r_prim;
@@ -25898,7 +25883,7 @@ isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->i_state = LMI_UNUSABLE;
 		cc->i_style = LMI_STYLE1;
 		cc->i_version = 1;
-		lis_spin_lock_init(&cc->lock, "cc-lock");
+		spin_lock_init(&cc->lock); /* "cc-lock" */
 		/*
 		   initialize bind list 
 		 */
@@ -25925,7 +25910,7 @@ isup_free_cc(queue_t *q)
 	ensure(cc, return);
 	printd(("%s: %s: %p: free cc %d:%d\n", ISUP_DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
-	lis_spin_lock_irqsave(&cc->lock, &flags);
+	spin_lock_irqsave(&cc->lock, flags);
 	{
 		/*
 		   stopping bufcalls 
@@ -26020,7 +26005,7 @@ isup_free_cc(queue_t *q)
 			atomic_set(&cc->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&cc->lock, &flags);
+	spin_unlock_irqrestore(&cc->lock, flags);
 	cc_put(cc);		/* final put */
 	return;
 }
@@ -26057,7 +26042,7 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 	if ((ct = kmem_cache_alloc(isup_ct_cachep, SLAB_ATOMIC))) {
 		bzero(ct, sizeof(*ct));
 		ct_get(ct);	/* first get */
-		lis_spin_lock_init(&ct->lock, "ct-lock");
+		spin_lock_init(&ct->lock); /* "ct-lock" */
 		ct->id = id;
 		ct->cic = cic;
 		/*
@@ -26141,7 +26126,7 @@ isup_free_ct(struct ct *ct)
 	psw_t flags;
 	ensure(ct, return);
 	printd(("%s: %s: %p free ct->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, ct, ct->id));
-	lis_spin_lock_irqsave(&ct->lock, &flags);
+	spin_lock_irqsave(&ct->lock, flags);
 	{
 		/*
 		   stop all timers 
@@ -26327,7 +26312,7 @@ isup_free_ct(struct ct *ct)
 		}
 
 	}
-	lis_spin_unlock_irqrestore(&ct->lock, &flags);
+	spin_unlock_irqrestore(&ct->lock, flags);
 	ct_put(ct);		/* final put */
 	return;
 }
@@ -26387,7 +26372,7 @@ isup_alloc_cg(ulong id, struct sr *sr)
 	if ((cg = kmem_cache_alloc(isup_cg_cachep, SLAB_ATOMIC))) {
 		bzero(cg, sizeof(*cg));
 		cg_get(cg);	/* first get */
-		lis_spin_lock_init(&cg->lock, "cg-lock");
+		spin_lock_init(&cg->lock); /* "cg-lock" */
 		cg->id = id;
 		switch (sr->proto.pvar & SS7_PVAR_MASK) {
 		default:
@@ -26443,7 +26428,7 @@ isup_free_cg(struct cg *cg)
 	psw_t flags;
 	ensure(cg, return);
 	printd(("%s: %s: %p free cg->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, cg, cg->id));
-	lis_spin_lock_irqsave(&cg->lock, &flags);
+	spin_lock_irqsave(&cg->lock, flags);
 	{
 		/*
 		   stop all timers 
@@ -26557,7 +26542,7 @@ isup_free_cg(struct cg *cg)
 			atomic_set(&cg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&cg->lock, &flags);
+	spin_unlock_irqrestore(&cg->lock, flags);
 	cg_put(cg);		/* final put */
 	return;
 }
@@ -26617,7 +26602,7 @@ isup_alloc_tg(ulong id, struct sr *sr)
 	if ((tg = kmem_cache_alloc(isup_tg_cachep, SLAB_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
 		tg_get(tg);	/* first get */
-		lis_spin_lock_init(&tg->lock, "tg-lock");
+		spin_lock_init(&tg->lock); /* "tg-lock" */
 		tg->id = id;
 		tg->proto.pvar = SS7_PVAR_ITUT_96;
 		tg->proto.popt = 0;
@@ -26654,7 +26639,7 @@ isup_free_tg(struct tg *tg)
 	psw_t flags;
 	ensure(tg, return);
 	printd(("%s: %s: %p free tg->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, tg, tg->id));
-	lis_spin_lock_irqsave(&tg->lock, &flags);
+	spin_lock_irqsave(&tg->lock, flags);
 	{
 		/*
 		   free all circuits 
@@ -26740,7 +26725,7 @@ isup_free_tg(struct tg *tg)
 			atomic_set(&tg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&tg->lock, &flags);
+	spin_unlock_irqrestore(&tg->lock, flags);
 	tg_put(tg);		/* final put */
 	return;
 }
@@ -26800,7 +26785,7 @@ isup_alloc_sr(ulong id, struct sp *sp, mtp_addr_t * add)
 	if ((sr = kmem_cache_alloc(isup_sr_cachep, SLAB_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
 		sr_get(sr);	/* first get */
-		lis_spin_lock_init(&sr->lock, "sr-lock");
+		spin_lock_init(&sr->lock); /* "sr-lock" */
 		sr->id = id;
 		/*
 		   add to master list 
@@ -26843,7 +26828,7 @@ isup_free_sr(struct sr *sr)
 	psw_t flags;
 	ensure(sr, return);
 	printd(("%s: %s: %p free sr->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, sr, sr->id));
-	lis_spin_lock_irqsave(&sr->lock, &flags);
+	spin_lock_irqsave(&sr->lock, flags);
 	{
 		/*
 		   stop all timers 
@@ -26945,7 +26930,7 @@ isup_free_sr(struct sr *sr)
 			atomic_set(&sr->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&sr->lock, &flags);
+	spin_unlock_irqrestore(&sr->lock, flags);
 	sr_put(sr);		/* final put */
 }
 STATIC struct sr *
@@ -27004,7 +26989,7 @@ isup_alloc_sp(ulong id, mtp_addr_t * add)
 	if ((sp = kmem_cache_alloc(isup_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
-		lis_spin_lock_init(&sp->lock, "sp-lock");
+		spin_lock_init(&sp->lock); /* "sp-lock" */
 		sp->id = id;
 		sp->add = *add;
 		for (spp = &master.sp.list; *spp && (*spp)->id < id; spp = &(*spp)->next) ;
@@ -27029,7 +27014,7 @@ isup_free_sp(struct sp *sp)
 	psw_t flags;
 	ensure(sp, return);
 	printd(("%s: %s: %p free sp->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, sp, sp->id));
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_irqsave(&sp->lock, flags);
 	{
 		/*
 		   freeing all signalling relations 
@@ -27112,7 +27097,7 @@ isup_free_sp(struct sp *sp)
 			atomic_set(&sp->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_irqrestore(&sp->lock, flags);
 	sp_put(sp);		/* final put */
 }
 STATIC struct sp *
@@ -27173,7 +27158,7 @@ isup_alloc_mtp(queue_t *q, struct mtp **mpp, ulong index, cred_t *crp)
 		mtp_get(mtp);	/* first get */
 		mtp->u.mux.index = index;
 		mtp->cred = *crp;
-		lis_spin_lock_init(&mtp->qlock, "mtp-queue-lock");
+		spin_lock_init(&mtp->qlock); /* "mtp-queue-lock" */
 		(mtp->iq = RD(q))->q_ptr = mtp_get(mtp);
 		(mtp->oq = WR(q))->q_ptr = mtp_get(mtp);
 		mtp->o_prim = mtp_w_prim;
@@ -27183,7 +27168,7 @@ isup_alloc_mtp(queue_t *q, struct mtp **mpp, ulong index, cred_t *crp)
 		mtp->i_state = LMI_UNUSABLE;
 		mtp->i_style = LMI_STYLE1;
 		mtp->i_version = 1;
-		lis_spin_lock_init(&mtp->lock, "mtp-lock");
+		spin_lock_init(&mtp->lock); /* "mtp-lock" */
 		/*
 		   place in master list 
 		 */
@@ -27205,7 +27190,7 @@ isup_free_mtp(queue_t *q)
 	ensure(mtp, return);
 	printd(("%s: %s: %p free mtp index = %lu\n", ISUP_DRV_NAME, __FUNCTION__, mtp,
 		mtp->u.mux.index));
-	lis_spin_lock_irqsave(&mtp->lock, &flags);
+	spin_lock_irqsave(&mtp->lock, flags);
 	{
 		/*
 		   flushing buffers 
@@ -27278,7 +27263,7 @@ isup_free_mtp(queue_t *q)
 			atomic_set(&mtp->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&mtp->lock, &flags);
+	spin_unlock_irqrestore(&mtp->lock, flags);
 	mtp_put(mtp);		/* final put */
 }
 STATIC struct mtp *
@@ -27354,7 +27339,7 @@ isup_init(void)
 		} else if (mindex)
 			isup_majors[mindex] = err;
 	}
-	lis_spin_lock_init(&master.lock, "isup-master-list-lock");
+	spin_lock_init(&master.lock); /* "isup-master-list-lock" */
 	isup_initialized = 1;
 	return;
 }

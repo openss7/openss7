@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:56 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $"
 
-static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $";
+static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -66,17 +66,7 @@ static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1
  *  channel (slot) operation, where each SDL stream represents one DS0 or DS0a
  *  bearer channel.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -85,14 +75,8 @@ static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/mxi.h>
 #include <ss7/mxi_ioctl.h>
 
-#include "debug.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
-
 #define MX_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $"
+#define MX_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -103,19 +87,18 @@ static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1
 			MX_DEVICE	"\n" \
 			MX_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(MX_CONTACT);
 MODULE_DESCRIPTION(MX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MX_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MX_LICENSE);
 #endif
+#endif				/* LINUX */
 
-#ifndef psw_t
-#ifdef INT_PSW
-#define psw_t int
-#else
-#define psw_t unsigned long
-#endif
+#ifdef LFS
+#define MX_MOD_ID	CONFIG_STREAMS_MX_MODID
+#define MX_MOD_NAME	CONFIG_STREAMS_MX_NAME
 #endif
 
 /*
@@ -2666,13 +2649,13 @@ mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t *crp)
 		mx->cred = *crp;
 		(mx->oq = RD(q))->q_ptr = mx_get(mx);
 		(mx->iq = WR(q))->q_ptr = mx_get(mx);
-		lis_spin_lock_init(&mx->qlock, "mx-queue-lock");
+		spin_lock_init(&mx->qlock); /* "mx-queue-lock" */
 		mx->o_prim = &mx_r_prim;
 		mx->i_prim = &mx_w_prim;
 		mx->o_wakeup = NULL;
 		mx->i_wakeup = NULL;
 		mx->state = MXS_UNINIT;	/* unitialized */
-		lis_spin_lock_init(&mx->lock, "mx-priv-lock");
+		spin_lock_init(&mx->lock); /* "mx-priv-lock" */
 		if ((mx->next = *chp))
 			mx->next->prev = &mx->next;
 		mx->prev = chp;
@@ -2689,7 +2672,7 @@ mx_free_priv(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	psw_t flags;
 	ensure(mx, return);
-	lis_spin_lock_irqsave(&mx->lock, &flags);
+	spin_lock_irqsave(&mx->lock, flags);
 	{
 		ss7_unbufcall((str_t *) mx);
 		if ((*mx->prev = mx->next))
@@ -2705,7 +2688,7 @@ mx_free_priv(queue_t *q)
 		flushq(mx->iq, FLUSHALL);
 		mx->iq = NULL;
 	}
-	lis_spin_unlock_irqrestore(&mx->lock, &flags);
+	spin_unlock_irqrestore(&mx->lock, flags);
 	mx_put(mx);		/* final put */
 	return;
 }

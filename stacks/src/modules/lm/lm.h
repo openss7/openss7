@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lm.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $
+ @(#) $RCSfile: lm.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LMI_LM_H__
 #define __LMI_LM_H__
 
-#ident "@(#) $RCSfile: lm.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $"
+#ident "@(#) $RCSfile: lm.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $"
 
 struct lmi;
 
@@ -98,7 +98,7 @@ typedef struct lmi {
 	dev_t devnum;			/* driver device (null for module) */
 	struct queue *rq;		/* read queue */
 	struct queue *wq;		/* write queue */
-	lis_spin_lock_t lock;		/* spin lock for SMP */
+	spinlock_t lock;		/* spin lock for SMP */
 	void *user;			/* user of this structure */
 	uint nest;			/* nested locks */
 	lmi_ulong state;		/* LM interface state */
@@ -107,27 +107,27 @@ typedef struct lmi {
 } lmi_t;
 
 #define LMI_PRIV(__q) ((lmi_t *)(__q)->q_ptr)
-#define lmi_init_lock(__lmi) lis_spin_lock_init(&(__lmi)->lock,"lmi-private")
+#define lmi_init_lock(__lmi) spin_lock_init(&(__lmi)->lock)
 #define lmi_locked(__lmi) ((__lmi)->user)
 
 static inline int lmi_trylock(lmi_t * lmi)
 {
-	lis_spin_lock_t *lock = &lmi->lock;
-	lis_spin_lock(lock);
+	spinlock_t *lock = &lmi->lock;
+	spin_lock(lock);
 	if (lmi->user && lmi->user != current) {
-		lis_spin_unlock(lock);
+		spin_unlock(lock);
 		return (1);
 	}
 	lmi->user = current;
 	lmi->next++;
-	lis_spin_unlock(lock);
+	spin_unlock(lock);
 	return (0);
 }
 
 static inline void lmi_unlock(lmi_t * lmi)
 {
-	lis_spin_lock_t *lock = &lmi->lock;
-	lis_spin_lock(lock);
+	spinlock_t *lock = &lmi->lock;
+	spin_lock(lock);
 	if (lmi->nest && lmi->user == current) {
 		if (!--lmi->nest)
 			lmi->user = NULL;
@@ -136,7 +136,7 @@ static inline void lmi_unlock(lmi_t * lmi)
 		lmi->user = NULL;
 		lmi->nest = 0;
 	}
-	lis_spin_unlock(lock);
+	spin_unlock(lock);
 }
 
 extern int lmi_info(struct lmi *, void **, int *);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,27 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:04 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:04 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
-#include "debug.h"
-#include "bufq.h"
+#include "compat.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -79,7 +67,7 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:04 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -90,12 +78,14 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $
 			SCTP_DEVICE	"\n" \
 			SCTP_CONTACT	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(SCTP_CONTACT);
 MODULE_DESCRIPTION(SCTP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SCTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCTP_LICENSE);
 #endif
+#endif				/* LINUX */
 
 STATIC void
 sctp_init(void)

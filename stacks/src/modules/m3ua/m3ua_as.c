@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as.c,v 0.9.2.1 2004/08/21 10:14:44 brian Exp $
+ @(#) $Id: m3ua_as.c,v 0.9.2.2 2004/08/26 23:37:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2004/08/21 10:14:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.2  2004/08/26 23:37:57  brian
+ - Converted for use with Linux Fast-STREAMS.
+
  Revision 0.9.2.1  2004/08/21 10:14:44  brian
  - Force checkin on branch.
 
@@ -50,20 +53,9 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
-
-#include "../debug.h"
-#include "../bufq.h"
+#include "compat.h"
 
 #include <ss7/m3ua.h>
 #include <ss7/m3ua_ioctl.h>
@@ -78,6 +70,7 @@ static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 1
 			M3UA_DEVICES	"\n" \
 			M3UA_CONTACT	"\n"
 
+#ifdef LINUX
 #ifdef MODULE
 MODULE_AUTHOR(M3UA_CONTACT);
 MODULE_DESCRIPTION(M3UA_DESCRIP);
@@ -85,12 +78,7 @@ MODULE_SUPPORTED_DEVICE(M3UA_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M3UA_LICENSE);
 #endif
-#define MODULE_STATIC static
-#else
-#define MOD_INC_USE_COUNT
-#define MOD_DEC_USE_COUNT
-#define MODULE_STATIC
-#endif
+#endif				/* LINUX */
 
 #ifdef M3UA_DEBUG
 static int m3ua_debug = M3UA_DEBUG;
@@ -100,9 +88,13 @@ static int m3ua_debug = 2;
 
 #define DEBUG_LEVEL m3ua_debug
 
-#ifndef M3UA_CMAJOR
-#define M3UA_CMAJOR 248
+#ifdef LFS
+#define M3UA_DEV_ID		CONFIG_STREAMS_M3UA_MODID
+#define M3UA_DEV_NAME		CONFIG_STREAMS_M3UA_NAME
+#define M3UA_CMAJORS		CONFIG_STREAMS_M3UA_NMAJORS
+#define M3UA_CMAJOR_0		CONFIG_STREAMS_M3UA_MAJOR
 #endif
+
 #define M3UA_NMINOR 255
 
 /*

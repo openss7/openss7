@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:10 $"
 
-static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $";
+static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:10 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
  *  cam be pushed over a TLI transport to effect an OpenSS7 Signalling Link or
  *  Signalling Data Terminal.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef CONFIG_MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <tihdr.h>
 // #include <xti.h>
@@ -84,9 +74,6 @@ static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#include "debug.h"
-#include "bufq.h"
-
 #define SS7IP_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
 #define SS7IP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SS7IP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
@@ -96,12 +83,21 @@ static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.1
 			SS7IP_COPYRIGHT	"\n" \
 			SS7IP_DEVICE	"\n" \
 			SS7IP_CONTACT
+#define SS7IP_SPLASH	SS7IP_DEVICE	" - " \
+			SS7IP_REVISION	"\n" \
 
+#ifdef LINUX
 MODULE_AUTHOR(SS7IP_CONTACT);
 MODULE_DESCRIPTION(SS7IP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SS7IP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SS7IP_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SL_TPI_MOD_ID CONFIG_STREAMS_SL_TPI_MODID
+#define SL_TPI_MOD_NAME CONFIG_STREAMS_SL_TPI_NAME
 #endif
 
 /*
@@ -168,12 +164,12 @@ typedef struct sl {
 	struct sl *next;		/* list linkage */
 	struct sl **prev;		/* list linkage */
 	size_t refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	ushort cmajor;			/* major device number */
 	ushort cminor;			/* minor device number */
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
-	lis_spin_lock_t qlock;		/* queue lock */
+	spinlock_t qlock;		/* queue lock */
 	queue_t *rwait;			/* RD queue waiting on qlock */
 	queue_t *wwait;			/* WR queue waiting on qlock */
 	uint rbid;			/* rd bufcall id */
@@ -261,7 +257,7 @@ sl_trylockq(queue_t *q)
 {
 	int res;
 	sl_t *s = PRIV(q);
-	if (!(res = lis_spin_trylock(&s->qlock))) {
+	if (!(res = spin_trylock(&s->qlock))) {
 		if (q == s->rq)
 			s->rwait = q;
 		if (q == s->wq)
@@ -273,7 +269,7 @@ STATIC INLINE void
 sl_unlockq(queue_t *q)
 {
 	sl_t *s = PRIV(q);
-	lis_spin_unlock(&s->qlock);
+	spin_unlock(&s->qlock);
 	if (s->rwait)
 		qenable(xchg(&s->rwait, NULL));
 	if (s->wwait)
@@ -287,7 +283,6 @@ sl_unlockq(queue_t *q)
  *
  *  =========================================================================
  */
-typedef void (*bufcall_fnc_t) (long);
 /*
  *  BUFSRV calls service routine
  *  -------------------------------------------------------------------------
@@ -2099,7 +2094,7 @@ sl_timer_start(queue_t *q, const uint t)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->qlock, &flags);
+	spin_lock_irqsave(&sl->qlock, flags);
 	{
 		sl_timer_stop(q, t);
 		switch (t) {
@@ -2162,7 +2157,7 @@ sl_timer_start(queue_t *q, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->qlock, &flags);
+	spin_unlock_irqrestore(&sl->qlock, flags);
 }
 
 /*
@@ -2800,7 +2795,7 @@ sl_txc_transmission_request(queue_t *q)
 		}
 		return (mp);
 	} else {
-		lis_spin_lock(&sl->sl.tb.q_lock);
+		spin_lock(&sl->sl.tb.q_lock);
 		if ((mp = bufq_head(&sl->sl.tb)) && (mp = dupmsg(mp))) {
 			mblk_t *bp = bufq_dequeue(&sl->sl.tb);
 			sl->sl.statem.Cm--;
@@ -2833,7 +2828,7 @@ sl_txc_transmission_request(queue_t *q)
 			sl->sl.statem.tx.N.fib = sl->sl.statem.tx.N.fib;
 			sl_daedt_msu(q, mp);
 		}
-		lis_spin_unlock(&sl->sl.tb.q_lock);
+		spin_unlock(&sl->sl.tb.q_lock);
 		return (mp);
 	}
 }
@@ -5192,7 +5187,7 @@ sl_send_data(queue_t *q, mblk_t *mp)
 		swerr();
 		return (-EPROTO);
 	}
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF)
 			ret = sl_lsc_pdu(q, mp);
@@ -5207,7 +5202,7 @@ sl_send_data(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 
@@ -5224,11 +5219,11 @@ sl_pdu_req(queue_t *q, mblk_t *mp)
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
 			int ret;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				ret = sl_lsc_pdu(q, mp);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (ret);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5250,11 +5245,11 @@ sl_emergency_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_emergency(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5276,11 +5271,11 @@ sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_emergency_ceases(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5302,11 +5297,11 @@ sl_start_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_start(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5328,11 +5323,11 @@ sl_stop_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_stop(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5355,11 +5350,11 @@ sl_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 		if (sl->state == LMI_ENABLED) {
 			int err;
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				err = sl_lsc_retrieve_bsnt(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (err);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5382,11 +5377,11 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 		if (sl->state == LMI_ENABLED) {
 			int err;
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				err = sl_lsc_retrieval_request_and_fsnc(q, p->sl_fsnc);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (err);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5408,11 +5403,11 @@ sl_resume_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_resume(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5435,11 +5430,11 @@ sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 		if (sl->state == LMI_ENABLED) {
 			int err;
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				err = sl_lsc_clear_buffers(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (err);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5461,11 +5456,11 @@ sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_clear_rtb(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5487,11 +5482,11 @@ sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_local_processor_outage(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5513,11 +5508,11 @@ sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_congestion_discard(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5539,11 +5534,11 @@ sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_congestion_accept(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5565,11 +5560,11 @@ sl_no_congestion_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_no_congestion(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5591,11 +5586,11 @@ sl_power_on_req(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
-			lis_spin_lock_irqsave(&sl->lock, &flags);
+			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_power_on(q);
 			}
-			lis_spin_unlock_irqrestore(&sl->lock, &flags);
+			spin_unlock_irqrestore(&sl->lock, flags);
 			return (QR_DONE);
 		}
 		ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5637,7 +5632,7 @@ sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		if (sl->sdt.tb.q_count > 1024)
 			return (-EBUSY);
@@ -5646,7 +5641,7 @@ sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 			ret = (QR_TRIMMED);
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 
@@ -5661,11 +5656,11 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_daedt_start(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5680,11 +5675,11 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_daedr_start(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5699,11 +5694,11 @@ sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_aerm_start(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5718,11 +5713,11 @@ sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_aerm_stop(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5737,11 +5732,11 @@ sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_aerm_set_ti_to_tin(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5756,11 +5751,11 @@ sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_aerm_set_ti_to_tie(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5775,11 +5770,11 @@ sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_suerm_start(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -5794,11 +5789,11 @@ sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl_suerm_stop(q);
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (QR_DONE);
 }
 
@@ -6082,11 +6077,11 @@ t_info_ack(queue_t *q, mblk_t *mp)
 			sl->t.pdu_size = p->TIDU_size;
 		if ((sl->sdt.config.m =
 		     sl->t.pdu_size - 1 - ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3)) < 272)
-			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %d",
+			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %ld",
 				SL_TPI_MOD_NAME, sl->sdt.config.m);
 		if ((sl->t.add_size = p->ADDR_size) > sizeof(struct sockaddr))
-			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %d",
-				SL_TPI_MOD_NAME, p->ADDR_size);
+			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %ld",
+				SL_TPI_MOD_NAME, (long) p->ADDR_size);
 		sl->t.opt_size = p->OPT_size;
 		sl->t.state = p->CURRENT_state;
 		sl->t.serv_type = p->SERV_type;
@@ -6496,11 +6491,11 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6514,11 +6509,11 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6532,11 +6527,11 @@ sl_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6550,11 +6545,11 @@ sl_iocsconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.config = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6568,11 +6563,11 @@ sl_ioctconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6586,11 +6581,11 @@ sl_ioccconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6604,11 +6599,11 @@ sl_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statem;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6622,11 +6617,11 @@ sl_ioccmreset(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.statem = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6640,11 +6635,11 @@ sl_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statsp;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6658,11 +6653,11 @@ sl_iocsstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6676,11 +6671,11 @@ sl_iocgstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.stats;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6694,11 +6689,11 @@ sl_ioccstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->sl.stats, sizeof(sl->sl.stats));
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6712,11 +6707,11 @@ sl_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.notify;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6730,11 +6725,11 @@ sl_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events |= arg->events;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6748,11 +6743,11 @@ sl_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events &= ~(arg->events);
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6771,7 +6766,7 @@ sdt_test_config(sl_t * sl, sdt_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	do {
 		if (!arg->t8)
 			arg->t8 = sl->sdt.config.t8;
@@ -6800,19 +6795,19 @@ sdt_test_config(sl_t * sl, sdt_config_t * arg)
 			break;
 		}
 	} while (0);
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 STATIC int
 sdt_commit_config(sl_t * sl, sdt_config_t * arg)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sdt_test_config(sl, arg);
 		sl->sdt.config = *arg;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 STATIC int
@@ -6822,11 +6817,11 @@ sdt_iocgoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6839,11 +6834,11 @@ sdt_iocsoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6856,11 +6851,11 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6873,11 +6868,11 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.config = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6912,11 +6907,11 @@ sdt_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.statem;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6938,11 +6933,11 @@ sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.statsp;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6955,11 +6950,11 @@ sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6972,11 +6967,11 @@ sdt_iocgstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.stats;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -6988,11 +6983,11 @@ sdt_ioccstats(queue_t *q, mblk_t *mp)
 	psw_t flags;
 	sl_t *sl = PRIV(q);
 	(void) mp;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		bzero(&sl->sdt.stats, sizeof(sl->sdt.stats));
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 STATIC int
@@ -7002,11 +6997,11 @@ sdt_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.notify;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7019,11 +7014,11 @@ sdt_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.notify = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7036,11 +7031,11 @@ sdt_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.notify.events &= ~arg->events;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7053,11 +7048,11 @@ sdt_ioccabort(queue_t *q, mblk_t *mp)
 	int ret = 0;
 	psw_t flags;
 	(void) mp;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ret = -EOPNOTSUPP;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 
@@ -7104,11 +7099,11 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7121,11 +7116,11 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7138,11 +7133,11 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.config;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7156,12 +7151,12 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			if (!(ret = sdl_test_config(sl, arg)))
 				sdl_commit_config(sl, arg);
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7175,11 +7170,11 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = sdl_test_config(sl, arg);
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7192,11 +7187,11 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sdl_commit_config(sl, arg);
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7209,11 +7204,11 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.statem;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7236,11 +7231,11 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.statsp;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7254,11 +7249,11 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		fixme(("%s: FIXME: check these settings\n", SL_TPI_MOD_NAME));
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.statsp = *arg;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7271,11 +7266,11 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.stats;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7287,11 +7282,11 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	psw_t flags;
 	(void) mp;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		bzero(&sl->sdl.stats, sizeof(sl->sdl.stats));
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 STATIC int
@@ -7301,11 +7296,11 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.notify;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7318,11 +7313,11 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.notify.events |= arg->events;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7335,11 +7330,11 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		lis_spin_lock_irqsave(&sl->lock, &flags);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.notify.events &= ~arg->events;
 		}
-		lis_spin_unlock_irqrestore(&sl->lock, &flags);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (0);
 	}
 	rare();
@@ -7351,11 +7346,11 @@ sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	psw_t flags;
 	(void) mp;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl->sdl.config.ifflags &= ~SDL_IF_TX_RUNNING;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 STATIC int
@@ -7364,11 +7359,11 @@ sdl_ioccconntx(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	psw_t flags;
 	(void) mp;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sl->sdl.config.ifflags |= SDL_IF_TX_RUNNING;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 
@@ -7895,7 +7890,7 @@ sl_r_pcrse(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	int rtn;
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		switch (*(ulong *) mp->b_rptr) {
 		case t1:
@@ -7940,7 +7935,7 @@ sl_r_pcrse(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (rtn);
 }
 
@@ -8254,13 +8249,13 @@ sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
 		sl->wq = WR(q);
 		sl->wq->q_ptr = sl;
 		sl->refcnt++;
-		lis_spin_lock_init(&sl->qlock, "sl-queue-lock");
+		spin_lock_init(&sl->qlock); /* "sl-queue-lock" */
 		sl->rwait = NULL;
 		sl->wwait = NULL;
 		sl->version = 1;
 		sl->state = LMI_UNUSABLE;
 		sl->style = LMI_STYLE1;
-		lis_spin_lock_init(&sl->lock, "sl-priv-lock");
+		spin_lock_init(&sl->lock); /* "sl-priv-lock" */
 		if ((sl->next = *slp))
 			sl->next->prev = &sl->next;
 		sl->prev = slp;
@@ -8360,7 +8355,7 @@ sl_free_priv(queue_t *q)
 	sl_t *sl = PRIV(q);
 	psw_t flags;
 	ensure(sl, return);
-	lis_spin_lock_irqsave(&sl->lock, &flags);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		if (sl->sdt.rx_cmp)
 			sl_fast_freemsg(xchg(&sl->sdt.rx_cmp, NULL));
@@ -8395,7 +8390,7 @@ sl_free_priv(queue_t *q)
 		sl->wq->q_ptr = NULL;
 		sl->refcnt--;
 	}
-	lis_spin_unlock_irqrestore(&sl->lock, &flags);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	printd(("%s: unlinked module private structure\n", SL_TPI_MOD_NAME));
 	if (sl->refcnt) {
 		assure(sl->refcnt);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,37 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/sli.h>
 
-#include "debug.h"
-
-#ifndef MUX_CMAJOR
-#define MUX_CMAJOR 220
-#endif
-
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -87,11 +72,20 @@ char const ident[] =
 			SL_DEVICE	"\n" \
 			SL_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(SL_CONTACT);
 MODULE_DESCRIPTION(SL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SL_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SL_MUX_DRV_ID		CONFIG_STREAMS_SL_MUX_MODID
+#define SL_MUX_DRV_NAME		CONFIG_STREAMS_SL_MUX_NAME
+#define SL_MUX_CMAJORS		CONFIG_STREAMS_SL_MUX_NMAJORS
+#define SL_MUX_CMAJOR_0		CONFIG_STREAMS_SL_MUX_MAJOR
 #endif
 
 static struct module_info sl_minfo = {
@@ -462,7 +456,7 @@ sl_u_wput(queue_t *q, mblk_t *mp)
 			flushq(q, FLUSHDATA);
 		if (*mp->b_rptr & FLUSHR) {
 			*mp->b_rptr &= ~FLUSHW;
-			flushq(OTHER(q), FLUSHDATA);
+			flushq(OTHERQ(q), FLUSHDATA);
 			qreply(q, mp);
 		} else {
 			ptrace(("Discarding\n"));
@@ -543,13 +537,13 @@ int
 init_module(void)
 {
 	cmn_err(CE_NOTE, SL_BANNER);	/* console splash */
-	lis_register_strdev(MUX_CMAJOR, &sl_info, 256, SL_MUX_DRV_NAME);
+	lis_register_strdev(SL_MUX_CMAJOR_0, &sl_info, 256, SL_MUX_DRV_NAME);
 	return (0);
 }
 
 void
 cleanup_module(void)
 {
-	lis_unregister_strdev(MUX_CMAJOR);
+	lis_unregister_strdev(SL_MUX_CMAJOR_0);
 	return;
 }

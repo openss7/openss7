@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:11 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $"
 
-static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $";
+static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
-
-#include "debug.h"
-#include "bufq.h"
-#include "priv.h"
-#include "lock.h"
-#include "queue.h"
-#include "allocb.h"
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -80,7 +64,7 @@ static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -91,11 +75,20 @@ static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 			MG_DEVICE	"\n" \
 			MG_CONTACT
 
+#ifdef LINUX
 MODULE_AUTHOR(MG_CONTACT);
 MODULE_DESCRIPTION(MG_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MG_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MG_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define MG_DRV_ID		CONFIG_STREAMS_MG_MODID
+#define MG_DRV_NAME		CONFIG_STREAMS_MG_NAME
+#define MG_CMAJORS		CONFIG_STREAMS_MG_NMAJORS
+#define MG_CMAJOR_0		CONFIG_STREAMS_MG_MAJOR
 #endif
 
 #define MG_CMINORS 255
@@ -209,7 +202,7 @@ struct ch;				/* channel */
 struct mx;				/* multiplexer lower stream */
 
 typedef struct df {
-	lis_spin_lock_t lock;		/* master lock */
+	spinlock_t lock;		/* master lock */
 	SLIST_HEAD (mg, mg);		/* list of MG structures */
 	SLIST_HEAD (se, se);		/* list of SE structures */
 	SLIST_HEAD (lg, lg);		/* list of LG structures */
@@ -5133,7 +5126,7 @@ mg_iocgstatem(queue_t *q, mblk_t *mp)
 		mg_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_sta_mg(arg, mg_lookup(arg->id), size);
@@ -5157,7 +5150,7 @@ mg_iocgstatem(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5196,7 +5189,7 @@ mg_iocgstatsp(queue_t *q, mblk_t *mp)
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_statp_get_mg(arg, mg_lookup(arg->id), size);
@@ -5220,7 +5213,7 @@ mg_iocgstatsp(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5243,7 +5236,7 @@ mg_iocsstatsp(queue_t *q, mblk_t *mp)
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_statp_set_mg(arg, mg_lookup(arg->id), size);
@@ -5267,7 +5260,7 @@ mg_iocsstatsp(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5290,7 +5283,7 @@ mg_iocgstats(queue_t *q, mblk_t *mp)
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_stat_get_mg(arg, mg_lookup(arg->id), size);
@@ -5314,7 +5307,7 @@ mg_iocgstats(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5337,7 +5330,7 @@ mg_ioccstats(queue_t *q, mblk_t *mp)
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_stat_clr_mg(arg, mg_lookup(arg->id), size);
@@ -5361,7 +5354,7 @@ mg_ioccstats(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5384,7 +5377,7 @@ mg_iocgnotify(queue_t *q, mblk_t *mp)
 		mg_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_not_get_mg(arg, mg_lookup(arg->id), size);
@@ -5408,7 +5401,7 @@ mg_iocgnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5431,7 +5424,7 @@ mg_iocsnotify(queue_t *q, mblk_t *mp)
 		mg_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_not_set_mg(arg, mg_lookup(arg->id), size);
@@ -5455,7 +5448,7 @@ mg_iocsnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -5478,7 +5471,7 @@ mg_ioccnotify(queue_t *q, mblk_t *mp)
 		mg_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
-		lis_spin_lock_irqsave(&master.lock, &flags);
+		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case MG_OBJ_TYPE_MG:
 			ret = mg_not_clr_mg(arg, mg_lookup(arg->id), size);
@@ -5502,7 +5495,7 @@ mg_ioccnotify(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6150,7 +6143,7 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	lis_spin_lock_irqsave(&master.lock, &flags);
+	spin_lock_irqsave(&master.lock, flags);
 	for (; *mgp; mgp = (typeof(mgp)) & (*mgp)->next) {
 		ushort dmajor = (*mgp)->u.dev.cmajor;
 		if (cmajor != dmajor)
@@ -6169,7 +6162,7 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= MG_CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", MG_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -6177,11 +6170,11 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(mg = mg_alloc_priv(q, mgp, devp, crp))) {
 		ptrace(("%s: ERROR: no memory\n", MG_DRV_NAME));
-		lis_spin_unlock_irqrestore(&master.lock, &flags);
+		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	lis_spin_unlock_irqrestore(&master.lock, &flags);
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (0);
 }
 
@@ -6350,7 +6343,7 @@ mg_alloc_priv(queue_t *q, struct mg **mgp, dev_t *devp, cred_t *crp)
 		mg->u.dev.cmajor = getmajor(*devp);
 		mg->u.dev.cminor = getminor(*devp);
 		mg->cred = *crp;
-		lis_spin_lock_init(&mg->qlock, "mg-queue-lock");
+		spin_lock_init(&mg->qlock); /* "mg-queue-lock" */
 		(mg->iq = WR(q))->q_ptr = mg_get(mg);
 		(mg->oq = RD(q))->q_ptr = mg_get(mg);
 		mg->o_prim = mg_r_prim;
@@ -6360,7 +6353,7 @@ mg_alloc_priv(queue_t *q, struct mg **mgp, dev_t *devp, cred_t *crp)
 		mg->i_state = MGS_DETACHED;
 		mg->i_style = LMI_STYLE1;
 		mg->i_version = 1;
-		lis_spin_lock_init(&mg->lock, "mg-priv-lock");
+		spin_lock_init(&mg->lock); /* "mg-priv-lock" */
 		/*
 		   place in master list 
 		 */
@@ -6379,7 +6372,7 @@ mg_free_priv(struct mg *mg)
 {
 	psw_t flags;
 	ensure(mg, return);
-	lis_spin_lock_irqsave(&mg->lock, &flags);
+	spin_lock_irqsave(&mg->lock, flags);
 	{
 		struct ch *ch;
 		struct se *se;
@@ -6424,7 +6417,7 @@ mg_free_priv(struct mg *mg)
 			atomic_set(&mg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&mg->lock, &flags);
+	spin_unlock_irqrestore(&mg->lock, flags);
 	mg_put(mg);		/* final put */
 	return;
 }
@@ -6469,7 +6462,7 @@ se_alloc_priv(ulong id, struct mg *mg)
 	struct se *se, **sep;
 	if ((se = kmem_cache_alloc(se_priv_cachep, SLAB_ATOMIC))) {
 		bzero(se, sizeof(*se));
-		lis_spin_lock_init(&se->lock, "se-lock");
+		spin_lock_init(&se->lock); /* "se-lock" */
 		se_get(se);	/* first get */
 		/*
 		   add to master list 
@@ -6503,7 +6496,7 @@ se_free_priv(struct se *se)
 {
 	psw_t flags;
 	ensure(se, return);
-	lis_spin_lock_irqsave(&se->lock, &flags);
+	spin_lock_irqsave(&se->lock, flags);
 	{
 		struct mg *mg;
 		struct lg *lg;
@@ -6547,7 +6540,7 @@ se_free_priv(struct se *se)
 			atomic_set(&se->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&se->lock, &flags);
+	spin_unlock_irqrestore(&se->lock, flags);
 	se_put(se);		/* final put */
 	return;
 }
@@ -6592,7 +6585,7 @@ lg_alloc_priv(ulong id, struct se *se)
 	struct lg *lg;
 	if ((lg = kmem_cache_alloc(lg_priv_cachep, SLAB_ATOMIC))) {
 		bzero(lg, sizeof(*lg));
-		lis_spin_lock_init(&lg->lock, "lg-lock");
+		spin_lock_init(&lg->lock); /* "lg-lock" */
 		lg_get(lg);	/* first get */
 		/*
 		   add to master list 
@@ -6625,7 +6618,7 @@ lg_free_priv(struct lg *lg)
 {
 	psw_t flags;
 	ensure(lg, return);
-	lis_spin_lock_irqsave(&lg->lock, &flags);
+	spin_lock_irqsave(&lg->lock, flags);
 	{
 		struct se *se;
 		struct ch *ch;
@@ -6690,7 +6683,7 @@ lg_free_priv(struct lg *lg)
 			atomic_set(&lg->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&lg->lock, &flags);
+	spin_unlock_irqrestore(&lg->lock, flags);
 	lg_put(lg);		/* final put */
 }
 static struct lg *
@@ -6882,7 +6875,7 @@ ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 	struct ch *ch;
 	if ((ch = kmem_cache_alloc(ch_priv_cachep, SLAB_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
-		lis_spin_lock_init(&ch->lock, "ch-lock");
+		spin_lock_init(&ch->lock); /* "ch-lock" */
 		ch_get(ch);	/* first get */
 		/*
 		   add to master list 
@@ -6955,7 +6948,7 @@ ch_free_priv(struct ch *ch)
 {
 	psw_t flags;
 	ensure(ch, return);
-	lis_spin_lock_irqsave(&ch->lock, &flags);
+	spin_lock_irqsave(&ch->lock, flags);
 	{
 		struct mx *mx;
 		struct lg *lg;
@@ -7029,7 +7022,7 @@ ch_free_priv(struct ch *ch)
 			atomic_set(&ch->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&ch->lock, &flags);
+	spin_unlock_irqrestore(&ch->lock, flags);
 	ch_put(ch);		/* final put */
 }
 static struct ch *
@@ -7077,7 +7070,7 @@ mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 		mx_get(mx);	/* first get */
 		mx->u.mux.index = index;
 		mx->cred = *crp;
-		lis_spin_lock_init(&mx->qlock, "mx-queue-lock");
+		spin_lock_init(&mx->qlock); /* "mx-queue-lock" */
 		(mx->iq = RD(q))->q_ptr = mx_get(mx);
 		(mx->oq = WR(q))->q_ptr = mx_get(mx);
 		mx->o_prim = mx_w_prim;
@@ -7088,7 +7081,7 @@ mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 		mx->i_style = LMI_STYLE1;
 		mx->i_version = 1;
 		mx->state = MXS_ATTACHED;	/* must be linked in attached state */
-		lis_spin_lock_init(&mx->lock, "mx-priv-lock");
+		spin_lock_init(&mx->lock); /* "mx-priv-lock" */
 		/*
 		   place in master list 
 		 */
@@ -7109,7 +7102,7 @@ mx_free_link(struct mx *mx)
 {
 	psw_t flags;
 	ensure(mx, return);
-	lis_spin_lock_irqsave(&mx->lock, &flags);
+	spin_lock_irqsave(&mx->lock, flags);
 	{
 		struct ch *ch;
 		ss7_unbufcall((str_t *) mx);
@@ -7148,7 +7141,7 @@ mx_free_link(struct mx *mx)
 			atomic_set(&mx->refcnt, 1);
 		}
 	}
-	lis_spin_unlock_irqrestore(&mx->lock, &flags);
+	spin_unlock_irqrestore(&mx->lock, flags);
 	mx_put(mx);		/* final put */
 	return;
 }
@@ -7223,7 +7216,7 @@ mg_init(void)
 		} else
 			mg_majors[mindex] = err;
 	}
-	lis_spin_lock_init(&master.lock, "mg-master-list-lock");
+	spin_lock_init(&master.lock); /* "mg-master-list-lock" */
 	mg_initialized = 1;
 	return;
 }

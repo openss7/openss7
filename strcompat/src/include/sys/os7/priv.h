@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: priv.h,v 0.9.2.1 2004/08/21 10:14:38 brian Exp $
+ @(#) $Id: priv.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __PRIV_H__
-#define __PRIV_H__
+#ifndef __OS7_PRIV_H__
+#define __OS7_PRIV_H__
 
 /*
  *  =========================================================================
@@ -67,9 +67,9 @@
 	__type *next;				/* link linkage */ \
 	__type **prev;				/* link linkage */ \
 	atomic_t refcnt;			/* reference count */ \
-	lis_spin_lock_t lock;			/* structure lock */ \
-	void (*put)(__type *);			/* release function */ \
-	__type *(*get)(__type *);		/* acquire function */ \
+	spinlock_t lock;			/* structure lock */ \
+	void (*priv_put)(__type *);		/* release function */ \
+	__type *(*priv_get)(__type *);		/* acquire function */ \
 	ulong type;				/* structure type */ \
 	ulong id;				/* structure id */ \
 	ulong state;				/* state */ \
@@ -100,7 +100,7 @@ typedef struct head {
 	int (*o_prim)(queue_t *, mblk_t *);	/* oput function */ \
 	void (*i_wakeup)(queue_t *);		/* isrv wakeup function */ \
 	void (*o_wakeup)(queue_t *);		/* osrv wakeup function */ \
-	lis_spin_lock_t qlock;			/* queue lock */ \
+	spinlock_t qlock;			/* queue lock */ \
 	uint ibid;				/* iput bufcall id */ \
 	uint obid;				/* oput bufcall id */ \
 	queue_t *iwait;				/* iput queue waiting */ \
@@ -140,4 +140,4 @@ typedef struct str {
 		struct __s1 *hash[__n]; \
 	} __s2 \
 
-#endif				/* __PRIV_H__ */
+#endif				/* __OS7_PRIV_H__ */

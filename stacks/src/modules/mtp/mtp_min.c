@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:13 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -60,17 +60,7 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
  *  complete Message Transfer Part protocol layer for SS7.  This is a minimal
  *  implementation which is suitable for GSM-A or F-Links only between SEPs.
  */
-
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dki.h>
+#include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -84,11 +74,8 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/xti_ss7.h>
 #include <sys/xti_mtp.h>
 
-#include "debug.h"
-#include "bufq.h"
-
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
+#define MTP_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -98,12 +85,23 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 			MTP_COPYRIGHT	"\n" \
 			MTP_DEVICE	"\n" \
 			MTP_CONTACT
+#define MTP_SPLASH	MTP_DEVICE	" - " \
+			MTP_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(MTP_CONTACT);
 MODULE_DESCRIPTION(MTP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_LICENSE);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define MTP_MIN_DRV_ID		CONFIG_STREAMS_MTP_MIN_MODID
+#define MTP_MIN_DRV_NAME	CONFIG_STREAMS_MTP_MIN_NAME
+#define MTP_MIN_CMAJORS		CONFIG_STREAMS_MTP_MIN_NMAJORS
+#define MTP_MIN_CMAJOR_0	CONFIG_STREAMS_MTP_MIN_MAJOR
 #endif
 
 #define MTP_MIN_CMINORS 255
@@ -243,7 +241,7 @@ static mtp_options_t mtp_opt_defaults = { SS7_PVAR_ETSI_00, 0, 0, 0, 0, 0 };
 	__type *next;			/* list linkage */ \
 	__type **prev;			/* list linkage */ \
 	size_t refcnt;			/* reference count */ \
-	lis_spin_lock_t lock;		/* structure lock */ \
+	spinlock_t lock;		/* structure lock */ \
 	ulong id;			/* structure id */ \
 
 
@@ -267,7 +265,7 @@ typedef struct head {
 	} u; \
 	queue_t *rq;			/* rd queue */ \
 	queue_t *wq;			/* wr queue */ \
-	lis_spin_lock_t qlock;		/* queue lock */ \
+	spinlock_t qlock;		/* queue lock */ \
 	uint rbid;			/* rd bufcall id */ \
 	uint wbid;			/* wr bufcall id */ \
 	queue_t *rwait;			/* rd queue waiting */ \
@@ -546,7 +544,7 @@ mtp_trylock(queue_t *q)
 {
 	int res;
 	str_t *s = PRIV(q);
-	if (!(res = lis_spin_trylock(&s->qlock))) {
+	if (!(res = spin_trylock(&s->qlock))) {
 		if (q == s->rq)
 			s->rwait = q;
 		if (q == s->wq)
@@ -558,7 +556,7 @@ static void
 mtp_unlockq(queue_t *q)
 {
 	str_t *s = PRIV(q);
-	lis_spin_unlock(&s->qlock);
+	spin_unlock(&s->qlock);
 	if (s->rwait)
 		qenable(xchg(&s->rwait, NULL));
 	if (s->wwait)
@@ -572,7 +570,6 @@ mtp_unlockq(queue_t *q)
  *
  *  =========================================================================
  */
-typedef void (*bufcall_fnc_t) (long);
 /*
  *  BUFSRV calls service routine
  *  -------------------------------------------------------------------------
@@ -3837,7 +3834,7 @@ STATIC inline void
 sl_timer_start(sl_t * sl, const uint t)
 {
 	psw_t flags;
-	lis_spin_lock_irqsave(&sl->qlock, &flags);
+	spin_lock_irqsave(&sl->qlock, flags);
 	{
 		sl_timer_stop(sl, t);
 		switch (t) {
@@ -3858,7 +3855,7 @@ sl_timer_start(sl_t * sl, const uint t)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&sl->qlock, &flags);
+	spin_unlock_irqrestore(&sl->qlock, flags);
 }
 
 /*
@@ -6858,7 +6855,7 @@ mtp_r_rse(queue_t *q, mblk_t *mp)
 	str_t *s = PRIV(q);
 	int rtn;
 	psw_t flags;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		switch (*(ulong *) mp->b_rptr) {
 		case t1t:
@@ -6875,7 +6872,7 @@ mtp_r_rse(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	return (rtn);
 }
 static int
@@ -6884,7 +6881,7 @@ sl_w_rse(queue_t *q, mblk_t *mp)
 	str_t *s = PRIV(q);
 	int rtn;
 	psw_t flags;
-	lis_spin_lock_irqsave(&s->lock, &flags);
+	spin_lock_irqsave(&s->lock, flags);
 	{
 		switch (*(ulong *) mp->b_rptr) {
 		case t1:
@@ -6897,7 +6894,7 @@ sl_w_rse(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
-	lis_spin_unlock_irqrestore(&s->lock, &flags);
+	spin_unlock_irqrestore(&s->lock, flags);
 	return (rtn);
 }
 

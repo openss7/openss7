@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
+
+#include "compat.h"
 
 #define SSCOP_DESCRIP	"SSCOP/UDP STREAMS DRIVER."
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
@@ -64,19 +66,17 @@ static char const ident[] =
 			SSCOP_COPYTIGHT	"\n" \
 			SSCOP_DEVICE	"\n" \
 			SSCOP_CONTACT	"\n"
+#define SSCOP_SPLASH	SSCOP_DEVICE	" - " \
+			SSCOP_REVISION	"\n"
 
-#ifdef MODULE
+#ifdef LINUX
 MODULE_AUTHOR(SSCOP_CONTACT);
 MODULE_DESCRIPTION(SSCOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SCCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
 #endif
-#define MODULE_STATIC static
-#else
-#define MOD_INC_USE_COUNT
-#define MOD_DEC_USE_COUNT
-#endif
+#endif				/* LINUX */
 
 #ifdef SCCOP_DEBUG
 static int sscop_debug = SSCOP_DEBUG;
@@ -84,16 +84,17 @@ static int sscop_debug = SSCOP_DEBUG;
 static int sscop_debug = 2;
 #endif
 
-#ifndef SSCOP_CMAJOR
-#define SSCOP_CMAJOR 240
+#ifdef LFS
+#define SSCOP_NPI_DRV_ID	CONFIG_STREAMS_SSCOP_NPI_MODID
+#define SSCOP_NPI_DRV_NAME	CONFIG_STREAMS_SSCOP_NPI_NAME
+#define SSCOP_NPI_CMAJORS	CONFIG_STREAMS_SSCOP_NPI_NMAJORS
+#define SSCOP_NPI_CMAJOR_0	CONFIG_STREAMS_SSCOP_NPI_MAJOR
+#endif
+
+#ifndef SSCOP_CMAJOR_0
+#define SSCOP_CMAJOR_0 240
 #endif
 #define SSCOP_NMINOR 255
-
-#ifdef LIS_2_12
-#define INT int
-#else
-#define INT void
-#endif
 
 /*
  *  =========================================================================

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 21:32:28 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $";
 
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if defined(LIS) && !defined(MODULE)
-#   error ****
-#   error ****  tirdwr can only compile as a module under LiS.
-#   error ****  This is normally because LiS has been grossly misconfigured.
-#   error ****  Report bugs to <bugs@openss7.org>.
-#   error ****
-#endif
-
-#ifdef LINUX
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/modversions.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#endif
-
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 /*
    These are for TPI definitions 
@@ -96,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -137,8 +112,8 @@ MODULE_LICENSE(TIRDWR_LICENSE);
 #   endif
 #endif
 
-static modID_t modid = TIRDWR_MOD_ID;
-MODULE_PARM(modid, "b");
+modID_t modid = TIRDWR_MOD_ID;
+MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for TIRDWR.");
 
 static struct module_info tirdwr_minfo = {
@@ -307,7 +282,7 @@ tirdwr_rdzero(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->rdzero_bcid = bufcall(0, BPRI_HI, &tirdwr_rdzero_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call");
+			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call", TIRDWR_MOD_NAME);
 	}
 }
 static void
@@ -333,7 +308,7 @@ tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->hangup_bcid = bufcall(0, BPRI_HI, &tirdwr_hangup_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call");
+			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call", TIRDWR_MOD_NAME);
 	}
 }
 static void
@@ -355,7 +330,7 @@ tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->eproto_bcid = bufcall(2, BPRI_HI, &tirdwr_eproto_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate eproto buffer call");
+			cmn_err(CE_WARN, "%s: could not allocate eproto buffer call", TIRDWR_MOD_NAME);
 	}
 }
 
@@ -412,7 +387,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *bp = NULL;
 #if defined LIS
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
@@ -562,7 +537,7 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
 #if defined LIS
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
@@ -674,6 +649,7 @@ tirdwr_push(queue_t *q)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
+#ifdef LIS
 		lis_flags_t psw;
 		/*
 		   Under LiS we can't freeze the stream but we can lock the queue.  This is not a
@@ -687,13 +663,20 @@ tirdwr_push(queue_t *q)
 		   instead. 
 		 */
 		LIS_QISRLOCK(hq, &psw);
+#else
+		unsigned long psw = freezestr(q);
+#endif
 		for (mp = hq->q_first; mp && !err; mp = mp->b_next)
 			switch (mp->b_datap->db_type) {
 			case M_PROTO:
 			case M_PCPROTO:
 				err = EPROTO;
 			}
+#ifdef LIS
 		LIS_QISRUNLOCK(hq, &psw);
+#else
+		unfreezestr(q, psw);
+#endif
 	}
 	return (err);
 }
@@ -785,7 +768,7 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
       quit:
 	MOD_DEC_USE_COUNT;
-	return (ENXIO);
+	return (err);
 }
 
 static int
@@ -802,7 +785,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 			__FUNCTION__);
 		goto quit;
 	}
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		goto skip_pop;
@@ -840,7 +823,7 @@ static int
 tirdwr_register_module(void)
 {
 	int err;
-	if ((err = register_strmod(modid, &tirdwr_fmod)) < 0)
+	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -849,7 +832,7 @@ tirdwr_register_module(void)
 static void
 tirdwr_unregister_module(void)
 {
-	return (void) unregister_strmod(modid, &tirdwr_fmod);
+	return (void) unregister_strmod(&tirdwr_fmod);
 }
 
 #elif defined LIS
@@ -877,11 +860,6 @@ tirdwr_unregister_module(void)
 	return (void) lis_unregister_strmod(&tirdwr_info);
 }
 
-#else
-#   error ****
-#   error ****  One of LFS or LIS must be defined
-#   error ****  to compile the tirdwr module.
-#   error ****
 #endif
 
 static int __init

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lower.c,v 0.9.2.1 2004/08/21 10:14:59 brian Exp $
+ @(#) $Id: sua_lower.c,v 0.9.2.2 2004/08/26 23:38:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,9 +24,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/26 23:38:13 $ by $Author: brian $
 
  $Log: sua_lower.c,v $
+ Revision 0.9.2.2  2004/08/26 23:38:13  brian
+ - Converted for use with Linux Fast-STREAMS.
+
  Revision 0.9.2.1  2004/08/21 10:14:59  brian
  - Force checkin on branch.
 
@@ -47,20 +50,11 @@
 
  *****************************************************************************/
 
-#ident "@(#) $Id: sua_lower.c,v 0.9.2.1 2004/08/21 10:14:59 brian Exp $"
+#ident "@(#) $Id: sua_lower.c,v 0.9.2.2 2004/08/26 23:38:13 brian Exp $"
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <sys/cmn_err.h>
+#include "compat.h"
 
 #include "sua.h"
 #include "sua_data.h"
