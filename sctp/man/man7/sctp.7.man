@@ -1,6 +1,6 @@
 .\" -*- nroff -*-
 .\"
-.\" @(#) $Id: sctp.7.man,v 0.9.2.4 2002/05/16 07:33:28 brian Exp $
+.\" @(#) $Id: sctp.7.man,v 0.9.2.5 2002/05/23 15:24:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -30,7 +30,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2002/05/16 07:33:28 $ by $Author: brian $
+.\" Modified $Date: 2002/05/23 15:24:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .TH SCTP 7 "8 May 2002" "Linux Man Page" "Linux Programmer's Manual"
@@ -92,7 +92,7 @@ with \fB\)send\fR(2) or \fB\)write\fR(2) will use SCTP's destination transport
 address selection policies for transmission and retransmission.  The stream
 upon which to send the data can also be set with the \fB\)SCTP_SID\fR socket
 option on a socket basis with \fB\)setsockopt\fR(2) or on a per-message basis
-with \fB\)sendmsg\fR(2).  In addition, the \fB\)ip\fr(7) \fI\)IP_PKTINFO\fR
+with \fB\)sendmsg\fR(2).  In addition, the \fB\)ip\fR(7) \fI\)IP_PKTINFO\fR
 option can be used with \fB\)sendmsg\fR(2) to specify the interface, first-hop
 destination address and source address to be used in the outbound packet on
 \fI\)SOCK_SEQPACKET\fR and \fI\)SOCK_RDM\fR sockets.  IP options can also be
@@ -979,6 +979,20 @@ Passed socket address type in \fI\)sin_family\fR was not \fB\)AF_INET\fR.
 Any errors defined for \fB\)ip\fR(7) or the generic \fB\)socket\fR(7) layer
 may also be returned for SCTP.
 .PP
+
+.SH "FEATURES"
+.PP
+Linux SCTP provides some enhanced features as follows:
+.TP 3
+\(bu
+Silly Window Syndrome avoidance per RFC 1122 Section 4.2.3.2 and 4.2.3.3 as
+recommended in the SCTP Implementor's Guide.
+.TP 3
+\(bu
+Nagle algorithm per RFC 896 and RFC 1122 Section 4.2.3 with delayed ACK
+modifications presented by Minshall in draft-minshall-tsvwg-nagle-01.txt.
+.TP 3
+\(bu
 
 .SH "CAVEATS"
 .PP
