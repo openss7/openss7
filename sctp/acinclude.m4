@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/08 19:29:38 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/14 09:36:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 19:29:38 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 09:36:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -332,6 +332,21 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			  struct sock.protinfo.af_inet.ttl,
 			  struct sock.protinfo.af_inet.uc_ttl,
 			  struct sock.tp_pinfo.af_sctp], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/protocol.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
+    _LINUX_CHECK_FUNCS([dst_pmtu], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>

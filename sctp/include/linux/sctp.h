@@ -74,7 +74,7 @@ struct __os7_sctpchdr {
 	__u16 len;
 };
 
-#ifdef HAVE_MEMBER_SK_BUFF_H_SH
+#ifdef HAVE_KMEMB_STRUCT_SK_BUFF_H_SH
 #define SCTP_SKB_SH(__skb)	((__skb)->h.sh)
 #else
 #define SCTP_SKB_SH(__skb)	((struct __os7_sctphdr *)((__skb)->h.raw))

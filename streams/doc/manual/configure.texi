@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 0.9.2.1 2004/11/06 10:24:35 brian Exp $
+@c @(#) $Id: configure.texi,v 0.9.2.2 2005/03/14 09:27:44 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2004/11/06 10:24:35 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/14 09:27:44 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,58 @@ In addition, the following @command{configure} options, specific to the
 @value{PACKAGE_TITLE} package are available:
 
 @table @command
+
+@item --enable-module-sth
+Enable @file{sth} (stream head) module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+
+@item --enable-module-pipemod
+Enable @file{pipemod} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+
+@item --enable-module-connld
+Enable @file{connld} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+
+@item --enable-module-sc
+Enable @file{sc} module linked into @file{streams} object.
+The default is to create the module as a separate loadable kernel module.
+
+@item --enable-driver-clone
+Enable @file{clone} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-fifo
+Enable @file{fifo} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-loop
+Enable @file{loop} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-sad
+Enable @file{sad} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-nsdev
+Enable @file{nsdev} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-echo
+Enable @file{echo} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-nuls
+Enable @file{nuls} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-pipe
+Enable @file{pipe} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
+
+@item --enable-driver-log
+Enable @file{log} driver linked into @file{streams} object.
+The default is to create the driver as a separate loadable kernel module.
 
 @item --enable-compat-svr4
 @opindex compat-svr4

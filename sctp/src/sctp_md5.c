@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:19 $
+ @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/14 09:36:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:19 $ by $Author: brian $
+ Last Modified $Date: 2005/03/14 09:36:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:19 $"
+#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/14 09:36:52 $"
 
-static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:19 $";
+static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/14 09:36:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,11 +76,11 @@ static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2
 #endif
 
 #include <net/inet_common.h>
-#ifdef HAVE_NET_XFRM_H
+#ifdef HAVE_KINC_NET_XFRM_H
 #include <net/xfrm.h>
 #endif
 #include <net/icmp.h>
-#ifdef HAVE_NET_DST_H
+#ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
 #include <net/ip.h>

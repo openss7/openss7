@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/03/12 22:34:11 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.5 $) $Date: 2005/03/14 09:36:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/12 22:34:11 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 09:36:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -755,10 +755,18 @@ AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
 	kernel header files.  RedHat changes some of the use of sigmask_lock.
 	Autoconf will check your header files.  The code will lock sigmask_lock
 	when required.])
-    _LINUX_KERNEL_SYMBOL([sigmask_lock], [dnl
+    _LINUX_CHECK_MEMBER([struct task_struct.sigmask_lock], [dnl
 	LIS_SIGMASKLOCK='y'
 	AC_DEFINE([SIGMASKLOCK], [1])], [dnl
-	LIS_SIGMASKLOCK='n'])
+	LIS_SIGMASKLOCK='n'], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/slab.h>
+#include <linux/sched.h>
+	])
 ])# _LIS_SIGMASKLOCK
 # =============================================================================
 

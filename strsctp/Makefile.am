@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/09 06:52:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/14 09:37:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 06:52:00 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 09:37:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -165,6 +165,8 @@ sctp_source_FILES		= \
 				  src/include/os7/timer.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
+				  src/drivers/sctp_compat.h \
+				  src/drivers/sctp_hooks.h \
 				  src/include/os7/allocb.h \
 				  src/include/os7/bufpool.h \
 				  src/include/os7/bufq.h \
@@ -322,6 +324,8 @@ sctp_source_FILES		= \
 				  src/include/os7/timer.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
+				  src/drivers/sctp_compat.h \
+				  src/drivers/sctp_hooks.h \
 				  src/include/os7/allocb.h \
 				  src/include/os7/bufpool.h \
 				  src/include/os7/bufq.h \

@@ -82,11 +82,11 @@ static char const ident[] = "sctp_glue.c,v LINUX-2-4-20-SCTP(1.1.6.3) 2004/02/09
 #endif
 
 #include <net/inet_common.h>
-#ifdef HAVE_NET_XFRM_H
+#ifdef HAVE_KINC_NET_XFRM_H
 #include <net/xfrm.h>
 #endif
 #include <net/icmp.h>
-#ifdef HAVE_NET_DST_H
+#ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
 #include <net/ip.h>

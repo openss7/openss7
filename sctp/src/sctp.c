@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/09 08:03:18 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/14 09:36:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:18 $ by $Author: brian $
+ Last Modified $Date: 2005/03/14 09:36:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/09 08:03:18 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/14 09:36:51 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/09 08:03:18 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/14 09:36:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -103,13 +103,13 @@ static char const ident[] =
 #endif				/* SCTP_CONFIG_MODULE */
 
 #include <net/inet_common.h>
-#ifdef HAVE_NET_XFRM_H
+#ifdef HAVE_KINC_NET_XFRM_H
 #include <net/xfrm.h>
-#endif				/* HAVE_NET_XFRM_H */
+#endif				/* HAVE_KINC_NET_XFRM_H */
 #include <net/icmp.h>
-#ifdef HAVE_NET_DST_H
+#ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
-#endif				/* HAVE_NET_DST_H */
+#endif				/* HAVE_KINC_NET_DST_H */
 #include <net/ip.h>
 #ifdef	CONFIG_IP_MASQUERADE
 #include <net/ip_masq.h>
@@ -158,9 +158,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.26 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.27 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/09 08:03:18 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/14 09:36:51 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1019,7 +1019,7 @@ struct sctpchdr {
 #define SCTP_SH(__skb) (SCTP_SKB_SH(__skb))
 #define SCTP_CH(__skb) (SCTP_SKB_CH(__skb))
 
-#ifdef HAVE_MEMBER_SK_BUFF_H_SH
+#ifdef HAVE_KMEMB_STRUCT_SK_BUFF_H_SH
 #define SCTP_SKB_SH(__skb)	((__skb)->h.sh)
 #else
 #define SCTP_SKB_SH(__skb)	((struct sctphdr *)((__skb)->h.raw))
