@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: README,v 0.9.2.3 2002/05/08 13:06:13 brian Exp $
+# $Id: README,v 0.9.2.4 2002/05/14 12:53:19 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -29,12 +29,12 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
+# Last Modified $Date: 2002/05/14 12:53:19 $ by $Author: brian $
 # 
 # *****************************************************************************
 
-This is the linux-sctp-0.2 prerelease.  It can be obtained from the
-download area of http://www.openss7.org as linux-sctp-0.2.tgz.
+This is the linux-sctp-0.2.4 prerelease.  It can be obtained from the
+download area of http://www.openss7.org as linux-sctp-0.2.4.tgz.
 
 Please see the INSTALL file for installation instructions.
 
@@ -44,10 +44,10 @@ this licensing arrangement.  If you are interested in different licensing
 arrangements on the loadable module, please contact the copyright holder
 (OpenSS7 Corporation) or bidulock@openss7.org
 
-linux-sctp-0.2 is the Prerelease2 version of a Linux Kernel native
+linux-sctp-0.2.4 is the Prerelease2 version of a Linux Kernel native
 implementation of RFC 2960 Stream Control Transmission Protocol.  For
 information on using the implementation see the man/sctp.7 Linux manual
-page and look at the test programs in linux-sctp-0.2/test/.
+page and look at the test programs in linux-sctp-0.2.4/test/.
 
 Please see RELEASE-NOTES for the release notes for the current version.
 

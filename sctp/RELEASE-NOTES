@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: RELEASE-NOTES,v 0.9.2.3 2002/05/08 13:06:13 brian Exp $
+# $Id: RELEASE-NOTES,v 0.9.2.4 2002/05/14 12:53:19 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -29,9 +29,25 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
+# Last Modified $Date: 2002/05/14 12:53:19 $ by $Author: brian $
 # 
 # *****************************************************************************
+
+Release linux-sctp-0.2.4: (Prerelease2-4)
+
+	Upgraded MIB stats to draft-ietf-sigtran-sctp-mib-07.txt.
+
+Release linux-sctp-0.2.3: (Prerelease2-3)
+
+	Bug fixes.
+
+Release linux-sctp-0.2.2: (Prerelease2-2)
+
+	Bug fixes.
+
+Release linux-sctp-0.2.1: (Prerelease2-1)
+
+	Bug fixes.
 
 Release linxu-sctp-0.2:  (Prerelease2)
 
