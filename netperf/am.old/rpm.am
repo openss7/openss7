@@ -1,0 +1,231 @@
+# vim: ft=automake
+# =============================================================================
+# 
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/05 10:50:14 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/08/05 10:50:14 $ by $Author: brian $
+#
+# =============================================================================
+
+if PUBLIC_RELEASE
+
+rpmdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
+
+else
+
+rpmdir = $(PACKAGE_NAME)-bin-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
+
+endif
+
+RPM_ARCHIVES = $(rpmdir).tar.gz $(rpmdir).tar.bz2
+
+if BUILD_RPMS
+
+#
+#   These are some rules that I use for generating source and binary RPMs
+#   using automake.  I need to package releases using RPM.  The following
+#   rules accomplish that for most packages.
+#
+
+RPMOPTS = -vv \
+	--define "__source_payload w9.bzdio" \
+	--define "__binary_payload w9.bzdio" \
+	--define "_topdir `(cd $(top_builddir); pwd)`" \
+	--define "_icon openss7-logo-small.gif" \
+	--define "_kversion $(PACKAGE_KVERSION)" \
+	$(PACKAGE_OPTIONS)
+
+RPMBOPTS = -vv \
+	--rebuild \
+	--define "_topdir `(cd $(top_builddir); pwd)`" \
+	--define "_icon openss7-logo-small.gif" \
+	$(PACKAGE_OPTIONS)
+
+RPMSOPTS = -vv \
+	--define "_signature gpg" \
+	--define "_gpg_path $(GNUPGHOME)" \
+	--define "_gpg_name $(GNUPGUSER)" \
+	--define "_gpgbin $(GPG)"
+
+RPMTARGET = $(target)
+
+EXTRA_DIST += $(PACKAGE_NAME).spec openss7-logo-small.gif
+
+#
+#   This builds an SRPM for the current target.  Note: rpm demands icon in
+#   current directory
+#
+srpm:
+	$(MAKE) $(AM_MAKEFLAGS) distdir='$(rpmdir)' dist
+	$(mkinstalldirs) $(top_builddir)/BUILD $(top_builddir)/SRPMS $(top_builddir)/SPECS $(top_builddir)/SOURCES $(top_builddir)/RPMS
+	/bin/cp -f $(top_srcdir)/openss7-logo-small.gif .
+	$(RPMBUILD) -ts $(RPMOPTS) $(SRPMFLAGS) $(AM_SRPMFLAGS) --target $(target) -- $(rpmdir).tar.bz2
+
+#
+#   This is the type of thing that needs to be included in the master makefile
+#   to build rpms for the current target, we also build any defined
+#   AM_RPMTARGETS
+#
+rpms: srpm
+	@for t in $(RPMTARGET) $(AM_RPMTARGETS) ; do \
+		echo "$(RPMBUILD) --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t --" SRPMS/$(rpmdir).src.rpm; \
+		$(RPMBUILD) --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t -- SRPMS/$(rpmdir).src.rpm; \
+	done
+
+sign:
+	@for f in $(RPM_ARCHIVES) ; do \
+		if test ! -f $$f ; then \
+			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+			break ; \
+		fi ; \
+	done ; \
+	if test ! -f SRPMS/$(rpmdir).src.rpm ; then \
+		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+	fi ; \
+	for f in $(RPM_ARCHIVES) ; do \
+		if test -f $$f ; then \
+			rm -f $$f.asc ; \
+			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
+			home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+			echo "$(GPG) -ba$$user$$home -- $$f" ; \
+			$(GPG) -ba$$user$$home -- $$f ; \
+		fi ; \
+	done ; \
+	if test -f SRPMS/$(rpmdir).src.rpm ; then \
+		echo "$(RPM) --resign $(RPMSOPTS) -- SRPMS/$(rpmdir).src.rpm" ; \
+		$(RPM) --resign $(RPMSOPTS) -- SRPMS/$(rpmdir).src.rpm ; \
+	fi
+
+rebuild:
+	@if test ! -f SRPMS/$(rpmdir).src.rpm ; then \
+		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+	fi ; \
+	kernels="`find $(DESTDIR)/lib/modules -type d -name '2\.4\.*'`" ; \
+	targets="$(AM_RPMTARGETS)" ; \
+	for t in $$targets ; do \
+		for k in $$kernels ; do \
+			k=`basename $$k` ; \
+			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
+				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define \"_kversion $$k\" --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define "_kversion $$k" --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
+			fi ; \
+		done ; \
+		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+		$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
+	done
+
+resign: sign
+	@if test -n "$(AM_RPMTARGETS)" ; then \
+		list="`find RPMS -name '$(PACKAGE_NAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).*.rpm'`" ; \
+		if test -z "$$list" ; then \
+			$(MAKE) $(AM_MAKEFLAGS) rebuild ; \
+			list="`find RPMS -name '$(PACKAGE_NAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).*.rpm'`" ; \
+			if test -z "$$list" ; then \
+				exit 1 ; \
+			fi ; \
+		fi ; \
+		echo "$(RPM) --resign $(RPMSOPTS) -- $$list" ; \
+		$(RPM) --resign $(RPMSOPTS) -- $$list ; \
+	fi
+
+EXTRA_DIST += .rpmepoch .rpmrelease
+
+else
+
+srpm:
+	$(MAKE) $(AM_MAKEFLAGS) distdir='$(rpmdir)' dist
+
+rpms: srpm
+
+sign:
+	@for f in $(RPM_ARCHIVES) ; do \
+		if test ! -f $$f ; then \
+			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+			break ; \
+		fi ; \
+	done ; \
+	@for f in $(RPM_ARCHIVES) ; do \
+		if test -f $$f ; then \
+			rm -f $$f.asc ; \
+			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
+			home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+			echo "$(GPG) -ba$$user$$home -- $$f" ; \
+			$(GPG) -ba$$user$$home -- $$f ; \
+		fi ; \
+	done
+
+rebuild:
+	@for f in $(RPM_ARCHIVES) ; do \
+		if test ! -f $$f ; then \
+			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+			break ; \
+		fi ; \
+	done
+
+resign: sign
+
+endif
+
+distclean-rpms:
+	rm -f openss7-logo-small.gif
+	rm -fr BUILD RPMS SOURCES SPECS SRPMS
+	@for f in $(RPM_ARCHIVES) ; do \
+		echo "rm -f $$f" ; \
+		rm -f $$f ; \
+	done
+
+distclean-sign:
+	@for f in $(RPM_ARCHIVES) ; do \
+		echo "rm -f $$f.asc" ; \
+		rm -f $$f.asc ; \
+	done
+
+distclean-local: distclean-rpms distclean-sign
+
+.PHONY: srpm rpms sign rebuild resign distclean-rpms distclean-sign
+
+# vim: ft=automake

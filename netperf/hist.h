@@ -1,4 +1,3 @@
-#include <time.h>
 /* hist.h
 
    Given a time difference in microseconds, increment one of 61
@@ -25,10 +24,6 @@
 #ifndef _HIST_INCLUDED
 #define _HIST_INCLUDED
 
-#ifdef IRIX
-#include <sys/time.h>
-#endif /* IRIX */
-   
 struct histogram_struct {
   int unit_usec[10];
   int ten_usec[10];

@@ -78,10 +78,16 @@ char    netlib_id[]="\
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/times.h>
-#ifndef MPE
-#include <time.h>
-#include <sys/time.h>
-#endif /* MPE */
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -170,7 +176,9 @@ DWORD SysPageSize()
 #endif /* _SC_PAGE_SIZE */
 
 #ifdef DO_DLPI
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
 #include <sys/stream.h>
+#endif
 #include <sys/stropts.h>
 #include <sys/poll.h>
 #ifdef __osf__

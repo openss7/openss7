@@ -30,9 +30,20 @@ char	nettest_dlpi_id[]="\
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 #include <malloc.h>
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
 #include <sys/stream.h>
+#endif
 #include <sys/stropts.h>
 #include <sys/poll.h>
 #ifdef __osf__
@@ -396,7 +407,7 @@ Send   Recv    Send   Recv             Send (avg)          Recv (avg)\n\
   
   /* Connect up to the remote port on the data descriptor */
   if(dl_connect(send_descriptor,
-		dlpi_co_stream_response->station_addr,
+		(unsigned char *)dlpi_co_stream_response->station_addr,
 		dlpi_co_stream_response->station_addr_len) != 0) {
     fprintf(where,"recv_dlpi_co_stream: connect failure\n");
     fflush(where);
@@ -1287,7 +1298,7 @@ int send_dlpi_co_rr(char remote_host[])
   /*Connect up to the remote port on the data descriptor  */
   
   if(dl_connect(send_descriptor,
-		dlpi_co_rr_response->station_addr,
+		(unsigned char *)dlpi_co_rr_response->station_addr,
 		dlpi_co_rr_response->station_addr_len) != 0) {
     fprintf(where,"send_dlpi_co_rr: connect failure\n");
     fflush(where);

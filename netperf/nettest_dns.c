@@ -40,7 +40,16 @@ char	nettest_dns_id[]="\
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 #ifdef NOSTDLIBH
 #include <malloc.h>
 #else /* NOSTDLIBH */
@@ -75,9 +84,6 @@ char	nettest_dns_id[]="\
 #include "nettest_dns.h"
 
 #ifdef HISTOGRAM
-#ifdef __sgi
-#include <sys/time.h>
-#endif /* __sgi */
 #include "hist.h"
 #endif /* HISTOGRAM */
 

@@ -49,7 +49,6 @@ char	nettest_id[]="\
 #endif
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #ifdef NOSTDLIBH
 #include <malloc.h>
 #else /* NOSTDLIBH */
@@ -57,7 +56,16 @@ char	nettest_id[]="\
 #endif /* NOSTDLIBH */
 
 #ifndef WIN32
-#include <sys/time.h>
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 #if !defined(__VMS)
 #include <sys/ipc.h>
 #endif /* !defined(__VMS) */
@@ -78,9 +86,6 @@ char	nettest_id[]="\
 #include "nettest_bsd.h"
 
 #ifdef HISTOGRAM
-#ifdef __sgi
-#include <sys/time.h>
-#endif /* __sgi */
 #include "hist.h"
 #endif /* HISTOGRAM */
 

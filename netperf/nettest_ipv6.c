@@ -45,7 +45,16 @@ char	nettest_ipv6_id[]="\
 #include <netdb.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/time.h>
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 #include <unistd.h>
 #else /* WIN32 */
 #include <process.h>
@@ -67,9 +76,6 @@ char	nettest_ipv6_id[]="\
 #include "nettest_ipv6.h"
 
 #ifdef HISTOGRAM
-#ifdef __sgi
-#include <sys/time.h>
-#endif /* __sgi */
 #include "hist.h"
 #endif /* HISTOGRAM */
 

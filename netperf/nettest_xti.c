@@ -48,7 +48,16 @@ char	nettest_xti_id[]="\
 #include <windows.h>
 #endif /* WIN32 */
 #include <stdio.h>
-#include <time.h>
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 #include <malloc.h>
  /* xti.h should be included *after* in.h because there are name */
  /* conflicts!( Silly standards people... raj 2/95 fortuenately, the */
@@ -60,9 +69,6 @@ char	nettest_xti_id[]="\
 #include "nettest_xti.h"
 
 #ifdef HISTOGRAM
-#ifdef __sgi
-#include <sys/time.h>
-#endif /* __sgi */
 #include "hist.h"
 #endif /* HISTOGRAM */
 
