@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.8 2005/03/08 19:29:43 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.10 2005/03/09 10:33:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:29:43 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 10:33:16 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -74,7 +74,25 @@
 #include <asm/system.h>
 #include <linux/interrupt.h>
 #include <linux/kdev_t.h>
+#if ! HAVE_KTYPE_IRQRETURN_T
+typedef void irqreturn_t;
+#endif
+#undef IRQ_NONE
+#define IRQ_NONE	(0)
+#undef IRQ_HANDLED
+#define IRQ_HANDLED	(1)
+#undef IRQ_RETVAL
+#define IRQ_RETVAL(x)	((x) != 0)
 #endif				/* LINUX */
+
+#ifndef __MOD_INC_USE_COUNT
+#undef MOD_INC_USE_COUNT
+#define MOD_INC_USE_COUNT
+#endif
+#ifndef __MOD_DEC_USE_COUNT
+#undef MOD_DEC_USE_COUNT
+#define MOD_DEC_USE_COUNT
+#endif
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>
