@@ -16,7 +16,7 @@
 .\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
 .\" MA 02139, USA.
 .\"
-.TH FDETACH 3 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.TH FDETACH 3 "6 Oct 2003" "LiS 2.16.14" "Linux STREAMS"
 .SH NAME
 .B fdetach
 \- detach any
@@ -57,6 +57,12 @@ No
 file is currently attached to the
 .I path
 given as an argument.
+.B "[EPERM]"
+The effective user associated with the calling process is not the
+superuser and is not the owner of the path name.
+.B "[EACCES]"
+The effective user associated with the calling process is not the
+superuser and does not have write permission for the path name.
 .SH "APPLICATION USAGE"
 Applications wishing to use the version of the
 .BR fdetach "() "
@@ -91,14 +97,6 @@ It should be noted, however, that this behavior is not common to
 other
 .B STREAMS
 implementations and should be considered a non-standard extension.
-.SH "FUTURE DIRECTIONS"
-.BR fdetach "() "
-is currently implemented as an IOCTL operation on an anonymous
-.BR STREAMS "\-based"
-file.
-Should LiS ever become part of the Linux kernel, it may become a
-system call; a system call implementation is in fact already
-included within LiS.
 .SH "SEE ALSO"
 .BR fattach "(3), "
 .BR fattach "(8), "

@@ -16,7 +16,7 @@
 .\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
 .\" MA 02139, USA.
 .\"
-.TH FATTACH 3 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.TH FATTACH 3 "6 Oct 2003" "LiS 2.16.14" "Linux STREAMS"
 .SH NAME
 .B fattach
 \- attach a
@@ -98,6 +98,12 @@ The
 argument is currently a mount point, or already has a
 .BR STREAMS "\-based"
 file attached to it.
+.B "[EPERM]"
+The effective user associated with the calling process is not the
+superuser and is not the owner of the path name.
+.B "[EACCES]"
+The effective user associated with the calling process is not the
+superuser and does not have write permission for the path name.
 .SH "APPLICATION USAGE"
 Both conceptually and mechanically,
 .BR fattach "() "
@@ -278,21 +284,7 @@ for examples.)  Note that doing so alters the
 file permanently; i.e., such changes will not be undone by an effective
 subsequent
 .BR fdetach "(3)."
-.SH "FUTURE DIRECTIONS"
-In the current implementation,
-.BR fattach "() "
-will not attach to a directory name, to avoid conflict with the normal
-process of mounting file systems on directory mount points.  Though
-we foresee no need to allow attachment to directory path names at
-the time of this writing, this is subject to change in the future.
-.sp
-.BR fattach "() "
-is currently implemented as an IOCTL operation on the given file.
-Should LiS ever become part of the Linux kernel, it may become a
-system call; a system call implementation is in fact already
-included within LiS.
 .SH BUGS
-This is an initial release of this function.
 Should bugs be found, please report them via the LiS mailing list.
 .SH "SEE ALSO"
 .BR chmod "(2), "
