@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:21 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:48 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:48 $";
 
 #include "compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:48 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6075,7 +6075,7 @@ mx_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC ushort mg_majors[MG_CMAJORS] = { MG_CMAJOR_0, };
+STATIC major_t mg_majors[MG_CMAJORS] = { MG_CMAJOR_0, };
 
 /*
  *  OPEN
@@ -6086,8 +6086,8 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	struct mg *mg, **mgp = &master.mg.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -6105,11 +6105,11 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *mgp; mgp = (typeof(mgp)) & (*mgp)->next) {
-		ushort dmajor = (*mgp)->u.dev.cmajor;
+		major_t dmajor = (*mgp)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*mgp)->u.dev.cminor;
+			minor_t dminor = (*mgp)->u.dev.cminor;
 			if (cminor < dminor) {
 				if (++cminor >= NMINORS) {
 					if (++mindex >= MG_CMAJORS || !(cmajor = mg_majors[mindex]))

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:28 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:54 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:54 $";
 
 #include "compat.h"
 
@@ -111,7 +111,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:54 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -256,8 +256,8 @@ struct sctp_ifops;			/* interface operations */
 struct sctp {
 	struct sctp *next;		/* linkage for master list */
 	struct sctp **prev;		/* linkage for master list */
-	ushort cmajor;			/* major device number */
-	ushort cminor;			/* minor device number */
+	major_t cmajor;			/* major device number */
+	minor_t cminor;			/* minor device number */
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
 	cred_t cred;			/* credentials of opener */
@@ -13037,7 +13037,7 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 1;
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
 	for (; *spp && cminor <= NMINORS; spp = &(*spp)->next) {
-		ushort dminor = (*spp)->cminor;
+		minor_t dminor = (*spp)->cminor;
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {
@@ -16877,7 +16877,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 1;
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
 	for (; *spp && cminor <= NMINORS; spp = &(*spp)->next) {
-		ushort dminor = (*spp)->cminor;
+		minor_t dminor = (*spp)->cminor;
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {

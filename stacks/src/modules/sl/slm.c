@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -97,7 +97,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -207,8 +207,8 @@ typedef struct pp {
 	spinlock_t lock;		/* structure lock */
 	union {
 		struct {
-			ushort cmajor;	/* major device number */
-			ushort cminor;	/* minor device number */
+			major_t cmajor;	/* major device number */
+			minor_t cminor;	/* minor device number */
 		} dev;
 		uint mux;		/* multiplexor index for this structure */
 	} id;
@@ -3843,7 +3843,7 @@ slm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	for (; *ppp && (*ppp)->id.dev.cmajor < cmajor; ppp = &(*ppp)->next) ;
 	for (; *ppp && cminor < NMINORS; ppp = &(*ppp)->next) {
-		ushort dminor = (*ppp)->id.dev.cminor;
+		minor_t dminor = (*ppp)->id.dev.cminor;
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {

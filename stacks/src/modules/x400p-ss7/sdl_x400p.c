@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:01 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:37 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:20:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:01 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:01 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:01 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2475,7 +2475,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (!cminor)
 		sflag = CLONEOPEN;
 	if (sflag == CLONEOPEN) {
-		printd(("%s: Clone open in effect on major %d\n", DRV_NAME, cmajor));
+		printd(("%s: Clone open in effect on major %d\n", DRV_NAME, (int)cmajor));
 		cminor = 1;
 	}
 	spin_lock_irqsave(&xp_lock, flags);
@@ -2505,7 +2505,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, (ushort)cmajor, (ushort)cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(xp = xp_alloc_priv(q, xpp, devp, crp))) {
 		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
@@ -2524,8 +2524,8 @@ xp_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) xp;
-	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, xp->u.dev.cmajor,
-		xp->u.dev.cminor));
+	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, (ushort)xp->u.dev.cmajor,
+		(ushort)xp->u.dev.cminor));
 	spin_lock_irqsave(&xp_lock, flags);
 	xp_free_priv(xp);
 	spin_unlock_irqrestore(&xp_lock, flags);

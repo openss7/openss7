@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:07 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:07 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:07 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:07 $";
+static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $";
 
 #define __NO_VERSION__
 
@@ -3943,7 +3943,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 1;
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
 	for (; *spp && cminor <= SCTP_T_CMINORS; spp = &(*spp)->next) {
-		ushort dminor = (*spp)->cminor;
+		minor_t dminor = (*spp)->cminor;
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:15 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -80,7 +80,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -25124,7 +25124,7 @@ mtp_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC ushort isup_majors[ISUP_CMAJORS] = { ISUP_CMAJOR_0, };
+STATIC major_t isup_majors[ISUP_CMAJORS] = { ISUP_CMAJOR_0, };
 
 /*
  *  OPEN
@@ -25135,8 +25135,8 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	struct cc *cc, **ccp = &master.cc.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -25157,11 +25157,11 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = 1;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *ccp; ccp = &(*ccp)->next) {
-		ushort dmajor = (*ccp)->u.dev.cmajor;
+		major_t dmajor = (*ccp)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*ccp)->u.dev.cminor;
+			minor_t dminor = (*ccp)->u.dev.cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lower.c,v 0.9.2.2 2004/08/26 23:38:13 brian Exp $
+ @(#) $Id: sua_lower.c,v 0.9.2.3 2004/08/31 07:19:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,9 +24,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:13 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:59 $ by $Author: brian $
 
  $Log: sua_lower.c,v $
+ Revision 0.9.2.3  2004/08/31 07:19:59  brian
+ - Changes to compile against LiS again.
+
  Revision 0.9.2.2  2004/08/26 23:38:13  brian
  - Converted for use with Linux Fast-STREAMS.
 
@@ -50,9 +53,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $Id: sua_lower.c,v 0.9.2.2 2004/08/26 23:38:13 brian Exp $"
+#ident "@(#) $Id: sua_lower.c,v 0.9.2.3 2004/08/31 07:19:59 brian Exp $"
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $";
 
 #include "compat.h"
 
@@ -189,19 +192,19 @@ static inline int sua_rd(queue_t * q, mblk_t * mp)
 	return (-EFAULT);
 }
 
-INT sua_l_rput(queue_t * q, mblk_t * mp)
+int sua_l_rput(queue_t * q, mblk_t * mp)
 {
 	int err;
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
-		return (INT) (0);
+		return (0);
 	}
 	if ((err = sua_rd(q, mp)))
-		return (INT) (sua_recover(q, mp, err));
-	return (INT) (0);
+		return (sua_recover(q, mp, err));
+	return (0);
 }
 
-INT sua_l_rsrv(queue_t * q)
+int sua_l_rsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -209,9 +212,9 @@ INT sua_l_rsrv(queue_t * q)
 		if (!(err = sua_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (sua_reservice(q, mp, err));
+			return (sua_reservice(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
-	return (INT) (0);
+	return (0);
 }

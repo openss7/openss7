@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: priv.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
+ @(#) $Id: priv.h,v 0.9.2.3 2004/08/31 07:19:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -86,8 +86,8 @@ typedef struct head {
 	HEAD_DECLARATION(__type);		/* link linkage */ \
 	union { \
 		struct { \
-			ushort cmajor;		/* device major */ \
-			ushort cminor;		/* device minor */ \
+			major_t cmajor;		/* device major */ \
+			minor_t cminor;		/* device minor */ \
 		} dev; \
 		struct { \
 			ulong index;		/* linked index */ \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:31 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $"
+#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:59 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $";
+    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:59 $";
 
 #include "compat.h"
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:59 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -131,8 +131,8 @@ STATIC struct module_info sscop_info = {
 	1 * 512				/* Lo water mark */
 };
 
-STATIC INT sscop_rput(queue_t *, mblk_t *);
-STATIC INT sscop_rsrv(queue_t *);
+STATIC int sscop_rput(queue_t *, mblk_t *);
+STATIC int sscop_rsrv(queue_t *);
 STATIC int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sscop_close(queue_t *, int, cred_t *);
 
@@ -146,8 +146,8 @@ STATIC struct qinit sscop_rinit = {
 	NULL				/* Statistics */
 };
 
-STATIC INT sscop_wput(queue_t *, mblk_t *);
-STATIC INT sscop_wsrv(queue_t *);
+STATIC int sscop_wput(queue_t *, mblk_t *);
+STATIC int sscop_wsrv(queue_t *);
 
 STATIC struct qinit sscop_winit = {
 	sscop_wput,			/* Write put (msg from above) */
@@ -1757,7 +1757,7 @@ sscop_r_error(queue_t *q, mblk_t *mp)
  *  supported, we pass it down-queue if possible.  If the message cannot be
  *  processed immediately we place it on the queue.
  */
-STATIC INT
+STATIC int
 sscop_rput(queue_t *q, mblk_t *mp)
 {
 	int err = -EOPNOTSUPP;
@@ -1820,7 +1820,7 @@ sscop_rput(queue_t *q, mblk_t *mp)
  *  messages which cannot be processed immediately.  Unrecognized messages are
  *  passed down-queue.
  */
-STATIC INT
+STATIC int
 sscop_rsrv(queue_t *q)
 {
 	mblk_t *mp;
@@ -1891,7 +1891,7 @@ sscop_rsrv(queue_t *q)
  *  supported, we pass it down-queue if possible.  If the message cannot be
  *  processed immediately, we place it on the queue.
  */
-STATIC INT
+STATIC int
 sscop_wput(queue_t *q, mblk_t *mp)
 {
 	mblk_t *mp;
@@ -1959,7 +1959,7 @@ sscop_wput(queue_t *q, mblk_t *mp)
  *  messages which cannot be processed immediately.  Unrecognized messages are
  *  passed down-queue.
  */
-STATIC INT
+STATIC int
 sscop_wsrv(queue_t *q)
 {
 	int err = -EOPNOTSUPP;

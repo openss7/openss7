@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $";
 
 #include "compat.h"
 
@@ -120,7 +120,7 @@ static struct module_info s_minfo = {
 static int s_open(queue_t *, dev_t *, int, int, cred_t *);
 static int s_close(queue_t *, int, cred_t *);
 
-static INT s_rput(queue_t *, mblk_t *);
+static int s_rput(queue_t *, mblk_t *);
 
 static struct qinit s_rinit = {
 	s_rput,				/* Read put (msg from below) */
@@ -132,7 +132,7 @@ static struct qinit s_rinit = {
 	NULL				/* Statistics */
 };
 
-static INT s_wput(queue_t *, mblk_t *);
+static int s_wput(queue_t *, mblk_t *);
 
 static struct qinit s_winit = {
 	s_wput,				/* Write put (msg from below) */
@@ -438,14 +438,14 @@ s_r_other(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-static INT
+static int
 s_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn = 0;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
-	ensure(q, return ((INT) (-EFAULT)));
-	ensure(sp, return ((INT) (-EFAULT)));
-	ensure(mp, return ((INT) (-EFAULT)));
+	ensure(q, return (-EFAULT));
+	ensure(sp, return (-EFAULT));
+	ensure(mp, return (-EFAULT));
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		rtn = s_w_data(q, mp);
@@ -483,20 +483,20 @@ s_wput(queue_t *q, mblk_t *mp)
 		ptrace(("Error = %d\n", rtn));
 		freemsg(mp);
 		s_tx_wakeup(sp);
-		return (INT) (rtn);
+		return (rtn);
 	}
 	s_tx_wakeup(sp);
-	return (INT) (0);
+	return (0);
 }
 
-static INT
+static int
 s_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn = 0;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
-	ensure(q, return ((INT) (-EFAULT)));
-	ensure(sp, return ((INT) (-EFAULT)));
-	ensure(mp, return ((INT) (-EFAULT)));
+	ensure(q, return (-EFAULT));
+	ensure(sp, return (-EFAULT));
+	ensure(mp, return (-EFAULT));
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		rtn = s_r_data(q, mp);
@@ -538,11 +538,11 @@ s_rput(queue_t *q, mblk_t *mp)
 		freemsg(mp);
 		s_rx_wakeup(sp);
 		s_tx_wakeup(sp);
-		return (INT) (rtn);
+		return (rtn);
 	}
 	s_rx_wakeup(sp);
 	s_tx_wakeup(sp);
-	return (INT) (0);
+	return (0);
 }
 
 /*

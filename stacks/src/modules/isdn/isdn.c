@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -73,7 +73,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14414,7 +14414,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  */
 // STATIC isdn_t *isdn_list = NULL;
 STATIC spinlock_t isdn_lock;
-STATIC ushort isdn_majors[ISDN_CMAJORS] = { ISDN_CMAJOR_0, };
+STATIC major_t isdn_majors[ISDN_CMAJORS] = { ISDN_CMAJOR_0, };
 
 /*
  *  OPEN
@@ -14425,8 +14425,8 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	struct cc *cc, **ip = &master.cc.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -14444,11 +14444,11 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	spin_lock_irqsave(&isdn_lock, flags);
 	for (; *ip; ip = (typeof(ip)) & (*ip)->next) {
-		ushort dmajor = (*ip)->u.dev.cmajor;
+		major_t dmajor = (*ip)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*ip)->u.dev.cminor;
+			minor_t dminor = (*ip)->u.dev.cminor;
 			if (cminor < dminor) {
 				if (++cminor >= NMINORS) {
 					if (++mindex >= ISDN_CMAJORS

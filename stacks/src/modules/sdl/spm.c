@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -187,8 +187,8 @@ STATIC struct streamtab spminfo = {
 typedef struct spm {
 	struct spm *next;		/* list linkage */
 	struct spm **prev;		/* list linkage */
-	ushort cmajor;			/* major device number */
-	ushort cminor;			/* minor device number */
+	major_t cmajor;			/* major device number */
+	minor_t cminor;			/* minor device number */
 	queue_t *rq;			/* rd queue */
 	queue_t *wq;			/* wr queue */
 	uint rbid;			/* rd bufcall id */
@@ -258,7 +258,7 @@ spm_term_caches(void)
  *  ------------------------------------------------------------------------
  */
 STATIC spm_t *
-spm_alloc_priv(queue_t *q, spm_t ** sp, ushort cmajor, ushort cminor)
+spm_alloc_priv(queue_t *q, spm_t ** sp, major_t cmajor, minor_t cminor)
 {
 	spm_t *s;
 	if ((s = kmem_cache_alloc(spm_priv_cachep, SLAB_ATOMIC))) {
@@ -1338,7 +1338,7 @@ spm_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) s;
-	printd(("spm: Popped module for char device %d:%d\n", s->cmajor, s->cminor));
+	printd(("spm: Popped module for char device %hu:%hu\n", (ushort)s->cmajor, (ushort)s->cminor));
 	spm_free_priv(q);
 	MOD_DEC_USE_COUNT;
 	return (0);

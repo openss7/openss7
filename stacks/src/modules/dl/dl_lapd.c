@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $";
 
 #include "compat.h"
 
@@ -68,7 +68,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3482,8 +3482,8 @@ STATIC struct dl *
 dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 {
 	struct dl *dl;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	printd(("%s: create dl dev = %d:%d\n", DRV_NAME, cmajor, cminor));
 	if ((dl = kmem_cache_alloc(dl_priv_cachep, SLAB_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
@@ -6440,9 +6440,9 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	struct dl *dl, **dlp = &master.dl.list;
 	MOD_INC_USE_COUNT;
 	if (q->q_ptr != NULL) {
@@ -6463,8 +6463,8 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = 1;
 	spin_lock_irqsave(&master.lock, flags);
 	for (dlp = &master.dl.list; *dlp; dlp = &(*dlp)->next) {
-		ushort dmajor = (*dlp)->u.dev.cmajor;
-		ushort dminor = (*dlp)->u.dev.cminor;
+		major_t dmajor = (*dlp)->u.dev.cmajor;
+		minor_t dminor = (*dlp)->u.dev.cminor;
 		if (!dmajor)
 			continue;	/* skip headless opens */
 		if (!cmajor || cmajor != dmajor || cminor < dminor)

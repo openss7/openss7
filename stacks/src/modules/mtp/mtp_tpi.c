@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:25 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -73,11 +73,8 @@ static char const ident[] =
 #include <sys/xti.h>
 #include <sys/xti_mtp.h>
 
-#undef INLINE
-#define INLINE			/* let compiler do its job */
-
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

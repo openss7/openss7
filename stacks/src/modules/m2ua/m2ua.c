@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:19 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:47 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:47 $";
 
 #include "compat.h"
 
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:47 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -475,7 +475,7 @@ STATIC struct df master;
 /*
  *  Forward declarations.
  */
-STATIC union priv *m2ua_alloc_priv(queue_t *, union priv **, dev_t *, cred_t *, ushort);
+STATIC union priv *m2ua_alloc_priv(queue_t *, union priv **, dev_t *, cred_t *, minor_t);
 STATIC void m2ua_free_priv(queue_t *);
 STATIC union priv *priv_get(union priv *);
 STATIC void priv_put(union priv *);
@@ -15086,7 +15086,7 @@ xp_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC ushort m2ua_majors[M2UA_CMAJORS] = { M2UA_CMAJOR_0, };
+STATIC major_t m2ua_majors[M2UA_CMAJORS] = { M2UA_CMAJOR_0, };
 
 /*
  *  OPEN
@@ -15097,9 +15097,9 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	union priv *p, **pp = &master.priv.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -15129,11 +15129,11 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = 2;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *pp; pp = (union priv **) &(*pp)->str.next) {
-		ushort dmajor = (*pp)->str.u.dev.cmajor;
+		major_t dmajor = (*pp)->str.u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*pp)->str.u.dev.cminor;
+			minor_t dminor = (*pp)->str.u.dev.cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -15529,7 +15529,7 @@ m2ua_free_gp(struct gp *gp)
  *  Private structure allocation, deallocation and reference counting.
  */
 STATIC union priv *
-m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, ushort bminor)
+m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	union priv *p;
 	printd(("%s: %s: create priv dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
@@ -16586,7 +16586,7 @@ STATIC int
 m2ua_register_strdev(major_t major)
 {
 	int err;
-	if ((err = lis_register_strdev(major, &m2uainfo, NMINOR, DRV_NAME)) < 0)
+	if ((err = lis_register_strdev(major, &m2uainfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	return (0);
 }

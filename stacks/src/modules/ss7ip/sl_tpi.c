@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:40 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -175,8 +175,8 @@ typedef struct sl {
 	struct sl **prev;		/* list linkage */
 	size_t refcnt;			/* structure reference count */
 	spinlock_t lock;		/* structure lock */
-	ushort cmajor;			/* major device number */
-	ushort cminor;			/* minor device number */
+	major_t cmajor;			/* major device number */
+	minor_t cminor;			/* minor device number */
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
 	spinlock_t qlock;		/* queue lock */
@@ -8203,7 +8203,7 @@ sl_term_caches(void)
 	return (0);
 }
 STATIC sl_t *
-sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
+sl_alloc_priv(queue_t *q, sl_t ** slp, major_t cmajor, minor_t cminor)
 {
 	sl_t *sl;
 	if ((sl = kmem_cache_alloc(sl_priv_cachep, SLAB_ATOMIC))) {

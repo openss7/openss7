@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:35 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:20:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:00 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:00 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -94,7 +94,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:20:00 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -287,7 +287,7 @@ typedef struct tcap {
 } tcap_t;
 #define TCAP_PRIV(__q) ((struct tcap *)(__q)->q_ptr)
 
-STATIC struct tcap *tcap_alloc_priv(queue_t *, struct tcap **, dev_t *, cred_t *, ushort);
+STATIC struct tcap *tcap_alloc_priv(queue_t *, struct tcap **, dev_t *, cred_t *, minor_t);
 STATIC struct tcap *tcap_get(struct tcap *);
 STATIC struct tcap *tcap_lookup(ulong);
 STATIC ulong tcap_get_id(ulong);
@@ -9874,7 +9874,7 @@ tcap_close(queue_t *q, int flag, cred_t *crp)
  *  -----------------------------------
  */
 STATIC struct tcap *
-tcap_alloc_priv(queue_t *, struct tcap **, dev_t *, cred_t *, ushort)
+tcap_alloc_priv(queue_t *, struct tcap **, dev_t *, cred_t *, minor_t)
 {
 }
 STATIC struct tcap *

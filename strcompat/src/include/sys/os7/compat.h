@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.3 2004/08/29 20:25:01 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.4 2004/08/31 07:19:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -98,18 +98,6 @@
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
 #endif				/* LFS */
-
-#ifdef LIS
-#include <sys/osif.h>
-typedef void (*bufcall_fnc_t) (long);
-#ifdef LIS_2_12
-#define INT int
-#else				/* LIS_2_12 */
-#define INT void
-#endif				/* LIS_2_12 */
-#else				/* LIS */
-#define INT int
-#endif				/* LIS */
 
 #ifndef tid_t
 typedef int tid_t;

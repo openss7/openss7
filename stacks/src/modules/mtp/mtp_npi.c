@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:25 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:25 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:25 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:25 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -71,11 +71,8 @@ static char const ident[] =
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
 
-#undef INLINE
-#define INLINE			/* let compiler do its job */
-
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:25 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

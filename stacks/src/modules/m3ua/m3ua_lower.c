@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $
+ @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $"
+#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:48 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $";
+    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:48 $";
 
 #define __NO_VERSION__
 
@@ -255,19 +255,19 @@ static inline int m3ua_rd(queue_t * q, mblk_t * mp)
 	return (-EFAULT);
 }
 
-INT m3ua_l_rput(queue_t * q, mblk_t * mp)
+int m3ua_l_rput(queue_t * q, mblk_t * mp)
 {
 	int err;
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
-		return (INT) (0);
+		return (0);
 	}
 	if ((err = m3ua_rd(q, mp)))
-		return (INT) (m3ua_recover(q, mp, err));
-	return (INT) (0);
+		return (m3ua_recover(q, mp, err));
+	return (0);
 }
 
-INT m3ua_l_rsrv(queue_t * q)
+int m3ua_l_rsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -275,9 +275,9 @@ INT m3ua_l_rsrv(queue_t * q)
 		if (!(err = m3ua_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (m3ua_reservice(q, mp, err));
+			return (m3ua_reservice(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
-	return (INT) (0);
+	return (0);
 }

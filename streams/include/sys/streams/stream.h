@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.23 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.24 2004/08/31 07:27:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:27:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/08/31 07:27:56 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -521,7 +521,7 @@ typedef struct module_stat {
 	long ms_ocnt;			/* calls to qi_qopen() */
 	long ms_ccnt;			/* calls to qi_qclose() */
 	long ms_acnt;			/* calls to qi_qadmin() */
-	void *ms_xprt;			/* module private stats */
+	char *ms_xptr;			/* module private stats */
 	short ms_xsize;			/* len of private stats */
 	uint ms_flags;			/* bool stats -- for future use */
 } module_stat_t;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.1 2004/08/21 10:14:57 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.2 2004/08/31 07:19:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_H__
 #define __SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/31 07:19:54 $"
 
 #ifndef tid_t
 typedef int tid_t;
@@ -237,8 +237,8 @@ struct sctp {
 	struct sctp *next;		/* linkage for master list */
 	struct sctp **prev;		/* linkage for master list */
 
-	ushort cmajor;			/* major device number */
-	ushort cminor;			/* minor device number */
+	major_t cmajor;			/* major device number */
+	minor_t cminor;			/* minor device number */
 
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */

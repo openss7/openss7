@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:32 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -280,7 +280,7 @@ typedef struct sc {
 } sc_t;
 #define SCCP_PRIV(__q) ((struct sc *)(__q)->q_ptr)
 
-STATIC struct sc *sccp_alloc_priv(queue_t *, struct sc **, dev_t *, cred_t *, ushort);
+STATIC struct sc *sccp_alloc_priv(queue_t *, struct sc **, dev_t *, cred_t *, minor_t);
 STATIC struct sc *sccp_get(struct sc *);
 STATIC struct sc *sccp_lookup(ulong);
 STATIC ulong sccp_get_id(ulong);
@@ -19921,9 +19921,9 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	struct sc *sc, **scp = &master.sc.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -20172,7 +20172,7 @@ sccp_term_caches(void)
  *  -------------------------------------------------------------------------
  */
 STATIC struct sc *
-sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, ushort bminor)
+sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	struct sc *sc;
 	if ((sc = kmem_cache_alloc(sccp_sc_cachep, SLAB_ATOMIC))) {

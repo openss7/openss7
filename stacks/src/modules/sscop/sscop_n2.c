@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $";
 
 #include "compat.h"
 
@@ -113,8 +113,8 @@ static struct module_info sscop_info = {
 	1 * 512				/* Lo water mark */
 };
 
-static INT sscop_rput(queue_t *, mblk_t *);
-static INT sscop_rsrv(queue_t *);
+static int sscop_rput(queue_t *, mblk_t *);
+static int sscop_rsrv(queue_t *);
 static int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
 static int sscop_close(queue_t *, int, cred_t *);
 
@@ -128,8 +128,8 @@ static struct qinit sscop_rinit = {
 	NULL				/* Statistics */
 };
 
-static INT sscop_wput(queue_t *, mblk_t *);
-static INT sscop_wsrv(queue_t *);
+static int sscop_wput(queue_t *, mblk_t *);
+static int sscop_wsrv(queue_t *);
 
 static struct qinit sscop_winit = {
 };

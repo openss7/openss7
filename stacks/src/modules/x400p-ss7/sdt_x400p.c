@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:37 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:20:02 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:37 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:20:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:37 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:20:02 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:37 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:20:02 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:37 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:20:02 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -205,8 +205,8 @@ typedef struct xp {
 	struct xp **prev;		/* list linkage */
 	size_t refcnt;			/* reference count */
 	spinlock_t lock;		/* structure lock */
-	ushort cmajor;			/* major device number */
-	ushort cminor;			/* minor device number */
+	major_t cmajor;			/* major device number */
+	minor_t cminor;			/* minor device number */
 	queue_t *rq;			/* rd queue */
 	queue_t *wq;			/* wr queue */
 	spinlock_t qlock;		/* queue lock */

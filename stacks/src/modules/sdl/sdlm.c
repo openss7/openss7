@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -150,7 +150,7 @@ STATIC struct module_stat dl_rmstat = {
 	.ms_ocnt = 0,			/* calls to qi_qopen() */
 	.ms_ccnt = 0,			/* calls to qi_qclose() */
 	.ms_acnt = 0,			/* calls to qi_qadmin() */
-	.ms_xprt = NULL,		/* module private stats */
+	.ms_xptr = NULL,		/* module private stats */
 	.ms_xsize = 0,			/* length of private stats */
 	.ms_flags = 0,			/* bool stats -- for future use */
 };
@@ -161,7 +161,7 @@ STATIC struct module_stat dl_wmstat = {
 	.ms_ocnt = 0,			/* calls to qi_qopen() */
 	.ms_ccnt = 0,			/* calls to qi_qclose() */
 	.ms_acnt = 0,			/* calls to qi_qadmin() */
-	.ms_xprt = NULL,		/* module private stats */
+	.ms_xptr = NULL,		/* module private stats */
 	.ms_xsize = 0,			/* length of private stats */
 	.ms_flags = 0,			/* bool stats -- for future use */
 };
@@ -196,7 +196,7 @@ STATIC struct module_stat dl_lr_mstat = {
 	.ms_ocnt = 0,			/* calls to qi_qopen() */
 	.ms_ccnt = 0,			/* calls to qi_qclose() */
 	.ms_acnt = 0,			/* calls to qi_qadmin() */
-	.ms_xprt = NULL,		/* module private stats */
+	.ms_xptr = NULL,		/* module private stats */
 	.ms_xsize = 0,			/* length of private stats */
 	.ms_flags = 0,			/* bool stats -- for future use */
 };
@@ -207,7 +207,7 @@ STATIC struct module_stat dl_lw_mstat = {
 	.ms_ocnt = 0,			/* calls to qi_qopen() */
 	.ms_ccnt = 0,			/* calls to qi_qclose() */
 	.ms_acnt = 0,			/* calls to qi_qadmin() */
-	.ms_xprt = NULL,		/* module private stats */
+	.ms_xptr = NULL,		/* module private stats */
 	.ms_xsize = 0,			/* length of private stats */
 	.ms_flags = 0,			/* bool stats -- for future use */
 };
@@ -573,7 +573,12 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		if (!sd || sd->iq->q_next)
 			goto lbadppa;
 		/* link queues together */
+#ifdef LFS
 		weldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
+#else
+		dl->iq->q_next = sd->oq;
+		sd->iq->q_next = dl->oq;
+#endif
 		return lmi_ok_ack_reply(q, mp, LMI_ATTACH_REQ, LMI_DISABLED);
 	}
       lbadppa:
@@ -611,7 +616,12 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 		struct dl *dl = DL_PRIV(q);
 		struct sd *sd = SD_PRIV(q->q_next);
 		/* disconnect them */
+#ifdef LFS
 		unweldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
+#else
+		dl->iq->q_next = NULL;
+		sd->iq->q_next = NULL;
+#endif
 		mp->b_wptr = mp->b_rptr;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_OK_ACK;

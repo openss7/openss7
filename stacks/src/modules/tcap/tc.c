@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:14 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -130,9 +130,9 @@ static struct module_info tc_minfo = {
 static int tc_open(queue_t *, dev_t *, int, int, cred_t *);
 static int tc_close(queue_t *, int, cred_t *);
 
-static INT tc_u_rsrv(queue_t *);
-static INT tc_u_wput(queue_t *, mblk_t *);
-static INT tc_u_wsrv(queue_t *);
+static int tc_u_rsrv(queue_t *);
+static int tc_u_wput(queue_t *, mblk_t *);
+static int tc_u_wsrv(queue_t *);
 
 static struct qinit tc_u_rinit = {
 	NULL,				/* Read put (msg from below) */
@@ -153,9 +153,9 @@ static struct qinit tc_u_wrinit = {
 	NULL				/* Statistics */
 };
 
-static INT tc_l_wsrv(queue_t *);
-static INT tc_l_rput(queue_t *, mblk_t *);
-static INT tc_l_rsrv(queue_t *);
+static int tc_l_wsrv(queue_t *);
+static int tc_l_rput(queue_t *, mblk_t *);
+static int tc_l_rsrv(queue_t *);
 
 static struct qinit tc_l_winit = {
 	NULL,				/* Write put (msg from above) */
@@ -1891,14 +1891,14 @@ static int tc_w_ioctl(queue_t * q, mblk_t * pdu)
  *
  *  =========================================================================
  */
-static INT tc_u_wput(queue_t *, mblk_t *);
-static INT tc_u_wsrv(queue_t *);
+static int tc_u_wput(queue_t *, mblk_t *);
+static int tc_u_wsrv(queue_t *);
 
-static INT tc_l_wsrv(queue_t *);
-static INT tc_l_rput(queue_t *, mblk_t *);
+static int tc_l_wsrv(queue_t *);
+static int tc_l_rput(queue_t *, mblk_t *);
 
-static INT tc_u_rsrv(queue_t *);
-static INT tc_l_rsrv(queue_t *);
+static int tc_u_rsrv(queue_t *);
+static int tc_l_rsrv(queue_t *);
 
 static inline int tc_recover(queue_t * q, mblk_t * mp, int err)
 {
@@ -1937,18 +1937,18 @@ static inline int tc_rd(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static INT tc_l_rput(queue_t * q, mblk_t * mp)
+static int tc_l_rput(queue_t * q, mblk_t * mp)
 {
 	int err;
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
-		return (INT) (0);
+		return (0);
 	}
 	if ((err = tc_rd(q, mp)))
-		return (INT) (tc_recover(q, mp, err));
-	return (INT) (0);
+		return (tc_recover(q, mp, err));
+	return (0);
 }
-static INT tc_l_rsrv(queue_t * q)
+static int tc_l_rsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -1956,11 +1956,11 @@ static INT tc_l_rsrv(queue_t * q)
 		if (!(err = tc_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tc_recover(q, mp, err));
+			return (tc_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
-	return (INT) (0);
+	return (0);
 }
 
 /*
@@ -1984,18 +1984,18 @@ static inline int tc_wr(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static INT tc_u_wput(queue_t * q, mblk_t * mp)
+static int tc_u_wput(queue_t * q, mblk_t * mp)
 {
 	int err;
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
-		return (INT) (0);
+		return (0);
 	}
 	if ((err = tc_wr(q, mp)))
-		return (INT) (tc_recover(q, mp, err));
-	return (INT) (0);
+		return (tc_recover(q, mp, err));
+	return (0);
 }
-static INT tc_u_wsrv(queue_t * q)
+static int tc_u_wsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -2003,11 +2003,11 @@ static INT tc_u_wsrv(queue_t * q)
 		if (!(err = tc_wr(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tc_recover(q, mp, err));
+			return (tc_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
-	return (INT) (0);
+	return (0);
 }
 
 /*
@@ -2036,7 +2036,7 @@ static inline int tc_input(queue_t * q, mblk_t * mp)
 	putnext(q, mp);
 	return (0);
 }
-static INT tc_u_rsrv(queue_t * q)
+static int tc_u_rsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -2044,9 +2044,9 @@ static INT tc_u_rsrv(queue_t * q)
 		if (!(err = tc_input(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tc_recover(q, mp, err));
+			return (tc_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
 }
 
@@ -2068,7 +2068,7 @@ static inline int tc_output(queue_t * q, mblk_t * mp)
 	putnext(q, mp);
 	return (0);
 }
-static INT tc_l_wsrv(queue_t * q)
+static int tc_l_wsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -2076,9 +2076,9 @@ static INT tc_l_wsrv(queue_t * q)
 		if (!(err = tc_output(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tc_recover(q, mp, err));
+			return (tc_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
 }
 

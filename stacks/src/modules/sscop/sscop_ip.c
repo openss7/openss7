@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_ip.c,v 0.9.2.2 2004/08/26 23:38:12 brian Exp $
+ @(#) $Id: sscop_ip.c,v 0.9.2.3 2004/08/31 07:19:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,11 +24,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:58 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
@@ -93,10 +93,10 @@ static struct module_info sscop_minfo = {
 
 static int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
 static int sscop_close(queue_t *, int, cred_t *);
-static INT sscop_rput(queue_t *, mblk_t *);
-static INT sscop_rsrv(queue_t *);
-static INT sscop_wput(queue_t *, mblk_t *);
-static INT sscop_wsrv(queue_t *);
+static int sscop_rput(queue_t *, mblk_t *);
+static int sscop_rsrv(queue_t *);
+static int sscop_wput(queue_t *, mblk_t *);
+static int sscop_wsrv(queue_t *);
 
 static struct qinit sscop_rinit = {
 	sscop_rput,			/* Read put (msg from below) */

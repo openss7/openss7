@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $";
 
 #define __NO_VERSION__
 
@@ -2000,9 +2000,9 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	struct sctp *sp, **spp = &sctp_n_list;
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
@@ -2023,11 +2023,11 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = 1;
 	spin_lock_irqsave(&sctp_n_lock, flags);
 	for (; *spp; spp = &(*spp) - next) {
-		ushort dmajor = (*spp)->cmajor;
+		major_t dmajor = (*spp)->cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*spp)->cminor;
+			minor_t dminor = (*spp)->cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:22 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:49 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:49 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:49 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -331,7 +331,7 @@ typedef struct mtp {
 } mtp_t;
 #define MTP_PRIV(__q) ((struct mtp *)(__q)->q_ptr)
 
-STATIC struct mtp *mtp_alloc_priv(queue_t *, struct mtp **, dev_t *, cred_t *, ushort);
+STATIC struct mtp *mtp_alloc_priv(queue_t *, struct mtp **, dev_t *, cred_t *, minor_t);
 STATIC void mtp_free_priv(struct mtp *);
 STATIC struct mtp *mtp_lookup(ulong);
 STATIC ulong mtp_get_id(ulong);
@@ -17416,9 +17416,9 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	struct mtp *mtp, **mtpp = &master.mtp.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -17439,11 +17439,11 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = MTP_CMINOR_FREE;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *mtpp; mtpp = &(*mtpp)->next) {
-		ushort dmajor = (*mtpp)->u.dev.cmajor;
+		major_t dmajor = (*mtpp)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*mtpp)->u.dev.cminor;
+			minor_t dminor = (*mtpp)->u.dev.cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -17751,7 +17751,7 @@ mtp_put(struct mtp *mtp)
 	}
 }
 STATIC struct mtp *
-mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, ushort bminor)
+mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	struct mtp *mt;
 	if ((mt = kmem_cache_alloc(mtp_mt_cachep, SLAB_ATOMIC))) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:11 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -213,7 +213,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $"
+#define SS__REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -549,8 +549,8 @@ typedef struct inet {
 	struct inet **prev;		/* list of all IP-Users */
 	size_t refcnt;			/* structure reference count */
 	spinlock_t lock;		/* structure lock */
-	ushort cmajor;			/* major device number */
-	ushort cminor;			/* minor device number */
+	major_t cmajor;			/* major device number */
+	minor_t cminor;			/* minor device number */
 	queue_t *rq;			/* associated read queue */
 	queue_t *wq;			/* associated write queue */
 	cred_t cred;			/* credientials */
@@ -14014,7 +14014,7 @@ ss_term_caches(void)
 	return (0);
 }
 STATIC ss_t *
-ss_alloc_priv(queue_t *q, ss_t ** slp, ushort cmajor, ushort cminor, cred_t *crp,
+ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *crp,
 	      const ss_profile_t * prof)
 {
 	ss_t *ss;

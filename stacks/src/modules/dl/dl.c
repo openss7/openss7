@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $";
 
 #include "compat.h"
 /*
@@ -62,8 +62,8 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.3 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.4 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -90,7 +90,7 @@ MODULE_LICENSE(DL_LICENSE);
 #define DL_DRV_NAME	CONFIG_STREAMS_DL_NAME
 #define DL_CMAJORS	CONFIG_STREAMS_DL_NMAJORS
 #define DL_CMAJOR_0	CONFIG_STREAMS_DL_MAJOR
-#define DL_NMINOR	CONFIG_STREAMS_DL_NMINORS
+#define DL_UNITS	CONFIG_STREAMS_DL_NMINORS
 #endif
 
 /*
@@ -103,8 +103,9 @@ MODULE_LICENSE(DL_LICENSE);
 
 #define DRV_ID		DL_DRV_ID
 #define DRV_NAME	DL_DRV_NAME
+#define CMAJORS		DL_CMAJORS
 #define CMAJOR_0	DL_CMAJOR_0
-#define NMINOR		DL_NMINOR
+#define UNITS		DL_UNITS
 #ifdef MODULE
 #define DRV_BANNER	DL_BANNER
 #else				/* MODULE */
@@ -255,7 +256,7 @@ dl_close(queue_t *q, int flag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-unsigned short modid = MOD_ID;
+unsigned short modid = DRV_ID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for the DL driver. (0 for allocation.)");
 
@@ -308,7 +309,7 @@ STATIC int
 dl_register_strdev(major_t major)
 {
 	int err;
-	if ((err = lis_register_strdev(major, &dlinfo, NMINOR, DRV_NAME)) < 0)
+	if ((err = lis_register_strdev(major, &dlinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	return (0);
 }
@@ -331,14 +332,12 @@ dlterminate(void)
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (dl_majors[mindex]) {
 			if ((err = dl_unregister_strdev(dl_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: cannot unregister major %d", MOD_NAME,
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
 					dl_majors[mindex]);
 			if (mindex)
 				dl_majors[mindex] = 0;
 		}
 	}
-	if ((err = dl_term_caches()))
-		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
@@ -347,31 +346,26 @@ dlinit(void)
 {
 	int err, mindex = 0;
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	if ((err = dl_init_caches())) {
-		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
-		dlterminate();
-		return (err);
-	}
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
 		if ((err = dl_register_strdev(dl_majors[mindex])) < 0) {
 			if (mindex) {
-				cmn_err(CE_WARN, "%s: could not register major %d", MOD_NAME,
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
 					dl_majors[mindex]);
 				continue;
 			} else {
 				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
-					MOD_NAME, err);
+					DRV_NAME, err);
 				dlterminate();
 				return (err);
 			}
 		}
-		if (dl_major[mindex] == 0)
-			dl_major[mindex] = err;
+		if (dl_majors[mindex] == 0)
+			dl_majors[mindex] = err;
 #ifdef LIS
-		LIS_DEVFLAGS(dl_major[mindex]) |= LIS_MODFLG_CLONE;
+		LIS_DEVFLAGS(dl_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)
-			major = dl_major[0];
+			major = dl_majors[0];
 	}
 	return (0);
 }

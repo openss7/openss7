@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:24 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:19:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:51 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:51 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -76,7 +76,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:51 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -267,8 +267,8 @@ typedef struct head {
 	HEAD_DECLARATION(__type);	/* list linkage */ \
 	union { \
 		struct { \
-			ushort cmajor;	/* device major */ \
-			ushort cminor;	/* device minor */ \
+			major_t cmajor;	/* device major */ \
+			minor_t cminor;	/* device minor */ \
 		} dev; \
 		struct { \
 			ulong index;	/* linked index */ \

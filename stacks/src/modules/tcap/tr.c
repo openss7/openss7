@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:20:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:14 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 07:20:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:20:01 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:20:01 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -69,7 +69,7 @@ static char const ident[] =
 #include "compat.h"
 
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date"
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -138,9 +138,9 @@ static struct module_info tr_minfo = {
 static int tr_open(queue_t *, dev_t *, int, int, cred_t *);
 static int tr_close(queue_t *, int, cred_t *);
 
-static INT tr_u_rsrv(queue_t *);
-static INT tr_u_wput(queue_t *, mblk_t *);
-static INT tr_u_wsrv(queue_t *);
+static int tr_u_rsrv(queue_t *);
+static int tr_u_wput(queue_t *, mblk_t *);
+static int tr_u_wsrv(queue_t *);
 
 static struct qinit tr_u_rinit = {
 	NULL,				/* Read put (msg from below) */
@@ -161,9 +161,9 @@ static struct qinit tr_u_wrinit = {
 	NULL				/* Statistics */
 };
 
-static INT tr_l_wsrv(queue_t *);
-static INT tr_l_rput(queue_t *, mblk_t *);
-static INT tr_l_rsrv(queue_t *);
+static int tr_l_wsrv(queue_t *);
+static int tr_l_rput(queue_t *, mblk_t *);
+static int tr_l_rsrv(queue_t *);
 
 static struct qinit tr_l_winit = {
 	NULL,				/* Write put (msg from above) */
@@ -1899,14 +1899,14 @@ static int tr_w_ioctl(queue_t * q, mblk_t * pdu)
  *
  *  =========================================================================
  */
-static INT tr_u_wput(queue_t *, mblk_t *);
-static INT tr_u_wsrv(queue_t *);
+static int tr_u_wput(queue_t *, mblk_t *);
+static int tr_u_wsrv(queue_t *);
 
-static INT tr_l_wsrv(queue_t *);
-static INT tr_l_rput(queue_t *, mblk_t *);
+static int tr_l_wsrv(queue_t *);
+static int tr_l_rput(queue_t *, mblk_t *);
 
-static INT tr_u_rsrv(queue_t *);
-static INT tr_l_rsrv(queue_t *);
+static int tr_u_rsrv(queue_t *);
+static int tr_l_rsrv(queue_t *);
 
 static inline int tr_recover(queue_t * q, mblk_t * mp, int err)
 {
@@ -1945,18 +1945,18 @@ static inline int tr_rd(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static INT tr_l_rput(queue_t * q, mblk_t * mp)
+static int tr_l_rput(queue_t * q, mblk_t * mp)
 {
 	int err;
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
-		return (INT) (0);
+		return (0);
 	}
 	if ((err = tr_rd(q, mp)))
-		return (INT) (tr_recover(q, mp, err));
-	return (INT) (0);
+		return (tr_recover(q, mp, err));
+	return (0);
 }
-static INT tr_l_rsrv(queue_t * q)
+static int tr_l_rsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -1964,11 +1964,11 @@ static INT tr_l_rsrv(queue_t * q)
 		if (!(err = tr_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tr_recover(q, mp, err));
+			return (tr_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
-	return (INT) (0);
+	return (0);
 }
 
 /*
@@ -1992,18 +1992,18 @@ static inline int tr_wr(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static INT tr_u_wput(queue_t * q, mblk_t * mp)
+static int tr_u_wput(queue_t * q, mblk_t * mp)
 {
 	int err;
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
-		return (INT) (0);
+		return (0);
 	}
 	if ((err = tr_wr(q, mp)))
-		return (INT) (tr_recover(q, mp, err));
-	return (INT) (0);
+		return (tr_recover(q, mp, err));
+	return (0);
 }
-static INT tr_u_wsrv(queue_t * q)
+static int tr_u_wsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -2011,11 +2011,11 @@ static INT tr_u_wsrv(queue_t * q)
 		if (!(err = tr_wr(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tr_recover(q, mp, err));
+			return (tr_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
-	return (INT) (0);
+	return (0);
 }
 
 /*
@@ -2044,7 +2044,7 @@ static inline int tr_input(queue_t * q, mblk_t * mp)
 	putnext(q, mp);
 	return (0);
 }
-static INT tr_u_rsrv(queue_t * q)
+static int tr_u_rsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -2052,9 +2052,9 @@ static INT tr_u_rsrv(queue_t * q)
 		if (!(err = tr_input(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tr_recover(q, mp, err));
+			return (tr_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
 }
 
@@ -2076,7 +2076,7 @@ static inline int tr_output(queue_t * q, mblk_t * mp)
 	putnext(q, mp);
 	return (0);
 }
-static INT tr_l_wsrv(queue_t * q)
+static int tr_l_wsrv(queue_t * q)
 {
 	mblk_t *mp;
 	while ((mp = getq(q))) {
@@ -2084,9 +2084,9 @@ static INT tr_l_wsrv(queue_t * q)
 		if (!(err = tr_output(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
-			return (INT) (tr_recover(q, mp, err));
+			return (tr_recover(q, mp, err));
 		freemsg(mp);
-		return (INT) (err);
+		return (err);
 	}
 }
 
