@@ -100,8 +100,8 @@ typedef int nthread_t;
 #include "Settings.hpp"
 
     // initialize or destroy the thread subsystem
-    void thread_init( );
-    void thread_destroy( );
+    void thread_init( void );
+    void thread_destroy( void );
 
     // start or stop a thread executing
     void thread_start( struct thread_Settings* thread );

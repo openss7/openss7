@@ -50,6 +50,8 @@
 #
 # =============================================================================
 
+include ../am/openss7.am
+
 noinst_LIBRARIES = libcompat.a
 
 AM_CPPFLAGS = @STRIP_BEGIN@ \

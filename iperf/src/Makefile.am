@@ -50,6 +50,8 @@
 #
 # =============================================================================
 
+include ../am/openss7.am
+
 bin_PROGRAMS = iperf
 
 LIBCOMPAT_LDADDS = @STRIP_BEGIN@ \

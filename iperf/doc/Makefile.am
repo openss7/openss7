@@ -50,6 +50,8 @@
 #
 # =============================================================================
 
+include ../am/openss7.am
+
 SUBDIRS = man
 
 EXTRA_DIST = index.html ui_license.html dast.gif

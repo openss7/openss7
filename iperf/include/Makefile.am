@@ -50,6 +50,8 @@
 #
 # =============================================================================
 
+include ../am/openss7.am
+
 noinst_HEADERS = \
 		Client.hpp \
 		Condition.h \
