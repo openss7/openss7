@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.6 2004/12/22 11:27:51 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.7 2004/12/24 07:58:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/22 11:27:51 $ by $Author: brian $
+ Last Modified $Date: 2004/12/24 07:58:07 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #include <features.h>
 #include <sys/types.h>
@@ -204,6 +204,156 @@ struct __os7_sctp_astat {
 #ifndef SOL_SCTP
 #define SOL_SCTP	132	/* SCTP level */
 #endif
+
+#undef SCTP_ADD_IP
+#undef SCTP_ADD
+#undef SCTP_ALI
+#undef SCTP_ASSOC_MAX_RETRANS
+#undef sctp_astat
+#undef SCTP_CKSUM_TYPE
+#undef SCTP_CLOSED
+#undef SCTP_COOKIE_ECHOED
+#undef SCTP_COOKIE_INC
+#undef SCTP_COOKIE_LIFE
+#undef SCTP_COOKIE_WAIT
+#undef SCTP_CORK
+#undef SCTP_CSUM_ADLER32
+#undef SCTP_CSUM_CRC32C
+#undef SCTP_DEBUG_OPTIONS
+#undef SCTP_DEL_IP
+#undef SCTP_DISPOSITION_ACKED
+#undef SCTP_DISPOSITION_GAP_ACKED
+#undef SCTP_DISPOSITION_NONE
+#undef SCTP_DISPOSITION
+#undef SCTP_DISPOSITION_SENT
+#undef SCTP_DISPOSITION_UNSENT
+#undef sctp_dstat
+#undef SCTP_ECN
+#undef SCTP_ESTABLISHED
+#undef sctp_hbitvl
+#undef SCTP_HB
+#undef SCTP_HEARTBEAT_ITVL
+#undef SCTP_HMAC_MD5
+#undef SCTP_HMAC_NONE
+#undef SCTP_HMAC_SHA_1
+#undef SCTP_ISTREAMS
+#undef SCTP_LIFETIME
+#undef SCTP_LISTEN
+#undef SCTP_MAC_TYPE
+#undef SCTP_MAX_BURST
+#undef SCTP_MAX_INIT_RETRIES
+#undef SCTP_MAXSEG
+#undef SCTP_MAX_STATES
+#undef SCTP_NODELAY
+#undef SCTP_OPTION_BREAK
+#undef SCTP_OPTION_DBREAK
+#undef SCTP_OPTION_DROPPING
+#undef SCTP_OPTION_RANDOM
+#undef SCTP_OSTREAMS
+#undef SCTP_PATH_MAX_RETRANS
+#undef SCTP_PPI
+#undef SCTP_PR_NONE
+#undef SCTP_PR
+#undef SCTP_PR_PREFERRED
+#undef SCTP_PR_REQUIRED
+#undef SCTP_RECVPPI
+#undef SCTP_RECVSID
+#undef SCTP_RECVSSN
+#undef SCTP_RECVTSN
+#undef SCTP_RTO_INITIAL
+#undef SCTP_RTO_MAX
+#undef SCTP_RTO_MIN
+#undef SCTP_RTO
+#undef sctp_rtoval
+#undef SCTP_SACK_DELAY
+#undef SCTP_SET_IP
+#undef SCTP_SET
+#undef SCTP_SHUTDOWN_ACK_SENT
+#undef SCTP_SHUTDOWN_PENDING
+#undef SCTP_SHUTDOWN_RECEIVED
+#undef SCTP_SHUTDOWN_RECVWAIT
+#undef SCTP_SHUTDOWN_SENT
+#undef SCTP_SID
+#undef SCTP_SSN
+#undef SCTP_STATUS
+#undef SCTP_THROTTLE_ITVL
+#undef SCTP_TSN
+#undef SCTP_UNREACHABLE
+
+#define SCTP_ADD_IP			__OS7_SCTP_ADD_IP
+#define SCTP_ADD			__OS7_SCTP_ADD
+#define SCTP_ALI			__OS7_SCTP_ALI
+#define SCTP_ASSOC_MAX_RETRANS		__OS7_SCTP_ASSOC_MAX_RETRANS
+#define sctp_astat			__os7_sctp_astat
+#define SCTP_CKSUM_TYPE			__OS7_SCTP_CKSUM_TYPE
+#define SCTP_CLOSED			__OS7_SCTP_CLOSED
+#define SCTP_COOKIE_ECHOED		__OS7_SCTP_COOKIE_ECHOED
+#define SCTP_COOKIE_INC			__OS7_SCTP_COOKIE_INC
+#define SCTP_COOKIE_LIFE		__OS7_SCTP_COOKIE_LIFE
+#define SCTP_COOKIE_WAIT		__OS7_SCTP_COOKIE_WAIT
+#define SCTP_CORK			__OS7_SCTP_CORK
+#define SCTP_CSUM_ADLER32		__OS7_SCTP_CSUM_ADLER32
+#define SCTP_CSUM_CRC32C		__OS7_SCTP_CSUM_CRC32C
+#define SCTP_DEBUG_OPTIONS		__OS7_SCTP_DEBUG_OPTIONS
+#define SCTP_DEL_IP			__OS7_SCTP_DEL_IP
+#define SCTP_DISPOSITION_ACKED		__OS7_SCTP_DISPOSITION_ACKED
+#define SCTP_DISPOSITION_GAP_ACKED	__OS7_SCTP_DISPOSITION_GAP_ACKED
+#define SCTP_DISPOSITION_NONE		__OS7_SCTP_DISPOSITION_NONE
+#define SCTP_DISPOSITION		__OS7_SCTP_DISPOSITION
+#define SCTP_DISPOSITION_SENT		__OS7_SCTP_DISPOSITION_SENT
+#define SCTP_DISPOSITION_UNSENT		__OS7_SCTP_DISPOSITION_UNSENT
+#define sctp_dstat			__os7_sctp_dstat
+#define SCTP_ECN			__OS7_SCTP_ECN
+#define SCTP_ESTABLISHED		__OS7_SCTP_ESTABLISHED
+#define sctp_hbitvl			__os7_sctp_hbitvl
+#define SCTP_HB				__OS7_SCTP_HB
+#define SCTP_HEARTBEAT_ITVL		__OS7_SCTP_HEARTBEAT_ITVL
+#define SCTP_HMAC_MD5			__OS7_SCTP_HMAC_MD5
+#define SCTP_HMAC_NONE			__OS7_SCTP_HMAC_NONE
+#define SCTP_HMAC_SHA_1			__OS7_SCTP_HMAC_SHA_1
+#define SCTP_ISTREAMS			__OS7_SCTP_ISTREAMS
+#define SCTP_LIFETIME			__OS7_SCTP_LIFETIME
+#define SCTP_LISTEN			__OS7_SCTP_LISTEN
+#define SCTP_MAC_TYPE			__OS7_SCTP_MAC_TYPE
+#define SCTP_MAX_BURST			__OS7_SCTP_MAX_BURST
+#define SCTP_MAX_INIT_RETRIES		__OS7_SCTP_MAX_INIT_RETRIES
+#define SCTP_MAXSEG			__OS7_SCTP_MAXSEG
+#define SCTP_MAX_STATES			__OS7_SCTP_MAX_STATES
+#define SCTP_NODELAY			__OS7_SCTP_NODELAY
+#define SCTP_OPTION_BREAK		__OS7_SCTP_OPTION_BREAK
+#define SCTP_OPTION_DBREAK		__OS7_SCTP_OPTION_DBREAK
+#define SCTP_OPTION_DROPPING		__OS7_SCTP_OPTION_DROPPING
+#define SCTP_OPTION_RANDOM		__OS7_SCTP_OPTION_RANDOM
+#define SCTP_OSTREAMS			__OS7_SCTP_OSTREAMS
+#define SCTP_PATH_MAX_RETRANS		__OS7_SCTP_PATH_MAX_RETRANS
+#define SCTP_PPI			__OS7_SCTP_PPI
+#define SCTP_PR_NONE			__OS7_SCTP_PR_NONE
+#define SCTP_PR				__OS7_SCTP_PR
+#define SCTP_PR_PREFERRED		__OS7_SCTP_PR_PREFERRED
+#define SCTP_PR_REQUIRED		__OS7_SCTP_PR_REQUIRED
+#define SCTP_RECVPPI			__OS7_SCTP_RECVPPI
+#define SCTP_RECVSID			__OS7_SCTP_RECVSID
+#define SCTP_RECVSSN			__OS7_SCTP_RECVSSN
+#define SCTP_RECVTSN			__OS7_SCTP_RECVTSN
+#define SCTP_RTO_INITIAL		__OS7_SCTP_RTO_INITIAL
+#define SCTP_RTO_MAX			__OS7_SCTP_RTO_MAX
+#define SCTP_RTO_MIN			__OS7_SCTP_RTO_MIN
+#define SCTP_RTO			__OS7_SCTP_RTO
+#define sctp_rtoval			__os7_sctp_rtoval
+#define SCTP_SACK_DELAY			__OS7_SCTP_SACK_DELAY
+#define SCTP_SET_IP			__OS7_SCTP_SET_IP
+#define SCTP_SET			__OS7_SCTP_SET
+#define SCTP_SHUTDOWN_ACK_SENT		__OS7_SCTP_SHUTDOWN_ACK_SENT
+#define SCTP_SHUTDOWN_PENDING		__OS7_SCTP_SHUTDOWN_PENDING
+#define SCTP_SHUTDOWN_RECEIVED		__OS7_SCTP_SHUTDOWN_RECEIVED
+#define SCTP_SHUTDOWN_RECVWAIT		__OS7_SCTP_SHUTDOWN_RECVWAIT
+#define SCTP_SHUTDOWN_SENT		__OS7_SCTP_SHUTDOWN_SENT
+#define SCTP_SID			__OS7_SCTP_SID
+#define SCTP_SSN			__OS7_SCTP_SSN
+#define SCTP_STATUS			__OS7_SCTP_STATUS
+#define SCTP_THROTTLE_ITVL		__OS7_SCTP_THROTTLE_ITVL
+#define SCTP_TSN			__OS7_SCTP_TSN
+#define SCTP_UNREACHABLE		__OS7_SCTP_UNREACHABLE
 
 __END_DECLS
 

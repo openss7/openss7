@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $
+ @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/24 08:00:50 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/22 14:34:53 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/12/24 08:00:50 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $"
+#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/24 08:00:50 $"
 
 static char const ident[] =
-    "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $";
+    "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/24 08:00:50 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -80,37 +80,20 @@ static char const ident[] =
 
 #define MSG_LEN 64
 
-void usage(void)
-{
-	fprintf(stderr, "Usage:  test-tcps [options]\n");
-	fprintf(stderr, "Options:\n");
-	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
-	fprintf(stderr,
-		"      port specifies both the local and remote port number\n");
-	fprintf(stderr, "  -l, --loc_host loc_host   (default: 0.0.0.0)\n");
-	fprintf(stderr,
-		"      loc_host specifies the local (bind) host for the TCP\n");
-	fprintf(stderr, "      socket with optional local port number\n");
-	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
-	fprintf(stderr, "      time give the time in seconds between reports\n");
-	fprintf(stderr, "  -w, --length              (default: %d)\n", MSG_LEN);
-	fprintf(stderr, "      packet length\n");
-	fprintf(stderr, "  -n, --nagle               (default: nonagle)\n");
-	fprintf(stderr, "      enable nagle algorithm\n");
-}
-
 #define HOST_BUF_LEN 256
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
@@ -126,7 +109,8 @@ static int timer_sethandler(void)
 	return 0;
 }
 
-static int start_timer(void)
+static int
+start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {1, 0} };
 	if (timer_sethandler())
@@ -144,7 +128,8 @@ int len = MSG_LEN;
 
 int nodelay = 1;
 
-int test_tcps(void)
+int
+test_tcps(void)
 {
 	int lfd, fd;
 	int offset = 0, mode = 0;
@@ -197,8 +182,7 @@ int test_tcps(void)
 		if (timer_timeout) {
 			printf
 			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes,
-			     inp_bytes - out_bytes);
+			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -218,8 +202,7 @@ int test_tcps(void)
 		if (mode) {
 			if (pfd[0].revents & POLLOUT) {
 				int rtn;
-				if ((rtn =
-				     send(fd, my_msg, offset, MSG_DONTWAIT)) < 0) {
+				if ((rtn = send(fd, my_msg, offset, MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("send");
@@ -241,8 +224,7 @@ int test_tcps(void)
 				int rtn;
 				if ((rtn =
 				     recv(fd, ur_msg + offset,
-					  sizeof(ur_msg) - offset,
-					  MSG_DONTWAIT)) < 0) {
+					  sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("recv");
@@ -277,9 +259,131 @@ int test_tcps(void)
 	return (0);
 }
 
-int main(int argc, char **argv)
+static int verbose = 1;
+
+void
+splash(int argc, char *argv[])
 {
-	int c;
+	if (verbose <= 0)
+		return;
+	fprintf(stdout, "\
+%1$s: TCP Performance Test Program\n\
+%2$s\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+", argv[0], ident);
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (verbose <= 0)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (verbose <= 0)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (verbose <= 0)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -l, --loc_host\n\
+        Local host (bind) address            [default: 0.0.0.0]\n\
+    -p, --port PORTNUM\n\
+        Remote port (connect) number         [default: 10000]\n\
+    -w, --length LENGTH\n\
+        Length of message in bytes           [default: %2$d]\n\
+    -n, --nagle\n\
+        Suppress Nagle algorithm\n\
+    -t, --rep_time INTERVAL\n\
+        Sets the report time INTERVAL (secs) [default: 1]\n\
+    -q, --quiet\n\
+        Suppress normal output\n\
+        (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL   [default 1]\n\
+        This option may be repeated\n\
+    -h, --help\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exits\n\
+", argv[0], MSG_LEN);
+}
+
+int
+main(int argc, char **argv)
+{
 	char *hostl = "0.0.0.0";
 	char hostbufl[HOST_BUF_LEN];
 	char hostbufr[HOST_BUF_LEN];
@@ -288,50 +392,31 @@ int main(int argc, char **argv)
 	int time;
 	struct hostent *haddr;
 	while (1) {
+		int c, val;
+#if defined _GNU_SOURCE
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			{"loc_host", 1, 0, 'l'},
-			{"rep_time", 1, 0, 't'},
-			{"help", 0, 0, 'h'},
-			{"port", 1, 0, 'p'},
-			{"length", 1, 0, 'w'},
-			{"nagle", 0, 0, 'n'}
+			{"loc_host",	required_argument,	NULL, 'l'},
+			{"rep_time",	required_argument,	NULL, 't'},
+			{"port",	required_argument,	NULL, 'p'},
+			{"length",	required_argument,	NULL, 'w'},
+			{"nagle",	no_argument,		NULL, 'n'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
-		c = getopt_long(argc, argv, "l:r:t:hp:w:n", long_options,
-				&option_index);
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "l:r:p:t:qvhV?");
+#endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
-		case 0:
-			switch (option_index) {
-			case 0:	/* loc_host */
-				strncpy(hostbufl, optarg, HOST_BUF_LEN);
-				hostl = hostbufl;
-				hostlp = &hostl;
-				break;
-			case 2:	/* rep_time */
-				time = atoi(optarg);
-				break;
-			case 3:	/* help */
-				usage();
-				exit(0);
-			case 4:	/* port */
-				port = atoi(optarg);
-				break;
-			case 5:	/* length */
-				len = atoi(optarg);
-				if (len > 2048) {
-					len = 2048;
-				}
-				break;
-			case 6:	/* nagle */
-				nodelay = 0;
-				break;
-			default:
-				usage();
-				exit(1);
-			}
-			break;
 		case 'l':
 			strncpy(hostbufl, optarg, HOST_BUF_LEN);
 			hostl = hostbufl;
@@ -340,9 +425,6 @@ int main(int argc, char **argv)
 		case 't':
 			time = atoi(optarg);
 			break;
-		case 'h':
-			usage();
-			exit(0);
 		case 'p':
 			port = atoi(optarg);
 			break;
@@ -354,20 +436,46 @@ int main(int argc, char **argv)
 		case 'n':
 			nodelay = 0;
 			break;
+		case 'q':
+			verbose = 0;
+			break;
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 'H':
+		case 'h':
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
 		default:
-			fprintf(stderr, "ERROR: Unrecognized option `%c'.\n", c);
-			usage();
-			exit(1);
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
 		}
 	}
-	if (optind < argc) {
-		fprintf(stderr, "ERROR: Option syntax: ");
-		while (optind < argc)
-			fprintf(stderr, "%s ", argv[optind++]);
-		fprintf(stderr, "\n");
-		usage();
-		exit(1);
-	}
+	if (optind < argc)
+		goto bad_nonopt;
+
+	splash(argc, argv);
 
 	haddr = gethostbyname(*hostlp);
 	loc_addr.sin_family = AF_INET;
