@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/01/29 11:22:39 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/02/01 19:01:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/29 11:22:39 $ by $Author: brian $
+# Last Modified $Date: 2005/02/01 19:01:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -234,8 +234,8 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
 fi
 %endif
 
-%define cache_file %{_builddir}/%{extrarelease}/%{_target_platform}-config.cache
-%define csite_file %{_builddir}/%{extrarelease}/%{_target_platform}-config.site
+%define cache_file %{_builddir}/%{_target_platform}-config.cache
+%define csite_file %{_builddir}/%{_target_platform}-config.site
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
@@ -377,6 +377,9 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.4  2005/02/01 19:01:24  brian
+# - Working up master build.
+#
 # Revision 1.1.2.3  2005/01/29 11:22:39  brian
 # - Have master build working well.
 #

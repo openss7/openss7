@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/01/26 22:12:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/02/01 18:59:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:09 $ by $Author: brian $
+# Last Modified $Date: 2005/02/01 18:59:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -916,13 +916,17 @@ endif
 dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV) 
 
-SUBDIRS = doc src intl m4 po
+SUBDIRS = doc src
+
+if WITH_XNET
+SUBDIRS += intl m4 po
+endif
 
 #
 #   Rules for making rpms
 #
-AM_RPMFLAGS = --define "_kversion $(kversion)"
-AM_SRPMFLAGS =
+AM_RPMFLAGS 			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS 			=
 
 include am/rpm.am
 

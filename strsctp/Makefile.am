@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/26 22:12:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/01 18:59:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:34 $ by $Author: brian $
+# Last Modified $Date: 2005/02/01 18:59:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -422,8 +422,8 @@ endif
 #
 #   Rules for making rpms
 #
-AM_RPMFLAGS				= --define "_kversion $(kversion)"
-AM_SRPMFLAGS				=
+AM_RPMFLAGS			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS			=
 
 include am/rpm.am
 

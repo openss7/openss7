@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/29 11:23:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/01 18:58:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,16 +46,31 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/29 11:23:05 $ by $Author: brian $
+# Last Modified $Date: 2005/02/01 18:58:37 $ by $Author: brian $
 #
 # =============================================================================
 
 include am/openss7.am
 
-srpm rpms rebuild sign resign:
+srpm rpms sign resign:
 	@list='$(subdirs)' ; for subdir in $$list ; do \
 		echo "Making $@ in $$subdir" ; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@) || exit 1 ; \
+	done
+
+rebuild:
+	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
+	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
+	for t in $$targets ;  do \
+		for k in $$kernels ; do \
+			k=`basename $$k` ; \
+			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
+				echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS=\"--define \"_without_tools --without-tools\"\" kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="--define \"_without_tools --without-tools\"" kversion="$$k" RPMTARGET="$$t" rpms || :; \
+			fi ; \
+		done ; \
+		echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS=\"--define \"_without_modules --without-modules\"\" kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="--define \"_without_modules --without-modules\"" kversion="$$k" RPMTARGET="$$t" rpms || :; \
 	done
 
 SUBDIRS	= @subdirs@
