@@ -1,1 +1,1 @@
-.so DL_REPLY_IND.7
+.so DL_REPLY_IND.7.man

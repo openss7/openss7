@@ -1,1 +1,1 @@
-.so DL_SUBS_BIND_REQ.7
+.so DL_SUBS_BIND_REQ.7.man

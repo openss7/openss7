@@ -1,1 +1,1 @@
-.so autopush.1
+.so autopush.8.man

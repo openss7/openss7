@@ -1,1 +1,1 @@
-.so sscop.4
+.so sscop.4.man

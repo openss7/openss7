@@ -1,1 +1,1 @@
-.so CD_HALT_INPUT_REQ.7
+.so CD_HALT_INPUT_REQ.7.man

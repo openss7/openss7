@@ -1,3 +1,3 @@
-.so N_BIND_ACK.7
+.so N_BIND_ACK.7.man
 
 

@@ -1,1 +1,1 @@
-.so spx.4
+.so spx.4.man

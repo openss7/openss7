@@ -1,1 +1,1 @@
-.so DL_CONNECT_CON.7
+.so DL_CONNECT_CON.7.man

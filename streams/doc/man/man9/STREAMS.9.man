@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.2 2004/03/10 08:45:54 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.4 2004/03/16 11:39:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/10 08:45:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/16 11:39:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STREAMS 9 "$Date: 2004/03/16 11:39:32 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -1146,10 +1146,10 @@ The default value is MAX_CHRDEV (256).
 This is a read-only system control.
 .TP
 .B sys.streams.msg_priority
-Defines whether allocation priority will honored or whether all allocations
+Defines whether allocation priority will be honoured or whether all allocations
 will be treated the same.  See
 .BR allocb (9).
-When true (non-zero), allocation priority will be honored when allocating
+When true (non-zero), allocation priority will be honoured when allocating
 message blocks.  When false (zero), allocation priority will be ignored.
 Valid values are zero (0) or non-zero.
 The default value is zero (0).

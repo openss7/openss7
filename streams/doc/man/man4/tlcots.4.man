@@ -1,1 +1,1 @@
-.so ticots.4
+.so ticots.4.man

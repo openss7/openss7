@@ -1,1 +1,1 @@
-.so ticlts.4
+.so ticlts.4.man

@@ -1,1 +1,1 @@
-.so T_EXDATA_IND.7
+.so T_EXDATA_IND.7.man

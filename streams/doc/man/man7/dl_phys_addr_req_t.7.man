@@ -1,1 +1,1 @@
-.so DL_PHYS_ADDR_REQ.7
+.so DL_PHYS_ADDR_REQ.7.man

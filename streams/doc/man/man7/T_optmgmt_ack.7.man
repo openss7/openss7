@@ -1,1 +1,1 @@
-.so T_OPTMGMT_ACK.7
+.so T_OPTMGMT_ACK.7.man

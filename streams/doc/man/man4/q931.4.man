@@ -1,1 +1,1 @@
-.so isdn.4
+.so isdn.4.man

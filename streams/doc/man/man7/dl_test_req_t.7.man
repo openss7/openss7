@@ -1,1 +1,1 @@
-.so DL_TEST_REQ.7
+.so DL_TEST_REQ.7.man

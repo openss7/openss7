@@ -1,1 +1,1 @@
-.so sockets.3
+.so sockets.3.man
