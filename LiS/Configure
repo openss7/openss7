@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.70 6/6/03"
+Configure_version="2.72 6/10/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -359,19 +359,33 @@ check_kver()
 }
 
 #
+# Try to extract the kernel version info from the version.h file
+# The argument is the full pathname of the version.h file to extract
+# from.
+#
+get_vers_h()
+{
+    if [ -f $1 ]; then
+	cc -I$KSRC/include -E -dM \
+	    -include $1 dummy.c >kver
+	KVER_H=`grep UTS_RELEASE kver | \
+	     sed -e 's/^.*UTS_RELEASE.//' -e's/"//g' -e's/  *$//'`
+	NKVER_H=`echo $KVER_H | sed -e 's/-.*//'`
+    fi
+}
+
+#
 # Figure out kernel version
 # Return the version string in KVER (e.g. 2.2.6)
 #
 get_kver()
 {
     check_kver
+    get_vers_h $KSRC/include/linux/version.h
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	KVER=`uname -r`
     elif [ -f $KSRC/include/linux/version.h ]; then
-	cc -I$KSRC/include -E -dM \
-	    -include $KSRC/include/linux/version.h dummy.c >kver
-	KVER=`grep UTS_RELEASE kver | \
-	     sed -e 's/^.*UTS_RELEASE.//' -e's/"//g' -e's/  *$//'`
+	KVER=$KVER_H
     elif [ -f $KSRC/vmlinux ]; then
 	KVDEC=`nm -g $KSRC/vmlinux | grep Version_ | sed -e 's/^.*_//'`
 	KMAJ=`expr $KVDEC / 65536`
@@ -401,6 +415,16 @@ get_kver()
 # Having dug out the kernel version from the kernel source info, now
 # verify that the currently running kernel has the same settings.
 #
+kver_h_err_msg()
+{
+    echo
+    echo "Your kernel source is for kernel version $KVER_H, but"
+    echo "your running kernel is version $PKVER.  Installation"
+    echo "will proceed by may encounter problems later."
+    echo
+    do_confirm
+}
+
 verify_kver()
 {
     if [ ! -f /proc/sys/kernel/osrelease ]; then
@@ -429,7 +453,58 @@ verify_kver()
 	do_confirm
 	exit 1
     fi
-    echo "Kernel version verified between kernel source and running kernel"
+
+    if [ "$KVER_H..." = "..." ]; then
+	echo
+	echo "The file $KSRC/include/linux/versin.h is missing"
+	echo "LiS needs thie file in order to build properly."
+	echo "This may be an indication that there is no kernel"
+	echo "source on this machine, or only partial kernel source."
+	echo
+	do_confirm
+	exit 1
+    fi
+
+    if [ "$NKVER_H..." != "$NPKVER..." ]; then
+	echo
+	echo "Your kernel source is for kernel version $NKVER_H, but"
+	echo "your running kernel is version $NPKVER.  This is a"
+	echo "good indication that you are not running on the kernel"
+	echo "represented by the kernel source.  Please make the"
+	echo "running kernel the same as the one in kernel source and"
+	echo "then install LiS again."
+	echo
+	do_confirm
+	exit 1
+    fi
+
+    if [ "$KVER_H..." != "$PKVER..." ]; then
+	if [ -f /boot/vmlinuz.version.h ]; then
+	    OKVER_H=$KVER_H
+	    get_vers_h /boot/vmlinuz.version.h
+	    if [ "$KVER_H..." = "$PKVER..." ]; then
+		echo
+		echo "Your kernel source is for kernel version $OKVER_H, but"
+		echo "your running kernel is version $PKVER.  However,"
+		echo "the file /boot/vmlinuz.version.h has the correct"
+		echo "information it it.  Installation will proceed by"
+		echo "copying this file to $KSRC/include/linux/version.h."
+		echo
+		do_confirm
+		if [ ! -f $KSRC/include/linux/version.h.orig ]; then
+		    mv  $KSRC/include/linux/version.h \
+			$KSRC/include/linux/version.h.orig
+		fi
+		cp -f /boot/vmlinuz.version.h $KSRC/include/linux/version.h
+	    else
+		kver_h_err_msg
+	    fi
+	else
+	    kver_h_err_msg
+	fi
+    else
+	echo "Kernel version verified between kernel source and running kernel"
+    fi
 }
 
 #
@@ -1415,6 +1490,8 @@ if [ "$TARGET" = "l" ]; then
     cfg_out KVER_PATCH $KVER_PATCH
     cfg_out KVER_PATCHNO $KVER_PATCHNO
     cfg_out KVER_MAJORMINOR $KVER_MAJORMINOR
+    cfg_out KVER_H $KVER_H
+    cfg_out NKVER_H $NKVER_H
     cfg_out KSMP $KSMP
     cfg_out KMODULES $KMODULES
     cfg_out KMODVERS $KMODVERS
