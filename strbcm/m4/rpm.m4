@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: rpm.m4,v 0.9.2.27 2005/01/22 22:51:58 brian Exp $
+dnl @(#) $Id: rpm.m4,v 0.9.2.28 2005/02/07 01:54:37 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 22:51:58 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/07 01:54:37 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -146,6 +146,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
         then
             rpm_cv_dist_vendor=suse
             rpm_cv_dist_flavor="SuSE Linux"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/debian_version
+        then
+            rpm_cv_dist_vendor=debian
+            rpm_cv_dist_flavor="Debian Linux"
         fi
         # look in /etc/lsb-release
         if test -z "$rpm_cv_dist_vendor" -a -r /etc/lsb-release
@@ -280,6 +285,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
             rpm_tmp=`cat /etc/SuSE-release | grep 'SuSE Linux'`
             rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
         fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/debian_version
+        then
+            rpm_tmp=`cat /etc/debian_version`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
         # look in /etc/issue
         if test -z "$rpm_cv_dist_release" -a -r /etc/issue
         then
@@ -352,6 +362,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                     SuSE*)
                         rpm_cv_dist_extra=".${rpm_cv_dist_release:-SuSE}"
                         ;;
+                    Debian*)
+                        rpm_cv_dist_extra=".deb${rpm_cv_dist_release}"
+                        ;;
                 esac
                 ;;
             *)
@@ -377,7 +390,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                 rpm_cv_dist_topdir='/usr/src/SuSE'
                 ;;
             *Debian*)
-                rpm_cv_dist_topdir="$ac_abs_top_buiddir"
+                rpm_cv_dist_topdir='/usr/src/rpm'
                 ;;
             *)
                 rpm_cv_dist_topdir="$ac_abs_top_buiddir"
