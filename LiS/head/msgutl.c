@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-#ident "@(#) LiS msgutl.c 2.12 8/15/03 13:53:59 "
+#ident "@(#) LiS msgutl.c 2.13 9/24/03 16:59:57 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -388,7 +388,7 @@ lis_pullupmsg(mblk_t *mp, int length)
 
     if (length <= (n = mp->b_wptr - mp->b_rptr))
     {
-	if ((((int) mp->b_rptr) & ALIGN_MOD) == 0)	/* aligned?  */
+	if ((((uintptr_t) mp->b_rptr) & ALIGN_MOD) == 0)	/* aligned?  */
 	    return 1;		/* already pulled up */
 	length = n ;		/* don't make 1st bfr any smaller */
     }

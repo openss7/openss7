@@ -181,7 +181,7 @@ STATIC void sad_iocdata(struct priv *p, mblk_t *mp)
 	int err = 0, ret = 0;
 
 	if (res->cp_rval != 0) {
-		err = -(int)res->cp_rval;
+		err = (int)(-(intptr_t)res->cp_rval);
 		ret = -1;
 		goto ioctl_done;
 	}
