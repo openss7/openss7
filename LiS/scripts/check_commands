@@ -1,0 +1,296 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_commands,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/17 15:47:06 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/01/17 15:47:06 $ by $Author: brian $
+#
+# =============================================================================
+
+#
+#   Tests various options of each installed program and script.  This goes
+#   further than the GNU stnadard options (--help and --version) and adds a
+#   few that should be present in OpenSS7 project programs and scripts.  We
+#   also display the resulting information.
+#
+retval=0
+
+me=`basename $0`
+
+exec 5>$me.log
+
+export -p >&5
+
+echo_v()
+{
+	if test -n "$MAINTAINER_MODE" ; then
+		echo "$me: I: $1"
+	fi
+}
+
+echo_d()
+{
+	if test -n "$MAINTAINER_MODE" ; then
+		echo "$me: D: $1"
+	fi
+	echo "$me: D: $1" >&5
+}
+
+echo_e()
+{
+	echo "$me: E: $1" >&2
+	echo "$me: E: $1" >&5
+}
+
+echo_v "---------------------------------------------------------------"
+echo_v "Testing basic options of each installed program and script."
+echo_v "---------------------------------------------------------------"
+
+programs="$bin_PROGRAMS $sbin_PROGRAMS $libexec_PROGRAMS"
+scripts="$dist_bin_SCRIPTS $dist_sbin_SCRIPTS $dist_libexec_SCRIPTS"
+
+if test -z "$programs$scripts"
+then
+	echo_e "Nothing to check, skipping test."
+	echo_v "---------------------------------------------------------------"
+	exit 77
+fi
+
+#
+# PROGRAMS must be built, so they always appear in the build directory, which is the current
+# directory.  If we are cross-compiling we cannot test compiled programs on the build host.
+#
+echo_v "Testing programs."
+echo_v "---------------------------------------------------------------"
+if test :"${cross_compiling:-no}" = :no
+then
+	for program in $programs
+	do
+		echo_v "Testing program `basename $program`."
+		echo_v "---------------------------------------------------------------"
+		if test ! -e ./$program ; then
+			echo_e "cannot find program $program."
+			retval=1
+			continue;
+		fi
+		if test -x ./$program ; then :
+			for opt in --help --version --copying
+			do
+				echo_v "Testing ./$program $opt"
+				./$program $opt    > ${me}_$$.out 2> ${me}_$$.err \
+				&& test -n "`cat ${me}_$$.out`" \
+				&& test -z "`cat ${me}_$$.err`" \
+				|| {
+					echo_e "$program does not support $opt"
+					echo_d "stderr was:"
+					while read line ; do echo_d "$line" ; done < ${me}_$$.err
+					echo_d "stdout was:"
+					while read line ; do echo_d "$line" ; done < ${me}_$$.out
+					retval=1
+				}
+			done
+		else
+			echo_v "$program is not executable: skipping."
+		fi
+		echo_v "---------------------------------------------------------------"
+	done
+else
+	echo_v "Cross compiling: cannot test programs."
+	echo_v "---------------------------------------------------------------"
+
+fi
+#
+# SCRIPTS could be in the source directory or they could be derived and in the
+# build directory, so we need to check for their location.
+#
+echo_v "Testing scripts."
+echo_v "---------------------------------------------------------------"
+for script in $scripts
+do
+	echo_v "Testing script $script"
+	echo_v "---------------------------------------------------------------"
+	s="./$script"
+	if test ! -e $s ; then
+		s="$srcdir/$script"
+		if test ! -e $s ; then
+			echo_e "cannot find script `basename $script`."
+			retval=1
+			continue;
+		fi
+	fi
+	for opt in --help --version --copying
+	do
+		echo_v "Testing ${SHELL} $s $opt"
+		${SHELL} $s $opt    > ${me}_$$.out 2> ${me}_$$.err \
+		&& test -n "`cat ${me}_$$.out`" \
+		&& test -z "`cat ${me}_$$.err`" \
+		|| { 
+			echo_e "$s does not support $opt"
+			echo_d "stderr was:"
+			while read line ; do echo_d "$line" ; done < ${me}_$$.err
+			echo_d "stdout was:"
+			while read line ; do echo_d "$line" ; done < ${me}_$$.out
+			retval=1
+		}
+	done
+	echo_v "---------------------------------------------------------------"
+done
+
+#
+# For each program or script check that we have a manual page in section 1 or 8.
+#
+echo_v "Testing manual pages."
+echo_v "---------------------------------------------------------------"
+for prog in $bin_PROGRAMS $dist_bin_SCRIPTS $sbin_PROGRAMS $dist_sbin_SCRIPTS $libexec_PROGRAMS $dist_libexec_SCRIPTS
+do
+	base=`basename $prog`
+	found=
+	echo_v "Testing manual pages for $base"
+	echo_v "---------------------------------------------------------------"
+	sections="1 8"
+	case " $bin_PROGRAMS $dist_bin_SCRIPTS " in
+		*" $prog "*)
+			sections='1'
+			;;
+		*) ;;
+	esac
+	case " $sbin_PROGRAMS $dist_sbin_SCRIPTS " in
+		*" $prog "*)
+			sections='8'
+			;;
+		*) ;;
+	esac
+	case " $libexec_PROGRAMS $dist_libexec_SCRIPTS " in
+		*" $prog "*)
+			sections=''
+			echo_v "Skipping libexec program."
+			echo_v "---------------------------------------------------------------"
+			continue
+			;;
+		*) ;;
+	esac
+	for section in $sections
+	do
+		for dir in ./doc $srcdir/doc . $srcdir
+		do
+			f="$dir/man/man$section/$base.$section"
+			if test -e $f
+			then
+				echo_v "Found manual page for $base, $f."
+				found="${found}${found:+ }$f"
+			fi
+			if test -e ${f}s
+			then
+				echo_v "Found manual page for $base, ${f}s."
+				found="${found}${found:+ }${f}s"
+			fi
+		done
+	done
+	if test -z "$found"
+	then
+		echo_e "cannot find manpage for $base."
+		echo_v "---------------------------------------------------------------"
+		retval=1
+		continue;
+	fi
+	for page in $found
+	do
+		echo_d "man $page"
+		# this only works for ascii
+		if man $page | sed -e 's/.[[:cntrl:]]//g' > ${me}_$$.out 2> ${me}_$$.err \
+			&& test -n "`cat ${me}_$$.out`" \
+			&& test -z "`cat ${me}_$$.err`"
+		then
+			:
+		else
+			echo_e "Error formatting manual page $page"
+			echo_d "stderr was:"
+			while read line ; do echo_d "$line" ; done < ${me}_$$.err
+			echo_d "stdout was:"
+			while read line ; do echo_d "$line" ; done < ${me}_$$.out
+			retval=1
+			continue
+		fi
+		# check for mandatory sections
+		while read section
+		do
+			if (grep -- "$section" ${me}_$$.out >/dev/null 2>&1)
+			then :
+			else
+				echo_e "cannot find section '$section' in $page"
+				retval=1
+				continue;
+			fi
+		done<<_ACEOF
+NAME
+SYNOPSIS
+DESCRIPTION
+OPTIONS
+DIAGNOSTICS
+IDENTIFICATION
+_ACEOF
+		while read opt
+		do
+			if (grep -- "$opt" ${me}_$$.out >/dev/null 2>&1)
+			then :
+			else
+				echo_e "cannot find option '$opt' in $page"
+				retval=1
+				continue;
+			fi
+		done<<_ACEOF
+--help
+--version
+--copying
+_ACEOF
+	done
+	echo_v "---------------------------------------------------------------"
+done
+
+rm -f ${me}_$$.out ${me}_$$.err
+
+exit $retval

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 06:20:57 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/17 13:16:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/14 06:20:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/17 13:16:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,6 +102,10 @@ $(man8_MANS):: %.8: %.man
 	@echo "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
 
+$(man9_MANS):: %.9: %.man
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.9/' > $@ ;
+
 $(man_MANS):: $(man_MACROS)
 $(man1_MANS):: $(man_MACROS)
 $(man2_MANS):: $(man_MACROS)
@@ -111,6 +115,7 @@ $(man5_MANS):: $(man_MACROS)
 $(man6_MANS):: $(man_MACROS)
 $(man7_MANS):: $(man_MACROS)
 $(man8_MANS):: $(man_MACROS)
+$(man9_MANS):: $(man_MACROS)
 
 install-manpages:
 
@@ -159,7 +164,11 @@ $(man8_MANS): %.8: %.man
 	@echo "converting manpage $< to $@" ; \
 	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
 
-install-manpages: $(man_MANS) $(man_MACROS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) $(man5_MANS) $(man6_MANS) $(man7_MANS) $(man8_MANS)
+$(man9_MANS): %.9: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.9/' > $@ ;
+
+install-manpages: $(man_MANS) $(man_MACROS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) $(man5_MANS) $(man6_MANS) $(man7_MANS) $(man8_MANS) $(man9_MANS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(mandir)
 	@list="$(man_MACROS)" ; if test -n "$$list" ; then \
@@ -213,6 +222,10 @@ clean-manpages:
 	if test -n "$(man8_MANS)" ; then \
 		echo "rm -f $(man8_MANS)" ; \
 		rm -f $(man8_MANS) ; \
+	fi ; \
+	if test -n "$(man9_MANS)" ; then \
+		echo "rm -f $(man9_MANS)" ; \
+		rm -f $(man9_MANS) ; \
 	fi
 
 INSTALL_DATA_LOCAL += install-manpages
@@ -306,6 +319,14 @@ post-manpages:
 					fi ; \
 				done ; \
 			fi ; \
+			list="$(man9_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man9/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man9/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man9/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 
@@ -385,6 +406,14 @@ postun-manpages:
 					if test -f $(DESTDIR)$(mandir)/man8/$$f.gz ; then \
 						echo "rm -f $(DESTDIR)$(mandir)/man8/$$f.gz" ; \
 						rm -f $(DESTDIR)$(mandir)/man8/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man9_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man9/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man9/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man9/$$f.gz ; \
 					fi ; \
 				done ; \
 			fi ; \

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/01/15 22:39:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/01/17 14:20:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/15 22:39:18 $ by $Author: brian $
+# Last Modified $Date: 2005/01/17 14:20:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -540,10 +540,15 @@ AM_SRPMFLAGS =
 
 include am/rpm.am
 
-dist_check_SCRIPTS	= $(srcdir)/scripts/check_modules
+@MAINTAINER_MODE_TRUE@MAINTAINER_MODE = yes
+@MAINTAINER_MODE_FALSE@MAINTAINER_MODE =
 
-TESTS			= $(srcdir)/scripts/check_modules
-TESTS_ENVIRONMENT	= $(SHELL) -a
+dist_check_SCRIPTS	= $(srcdir)/scripts/check_libs \
+			  $(srcdir)/scripts/check_commands \
+			  $(srcdir)/scripts/check_modules
+
+TESTS			= $(dist_check_SCRIPTS)
+TESTS_ENVIRONMENT	= $(SHELL)
 
 .EXPORT_ALL_VARIABLES:
 
