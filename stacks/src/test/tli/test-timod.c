@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:41 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:24 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/12 08:01:41 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/09/02 09:31:24 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:41 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:24 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:41 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:24 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -113,8 +113,16 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
  *  the module can be removed correctly.
  */
 
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#elif HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -133,7 +141,6 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
 
 #define NEED_T_USCALAR_T
 
-#include <sys/types.h>
 #include <xti.h>
 #include <tihdr.h>
 #include <timod.h>
@@ -4676,15 +4683,16 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argv[])
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 XNS 5.2 - OpenSS7 XTI/TLI Library - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -4726,6 +4734,7 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
 }
 
@@ -4735,12 +4744,16 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permissions.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -4754,6 +4767,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -4763,32 +4777,37 @@ help(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
     -f, --fast [SCALE]\n\
-        Increase speed of tests by scaling timers [default: 50]\n\
+        increase speed of tests by scaling timers [default: 50]\n\
     -s, --summary\n\
-        Print a test case summary at end of testing [default: off]\n\
+        print a test case summary at end of testing [default: off]\n\
     -o, --onetest [TESTCASE]\n\
-        Run a single test case.\n\
+        run a single test case.\n\
     -t, --tests [RANGE]\n\
-        Run a range of test cases.\n\
+        run a range of test cases.\n\
     -m, --messages\n\
-        Display messages. [default: off]\n\
+        display messages. [default: off]\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-	This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+	this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permissions and exit\n\
+\n\
 ", argv[0]);
 }
 
@@ -4820,12 +4839,14 @@ main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "f::so:t:mqvhV?");
+		c = getopt(argc, argv, "f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -4902,6 +4923,9 @@ main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			copying(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -4931,7 +4955,7 @@ main(int argc, char *argv[])
 		}
 		exit(2);
 	}
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 08:48:44 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 09:31:22 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 08:48:44 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/09/02 09:31:22 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 08:48:44 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 09:31:22 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 08:48:44 $";
+    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 09:31:22 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -76,27 +76,34 @@ static char const ident[] =
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <signal.h>
+#include <sys/uio.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
 
-#if 0
-#include "../include/sys/npi.h"
-#include "../include/sys/npi_sctp.h"
-#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
-#endif
 
 static int verbose = 1;
 static int summary = 0;
-static int timer_scale = 1;
+
 static int show_msg = 0;
+static int show_acks = 0;
+static int show_timeout = 0;
+
+static int last_event = 0;
+static int last_errno = 0;
+static int last_prim = 0;
+
+static int conn_fd = 0;
+static int resp_fd = 0;
+static int list_fd = 0;
 
 #define BUFSIZE 5*4096
 #define FFLUSH(stream)
@@ -104,6 +111,7 @@ static int show_msg = 0;
 #define SHORT_WAIT 10
 #define NORMAL_WAIT 100
 #define LONG_WAIT 500
+#define LONGER_WAIT 5000
 
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
@@ -117,24 +125,339 @@ union {
 } cmd;
 
 char dbuf[BUFSIZE];
+
 struct strbuf ctrl = { BUFSIZE, 0, cmd.cbuf };
 struct strbuf data = { BUFSIZE, 0, dbuf };
 
+struct strfdinsert fdi = {
+	{BUFSIZE, 0, cmd.cbuf},
+	{BUFSIZE, 0, dbuf},
+	0,
+	0,
+	0
+};
+int flags = 0;
+
+#ifndef SCTP_VERSION_2
 typedef struct addr {
 	uint16_t port __attribute__ ((packed));
 	struct in_addr addr[3] __attribute__ ((packed));
 } addr_t;
+#endif				/* SCTP_VERSION_2 */
 
 struct timeval when;
 
-#define INCONCLUSIVE -2
-#define FAILURE -1
-#define SUCCESS 0
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Events and Actions
+ *
+ *  -------------------------------------------------------------------------
+ */
+enum {
+	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
+	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0,
+	__RESULT_FAILURE = 1, __EVENT_CONN_REQ = 2, __EVENT_CONN_RES,
+	__EVENT_DISCON_REQ, __EVENT_DATA_REQ, __EVENT_EXDATA_REQ,
+	__EVENT_INFO_REQ, __EVENT_BIND_REQ, __EVENT_UNBIND_REQ,
+	__EVENT_UNITDATA_REQ, __EVENT_OPTMGMT_REQ, __EVENT_ORDREL_REQ,
+	__EVENT_OPTDATA_REQ, __EVENT_ADDR_REQ, __EVENT_CAPABILITY_REQ,
+	__EVENT_CONN_IND, __EVENT_CONN_CON, __EVENT_DISCON_IND,
+	__EVENT_DATA_IND, __EVENT_EXDATA_IND, __EVENT_INFO_ACK,
+	__EVENT_BIND_ACK, __EVENT_ERROR_ACK, __EVENT_OK_ACK,
+	__EVENT_UNITDATA_IND, __EVENT_UDERROR_IND, __EVENT_OPTMGMT_ACK,
+	__EVENT_ORDREL_IND, __EVENT_OPTDATA_IND, __EVENT_ADDR_ACK,
+	__EVENT_CAPABILITY_ACK, __EVENT_WRITE, __EVENT_WRITEV,
+	__EVENT_PUTMSG_DATA, __EVENT_PUTPMSG_DATA, __EVENT_PUSH, __EVENT_POP,
+	__EVENT_READ, __EVENT_READV, __EVENT_GETMSG, __EVENT_GETPMSG,
+	__EVENT_DATA,
+	__EVENT_DATACK_REQ, __EVENT_DATACK_IND,
+	__EVENT_RESET_REQ, __EVENT_RESET_IND, __EVENT_RESET_RES, __EVENT_RESET_CON,
+};
 
+/* 
+ *  -------------------------------------------------------------------------
+ */
+const char *device = "/dev/sctp_n";
 int show = 1;
-int state;
-int fd1, fd2, fd3;
-addr_t addr1, addr2, addr3;
+#ifndef SCTP_VERSION_2
+addr_t addr1, addr2, addr3, addr4;
+#else				/* SCTP_VERSION_2 */
+struct sockaddr_in addr1[3], addr2[3], addr3[3], addr4[3];
+#endif				/* SCTP_VERSION_2 */
+unsigned short port1 = 10000, port2 = 10001, port3 = 10002, port4 = 10003;
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Timer Functions
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/* 
+ *  Timer values for tests: each timer has a low range (minus error margin)
+ *  and a high range (plus error margin).
+ */
+
+static long timer_scale = 1;
+
+#define TEST_TIMEOUT 5000
+
+typedef struct timer_range {
+	long lo;
+	long hi;
+} timer_range_t;
+
+enum {
+	t1 = 0, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15,
+	t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29,
+	t30, t31, t32, t33, t34, t35, t36, t37, t38, tmax
+};
+
+#undef HZ
+#define HZ 1000
+
+/* *INDENT-OFF* */
+static timer_range_t timer[tmax] = {
+	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
+	{(3 * 60 * HZ),		(3 * 60 * HZ)},		/* T2 3 minutes */
+	{(2 * 60 * HZ),		(2 * 60 * HZ)},		/* T3 2 minutes */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T4 5-15 minutes */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T5 5-15 minutes */
+	{(10 * HZ),		(32 * HZ)},		/* T6 10-32 seconds (specified in Q.118) */
+	{(20 * HZ),		(30 * HZ)},		/* T7 20-30 seconds */
+	{(10 * HZ),		(15 * HZ)},		/* T8 10-15 seconds */
+	{(2 * 60 * HZ),		(4 * 60 * HZ)},		/* T9 2-4 minutes (specified in Q.118) */
+	{(4 * HZ),		(6 * HZ)},		/* T10 4-6 seconds */
+	{(15 * HZ),		(20 * HZ)},		/* T11 15-20 seconds */
+	{(15 * HZ),		(60 * HZ)},		/* T12 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T13 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T14 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T15 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T16 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T17 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T18 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T19 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T20 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T21 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T22 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T23 5-15 minutes */
+	{(1 * HZ),		(2 * HZ)},		/* T24 < 2 seconds */
+	{(1 * HZ),		(10 * HZ)},		/* T25 1-10 seconds */
+	{(1 * 60 * HZ),		(3 * 60 * HZ)},		/* T26 1-3 minutes */
+	{(4 * 60 * HZ),		(4 * 60 * HZ)},		/* T27 4 minutes */
+	{(10 * HZ),		(10 * HZ)},		/* T28 10 seconds */
+	{(300 * HZ / 1000),	(600 * HZ / 1000)},	/* T29 300-600 milliseconds */
+	{(5 * HZ),		(10 * HZ)},		/* T30 5-10 seconds */
+	{(6 * 60 * HZ),		(7 * 60 * HZ)},		/* T31 > 6 minutes */
+	{(3 * HZ),		(5 * HZ)},		/* T32 3-5 seconds */
+	{(12 * HZ),		(15 * HZ)},		/* T33 12-15 seconds */
+	{(12 * HZ),		(15 * HZ)},		/* T34 12-15 seconds */
+	{(15 * HZ),		(20 * HZ)},		/* T35 15-20 seconds */
+	{(15 * HZ),		(20 * HZ)},		/* T36 15-20 seconds */
+	{(2 * HZ),		(4 * HZ)},		/* T37 2-4 seconds */
+	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
+};
+/* *INDENT-ON* */
+
+long test_start = 0;
+
+static int state;
+
+/* 
+ *  Return the current time in milliseconds.
+ */
+static long
+now(void)
+{
+	long ret;
+	struct timeval now;
+	if (gettimeofday(&now, NULL)) {
+		last_errno = errno;
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"***************ERROR! couldn't get time!            !  !                    \n");
+		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+		return (0);
+	}
+	if (!test_start)	/* avoid blowing over precision */
+		test_start = now.tv_sec;
+	ret = (now.tv_sec - test_start) * 1000L;
+	ret += (now.tv_usec + 999L) / 1000L;
+	return ret;
+}
+static long
+milliseconds(char *t)
+{
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    .               :               .  .                    \n");
+		fprintf(stdout,
+			"                    .             %6s            .  .                    <%d>\n",
+			t, state);
+		fprintf(stdout,
+			"                    .               :               .  .                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return now();
+}
+static long
+milliseconds_2nd(char *t)
+{
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    .               :   :           .  .                    \n");
+		fprintf(stdout,
+			"                    .               : %6s        .  .                    <%d>\n",
+			t, state);
+		fprintf(stdout,
+			"                    .               :   :           .  .                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return now();
+}
+
+/* 
+ *  Check the current time against the beginning time provided as an argnument
+ *  and see if the time inverval falls between the low and high values for the
+ *  timer as specified by arguments.  Return SUCCESS if the interval is within
+ *  the allowable range and FAILURE otherwise.
+ */
+static int
+check_time(const char *t, long i, long lo, long hi)
+{
+	float tol, dlo, dhi, itv;
+	itv = i * timer_scale;
+	dlo = lo;
+	dhi = hi;
+	tol = 100 * timer_scale;
+	itv = itv / 1000;
+	dlo = dlo / 1000;
+	dhi = dhi / 1000;
+	tol = tol / 1000;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n",
+			dlo - tol, itv, dhi + tol, t, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (dlo - tol <= itv && itv <= dhi + tol)
+		return __RESULT_SUCCESS;
+	else
+		return __RESULT_FAILURE;
+}
+
+static int
+time_event(int event)
+{
+	if (verbose > 4) {
+		float t, m;
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		if (!test_start)
+			test_start = now.tv_sec;
+		t = (now.tv_sec - test_start);
+		m = now.tv_usec;
+		m = m / 1000000;
+		t += m;
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    | %11.6g                   |  |                    <%d>\n",
+			t, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return (event);
+}
+
+static int timer_timeout = 0;
+
+static void
+timer_handler(int signum)
+{
+	if (signum == SIGALRM)
+		timer_timeout = 1;
+	return;
+}
+
+static int
+timer_sethandler(void)
+{
+	sigset_t mask;
+	struct sigaction act;
+	act.sa_handler = timer_handler;
+	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		return __RESULT_FAILURE;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	return __RESULT_SUCCESS;
+}
+
+/* 
+ *  Start an interval timer as the overall test timer.
+ */
+static int
+start_tt(long duration)
+{
+	struct itimerval setting = {
+		{0, 0},
+		{duration / 1000, (duration % 1000) * 1000}
+	};
+	if (timer_sethandler())
+		return __RESULT_FAILURE;
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	timer_timeout = 0;
+	return __RESULT_SUCCESS;
+}
+static int
+start_st(long duration)
+{
+	long sdur = (duration + timer_scale - 1) / timer_scale;
+	return start_tt(sdur);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	sigset_t mask;
+	struct sigaction act;
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	act.sa_handler = SIG_DFL;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		return __RESULT_FAILURE;
+	timer_timeout = 0;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
+	return __RESULT_SUCCESS;
+}
+
+/* 
+ *  -------------------------------------------------------------------------
+ *  
+ *  Options
+ *  
+ *  -------------------------------------------------------------------------
+ */
+
 N_qos_sel_data_sctp_t qos_data = {
 	N_QOS_SEL_DATA_SCTP,		/* n_qos_type */
 	10,				/* ppi */
@@ -171,202 +494,530 @@ N_qos_sel_info_sctp_t qos_info = {
 };
 
 char *
-err_string(ulong error)
+errno_string(long err)
 {
-	switch (error) {
+	switch (err) {
+	case 0:
+		return ("ok");
+	case EPERM:
+		return ("[EPERM]");
+	case ENOENT:
+		return ("[ENOENT]");
+	case ESRCH:
+		return ("[ESRCH]");
+	case EINTR:
+		return ("[EINTR]");
+	case EIO:
+		return ("[EIO]");
+	case ENXIO:
+		return ("[ENXIO]");
+	case E2BIG:
+		return ("[E2BIG]");
+	case ENOEXEC:
+		return ("[ENOEXEC]");
+	case EBADF:
+		return ("[EBADF]");
+	case ECHILD:
+		return ("[ECHILD]");
+	case EAGAIN:
+		return ("[EAGAIN]");
+	case ENOMEM:
+		return ("[ENOMEM]");
+	case EACCES:
+		return ("[EACCES]");
+	case EFAULT:
+		return ("[EFAULT]");
+	case ENOTBLK:
+		return ("[ENOTBLK]");
+	case EBUSY:
+		return ("[EBUSY]");
+	case EEXIST:
+		return ("[EEXIST]");
+	case EXDEV:
+		return ("[EXDEV]");
+	case ENODEV:
+		return ("[ENODEV]");
+	case ENOTDIR:
+		return ("[ENOTDIR]");
+	case EISDIR:
+		return ("[EISDIR]");
+	case EINVAL:
+		return ("[EINVAL]");
+	case ENFILE:
+		return ("[ENFILE]");
+	case EMFILE:
+		return ("[EMFILE]");
+	case ENOTTY:
+		return ("[ENOTTY]");
+	case ETXTBSY:
+		return ("[ETXTBSY]");
+	case EFBIG:
+		return ("[EFBIG]");
+	case ENOSPC:
+		return ("[ENOSPC]");
+	case ESPIPE:
+		return ("[ESPIPE]");
+	case EROFS:
+		return ("[EROFS]");
+	case EMLINK:
+		return ("[EMLINK]");
+	case EPIPE:
+		return ("[EPIPE]");
+	case EDOM:
+		return ("[EDOM]");
+	case ERANGE:
+		return ("[ERANGE]");
+	case EDEADLK:
+		return ("[EDEADLK]");
+	case ENAMETOOLONG:
+		return ("[ENAMETOOLONG]");
+	case ENOLCK:
+		return ("[ENOLCK]");
+	case ENOSYS:
+		return ("[ENOSYS]");
+	case ENOTEMPTY:
+		return ("[ENOTEMPTY]");
+	case ELOOP:
+		return ("[ELOOP]");
+	case ENOMSG:
+		return ("[ENOMSG]");
+	case EIDRM:
+		return ("[EIDRM]");
+	case ECHRNG:
+		return ("[ECHRNG]");
+	case EL2NSYNC:
+		return ("[EL2NSYNC]");
+	case EL3HLT:
+		return ("[EL3HLT]");
+	case EL3RST:
+		return ("[EL3RST]");
+	case ELNRNG:
+		return ("[ELNRNG]");
+	case EUNATCH:
+		return ("[EUNATCH]");
+	case ENOCSI:
+		return ("[ENOCSI]");
+	case EL2HLT:
+		return ("[EL2HLT]");
+	case EBADE:
+		return ("[EBADE]");
+	case EBADR:
+		return ("[EBADR]");
+	case EXFULL:
+		return ("[EXFULL]");
+	case ENOANO:
+		return ("[ENOANO]");
+	case EBADRQC:
+		return ("[EBADRQC]");
+	case EBADSLT:
+		return ("[EBADSLT]");
+	case EBFONT:
+		return ("[EBFONT]");
+	case ENOSTR:
+		return ("[ENOSTR]");
+	case ENODATA:
+		return ("[ENODATA]");
+	case ETIME:
+		return ("[ETIME]");
+	case ENOSR:
+		return ("[ENOSR]");
+	case ENONET:
+		return ("[ENONET]");
+	case ENOPKG:
+		return ("[ENOPKG]");
+	case EREMOTE:
+		return ("[EREMOTE]");
+	case ENOLINK:
+		return ("[ENOLINK]");
+	case EADV:
+		return ("[EADV]");
+	case ESRMNT:
+		return ("[ESRMNT]");
+	case ECOMM:
+		return ("[ECOMM]");
+	case EPROTO:
+		return ("[EPROTO]");
+	case EMULTIHOP:
+		return ("[EMULTIHOP]");
+	case EDOTDOT:
+		return ("[EDOTDOT]");
+	case EBADMSG:
+		return ("[EBADMSG]");
+	case EOVERFLOW:
+		return ("[EOVERFLOW]");
+	case ENOTUNIQ:
+		return ("[ENOTUNIQ]");
+	case EBADFD:
+		return ("[EBADFD]");
+	case EREMCHG:
+		return ("[EREMCHG]");
+	case ELIBACC:
+		return ("[ELIBACC]");
+	case ELIBBAD:
+		return ("[ELIBBAD]");
+	case ELIBSCN:
+		return ("[ELIBSCN]");
+	case ELIBMAX:
+		return ("[ELIBMAX]");
+	case ELIBEXEC:
+		return ("[ELIBEXEC]");
+	case EILSEQ:
+		return ("[EILSEQ]");
+	case ERESTART:
+		return ("[ERESTART]");
+	case ESTRPIPE:
+		return ("[ESTRPIPE]");
+	case EUSERS:
+		return ("[EUSERS]");
+	case ENOTSOCK:
+		return ("[ENOTSOCK]");
+	case EDESTADDRREQ:
+		return ("[EDESTADDRREQ]");
+	case EMSGSIZE:
+		return ("[EMSGSIZE]");
+	case EPROTOTYPE:
+		return ("[EPROTOTYPE]");
+	case ENOPROTOOPT:
+		return ("[ENOPROTOOPT]");
+	case EPROTONOSUPPORT:
+		return ("[EPROTONOSUPPORT]");
+	case ESOCKTNOSUPPORT:
+		return ("[ESOCKTNOSUPPORT]");
+	case EOPNOTSUPP:
+		return ("[EOPNOTSUPP]");
+	case EPFNOSUPPORT:
+		return ("[EPFNOSUPPORT]");
+	case EAFNOSUPPORT:
+		return ("[EAFNOSUPPORT]");
+	case EADDRINUSE:
+		return ("[EADDRINUSE]");
+	case EADDRNOTAVAIL:
+		return ("[EADDRNOTAVAIL]");
+	case ENETDOWN:
+		return ("[ENETDOWN]");
+	case ENETUNREACH:
+		return ("[ENETUNREACH]");
+	case ENETRESET:
+		return ("[ENETRESET]");
+	case ECONNABORTED:
+		return ("[ECONNABORTED]");
+	case ECONNRESET:
+		return ("[ECONNRESET]");
+	case ENOBUFS:
+		return ("[ENOBUFS]");
+	case EISCONN:
+		return ("[EISCONN]");
+	case ENOTCONN:
+		return ("[ENOTCONN]");
+	case ESHUTDOWN:
+		return ("[ESHUTDOWN]");
+	case ETOOMANYREFS:
+		return ("[ETOOMANYREFS]");
+	case ETIMEDOUT:
+		return ("[ETIMEDOUT]");
+	case ECONNREFUSED:
+		return ("[ECONNREFUSED]");
+	case EHOSTDOWN:
+		return ("[EHOSTDOWN]");
+	case EHOSTUNREACH:
+		return ("[EHOSTUNREACH]");
+	case EALREADY:
+		return ("[EALREADY]");
+	case EINPROGRESS:
+		return ("[EINPROGRESS]");
+	case ESTALE:
+		return ("[ESTALE]");
+	case EUCLEAN:
+		return ("[EUCLEAN]");
+	case ENOTNAM:
+		return ("[ENOTNAM]");
+	case ENAVAIL:
+		return ("[ENAVAIL]");
+	case EISNAM:
+		return ("[EISNAM]");
+	case EREMOTEIO:
+		return ("[EREMOTEIO]");
+	case EDQUOT:
+		return ("[EDQUOT]");
+	case ENOMEDIUM:
+		return ("[ENOMEDIUM]");
+	case EMEDIUMTYPE:
+		return ("[EMEDIUMTYPE]");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "[%ld]", err);
+		return buf;
+	}
+	}
+}
+
+char *
+nerrno_string(ulong nerr, long uerr)
+{
+	switch (nerr) {
 	case NBADADDR:
-		return ("NBADADDR");
+		return ("[NBADADDR]");
 	case NBADOPT:
-		return ("NBADOPT");
+		return ("[NBADOPT]");
 	case NACCESS:
-		return ("NACCESS");
+		return ("[NACCESS]");
 	case NNOADDR:
-		return ("NNOADDR");
+		return ("[NNOADDR]");
 	case NOUTSTATE:
-		return ("NOUTSTATE");
+		return ("[NOUTSTATE]");
 	case NBADSEQ:
-		return ("NBADSEQ");
+		return ("[NBADSEQ]");
 	case NSYSERR:
-		return ("NSYSERR");
+		return errno_string(uerr);
 	case NBADDATA:
-		return ("NBADDATA");
+		return ("[NBADDATA]");
 	case NBADFLAG:
-		return ("NBADFLAG");
+		return ("[NBADFLAG]");
 	case NNOTSUPPORT:
-		return ("NNOTSUPPORT");
+		return ("[NNOTSUPPORT]");
 	case NBOUND:
-		return ("NBOUND");
+		return ("[NBOUND]");
 	case NBADQOSPARAM:
-		return ("NBADQOSPARAM");
+		return ("[NBADQOSPARAM]");
 	case NBADQOSTYPE:
-		return ("NBADQOSTYPE");
+		return ("[NBADQOSTYPE]");
 	case NBADTOKEN:
-		return ("NBADTOKEN");
+		return ("[NBADTOKEN]");
 	case NNOPROTOID:
-		return ("NNOPROTOID");
+		return ("[NNOPROTOID]");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "[%lu]", nerr);
+		return buf;
+	}
+	}
+}
+
+const char *
+event_string(int event)
+{
+	switch (event) {
+	case __EVENT_NO_MSG:
+		return ("NO MESSAGE");
+	case __EVENT_TIMEOUT:
+		return ("TIMEOUT");
+	case __EVENT_UNKNOWN:
+		return ("UNKNOWN");
+	case __RESULT_DECODE_ERROR:
+		return ("DECODE ERROR");
+	case __RESULT_SCRIPT_ERROR:
+		return ("SCRIPT ERROR");
+	case __RESULT_INCONCLUSIVE:
+		return ("INCONCLUSIVE");
+	case __RESULT_SUCCESS:
+		return ("SUCCESS");
+	case __RESULT_FAILURE:
+		return ("FAILURE");
+	case __EVENT_CONN_REQ:
+		return ("N_CONN_REQ");
+	case __EVENT_CONN_RES:
+		return ("N_CONN_RES");
+	case __EVENT_DISCON_REQ:
+		return ("N_DISCON_REQ");
+	case __EVENT_DATA_REQ:
+		return ("N_DATA_REQ");
+	case __EVENT_EXDATA_REQ:
+		return ("N_EXDATA_REQ");
+	case __EVENT_INFO_REQ:
+		return ("N_INFO_REQ");
+	case __EVENT_BIND_REQ:
+		return ("N_BIND_REQ");
+	case __EVENT_UNBIND_REQ:
+		return ("N_UNBIND_REQ");
+	case __EVENT_UNITDATA_REQ:
+		return ("N_UNITDATA_REQ");
+	case __EVENT_OPTMGMT_REQ:
+		return ("N_OPTMGMT_REQ");
+	case __EVENT_CONN_IND:
+		return ("N_CONN_IND");
+	case __EVENT_CONN_CON:
+		return ("N_CONN_CON");
+	case __EVENT_DISCON_IND:
+		return ("N_DISCON_IND");
+	case __EVENT_DATA_IND:
+		return ("N_DATA_IND");
+	case __EVENT_EXDATA_IND:
+		return ("N_EXDATA_IND");
+	case __EVENT_INFO_ACK:
+		return ("N_INFO_ACK");
+	case __EVENT_BIND_ACK:
+		return ("N_BIND_ACK");
+	case __EVENT_ERROR_ACK:
+		return ("N_ERROR_ACK");
+	case __EVENT_OK_ACK:
+		return ("N_OK_ACK");
+	case __EVENT_UNITDATA_IND:
+		return ("N_UNITDATA_IND");
+	case __EVENT_UDERROR_IND:
+		return ("N_UDERROR_IND");
+	case __EVENT_DATACK_REQ:
+		return ("N_DATACK_REQ");
+	case __EVENT_DATACK_IND:
+		return ("N_DATACK_IND");
+	case __EVENT_RESET_REQ:
+		return ("N_RESET_REQ");
+	case __EVENT_RESET_IND:
+		return ("N_RESET_IND");
+	case __EVENT_RESET_RES:
+		return ("N_RESET_RES");
+	case __EVENT_RESET_CON:
+		return ("N_RESET_CON");
+	default:
+		return ("(unexpected");
+	}
+}
+
+const char *
+state_string(ulong state)
+{
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
 	default:
 		return ("(unknown)");
 	}
 }
 
-void
-print_error(ulong error)
-{
-	printf("%s\n", err_string(error));
-}
-
-char *
-prim_string(ulong prim)
-{
-	switch (prim) {
-	case N_CONN_REQ:
-		return ("N_CONN_REQ");
-	case N_CONN_RES:
-		return ("N_CONN_RES");
-	case N_DISCON_REQ:
-		return ("N_DISCON_REQ");
-	case N_DATA_REQ:
-		return ("N_DATA_REQ");
-	case N_EXDATA_REQ:
-		return ("N_EXDATA_REQ");
-	case N_INFO_REQ:
-		return ("N_INFO_REQ");
-	case N_BIND_REQ:
-		return ("N_BIND_REQ");
-	case N_UNBIND_REQ:
-		return ("N_UNBIND_REQ");
-	case N_UNITDATA_REQ:
-		return ("N_UNITDATA_REQ");
-	case N_OPTMGMT_REQ:
-		return ("N_OPTMGMT_REQ");
-	case N_DATACK_REQ:
-		return ("N_DATACK_REQ");
-	case N_RESET_REQ:
-		return ("N_RESET_REQ");
-	case N_RESET_RES:
-		return ("N_RESET_RES");
-	case N_CONN_IND:
-		return ("N_CONN_IND");
-	case N_CONN_CON:
-		return ("N_CONN_CON");
-	case N_DISCON_IND:
-		return ("N_DISCON_IND");
-	case N_DATA_IND:
-		return ("N_DATA_IND");
-	case N_EXDATA_IND:
-		return ("N_EXDATA_IND");
-	case N_INFO_ACK:
-		return ("N_INFO_ACK");
-	case N_BIND_ACK:
-		return ("N_BIND_ACK");
-	case N_OK_ACK:
-		return ("N_OK_ACK");
-	case N_ERROR_ACK:
-		return ("N_ERROR_ACK");
-	case N_DATACK_IND:
-		return ("N_DATACK_IND");
-	case N_RESET_IND:
-		return ("N_RESET_IND");
-	case N_RESET_CON:
-		return ("N_RESET_CON");
-	case FAILURE:
-		return ("(nothing)");
-	default:
-		return ("(unexpected)");
-	}
-}
-
-void
-print_prim(ulong prim)
-{
-	printf("%s", prim_string(prim));
-}
-
-void
-print_state(ulong state)
-{
-	switch (state) {
-	case NS_UNBND:
-		printf("NS_UNBND");
-		break;
-	case NS_WACK_BREQ:
-		printf("NS_WACK_BREQ");
-		break;
-	case NS_WACK_UREQ:
-		printf("NS_WACK_UREQ");
-		break;
-	case NS_IDLE:
-		printf("NS_IDLE");
-		break;
-	case NS_WACK_OPTREQ:
-		printf("NS_WACK_OPTREQ");
-		break;
-	case NS_WACK_RRES:
-		printf("NS_WACK_RRES");
-		break;
-	case NS_WCON_CREQ:
-		printf("NS_WCON_CREQ");
-		break;
-	case NS_WRES_CIND:
-		printf("NS_WRES_CIND");
-		break;
-	case NS_WACK_CRES:
-		printf("NS_WACK_CRES");
-		break;
-	case NS_DATA_XFER:
-		printf("NS_DATA_XFER");
-		break;
-	case NS_WCON_RREQ:
-		printf("NS_WCON_RREQ");
-		break;
-	case NS_WRES_RIND:
-		printf("NS_WRES_RIND");
-		break;
-	case NS_WACK_DREQ6:
-		printf("NS_WACK_DREQ6");
-		break;
-	case NS_WACK_DREQ7:
-		printf("NS_WACK_DREQ7");
-		break;
-	case NS_WACK_DREQ9:
-		printf("NS_WACK_DREQ9");
-		break;
-	case NS_WACK_DREQ10:
-		printf("NS_WACK_DREQ10");
-		break;
-	case NS_WACK_DREQ11:
-		printf("NS_WACK_DREQ11");
-		break;
-	default:
-		printf("(unknown [%lu])", state);
-		break;
-	}
-	printf("\n");
-	return;
-}
-
+#ifndef SCTP_VERSION_2
 void
 print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	size_t anum =
 	    add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		int i;
 		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
-			printf("Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
-		printf("[%d]", ntohs(a->port));
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a->port));
 		for (i = 0; i < anum; i++) {
-			printf("%s%d.%d.%d.%d",
-			       i ? "," : "",
-			       (a->addr[i] >> 0) & 0xff,
-			       (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff,
-			       (a->addr[i] >> 24) & 0xff);
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff,
+				(a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff,
+				(a->addr[i] >> 24) & 0xff);
 		}
 	} else
-		printf("(no address)");
-	printf("\n");
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
 }
+
+char *
+addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum =
+	    add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			len +=
+			    snprintf(buf + len, sizeof(buf) - len,
+				     "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			len +=
+			    snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "",
+				     (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff,
+				     (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	len += snprintf(buf + len, sizeof(buf) - len, "\0");
+	return buf;
+}
+#else				/* SCTP_VERSION_2 */
+void
+print_addr(char *add_ptr, size_t add_len)
+{
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	size_t anum = add_len / sizeof(*a);
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len > 0) {
+		int i;
+		if (add_len != anum * sizeof(*a))
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+			fprintf(stdout, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff,
+				(addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
+	} else
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+char *
+addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	size_t anum = add_len / sizeof(*a);
+	if (add_len > 0) {
+		int i;
+		if (add_len != anum * sizeof(*a))
+			len +=
+			    snprintf(buf + len, sizeof(buf) - len,
+				     "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+			snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d.", i ? "," : "",
+				 (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff,
+				 (addr >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	len += snprintf(buf + len, sizeof(buf) - len, "\0");
+	return buf;
+}
+#endif				/* SCTP_VERSION_2 */
 
 void
 print_proto(char *pro_ptr, size_t pro_len)
@@ -471,937 +1122,565 @@ print_size(ulong size)
 }
 
 void
-print_msg(int fd)
+print_event_conn(int fd, int event)
 {
-	if (ctrl.len > 0) {
-		switch (show) {
-		case 0:
-			return;
-		case 2:
-			switch (cmd.prim) {
-			case N_INFO_REQ:
-				printf("%d-N_INFO_REQ:\n", fd);
-				break;
-
-			case N_INFO_ACK:
-				printf("%d-N_INFO_ACK:\n", fd);
-				printf("  NSDU_size      = ");
-				print_size(cmd.npi.info_ack.NSDU_size);
-				printf("  ENSDU_size     = ");
-				print_size(cmd.npi.info_ack.ENSDU_size);
-				printf("  CDATA_size     = ");
-				print_size(cmd.npi.info_ack.CDATA_size);
-				printf("  DDATA_size     = ");
-				print_size(cmd.npi.info_ack.DDATA_size);
-				printf("  ADDR_size      = ");
-				print_size(cmd.npi.info_ack.ADDR_size);
-				printf("  ADDR           = ");
-				print_addr(cmd.cbuf + cmd.npi.info_ack.ADDR_offset,
-					   cmd.npi.info_ack.ADDR_length);
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + cmd.npi.info_ack.QOS_offset,
-					  cmd.npi.info_ack.QOS_length);
-				printf("  QOR            = ");
-				print_qos(cmd.cbuf + cmd.npi.info_ack.QOS_range_offset,
-					  cmd.npi.info_ack.QOS_range_length);
-				printf("  OPTIONS_flags  =");
-				if (cmd.npi.info_ack.OPTIONS_flags & REC_CONF_OPT)
-					printf(" REC_CONF_OPT");
-				if (cmd.npi.info_ack.OPTIONS_flags & EX_DATA_OPT)
-					printf(" EX_DATA_OPT");
-				printf("\n");
-				printf("  NIDU_size      = ");
-				print_size(cmd.npi.info_ack.NIDU_size);
-				printf("  SERV_type      =");
-				if (cmd.npi.info_ack.SERV_type & N_CONS)
-					printf(" N_CONS");
-				if (cmd.npi.info_ack.SERV_type & N_CLNS)
-					printf(" N_CLNS");
-				printf("\n");
-				printf("  CURRENT_state  = ");
-				print_state(cmd.npi.info_ack.CURRENT_state);
-				printf("  PROVIDER_type  = ");
-				switch (cmd.npi.info_ack.PROVIDER_type) {
-				case N_SNICFP:
-					printf("N_SNICFP\n");
-					break;
-				case N_SUBNET:
-					printf("N_SUBNET\n");
-					break;
-				default:
-					printf("(unknown %lu)\n", cmd.npi.info_ack.PROVIDER_type);
-					break;
-				}
-				printf("  NODU_size      = ");
-				print_size(cmd.npi.info_ack.NODU_size);
-				printf("  PROTOID        = ");
-				print_proto(cmd.cbuf + cmd.npi.info_ack.PROTOID_offset,
-					    cmd.npi.info_ack.PROTOID_length);
-				printf("  NPI_version    = %lu\n", cmd.npi.info_ack.NPI_version);
-				break;
-
-			case N_OPTMGMT_REQ:
-				printf("%d-N_OPTMGMT_REQ:\n", fd);
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + cmd.npi.optmgmt_req.QOS_offset,
-					  cmd.npi.optmgmt_req.QOS_length);
-				printf("  OPTMGMT_flags  = ");
-				if (cmd.npi.optmgmt_req.OPTMGMT_flags & DEFAULT_RC_SEL)
-					printf(" DEFAULT_RC_SEL");
-				printf("\n");
-				break;
-
-			case N_BIND_REQ:
-				printf("%d-N_BIND_REQ:\n", fd);
-				printf("  ADDR           = ");
-				print_addr(cmd.cbuf + cmd.npi.bind_req.ADDR_offset,
-					   cmd.npi.bind_req.ADDR_length);
-				printf("  CONIND_number  = %lu\n", cmd.npi.bind_req.CONIND_number);
-				printf("  BIND_flags     =");
-				if (cmd.npi.bind_req.BIND_flags & DEFAULT_LISTENER)
-					printf(" DEFAULT_LISTENER");
-				if (cmd.npi.bind_req.BIND_flags & TOKEN_REQUEST)
-					printf(" TOKEN_REQUEST");
-				if (cmd.npi.bind_req.BIND_flags & DEFAULT_DEST)
-					printf(" DEFAULT_DEST");
-				printf("\n");
-				printf("  PROTOID        = ");
-				print_proto(cmd.cbuf + cmd.npi.bind_req.PROTOID_offset,
-					    cmd.npi.bind_req.PROTOID_length);
-				break;
-
-			case N_BIND_ACK:
-				printf("%d-N_BIND_ACK:\n", fd);
-				printf("  ADDR           = ");
-				print_addr(cmd.cbuf + cmd.npi.bind_ack.ADDR_offset,
-					   cmd.npi.bind_ack.ADDR_length);
-				printf("  CONIND_number  = %lu\n", cmd.npi.bind_ack.CONIND_number);
-				printf("  TOKEN_value    = %lu\n", cmd.npi.bind_ack.TOKEN_value);
-				printf("  PROTOID        = ");
-				print_proto(cmd.cbuf + cmd.npi.bind_ack.PROTOID_offset,
-					    cmd.npi.bind_ack.PROTOID_length);
-				tok[fd] = cmd.npi.bind_ack.TOKEN_value;
-				break;
-
-			case N_UNBIND_REQ:
-				printf("%d-N_UNBIND_REQ:\n", fd);
-				break;
-
-			case N_ERROR_ACK:
-				printf("%d-N_ERROR_ACK:\n", fd);
-				printf("  ERROR_prim     = ");
-				print_prim(cmd.npi.error_ack.ERROR_prim);
-				printf("\n");
-				printf("  NPI_error      = ");
-				print_error(cmd.npi.error_ack.NPI_error);
-				printf("  UNIX_error     = %lu (%s)\n",
-				       cmd.npi.error_ack.UNIX_error,
-				       strerror(cmd.npi.error_ack.UNIX_error));
-				break;
-
-			case N_OK_ACK:
-				printf("%d-N_OK_ACK:\n", fd);
-				printf("  CORRECT_prim   = ");
-				print_prim(cmd.npi.error_ack.ERROR_prim);
-				printf("\n");
-				break;
-
-			case N_CONN_REQ:
-				printf("%d-N_CONN_REQ:\n", fd);
-				printf("  DEST           = ");
-				print_addr(cmd.cbuf + cmd.npi.conn_req.DEST_offset,
-					   cmd.npi.conn_req.DEST_length);
-				printf("  CONN_flags     =");
-				if (cmd.npi.conn_req.CONN_flags & REC_CONF_OPT)
-					printf(" REC_CONF_OPT");
-				if (cmd.npi.conn_req.CONN_flags & EX_DATA_OPT)
-					printf(" EX_DATA_OPT");
-				printf("\n");
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + cmd.npi.conn_req.QOS_offset,
-					  cmd.npi.conn_req.QOS_length);
-				if (data.len)
-					printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case N_CONN_IND:
-				printf("%d-N_CONN_IND:\n", fd);
-				printf("  DEST           = ");
-				print_addr(cmd.cbuf + cmd.npi.conn_ind.DEST_offset,
-					   cmd.npi.conn_ind.DEST_length);
-				printf("  SRC            = ");
-				print_addr(cmd.cbuf + cmd.npi.conn_ind.SRC_offset,
-					   cmd.npi.conn_ind.SRC_length);
-				printf("  SEQ_number     = %lx\n", cmd.npi.conn_ind.SEQ_number);
-				printf("  CONN_flags     =");
-				if (cmd.npi.conn_ind.CONN_flags & REC_CONF_OPT)
-					printf(" REC_CONF_OPT");
-				if (cmd.npi.conn_ind.CONN_flags & EX_DATA_OPT)
-					printf(" EX_DATA_OPT");
-				printf("\n");
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + cmd.npi.conn_ind.QOS_offset,
-					  cmd.npi.conn_ind.QOS_length);
-				seq[fd] = cmd.npi.conn_ind.SEQ_number;
-				break;
-
-			case N_CONN_RES:
-				printf("%d-N_CONN_RES:\n", fd);
-				printf("  TOKEN_value    = %lu\n", cmd.npi.conn_res.TOKEN_value);
-				printf("  RES            = ");
-				print_addr(cmd.cbuf + cmd.npi.conn_res.RES_offset,
-					   cmd.npi.conn_res.RES_length);
-				printf("  SEQ_number     = %lx\n", cmd.npi.conn_res.SEQ_number);
-				printf("  CONN_flags     =");
-				if (cmd.npi.conn_res.CONN_flags & REC_CONF_OPT)
-					printf(" REC_CONF_OPT");
-				if (cmd.npi.conn_res.CONN_flags & EX_DATA_OPT)
-					printf(" EX_DATA_OPT");
-				printf("\n");
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + cmd.npi.conn_res.QOS_offset,
-					  cmd.npi.conn_res.QOS_length);
-				if (data.len)
-					printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case N_CONN_CON:
-				printf("%d-N_CONN_CON:\n", fd);
-				printf("  RES            = ");
-				print_addr(cmd.cbuf + cmd.npi.conn_con.RES_offset,
-					   cmd.npi.conn_con.RES_length);
-				printf("  CONN_flags     =");
-				if (cmd.npi.conn_con.CONN_flags & REC_CONF_OPT)
-					printf(" REC_CONF_OPT");
-				if (cmd.npi.conn_con.CONN_flags & EX_DATA_OPT)
-					printf(" EX_DATA_OPT");
-				printf("\n");
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + cmd.npi.conn_con.QOS_offset,
-					  cmd.npi.conn_res.QOS_length);
-
-				break;
-
-			case N_DATA_REQ:
-				printf("%d-N_DATA_REQ:\n", fd);
-				printf("  DATA_xfer_flags=");
-				if (cmd.npi.data_req.DATA_xfer_flags & N_MORE_DATA_FLAG)
-					printf(" N_MORE_DATA_FLAG");
-				if (cmd.npi.data_req.DATA_xfer_flags & N_RC_FLAG)
-					printf(" N_RC_FLAG");
-				printf("\n");
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + sizeof(cmd.npi.data_req),
-					  ctrl.len - sizeof(cmd.npi.data_req));
-				if (data.len)
-					printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case N_DATA_IND:
-				printf("%d-N_DATA_IND:\n", fd);
-				printf("  DATA_xfer_flags=");
-				if (cmd.npi.data_ind.DATA_xfer_flags & N_MORE_DATA_FLAG)
-					printf(" N_MORE_DATA_FLAG");
-				if (cmd.npi.data_ind.DATA_xfer_flags & N_RC_FLAG)
-					printf(" N_RC_FLAG");
-				printf("\n");
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + sizeof(cmd.npi.data_ind),
-					  ctrl.len - sizeof(cmd.npi.data_ind));
-				tsn[fd] =
-				    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-								sizeof(cmd.npi.data_ind)))->tsn;
-				sid[fd] =
-				    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-								sizeof(cmd.npi.data_ind)))->sid;
-				if (data.len)
-					printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case N_EXDATA_REQ:
-				printf("%d-N_EXDATA_REQ:\n", fd);
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + sizeof(cmd.npi.exdata_req),
-					  ctrl.len - sizeof(cmd.npi.exdata_req));
-				if (data.len)
-					printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case N_EXDATA_IND:
-				printf("%d-N_EXDATA_IND:\n", fd);
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + sizeof(cmd.npi.exdata_ind),
-					  ctrl.len - sizeof(cmd.npi.exdata_ind));
-				tsn[fd] =
-				    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-								sizeof(cmd.npi.exdata_ind)))->tsn;
-				sid[fd] =
-				    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-								sizeof(cmd.npi.exdata_ind)))->sid;
-				if (data.len)
-					printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case N_DATACK_REQ:
-				printf("%d-N_DATACK_REQ:\n", fd);
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + sizeof(cmd.npi.datack_req),
-					  ctrl.len - sizeof(cmd.npi.datack_req));
-				break;
-
-			case N_DATACK_IND:
-				printf("%d-N_DATACK_IND:\n", fd);
-				printf("  QOS            = ");
-				print_qos(cmd.cbuf + sizeof(cmd.npi.datack_ind),
-					  ctrl.len - sizeof(cmd.npi.datack_ind));
-				tsn[fd] =
-				    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-								sizeof(cmd.npi.datack_ind)))->tsn;
-				sid[fd] =
-				    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-								sizeof(cmd.npi.datack_ind)))->sid;
-				break;
-
-			case N_RESET_REQ:
-				printf("%d-N_RESET_REQ:\n", fd);
-				printf("  RESET_reason   = %lu\n", cmd.npi.reset_req.RESET_reason);
-				break;
-
-			case N_RESET_IND:
-				printf("%d-N_RESET_IND:\n", fd);
-				printf("  RESET_orig     = %lu\n", cmd.npi.reset_ind.RESET_orig);
-				printf("  RESET_reason   = %lu\n", cmd.npi.reset_ind.RESET_reason);
-				break;
-
-			case N_RESET_RES:
-				printf("%d-N_RESET_RES:\n", fd);
-				break;
-
-			case N_RESET_CON:
-				printf("%d-N_RESET_CON:\n", fd);
-				break;
-
-			case N_DISCON_REQ:
-				printf("%d-N_DISCON_REQ:\n", fd);
-				printf("  DISCON_reason  = %lu\n",
-				       cmd.npi.discon_req.DISCON_reason);
-				printf("  RES            = ");
-				print_addr(cmd.cbuf + cmd.npi.discon_req.RES_offset,
-					   cmd.npi.discon_req.RES_length);
-				printf("  SEQ_number     = %lx\n", cmd.npi.discon_req.SEQ_number);
-				break;
-
-			case N_DISCON_IND:
-				printf("%d-N_DISCON_IND:\n", fd);
-				printf("  DISCON_orig    = %lu\n", cmd.npi.discon_ind.DISCON_orig);
-				printf("  DISCON_reason  = %lu\n",
-				       cmd.npi.discon_ind.DISCON_reason);
-				printf("  RES            = ");
-				print_addr(cmd.cbuf + cmd.npi.discon_ind.RES_offset,
-					   cmd.npi.discon_ind.RES_length);
-				printf("  SEQ_number     = %lx\n", cmd.npi.discon_ind.SEQ_number);
-				break;
-
-			default:
-				printf("Unrecognized primitive %lu!\n", cmd.prim);
-				break;
-			}
-			break;
-		case 1:
-			if (fd == fd1) {
-				switch (cmd.npi.type) {
-				case N_INFO_REQ:
-					printf
-					    ("N_INFO_REQ    ----->|                               |  |                    \n");
-					break;
-				case N_INFO_ACK:
-					printf
-					    ("N_INFO_ACK    <-----|                               |  |                    \n");
-					break;
-				case N_OPTMGMT_REQ:
-					printf
-					    ("N_OPTMGMT_REQ ----->|                               |  |                    \n");
-					break;
-				case N_BIND_REQ:
-					printf
-					    ("N_BIND_REQ    ----->|                               |  |                    \n");
-					break;
-				case N_BIND_ACK:
-					printf
-					    ("N_BIND_ACK    <-----|                               |  |                    \n");
-					tok[fd] = cmd.npi.bind_ack.TOKEN_value;
-					break;
-				case N_UNBIND_REQ:
-					printf
-					    ("N_UNBIND_REQ  ----->|                               |  |                    \n");
-					break;
-				case N_ERROR_ACK:
-					printf
-					    ("N_ERROR_ACK   <----/|                               |  |                    \n");
-					printf
-					    ("[%-11s]       |                               |  |                    \n",
-					     err_string(cmd.npi.error_ack.NPI_error));
-					break;
-				case N_OK_ACK:
-					printf
-					    ("N_OK_ACK      <----/|                               |  |                    \n");
-					break;
-				case N_CONN_REQ:
-					printf
-					    ("N_CONN_REQ    ----->|--------------->|              |  |                    \n");
-					break;
-				case N_CONN_IND:
-					printf
-					    ("N_CONN_IND    <-----|<---------------|              |  |                    \n");
-					seq[fd] = cmd.npi.conn_ind.SEQ_number;
-					break;
-				case N_CONN_RES:
-					printf
-					    ("N_CONN_RES    ----->|--------------->|              |  |                    \n");
-					break;
-				case N_CONN_CON:
-					printf
-					    ("N_CONN_CON    <-----|<---------------|              |  |                    \n");
-					break;
-				case N_DATA_REQ:
-					printf
-					    ("N_DATA_REQ%c%c  ----->|---(%03lu:%03lu)--->|                 |       %6d bytes \n",
-					     cmd.npi.data_req.
-					     DATA_xfer_flags & N_RC_FLAG ? '!' : ' ',
-					     cmd.npi.data_req.
-					     DATA_xfer_flags & N_MORE_DATA_FLAG ? '+' : ' ',
-					     qos_data.sid, qos_data.ssn, data.len);
-					break;
-				case N_DATA_IND:
-					printf
-					    ("N_DATA_IND%c%c  <-----|<--(%03lu:%03lu)----|  [%010lu]   |                    \n",
-					     cmd.npi.data_ind.
-					     DATA_xfer_flags & N_RC_FLAG ? '!' : ' ',
-					     cmd.npi.data_ind.
-					     DATA_xfer_flags & N_MORE_DATA_FLAG ? '+' : ' ',
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     ssn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     tsn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.data_ind)))->
-					    tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.data_ind)))->
-					    sid;
-					break;
-				case N_EXDATA_REQ:
-					printf
-					    ("N_EXDATA_REQ  ----->|---(%03lu:%03lu)--->|                 |                    \n",
-					     qos_data.sid, qos_data.ssn);
-					break;
-				case N_EXDATA_IND:
-					printf
-					    ("N_EXDATA_IND  <-----|<--(%03lu:%03lu)----|  [%010lu]   |                    \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     ssn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     tsn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       exdata_ind)))->tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       exdata_ind)))->sid;
-					break;
-				case N_DATACK_REQ:
-					printf
-					    ("N_DATACK_REQ  ----->|---(%03lu:%03lu)--->|                 |                    \n",
-					     qos_data.sid, qos_data.ssn);
-					break;
-				case N_DATACK_IND:
-					printf
-					    ("N_DATACK_IND  <-----|<--(%03lu:%03lu)----|  [%010lu]   |                    \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     ssn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     tsn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       datack_ind)))->tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       datack_ind)))->sid;
-					break;
-				case N_DISCON_REQ:
-					printf
-					    ("N_DISCON_REQ  ----->|--------------->|              |  |                    \n");
-					break;
-				case N_DISCON_IND:
-					printf
-					    ("N_DISCON_IND  <-----|<---------------|              |  |                    \n");
-					break;
-				case N_RESET_REQ:
-					printf
-					    ("N_RESET_REQ   ----->|--------------->|              |  |                    \n");
-					break;
-				case N_RESET_IND:
-					printf
-					    ("N_RESET_IND   <-----|<---------------|              |  |                    \n");
-					break;
-				case N_RESET_RES:
-					printf
-					    ("N_RESET_RES   ----->|--------------->|              |  |                    \n");
-					break;
-				case N_RESET_CON:
-					printf
-					    ("N_RESET_CON   <-----|<---------------|              |  |                    \n");
-					break;
-				default:
-					printf
-					    ("????%4ld????  ?----?|                                  |                    \n",
-					     cmd.npi.type);
-					break;
-				}
-			}
-			if (fd == fd2) {
-				switch (cmd.npi.type) {
-				case N_INFO_REQ:
-					printf
-					    ("                    |                               |<-+------ N_INFO_REQ   \n");
-					break;
-				case N_INFO_ACK:
-					printf
-					    ("                    |                               |--+-----> N_INFO_ACK   \n");
-					break;
-				case N_OPTMGMT_REQ:
-					printf
-					    ("                    |                               |<-+------ N_OPTMGMT_REQ\n");
-					break;
-				case N_BIND_REQ:
-					printf
-					    ("                    |                               |<-+------ N_BIND_REQ   \n");
-					break;
-				case N_BIND_ACK:
-					printf
-					    ("                    |                               |--+-----> N_BIND_ACK   \n");
-					tok[fd] = cmd.npi.bind_ack.TOKEN_value;
-					break;
-				case N_UNBIND_REQ:
-					printf
-					    ("                    |                               |<-+------ N_UNBIND_REQ \n");
-					break;
-				case N_ERROR_ACK:
-					printf
-					    ("                    |                               |\\-+-----> N_ERROR_ACK  \n");
-					printf
-					    ("                    |                               |          [%-11s]\n",
-					     err_string(cmd.npi.error_ack.NPI_error));
-					break;
-				case N_OK_ACK:
-					printf
-					    ("                    |                               |\\-+-----> N_OK_ACK     \n");
-					break;
-				case N_CONN_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ N_CONN_REQ   \n");
-					break;
-				case N_CONN_IND:
-					printf
-					    ("                    |                |------------->|--+-----> N_CONN_IND   \n");
-					seq[fd] = cmd.npi.conn_ind.SEQ_number;
-					break;
-				case N_CONN_RES:
-					printf
-					    ("                    |                |<-------------|<-+------ N_CONN_RES   \n");
-					break;
-				case N_CONN_CON:
-					printf
-					    ("                    |                |------------->|--+-----> N_CONN_CON   \n");
-					break;
-				case N_DATA_REQ:
-					printf
-					    ("                    |                |<--(%03lu:%03lu)--|<-+------ N_DATA_REQ%c%c \n",
-					     qos_data.sid, qos_data.ssn,
-					     cmd.npi.data_req.
-					     DATA_xfer_flags & N_RC_FLAG ? '!' : ' ',
-					     cmd.npi.data_req.
-					     DATA_xfer_flags & N_MORE_DATA_FLAG ? '+' : ' ');
-					break;
-				case N_DATA_IND:
-					printf
-					    ("                    |  [%010lu]  |---(%03lu:%03lu)->|--+-----> N_DATA_IND%c%c \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     tsn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     ssn,
-					     cmd.npi.data_ind.
-					     DATA_xfer_flags & N_RC_FLAG ? '!' : ' ',
-					     cmd.npi.data_ind.
-					     DATA_xfer_flags & N_MORE_DATA_FLAG ? '+' : ' ');
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.data_ind)))->
-					    tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.data_ind)))->
-					    sid;
-					break;
-				case N_EXDATA_REQ:
-					printf
-					    ("                    |                |<--(%03lu:%03lu)--|<-+------ N_EXDATA_REQ \n",
-					     qos_data.sid, qos_data.ssn);
-					break;
-				case N_EXDATA_IND:
-					printf
-					    ("                    |  [%010lu]  |---(%03lu:%03lu)->|--+-----> N_EXDATA_IND \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     tsn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     ssn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       exdata_ind)))->tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       exdata_ind)))->sid;
-					break;
-				case N_DATACK_REQ:
-					printf
-					    ("                    |                |<--(%03lu:%03lu)--|<-+------ N_DATACK_REQ \n",
-					     qos_data.sid, qos_data.ssn);
-					break;
-				case N_DATACK_IND:
-					printf
-					    ("                    |  [%010lu]  |---(%03lu:%03lu)->|--+-----> N_DATACK_IND \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     tsn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     ssn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       datack_ind)))->tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       datack_ind)))->sid;
-					break;
-				case N_DISCON_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ N_DISCON_REQ \n");
-					break;
-				case N_DISCON_IND:
-					printf
-					    ("                    |                |------------->|--+-----> N_DISCON_IND \n");
-					break;
-				case N_RESET_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ N_RESET_REQ  \n");
-					break;
-				case N_RESET_IND:
-					printf
-					    ("                    |                |------------->|--+-----> N_RESET_IND  \n");
-					break;
-				case N_RESET_RES:
-					printf
-					    ("                    |                |<-------------|<-+------ N_RESET_RES  \n");
-					break;
-				case N_RESET_CON:
-					printf
-					    ("                    |                |------------->|--+-----> N_RESET_CON  \n");
-					break;
-				default:
-					printf
-					    ("                    |                               |?-+-----? ????%4ld???? \n",
-					     cmd.npi.type);
-					break;
-				}
-			}
-			if (fd == fd3) {
-				switch (cmd.npi.type) {
-				case N_INFO_REQ:
-					printf
-					    ("                    |                               |  |<----- N_INFO_REQ   \n");
-					break;
-				case N_INFO_ACK:
-					printf
-					    ("                    |                               |  |-----> N_INFO_ACK   \n");
-					break;
-				case N_OPTMGMT_REQ:
-					printf
-					    ("                    |                               |  |<----- N_OPTMGMT_REQ\n");
-					break;
-				case N_BIND_REQ:
-					printf
-					    ("                    |                               |  |<----- N_BIND_REQ   \n");
-					break;
-				case N_BIND_ACK:
-					printf
-					    ("                    |                               |  |-----> N_BIND_ACK   \n");
-					tok[fd] = cmd.npi.bind_ack.TOKEN_value;
-					break;
-				case N_UNBIND_REQ:
-					printf
-					    ("                    |                               |  |<----- N_UNBIND_REQ \n");
-					break;
-				case N_ERROR_ACK:
-					printf
-					    ("                    |                               |  |\\----> N_ERROR_ACK  \n");
-					printf
-					    ("                    |                               |  |       [%-11s]\n",
-					     err_string(cmd.npi.error_ack.NPI_error));
-					break;
-				case N_OK_ACK:
-					printf
-					    ("                    |                               |  |\\----> N_OK_ACK     \n");
-					break;
-				case N_CONN_REQ:
-					printf
-					    ("                    |                |<----------------|<----- N_CONN_REQ   \n");
-					break;
-				case N_CONN_IND:
-					printf
-					    ("                    |                |---------------->|-----> N_CONN_IND   \n");
-					seq[fd] = cmd.npi.conn_ind.SEQ_number;
-					break;
-				case N_CONN_RES:
-					printf
-					    ("                    |                |<----------------|<----- N_CONN_RES   \n");
-					break;
-				case N_CONN_CON:
-					printf
-					    ("                    |                |---------------->|-----> N_CONN_CON   \n");
-					break;
-				case N_DATA_REQ:
-					printf
-					    ("                    |                |<---(%03lu:%03lu)----|<----- N_DATA_REQ%c%c \n",
-					     qos_data.sid, qos_data.ssn,
-					     cmd.npi.data_req.
-					     DATA_xfer_flags & N_RC_FLAG ? '!' : ' ',
-					     cmd.npi.data_req.
-					     DATA_xfer_flags & N_MORE_DATA_FLAG ? '+' : ' ');
-					break;
-				case N_DATA_IND:
-					printf
-					    ("       %6d bytes |  [%010lu]  |----(%03lu:%03lu)--->|-----> N_DATA_IND%c%c \n",
-					     data.len,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     tsn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											data_ind)))->
-					     ssn,
-					     cmd.npi.data_ind.
-					     DATA_xfer_flags & N_RC_FLAG ? '!' : ' ',
-					     cmd.npi.data_ind.
-					     DATA_xfer_flags & N_MORE_DATA_FLAG ? '+' : ' ');
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.data_ind)))->
-					    tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.data_ind)))->
-					    sid;
-					break;
-				case N_EXDATA_REQ:
-					printf
-					    ("                    |                |<---(%03lu:%03lu)----|<----- N_EXDATA_REQ \n",
-					     qos_data.sid, qos_data.ssn);
-					break;
-				case N_EXDATA_IND:
-					printf
-					    ("                    |  [%010lu]  |----(%03lu:%03lu)--->|-----> N_EXDATA_IND \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     tsn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											exdata_ind)))->
-					     ssn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       exdata_ind)))->tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       exdata_ind)))->sid;
-					break;
-				case N_DATACK_REQ:
-					printf
-					    ("                    |                |<---(%03lu:%03lu)----|<----- N_DATACK_REQ \n",
-					     qos_data.sid, qos_data.ssn);
-					break;
-				case N_DATACK_IND:
-					printf
-					    ("                    |  [%010lu]  |----(%03lu:%03lu)--->|-----> N_DATACK_IND \n",
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     tsn,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     sid,
-					     (ulong) ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-										 sizeof(cmd.npi.
-											datack_ind)))->
-					     ssn);
-					tsn[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       datack_ind)))->tsn;
-					sid[fd] =
-					    ((N_qos_sel_data_sctp_t *) (cmd.cbuf +
-									sizeof(cmd.npi.
-									       datack_ind)))->sid;
-					break;
-				case N_DISCON_REQ:
-					printf
-					    ("                    |                |<----------------|<----- N_DISCON_REQ \n");
-					break;
-				case N_DISCON_IND:
-					printf
-					    ("                    |                |---------------->|-----> N_DISCON_IND \n");
-					break;
-				case N_RESET_REQ:
-					printf
-					    ("                    |                |<----------------|<----- N_RESET_REQ  \n");
-					break;
-				case N_RESET_IND:
-					printf
-					    ("                    |                |---------------->|-----> N_RESET_IND  \n");
-					break;
-				case N_RESET_RES:
-					printf
-					    ("                    |                |<----------------|<----- N_RESET_RES  \n");
-					break;
-				case N_RESET_CON:
-					printf
-					    ("                    |                |---------------->|-----> N_RESET_CON  \n");
-					break;
-				default:
-					printf
-					    ("                    |                               |  |?----? ????%4ld???? \n",
-					     cmd.npi.type);
-					break;
-				}
-			}
-			break;
-		}
+	switch (event) {
+	case __EVENT_INFO_REQ:
+		fprintf(stdout,
+			"N_INFO_REQ    ----->|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_INFO_ACK:
+		fprintf(stdout,
+			"N_INFO_ACK    <----/|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_OPTMGMT_REQ:
+		fprintf(stdout,
+			"N_OPTMGMT_REQ ----->|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_BIND_REQ:
+		fprintf(stdout,
+			"N_BIND_REQ    ----->|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_BIND_ACK:
+		fprintf(stdout,
+			"N_BIND_ACK    <----/|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_UNBIND_REQ:
+		fprintf(stdout,
+			"N_UNBIND_REQ  ----->|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_ERROR_ACK:
+		fprintf(stdout,
+			"N_ERROR_ACK   <----/|                               |  |                    [%d]\n",
+			state);
+		fprintf(stdout,
+			"%-15s     |                               |  |                    \n",
+			nerrno_string(cmd.npi.error_ack.NPI_error, cmd.npi.error_ack.UNIX_error));
+		break;
+	case __EVENT_OK_ACK:
+		fprintf(stdout,
+			"N_OK_ACK      <----/|                               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_UNITDATA_REQ:
+		fprintf(stdout,
+			"N_UNITDATA_REQ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_UNITDATA_IND:
+		fprintf(stdout,
+			"N_UNITDATA_IND<-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_UDERROR_IND:
+		fprintf(stdout,
+			"N_UDERROR_IND <----/|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_REQ:
+		fprintf(stdout,
+			"N_CONN_REQ    ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_IND:
+		fprintf(stdout,
+			"N_CONN_IND    <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		seq[fd] = cmd.npi.conn_ind.SEQ_number;
+		break;
+	case __EVENT_CONN_RES:
+		fprintf(stdout,
+			"N_CONN_RES    ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_CON:
+		fprintf(stdout,
+			"N_CONN_CON    <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_DATA_REQ:
+		if (cmd.npi.data_req.DATA_xfer_flags & N_MORE_DATA_FLAG)
+			fprintf(stdout,
+				"N_DATA_REQ+   ----->| - - - - - - ->\\               |  |                    [%d]\n",
+				state);
+		else
+			fprintf(stdout,
+				"N_DATA_REQ    ----->| - - - - - - ->\\               |  |                    [%d]\n",
+				state);
+		break;
+	case __EVENT_DATA_IND:
+		if (cmd.npi.data_ind.DATA_xfer_flags & N_MORE_DATA_FLAG)
+			fprintf(stdout,
+				"N_DATA_IND+   <-----|<- - - - - - - /               |  |                    [%d]\n",
+				state);
+		else
+			fprintf(stdout,
+				"N_DATA_IND    <-----|<- - - - - - - /               |  |                    [%d]\n",
+				state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.data_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.data_ind)))->sid;
+		break;
+	case __EVENT_EXDATA_REQ:
+		fprintf(stdout,
+			"N_EXDATA_REQ  ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_EXDATA_IND:
+		fprintf(stdout,
+			"N_EXDATA_IND  <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.exdata_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.exdata_ind)))->sid;
+		break;
+	case __EVENT_DISCON_REQ:
+		fprintf(stdout,
+			"N_DISCON_REQ  ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_DISCON_IND:
+		fprintf(stdout,
+			"N_DISCON_IND  <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_DATACK_REQ:
+		fprintf(stdout,
+			"N_DATACK_REQ  ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_DATACK_IND:
+		fprintf(stdout,
+			"N_DATACK_IND  <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.datack_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.datack_ind)))->sid;
+		break;
+	case __EVENT_RESET_REQ:
+		fprintf(stdout,
+			"N_RESET_REQ   ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_IND:
+		fprintf(stdout,
+			"N_RESET_IND   <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_RES:
+		fprintf(stdout,
+			"N_RESET_RES   ----->| - - - - - - ->\\               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_CON:
+		fprintf(stdout,
+			"N_RESET_CON   <-----|<- - - - - - - /               |  |                    [%d]\n",
+			state);
+		break;
+	case __EVENT_UNKNOWN:
+		fprintf(stdout,
+			"????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n",
+			cmd.npi.type, state);
+		break;
+	default:
+	case __RESULT_SCRIPT_ERROR:
+		break;
 	}
-	FFLUSH(stdout);
+}
+
+void
+print_event_list(int fd, int event)
+{
+	switch (event) {
+	case __EVENT_INFO_REQ:
+		fprintf(stdout,
+			"                    |                               |<-+---- N_INFO_REQ     [%d]\n",
+			state);
+		break;
+	case __EVENT_INFO_ACK:
+		fprintf(stdout,
+			"                    |                               |\\-+---> N_INFO_ACK     [%d]\n",
+			state);
+		break;
+	case __EVENT_OPTMGMT_REQ:
+		fprintf(stdout,
+			"                    |                               |<-+---- N_OPTMGMT_REQ  [%d]\n",
+			state);
+		break;
+	case __EVENT_BIND_REQ:
+		fprintf(stdout,
+			"                    |                               |<-+---- N_BIND_REQ     [%d]\n",
+			state);
+		break;
+	case __EVENT_BIND_ACK:
+		fprintf(stdout,
+			"                    |                               |\\-+---> N_BIND_ACK     [%d]\n",
+			state);
+		break;
+	case __EVENT_UNBIND_REQ:
+		fprintf(stdout,
+			"                    |                               |<-+---- N_UNBIND_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_ERROR_ACK:
+		fprintf(stdout,
+			"                    |                               |\\-+---> N_ERROR_ACK    [%d]\n",
+			state);
+		fprintf(stdout,
+			"                    |                               |   .    %-15s\n",
+			nerrno_string(cmd.npi.error_ack.NPI_error, cmd.npi.error_ack.UNIX_error));
+		break;
+	case __EVENT_OK_ACK:
+		fprintf(stdout,
+			"                    |                               |\\-+---> N_OK_ACK       [%d]\n",
+			state);
+		break;
+	case __EVENT_UNITDATA_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_UNITDATA_REQ [%d]\n",
+			state);
+		break;
+	case __EVENT_UNITDATA_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_UNITDATA_IND [%d]\n",
+			state);
+		break;
+	case __EVENT_UDERROR_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|\\-+---> N_UDERROR_IND  [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_CONN_REQ     [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_CONN_IND     [%d]\n",
+			state);
+		seq[fd] = cmd.npi.conn_ind.SEQ_number;
+		break;
+	case __EVENT_CONN_RES:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_CONN_RES     [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_CON:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_CONN_CON     [%d]\n",
+			state);
+		break;
+	case __EVENT_DATA_REQ:
+		if (cmd.npi.data_req.DATA_xfer_flags & N_MORE_DATA_FLAG)
+			fprintf(stdout,
+				"                    |               /<- - - - - - - |<-+---- N_DATA_REQ+    [%d]\n",
+				state);
+		else
+			fprintf(stdout,
+				"                    |               /<- - - - - - - |<-+---- N_DATA_REQ     [%d]\n",
+				state);
+		break;
+	case __EVENT_DATA_IND:
+		if (cmd.npi.data_ind.DATA_xfer_flags & N_MORE_DATA_FLAG)
+			fprintf(stdout,
+				"                    |               \\ - - - - - - ->|--+---> N_DATA_IND+    [%d]\n",
+				state);
+		else
+			fprintf(stdout,
+				"                    |               \\ - - - - - - ->|--+---> N_DATA_IND     [%d]\n",
+				state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.data_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.data_ind)))->sid;
+		break;
+	case __EVENT_EXDATA_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_EXDATA_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_EXDATA_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_EXDATA_IND   [%d]\n",
+			state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.exdata_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.exdata_ind)))->sid;
+		break;
+	case __EVENT_DISCON_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_DISCON_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_DISCON_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_DISCON_IND   [%d]\n",
+			state);
+		break;
+	case __EVENT_DATACK_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_DATACK_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_DATACK_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_DATACK_IND   [%d]\n",
+			state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.datack_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.datack_ind)))->sid;
+		break;
+	case __EVENT_RESET_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_RESET_REQ    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_RESET_IND    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_RES:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - |<-+---- N_RESET_RES    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_CON:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - ->|--+---> N_RESET_CON    [%d]\n",
+			state);
+		break;
+	case __EVENT_UNKNOWN:
+		fprintf(stdout,
+			"                    |                               |?-+---? ????%4ld????   [%d]\n",
+			cmd.npi.type, state);
+		break;
+	default:
+	case __RESULT_SCRIPT_ERROR:
+		break;
+	}
+}
+
+void
+print_event_resp(int fd, int event)
+{
+	switch (event) {
+	case __EVENT_INFO_REQ:
+		fprintf(stdout,
+			"                    |                               |  |<--- N_INFO_REQ     [%d]\n",
+			state);
+		break;
+	case __EVENT_INFO_ACK:
+		fprintf(stdout,
+			"                    |                               |  |\\--> N_INFO_ACK---> [%d]\n",
+			state);
+		break;
+	case __EVENT_OPTMGMT_REQ:
+		fprintf(stdout,
+			"                    |                               |  |<--- N_OPTMGMT_REQ  [%d]\n",
+			state);
+		break;
+	case __EVENT_BIND_REQ:
+		fprintf(stdout,
+			"                    |                               |  |<--- N_BIND_REQ     [%d]\n",
+			state);
+		break;
+	case __EVENT_BIND_ACK:
+		fprintf(stdout,
+			"                    |                               |  |\\--> N_BIND_ACK     [%d]\n",
+			state);
+		break;
+	case __EVENT_UNBIND_REQ:
+		fprintf(stdout,
+			"                    |                               |  |<--- N_UNBIND_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_ERROR_ACK:
+		fprintf(stdout,
+			"                    |                               |  |\\--> N_ERROR_ACK    [%d]\n",
+			state);
+		fprintf(stdout,
+			"                    |                               |  |     %-15s\n",
+			nerrno_string(cmd.npi.error_ack.NPI_error, cmd.npi.error_ack.UNIX_error));
+		break;
+	case __EVENT_OK_ACK:
+		fprintf(stdout,
+			"                    |                               |  |\\--> N_OK_ACK       [%d]\n",
+			state);
+		break;
+	case __EVENT_UNITDATA_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_UNITDATA_REQ [%d]\n",
+			state);
+		break;
+	case __EVENT_UNITDATA_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_UNITDATA_IND [%d]\n",
+			state);
+		break;
+	case __EVENT_UDERROR_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|\\--> N_UDERROR_IND  [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_CONN_REQ     [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_CONN_IND     [%d]\n",
+			state);
+		seq[fd] = cmd.npi.conn_ind.SEQ_number;
+		break;
+	case __EVENT_CONN_RES:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_CONN_RES     [%d]\n",
+			state);
+		break;
+	case __EVENT_CONN_CON:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_CONN_CON     [%d]\n",
+			state);
+		break;
+	case __EVENT_DATA_REQ:
+		if (cmd.npi.data_req.DATA_xfer_flags & N_MORE_DATA_FLAG)
+			fprintf(stdout,
+				"                    |               /<- - - - - - - + -|<--- N_DATA_REQ+    [%d]\n",
+				state);
+		else
+			fprintf(stdout,
+				"                    |               /<- - - - - - - + -|<--- N_DATA_REQ     [%d]\n",
+				state);
+		break;
+	case __EVENT_DATA_IND:
+		if (cmd.npi.data_ind.DATA_xfer_flags & N_MORE_DATA_FLAG)
+			fprintf(stdout,
+				"                    |               \\ - - - - - - - +->|---> N_DATA_IND+    [%d]\n",
+				state);
+		else
+			fprintf(stdout,
+				"                    |               \\ - - - - - - - +->|---> N_DATA_IND     [%d]\n",
+				state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.data_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.data_ind)))->sid;
+		break;
+	case __EVENT_EXDATA_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_EXDATA_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_EXDATA_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_EXDATA_IND   [%d]\n",
+			state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.exdata_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.exdata_ind)))->sid;
+		break;
+	case __EVENT_DISCON_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_DISCON_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_DISCON_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_DISCON_IND   [%d]\n",
+			state);
+		break;
+	case __EVENT_UNKNOWN:
+		fprintf(stdout,
+			"                    |                               |  |?--? ????%4ld????   [%d]\n",
+			cmd.npi.type, state);
+		break;
+	case __EVENT_DATACK_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_DATACK_REQ   [%d]\n",
+			state);
+		break;
+	case __EVENT_DATACK_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_DATACK_IND   [%d]\n",
+			state);
+		tsn[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.datack_ind)))->tsn;
+		sid[fd] = ((N_qos_sel_data_sctp_t *) (cmd.cbuf + sizeof(cmd.npi.datack_ind)))->sid;
+		break;
+	case __EVENT_RESET_REQ:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_RESET_REQ    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_IND:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_RESET_IND    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_RES:
+		fprintf(stdout,
+			"                    |               /<- - - - - - - + -|<--- N_RESET_RES    [%d]\n",
+			state);
+		break;
+	case __EVENT_RESET_CON:
+		fprintf(stdout,
+			"                    |               \\ - - - - - - - +->|---> N_RESET_CON    [%d]\n",
+			state);
+		break;
+	default:
+	case __RESULT_SCRIPT_ERROR:
+		break;
+	}
+}
+
+void
+print_event(int fd, int event)
+{
+	if (verbose < 1 || !show)
+		return;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (fd == conn_fd)
+		print_event_conn(fd, event);
+	else if (fd == list_fd)
+		print_event_list(fd, event);
+	else if (fd == resp_fd)
+		print_event_resp(fd, event);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return;
 }
 
 void
 print_less(int fd)
 {
-	switch (show) {
-	case 1:
-		switch (fd) {
-		case 0:
-			printf
-			    (" .         .  <---->|                .                 |<---->  .         . \n");
-			printf
-			    (" .  (more) .  <---->|                .                 |<---->  . (more)  . \n");
-			printf
-			    (" .         .  <---->|                .                 |<---->  .         . \n");
-			break;
-		case 3:
-			printf
-			    (" .         .  <---->|                .              |  |                    \n");
-			printf
-			    (" .  (more) .  <---->|                .              |  |                    \n");
-			printf
-			    (" .         .  <---->|                .              |  |                    \n");
-			break;
-		case 4:
-			printf
-			    ("                    |                .              |<-+----->  .         . \n");
-			printf
-			    ("                    |                .              |<-+----->  . (more)  . \n");
-			printf
-			    ("                    |                .              |<-+----->  .         . \n");
-			break;
-		case 5:
-			printf
-			    ("                    |                .              |  |<---->  .         . \n");
-			printf
-			    ("                    |                .              |  |<---->  . (more)  . \n");
-			printf
-			    ("                    |                .              |  |<---->  .         . \n");
-			break;
-		}
-		break;
-	case 2:
-		printf("%d-(more) ...\n", fd);
-		break;
+	if (verbose < 1 || !show)
+		return;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (fd == conn_fd) {
+		fprintf(stdout,
+			" .         .  <---->|               .               :  :                    \n");
+		fprintf(stdout,
+			" .  (more) .  <---->|               .               :  :                    [%d]\n",
+			state);
+		fprintf(stdout,
+			" .         .  <---->|               .               :  :                    \n");
+	} else if (fd == resp_fd) {
+		fprintf(stdout,
+			"                    :               .               :  |<-->  .         .   \n");
+		fprintf(stdout,
+			"                    :               .               :  |<-->  . (more)  .   [%d]\n",
+			state);
+		fprintf(stdout,
+			"                    :               .               :  |<-->  .         .   \n");
+	} else if (fd == list_fd) {
+		fprintf(stdout,
+			"                    :               .               |<-:--->  .         .   \n");
+		fprintf(stdout,
+			"                    :               .               |<-:--->  . (more)  .   [%d]\n",
+			state);
+		fprintf(stdout,
+			"                    :               .               |<-:--->  .         .   \n");
 	}
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
 	show = 0;
 	return;
 }
@@ -1412,228 +1691,467 @@ print_more(void)
 	show = 1;
 }
 
-int
-get_msg(int fd, int wait)
+void
+print_open(int *fdp)
 {
-	int ret;
-	int flags = 0;
-	while ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {
-		switch (errno) {
+	if (verbose > 3) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fdp == &conn_fd)
+			fprintf(stdout,
+				"open()        ----->v                                                       \n");
+		else if (fdp == &resp_fd)
+			fprintf(stdout,
+				"                    |                                  v<--- open()         \n");
+		else if (fdp == &list_fd)
+			fprintf(stdout,
+				"                    |                               v<-|---- open()         \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_close(int *fdp)
+{
+	if (verbose > 3) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fdp == &conn_fd)
+			fprintf(stdout,
+				"close()       ----->X                               |  |                    \n");
+		else if (fdp == &resp_fd)
+			fprintf(stdout,
+				"                                                    |  X<--- close()        \n");
+		else if (fdp == &list_fd)
+			fprintf(stdout,
+				"                                                    X<------ close()        \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_command(int fd, const char *command)
+{
+	if (verbose > 3) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout,
+				"%-14s----->|                               |  |                    [%d]\n",
+				command, state);
+		else if (fd == resp_fd)
+			fprintf(stdout,
+				"                    |                               |  |<--- %-14s [%d]\n",
+				command, state);
+		else if (fd == list_fd)
+			fprintf(stdout,
+				"                    |                               |<-+---- %-14s [%d]\n",
+				command, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_errno(int fd, long error)
+{
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout,
+				"%-14s<----/|                               |  |                    [%d]\n",
+				errno_string(error), state);
+		else if (fd == resp_fd)
+			fprintf(stdout,
+				"                    |                               |  |\\--> %-14s [%d]\n",
+				errno_string(error), state);
+		else if (fd == list_fd)
+			fprintf(stdout,
+				"                    |                               |\\-+---> %-14s [%d]\n",
+				errno_string(error), state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_success(int fd)
+{
+	if (verbose > 4) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout,
+				"ok            <----/|                               |  |                    [%d]\n",
+				state);
+		else if (fd == resp_fd)
+			fprintf(stdout,
+				"                    |                               |  |\\--> ok             [%d]\n",
+				state);
+		else if (fd == list_fd)
+			fprintf(stdout,
+				"                    |                               |\\-+---> ok             [%d]\n",
+				state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+static int
+decode_data(int fd)
+{
+	int event = __RESULT_DECODE_ERROR;
+	if (data.len >= 0)
+		event = __EVENT_DATA;
+	if (verbose > 0 && show)
+		print_event(fd, event);
+	return ((last_event = event));
+}
+
+static int
+decode_ctrl(int fd)
+{
+	int event = __RESULT_DECODE_ERROR;
+	if (ctrl.len >= sizeof(cmd.npi.type))
+		switch ((last_prim = cmd.npi.type)) {
+		case N_CONN_REQ:
+			event = __EVENT_CONN_REQ;
+			break;
+		case N_CONN_RES:
+			event = __EVENT_CONN_RES;
+			break;
+		case N_DISCON_REQ:
+			event = __EVENT_DISCON_REQ;
+			break;
+		case N_DATA_REQ:
+			event = __EVENT_DATA_REQ;
+			break;
+		case N_EXDATA_REQ:
+			event = __EVENT_EXDATA_REQ;
+			break;
+		case N_INFO_REQ:
+			event = __EVENT_INFO_REQ;
+			break;
+		case N_BIND_REQ:
+			event = __EVENT_BIND_REQ;
+			break;
+		case N_UNBIND_REQ:
+			event = __EVENT_UNBIND_REQ;
+			break;
+		case N_UNITDATA_REQ:
+			event = __EVENT_UNITDATA_REQ;
+			break;
+		case N_OPTMGMT_REQ:
+			event = __EVENT_OPTMGMT_REQ;
+			break;
+		case N_DATACK_REQ:
+			event = __EVENT_DATACK_REQ;
+			break;
+		case N_RESET_REQ:
+			event = __EVENT_RESET_REQ;
+			break;
+		case N_RESET_RES:
+			event = __EVENT_RESET_RES;
+			break;
+		case N_CONN_IND:
+			event = __EVENT_CONN_IND;
+			break;
+		case N_CONN_CON:
+			event = __EVENT_CONN_CON;
+			break;
+		case N_DISCON_IND:
+			event = __EVENT_DISCON_IND;
+			break;
+		case N_DATA_IND:
+			event = __EVENT_DATA_IND;
+			break;
+		case N_EXDATA_IND:
+			event = __EVENT_EXDATA_IND;
+			break;
+		case N_INFO_ACK:
+			event = __EVENT_INFO_ACK;
+			break;
+		case N_BIND_ACK:
+			event = __EVENT_BIND_ACK;
+			break;
+		case N_ERROR_ACK:
+			event = __EVENT_ERROR_ACK;
+			break;
+		case N_OK_ACK:
+			event = __EVENT_OK_ACK;
+			break;
+		case N_UNITDATA_IND:
+			event = __EVENT_UNITDATA_IND;
+			break;
+		case N_UDERROR_IND:
+			event = __EVENT_UDERROR_IND;
+			break;
+		case N_DATACK_IND:
+			event = __EVENT_DATACK_IND;
+			break;
+		case N_RESET_IND:
+			event = __EVENT_RESET_IND;
+			break;
+		case N_RESET_CON:
+			event = __EVENT_RESET_CON;
+			break;
 		default:
-		case EPROTO:
-		case EINVAL:
-			printf("ERROR: getmsg: [%d] %s\n", errno, strerror(errno));
-			exit(2);
-		case EINTR:
-		case ERESTART:
-			continue;
-		case EAGAIN:
+			event = __EVENT_UNKNOWN;
 			break;
 		}
-		break;
+	if (verbose > 0 && show)
+		print_event(fd, event);
+	return ((last_event = event));
+}
+
+static int
+decode_msg(int fd)
+{
+	if (ctrl.len >= 0) {
+		if ((last_event = decode_ctrl(fd)) != __EVENT_UNKNOWN)
+			return time_event(last_event);
+	} else if (data.len >= 0) {
+		if ((last_event = decode_data(fd)) != __EVENT_UNKNOWN)
+			return time_event(last_event);
 	}
-	if (!ret) {
-		gettimeofday(&when, NULL);
-		if (show)
-			print_msg(fd);
-		return (cmd.npi.type);
-	}
-	if (!wait) {
-		/* printf("Nothing to get on getmsg\n"); */
-		return (FAILURE);
-	}
-	do {
-		struct pollfd pfd[] = {
-			{fd, POLLIN | POLLPRI, 0}
-		};
-		if (!(ret = poll(pfd, 1, wait))) {
-			/* printf("Timeout on poll for getmsg\n"); */
-			return (FAILURE);
-		}
-		if (ret == 1 || ret == 2) {
-			if (pfd[0].revents & (POLLIN | POLLPRI)) {
-				flags = 0;
-				while ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {
-					switch (errno) {
-					default:
-						printf("ERROR: getmsg: [%d] %s\n", errno,
-						       strerror(errno));
-						return (FAILURE);
-					case EINTR:
-					case ERESTART:
-					case EAGAIN:
-						continue;
-					}
-				}
-				gettimeofday(&when, NULL);
-				if (show)
-					print_msg(fd);
-				return (cmd.prim);
+	return ((last_event = __EVENT_NO_MSG));
+}
+
+int
+wait_event(int fd, int wait)
+{
+	for (;;) {
+		struct pollfd pfd[] = { {fd, POLLIN | POLLPRI, 0} };
+		if (timer_timeout) {
+			timer_timeout = 0;
+			if (show_timeout || verbose > 1) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				if (fd == conn_fd)
+					fprintf(stdout,
+						"++++++++++++++++++++|+++++++++++ TIMEOUT +++++++++++|  |                    [%d]\n",
+						state);
+				else if (fd == resp_fd)
+					fprintf(stdout,
+						"                    |+++++++++++ TIMEOUT +++++++++++|  |++++++++++++++++++++[%d]\n",
+						state);
+				else if (fd == list_fd)
+					fprintf(stdout,
+						"                    |+++++++++++ TIMEOUT +++++++++++|++|++++++++++++++++++++[%d]\n",
+						state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+				show_timeout--;
 			}
+			last_event = __EVENT_TIMEOUT;
+			return time_event(__EVENT_TIMEOUT);
 		}
-		if (ret == -1) {
-			printf("ERROR: poll: [%d] %s\n", errno, strerror(errno));
-			return (FAILURE);
+		print_command(fd, "poll()");
+		pfd[0].fd = fd;
+		pfd[0].events =
+		    POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
+		pfd[0].revents = 0;
+		switch (poll(pfd, 1, wait)) {
+		case -1:
+			print_errno(fd, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				break;
+			return (__RESULT_FAILURE);
+		case 0:
+			print_success(fd);
+			last_event = __EVENT_NO_MSG;
+			return time_event(__EVENT_NO_MSG);
+		case 1:
+			print_success(fd);
+			if (pfd[0].revents) {
+				int ret;
+				ctrl.len = -1;
+				data.len = -1;
+				flags = 0;
+				for (;;) {
+					print_command(fd, "getmsg()");
+					if ((ret = getmsg(fd, &ctrl, &data, &flags)) >= 0)
+						break;
+					print_errno(fd, (last_errno = errno));
+					if (last_errno == EINTR || last_errno == ERESTART)
+						continue;
+					if (last_errno == EAGAIN)
+						break;
+					return __RESULT_FAILURE;
+				}
+				if (ret < 0)
+					break;
+				if (ret == 0) {
+					print_success(fd);
+					if ((last_event = decode_msg(fd)) != __EVENT_NO_MSG)
+						return (last_event);
+				}
+			}
+		default:
+			break;
 		}
-	} while (1);
+	}
+	return __EVENT_UNKNOWN;
+}
+
+int
+get_event(int fd)
+{
+	return wait_event(fd, -1);
+}
+
+void
+test_sleep(int fd, unsigned long t)
+{
+	if (verbose > 1 && show) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout,
+				"/ / / / / / / / / / | / / / Waiting %03lu seconds / / |  |                    [%d]\n",
+				t, state);
+		else if (fd == resp_fd)
+			fprintf(stdout,
+				"                    | / / / Waiting %03lu seconds / / |  | / / / / / / / / / /[%d]\n",
+				t, state);
+		else if (fd == list_fd)
+			fprintf(stdout,
+				"                    | / / / Waiting %03lu seconds / / |/ | / / / / / / / / / /[%d]\n",
+				t, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	sleep(t);
 }
 
 int
 expect(int fd, int wait, int want)
 {
-	int got;
-	if ((got = get_msg(fd, wait)) == want)
-		return (SUCCESS);
-	else {
-		switch (show) {
-		case 1:
-			switch (fd) {
-			case 3:
-				printf
-				    ("(%-12s)<-????X[Expected]                     X  X                    \n",
-				     prim_string(want));
-				break;
-			case 4:
-				printf
-				    ("                    X                     [Expected]X--X\?\?\?\?->(%-12s)\n",
-				     prim_string(want));
-				break;
-			case 5:
-				printf
-				    ("                    X                     [Expected]X  X\?\?\?\?->(%-12s)\n",
-				     prim_string(want));
-				break;
-			}
-			break;
-		case 2:
-			printf("%d-ERROR: Expected ", fd);
-			print_prim(want);
-			printf(" got ");
-			print_prim(got);
-			printf("\n");
-			break;
-		}
-		return (FAILURE);
+	if ((last_event = wait_event(fd, wait)) == want)
+		return (__RESULT_SUCCESS);
+	if (verbose > 1 && show) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout,
+				"- (%-15s) | - - - - - [Expected]- - - - - |  |                    [%d]\n",
+				event_string(want), state);
+		else if (fd == resp_fd)
+			fprintf(stdout,
+				"                    | - - - - - [Expected]- - - - - |  | (%-15s) -[%d]\n",
+				event_string(want), state);
+		else if (fd == list_fd)
+			fprintf(stdout,
+				"                    | - - - - - [Expected]- - - - - |- | (%-15s) -[%d]\n",
+				event_string(want), state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
 	}
+	return (__RESULT_FAILURE);
 }
 
 int
 put_msg(int fd, int band, int flags, int wait)
 {
 	int ret;
-	struct strbuf *mydata = data.len ? &data : NULL;
-	while ((ret = putpmsg(fd, &ctrl, mydata, band, flags)) < 0) {
-		switch (errno) {
-		default:
-			printf("ERROR: putpmsg: [%d] %s\n", errno, strerror(errno));
-			exit(2);
+	struct strbuf *myctrl = ctrl.len >= 0 ? &ctrl : NULL;
+	struct strbuf *mydata = data.len >= 0 ? &data : NULL;
+	decode_msg(fd);
+	for (;;) {
+		print_command(fd, "putpmsg()");
+		if ((ret = putpmsg(fd, myctrl, mydata, band, flags)) >= 0)
 			break;
-		case EINTR:
-		case ERESTART:
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
-		case EAGAIN:
+		if (last_errno == EAGAIN)
 			break;
-		}
-		break;
+		return (__RESULT_FAILURE);
 	}
-	if (!ret) {
-		gettimeofday(&when, NULL);
-		if (show)
-			print_msg(fd);
-		return (SUCCESS);
-	}
+	print_success(fd);
+	if (!ret)
+		return (__RESULT_SUCCESS);
 	if (!wait) {
-		/* printf("Nothing put on putpmsg\n"); */
-		return (FAILURE);
+		/* 
+		 * printf("Nothing put on putpmsg\n"); 
+		 */
+		return (__RESULT_FAILURE);
 	}
-	do {
+	for (;;) {
 		int flag = band ? POLLWRNORM | POLLOUT : POLLWRBAND;
 		struct pollfd pfd[] = {
 			{fd, flag, 0}
 		};
 		if (!(ret = poll(pfd, 1, wait))) {
-			/* printf("Timeout on poll for putpmsg\n"); */
-			return (FAILURE);
+			/* 
+			 * printf("Timeout on poll for putpmsg\n"); 
+			 */
+			return (__RESULT_FAILURE);
 		}
 		if (ret == 1 || ret == 2) {
 			if (pfd[0].revents & (POLLOUT | POLLWRNORM | POLLWRBAND)) {
-				if (putpmsg(fd, &ctrl, mydata, band, flags) == 0) {
-					gettimeofday(&when, NULL);
-					if (show)
-						print_msg(fd);
-					return (SUCCESS);
-				}
-				printf("ERROR: putpmsg: [%d] %s\n", errno, strerror(errno));
-				return (FAILURE);
+				if (putpmsg(fd, myctrl, mydata, band, flags) == 0)
+					return (__RESULT_SUCCESS);
+				printf("%d-ERROR: putpmsg: [%d] %s\n", fd, errno, strerror(errno));
+				return (__RESULT_FAILURE);
 			}
 		}
 		if (ret == -1) {
-			printf("ERROR: poll: [%d] %s\n", errno, strerror(errno));
-			return (FAILURE);
+			printf("%d-ERROR: poll: [%d] %s\n", fd, errno, strerror(errno));
+			return (__RESULT_FAILURE);
 		}
-	} while (1);
+	}
 }
 
 int
-sctp_n_open(void)
+put_fdi(int fd, int resfd, int offset, int flags)
+{
+	fdi.flags = flags;
+	fdi.fildes = resfd;
+	fdi.offset = offset;
+	decode_msg(fd);
+	for (;;) {
+		print_command(fd, "ioctl()");
+		if (ioctl(fd, I_FDINSERT, &fdi) >= 0) {
+			print_success(fd);
+			return (__RESULT_SUCCESS);
+		}
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
+	}
+}
+
+int
+sctp_n_open(const char *name, int *fdp)
 {
 	int fd;
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0)
-		printf("ERROR: open: [%d] %s\n", errno, strerror(errno));
-	else
-		switch (show) {
-		case 1:
-			switch (fd) {
-			case 3:
-				printf
-				    ("OPEN          ----->v                                                       \n");
-				break;
-			case 4:
-				printf
-				    ("                    |                               v<-------- OPEN         \n");
-				break;
-			case 5:
-				printf
-				    ("                    |                               |  v<----- OPEN         \n");
-				break;
-			}
-			break;
-		case 2:
-			printf("\n%d-OPEN: sctp_n\n", fd);
-			break;
+	for (;;) {
+		print_open(fdp);
+		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+			*fdp = fd;
+			print_success(fd);
+			return (__RESULT_SUCCESS);
 		}
-	return (fd);
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
+	}
 }
 
 int
-sctp_close(int fd)
+sctp_close(int *fdp)
 {
-	int ret;
-	if ((ret = close(fd)) < 0)
-		printf("ERROR: close: [%d] %s\n", errno, strerror(errno));
-	else
-		switch (show) {
-		case 1:
-			switch (fd) {
-			case 3:
-				printf
-				    ("CLOSE         ----->X                               |  |                    \n");
-				break;
-			case 4:
-				printf
-				    ("                                                    X<-+------ CLOSE        \n");
-				break;
-			case 5:
-				printf
-				    ("                                                       X<----- CLOSE        \n");
-				break;
-			}
-			break;
-		case 2:
-			printf("\n%d-CLOSE:\n", fd);
-			break;
+	int fd = *fdp;
+	*fdp = 0;
+	for (;;) {
+		print_close(fdp);
+		if (close(fd) >= 0) {
+			print_success(fd);
+			return __RESULT_SUCCESS;
 		}
-	return (ret);
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return __RESULT_FAILURE;
+	}
 }
 
 int
@@ -1659,18 +2177,18 @@ sctp_optmgmt_req(int fd, ulong flags)
 }
 
 int
-sctp_bind_req(int fd, addr_t * addr, int coninds)
+sctp_bind_req(int fd, void *add_ptr, size_t add_len, int coninds)
 {
 	data.len = 0;
-	ctrl.len = sizeof(cmd.npi.bind_req) + sizeof(*addr);
+	ctrl.len = sizeof(cmd.npi.bind_req) + add_len;
 	cmd.prim = N_BIND_REQ;
-	cmd.npi.bind_req.ADDR_length = sizeof(*addr);
+	cmd.npi.bind_req.ADDR_length = add_len;
 	cmd.npi.bind_req.ADDR_offset = sizeof(cmd.npi.bind_req);
 	cmd.npi.bind_req.CONIND_number = coninds;
 	cmd.npi.bind_req.BIND_flags = TOKEN_REQUEST;
 	cmd.npi.bind_req.PROTOID_length = 0;
 	cmd.npi.bind_req.PROTOID_offset = 0;
-	bcopy(addr, (&cmd.npi.bind_req) + 1, sizeof(*addr));
+	bcopy(add_ptr, (&cmd.npi.bind_req) + 1, add_len);
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
@@ -1684,29 +2202,35 @@ sctp_unbind_req(int fd)
 }
 
 int
-sctp_conn_req(int fd, addr_t * addr, const char *dat)
+sctp_conn_req(int fd, void *add_ptr, size_t add_len, const char *dat)
 {
+	int ret;
 	if (!dat)
 		data.len = 0;
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
 	}
-	ctrl.len = sizeof(cmd.npi.conn_req) + sizeof(*addr) + sizeof(qos_conn);
+	ctrl.len = sizeof(cmd.npi.conn_req) + add_len + sizeof(qos_conn);
 	cmd.prim = N_CONN_REQ;
-	cmd.npi.conn_req.DEST_length = sizeof(*addr);
+	cmd.npi.conn_req.DEST_length = add_len;
 	cmd.npi.conn_req.DEST_offset = sizeof(cmd.npi.conn_req);
 	cmd.npi.conn_req.CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	cmd.npi.conn_req.QOS_length = sizeof(qos_conn);
-	cmd.npi.conn_req.QOS_offset = sizeof(cmd.npi.conn_req) + sizeof(*addr);
-	bcopy(addr, (cmd.cbuf + sizeof(cmd.npi.conn_req)), sizeof(*addr));
-	bcopy(&qos_conn, (cmd.cbuf + sizeof(cmd.npi.conn_req) + sizeof(*addr)), sizeof(qos_conn));
-	return put_msg(fd, 0, MSG_BAND, 0);
+	cmd.npi.conn_req.QOS_offset = sizeof(cmd.npi.conn_req) + add_len;
+	bcopy(add_ptr, (cmd.cbuf + sizeof(cmd.npi.conn_req)), add_len);
+	bcopy(&qos_conn, (cmd.cbuf + sizeof(cmd.npi.conn_req) + add_len), sizeof(qos_conn));
+	ret = put_msg(fd, 0, MSG_BAND, 0);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
 sctp_conn_res(int fd, int fd2, const char *dat)
 {
+	int ret;
 	if (!dat)
 		data.len = 0;
 	else {
@@ -1722,27 +2246,32 @@ sctp_conn_res(int fd, int fd2, const char *dat)
 	cmd.npi.conn_res.CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	cmd.npi.conn_res.QOS_offset = 0;
 	cmd.npi.conn_res.QOS_length = 0;
-	return put_msg(fd, 0, MSG_BAND, 0);
+	ret = put_msg(fd, 0, MSG_BAND, 0);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
 sctp_discon_req(int fd, ulong seq)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.npi.discon_req);
 	cmd.prim = N_DISCON_REQ;
 	cmd.npi.discon_req.DISCON_reason = 0;
 	cmd.npi.discon_req.RES_length = 0;
 	cmd.npi.discon_req.RES_offset = 0;
 	cmd.npi.discon_req.SEQ_number = seq;
+	data.len = -1;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
 int
 sctp_data_req(int fd, ulong flags, const char *dat, int wait)
 {
+	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
@@ -1751,7 +2280,11 @@ sctp_data_req(int fd, ulong flags, const char *dat, int wait)
 	cmd.prim = N_DATA_REQ;
 	cmd.npi.data_req.DATA_xfer_flags = flags;
 	bcopy(&qos_data, cmd.cbuf + sizeof(cmd.npi.data_req), sizeof(qos_data));
-	return put_msg(fd, 0, MSG_BAND, wait);
+	ret = put_msg(fd, 0, MSG_BAND, wait);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
@@ -1759,7 +2292,7 @@ sctp_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 {
 	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.maxlen = len;
 		data.len = len;
@@ -1779,8 +2312,9 @@ sctp_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 int
 sctp_exdata_req(int fd, const char *dat)
 {
+	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
@@ -1788,14 +2322,18 @@ sctp_exdata_req(int fd, const char *dat)
 	ctrl.len = sizeof(cmd.npi.exdata_req) + sizeof(qos_data);
 	cmd.prim = N_EXDATA_REQ;
 	bcopy(&qos_data, cmd.cbuf + sizeof(cmd.npi.exdata_req), sizeof(qos_data));
-	return put_msg(fd, 1, MSG_BAND, 0);
+	ret = put_msg(fd, 1, MSG_BAND, 0);
+	data.maxlen = BUFSIZE;
+	data.len = 0;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
 sctp_datack_req(int fd, ulong tsn)
 {
 	int ret;
-	data.len = 0;
+	data.len = -1;
 	ctrl.len = sizeof(cmd.npi.datack_req) + sizeof(qos_data);
 	cmd.prim = N_DATACK_REQ;
 	qos_data.tsn = tsn;
@@ -1805,1663 +2343,2126 @@ sctp_datack_req(int fd, ulong tsn)
 	return (ret);
 }
 
-int
-sctp_wait(int fd, int wait)
-{
-	return get_msg(fd, wait);
-}
-
-void
-sctp_sleep(unsigned long t)
-{
-	switch (show) {
-	case 1:
-		printf
-		    ("/ / / / / / / / / / / / / / Waiting %04lu seconds / / / / / / / / / / / / / /\n",
-		     t);
-		break;
-	case 2:
-		printf("Waiting for %lu seconds...\n", t);
-		break;
-	}
-	sleep(t);
-	if (show == 2)
-		printf(" ...done\n");
-}
+/* 
+ *  -------------------------------------------------------------------------
+ *  -------------------------------------------------------------------------
+ */
 
 int
 begin_tests(void)
 {
-	addr1.port = htons(10000);
+#ifndef SCTP_VERSION_2
+	addr1.port = htons(port1);
 	inet_aton("127.0.0.3", &addr1.addr[0]);
 	inet_aton("127.0.0.2", &addr1.addr[1]);
 	inet_aton("127.0.0.1", &addr1.addr[2]);
-
-	addr2.port = htons(10001);
+	port1 += 3;
+	addr2.port = htons(port2);
 	inet_aton("127.0.0.3", &addr2.addr[0]);
 	inet_aton("127.0.0.2", &addr2.addr[1]);
 	inet_aton("127.0.0.1", &addr2.addr[2]);
-
-	addr3.port = htons(10001);
+	port2 += 3;
+	addr3.port = htons(port3);
 	inet_aton("127.0.0.3", &addr3.addr[0]);
 	inet_aton("127.0.0.2", &addr3.addr[1]);
 	inet_aton("127.0.0.1", &addr3.addr[2]);
-
-	state = 0;
-
-	return (SUCCESS);
+	port3 += 3;
+	addr4.port = htons(port4);
+	inet_aton("127.0.0.3", &addr4.addr[0]);
+	inet_aton("127.0.0.2", &addr4.addr[1]);
+	inet_aton("127.0.0.1", &addr4.addr[2]);
+	port4 += 3;
+#else				/* SCTP_VERSION_2 */
+	addr1[0].sin_family = addr1[1].sin_family = addr1[2].sin_family = AF_INET;
+	addr1[0].sin_port = addr1[1].sin_port = addr1[2].sin_port = htons(port1);
+	inet_aton("127.0.0.3", &addr1[0].sin_addr);
+	inet_aton("127.0.0.2", &addr1[1].sin_addr);
+	inet_aton("127.0.0.1", &addr1[2].sin_addr);
+	port1 += 3;
+	addr2[0].sin_family = addr2[1].sin_family = addr2[2].sin_family = AF_INET;
+	addr2[0].sin_port = addr2[1].sin_port = addr2[2].sin_port = htons(port2);
+	inet_aton("127.0.0.3", &addr2[0].sin_addr);
+	inet_aton("127.0.0.2", &addr2[1].sin_addr);
+	inet_aton("127.0.0.1", &addr2[2].sin_addr);
+	port2 += 3;
+	addr3[0].sin_family = addr3[1].sin_family = addr3[2].sin_family = AF_INET;
+	addr3[0].sin_port = addr3[1].sin_port = addr3[2].sin_port = htons(port3);
+	inet_aton("127.0.0.3", &addr3[0].sin_addr);
+	inet_aton("127.0.0.2", &addr3[1].sin_addr);
+	inet_aton("127.0.0.1", &addr3[2].sin_addr);
+	port3 += 3;
+	addr4[0].sin_family = addr4[1].sin_family = addr4[2].sin_family = AF_INET;
+	addr4[0].sin_port = addr4[1].sin_port = addr4[2].sin_port = htons(port4);
+	inet_aton("127.0.0.3", &addr4[0].sin_addr);
+	inet_aton("127.0.0.2", &addr4[1].sin_addr);
+	inet_aton("127.0.0.1", &addr4[2].sin_addr);
+	port4 += 3;
+#endif				/* SCTP_VERSION_2 */
+	if (sctp_n_open(device, &conn_fd) != __RESULT_SUCCESS)
+		goto failure;
+	if (sctp_n_open(device, &resp_fd) != __RESULT_SUCCESS)
+		goto failure;
+	if (sctp_n_open(device, &list_fd) != __RESULT_SUCCESS)
+		goto failure;
+	show = 0;
+	if (sctp_bind_req(resp_fd, &addr3, sizeof(addr3), 0) != __RESULT_SUCCESS)
+		goto failure;
+	if (expect(resp_fd, NORMAL_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	tok[resp_fd] = cmd.npi.bind_ack.TOKEN_value;
+	if (sctp_unbind_req(resp_fd) != __RESULT_SUCCESS)
+		goto failure;
+	if (expect(resp_fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	show = 1;
+	return (__RESULT_SUCCESS);
+      failure:
+	show = 1;
+	return __RESULT_FAILURE;
 }
 
 int
 end_tests(void)
 {
-	return (SUCCESS);
+	show_acks = 0;
+	qos_data.sid = 0;
+	qos_info.hmac = SCTP_HMAC_NONE;
+	qos_info.options = 0;
+	qos_info.i_streams = 1;
+	qos_info.o_streams = 1;
+	qos_conn.i_streams = 1;
+	qos_conn.o_streams = 1;
+	if (sctp_close(&conn_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	if (sctp_close(&resp_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	if (sctp_close(&list_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return (__RESULT_SUCCESS);
 }
 
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Preambles and postables
+ *
+ *  -------------------------------------------------------------------------
+ */
+
 int
-preamble_0(void)
+preamble_0(int fd)
 {
-	if ((fd1 = sctp_n_open()) < 0)
-		return (FAILURE);
-	if ((fd2 = sctp_n_open()) < 0)
-		return (FAILURE);
-	if ((fd3 = sctp_n_open()) < 0)
-		return (FAILURE);
-
-	return (SUCCESS);
+	return (__RESULT_SUCCESS);
 }
 
 int
-postamble_0(void)
+postamble_0(int fd)
 {
-	do {
-		if (sctp_close(fd1) == FAILURE)
-			break;
-		if (sctp_close(fd2) == FAILURE)
-			break;
-		if (sctp_close(fd3) == FAILURE)
-			break;
-		return (SUCCESS);
-	}
-	while (0);
-	return (FAILURE);
+	return (__RESULT_SUCCESS);
 }
 
 int
-preamble_1(void)
+preamble_1(int fd, void *add_ptr, size_t add_len, int coninds)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if ((fd1 = sctp_n_open()) < 0)
-				break;
-			state = 1;
-		case 1:
-			if ((fd2 = sctp_n_open()) < 0)
-				break;
-			state = 2;
-		case 2:
-			if ((fd3 = sctp_n_open()) < 0)
-				break;
-			state = 3;
-		case 3:
-			if (sctp_optmgmt_req(fd1, 0) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (sctp_bind_req(fd1, &addr1, 0) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (expect(fd1, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (sctp_optmgmt_req(fd2, 0) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 9;
-		case 9:
-			if (sctp_bind_req(fd2, &addr2, 5) == FAILURE)
-				break;
-			state = 10;
-		case 10:
-			if (expect(fd2, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 11;
-		case 11:
-			if (sctp_optmgmt_req(fd3, 0) == FAILURE)
-				break;
-			state = 12;
-		case 12:
-			if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 13;
-		case 13:
-			if (sctp_bind_req(fd3, &addr3, 0) == FAILURE)
-				break;
-			state = 14;
-		case 14:
-			if (expect(fd3, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (sctp_optmgmt_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_bind_req(fd, add_ptr, add_len, coninds) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
-preamble_2(void)
+preamble_1_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (preamble_1() == FAILURE)
-				break;
-			state = 15;
-		case 15:
-			if (sctp_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 16;
-		case 16:
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 17;
-		case 17:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 18;
-		case 18:
-			if (sctp_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 19;
-		case 19:
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 20;
-		case 20:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	return preamble_1(fd, &addr1, sizeof(addr1), 0);
 }
 
 int
-preamble_2b(void)
+preamble_1_list(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (preamble_1() == FAILURE)
-				break;
-			state = 15;
-		case 15:
-			if (sctp_conn_req(fd1, &addr2, "Hello World!") == FAILURE)
-				break;
-			state = 16;
-		case 16:
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 17;
-		case 17:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 18;
-		case 18:
-			if (sctp_conn_res(fd2, fd3, "Hello There!") == FAILURE)
-				break;
-			state = 19;
-		case 19:
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 20;
-		case 20:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			state = 21;
-		case 21:
-			if (expect(fd3, NORMAL_WAIT, N_EXDATA_IND) == FAILURE)
-				break;
-			state = 22;
-		case 22:
-			if (expect(fd1, NORMAL_WAIT, N_EXDATA_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	return preamble_1(fd, &addr2, sizeof(addr2), 5);
 }
 
 int
-preamble_2c(void)
+preamble_1_resp(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (preamble_1() == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			sctp_optmgmt_req(fd1, DEFAULT_RC_SEL);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			sctp_optmgmt_req(fd2, DEFAULT_RC_SEL);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			sctp_optmgmt_req(fd3, DEFAULT_RC_SEL);
-			if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	return preamble_1(fd, &addr2, sizeof(addr3), 0);
 }
 
 int
-preamble_3(void)
+postamble_1(int fd)
 {
-	return preamble_1();
+	if (sctp_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
-preamble_3b(void)
+preamble_1s_conn(int fd)
+{
+	if (preamble_1_conn(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_1s_list(int fd)
+{
+	if (preamble_1_list(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_1s_resp(int fd)
+{
+	if (preamble_1_resp(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+postamble_1e(int fd)
+{
+	if (sctp_unbind_req(fd) == __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	expect(fd, NORMAL_WAIT, __EVENT_OK_ACK);
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2_conn(int fd)
+{
+	if (preamble_1s_conn(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2_list(int fd)
+{
+	if (preamble_1s_list(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2_resp(int fd)
+{
+	if (preamble_1s_resp(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+postamble_2_conn(int fd)
+{
+	if (sctp_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+postamble_2_list(int fd)
+{
+	return postamble_1(fd);
+}
+
+int
+postamble_2_resp(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2b_conn(int fd)
+{
+	if (preamble_1s_conn(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), "Hello World!") != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2b_list(int fd)
+{
+	if (preamble_1s_list(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, "Hello There!") != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2b_resp(int fd)
+{
+	if (preamble_1s_resp(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2c_conn(int fd)
+{
+	if (preamble_1_conn(fd) == __RESULT_FAILURE)
+		goto failure;
+	state++;
+	if (sctp_optmgmt_req(fd, DEFAULT_RC_SEL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2c_list(int fd)
+{
+	if (preamble_1_list(fd) == __RESULT_FAILURE)
+		goto failure;
+	state++;
+	if (sctp_optmgmt_req(fd, DEFAULT_RC_SEL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_2c_resp(int fd)
+{
+	if (preamble_1_resp(fd) == __RESULT_FAILURE)
+		goto failure;
+	state++;
+	if (sctp_optmgmt_req(fd, DEFAULT_RC_SEL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+preamble_3_conn(int fd)
+{
+	return preamble_1_conn(fd);
+}
+
+int
+preamble_3_list(int fd)
+{
+	return preamble_1_list(fd);
+}
+
+int
+preamble_3_resp(int fd)
+{
+	return preamble_1_resp(fd);
+}
+
+int
+preamble_3b_conn(int fd)
 {
 	qos_info.i_streams = 32;
 	qos_info.o_streams = 32;
 	qos_conn.i_streams = 32;
 	qos_conn.o_streams = 32;
-	return preamble_2();
+	return preamble_2_conn(fd);
 }
 
 int
-preamble_4(void)
+preamble_3b_list(int fd)
+{
+	qos_info.i_streams = 32;
+	qos_info.o_streams = 32;
+	qos_conn.i_streams = 32;
+	qos_conn.o_streams = 32;
+	return preamble_2_list(fd);
+}
+
+int
+preamble_3b_resp(int fd)
+{
+	qos_info.i_streams = 32;
+	qos_info.o_streams = 32;
+	qos_conn.i_streams = 32;
+	qos_conn.o_streams = 32;
+	return preamble_2_resp(fd);
+}
+
+int
+preamble_4_conn(int fd)
 {
 	// qos_info.options = SCTP_OPTION_RANDOM;
 	qos_info.options = SCTP_OPTION_DROPPING;
-	return preamble_2();
+	return preamble_2_conn(fd);
 }
 
 int
-preamble_5(void)
+preamble_4_list(int fd)
+{
+	// qos_info.options = SCTP_OPTION_RANDOM;
+	qos_info.options = SCTP_OPTION_DROPPING;
+	return preamble_2_list(fd);
+}
+
+int
+preamble_4_resp(int fd)
+{
+	// qos_info.options = SCTP_OPTION_RANDOM;
+	qos_info.options = SCTP_OPTION_DROPPING;
+	return preamble_2_resp(fd);
+}
+
+int
+preamble_5_conn(int fd)
 {
 	// qos_info.options = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
 	qos_info.options = SCTP_OPTION_BREAK;
-	return preamble_2();
+	return preamble_2_conn(fd);
 }
 
 int
-preamble_6(void)
+preamble_5_list(int fd)
+{
+	// qos_info.options = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	qos_info.options = SCTP_OPTION_BREAK;
+	return preamble_2_list(fd);
+}
+
+int
+preamble_5_resp(int fd)
+{
+	// qos_info.options = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	qos_info.options = SCTP_OPTION_BREAK;
+	return preamble_2_resp(fd);
+}
+
+int
+preamble_6_conn(int fd)
 {
 	qos_info.options = SCTP_OPTION_RANDOM;
-	return preamble_3b();
+	return preamble_3b_conn(fd);
 }
 
 int
-preamble_7(void)
+preamble_6_list(int fd)
+{
+	qos_info.options = SCTP_OPTION_RANDOM;
+	return preamble_3b_list(fd);
+}
+
+int
+preamble_6_resp(int fd)
+{
+	qos_info.options = SCTP_OPTION_RANDOM;
+	return preamble_3b_resp(fd);
+}
+
+int
+preamble_7_conn(int fd)
 {
 	qos_info.hmac = SCTP_HMAC_SHA_1;
-	return preamble_1();
+	return preamble_1_conn(fd);
 }
 
 int
-preamble_8(void)
+preamble_7_list(int fd)
+{
+	qos_info.hmac = SCTP_HMAC_SHA_1;
+	return preamble_1_list(fd);
+}
+
+int
+preamble_7_resp(int fd)
+{
+	qos_info.hmac = SCTP_HMAC_SHA_1;
+	return preamble_1_resp(fd);
+}
+
+int
+preamble_8_conn(int fd)
 {
 	qos_info.hmac = SCTP_HMAC_MD5;
-	return preamble_1();
+	return preamble_1_conn(fd);
 }
 
 int
-postamble_1(void)
+preamble_8_list(int fd)
 {
-	uint failed = -1;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_unbind_req(fd1) == FAILURE) {
-				failed = state;
-				state = 1;
-				continue;
-			}
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 1;
-		case 1:
-			if (sctp_unbind_req(fd2) == FAILURE) {
-				failed = state;
-				state = 2;
-				continue;
-			}
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 2;
-		case 2:
-			if (sctp_unbind_req(fd3) == FAILURE) {
-				failed = state;
-				state = 3;
-				continue;
-			}
-			if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 3;
-		case 3:
-			if (sctp_close(fd1) == FAILURE)
-				failed = state;
-			if (sctp_close(fd2) == FAILURE)
-				failed = state;
-			if (sctp_close(fd3) == FAILURE)
-				failed = state;
-		}
-		qos_data.sid = 0;
-		qos_info.hmac = SCTP_HMAC_NONE;
-		qos_info.options = 0;
-		qos_info.i_streams = 1;
-		qos_info.o_streams = 1;
-		qos_conn.i_streams = 1;
-		qos_conn.o_streams = 1;
-		if (failed != -1) {
-			state = failed;
-			return (FAILURE);
-		}
-		return (SUCCESS);
-	}
+	qos_info.hmac = SCTP_HMAC_MD5;
+	return preamble_1_list(fd);
 }
+
 int
-postamble_2(void)
+preamble_8_resp(int fd)
 {
-	uint failed = -1;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_discon_req(fd1, 0) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 2;
-		case 2:
-			if (expect(fd3, LONG_WAIT, N_DISCON_IND) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 6;
-			continue;
-		case 4:
-			if (sctp_discon_req(fd3, 0) == FAILURE) {
-				failed = state;
-				state = 6;
-				continue;
-			}
-			state = 5;
-		case 5:
-			if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 6;
-		case 6:
-			if (sctp_unbind_req(fd1) == FAILURE)
-				failed = state;
-			else if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 7;
-		case 7:
-			if (sctp_unbind_req(fd2) == FAILURE)
-				failed = state;
-			else if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 8;
-		case 8:
-			if (sctp_unbind_req(fd3) == FAILURE)
-				failed = state;
-			else if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				failed = state;
-			state = 9;
-		case 9:
-			if (sctp_close(fd1) == FAILURE)
-				failed = state;
-			if (sctp_close(fd2) == FAILURE)
-				failed = state;
-			if (sctp_close(fd3) == FAILURE)
-				failed = state;
-		}
-		qos_data.sid = 0;
-		qos_info.hmac = SCTP_HMAC_NONE;
-		qos_info.options = 0;
-		qos_info.i_streams = 1;
-		qos_info.o_streams = 1;
-		qos_conn.i_streams = 1;
-		qos_conn.o_streams = 1;
-		if (failed != -1) {
-			state = failed;
-			return (FAILURE);
-		}
-		return (SUCCESS);
-	}
+	qos_info.hmac = SCTP_HMAC_MD5;
+	return preamble_1_resp(fd);
 }
 
 /* 
  *  Do options management.
  */
-#define desc_case_1 "\
-Test Case 1(a):\n\
+#define numb_case_1_1 "1.1"
+#define name_case_1_1 "Do options management."
+#define desc_case_1_1 "\
 Checks that options management can be performed on several streams\n\
 and that one stream can be bound and unbound."
 int
-test_case_1(void)
+test_case_1_1(int fd, void *add_ptr, size_t add_len, int coninds)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_optmgmt_req(fd1, 0);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			sctp_info_req(fd1);
-			if (expect(fd1, NORMAL_WAIT, N_INFO_ACK) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			sctp_bind_req(fd1, &addr1, 3);
-			if (expect(fd1, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_optmgmt_req(fd1, 0);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			sctp_info_req(fd1);
-			if (expect(fd1, NORMAL_WAIT, N_INFO_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			sctp_unbind_req(fd1);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
+	if (sctp_optmgmt_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_info_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (add_len) {
+		if (sctp_bind_req(fd, add_ptr, add_len, coninds) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(fd, NORMAL_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (sctp_optmgmt_req(fd, 0) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (sctp_info_req(fd) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(fd, NORMAL_WAIT, __EVENT_INFO_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (sctp_unbind_req(fd) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(fd, NORMAL_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
 	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_1_1_conn(int fd)
+{
+	return test_case_1_1(fd, &addr1, sizeof(addr1), 0);
+}
+
+int
+test_case_1_1_list(int fd)
+{
+	return test_case_1_1(fd, NULL, 0, 0);
+}
+
+int
+test_case_1_1_resp(int fd)
+{
+	return test_case_1_1(fd, NULL, 0, 0);
+}
+
+#define preamble_1_1_conn preamble_0
+#define preamble_1_1_resp preamble_0
+#define preamble_1_1_list preamble_0
+
+#define postamble_1_1_conn postamble_0
+#define postamble_1_1_resp postamble_0
+#define postamble_1_1_list postamble_0
 
 /* 
  *  Bind and unbind three streams.
  */
-#define desc_case_1b "\
-Test Case 1(b):\n\
+#define numb_case_1_2 "1.2"
+#define name_case_1_2 "Bind and unbind three streams."
+#define desc_case_1_2 "\
 Checks that three streams can be bound and unbound with\n\
-on stream as listener."
+one stream as listener."
 int
-test_case_1b(void)
+test_case_1_2(int fd, void *add_ptr, size_t add_len, int coninds)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_bind_req(fd1, &addr1, 0);
-			if (expect(fd1, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			sctp_bind_req(fd2, &addr2, 5);
-			if (expect(fd2, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_bind_req(fd3, &addr3, 0);
-			if (expect(fd3, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			sctp_unbind_req(fd1);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			sctp_unbind_req(fd2);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			sctp_unbind_req(fd3);
-			if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (sctp_bind_req(fd, add_ptr, add_len, coninds) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_1_2_conn(int fd)
+{
+	return test_case_1_2(fd, &addr1, sizeof(addr1), 0);
+}
+
+int
+test_case_1_2_list(int fd)
+{
+	return test_case_1_2(fd, &addr2, sizeof(addr2), 5);
+}
+
+int
+test_case_1_2_resp(int fd)
+{
+	return test_case_1_2(fd, &addr2, sizeof(addr3), 0);
+}
+
+#define preamble_1_2_conn preamble_0
+#define preamble_1_2_resp preamble_0
+#define preamble_1_2_list preamble_0
+
+#define postamble_1_2_conn postamble_0
+#define postamble_1_2_resp postamble_0
+#define postamble_1_2_list postamble_0
 
 /* 
  *  Attempt a connection with no listener.
  */
-#define desc_case_2 "\
-Test Case 2(a):\n\
+#define numb_case_2_1 "2.1"
+#define name_case_2_1 "Attempt a connection with no listener."
+#define desc_case_2_1 "\
 Attempts a connection with no listener.  The connection attempt\n\
 should time out."
 int
-test_case_2(void)
+test_case_2_1_conn(int fd)
 {
 	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_optmgmt_req(fd1, 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (sctp_bind_req(fd1, &addr1, 0) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, NORMAL_WAIT, N_BIND_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (sctp_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			for (i = 0; i < 25; i++)
-				if (expect(fd1, LONG_WAIT, N_DISCON_IND) == SUCCESS)
-					break;
-				else
-					sctp_sleep(qos_info.rto_max * (qos_info.max_inits + 1) /
-						   100);
-			if (i == 25)
-				break;
-			state = 6;
-		case 6:
-			if (sctp_unbind_req(fd1) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
+	if (sctp_optmgmt_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_bind_req(fd, &addr1, sizeof(addr1), 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	for (i = 0; i < 25; i++) {
+		state++;
+		if (expect(fd, LONG_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+			test_sleep(fd, qos_info.rto_max * (qos_info.max_inits + 1) / 100);
+		else
+			break;
 	}
+	if (i == 25)
+		goto failure;
+	state++;
+	if (sctp_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) == __RESULT_FAILURE)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_2_1_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_2_1_resp(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_2_1_conn preamble_0
+#define preamble_2_1_resp preamble_0
+#define preamble_2_1_list preamble_0
+
+#define postamble_2_1_conn postamble_0
+#define postamble_2_1_resp postamble_0
+#define postamble_2_1_list postamble_0
 
 /* 
  *  Attempt and withdraw a connection request.
  */
-#define desc_case_2b "\
-Test Case 2(a):\n\
+#define numb_case_2_2 "2.2"
+#define name_case_2_2 "Attempt and withdraw a connection request."
+#define desc_case_2_2 "\
 Attempts and then withdraws a connection request.  The connection\n\
 should disconnect at both ends."
 int
-test_case_2b(void)
+test_case_2_2_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_discon_req(fd1, 0);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd2, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_2_2_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_2_2_resp(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_2_2_conn preamble_1_conn
+#define preamble_2_2_resp preamble_1_resp
+#define preamble_2_2_list preamble_1_list
+
+#define postamble_2_2_conn postamble_1
+#define postamble_2_2_resp postamble_1
+#define postamble_2_2_list postamble_1
 
 /* 
  *  Attempt and refuse a connection request.
  */
-#define desc_case_3 "\
-Test Case 3(a):\n\
+#define numb_case_3_1 "3.1"
+#define name_case_3_1 "Attempt and refuse a connection request."
+#define desc_case_3_1 "\
 Attempts a connection which is refused by the receiving end.\n\
 The connection should disconnect at the attempting end."
 int
-test_case_3(void)
+test_case_3_1_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_discon_req(fd2, seq[fd2]);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+      success:
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_3_1_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_discon_req(fd, seq[fd]) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_3_1_resp(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_3_1_conn preamble_1_conn
+#define preamble_3_1_resp preamble_1_resp
+#define preamble_3_1_list preamble_1_list
+
+#define postamble_3_1_conn postamble_1
+#define postamble_3_1_resp postamble_1
+#define postamble_3_1_list postamble_1
 
 /* 
  *  Attempt and delayed refuse a connection request.
  */
-#define desc_case_3b "\
-Test Case 3(b):\n\
+#define numb_case_3_2 "3.2"
+#define name_case_3_2 "Attempt and delayed refuse a connection request."
+#define desc_case_3_2 "\
 Attempts a delayed refusal of a connection requrest.  This delayed\n\
 refusal should come after the connector has already timed out."
 int
-test_case_3b(void)
+test_case_3_2_conn(int fd)
 {
 	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			for (i = 0; i < 25; i++)
-				if (expect(fd1, LONG_WAIT, N_DISCON_IND) == SUCCESS)
-					break;
-				else
-					sctp_sleep(qos_info.rto_max * (qos_info.max_inits + 1) /
-						   100);
-			if (i == 25)
-				break;
-			state = 3;
-		case 3:
-			sctp_discon_req(fd2, seq[fd2]);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 25; i++)
+		if (expect(fd, LONG_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+			test_sleep(fd, qos_info.rto_max * (qos_info.max_inits + 1) / 100);
+		else
+			break;
+	if (i == 25)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_3_2_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_discon_req(fd, seq[fd]) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_3_2_resp(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_3_2_conn preamble_1_conn
+#define preamble_3_2_resp preamble_1_resp
+#define preamble_3_2_list preamble_1_list
+
+#define postamble_3_2_conn postamble_1
+#define postamble_3_2_resp postamble_1
+#define postamble_3_2_list postamble_1
 
 /* 
  *  Accept a connection.
  */
-#define desc_case_4 "\
-Test Case 4(a):\n\
+#define numb_case_4_1 "4.1"
+#define name_case_4_1 "Accept a connection."
+#define desc_case_4_1 "\
 Accept a connection and then disconnect.  This connection attempt\n\
 should be successful."
 int
-test_case_4(void)
+test_case_4_1_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_conn_res(fd2, fd3, NULL);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			sctp_discon_req(fd3, 0);
-			if (expect(fd3, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd1, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_4_1_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_4_1_resp(int fd)
+{
+	test_sleep(fd, 2);
+	state++;
+	if (sctp_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_1_conn preamble_1_conn
+#define preamble_4_1_resp preamble_1_resp
+#define preamble_4_1_list preamble_1_list
+
+#define postamble_4_1_conn postamble_1
+#define postamble_4_1_resp postamble_1
+#define postamble_4_1_list postamble_1
 
 /* 
  *  Attempt and delayed accept a connection request.
  */
-#define desc_case_4b "\
-Test Case 4(b):\n\
+#define numb_case_4_2 "4.2"
+#define name_case_4_2 "Attempt and delayed accept a connection request."
+#define desc_case_4_2 "\
 Attempt a connection and delay the acceptance of the connection request.\n\
 This should result in a disconnection indication after the connection is\n\
 accepted.  "
 int
-test_case_4b(void)
+test_case_4_2_conn(int fd)
 {
 	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			for (i = 0; i < 25; i++)
-				if (expect(fd1, LONG_WAIT, N_DISCON_IND) == SUCCESS)
-					break;
-				else
-					sctp_sleep(qos_info.rto_max * (qos_info.max_inits + 1) /
-						   100 + 1);
-			if (i == 25)
-				break;
-			state = 3;
-		case 3:
-			sctp_conn_res(fd2, fd3, NULL);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd3, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (sctp_data_req(fd3, 0, "Hello!", 0) == FAILURE)
-				break;
-			if (expect(fd3, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 25; i++)
+		if (expect(fd, LONG_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+			test_sleep(fd, qos_info.rto_max * (qos_info.max_inits + 1) / 100 + 1);
+		else
+			break;
+	if (i == 25)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_4_2_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, 2);
+	state++;
+	if (sctp_conn_res(fd, resp_fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_4_2_resp(int fd)
+{
+	test_sleep(fd, 4);
+	state++;
+	if (sctp_data_req(fd, 0, "Hello!", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_2_conn preamble_1_conn
+#define preamble_4_2_resp preamble_1_resp
+#define preamble_4_2_list preamble_1_list
+
+#define postamble_4_2_conn postamble_1
+#define postamble_4_2_resp postamble_1
+#define postamble_4_2_list postamble_1
 
 /* 
  *  Accept a connection.
  */
-#define desc_case_5 "\
-Test Case 5(a):\n\
+#define numb_case_5_1 "5.1"
+#define name_case_5_1 "Accept a connection."
+#define desc_case_5_1 "\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_NONE signature on its cookie."
 int
-test_case_5(void)
+test_case_5_1_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_conn_res(fd2, fd3, NULL);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			sctp_discon_req(fd1, 0);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_5_1_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_5_1_resp(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_5_1_conn preamble_1_conn
+#define preamble_5_1_resp preamble_1_resp
+#define preamble_5_1_list preamble_1_list
+
+#define postamble_5_1_conn postamble_1
+#define postamble_5_1_resp postamble_1
+#define postamble_5_1_list postamble_1
 
 /* 
  *  Accept a connection (MD5 hashed cookie)
  */
-#define desc_case_5b "\
-Test Case 5(b):\n\
+#define numb_case_5_2 "5.2"
+#define name_case_5_2 "Accept a connection (MD5 hashed cookie)"
+#define desc_case_5_2 "\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_MD5 signature on its cookie."
 int
-test_case_5b(void)
+test_case_5_2_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_conn_res(fd2, fd3, NULL);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			sctp_discon_req(fd1, 0);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_5_2_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_5_2_resp(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_5_2_conn preamble_8_conn
+#define preamble_5_2_resp preamble_8_resp
+#define preamble_5_2_list preamble_8_list
+
+#define postamble_5_2_conn postamble_1
+#define postamble_5_2_resp postamble_1
+#define postamble_5_2_list postamble_1
 
 /* 
  *  Accept a connection (SHA1 hashed cookie)
  */
-#define desc_case_5c "\
-Test Case 5(c):\n\
+#define numb_case_5_3 "5.3"
+#define name_case_5_3 "Accept a connection (SHA1 hashed cookie)"
+#define desc_case_5_3 "\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_SHA_1 signature on its cookie."
 int
-test_case_5c(void)
+test_case_5_3_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			sctp_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			sctp_conn_res(fd2, fd3, NULL);
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			sctp_discon_req(fd1, 0);
-			if (expect(fd1, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, LONG_WAIT, N_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_5_3_list(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_5_3_resp(int fd)
+{
+	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_5_3_conn preamble_7_conn
+#define preamble_5_3_resp preamble_7_resp
+#define preamble_5_3_list preamble_7_list
+
+#define postamble_5_3_conn postamble_1
+#define postamble_5_3_resp postamble_1
+#define postamble_5_3_list postamble_1
 
 /* 
  *  Connect with data.
  */
-#define desc_case_6 "\
-Test Case 6(a):\n\
+#define numb_case_6_1 "6.1"
+#define name_case_6_1 "Connect with data."
+#define desc_case_6_1 "\
 Attempt and accept a connection where data is also passed in the\n\
 connection request and the connection response.  This should result\n\
 in DATA chunks being bundled with the COOKIE-ECHO and COOKIE-ACK\n\
 chunks in the SCTP messages."
 int
-test_case_6(void)
+test_case_6_1_conn(int fd)
 {
 	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_data_req(fd1, 0, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, 0, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, 0, "Hellos Again!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE ||
-			    expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE ||
-			    expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			for (i = 0; i < 21; i++)
-				if (sctp_data_req(fd3, 0, "Hello Too!", 0) == FAILURE)
-					break;
-			if (i < 21)
-				break;
-			state = 4;
-		case 4:
-			for (i = 0; i < 21; i++)
-				if (expect(fd1, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-					break;
-			if (i != 21)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (sctp_data_req(fd, 0, "Hellos Again!", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, 0, "Hellos Again!", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, 0, "Hellos Again!", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 21; i++)
+		if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_6_1_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_6_1_resp(int fd)
+{
+	int i;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 21; i++)
+		if (sctp_data_req(fd, 0, "Hello Too!", 0) != __RESULT_SUCCESS)
+			goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_6_1_conn preamble_2b_conn
+#define preamble_6_1_resp preamble_2b_resp
+#define preamble_6_1_list preamble_2b_list
+
+#define postamble_6_1_conn postamble_2_conn
+#define postamble_6_1_resp postamble_2_resp
+#define postamble_6_1_list postamble_2_list
 
 /* 
  *  Connect and send partial data.
  */
-#define desc_case_6b "\
-Test Case 6(b):\n\
+#define numb_case_6_2 "6.2"
+#define name_case_6_2 "Connect and send partial data."
+#define desc_case_6_2 "\
 Connect and send partial data (i.e., data with more flag set)."
 int
-test_case_6b(void)
+test_case_6_2_conn(int fd)
 {
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_data_req(fd1, N_MORE_DATA_FLAG, "Hello There.", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_MORE_DATA_FLAG, "Hello There.", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_MORE_DATA_FLAG, "Hello There.", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, 0, "Hello There.", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG | 0, "Hello There.", 0) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (sctp_data_req(fd, N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, 0, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_data_req(fd, N_RC_FLAG | 0, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATACK_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_6_2_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_6_2_resp(int fd)
+{
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_6_2_conn preamble_2_conn
+#define preamble_6_2_resp preamble_2_resp
+#define preamble_6_2_list preamble_2_list
+
+#define postamble_6_2_conn postamble_2_conn
+#define postamble_6_2_resp postamble_2_resp
+#define postamble_6_2_list postamble_2_list
 
 /* 
  *  Connect and send partial data.
  */
-#define desc_case_6c "\
-Test Case 6(c):\n\
+#define numb_case_6_3 "6.3"
+#define name_case_6_3 "Connect and send partial data."
+#define desc_case_6_3 "\
 Connect and send partial data and expedited data on multiple streams.\n\
 Expedited data should be delivered between ordered data fragments on\n\
 the same stream and delivered to the user first."
 int
-test_case_6c(void)
+test_case_6_3_conn(int fd)
 {
 	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			qos_data.sid = 0;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 1;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 2;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 3;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 0;
-			sctp_exdata_req(fd1, "Hi There.");
-			qos_data.sid = 0;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 1;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 2;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 3;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 0;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 1;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 2;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 3;
-			if (sctp_data_req(fd1, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) ==
-			    FAILURE)
-				break;
-			qos_data.sid = 0;
-			if (sctp_data_req(fd1, N_RC_FLAG | 0, "Hello There.", 0) == FAILURE)
-				break;
-			qos_data.sid = 1;
-			if (sctp_data_req(fd1, N_RC_FLAG | 0, "Hello There.", 0) == FAILURE)
-				break;
-			qos_data.sid = 2;
-			if (sctp_data_req(fd1, N_RC_FLAG | 0, "Hello There.", 0) == FAILURE)
-				break;
-			qos_data.sid = 3;
-			if (sctp_data_req(fd1, N_RC_FLAG | 0, "Hello There.", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, N_EXDATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			for (i = 0; i < 16; i++)
-				if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-					break;
-			if (i < 16)
-				break;
-			state = 3;
-		case 3:
-			for (i = 0; i < 4; i++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE)
-					break;
-			if (i < 4)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
+	qos_data.sid = 0;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 1;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 2;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 3;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 0;
+	sctp_exdata_req(fd, "Hi There.");
+	qos_data.sid = 0;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 1;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 2;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 3;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 0;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 1;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 2;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 3;
+	if (sctp_data_req(fd, N_RC_FLAG | N_MORE_DATA_FLAG, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 0;
+	if (sctp_data_req(fd, N_RC_FLAG | 0, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 1;
+	if (sctp_data_req(fd, N_RC_FLAG | 0, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 2;
+	if (sctp_data_req(fd, N_RC_FLAG | 0, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	qos_data.sid = 3;
+	if (sctp_data_req(fd, N_RC_FLAG | 0, "Hello There.", 0) != __RESULT_SUCCESS)
+		goto failure;
+	for (i = 0; i < 4; i++) {
+		state++;
+		if (expect(fd, NORMAL_WAIT, __EVENT_DATACK_IND) != __RESULT_SUCCESS)
+			break;
 	}
+	if (i < 4)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_6_3_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_6_3_resp(int fd)
+{
+	int i;
+	if (expect(fd, NORMAL_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 16; i++) {
+		if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_6_3_conn preamble_3b_conn
+#define preamble_6_3_resp preamble_3b_resp
+#define preamble_6_3_list preamble_3b_list
+
+#define postamble_6_3_conn postamble_2_conn
+#define postamble_6_3_resp postamble_2_resp
+#define postamble_6_3_list postamble_2_list
 
 /* 
  *  Test fragmentation by sending very large packets.
  */
-#define desc_case_7 "\
-Test Case 7(a):\n\
-Connect and send very large packets to test fragmentation."
+#define numb_case_7_1 "7.1"
+#define name_case_7_1 "Test fragmentation by sending very large packets."
+#define desc_case_7_1 "\
+Connect and send very large packets to test fragmentation.  We send 4 100000\n\
+byte packets, 4 expedited packets with the message \"Urgent.\" and 4 normal\n\
+packets with the message \"Hello\".  The urgent packets should deliver between\n\
+the fragments and but the normal packets should wait until the large packets\n\
+are complete."
 int
-test_case_7(void)
+test_case_7_1_conn(int fd)
 {
+	int i;
 	unsigned char lbuf[100000];
-	int i = 0, j = 0, k = 0, f = 0;
-	size_t len = 0;
 	const char nrm[] = "Hello.";
 	const char urg[] = "Urgent.";
 	bzero(lbuf, sizeof(lbuf));
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (i < 4 && sctp_ndata_req(fd1, 0, lbuf, sizeof(lbuf), 0) == SUCCESS)
-				i++;
-			if (j < 4 && sctp_exdata_req(fd1, urg) == SUCCESS)
-				j++;
-			if (k < 4 && sctp_data_req(fd1, 0, nrm, 0) == SUCCESS)
-				k++;
-			state = 1;
-		case 1:
-			if (len < i * sizeof(lbuf) + j * sizeof(urg) + k * sizeof(nrm)) {
-				int ret;
-				switch ((ret = get_msg(fd3, LONG_WAIT))) {
-				case N_EXDATA_IND:
-				case N_DATA_IND:
-					len += data.len;
-				case FAILURE:
-					ret = 0;
-					break;
-#if 0
-				default:
-					printf("Huh? Got return %d\n", ret);
-					ret = 0;
-					break;
-#endif
-				}
-				if (ret)
-					break;
-			}
-			if (f++ < 10000) {
-				if (i < 4 || j < 4 || k < 4) {
-					state = 0;
-					continue;
-				}
-				if (len < i * sizeof(lbuf) + j * sizeof(urg) + k * sizeof(nrm)) {
-					state = 1;
-					continue;
-				}
-			} else {
-				printf("i = %d, j = %d, k = %d\n", i, j, k);
-				printf("Received %u bytes, expecting %u\n", len,
-				       i * sizeof(lbuf) + j * sizeof(urg) + k * sizeof(nrm));
-				break;
-			}
-			state = 6;
-		case 6:
-			// if ( expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE
-			// || expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE ) break;
-			return (SUCCESS);
+	for (i = 0; i < 4; i++) {
+		if (sctp_ndata_req(fd, 0, lbuf, sizeof(lbuf), 0) != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(fd, 1);
+			if (sctp_ndata_req(fd, 0, lbuf, sizeof(lbuf), 0) != __RESULT_SUCCESS)
+				goto failure;
 		}
-		return (FAILURE);
+		state++;
+		if (sctp_exdata_req(fd, urg) != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(fd, 1);
+			if (sctp_exdata_req(fd, urg) != __RESULT_SUCCESS)
+				goto failure;
+		}
+		state++;
+		if (sctp_data_req(fd, 0, nrm, 0) != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(fd, 1);
+			if (sctp_data_req(fd, 0, nrm, 0) != __RESULT_SUCCESS)
+				goto failure;
+		}
+		state++;
 	}
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_7_1_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_7_1_resp(int fd)
+{
+	size_t len = 0;
+	while (len < 4 * 100000 + 4 * 8 + 4 * 7) {
+		switch (wait_event(fd, LONGER_WAIT)) {
+		case __EVENT_EXDATA_IND:
+		case __EVENT_DATA_IND:
+			len += data.len;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "i = %d, j = %d, k = %d\n", 4, 4, 4);
+	fprintf(stdout, "Received %u bytes, expecting %u\n", len, 4 * 100000 + 4 * 8 + 4 * 7);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_7_1_conn preamble_2_conn
+#define preamble_7_1_resp preamble_2_resp
+#define preamble_7_1_list preamble_2_list
+
+#define postamble_7_1_conn postamble_2_conn
+#define postamble_7_1_resp postamble_2_resp
+#define postamble_7_1_list postamble_2_list
 
 /* 
  *  Test coallescing packets by sending many small fragmented pieces.
  */
-#define desc_case_7b "\
-Test Case 7(b):\n\
+#define numb_case_7_2 "7.2"
+#define name_case_7_2 "Test coallescing packets by sending many small fragmented pieces."
+#define desc_case_7_2 "\
 Connect and send many small packets to test coallescing of packets."
 int
-test_case_7b(void)
+test_case_7_2_conn(int fd)
 {
-	int s = 0, r = 0;
+	int s = 0;
 	size_t snd_bytes = 0;
-	size_t rcv_bytes = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_data_req(fd1, N_MORE_DATA_FLAG, "Hi There.", 0) == FAILURE)
-				break;
-			snd_bytes += data.len;
-			if (s++ < 4)
-				continue;
-			print_less(fd1);
-			state = 1;
-		case 1:
-			while (sctp_data_req(fd1, N_MORE_DATA_FLAG, "Hi There.", 0) == SUCCESS) {
-				snd_bytes += data.len;
-				s++;
-			}
+	while (s < 10000) {
+		if (sctp_data_req(fd, N_MORE_DATA_FLAG, "Hi There.", 0) != __RESULT_SUCCESS) {
+			state++;
 			print_more();
-			state = 2;
-		case 2:
-			if (expect(fd3, 0, N_DATA_IND) == FAILURE)
-				break;
-			rcv_bytes += data.len;
-			if (r++ < 4)
-				continue;
-			print_less(fd3);
-			state = 3;
-		case 3:
-			if (expect(fd3, 0, N_DATA_IND) == FAILURE)
-				break;
-			rcv_bytes += data.len;
-			r++;
-			if (data.len != 10) {
-				print_more();
-				print_msg(fd3);
-				state = 5;
-				continue;
-			}
-			if (rcv_bytes < snd_bytes)
-				continue;
-			state = 4;
-		case 4:
-			print_more();
-			state = 5;
-		case 5:
-			if (rcv_bytes < snd_bytes) {
-				if (expect(fd3, 0, N_DATA_IND) == FAILURE)
-					break;
-				rcv_bytes += data.len;
-				r++;
-				continue;
-			}
-			if (rcv_bytes != snd_bytes)
-				break;
-			return (SUCCESS);
+			test_sleep(fd, 1);
+			if (sctp_data_req(fd, N_MORE_DATA_FLAG, "Hi There.", 0) != __RESULT_SUCCESS)
+				goto failure;
 		}
-		printf("Sent %3d messages making %6u bytes.\n", s, snd_bytes);
-		printf("Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
-		print_more();
-		return (FAILURE);
+		snd_bytes += 10;
+		s++;
+		state++;
+		if (s > 3)
+			print_less(fd);
 	}
+	state++;
+	sctp_data_req(fd, 0, "Hi There.", 0);
+	snd_bytes += 10;
+	state++;
+	print_more();
+	state++;
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "Sent %3d messages making %6u bytes.\n", s, snd_bytes);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	print_more();
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_7_2_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_7_2_resp(int fd)
+{
+	int r = 0;
+	size_t rcv_bytes = 0;
+	int joined = 0;
+	test_sleep(fd, 1);
+	state++;
+	while (r < 4) {
+		if (expect(fd, LONGER_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		if (data.len > 10)
+			joined = 1;
+		rcv_bytes += data.len;
+		r++;
+		state++;
+	}
+	print_less(fd);
+	while (rcv_bytes < 100010) {
+		if (expect(fd, LONGER_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		if (data.len > 10)
+			joined = 1;
+		rcv_bytes += data.len;
+		r++;
+		state++;
+	}
+	if (!joined)
+		goto failure;
+	state++;
+	print_more();
+	state++;
+	test_sleep(fd, 2);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	print_more();
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_7_2_conn preamble_2_conn
+#define preamble_7_2_resp preamble_2_resp
+#define preamble_7_2_list preamble_2_list
+
+#define postamble_7_2_conn postamble_2_conn
+#define postamble_7_2_resp postamble_2_resp
+#define postamble_7_2_list postamble_2_list
 
 /* 
  *  Connect with data.
  */
-#define desc_case_8 "\
-Test Case 8(a):\n\
+#define numb_case_8_1 "8.1"
+#define name_case_8_1 "Connect with data."
+#define desc_case_8_1 "\
 Connect with data in the connection request and response, and\n\
 send data with receipt confirmation set.  Check that the data\n\
 returns an acknowledgement when it is SACK'ed by the other end."
 int
-test_case_8(void)
+test_case_8_1_conn(int fd)
 {
-	int i, j;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE ||
-			    expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE ||
-			    expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			for (j = 0; j < 10; j++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-					break;
-			if (j == 10)
-				break;
-			for (j = 0; j < 10; j++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-					break;
-			if (j == 10)
-				break;
-			for (j = 0; j < 10; j++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-					break;
-			if (j == 10)
-				break;
-			state = 3;
-		case 3:
-			for (i = 0; i < 21; i++)
-				if (sctp_data_req(fd3, N_RC_FLAG, "Hello Too!", 0) == FAILURE)
-					break;
-			if (i < 21)
-				break;
-			state = 4;
-		case 4:
-			sctp_sleep(qos_info.hb_itvl / 50 + 1);	/* wait for heartbeats */
-			for (i = 0; i < 21; i++)
-				if (expect(fd1, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-					break;
-			if (i != 21)
-				break;
-			state = 5;
-		case 5:
-			for (i = 0; i < 21; i++) {
-				for (j = 0; j < 10; j++)
-					if (expect(fd3, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-						break;
-				if (j == 10)
-					break;
-			}
-			if (i != 21)
-				break;
-			state = 6;
-		case 6:
-			if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE ||
-			    expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE ||
-			    expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			for (j = 0; j < 10; j++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-					break;
-			if (j == 10)
-				break;
-			for (j = 0; j < 10; j++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-					break;
-			if (j == 10)
-				break;
-			for (j = 0; j < 10; j++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == SUCCESS)
-					break;
-			if (j == 10)
-				break;
-			return (SUCCESS);
+	int i, j, k;
+	for (k = 0; k < 2; k++) {
+		for (j = 0; j < 6; j++) {
+			if (sctp_data_req(fd, N_RC_FLAG, "Hellos Again!", 0) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
 		}
-		return (FAILURE);
+		for (i = 0, j = 0; i < 21 || j < 6; state++) {
+			switch (wait_event(fd, qos_info.hb_itvl / 50 + 1)) {
+			case __EVENT_DATACK_IND:
+				j++;
+				continue;
+			case __EVENT_DATA_IND:
+				i++;
+				continue;
+			default:
+				goto failure;
+			}
+		}
 	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_8_1_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_8_1_resp(int fd)
+{
+	int i, j, k;
+	for (k = 0; k < 2; k++) {
+		for (j = 0; j < 21; j++) {
+			if (sctp_data_req(fd, N_RC_FLAG, "Hello Too!", 0) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+		}
+		for (i = 0, j = 0; i < 6 || j < 21; state++) {
+			switch (wait_event(fd, qos_info.hb_itvl / 50 + 1)) {
+			case __EVENT_DATACK_IND:
+				j++;
+				continue;
+			case __EVENT_DATA_IND:
+				i++;
+				continue;
+			default:
+				goto failure;
+			}
+		}
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_8_1_conn preamble_2b_conn
+#define preamble_8_1_resp preamble_2b_resp
+#define preamble_8_1_list preamble_2b_list
+
+#define postamble_8_1_conn postamble_2_conn
+#define postamble_8_1_resp postamble_2_resp
+#define postamble_8_1_list postamble_2_list
 
 /* 
  *  Data with default receipt confirmation.
  */
-#define desc_case_8b "\
-Test Case 8(b):\n\
+#define numb_case_8_2 "8.2"
+#define name_case_8_2 "Data with default receipt confirmation."
+#define desc_case_8_2 "\
 Connect with data and transfer data with default receipt confirmation.\n\
 This would require that an explicit acknowledgement is requested for\n\
 each data (but we don't support this as SCTP cannot handle it)."
 int
-test_case_8b(void)
+test_case_8_2_conn(int fd)
 {
 	int i;
-	uint32_t tsn1[10], tsn3[10];
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (sctp_conn_req(fd1, &addr2, "Hello World!") == FAILURE)
-				break;
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, N_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (sctp_conn_res(fd2, fd3, "Hello There!") == FAILURE)
-				break;
-			if (expect(fd2, SHORT_WAIT, N_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, N_CONN_CON) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd3, NORMAL_WAIT, N_EXDATA_IND) == FAILURE)
-				break;
-			tsn3[0] = tsn[fd3];
-			state = 5;
-		case 5:
-			if (expect(fd1, NORMAL_WAIT, N_EXDATA_IND) == FAILURE)
-				break;
-			tsn1[0] = tsn[fd1];
-			state = 6;
-		case 6:
-			for (i = 1; i < 5; i++)
-				if (sctp_data_req(fd1, N_RC_FLAG, "Hellos Again!", 0) == FAILURE)
-					break;
-			if (i < 5)
-				break;
-			state = 7;
-		case 7:
-			sctp_sleep(qos_info.rto_max / 100 + 1);
-			for (i = 1; i < 5; i++)
-				if (expect(fd3, NORMAL_WAIT, N_DATA_IND) == FAILURE)
-					break;
-				else
-					tsn3[i] = tsn[fd3];
-			if (i != 5)
-				break;
-			state = 8;
-		case 8:
-			if (sctp_datack_req(fd1, tsn1[0]) == FAILURE)
-				break;
-			for (i = 0; i < 5; i++)
-				sctp_datack_req(fd3, tsn3[i]);
-			state = 9;
-		case 9:
-			sctp_sleep(qos_info.rto_max / 100 + 1);
-			for (i = 1; i < 5; i++)
-				if (expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE)
-					break;
-			if (i != 5)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	uint32_t tsn1[10];
+	test_sleep(fd, 1);
+	state++;
+	if (sctp_conn_req(fd, &addr2, sizeof(addr2), "Hello World!") != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, LONG_WAIT, __EVENT_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, NORMAL_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	tsn1[0] = tsn[fd];
+	for (i = 1; i < 5; i++)
+		if (sctp_data_req(fd, N_RC_FLAG, "Hellos Again!", 0) != __RESULT_SUCCESS)
+			break;
+	if (i < 5)
+		goto failure;
+	state++;
+	if (sctp_datack_req(fd, tsn1[0]) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(fd, qos_info.rto_max / 100 + 1);
+	for (i = 1; i < 5; i++)
+		if (expect(fd, NORMAL_WAIT, __EVENT_DATACK_IND) != __RESULT_SUCCESS)
+			break;
+	if (i != 5)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_8_2_list(int fd)
+{
+	int i;
+	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (sctp_conn_res(fd, resp_fd, "Hello There!") != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_8_2_resp(int fd)
+{
+	int i;
+	uint32_t tsn3[10];
+	if (expect(fd, LONGER_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	tsn3[0] = tsn[fd];
+	test_sleep(fd, qos_info.rto_max / 100 + 1);
+	for (i = 1; i < 5; i++)
+		if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+			break;
+		else
+			tsn3[i] = tsn[fd];
+	if (i != 5)
+		goto failure;
+	state++;
+	for (i = 0; i < 5; i++)
+		sctp_datack_req(fd, tsn3[i]);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_8_2_conn preamble_2c_conn
+#define preamble_8_2_resp preamble_2c_resp
+#define preamble_8_2_list preamble_2c_list
+
+#define postamble_8_2_conn postamble_2_conn
+#define postamble_8_2_resp postamble_2_resp
+#define postamble_8_2_list postamble_2_list
 
 /* 
  *  Delivering ordered data under noise.
  */
-#define desc_case_9a "\
-Test Case 9(a):\n\
+#define numb_case_9_1 "9.1"
+#define name_case_9_1 "Delivering ordered data under noise."
+#define desc_case_9_1 "\
 Delivery of ordered data under noise with acknowledgement."
 #define TEST_PACKETS 300
 int
-test_case_9a(void)
+test_case_9_1_conn(int fd)
 {
-	int i = 0, j = 0, k = 0, l = 0, m = 0, n = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (i < TEST_PACKETS) {
-				if (sctp_data_req(fd1, N_RC_FLAG, "Pattern-1", 0) == FAILURE)
-					break;
-				i++;
-			}
-			while (j < TEST_PACKETS || n < TEST_PACKETS) {
-				switch (get_msg(fd3, wait)) {
-				case N_DATA_IND:
-					j++;
-					continue;
-				case N_DATACK_IND:
-					n++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9a_failure;
-				}
-				break;
-			}
-			if (l < TEST_PACKETS) {
-				if (sctp_data_req(fd3, N_RC_FLAG, "Pattern-3", 0) == FAILURE)
-					break;
-				l++;
-			}
-			while (m < TEST_PACKETS || k < TEST_PACKETS) {
-				switch (get_msg(fd1, wait)) {
-				case N_DATA_IND:
-					m++;
-					continue;
-				case N_DATACK_IND:
-					k++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9a_failure;
-				}
-				break;
-			}
-			if (i >= TEST_PACKETS && l >= TEST_PACKETS)
-				wait = 20;
-			if (f > TEST_PACKETS * 10)
-				goto test_case_9a_failure;
-			if (i < TEST_PACKETS
-			    || j < TEST_PACKETS
-			    || k < TEST_PACKETS || l < TEST_PACKETS || m < TEST_PACKETS ||
-			    n < TEST_PACKETS)
-				continue;
-			return (SUCCESS);
-		}
-	      test_case_9a_failure:
-		printf("%d sent %d inds %d acks %d\n", fd1, i, j, k);
-		printf("%d sent %d inds %d acks %d\n", fd3, l, m, n);
-		printf("%d failures\n", f);
-		return (FAILURE);
+	int i = 0, j = 0, k = 0;
+	while (i < TEST_PACKETS) {
+		if (sctp_data_req(fd, N_RC_FLAG, "Pattern-1", 0) != __RESULT_SUCCESS)
+			goto failure;
+		i++;
 	}
+	while (j < TEST_PACKETS || k < TEST_PACKETS) {
+		switch (wait_event(fd, NORMAL_WAIT)) {
+		case __EVENT_DATA_IND:
+			j++;
+			break;
+		case __EVENT_DATACK_IND:
+			k++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d acks %d\n", fd, i, j, k);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_9_1_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_9_1_resp(int fd)
+{
+	int i = 0, j = 0, k = 0;
+	while (i < TEST_PACKETS) {
+		if (sctp_data_req(fd, N_RC_FLAG, "Pattern-3", 0) != __RESULT_SUCCESS)
+			goto failure;
+		i++;
+	}
+	while (j < TEST_PACKETS || k < TEST_PACKETS) {
+		switch (wait_event(fd, NORMAL_WAIT)) {
+		case __EVENT_DATA_IND:
+			j++;
+			break;
+		case __EVENT_DATACK_IND:
+			k++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d acks %d\n", fd, i, j, k);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_1_conn preamble_4_conn
+#define preamble_9_1_resp preamble_4_resp
+#define preamble_9_1_list preamble_4_list
+
+#define postamble_9_1_conn postamble_2_conn
+#define postamble_9_1_resp postamble_2_resp
+#define postamble_9_1_list postamble_2_list
 
 /* 
  *  Delivering out-of-order data under noise.
  */
-#define desc_case_9b "\
-Test Case 9(b):\n\
+#define numb_case_9_2 "9.2"
+#define name_case_9_2 "Delivering out-of-order data under noise."
+#define desc_case_9_2 "\
 Delivery of un-ordered data under noise."
 int
-test_case_9b(void)
+test_case_9_2_conn(int fd)
 {
-	int i = 0, j = 0, l = 0, m = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (i < TEST_PACKETS) {
-				sctp_exdata_req(fd1, "Pattern-1");
-				i++;
-			}
-			while (j < TEST_PACKETS) {
-				switch (get_msg(fd3, wait)) {
-				case N_EXDATA_IND:
-					j++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9b_failure;
-				}
-				break;
-			}
-			if (l < TEST_PACKETS) {
-				sctp_exdata_req(fd3, "Pattern-3");
-				l++;
-			}
-			while (m < TEST_PACKETS) {
-				switch (get_msg(fd1, wait)) {
-				case N_EXDATA_IND:
-					m++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9b_failure;
-				}
-				break;
-			}
-			if (i >= TEST_PACKETS && l >= TEST_PACKETS)
-				wait = 20;
-			if (f > TEST_PACKETS * 10)
-				goto test_case_9b_failure;
-			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS ||
-			    m < TEST_PACKETS)
-				continue;
-			return (SUCCESS);
+	int i = 0, j = 0;
+	while (i < TEST_PACKETS) {
+		if (sctp_exdata_req(fd, "Pattern-1") != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(fd, 1);
+			state++;
+			if (sctp_exdata_req(fd, "Pattern-1") != __RESULT_SUCCESS)
+				goto failure;
 		}
-	      test_case_9b_failure:
-		printf("%d sent %d inds %d\n", fd1, i, j);
-		printf("%d sent %d inds %d\n", fd3, l, m);
-		printf("%d failures\n", f);
-		return (FAILURE);
+		i++;
 	}
+	while (j < TEST_PACKETS) {
+		if (expect(fd, LONGER_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d\n", fd, i, j);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_9_2_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_9_2_resp(int fd)
+{
+	int i = 0, j = 0;
+	while (i < TEST_PACKETS) {
+		if (sctp_exdata_req(fd, "Pattern-3") != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(fd, 1);
+			state++;
+			if (sctp_exdata_req(fd, "Pattern-3") != __RESULT_SUCCESS)
+				goto failure;
+		}
+		i++;
+	}
+	while (j < TEST_PACKETS) {
+		if (expect(fd, LONGER_WAIT, __EVENT_EXDATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	test_sleep(fd, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d\n", fd, i, j);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_2_conn preamble_4_conn
+#define preamble_9_2_resp preamble_4_resp
+#define preamble_9_2_list preamble_4_list
+
+#define postamble_9_2_conn postamble_2_conn
+#define postamble_9_2_resp postamble_2_resp
+#define postamble_9_2_list postamble_2_list
 
 #undef TEST_PACKETS
 
@@ -3471,493 +4472,1142 @@ test_case_9b(void)
 /* 
  *  Delivering ordered data in multiple streams under noise.
  */
-#define desc_case_9c "\
-Test Case 9(c):\n\
+#define numb_case_9_3 "9.3"
+#define name_case_9_3 "Delivering ordered data in multiple streams under noise."
+#define desc_case_9_3 "\
 Delivery of ordered data in multiple streams under noise."
 int
-test_case_9c(void)
+test_case_9_3_conn(int fd)
 {
+	int s;
 	int i[TEST_STREAMS] = { 0, };
 	int j[TEST_STREAMS] = { 0, };
 	int k[TEST_STREAMS] = { 0, };
-	int l[TEST_STREAMS] = { 0, };
-	int m[TEST_STREAMS] = { 0, };
-	int n[TEST_STREAMS] = { 0, };
-	int I = 0, J = 0, K = 0, L = 0, M = 0, N = 0;
-	int s = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
-				qos_data.sid = s;
-				if (sctp_data_req(fd1, N_RC_FLAG, "Pattern-1", 0) == FAILURE)
-					break;
-				i[s]++;
-				I++;
+	int I = 0, J = 0, K = 0;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			qos_data.sid = s;
+			if (sctp_data_req(fd, N_RC_FLAG, "Pattern-1", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				if (sctp_data_req(fd, N_RC_FLAG, "Pattern-1", 0) !=
+				    __RESULT_SUCCESS)
+					goto failure;
 			}
-			while (J < TEST_TOTAL || N < TEST_TOTAL) {
-				switch (get_msg(fd3, wait)) {
-				case N_DATA_IND:
-					j[sid[fd3]]++;
-					J++;
-					break;
-				case N_DATACK_IND:
-					n[sid[fd3]]++;
-					N++;
-					break;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9c_failure;
-				}
-				break;
-			}
-			if (L < TEST_TOTAL && l[s] < TEST_PACKETS) {
-				qos_data.sid = s;
-				if (sctp_data_req(fd3, N_RC_FLAG, "Pattern-3", 0) == FAILURE)
-					break;
-				l[s]++;
-				L++;
-			}
-			while (M < TEST_TOTAL || K < TEST_TOTAL) {
-				switch (get_msg(fd1, wait)) {
-				case N_DATA_IND:
-					m[sid[fd1]]++;
-					M++;
-					break;
-				case N_DATACK_IND:
-					k[sid[fd1]]++;
-					K++;
-					break;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9c_failure;
-				}
-				break;
-			}
-			if (++s >= TEST_STREAMS)
-				s = 0;
-			if (I >= TEST_TOTAL && L >= TEST_TOTAL)
-				wait = 20;
-			if (f > TEST_TOTAL * 10)
-				goto test_case_9c_failure;
-			if (i[s] < TEST_PACKETS || l[s] < TEST_PACKETS)
-				continue;
-			if (J < TEST_TOTAL || K < TEST_TOTAL || M < TEST_TOTAL || N < TEST_TOTAL)
-				continue;
-			for (s = 0; s < TEST_STREAMS; s++) {
-				if (j[s] != TEST_PACKETS
-				    || k[s] != TEST_PACKETS || m[s] != TEST_PACKETS ||
-				    n[s] != TEST_PACKETS)
-					goto test_case_9c_failure;
-			}
-			return (SUCCESS);
+			i[s]++;
+			I++;
 		}
-	      test_case_9c_failure:
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d acks %d\n", fd1, i[s], j[s], k[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d acks %d\n", fd3, l[s], m[s], n[s]);
-		printf("%d failures\n", f);
-		return (FAILURE);
 	}
+	while (J < TEST_TOTAL || K < TEST_TOTAL) {
+		switch (wait_event(fd, NORMAL_WAIT)) {
+		case __EVENT_DATA_IND:
+			j[sid[fd]]++;
+			J++;
+			break;
+		case __EVENT_DATACK_IND:
+			k[sid[fd]]++;
+			K++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	for (s = 0; s < TEST_STREAMS; s++) {
+		if (j[s] != TEST_PACKETS || k[s] != TEST_PACKETS)
+			goto failure;
+	}
+	test_sleep(fd, 2);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_9_3_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_9_3_resp(int fd)
+{
+	int s;
+	int i[TEST_STREAMS] = { 0, };
+	int j[TEST_STREAMS] = { 0, };
+	int k[TEST_STREAMS] = { 0, };
+	int I = 0, J = 0, K = 0;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			qos_data.sid = s;
+			if (sctp_data_req(fd, N_RC_FLAG, "Pattern-3", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				if (sctp_data_req(fd, N_RC_FLAG, "Pattern-3", 0) !=
+				    __RESULT_SUCCESS)
+					goto failure;
+			}
+			i[s]++;
+			I++;
+		}
+	}
+	while (J < TEST_TOTAL || K < TEST_TOTAL) {
+		switch (wait_event(fd, NORMAL_WAIT)) {
+		case __EVENT_DATA_IND:
+			j[sid[fd]]++;
+			J++;
+			break;
+		case __EVENT_DATACK_IND:
+			k[sid[fd]]++;
+			K++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	for (s = 0; s < TEST_STREAMS; s++) {
+		if (j[s] != TEST_PACKETS || k[s] != TEST_PACKETS)
+			goto failure;
+	}
+	test_sleep(fd, 2);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_3_conn preamble_6_conn
+#define preamble_9_3_resp preamble_6_resp
+#define preamble_9_3_list preamble_6_list
+
+#define postamble_9_3_conn postamble_2_conn
+#define postamble_9_3_resp postamble_2_resp
+#define postamble_9_3_list postamble_2_list
 
 /* 
  *  Delivering ordered and unordered data in multiple streams under noise.
  */
-#define desc_case_9d "\
-Test Case 9(d):\n\
+#define numb_case_9_4 "9.4"
+#define name_case_9_4 "Delivering ordered and unordered data in multiple streams under noise."
+#define desc_case_9_4 "\
 Delivery of ordered and un-ordered data in multiple streams under noise."
 int
-test_case_9d(void)
+test_case_9_4_conn(int fd)
 {
+	int s;
 	int i[TEST_STREAMS] = { 0, };
 	int j[TEST_STREAMS] = { 0, };
 	int k[TEST_STREAMS] = { 0, };
-	int l[TEST_STREAMS] = { 0, };
-	int m[TEST_STREAMS] = { 0, };
-	int n[TEST_STREAMS] = { 0, };
 	int o[TEST_STREAMS] = { 0, };
 	int p[TEST_STREAMS] = { 0, };
-	int q[TEST_STREAMS] = { 0, };
-	int r[TEST_STREAMS] = { 0, };
-	int I = 0, J = 0, K = 0, L = 0, M = 0, N = 0, O = 0, P = 0, Q = 0, R = 0;
-	int s = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
-				qos_data.sid = s;
-				if (sctp_data_req(fd1, N_RC_FLAG, "Pattern-1", 0) == FAILURE)
-					break;
-				i[s]++;
-				I++;
+	int I = 0, J = 0, K = 0, O = 0, P = 0;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			qos_data.sid = s;
+			if (sctp_data_req(fd, N_RC_FLAG, "Pattern-1", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				state++;
+				if (sctp_data_req(fd, N_RC_FLAG, "Pattern-1", 0) !=
+				    __RESULT_SUCCESS)
+					goto failure;
 			}
-			while (J < TEST_TOTAL || N < TEST_TOTAL || P < TEST_TOTAL) {
-				switch (get_msg(fd3, wait)) {
-				case N_DATA_IND:
-					j[sid[fd3]]++;
-					J++;
-					break;
-				case N_DATACK_IND:
-					n[sid[fd3]]++;
-					N++;
-					break;
-				case N_EXDATA_IND:
-					p[sid[fd3]]++;
-					P++;
-					break;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (O < TEST_TOTAL && o[s] < TEST_PACKETS) {
-				qos_data.sid = s;
-				sctp_exdata_req(fd1, "Pattern-1");
-				o[s]++;
-				O++;
-			}
-			while (J < TEST_TOTAL || N < TEST_TOTAL || P < TEST_TOTAL) {
-				switch (get_msg(fd3, wait)) {
-				case N_DATA_IND:
-					j[sid[fd3]]++;
-					J++;
-					break;
-				case N_DATACK_IND:
-					n[sid[fd3]]++;
-					N++;
-					break;
-				case N_EXDATA_IND:
-					p[sid[fd3]]++;
-					P++;
-					break;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (L < TEST_TOTAL && l[s] < TEST_PACKETS) {
-				qos_data.sid = s;
-				if (sctp_data_req(fd3, N_RC_FLAG, "Pattern-3", 0) == FAILURE)
-					break;
-				l[s]++;
-				L++;
-			}
-			while (M < TEST_TOTAL || K < TEST_TOTAL || R < TEST_TOTAL) {
-				switch (get_msg(fd1, wait)) {
-				case N_DATA_IND:
-					m[sid[fd1]]++;
-					M++;
-					break;
-				case N_DATACK_IND:
-					k[sid[fd1]]++;
-					K++;
-					break;
-				case N_EXDATA_IND:
-					r[sid[fd1]]++;
-					R++;
-					break;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (Q < TEST_TOTAL && q[s] < TEST_PACKETS) {
-				qos_data.sid = s;
-				sctp_exdata_req(fd3, "Pattern-3");
-				q[s]++;
-				Q++;
-			}
-			while (M < TEST_TOTAL || K < TEST_TOTAL || R < TEST_TOTAL) {
-				switch (get_msg(fd1, wait)) {
-				case N_DATA_IND:
-					m[sid[fd1]]++;
-					M++;
-					break;
-				case N_DATACK_IND:
-					k[sid[fd1]]++;
-					K++;
-					break;
-				case N_EXDATA_IND:
-					r[sid[fd1]]++;
-					R++;
-					break;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (++s >= TEST_STREAMS)
-				s = 0;
-			if (I >= TEST_TOTAL && L >= TEST_TOTAL && O >= TEST_TOTAL &&
-			    Q >= TEST_TOTAL)
-				wait = 20;
-			if (f > TEST_TOTAL * 10)
-				goto test_case_9d_failure;
-			if (i[s] < TEST_PACKETS || l[s] < TEST_PACKETS)
-				continue;
-			if (o[s] < TEST_PACKETS || q[s] < TEST_PACKETS)
-				continue;
-			if (J < TEST_TOTAL
-			    || K < TEST_TOTAL || M < TEST_TOTAL || N < TEST_TOTAL || P < TEST_TOTAL
-			    || R < TEST_TOTAL)
-				continue;
-			for (s = 0; s < TEST_STREAMS; s++) {
-				if (j[s] != TEST_PACKETS
-				    || k[s] != TEST_PACKETS
-				    || m[s] != TEST_PACKETS
-				    || n[s] != TEST_PACKETS || p[s] != TEST_PACKETS ||
-				    r[s] != TEST_PACKETS)
-					goto test_case_9d_failure;
-			}
-			return (SUCCESS);
+			i[s]++;
+			I++;
+			state++;
 		}
-	      test_case_9d_failure:
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d acks %d\n", fd1, i[s], j[s], k[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd1, o[s], p[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d acks %d\n", fd3, l[s], m[s], n[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd3, q[s], r[s]);
-		printf("%d failures\n", f);
-		return (FAILURE);
+		while (O < TEST_TOTAL && o[s] < TEST_PACKETS) {
+			qos_data.sid = s;
+			sctp_exdata_req(fd, "Pattern-1");
+			o[s]++;
+			O++;
+			state++;
+		}
 	}
+	while (J < TEST_TOTAL || K < TEST_TOTAL || P < TEST_TOTAL) {
+		switch (wait_event(fd, LONGER_WAIT)) {
+		case __EVENT_DATA_IND:
+			j[sid[fd]]++;
+			J++;
+			break;
+		case __EVENT_DATACK_IND:
+			k[sid[fd]]++;
+			K++;
+			break;
+		case __EVENT_EXDATA_IND:
+			p[sid[fd]]++;
+			P++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	test_sleep(fd, 3);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", fd, o[s], p[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_9_4_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_9_4_resp(int fd)
+{
+	int s;
+	int i[TEST_STREAMS] = { 0, };
+	int j[TEST_STREAMS] = { 0, };
+	int k[TEST_STREAMS] = { 0, };
+	int o[TEST_STREAMS] = { 0, };
+	int p[TEST_STREAMS] = { 0, };
+	int I = 0, J = 0, K = 0, O = 0, P = 0;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			qos_data.sid = s;
+			if (sctp_data_req(fd, N_RC_FLAG, "Pattern-3", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				state++;
+				if (sctp_data_req(fd, N_RC_FLAG, "Pattern-3", 0) !=
+				    __RESULT_SUCCESS)
+					goto failure;
+			}
+			i[s]++;
+			I++;
+			state++;
+		}
+		while (O < TEST_TOTAL && o[s] < TEST_PACKETS) {
+			qos_data.sid = s;
+			sctp_exdata_req(fd, "Pattern-3");
+			o[s]++;
+			O++;
+			state++;
+		}
+	}
+	while (J < TEST_TOTAL || K < TEST_TOTAL || P < TEST_TOTAL) {
+		switch (wait_event(fd, LONGER_WAIT)) {
+		case __EVENT_DATA_IND:
+			j[sid[fd]]++;
+			J++;
+			break;
+		case __EVENT_DATACK_IND:
+			k[sid[fd]]++;
+			K++;
+			break;
+		case __EVENT_EXDATA_IND:
+			p[sid[fd]]++;
+			P++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	for (s = 0; s < TEST_STREAMS; s++) {
+		if (j[s] != TEST_PACKETS || k[s] != TEST_PACKETS || p[s] != TEST_PACKETS)
+			goto failure;
+	}
+	test_sleep(fd, 3);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", fd, o[s], p[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_4_conn preamble_6_conn
+#define preamble_9_4_resp preamble_6_resp
+#define preamble_9_4_list preamble_6_list
+
+#define postamble_9_4_conn postamble_2_conn
+#define postamble_9_4_resp postamble_2_resp
+#define postamble_9_4_list postamble_2_list
 
 /* 
  *  Data for destination failure testing.
  */
-#define desc_case_10a "\
-Test Case 10(a):\n\
+#define numb_case_10_1 "10.1"
+#define name_case_10_1 "Data for destination failure testing."
+#define desc_case_10_1 "\
 Delivery of ordered data with destination failure."
 int
-test_case_10a(void)
+test_case_10_1_conn(int fd)
 {
-	int i, j, k;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			for (j = 0; j < 20; j++) {
-				for (i = 0; i < 20; i++) {
-					if (sctp_data_req(fd1, 0, "Test Pattern-1", 0) == FAILURE)
-						break;
-					if (sctp_data_req(fd3, 0, "Test Pattern-3", 0) == FAILURE)
-						break;
-				}
-				if (i < 20)
-					break;
-				for (i = 0, k = 0; i < 20 || k < 20;) {
-					switch (sctp_wait(fd1, SHORT_WAIT)) {
-					case N_DATA_IND:
-						i++;
-						continue;
-					case FAILURE:
-						break;
-					default:
-						print_msg(fd1);
-						return (FAILURE);
-					}
-					switch (sctp_wait(fd3, SHORT_WAIT)) {
-					case N_DATA_IND:
-						k++;
-						continue;
-					case FAILURE:
-						break;
-					default:
-						print_msg(fd3);
-						return (FAILURE);
-					}
-				}
+	int i, j;
+	for (j = 0; j < 20; j++) {
+		for (i = 0; i < 20; i++) {
+			if (sctp_data_req(fd, 0, "Test Pattern-1", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				state++;
+				if (sctp_data_req(fd, 0, "Test Pattern-1", 0) != __RESULT_SUCCESS)
+					goto failure;
 			}
-			return (SUCCESS);
+			state++;
 		}
-		return (FAILURE);
+		for (i = 0; i < 20; i++, state++) {
+			if (expect(fd, LONGER_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+				goto failure;
+		}
 	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
+int
+test_case_10_1_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_10_1_resp(int fd)
+{
+	int i, j;
+	for (j = 0; j < 20; j++) {
+		for (i = 0; i < 20; i++) {
+			if (sctp_data_req(fd, 0, "Test Pattern-3", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				state++;
+				if (sctp_data_req(fd, 0, "Test Pattern-3", 0) != __RESULT_SUCCESS)
+					goto failure;
+			}
+			state++;
+		}
+		for (i = 0; i < 20; i++, state++) {
+			if (expect(fd, LONGER_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+				goto failure;
+		}
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_10_1_conn preamble_5_conn
+#define preamble_10_1_resp preamble_5_resp
+#define preamble_10_1_list preamble_5_list
+
+#define postamble_10_1_conn postamble_2_conn
+#define postamble_10_1_resp postamble_2_resp
+#define postamble_10_1_list postamble_2_list
+
+/* 
+ *  Data for destination failure testing.
+ */
 long
 time_sub(struct timeval *t1, struct timeval *t2)
 {
 	return ((t1->tv_sec - t2->tv_sec) * 1000000 + (t1->tv_usec - t2->tv_usec));
 }
 
-/* 
- *  Data for destination failure testing.
- */
-#define desc_case_10b "\
-Test Case 10(b):\n\
+#define numb_case_10_2 "10.2"
+#define name_case_10_2 "Data for destination failure testing."
+#define desc_case_10_2 "\
 Delivery of ordered data with destination failure."
 int
-test_case_10b(void)
+test_case_10_2_conn(int fd)
 {
-#define SETS 1000
-#define REPS 1
-	int ret, i, j, k, n = 0;
+	int i, j, n = 0;
 	struct result {
 		uint req_idx;
 		struct timeval req;
-		uint ind_idx;
-		struct timeval ind;
 		uint ack_idx;
 		struct timeval ack;
 	};
+#define SETS 1000
+#define REPS 1
 	struct result times[SETS * REPS];
-	ulong itotal = 0;
 	ulong atotal = 0;
 	bzero(times, sizeof(times));
-	state = 0;
-	ret = FAILURE;
-	for (;;) {
-		switch (state) {
-		case 0:
-			show = 0;
-			for (j = 0; j < SETS; j++) {
-				for (i = 0; i < REPS; i++) {
-					// if ( sctp_data_req(fd1, N_RC_FLAG, "This is a much
-					// longer test pattern that is being used to see whether we 
-					// 
-					// can generate some congestion and it is called Test
-					// Pattern-1", 0) == FAILURE ) break;
-					if (sctp_data_req(fd1, N_RC_FLAG, "Test Pattern-1", 0) ==
-					    FAILURE)
-						break;
-					times[j * REPS + i].req = when;
-					times[j * REPS + i].req_idx = n++;
-				}
-				if (i < REPS)
-					break;
-				for (i = 0, k = 0; i < REPS || k < REPS;) {
-					if (k < REPS)
-						switch (sctp_wait(fd3, SHORT_WAIT)) {
-						case N_DATA_IND:
-							times[j * REPS + k].ind = when;
-							times[j * REPS + k].ind_idx = n++;
-							k++;
-							break;
-						case FAILURE:
-							break;
-						default:
-							show = 1;
-							goto test_case_10b_failed;
-						}
-					if (i < REPS)
-						switch (sctp_wait(fd1, SHORT_WAIT)) {
-						case N_DATACK_IND:
-							times[j * REPS + i].ack = when;
-							times[j * REPS + i].ack_idx = n++;
-							i++;
-							break;
-						case FAILURE:
-							break;
-						default:
-							show = 1;
-							goto test_case_10b_failed;
-						}
-				}
+	show = 0;
+	for (j = 0; j < SETS; j++) {
+		for (i = 0; i < REPS; i++, state++) {
+			if (sctp_data_req(fd, N_RC_FLAG, "Test Pattern-1", 0) != __RESULT_SUCCESS) {
+				state++;
+				test_sleep(fd, 1);
+				state++;
+				if (sctp_data_req(fd, N_RC_FLAG, "Test Pattern-1", 0) !=
+				    __RESULT_SUCCESS)
+					goto failure;
 			}
-			show = 1;
-			ret = SUCCESS;
+			times[j * REPS + i].req = when;
+			times[j * REPS + i].req_idx = n++;
 		}
-	      test_case_10b_failed:
-		j = 0;
-		k = 0;
-		for (n = 0; n < 3 * SETS * REPS; n++) {
-			for (i = 0; i < SETS * REPS; i++) {
-				if (times[i].req_idx == n) {
-					printf
-					    ("N_DATA_REQ    ----->|--------------->|                 |                    \n");
-					break;
-				}
-				if (times[i].ind_idx == n) {
-					printf
-					    ("                    |                |-%9ld usec->|-----> N_DATA_IND   \n",
-					     time_sub(&times[i].ind, &times[i].req));
-					k++;
-					itotal += time_sub(&times[i].ind, &times[i].req);
-					break;
-				}
-				if (times[i].ack_idx == n) {
-					printf
-					    ("N_DATACK_IND  <-----|<-%9ld usec|                 |                    \n",
-					     time_sub(&times[i].ack, &times[i].req));
-					j++;
-					atotal += time_sub(&times[i].ack, &times[i].req);
-					break;
-				}
-			}
+		for (i = 0; i < REPS; i++, state++) {
+			if (expect(fd, LONGER_WAIT, __EVENT_DATACK_IND) != __RESULT_SUCCESS)
+				goto failure;
+			times[j * REPS + i].ack = when;
+			times[j * REPS + i].ack_idx = n++;
 		}
-		itotal /= k;
-		atotal /= j;
-		printf
-		    ("                    |                |                 |                    \n");
-		printf("                    |    ind average = %9ld usec  |                    \n",
-		       itotal);
-		printf("                    |    ack average = %9ld usec  |                    \n",
-		       atotal);
-		printf
-		    ("                    |                |                 |                    \n");
-		return (ret);
 	}
+	show = 1;
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (j = 0, n = 0; n < 3 * SETS * REPS; n++) {
+		for (i = 0; i < SETS * REPS; i++) {
+			if (times[i].req_idx == n) {
+				fprintf(stdout,
+					"N_DATA_REQ    ----->| - - - - - - ->\\               |  |                    \n");
+				break;
+			}
+			if (times[i].ack_idx == n) {
+				fprintf(stdout,
+					"                    |               \\ - - - - - - - +->|---> N_DATA_IND     \n");
+				fprintf(stdout,
+					"N_DATACK_IND  <-----|<%9ld usec/               |  |                    \n",
+					time_sub(&times[i].ack, &times[i].req));
+				j++;
+				atotal += time_sub(&times[i].ack, &times[i].req);
+				break;
+			}
+		}
+	}
+	atotal /= j;
+	fprintf(stdout,
+		"                    |               |               |  |                    \n");
+	fprintf(stdout,
+		"                    |  ack average = %9ld usec |  |                    \n");
+	fprintf(stdout,
+		"                    |               |               |  |                    \n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	show = 1;
+	return (__RESULT_SUCCESS);
+      failure:
+	show = 1;
+	return (__RESULT_FAILURE);
 }
+
+int
+test_case_10_2_list(int fd)
+{
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_10_2_resp(int fd)
+{
+	int i, j;
+	show = 0;
+	for (j = 0; j < SETS; j++)
+		for (i = 0; i < REPS; i++, state++)
+			if (expect(fd, LONGER_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
+				goto failure;
+	show = 1;
+	return (__RESULT_SUCCESS);
+      failure:
+	show = 1;
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_10_2_conn preamble_5_conn
+#define preamble_10_2_resp preamble_5_resp
+#define preamble_10_2_list preamble_5_list
+
+#define postamble_10_2_conn postamble_2_conn
+#define postamble_10_2_resp postamble_2_resp
+#define postamble_10_2_list postamble_2_list
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Test case child scheduler
+ *
+ *  -------------------------------------------------------------------------
+ */
+struct test_side {
+	int (*preamble) (int);		/* test preamble */
+	int (*testcase) (int);		/* test case */
+	int (*postamble) (int);		/* test postamble */
+};
+
+int
+conn_run(struct test_side *side)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"--------------------+------------Preamble-----------+--+                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	state = 0;
+	if (side->preamble && side->preamble(conn_fd) != __RESULT_SUCCESS) {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+				state);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		result = __RESULT_INCONCLUSIVE;
+	} else {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"--------------------+--------------Test-------------+--+                    \n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		state = 0;
+		switch (side->testcase(conn_fd)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_FAILURE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"####################|########## SCRIPT ERROR #######|##|                    [%d]\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			if (verbose > 2) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"********************|************ PASSED ***********|**|                    [%d]\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"--------------------+------------Postamble----------+--+                    \n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		state = 0;
+		if (side->postamble && side->postamble(conn_fd) != __RESULT_SUCCESS) {
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if (result == __RESULT_SUCCESS)
+				result = __RESULT_INCONCLUSIVE;
+		}
+	}
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"--------------------+-------------------------------+--+                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	exit(result);
+}
+
+int
+resp_run(struct test_side *side)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    +------------Preamble-----------+  +--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	state = 0;
+	if (side->preamble && side->preamble(resp_fd) != __RESULT_SUCCESS) {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n",
+				state);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		result = __RESULT_INCONCLUSIVE;
+	} else {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"                    +--------------Test-------------+  +--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		state = 0;
+		switch (side->testcase(resp_fd)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_FAILURE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|  |XXXXXXXXXXXXXXXXXXX(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |######### SCRIPT ERROR ########|  |###################(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			if (verbose > 2) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |************ PASSED ***********|  |********************(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"                    +------------Postamble----------+  +--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		state = 0;
+		if (side->postamble && side->postamble(resp_fd) != __RESULT_SUCCESS) {
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if (result == __RESULT_SUCCESS)
+				result = __RESULT_INCONCLUSIVE;
+		}
+	}
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    +-------------------------------+  +--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	exit(result);
+}
+
+int
+list_run(struct test_side *side)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    +------------Preamble-----------+--+--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	state = 0;
+	if (side->preamble && side->preamble(list_fd) != __RESULT_SUCCESS) {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n",
+				state);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		result = __RESULT_INCONCLUSIVE;
+	} else {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"                    +--------------Test-------------+--+--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		state = 0;
+		switch (side->testcase(list_fd)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_FAILURE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |######### SCRIPT ERROR ########|##|###################(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			if (verbose > 2) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |************ PASSED ***********|**|********************(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout,
+				"                    +------------Postamble----------+--+--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		state = 0;
+		if (side->postamble && side->postamble(list_fd) != __RESULT_SUCCESS) {
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout,
+					"                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n",
+					state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if (result == __RESULT_SUCCESS)
+				result = __RESULT_INCONCLUSIVE;
+		}
+	}
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"                    +-------------------------------+--+--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	exit(result);
+}
+
+/* 
+ *  Fork multiple children to do the actual testing.  The conn child is the
+ *  connecting process, the resp child is the responding process.
+ */
+
+int
+test_run(struct test_side *conn_side, struct test_side *resp_side, struct test_side *list_side)
+{
+	int children = 0;
+	pid_t got_chld, conn_chld = 0, resp_chld = 0, list_chld = 0;
+	int got_stat, conn_stat, resp_stat, list_stat;
+	start_tt(5000);
+	if (conn_side) {
+		switch ((conn_chld = fork())) {
+		case 00:	/* we are the child */
+			exit(conn_run(conn_side));	/* execute conn state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		conn_stat = __RESULT_SUCCESS;
+	if (resp_side) {
+		switch ((resp_chld = fork())) {
+		case 00:	/* we are the child */
+			exit(resp_run(resp_side));	/* execute resp state machine */
+		case -1:	/* error */
+			if (conn_chld)
+				kill(conn_chld, SIGKILL);	/* toast conn child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		resp_stat = __RESULT_SUCCESS;
+	if (list_side) {
+		switch ((list_chld = fork())) {
+		case 00:	/* we are the child */
+			exit(list_run(list_side));	/* execute list state machine */
+		case -1:	/* error */
+			if (conn_chld)
+				kill(conn_chld, SIGKILL);	/* toast conn child */
+			if (resp_chld)
+				kill(resp_chld, SIGKILL);	/* toast resp child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		list_stat = __RESULT_SUCCESS;
+	for (; children > 0; children--) {
+		if ((got_chld = wait(&got_stat)) > 0) {
+			if (WIFEXITED(got_stat)) {
+				int status = WEXITSTATUS(got_stat);
+				if (got_chld == conn_chld) {
+					conn_stat = status;
+					conn_chld = 0;
+				}
+				if (got_chld == resp_chld) {
+					resp_stat = status;
+					resp_chld = 0;
+				}
+				if (got_chld == list_chld) {
+					list_stat = status;
+					list_chld = 0;
+				}
+			} else if (WIFSIGNALED(got_stat)) {
+				int signal = WTERMSIG(got_stat);
+				if (got_chld == conn_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout,
+							"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
+							signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					conn_stat = __RESULT_FAILURE;
+					conn_chld = 0;
+				}
+				if (got_chld == resp_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout,
+							"                    |@@@@@@@@@@ TERMINATED @@@@@@@@@|  |@@@@@@@@@@@@@@@@@@@@{%d}\n",
+							signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					resp_stat = __RESULT_FAILURE;
+					resp_chld = 0;
+				}
+				if (got_chld == list_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout,
+							"                    |@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@@{%d}\n",
+							signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					list_stat = __RESULT_FAILURE;
+					list_chld = 0;
+				}
+			} else if (WIFSTOPPED(got_stat)) {
+				int signal = WSTOPSIG(got_stat);
+				if (got_chld == conn_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout,
+							"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
+							signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					conn_stat = __RESULT_FAILURE;
+					conn_chld = 0;
+				}
+				if (got_chld == resp_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout,
+							"                    |&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |&&&&&&&&&&&&&&&&&&&&{%d}\n",
+							signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					resp_stat = __RESULT_FAILURE;
+					resp_chld = 0;
+				}
+				if (got_chld == list_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout,
+							"                    |&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&&&{%d}\n",
+							signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					list_stat = __RESULT_FAILURE;
+					list_chld = 0;
+				}
+			}
+		} else {
+			if (timer_timeout) {
+				timer_timeout = 0;
+				if (show_timeout || verbose) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout,
+						"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
+						state);
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+					show_timeout--;
+				}
+				last_event = __EVENT_TIMEOUT;
+			}
+			if (conn_chld) {
+				kill(conn_chld, SIGKILL);
+				conn_stat = __RESULT_FAILURE;
+				conn_chld = 0;
+			}
+			if (resp_chld) {
+				kill(resp_chld, SIGKILL);
+				resp_stat = __RESULT_FAILURE;
+				resp_chld = 0;
+			}
+			if (list_chld) {
+				kill(list_chld, SIGKILL);
+				list_stat = __RESULT_FAILURE;
+				list_chld = 0;
+			}
+			break;
+		}
+	}
+	stop_tt();
+	if (conn_stat == __RESULT_FAILURE || resp_stat == __RESULT_FAILURE
+	    || list_stat == __RESULT_FAILURE)
+		return (__RESULT_FAILURE);
+	if (conn_stat == __RESULT_SUCCESS && resp_stat == __RESULT_SUCCESS
+	    && list_stat == __RESULT_SUCCESS)
+		return (__RESULT_SUCCESS);
+	return (__RESULT_INCONCLUSIVE);
+}
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Test case lists
+ *
+ *  -------------------------------------------------------------------------
+ */
 
 struct test_case {
 	const char *numb;		/* test case number */
 	const char *name;		/* test case name */
-	int (*preamble) (void);		/* test case preamble */
-	int (*testcase) (void);		/* test case proper */
-	int (*postamble) (void);	/* test case postamble */
+	const char *desc;		/* test case description */
+	struct test_side conn;		/* connecting process */
+	struct test_side resp;		/* responding process */
+	struct test_side list;		/* listening process */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
 } tests[] = {
 	{
-	"1(a)", desc_case_1, &preamble_0, &test_case_1, &postamble_0, 0, 0}, {
-	"1(b)", desc_case_1b, &preamble_0, &test_case_1b, &postamble_0, 0, 0}, {
-	"2(a)", desc_case_2, &preamble_0, &test_case_2, &postamble_0, 0, 0}, {
-	"2(b)", desc_case_2b, &preamble_1, &test_case_2b, &postamble_1, 0, 0}, {
-	"3(a)", desc_case_3, &preamble_1, &test_case_3, &postamble_1, 0, 0}, {
-	"3(b)", desc_case_3b, &preamble_1, &test_case_3b, &postamble_1, 0, 0}, {
-	"4(a)", desc_case_4, &preamble_1, &test_case_4, &postamble_1, 0, 0}, {
-	"4(b)", desc_case_4b, &preamble_1, &test_case_4b, &postamble_1, 0, 0}, {
-	"5(a)", desc_case_5, &preamble_1, &test_case_5, &postamble_1, 0, 0}, {
-	"5(b)", desc_case_5b, &preamble_8, &test_case_5b, &postamble_1, 0, 0}, {
-	"5(c)", desc_case_5c, &preamble_7, &test_case_5c, &postamble_1, 0, 0}, {
-	"6(a)", desc_case_6, &preamble_2b, &test_case_6, &postamble_2, 0, 0}, {
-	"6(b)", desc_case_6b, &preamble_2, &test_case_6b, &postamble_2, 0, 0}, {
-	"6(c)", desc_case_6c, &preamble_3b, &test_case_6c, &postamble_2, 0, 0}, {
-	"7(a)", desc_case_7, &preamble_2, &test_case_7, &postamble_2, 0, 0}, {
-	"7(b)", desc_case_7b, &preamble_2, &test_case_7b, &postamble_2, 0, 0}, {
-	"8(a)", desc_case_8, &preamble_2b, &test_case_8, &postamble_2, 0, 0}, {
-	"8(b)", desc_case_8b, &preamble_2c, &test_case_8b, &postamble_2, 0, 0}, {
-	"9(a)", desc_case_9a, &preamble_4, &test_case_9a, &postamble_2, 0, 0}, {
-	"9(b)", desc_case_9b, &preamble_4, &test_case_9b, &postamble_2, 0, 0}, {
-	"9(c)", desc_case_9c, &preamble_6, &test_case_9c, &postamble_2, 0, 0}, {
-	"9(d)", desc_case_9d, &preamble_6, &test_case_9d, &postamble_2, 0, 0}, {
-	"10(a)", desc_case_10a, &preamble_5, &test_case_10a, &postamble_2, 0, 0}, {
-	"10(b)", desc_case_10b, &preamble_5, &test_case_10b, &postamble_2, 0, 0}, {
+		numb_case_1_1, name_case_1_1, desc_case_1_1, {
+		&preamble_1_1_conn, &test_case_1_1_conn, &postamble_1_1_conn}, {
+		&preamble_1_1_resp, &test_case_1_1_resp, &postamble_1_1_resp}, {
+	&preamble_1_1_list, &test_case_1_1_list, &postamble_1_1_list}, 0, 0}, {
+		numb_case_1_2, name_case_1_2, desc_case_1_2, {
+		&preamble_1_2_conn, &test_case_1_2_conn, &postamble_1_2_conn}, {
+		&preamble_1_2_resp, &test_case_1_2_resp, &postamble_1_2_resp}, {
+	&preamble_1_2_list, &test_case_1_2_list, &postamble_1_2_list}, 0, 0}, {
+		numb_case_2_1, name_case_2_1, desc_case_2_1, {
+		&preamble_2_1_conn, &test_case_2_1_conn, &postamble_2_1_conn}, {
+		&preamble_2_1_resp, &test_case_2_1_resp, &postamble_2_1_resp}, {
+	&preamble_2_1_list, &test_case_2_1_list, &postamble_2_1_list}, 0, 0}, {
+		numb_case_2_2, name_case_2_2, desc_case_2_2, {
+		&preamble_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn}, {
+		&preamble_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp}, {
+	&preamble_2_2_list, &test_case_2_2_list, &postamble_2_2_list}, 0, 0}, {
+		numb_case_3_1, name_case_3_1, desc_case_3_1, {
+		&preamble_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn}, {
+		&preamble_3_1_resp, &test_case_3_1_resp, &postamble_3_1_resp}, {
+	&preamble_3_1_list, &test_case_3_1_list, &postamble_3_1_list}, 0, 0}, {
+		numb_case_3_2, name_case_3_2, desc_case_3_2, {
+		&preamble_3_2_conn, &test_case_3_2_conn, &postamble_3_2_conn}, {
+		&preamble_3_2_resp, &test_case_3_2_resp, &postamble_3_2_resp}, {
+	&preamble_3_2_list, &test_case_3_2_list, &postamble_3_2_list}, 0, 0}, {
+		numb_case_4_1, name_case_4_1, desc_case_4_1, {
+		&preamble_4_1_conn, &test_case_4_1_conn, &postamble_4_1_conn}, {
+		&preamble_4_1_resp, &test_case_4_1_resp, &postamble_4_1_resp}, {
+	&preamble_4_1_list, &test_case_4_1_list, &postamble_4_1_list}, 0, 0}, {
+		numb_case_4_2, name_case_4_2, desc_case_4_2, {
+		&preamble_4_2_conn, &test_case_4_2_conn, &postamble_4_2_conn}, {
+		&preamble_4_2_resp, &test_case_4_2_resp, &postamble_4_2_resp}, {
+	&preamble_4_2_list, &test_case_4_2_list, &postamble_4_2_list}, 0, 0}, {
+		numb_case_5_1, name_case_5_1, desc_case_5_1, {
+		&preamble_5_1_conn, &test_case_5_1_conn, &postamble_5_1_conn}, {
+		&preamble_5_1_resp, &test_case_5_1_resp, &postamble_5_1_resp}, {
+	&preamble_5_1_list, &test_case_5_1_list, &postamble_5_1_list}, 0, 0}, {
+		numb_case_5_2, name_case_5_2, desc_case_5_2, {
+		&preamble_5_2_conn, &test_case_5_2_conn, &postamble_5_2_conn}, {
+		&preamble_5_2_resp, &test_case_5_2_resp, &postamble_5_2_resp}, {
+	&preamble_5_2_list, &test_case_5_2_list, &postamble_5_2_list}, 0, 0}, {
+		numb_case_5_3, name_case_5_3, desc_case_5_3, {
+		&preamble_5_3_conn, &test_case_5_3_conn, &postamble_5_3_conn}, {
+		&preamble_5_3_resp, &test_case_5_3_resp, &postamble_5_3_resp}, {
+	&preamble_5_3_list, &test_case_5_3_list, &postamble_5_3_list}, 0, 0}, {
+		numb_case_6_1, name_case_6_1, desc_case_6_1, {
+		&preamble_6_1_conn, &test_case_6_1_conn, &postamble_6_1_conn}, {
+		&preamble_6_1_resp, &test_case_6_1_resp, &postamble_6_1_resp}, {
+	&preamble_6_1_list, &test_case_6_1_list, &postamble_6_1_list}, 0, 0}, {
+		numb_case_6_2, name_case_6_2, desc_case_6_2, {
+		&preamble_6_2_conn, &test_case_6_2_conn, &postamble_6_2_conn}, {
+		&preamble_6_2_resp, &test_case_6_2_resp, &postamble_6_2_resp}, {
+	&preamble_6_2_list, &test_case_6_2_list, &postamble_6_2_list}, 0, 0}, {
+		numb_case_6_3, name_case_6_3, desc_case_6_3, {
+		&preamble_6_3_conn, &test_case_6_3_conn, &postamble_6_3_conn}, {
+		&preamble_6_3_resp, &test_case_6_3_resp, &postamble_6_3_resp}, {
+	&preamble_6_3_list, &test_case_6_3_list, &postamble_6_3_list}, 0, 0}, {
+		numb_case_7_1, name_case_7_1, desc_case_7_1, {
+		&preamble_7_1_conn, &test_case_7_1_conn, &postamble_7_1_conn}, {
+		&preamble_7_1_resp, &test_case_7_1_resp, &postamble_7_1_resp}, {
+	&preamble_7_1_list, &test_case_7_1_list, &postamble_7_1_list}, 0, 0}, {
+		numb_case_7_2, name_case_7_2, desc_case_7_2, {
+		&preamble_7_2_conn, &test_case_7_2_conn, &postamble_7_2_conn}, {
+		&preamble_7_2_resp, &test_case_7_2_resp, &postamble_7_2_resp}, {
+	&preamble_7_2_list, &test_case_7_2_list, &postamble_7_2_list}, 0, 0}, {
+		numb_case_8_1, name_case_8_1, desc_case_8_1, {
+		&preamble_8_1_conn, &test_case_8_1_conn, &postamble_8_1_conn}, {
+		&preamble_8_1_resp, &test_case_8_1_resp, &postamble_8_1_resp}, {
+	&preamble_8_1_list, &test_case_8_1_list, &postamble_8_1_list}, 0, 0}, {
+		numb_case_8_2, name_case_8_2, desc_case_8_2, {
+		&preamble_8_2_conn, &test_case_8_2_conn, &postamble_8_2_conn}, {
+		&preamble_8_2_resp, &test_case_8_2_resp, &postamble_8_2_resp}, {
+	&preamble_8_2_list, &test_case_8_2_list, &postamble_8_2_list}, 0, 0}, {
+		numb_case_9_1, name_case_9_1, desc_case_9_1, {
+		&preamble_9_1_conn, &test_case_9_1_conn, &postamble_9_1_conn}, {
+		&preamble_9_1_resp, &test_case_9_1_resp, &postamble_9_1_resp}, {
+	&preamble_9_1_list, &test_case_9_1_list, &postamble_9_1_list}, 0, 0}, {
+		numb_case_9_2, name_case_9_2, desc_case_9_2, {
+		&preamble_9_2_conn, &test_case_9_2_conn, &postamble_9_2_conn}, {
+		&preamble_9_2_resp, &test_case_9_2_resp, &postamble_9_2_resp}, {
+	&preamble_9_2_list, &test_case_9_2_list, &postamble_9_2_list}, 0, 0}, {
+		numb_case_9_3, name_case_9_3, desc_case_9_3, {
+		&preamble_9_3_conn, &test_case_9_3_conn, &postamble_9_3_conn}, {
+		&preamble_9_3_resp, &test_case_9_3_resp, &postamble_9_3_resp}, {
+	&preamble_9_3_list, &test_case_9_3_list, &postamble_9_3_list}, 0, 0}, {
+		numb_case_9_4, name_case_9_4, desc_case_9_4, {
+		&preamble_9_4_conn, &test_case_9_4_conn, &postamble_9_4_conn}, {
+		&preamble_9_4_resp, &test_case_9_4_resp, &postamble_9_4_resp}, {
+	&preamble_9_4_list, &test_case_9_4_list, &postamble_9_4_list}, 0, 0}, {
+		numb_case_10_1, name_case_10_1, desc_case_10_1, {
+		&preamble_10_1_conn, &test_case_10_1_conn, &postamble_10_1_conn}, {
+		&preamble_10_1_resp, &test_case_10_1_resp, &postamble_10_1_resp}, {
+	&preamble_10_1_list, &test_case_10_1_list, &postamble_10_1_list}, 0, 0}, {
+		numb_case_10_2, name_case_10_2, desc_case_10_2, {
+		&preamble_10_2_conn, &test_case_10_2_conn, &postamble_10_2_conn}, {
+		&preamble_10_2_resp, &test_case_10_2_resp, &postamble_10_2_resp}, {
+	&preamble_10_2_list, &test_case_10_2_list, &postamble_10_2_list}, 0, 0}, {
 	NULL,}
 };
 
@@ -3965,118 +5615,140 @@ int
 do_tests(void)
 {
 	int i;
-	int result = INCONCLUSIVE;
+	int result = __RESULT_INCONCLUSIVE;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
 	int num_exit;
-	if (verbose) {
+	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout,
 			"\n\nRFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Program.\n");
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests() == SUCCESS) {
+	show = 0;
+	state = 0;
+	if (begin_tests() == __RESULT_SUCCESS) {
+		end_tests();
+		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
 			if (tests[i].result)
 				continue;
 			if (!tests[i].run) {
-				tests[i].result = INCONCLUSIVE;
+				tests[i].result = __RESULT_INCONCLUSIVE;
 				continue;
 			}
-			if (verbose) {
+			if (verbose > 0) {
 				lockf(fileno(stdout), F_LOCK, 0);
-				fprintf(stdout, "\nTest Case SCTP NPI:%s:\n%s\n", tests[i].numb,
+				fprintf(stdout, "\nTest Case SCTP-NPI/%s: %s\n", tests[i].numb,
 					tests[i].name);
+				if (verbose > 1)
+					fprintf(stdout, "%s\n", tests[i].desc);
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			fprintf(stdout,
-				"---------------------------------Preamble-----------------------------------\n");
-			if (tests[i].preamble && tests[i].preamble() != SUCCESS) {
-				fprintf(stdout,
-					"                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-					state);
-				result = INCONCLUSIVE;
-			} else {
-				fprintf(stdout,
-					"--------------------|--------------Test-------------|--|--------------------\n");
-				if (tests[i].testcase && tests[i].testcase() == FAILURE) {
-					fprintf(stdout,
-						"                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    \n");
-					result = FAILURE;
-				} else {
-					fprintf(stdout,
-						"                    |************ PASSED ***********|**|                    \n");
-					result = SUCCESS;
-				}
-			}
-			fprintf(stdout,
-				"--------------------|------------Postamble----------|--|--------------------\n");
-			if (tests[i].postamble && tests[i].postamble() != SUCCESS) {
-				fprintf(stdout,
-					"                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-					state);
-				if (result == SUCCESS)
-					result = INCONCLUSIVE;
-			}
-			fprintf(stdout,
-				"----------------------------------------------------------------------------\n");
+			state = 0;
+			if ((result = begin_tests()) != __RESULT_SUCCESS)
+				goto inconclusive;
+			result = test_run(&tests[i].conn, &tests[i].resp, &tests[i].list);
+			end_tests();
 			switch (result) {
-			case SUCCESS:
+			case __RESULT_SUCCESS:
 				successes++;
-				fprintf(stdout, "*********\n");
-				fprintf(stdout, "********* Test Case SUCCESSFUL\n");
-				fprintf(stdout, "*********\n\n");
+				if (verbose > 0) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "*********\n");
+					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
+					fprintf(stdout, "*********\n\n");
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
-			case FAILURE:
+			case __RESULT_FAILURE:
 				failures++;
-				fprintf(stdout, "XXXXXXXXX\n");
-				fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
-				fprintf(stdout, "XXXXXXXXX\n\n");
+				if (verbose > 0) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
 			default:
-			case INCONCLUSIVE:
+			case __RESULT_INCONCLUSIVE:
+			      inconclusive:
 				inconclusive++;
-				fprintf(stdout, "?????????\n");
-				fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
-				fprintf(stdout, "?????????\n\n");
+				if (verbose > 0) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "?????????\n");
+					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
+					fprintf(stdout, "?????????\n\n");
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
 			}
 			tests[i].result = result;
 		}
-	} else
-		fprintf(stdout, "Test setup failed!\n");
-	end_tests();
-	lockf(fileno(stdout), F_LOCK, 0);
-	if (summary && verbose) {
-		fprintf(stdout, "\n\n");
-		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (tests[i].run) {
-				fprintf(stdout, "Test Case SCTP NPI:%-10s  ", tests[i].numb);
-				switch (tests[i].result) {
-				case SUCCESS:
-					fprintf(stdout, "SUCCESS\n");
-					break;
-				case FAILURE:
-					fprintf(stdout, "FAILURE\n");
-					break;
-				default:
-				case INCONCLUSIVE:
-					fprintf(stdout, "INCONCLUSIVE\n");
-					break;
+		if (summary && verbose) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "\n\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb;
+			     i++) {
+				if (tests[i].run) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "Test Case SCTP-NPI/%-10s ", tests[i].numb);
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+					switch (tests[i].result) {
+					case __RESULT_SUCCESS:
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SUCCESS\n");
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_FAILURE:
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "FAILURE\n");
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "INCONCLUSIVE\n");
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					}
 				}
 			}
 		}
-		fflush(stdout);
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "Done.\n\n");
+			fprintf(stdout, "========= %2d successes   \n", successes);
+			fprintf(stdout, "========= %2d failures    \n", failures);
+			fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		return (0);
+	} else {
+		end_tests();
+		show = 1;
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "Test setup failed!\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		return (2);
 	}
-	fprintf(stdout, "Done.\n\n");
-	fprintf(stdout, "========= %2d successes   \n", successes);
-	fprintf(stdout, "========= %2d failures    \n", failures);
-	fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
-	lockf(fileno(stdout), F_ULOCK, 0);
-	return (0);
 }
 
 void
@@ -4141,7 +5813,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -4215,6 +5887,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
 			{"summary",	no_argument,		NULL, 's'},
 			{"onetest",	required_argument,	NULL, 'o'},
@@ -4228,13 +5901,52 @@ main(int argc, char *argv[])
 			{NULL, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "f::so:t:mqvhV?");
+		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'l':
+			if (optarg) {
+				l = strnlen(optarg, 16);
+				fprintf(stdout, "\n");
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, l)) {
+						fprintf(stdout, "Test Case SCTP-NPI/%s: %s\n",
+							t->numb, t->name);
+						if (verbose > 1)
+							fprintf(stdout, "%s\n\n", t->desc);
+						fflush(stdout);
+						n++;
+					}
+				if (!n) {
+					fprintf(stderr,
+						"WARNING: specification `%s' matched no test\n",
+						optarg);
+					fflush(stderr);
+					goto bad_option;
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			} else {
+				fprintf(stdout, "\n");
+				for (t = tests; t->numb; t++) {
+					fprintf(stdout, "Test Case SCTP-NPI/%s: %s\n", t->numb,
+						t->name);
+					if (verbose > 1)
+						fprintf(stdout, "%s\n\n", t->desc);
+					fflush(stdout);
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			}
+			break;
 		case 'f':
 			if (optarg)
 				timer_scale = atoi(optarg);

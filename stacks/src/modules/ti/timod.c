@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/09/02 09:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 09:31:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/09/02 09:31:20 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/09/02 09:31:20 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/09/02 09:31:20 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -108,14 +108,6 @@ MODULE_LICENSE(TIMOD_LICENSE);
 #define TIMOD_MOD_ID		CONFIG_STREAMS_TIMOD_MODID
 #define TIMOD_MOD_NAME		CONFIG_STREAMS_TIMOD_NAME
 #endif				/* LFS */
-
-#ifndef TIMOD_MOD_NAME
-#define TIMOD_MOD_NAME		"timod"
-#endif
-
-#ifndef TIMOD_MOD_ID
-#define TIMOD_MOD_ID		0
-#endif
 
 /*
  *  =========================================================================
@@ -227,8 +219,7 @@ timod_alloc_priv(queue_t *q)
 		priv->flags = 0;
 		priv->qlen = 0;
 		priv->cons = 0;
-		/* 
-		   we are a module with no service routine so our hiwat, lowat shouldn't matter;
+		/* we are a module with no service routine so our hiwat, lowat shouldn't matter;
 		   however, our minpsz, maxpsz do because we are the first queue under the stream
 		   head.  We do not want to alter the characteristics of the transport packet sizes
 		   so we copy them here. This will allow the stream head to exhibit the same
@@ -311,8 +302,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 		p = (typeof(p)) mp->b_rptr;
 		if (!(dp = xchg(&priv->iocblk, NULL)))
 			goto pass_along;
-		/* 
-		   we are expecting a response, but only intercept the expected response, pass
+		/* we are expecting a response, but only intercept the expected response, pass
 		   along others */
 		ioc = (typeof(ioc)) dp->b_rptr;
 		switch (p->type) {
@@ -329,8 +319,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 			case TI_SETMYNAME:
 				switch (priv->state) {
 				case TS_WACK_CRES:
-					/* 
-					   but could be TS_DATA_XFER for same stream connect */
+					/* but could be TS_DATA_XFER for same stream connect */
 					priv->state = (priv->cons && --priv->cons > 0)
 					    ? TS_WRES_CIND : TS_IDLE;
 					break;
@@ -430,8 +419,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 			putnext(q, dp);
 			return (0);
 		}
-		/* 
-		   not expecting anything, but do state tracking */
+		/* not expecting anything, but do state tracking */
 	      pass_along:
 		switch (p->type) {
 		case T_CONN_IND:
@@ -479,8 +467,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 				priv->state = TS_WCON_CREQ;
 				break;
 			case TS_WACK_CRES:
-				/* 
-				   FIXME: depends */
+				/* FIXME: depends */
 				priv->state = TS_DATA_XFER;
 				break;
 			case TS_WACK_DREQ6:
@@ -557,8 +544,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		mblk_t *dp;
 		int err;
 	case M_IOCTL:
-		/* 
-		   Most of the ioctls provided here are to acheive atomic and thread-safe
+		/* Most of the ioctls provided here are to acheive atomic and thread-safe
 		   operations on the stream for use by the XTI/TLI library.  Each ioctl takes a TPI 
 		   message in the buffer and results in sending the TPI message downstream.  We
 		   strip off and keep the io control block for latter response correlation.  We
@@ -786,8 +772,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		return (0);
 	case M_PROTO:
 	case M_PCPROTO:
-		/* 
-		   this is just to do state tracking */
+		/* this is just to do state tracking */
 		if (mp->b_wptr < mp->b_rptr + sizeof(p->type))
 			break;
 		p = (typeof(p)) mp->b_rptr;
@@ -914,8 +899,7 @@ timod_pop(queue_t *q)
 				qreply(q, mp);
 			}
 		}
-		/* 
-		   fall through */
+		/* fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
@@ -981,8 +965,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 #if defined LIS
-	/* 
-	   protect against LiS bugs */
+	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;

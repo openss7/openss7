@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:41 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 09:31:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:15 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:15 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -212,18 +212,20 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define LINUX_2_4 1
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:41 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:15 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
 #define SS__BANNER	SS__DESCRIP	"\n" \
-			SS__COPYRIGHT	"\n" \
+			SS__EXTRA	"\n" \
 			SS__REVISION	"\n" \
+			SS__COPYRIGHT	"\n" \
 			SS__DEVICE	"\n" \
-			SS__CONTACT	"\n"
-#define SS__SPLASH	SS__DEVICE	" - " \
-			SS__REVISION	"\n"
+			SS__CONTACT
+#define SS__SPLASH	SS__DESCRIP	"\n" \
+			SS__REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(SS__CONTACT);
@@ -241,18 +243,6 @@ MODULE_LICENSE(SS__LICENSE);
 #define SS__CMAJOR_0	CONFIG_STREAMS_SS__MAJOR
 #define SS__UNITS	CONFIG_STREAMS_SS__NMINORS
 #endif				/* LFS */
-
-#ifndef SS__DRV_NAME
-#define SS__DRV_NAME		"inet"
-#endif				/* SS__DRV_NAME */
-
-#ifndef SS__CMAJORS
-#define SS__CMAJORS		4
-#endif				/* SS__CMAJORS */
-
-#ifndef SS__CMAJOR_0
-#define SS__CMAJOR_0		30
-#endif				/* SS__CMAJOR_0 */
 
 #define IP_CMINOR	32
 
@@ -280,10 +270,6 @@ MODULE_LICENSE(SS__LICENSE);
 #endif				/* defined HAVE_OPENSS7_SCTP */
 
 #define FREE_CMINOR	50
-
-#ifndef SS__UNITS
-#define SS__UNITS	(FREE_CMINOR-1)
-#endif				/* SS__UNITS */
 
 /*
  *  =========================================================================
@@ -4008,10 +3994,10 @@ ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 				case IP_RECVOPTS:
 				{
 					size_t len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
-					printd(("%s: %p: processing option IP_RECVOPTS\n",
-						DRV_NAME, ss));
-					printd(("%s: %p: building option T_IP_OPTIONS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option IP_RECVOPTS\n", DRV_NAME,
+						ss));
+					printd(("%s: %p: building option T_IP_OPTIONS\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
 					oh->len = T_LENGTH(len);
@@ -4047,8 +4033,8 @@ ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_PKTINFO:
-					printd(("%s: %p: processing option IP_PKTINFO\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option IP_PKTINFO\n", DRV_NAME,
+						ss));
 					printd(("%s: %p: building option T_IP_ADDR\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
@@ -6024,8 +6010,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					DRV_NAME, ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
+					ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -6200,8 +6186,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					printd(("%s: %p: processing option T_IP_ADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.addr);
@@ -6454,8 +6440,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CORK:
-					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cork);
@@ -6466,8 +6452,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PPI:
-					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.ppi);
@@ -6478,8 +6464,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SID:
-					printd(("%s: %p: processing option T_SCTP_SID\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.sid);
@@ -6490,8 +6476,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
-					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = sizeof(*oh);
@@ -6501,8 +6487,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
-					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = sizeof(*oh);
@@ -6707,8 +6693,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HB:
-					printd(("%s: %p: processing option T_SCTP_HB\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.hb);
@@ -6720,8 +6706,8 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO:
-					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto);
@@ -6814,8 +6800,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					DRV_NAME, ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
+					ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -6999,8 +6985,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					printd(("%s: %p: processing option T_IP_ADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.addr);
@@ -7249,8 +7235,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CORK:
-					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cork);
@@ -7262,8 +7248,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PPI:
-					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ppi);
@@ -7275,8 +7261,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SID:
-					printd(("%s: %p: processing option T_SCTP_SID\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sid);
@@ -7288,8 +7274,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
-					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ssn);
@@ -7301,8 +7287,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
-					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.tsn);
@@ -7524,8 +7510,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HB:
-					printd(("%s: %p: processing option T_SCTP_HB\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.hb);
@@ -7538,8 +7524,8 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO:
-					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto);
@@ -7638,8 +7624,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					DRV_NAME, ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
+					ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->len = ih->len;
@@ -7934,8 +7920,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					printd(("%s: %p: processing option T_IP_ADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = ih->len;
@@ -8347,8 +8333,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CORK:
-					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = ih->len;
@@ -8364,8 +8350,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PPI:
-					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = ih->len;
@@ -8380,8 +8366,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SID:
-					printd(("%s: %p: processing option T_SCTP_SID\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = ih->len;
@@ -8397,8 +8383,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
-					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = ih->len;
@@ -8409,8 +8395,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
-					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = ih->len;
@@ -8799,8 +8785,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HB:
-					printd(("%s: %p: processing option T_SCTP_HB\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = ih->len;
@@ -8836,8 +8822,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO:
-					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = ih->len;
@@ -8984,8 +8970,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					DRV_NAME, ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
+					ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -9416,8 +9402,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_ADDR:
 				{
 					uint32_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_ADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9955,8 +9941,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_CORK:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9981,8 +9967,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_PPI:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10007,8 +9993,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_SID:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_SID\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10033,8 +10019,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_SSN:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10059,8 +10045,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_TSN:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10472,8 +10458,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_HB:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_HB\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10498,8 +10484,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_RTO:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
+						ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -12820,8 +12806,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	if (ss->p.info.SERV_type == T_CLTS && p->CONIND_number)
 		goto notsupport;
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
-		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME,
-			ss, p->ADDR_offset, p->ADDR_length));
+		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME, ss,
+			p->ADDR_offset, p->ADDR_length));
 		goto badaddr;
 	}
 	switch (ss->p.prot.family) {

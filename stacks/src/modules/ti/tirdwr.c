@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 09:31:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:20 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:20 $";
 
 #include "compat.h"
 
@@ -70,18 +70,20 @@ static char const ident[] =
 // #define TIRDWR_TPI_PEDANTIC
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $"
+#define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 09:31:20 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
+				TIRDWR_EXTRA		"\n" \
 				TIRDWR_REVISION		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_DEVICE		"\n" \
 				TIRDWR_CONTACT
 #define TIRDWR_SPLASH		TIRDWR_DEVICE		"\n" \
-				TIRDWR_REVSISION
+				TIRDWR_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(TIRDWR_CONTACT);

@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: sockmod.h,v 0.9.2.1 2004/08/21 10:14:40 brian Exp $
+ @(#) $Id: sockmod.h,v 0.9.2.2 2004/09/02 09:31:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,26 +40,58 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:40 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/09/02 09:31:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _SYS_SOCKMOD_H
-#define _SYS_SOCKMOD_H
+#ifndef __SYS_SOCKMOD_H__
+#define __SYS_SOCKMOD_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:14 $"
 
-#define SOCKMOD	('I'<<8)
+#define O_SI_GETUDATA	(('I'<<8)|101)
+#define SI_SHUTDOWN	(('I'<<8)|102)
+#define SI_LISTEN	(('I'<<8)|103)
+#define SI_SETMYNAME	(('I'<<8)|104)
+#define SI_SETPEERNAME	(('I'<<8)|105)
+#define SI_GETINTRANSIT	(('I'<<8)|106)
+#define SI_TCL_LINK	(('I'<<8)|107)
+#define SI_TCL_UNLINK	(('I'<<8)|108)
+#define SI_SOCKPARAMS	(('I'<<8)|109)
+#define SI_GETUDATA	(('I'<<8)|110)
 
-#define O_SI_GETUDATA	(SOCKMOD + 101)
-#define SI_SHUTDOWN	(SOCKMOD + 102)
-#define SI_LISTEN	(SOCKMOD + 103)
-#define SI_SETMYNAME	(SOCKMOD + 104)
-#define SI_SETPEERNAME	(SOCKMOD + 105)
-#define SI_GETINTRANSIT	(SOCKMOD + 106)
-#define SI_TCL_LINK	(SOCKMOD + 107)
-#define SI_TCL_UNLINK	(SOCKMOD + 108)
-#define SI_SOCKPARAMS	(SOCKMOD + 109)
-#define SI_GETUDATA	(SOCKMOD + 110)
+struct si_sockparams {
+	int sp_family;
+	int sp_type;
+	int sp_protocol;
+};
 
-#endif				/* _SYS_SOCKMOD_H */
+struct o_si_udata {
+	int tidusize;
+	int addrsize;
+	int optsize;
+	int etsdusize;
+	int servtype;
+	int so_state;
+	int so_options;
+	int tsdusize;
+};
+
+struct si_udata {
+	int tidusize;
+	int addrsize;
+	int optsize;
+	int etsdusize;
+	int servtype;
+	int so_state;
+	int so_options;
+	int tsdusize;
+	struct si_sockparams sockparams;
+};
+
+#endif				/* __SYS_SOCKMOD_H__ */

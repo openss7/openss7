@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:40 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/12 08:01:40 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 09:31:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:40 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:15 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:40 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:15 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -98,6 +98,12 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #pragma weak getmsg
 #pragma weak putmsg
 #pragma weak isastream
+#endif
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#elif HAVE_STDINT_H
+# include <stdint.h>
 #endif
 
 #include <unistd.h>
@@ -2855,17 +2861,23 @@ __xnet_t_peek(int fd)
 		pfd.events = (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
 		pfd.revents = 0;
 		switch (poll(&pfd, 1, 0)) {
-		case -1:
-			goto tsyserr;
+		case 1:
+			if (pfd.revents & (POLLMSG | POLLERR | POLLHUP))
+				goto tlook;
+			if (pfd.revents & (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND))
+				return __xnet_t_look(fd);
 		case 0:
 			break;
-		case 1:
-			return __xnet_t_look(fd);
+		case -1:
+			goto tsyserr;
 		default:
 			goto tproto;
 		}
 	}
 	return (user->event);
+      tlook:
+	t_errno = TLOOK;
+	goto error;
       tproto:
 	t_errno = TPROTO;
 	goto error;
@@ -3255,17 +3267,17 @@ __xnet_t_rcvconnect(int fd, struct t_call *call)
 	{
 		__xnet_u_setstate_const(user, TS_DATA_XFER);
 		if (call) {
-			if (call->addr.maxlen < p->conn_con.RES_length)
+			if (call->addr.maxlen && call->addr.maxlen < p->conn_con.RES_length)
 				goto tbufovflw;
-			if (call->opt.maxlen < p->conn_con.OPT_length)
+			if (call->opt.maxlen && call->opt.maxlen < p->conn_con.OPT_length)
 				goto tbufovflw;
-			if (call->udata.maxlen < user->data.len)
+			if (call->udata.maxlen && call->udata.maxlen < user->data.len)
 				goto tbufovflw;
-			if ((call->addr.len = p->conn_con.RES_length))
+			if (call->addr.maxlen && (call->addr.len = p->conn_con.RES_length))
 				memcpy(call->addr.buf, (char *) p + p->conn_con.RES_offset, call->addr.len);
-			if ((call->opt.len = p->conn_con.OPT_length))
+			if (call->opt.maxlen && (call->opt.len = p->conn_con.OPT_length))
 				memcpy(call->opt.buf, (char *) p + p->conn_con.OPT_offset, call->opt.len);
-			if ((call->udata.len = user->data.len))
+			if (call->udata.maxlen && (call->udata.len = user->data.len))
 				memcpy(call->udata.buf, user->data.buf, call->udata.len);
 		}
 		__xnet_u_reset_event(user);	/* consume the event */
@@ -5907,10 +5919,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.1 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.2 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.1 $)
- * @date \$Date: 2004/05/12 08:01:40 $
+ * @version \$Name:  $(\$Revision: 0.9.2.2 $)
+ * @date \$Date: 2004/09/02 09:31:15 $
  *
  * @}
  */
