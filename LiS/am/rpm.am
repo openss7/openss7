@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/02/23 01:56:56 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/03/02 17:41:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
+## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -183,7 +183,7 @@ rpm_source_files = \
 ### overridden.
 ####
 ##$(rpm_source_files): $(sourcedir)
-##	@f=`echo "$@" | sed -e 's|$(sourcedir)|$(PACKAGE_DISTDIR)|'` ; \
+##	@f=`$(ECHO) "$@" | sed -e 's|$(sourcedir)|$(PACKAGE_DISTDIR)|'` ; \
 ##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
 ##	test -f "$@" -a ":$(FORCE)" != :force || cp -fv -- $$f $@
 
@@ -191,30 +191,30 @@ rpm_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
 
 $(sourcedir)/$(PACKAGE)-$(VERSION).tar.gz \
 $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2::
-	@f=`echo "$@" | sed -e 's|.*/||'` ; \
+	@f=`$(ECHO) "$@" | sed -e 's|.*/||'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		echo "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
 	} ;  \
 	d= ; test -f $$f || d='$(srcdir)/' ; \
 	test "$@" -ef "$$d$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
-		echo "cp -f -- $$d$$f $@" ; \
+		$(ECHO) "cp -f -- $$d$$f $@" ; \
 		cp -f -- $$d$$f $@ ; \
 	}
 
 $(specdir)/$(PACKAGE)-$(VERSION).spec \
 $(sourcedir)/$(PACKAGE)-$(VERSION).gif \
 $(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
-	@f=`echo "$@" | sed -e 's|.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
+	@f=`$(ECHO) "$@" | sed -e 's|.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		echo "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
 	} ;  \
 	d= ; test -f $$f || d='$(srcdir)/' ; \
 	test "$@" -ef "$$d$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
-		echo "cp -f -- $$d$$f $@" ; \
+		$(ECHO) "cp -f -- $$d$$f $@" ; \
 		cp -f -- $$d$$f $@ ; \
 	}
 
@@ -224,7 +224,7 @@ $(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
 ### should never run unless these make variables were overridden.
 ####
 ##$(rpm_spec_file): $(specdir)
-##	@f=`echo "$@" | sed -e 's|$(specdir)|$(sourcedir)|'` ; \
+##	@f=`$(ECHO) "$@" | sed -e 's|$(specdir)|$(sourcedir)|'` ; \
 ##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
 ##	test -f "$@" -a ":$(FORCE)" != :force || cp -fv -- $$f $@
 
@@ -294,7 +294,7 @@ rpms: $(AM_RPMSMAKETARGETS)
 
 sign srpm-sign: $(srpm)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
-		echo "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
 	fi
 
@@ -308,16 +308,16 @@ RELEASE_SIGN	+= srpm-sign
 rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
-	rpmtarg=`echo $@ | sed -e 's|rebuild|rpms|'` ; \
+	rpmtarg=`$(ECHO) $@ | sed -e 's|rebuild|rpms|'` ; \
 	for t in $$targets ;  do \
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
 				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
 			fi ; \
 		done ; \
-		echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
 	done
 
@@ -335,11 +335,11 @@ resign: sign
 		if ! $(RPM) -K -- $$rpm 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 			unsigned_rpms="$$unsigned_rpms $$rpm" ; \
 		else \
-			echo "D: existing gpg sig in $$rpm" ; \
+			$(ECHO) "D: existing gpg sig in $$rpm" ; \
 		fi ; \
 	done ; \
 	if test :$$unsigned_rpms != : ; then \
-		echo "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms" ; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
 

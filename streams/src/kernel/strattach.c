@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/02 17:41:28 $";
 
 #define __NO_VERSION__
 
@@ -73,11 +73,11 @@ static char const ident[] =
 #include <asm/uaccess.h>
 
 #include <linux/seq_file.h>
-#ifdef HAVE_TASK_NAMESPACE_SEM
+#if HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 #include <linux/file.h>
-#ifdef HAVE_LINUX_NAMEI_H
+#if HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
 
@@ -139,7 +139,7 @@ long do_fattach(const struct file *file, const char *file_name)
 	if (!mnt)
 		goto release;
 
-#if defined HAVE_TASK_NAMESPACE_SEM
+#ifndef HAVE_MOUNT_SEM_ADDR
 	down_write(&current->namespace->sem);
 #else
 	down(&mount_sem);
@@ -161,7 +161,7 @@ long do_fattach(const struct file *file, const char *file_name)
 	err = graft_tree(mnt, &nd);
 
       unlock:
-#if defined HAVE_TASK_NAMESPACE_SEM
+#ifndef HAVE_MOUNT_SEM_ADDR
 	up_write(&current->namespace->sem);
 #else
 	up(&mount_sem);

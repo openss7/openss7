@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/28 14:13:57 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/28 14:13:57 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/28 14:13:57 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/02 17:41:28 $";
 
 #define __NO_VERSION__
 
@@ -72,11 +72,11 @@ static char const ident[] =
 #include <asm/uaccess.h>
 
 #include <linux/seq_file.h>
-#ifdef HAVE_TASK_NAMESPACE_SEM
+#if HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 #include <linux/file.h>
-#ifdef HAVE_LINUX_NAMEI_H
+#if HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
 

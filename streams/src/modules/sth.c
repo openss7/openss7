@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3593,7 +3593,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	ptrace(("%s: opening character device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
-#ifdef HAVE_KFUNC_TO_KDEV_T
+#if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else
@@ -3753,7 +3753,7 @@ static struct fmodsw sth_fmod = {
 /* bleedin' mercy! */
 static inline void put_filesystem(struct file_system_type *fs)
 {
-#ifdef HAVE_KFUNC_MODULE_PUT
+#if HAVE_KFUNC_MODULE_PUT
 	module_put(fs->owner);
 #else
 	if (fs->owner)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/02 17:41:28 $";
 
 #define __NO_VERSION__
 
@@ -66,7 +66,7 @@ static char const ident[] =
 #include <linux/spinlock.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
-#ifdef HAVE_LINUX_LOCKS_H
+#if HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
 #include <linux/delay.h>
@@ -1135,7 +1135,7 @@ static void timeout_function(unsigned long arg)
 	*xchg(&t->strtimout_tail, &se->se_next) = se;
 	/* bind timeout back to the CPU that called for it */
 	if (!test_and_set_bit(strtimout, &t->flags))
-#if defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
+#if HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		cpu_raise_softirq(se->x.t.cpu, STREAMS_SOFTIRQ);
 #else
 		raise_softirq(STREAMS_SOFTIRQ);

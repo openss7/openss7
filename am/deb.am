@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/23 01:56:56 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/02 17:41:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
+## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -95,7 +95,7 @@ $(debian_dir):: $(debian_dir_stamp)
 $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(PACKAGE_DEBTOPDIR)
 	rm -rf $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION) $(debian_dir)
 	$(mkdir_p) $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION)
-	gzip -dc $< | tar xf - -C $(PACKAGE_DEBTOPDIR)
+	$(GZIP_CMD) -dc $< | tar xf - -C $(PACKAGE_DEBTOPDIR)
 	mv -f $(PACKAGE_DEBTOPDIR)/${PACKAGE}-$(VERSION) $(debian_dir)
 	touch $(debian_dir_stamp)
 
@@ -115,10 +115,10 @@ $(debian_sig_file): $(debian_dsc_file)
 	user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 	home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
 	pass="${GNUPGPASS}" ; pass="$${pass:+ --batch --passphrase-fd 0 }" ; \
-	pipe="${GNUPGPASS}" ; pipe="$${pipe:+ echo "$$pipe" |}" ; \
-	echo "rm -f $(debian_sig_file)" ; \
+	pipe="${GNUPGPASS}" ; pipe="$${pipe:+ $(ECHO) "$$pipe" |}" ; \
+	$(ECHO) "rm -f $(debian_sig_file)" ; \
 	rm -f $(debian_sig_file) ; \
-	echo "$(GPG) --clearsign -a$$user$$home$$pass -o- -- $< > $@" ; \
+	$(ECHO) "$(GPG) --clearsign -a$$user$$home$$pass -o- -- $< > $@" ; \
 	eval "$$pipe $(GPG) --clearsign -a$$user$$home$$pass -o- -- $< > $@" || { rm -f $< $@ ; exit 1 ; }
 	cp -fp $(debian_sig_file) $(debian_dsc_file)
 	touch $(debian_sig_file)

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/02 17:41:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -219,25 +219,26 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [dnl
     AC_CONFIG_COMMANDS([strconf],
-	[_STRCONF_OUTPUT_CONFIG_COMMANDS],
-	[ac_aux_dir="$ac_aux_dir" \
-	PACKAGE_TARNAME="$PACKAGE_TARNAME" \
-	PACKAGE_VERSION="$PACKAGE_VERSION" \
-	PACKAGE_RELEASE="$PACKAGE_RELEASE" \
-	STRCONF="$STRCONF" \
-	STRCONF_STEM="$STRCONF_STEM" \
-	STRCONF_SCRIPT="$STRCONF_SCRIPT" \
-	STRCONF_INPUT="$STRCONF_INPUT" \
-	STRCONF_MAJBASE="$STRCONF_MAJBASE" \
-	STRCONF_CONFIG="$STRCONF_CONFIG" \
-	STRCONF_MODCONF="$STRCONF_MODCONF" \
-	STRCONF_MKNODES="$STRCONF_MKNODES" \
-	STRCONF_DRVCONF="$STRCONF_DRVCONF" \
-	STRCONF_CONFMOD="$STRCONF_CONFMOD" \
-	STRCONF_MAKEDEV="$STRCONF_MAKEDEV" \
-	STRCONF_STSETUP="$STRCONF_STSETUP" \
-	STRCONF_STRLOAD="$STRCONF_STRLOAD" \
-	STRCONF_PACKAGE="$STRCONF_PACKAGE" ])
+	[_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
+ac_aux_dir="$ac_aux_dir"
+PACKAGE_TARNAME="$PACKAGE_TARNAME"
+PACKAGE_VERSION="$PACKAGE_VERSION"
+PACKAGE_RELEASE="$PACKAGE_RELEASE"
+STRCONF="$STRCONF"
+STRCONF_STEM="$STRCONF_STEM"
+STRCONF_SCRIPT="$STRCONF_SCRIPT"
+STRCONF_INPUT="$STRCONF_INPUT"
+STRCONF_MAJBASE="$STRCONF_MAJBASE"
+STRCONF_CONFIG="$STRCONF_CONFIG"
+STRCONF_MODCONF="$STRCONF_MODCONF"
+STRCONF_MKNODES="$STRCONF_MKNODES"
+STRCONF_DRVCONF="$STRCONF_DRVCONF"
+STRCONF_CONFMOD="$STRCONF_CONFMOD"
+STRCONF_MAKEDEV="$STRCONF_MAKEDEV"
+STRCONF_STSETUP="$STRCONF_STSETUP"
+STRCONF_STRLOAD="$STRCONF_STRLOAD"
+STRCONF_PACKAGE="$STRCONF_PACKAGE"
+    ])
 ])# _STRCONF_OUTPUT_CONFIG
 # =============================================================================
 

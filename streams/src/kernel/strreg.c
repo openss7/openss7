@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/28 14:13:57 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/28 14:13:57 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/28 14:13:57 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/02 17:41:28 $";
 
 #define __NO_VERSION__
 
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <linux/poll.h>
 #include <linux/fs.h>
 #include <linux/mount.h>	/* for vfsmount and friends */
-#ifdef HAVE_LINUX_NAMEI_H
+#if HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>	/* for lookup_hash on 2.6 */
 #endif
 #include <asm/hardirq.h>

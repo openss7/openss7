@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.2 2005/02/28 13:49:24 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.3 2005/03/02 17:41:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/28 13:49:24 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/02 17:41:27 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -179,7 +179,7 @@ __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
 		*(unsigned long *) value_p = jiffies;
 		return (0);
 	case PPGP:
-#ifdef HAVE_KFUNC_PROCESS_GROUP
+#if HAVE_KFUNC_PROCESS_GROUP
 		*(pid_t *) value_p = process_group(current);
 #else
 		*(pid_t *) value_p = current->pgrp;

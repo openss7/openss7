@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/23 01:56:56 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/02 17:41:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
+## Last Modified $Date: 2005/03/02 17:41:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -60,7 +60,7 @@
 ##
 deb-rules-check:
 	@if test -e $(PACKAGE)-$(VERSION)/debian/rules -a ! -x $(PACKAGE)-$(VERSION)/debian/rules ; then \
-		echo "chmod +x $(PACKAGE)-$(VERSION)/debian/rules" ; \
+		$(ECHO) "chmod +x $(PACKAGE)-$(VERSION)/debian/rules" ; \
 		chmod +x $(PACKAGE)-$(VERSION)/debian/rules ; \
 	fi
 
@@ -93,14 +93,14 @@ RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR)
 ##
 $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
 $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2::
-	@f=`echo "$@" | sed -e 's|.*/||'` ; \
+	@f=`$(ECHO) "$@" | sed -e 's|.*/||'` ; \
 	test "$@" -ef "$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		echo "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
 	test "$@" -ef "$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
-		echo "cp -f -- $$f $@" ; \
+		$(ECHO) "cp -f -- $$f $@" ; \
 		cp -f -- $$f $@ ; }
 
 ##
@@ -131,8 +131,8 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
 		pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch --passphrase-fd 0}" ; \
-		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+echo "$$pipe" |}" ; \
-		echo "$(GPG) -ba$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
+		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+$(ECHO) "$$pipe" |}" ; \
+		$(ECHO) "$(GPG) -ba$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 		eval "$$pipe $(GPG) -ba$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 	else touch "$@" ; fi
 
@@ -142,8 +142,8 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
 		pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch --passphrase-fd 0}" ; \
-		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+echo "$$pipe" |}" ; \
-		echo "$(GPG) -ba$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
+		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+$(ECHO) "$$pipe" |}" ; \
+		$(ECHO) "$(GPG) -ba$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 		eval "$$pipe $(GPG) -ba$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 	else touch "$@" ; fi
 

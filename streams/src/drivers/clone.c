@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/02 17:41:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/02/28 13:46:46 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/02 17:41:28 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -219,7 +219,7 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	ptrace(("%s: opening clone device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
-#ifdef HAVE_KFUNC_TO_KDEV_T
+#if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else

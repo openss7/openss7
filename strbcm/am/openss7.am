@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/02/23 01:56:56 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/03/02 17:41:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
+## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -118,19 +118,19 @@ $(FORCED_TARGETS): forced-% : %
 MY_PHONY		+= $(FORCED_TARGETS)
 
 $(RELEASE_DIRECTORIES)::
-	@test -d $@ || { echo " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
+	@test -d $@ || { $(ECHO) " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
 	
 release: $(RELEASE_DIRECTORIES) $(RELEASE)
 
 release-clean-local:
 	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
-		echo "$(MAKE) $(AM_MAKEFLAGS) $$target" ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $$target" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $$target ; \
 	done
 
 release-clean: release-clean-local
 	@if test -n "$(RELEASECLEANFILES)" ; then \
-		echo "rm -f -- $(RELEASECLEANFILES)" ; \
+		$(ECHO) "rm -f -- $(RELEASECLEANFILES)" ; \
 		rm -f -- $(RELEASECLEANFILES) ; \
 	fi
 
@@ -148,9 +148,9 @@ MY_RECURSIVE_TARGETS =
 
 $(MY_RECURSIVE_TARGETS):
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
-	target=`echo $@ | sed s/-recursive//` ; \
+	target=`$(ECHO) $@ | sed s/-recursive//` ; \
 	list='$(SUBDIRS)' ; for subdir in $$list ; do \
-		echo "Making $$target in $$subdir" ; \
+		$(ECHO) "Making $$target in $$subdir" ; \
 		if test "$$subdir" = "." ; then \
 			dot_seen=yes ; \
 			local_target="$$target-am" ; \
@@ -172,9 +172,9 @@ ALL_RECURSIVE_TARGETS =
 
 $(ALL_RECURSIVE_TARGETS):
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
-	target=`echo $@ | sed -e 's|^all-||'` ; \
+	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
 	list='$(subdirs)' ; for subdir in $$list ; do \
-		echo "Making $$target in $$subdir" ; \
+		$(ECHO) "Making $$target in $$subdir" ; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; test -z "$$fail"

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/13 09:20:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/13 09:20:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/02 17:41:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,11 +67,11 @@ TESTSUITE		= testsuite
 # my rule
 package.m4: $(top_srcdir)/configure
 	@( \
-		echo 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
-		echo 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE_TARNAME@])'; \
-		echo 'm4_define([AT_PACKAGE_VERSION], [@PACKAGE_VERSION@])'; \
-		echo 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
-		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE_TARNAME@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@PACKAGE_VERSION@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
 	cp -pf package.m4 $(srcdir)/package.m4
 	rm -f package.m4
@@ -85,7 +85,7 @@ TESTSUITE_DEPS		= \
 # my rule
 $(TESTSUITE): $(TESTSUITE_DEPS)
 	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
-	@file=`echo '$@' | sed -e 's|.*/||'` ; \
+	@file=`$(ECHO) '$@' | sed -e 's|.*/||'` ; \
 	cp -pf $@.tmp $(srcdir)/$$file
 	rm -f $@.tmp
 
@@ -145,7 +145,7 @@ endif
 # my rule
 clean-testsuite: $(TESTSUITE)
 	@if test -r "$<" ; then \
-		echo "$(SHELL) $< --clean" ; \
+		$(ECHO) "$(SHELL) $< --clean" ; \
 		$(SHELL) $< --clean ; \
 	fi
 

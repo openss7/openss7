@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/01 22:58:25 $
+# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/02 17:41:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,19 +47,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/01 22:58:25 $ by $Author: brian $
+# Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 #
 # =============================================================================
 
-echo='echo'
+ECHO='echo'
 SHELL=${CONFIG_SHELL:-/bin/sh}
 SED='sed'
 
-# Check that we have a working $echo.
+# Check that we have a working $ECHO.
 if test "X$1" = X--no-reexec; then
     # Discard the --no-reexec flag, and continue
     shift
-elif test "X`($echo '\t')` 2>/dev/null " = 'X\t'; then
+elif test "X`($ECHO '\t')` 2>/dev/null " = 'X\t'; then
     :
 else
     exec $SHELL "$0" --no-reexec ${1+"$@"}
@@ -73,18 +73,19 @@ EOF
     exit 0
 fi
 
-program=`$echo "$0" | ${SED} -e 's%^.*/%%'`
+program=`$ECHO "$0" | ${SED} -e 's%^.*/%%'`
 modename="$program"
 reexec="$SHELL $0"
 
-ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/01 22:58:25 $'
+version="3.0.0"
+ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/02 17:41:28 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
 Xsed="${SED}"' -e 1s/^X//'
 sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
 # test EBCDIC or ASCII
-case `$echo A|od -x` in
+case `$ECHO A|od -x` in
  *[Cc]1*) # EBCDIC based system
   SP2NL="tr '\100' '\n'"
   NL2SP="tr '\r\n' '\100\100'"
@@ -136,6 +137,7 @@ function version()
 	return
     fi
     cat <<EOF
+Version $version
 $ident
 Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.
 Distributed under GPL Version 2, included here by reference.
@@ -149,6 +151,8 @@ function usage()
 	return
     fi
     cat <<EOF
+$program:
+    $ident
 Usage:
     $program [options] [MODULE ...]
     $program {-h|--help}
@@ -425,11 +429,11 @@ else
 fi
 
 command_error() {
-    $echo "$program: ERROR: ${1+@}" >&3
+    $ECHO "$program: ERROR: ${1+@}" >&3
 }
 
 command_info() {
-    $echo "$program: INFO: ${1+@}" >&3
+    $ECHO "$program: INFO: ${1+@}" >&3
 }
 
 process_map() {
@@ -438,9 +442,9 @@ process_map() {
 	shift
 	while read crc flag expsym junk ; do
 		test -z "$junk" || { command_error "got junk $junk" ; continue ; }
-		$echo "$expsym" | egrep -q '^(_)?__crc_' &>/dev/null || { command_error "not crc symbol $expsym" ; continue ; }
+		$ECHO "$expsym" | egrep -q '^(_)?__crc_' &>/dev/null || { command_error "not crc symbol $expsym" ; continue ; }
 		test :$flag = :A || { command_error "wrong flag $flag" ; continue ; }
-		symbol=`$echo "$expsym" | sed -r -e 's|^(_)?__crc_||'`
+		symbol=`$ECHO "$expsym" | sed -r -e 's|^(_)?__crc_||'`
 		test -n "$symbol" || { command_error "no symbol for $expsym" ; continue ; }
 		printf "0x%08x\t%s\t%s\n" "0x$crc" $symbol $modname
 	done

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.2 2005/02/28 13:49:24 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.3 2005/03/02 17:41:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUNDDI_H__
 #define __SYS_SUNDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/28 13:49:24 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/02 17:41:27 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -183,7 +183,7 @@ __SUN_EXTERN_INLINE time_t ddi_get_time(void)
 }
 __SUN_EXTERN_INLINE unsigned short ddi_getiminor(dev_t dev)
 {
-#if defined HAVE_KFUNC_TO_KDEV_T
+#if HAVE_KFUNC_TO_KDEV_T
 	kdev_t kdev;
 	kdev = to_kdev_t(dev);
 	return MINOR(kdev);

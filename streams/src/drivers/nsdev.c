@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/02 17:41:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/02 17:41:28 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -223,7 +223,7 @@ STATIC int nsdev_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
-#ifdef HAVE_KFUNC_TO_KDEV_T
+#if HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 #else

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/02/28 14:13:53 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/03/02 17:41:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/28 14:13:53 $ by $Author: brian $
+# Last Modified $Date: 2005/03/02 17:41:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -751,10 +751,165 @@ AC_DEFUN([_LFS_SETUP_MODULE], [dnl
 # _LFS_CHECK_KERNEL
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
+    _LFS_CONFIG_KERNEL
     _LFS_CONFIG_FATTACH
     _LFS_CONFIG_LIS
     _LFS_CONFIG_LFS
-    _LFS_CONFIG_KERNEL
+])# _LFS_CHECK_KERNEL
+# =============================================================================
+
+# =============================================================================
+# _LFS_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# and 2.6 kernels.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h linux/locks.h asm/softirq.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+])
+    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked process_group cpu_raise_softirq check_region pcibios_init pcibios_find_class pcibios_find_device pcibios_present pcibios_read_config_byte pcibios_read_config_dword pcibios_read_config_word pcibios_write_config_byte pcibios_write_config_dword pcibios_write_config_word MOD_DEC_USE_COUNT MOD_INC_USE_COUNT], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+])
+    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+])
+dnl 
+dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
+dnl union u itself have been removed and a simple void pointer for filesystem
+dnl specific information has been put in place instead.  We don't really care
+dnl one way to the other, but this check discovers which way is used.
+dnl 
+    _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
+			 struct super_block.s_fs_info,
+			 struct super_block.u.generic_sbp,
+			 struct file_system_type.read_super,
+			 struct file_system_type.get_sb,
+			 struct super_operations.read_inode2,
+			 struct kstatfs.f_type], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+])
+	_LINUX_KERNEL_ENV([dnl
+	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
+			   [linux_cv_have_iop_lookup_nameidata], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif]],
+			[[struct inode_operations temp;
+(*temp.lookup)((struct inode *)0, (struct dentry *)0, (struct nameidata *)0);]]) ],
+		    [linux_cv_have_iop_lookup_nameidata='yes'],
+		    [linux_cv_have_iop_lookup_nameidata='no'])
+	    ])
+	    AH_TEMPLATE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA],
+		    [Set if inode_operation lookup function takes nameidata pointer.])
+	    if test :$linux_cv_have_iop_lookup_nameidata = :yes ; then
+		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1])
+	    else
+		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [0])
+	    fi
+	    AC_CACHE_CHECK([for kernel do_settimeofday with timespec],
+			   [linux_cv_have_timespec_settimeofday], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */]],
+			[[struct timespec ts;
+int retval;
+retval = do_settimeofday(&ts);]]) ],
+		[linux_cv_have_timespec_settimeofday='yes'],
+		[linux_cv_have_timespec_settimeofday='no'])
+	    ])
+	    if test :$linux_cv_have_timespec_settimeofday = :yes ; then
+		AC_DEFINE_UNQUOTED([HAVE_TIMESPEC_DO_SETTIMEOFDAY], [],
+		    [Define if do_settimeofday takes struct timespec and returns int.])
+	    fi
+	])
 ])# _LFS_CHECK_KERNEL
 # =============================================================================
 
@@ -786,13 +941,9 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
 # 
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_FATTACH], [dnl
-    _LINUX_KERNEL_SYMBOL_EXPORT([mount_sem], [dnl
-	AC_DEFINE_UNQUOTED([HAVE_TASK_NAMESPACE_SEM], [1],
-	[Some recent 2.4 RH kernel place the mount semaphore into the task
-	structure rather than using the static global mount_sem semaphore.
-	Define this if you have a modified kernel.]) ])
     lfs_pipe=yes
     lfs_fattach=yes
+    _LINUX_KERNEL_SYMBOL_EXPORT([mount_sem])
     _LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([check_mnt], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([graft_tree], [lfs_fattach=no; lfs_pipe=no])
@@ -872,144 +1023,6 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
     _LINUX_KERNEL_SYMBOL_EXPORT([sock_readv_writev])
     _LINUX_KERNEL_SYMBOL_EXPORT([__wake_up_sync])
 ])# _LFS_CONFIG_LFS
-# =============================================================================
-
-# =============================================================================
-# _LFS_CONFIG_KERNEL
-# -----------------------------------------------------------------------------
-# These are a bunch of kernel configuraiton checks primarily in support of 2.5
-# and 2.6 kernels.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
-    _LFS_CHECK_MODCOUNT
-])# _LFS_CONFIG_KERNEL
-# =============================================================================
-
-# =============================================================================
-# _LFS_CHECK_MODCOUNT
-# -----------------------------------------------------------------------------
-# 2.4 kernels use try_inc_mod_count, whereas newer kernels use try_module_get
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_CHECK_MODCOUNT], [dnl
-    _LINUX_CHECK_HEADERS([linux/kdev_t.h linux/statfs.h linux/namei.h linux/locks.h asm/softirq.h], [:], [:], [
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#include <linux/fs.h>
-])
-    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked process_group cpu_raise_softirq check_region pcibios_init pcibios_find_class pcibios_find_device pcibios_present pcibios_read_config_byte pcibios_read_config_dword pcibios_read_config_word pcibios_write_config_byte pcibios_write_config_dword pcibios_write_config_word MOD_DEC_USE_COUNT MOD_INC_USE_COUNT], [:], [:], [
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#include <linux/fs.h>
-#include <linux/sched.h>
-#ifdef HAVE_LINUX_KDEV_T_H
-#include <linux/kdev_t.h>
-#endif
-#ifdef HAVE_LINUX_STATFS_H
-#include <linux/statfs.h>
-#endif
-#include <linux/interrupt.h>	/* for cpu_raise_softirq */
-#include <linux/ioport.h>	/* for check_region */
-#include <linux/pci.h>		/* for pci checks */
-])
-    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#include <linux/fs.h>
-#include <linux/sched.h>
-#ifdef HAVE_LINUX_KDEV_T_H
-#include <linux/kdev_t.h>
-#endif
-#ifdef HAVE_LINUX_STATFS_H
-#include <linux/statfs.h>
-#endif
-#include <linux/interrupt.h>	/* for irqreturn_t */ 
-#include <linux/time.h>		/* for struct timespec */
-])
-dnl 
-dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
-dnl union u itself have been removed and a simple void pointer for filesystem
-dnl specific information has been put in place instead.  We don't really care
-dnl one way to the other, but this check discovers which way is used.
-dnl 
-    _LINUX_CHECK_MEMBERS([struct super_block.s_fs_info,
-			 struct super_block.u.generic_sbp,
-			 struct file_system_type.read_super,
-			 struct file_system_type.get_sb,
-			 struct super_operations.read_inode2,
-			 struct kstatfs.f_type], [:], [:], [
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#include <linux/fs.h>
-#ifdef HAVE_LINUX_STATFS_H
-#include <linux/statfs.h>
-#endif
-])
-	_LINUX_KERNEL_ENV([dnl
-	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
-			   [linux_cv_have_iop_lookup_nameidata], [dnl
-		AC_COMPILE_IFELSE([
-		    AC_LANG_PROGRAM([[
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#include <linux/fs.h>
-#ifdef HAVE_LINUX_NAMEI_H
-#include <linux/namei.h>
-#endif]],
-			[[struct inode_operations temp;
-(*temp.lookup)((struct inode *)0, (struct dentry *)0, (struct nameidata *)0);]]) ],
-		    [linux_cv_have_iop_lookup_nameidata='yes'],
-		    [linux_cv_have_iop_lookup_nameidata='no'])
-	    ])
-	    if test :$linux_cv_have_iop_lookup_nameidata = :yes ; then
-		AC_DEFINE_UNQUOTED([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [],
-		    [Define if inode_operation lookup function takes nameidata pointer.])
-	    fi
-	    AC_CACHE_CHECK([for kernel do_settimeofday with timespec],
-			   [linux_cv_have_timespec_settimeofday], [dnl
-		AC_COMPILE_IFELSE([
-		    AC_LANG_PROGRAM([[
-#include <linux/compiler.h>
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-#include <linux/fs.h>
-#include <linux/sched.h>
-#ifdef HAVE_LINUX_KDEV_T_H
-#include <linux/kdev_t.h>
-#endif
-#ifdef HAVE_LINUX_STATFS_H
-#include <linux/statfs.h>
-#endif
-#include <linux/interrupt.h>	/* for irqreturn_t */ 
-#include <linux/time.h>		/* for struct timespec */]],
-			[[struct timespec ts;
-int retval;
-retval = do_settimeofday(&ts);]]) ],
-		[linux_cv_have_timespec_settimeofday='yes'],
-		[linux_cv_have_timespec_settimeofday='no'])
-	    ])
-	    if test :$linux_cv_have_timespec_settimeofday = :yes ; then
-		AC_DEFINE_UNQUOTED([HAVE_TIMESPEC_DO_SETTIMEOFDAY], [],
-		    [Define if do_settimeofday takes struct timespec and returns int.])
-	    fi
-	])
-])# _LFS_CHECK_MODCOUNT
 # =============================================================================
 
 # =============================================================================

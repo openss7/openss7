@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/02 17:41:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -68,7 +68,7 @@ if RPM_BUILD_USER
 ##
 post-libraries:
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
-		echo "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 
@@ -89,7 +89,7 @@ INSTALL_EXEC_HOOK += post-libraries
 ##
 postun-libraries:
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
-		echo "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lisddi.h,v 0.9.2.6 2005/02/28 13:49:24 brian Exp $
+ @(#) $Id: lisddi.h,v 0.9.2.7 2005/03/02 17:41:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/28 13:49:24 $"
+#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/02 17:41:27 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -298,7 +298,7 @@ extern lis_atomic_t lis_queues_running;
 extern int lis_recvfd(struct stdata *recvhd, strrecvfd_t * recv, struct file *fp);
 extern void lis_release_region(unsigned int from, unsigned int extent);
 extern int lis_request_dma(unsigned int dma_nr, const char *device_id);
-#ifdef HAVE_IRQRETURN_T
+#if HAVE_KTYPE_IRQRETURN_T
 extern int lis_request_irq(unsigned int irq, irqreturn_t (*handler) (int, void *, struct pt_regs *),
 			   unsigned long flags, const char *device, void *dev_id);
 #else

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/02/28 13:51:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/03/02 17:41:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/28 13:51:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/02 17:41:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,11 +113,11 @@ endif
 if RPM_BUILD_KERNEL
 
 noinst_LIBRARIES		= \
-				libLfSspecfs.a \
-				libLfSkernel.a \
-				libLfSdrivers.a \
-				libLfSmodules.a \
-				libLfScompat.a
+				libLfS-specfs.a \
+				libLfS-streams.a \
+				libLfS-drivers.a \
+				libLfS-modules.a \
+				libLfS-compat.a
 
 LOCAL_INCLUDES			= \
 				-I./src/compat -I$(srcdir)/src/compat \
@@ -125,7 +125,7 @@ LOCAL_INCLUDES			= \
 				-I./src/drivers -I$(srcdir)/src/drivers \
 				-I./src/modules -I$(srcdir)/src/modules
 				
-libLfSspecfs_a_SOURCES		= \
+libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.c \
 				src/kernel/strspecfs.h \
 				src/kernel/strlookup.c \
@@ -138,14 +138,14 @@ libLfSspecfs_a_SOURCES		= \
 				src/kernel/strpipe.h \
 				src/kernel/strargs.h
 
-libLfSspecfs_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfSspecfs_a_CPPFLAGS		= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
-libLfSspecfs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
+libLfS_specfs_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libLfSspecfs_a_OBJECTS): $(libLfSspecfs_a_DEPENDENCIES)
+$(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
 
 
-libLfSkernel_a_SOURCES		= \
+libLfS_streams_a_SOURCES		= \
 				src/kernel/strmain.c \
 				src/kernel/strprocfs.c \
 				src/kernel/strprocfs.h \
@@ -161,180 +161,200 @@ libLfSkernel_a_SOURCES		= \
 				src/kernel/strargs.h
 
 if CONFIG_STREAMS_COMPAT_SVR4
-libLfSkernel_a_SOURCES		+= src/compat/svr4/svr4compat.c
+libLfS_streams_a_SOURCES	+= src/compat/svr4/svr4compat.c
 endif
 if CONFIG_STREAMS_COMPAT_SUN
-libLfSkernel_a_SOURCES		+= src/compat/sun/suncompat.c
+libLfS_streams_a_SOURCES	+= src/compat/sun/suncompat.c
 endif
 if CONFIG_STREAMS_COMPAT_UW7
-libLfSkernel_a_SOURCES		+= src/compat/uw7/uw7compat.c
+libLfS_streams_a_SOURCES	+= src/compat/uw7/uw7compat.c
 endif
 if CONFIG_STREAMS_COMPAT_OSF
-libLfSkernel_a_SOURCES		+= src/compat/osf/osfcompat.c
+libLfS_streams_a_SOURCES	+= src/compat/osf/osfcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_AIX
-libLfSkernel_a_SOURCES		+= src/compat/aix/aixcompat.c
+libLfS_streams_a_SOURCES	+= src/compat/aix/aixcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_HPUX
-libLfSkernel_a_SOURCES		+= src/compat/hpux/hpuxcompat.c
+libLfS_streams_a_SOURCES	+= src/compat/hpux/hpuxcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_LIS
-libLfSkernel_a_SOURCES		+= src/compat/lis/liscompat.c
+libLfS_streams_a_SOURCES	+= src/compat/lis/liscompat.c
 endif
 
 if CONFIG_STREAMS_STH
-libLfSkernel_a_SOURCES		+= src/modules/sth.c src/modules/sth.h 
+libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
 endif
 if CONFIG_STREAMS_PIPEMOD
-libLfSkernel_a_SOURCES		+= src/modules/pipemod.c
+libLfS_streams_a_SOURCES	+= src/modules/pipemod.c
 endif
 if CONFIG_STREAMS_CONNLD
-libLfSkernel_a_SOURCES		+= src/modules/connld.c
+libLfS_streams_a_SOURCES	+= src/modules/connld.c
 endif
 if CONFIG_STREAMS_SC
-libLfSkernel_a_SOURCES		+= src/modules/sc.c include/sys/sc.h
+libLfS_streams_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
 endif
 
 if CONFIG_STREAMS_CLONE
-libLfSkernel_a_SOURCES		+= src/drivers/clone.c src/drivers/clone.h
+libLfS_streams_a_SOURCES	+= src/drivers/clone.c src/drivers/clone.h
 endif
 if CONFIG_STREAMS_FIFO
-libLfSkernel_a_SOURCES		+= src/drivers/fifo.c src/drivers/fifo.h
+libLfS_streams_a_SOURCES	+= src/drivers/fifo.c src/drivers/fifo.h
 endif
 if CONFIG_STREAMS_LOOP
-libLfSkernel_a_SOURCES		+=
+libLfS_streams_a_SOURCES	+=
 endif
 if CONFIG_STREAMS_SAD
-libLfSkernel_a_SOURCES		+= src/drivers/sad.c include/sys/sad.h
+libLfS_streams_a_SOURCES	+= src/drivers/sad.c include/sys/sad.h
 endif
 if CONFIG_STREAMS_NSDEV
-libLfSkernel_a_SOURCES		+= src/drivers/nsdev.c
+libLfS_streams_a_SOURCES	+= src/drivers/nsdev.c
 endif
 if CONFIG_STREAMS_ECHO
-libLfSkernel_a_SOURCES		+= src/drivers/echo.c
+libLfS_streams_a_SOURCES	+= src/drivers/echo.c
 endif
 if CONFIG_STREAMS_NULS
-libLfSkernel_a_SOURCES		+= src/drivers/nuls.c
+libLfS_streams_a_SOURCES	+= src/drivers/nuls.c
 endif
 if CONFIG_STREAMS_PIPE
-libLfSkernel_a_SOURCES		+= src/drivers/pipe.c src/drivers/pipe.h
+libLfS_streams_a_SOURCES	+= src/drivers/pipe.c src/drivers/pipe.h
 endif
 if CONFIG_STREAMS_LOG
-libLfSkernel_a_SOURCES		+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
+libLfS_streams_a_SOURCES	+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
 				   src/drivers/log.h src/drivers/log.c
 endif
 #if CONFIG_STREAMS_SFX
-#libLfSkernel_a_SOURCES		+= src/drivers/sfx.c
+#libLfS_streams_a_SOURCES	+= src/drivers/sfx.c
 #endif
 #if CONFIG_STREAMS_SPX
-#libLfSkernel_a_SOURCES		+= src/drivers/spx.c
+#libLfS_streams_a_SOURCES	+= src/drivers/spx.c
 #endif
 
-libLfSkernel_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfSkernel_a_CPPFLAGS		= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
-libLfSkernel_a_CFLAGS		= $(KERNEL_CFLAGS)
+libLfS_streams_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
+libLfS_streams_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libLfSkernel_a_OBJECTS): $(libLfSkernel_a_DEPENDENCIES)
+$(libLfS_streams_a_OBJECTS): $(libLfS_streams_a_DEPENDENCIES)
 
-libLfSdrivers_a_SOURCES		=
+libLfS_drivers_a_SOURCES	=
 
 if CONFIG_STREAMS_CLONE_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/clone.c src/drivers/clone.h
+libLfS_drivers_a_SOURCES	+= src/drivers/clone.c src/drivers/clone.h
 endif
 if CONFIG_STREAMS_FIFO_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/fifo.c src/drivers/fifo.h
+libLfS_drivers_a_SOURCES	+= src/drivers/fifo.c src/drivers/fifo.h
 endif
 if CONFIG_STREAMS_LOOP_MODULE
-libLfSdrivers_a_SOURCES		+=
+libLfS_drivers_a_SOURCES	+=
 endif
 if CONFIG_STREAMS_SAD_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/sad.c include/sys/sad.h
+libLfS_drivers_a_SOURCES	+= src/drivers/sad.c include/sys/sad.h
 endif
 if CONFIG_STREAMS_NSDEV_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/nsdev.c
+libLfS_drivers_a_SOURCES	+= src/drivers/nsdev.c
 endif
 if CONFIG_STREAMS_ECHO_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/echo.c
+libLfS_drivers_a_SOURCES	+= src/drivers/echo.c
 endif
 if CONFIG_STREAMS_NULS_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/nuls.c
+libLfS_drivers_a_SOURCES	+= src/drivers/nuls.c
 endif
 if CONFIG_STREAMS_PIPE_MODULE
-libLfSdrivers_a_SOURCES		+= src/drivers/pipe.c src/drivers/pipe.h
+libLfS_drivers_a_SOURCES	+= src/drivers/pipe.c src/drivers/pipe.h
 endif
 if CONFIG_STREAMS_LOG_MODULE
-libLfSdrivers_a_SOURCES		+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
+libLfS_drivers_a_SOURCES	+= include/log.h include/sys/log.h include/strlog.h include/sys/strlog.h \
 				   src/drivers/log.h src/drivers/log.c
 endif
 #if CONFIG_STREAMS_SFX_MODULE
-#libLfSdrivers_a_SOURCES		+= src/drivers/sfx.c
+#libLfS_drivers_a_SOURCES		+= src/drivers/sfx.c
 #endif
 #if CONFIG_STREAMS_SPX_MODULE
-#libLfSdrivers_a_SOURCES		+= src/drivers/spx.c
+#libLfS_drivers_a_SOURCES		+= src/drivers/spx.c
 #endif
 
-libLfSdrivers_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfSdrivers_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
-libLfSdrivers_a_CFLAGS		= $(KERNEL_CFLAGS)
+libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
+libLfS_drivers_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libLfSdrivers_a_OBJECTS): $(libLfSdrivers_a_DEPENDENCIES)
+$(libLfS_drivers_a_OBJECTS): $(libLfS_drivers_a_DEPENDENCIES)
 
-libLfSmodules_a_SOURCES		=
+libLfS_modules_a_SOURCES	=
 
 if CONFIG_STREAMS_STH_MODULE
-libLfSmodules_a_SOURCES		+= src/modules/sth.c src/modules/sth.h 
+libLfS_modules_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
 endif
 if CONFIG_STREAMS_PIPEMOD_MODULE
-libLfSmodules_a_SOURCES		+= src/modules/pipemod.c
+libLfS_modules_a_SOURCES	+= src/modules/pipemod.c
 endif
 if CONFIG_STREAMS_CONNLD_MODULE
-libLfSmodules_a_SOURCES		+= src/modules/connld.c
+libLfS_modules_a_SOURCES	+= src/modules/connld.c
 endif
 if CONFIG_STREAMS_SC_MODULE
-libLfSmodules_a_SOURCES		+= src/modules/sc.c include/sys/sc.h
+libLfS_modules_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
 endif
 
-libLfSmodules_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfSmodules_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
-libLfSmodules_a_CFLAGS		= $(KERNEL_CFLAGS)
+libLfS_modules_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
+libLfS_modules_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libLfSmodules_a_OBJECTS): $(libLfSmodules_a_DEPENDENCIES)
+$(libLfS_modules_a_OBJECTS): $(libLfS_modules_a_DEPENDENCIES)
 
-libLfScompat_a_SOURCES		= 
+libLfS_compat_a_SOURCES		= 
 
 if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-libLfScompat_a_SOURCES		+= src/compat/svr4/svr4compat.c
+libLfS_compat_a_SOURCES		+= src/compat/svr4/svr4compat.c
 endif
 if CONFIG_STREAMS_COMPAT_SUN_MODULE
-libLfScompat_a_SOURCES		+= src/compat/sun/suncompat.c
+libLfS_compat_a_SOURCES		+= src/compat/sun/suncompat.c
 endif
 if CONFIG_STREAMS_COMPAT_UW7_MODULE
-libLfScompat_a_SOURCES		+= src/compat/uw7/uw7compat.c
+libLfS_compat_a_SOURCES		+= src/compat/uw7/uw7compat.c
 endif
 if CONFIG_STREAMS_COMPAT_OSF_MODULE
-libLfScompat_a_SOURCES		+= src/compat/osf/osfcompat.c
+libLfS_compat_a_SOURCES		+= src/compat/osf/osfcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_AIX_MODULE
-libLfScompat_a_SOURCES		+= src/compat/aix/aixcompat.c
+libLfS_compat_a_SOURCES		+= src/compat/aix/aixcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-libLfScompat_a_SOURCES		+= src/compat/hpux/hpuxcompat.c
+libLfS_compat_a_SOURCES		+= src/compat/hpux/hpuxcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
-libLfScompat_a_SOURCES		+= src/compat/lis/liscompat.c
+libLfS_compat_a_SOURCES		+= src/compat/lis/liscompat.c
 endif
 
-libLfScompat_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfScompat_a_CPPFLAGS		= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
-libLfScompat_a_CFLAGS		= $(KERNEL_CFLAGS)
+libLfS_compat_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
+libLfS_compat_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_compat_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libLfScompat_a_OBJECTS): $(libLfScompat_a_DEPENDENCIES)
+$(libLfS_compat_a_OBJECTS): $(libLfS_compat_a_DEPENDENCIES)
 
-specfs.o: $(libLfSspecfs_a_OBJECTS)
+if WITH_KO_MODULES
+## WITH_KO_MODULES
+
+specfs.o: stamp-verobjs
+	@list=`$(ECHO) " $(libLfS_specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+
+streams.o: stamp-verobjs
+	@list=`$(ECHO) " $(libLfS_streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+
+## WITH_KO_MODULES
+else
+## !WITH_KO_MODULES
+
+specfs.o: $(libLfS_specfs_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-streams.o: $(libLfSkernel_a_OBJECTS)
+streams.o: $(libLfS_streams_a_OBJECTS)
 	$(LD) -r -o $@ $^
+
+## !WITH_KO_MODULES
+endif
 
 endif
 
@@ -350,7 +370,8 @@ EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+= configure.nexusware
 
-export KERNEL_MODULES		= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
+export KERNEL_OBJECTS		= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
+export KERNEL_MODULES		= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
 export KERNEL_PRELOADS		=
 export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
 export KERNEL_SUBDIR		= $(PACKAGE_LCNAME)

@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/25 09:46:09 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/02 17:41:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/25 09:46:09 $ by $Author: brian $
+## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -66,7 +66,7 @@
 if RPM_BUILD_KERNEL
 
 Modules.map: $(KERNEL_MODULES)
-	nm -s $(KERNEL_MODULES) > $@
+	$(NM) -s $(KERNEL_MODULES) > $@
 
 all-kernel: $(KERNEL_MODULES) Modules.map
 
@@ -83,26 +83,26 @@ install-modules: $(KERNEL_MODULES)
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -n "$(KERNEL_PRELOADS)" ; then \
-		echo "$(mkinstalldirs) $$d/boot" ; \
+		$(ECHO) "$(mkinstalldirs) $$d/boot" ; \
 		$(mkinstalldirs) $$d/boot ; \
 	elif test -n "$(KERNEL_MODULES)" ; then \
-		echo "$(mkinstalldirs) $$d" ; \
+		$(ECHO) "$(mkinstalldirs) $$d" ; \
 		$(mkinstalldirs) $$d ; \
 	else \
-		echo "$(mkinstalldirs) $$k" ; \
+		$(ECHO) "$(mkinstalldirs) $$k" ; \
 		$(mkinstalldirs) $$k ; \
 	fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		if test -f $$p; then \
-			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
-			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f" ; \
+			f="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
+			$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f ; \
 			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
-				echo "$(STRIP_KERNEL_MODULES) $$d/$$f" ; \
+				$(ECHO) "$(STRIP_KERNEL_MODULES) $$d/$$f" ; \
 				$(STRIP_KERNEL_MODULES) $$d/$$f ; \
 			fi ; \
 			if test -n "$(COMPRESS_KERNEL_MODULES)" ; then \
-				echo "$(COMPRESS_KERNEL_MODULES) $$d/$$f" ; \
+				$(ECHO) "$(COMPRESS_KERNEL_MODULES) $$d/$$f" ; \
 				$(COMPRESS_KERNEL_MODULES) $$d/$$f ; \
 			fi ; \
 		else :; fi ; \
@@ -110,12 +110,12 @@ install-modules: $(KERNEL_MODULES)
 	list='$(KERNEL_PRELOADS)'; for p in $$list ; do \
 		p="$$p$$kext" ; \
 		if test -f $$d/$$p ; then \
-			echo "(cd $$d/boot ; $(LN_S) ../$$p . )" ; \
+			$(ECHO) "(cd $$d/boot ; $(LN_S) ../$$p . )" ; \
 			(cd $$d/boot ; $(LN_S) ../$$p . ) ; \
 		fi ; \
 	done ; \
 	if test -n "$(KERNEL_MODCONF)" ; then \
-		echo "$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT)" ; \
+		$(ECHO) "$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT)" ; \
 		$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT) ; \
 	fi
 
@@ -154,7 +154,7 @@ post-modules:
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
 			s="$$r$(ksysmap)" ; \
 			if test -f "$$s" ; then \
-				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
+				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
 				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \
@@ -167,7 +167,7 @@ post-modules:
 				f=`basename $$p .o` ; \
 				sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
 				mv -f $$prel_tmp $$prel_new ; \
-				echo "$$f" >> $$prel_new ; \
+				$(ECHO) "$$f" >> $$prel_new ; \
 			done ; \
 			chmod --reference=$$prel_fil $$prel_new ; \
 			cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
@@ -180,9 +180,9 @@ post-source:
 	if test -d $$u ; then \
 		p="$$u/$(PACKAGE_TARNAME)" ; \
 		d=`(cd $(srcdir); pwd)` ; \
-		echo "rm -f -- $$p" ; \
+		$(ECHO) "rm -f -- $$p" ; \
 		rm -f -- "$$p" ; \
-		echo "$(LN_S) -f $$d $$p" ; \
+		$(ECHO) "$(LN_S) -f $$d $$p" ; \
 		$(LN_S) -f "$$d" "$$p" ; \
 	fi
 
@@ -205,19 +205,19 @@ uninstall-modules:
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
-		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
+		p="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
 		p="$$p$$kext" ; \
-		echo "$(LIBTOOL) --mode=uninstall rm -f -- $$d/$$p" ; \
+		$(ECHO) "$(LIBTOOL) --mode=uninstall rm -f -- $$d/$$p" ; \
 		$(LIBTOOL) --mode=uninstall rm -f -- "$$d/$$p" ; \
 	done ; \
 	list='$(KERNEL_PRELOADS)'; for p in $$list; do \
 		p="$$p$$kext" ; \
-		echo "rm -f -- $$d/boot/$$p" ; \
+		$(ECHO) "rm -f -- $$d/boot/$$p" ; \
 		rm -f -- $$d/boot/$$p ; \
 	done ; \
-	echo "rmdir --ignore-fail-on-non-empty $$d" ; \
+	$(ECHO) "rmdir --ignore-fail-on-non-empty $$d" ; \
 	rmdir --ignore-fail-on-non-empty "$$d" ; \
-	echo "rm -f -- $$k/modules.$(KMODCONF_EXT)" ; \
+	$(ECHO) "rm -f -- $$k/modules.$(KMODCONF_EXT)" ; \
 	rm -f -- "$$k/modules.$(KMODCONF_EXT)"
 
 UNINSTALL_LOCAL += uninstall-modules
@@ -270,7 +270,7 @@ postun-modules:
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
 			s="$$r$(ksysmap)" ; \
 			if test -f $$s ; then \
-				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
+				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
 				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \

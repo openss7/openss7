@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/02 17:41:28 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/02 17:41:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/02 17:41:28 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -880,7 +880,7 @@ int lis_can_unload(void)
 }
 
 EXPORT_SYMBOL_GPL(lis_can_unload);
-#ifdef HAVE_KFUNC_CHECK_REGION
+#if HAVE_KFUNC_CHECK_REGION
 int lis_check_region(unsigned int from, unsigned int extent)
 {
 	return WARN(check_region(from, extent));
@@ -1023,7 +1023,7 @@ const char *lis_pcibios_strerror(int error)
 }
 
 EXPORT_SYMBOL_GPL(lis_pcibios_strerror);
-#ifdef HAVE_KFUNC_PCIBIOS_INIT
+#if HAVE_KFUNC_PCIBIOS_INIT
 void lis_pcibios_init(void)
 {
 #ifdef HAVE_PCIBIOS_INIT_ADDR
@@ -1036,7 +1036,7 @@ void lis_pcibios_init(void)
 
 EXPORT_SYMBOL_GPL(lis_pcibios_init);
 #endif
-#ifdef HAVE_KFUNC_PCIBIOS_FIND_CLASS
+#if HAVE_KFUNC_PCIBIOS_FIND_CLASS
 int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
 			   unsigned char *dev_fn)
 {
@@ -1045,7 +1045,7 @@ int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsign
 
 EXPORT_SYMBOL_GPL(lis_pcibios_find_class);
 #endif
-#ifdef HAVE_KFUNC_PCIBIOS_FIND_DEVICE
+#if HAVE_KFUNC_PCIBIOS_FIND_DEVICE
 int lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsigned short index,
 			    unsigned char *bus, unsigned char *dev_fn)
 {
@@ -1054,7 +1054,7 @@ int lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id, unsign
 
 EXPORT_SYMBOL_GPL(lis_pcibios_find_device);
 #endif
-#ifdef HAVE_KFUNC_PCIBIOS_PRESENT
+#if HAVE_KFUNC_PCIBIOS_PRESENT
 int lis_pcibios_present(void)
 {
 	return WARN(pcibios_present());
@@ -1062,7 +1062,7 @@ int lis_pcibios_present(void)
 
 EXPORT_SYMBOL_GPL(lis_pcibios_present);
 #endif
-#ifdef HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
+#if HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
 int lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
 				 unsigned char *val)
 {
@@ -1071,7 +1071,7 @@ int lis_pcibios_read_config_byte(unsigned char bus, unsigned char dev_fn, unsign
 
 EXPORT_SYMBOL_GPL(lis_pcibios_read_config_byte);
 #endif
-#ifdef HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
+#if HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
 int lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
 				  unsigned int *val)
 {
@@ -1080,7 +1080,7 @@ int lis_pcibios_read_config_dword(unsigned char bus, unsigned char dev_fn, unsig
 
 EXPORT_SYMBOL_GPL(lis_pcibios_read_config_dword);
 #endif
-#ifdef HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
+#if HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
 int lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
 				 unsigned short *val)
 {
@@ -1089,7 +1089,7 @@ int lis_pcibios_read_config_word(unsigned char bus, unsigned char dev_fn, unsign
 
 EXPORT_SYMBOL_GPL(lis_pcibios_read_config_word);
 #endif
-#ifdef HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_BYTE
+#if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_BYTE
 int lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsigned char where,
 				  unsigned char val)
 {
@@ -1098,7 +1098,7 @@ int lis_pcibios_write_config_byte(unsigned char bus, unsigned char dev_fn, unsig
 
 EXPORT_SYMBOL_GPL(lis_pcibios_write_config_byte);
 #endif
-#ifdef HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_DWORD
+#if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_DWORD
 int lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsigned char where,
 				   unsigned int val)
 {
@@ -1107,7 +1107,7 @@ int lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_fn, unsi
 
 EXPORT_SYMBOL_GPL(lis_pcibios_write_config_dword);
 #endif
-#ifdef HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_WORD
+#if HAVE_KFUNC_LIS_PCIBIOS_WRITE_CONFIG_WORD
 int lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn, unsigned char where,
 				  unsigned short val)
 {
@@ -1124,7 +1124,7 @@ int lis_request_dma(unsigned int dma_nr, const char *device_id)
 }
 
 EXPORT_SYMBOL_GPL(lis_request_dma);
-#ifdef HAVE_IRQRETURN_T
+#if HAVE_KTYPE_IRQRETURN_T
 int lis_request_irq(unsigned int irq, irqreturn_t (*handler) (int, void *, struct pt_regs *),
 		    unsigned long flags, const char *device, void *dev_id)
 {
@@ -1380,7 +1380,7 @@ void lis_assert_fail(const char *expr, const char *objname, const char *file, un
 }
 
 EXPORT_SYMBOL_GPL(lis_assert_fail);
-#ifdef HAVE_KFUNC_MOD_DEC_USE_COUNT
+#if HAVE_KFUNC_MOD_DEC_USE_COUNT
 void lis_dec_mod_cnt_fcn(const char *file, int line)
 {
 	WARNF(MOD_DEC_USE_COUNT, file, line);
@@ -1419,7 +1419,7 @@ void lis_gettimeofday(struct timeval *tv)
 }
 
 EXPORT_SYMBOL_GPL(lis_gettimeofday);
-#ifdef HAVE_KFUNC_MOD_INC_USE_COUNT
+#if HAVE_KFUNC_MOD_INC_USE_COUNT
 void lis_inc_mod_cnt_fcn(const char *file, int line)
 {
 	WARNF(MOD_INC_USE_COUNT, file, line);

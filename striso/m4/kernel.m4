@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/02/28 13:48:42 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/03/02 17:41:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/28 13:48:42 $ by $Author: brian $
+# Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -260,8 +260,14 @@ dnl pull out versions from release number
     then
 	AC_DEFINE_UNQUOTED([LINUX_2_6], [], [Define for the linux 2.6 kernel series.])
     fi
+    if test "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \)
+    then
+	linux_cv_k_ko_modules='yes'
+	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [], [Define for linux 2.5.48+ .ko kernel modules.])
+    fi
     AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_minor -eq 4])
     AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_minor -eq 6])
+    AM_CONDITIONAL([WITH_KO_MODULES], [test :${linux_cv_k_ko_modules:-no} = :yes])
 ])# _LINUX_CHECK_KERNEL_RELEASE
 # =========================================================================
 
@@ -1444,12 +1450,14 @@ AC_DEFUN([_LINUX_CHECK_MEMBER_internal],
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_MEMBERS_internal],
     [m4_foreach([LK_Member], [$1],
-	[_LINUX_CHECK_MEMBER_internal(LK_Member,
-	    [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_[]LK_Member), 1,
+	[AH_TEMPLATE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member),
 		[Define to 1 if `]m4_bpatsubst(LK_Member, [^[^.]*\.])[' is member of `]m4_bpatsubst(LK_Member, [\..*])['.])
+	 _LINUX_CHECK_MEMBER_internal(LK_Member,
+	    [AC_DEFINE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member), 1)
 $2],
-		[$3],
-		[$4])])
+	    [AC_DEFINE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member), 0)
+$3],
+	    [$4])])
 ])# _LINUX_CHECK_MEMBERS_internal
 # =============================================================================
 
@@ -1507,9 +1515,10 @@ AC_DEFUN([_LINUX_CHECK_FUNCS_internal],
 for lk_func in $1
 do
     _LINUX_CHECK_FUNC_internal($lk_func,
-			       [AC_DEFINE_UNQUOTED([AS_TR_CPP([HAVE_KFUNC_$lk_func])])
+	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KFUNC_$lk_func]), 1)
 $2],
-			       [$3], [$4])dnl
+	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KFUNC_$lk_func]), 0)
+$3], [$4])dnl
 done
 ])# _LINUX_CHECK_FUNCS_internal
 # =============================================================================
@@ -1563,11 +1572,13 @@ if (sizeof ($1))
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_TYPES_internal], [dnl
     m4_foreach([LK_Type], [$1],
-	[_LINUX_CHECK_TYPE_internal(LK_Type,
-	    [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_[]LK_Type), 1,
+	[AH_TEMPLATE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type),
 		[Define to 1 if the system has the type ']LK_Type['.])
+	 _LINUX_CHECK_TYPE_internal(LK_Type,
+	    [AC_DEFINE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type), 1)
 $2],
-	    [$3],
+	    [AC_DEFINE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type), 0)
+$3],
 	    [$4])])
 ])# _LINUX_CHECK_TYPES_internal
 # =============================================================================
@@ -1612,14 +1623,15 @@ AC_DEFUN([_LINUX_CHECK_HEADER_internal], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_HEADERS_internal], [dnl
     AC_FOREACH([LK_Header], [$1],
-	[AH_TEMPLATE(AS_TR_CPP(HAVE_[]LK_Header),
+	[AH_TEMPLATE(AS_TR_CPP(HAVE_KINC_[]LK_Header),
 	    [Define to 1 if you have the <]LK_Header[> header file.])])
 for lk_header in $1
 do
     _LINUX_CHECK_HEADER_internal($lk_header,
-	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$lk_header))
+	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_KINC_$lk_header), 1)
 $2],
-	[$3],
+	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_KINC_$lk_header), 0)
+$3],
 	[$4])dnl
 done
 ])# _LINUX_CHECK_HEADERS_internal

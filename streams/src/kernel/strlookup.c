@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/28 14:13:57 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/28 14:13:57 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:28 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/28 14:13:57 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:28 $";
 
 #define __NO_VERSION__
 
@@ -79,10 +79,10 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
-#ifndef HAVE_KFUNC_TRY_MODULE_GET
+#if ! HAVE_KFUNC_TRY_MODULE_GET
 #define try_module_get try_inc_mod_count
 #endif
-#ifndef HAVE_KFUNC_MODULE_PUT
+#if ! HAVE_KFUNC_MODULE_PUT
 #define module_put(__m) __MOD_DEC_USE_COUNT((__m))
 #endif
 
@@ -981,7 +981,7 @@ int cdev_add(struct cdevsw *cdev, modID_t modid)
 		if (!(mnt = specfs_get()))
 			return (-ENODEV);
 		sb = mnt->mnt_sb;
-#ifdef HAVE_KFUNC_IGET_LOCKED
+#if HAVE_KFUNC_IGET_LOCKED
 		inode = iget_locked(sb, dev);
 #else
 		inode = iget4(sb, dev, NULL, cdev);
@@ -992,7 +992,7 @@ int cdev_add(struct cdevsw *cdev, modID_t modid)
 		ptrace(("couldn't allocate inode\n"));
 		return (-ENOMEM);
 	}
-#ifdef HAVE_KFUNC_IGET_LOCKED
+#if HAVE_KFUNC_IGET_LOCKED
 	if (inode->i_state & I_NEW) {
 		inode->u.generic_ip = cdev;
 		sb->s_op->read_inode(inode);
@@ -1067,7 +1067,7 @@ int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 			return (-ENODEV);
 		sb = mnt->mnt_sb;
 		/* get dentry if required */
-#ifdef HAVE_KFUNC_IGET_LOCKED
+#if HAVE_KFUNC_IGET_LOCKED
 		inode = iget_locked(sb, dev);
 #else
 		inode = iget4(sb, dev, NULL, cdev);
@@ -1078,7 +1078,7 @@ int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 		ptrace(("couldn't allocate inode\n"));
 		return (-ENOMEM);
 	}
-#ifdef HAVE_KFUNC_IGET_LOCKED
+#if HAVE_KFUNC_IGET_LOCKED
 	if (inode->i_state & I_NEW) {
 		inode->u.generic_ip = cdev;
 		sb->s_op->read_inode(inode);
