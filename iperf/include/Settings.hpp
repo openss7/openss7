@@ -208,6 +208,8 @@ typedef struct thread_Settings {
 #define FLAG_NOMULTREPORT   0x00080000
 #define FLAG_SINGLECLIENT   0x00100000
 #define FLAG_SINGLEUDP      0x00200000
+#define FLAG_SCTP	    0x00400000
+#define FLAG_SEQPACKET	    0x00800000
 
 #define isBuflenSet(settings)      ((settings->flags & FLAG_BUFLENSET) != 0)
 #define isCompat(settings)         ((settings->flags & FLAG_COMPAT) != 0)
@@ -233,6 +235,8 @@ typedef struct thread_Settings {
 // end Active Low
 #define isSingleClient(settings)   ((settings->flags & FLAG_SINGLECLIENT) != 0)
 #define isSingleUDP(settings)      ((settings->flags & FLAG_SINGLEUDP) != 0)
+#define isSCTP(settings)	   ((settings->flags & FLAG_SCTP) != 0)
+#define isSeqpacket(settings)	   ((settings->flags & FLAG_SEQPACKET) != 0)
 
 #define setBuflenSet(settings)     settings->flags |= FLAG_BUFLENSET
 #define setCompat(settings)        settings->flags |= FLAG_COMPAT
@@ -256,6 +260,8 @@ typedef struct thread_Settings {
 #define setNoMultReport(settings)  settings->flags |= FLAG_NOMULTREPORT
 #define setSingleClient(settings)  settings->flags |= FLAG_SINGLECLIENT
 #define setSingleUDP(settings)     settings->flags |= FLAG_SINGLEUDP
+#define setSCTP(settings)	   settings->flags |= FLAG_SCTP
+#define setSeqpacket(settings)	   settings->flags |= FLAG_SEQPACKET
 
 #define unsetBuflenSet(settings)   settings->flags &= ~FLAG_BUFLENSET
 #define unsetCompat(settings)      settings->flags &= ~FLAG_COMPAT
@@ -279,6 +285,8 @@ typedef struct thread_Settings {
 #define unsetNoMultReport(settings)   settings->flags &= ~FLAG_NOMULTREPORT
 #define unsetSingleClient(settings)   settings->flags &= ~FLAG_SINGLECLIENT
 #define unsetSingleUDP(settings)      settings->flags &= ~FLAG_SINGLEUDP
+#define unsetSCTP(settings)	   settings->flags &= ~FLAG_SCTP
+#define unsetSeqpacket(settings)   settings->flags &= ~FLAG_SEQPACKET
 
 
 #define HEADER_VERSION1 0x80000000

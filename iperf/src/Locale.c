@@ -83,8 +83,10 @@ Client/Server:\n\
   -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)\n\
   -o, --output    <filename> output the report or error message to this specified file\n\
   -p, --port      #        server port to listen on/connect to\n\
+  -q, --seqpacket          for SCTP use SOCK_SEQPACKET instead of SOCK_STREAM\n\
   -u, --udp                use UDP rather than TCP\n\
   -w, --window    #[KM]    TCP window size (socket buffer size)\n\
+  -z, --sctp               use SCTP (rather than UDP or TCP)\n\
   -B, --bind      <host>   bind to <host>, an interface or multicast address\n\
   -C, --compatibility      for use with older versions does not sent extra msgs\n\
   -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
@@ -136,8 +138,10 @@ Client/Server:\n\
   -l, --len       #[KM]    length of buffer to read or write (default 8 KB)\n\
   -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)\n\
   -p, --port      #        server port to listen on/connect to\n\
+  -q, --seqpacket          for SCTP use SOCK_SEQPACKET instead of SOCK_STREAM\n\
   -u, --udp                use UDP rather than TCP\n\
   -w, --window    #[KM]    TCP window size (socket buffer size)\n\
+  -z, --sctp               use SCTP (rather than UDP or TCP)\n\
   -B, --bind      <host>   bind to <host>, an interface or multicast address\n\
   -C, --compatibility      for use with older versions does not sent extra msgs\n\
   -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
