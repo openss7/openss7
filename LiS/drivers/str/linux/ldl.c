@@ -1117,6 +1117,7 @@ STATIC void ndev_wr_wakeup(struct ndev *ndev)
 	ndev_wr_wakeup_endp(ndev);
 }
 
+#ifndef KERNEL_2_1		/* old 2.0 kernel, not supported anymore */
 
 STATIC void tx_congestion_timeout(caddr_t dp)
 {
@@ -1152,6 +1153,7 @@ STATIC void ndev_wr_sleep(struct ndev *ndev)
 	else
 		printk("ldl: ndev_wr_sleep() failed\n");
 }
+#endif
 
 /*
  *  This is the skb destructor callback.

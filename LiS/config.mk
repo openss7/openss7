@@ -129,6 +129,7 @@ DRVROBJ = $(DRVRDIR)/$(LIS_TARG)
 PROBLEMS = -Wpointer-arith
 PROBLEMS = 
 XOPTS = -Wall -Wstrict-prototypes $(PROBLEMS)
+XOPTS+= -fno-strict-aliasing -Wno-sign-compare -fno-common
 
 #
 # Compiler options for debugging and optimization.
