@@ -28,14 +28,13 @@
  * 
  */
 
-#ident "@(#) LiS dki.c 2.12 12/27/03 15:12:51 "
+#ident "@(#) LiS dki.c 2.16 09/07/04 11:11:22 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
 
 lis_spin_lock_t	  lis_tlist_lock ;
 
-#if !(defined(LINUX) && defined(USE_LINUX_KMEM_TIMER))
 /************************************************************************
 *                       SVR4 Compatible timeout                         *
 *************************************************************************
@@ -62,9 +61,82 @@ typedef struct tlist
 
 } tlist_t ;
 
-volatile tlist_t *lis_tlist_head ;	/* this list is no particular order */
+#define THASH		757		/* prime number */
+
+/*
+ * head[0] is for free timer structures.  The others head linked
+ * lists of timer structures whose handles hash to the same value.
+ */
+volatile tlist_t *lis_tlist_heads[THASH] ;
+/*
+ * The tlist handles roll over at 2^31 and thus are virtually never
+ * repeated.  But we check whenever assigning a timer handle to ensure
+ * that it is not already in use.  The hash table makes this easy.
+ */
 volatile int	  lis_tlist_handle ;	/* next handle to use */
 
+/*
+ * Timer list manipulations
+ *
+ * Caller has timer list locked
+ */
+static INLINE void enter_timer_in_list(tlist_t *tp)
+{
+    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[tp->handle % THASH] ;
+
+    tp->next = *headp ;
+    *headp = tp ;
+}
+
+static INLINE void remove_timer_from_list(tlist_t *tp)
+{
+    tlist_t	*t ;
+    tlist_t	*nxt ;
+    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[tp->handle % THASH] ;
+
+    if ((t = *headp) == NULL)	/* nothing in that hash list */
+    {
+	tp->next = NULL ;
+	return ;
+    }
+
+    if (t == tp)		/* our entry is first in list */
+    {
+	*headp = tp->next ;
+	tp->next = NULL ;
+	return ;
+    }
+
+    /* Find this entry starting at the 2nd element and on down the list */
+    for (nxt = NULL; t->next != NULL; t = nxt)
+    {
+	nxt = t->next ;
+	if (nxt == tp)
+	{
+	    t->next = tp->next ;
+	    tp->next = NULL ;
+	    return ;
+	}
+    }
+
+    tp->next = NULL ;		/* ensure null next pointer */
+}
+
+static INLINE tlist_t *alloc_timer(char *file_name, int line_nr)
+{
+    tlist_t	*t ;
+    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[0] ;
+
+    if ((t = *headp) == NULL)	/* nothing in the hash list */
+	t = (tlist_t *) lis_alloc_timer(file_name, line_nr) ;
+    else
+    {
+	*headp = t->next ;	/* link around 1st element */
+	lis_mark_mem(t, file_name, line_nr) ;
+    }
+
+    return(t) ;			/* NULL if could not allocate */
+}
 
 /*
  * This is always the function passed to the kernel.  'arg' is a pointer to
@@ -73,108 +145,126 @@ volatile int	  lis_tlist_handle ;	/* next handle to use */
 static void sys_timeout_fcn(ulong arg)
 {
     tlist_t		*tp = (tlist_t *) arg ;
-    timo_fcn_t		*fcn ;
-    caddr_t		 uarg ;
+    timo_fcn_t		*fcn = (timo_fcn_t *) NULL ;
+    caddr_t		 uarg = NULL ;
     lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+
+    remove_timer_from_list(tp) ;	/* handle can no longer be found */
     if (tp->handle != 0 && tp->fcn != NULL)
     {
 	fcn        = tp->fcn ;		/* save local copy */
 	uarg       = tp->arg ;
-	tp->handle = 0 ;		/* entry now available */
-	tp->fcn    = NULL ;
-	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-	fcn(uarg) ;			/* call fcn while not holding lock */
     }
-    else
-	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+
+    tp->handle = 0 ;			/* entry now available */
+    tp->fcn    = NULL ;
+    enter_timer_in_list(tp) ;		/* enter in list 0 (free list) */
+    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+
+    if (fcn != (timo_fcn_t *) NULL)
+	fcn(uarg) ;			/* call fcn while not holding lock */
+}
+
+
+/*
+ * Find the timer entry associated with the given handle.
+ *
+ * Caller has timer list locked
+ */
+static INLINE tlist_t *find_timer_by_handle(int handle)
+{
+    tlist_t	*tp = NULL ;
+    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[handle % THASH] ;
+
+    for (tp = *headp; tp != NULL; tp = tp->next)
+    {
+	if (tp->handle == handle) return(tp) ;
+    }
+
+    return(NULL) ;
 }
 
 /*
- * "timeout" is #defined to be this function in dki.h.
+ * Allocate an unused timer handle.  If there is a timer structure in
+ * the list that is available return a pointer to it, else null.
+ *
+ * In any event return a unique handle.
+ *
+ * Caller has locked the timer list.
  */
-toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-		    char *file_name, int line_nr)
+static INLINE int alloc_handle(void)
 {
-    tlist_t	*tp ;
-    tlist_t	*found ;
-    lis_flags_t  psw;
+    tlist_t	*tp = NULL ;
     int		 handle ;
-    int		 unique ;
 
-    unique = 0 ;
-    found = NULL ;
-    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-    while (!unique)
+    while (1)
     {
 	do
 	{					/* next handle */
 	    handle = (++lis_tlist_handle) & 0x7FFFFFFF ;
 	}
-	while (handle == 0) ;			/* prevent use of handle 0 */
+	while ((handle % THASH) == 0) ;		/* prevent use of handle 0 */
 
-	unique = 1 ;				/* hopefully unique handle */
-	for (tp = (tlist_t *) lis_tlist_head; tp != NULL; tp = tp->next)
-	{					/* find one not-in use */
-	    if (tp->handle == handle) unique = 0 ;	/* handle not unique */
-	    if (found == NULL && tp->handle == 0)
-		found = tp ;
-
-	    if (!unique && found != NULL)
-		break ;				/* try w/another handle */
-	}					/* traverse entire list */
+	tp = find_timer_by_handle(handle) ;
+	if (tp == NULL)				/* handle available */
+	    break ;
     }
 
-    if (found == NULL)				/* must allocate a new one */
+    return(handle) ;
+}
+
+/*
+ * "timeout" is #defined to be this function in dki.h.
+ */
+toid_t	_RP lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+		    char *file_name, int line_nr)
+{
+    tlist_t	*tp ;
+    int		 handle ;
+    lis_flags_t  psw;
+    static tlist_t z ;
+
+    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+
+    handle = alloc_handle() ;
+    tp = alloc_timer(file_name, line_nr) ;	/* available timer struct */
+    if (tp == NULL)				/* must allocate a new one */
     {
-#if defined(CONFIG_DEV)
-	tp = (tlist_t *) LISALLOC(sizeof(*tp),file_name, line_nr) ;
-#else
-	tp = (tlist_t *) ALLOC(sizeof(*tp)) ;
-#endif
-	if (tp == NULL)
-	{
-	    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-	    return(0) ;		/* no memory for timer */
-	}
-
-	tp->next = (tlist_t *) lis_tlist_head ;
-	lis_tlist_head = tp ;
-    }
-    else
-    {
-	tp = found ;				/* use found timer */
-	lis_mark_mem(tp, file_name, line_nr) ;
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+	return(0) ;				/* no memory for timer */
     }
 
+    *tp = z ;					/* zero out structure */
     tp->handle	= handle ;
     tp->fcn	= timo_fcn ;
     tp->arg	= arg ;
     
+    enter_timer_in_list(tp) ;			/* hashed by handle */
     lis_tmout(&tp->tl, sys_timeout_fcn, (long) tp, ticks) ;
-						/* use Linux */
+						/* start system timer */
     lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
 
-    return(tp->handle) ;			/* return handle */
+    return(handle) ;				/* return handle */
 
 } /* lis_timeout_fcn */
 
-toid_t	lis_untimeout(toid_t id)
+toid_t	_RP lis_untimeout(toid_t id)
 {
     tlist_t	*tp ;
     lis_flags_t  psw;
 
     lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-    for (tp = (tlist_t *) lis_tlist_head; tp != NULL; tp = tp->next)
-    {						/* find one not-in use */
-	if (tp->handle == id)			/* is this our timer?  */
-	{
-	    lis_mark_mem(tp, "unused", MEM_TIMER) ;
-	    lis_untmout(&tp->tl) ;		/* stop it */
-	    tp->handle = 0 ;			/* make available */
-	    break ;				/* done */
-	}
+
+    tp = find_timer_by_handle(id) ;
+    if (tp != NULL)
+    {
+	lis_mark_mem(tp, "unused-timer", MEM_TIMER) ;
+	remove_timer_from_list(tp) ;
+	lis_untmout(&tp->tl) ;			/* stop system timer */
+	tp->handle = 0 ;			/* make available */
+	enter_timer_in_list(tp) ;		/* list 0 is free list */
     }
 
     lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
@@ -184,60 +274,34 @@ toid_t	lis_untimeout(toid_t id)
 
 void lis_terminate_dki(void)
 {
-	lis_flags_t     psw;
+    lis_flags_t     psw;
+    int		    i ;
 
-	/*
-	 *  In case of buggy drivers, timeouts could still happen.
-	 *  Better be on the safe side.
-	 */
-        lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-	while (lis_tlist_head != NULL)
+    /*
+     *  In case of buggy drivers, timeouts could still happen.
+     *  Better be on the safe side.
+     */
+    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+
+    for (i = 0; i < THASH; i++)
+    {
+	while (lis_tlist_heads[i] != NULL)
 	{
-		tlist_t *tp = (tlist_t *) lis_tlist_head;
+	    tlist_t *tp = (tlist_t *) lis_tlist_heads[i];
 
-		lis_untmout(&tp->tl);
-		lis_tlist_head = tp->next;
-		FREE(tp);
+	    lis_untmout(&tp->tl);
+	    remove_timer_from_list(tp) ;
+	    lis_free_timer(tp);
 	}
-        lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-}
-#endif
+    }
 
-/************************************************************************
-*                           lis_create_node                             *
-*************************************************************************
-*									*
-* Create a node in the "/dev" directory.				*
-*									*
-************************************************************************/
-#if 0			/* see rant in dki.h */
-int      lis_create_node(char *name,
-			 int   major_num,
-			 int   minor_num,
-			 int   spec_type,
-			 int   flag)
+    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+    lis_terminate_timers() ;			/* an mdep routine */
+}
+
+void lis_initialize_dki(void)
 {
-    dev_t	dev ;
-
-    if (flag == CLONE_DEV)
-	dev = makedevice(LIS_CLONE, major_num) ;
-    else
-	dev = makedevice(major_num, minor_num) ;
-
-    return(lis_mknod(name, spec_type, dev)) ;
+    lis_init_timers(sizeof(tlist_t)) ;		/* an mdep routine */
 }
-#endif
 
-/************************************************************************
-*                          lis_remove_node                              *
-*************************************************************************
-*									*
-* Remove the node from "/dev".						*
-*									*
-************************************************************************/
-#if 0			/* see rant in dki.h */
-int      lis_remove_node(char *name)
-{
-    return(lis_unlink(name)) ;
-}
-#endif
+

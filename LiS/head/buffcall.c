@@ -33,7 +33,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS bufcall.c 2.6 5/30/03 21:40:39 "
+#ident "@(#) LiS bufcall.c 2.9 09/13/04 13:52:56 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -88,7 +88,7 @@ static void bc_timeout(unsigned long not_used)
     lis_strbcflag = 1 ;
     lis_spin_unlock_irqrestore(&lis_bc_lock, &psw) ;
     lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
-    lis_atomic_inc(&lis_runq_req_cnt) ;
+    K_ATOMIC_INC(&lis_runq_req_cnt) ;
     lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
 
     lis_setqsched(0);			/* schedule, but don't run right now */
@@ -98,7 +98,7 @@ static void bc_timeout(unsigned long not_used)
 
 /* link a new bcinfo struct, init it w/ given parms and return its address
  */
-static int bc_link( int size, void (*function)(long), long arg )
+static int bc_link( int size, void _RP (*function)(long), long arg )
 {
     bcinfo_t		*bcinfo;
     bclist_t		*list ;
@@ -208,8 +208,8 @@ static void bc_ulink(bcinfo_t *bcinfo)
 /* lis_bufcall - schedule recovery from alloc failure
  *
  */
-int 
-lis_bufcall(unsigned size, int priority, void (*function)(long), long arg)
+int _RP
+lis_bufcall(unsigned size, int priority, void _RP (*function)(long), long arg)
 {
     LisUpCount(BUFCALLS) ;			/* stats array */
     (void)priority;
@@ -230,8 +230,8 @@ lis_bufcall(unsigned size, int priority, void (*function)(long), long arg)
  *	will be called when there is a `good chance' that the
  *	lis_esballoc will succeed.
  */
-int 
-lis_esbbcall(int priority, void (*function)(long), long arg)
+int _RP
+lis_esbbcall(int priority, void _RP (*function)(long), long arg)
 {
     LisUpCount(BUFCALLS) ;			/* stats array */
     (void)priority;
@@ -250,7 +250,7 @@ lis_esbbcall(int priority, void (*function)(long), long arg)
 /* unbufcall - cancels a bufcall/esbbcall
  *
  */
-void
+void _RP
 lis_unbufcall(int bcid)
 {
     bcinfo_t	*bcinfo ;
@@ -315,7 +315,7 @@ lis_dobufcall(int cpu_id)
     lis_flags_t     	 psw;
     bclist_t		*list ;
     struct bcinfo	*bc;
-    void	       (*fcn)(long);
+    void	         _RP (*fcn)(long);
     long		 arg ;
 
     (void) cpu_id ;
