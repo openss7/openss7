@@ -1,0 +1,265 @@
+
+    Internet Draft                Informational                   March 2001
+
+    Network Working Group                                     Brian Bidulock
+    INTERNET-DRAFT                                       The OpenSS7 Project
+
+
+    Expires in six months                                         March 2001
+
+
+
+                  Stream Control Transmission Protocol (SCTP)
+           An Algorithm for Gap Report and Duplicate TSN Calculations
+                     <draft-bidulock-sigtran-gapalg-00.txt>
+
+
+
+    Status of this Memo
+
+    This document is an Internet-Draft and is in full conformance  with  all
+    provisions of Section 10 or RFC 2026.  Internet-Drafts are working docu-
+    ments of the Inetnet Engineering Task Force (IETF), its areas,  and  its
+    working groups.  Note that other groups may also distribute working doc-
+    uments as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum  of  six  months
+    and  may  be  updated,  replaced, or obsoleted by other documents at any
+    time.  It is inappropriate to use Internet-Drafts as reference  material
+    or to cite them other than as 'work in progress'.
+
+    The    list    of   current   Internet-Drafts   can   be   accessed   at
+    http://www.ietf.org/ietf/1id-abstracts.txt
+
+    The list  of  Internet-Draft  Shadow  Directories  can  be  accessed  at
+    http://www.ietf.org/shadow.html
+
+    To  learn  the current status of any Internet-Draft, please check the on
+    ftp.is.co.za (Africa), nic.nordu.net  (Europe),  munnari.oz.au  (Pacific
+    Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+
+    Abstract
+
+    This  Internet Draft describes an algorithm for the tracking and genera-
+    tion of SACK Gap and Duplicate TSN reports.  This algorithm has been im-
+    plemented in the OpenSS7 Linux Kernel implementation of SCTP [RFC 2960].
+
+
+    1.  Introduction
+
+    This internet-draft provides an algorithm for tracking gap and duplicate
+    TSN  SACK  reports  for  the Stream Control Transmission Protocol as de-
+    scribed in [RFC 2960].
+
+    There are several difficulties to consider when  attempting  implementa-
+    tion of the Gap and Duplicate TSN reports in SCTP:
+
+
+    i)   The algorithm must support a quick determination of whether the TSN
+         is a duplicate TSN.
+
+    ii)  The algorithm must support a quick determination of whether the TSN
+         falls within an existing SACK'ed TSN range.
+
+
+
+    Bidulock                       Version 0.0                        Page 1
+
+    Internet Draft                Informational                   March 2001
+
+    iii) The  algorithm  must support counting duplicates accumulated over a
+         number of SCTP messages but be able to be cleared quickly as a  Du-
+         plicate TSN report is generated.
+
+    iv)  The algorithm must support on demand generation of Gap Reports.
+
+    v)   The algorithm must consume a finite and bounded amount of memory.
+
+    vi)  The algorithm must smoothly interwork with the SCTP's procedures.
+
+    The  algortihm  presented in this internet-draft attempts to meet all of
+    these objectives and provide a compact solution.
+
+
+
+
+
+    Security Considerations
+
+    Acknowledgements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Bidulock                       Version 0.0                        Page 2
+
+    Internet Draft                Informational                   March 2001
+
+
+    References
+
+    RFC 2960.
+         Randall Stewart, Qiaobing Xie, Ken  Morneault,  Chip  Sharp,  Hanns
+         Juergen Schwarzbauer, Tom Taylor, Ian Rytina, Hallewar Kalla, Lixia
+         Zhang, and  Vern  Paxson,  "Stream  Control  Transmission  Protocol
+         (SCTP)," RFC 2960, The Internet Society (February 2000).
+
+
+
+
+    Author's  Addresses
+
+    Brian F. G. Bidulock                                Tel: +1-972-839-4489
+    The OpenSS7 Project                          EMail: bidulock@openss7.org
+    4701 Preston Park Boulevard, Suite 424
+    Plano, TX 75093
+    USA
+
+
+
+    This Internet Draft expires September 2001.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Bidulock                       Version 0.0                        Page 3
+
+    Internet Draft                Informational                   March 2001
+
+                               TABLE OF CONTENTS
+
+     Status of this Memo ..............................................    1
+     Abstract .........................................................    1
+    1 Introduction ....................................................    1
+     Security Considerations ..........................................    2
+     Acknowledgements .................................................    2
+     References .......................................................    3
+     Author's  Addresses ..............................................    3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Bidulock                       Version 0.0                        Page 4
+

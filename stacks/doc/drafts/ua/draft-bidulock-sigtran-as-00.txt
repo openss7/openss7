@@ -1,0 +1,532 @@
+
+
+
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+
+
+Expires in six months                                    January 5, 2003
+
+
+
+
+               Signalling Transport User Adaptation Layer
+                        Applicability Statement
+                                 UA AS
+                   <draft-bidulock-sigtran-as-00.txt>
+
+
+Status of this Memo
+
+     This document is an Internet-Draft and is in full conformance with
+  all provisions of Section 10 or RFC 2026.  Internet-Drafts are working
+  documents of the Internet Engineering Task Force (IETF), its areas,
+  and its working groups.  Note that other groups may also distribute
+  working documents as Internet-Drafts.
+
+     Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as 'work in progress'.
+
+     The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt
+
+     The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html
+
+     To learn the current status of any Internet-Draft, please check the
+  '1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+  Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe),
+  munnari.oz.au (Pacific Rim), ftp.ietf.org (US East Coast), or
+  ftp.isi.edu (US West Coast).
+
+Abstract
+
+     This document defines a protocol for the transport of any SS7 ISUP-
+  User signalling (e.g, Call Control) over IP using the Stream Control
+  Transport Protocol [RFC 2960].  The protocol should be modular and
+  symmetric, to allow it to work in diverse architectures, such as a
+  Signalling Gateway and IP Signalling End-point architecture.  Protocol
+  elements are added to allow seamless operation between peers in the
+  SS7 and IP domains.
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 1
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+Contents
+
+     A complete table of contents appears the end of this document.
+
+1.  Introduction
+
+1.1.  Scope
+
+1.2.  Change History
+
+1.3.  Terminology
+
+2.  Conventions
+
+     The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+  SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL, when they
+  appear in this document, are to be interpreted as described in [RFC
+  2119].
+
+  In this document, the following conventions are used to describe how a
+  parameter is used in the message:
+
+    Mandatory     The parameter MUST be present in the message.  A
+                  message listing a parameter as Mandatory without
+                  containing such a parameter is is incorrectly
+                  formatted.
+
+    Conditional   The parameter SHOULD be present in the message
+                  under the conditions specified.  A message listing
+                  a parameter as Conditional without containing such
+                  a parameter under the conditions specified is
+                  incorrectly formatted.
+
+    Optional      The parameter MAY be present in the message as
+                  specified.  A message listing a parameter as
+                  Optional without containing such a parameter is
+                  correctly formatted.
+
+
+3.  Applicability
+
+3.1.  Applicability of UAs at Various Protocol Levels
+
+3.2.  M2PA Applicability
+
+3.2.1.  Architecture
+
+     Figure 1 illustrates the intended architecture for M2PA [M2PA06].
+
+
+
+                     Figure 1.  M2PA Architecture
+
+
+
+B. Bidulock                    Version 0.0                        Page 2
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+3.2.2.  Redundancy
+
+3.2.3.  Multiple SGs
+
+3.2.4.  Traffic Modes
+
+3.3.  M2UA Applicability
+
+3.3.1.  Architecture
+
+     Figure 2 illustrates the intended architecture for M2UA [M2UA].
+
+
+
+                     Figure 2.  M2UA Architecture
+
+
+3.3.2.  Redundancy
+
+3.3.3.  Multiple SGs
+
+3.3.4.  Traffic Modes
+
+3.4.  M3UA Applicability
+
+3.4.1.  Architecture
+
+     Figure 3 illustrates the intended architecture for M3UA [M3UA].
+
+
+
+                     Figure 3.  M3UA Architecture
+
+
+3.4.2.  Redundancy
+
+3.4.3.  Multiple SGs
+
+3.4.4.  Traffic Modes
+
+3.5.  ISUA Applicability
+
+3.5.1.  Architecture
+
+     Figure 4 illustrates the intended architecture for ISUA [ISUA00].
+
+
+
+                     Figure 4.  ISUA Architecture
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 3
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+3.5.2.  Redundancy
+
+3.5.3.  Multiple SGs
+
+3.5.4.  Traffic Modes
+
+3.6.  SUA Applicability
+
+3.6.1.  Architecture
+
+     Figure 5 illustrates the intended architecture for SUA [SUA14].
+
+
+
+                     Figure 5.  SUA Architecture
+
+
+3.6.2.  Redundancy
+
+3.6.3.  Multiple SGs
+
+3.6.4.  Traffic Modes
+
+3.7.  TUA Applicability
+
+3.7.1.  Architecture
+
+     Figure 6 illustrates the intended architecture for TUA [TUA01].
+
+
+
+                     Figure 6.  TUA Architecture
+
+
+3.7.2.  Redundancy
+
+3.7.3.  Multiple SGs
+
+3.7.4.  Traffic Modes
+
+4.  Security
+
+5.  IANA Considerations
+
+6.  Timer Values
+
+End Notes
+
+References
+
+  RFC 2960.
+       R. Stewart, Q. Xie, K. Morneault, C. Sharp, H. J. Schwarzbauer,
+       T. Taylor, I. Rytina, H. Kalla, L. Zhang and V. Paxson, "Stream
+       Control Transmission Protocol (SCTP)," RFC 2960, The Internet
+
+B. Bidulock                    Version 0.0                        Page 4
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+       Society (February 2000).  [Normative]
+
+  RFC 2119.
+       S. Bradner, "Key words for use in RFCs to Indicate Requirement
+       Levels," RFC 2119 - BCP 14, The Internet Society (March 1997).
+       [Normative]
+
+  M2PA06.
+       T. George, R. Dantu, M. Kalla, H. J. Schwarzbauer, G. Sidebottom,
+       K. Morneault and B. Bidulock, "SS7 MTP2-User Peer-to-Peer
+       Adaptation Layer," <draft-ietf-sigtran-m2pa-06.txt>, Internet
+       Engineering Task Force - Signalling Transport Working Group
+       (August 28, 2002).  Work In Progress.
+
+  M2UA.
+       K. Morneault, R. Dantu, G. Sidebottom, B. Bidulock and J. Heitz,
+       "Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) - User
+       Adaptation Layer," RFC 3331, Internet Engineering Task Force -
+       Signalling Transport Working Group (September, 2002).
+
+  M3UA.
+       G. Sidebottom, K. Morneault and J. Pastor-Balbas, (eds),
+       "Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) - User
+       Adaptation Layer (M3UA)," RFC 3332, Internet Engineering Task
+       Force - Signalling Transport Working Group (September, 2002).
+
+  ISUA00.
+       B. Bidulock, "SS7 ISUP-User Adaptation Layer (ISUA)," <draft-
+       bidulock-sigtran-isua-00.txt>, Internet Engineering Task Force -
+       Signalling Transport Working Group (January 5, 2003).  Work In
+       Progress.
+
+  SUA14.
+       J. Loughney, G. Sidebottom, L. Coene, G. Verwimp, J. Keller and
+       B. Bidulock, "SS7 SCCP-User Adaptation Layer (SUA)," <draft-ietf-
+       sigtran-sua-14.txt>, Internet Engineering Task Force - Signalling
+       Transport Working Group (June 30, 2002).  Work In Progress.
+
+  TUA01.
+       B. Bidulock, "SS7 TCAP-User Adaptation Layer (TUA)," <draft-
+       bidulock-sigtran-tua-01.txt>, Internet Engineering Task Force -
+       Signalling Transport Working Group (January 2, 2003).  Work In
+       Progress.
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 5
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+
+Author's Addresses
+
+  Brian Bidulock                                  Phone: +1-780-490-1141
+  OpenSS7 Corporation                        Email: bidulock@openss7.org
+  1469 Jeffreys Crescent                    URL: http://www.openss7.org/
+  Edmonton, AB  T6L 6T1
+  Canada
+
+
+
+
+
+  This draft expires July 2003.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 6
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+
+                            List of Tables
+
+
+
+
+
+                        List of Illustrations
+
+  Figure 1 M2PA Architecture ....................................    2
+  Figure 2 M2UA Architecture ....................................    3
+  Figure 3 M3UA Architecture ....................................    3
+  Figure 4 ISUA Architecture ....................................    3
+  Figure 5 SUA Architecture .....................................    4
+  Figure 6 TUA Architecture .....................................    4
+
+
+
+
+                          Table of Contents
+
+  Status of this Memo ...........................................    1
+  Abstract ......................................................    1
+  Contents ......................................................    2
+  1 Introduction ................................................    2
+  1.1 Scope .....................................................    2
+  1.2 Change History ............................................    2
+  1.3 Terminology ...............................................    2
+  2 Conventions .................................................    2
+  3 Applicability ...............................................    2
+  3.1 Applicability of UAs at Various Protocol Levels ...........    2
+  3.2 M2PA Applicability ........................................    2
+  3.2.1 Architecture ............................................    2
+  3.2.2 Redundancy ..............................................    3
+  3.2.3 Multiple SGs ............................................    3
+  3.2.4 Traffic Modes ...........................................    3
+  3.3 M2UA Applicability ........................................    3
+  3.3.1 Architecture ............................................    3
+  3.3.2 Redundancy ..............................................    3
+  3.3.3 Multiple SGs ............................................    3
+  3.3.4 Traffic Modes ...........................................    3
+  3.4 M3UA Applicability ........................................    3
+  3.4.1 Architecture ............................................    3
+  3.4.2 Redundancy ..............................................    3
+  3.4.3 Multiple SGs ............................................    3
+  3.4.4 Traffic Modes ...........................................    3
+  3.5 ISUA Applicability ........................................    3
+  3.5.1 Architecture ............................................    3
+  3.5.2 Redundancy ..............................................    4
+  3.5.3 Multiple SGs ............................................    4
+  3.5.4 Traffic Modes ...........................................    4
+  3.6 SUA Applicability .........................................    4
+  3.6.1 Architecture ............................................    4
+  3.6.2 Redundancy ..............................................    4
+
+B. Bidulock                    Version 0.0                        Page 7
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+  3.6.3 Multiple SGs ............................................    4
+  3.6.4 Traffic Modes ...........................................    4
+  3.7 TUA Applicability .........................................    4
+  3.7.1 Architecture ............................................    4
+  3.7.2 Redundancy ..............................................    4
+  3.7.3 Multiple SGs ............................................    4
+  3.7.4 Traffic Modes ...........................................    4
+  4 Security ....................................................    4
+  5 IANA Considerations .........................................    4
+  6 Timer Values ................................................    4
+  End Notes .....................................................    4
+  References ....................................................    4
+  Author's Addresses ............................................    6
+  List of Tables ................................................    7
+  List of Illustrations .........................................    7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 8
+
+Internet Draft       SS7 ISUP-User Adaptation Layer      January 5, 2003
+
+Copyright Statement
+
+  Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+     This document and translations of it may be copied and furnished to
+  others, and derivative works that comment on or otherwise explain it
+  or assist in its implementation may be prepared, copied, published and
+  distributed, in whole or in part, without restriction of any kind,
+  provided that the above copyright notice and this paragraph are
+  included on all such copies and derivative works.  However, this
+  document itself may not be modified in any way, such as by removing
+  the copyright notice or references to the Internet Society or other
+  Internet organizations, except as needed for the purpose of developing
+  Internet standards in which case the procedure for copyrights defined
+  in the Internet Standards process must be followed, or as required to
+  translate into languages other than English.
+
+     The limited permission granted above are perpetual and will not be
+  revoked by the Internet Society or its successors or assigns.
+
+     This document and the information contained herein is provided on
+  an "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+  TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+  NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN
+  WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 9
+

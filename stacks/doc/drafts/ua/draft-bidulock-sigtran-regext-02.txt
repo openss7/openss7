@@ -1,0 +1,1892 @@
+
+
+
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+
+                                                           July 26, 2003
+Expires in January 2004
+
+
+
+                    Registration Extensions (REGEXT)
+                                  for
+                   Signalling User Adaptation Layers
+
+                 <draft-bidulock-sigtran-regext-02.txt>
+
+
+Status of this Memo
+
+     This document is an Internet-Draft and is in full conformance with
+  all provisions of Section 10 or RFC 2026.  Internet-Drafts are working
+  documents of the Internet Engineering Task Force (IETF), its areas,
+  and its working groups.  Note that other groups may also distribute
+  working documents as Internet-Drafts.
+
+     Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as 'work in progress'.
+
+     The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt
+
+     The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html
+
+     To learn the current status of any Internet-Draft, please check the
+  Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe),
+  munnari.oz.au (Pacific Rim), ftp.ietf.org (US East Coast), or
+  ftp.isi.edu (US West Coast).
+
+Copyright
+
+     Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+Abstract
+
+     This memo describes Registration Extensions (REGEXT) that provides
+  the ability for an Application Server Process (ASP) to modify existing
+  Routing (Link) Keys with a Signalling Gateway (SG).
+
+     Current procedures in the SS7 Signalling User Adaptation Layers
+  (UAs) [M2UA..SUA, ISUA, TUA] do not provide for the modification of
+  Routing (Link) Keys without deactivation of the Application Server
+  (AS).  This causes problems in making changes to live systems.
+
+
+B. Bidulock                    Version 0.2                        Page 1
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+     The extensions described in this memo permit modification of
+  Signalling Link membership in Application Servers for SS7 MTP2-User
+  Adaptation Layer [M2UA], modification of Circuit Identification Code
+  (CIC) ranges for the SS7 MTP3-User Adaptation Layer [M3UA],
+  modification of Circuit Identification Code (CIC) ranges for the SS7
+  ISUP-User Adaptation Layer [ISUA], modificiation of Destination Local
+  Reference (DLR) ranges for SS7 SCCP-User Adaptation Layer [SUA], and
+  modification of Transaction Identifier (TID) ranges for SS7 TCAP-User
+  Adaptation Layer [TUA].
+
+Contents
+
+     A complete table of contents, list of illustrations and tables, and
+  a change history, are included at the end of this document.
+
+1.  Introduction
+
+1.1.  Scope
+
+     This Internet-Draft provides parameters and procedures in extension
+  to the parameters and procedures of the SS7 Signalling User Adaptation
+  Layers (UAs) [M2UA..SUA, ISUA, TUA], for the purpose of supporting
+  changed to Routing (Link) Keys to be made in live systems.
+
+     UA implementations with REGEXT are intended to be compatible with
+  UA implementations not supporting this extension.
+
+1.2.  Abbreviations
+
+      AS      --Application Server.
+      ASP     --Application Server Process.
+      IANA    --Internet Assigned Numbers Authority
+      I-D     --Internet-Draft
+      IETF    --Internet Engineering Task Force
+      IP      --Internet Protocol.
+      IPSP    --IP Signalling Point.
+      SCCP    --Signalling Connection Control Part.
+      SCTP    --Stream Control Transmission Protocol.
+      SG      --Signalling Gateway.
+      SGP     --Signalling Gateway Process.
+      SIGTRAN --IETF Signalling Transport WG
+      SPP     --Signalling Peer Process.
+      SS7     --Signalling System No. 7.
+      SUA     --SS7 SCCP-User Adpatation Layer.
+      TCAP    --Transaction Capabilities Application Part.
+      TUA     --SS7 TCAP-User Adaptation Layer.
+      UA      --User Adaptation Layer.
+      WG      --Working Group
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                        Page 2
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+1.3.  Terminology
+
+     REGEXT adds the following terms to the terminology presented in the
+  UA documents:
+
+  Registration Extension (REGEXT) - The parameters and procedures
+      described by this memo.
+
+  Signalling Peer Process (SPP) - refers to an ASP, SGP or IPSP.
+
+  Signalling User Adaptation Layer (UA) - one or more of the Stream
+      Control Transmission Protocol (SCTP) [RFC 2960] SS7 Signalling
+      User Adaptation Layers [M2UA..SUA, ISUA, TUA] supporting
+      Registration.
+
+1.4.  Overview
+
+     Existing registration management procedures do not provide for the
+  alteration of Routing (Link) Keys on live systems.  This can lead to
+  significant operational difficulties in large scale deployments.  This
+  memo provides extension procedures that permit this modification.
+
+1.4.1.  Limitations of Existing Registration Management
+
+     Each of the SS7 UAs [M2UA..SUA, ISUA, TUA] provides procedures for
+  registration and deregistration of Routing (Link) Keys.  None of these
+  procedures currently provides for alteration of Routing (Link) Keys
+  for a Application Server (AS) in the active state.
+
+1.4.1.1.  Limitations of Registration for M2UA
+
+     In SS7 MTP2-User Adaptation Layer [M2UA] registration of a Link Key
+  associates a signalling link with an Interface Identifier (IID).
+  However, registration does not provide a mechanism for associating
+  groups of Interface Identifiers together into Application Servers
+  (AS), nor does it provide a mechanism for altering the membership of
+  signalling links associated with an Application Server.
+
+1.4.1.2.  Limitations of Registration for M3UA
+
+     The SS7 MTP3-User Adaptation Layer [M3UA] registration of a Routing
+  Key associates a range of traffic with an Application Server through a
+  Routing Context.  However, it does not provide procedures for changing
+  the range of traffic associated with an Application Server and Routing
+  Context without deactivating the Application Server and deregistering
+  the Routing Key.  This can cause difficulties when M3UA is used in
+  support of ISUP MTP3-Users where normal circuit management expects to
+  add and remove specific circuits or ranges of circuits (circuit
+  groups) to and from Application Servers.[1]
+
+1.4.1.3.  Limitations of Registration for ISUA
+
+     The SS7 ISUP-User Adaptation Layer [ISUA] registration of a Routing
+  Key associates a range of traffic with an Application Server through a
+
+B. Bidulock                    Version 0.2                        Page 3
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+  Routing Context.  However, it does not provide procedures for changing
+  the range of traffic associated with an Application Server and Routing
+  Context without deactivating the Application Server and deregistering
+  the Routing Key.  This can cause difficulties where normal circuit
+  management expects to add and remove specific circuits or ranges of
+  circuits (circuit groups) to and from Application Servers.[2]
+
+1.4.1.4.  Limitations of Registration for SUA
+
+     The SS7 SCCP-User Adaptation Layer [SUA] registration of a Routing
+  Key associates a range of traffic with an Application Server through a
+  Routing Context and the Address Mapping Function.  However, it does
+  not provide procedures for changing the range of traffic associated
+  with an Application Server and Routing Context without deactivating
+  the Application Server and deregistering the Routing Key.  This can
+  cause difficulties when SUA is used in the connection-oriented
+  environment and the ASP wishes to dynamically assign connections to
+  Application Servers.[2]
+
+1.4.1.5.  Limitations of Registration for TUA
+
+     The SS7 TCAP-User Adaptation Layer [TUA] registration of a Routing
+  Key associates a range of traffic wtih an Application Server through a
+  Routing Context and the Transaction Mapping Function.  However, it
+  does not provide procedures for changing the range of traffic
+  associated with an Application Server and Routing Context without
+  deactivating the Application Server and deregistering the Routing Key.
+  This can cause difficulties when TUA is used in operation class 1, 2
+  and 3 (dialogues) and the ASP wishes to dynamically assign dialogues
+  to Application Servers.
+
+1.4.2.  Registration Extension
+
+     This memo provides extensions for the UA registration and
+  deregistration procedures which addresses these limitations in the
+  existing procedures.  REGEXT provides support for altering an existing
+  Routing (Link) Key for an active Application Server.
+
+1.4.2.1.  Registration Extensions for M2UA
+
+     The purpose of REGEXT for M2UA [M2UA] is to support the Dynamic
+  Allocation of Signalling Data Links and Signalling Terminals [Q.704],
+  and, in particular, the ability to associate a new Signalling Link as
+  specified by the combination of Signalling Data Link Identifier (SDLI)
+  and Signalling Data Terminal Identifier (SDTI), with an existing
+  Application Server.  This permits MTP Level 3 to perform the Level 1
+  Connect and Level 1 Disconnect primitives, as well as associating a
+  new Signalling Terminal with an existing Signalling Data Link for the
+  Dynamic Allocation of Signalling Terminals.
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                        Page 4
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+                        SG                             ASP
+                _________________                  ___________
+               |         ______  |                |  _______  |
+         SDL0  |        |      | |       IID0     | |       | |
+        _______|_ _ _ __| SDT0 |_|________________|_|  AS0  | |
+               |   ( /  |______| |                | |_______| |
+               |    /    ______  |                |  _______  |
+         SDL1  |   /    |      | |       IID1     | |       | |
+        _______|__/     | SDT1 | |       _________|_|  AS1  | |
+               |        |______| |      /         | |_______| |
+               |         ______  |     /          |___________|
+         SDL2  |        |      | |    /
+        _______|________| SDT2 |_|___/
+               |        |______| |
+               |         ______  |
+         SDL3  |        |      | |
+        _______|        | SDT3 | |
+               |        |______| |
+               |_________________|
+
+
+               Figure A.  Example (A) - M2UA Configuration
+
+
+     For example, an ASP is ASP-ACTIVE for a given Application Server
+  and signalling data link and terminal wishes to replace the Signalling
+  Data Link associated with a Signalling Link (under MTP Level 3 [Q.704]
+  control).  The ASP wishes to replace the Signalling Data Link (SDL1)
+  with the Signalling Data Link (SDL0) for the Signalling Link
+  represented by AS0/IID0 as illustrated in Figure A.
+
+     REGEXT permits the ASP to perform this switch using the REG REQ
+  message with the Interface Identifier IID0 placed in the message along
+  with the Link Key SDT0/SDL0.  Examples are provided in Section 6.
+
+1.4.2.2.  Registration Extensions for M3UA
+
+     The purpose of REGEXT for M3UA [M3UA] is to support the
+  modification of traffic to and from an active Application Server for
+  operations, maintenance, administration and provisioning.  In
+  particular this allows an MTP-User Part (SI value), Signalling Point
+  Code or perhaps a Circuit Identification Code (CIC) range to be added
+  or removed from an existing Routing Key associated with an active
+  Application Server.
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                        Page 5
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+                                       STP             MGC
+             ___                       ____           _____
+            /   \     signalling      |   /|  assoc. |     |
+           | SP1 |-------/-----/---/--| SG |---------| ASP |
+            \___/\\     /     /   /   |/___|         |_____|
+             ___  \\===/=====/===/=====================//
+            /   \_____/     /   /     circuits        //
+           | SP2 |         /   /                     //
+            \___/\\       /   /                     //
+             ___  \\=====/===/=====================//
+            /   \_______/   /      circuits       //
+           | SP3 |         /                     //
+            \___/\\       /                     //
+             ___  \\=====/=====================//
+            /   \_______/       circuits      //
+           | SP4 |                           //
+            \___/\\                         //
+                  \\+++++++++++++++++++++++//
+                             circuits
+
+
+               Figure B.  Example (B) - M3UA Configuration
+
+
+     For example, an ISUP Application Server wishes to add new trunk
+  group(s) to a new Signalling Point Code (i.e. MGC).  The AS is
+  currently registered against a Routing Key which includes several
+  remote point codes, but does not include the remote point code of the
+  switch to which the trunk group(s) are to be added (as illustrated in
+  Figure B).
+
+     REGEXT permits the Application Server to provision the new trunk
+  group(s) by adding the new remote point code to the Routing Key with
+  the REG REQ message.
+
+1.4.2.3.  Registration Extensions for ISUA
+
+     The purpose of REGEXT for ISUA [ISUA] is to support the
+  modification of traffic to and from an active Application Server for
+  operations, maintenance, administration and provisioning.  In
+  particular this allows perhaps a Circuit Identification Code (CIC)
+  range to be added or removed from an existing Routing Key associated
+  with an active Application Server.
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                        Page 6
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+                                       STP             MGC
+             ___                       ____           _____
+            /   \     signalling      |   /|  assoc. |     |
+           | SP1 |-------/-----/---/--| SG |---------| ASP |
+            \___/\\     /     /   /   |/___|         |_____|
+             ___  \\===/=====/===/=====================//
+            /   \_____/     /   /     circuits        //
+           | SP2 |         /   /                     //
+            \___/\\       /   /                     //
+             ___  \\=====/===/=====================//
+            /   \_______/   /      circuits       //
+           | SP3 |         /                     //
+            \___/\\       /                     //
+             ___  \\=====/=====================//
+            /   \_______/       circuits      //
+           | SP4 |                           //
+            \___/\\                         //
+                  \\+++++++++++++++++++++++//
+                             circuits
+
+
+               Figure C.  Example (C) - ISUA Configuration
+
+
+     For example, an ISUP Application Server wishes to add new trunk
+  group(s) to a new Signalling Point Code (i.e. MGC).  The AS is
+  currently registered against a Routing Key which includes several
+  remote point codes, but does not include the remote point code of the
+  switch to which the trunk group(s) are to be added (as illustrated in
+  Figure C).
+
+     REGEXT permits the Application Server to provision the new trunk
+  group(s) by adding the new remote point code to the Routing Key with
+  the REG REQ message.
+
+1.4.2.4.  Registration Extensions for SUA
+
+     The purpose of REGEXT for SUA [SUA] is to associate a newly formed
+  connection with an Application Server that is responsible for the
+  connection.  Almost all connection-oriented interface models (STREAMS,
+  Sockets) rely on the concept of a listening stream or socket and an
+  independent accepting stream or socket.  REGEXT permits an accepted
+  connection to be established on an Application Server which is
+  independent from the Application Server upon which the connection
+  request was received.
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                        Page 7
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+                              SG                ASP
+                           _________         _________
+                          |         |       |         |
+                 _________|___      |       |  _____  |
+                 _________|___| RK2 |  RC2  | |     | |
+                 _________|___|_____|_______|_| AS2 | |
+                 _________|___|     |       | |     | |
+                 _________|___|     |       | |_____| |
+                 _________|___      |       |  _____  |
+                 _________|___| RK1 |  RC1  | |     | |
+                 _________|___|_____|_______|_| AS1 | |
+                 _________|___|     |       | |     | |
+                 _________|___|     |       | |_____| |
+                          |         |       |  _____  |
+                  connections   RK0 |  RC0  | |     | |
+                 _________|_________|_______|_| AS0 | |
+                          |         |       | |     | |
+                          |         |       | |_____| |
+                          |         |       |         |
+                          |_________|       |_________|
+
+
+                Figure D.  Example (D) - SUA Configuration
+
+
+     For example, as illustrated in Figure D, one Application Server
+  (AS0) is configured with a Routing Key which does not contain
+  Destination Reference Number for SSN=5.  Another Application Server
+  (AS1) processes some connections for SSN=5 and AS2 processes other
+  connections.  When a CORE is received by AS0, and before sending a
+  COAK, the ASP would like to assign the connection to one of AS1 or AS2
+  for further communication associated with the newly arrived
+  connection.
+
+     REGEXT permits AS0 to modify Routing Key RK1 by sending a REG REQ
+  message that includes Routing Context RC1 and the additional
+  Destination Reference Number that is assigned to the connection,
+  permitting the SCCP implementation to follow the Network Provider
+  Interface [NPI].
+
+     REGEXT also permits AS0 to modify the Routing Key on another
+  Signalling Gateway with the complete fail-over support of the
+  Application Server, avoiding many of the problems associated with DRN
+  Label approach.
+
+1.4.2.5.  Registration Extensions for TUA
+
+     The purpose of REGEXT for TUA [TUA] is to associate a newly formed
+  dialogue or transaction with an Application Server that is responsible
+  for the dialogue or transaction.  Almost all connection-oriented
+  interface models (STREAMS, Sockets) rely on the concept of a listening
+  stream or socket and an independent accepting stream or socket.
+  REGEXT permits an accepted dialogue or transaction to be established
+  on an Application Server which is independent from the Application
+
+B. Bidulock                    Version 0.2                        Page 8
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+  Server upon which the dialogue or transaction initiation was received.
+
+                              SG                ASP
+                           _________         _________
+                          |         |       |         |
+                 _________|___      |       |  _____  |
+                 _________|___| RK2 |  RC2  | |     | |
+                 _________|___|_____|_______|_| AS2 | |
+                 _________|___|     |       | |     | |
+                 _________|___|     |       | |_____| |
+                 _________|___      |       |  _____  |
+                 _________|___| RK1 |  RC1  | |     | |
+                 _________|___|_____|_______|_| AS1 | |
+                 _________|___|     |       | |     | |
+                 _________|___|     |       | |_____| |
+                          |         |       |  _____  |
+                  dialogues     RK0 |  RC0  | |     | |
+                 _________|_________|_______|_| AS0 | |
+                          |         |       | |     | |
+                          |         |       | |_____| |
+                          |         |       |         |
+                          |_________|       |_________|
+
+
+                Figure E.  Example (E) - TUA Configuration
+
+
+     For example, as illustrated in Figure E, one Application Server
+  (AS0) is configured with a Routing Key which does not contain
+  Terminating Transaction Id for a given Application Context.  Another
+  Application Server (AS1) processes some dialogues and transactions for
+  the Application Context, and AS2 processes other dialogues and
+  transactions.  When a TBEG is received by AS0, and before sending a
+  TCON, the ASP would list to assign the transaction to one of AS1 or
+  AS2 for further communication associated with the newly arrived
+  transaction.
+
+     REGEXT permits AS0 to modify the Routing Key RK1 by sending a REG
+  REQ message that includes Routing Context RC1 and the additional
+  Terminating Transaction Id that is assigned to the transaction,
+  permitting the TCAP implementation to follow the Transport Provider
+  Interface [TPI, XNS].
+
+     REGEXT also permits AS0 to modify the Routing Key on another
+  Signalling Gateway with the complete fail-over support of the
+  Application Server, permitting SGs to be configured as STP pairs in
+  the SS7 network.
+
+1.5.  Limitations
+
+     Although the methods for dynamic modification of Routing Keys and
+  Load Selections presented in this document is consistent with that
+  previously discussed on the SIGTRAN WG, it has a number of
+  limitations.  To change a Routing Key or Load Selections requires that
+
+B. Bidulock                    Version 0.2                        Page 9
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+  the entire new key or selection be included in the REG REQ message.
+  This may be especially inconvenient if the resulting Routing Key or
+  Load Selection contains thousands of elements (as it might for CIC
+  Ranges on large MGC).
+
+     A method more amenable to this situation would be to use the REG
+  REQ message to "add" elements to the Routing Key or Load Selection and
+  use the DEREG REQ to "delete" elements from the Routing Key or Load
+  Selection.
+
+     A third approach would be to define two new messages, such as:
+  Registration Add (REG ADD) and Registration Delete (REG DEL), but
+  share the REG RSP message.  This last approach would probably be more
+  convenient.
+
+     The second approach is proposed by this memo.
+
+Notes for Section 1
+
+  [1]  EDITOR'S NOTE:- Text was included in the M3UA specification
+       [M3UA] to permit this operation, however, detailed procedures
+       and the addition of the Routing Context parameter to the
+       Routing Key, and addition of the corresponding error code was
+       missed.
+
+  [2]  EDITOR'S NOTE:- Text was include in the SUA specification [SUA]
+       to permit this operation, however, detailed procedures and the
+       addition of the Routing Context parameter to the Routing Key
+       was missed.
+       In addition, this mechanism can provide superior support for
+       multiple SGs acting as STPs, and can replace the DRN Label and
+       associated mechanism.  The TID Label and associated mechanism
+       is inadequate and should be removed from the SUA specification
+       [SUA].
+
+2.  Conventions
+
+     The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+  SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL, when they
+  appear in this document, are to be interpreted as described in [RFC
+  2119].
+
+3.  Protocol Elements
+
+     The following subsections describe the parameters which are added
+  or whose use is modified by this extension, their format and the
+  messages in which they are used.
+
+3.1.  Parameters
+
+     This memo permits the use of the Routing Context (Interface
+  Identifier) parameter within a Routing (Link) Key parameter.  It also
+  allows the use of the Routing (Link) Key parameter within a DEREG REQ
+  message.  This memo also defines a new Reference Number Range
+
+B. Bidulock                    Version 0.2                       Page 10
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+  parameter for use in the SUA [SUA] Routing Key.  In addition, this
+  memo permits the use of the Source Reference Number, Destination
+  Reference Number and Reference Number Range parameters in the SUA
+  [SUA] Routing Key.
+
+3.1.1.  Routing Key Parameters
+
+3.1.1.1.  SUA Reference Number Range
+
+     REGEXT defines a new SUA [SUA] Reference Number Range parameter for
+  use in the Routing Key in the REG REQ message.  This parameter is used
+  to associate a range of source or destination reference numbers with
+  an Application Server.
+
+  The Reference Number Range parameter is formatted as follows: [1]
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0119          |            Length             |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                  Reference Number Parameter(s)                /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  The Reference Number Range parameter can contain the following fields:
+
+  Reference Number field: variable (TLV parameters)
+
+    The Reference Number field can contain the following parameters:
+
+
+         Parameters
+         ------------------------------------------------
+         Source Reference Number        Conditional   *1
+         Destination Reference Number   Conditional   *1
+
+
+    Note 1: The Reference Number field must contain pairs of Source
+            Reference Numbers or Destination Reference Numbers and MUST
+            contain one and only one pair of addresses; but, MUST NOT
+            mix Source Reference Numbers with Destination Reference
+            Numbers in the same Reference Number field.
+
+
+3.1.2.  Routing (Link) Key
+
+     REGEXT extends the Link Key parameter of M2UA [M2UA] and the
+  Routing Key parameters of M3UA, SUA, and TUA [M3UA, SUA, ISUA, TUA].
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 11
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+3.1.2.1.  M2UA Link Key
+
+  The M2UA [M2UA] Link Key parameter is formatted as follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          Tag = 0x0309         |            Length             |
+   +-------------------------------+-------------------------------+
+   |                      Local-LK-Identifier                      |
+   +---------------------------------------------------------------+
+   \                                                               \
+   /                        Key parameter(s)                       /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the M2UA Link Key parameter by adding the following
+  parameters to the Link Key:
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Interface Identifier        Optional   *1
+
+
+  Note 1: The Interface Identifier parameter is optional in the Link
+          Key.  This parameter identifies an existing Application Server
+          for which the Link Key is to be altered.  The format of the
+          Interface Identifier consists of a single integer Interface
+          Identifier or a single text Interface Identifier.
+
+
+3.1.2.2.  M3UA Routing Key
+
+  The M3UA [M3UA] Routing Key parameter is formatted as follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          Tag = 0x0207         |            Length             |
+   +-------------------------------+-------------------------------+
+   |                       Local-RK-Identifier                     |
+   +---------------------------------------------------------------+
+   \                                                               \
+   /                        Key parameter(s)                       /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     The Routing Key parameter is used in the REG REQ and DEREG REQ
+  messages.  It is used to identify the portion of traffic for which an
+  ASP is registering or deregistering.
+
+
+B. Bidulock                    Version 0.2                       Page 12
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+     REGEXT extends the M3UA [M3UA] Routing Key parameter by allowing
+  the following parameters to be used as optional sub-parameters within
+  the Routing Key:
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Routing Context             Optional   *1
+
+
+  Note 1: The Routing Context parameter is optional in the Routing Key.
+          This parameter identifies an existing Application Server for
+          which the Routing Key is to be altered.  The format of the
+          Routing Context consists of a single Routing Context value.
+
+
+3.1.2.3.  ISUA Routing Key
+
+  The ISUA [ISUA] Routing Key parameter is formatted as follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0522          |            Length             |
+   +-------------------------------+-------------------------------+
+   |                  Local Routing Key Identifier                 |
+   +---------------------------------------------------------------+
+   \                                                               \
+   /                        Key parameter(s)                       /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the ISUA Routing Key [ISUA] by adding the following
+  optional Key parameters to the Routing Key.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Routing Context             Optional   *1
+
+
+  Note 1: The Routing Context parameter is included in the Routing Key
+          when the ASP wishes to alter an existing Routing Key which
+          corresponds to the indicated Routing Context.  The Routing
+          Context parameter MUST only occur once in the Key parameters.
+
+
+3.1.2.4.  SUA Routing Key
+
+  The SUA [SUA] Routing Key parameter is formatted as follows:
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 13
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x010E          |            Length             |
+   +-------------------------------+-------------------------------+
+   |                  Local Routing Key Identifier                 |
+   +---------------------------------------------------------------+
+   \                                                               \
+   /                         Key parameter(s)                      /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the SUA Routing Key [SUA] by adding the following
+  optional Key parameters to the Routing Key.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Routing Context             Optional   *1
+       Reference Number Range      Optional   *2
+
+
+  Note 1: The Routing Context parameter is included in the Routing Key
+          when the ASP wishes to alter an existing Routing Key which
+          corresponds to the indicated Routing Context.  The Routing
+          Context parameter MUST only occur once in the Key parameters.
+
+  Note 2: The Reference Number Range parameter is included in the
+          Routing Key when the ASP wishes to accept or restrict
+          connection oriented traffic within a Destination Local
+          Reference (DLR) range for the Application Server being
+          registered.  The Reference Number Range parameter SHOULD only
+          occur once in the Key parameters.
+
+
+3.1.2.5.  TUA Routing Key
+
+  The TUA [TUA] Routing Key parameter is formatted as follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x041E          |            Length             |
+   +-------------------------------+-------------------------------+
+   |                  Local Routing Key Identifier                 |
+   +---------------------------------------------------------------+
+   \                                                               \
+   /                        Key parameter(s)                       /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 14
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+     REGEXT extends the TUA Routing Key [TUA] by adding the following
+  optional Key parameters to the Routing Key.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Routing Context             Optional   *1
+
+
+  Note 1: The Routing Context parameter is included in the Routing Key
+          when the ASP wishes to alter an existing Routing Key which
+          corresponds to the indicated Routing Context.  The Routing
+          Context parameter MUST only occur once in the Key parameters.
+
+
+3.1.3.  Load Selection
+
+3.1.3.1.  M2UA Load Selection
+
+  The M2UA [M2UA] Load Selection parameter [LOADSEL] is formatted as
+  follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0019          |            Length             |
+   +-------------------------------+-------------------------------+
+   \                                                               \
+   /                      Load Key parameter(s)                    /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the M2UA Load Selection [LOADSEL] parameter by
+  adding the following optional Load Key parameters to the Load
+  Selection.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Load Selector               Optional   *1
+
+
+  Note 1: The Load Selector parameter is included in the Load Selection
+          when the ASP wishes to alter an existing Load Selection which
+          corresponds to the indicated Load Selector.  The Load Selector
+          parameter MUST only occur once in the Load Selection
+          parameter.
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 15
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+3.1.3.2.  M3UA Load Selection
+
+  The M3UA [M3UA] Load Selection parameter [LOADSEL] is formatted as
+  follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0019          |            Length             |
+   +-------------------------------+-------------------------------+
+   \                                                               \
+   /                      Load Key parameter(s)                    /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the M3UA Load Selection [LOADSEL] parameter by
+  adding the following optional Load Key parameters to the Load
+  Selection.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Load Selector               Optional   *1
+
+
+  Note 1: The Load Selector parameter is included in the Load Selection
+          when the ASP wishes to alter an existing Load Selection which
+          corresponds to the indicated Load Selector.  The Load Selector
+          parameter MUST only occur once in the Load Selection
+          parameter.
+
+
+3.1.3.3.  ISUA Load Selection
+
+  The ISUA [ISUA] Load Selection parameter [LOADSEL] is formatted as
+  follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0019          |            Length             |
+   +-------------------------------+-------------------------------+
+   \                                                               \
+   /                      Load Key parameter(s)                    /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the ISUA Load Selection [LOADSEL] parameter by
+  adding the following optional Load Key parameters to the Load
+  Selection.
+
+
+
+B. Bidulock                    Version 0.2                       Page 16
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Load Selector               Optional   *1
+
+
+  Note 1: The Load Selector parameter is included in the Load Selection
+          when the ASP wishes to alter an existing Load Selection which
+          corresponds to the indicated Load Selector.  The Load Selector
+          parameter MUST only occur once in the Load Selection
+          parameter.
+
+
+3.1.3.4.  SUA Load Selection
+
+  The SUA [SUA] Load Selection parameter [LOADSEL] is formatted as
+  follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0019          |            Length             |
+   +-------------------------------+-------------------------------+
+   \                                                               \
+   /                      Load Key parameter(s)                    /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the SUA Load Selection [LOADSEL] parameter by adding
+  the following optional Load Key parameters to the Load Selection.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Load Selector               Optional   *1
+
+
+  Note 1: The Load Selector parameter is included in the Load Selection
+          when the ASP wishes to alter an existing Load Selection which
+          corresponds to the indicated Load Selector.  The Load Selector
+          parameter MUST only occur once in the Load Selection
+          parameter.
+
+
+3.1.3.5.  TUA Load Selection
+
+  The TUA [TUA] Load Selection parameter [LOADSEL] is formatted as
+  follows:
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 17
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0019          |            Length             |
+   +-------------------------------+-------------------------------+
+   \                                                               \
+   /                      Load Key parameter(s)                    /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the TUA Load Selection [LOADSEL] parameter by adding
+  the following optional Load Key parameters to the Load Selection.
+
+
+       Extension Sub-Parameters
+       ------------------------------------------
+       Load Selector               Optional   *1
+
+
+  Note 1: The Load Selector parameter is included in the Load Selection
+          when the ASP wishes to alter an existing Load Selection which
+          corresponds to the indicated Load Selector.  The Load Selector
+          parameter MUST only occur once in the Load Selection
+          parameter.
+
+
+3.1.4.  Error Codes
+
+3.1.4.1.  SUA Error Codes
+
+     REGEXT extends the Common mandatory Error Code parameter by
+  removing the following Error Code values:
+
+
+       Value   Description
+       -----------------------------------
+       0x17    Routing Key Change Refused
+
+
+
+     In addition, REGEXT removes the following text associated with the
+  "Routing Key Change Refused" error code:
+
+      The "Routing Key Change Refused" error is sent when the SG
+      refuses a change in the Routing Key parameters.  [SUA]
+
+
+3.1.5.  Registration Status
+
+     REGEXT extends the Registration Status parameter by adding the
+  following values to the Common and UA-specific mandatory Registration
+  Status parameter[2] in the REG RSP message:
+
+
+B. Bidulock                    Version 0.2                       Page 18
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+       Value   Description
+       ----------------------------------------------
+        11     Error - Routing Key Change Refused
+        17     Error - Load Selection Change Refused
+
+
+
+3.1.5.1.  Common Registration Status
+
+  The Common [SUA, ISUA, TUA] Registration Status parameter is formatted
+  as follows:
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |         Tag = 0x0016          |            Length             |
+    + - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+    |                       Registration Status                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the Common Registration Status parameter for ISUA
+  [ISUA], SUA [SUA] and TUA [TUA] by adding the following values to the
+  status field:
+
+
+       Value   Description
+       ----------------------------------------------
+        11     Error - Routing Key Change Refused
+        17     Error - Load Selection Change Refused
+
+
+
+     The "Error - Routing Key Change Refused" status is returned when
+  the ASP has included an Routing Context in the Routing Key and the SGP
+  is either unequipped to perform dynamic modification of the Routing
+  Key, or dynamic modification of the Routing Key is not currently
+  permitted.
+
+     The "Error - Load Selection Change Refused" status is returned when
+  the ASP has included a Load Selector in the Load Selection and the SGP
+  is either unequipped to perform dynamic modification of the Load
+  Selection, or dynamic modification of the Load Selection is not
+  currently permitted.
+
+3.1.5.2.  M2UA Registration Status
+
+  The M2UA [M2UA] Registration Status parameter is formatted as follows:
+  [3]
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 19
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |         Tag = 0x030E          |            Length             |
+    + - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+    |                       Registration Status                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the M2UA [M2UA] Registration Status parameter by
+  adding the following values to the status field: [4]
+
+
+       Value   Description
+       ----------------------------------------------
+        11     Error - Link Key Change Refused
+        17     Error - Load Selection Change Refused
+
+
+
+     The "Error - Link Key Change Refused" status is returned by and SGP
+  when the ASP has included an Interface Identifier in the Link Key and
+  the SGP is either unequipped to perform dynamic modification of the
+  Link Key, or dynamic modification of the Link Key is not currently
+  permitted.
+
+     The "Error - Load Selection Change Refused" status is returned when
+  the ASP has included a Load Selector in the Load Selection and the SGP
+  is either unequipped to perform dynamic modification of the Load
+  Selection, or dynamic modification of the Load Selection is not
+  currently permitted.
+
+3.1.5.3.  M3UA Registration Status
+
+  The M3UA [M3UA] Registration Status parameter is formatted as follows:
+  [5]
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |         Tag = 0x0212          |            Length             |
+    + - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+    |                       Registration Status                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     REGEXT extends the M3UA [M3UA] Registration Status parameter by
+  adding the following values to the status field:
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 20
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+       Value   Description
+       ----------------------------------------------
+        11     Error - Routing Key Change Refused
+        17     Error - Load Selection Change Refused
+
+
+
+     The "Error - Routing Key Change Refused" status is returned when
+  the ASP has included an Routing Context in the Routing Key and the SGP
+  is either unequipped to perform dynamic modification of the Routing
+  Key, or dynamic modification of the Routing Key is not currently
+  permitted.
+
+     The "Error - Load Selection Change Refused" status is returned when
+  the ASP has included a Load Selector in the Load Selection and the SGP
+  is either unequipped to perform dynamic modification of the Load
+  Selection, or dynamic modification of the Load Selection is not
+  currently permitted.
+
+3.2.  Messages
+
+     REGEXT extends the REG REQ and REG RSP messages.
+
+3.2.1.  Registration Request (REG REQ)
+
+     REGEXT extends the Registration Request (REG REQ) message by
+  extending the Routing Key (Link Key) parameter and permitting the
+  Routing Context (Interface Identifier) to be included in the REG REQ
+  message.
+
+     REGEXT also extends the REG REQ message by extending the Load
+  Selection parameter [LOADSEL] and permitting the Load Selector to be
+  included in the REG REQ message.
+
+3.2.2.  Registration Response (REG RSP)
+
+     REGEXT extends the Registration Response (REG RSP) message by
+  adding the following values to the mandatory Registration Status
+  parameter in the mandatory Registration Result parameter in the REG
+  RSP message: [6]
+
+
+       Value   Description
+       --------------------------------------------------
+        11     Error - Routing (Link) Key Change Refused
+        17     Error - Load Selection Change Refused
+
+
+  The new Registration Status values are interpreted as follows:
+
+  "Error - Routing (Link) Key Change Refused"   This Registration Status
+       is returned in a REG RSP message by the SGP when it is either
+
+
+B. Bidulock                    Version 0.2                       Page 21
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+       unequipped to perform Routing (Link) Key modifications described
+       in this memo, or is otherwise unable to modify the the Routing
+       (Link) Key as requested by the ASP.
+
+  "Error - Load Selection Change Refused"   This Registration Status is
+       returned in a REG RSP message by the SGP when it is either
+       unequipped to perform Load Selection modifications described in
+       this memo, or is otherwise unable to modify the the Load
+       Selection as requested by the ASP.
+
+Notes for Section 3
+
+  [1]  IANA NOTE:-  The parameter tag values shown as 0x0119 will be
+       assigned by IANA within the specific parameter range of SUA
+       [SUA] and may change its value in further versions of this
+       document.
+
+  [2]  IANA Note:-  Note that the Registration Status parameter has
+       tag value 0x030e for M2UA [M2UA], tag value 0x0212 for M3UA
+       [M3UA] and (perhaps not surprisingly) tag value 0x0016 for ISUA
+       [ISUA], SUA [SUA] and TUA [TUA].
+
+  [3]  IANA NOTE:-  The Registration Status value shown as 11 and 17
+       will be assigned by IANA as a value of the Common Registration
+       Status parameter for the SIGTRAN UAs and may change its value
+       in further versions of this document.
+
+  [3]  EDITOR'S NOTE:-  The M2UA [M2UA] Registration Result,
+       Registration Status, Deregistration Result and Deregistration
+       Status parameter should be altered from the M2UA-specific tag
+       values to the Common tag values to be consistent with the other
+       UAs.
+
+  [4]  IANA NOTE:-  The Registration Status value shown as 11 and 17
+       will be assigned by IANA as a value of the M2UA-specific
+       Registration Status parameter for M2UA [M2UA] and may change
+       its value in further versions of this document.
+
+  [5]  EDITOR'S NOTE:-  The M3UA [M3UA] Registration Result,
+       Registration Status, Deregistration Result and Deregistration
+       Status parameter should be altered from the M3UA-specific tag
+       values to the Common tag values to be consistent with the other
+       UAs.
+
+  [6]  IANA NOTE:-  The Registration Status value shown as 11 and 17
+       will be assigned by IANA as a value of the M3UA-specific
+       Registration Status parameter for M3UA [M3UA] and may change
+       its value in further versions of this document.
+
+  [6]  IANA NOTE:-  The Registration Status values shown as 11 and 17
+       will be assigned by IANA as a value of the Common Registration
+       Status parameter for SIGTRAN UAs and may change its value in
+       further versions of this document.
+
+
+B. Bidulock                    Version 0.2                       Page 22
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+4.  Procedures
+
+4.1.  Registration
+
+     In extension to the registration procedures of M2UA [M2UA], REGEXT
+  provides the following registration procedures:
+
+4.1.1.  Common Registration Procedures
+
+     In extension to the registration procedures of Common [M3UA, SUA,
+  ISUA, TUA], REGEXT provides the following registration procedures:
+
+     An ASP MAY modify an existing Routing Key by including the Routing
+  Context in the REG REQ.  If the SGP determines that the Routing
+  Context applies to an existing Routing Key, the SG MAY adjust the
+  existing Routing Key to match the new information provided in the
+  Routing Key parameter.  A REG RSP with Registration Status "Error -
+  Routing Key Change Refused" is returned if the SGP does not accept the
+  modification of the Routing Key. [1]
+
+     An ASP MAY modify an existing Load Selection by including the Load
+  Selector in the REG REQ.  If the SGP supports load selection
+  extensions [LOADSEL] and determines that the Load Selector applies to
+  an existing Load Selection, the SGP MAY adjust the existing Load
+  Selection to match the new information provided in the Load Selection
+  parameter.  A REG RSP  with Registration Status "Error - Load
+  Selection Change Refused" is returned if the SGP does not accept the
+  modification of the Load Selection.
+
+4.1.2.  M2UA Registration Procedures
+
+     In extension to the registration procedures of M2UA [M2UA], REGEXT
+  provides the following registration procedures:
+
+     An ASP MAY modify an existing Link Key by including the Interface
+  Identifier in the REG REQ.  If the SGP determines that the Interface
+  Identifier applies to an existing Link Key, the SG MAY adjust the
+  existing Link Key to match the new information provided in the Link
+  Key parameter.  A REG RSP with Registration Status "Error - Link Key
+  Change Refused" is returned if the SGP does not accept the
+  modification of the Link Key.
+
+     An ASP MAY modify an existing Load Selection by including the Load
+  Selector in the REG REQ.  If the SGP supports load selection
+  extensions [LOADSEL] and determines that the Load Selector applies to
+  an existing Load Selection, the SGP MAY adjust the existing Load
+  Selection to match the new information provided in the Load Selection
+  parameter.  A REG RSP  with Registration Status "Error - Load
+  Selection Change Refused" is returned if the SGP does not accept the
+  modification of the Load Selection.
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 23
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+Notes for Section 4
+
+  [1]  EDITOR'S NOTE:- ISUA [ISUA], SUA [SUA] and TUA [TUA] already
+       contains the procedures described in this paragraph.  The only
+       difference provided by REGEXT is that the Registration Status
+       "Error - Routing Key Change Refused" is actually defined.
+
+5.  Interworking
+
+     REGEXT also provides procedures for an SGP or ASP not supporting
+  REGEXT to interwork with an ASP or SGP supporting REGEXT.
+
+5.1.  Registration Interworking
+
+     An ASP that determines than an SG is unequipped to perform REGEXT
+  SHOULD NOT send any subsequent REG REQ messages containing a Routing
+  Context (or Interface Identifier) to that SG.
+
+     An SG or ASP supporting ASPEXT [ASPEXT] will identify its ability
+  or inability to support REGEXT using the ASP Extensions procedure
+  [ASPEXT].
+
+     If an SG does not support dynamic registration, it also does not
+  support REGEXT.
+
+     If an SG not supporting REGEXT receives a Routing Context
+  (Interface Identifier) in the REG REQ message, it could respond with
+  an existing non-zero Registration Status or an ERR message.  If the
+  ASP receives a REG RSP message containing a non-zero Registration
+  Status, or receives an ERR message with an appropriate Error Code
+  correlating to the REG REQ message and an indication that the Routing
+  Context (Interface Identifier) parameter was considered invalid, from
+  an SG not supporting ASP Extensions [ASPEXT], then the ASP SHOULD mark
+  the SG as unequipped to perform REGEXT and not place any Routing
+  Context (Interface Identifier) in any further messages to that SG, or
+  attempt any of the extension procedures defined in this memo.
+
+5.1.1.  Registration Status REGEXT Unsupported
+
+     Examples of possible Registration Status errors returned in a REG
+  RSP message when the peer does not support REGEXT are as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 24
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+       Value   Description
+       ------------------------------------------------------
+           4   Error - Invalid Routing Key
+       ------------------------------------------------------
+           6   Error - Cannot Support Unique Routing
+               Error - Overlapping (Non-unique) Link Key
+       ------------------------------------------------------
+           7   Error - Routing Key not Currently Provisioned
+               Error - Link Key not Provisioned
+       ------------------------------------------------------
+           9   Error - Unsupported RK parameter field
+       ------------------------------------------------------
+          11   Error - Routing Key Change Refused
+               Error - Link Key Change Refused
+       ------------------------------------------------------
+
+
+
+5.1.2.  Error Codes REGEXT Unsupported
+
+     Examples of possible Error Codes returned in a ERR message when the
+  peer does not support REGEXT are as follows:
+
+
+       Value   Description
+       -----------------------------------------------
+        0x02   Invalid Interface Identifier
+        0x03   Unsupported Message Class
+        0x04   Unsupported Message Type
+        0x10   ASP Active for Interface Identifier(s)
+        0x11   Invalid Parameter Value
+        0x12   Parameter Field Error
+        0x13   Unexpected Parameter
+        0x19   Invalid Routing Context
+       -----------------------------------------------
+
+
+
+6.  Examples
+
+7.  Security
+
+     REGEXT provides adds some security risks to M2UA [M2UA], M3UA
+  [M3UA], ISUA [ISUA], SUA [SUA] and TUA [TUA].
+
+     If the Signalling Gateway (SG) does cannot properly authenticate
+  the peer, the peer might gain privileges to alter a Routing (Link) Key
+  to which the peer should not have permission, or alter a Load
+  Selection to which the peer should not have permission.
+
+     However, if the peer can imitate an ASP and gain access with the
+  privileges of an ASP, use of the Routing Context (Interface
+
+
+B. Bidulock                    Version 0.2                       Page 25
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+  Identifier) parameter in the ASPTM message can always be used to
+  perform denial of service on traffic destined for legitimate
+  Application Servers.  As the REGEXT extensions require the use of the
+  Routing Context (Interface Identifier) parameter in the REG REQ
+  message, the same levels of protection afforded the Routing Context
+  (Interface Identifier) parameter in the REG REQ message as is
+  experienced in the ASPAC (ACK) message.
+
+8.  IANA Considerations
+
+     REGEXT adds the following parameter tag value (described in Section
+  3) to the SUA-Specific Parameter numbering range for SUA [SUA]:
+
+
+       Tag Value   Parameter Name
+       --------------------------------------
+        0x0119     Reference Number Range[1]
+
+
+
+
+Notes for Section 8
+
+  [1]  IANA NOTE:-  The Reference Number Range tag values shown
+       through this document as 0x0119 will be assigned by IANA within
+       the SUA-specific parameter range of the SUA [SUA] and may
+       change its value in further versions of this document.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 26
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+0.  Revision History
+
+     This section provides historical information on the changes made to
+  this draft.  This section will be removed from the document when the
+  document is finalized.
+
+0.2.  Changes from Version 0.1 to Version 0.2
+
+   + added list of abbreviations.
+   + moved change history here.
+   + updated references.
+   + split references.
+   + updated version numbers and dates.
+   + updated security section.
+   + moved notes to end of document.
+   + fixed spelling errors and typos.
+
+0.1.  Changes from Version 0.0 to Version 0.1
+
+   + added this history section,
+   + updated references,
+   + updated version numbers and dates,
+   + updated author's address.
+   + addition of Source Reference Number, Destination Reference Number
+     and Reference Number Range to SUA [SUA14] Routing Key.
+
+0.0.0.  Change Log
+
+    $Log: draft-bidulock-sigtran-regext-02.txt,v $
+    Revision 0.9.2.1  2004/03/16 07:06:19  brian
+    - Added older drafts in pdf and txt form.
+
+    Revision 0.8.2.4  2003/08/01 12:23:16  brian
+    Added abbreviations, updated format.
+
+    Revision 0.8.2.3  2003/07/29 00:35:09  brian
+    Finalizing latest round of drafts.
+
+    Revision 0.8.2.2  2003/07/28 13:12:21  brian
+    Reformatting.
+
+    Revision 0.8.2.1  2003/07/27 08:15:30  brian
+    Checking in changes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 27
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+R.  References
+
+R.1.  Normative References
+
+  [M2UA]  Morneault, K., Dantu, R., Sidebottom, G., Bidulock, B. and
+       Heitz, J., "Signaling System 7 (SS7) Message Transfer Part 2
+       (MTP2) - User Adaptation Layer," RFC 3331, Internet Engineering
+       Task Force - Signalling Transport Working Group (September,
+       2002).
+
+  [M3UA]  Sidebottom, G., Morneault, K. and Pastor-Balbas, J., (eds),
+       "Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) - User
+       Adaptation Layer (M3UA)," RFC 3332, Internet Engineering Task
+       Force - Signalling Transport Working Group (September, 2002).
+
+  [SUA]  Loughney, J., Sidebottom, G., Coene, L., Verwimp, G., Keller,
+       J. and Bidulock, B., "SS7 SCCP-User Adaptation Layer (SUA),"
+       draft-ietf-sigtran-sua-15.txt, Internet Engineering Task Force -
+       Signalling Transport Working Group (June 30, 2003).  Work In
+       Progress.
+
+  [RFC 2960]  Stewart, R., Xie, Q., Morneault, K., Sharp, C.,
+       Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
+       and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
+       RFC 2960, The Internet Society (February 2000).
+
+  [RFC 2119]  Bradner, S., "Key words for use in RFCs to Indicate
+       Requirement Levels," RFC 2119 - BCP 14, The Internet Society
+       (March 1997).
+
+  [LOADSEL]  Bidulock, B., "Load Selection Extension for Signalling User
+       Adaptation Layers (LOADSEL)," <draft-bidulock-sigtran-
+       loadsel-02.txt>, Internet Engineering Task Force - Signalling
+       Transport Working Group (July 26, 2003).  Work In Progress.
+
+R.2.  Informative References
+
+  [ISUA]  Bidulock, B., "SS7 ISUP-User Adaptation Layer (ISUA)," <draft-
+       bidulock-sigtran-isua-01.txt>, Internet Engineering Task Force -
+       Signalling Transport Working Group (July 26, 2003).  Work In
+       Progress.
+
+  [TUA]  Bidulock, B., "SS7 TCAP-User Adaptation Layer (TUA)," <draft-
+       bidulock-sigtran-tua-02.txt>, Internet Engineering Task Force -
+       Signalling Transport Working Group (July 26, 2003).  Work In
+       Progress.
+
+  [Q.704]  ITU, "Message Transfer Part - Signalling Network Functions
+       and Messages," ITU-T Recommendation Q.704, ITU-T
+       Telecommunication Standardization Sector of ITU, Geneva (March
+       1993).  (Previously "CCITT Recommendation")
+
+  [NPI]  International, UNIX., "Network Provider Interface
+
+B. Bidulock                    Version 0.2                       Page 28
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+       Specification," NPI Revision 2.0.0, UNIX International
+       Publication, Parsippany, New Jersey (August 17, 1992).
+       http://www.openss7.org/doc/npi.pdf
+
+  [TPI]  Open Group, "Transport Provider Interface Specification," TPI
+       Version 2, Draft 2, Open Group Publication (1999).
+       http://www.opengroup.org/onlinepubs/
+
+  [XNS]  Open Group, "Technical Standard: Network Services (XNS)," XNS
+       Issue 5.2 Draft 2.0 [ISBN: 1-85912-241-8], Open Group Publication
+       (1999).  http://www.opengroup.org/onlinepubs/
+
+  [ASPEXT]  Bidulock, B., "Application Server Process (ASP) Extension
+       Framework," <draft-bidulock-sigtran-aspext-02.txt>, Internet
+       Engineering Task Force - Signalling Transport Working Group (July
+       26, 2003).  Work In Progress.
+
+  [SUA14]  Loughney, J., Sidebottom, G., Coene, L., Verwimp, G., Keller,
+       J. and Bidulock, B., "SS7 SCCP-User Adaptation Layer (SUA),"
+       <draft-ietf-sigtran-sua-14.txt>, Internet Engineering Task Force
+       - Signalling Transport Working Group (June 30, 2002).  Work In
+       Progress.
+
+
+Author's Addresses
+
+  Brian Bidulock                                  Phone: +1-780-490-1141
+  OpenSS7 Corporation                        Email: bidulock@openss7.org
+  1469 Jeffreys Crescent                     URL: http//www.openss7.org/
+  Edmonton, AB  T6L 6T1
+  Canada
+
+
+
+
+  This draft expires January 2004.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 29
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+
+                        List of Illustrations
+
+  Figure A. Example (A) - M2UA Configuration ......................    5
+  Figure B. Example (B) - M3UA Configuration ......................    6
+  Figure C. Example (C) - ISUA Configuration ......................    7
+  Figure D. Example (D) - SUA Configuration .......................    8
+  Figure E. Example (E) - TUA Configuration .......................    9
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  Contents ........................................................    2
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.2 Abbreviations ...............................................    2
+  1.3 Terminology .................................................    3
+  1.4 Overview ....................................................    3
+  1.4.1 Limitations of Existing Registration Management ...........    3
+  1.4.2 Registration Extension ....................................    4
+  1.5 Limitations .................................................    9
+  Notes for Section 1 .............................................   10
+  2 Conventions ...................................................   10
+  3 Protocol Elements .............................................   10
+  3.1 Parameters ..................................................   10
+  3.1.1 Routing Key Parameters ....................................   11
+  3.1.2 Routing (Link) Key ........................................   11
+  3.1.3 Load Selection ............................................   15
+  3.1.4 Error Codes ...............................................   18
+  3.1.5 Registration Status .......................................   18
+  3.2 Messages ....................................................   21
+  3.2.1 Registration Request (REG REQ) ............................   21
+  3.2.2 Registration Response (REG RSP) ...........................   21
+  Notes for Section 3 .............................................   22
+  4 Procedures ....................................................   23
+  4.1 Registration ................................................   23
+  4.1.1 Common Registration Procedures ............................   23
+  4.1.2 M2UA Registration Procedures ..............................   23
+  Notes for Section 4 .............................................   24
+  5 Interworking ..................................................   24
+  5.1 Registration Interworking ...................................   24
+  5.1.1 Registration Status REGEXT Unsupported ....................   24
+  5.1.2 Error Codes REGEXT Unsupported ............................   25
+  6 Examples ......................................................   25
+  7 Security ......................................................   25
+  8 IANA Considerations ...........................................   26
+  Notes for Section 8 .............................................   26
+  0 Revision History ..............................................   27
+  0.2 Changes from Version 0.1 to Version 0.2 .....................   27
+  0.1 Changes from Version 0.0 to Version 0.1 .....................   27
+  0.0.0 Change Log ................................................   27
+  R References ....................................................   28
+
+B. Bidulock                    Version 0.2                       Page 30
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+  R.1 Normative References ........................................   28
+  R.2 Informative References ......................................   28
+  Author's Addresses ..............................................   29
+  List of Illustrations ...........................................   30
+  Table of Contents ...............................................   30
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 31
+
+Internet Draft                  UA REGEXT                  July 26, 2003
+
+Full Copyright Statement
+
+  Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+     This document and translations of it may be copied and furnished to
+  others, and derivative works that comment on or otherwise explain it
+  or assist in its implementation may be prepared, copied, published and
+  distributed, in whole or in part, without restriction of any kind,
+  provided that the above copyright notice and this paragraph are
+  included on all such copies and derivative works.  However, this
+  document itself may not be modified in any way, such as by removing
+  the copyright notice or references to the Internet Society or other
+  Internet organizations, except as needed for the purpose of developing
+  Internet standards in which case the procedure for copyrights defined
+  in the Internet Standards process must be followed, or as required to
+  translate into languages other than English.
+
+     The limited permission granted above are perpetual and will not be
+  revoked by the Internet Society or its successors or assigns.
+
+     This document and the information contained herein is provided on
+  an "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+  TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT
+  NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN
+  WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+     Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.2                       Page 32
+
