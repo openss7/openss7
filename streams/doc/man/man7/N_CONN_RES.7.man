@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: N_CONN_RES.7.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\" @(#) $Id: N_CONN_RES.7.man,v 0.9.2.2 2004/05/14 07:59:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH N_CONN_RES 7 "$Date: 2004/03/01 02:44:06 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH N_CONN_RES 7 "$Date: 2004/05/14 07:59:55 $" "$Name:  $" "Network Provider Interface (NPI)"
 .SH NAME
 .BR N_CONN_RES " (" N_conn_res_t )
 \- network connection response
@@ -244,17 +244,17 @@ The sequence number specified in the primitive wasincorrect or illegal.
 .TP
 .RB [ NSYSERR ]
 A system error has occurred and the Linux system error isindicated in the primitive.
-.SH "CONFORMING TO"
+.SH HISTORY
+.PP
+The Network Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
 .PP
 This interface conforms to NPI Revision 2.
 .[
 npi
-.]
-.SH "HISTORY"
-.PP
-The Network Provider Interface first appeared in SVR4.
-.[
-svr4
 .]
 .XX
 .[

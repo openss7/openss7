@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strsetup.8.man,v 0.9.2.7 2004/04/17 23:14:57 brian Exp $
+.\" @(#) $Id: strsetup.8.man,v 0.9.2.8 2004/05/14 07:59:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:57 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRSETUP 8 "$Date: 2004/04/17 23:14:57 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRSETUP 8 "$Date: 2004/05/14 07:59:59 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -429,7 +429,7 @@ provides
 for compatibility with
 .IR OSF/1 \(rg
 with the following portability considerations:
-.IP \(em
+.IP \(em \w'\(em\(em'u
 .IR OSF/1 \(rg
 does not document long options.
 .IP \(em

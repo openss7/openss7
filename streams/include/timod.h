@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.2 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.3 2004/05/14 08:00:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,15 +45,37 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/14 08:00:01 $ by $Author: brian $
+
+ $Log: timod.h,v $
+ Revision 0.9.2.3  2004/05/14 08:00:01  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 1.3  2004/05/14 08:00:01  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 0.9.4.2  2004/04/13 12:12:51  brian
+ - Rearranged header files.
 
  *****************************************************************************/
 
 #ifndef _TIMOD_H
 #define _TIMOD_H
 
-#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/14 08:00:01 $"
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
 #include <sys/timod.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* _TIMOD_H */

@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.2 2004/05/14 07:59:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI-TCP 7 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Transport Provider Interface"
+.TH TPI-TCP 7 "$Date: 2004/05/14 07:59:58 $" "$Name:  $" "Transport Provider Interface"
 .SH NAME
 .B tpi_tcp
 \- Transport Provider Interface (TPI) \- Transmission Control Protocol (TCP) Corrigendum
@@ -240,19 +240,19 @@ level protocol options, none of the options are of end-to-end significance.
 .BR tpi (7),
 .BR xti (3),
 .BR sockets (3).
-.SH "VERSIONS"
+.SH HISTORY
 .PP
-.PP
-This manpage describes Version 5.2 of the
-.B TPI-TCP
-interface.
-.XX
+The Transport Provider Interface first appeared in SVR 4.
 .[
-xns
+svr4
 .]
+.SH CONFORMANCE
+.PP
+This interface conforms to TPI Version 2, Draft 2.
 .[
 TPI Revision 2.0.0
 .]
+.XX
 .[
 magic
 .]
@@ -262,4 +262,4 @@ advprog
 .[
 $LIST$
 .]
-.TA
+.TI

@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: soon.8.man,v 0.9.2.3 2004/04/17 23:14:56 brian Exp $
+.\" @(#) $Id: soon.8.man,v 0.9.2.4 2004/05/14 07:59:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXXX 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Under Construction"
+.TH XXXX 8 "$Date: 2004/05/14 07:59:59 $" "$Name:  $" "Under Construction"
 .SH NAME
 .B xxx
 \- incomplete man page
@@ -81,5 +81,4 @@ none
 This manpage is under construction.
 .SH BUGS
 Not done yet.
-.so streams.macros
 .TA

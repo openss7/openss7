@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sad.4.man,v 0.9.2.4 2004/04/26 22:16:40 brian Exp $
+.\" @(#) $Id: sad.4.man,v 0.9.2.5 2004/05/14 07:59:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/26 22:16:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SAD 4 "$Date: 2004/04/26 22:16:40 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH SAD 4 "$Date: 2004/05/14 07:59:52 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -641,7 +641,7 @@ and
 LiS
 .]
 with the following considerations:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .B sad
 implements the
 .IR UnixWare \(rg

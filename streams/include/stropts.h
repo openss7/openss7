@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.2 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.3 2004/05/14 08:00:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/14 08:00:01 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -53,8 +54,20 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004  Open SS7 Corporation"
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
 #include <sys/stropts.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* _STROPTS_H */

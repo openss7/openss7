@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_rcvdis.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
+.\" @(#) $Id: t_rcvdis.3.man,v 0.9.2.5 2004/05/14 07:59:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_RCVDIS 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_RCVDIS 3 "$Date: 2004/05/14 07:59:51 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
@@ -232,7 +232,7 @@ available, and the stream is set for asynchronous mode
 .BR "" ( O_NONBLOCK " or " O_NDELAY " to " t_open "(3) or " fcntl (2).
 .TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TPI primitive not supported by the underlying transport provider.
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
 Abortive disconnect is not supported by all transport service providers.
 If the transport provider service type is connectionless
 .RB [R T_CLTS , ]

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.11 2004/04/25 07:38:48 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.13 2004/05/14 12:15:09 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/25 07:38:48 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/14 12:15:09 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.11 2004/04/25 07:38:48 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.13 2004/05/14 12:15:09 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/timod.c])
@@ -78,6 +78,7 @@ AC_GNU_SOURCE
 # Checks for programs.
 AM_PROG_AS
 AC_PROG_AWK
+AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
 AM_PROG_CC_C_O
@@ -91,6 +92,7 @@ AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION(0.14.1)
 
 # Checks for libraries.
+AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
 
 # Checks for header files.
@@ -134,7 +136,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul])
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gettimeofday inet_ntoa localtime_r mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul])
 
 AC_LFS
 
@@ -145,6 +147,8 @@ AC_CONFIG_FILES([Makefile
 		 m4/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/Makefile])
+		 doc/manual/Makefile
+		 src/modules/Config
+		 src/drivers/Config])
 
 AC_OUTPUT

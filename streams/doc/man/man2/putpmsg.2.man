@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putpmsg.2.man,v 0.9.2.5 2004/04/17 23:14:55 brian Exp $
+.\" @(#) $Id: putpmsg.2.man,v 0.9.2.6 2004/05/14 07:59:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:55 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTPMSG 2 "$Date: 2004/04/17 23:14:55 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PUTPMSG 2 "$Date: 2004/05/14 07:59:49 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -527,7 +527,7 @@ is compatible with LiS
 LiS
 .]
 with the following exceptions:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .B LiS
 .[
 LiS
@@ -538,21 +538,21 @@ instead of
 .RB [ EIO ]
 when the internal head queue pointer points to a structure that is not a queue
 structure, or is mangled.
-.IP \(em 4
+.IP \(em
 .B LiS
 does not return
 .RB [ EIO ]
 when
 .I fd
 refers to a closing stream.
-.IP \(em 4
+.IP \(em
 .B LiS
 incorrectly returns
 .RB [ EIO ]
 when
 .I fd
 refers to a broken pipe.
-.IP \(em 4
+.IP \(em
 .B LiS
 incorrectly returns
 .RB [ EAGAIN ]
@@ -563,7 +563,7 @@ when an
 message causes a signal that interrupts the call to
 .BR putpmsg ()
 before any data is written.
-.IP \(em 4
+.IP \(em
 .B LiS
 incorrectly returns
 .RB [ ENODEV ]
@@ -571,7 +571,7 @@ instead of
 .RB [ ENOSTR ]
 when there is no stream associated with
 .IR fd .
-.IP \(em 4
+.IP \(em
 .B LiS
 incorrectly returns
 .RB [ EINVAL ]

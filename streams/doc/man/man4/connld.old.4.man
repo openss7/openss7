@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: connld.old.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: connld.old.4.man,v 0.9.2.3 2004/05/14 07:59:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,27 +53,9 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.\"
-.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
-.\"
-.\" This library is free software; you can redistribute it and/or
-.\" modify it under the terms of the GNU Library General Public
-.\" License as published by the Free Software Foundation; either
-.\" version 2 of the License, or (at your option) any later version.
-.\"
-.\" This library is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-.\" Library General Public License for more details.
-.\"
-.\" You should have received a copy of the GNU Library General Public
-.\" License along with this library; if not, write to the
-.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
-.\" MA 02139, USA.
-.\"
 .so streams.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -89,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CONNLD 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH CONNLD 4 "$Date: 2004/05/14 07:59:52 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME

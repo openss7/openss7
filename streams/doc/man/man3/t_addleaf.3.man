@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_addleaf.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
+.\" @(#) $Id: t_addleaf.3.man,v 0.9.2.5 2004/05/14 07:59:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,10 +53,9 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
-
 .so streams.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -74,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_ADDLEAF 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_ADDLEAF 3 "$Date: 2004/05/14 07:59:50 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_addleaf
 \- add a point to a point to multipoint connection
@@ -183,7 +182,7 @@ An address was not specified and the transport provider could not assign one.
 An attempt was made to read the add leaf confirmation but no add leaf confirmation was available.
 .TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TPI primitive not supported by the underlying transport provider.
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
 .TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in an incorrect state.

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/08 19:21:12 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/14 12:14:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/08 19:21:12 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 12:14:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -537,7 +537,7 @@ ldconfig
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
-%{_datadir}/locale/*
+@WITH_XNET_TRUE@%{_datadir}/locale/*
 %endif
 
 # ===========================================================================
@@ -566,22 +566,52 @@ development of STREAMS applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/%{name}.info ; then
-        /sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir
-    elif test -f %{_infodir}/%{name}.info.gz ; then
-        /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    if test -f %{_infodir}/STREAMS.info ; then
+        /sbin/install-info %{_infodir}/STREAMS.info %{_infodir}/dir
+    elif test -f %{_infodir}/STREAMS.info.gz ; then
+        /sbin/install-info %{_infodir}/STREAMS.info.gz %{_infodir}/dir
     fi
+    if test -f %{_infodir}/SPG.info ; then
+        /sbin/install-info %{_infodir}/SPG.info %{_infodir}/dir
+    elif test -f %{_infodir}/SPG.info.gz ; then
+        /sbin/install-info %{_infodir}/SPG.info.gz %{_infodir}/dir
+    fi
+    if test -f %{_infodir}/porting.info ; then
+        /sbin/install-info %{_infodir}/porting.info %{_infodir}/dir
+    elif test -f %{_infodir}/porting.info.gz ; then
+        /sbin/install-info %{_infodir}/porting.info.gz %{_infodir}/dir
+    fi
+@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
+@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info %{_infodir}/dir
+@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
+@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info.gz %{_infodir}/dir
+@WITH_XNET_TRUE@    fi
 fi
 
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/%{name}.info ; then
-        /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir
-    elif test -f %{_infodir}/%{name}.info.gz ; then
-        /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    if test -f %{_infodir}/STREAMS.info ; then
+        /sbin/install-info %{_infodir}/STREAMS.info %{_infodir}/dir
+    elif test -f %{_infodir}/STREAMS.info.gz ; then
+        /sbin/install-info %{_infodir}/STREAMS.info.gz %{_infodir}/dir
     fi
+    if test -f %{_infodir}/SPG.info ; then
+        /sbin/install-info %{_infodir}/SPG.info %{_infodir}/dir
+    elif test -f %{_infodir}/SPG.info.gz ; then
+        /sbin/install-info %{_infodir}/SPG.info.gz %{_infodir}/dir
+    fi
+    if test -f %{_infodir}/porting.info ; then
+        /sbin/install-info --delete %{_infodir}/porting.info %{_infodir}/dir
+    elif test -f %{_infodir}/porting.info.gz ; then
+        /sbin/install-info --delete %{_infodir}/porting.info.gz %{_infodir}/dir
+    fi
+@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
+@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info %{_infodir}/dir
+@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
+@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info.gz %{_infodir}/dir
+@WITH_XNET_TRUE@    fi
 fi
 
 %postun doc
@@ -592,9 +622,11 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%doc AUTHORS COPYING ChangeLog INSTALL NEWS README THANKS
-%doc doc/manual/*.texi
-%doc doc/manual/*.pdf
+%if %{?_with_xnet: 1}%{!?_with_xnet: 0}
+%doc ABOUT-NLS
+%endif
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc doc/manual
 %{_infodir}/*
 %endif
 
@@ -642,7 +674,7 @@ developing STREAMS application programs.
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_libdir}/*.a
+@WITH_XNET_TRUE@%{_libdir}/*.a
 %{_includedir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
@@ -768,7 +800,9 @@ fi
 %defattr(-,root,root)
 %{_bindir}/*
 %{_sbindir}/*
-%{_libexecdir}/*
+@WITH_TLI_TRUE@%{_libexecdir}/*
+@WITH_TLI_FALSE@@WITH_INET_TRUE@%{_libexecdir}/*
+@WITH_TLI_FALSE@@WITH_INET_FALSE@@WITH_XNET_TRUE@%{_libexecdir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 %{_mandir}/man1/*
@@ -779,15 +813,23 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.15  2004/05/08 19:21:12  brian
-# - Commenting out unused structure members.
+# Revision 0.9.2.17  2004/05/14 12:14:27  brian
+# - corrected logic for including test files
 #
-# Revision 1.15  2004/05/08 19:21:12  brian
-# - Commenting out unused structure members.
+# Revision 1.17  2004/05/14 12:14:27  brian
+# - corrected logic for including test files
 #
-# Revision 1.14  2004/04/25 07:42:33  brian
-# - Updated change log.
+# Revision 1.16  2004/05/14 07:59:48  brian
+# - Updated xns, tli, inet, xnet and documentation.
 #
+
+* Wed May  5 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.15  2004/05/08 19:21:12  brian
+- Commenting out unused structure members.
+
+* Sun Apr 25 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.14  2004/04/25 07:42:33  brian
+- Updated change log.
 
 * Sun Apr 25 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.13  2004/04/25 07:41:29  brian

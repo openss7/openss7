@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmsg.2.man,v 0.9.2.5 2004/04/17 23:14:55 brian Exp $
+.\" @(#) $Id: getmsg.2.man,v 0.9.2.6 2004/05/14 07:59:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,10 +53,9 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:55 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
-
 .so streams.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -72,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMSG 2 "$Date: 2004/04/17 23:14:55 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH GETMSG 2 "$Date: 2004/05/14 07:59:49 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -502,7 +501,7 @@ is compatible with LiS
 LiS
 .]
 with the following exceptions:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .B LiS
 .[
 LiS
@@ -515,7 +514,7 @@ with a
 .B NULL
 .I bandp
 pointer.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -526,7 +525,7 @@ instead of
 .RB [ EIO ]
 when the internal head queue pointer points to a structure that is not a queue
 structure, or is mangled.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -542,7 +541,7 @@ yeilds a
 message pointer, but
 .B getq()
 later cannot retrieve a message.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -552,7 +551,7 @@ does not return
 when
 .B getmsg()
 is called on a closing stream.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -566,7 +565,7 @@ when an
 message causes a signal that interrupts the call to
 .B getmsg()
 before any data is read.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -577,7 +576,7 @@ instead of
 .RB [ ENOSTR ]
 when there is no stream associated with
 .IR fd .
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS

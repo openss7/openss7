@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.13 2004/05/09 07:22:32 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.14 2004/05/14 08:00:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/09 07:22:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/14 08:00:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/09 07:22:32 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/14 08:00:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -70,7 +70,24 @@
 #include <linux/modversions.h>
 
 #include <linux/types.h>	/* for various types */
+
+/* FIXME: Need to put these in autoconf */
+
+#ifndef uchar
 typedef unsigned char uchar;		/* idiots! */
+#define uchar uchar
+#endif
+
+#ifndef uintptr_t
+typedef unsigned long uintptr_t;
+#define uintptr_t uintptr_t
+#endif
+
+#ifndef intptr_t
+typedef long intptr_t;
+#define intptr_t intptr_t
+#endif
+
 #include <asm/system.h>		/* for xchg */
 #include <asm/bitops.h>		/* for set_bit */
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:17 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:17 $ by $Author: brian $
+ Last Modified $Date: 2004/05/14 08:00:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:17 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:17 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $";
 
-/* 
+/*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
  *  service providers supporting the T_ADDR_REQ primitive.
  *
@@ -66,34 +66,62 @@ static char const ident[] =
  *  conforming t_sync() library call.
  */
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
+#if defined(_LIS_SOURCE) && !defined(MODULE)
+#   error ****
+#   error ****  timod can only compile as a module under LiS.
+#   error ****  This is normally because LiS has been grossly misconfigured.
+#   error ****  Report bugs to <bugs@openss7.org>.
+#   error ****
 #endif
-#include <linux/module.h>
-#include <linux/modversions.h>
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifdef MODVERSIONS
+#	include <linux/modversions.h>
+#   endif
+#   include <linux/module.h>
+#   include <linux/modversions.h>
+#   ifndef __GENKSYMS__
+#	ifdef LIS
+#	    include <sys/LiS/modversions.h>
+#	else
+#	    include <sys/streams/modversions.h>
+#	endif
+#   endif
 #endif
 
 #include <sys/kmem.h>
+#include <sys/cmn_err.h>
+
 #include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
-#include <tihdr.h>
-#include <timod.h>
+/*
+   These are for TPI definitions 
+ */
+#if defined HAVE_TIHDR_H
+#   include <tihdr.h>
+#else
+#   include <sys/tihdr.h>
+#endif
+#if defined HAVE_TIMOD_H
+#   include <timod.h>
+#else
+#   include <sys/timod.h>
+#endif
 
+#ifdef _LFS_SOURCE
 #include "sys/config.h"
 #include "strdebug.h"
+#endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:17 $"
+#define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -105,36 +133,64 @@ static char const ident[] =
 #define TIMOD_SPLASH	TIMOD_DEVICE	" - " \
 			TIMOD_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_TIMOD_MODULE
 MODULE_AUTHOR(TIMOD_CONTACT);
 MODULE_DESCRIPTION(TIMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TIMOD_DEVICE);
 MODULE_LICENSE(TIMOD_LICENSE);
+
+#ifndef TIMOD_MOD_NAME
+#   ifdef CONFIG_STREAMS_TIMOD_NAME
+#	define TIMOD_MOD_NAME CONFIG_STREAMS_TIMOD_NAME
+#   else
+#	define TIMOD_MOD_NAME "timod"
+#   endif
 #endif
 
-#ifndef CONFIG_STREAMS_TIMOD_NAME
-//#define CONFIG_STREAMS_TIMOD_NAME "timod"
-#error "CONFIG_STREAMS_TIMOD_NAME must be defined."
-#endif
-#ifndef CONFIG_STREAMS_TIMOD_MODID
-//#define CONFIG_STREAMS_TIMOD_MODID 15
-#error "CONFIG_STREAMS_TIMOD_MODID must be defined."
+#ifndef TIMOD_MOD_ID
+#   ifdef CONFIG_STREAMS_TIMOD_MODID
+#	define TIMOD_MOD_ID CONFIG_STREAMS_TIMOD_MODID
+#   else
+#	define TIMOD_MOD_ID 0
+#   endif
 #endif
 
-static modID_t modid = CONFIG_STREAMS_TIMOD_MODID;
-MODULE_PARM(modid, "b");
+static modID_t modid = TIMOD_MOD_ID;
+MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for TIMOD.");
 
 static struct module_info timod_minfo = {
-	mi_idnum:CONFIG_STREAMS_TIMOD_MODID,
-	mi_idname:CONFIG_STREAMS_TIMOD_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+	mi_idnum:TIMOD_MOD_ID,		/* Module ID number */
+	mi_idname:TIMOD_MOD_NAME,	/* Module name */
+	mi_minpsz:0,			/* Min packet size accepted */
+	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
+	mi_hiwat:1,			/* Hi water mark */
+	mi_lowat:0,			/* Lo water mark */
 };
 
-/* 
+static int timod_open(queue_t *, dev_t *, int, int, cred_t *);
+static int timod_close(queue_t *, int, cred_t *);
+
+static int timod_rput(queue_t *, mblk_t *);
+static int timod_wput(queue_t *, mblk_t *);
+
+static struct qinit timod_rinit = {
+	qi_putp:timod_rput,		/* Read put (message from below) */
+	qi_qopen:timod_open,		/* Each open */
+	qi_qclose:timod_close,		/* Last close */
+	qi_minfo:&timod_minfo,		/* Information */
+};
+
+static struct qinit timod_winit = {
+	qi_putp:timod_wput,		/* Write put (message from above) */
+	qi_minfo:&timod_minfo,		/* Information */
+};
+
+static struct streamtab timod_info = {
+	st_rdinit:&timod_rinit,		/* Upper read queue */
+	st_wrinit:&timod_winit,		/* Upper write queue */
+};
+
+/*
  *  -------------------------------------------------------------------------
  *
  *  Private Datastructure ctors and dtors
@@ -142,299 +198,853 @@ static struct module_info timod_minfo = {
  *  -------------------------------------------------------------------------
  */
 struct timod {
-	struct list_head list;		/* list of timod structures */
-	dev_t dev;			/* device number of driver */
+	queue_t *rq;			/* module read queue */
+	queue_t *wq;			/* module write queue */
+	queue_t *hq;			/* stream head read queue */
+	ulong state;			/* module state */
+	ulong oldstate;			/* module state */
+	ulong flags;			/* module flags */
 	mblk_t *iocblk;			/* ioctl being processed */
-	cred_t cred;			/* credentials */
+	ulong qlen;			/* bind ack queue length */
+	ulong cons;			/* outstanding connection indications */
 };
 
-static rwlock_t timod_list_lock = RW_LOCK_UNLOCKED;
+static kmem_cache_t *timod_priv_cachep = NULL;
 
-static struct list_head timod_opens = {
-	next:&timod_opens,
-	prev:&timod_opens,
-};
-
-static struct timod *timod_alloc_priv(queue_t *q, struct list_head *list, dev_t *devp, cred_t *crp)
+static int
+timod_init_caches(void)
 {
-	struct timod *timod;
-	if ((timod = kmem_zalloc(sizeof(*timod), KM_NOSLEEP))) {
-		queue_t *wq = WR(q);
-		timod->dev = *devp;
-		timod->cred = *crp;
-		write_lock(&timod_list_lock);
-		list_add_tail(&timod->list, list);
-		write_unlock(&timod_list_lock);
-		/* we are a module with no service routine so our hiwat, lowat don't matter;
-		   however, our minpsz, maxpsz do because we are the first queue under the stream
-		   head */
-		wq->q_minpsz = wq->q_next->q_minpsz;
-		wq->q_maxpsz = wq->q_next->q_maxpsz;
-		wq->q_ptr = q->q_ptr = timod;
+	if (!timod_priv_cachep
+	    && !(timod_priv_cachep =
+		 kmem_cache_create(TIMOD_MOD_NAME, sizeof(struct timod), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL))) {
+		cmn_err(CE_WARN, "%s: %s: Cannot allocate timod_priv_cachep", TIMOD_MOD_NAME,
+			__FUNCTION__);
+		return (-ENOMEM);
 	}
-	return (timod);
+	return (0);
 }
-static void timod_free_priv(queue_t *q)
+
+static void
+timod_term_caches(void)
 {
-	struct timod *timod = q->q_ptr;
-	write_lock(&timod_list_lock);
-	list_del(&timod->list);
-	write_unlock(&timod_list_lock);
-	kmem_free(timod, sizeof(*timod));
+	if (timod_priv_cachep) {
+		if (kmem_cache_destroy(timod_priv_cachep))
+			cmn_err(CE_WARN, "%s: %s: did not destroy timod_priv_cachep",
+				TIMOD_MOD_NAME, __FUNCTION__);
+	}
 	return;
 }
 
-#if defined TI_CONNECT || defined TI_ACCEPT || defined TI_DISCONNECT
-static int split_buffer(mblk_t *mp, unsigned char *ptr)
+static struct timod *
+timod_alloc_priv(queue_t *q)
 {
-	if (ptr >= mp->b_wptr) {
-		mp->b_datap->db_type = M_PROTO;
-		return (0);
-	} else {
+	struct timod *priv;
+	if ((priv = kmem_cache_alloc(timod_priv_cachep, SLAB_ATOMIC))) {
+		bzero(priv, sizeof(*priv));
+		priv->rq = q;
+		priv->wq = WR(q);
+		priv->hq = q->q_next;
+		priv->state = TS_UNBND;	/* assume we are in the correct initial state */
+		priv->oldstate = -1UL;
+		priv->flags = 0;
+		priv->qlen = 0;
+		priv->cons = 0;
+		/*
+		   we are a module with no service routine so our hiwat, lowat shouldn't matter;
+		   however, our minpsz, maxpsz do because we are the first queue under the stream
+		   head.  We do not want to alter the characteristics of the transport packet sizes
+		   so we copy them here. This will allow the stream head to exhibit the same
+		   behaviour as before we were pushed. 
+		 */
+		priv->wq->q_minpsz = priv->wq->q_next->q_minpsz;
+		priv->wq->q_maxpsz = priv->wq->q_next->q_maxpsz;
+		q->q_ptr = WR(q)->q_ptr = priv;
+	}
+	return (priv);
+}
+
+static void
+timod_free_priv(queue_t *q)
+{
+	struct timod *priv;
+	if ((priv = (typeof(priv)) q->q_ptr)) {
+		q->q_ptr = WR(q)->q_ptr = NULL;
+		priv->rq = NULL;
+		priv->wq = NULL;
+		priv->hq = NULL;
+		priv->state = -1UL;
+		priv->oldstate = -1UL;
+		priv->flags = 0;
+		priv->qlen = 0;
+		priv->cons = 0;
+		if (priv->iocblk)
+			freemsg(xchg(&priv->iocblk, NULL));
+		kmem_cache_free(timod_priv_cachep, priv);
+	}
+	return;
+}
+
+static int
+split_buffer(mblk_t *mp, int offset)
+{
+	unsigned char *ptr = mp->b_rptr + offset;
+	if (ptr > mp->b_wptr)
+		return (-EINVAL);
+	if (ptr < mp->b_wptr) {
 		mblk_t *dp;
-		if ((dp = dupb(mp))) {
-			mp->b_wptr = ptr;
-			dp->b_rptr = ptr;
+		if ((dp = copyb(mp))) {
+			dp->b_datap->db_type = M_DATA;
+			dp->b_rptr += offset;
 			mp->b_datap->db_type = M_PROTO;
+			mp->b_wptr = ptr;
+			linkb(mp, dp);
+			return (0);
 		}
 		return (-ENOSR);
 	}
+	mp->b_datap->db_type = M_PROTO;
+	return (0);
 }
-#endif
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  PUT routine
  *  
  *  -------------------------------------------------------------------------
  */
-static int timod_put(queue_t *q, mblk_t *mp)
+static int
+timod_rput(queue_t *q, mblk_t *mp)
 {
-	struct timod *timod = q->q_ptr;
+	struct timod *priv = q->q_ptr;
+#if defined _LIS_SOURCE
+	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			TIMOD_MOD_NAME, __FUNCTION__);
+		freemsg(mp);
+		return (0);
+	}
+#endif				/* defined _LIS_SOURCE */
+	switch (mp->b_datap->db_type) {
+		union T_primitives *p;
+		struct iocblk *ioc;
+		mblk_t *dp;
+	case M_PCPROTO:
+	case M_PROTO:
+		p = (typeof(p)) mp->b_rptr;
+		if (!(dp = xchg(&priv->iocblk, NULL)))
+			goto pass_along;
+		/*
+		   we are expecting a response, but only intercept the expected response, pass
+		   along others 
+		 */
+		ioc = (typeof(ioc)) dp->b_rptr;
+		switch (p->type) {
+		case T_OK_ACK:
+			switch (ioc->ioc_cmd) {
+			case O_TI_UNBIND:
+			case TI_UNBIND:
+				priv->state = TS_UNBND;
+				priv->qlen = 0;
+				goto ack_it;
+#ifdef TI_ACCEPT
+			case TI_ACCEPT:
+#endif
+			case TI_SETMYNAME:
+				switch (priv->state) {
+				case TS_WACK_CRES:
+					/*
+					   but could be TS_DATA_XFER for same stream connect 
+					 */
+					priv->state = (priv->cons && --priv->cons > 0)
+					    ? TS_WRES_CIND : TS_IDLE;
+					break;
+				case TS_WACK_DREQ7:
+					priv->state = (priv->cons && --priv->cons > 0)
+					    ? TS_WRES_CIND : TS_IDLE;
+					break;
+				}
+				goto ack_it;
+#ifdef TI_CONNECT
+			case TI_CONNECT:
+#endif
+			case TI_SETPEERNAME:
+				switch (priv->state) {
+				case TS_WACK_CREQ:
+					priv->state = TS_WCON_CREQ;
+					break;
+				case TS_WACK_DREQ6:
+				case TS_WACK_DREQ9:
+				case TS_WACK_DREQ10:
+				case TS_WACK_DREQ11:
+					priv->state = TS_IDLE;
+					break;
+				}
+				priv->state = TS_WCON_CREQ;
+				goto ack_it;
+#ifdef TI_DISCONNECT
+			case TI_DISCONNECT:
+				priv->state = TS_IDLE;
+				goto ack_it;
+#endif
+			}
+			break;
+		case T_INFO_ACK:
+			switch (ioc->ioc_cmd) {
+			case O_TI_GETINFO:
+			case TI_GETINFO:
+				priv->state = priv->oldstate;
+				goto ack_it;
+			}
+			break;
+		case T_BIND_ACK:
+			switch (ioc->ioc_cmd) {
+			case O_TI_BIND:
+			case TI_BIND:
+				priv->state = TS_IDLE;
+				priv->qlen = p->bind_ack.CONIND_number;
+				goto ack_it;
+			}
+			break;
+		case T_OPTMGMT_ACK:
+			switch (ioc->ioc_cmd) {
+			case O_TI_OPTMGMT:
+			case TI_OPTMGMT:
+				priv->state = priv->oldstate;
+				goto ack_it;
+			}
+			break;
+		case T_ADDR_ACK:
+			switch (ioc->ioc_cmd) {
+#ifdef TI_GETPROTADDR
+			case TI_GETPROTADDR:
+#endif
+			case TI_GETADDRS:
+			case TI_GETMYNAME:
+			case TI_GETPEERNAME:
+				priv->state = priv->oldstate;
+				goto ack_it;
+			}
+			break;
+#ifdef T_CAPABILITY_ACK
+		case T_CAPABILITY_ACK:
+			switch (ioc->ioc_cmd) {
+			case TI_CAPABILITY:
+				priv->state = priv->oldstate;
+				goto ack_it;
+			}
+			break;
+#endif
+		case T_ERROR_ACK:
+			priv->state = priv->oldstate;
+			dp->b_datap->db_type = M_IOCACK;
+			linkb(dp, mp);
+			ioc->ioc_count = mp->b_wptr - mp->b_rptr;
+			ioc->ioc_error = 0;
+			ioc->ioc_rval = (p->error_ack.UNIX_error << 8) | p->error_ack.TLI_error;
+			if (ioc->ioc_rval == 0 || ioc->ioc_rval == TSYSERR)
+				ioc->ioc_rval = (EINVAL << 8) | TSYSERR;
+			putnext(q, dp);
+			return (0);
+		      ack_it:
+			dp->b_datap->db_type = M_IOCACK;
+			linkb(dp, mp);
+			ioc->ioc_count = mp->b_wptr - mp->b_rptr;
+			ioc->ioc_error = 0;
+			ioc->ioc_rval = 0;
+			putnext(q, dp);
+			return (0);
+		}
+		/*
+		   not expecting anything, but do state tracking 
+		 */
+	      pass_along:
+		switch (p->type) {
+		case T_CONN_IND:
+			priv->oldstate = priv->state;
+			priv->cons++;
+			priv->state = TS_WRES_CIND;
+			break;
+		case T_CONN_CON:
+			priv->oldstate = priv->state;
+			priv->state = TS_DATA_XFER;
+			break;
+		case T_DISCON_IND:
+			priv->oldstate = priv->state;
+			if (priv->cons && --priv->cons) {
+				priv->state = TS_WRES_CIND;
+				break;
+			}
+			priv->state = TS_IDLE;
+			break;
+		case T_DATA_IND:
+			priv->oldstate = priv->state;
+			priv->state = TS_DATA_XFER;
+			break;
+		case T_EXDATA_IND:
+			priv->oldstate = priv->state;
+			priv->state = TS_DATA_XFER;
+			break;
+		case T_INFO_ACK:
+			priv->state = priv->oldstate;
+			break;
+		case T_BIND_ACK:
+			priv->oldstate = priv->state;
+			priv->qlen = p->bind_ack.CONIND_number;
+			priv->state = TS_IDLE;
+			break;
+		case T_ERROR_ACK:
+			priv->state = priv->oldstate;
+			break;
+		case T_OK_ACK:
+			switch ((priv->oldstate = priv->state)) {
+			case TS_WACK_UREQ:
+				priv->state = TS_UNBND;
+				break;
+			case TS_WACK_CREQ:
+				priv->state = TS_WCON_CREQ;
+				break;
+			case TS_WACK_CRES:
+				/*
+				   FIXME: depends 
+				 */
+				priv->state = TS_DATA_XFER;
+				break;
+			case TS_WACK_DREQ6:
+			case TS_WACK_DREQ9:
+			case TS_WACK_DREQ10:
+			case TS_WACK_DREQ11:
+				priv->state = TS_IDLE;
+				break;
+			case TS_WACK_DREQ7:
+				if (priv->cons && --priv->cons) {
+					priv->state = TS_WRES_CIND;
+					break;
+				}
+				priv->state = TS_IDLE;
+				break;
+			}
+			break;
+		case T_UNITDATA_IND:
+			priv->oldstate = priv->state;
+			priv->state = TS_IDLE;
+			break;
+		case T_UDERROR_IND:
+			priv->oldstate = priv->state;
+			priv->state = TS_IDLE;
+			break;
+		case T_OPTMGMT_ACK:
+			priv->state = priv->oldstate;
+			break;
+		case T_ORDREL_IND:
+			switch ((priv->oldstate = priv->state)) {
+			case TS_DATA_XFER:
+				priv->state = TS_WIND_ORDREL;
+				break;
+			case TS_WIND_ORDREL:
+				priv->state = TS_IDLE;
+				break;
+			}
+			break;
+		case T_ADDR_ACK:
+			priv->state = priv->oldstate;
+			break;
+#ifdef T_CAPABILITY_ACK
+		case T_CAPABILITY_ACK:
+			priv->state = priv->oldstate;
+			break;
+#endif
+		}
+		break;
+	case M_ERROR:
+	case M_HANGUP:
+		priv->oldstate = -1UL;
+		priv->state = -1UL;
+		break;
+	}
+	putnext(q, mp);
+	return (0);
+}
+
+static int
+timod_wput(queue_t *q, mblk_t *mp)
+{
+	struct timod *priv = q->q_ptr;
+#if defined _LIS_SOURCE
+	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			TIMOD_MOD_NAME, __FUNCTION__);
+		freemsg(mp);
+		return (0);
+	}
+#endif				/* defined _LIS_SOURCE */
 	switch (mp->b_datap->db_type) {
 		union T_primitives *p;
 		struct iocblk *ioc;
 		mblk_t *dp;
 		int err;
 	case M_IOCTL:
+		/*
+		   Most of the ioctls provided here are to acheive atomic and thread-safe
+		   operations on the stream for use by the XTI/TLI library.  Each ioctl takes a TPI 
+		   message in the buffer and results in sending the TPI message downstream.  We
+		   strip off and keep the io control block for latter response correlation.  We
+		   also track the state of the stream and the number of outstanding connection
+		   indications. 
+		 */
 		ioc = (typeof(ioc)) mp->b_rptr;
-		dp = unlinkb(mp);
+		err = -EFAULT;
+		if (!(dp = unlinkb(mp)))
+			goto error;
 		dp->b_datap->db_type = (ioc->ioc_cmd == TI_GETINFO) ? M_PCPROTO : M_PROTO;
 		p = (typeof(p)) dp->b_rptr;
 		err = -EINVAL;
 		if (ioc->ioc_count == TRANSPARENT)
 			goto error;
 		switch (ioc->ioc_cmd) {
+		case O_TI_OPTMGMT:
+			err = TNOTSUPPORT;
+			goto error;
 		case TI_OPTMGMT:
-			if (ioc->ioc_count >= sizeof(p->optmgmt_req) && p->type == T_OPTMGMT_REQ)
+			if (p->type == T_OPTMGMT_REQ && ioc->ioc_count >= sizeof(p->optmgmt_ack)) {
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+#ifdef TS_WACK_OPTREQ
+				priv->state = TS_WACK_OPTREQ;
+#endif
 				break;
+			}
+			goto error;
+		case O_TI_BIND:
+			err = TNOTSUPPORT;
 			goto error;
 		case TI_BIND:
-			if (ioc->ioc_count >= sizeof(p->bind_req) && p->type == T_BIND_REQ)
+			if (p->type == T_BIND_REQ && ioc->ioc_count >= sizeof(p->bind_ack)) {
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+				priv->state = TS_WACK_BREQ;
 				break;
+			}
+			goto error;
+		case O_TI_GETINFO:
+			err = TNOTSUPPORT;
 			goto error;
 		case TI_GETINFO:
-			if (ioc->ioc_count >= sizeof(p->info_req) && p->type == T_INFO_REQ)
+			if (p->type == T_INFO_REQ && ioc->ioc_count >= sizeof(p->info_ack)) {
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
 				break;
+			}
+			goto error;
+		case O_TI_UNBIND:
+			err = TNOTSUPPORT;
 			goto error;
 		case TI_UNBIND:
-			if (ioc->ioc_count >= sizeof(p->unbind_req) && p->type == T_UNBIND_REQ)
+			if (p->type == T_UNBIND_REQ && ioc->ioc_count >= sizeof(p->ok_ack)) {
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+				priv->state = TS_WACK_UREQ;
 				break;
-			goto error;
-#ifdef TI_GETPROTADDR
-		case TI_GETPROTADDR:
-			if (ioc->ioc_count >= sizeof(p->addr_req) && p->type == T_ADDR_REQ)
-				break;
-			goto error;
-#endif
-#ifdef TI_CONNECT
-		case TI_CONNECT:
-			if (ioc->ioc_count >= sizeof(p->conn_req) && p->type == T_CONN_REQ) {
-				unsigned char *dat;
-				dat =
-				    dp->b_rptr + (p->conn_req.OPT_length ? p->conn_req.OPT_offset +
-						  p->conn_req.OPT_length : (p->conn_req.
-									    DEST_length ? p->
-									    conn_req.DEST_offset +
-									    p->conn_req.
-									    DEST_length : sizeof(p->
-												 conn_req)));
-				if ((err = split_buffer(dp, dat)) < 0)
-					goto error;
 			}
-#endif
-#ifdef TI_ACCEPT
+			goto error;
+#if defined TI_ACCEPT
 		case TI_ACCEPT:
-			if (ioc->ioc_count >= sizeof(p->conn_res) && p->type == T_CONN_RES) {
-				unsigned char *dat;
-				dat =
-				    dp->b_rptr + (p->conn_res.OPT_length ? p->conn_res.OPT_offset +
-						  p->conn_res.OPT_length : sizeof(p->conn_res));
-				if ((err = split_buffer(dp, dat)) < 0)
-					goto error;
-			}
 #endif
-#ifdef TI_DISCONNECT
-		case TI_DISCONNECT:
-			if (ioc->ioc_count >= sizeof(p->discon_req) && p->type == T_DISCON_REQ) {
-				unsigned char *dat;
-				dat = dp->b_rptr + sizeof(p->discon_req);
-				if ((err = split_buffer(dp, dat)) < 0)
-					goto error;
-			}
-#endif
-		case TI_GETMYNAME:
-		case TI_GETPEERNAME:
 		case TI_SETMYNAME:
+			if (p->type == T_CONN_RES && ioc->ioc_count >= sizeof(p->conn_res)) {
+				int doff = sizeof(p->conn_res);
+				if (p->conn_res.OPT_length
+				    && doff < p->conn_res.OPT_offset + p->conn_res.OPT_length)
+					doff = p->conn_res.OPT_offset + p->conn_res.OPT_length;
+				if ((err = split_buffer(dp, doff)) < 0)
+					goto error;
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+				priv->state = TS_WACK_CRES;
+				break;
+			}
+			if (p->type == T_DISCON_REQ && ioc->ioc_count >= sizeof(p->discon_req)) {
+				if ((err = split_buffer(dp, sizeof(p->discon_req))) < 0)
+					goto error;
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+				priv->state = TS_WACK_DREQ7;
+				break;
+			}
+			goto error;
+#if defined TI_CONNECT
+		case TI_CONNECT:
+#endif
 		case TI_SETPEERNAME:
+			if (p->type == T_CONN_REQ && ioc->ioc_count >= sizeof(p->conn_req)) {
+				int doff = sizeof(p->conn_req);
+				if (p->conn_req.OPT_length
+				    && doff < p->conn_req.OPT_offset + p->conn_req.OPT_length)
+					doff = p->conn_req.OPT_offset + p->conn_req.OPT_length;
+				if (p->conn_req.DEST_length
+				    && doff < p->conn_req.DEST_offset + p->conn_req.DEST_length)
+					doff = p->conn_req.DEST_offset + p->conn_req.DEST_length;
+				if ((err = split_buffer(dp, doff)) < 0)
+					goto error;
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+				priv->state = TS_WACK_CREQ;
+				break;
+			}
+			if (p->type == T_DISCON_REQ && ioc->ioc_count >= sizeof(p->discon_req)) {
+				if ((err = split_buffer(dp, sizeof(p->discon_req))) < 0)
+					goto error;
+				dp->b_datap->db_type = M_PROTO;
+				switch ((priv->oldstate = priv->state)) {
+				case TS_WCON_CREQ:
+					priv->state = TS_WACK_DREQ6;
+					break;
+				case TS_DATA_XFER:
+					priv->state = TS_WACK_DREQ9;
+					break;
+				case TS_WIND_ORDREL:
+					priv->state = TS_WACK_DREQ10;
+					break;
+				case TS_WREQ_ORDREL:
+					priv->state = TS_WACK_DREQ11;
+					break;
+				}
+				break;
+			}
+			goto error;
+		case TI_GETMYNAME:
+			if (ioc->ioc_count >= sizeof(p->addr_ack)) {
+				dp->b_datap->db_type = M_PCPROTO;
+				p->type = T_ADDR_REQ;
+				dp->b_wptr = dp->b_rptr + sizeof(p->addr_req);
+				break;
+			}
+			goto error;
+		case TI_GETPEERNAME:
+			if (ioc->ioc_count >= sizeof(p->addr_ack)) {
+				dp->b_datap->db_type = M_PCPROTO;
+				p->type = T_ADDR_REQ;
+				dp->b_wptr = dp->b_rptr + sizeof(p->addr_req);
+				break;
+			}
+			goto error;
+		case TI_GETADDRS:
+			if (ioc->ioc_count >= sizeof(p->addr_ack)
+			    && p->type == T_ADDR_REQ) {
+				dp->b_datap->db_type = M_PCPROTO;
+				priv->oldstate = priv->state;
+				break;
+			}
+			goto error;
+		case TI_SYNC:
+			if (ioc->ioc_count >= sizeof(struct ti_sync_ack)) {
+				int flags = ((struct ti_sync_req *) p)->tsr_flags;
+				if (flags & TSRF_INFO_REQ) {
+					dp->b_datap->db_type = M_PCPROTO;
+					p->type = T_INFO_REQ;
+					dp->b_wptr = dp->b_rptr + sizeof(p->info_req);
+					break;
+				} else {
+				}
+				if (flags & TSRF_IS_EXP_IN_RCVBUF) {
+				}
+				if (flags & TSRF_QLEN_REQ) {
+				}
+				break;
+			}
+			goto error;
+#if 0
+		case TI_GETPROTADDR:
 			err = -EOPNOTSUPP;
 			goto error;
+		case TI_DISCONNECT:
+			if (p->type == T_DISCON_REQ && ioc->ioc_count >= sizeof(p->discon_req)) {
+				if ((err = split_buffer(dp, sizeof(p->discon_req))) < 0)
+					goto error;
+				dp->b_datap->db_type = M_PROTO;
+				priv->oldstate = priv->state;
+				switch (priv->state) {
+				case TS_WCON_CREQ:
+					priv->state = TS_WACK_DREQ6;
+					break;
+				case TS_WRES_CIND:
+					priv->state = TS_WACK_DREQ7;
+					break;
+				case TS_DATA_XFER:
+					priv->state = TS_WACK_DREQ9;
+					break;
+				case TS_WIND_ORDREL:
+					priv->state = TS_WACK_DREQ10;
+					break;
+				case TS_WREQ_ORDREL:
+					priv->state = TS_WACK_DREQ11;
+					break;
+				default:
+					priv->state = -1;
+					goto error;
+				}
+				break;
+			}
+			goto error;
+#endif
+		case TI_CAPABILITY:
+#ifdef T_CAPABILITY_REQ
+			if (ioc->ioc_count >= sizeof(p->capability_req)
+			    && p->type == T_CAPABILITY_REQ) {
+				dp->b_datap->db_type = M_PCPROTO;
+				priv->oldstate = priv->state;
+				break;
+			}
+			goto error;
+#endif
 		default:
 			putnext(q, mp);
 			return (0);
 		}
-		if ((mp = xchg(&timod->iocblk, mp)))
+		if ((mp = xchg(&priv->iocblk, mp)))
 			freemsg(mp);
 		putnext(q, dp);
 		return (0);
 	      error:
-		linkb(mp, dp);
-		ioc->ioc_error = (-err << 8) | TSYSERR;
 		mp->b_datap->db_type = M_IOCNAK;
+		linkb(mp, dp);
+		ioc->ioc_error = -err;
 		ioc->ioc_rval = -1;
 		qreply(q, mp);
 		return (0);
-	case M_PCPROTO:
 	case M_PROTO:
-		if (!(dp = xchg(&timod->iocblk, NULL)))
+	case M_PCPROTO:
+		/*
+		   this is just to do state tracking 
+		 */
+		if (mp->b_wptr < mp->b_rptr + sizeof(p->type))
 			break;
-		ioc = (typeof(ioc)) dp->b_rptr;
-		linkb(dp, mp);
 		p = (typeof(p)) mp->b_rptr;
 		switch (p->type) {
-		case T_ERROR_ACK:
-			mp->b_datap->db_type = M_IOCNAK;
-			ioc->ioc_error = ((p->error_ack.UNIX_error << 8) | p->error_ack.TLI_error);
-			ioc->ioc_rval = -1;
-			qreply(q, dp);
-			return (0);
-		case T_OK_ACK:
-			switch (ioc->ioc_cmd) {
-			case TI_UNBIND:
-#ifdef TI_ACCEPT
-			case TI_ACCEPT:
-#endif
-#ifdef TI_CONNECT
-			case TI_CONNECT:
-#endif
-#ifdef TI_DISCONNECT
-			case TI_DISCONNECT:
-#endif
+		case T_CONN_REQ:
+			priv->oldstate = priv->state;
+			priv->state = TS_WACK_CREQ;
+			break;
+		case T_CONN_RES:
+			priv->oldstate = priv->state;
+			priv->state = TS_WACK_CRES;
+			break;
+		case T_DISCON_REQ:
+			switch ((priv->oldstate = priv->state)) {
+			case TS_WCON_CREQ:
+				priv->state = TS_WACK_DREQ6;
+				break;
+			case TS_WRES_CIND:
+				priv->state = TS_WACK_DREQ7;
+				break;
+			case TS_DATA_XFER:
+				priv->state = TS_WACK_DREQ9;
+				break;
+			case TS_WIND_ORDREL:
+				priv->state = TS_WACK_DREQ10;
+				break;
+			case TS_WREQ_ORDREL:
+				priv->state = TS_WACK_DREQ11;
 				break;
 			}
-			goto exit;
-		case T_INFO_ACK:
-			if (ioc->ioc_cmd == TI_GETINFO)
-				break;
-			goto exit;
-		case T_BIND_ACK:
-			if (ioc->ioc_cmd == TI_BIND)
-				break;
-			goto exit;
-		case T_OPTMGMT_ACK:
-			if (ioc->ioc_cmd == TI_OPTMGMT)
-				break;
-			goto exit;
-		case T_ADDR_ACK:
-#ifdef TI_GETPROTADDR
-			if (ioc->ioc_cmd == TI_GETPROTADDR)
-				break;
+			break;
+		case T_DATA_REQ:
+			priv->oldstate = priv->state;
+			priv->state = TS_DATA_XFER;
+			break;
+		case T_EXDATA_REQ:
+			priv->oldstate = priv->state;
+			priv->state = TS_DATA_XFER;
+			break;
+		case T_INFO_REQ:
+			priv->oldstate = priv->state;
+			priv->state = priv->oldstate;
+			break;
+		case T_BIND_REQ:
+			priv->oldstate = priv->state;
+			priv->state = TS_WACK_BREQ;
+			break;
+		case T_UNBIND_REQ:
+			priv->oldstate = priv->state;
+			priv->state = TS_WACK_UREQ;
+			break;
+		case T_UNITDATA_REQ:
+			priv->oldstate = priv->state;
+			priv->state = TS_IDLE;
+			break;
+		case T_OPTMGMT_REQ:
+			priv->oldstate = priv->state;
+#ifdef TS_WACK_OPTREQ
+			priv->state = TS_WACK_OPTREQ;
 #endif
-			goto exit;
-		      exit:
-			timod->iocblk = unlinkb(dp);
+			break;
+		case T_ORDREL_REQ:
+			switch ((priv->oldstate = priv->state)) {
+			case TS_WREQ_ORDREL:
+				priv->state = TS_IDLE;
+				break;
+			case TS_DATA_XFER:
+				priv->state = TS_WIND_ORDREL;
+				break;
+			}
+			break;
+		case T_ADDR_REQ:
+			priv->oldstate = priv->state;
+			priv->state = priv->oldstate;
+			break;
+#ifdef T_CAPABILITY_REQ
+		case T_CAPABILITY_REQ:
+			priv->oldstate = priv->state;
+			priv->state = priv->oldstate;
+			break;
+#endif
 		default:
-			putnext(q, mp);
-			return (0);
+			break;
 		}
-		dp->b_datap->db_type = M_IOCACK;
-		ioc->ioc_count = mp->b_wptr - mp->b_rptr;
-		ioc->ioc_error = 0;
-		ioc->ioc_rval = 0;
-		putnext(q, dp);
-		return (0);
 	}
 	putnext(q, mp);
 	return (0);
 }
 
-/* 
+#define TIMOD_HANGUP	01
+#define TIMOD_EPROTO	02
+
+/*
  *  -------------------------------------------------------------------------
  *
  *  OPEN and CLOSE
  *
  *  -------------------------------------------------------------------------
  */
-static int timod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+
+/*
+   LiS does not offer us a way to wait for an allocation.  Solaris, OSF and Linux Fast-STREAMS do. 
+ */
+#if !defined BPRI_WAITOK
+#   if defined BPRI_FT
+#	define BPRI_WAITOK BPRI_FT
+#   else
+#	define BPRI_WAITOK BPRI_HI
+#   endif
+#endif
+
+static void
+timod_pop(queue_t *q)
 {
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
-	if (q->q_ptr != NULL) {
-		MOD_DEC_USE_COUNT;
-		return (0);	/* alread open */
-	}
-	if (sflag == MODOPEN || WR(q)->q_next != NULL) {
-		struct timod *timod;
-		struct list_head *pos;
-		read_lock(&timod_list_lock);
-		list_for_each(pos, &timod_opens) {
-			timod = list_entry(pos, struct timod, list);
-			if (timod->dev == *devp) {
-				read_unlock(&timod_list_lock);
-				MOD_DEC_USE_COUNT;
-				return (ENXIO);	/* double push */
+	struct timod *priv = (typeof(priv)) q->q_ptr;
+	mblk_t *mp;
+	switch (priv->state) {
+	case TS_WREQ_ORDREL:
+		if (!(priv->flags & TIMOD_EPROTO)) {
+			if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
+				struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+				mp->b_datap->db_type = M_PROTO;
+				prim->PRIM_type = T_ORDREL_REQ;
+				qreply(q, mp);
 			}
 		}
-		read_unlock(&timod_list_lock);
-		if (!timod_alloc_priv(q, &timod_opens, devp, crp)) {
-			MOD_DEC_USE_COUNT;
-			return (-ENOMEM);
+		/*
+		   fall through 
+		 */
+	case TS_DATA_XFER:
+		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
+			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+			mp->b_datap->db_type = M_PROTO;
+			prim->PRIM_type = T_DISCON_REQ;
+			prim->SEQ_number = 0;
+			qreply(q, mp);
 		}
-		return (0);
+		break;
+		break;
+	case TS_IDLE:
+	default:
+		break;
 	}
-	MOD_DEC_USE_COUNT;
-	return (EIO);		/* can't be opened as driver */
+	if ((priv->flags & TIMOD_EPROTO)) {
+		if ((mp = allocb(2, BPRI_WAITOK))) {
+			mp->b_datap->db_type = M_ERROR;
+			*(mp->b_wptr)++ = 0;
+			*(mp->b_wptr)++ = 0;
+			qreply(q, mp);
+		}
+#	    if defined M_ERROR_UNDOES_M_HANGUP
+		priv->flags &= ~(TIMOD_EPROTO | TIMOD_HANGUP);
+#	    else		/* defined M_ERROR_UNDOES_M_HANGUP */
+		priv->flags &= ~TIMOD_EPROTO;
+#	    endif		/* defined M_ERROR_UNDOES_M_HANGUP */
+	}
+#   if defined M_UNHANGUP
+	if ((priv->flags & TIMOD_HANGUP)) {
+		if ((mp = allocb(0, BRPI_WAITOK))) {
+			mp->b_datap->db_type = M_UNHANGUP;
+			qreply(q, mp);
+		}
+		priv->flags &= ~TIMOD_HANGUP;
+	}
+#   endif			/* defined M_UNHANGUP */
 }
-static int timod_close(queue_t *q, int oflag, cred_t *crp)
+
+static int
+timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+{
+	int err;
+	MOD_INC_USE_COUNT;	/* keep module from unloading */
+	err = 0;
+	if (q->q_ptr != NULL)
+		goto quit;	/* already open */
+	err = ENXIO;
+	if (sflag != MODOPEN || WR(q)->q_next == NULL)
+		goto quit;
+	err = ENOMEM;
+	if (!(timod_alloc_priv(q)))
+		goto quit;
+	qprocson(q);
+	return (0);
+      quit:
+	MOD_DEC_USE_COUNT;
+	return (ENXIO);
+}
+
+static int
+timod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
-	if (!q->q_ptr)
-		return (ENXIO);
+#if defined _LIS_SOURCE
+	/*
+	   protect against LiS bugs 
+	 */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", TIMOD_MOD_NAME,
+			__FUNCTION__);
+		goto quit;
+	}
+	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			TIMOD_MOD_NAME, __FUNCTION__);
+		goto skip_pop;
+	}
+#endif				/* defined _LIS_SOURCE */
+	timod_pop(q);
+	goto skip_pop;
+      skip_pop:
+	qprocsoff(q);
 	timod_free_priv(q);
 	MOD_DEC_USE_COUNT;
+	goto quit;
+      quit:
 	return (0);
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Registration and initialization
  *
  *  -------------------------------------------------------------------------
  */
-static struct qinit timod_qinit = {
-	qi_putp:timod_put,
-	qi_qopen:timod_open,
-	qi_qclose:timod_close,
-	qi_minfo:&timod_minfo,
-};
-
-static struct streamtab timod_info = {
-	st_rdinit:&timod_qinit,
-	st_wrinit:&timod_qinit,
-};
-
+#if defined _LFS_SOURCE
 static struct fmodsw timod_fmod = {
 	f_name:CONFIG_STREAMS_TIMOD_NAME,
 	f_str:&timod_info,
@@ -442,31 +1052,82 @@ static struct fmodsw timod_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-static int __init timod_init(void)
+static int
+timod_register_module(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_TIMOD_MODULE
-	printk(KERN_INFO TIMOD_BANNER);
-#else
-	printk(KERN_INFO TIMOD_SPLASH);
-#endif
-	timod_minfo.mi_idnum = modid;
 	if ((err = register_strmod(&timod_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
 	return (0);
-};
-static void __exit timod_exit(void)
+}
+static void
+timod_unregister_module(void)
+{
+	return (void) unregister_strmod(&timod_fmod);
+}
+
+#elif defined _LIS_SOURCE
+
+static int
+timod_register_module(void)
+{
+	int ret;
+	if ((ret = lis_register_strmod(&timod_info, TIMOD_MOD_NAME)) != LIS_NULL_MID) {
+		if (modid == 0)
+			modid = ret;
+		return (0);
+	}
+	/*
+	   LiS is not too good on giving informative errors here. 
+	 */
+	return (EIO);
+}
+static void
+timod_unregister_module(void)
+{
+	/*
+	   LiS provides detailed errors here when they are discarded. 
+	 */
+	return (void) lis_unregister_strmod(&timod_info);
+}
+
+#else
+#   error ****
+#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error ****  to compile the timod module.
+#   error ****
+#endif
+
+static int __init
+timod_init(void)
 {
 	int err;
-
-	if ((err = unregister_strmod(&timod_fmod)))
-		return (void) (err);
-	return (void) (0);
+#ifdef CONFIG_STREAMS_TIMOD_MODULE
+	printk(KERN_INFO TIMOD_BANNER);	/* banner message */
+#else
+	printk(KERN_INFO TIMOD_SPLASH);	/* console splash */
+#endif
+	if ((err = timod_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", TIMOD_MOD_NAME, -err);
+		return (err);
+	}
+	if ((err = timod_register_module())) {
+		timod_term_caches();
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", TIMOD_MOD_NAME, -err);
+		return (err);
+	}
+	return (0);
 };
 
-#ifdef CONFIG_STREAMS_TIMOD_MODULE
+static void __exit
+timod_exit(void)
+{
+	timod_unregister_module();
+	timod_term_caches();
+	return;
+};
+
 module_init(timod_init);
 module_exit(timod_exit);
-#endif

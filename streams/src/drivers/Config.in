@@ -1,0 +1,165 @@
+#
+# Configuration file for STREAMS device drivers
+#
+# The built-in STREAMS drivers are configured in this file.  External
+# binary packages are configured in /usr/src/linux/drivers/streams/pkg
+# (see the Makefile in that directory and the one above it).
+#
+# Driver specifications
+#
+# multiple major numbers for a driver may be allocated two ways:
+# . by explicitly requesting n-majors (see below)
+# . by requesting an n-minors value large enough to require more than
+#   one major number.
+#
+# strconf now supports allocating multiple major numbers, but
+# not all drivers do.  It is only known to work for 'fifo' at this time.
+#
+#	name		prefix	major	n-minors  n-majors
+driver	clone		clone	*
+driver	fifo		fifo	*
+driver	loop		loop	*
+driver	sad		sad	*
+driver	nsdev		nsdev	*
+driver	echo		echo	*
+driver	nuls		nuls	*
+driver	pipe		pipe	*
+#driver	sfx		sfx	*
+#driver	spx		spx	*
+driver	socksys		socksys	*
+@WITH_INET_TRUE@driver	unix		unix	*
+@WITH_INET_TRUE@driver	xnet		xnet	*
+driver	log		log	*
+#
+# this must be 30 for iBCS compatibility
+#
+@WITH_INET_TRUE@driver	inet		inet	30
+
+#
+# Object name specifications
+#
+#	type	name		object name
+objname driver	clone		clone
+objname driver	fifo		fifo
+objname driver	loop		loop
+objname driver	sad		sad
+objname	driver	nsdev		nsdev
+objname	driver	echo		echo
+objname	driver	nuls		nuls
+objname	driver	pipe		pipe
+#objname	driver	sfx		sfx
+#objname	driver	spx		spx
+objname	driver	socksys		socksys
+@WITH_INET_TRUE@objname	driver	unix		unix
+@WITH_INET_TRUE@objname	driver	xnet		xnet
+@WITH_INET_TRUE@objname driver	inet		inet
+objname driver	log		log
+
+#
+# Autopush specifications
+#
+# These are just stupid examples
+#
+#         driver          minor lastminor  modules
+#autopush clone-drvr          1         0  relay
+#autopush clone-drvr          2         5  relay2
+#autopush link-drvr          -1         0  relay relay2
+
+#
+# Loadable specifications
+#
+loadable clone
+loadable fifo
+loadable loop
+loadable sad
+loadable nsdev
+loadable echo
+loadable nuls
+loadable pipe
+#loadable sfx
+#loadable spx
+loadable socksys
+@WITH_INET_TRUE@loadable unix
+@WITH_INET_TRUE@loadable xnet
+@WITH_INET_TRUE@loadable inet
+loadable log
+
+#
+# Initialization specifications
+#
+#initialize clone-drvr
+#initialize fifo
+#initialize link-drvr
+#initialize loop-around
+
+#
+# Termination specifications
+#
+#terminate fifo
+#terminate loop-around
+
+#
+# Node specifications
+#
+# Loop driver now makes its own nodes in its init routine as an 
+# example of how to use lis_mknod.
+#
+#	name	          type	perm	major		minor
+#node	/dev/loop.1	     c	0644	loop-around	1
+#node	/dev/loop.2	     c	*	loop-around	2
+#node	/dev/loop_clone	     c	*	clone-drvr	loop-around
+node	/dev/clone	     c	*	clone		0
+node	/dev/fifo	     c  0666    clone		fifo
+node	/dev/loop	     c  0666    clone		loop
+node	/dev/sad	     c	*	clone		sad
+node	/dev/nsdev	     c	*	nsdev		0
+node	/dev/echo	     c	*	clone		echo
+node	/dev/nuls	     c	*	clone		nuls
+node	/dev/pipe	     c	*	pipe		0
+#node	/dev/sfx	     c	*	sfx		0
+#node	/dev/spx	     c	*	spx		0
+node	/dev/socksys	     c	*	socksys		0
+@WITH_INET_TRUE@node	/dev/unix	     c	*	unix		0
+@WITH_INET_TRUE@node	/dev/xnet	     c	*	xnet		0
+node	/dev/strlog	     c	*	clone		log
+#
+# These are iBCS devices that should already be installed on a
+# system that supports the iBCS.  The /dev entries are supposed
+# to by symbolic links to the /dev/inet entries.  arp and rip
+# are supposed to be symbolic links to udp
+#
+#node	/dev/ip		     c	0666	inet		32
+#node	/dev/icmp	     c	0666	inet		33
+#node	/dev/ggp	     c	0666	inet		34
+#node	/dev/ipip	     c	0666	inet		35
+#node	/dev/tcp	     c	0666	inet		36
+#node	/dev/egp	     c	0666	inet		37
+#node	/dev/pup	     c	0666	inet		38
+#node	/dev/udp	     c	0666	inet		39
+#node	/dev/idp	     c	0666	inet		40
+#node	/dev/rawip	     c	0666	inet		41
+#node	/dev/arp	     c	0666	inet		39
+#node	/dev/rip	     c	0666	inet		39
+#node	/dev/inet/ip	     c	0666	inet		32
+#node	/dev/inet/icmp	     c	0666	inet		33
+#node	/dev/inet/ggp	     c	0666	inet		34
+#node	/dev/inet/ipip	     c	0666	inet		35
+#node	/dev/inet/tcp	     c	0666	inet		36
+#node	/dev/inet/egp	     c	0666	inet		37
+#node	/dev/inet/pup	     c	0666	inet		38
+#node	/dev/inet/udp	     c	0666	inet		39
+#node	/dev/inet/idp	     c	0666	inet		40
+#node	/dev/inet/rawip	     c	0666	inet		41
+#node	/dev/inet/arp	     c	0666	inet		39
+#node	/dev/inet/rip	     c	0666	inet		39
+@WITH_INET_TRUE@node	/dev/ticots_ord	     c	0666	inet		42
+@WITH_INET_TRUE@node	/dev/ticots	     c	0666	inet		43
+@WITH_INET_TRUE@node	/dev/ticlts	     c	0666	inet		44
+
+#
+# Device specifications
+#
+#	drvr-name	unit  port nports share	IRQ     mem M-size DMA1 DMA2
+#device	cdip		   0 0x310     16     S  10 0xD0000 0x4000
+#device	cdip		   1     0      0     S  10       0      0
+

@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.2 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.3 2004/05/14 08:00:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,15 +46,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/14 08:00:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/14 08:00:01 $"
 
-#include <xti/xti.h>
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
+
+#include <sys/xti.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* _XTI_H */

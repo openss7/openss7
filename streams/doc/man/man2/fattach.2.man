@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.2.man,v 0.9.2.6 2004/04/17 23:14:55 brian Exp $
+.\" @(#) $Id: fattach.2.man,v 0.9.2.7 2004/05/14 07:59:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:55 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 2 "$Date: 2004/04/17 23:14:55 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH FATTACH 2 "$Date: 2004/05/14 07:59:49 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -189,7 +189,7 @@ including
 and
 .IR UXP/V \(rg,
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\(em\(em'u
 .BR fattach ()
 can be performed on any file to which the caller has ownership, write
 permission and sufficient privilege to execute
@@ -199,7 +199,7 @@ Under
 root privilege or
 .B CAP_SYS_ADMIN
 is required.
-.IP \(bu
+.IP \(em
 .BR fattach ()
 makes no additional limitation on the number of
 .I STREAMS
@@ -212,10 +212,10 @@ limits number of
 files attached to less than 256, because that is the maximum number of unnamed
 devices allowed by
 .BR mount (2).
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
 .\"
 .\"
 .SH CONFORMANCE

@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: socketpair.3.man,v 0.9.2.4 2004/04/17 20:35:15 brian Exp $
+.\" @(#) $Id: socketpair.3.man,v 0.9.2.5 2004/05/14 07:59:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 20:35:15 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH SOCKETPAIR 3 "$Date: 2004/04/17 20:35:15 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.TH SOCKETPAIR 3 "$Date: 2004/05/14 07:59:50 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
 .SH NAME
 .B socketpair
 \- create a pair of connected sockets

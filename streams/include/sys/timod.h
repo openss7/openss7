@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.4 2004/05/14 08:00:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/14 08:00:02 $ by $Author: brian $
+
+ $Log: timod.h,v $
+ Revision 0.9.2.4  2004/05/14 08:00:02  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 1.4  2004/05/14 08:00:02  brian
+ - Updated xns, tli, inet, xnet and documentation.
 
  *****************************************************************************/
 
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
-
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define TIMOD			('T'<<8)
 #define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */
@@ -140,11 +141,5 @@ struct ti_sync_ack {
 };
 
 #define TSA_EXP_QUEUED		01
-
-#ifndef __KERNEL__
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
 
 #endif				/* _SYS_TIMOD_H */

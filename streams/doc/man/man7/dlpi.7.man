@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dlpi.7.man,v 0.9.2.1 2004/03/01 02:44:07 brian Exp $
+.\" @(#) $Id: dlpi.7.man,v 0.9.2.2 2004/05/14 07:59:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:07 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DLPI 7 "$Date: 2004/03/01 02:44:07 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH DLPI 7 "$Date: 2004/05/14 07:59:58 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
 .\"
 .\"
 .SH NAME
@@ -697,14 +697,14 @@ DLS users.
 .PP
 The interaction between each DLS user and the DLS provider will be one of the
 following:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 a
 .BR DL_RESET_REQ (7)
 from the DLS user, followed by a
 .BR DL_RESET_CON (7)
 from the DLS
 provider;
-.IP \(em 4
+.IP \(em
 a
 .BR DL_RESET_IND (7)
 from the DLS provider, followed by a
@@ -714,7 +714,7 @@ DLS user.  The
 .BR DL_RESET_REQ (7)
 acts as a synchronization mark in the stream of
 DLSDUs that are transmitted by the issuing DLS user;
-.IP \(em 4
+.IP \(em
 the
 .BR DL_RESET_IND (7)
 acts as a synchronization mark in the stream of DLSDUs that are received by
@@ -727,24 +727,24 @@ acts as a synchronization mark in the stream of DLSDUs that are received by
 the DLS user which originally issued the reset.
 .PP
 The resynchronizing properties of the reset service are that:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 No DLSDU transmitted by the DLS user before the synchronization mark in that
 transmitted stream will be delivered to the other DLS user after the
 synchronization mark in that received stream.
-.IP \(em 4
+.IP \(em
 The DLS provider will discard all DLSDUs submitted before the issuing of the
 .BR DL_RESET_REQ (7)
 that have not been delivered to the peer DLS user when the DLS provider issues
 the
 .BR DL_RESET_IND (7).
-.IP \(em 4
+.IP \(em
 The DLS provider will discard all DLSDUs submitted before the issuing of the
 .BR DL_RESET_RES (7)
 that have not been delivered to the initiator of the
 .BR DL_RESET_REQ (7)
 when the DLS provider issues the
 .BR DL_RESET_CON (7).
-.IP \(em 4
+.IP \(em
 No DLSDU transmitted by a DLS user after the synchronization mark in that
 transmitted stream will be delivered to the other DLS user before the
 synchronization mark in that received stream.
@@ -1255,17 +1255,17 @@ The miscellaneous management functions consist of the following services:
 .BR DL_XID_RES (7).
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
 .PP
 This interface conforms to DLPI Revision 2.
 .[
 dlpi
-.]
-.SH "HISTORY"
-.PP
-The Data Link Provider Interface first appeared in SVR4.
-.[
-svr4
 .]
 .XX
 .[

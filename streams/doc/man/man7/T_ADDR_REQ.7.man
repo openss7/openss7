@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: T_ADDR_REQ.7.man,v 0.9.2.1 2004/03/01 02:44:07 brian Exp $
+.\" @(#) $Id: T_ADDR_REQ.7.man,v 0.9.2.2 2004/05/14 07:59:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:07 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH T_ADDR_REQ 7 "$Date: 2004/03/01 02:44:07 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.TH T_ADDR_REQ 7 "$Date: 2004/05/14 07:59:57 $" "$Name:  $" "Transport Provider Interface (TPI)"
 .SH NAME
 .B T_ADDR_REQ
 \- Get Protocol Address Request
@@ -121,17 +121,17 @@ Transport user.
 .SH "SEE ALSO"
 .BR T_ADDR_ACK (7),
 .BR T_ERROR_ACK (7).
-.SH "CONFORMING TO"
-.PP
-This interface conforms to TPI Version 2, Draft 2.
-.[
-TPI Revision 2.0.0
-.]
-.SH "HISTORY"
+.SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.
 .[
 svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to TPI Version 2, Draft 2.
+.[
+TPI Revision 2.0.0
 .]
 .XX
 .[

@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tirdwr.4.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: tirdwr.4.man,v 0.9.2.4 2004/05/14 07:59:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIRDWR 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH TIRDWR 4 "$Date: 2004/05/14 07:59:53 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -149,7 +149,7 @@ and
 LiS
 .]
 with the following exceptions:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 An implementation of
 .B tirdwr
 is provided with the
@@ -167,7 +167,7 @@ for
 LiS
 .]
 has a number of bugs:
-.IP \(em 4
+.IP \(em
 Although
 .IR STREAMS (4)
 handles packet reads and writes from the stream head using the
@@ -194,7 +194,7 @@ LiS
 .]
 .B tirdwr
 doesn't handle expedited data transfer at all.)
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -211,7 +211,7 @@ converted to an
 .BR M_DATA .
 This signals the reader that the next read operation will read expedited
 data rather than normal data.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -220,7 +220,7 @@ LiS
 does not handle
 .BR T_OPTDATA_IND (7)
 messages.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -228,7 +228,7 @@ LiS
 .B tirdwr
 performs an error on disconnection or orderly release, but does not generate
 the proper signals for asynchronous file I/O.
-.IP \(em 4
+.IP \(em
 .B LiS
 .[
 LiS
@@ -239,7 +239,7 @@ This situation should be dealt with by the TPI driver rather than the
 read/write module.  The read/write module should be able to be pushed and
 popped from an idle stream in any state without affecting the stream in any
 way.
-.IP \(em 4
+.IP \(em
 .I Linux Fast-STREAMS
 .[
 LfS

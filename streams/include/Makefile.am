@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/08 19:21:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/14 12:15:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/08 19:21:12 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 12:15:09 $ by $Author: brian $
 #
 # =============================================================================
 
-nobase_pkginclude_HEADERS = \
+lfs_headers = \
+	log.h \
+	sad.h \
+	strlog.h \
 	stropts.h \
-	tihdr.h \
-	timod.h \
 	sys/aixddi.h \
 	sys/cmn_err.h \
 	sys/ddi.h \
@@ -62,10 +63,10 @@ nobase_pkginclude_HEADERS = \
 	sys/hpuxddi.h \
 	sys/kmem.h \
 	sys/lisddi.h \
+	sys/log.h \
 	sys/osfddi.h \
 	sys/sad.h \
 	sys/sc.h \
-	sys/sockmod.h \
 	sys/spec_fs_i.h \
 	sys/strconf.h \
 	sys/strdebug.h \
@@ -75,9 +76,73 @@ nobase_pkginclude_HEADERS = \
 	sys/strsubr.h \
 	sys/sunddi.h \
 	sys/svr4ddi.h \
+	sys/uw7ddi.h
+
+xns_headers = \
+	sys/cdi.h \
+	sys/dlpi.h \
+	sys/npi.h
+
+tli_headers = \
+	sys/ticlts.h \
+	sys/ticots.h \
+	sys/ticotsord.h \
 	sys/tihdr.h \
 	sys/timod.h \
-	sys/uw7ddi.h
+	sys/tirdwr.h \
+	sys/tiuser.h \
+	sys/tli.h \
+	sys/tpi.h \
+	ticlts.h \
+	ticots.h \
+	ticotsord.h \
+	tihdr.h \
+	timod.h \
+	tirdwr.h \
+	tiuser.h
+
+inet_headers =
+
+xnet_headers = \
+	sys/xti_atm.h \
+	sys/xti.h \
+	sys/xti_inet.h \
+	sys/xti_ip.h \
+	sys/xti_local.h \
+	sys/xti_mosi.h \
+	sys/xti_osi.h \
+	sys/xti_sctp.h \
+	sys/xti_tcp.h \
+	sys/xti_udp.h \
+	sys/xti_xti.h \
+	xti.h \
+	xti_inet.h
+
+sock_headers = \
+	sys/sockmod.h
+
+nobase_pkginclude_HEADERS = $(lfs_headers)
+
+if WITH_XNS
+nobase_pkginclude_HEADERS += $(xns_headers)
+endif
+
+if WITH_TLI
+nobase_pkginclude_HEADERS += $(tli_headers)
+endif
+
+if WITH_INET
+nobase_pkginclude_HEADERS += $(inet_headers)
+endif
+
+if WITH_XNET
+nobase_pkginclude_HEADERS += $(xnet_headers)
+endif
+
+if WITH_SOCK
+nobase_pkginclude_HEADERS += $(sock_headers)
+endif
+
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/streams/modversions.h \
@@ -97,22 +162,5 @@ nobase_nodist_pkginclude_HEADERS = \
 	sys/streams/versions/strutil.ver \
 	sys/streams/versions/strsyms.ver \
 	sys/streams/versions/sth.ver
-
-nobase_include_HEADERS = \
-	xti.h \
-	xti_inet.h \
-	xti/config.h \
-	xti/tihdr.h \
-	xti/timod.h \
-	xti/xti_atm.h \
-	xti/xti.h \
-	xti/xti_inet.h \
-	xti/xti_ip.h \
-	xti/xti_local.h \
-	xti/xti_mosi.h \
-	xti/xti_osi.h \
-	xti/xti_sctp.h \
-	xti/xti_tcp.h \
-	xti/xti_udp.h
 
 # vim: ft=automake

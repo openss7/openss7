@@ -1,11 +1,11 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DL_RESET_IND.7.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\" @(#) $Id: DL_RESET_IND.7.man,v 0.9.2.2 2004/05/14 07:59:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DL_RESET_IND 7 "$Date: 2004/03/01 02:44:06 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH DL_RESET_IND 7 "$Date: 2004/05/14 07:59:55 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_RESET_IND (dl_reset_ind_t)
 \- informs the DLS user that either the remote DLS user is resynchronizing
@@ -125,17 +125,17 @@ The resulting state is
 The DLS user should issue a
 .BR DL_RESET_RES (7)
 primitive to continue the resynchronization procedure.
-.SH "CONFORMING TO"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
 .PP
 This interface conforms to DLPI Revision 2.
 .[
 dlpi
-.]
-.SH "HISTORY"
-.PP
-The Data Link Provider Interface first appeared in SVR4.
-.[
-svr4
 .]
 .XX
 .[

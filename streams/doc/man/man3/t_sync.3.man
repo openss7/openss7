@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sync.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
+.\" @(#) $Id: t_sync.3.man,v 0.9.2.5 2004/05/14 07:59:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,12 +73,12 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SYNC 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $"" "OpenSS7 XTI/TLI Library"
+.TH T_SYNC 3 "$Date: 2004/05/14 07:59:51 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
 .B t_sync
-\- synchronize XTI/TLI library with TPI provider
+\- synchronize XTI/TLI library with TLI provider
 .\"
 .\"
 .SH SYNOPSIS
@@ -99,7 +99,7 @@ the transport endpoint to sync.
 .PP
 Synchronizes the XTI/TLI library for
 .I fd
-with the underlying TPI transport service provider.
+with the underlying TLI transport service provider.
 .PP
 .I fd
 specifies the local transport endpoint file descriptor to synchronize.

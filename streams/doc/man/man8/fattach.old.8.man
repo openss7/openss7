@@ -1,7 +1,7 @@
-'\" rt
+'\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.old.8.man,v 0.9.2.3 2004/04/17 23:14:56 brian Exp $
+.\" @(#) $Id: fattach.old.8.man,v 0.9.2.4 2004/05/14 07:59:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/14 07:59:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Linux STREAMS"
+.TH FATTACH 8 "$Date: 2004/05/14 07:59:58 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B fattach
 \- attach a \fISTREAMS\fR file to a path name in the file system
