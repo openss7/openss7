@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti.3.man,v 0.9.2.2 2004/04/07 09:33:28 brian Exp $
+.\" @(#) $Id: xti.3.man,v 0.9.2.3 2004/05/16 02:35:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/07 09:33:28 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/16 02:35:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XNET 3 "$Date: 2004/04/07 09:33:28 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH XNET 3 "$Date: 2004/05/16 02:35:38 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
@@ -157,23 +157,15 @@ sort-adjacent-labels
 is an
 .B OpenSS7
 implementation of the XNS 5.2 XTI/TLI Library for
-.B LfS
-(Linux Fast-STREAMS)
-.[
-lfs
-.]
-and
-.BR LiS .
-.[
-lis
-.]
+.B LiS
+(Linux STREAMS).
 .\"
 .\"
 .SH OPTIONS
 .PP
 .\"
 .\"
-.SS "XTI Generic Options"
+.SS "XTI/TLI Generic Options"
 .PP
 Several options are independent of transport service provider.  These options
 are specified at the option level
@@ -195,10 +187,10 @@ This option is an
 .IR "absolute requirement" .
 Legal values are implementation defined.
 .PP
-This option can be negotiated in any XTI transport endpoint state.
+This option can be negotiated in any XTI/TLI transport endpoint state.
 This option can be negotiated using the
 .BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
-XTI library calls.
+XTI/TLI library calls.
 .RE
 .\"
 .TP
@@ -262,7 +254,7 @@ The implementation may place upper and lower limits on the
 option value.  Requests that fall short of the lower limit are negotiated to
 the lower limit.  Legal values are all positive numbers.
 .PP
-This option can be negotiated in any XTI transport endpoint state; however, the
+This option can be negotiated in any XTI/TLI transport endpoint state; however, the
 negotiated value is not effective until
 .BR t_close (3)
 or
@@ -270,7 +262,7 @@ or
 is called.
 This option can be negotiated using the
 .BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
-XTI library calls.
+XTI/TLI library calls.
 .PP
 There are notes in
 .B Linux 2.4
@@ -304,12 +296,12 @@ The implementation may place upper and lower limits on the option value.
 Requests that fall short of the lower limit are negotiated to the lower limit.
 Legal values are all positive numbers.
 .PP
-This option can be negotiated in any XTI state; however, the negotiated value
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
 will not be effective until the
 .B T_DATAXFER
 state is acheived.  This option can be negotiated using the
 .BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
-XTI library calls.
+XTI/TLI library calls.
 .RE
 .\"
 .TP
@@ -332,12 +324,12 @@ The implementation may place upper and lower limits on the option value.
 Requests that fall short of the lower limit are negotiated to the lower limit.
 Legal values are all positive numbers.
 .PP
-This option can be negotiated in any XTI state; however, the negotiated value
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
 will not be effective until the
 .B T_DATAXFER
 state is acheived.  This option can be negotiated using the
 .BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
-XTI library calls.
+XTI/TLI library calls.
 .RE
 .\"
 .TP
@@ -354,12 +346,12 @@ The implementation may place upper and lower limits on the option value.
 Requests that fall short of the lower limit are negotiated to the lower limit.
 Legal values are all positive numbers.
 .PP
-This option can be negotiated in any XTI state; however, the negotiated value
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
 will not be effective until the
 .B T_DATAXFER
 state is acheived.  This option can be negotiated using the
 .BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
-XTI library calls.
+XTI/TLI library calls.
 .RE
 .\"
 .TP
@@ -377,12 +369,12 @@ The implementation may place upper and lower limits on the option value.
 Requests that fall short of the lower limit are negotiated to the lower limit.
 Legal values are all positive numbers.
 .PP
-This option can be negotiated in any XTI state; however, the negotiated value
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
 will not be effective until the
 .B T_DATAXFER
 state is acheived.  This option can be negotiated using the
 .BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
-XTI library calls.
+XTI/TLI library calls.
 .RE
 .\"
 .\"
@@ -419,7 +411,7 @@ parameter limits of a local transport endpoint.
 .HP
 .B Local Event Management
 functions are responsible for handling asynchronous events of the underlying
-transport service provider and resynchronizing the XTI library with the
+transport service provider and resynchronizing the XTI/TLI library with the
 underlying transport service provider.
 .RS
 .sp
@@ -537,13 +529,13 @@ The following Error Handling functions are provided:
 .br
 .BR t_error "(3) - print an error message"
 .br
-.BR t_strerror "(3) - describe an XTI library error"
+.BR t_strerror "(3) - describe an XTI/TLI library error"
 .RE
 
 .HP
 .B Utility Functions
-provide for the allocation and deallocation of XTI library datastructures, and
-equiry concerning XTI system confiruation parameters.
+provide for the allocation and deallocation of XTI/TLI library datastructures, and
+equiry concerning XTI/TLI system confiruation parameters.
 The following Utility Functions are provided:
 .RS
 .sp
@@ -551,17 +543,17 @@ The following Utility Functions are provided:
 .br
 .BR t_free "(3) - free a library structure"
 .br
-.BR t_sysconf "(3) - configure XTI system parameters"
+.BR t_sysconf "(3) - configure XTI/TLI system parameters"
 .RE
 .\"
 .\"
 .SH "RETURN VALUES"
 .PP
 Upon success,
-most XTI library functions return zero (0) or a positive integer reflecting a
+most XTI/TLI library functions return zero (0) or a positive integer reflecting a
 returned paramter value.
 Upon failure,
-XTI library functions return -1 and set
+XTI/TLI library functions return -1 and set
 .IR t_errno (3)
 to an applicable error number.
 .\"
@@ -626,4 +618,4 @@ xns
 .[
 $LIST$
 .]
-.TI
+.T4

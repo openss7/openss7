@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_connect.3.man,v 0.9.2.1 2004/04/07 09:33:28 brian Exp $
+.\" @(#) $Id: t_connect.3.man,v 0.9.2.2 2004/05/16 02:35:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/07 09:33:28 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/16 02:35:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_CONNECT 3 "$Date: 2004/04/07 09:33:28 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_CONNECT 3 "$Date: 2004/05/16 02:35:36 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
@@ -416,7 +416,7 @@ The call requires the use of a TLI primitive not supported by the underlying tra
 The call was issued with the interface in an incorrect state.
 .TP
 .RB [ TPROTO ]
-A protocol error occurred between the XTI library and the underlying transport provider.
+A protocol error occurred between the XTI/TLI library and the underlying transport provider.
 .TP
 .RB [ TSYSERR ]
 A
@@ -451,7 +451,7 @@ conformance test program.
 .\"
 .SH "CONFORMING TO"
 .PP
-XTI,
+XTI/TLI,
 .[
 XTI
 .]
@@ -473,4 +473,4 @@ susv2
 .[
 $LIST$
 .]
-.TI
+.T4

@@ -1,0 +1,214 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: netbuf.3.man,v 0.9.2.1 2004/05/16 02:35:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/05/16 02:35:35 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH NETBUF 3 "$Date: 2004/05/16 02:35:35 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.SH NAME
+.B netbuf
+\- the XTI/TLI netbuf structure
+.SH SYNOPSIS
+.PP
+.nf
+\fC\s-1\
+struct netbuf {
+        unsigned int maxlen;    /* max length           */
+        unsigned int len;       /* current length       */
+        char *buf;              /* data                 */
+};
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+The
+.B netbuf
+structure is used in many XTI/TLI
+.[
+XTI
+.]
+.[
+XNS
+.]
+structures referenced in function calls for
+passing opqaue arguments.
+The
+.B netbuf
+structure contains the following members:
+.TP
+.I maxlen
+When the object of a
+.B netbuf
+structure is passed to an XTI/TLI
+.[
+XTI
+.]
+.[
+XNS
+.]
+library call as an input argument only, the
+.I maxlen
+field is meaningless and is ignored by the call.  Whenever the object of a
+.B netbuf
+structure is returned from an XTI/TLI
+.[
+XTI
+.]
+.[
+XNS
+.]
+library call as an output argument, the
+.I maxlen
+field specifies the length of the buffer pointed to by
+.IR buf ,
+into which the caller requests that the opaque object be returned.
+.TP
+.I len
+When the object of a
+.B netbuf
+structure is passed to an XTI/TLI
+.[
+XTI
+.]
+.[
+XNS
+.]
+library call as an output argument only, the
+.I len
+field is meaningless to the call, but will be completed with the length of the
+actual data returned in
+.I buf
+when
+.I maxlen
+on call was greater than zero.
+Whenever the object of a
+.B netbuf
+structure is passed to an XTI/TLI
+.[
+XTI
+.]
+.[
+XNS
+.]
+library call as an input argument, the
+.I len
+field specifies on call the length of the opaque object present at
+.IR buf .
+.TP
+.I buf
+A pointer to the buffer area which contains an input argument when
+.I len
+is greater than zero on call,
+and which contains an output argument when
+.I maxlen
+is greater than zero on call and
+.I len
+is greater than zero on return.
+.SH CAVEATS
+.PP
+When
+.I maxlen
+is greater than zero and the size of the opaque data to be returned to the
+caller is greater than
+.IR maxlen ,
+the call will fail with error
+.BR TBUFOVFLW .
+.SH "SEE ALSO"
+.PP
+.BR t_accept (3),
+.BR t_addleaf (3),
+.BR t_bind (3),
+.BR t_connect (3),
+.BR t_getprotaddr (3),
+.BR t_listen (3),
+.BR t_optmgmt (3),
+.BR t_rcvconnect (3),
+.BR t_rcvdis (3),
+.BR t_rcvreldata (3),
+.BR t_rcvudata (3),
+.BR t_rcvuderr (3),
+.BR t_snddis (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndvudata (3).
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

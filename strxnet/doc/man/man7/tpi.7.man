@@ -1,11 +1,10 @@
-'\" rt
-.\" -*- nroff -*- vim: ft=nroff
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi.7.man,v 0.9.2.3 2004/04/07 09:33:29 brian Exp $
+.\" @(#) $Id: tpi.7.man,v 0.9.2.4 2004/05/16 02:35:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 1992  UNIX International Inc.
 .\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
@@ -30,9 +29,31 @@
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/04/07 09:33:29 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/16 02:35:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -50,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI 7 "$Date: 2004/04/07 09:33:29 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.TH TPI 7 "$Date: 2004/05/16 02:35:50 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B tpi
 \- Transport Provider Interface
@@ -95,7 +116,7 @@ implemented under
 (It is assumed that the reader of this document is familiar with the concept
 .IR STREAMS (4).)
 This version of the transport provider interface supports the XPG4 version of
-the X/Open Transport Interface (XTI).  A user communicates to a transport
+the X/Open Transport Interface (XTI/TLI).  A user communicates to a transport
 provider via a full duplex path known as a stream.  This stream provides a
 mechanism in which messages may be passed to the transport provider from the
 transport user and vice versa.
@@ -157,14 +178,14 @@ to query the transport service provider concerning options and parameters
 specific to the transport service provider and associated with the transport
 connection.
 The information services use the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_INFO_REQ (7):
 Requests information concerning the transport service provider, limits, modes
 and options.
 This primitive requires local acknowledgment with the
 .BR T_INFO_ACK "(7) or " T_ERROR_ACK (7)
 primitives
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_INFO_ACK (7):
 Provides information concerning the transport service provider, limits, modes
 and options.
@@ -175,13 +196,13 @@ the requesting stream to a transport endpoint address.  The bind service also
 permits the negotiation of the number of outstanding connection indications on
 a connection mode transport service provider.
 The bind service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_BIND_REQ (7):
 Requests the binding of the stream to a transport endpoint address.
 This primitive requires local acknowledgment with the
 .BR T_BIND_ACK "(7) or " T_ERROR_ACK (7)
 primitives.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_BIND_ACK (7):
 Provides acknowledgment of the bound transport endpoint address.
 .PP
@@ -190,7 +211,7 @@ The unbind service provides the transport services user with the ability to
 unbind the requesting stream from the transport endpoint address to which it
 is currently bound.
 The unbind service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_UNBIND_REQ (7):
 Requests the stream be unbound from the bound transport endpoint address.
 This primitive requires local acknowledgment with the
@@ -202,11 +223,11 @@ The receipt acknowledgment service provides an indication to the transport
 service user of the positive or negative acknowledgment of the previous
 primitive issued by the channel service user.
 The receipt acknowledgment service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_OK_ACK (7):
 Provides positive acknowledgment of request and response primitives that
 require acknowledgment.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_ERROR_ACK (7):
 Provides negative acknowledgment of the request and response primitives that
 require acknowledgment.
@@ -216,13 +237,13 @@ The options management service provides a mechanism whereby the transport
 service user can query and negotiate parameters associated with transport
 service provider and the transport connection.
 The options management service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_OPTMGMT_REQ (7):
 Requests the management of transport service provider options.
 This primitive requires local acknowledgment using the
 .BR T_OPTMGMT_ACK "(7) or " T_ERROR_ACK (7)
 primitives.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_OPTMGMT_ACK (7):
 Provides acknowledgment of the management of transport service provider
 options.
@@ -231,13 +252,13 @@ options.
 The address service provides the transport services user with the ability to
 query bound and connected transport endpoint addresses.
 The address service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_ADDR_REQ (7):
 Requests the bound and connected endpoint addresses.
 This primitive requires local acknowledgment using the
 .BR T_ADDR_ACK "(7) or " T_ERROR_ACK (7)
 primitives.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_ADDR_ACK (7):
 Provides the bound and connected endpoint addresses.
 .PP
@@ -246,14 +267,14 @@ The capability service provides the transport services user with the ability
 to query bound and connected transport addresses, token values associated with
 the requesting stream, and other optional transport capabilities.
 The capability service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_CAPABILITY_REQ (7):
 Requests information concerning the capabilities of the transport service
 provider, limits, modes, tokens and options.
 This primitive requires local acknowledgment using the
 .BR T_CAPABILITY_ACK "(7) or " T_ERROR_ACK (7)
 primitives.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_CAPABILITY_ACK (7):
 Provides information concerning the capabilities of the transport service
 provider, limits, modes, tokens and options.
@@ -268,13 +289,13 @@ connectionless mode data between the transport services user to the transport
 services provider.  It also provides indication to the transport services user
 of some protocol errors related to the transmission of unit data.
 The data transfer service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_UNITDATA_REQ (7):
 Requests the transmission of connectionless data.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_UNITDATA_IND (7):
 Provides indication of the reception of connectionless data.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_UDERROR_IND (7):
 Provides indication of errors encountered in the transmission of
 connectionless data.
@@ -290,16 +311,16 @@ The connection service provides the transport services user with the ability
 to form outgoing transport connections as well as acceppt or reject incoming
 transport connections.
 THe connection service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_CONN_REQ (7):
 Requests connection to a peer transport endpoint.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_CONN_CON (7):
 Provides confirmation of connection to a peer transport endpoint.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_CONN_IND (7):
 Provides indication of a connection request from a peer transport endpoint.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_CONN_RES (7):
 Responds to an outstanding connection indication.
 .SS "Connection Data Transfer"
@@ -316,10 +337,10 @@ transport service provider.  It also provides the ability to exchange data in
 transport inteface data units smaller that the overall transport service data
 unit.
 The connection mode data transfer service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_DATA_REQ (7):
 Requests the transmission of data on a transport connection.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_DATA_IND (7):
 Provides indication of the reception of data on a transport connection.
 .PP
@@ -330,10 +351,10 @@ transport service provider.  It also provides the ability to exchange data in
 transport inteface data units smaller that the overall expedited transport
 service data unit.
 The connection mode data transfer service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_EXDATA_REQ (7):
 Requests the transmission of expedited data on a transport connection.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_EXDATA_IND (7):
 Provides indication of the reception of expedited data on a transport connection.
 .PP
@@ -345,10 +366,10 @@ the ability to exchange data in transport interface data units smaller than
 the overall normal or expedited transport service data unit.
 The connection mode options data transfer service uses the following
 primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_OPTDATA_REQ (7):
 Requests the transmission of data with options on a transport connection.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_OPTDATA_IND (7):
 Provides indication of the reception of data with options on a transport connection.
 .SS "Connection Release"
@@ -361,10 +382,10 @@ The release service provides the transport services user with the ability to
 generate an abortive release of an existing transport connection, refuse an
 incomin transport connection, or accept the release of a transport connection.
 The release service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_DISCON_REQ (7):
 Requests that a transport connection be released.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_DISCON_IND (7):
 Provides indication that a transport connection has been released.
 .PP
@@ -373,10 +394,10 @@ The orderly release service provides the transport services user with the
 ability to perform or accept an orderly release of an existing transport
 connection.
 The orderly release service uses the following primitives:
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_ORDREL_REQ (7):
 Requests that a transport connection be released in an orderly fashion.
-.IP \(em 4
+.IP \(em \w'\(em\(em'u
 .BR T_ORDREL_IND (7):
 Provides indication that a transport connection is to be released in an
 orderly fashion.

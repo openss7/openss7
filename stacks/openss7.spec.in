@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/15 07:09:28 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/16 02:41:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/15 07:09:28 $ by $Author: brian $
+# Last Modified $Date: 2004/05/16 02:41:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,8 @@
 # rpmbuild will not build a binary rpm when it has no %files section
 %define BUILD_modules 1
 %define BUILD_tools   1
+%define BUILD_lis     1
+%define BUILD_lfs     0
 
 #
 # there are three ways to pass kernel version to the build process:
@@ -80,8 +82,13 @@
 # version, we accept the --with[out] options "modules" and "tools"
 %{?_without_modules: %{expand: %%define BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%define BUILD_tools   0}}
+%{?_without_lis:     %{expand: %%define BUILD_lis     0}}
+%{?_without_lfs:     %{expand: %%define BUILD_lfs     0}}
+
 %{?_with_modules:    %{expand: %%define BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%define BUILD_tools   1}}
+%{?_with_lis:        %{expand: %%define BUILD_lis     1}}
+%{?_with_lfs:        %{expand: %%define BUILD_lfs     1}}
 
 # we have some more options that control configure for the build
 
@@ -112,9 +119,10 @@ Obsoletes:      SS7 SIGTRAN H323 ISDN
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
-%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+%if %{Build_lfs}
 Requires:       streams >= 0.7a
-%else
+%endif
+%if %{Build_lis}
 Requires:       LiS >= 2.16.18-15
 %endif
 Provides:       SS7 SIGTRAN H323 ISDN
@@ -129,9 +137,10 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+%if %{Build_lfs}
 BuildRequires:  streams-devel >= 0.7a
-%else
+%endif
+%if %{Build_lis}
 BuildRequires:  LiS-devel >= 2.16.18-15
 %endif
 Autoreq:        true
@@ -289,9 +298,10 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 Summary:        OpenSS7 core kernel modules.
 Group:          System Environment/Kernel
 Requires:       kernel = %{kernel_version}
-%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+%if %{Build_lfs}
 Requires:       streams-core-%{kernel_version} >= 0.7a
-%else
+%endif
+%if %{Build_lis}
 Requires:       LiS-core-%{kernel_version} >= 2.16.18-15
 %endif
 Autoreq:        true
@@ -618,9 +628,10 @@ Summary:        OpenSS7 headers, lib and doc.
 Group:          Development/System
 Requires:       %{name}-lib = %{version}-%{base_release}
 Requires:       %{name}-doc = %{version}-%{base_release}
-%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+%if %{Build_lfs}
 Requires:       streams-devel >= 0.7a
-%else
+%endif
+%if %{Build_lis}
 Requires:       LiS-devel >= 2.16.18-15
 %endif
 Prefix:         %{_libdir}
@@ -767,12 +778,17 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.13  2004/05/15 07:09:28  brian
-# - New kernel symbol ripping macros.
+# Revision 0.9.2.14  2004/05/16 02:41:18  brian
+# - Updated for lis/lfs build.
 #
-# Revision 0.9.2.12  2004/05/14 20:40:17  brian
-# - Updated for latest LiS and LfS build processes.
-#
+
+* Sat May 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.13  2004/05/15 07:09:28  brian
+- New kernel symbol ripping macros.
+
+* Fri May 14 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.12  2004/05/14 20:40:17  brian
+- Updated for latest LiS and LfS build processes.
 
 * Wed May 12 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.11  2004/05/12 10:14:50  brian

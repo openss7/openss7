@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_optmgmt.3.man,v 0.9.2.1 2004/04/07 09:33:28 brian Exp $
+.\" @(#) $Id: t_optmgmt.3.man,v 0.9.2.2 2004/05/16 02:35:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/07 09:33:28 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/16 02:35:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_OPTMGMT 3 "$Date: 2004/04/07 09:33:28 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_OPTMGMT 3 "$Date: 2004/05/16 02:35:36 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
@@ -213,7 +213,7 @@ the requesting user.
 .B T_READONLY
 indicates that at least one of the options specified in
 .I req->opt
-is read-only (for the current XTI state).
+is read-only (for the current XTI/TLI state).
 This return flag does not apply when the request flag was
 .BR T_DEFAULT .
 .TP
@@ -243,7 +243,7 @@ Options within the
 .I opt
 buffer of the
 .B t_optmgmt
-structure (and other structures including XTI options) are formatted as a
+structure (and other structures including XTI/TLI options) are formatted as a
 contiguous list of options.  Each option in the list begins with a
 .B t_opthdr
 structure formatted as follows:
@@ -300,7 +300,7 @@ Option headers in the options list are always aligned in memory to permit
 direct access to the header.  This means that the next option in the list will
 begin on the next alignment boundary for a
 .B t_opthdr
-structure.  A macro is provided to assist the XTI application writer in
+structure.  A macro is provided to assist the XTI/TLI application writer in
 locating the next option in the option list.
 .PP
 A number of macros are provided to assist with handling options in option
@@ -534,7 +534,7 @@ if it is supported,
 .B T_NOTSUPPORT
 if it is not or needs additional user priviledges, and
 .B T_READONLY
-if it is read-only (in the current XTI state).  No option value is returned.
+if it is read-only (in the current XTI/TLI state).  No option value is returned.
 If an option is specified with an option value, the
 .I status
 field of the
@@ -663,7 +663,7 @@ The call requires the use of a TLI primitive not supported by the underlying tra
 The call was issued with the interface in an incorrect state.
 .TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
 .TP
 .RB [ TSYSERR ]
 A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
@@ -688,7 +688,7 @@ conformance test program.
 .\"
 .SH "CONFORMING TO"
 .PP
-XTI,
+XTI/TLI,
 .[
 XTI
 .]
@@ -710,4 +710,4 @@ susv2
 .[
 $LIST$
 .]
-.TI
+.T4

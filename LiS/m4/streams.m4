@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.2 2004/05/15 07:35:18 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.3 2004/05/16 02:35:51 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/15 07:35:18 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/16 02:35:51 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -159,6 +159,8 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [
     ])
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
+    AM_CONDITIONAL([WITH_LIS], test :"${streams_cv_package:-LiS}" = :LiS)
+    AM_CONDITIONAL([WITH_LFS], test :"${streams_cv_package:-LiS}" = :LfS)
 ])# _LINUX_STREAMS_SETUP
 # =========================================================================
 

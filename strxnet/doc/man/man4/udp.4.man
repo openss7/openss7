@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: udp.4.man,v 0.9.2.1 2004/04/06 12:33:59 brian Exp $
+.\" @(#) $Id: udp.4.man,v 0.9.2.2 2004/05/16 02:35:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -47,8 +47,13 @@
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
 .\"
-.\" Modified $Date: 2004/04/06 12:33:59 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/16 02:35:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -66,10 +71,14 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UDP 4 "$Date: 2004/04/06 12:33:59 $" "$Name:  $" "OpenSS7 INET Devices"
+.TH UDP 4 "$Date: 2004/05/16 02:35:40 $" "$Name:  $" "OpenSS7 INET Devices"
+.\"
+.\"
 .SH NAME
 .B udp
 \- User Datagram Protocol
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/socket.h>
@@ -85,6 +94,8 @@ sort-adjacent-labels
 .BI "int " udp_xtistr " = t_open(" \fR/dev/udp\fI ", " flags );
 .HP
 .BI "int " udp_socket " = socket(" \fRPF_INET\fI ", " \fRSOCK_DGRAM\fI ", " \fRIPPROTO_UDP\fI );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B UDP
@@ -104,20 +115,15 @@ is implemented as a
 .IR STREAMS (4)
 pseudo-driver using the
 .BR INET (4)
-.B strxnet
-package for
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-and
+.B strinet
+packet for
 .B LiS\c
 .
 .[
-lis
+LiS
 .]
 The
-.B strxnet
+.B strinet
 package translate Linux native
 .BR udp (7)
 sockets into TPI
@@ -193,6 +199,10 @@ socket uses the underlying Linux socket implementation,
 directly.  See
 .BR udp (7)
 for more information.
+.\"
+.\"
+.SH USAGE
+.PP
 .PP
 The following entries in
 .B /etc/protosw
@@ -209,12 +219,14 @@ PF_INET6:SOCK_DGRAM:IPPROTO_UDP:/dev/udp:tpi:clts
 .PP
 For additional information, see
 .BR socksys "(4) and " protosw (5).
+.\"
+.\"
 .SH IOCTLS
 .PP
 All interfaces support a set of management IO controls using
 .BR ioctl (2)
 and
-.BR streamio (2)
+.BR streamio (7)
 .I I_STR
 system calls on the
 .IR udp_stream ", " udp_xtistr " or " udp_socket .
@@ -223,7 +235,9 @@ These management controls are described in
 See also
 .BR udp (7)
 for sockets.
-.SH CAVEATS
+.\"
+.\"
+.SH NOTICES
 .PP
 .B TCP
 has several implementations.  This manpage is for the
@@ -234,6 +248,8 @@ access to the Linux NET4 version of
 .BR UDP .
 For more information on the Linux NET4 version, see
 .BR udp (7).
+.\"
+.\"
 .SH FILES
 .PP
 .PP
@@ -245,18 +261,22 @@ For more information on the Linux NET4 version, see
 .BR <sys/xti.h> ,
 .BR <sys/xti_ip.h> ,
 .BR <sys/xti_udp.h> .
+.\"
+.\"
 .SH DEVICES
 .PP
 .PP
 .IR /dev/udp ,
 .IR /dev/inet/udp .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .PP
 .BR INET (4),
 .BR ioctl (2),
 .BR ip (7),
-.BR STREAMS (9),
+.BR LiS (9),
 .BR protosw (5),
 .BR socket (7),
 .BR sockets (3),
@@ -279,4 +299,4 @@ For more information on the Linux NET4 version, see
 .[
 $LIST$
 .]
-.TA
+.TI

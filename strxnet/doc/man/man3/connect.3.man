@@ -1,0 +1,341 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: connect.3.man,v 0.9.2.1 2004/05/16 02:35:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/05/16 02:35:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CONNECT 3 "$Date: 2004/05/16 02:35:34 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.SH NAME
+.B connect
+\- connect a socket
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.HP
+.BI "int connect(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.SH DESCRIPTION
+.PP
+The
+.BR connect ()
+function requests a connection to be made on a socket.
+The function takes the following arguments:
+.TP
+.I socket
+Specifies the file descriptor associated with the socket.
+.TP
+.I address
+Points to a
+.B sockaddr
+structure containing the peer address.  The length and
+format of the address depend on the address family of the socket.
+.TP
+.I address_len
+Specifies the length of the
+.B sockaddr
+structure pointed to by the address
+argument.
+.PP
+If the socket has not already been bound to a local address,
+.BR connect ()
+will bind it to an address which, unless the socket's address family is
+.BR AF_UNIX ,
+is an unused local address.
+.PP
+If the initiating socket is not connection-mode, then
+.BR connect ()
+sets the
+socket's peer address, but no connection is made.  For
+.B SOCK_DGRAM
+sockets,
+the peer address identifies where all datagrams are sent on subsequent
+.BR send (3)
+calls, and limits the remote sender for subsequent
+.BR recv (3)
+calls.  If address is a null address for the protocol, the socket's peer
+address will be reset.
+.PP
+If the initiating socket is connection-mode, then
+.BR connect ()
+attempts
+to establish a connection to the address specified by the address argument.
+.PP
+If the connection cannot be established immediately and
+.B O_NONBLOCK
+is not
+set for the file descriptor for the socket,
+.BR connect ()
+will block for up to
+an unspecified timeout interval until the connection is established.  If
+the timeout interval expires before the connection is established,
+.BR connect ()
+will fail and the connection attempt will be aborted.  If
+.BR connect ()
+is interrupted by a signal that is caught while blocked
+waiting to establish a connection,
+.BR connect ()
+will fail and set
+.IR errno (3)
+to
+.RB [ EINTR ],
+but the connection request will not be aborted, and the connection
+will be established asynchronously.
+.PP
+If the connection cannot be established immediately and
+.B O_NONBLOCK
+is set
+for the file descriptor for the socket,
+.BR connect ()
+will fail and set
+.IR errno (3)
+to
+.RB [ EINPROGRESS ],
+but the connection request will not be aborted, and the
+connection will be established asynchronously.  Subsequent calls to
+.BR connect ()
+for the same socket, before the connection is established, will
+fail and set
+.IR errno (3)
+to
+.RB [ EALREADY ].
+.PP
+When the connection has been established asynchronously,
+.BR select (2)
+and
+.BR poll (2)
+will indicate that the file descriptor for the
+socket is ready for writing.
+.PP
+The socket in use may require the process to have appropriate privileges
+to use the
+.BR connect ()
+function.
+.SH NOTES
+.PP
+If
+.BR connect ()
+fails, the state of the socket is unspecified.  Portable
+applications should close the file descriptor and create a new socket before
+attempting to reconnect.
+.SH CAVEATS
+.PP
+This system call is implemented as a
+.B SIOCSOCKSYS
+IOCTL.  See
+.BR socksys (4)
+for more information.
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR connect ()
+returns 0.  Otherwise, -1 is returned
+and
+.IR errno (3)
+is set to indicate the error.
+.SH ERRORS
+.PP
+The
+.BR connect ()
+function will fail if:
+.TP
+.RB [ EADDRNOTAVAIL ]
+The specified address is not available from the local machine.
+.TP
+.RB [ EAFNOSUPPORT ]
+The specified address is not a valid address for the address family of the
+specified socket.
+.TP
+.RB [ EALREADY ]
+A connection request is already in progress for the specified socket.
+.TP
+.RB [ EBADF ]
+The socket argument is not a valid file descriptor.
+.TP
+.RB [ ECONNREFUSED ]
+The target address was not listening for connections or refused the connection
+request.
+.TP
+.RB [ EFAULT ]
+The address parameter can not be accessed.
+.TP
+.RB [ EINPROGRESS ]
+.B O_NONBLOCK
+is set for the file descriptor for the socket and the
+connection cannot be immediately established; the connection will be
+established asynchronously.
+.TP
+.RB [ EINTR ]
+The attempt to establish a connection was interrupted by delivery of
+a signal that was caught; the connection will be established asynchronously.
+.TP
+.RB [ EISCONN ]
+The specified socket is connection-mode and is already connected.
+.TP
+.RB [ ENETUNREACH ]
+No route to the network is present.
+.TP
+.RB [ ENOTSOCK ]
+The socket argument does not refer to a socket.
+.TP
+.RB [ EPROTOTYPE ]
+The specified address has a different type than the socket bound to the
+specified peer address.
+.TP
+.RB [ ETIMEDOUT ]
+The attempt to connect timed out before a connection was made.
+.PP
+If the address family of the socket is
+.BR AF_UNIX ,
+then
+.BR connect ()
+will fail if:
+.TP
+.RB [ EIO ]
+An I/O error occurred while reading from or writing to the file system.
+.TP
+.RB [ ELOOP ]
+Too many symbolic links were encountered in translating the pathname in
+address.
+.TP
+.RB [ ENAMETOOLONG ]
+A component of a pathname exceeded {NAME_MAX} characters, or an entire
+pathname exceeded {PATH_MAX} characters.
+.TP
+.RB [ ENOENT ]
+A component of the pathname does not name an existing file or the pathname
+is an empty string.
+.TP
+.RB [ ENOTDIR ]
+A component of the path prefix of the pathname in address is not a
+directory.
+.PP
+The
+.BR connect ()
+function may fail if:
+.TP
+.RB [ EACCES ]
+Search permission is denied for a component of the path prefix; or write
+access to the named socket is denied.
+.TP
+.RB [ EADDRINUSE ]
+Attempt to establish a connection that uses addresses that are already in
+use.
+.TP
+.RB [ ECONNRESET ]
+Remote host reset the connection request.
+.TP
+.RB [ EHOSTUNREACH ]
+The destination host cannot be reached (probably because the host is down
+or a remote router cannot reach it).
+.TP
+.RB [ EINVAL ]
+The address_len argument is not a valid length for the address family; or
+invalid address family in
+.B sockaddr
+structure.
+.TP
+.RB [ ENAMETOOLONG ]
+Pathname resolution of a symbolic link produced an intermediate result whose
+length exceeds {PATH_MAX}.
+.TP
+.RB [ ENETDOWN ]
+The local interface used to reach the destination is down.
+.TP
+.RB [ ENOBUFS ]
+No buffer space is available.
+.TP
+.RB [ ENOSR ]
+There were insufficient STREAMS resources available to complete the operation.
+.TP
+.RB [ EOPNOTSUPP ]
+The socket is listening and can not be connected.
+.SH "SEE ALSO"
+.PP
+.BR accept (3),
+.BR bind (3),
+.BR close (2),
+.BR getsockname (3),
+.BR poll (2),
+.BR select (2),
+.BR send (3),
+.BR shutdown (3),
+.BR socket (3),
+<sys/socket.h>.
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,244 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: socket.3.man,v 0.9.2.1 2004/05/16 02:35:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/05/16 02:35:35 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH SOCKET 3 "$Date: 2004/05/16 02:35:35 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.SH NAME
+.B socket
+\- create an endpoint for communication
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.HP
+.BI "int socket(int " domain ", int " type ", int " protocol );
+.SH DESCRIPTION
+.PP
+The
+.BR socket ()
+function creates an unbound socket in a communications
+domain, and returns a file descriptor that can be used in later
+function calls that operate on sockets.
+.PP
+The function takes the following arguments:
+.TP
+.I domain
+Specifies the communications domain in which a socket is to be
+created.
+.TP
+.I type
+Specifies the type of socket to be created.
+.TP
+.I protocol
+Specifies a particular protocol to be used with the socket.
+Specifying a protocol of 0 causes
+.BR socket ()
+to use an
+unspecified default protocol appropriate for the requested
+socket type.
+.PP
+The domain argument specifies the address family used in the
+communications domain.  The address families supported by the system
+are implementation-dependent.
+.PP
+Symbolic constants that can be used for the domain argument are
+defined in the <sys/socket.h> header.
+.PP
+The type argument specifies the socket type, which determines the
+semantics of communication over the socket.  The socket types
+supported by the system are implementation-dependent.  Possible
+socket types include:
+.TP
+.B SOCK_STREAM
+Provides sequenced, reliable, bidirectional, connection-mode
+byte streams, and may provide a transmission mechanism for
+out-of-band data.
+.TP
+.B SOCK_DGRAM
+Provides datagrams, which are connectionless-mode, unreliable
+messages of fixed maximum length.
+.TP
+.B SOCK_SEQPACKET
+Provides sequenced, reliable, bidirectional, connection-mode
+transmission path for records.  A record can be sent using one
+or more output operations and received using one or more input
+operations, but a single operation never transfers part of more
+than one record.  Record boundaries are visible to the receiver
+via the
+.B MSG_EOR
+flag.
+.PP
+If the protocol argument is non-zero, it must specify a protocol
+that is supported by the address family.  The protocols supported by
+the system are implementation-dependent.
+.PP
+The process may need to have appropriate privileges to use the
+.BR socket ()
+function or to create some sockets.
+.SH NOTES
+.PP
+The documentation for specific address families specify which
+protocols each address family supports.  The documentation for
+specific protocols specify which socket types each protocol
+supports.
+.PP
+The application can determine if an address family is supported by
+trying to create a socket with domain set to the protocol in
+question.
+.SH CAVEATS
+.PP
+This system call is implemented as a
+.B SIOCSOCKSYS
+IOCTL.  See
+.BR socksys (4)
+for more information.
+.SH "RETURN VALUE"
+.PP
+Upon successful completion,
+.BR socket ()
+returns a nonnegative integer,
+the socket file descriptor.  Otherwise a value of -1 is returned and
+.IR errno (3)
+is set to indicate the error.
+.SH ERRORS
+.PP
+The
+.BR socket ()
+function will fail if:
+.TP
+.RB [ EAFNOSUPPORT ]
+The implementation does not support the specified address
+family.
+.TP
+.RB [ EMFILE ]
+No more file descriptors are available for this process.
+.TP
+.RB [ ENFILE ]
+No more file descriptors are available for the system.
+.TP
+.RB [ EPROTONOSUPPORT ]
+The protocol is not supported by the address family, or the
+protocol is not supported by the implementation.
+.TP
+.RB [ EPROTOTYPE ]
+The socket type is not supported by the protocol.
+.PP
+The
+.BR socket ()
+function may fail if:
+.TP
+.RB [ EACCES ]
+The process does not have appropriate privileges.
+.TP
+.RB [ ENOBUFS ]
+Insufficient resources were available in the system to perform
+the operation.
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was available to fulfill the request.
+.TP
+.RB [ ENOSR ]
+There were insufficient
+.IR STREAMS (4)
+resources available for the
+operation to complete.
+.SH "SEE ALSO"
+.PP
+.BR accept (3),
+.BR bind (3),
+.BR connect (3),
+.BR getsockname (3),
+.BR getsockopt (3),
+.BR listen (3),
+.BR recv (3),
+.BR recvfrom (3),
+.BR recvmsg (3),
+.BR send (3),
+.BR sendmsg (3),
+.BR setsockopt (3),
+.BR shutdown (3),
+.BR socketpair (3),
+.BR <netinet/in.h> ,
+.BR <sys/socket.h> .
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

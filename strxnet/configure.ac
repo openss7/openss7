@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9 2004/04/03 22:37:07 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/05/16 04:12:30 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/16 04:12:30 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.57)
+AC_PREREQ(2.59)
 AC_INIT([strxnet],[0.9.2],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/timod.c])
 AC_CONFIG_HEADER([config.h])
@@ -79,6 +79,7 @@ dnl Checks for programs.
 dnl
 AM_PROG_AS
 AC_PROG_AWK
+AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CC_C_O
@@ -91,27 +92,30 @@ AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
 AM_GNU_GETTEXT
-AM_GNU_GETTEXT_VERSION(0.13.1)
+AM_GNU_GETTEXT_VERSION(0.14.1)
 
 dnl
 dnl Checks for libraries.
-dnl Replace `main' with a function in -lpthread
-AC_CHECK_LIB(pthread, main)dnl
-dnl Replace `main' with a function in -lstrmio
-AC_CHECK_LIB(strmio, main)dnl
-dnl Replace `main' with a function in -lLiS
-AC_CHECK_LIB(LiS, main)dnl
+dnl
+AC_CHECK_LIB([LiS], [fattach])
+AC_CHECK_LIB([streams], [fattach])
+AC_CHECK_LIB([c], [open])
+AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([xnet], [t_open])
+AC_CHECK_LIB([socket], [socket])
 
 dnl
 dnl Checks for header files.
 dnl
+AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h memory.h stddef.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h])
+AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h netinet/in.h memory.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h wchar.h])
 
 dnl 
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl 
+AC_HEADER_STDBOOL
 AC_HEADER_STAT
 AC_C_CONST
 AC_TYPE_UID_T
@@ -125,27 +129,41 @@ AC_STRUCT_ST_BLOCKS
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
 AC_C_VOLATILE
+AC_CHECK_TYPES([ptrdiff_t])
 
 dnl 
 dnl Checks for library functions.
 dnl 
+AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
 AC_PROG_GCC_TRADITIONAL
-AC_FUNC_MEMCMP
-AC_FUNC_SELECT_ARGTYPES
-if test :"${cross_compiling-no}" != :yes
-then
-	:
+if test :"${cross_compiling-no}" != :yes ; then
 	AC_FUNC_MALLOC
+fi
+AC_FUNC_MMAP
+AC_FUNC_MEMCMP
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+if test :"${cross_compiling-no}" != :yes ; then
 	AC_FUNC_SETPGRP
 fi
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
+AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm bzero gettimeofday inet_ntoa memset select strerror strrchr strtol strtoul])
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strstr strrchr strtol strtoul])
 
 AC_XNET
 
-AC_CONFIG_FILES([po/Makefile.in m4/Makefile intl/Makefile Makefile doc/Makefile doc/manual/Makefile])
+AC_CONFIG_FILES([
+	Makefile
+	intl/Makefile
+	po/Makefile.in
+	m4/Makefile
+	src/include/Makefile
+	src/Makefile
+	doc/Makefile
+	doc/man/Makefile
+	doc/manual/Makefile])
 
 AC_OUTPUT
