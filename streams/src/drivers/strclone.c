@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $"
 
-static char const ident[] = "$RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,13 +70,13 @@ static char const ident[] = "$RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2
 #include <sys/ddi.h>
 
 #include "strdebug.h"
-#include "strreg.h"		/* for strm_open() and str_args */
+#include "strspecfs.h"		/* for sdev_open() and str_args */
 
 #include "sys/config.h"
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -138,14 +138,14 @@ static struct streamtab clone_info = {
  *  CLONEOPEN
  *  -------------------------------------------------------------------------
  *  Clone open is called directly by spec_open.  This just swaps the device
- *  numbers and chains back to strm_open.  How fast is that?
+ *  numbers and chains back to sdev_open.  How fast is that?
  */
-static int cloneopen(struct inode *i, struct file *f)
+static int cloneopen(struct inode *inode, struct file *file)
 {
-	struct str_args *args = f->f_dentry->d_fsdata;
+	struct str_args *args = file->f_dentry->d_fsdata;
 	args->dev = makedevice(getminor(args->dev), 0);
 	args->sflag = CLONEOPEN;	/* clone open */
-	return strm_open(i, f);
+	return sdev_open(inode, file, file->f_vfsmnt, xchg(&file->f_dentry->d_fsdata, NULL));
 }
 
 struct file_operations clone_f_ops ____cacheline_aligned = {

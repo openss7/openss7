@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 19:43:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:14 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,6 +54,19 @@
 #define __LOCCAL_STRSPECFS_H__
 
 extern struct vfsmount *specfs_mnt;
+
+/* arguments definition */
+typedef struct str_args {
+	struct file *file;
+	dev_t dev;
+	int oflag;
+	int sflag;
+	cred_t *crp;
+	struct qstr name;
+	char buf[32];
+} str_args_t;
+
+extern int sdev_open(struct inode *i, struct file *f, struct vfsmount *mnt, struct str_args *argp);
 
 /* initialization for main */
 extern int strspecfs_init(void);

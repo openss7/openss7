@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strhead.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -73,8 +73,6 @@ extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 		      int *flagsp);
 extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
 		      int flags);
-
-extern struct file_operations strm_f_ops;	/* for strreg.c */
 
 extern struct smodule_info str_minfo;	/* for strsysctl.c */
 

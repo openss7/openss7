@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/04/30 10:42:02 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/04/30 10:42:02 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/30 19:43:13 $"
 
 static char const ident[] =
-    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/04/30 10:42:02 $";
+    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/30 19:43:13 $";
 
 #define __NO_VERSION__
 
@@ -3004,7 +3004,7 @@ int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned 
  *
  *  -------------------------------------------------------------------------
  */
-struct file_operations strm_f_ops ____cacheline_aligned = {
+STATIC struct file_operations strm_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
 	llseek:strllseek,
 	read:strread,
@@ -3450,6 +3450,148 @@ static struct file_operations strm_ops ____cacheline_aligned = {
 	open:open_strm,
 };
 #endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for character based streams, fifos and pipes.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  spec_open: - open a character special device node
+ *  @inode: the character device inode
+ *  @file: the user file pointer
+ *
+ *  spec_open() is only used to open a stream from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node.  It is also not used
+ *  for direct opens of fifos, pipes or sockets.  Those devices provide their own file operations to
+ *  the main operating system.  The character device number from the inode is used to determine the
+ *  shadow special file system (internal) inode and chain the open call.
+ *
+ *  This is the separation point where we can convert the external device number to an internal
+ *  device number.  The external device number is contained in inode->i_rdev.
+ */
+STATIC int spec_open(struct inode *inode, struct file *file)
+{
+	struct char_device *cd;
+	struct cdevsw *cdev;
+	major_t major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+	minor_t minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	struct str_args args = {
+		file:file,
+		dev:makedevice(major, minor),
+		oflag:make_oflag(file),
+		sflag:DRVOPEN,
+		crp:current_creds,
+		name:{args.buf, 0, 0},
+	};
+	int err;
+	if ((inode->i_mode & S_IFMT) != S_IFCHR)
+		return (-EIO);
+	if (!(cd = inode->i_cdev) && !(cd = inode->i_cdev = cdget(args.dev)))
+		return (-ENOMEM);	/* memory problem */
+	/* autoload and determine cloning right now */
+	if (!(cdev = cdev_get(getmajor(args.dev))))
+		return (-ENXIO);
+	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+	err = sdev_open(inode, file, specfs_mnt, &args);
+	cdev_put(cdev);
+	return (err);
+}
+
+STATIC struct file_operations spec_f_ops ____cacheline_aligned = {
+	owner:THIS_MODULE,
+	open:spec_open,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  REGISTRATION
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  register_strdev: - register a STREAMS device against a device major number
+ *  @major: requested major device number or 0 for automatic major selection
+ *  @cdev: STREAMS character device structure to register
+ *
+ *  register_strdev() registers the device specified by the @cdev to the device major number
+ *  specified by @major.
+ *
+ *  register_strdev() will register the STREAMS character device specified by @cdev against the
+ *  major device number @major.  If the major device number is zero, then it requests that
+ *  register_strdev() allocate an available major device number and assign it to @cdev.
+ *
+ *  Context: register_strdev() is intended to be called from kernel __init() or module_init()
+ *  routines only.  It cannot be called from in_irq() level.
+ *
+ *  Return Values: Upon success, register_strdev() will return the requested or assigned major
+ *  device number as a positive integer value.  Upon failure, the registration is denied and a
+ *  negative error number is returned.
+ *
+ *  Errors: Upon failure, register_strdev() returns on of the negative error numbers listed below.
+ *
+ *  -[%ENOMEM]	insufficient memory was available to complete the request.
+ *
+ *  -[%EINVAL]	@cdev was NULL
+ *
+ *  -[%EBUSY]	a device was already registered against the requested major device number, or no
+ *	        device numbers were available for automatic major device number assignment.
+ *
+ *  Notes: Linux Fast-STREAMS provides improvements over LiS.
+ *
+ *  LfS uses a small hash instead of a cdevsw[] table and requires that the driver (statically)
+ *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
+ *  cb_ops.
+ */
+int register_strdev(major_t major, struct cdevsw *cdev)
+{
+	if (!cdev)
+		return (-EINVAL);
+	cdev->d_fop = &strm_f_ops;
+	cdev->d_mode = (cdev->d_mode & S_IFMT) | S_IFCHR;
+	return register_inode(major, cdev, &spec_f_ops);
+}
+
+/**
+ *  unregister_strdev: - unregister previously registered STREAMS device
+ *  @major: major device number to unregister or 0 for all majors
+ *  @cdev: STREAMS character device structure to unregister
+ *
+ *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
+ *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
+ *  getminor(@dev) component must be coded zero (0).
+ *
+ *  unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
+ *  major device number in getmajor(@dev).  If the major device number is zero, then it requests
+ *  that unregister_strdev() unregister @cdev from any device majors with which it is currently
+ *  registered.
+ *
+ *  Context: unregister_strdev() is intended to be called from kernel __exit() or module_exit()
+ *  routines only.  It cannot be called from in_irq() level.
+ *
+ *  Return Values: Upon success, unregister_strdev() will return zero (0).  Upon failure, the
+ *  deregistration is denied and a negative error number is returned.
+ *
+ *  Errors: Upon failure, unregister_strdev() returns one of the negative error numbers listed
+ *  below.
+ *
+ *  -[%ENXIO]	The specified device does not exist in the registration tables.
+ *
+ *  -[%EINVAL]	@cdev is NULL, or the @d_name component associated with @cdev has changed since
+ *              registration.
+ *
+ *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
+ *		and permission is therefore denied.
+ */
+int unregister_strdev(major_t major, struct cdevsw *cdev)
+{
+	return unregister_inode(major, cdev);
+}
 
 /* 
  *  -------------------------------------------------------------------------

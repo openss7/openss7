@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:13 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:13 $";
 
 #define __NO_VERSION__
 
@@ -90,7 +90,8 @@ static char const ident[] =
 
 #include "strdebug.h"
 #include "strhead.h"		/* for stream operations */
-#include "strreg.h"		/* extern verification and str_args */
+#include "strspecfs.h"		/* for str_args */
+#include "strreg.h"		/* extern verification */
 
 #ifndef CONFIG_STREAMS_FIFO_MAJOR
 #define CONFIG_STREAMS_FIFO_MAJOR 211
@@ -125,9 +126,6 @@ rwlock_t minors_lock = RW_LOCK_UNLOCKED;
 struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here */
 struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
 struct list_head minors_list = LIST_HEAD_INIT(minors_list);	/* Minors go here */
-
-//struct fmodsw *fmodsw[MAX_STRMOD] ____cacheline_aligned = { NULL, };
-//struct cdevsw *cdevsw[MAX_STRDEV] ____cacheline_aligned = { NULL, };
 
 struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
 struct list_head cdevsw_hash[STRDEV_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
@@ -565,206 +563,6 @@ struct devnode *node_find(const struct cdevsw *cdev, const char *name)
 /* 
  *  -------------------------------------------------------------------------
  *
- *  Special open for character based streams, fifos and pipes.
- *
- *  -------------------------------------------------------------------------
- */
-
-#if 0
-/**
- *  create_hash: - create a dentry and hash for a name without lookup
- *  @name: the name to create
- *  @base: the base directory entry from which to create the new dentry
- *
- *  Like VFS lookup_hash(), but always creates a new dentry and a new inode for the dentry.  This
- *  uses VFS to stack potential multiple instances of the same inode number.
- */
-STATIC struct dentry *create_hash(struct qstr *name, struct dentry *base)
-{
-	struct dentry *new;
-	struct inode *inode;
-	struct super_block *sb;
-	int err;
-	inode = base->d_inode;
-	if ((err = permission(inode, MAY_EXEC)))
-		goto out;
-	if (base->d_op && base->d_op->d_hash)
-		if ((err = base->d_op->d_hash(base, name)) < 0)
-			goto out;
-	err = -ENOMEM;
-	if (!(new = d_alloc(base, name)))
-		goto out;
-	sb = inode->i_sb;
-	inode = new_inode(sb);
-	if (!inode)
-		goto dput_out;
-	inode->i_ino = name->hash;
-	inode->i_state = I_LOCK;
-	sb->s_op->read_inode(inode);
-	inode->i_state &= ~I_LOCK;
-	wake_up(&inode->i_wait);
-	d_add(new, inode);
-	err = -ENOMEM;
-	if (!inode->i_cdev)
-		goto dput_out;
-	err = -ENODEV;
-	if (is_bad_inode(inode))
-		goto dput_out;
-	return (new);
-      dput_out:
-	dput(new);
-      out:
-	return (ERR_PTR(err));
-}
-#endif
-
-#ifndef HAVE_FILE_MOVE_ADDR
-STATIC void _file_move(struct file *file, struct list_head *list)
-{
-	if (!list)
-		return;
-	file_list_lock();
-	list_del(&file->f_list);
-	list_add(&file->f_list, list);
-	file_list_unlock();
-}
-#endif
-
-void file_swap_put(struct file *f1, struct file *f2)
-{
-#ifdef HAVE_FILE_MOVE_ADDR
-	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
-#endif
-	f1->f_op = xchg(&f2->f_op, f1->f_op);
-	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
-	f1->f_vfsmnt = xchg(&f2->f_vfsmnt, f1->f_vfsmnt);
-	f1->private_data = xchg(&f2->private_data, f1->private_data);
-	_file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
-	_file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
-	fput(f2);
-}
-
-/**
- *  sdev_open: - open a stream from a character special device or a nested call
- */
-int sdev_open(struct inode *i, struct file *f, struct vfsmount *mnt, struct str_args *argp)
-{
-	struct dentry *dentry;
-	struct file *file;		/* next file pointer to use */
-	struct inode *inode;		/* next inode to use */
-	int err;
-	struct cdevsw *cdev;
-	if ((err = down_interruptible(&i->i_sem)) < 0)
-		goto exit;
-	if (!(cdev = cdev_get(getmajor(argp->dev))))
-		goto up_exit;
-	argp->name.len = snprintf(argp->buf, sizeof(argp->buf), "[%d]", getminor(argp->dev));
-	argp->name.hash = (cdev->d_str->st_rdinit->qi_minfo->mi_idnum << 16) | getminor(argp->dev);
-	dentry = lookup_hash(&argp->name, mnt->mnt_root);
-	cdev_put(cdev);
-	if ((err = PTR_ERR(dentry)) < 0)
-		goto up_exit;
-	/* we only fail to get an inode when memory allocation fails */
-	err = -ENOMEM;
-	if (!(inode = dentry->d_inode))
-		goto dput_exit;
-	/* we only get a bad inode when there is no device entry */
-	err = -ENODEV;
-	if (is_bad_inode(inode))
-		goto dput_exit;
-	dentry->d_fsdata = argp;	/* this is how we pass open arguments */
-	file = dentry_open(dentry, mnt, f->f_flags);
-	if ((err = PTR_ERR(file)) < 0)
-		goto up_exit;
-	if (err == 0) {
-		file_swap_put(f, file);
-		goto up_exit;
-	}
-	/* fifo returns 1 on exit to cleanup shadow pointer and use existing file pointer */
-	err = 0;
-      dput_exit:
-	dput(dentry);
-      up_exit:
-	up(&i->i_sem);
-      exit:
-	return (err);
-}
-
-/**
- *  strm_open: - nest another open call on a different device number
- *  @inode: the previous inode
- *  @file: the user file pointer
- *
- *  strm_open() is used to nest another ridirected call.  It is used by clone devices such as the
- *  Clone device and the Named Stream Device.
- */
-int strm_open(struct inode *inode, struct file *file)
-{
-	return sdev_open(inode, file, file->f_vfsmnt, xchg(&file->f_dentry->d_fsdata, NULL));
-}
-
-extern struct vfsmount *specfs_mnt;
-
-/**
- *  spec_open: - open a character special device node
- *  @inode: the character device inode
- *  @file: the user file pointer
- *
- *  spec_open() is only used to open a stream from a character device node in an external
- *  filesystem.  This is never called for direct opens of a specfs device node.  Therefore, the
- *  character device number from the inode is used to determine the shadow special file system
- *  (internal) inode and chain the open call.
- */
-STATIC int spec_open(struct inode *inode, struct file *file)
-{
-	struct char_device *cd;
-	struct cdevsw *cdev;
-	struct str_args args = {
-		file:file,
-		dev:kdev_t_to_nr(inode->i_rdev),
-		oflag:make_oflag(file),
-		sflag:DRVOPEN,
-		crp:current_creds,
-		name:{args.buf, 0, 0},
-	};
-	int err;
-	switch (inode->i_mode & S_IFMT) {
-#ifdef CONFIG_STREAMS_FIFO
-	case S_IFIFO:
-		args.dev = makedevice(CONFIG_STREAMS_FIFO_MAJOR, 0);
-		break;
-#endif
-#ifdef CONFIG_STREAMS_SOCKSYS
-	case S_IFSOCK:
-		args.dev = makedevice(CONFIG_STREAMS_SOCKSYS_MAJOR, 0);
-		break;
-#endif
-	case S_IFCHR:
-		args.dev = kdev_t_to_nr(inode->i_rdev);
-		break;
-	default:
-		swerr();
-		return (-EIO);
-	}
-	if (!(cd = inode->i_cdev) && !(cd = inode->i_cdev = cdget(args.dev)))
-		return (-ENOMEM);	/* memory problem */
-	/* autoload and determine cloning right now */
-	if (!(cdev = cdev_get(getmajor(args.dev))))
-		return (-ENXIO);
-	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
-	err = sdev_open(inode, file, specfs_mnt, &args);
-	cdev_put(cdev);
-	return (err);
-}
-
-STATIC struct file_operations spec_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:spec_open,
-};
-
-/* 
- *  -------------------------------------------------------------------------
- *
  *  Registration and Deregistration
  *
  *  -------------------------------------------------------------------------
@@ -907,85 +705,6 @@ int unregister_inode(major_t major, struct cdevsw *cdev)
 	write_unlock(&fmodsw_lock);
 	write_unlock(&cdevsw_lock);
 	return (err);
-}
-
-/**
- *  register_strdev: - register a STREAMS device against a device major number
- *  @major: requested major device number or 0 for automatic major selection
- *  @cdev: STREAMS character device structure to register
- *
- *  register_strdev() registers the device specified by the @cdev to the device major number
- *  specified by @major.
- *
- *  register_strdev() will register the STREAMS character device specified by @cdev against the
- *  major device number @major.  If the major device number is zero, then it requests that
- *  register_strdev() allocate an available major device number and assign it to @cdev.
- *
- *  Context: register_strdev() is intended to be called from kernel __init() or module_init()
- *  routines only.  It cannot be called from in_irq() level.
- *
- *  Return Values: Upon success, register_strdev() will return the requested or assigned major
- *  device number as a positive integer value.  Upon failure, the registration is denied and a
- *  negative error number is returned.
- *
- *  Errors: Upon failure, register_strdev() returns on of the negative error numbers listed below.
- *
- *  -[%ENOMEM]	insufficient memory was available to complete the request.
- *
- *  -[%EINVAL]	@cdev was NULL
- *
- *  -[%EBUSY]	a device was already registered against the requested major device number, or no
- *	        device numbers were available for automatic major device number assignment.
- *
- *  Notes: Linux Fast-STREAMS provides improvements over LiS.
- *
- *  LfS uses a small hash instead of a cdevsw[] table and requires that the driver (statically)
- *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
- *  cb_ops.
- */
-int register_strdev(major_t major, struct cdevsw *cdev)
-{
-	if (!cdev)
-		return (-EINVAL);
-	cdev->d_fop = &strm_f_ops;
-	cdev->d_mode = (cdev->d_mode & S_IFMT) | S_IFCHR;
-	return register_inode(major, cdev, &spec_f_ops);
-}
-
-/**
- *  unregister_strdev: - unregister previously registered STREAMS device
- *  @major: major device number to unregister or 0 for all majors
- *  @cdev: STREAMS character device structure to unregister
- *
- *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
- *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
- *  getminor(@dev) component must be coded zero (0).
- *
- *  unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
- *  major device number in getmajor(@dev).  If the major device number is zero, then it requests
- *  that unregister_strdev() unregister @cdev from any device majors with which it is currently
- *  registered.
- *
- *  Context: unregister_strdev() is intended to be called from kernel __exit() or module_exit()
- *  routines only.  It cannot be called from in_irq() level.
- *
- *  Return Values: Upon success, unregister_strdev() will return zero (0).  Upon failure, the
- *  deregistration is denied and a negative error number is returned.
- *
- *  Errors: Upon failure, unregister_strdev() returns one of the negative error numbers listed
- *  below.
- *
- *  -[%ENXIO]	The specified device does not exist in the registration tables.
- *
- *  -[%EINVAL]	@cdev is NULL, or the @d_name component associated with @cdev has changed since
- *              registration.
- *
- *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
- *		and permission is therefore denied.
- */
-int unregister_strdev(major_t major, struct cdevsw *cdev)
-{
-	return unregister_inode(major, cdev);
 }
 
 /**

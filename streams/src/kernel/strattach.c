@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:02 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:02 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 19:43:13 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:02 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 19:43:13 $";
 
 #define __NO_VERSION__
 
@@ -80,6 +80,8 @@ static char const ident[] =
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
 #endif
+
+#include <sys/dki.h>
 
 #include "strattach.h"
 #include "strspecfs.h"		/* for specfs_mnt */

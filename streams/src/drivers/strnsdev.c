@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $"
 
-static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -144,7 +144,7 @@ static struct streamtab nsdev_info = {
  *  -------------------------------------------------------------------------
  *  This is rather simple.  We are going to do a redirected open on the a new
  *  device with the major device number mapped according to name.  We do this
- *  by nesting another strm_open() inside the first one with an adjusted
+ *  by nesting another sdev_open() inside the first one with an adjusted
  *  device number. It helps that the orginal file and dentry pointer is stored
  *  with the args passed as fsdata attached to the dentry.  We use this to
  *  find the original file pointer and dentry and get the name of the opened
@@ -181,7 +181,7 @@ static int nsdevopen(struct inode *inode, struct file *file)
 		if (cdev_max && (len_max == name->len || len_max > 2)) {
 			argp->dev = makedevice(cdev_max->d_major, getminor(argp->dev));
 			argp->sflag = DRVOPEN;	/* this is a directed open */
-			return strm_open(inode, file);
+			return sdev_open(inode, file, file->f_vfsmnt, xchg(&file->f_dentry->d_fsdata, NULL));
 		}
 #ifdef CONFIG_KMOD
 		{

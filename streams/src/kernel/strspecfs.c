@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 19:43:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 19:43:13 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 19:43:13 $";
 
 #define __NO_VERSION__
 
@@ -81,6 +81,7 @@ static char const ident[] =
 #endif
 #include <linux/major.h>
 #include <asm/atomic.h>
+#include <linux/kernel.h>	/* for simple_strtoul */
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -98,6 +99,7 @@ static char const ident[] =
 #include "strsock.h"
 #include "strsched.h"
 #include "strreg.h"		/* for cdevsw_list */
+#include "strspecfs.h"		/* for str_args */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -217,6 +219,90 @@ static char const ident[] =
 /* 
  *  =========================================================================
  *
+ *  Shadow Special Filesystem Device nodes
+ *
+ *  =========================================================================
+ */
+/*
+ *  Shadow Special Filesystem Device node file operations.
+ *  -------------------------------------------------------------------------
+ */
+
+#ifndef HAVE_FILE_MOVE_ADDR
+STATIC void _file_move(struct file *file, struct list_head *list)
+{
+	if (!list)
+		return;
+	file_list_lock();
+	list_del(&file->f_list);
+	list_add(&file->f_list, list);
+	file_list_unlock();
+}
+#endif
+
+void file_swap_put(struct file *f1, struct file *f2)
+{
+#ifdef HAVE_FILE_MOVE_ADDR
+	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+#endif
+	f1->f_op = xchg(&f2->f_op, f1->f_op);
+	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
+	f1->f_vfsmnt = xchg(&f2->f_vfsmnt, f1->f_vfsmnt);
+	f1->private_data = xchg(&f2->private_data, f1->private_data);
+	_file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
+	_file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
+	fput(f2);
+}
+
+/**
+ *  sdev_open: - open a stream from a character special device or a nested call
+ */
+int sdev_open(struct inode *i, struct file *f, struct vfsmount *mnt, struct str_args *argp)
+{
+	struct dentry *dentry;
+	struct file *file;		/* next file pointer to use */
+	struct inode *inode;		/* next inode to use */
+	int err;
+	struct cdevsw *cdev;
+	if ((err = down_interruptible(&i->i_sem)) < 0)
+		goto exit;
+	if (!(cdev = cdev_get(getmajor(argp->dev))))
+		goto up_exit;
+	argp->name.len = snprintf(argp->buf, sizeof(argp->buf), "%u", getminor(argp->dev));
+	argp->name.hash = (cdev->d_str->st_rdinit->qi_minfo->mi_idnum << 16) | getminor(argp->dev);
+	dentry = lookup_hash(&argp->name, mnt->mnt_root);
+	cdev_put(cdev);
+	if ((err = PTR_ERR(dentry)) < 0)
+		goto up_exit;
+	/* we only fail to get an inode when memory allocation fails */
+	err = -ENOMEM;
+	if (!(inode = dentry->d_inode))
+		goto dput_exit;
+	/* we only get a bad inode when there is no device entry */
+	err = -ENODEV;
+	if (is_bad_inode(inode))
+		goto dput_exit;
+	dentry->d_fsdata = argp;	/* this is how we pass open arguments */
+	file = dentry_open(dentry, mnt, f->f_flags);
+	if ((err = PTR_ERR(file)) < 0)
+		goto up_exit;
+	if (err == 0) {
+		file_swap_put(f, file);
+		goto up_exit;
+	}
+	/* fifo returns 1 on exit to cleanup shadow pointer and use existing file pointer */
+	err = 0;
+      dput_exit:
+	dput(dentry);
+      up_exit:
+	up(&i->i_sem);
+      exit:
+	return (err);
+}
+
+/* 
+ *  =========================================================================
+ *
  *  Shadow Special Filesystem Module directory
  *
  *  =========================================================================
@@ -244,24 +330,52 @@ static char const ident[] =
  */
 static struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *dentry)
 {
+	struct inode *inode;
 	struct cdevsw *cdev;
 	struct devnode *node;
-	if ((cdev = dir->u.generic_ip) && (node = node_find(cdev, dentry->d_name.name))) {
-		struct inode *inode;
+	const char *name = dentry->d_name.name;
+	char *tail = (char *) name;
+	ulong minor;
+	ulong modid;
+	if (!(cdev = dir->u.generic_ip))
+		goto enoent;
+	/* if the name length is zero, the hash *is* the inode number */
+	if (dentry->d_name.len == 0) {
+		minor = dentry->d_name.hash;
+		modid = (minor & 0xffff0000) ? cdev->d_str->st_rdinit->qi_minfo->mi_idnum : 0;
+		if ((inode = iget(dir->i_sb, (modid << 16) | minor)))
+			goto gotit;
+		goto enoent;
+	}
+	/* check if the name is a valid number */
+	if (*name != '\0') {
+		minor = simple_strtoul(name, &tail, 0);
+		if (*tail != '\0') {
+			modid = (minor & 0xffff0000) ? cdev->d_str->st_rdinit->qi_minfo->mi_idnum : 0;
+			if ((inode = iget(dir->i_sb, (modid << 16) | minor)))
+				goto gotit;
+		}
+	}
+	/* check if the name is registered as a minor device node name */
+	if ((node = node_find(cdev, name))) {
+		minor = node->n_index;
 		if (!(inode = node->n_inode)) {
-			int ino = (node->n_str->st_rdinit->qi_minfo->mi_idnum << 16)
-			    | (node->n_index & 0x0000ffff);
-			if ((inode = iget(dir->i_sb, ino))) {
+			modid = (minor & 0xffff0000) ? cdev->d_str->st_rdinit->qi_minfo->mi_idnum : 0;
+			if ((inode = iget(dir->i_sb, (modid << 16) | minor))) {
 				if (inode->u.generic_ip == NULL)
 					inode->u.generic_ip = node;
 				node->n_inode = inode;
+				goto gotit;
 			}
+			goto enoent;
 		}
-		if (inode)
-			d_add(dentry, inode);
-		return (NULL);
+		goto gotit;
 	}
+      enoent:
 	return ERR_PTR(-ENOENT);
+      gotit:
+	d_add(dentry, inode);
+	return (NULL);
 }
 
  /* TODO: we can make links in this directory.  We just have to instantiate a devnode minor device
@@ -386,31 +500,46 @@ static struct file_operations spec_dir_f_ops = {
 static struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *dentry)
 {
 	struct inode *inode = NULL;
+	struct fmodsw *fmod;
+	const char *name = dentry->d_name.name;
+	char *tail = (char *) name;
+	ulong modid;
 	/* if the name length is zero, the hash *is* the inode number */
-	if (dentry->d_name.len > 2 && dentry->d_name.name[0] == '[') {
-		inode = iget(dir->i_sb, dentry->d_name.hash);
-	} else {
-		struct fmodsw *fmod;
-		/* this will also attempt to demand load the driver or module if required */
-		if ((fmod = (struct fmodsw *) cdev_find(dentry->d_name.name))
-		    || (fmod = fmod_find(dentry->d_name.name))) {
-			if (!(inode = fmod->f_inode)) {
-				int ino = fmod->f_str->st_rdinit->qi_minfo->mi_idnum;
-				if ((inode = iget(dir->i_sb, ino))) {
-					if (inode->u.generic_ip == NULL)
-						inode->u.generic_ip = fmod;
-					fmod->f_inode = inode;
-				} else
-					fmod_put(fmod);
+	if (dentry->d_name.len == 0) {
+		modid = dentry->d_name.hash;
+		if ((inode = iget(dir->i_sb, modid)))
+			goto gotit;
+		goto enoent;
+	}
+	/* check if the name is a valid number */
+	if (*name != '\0') {
+		modid = simple_strtoul(name, &tail, 0);
+		if (*tail != '\0') {
+			if ((inode = iget(dir->i_sb, modid)))
+				goto gotit;
+		}
+	}
+	/* this will also attempt to demand load the "streams-%s" if required */
+	if ((fmod = (struct fmodsw *) cdev_find(name)) ||
+	    (fmod = (struct fmodsw *) fmod_find(name))) {
+		if (!(inode = fmod->f_inode)) {
+			modid = fmod->f_str->st_rdinit->qi_minfo->mi_idnum;
+			if ((inode = iget(dir->i_sb, modid))) {
+				if (inode->u.generic_ip == NULL)
+					inode->u.generic_ip = fmod;
+				fmod->f_inode = inode;
+				goto gotit;
 			}
-		} else
-			return ERR_PTR(-ENOENT);
+			fmod_put(fmod);
+			goto enoent;
+		}
+		goto gotit;
 	}
-	if (inode) {
-		d_add(dentry, inode);
-		return (NULL);
-	}
+      enoent:
 	return ERR_PTR(-ENOENT);
+      gotit:
+	d_add(dentry, inode);
+	return (NULL);
 }
 
 static struct inode_operations spec_root_i_ops = {
@@ -847,7 +976,7 @@ static void spec_delete_inode(struct inode *inode)
 		if ((sd = (struct stdata *) inode->i_pipe)) {
 			swerr();
 			do {
-				inode->i_pipe = xchg(&sd->sd_clone, NULL);
+				inode->i_pipe = (void *) xchg(&sd->sd_clone, NULL);
 				if (sd->sd_inode == inode)
 					sd->sd_inode = NULL;
 				sd_put(sd);

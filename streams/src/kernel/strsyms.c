@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 19:43:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:14 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:14 $";
 
 #define __NO_VERSION__
 #define EXPORT_SYMTAB
@@ -254,14 +254,14 @@ EXPORT_SYMBOL_GPL(autopush_vml);	/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_find);	/* strconf.h */
 
 EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* strsysctl.h */
+
 EXPORT_SYMBOL_GPL(specfs_mnt);	/* strspecfs.h */
+EXPORT_SYMBOL_GPL(sdev_open);	/* strspecfs.h */
 
 #if	defined(CONFIG_STREAMS_CLONE_MODULE) || \
 	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
 	defined(CONFIG_STREAMS_SC_MODULE) || \
 	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-EXPORT_SYMBOL(strm_open);	/* strreg.h */
-EXPORT_SYMBOL(sdev_open);	/* strreg.h */
 EXPORT_SYMBOL(fmodsw_list);	/* strreg.h */
 EXPORT_SYMBOL(cdevsw_list);	/* strreg.h */
 EXPORT_SYMBOL(fmod_count);	/* strreg.h */
