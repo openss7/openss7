@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.133 11/23/03 19:58:44 "
+#ident "@(#) LiS head.c 2.135 12/27/03 15:12:51 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -259,6 +259,7 @@ C) Open vs Close
 #endif
 
 #if defined(KERNEL_2_3)
+#if defined(CONFIG_DEV)
 extern struct vfsmount *lis_mntget(struct vfsmount *m, 
 				   const char *file, int line, const char *fn);
 extern void lis_mntput(struct vfsmount *m, 
@@ -267,6 +268,14 @@ extern void lis_mntput(struct vfsmount *m,
 #define	MNTGET(m)	lis_mntget((m),__LIS_FILE__,__LINE__,__FUNCTION__)
 #define	MNTPUT(m)	lis_mntput((m),__LIS_FILE__,__LINE__,__FUNCTION__)
 #define MNT_COUNT(m)    atomic_read(&((m)->mnt_count))
+#else
+extern struct vfsmount *lis_mntget(struct vfsmount *m);
+extern void lis_mntput(struct vfsmount *m);
+
+#define	MNTGET(m)	lis_mntget((m))
+#define	MNTPUT(m)	lis_mntput((m))
+#define	MNT_COUNT(m)	atomic_read(&((m)->mnt_count))
+#endif
 #else
 #define	MNTGET(m)	0
 #define	MNTPUT(m)	do {} while (0)
@@ -424,7 +433,11 @@ typedef struct lis_code_path
 
 } lis_code_path_t ;
 
+#if defined(CONFIG_DEV)
 #define	USE_CODE_PATH	1
+#else
+#undef	USE_CODE_PATH
+#endif
 
 #if defined(USE_CODE_PATH)
 
@@ -475,10 +488,14 @@ static char		*lis_cp_fmt =		/* for printk */
 
 #endif
 
+#if defined(CONFIG_DEV)
 void	lis_cpfl(void *p, long a, const char *fcn, const char *f, int l)
 {
     CPFL(p,a,fcn,f,l) ;
 }
+#else
+#define	lis_cpfl(p,a,fcn,f,l)
+#endif
 
 /*  -------------------------------------------------------------------  */
 /*				  Glob. Vars                             */
@@ -634,8 +651,16 @@ extern mblk_t *lis_get_rput_q(stdata_t *hd);
  * Thus, when the use count goes to zero there really are no more possible
  * usages of this stream head structure and it can be deallocated.
  */
+#if defined(CONFIG_DEV)
 stdata_t *lis_head_get_fcn(stdata_t *hd, const char *file, int line)
+#else
+stdata_t *lis_head_get_fcn(stdata_t *hd)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file = "head.c" ;
+    static int   line = 0 ;
+#endif
     stdata_t *ihd = hd;
 
     if (hd == NULL)
@@ -683,8 +708,16 @@ stdata_t *lis_head_get_fcn(stdata_t *hd, const char *file, int line)
  * same time the count could go to zero without the structure being
  * deallocated.
  */
+#if defined(CONFIG_DEV)
 stdata_t *lis_head_put_fcn(stdata_t *hd, const char *file, int line)
+#else
+stdata_t *lis_head_put_fcn(stdata_t *hd)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file = "head.c" ;
+    static int   line = 0 ;
+#endif
     if (hd)
     {
 	int oldcnt, newcnt;
@@ -3951,6 +3984,12 @@ retry_from_start:			/* retry point for open/close races */
 	    existing_head = 0 ;
 	    head = lis_head_get(NULL) ;	/* allocates new structure */
 	    CP(head,odev) ;
+	    if (head == NULL)
+	    {
+		err = -ENOMEM ;
+		goto error_rtn ;
+	    }
+
 	    /*
 	     * In order for lis_lookup_stdata to locate this stream head
 	     * in case of a simultaneous open to this same device by another
@@ -7806,8 +7845,15 @@ void lis_init_head( void )
     lis_spin_lock_init(&lis_bc_lock, "Bufcall-Lock") ;
     lis_spin_lock_init(&lis_mem_lock, "Mem-Lock") ;
     lis_spin_lock_init(&lis_tlist_lock, "Tlist-Lock") ;
+#if defined(LINUX) && defined(USE_LINUX_KMEM_TIMER)
+    lis_init_dki();
+#endif
 
     lis_init_bufcall() ;
+#if (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+    lis_init_queues();
+    lis_init_msg();
+#endif
     lis_init_mod() ;
 }/*lis_init_head*/
 
@@ -7819,6 +7865,9 @@ void lis_terminate_head(void)
 {
     lis_terminate_mod() ;
     lis_terminate_msg() ;
+#if (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+    lis_terminate_queues();
+#endif
     lis_terminate_bufcall() ;
     lis_terminate_dki() ;
     SEM_DESTROY(&lis_stdata_sem);
