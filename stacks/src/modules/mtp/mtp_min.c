@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:15 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:15 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:15 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:15 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -76,7 +76,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:15 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -7401,11 +7401,19 @@ mtp_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the MTP-MIN driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the MTP-MIN driver. (0 for allocation.)");
 
 /*

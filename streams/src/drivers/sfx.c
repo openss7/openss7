@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/31 06:53:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/31 06:53:24 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/31 06:53:24 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/31 06:53:24 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -106,7 +106,11 @@ MODULE_LICENSE(SFX_LICENSE);
 #endif
 
 modID_t modid = CONFIG_STREAMS_SFX_MODID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-based FIFOs (0 for allocation).");
 
 #ifdef MODULE_ALIAS
@@ -115,7 +119,11 @@ MODULE_ALIAS("streams-driver-sfx");
 #endif
 
 major_t major = CONFIG_STREAMS_SFX_MAJOR;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs (0 for allocation).");
 
 #ifdef MODULE_ALIAS

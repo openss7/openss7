@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:18 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:20 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:18 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:18 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:20 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:18 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:20 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -9907,11 +9907,19 @@ xp_pci_cleanup(void)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the X100P-SL driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the X100P-SL driver. (0 for allocation.)");
 
 /*

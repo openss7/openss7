@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -101,7 +101,11 @@ MODULE_LICENSE(SPX_LICENSE);
 #endif
 
 modID_t modid = CONFIG_STREAMS_SPX_MODID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver.");
 
 #ifdef MODULE_ALIAS
@@ -110,7 +114,11 @@ MODULE_ALIAS("streams-driver-spx");
 #endif
 
 major_t major = CONFIG_STREAMS_SPX_MAJOR;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
 
 #ifdef MODULE_ALIAS

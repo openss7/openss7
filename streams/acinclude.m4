@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/03/30 02:24:26 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/03/31 06:53:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/30 02:24:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 06:53:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -797,6 +797,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -811,17 +814,23 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device \
+			read_trylock write_trylock \
+			sleep_on interruptible_sleep_on sleep_on_timeout \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -841,17 +850,53 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
 ])
+    _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
+			 read_trylock write_trylock], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -887,11 +932,15 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -909,6 +958,9 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -940,11 +992,15 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif

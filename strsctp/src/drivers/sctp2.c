@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/30 11:35:45 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 11:35:45 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/30 11:35:45 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/30 11:35:45 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $";
 
 #include "sctp_compat.h"
 #include "sctp_hooks.h"
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/30 11:35:45 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15173,11 +15173,19 @@ sctp_n_close(queue_t *q, int flag, cred_t *crp)
 
 #ifdef LINUX
 unsigned short n_modid = SCTP_N_DRV_ID;
+#ifndef module_param
 MODULE_PARM(n_modid, "h");
+#else
+module_param(n_modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(n_modid, "Module ID number for STREAMS SCTP NPI driver (0 for allocation).");
 
-unsigned short n_major = SCTP_N_CMAJOR_0;
+major_t n_major = SCTP_N_CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(n_major, "h");
+#else
+module_param(n_major, uint, 0);
+#endif
 MODULE_PARM_DESC(n_major, "Major device number for STREAMS SCTP NPI driver (0 for allocation).");
 #endif				/* LINUX */
 
@@ -24607,11 +24615,19 @@ sctp_t_close(queue_t *q, int flag, cred_t *crp)
 
 #ifdef LINUX
 unsigned short t_modid = SCTP_T_DRV_ID;
+#ifndef module_param
 MODULE_PARM(t_modid, "h");
+#else
+module_param(t_modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(t_modid, "Module ID number for STREAMS SCTP TPI driver (0 for allocation).");
 
-unsigned short t_major = SCTP_T_CMAJOR_0;
+major_t t_major = SCTP_T_CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(t_major, "h");
+#else
+module_param(t_major, uint, 0);
+#endif
 MODULE_PARM_DESC(t_major, "Major device number for STREAMS SCTP TPI driver (0 for allocation).");
 #endif				/* LINUX */
 

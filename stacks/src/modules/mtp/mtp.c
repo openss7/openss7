@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:13 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:13 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:13 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:13 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:13 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -19376,11 +19376,19 @@ na_put(struct na *na)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*

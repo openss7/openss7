@@ -411,18 +411,24 @@
 #endif
 #define	vsprintf			lis_vsprintf
 
+#if HAVE_KFUNC_SLEEP_ON
 #ifdef sleep_on
 #undef sleep_on
 #endif
 #define	sleep_on			lis_sleep_on
+#endif
+#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 #ifdef interruptible_sleep_on
 #undef interruptible_sleep_on
 #endif
 #define	interruptible_sleep_on		lis_interruptible_sleep_on
+#endif
+#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
 #ifdef sleep_on_timeout
 #undef sleep_on_timeout
 #endif
 #define	sleep_on_timeout		lis_sleep_on_timeout
+#endif
 #ifdef interruptible_sleep_on_timeout
 #undef interruptible_sleep_on_timeout
 #endif
@@ -719,9 +725,15 @@ void lis_osif_do_settimeofday( struct timeval *tp ) _RP;
  */
 #define	OSIF_WAIT_Q_ARG		wait_queue_head_t *wq
 #define	OSIF_WAIT_E_ARG		wait_queue_head_t  wq
+#if HAVE_KFUNC_SLEEP_ON
 void lis_sleep_on(OSIF_WAIT_Q_ARG) _RP;
+#endif
+#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 void lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG) _RP;
+#endif
+#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
 void lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout) _RP;
+#endif
 void lis_interruptible_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout) _RP;
 void lis_wait_event(OSIF_WAIT_E_ARG, int condition) _RP;
 void lis_wait_event_interruptible(OSIF_WAIT_E_ARG, int condition) _RP;

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/30 11:35:44 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/31 06:53:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/30 11:35:44 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 06:53:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -537,15 +537,15 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS], [1], [Define if function __ip_select_ident
 		       takes 3 arguments.])
 	fi
-	if test :"${linux_cv_have___ip_select_ident_2_args:-no}" = :no \
-	     -a :"${linux_cv_have___ip_select_ident_3_args:-no}" = :no
-	then
-	    AC_MSG_ERROR([
-***
-*** Configure cannot determine whether your __ip_select_ident function takes
-*** 2 arguments or whether it takes 3 arguments.
-*** ])
-	fi
+dnl 	if test :"${linux_cv_have___ip_select_ident_2_args:-no}" = :no \
+dnl 	     -a :"${linux_cv_have___ip_select_ident_3_args:-no}" = :no
+dnl 	then
+dnl 	    AC_MSG_ERROR([
+dnl ***
+dnl *** Configure cannot determine whether your __ip_select_ident function takes
+dnl *** 2 arguments or whether it takes 3 arguments.
+dnl *** ])
+dnl 	fi
     ])
     _LINUX_CHECK_HEADERS([linux/percpu.h], [:], [:], [
 #include <linux/compiler.h>

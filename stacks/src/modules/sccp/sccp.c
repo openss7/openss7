@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 14:43:44 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -21262,11 +21262,19 @@ mtp_get_id(ulong id)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the SCCP driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the SCCP driver. (0 for allocation.)");
 
 /*

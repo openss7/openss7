@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 14:43:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1225,12 +1225,14 @@ sdt_daedt_transmission_request(queue_t *q, struct sdt *s)
 #define SDT_TX_TABLE_LENGTH	(2* SDT_TX_STATES * 256)
 #define SDT_RX_TABLE_LENGTH	(2* SDT_RX_STATES * 256)
 
+struct tx_entry __attribute__ ((packed));
 typedef struct tx_entry {
 	uint bit_string:10;		/* the output string */
 	uint bit_length:4;		/* length in excess of 8 bits of output string */
 	uint state:3;			/* new state */
-} tx_entry_t __attribute__ ((packed));
+} tx_entry_t;
 
+struct rx_entry __attribute__ ((packed));
 typedef struct rx_entry {
 	uint bit_string:16;
 	uint bit_length:4;
@@ -1239,7 +1241,7 @@ typedef struct rx_entry {
 	uint hunt:1;
 	uint flag:1;
 	uint idle:1;
-} rx_entry_t __attribute__ ((packed));
+} rx_entry_t;
 
 typedef uint16_t bc_entry_t;
 
@@ -4316,7 +4318,11 @@ sdt_put(struct sdt *s)
  */
 
 unsigned short modid = MOD_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:30 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/31 06:53:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:30 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:30 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/31 06:53:23 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:30 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/31 06:53:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -117,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:30 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/31 06:53:23 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1433,12 +1433,14 @@ void lis_inc_mod_cnt_fcn(const char *file, int line)
 
 EXPORT_SYMBOL_GPL(lis_inc_mod_cnt_fcn);
 #endif
+#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 void lis_interruptible_sleep_on(wait_queue_head_t *wq)
 {
 	return WARN(interruptible_sleep_on(wq));
 }
 
 EXPORT_SYMBOL_GPL(lis_interruptible_sleep_on);
+#endif
 void lis_kernel_up(struct semaphore *sem)
 {
 	return WARN(up(sem));
@@ -1604,12 +1606,14 @@ void lis_request_region(unsigned int from, unsigned int extent, const char *name
 }
 
 EXPORT_SYMBOL_GPL(lis_request_region);
+#if HAVE_KFUNC_SLEEP_ON
 void lis_sleep_on(wait_queue_head_t *wq)
 {
 	return WARN(sleep_on(wq));
 }
 
 EXPORT_SYMBOL_GPL(lis_sleep_on);
+#endif
 void lis_udelay(long micro_secs)
 {
 	return WARN(udelay(micro_secs));

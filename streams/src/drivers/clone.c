@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/08 19:31:31 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/31 06:53:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:31 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/08 19:31:31 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/31 06:53:24 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/08 19:31:31 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/31 06:53:24 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/08 19:31:31 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/31 06:53:24 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -104,7 +104,11 @@ MODULE_LICENSE(CLONE_LICENSE);
 #endif
 
 modID_t modid = CONFIG_STREAMS_CLONE_MODID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module id number for CLONE driver.");
 
 #ifdef MODULE_ALIAS
@@ -113,7 +117,11 @@ MODULE_ALIAS("streams-driver-clone");
 #endif
 
 major_t major = CONFIG_STREAMS_CLONE_MAJOR;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Major device number for CLONE driver.");
 
 #ifdef MODULE_ALIAS

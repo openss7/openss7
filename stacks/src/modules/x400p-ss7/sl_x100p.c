@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:17 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:17 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:17 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:17 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:17 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9832,11 +9832,19 @@ xp_pci_cleanup(void)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the X100P-SL driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the X100P-SL driver. (0 for allocation.)");
 
 /*

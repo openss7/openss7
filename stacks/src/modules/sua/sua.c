@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:53 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:53 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:53 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:53 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $";
 
 #include "os7/compat.h"
 
@@ -214,11 +214,19 @@ static struct ua_driver sua_dinfo = {
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the SUA driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the SUA driver. (0 for allocation.)");
 
 /*

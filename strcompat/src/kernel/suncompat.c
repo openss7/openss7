@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:32 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -120,7 +120,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -151,10 +151,18 @@ EXPORT_SYMBOL(unfreezestr_SUN);
 void qwait(queue_t *rq)
 {
 	struct queinfo *qu = (typeof(qu)) rq;
+	DECLARE_WAITQUEUE(wait, current);
 	assert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
-	/* Need to lock the queue and test before scheduling */
-	sleep_on(&qu->qu_qwait);
+	qpwlock(rq);
+	add_wait_queue(&qu->qu_qwait, &wait);
+	set_current_state(TASK_UNINTERRUPTIBLE);
+	qpwunlock(rq);
+	schedule();
+	qpwlock(rq);
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&qu->qu_qwait, &wait);
+	qpwunlock(rq);
 }
 
 EXPORT_SYMBOL(qwait);		/* sunddi.h */
@@ -165,12 +173,23 @@ EXPORT_SYMBOL(qwait);		/* sunddi.h */
  */
 int qwait_sig(queue_t *rq)
 {
+	int ret = 0;
 	struct queinfo *qu = (typeof(qu)) rq;
+	DECLARE_WAITQUEUE(wait, current);
 	assert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
-	/* Need to lock the queue and test before scheduling */
-	interruptible_sleep_on(&qu->qu_qwait);
-	return (!signal_pending(current));
+	qpwlock(rq);
+	add_wait_queue(&qu->qu_qwait, &wait);
+	set_current_state(TASK_INTERRUPTIBLE);
+	qpwunlock(rq);
+	schedule();
+	qpwlock(rq);
+	if (signal_pending(current))
+		ret = 1;
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&qu->qu_qwait, &wait);
+	qpwunlock(rq);
+	return (ret);
 }
 
 EXPORT_SYMBOL(qwait_sig);	/* sunddi.h */

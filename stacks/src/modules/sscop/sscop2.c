@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:48 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:48 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:48 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:48 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $";
 
 #include "os7/compat.h"
 
@@ -641,7 +641,11 @@ s_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 
 /*

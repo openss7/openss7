@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:48 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 14:43:48 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:48 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:48 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -8469,7 +8469,11 @@ sl_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the SL-TPI module. (0 for allocation.)");
 
 /*

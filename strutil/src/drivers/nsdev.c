@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:33 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/31 06:53:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:33 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:33 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/31 06:53:24 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:33 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/31 06:53:24 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:33 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/31 06:53:24 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -108,7 +108,11 @@ MODULE_LICENSE(NSDEV_LICENSE);
 #endif
 
 modID_t modid = CONFIG_STREAMS_NSDEV_MODID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module id number for NSDEV driver.");
 
 #ifdef MODULE_ALIAS
@@ -117,7 +121,11 @@ MODULE_ALIAS("streams-driver-nsdev");
 #endif
 
 major_t major = CONFIG_STREAMS_NSDEV_MAJOR;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Major device number for NSDEV driver.");
 
 #ifdef MODULE_ALIAS

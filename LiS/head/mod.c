@@ -1240,7 +1240,13 @@ lis_find_strdev(major_t major)
 		}
 		if (initname != NULL) { /* call initialization */
 			void (* init)(void);
+#if HAVE_KFUNC___SYMBOL_GET && HAVE_KFUNC___SYMBOL_PUT
+			char symbolname[64];
+			snprintf(symbolname, 64, "%s%s", MODULE_SYMBOL_PREFIX, initname);
+			init = *(typeof(&init))(__symbol_get(symbolname));
+#else
 			init = inter_module_get_request(initname, name) ;
+#endif
 			if (init == NULL)
 				printk("lis_find_strdev(): "
 				       "Unable to resolve init function %s "
@@ -1249,7 +1255,11 @@ lis_find_strdev(major_t major)
 			else
 			{
 				(* init)();
+#if HAVE_KFUNC___SYMBOL_GET && HAVE_KFUNC___SYMBOL_PUT
+				__symbol_put(symbolname);
+#else
 				inter_module_put(initname) ;
+#endif
 			}
 		}
 	}

@@ -141,7 +141,9 @@ EXPORT_SYMBOL_GPL(lis_gettimeofday);
 EXPORT_SYMBOL_GPL(lis_hitime);
 EXPORT_SYMBOL_GPL(lis_insq);
 EXPORT_SYMBOL_GPL(lis_in_interrupt);
+#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 EXPORT_SYMBOL_GPL(lis_interruptible_sleep_on);
+#endif
 EXPORT_SYMBOL_GPL(lis_interruptible_sleep_on_timeout);
 EXPORT_SYMBOL_GPL(lis_ioremap);
 EXPORT_SYMBOL_GPL(lis_ioremap_nocache);
@@ -287,8 +289,12 @@ EXPORT_SYMBOL_GPL(lis_secs);
 EXPORT_SYMBOL_GPL(lis_sem_alloc);
 EXPORT_SYMBOL_GPL(lis_sem_destroy);
 EXPORT_SYMBOL_GPL(lis_sem_init);
+#if HAVE_KFUNC_SLEEP_ON
 EXPORT_SYMBOL_GPL(lis_sleep_on);
+#endif
+#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
 EXPORT_SYMBOL_GPL(lis_sleep_on_timeout);
+#endif
 EXPORT_SYMBOL_GPL(lis_wait_event);
 EXPORT_SYMBOL_GPL(lis_wait_event_interruptible);
 EXPORT_SYMBOL_GPL(lis_spin_is_locked_fcn);

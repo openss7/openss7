@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.14 $) $Date: 2005/03/30 11:35:42 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.15 $) $Date: 2005/03/31 06:53:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/30 11:35:42 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 06:53:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -442,7 +442,8 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device \
-			cpumask_scnprintf \
+			sleep_on interruptible_sleep_on sleep_on_timeout \
+			cpumask_scnprintf __symbol_get __symbol_put \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode], [:], [:], [
 #include <linux/compiler.h>
@@ -450,6 +451,9 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -458,6 +462,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/cpumask.h>
 #endif
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -479,6 +484,9 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif

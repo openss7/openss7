@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:29:54 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -80,7 +80,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -26731,11 +26731,19 @@ mtp_get_id(ulong id)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the ISUP driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the ISUP driver. (0 for allocation.)");
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:39 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -131,7 +131,11 @@ MODULE_LICENSE(STH_LICENSE);
 #endif
 
 modID_t modid = CONFIG_STREAMS_STH_MODID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module identification number for STH module.");
 
 #ifdef MODULE_ALIAS
@@ -754,7 +758,9 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 				if (!(dp = allocb(len, BPRI_HI)))
 					goto ioc_error;
 				dp->b_datap->db_type = M_DATA;
-				__copy_from_user(dp->b_wptr, ptr, len);
+				err = -EFAULT;
+				if (__copy_from_user(dp->b_wptr, ptr, len))
+					goto ioc_error;
 				dp->b_wptr += len;
 			} else {
 				if ((err = verify_area(VERIFY_WRITE, ptr, len)))
@@ -765,7 +771,9 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 				err = -EMSGSIZE;
 				if (dp->b_wptr < dp->b_rptr + len)
 					goto ioc_error;
-				__copy_to_user(ptr, dp->b_rptr, len);
+				err = -EFAULT;
+				if (__copy_to_user(ptr, dp->b_rptr, len))
+					goto ioc_error;
 			}
 			ioc->copyresp.cp_rval = (caddr_t) 0;
 			continue;
@@ -886,7 +894,9 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
 	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))) < 0)
 		goto exit;
-	__copy_from_user(&fdi, valp, sizeof(fdi));
+	err = -EFAULT;
+	if (__copy_from_user(&fdi, valp, sizeof(fdi)))
+		goto exit;
 	if ((err = check_stream_wr(file, sd)) < 0)
 		goto exit;
 	if (fdi.offset < 0 || fdi.ctlbuf.len < fdi.offset + sizeof(queue_t *)
@@ -998,7 +1008,8 @@ static int str_i_flushband(struct file *file, struct stdata *sd, unsigned int cm
 	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		return (err);
-	__copy_from_user(&bi, valp, sizeof(bi));
+	if (__copy_from_user(&bi, valp, sizeof(bi)))
+		return (-EFAULT);
 	if (bi.bi_flag & ~(FLUSHR | FLUSHW | FLUSHRW))
 		return (-EINVAL);
 	if ((err = check_stream_io(file, sd)))
@@ -1065,7 +1076,9 @@ static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd,
 	qrunlock(sd->sd_rq, &flags);
 	if (err == -ENODATA)
 		return (err);
-	__copy_to_user(valp, &err, sizeof(*valp));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &err, sizeof(*valp)))
+		return (err);
 	return (0);
 }
 
@@ -1087,7 +1100,9 @@ static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cm
 	if ((err = check_stream_wr(file, sd)))
 		return (err);
 	closetime = sd->sd_closetime;
-	__copy_to_user(valp, &closetime, sizeof(*valp));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &closetime, sizeof(*valp)))
+		return (err);
 	return (0);
 }
 
@@ -1108,7 +1123,8 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
 		return (err);
 	if ((err = check_stream_io(file, sd)))
 		return (err);
-	__copy_from_user(&closetime, valp, sizeof(*valp));
+	if (__copy_from_user(&closetime, valp, sizeof(*valp)))
+		return (-EFAULT);
 	sd->sd_closetime = closetime;
 	return (0);
 }
@@ -1129,7 +1145,9 @@ static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, 
 	if ((err = check_stream_io(file, sd)))
 		return (err);
 	flags = sd->sd_sigflags;
-	__copy_to_user(valp, &flags, sizeof(*valp));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &flags, sizeof(*valp)))
+		return (err);
 	return (0);
 }
 
@@ -1166,7 +1184,9 @@ static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 	if ((err = check_stream_io(file, sd)))
 		return (err);
 	rdopt = sd->sd_rdopt & RPROTMASK;
-	__copy_to_user(valp, &rdopt, sizeof(*valp));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &rdopt, sizeof(*valp)))
+		return (err);
 	return (0);
 }
 
@@ -1208,7 +1228,9 @@ static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, 
 	if ((err = check_stream_wr(file, sd)) < 0)
 		return (err);
 	wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD);
-	__copy_to_user(valp, &wropt, sizeof(*valp));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &wropt, sizeof(*valp)))
+		return (err);
 	return (0);
 }
 
@@ -1464,7 +1486,8 @@ static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, un
 		return (nmods);
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
-	__copy_from_user(&sl, valp, sizeof(sl));
+	if (__copy_from_user(&sl, valp, sizeof(sl)))
+		return (-EFAULT);
 	nmods = sl.sl_nmods < nmods ? sl.sl_nmods : nmods;
 	if (nmods < 0 || (sm = sl.sl_modlist) == NULL)
 		return (-EINVAL);
@@ -1472,7 +1495,9 @@ static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, un
 		return (err);
 	for (qp = &sd->sd_wq->q_next, i = 0; *qp && i < nmods; qp = &(*qp)->q_next, i++, sm++) {
 		snprintf(fmname, FMNAMESZ + 1, (*qp)->q_qinfo->qi_minfo->mi_idname);
-		__copy_to_user(sm->l_name, fmname, FMNAMESZ + 1);
+		err = -EFAULT;
+		if (__copy_to_user(sm->l_name, fmname, FMNAMESZ + 1))
+			return (err);
 	}
 	return (0);
 }
@@ -1497,8 +1522,10 @@ static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, un
 	if (!(q = sd->sd_wq->q_next) || !SAMESTR(sd->sd_wq))
 		goto unlock_exit;
 	snprintf(fmname, FMNAMESZ + 1, q->q_qinfo->qi_minfo->mi_idname);
-	__copy_to_user(valp, fmname, FMNAMESZ + 1);
-	return (err);
+	err = -EFAULT;
+	if (__copy_to_user(valp, fmname, FMNAMESZ + 1))
+		return (err);
+	return (0);
       unlock_exit:
 	srunlock(sd);
       exit:
@@ -1525,7 +1552,10 @@ static int str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, u
 	err = qsize(sd->sd_rq);
 	bytes = msgdsize(sd->sd_rq->q_first);
 	qrunlock(sd->sd_rq, &flags);
-	__copy_to_user(valp, &bytes, sizeof(bytes));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &bytes, sizeof(bytes)))
+		return (err);
+	return (0);
       exit:
 	return (err);
 }
@@ -1548,7 +1578,8 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 		return (-EINVAL);
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
-	__copy_from_user(&sp, valp, sizeof(sp));
+	if (__copy_from_user(&sp, valp, sizeof(sp)))
+		return (-EFAULT);
 	if (sp.ctlbuf.maxlen < 0 || sp.databuf.maxlen < 0 || (sp.ctlbuf.maxlen && !sp.ctlbuf.buf)
 	    || (sp.databuf.maxlen && !sp.databuf.buf))
 		return (-EINVAL);
@@ -1586,13 +1617,15 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 				if (dlen == -1)
 					break;
 				if (blen > dlen) {
-					__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr,
-						       dlen);
+					if (__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr,
+						       dlen))
+						return (-EFAULT);
 					sp.databuf.len += dlen;
 					dlen = 0;
 					break;
 				}
-				__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr, blen);
+				if (__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr, blen))
+					return (-EFAULT);
 				sp.databuf.len += blen;
 				dlen -= blen;
 			} else {
@@ -1600,13 +1633,15 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 				if (clen == -1)
 					break;
 				if (blen > clen) {
-					__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr,
-						       clen);
+					if (__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr,
+						       clen))
+						return (-EFAULT);
 					sp.ctlbuf.len += clen;
 					clen = 0;
 					break;
 				}
-				__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr, blen);
+				if (__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr, blen))
+					return (-EFAULT);
 				sp.ctlbuf.len += blen;
 				clen -= blen;
 			}
@@ -1757,9 +1792,13 @@ static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, 
 	sr.fd = fd;
 	sr.uid = f2->f_uid;
 	sr.gid = f2->f_gid;
-	__copy_to_user(valp, &sr, sizeof(sr));
+	if (__copy_to_user(valp, &sr, sizeof(sr)))
+		goto efault;
 	freemsg(mp);
 	return (0);
+      efault:
+	err = (-EFAULT);
+	goto putbq_error;
       ebadmsg:
 	err = (-EBADMSG);
 	goto putbq_error;
@@ -1797,13 +1836,15 @@ static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, uns
 		goto error;
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))) < 0)
 		goto error;
-	__copy_from_user(&ic, valp, sizeof(*valp));
+	if (__copy_from_user(&ic, valp, sizeof(*valp)))
+		return (-EFAULT);
 	if ((err = verify_area(VERIFY_READ, ic.ic_dp, ic.ic_len)) < 0)
 		goto error;
 	err = -ENOSR;
 	if (!(mp = allocb(ic.ic_len, BPRI_MED)))
 		goto error;
-	__copy_from_user(mp->b_wptr, ic.ic_dp, ic.ic_len);
+	if (__copy_from_user(mp->b_wptr, ic.ic_dp, ic.ic_len))
+		return (-EFAULT);
 	mp->b_wptr += ic.ic_len;
 	{
 		long timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
@@ -1833,7 +1874,9 @@ static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd,
 	if ((err = check_stream_io(file, sd)) < 0)
 		return (err);
 	eropt = sd->sd_eropt & (RERRNONPERSIST | WERRNONPERSIST);
-	__copy_to_user(valp, &eropt, sizeof(*valp));
+	err = -EFAULT;
+	if (__copy_to_user(valp, &eropt, sizeof(*valp)))
+		return (err);
 	return (0);
 }
 
@@ -2420,7 +2463,8 @@ ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 		struct strpmsg sg, *valp = (struct strpmsg *) buf;
 		if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 			goto error;
-		__copy_from_user(&sg, valp, sizeof(sg));
+		if (__copy_from_user(&sg, valp, sizeof(sg)))
+			return (-EFAULT);
 		if (sg.ctlbuf.maxlen > 0
 		    && (err = verify_area(VERIFY_WRITE, sg.ctlbuf.buf, sg.ctlbuf.maxlen)) < 0)
 			goto error;
@@ -2533,7 +2577,8 @@ ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 		struct strpmsg sp, *valp = (struct strpmsg *) buf;
 		if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 			goto error;
-		__copy_from_user(&sp, valp, sizeof(sp));
+		if (__copy_from_user(&sp, valp, sizeof(sp)))
+			return (-EFAULT);
 		if (sp.ctlbuf.len > 0
 		    && (err = verify_area(VERIFY_READ, sp.ctlbuf.buf, sp.ctlbuf.len)) < 0)
 			goto error;
@@ -2914,7 +2959,8 @@ static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
 	/* verify all areas */
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		goto error;
-	__copy_from_user(&sp, valp, sizeof(sp));
+	if (__copy_from_user(&sp, valp, sizeof(sp)))
+		return (-EFAULT);
 	if (sp.ctlbuf.len > 0 && (err = verify_area(VERIFY_READ, sp.ctlbuf.buf, sp.ctlbuf.len)) < 0)
 		goto error;
 	if (sp.databuf.len > 0
@@ -2939,7 +2985,8 @@ static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
 	/* verify all areas */
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		goto error;
-	__copy_from_user(&sg, valp, sizeof(sg));
+	if (__copy_from_user(&sg, valp, sizeof(sg)))
+		return (-EFAULT);
 	if (sg.ctlbuf.maxlen > 0
 	    && (err = verify_area(VERIFY_WRITE, sg.ctlbuf.buf, sg.ctlbuf.maxlen)) < 0)
 		goto error;

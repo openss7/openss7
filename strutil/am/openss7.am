@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/03/24 12:45:43 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/31 11:20:03 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/24 12:45:43 $ by $Author: brian $
+## Last Modified $Date: 2005/03/31 11:20:03 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -176,7 +176,7 @@ MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
 
 ALL_EXPORT_OPTS =
 
-ALL_RECURSIVE_TARGETS =
+ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck
 
 $(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_RECURSIVE_TARGETS):

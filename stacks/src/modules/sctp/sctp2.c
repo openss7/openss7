@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:38:33 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:38:33 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:38:33 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:12 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:38:33 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:12 $";
 
 #include "os7/compat.h"
 
@@ -122,7 +122,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:38:33 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:12 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13919,11 +13919,19 @@ sctp_n_close(queue_t *q, int flag, cred_t *crp)
 
 #ifdef LINUX
 unsigned short n_modid = SCTP_N_DRV_ID;
-MODULE_PARM(n_modid, "h");
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(n_modid, "Module ID number for STREAMS SCTP NPI driver (0 for allocation).");
 
 unsigned short n_major = SCTP_N_CMAJOR_0;
-MODULE_PARM(n_major, "h");
+#ifndef module_param
+MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(n_major, "Major device number for STREAMS SCTP NPI driver (0 for allocation).");
 #endif				/* LINUX */
 

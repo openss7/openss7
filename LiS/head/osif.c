@@ -911,20 +911,26 @@ int  _RP lis_vsprintf(char *bfr, const char *fmt, va_list args)
 /************************************************************************
 *                      Sleep/Wakeup Routines                            *
 ************************************************************************/
+#if HAVE_KFUNC_SLEEP_ON
 void  _RP lis_sleep_on(OSIF_WAIT_Q_ARG)
 {
     sleep_on(wq) ;
 }
+#endif
 
+#if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
 void  _RP lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
 {
     interruptible_sleep_on(wq) ;
 }
+#endif
 
+#if HAVE_KFUNC_SLEEP_ON_TIMEOUT
 void  _RP lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
 {
     sleep_on_timeout(wq, timeout) ;
 }
+#endif
 
 void  _RP lis_interruptible_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
 {

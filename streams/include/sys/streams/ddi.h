@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.11 2005/03/30 02:24:27 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.12 2005/03/31 06:53:23 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:27 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/30 02:24:27 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/31 06:53:23 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -118,11 +118,15 @@ int unlink(char *pathname);
 
 __EXTERN_INLINE int copyin(const void *from, void *to, size_t len)
 {
-	return copy_from_user(to, from, len);
+	if (copy_from_user(to, from, len))
+		return (-EFAULT);
+	return (0);
 }
 __EXTERN_INLINE int copyout(const void *from, void *to, size_t len)
 {
-	return copy_to_user(to, from, len);
+	if (copy_to_user(to, from, len))
+		return (-EFAULT);
+	return (0);
 }
 
 __EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz)

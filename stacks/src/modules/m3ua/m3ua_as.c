@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as.c,v 0.9.2.4 2005/03/08 19:30:03 brian Exp $
+ @(#) $Id: m3ua_as.c,v 0.9.2.5 2005/03/31 06:53:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2005/03/08 19:30:03 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.5  2005/03/31 06:53:08  brian
+ - changes for EL$ (CentOS 4.0) compatibility
+
  Revision 0.9.2.4  2005/03/08 19:30:03  brian
  - Changes for new build compile.
 
@@ -59,7 +62,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:03 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:08 $";
 
 #include "os7/compat.h"
 
@@ -1017,11 +1020,19 @@ m3ua_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*

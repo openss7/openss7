@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/30 14:43:50 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 14:43:50 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/30 14:43:50 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/30 14:43:50 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/03/30 14:43:50 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -4330,12 +4330,14 @@ xp_t8_timeout(struct xp *xp)
 #define SDT_TX_TABLE_LENGTH	(2* SDT_TX_STATES * 256)
 #define SDT_RX_TABLE_LENGTH	(2* SDT_RX_STATES * 256)
 
+struct tx_entry __attribute__ ((packed));
 typedef struct tx_entry {
 	uint bit_string:10;		/* the output string */
 	uint bit_length:4;		/* length in excess of 8 bits of output string */
 	uint state:3;			/* new state */
-} tx_entry_t __attribute__ ((packed));
+} tx_entry_t;
 
+struct rx_entry __attribute__ ((packed));
 typedef struct rx_entry {
 	uint bit_string:16;
 	uint bit_length:4;
@@ -4344,7 +4346,7 @@ typedef struct rx_entry {
 	uint hunt:1;
 	uint flag:1;
 	uint idle:1;
-} rx_entry_t __attribute__ ((packed));
+} rx_entry_t;
 
 typedef uint16_t bc_entry_t;
 
@@ -9866,11 +9868,19 @@ xp_pci_cleanup(void)
  */
 
 unsigned short modid = DRV_ID;
+#ifndef module_param
 MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(modid, "Module ID for the X100P driver. (0 for allocation.)");
 
-unsigned short major = CMAJOR_0;
+major_t major = CMAJOR_0;
+#ifndef module_param
 MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(major, "Device number for the X100P driver. (0 for allocation.)");
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:28 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/31 06:53:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:28 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:28 $";
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $";
 
 #define __NO_VERSION__
 
@@ -2089,11 +2089,19 @@ sctp_n_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short n_modid = DRV_ID;
-MODULE_PARM(n_modid, "h");
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0);
+#endif
 MODULE_PARM_DESC(n_modid, "Module ID for the SCTP-NPI driver. (0 for allocation.)");
 
 unsigned short n_major = CMAJOR_0;
-MODULE_PARM(n_major, "h");
+#ifndef module_param
+MODULE_PARM(major, "h");
+#else
+module_param(major, uint, 0);
+#endif
 MODULE_PARM_DESC(n_major, "Device number for the SCTP-NPI driver. (0 for allocation.)");
 
 /*
