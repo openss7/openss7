@@ -2,8 +2,8 @@
 
 <HTML>
 <HEAD>
-<TITLE>Iperf version 1.6.5</TITLE>
-<!-- $Id: index.html,v 1.5 2003/01/13 20:30:30 kgibbs Exp $ -->
+<TITLE>Iperf version 1.7.0</TITLE>
+<!-- $Id: index.html,v 1.6 2003/03/12 20:50:58 kgibbs Exp $ -->
 </HEAD>
 
 <BODY BGCOLOR="#FFFFFF" LINK="#006633" VLINK="#669900" ALINK="#669966">
@@ -13,9 +13,9 @@
         ALT="Distributed Applications Support Team"></P>
 </CENTER>
 
-<H1>Iperf version 1.6.5</H1>
+<H1>Iperf version 1.7.0</H1>
 
-<H3>January 2003</H3>
+<H3>March 2003</H3>
 
 <HR><!-- ----- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 
@@ -30,7 +30,7 @@
     Jon Dugan<BR>
     Kevin Gibbs<BR> </H4>
 
-January 2003 
+March 2003 
 <P></CENTER>
 [<a href="#compiling">Compiling</A> |&nbsp; 
 <A href="#features">Features</A>&nbsp; | 
@@ -202,6 +202,13 @@ we will try to fix them quickly. <BR>
       href="#ttl">-T</A> 
       option.</P></TD></TR>
   <TR vAlign=top>
+    <TD><A name=compatibility></A><TT>-C, --compatibility </TT></TD>
+    <TD><TT>$IPERF_COMPAT</TT></TD>
+    <TD>Compatibility mode allows for use with older version of iperf. This mode
+        is not required for interoperability but it is highly recommended. In
+        some cases when using representative streaming you could cause a 1.7 server
+        to crash or cause undesired connection attempts.</P></TD></TR>
+  <TR vAlign=top>
     <TD><A name=mss></A><TT>-M, --mss <I>#[KM}</I></TT></TD>
     <TD><TT>$IPERF_MSS</TT></TD>
     <TD>Attempt to set the TCP maximum segment size (MSS) via the TCP_MAXSEG 
@@ -240,6 +247,17 @@ we will try to fix them quickly. <BR>
     <TD><TT>-o </TT>(only for Windows, from v1.2 or higher)</TD>
     <TD>.</TD>
     <TD>Redirect output to given file.&nbsp;</TD></TR>
+  <TR vAlign=top>
+    <TD><A name=sclient></A><TT>-c, --client <I>host</I></TT></TD>
+    <TD><TT>$IPERF_CLIENT</TT></TD>
+    <TD> If Iperf is in server mode, then specifying a host with -c
+        will limit the connections that Iperf will accept to the
+        <I>host</I> specified. Does not work well for UDP.</TD></TR>
+  <TR vAlign=top>
+    <TD><A name=sparallel></A><TT>-P, --parallel <I>#</I></TT></TD>
+    <TD><TT>$IPERF_PARALLEL</TT></TD>
+    <TD>The number of connections to handle by the server before
+      closing. Default is 0 (which means to accept connections forever).</TD></TR>
   <TR>
     <TH bgColor=#cccccc colSpan=3>Client specific options</TH></TR>
   <TR vAlign=top>
@@ -253,6 +271,15 @@ we will try to fix them quickly. <BR>
     <TD>Run Iperf in client mode, connecting to an Iperf server running on 
       <I>host</I>.</TD></TR>
   <TR vAlign=top>
+    <TD><A name=dualtest></A><TT>-d, --dualtest </TT></TD>
+    <TD><TT>$IPERF_DUALTEST</TT></TD>
+    <TD>Run Iperf in dual testing mode. This will cause the server to connect
+        back to the client on the port specified in the
+        <A href="#listenport">-L</A> option (or defaults
+        to the port the client connected to the server on). This is done immediately
+        therefore running the tests simultaneously. If you want an alternating
+        test try <A href="#tradeoff">-r.</A></TD></TR>
+  <TR vAlign=top>
     <TD><A name=num></A><TT>-n, --num <I>#[KM]</I></TT></TD>
     <TD><TT>$IPERF_NUM</TT></TD>
     <TD>The number of buffers to transmit. Normally, Iperf sends for 10 
@@ -263,6 +290,16 @@ we will try to fix them quickly. <BR>
       href="#time">-t</A> 
       options.</TD></TR>
   <TR vAlign=top>
+    <TD><A name=tradeoff></A><TT>-r, --tradeoff </TT></TD>
+    <TD><TT>$IPERF_TRADEOFF</TT></TD>
+    <TD>Run Iperf in tradeoff testing mode. This will cause the server to connect
+        back to the client on the port specified in the
+        <A href="#listenport">-L</A> option (or defaults
+        to the port the client connected to the server on). This is done following
+        the client connection termination, therefore running the tests
+        alternating. If you want an simultaneous test try
+        <A href="#dualtest">-d.</A></TD></TR>
+  <TR vAlign=top>
     <TD><A name=time></A><TT>-t, --time <I>#</I></TT></TD>
     <TD><TT>$IPERF_TIME</TT></TD>
     <TD>The time in seconds to transmit for. Iperf normally works by 
@@ -272,6 +309,12 @@ we will try to fix them quickly. <BR>
       and <A 
       href="#num">-n</A> 
       options.</TD></TR>
+  <TR vAlign=top>
+    <TD><A name=listenport></A><TT>-L, --listenport <I>#</I></TT></TD>
+    <TD><TT>$IPERF_LISTENPORT</TT></TD>
+    <TD>This specifies the port that the server will connect back to the
+        client on. It defaults to the port used to connect to the server
+        from the client.</TD></TR>
   <TR vAlign=top>
     <TD><A name=parallel></A><TT>-P, --parallel <I>#</I></TT></TD>
     <TD><TT>$IPERF_PARALLEL</TT></TD>

@@ -4,7 +4,7 @@
 #
 # by Mark Gates <mgates@nlanr.net>
 # October 1999
-# $Id: Makefile,v 1.4 2002/10/14 19:08:25 kgibbs Exp $
+# $Id: Makefile,v 1.6 2003/03/12 20:57:31 kgibbs Exp $
 
 SHELL = /bin/sh
 
@@ -72,7 +72,7 @@ install: $(PROG)
 bindist: all
 	@PLATFORM=`./cfg/config.guess`;         \
 	FILE=iperf-$(VERSION)-$$PLATFORM.tar;   \
-	( tar -cvf $$FILE iperf doc;            \
+	( tar -cvf $$FILE iperf doc README KNOWN_PROBLEMS;  \
 	  gzip $$FILE;                          \
 	  echo Saved at $$FILE.gz;              \
 	);
@@ -167,8 +167,8 @@ $(PROG): $(LIBRARY)               \
 	$(CONFIG_FILES)           \
 	src/Client.cpp            \
 	src/Client.hpp            \
-	src/Extractor.cpp	  \
-	src/Extractor.hpp	  \
+	src/Extractor.cpp         \
+	src/Extractor.hpp         \
 	src/Listener.cpp          \
 	src/Listener.hpp          \
 	src/Locale.hpp            \
@@ -180,5 +180,13 @@ $(PROG): $(LIBRARY)               \
 	src/Server.hpp            \
 	src/Settings.cpp          \
 	src/Settings.hpp          \
+	src/Speaker.cpp           \
+	src/Speaker.hpp           \
+	src/Notify.cpp            \
+	src/Notify.hpp            \
+	src/Audience.cpp          \
+	src/Audience.hpp          \
+	src/List.cpp              \
+	src/List.h                \
 	src/main.cpp              \
 	src/version.h
