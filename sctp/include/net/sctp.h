@@ -55,10 +55,6 @@
 
 #ident "@(#) sctp.h,v LINUX-2-4-20-SCTP(1.1.6.4) 2004/02/09 17:33:55"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <linux/config.h>
 #include <linux/sctp.h>
 #include <linux/slab.h>

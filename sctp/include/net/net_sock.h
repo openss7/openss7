@@ -1,3 +1,58 @@
+/*****************************************************************************
+
+ @(#) $Id: net_sock.h,v 0.9.2.4 2004/12/20 19:40:16 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/12/20 19:40:16 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ifndef __OPENSS7_NET_SOCK_H__
+#define __OPENSS7_NET_SOCK_H__
+
+#ident "@(#) $RCSfile: net_sock.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <linux/config.h>
 #include <linux/timer.h>
@@ -18,7 +73,7 @@
 
 #include <linux/netdevice.h>
 #include <linux/skbuff.h>	/* struct sk_buff */
-#include <net/protocol.h>		/* struct inet_protocol */
+#include <net/protocol.h>	/* struct inet_protocol */
 #if defined(CONFIG_X25) || defined(CONFIG_X25_MODULE)
 #include <net/x25.h>
 #endif
@@ -38,7 +93,7 @@
 
 #if defined(CONFIG_PPPOE) || defined(CONFIG_PPPOE_MODULE)
 #include <linux/if_pppox.h>
-#include <linux/ppp_channel.h>   /* struct ppp_channel */
+#include <linux/ppp_channel.h>	/* struct ppp_channel */
 #endif
 
 #if defined(CONFIG_IPX) || defined(CONFIG_IPX_MODULE)
@@ -46,8 +101,8 @@
 #include <net/spx.h>
 #else
 #include <net/ipx.h>
-#endif /* CONFIG_SPX */
-#endif /* CONFIG_IPX */
+#endif				/* CONFIG_SPX */
+#endif				/* CONFIG_IPX */
 
 #if defined(CONFIG_ATALK) || defined(CONFIG_ATALK_MODULE)
 #include <linux/atalk.h>
@@ -87,166 +142,168 @@ struct sctp_dup {
 	__u32 tsn;
 };
 struct sctp_strm {
-	struct sctp_strm *next;		/* linkage to stream list	*/
-	struct sctp_strm **prev;	/* linkage to stream list	*/
+	struct sctp_strm *next;		/* linkage to stream list */
+	struct sctp_strm **prev;	/* linkage to stream list */
 	struct sctp_opt *sp;
-	__u16 sid;			/* stream identifier		*/
-	__u16 ssn;			/* stream sequence number	*/
+	__u16 sid;			/* stream identifier */
+	__u16 ssn;			/* stream sequence number */
 	struct {
-		__u32 ppi;		/* payload protocol id		*/
-		struct sk_buff *head;	/* head pointer			*/
-		uint more;		/* more data in (E)TSDU		*/
-	} x, n;				/* expedited (x) and normal (n)	*/
+		__u32 ppi;		/* payload protocol id */
+		struct sk_buff *head;	/* head pointer */
+		uint more;		/* more data in (E)TSDU */
+	} x, n;				/* expedited (x) and normal (n) */
 };
 struct sctp_saddr {
-	struct sctp_saddr *next;	/* linkage for srce address list	*/
-	struct sctp_saddr **prev;	/* linkage for srce address list	*/
-	struct sctp_opt *sp;		/* linkage for srce address list	*/
-	__u32 saddr;			/* srce address (network order)		*/
-	uint flags;			/* flags for this address		*/
+	struct sctp_saddr *next;	/* linkage for srce address list */
+	struct sctp_saddr **prev;	/* linkage for srce address list */
+	struct sctp_opt *sp;		/* linkage for srce address list */
+	__u32 saddr;			/* srce address (network order) */
+	uint flags;			/* flags for this address */
 };
 struct sctp_daddr {
-	struct sctp_daddr *next;	/* linkage for dest address list	*/
-	struct sctp_daddr **prev;	/* linkage for dest address list	*/
-	struct sctp_opt *sp;		/* linkage for dest address list	*/
-	__u32 daddr;			/* dest address (network order)		*/
-	__u32 saddr;			/* srce address (network order)		*/
-	uint dif;			/* device interface			*/
-	uint flags;			/* flags for this destination		*/
-	size_t header_len;		/* header length			*/
-	size_t mtu;			/* mtu					*/
-	size_t dmps;			/* dest max payload size		*/
-	uint hb_onoff;			/* activation of heartbeats		*/
-	uint hb_fill;			/* fill for heartbeat (PMTUDISC)	*/
-	size_t in_flight;		/* bytes in flight			*/
-	size_t retransmits;		/* retransmits this dest		*/
-	size_t max_retrans;		/* max path retransmits			*/
-	size_t dups;			/* number of duplicates			*/
-	size_t cwnd;			/* congestion window			*/
-	size_t ssthresh;		/* slow start threshold			*/
-	struct timer_list timer_heartbeat; /* heartbeat timer (for acks)	*/
-	struct timer_list timer_retrans;   /* retrans (RTO) timer		*/
-	struct timer_list timer_idle;	   /* idle timer			*/
-	ulong when;			/* last time transmitting		*/
-	size_t partial_ack;		/* partial window bytes acked		*/
-	size_t ack_accum;		/* accumulator for acks			*/
-	ulong hb_time;			/* time of last heartbeat sent		*/
-	ulong hb_itvl;			/* interval between heartbeats		*/
-	ulong hb_act;			/* heartbeat activation			*/
-	ulong rto_ini;			/* initial RTO value			*/
-	ulong rto_max;			/* maximum RTO value			*/
-	ulong rto_min;			/* minimum RTO value			*/
-	ulong rto;			/* current RTO value			*/
-	ulong rttvar;			/* current RTT variance			*/
-	ulong srtt;			/* current smoothed RTT			*/
-	int route_caps;			/* route capabilities			*/
-	struct dst_entry *dst_cache;	/* destination cache			*/
-	size_t packets;			/* packet count				*/
+	struct sctp_daddr *next;	/* linkage for dest address list */
+	struct sctp_daddr **prev;	/* linkage for dest address list */
+	struct sctp_opt *sp;		/* linkage for dest address list */
+	__u32 daddr;			/* dest address (network order) */
+	__u32 saddr;			/* srce address (network order) */
+	uint dif;			/* device interface */
+	uint flags;			/* flags for this destination */
+	size_t header_len;		/* header length */
+	size_t mtu;			/* mtu */
+	size_t dmps;			/* dest max payload size */
+	uint hb_onoff;			/* activation of heartbeats */
+	uint hb_fill;			/* fill for heartbeat (PMTUDISC) */
+	size_t in_flight;		/* bytes in flight */
+	size_t retransmits;		/* retransmits this dest */
+	size_t max_retrans;		/* max path retransmits */
+	size_t dups;			/* number of duplicates */
+	size_t cwnd;			/* congestion window */
+	size_t ssthresh;		/* slow start threshold */
+	struct timer_list timer_heartbeat;	/* heartbeat timer (for acks) */
+	struct timer_list timer_retrans;	/* retrans (RTO) timer */
+	struct timer_list timer_idle;	/* idle timer */
+	ulong when;			/* last time transmitting */
+	size_t partial_ack;		/* partial window bytes acked */
+	size_t ack_accum;		/* accumulator for acks */
+	ulong hb_time;			/* time of last heartbeat sent */
+	ulong hb_itvl;			/* interval between heartbeats */
+	ulong hb_act;			/* heartbeat activation */
+	ulong rto_ini;			/* initial RTO value */
+	ulong rto_max;			/* maximum RTO value */
+	ulong rto_min;			/* minimum RTO value */
+	ulong rto;			/* current RTO value */
+	ulong rttvar;			/* current RTT variance */
+	ulong srtt;			/* current smoothed RTT */
+	int route_caps;			/* route capabilities */
+	struct dst_entry *dst_cache;	/* destination cache */
+	size_t packets;			/* packet count */
 };
 struct sctp_opt {
-	struct sctp_opt *bnext;		/* linkage for bind hash		*/
-	struct sctp_opt **bprev;	/* linkage for bind hash		*/
-	struct sctp_bind_bucket *bindb;	/* linkage for bind hash		*/
-	struct sctp_opt *lnext;		/* linkage for list hash		*/
-	struct sctp_opt **lprev;	/* linkage for list hash		*/
-	struct sctp_opt *pnext;		/* linkage for ptag hash		*/
-	struct sctp_opt **pprev;	/* linkage for ptag hash		*/
-	struct sctp_opt *vnext;		/* linkage for vtag hash		*/
-	struct sctp_opt **vprev;	/* linkage for vtag hash		*/
-	struct sctp_opt *tnext;		/* linkage for tcb  hash		*/
-	struct sctp_opt **tprev;	/* linkage for tcb  hash		*/
-	uint hashent;			/* vtag cache entry			*/
-	uint options;			/* options flags			*/
-	uint nonagle;			/* Nagle setting			*/
-	struct sctp_saddr *saddr;	/* list of loc addresses		*/
-	struct sctp_daddr *daddr;	/* list of rem addresses		*/
-	size_t sanum;			/* number of srce addresses in list	*/
-	size_t danum;			/* number of dest addresses in list	*/
-	struct sctp_daddr *taddr;	/* primary transmit dest address	*/
-	struct sctp_daddr *raddr;	/* retransmission   dest address	*/
-	struct sctp_daddr *caddr;	/* last received    dest address	*/
-	struct sctp_strm *ostrm;	/* list of outbound streams		*/
-	struct sctp_strm *istrm;	/* list if  inbound streams		*/
-	size_t osnum;			/* number of outbound stream struct	*/
-	size_t isnum;			/* number of  inbound stream struct	*/
-	struct sctp_strm *ostr;		/* current output stream		*/
-	struct sctp_strm *istr;		/* current input  stream		*/
-	__u16 req_ostr;			/* requested outbound streams		*/
-	__u16 max_istr;			/* maximum    inbound streams		*/
-	ulong max_sack;			/* maximum sack delay			*/
-	ulong throttle;			/* throttle init interval		*/
-	ulong ck_life;			/* valid cookie life			*/
-	ulong ck_inc;			/* cookie increment			*/
-	ulong life;			/* data lifetime			*/
-	uint disp;			/* data disposition			*/
-	uint l_caps;			/* local capabilities			*/
-	uint p_caps;			/* peer capabilities			*/
-	__u32 l_ali;			/* local adaptation layer info		*/
-	__u32 p_ali;			/* peer adaptation layer info		*/
-	__u32 l_lsn;			/* local lowest ECN TSN			*/
-	__u32 p_lsn;			/* peer lowest ECN TSN			*/
-	uint prel;			/* partial reliabliity			*/
-	uint hmac;			/* hmac type				*/
-	uint cksum;			/* checksum type			*/
-	__u16 sid;			/* default sid				*/
-	__u32 ppi;			/* default ppi				*/
-	ulong rto_ini;			/* default rto initial			*/
-	ulong rto_min;			/* default rto minimum			*/
-	ulong rto_max;			/* default rto maximum			*/
-	size_t rtx_path;		/* default path max retrans		*/
-	ulong hb_itvl;			/* default hb interval			*/
-	ulong hb_tint;			/* hb throttle interval			*/
-	ulong hb_rcvd;			/* hb received timestamp		*/
-	struct sk_buff *retry;		/* msg to retry on timer expiry		*/
-	struct sk_buff *reply;		/* saved reply to ASCONF chunk		*/
-	struct sk_buff_head accept_queue; /* accept queue			*/
-	struct sk_buff_head expedited_queue; /* expedited queue			*/
-	int rmem_queued;		/* queued read memeory			*/
-	struct sk_buff_head urgent_queue; /* urgent queue			*/
-	struct sk_buff_head error_queue; /* error queue				*/
-	struct sk_buff_head out_of_order_queue; /* out of order queue		*/
-	struct sctp_skb_cb *gaps;	/* gaps acks for this stream		*/
-	size_t ngaps;			/* number of gap reports in list	*/
-	size_t nunds;			/* number of undelivered in list	*/
-	struct sk_buff_head duplicate_queue; /* duplicate queue			*/
-	struct sctp_skb_cb *dups;	/* dup  tsns for this stream		*/
-	size_t ndups;			/* number of dup reports in list	*/
-	struct sk_buff_head retrans_queue; /* retransmit queue			*/
-	size_t nrtxs;			/* number of retransmits in list	*/
-	size_t nsack;			/* number of sacked in list		*/
-	struct sk_buff_head ack_queue;	/* pending acknowledgement queue	*/
-	__u16 n_ostr;			/* number of outbound streams		*/
-	__u16 n_istr;			/* number of  inbound streams		*/
-	__u32 v_tag;			/* locl verification tag		*/
-	__u32 p_tag;			/* peer verification tag		*/
-	__u32 p_rwnd;			/* peer receive window			*/
-	__u32 p_rbuf;			/* send receive buffer			*/
-	__u32 a_rwnd;			/* advertized receive window		*/
-	__u32 m_tsn;			/* manshall TSN				*/
-	__u32 t_tsn;			/* transmit TSN				*/
-	__u32 t_ack;			/* transmit TSN cum acked		*/
-	__u32 r_ack;			/* received TSN cum acked		*/
-	__u32 l_asn;			/* local ASCONF sequence number		*/
-	__u32 p_asn;			/* peer  ASCONF sequence number		*/
-	__u32 l_fsn;			/* local advanced TSN			*/
-	__u32 p_fsn;			/* peer advanced TSN			*/
-	uint sackf;			/* sack flags for association		*/
-	uint flags;			/* flags				*/
-	uint cmsg_flags;		/* flags				*/
-	uint pmtu;			/* path MTU for association		*/
-	uint amps;			/* assoc max payload size		*/
-	int ext_header_len;		/* extra header length for options	*/
-	int user_amps;			/* user max assoc payload size		*/
-	size_t in_flight;		/* number of bytes in flight		*/
-	size_t retransmits;		/* number of retransmits this assoc	*/
-	size_t max_retrans;		/* max association retransmits		*/
-	size_t max_inits;		/* max init retransmits			*/
-	size_t max_burst;		/* max number of burst packets		*/
-	struct timer_list timer_init;	  /* init timer				*/
-	struct timer_list timer_cookie;	  /* cookie timer			*/
-	struct timer_list timer_shutdown; /* shutdown timer			*/
-	struct timer_list timer_guard;	/* shutdown guard timer			*/
-	struct timer_list timer_sack;	  /* sack timer				*/
-	struct timer_list timer_asconf;	/* asconf timer				*/
-	struct timer_list timer_life;	/* lifetime timer			*/
+	struct sctp_opt *bnext;		/* linkage for bind hash */
+	struct sctp_opt **bprev;	/* linkage for bind hash */
+	struct sctp_bind_bucket *bindb;	/* linkage for bind hash */
+	struct sctp_opt *lnext;		/* linkage for list hash */
+	struct sctp_opt **lprev;	/* linkage for list hash */
+	struct sctp_opt *pnext;		/* linkage for ptag hash */
+	struct sctp_opt **pprev;	/* linkage for ptag hash */
+	struct sctp_opt *vnext;		/* linkage for vtag hash */
+	struct sctp_opt **vprev;	/* linkage for vtag hash */
+	struct sctp_opt *tnext;		/* linkage for tcb hash */
+	struct sctp_opt **tprev;	/* linkage for tcb hash */
+	uint hashent;			/* vtag cache entry */
+	uint options;			/* options flags */
+	uint nonagle;			/* Nagle setting */
+	struct sctp_saddr *saddr;	/* list of loc addresses */
+	struct sctp_daddr *daddr;	/* list of rem addresses */
+	size_t sanum;			/* number of srce addresses in list */
+	size_t danum;			/* number of dest addresses in list */
+	struct sctp_daddr *taddr;	/* primary transmit dest address */
+	struct sctp_daddr *raddr;	/* retransmission dest address */
+	struct sctp_daddr *caddr;	/* last received dest address */
+	struct sctp_strm *ostrm;	/* list of outbound streams */
+	struct sctp_strm *istrm;	/* list if inbound streams */
+	size_t osnum;			/* number of outbound stream struct */
+	size_t isnum;			/* number of inbound stream struct */
+	struct sctp_strm *ostr;		/* current output stream */
+	struct sctp_strm *istr;		/* current input stream */
+	__u16 req_ostr;			/* requested outbound streams */
+	__u16 max_istr;			/* maximum inbound streams */
+	ulong max_sack;			/* maximum sack delay */
+	ulong throttle;			/* throttle init interval */
+	ulong ck_life;			/* valid cookie life */
+	ulong ck_inc;			/* cookie increment */
+	ulong life;			/* data lifetime */
+	uint disp;			/* data disposition */
+	uint l_caps;			/* local capabilities */
+	uint p_caps;			/* peer capabilities */
+	__u32 l_ali;			/* local adaptation layer info */
+	__u32 p_ali;			/* peer adaptation layer info */
+	__u32 l_lsn;			/* local lowest ECN TSN */
+	__u32 p_lsn;			/* peer lowest ECN TSN */
+	uint prel;			/* partial reliabliity */
+	uint hmac;			/* hmac type */
+	uint cksum;			/* checksum type */
+	__u16 sid;			/* default sid */
+	__u32 ppi;			/* default ppi */
+	ulong rto_ini;			/* default rto initial */
+	ulong rto_min;			/* default rto minimum */
+	ulong rto_max;			/* default rto maximum */
+	size_t rtx_path;		/* default path max retrans */
+	ulong hb_itvl;			/* default hb interval */
+	ulong hb_tint;			/* hb throttle interval */
+	ulong hb_rcvd;			/* hb received timestamp */
+	struct sk_buff *retry;		/* msg to retry on timer expiry */
+	struct sk_buff *reply;		/* saved reply to ASCONF chunk */
+	struct sk_buff_head accept_queue;	/* accept queue */
+	struct sk_buff_head expedited_queue;	/* expedited queue */
+	int rmem_queued;		/* queued read memeory */
+	struct sk_buff_head urgent_queue;	/* urgent queue */
+	struct sk_buff_head error_queue;	/* error queue */
+	struct sk_buff_head out_of_order_queue;	/* out of order queue */
+	struct sctp_skb_cb *gaps;	/* gaps acks for this stream */
+	size_t ngaps;			/* number of gap reports in list */
+	size_t nunds;			/* number of undelivered in list */
+	struct sk_buff_head duplicate_queue;	/* duplicate queue */
+	struct sctp_skb_cb *dups;	/* dup tsns for this stream */
+	size_t ndups;			/* number of dup reports in list */
+	struct sk_buff_head retrans_queue;	/* retransmit queue */
+	size_t nrtxs;			/* number of retransmits in list */
+	size_t nsack;			/* number of sacked in list */
+	struct sk_buff_head ack_queue;	/* pending acknowledgement queue */
+	__u16 n_ostr;			/* number of outbound streams */
+	__u16 n_istr;			/* number of inbound streams */
+	__u32 v_tag;			/* locl verification tag */
+	__u32 p_tag;			/* peer verification tag */
+	__u32 p_rwnd;			/* peer receive window */
+	__u32 p_rbuf;			/* send receive buffer */
+	__u32 a_rwnd;			/* advertized receive window */
+	__u32 m_tsn;			/* manshall TSN */
+	__u32 t_tsn;			/* transmit TSN */
+	__u32 t_ack;			/* transmit TSN cum acked */
+	__u32 r_ack;			/* received TSN cum acked */
+	__u32 l_asn;			/* local ASCONF sequence number */
+	__u32 p_asn;			/* peer ASCONF sequence number */
+	__u32 l_fsn;			/* local advanced TSN */
+	__u32 p_fsn;			/* peer advanced TSN */
+	uint sackf;			/* sack flags for association */
+	uint flags;			/* flags */
+	uint cmsg_flags;		/* flags */
+	uint pmtu;			/* path MTU for association */
+	uint amps;			/* assoc max payload size */
+	int ext_header_len;		/* extra header length for options */
+	int user_amps;			/* user max assoc payload size */
+	size_t in_flight;		/* number of bytes in flight */
+	size_t retransmits;		/* number of retransmits this assoc */
+	size_t max_retrans;		/* max association retransmits */
+	size_t max_inits;		/* max init retransmits */
+	size_t max_burst;		/* max number of burst packets */
+	struct timer_list timer_init;	/* init timer */
+	struct timer_list timer_cookie;	/* cookie timer */
+	struct timer_list timer_shutdown;	/* shutdown timer */
+	struct timer_list timer_guard;	/* shutdown guard timer */
+	struct timer_list timer_sack;	/* sack timer */
+	struct timer_list timer_asconf;	/* asconf timer */
+	struct timer_list timer_life;	/* lifetime timer */
 };
+
+#endif				/* __OPENSS7_NET_SOCK_H__ */

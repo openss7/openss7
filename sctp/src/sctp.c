@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/12/20 16:32:30 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/20 19:40:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/20 16:32:30 $ by $Author: brian $
+ Last Modified $Date: 2004/12/20 19:40:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/12/20 16:32:30 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/20 19:40:23 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/12/20 16:32:30 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/20 19:40:23 $";
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <linux/config.h>
 #include <linux/sysctl.h>
@@ -98,7 +102,7 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $
 
 #include "linux/hooks.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.2 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.4 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
@@ -12768,7 +12772,12 @@ struct proto_ops inet_sctp_ops = {
 	connect:	inet_stream_connect,
 	socketpair:	sock_no_socketpair,
 	accept:		inet_accept,
+#if defined(HAVE_INET_MULTI_GETNAME_EXPORT) || defined (HAVE_INET_MULTI_GETNAME_ADDR)
 	getname:	inet_multi_getname,
+#endif
+#if defined(HAVE_INET_GETNAME_EXPORT) || defined (HAVE_INET_GETNAME_ADDR)
+	getname:	inet_getname,
+#endif
 	poll:		sctp_poll,
 	ioctl:		inet_ioctl,
 	listen:		sctp_listen,

@@ -60,8 +60,20 @@ static char const ident[] = "sctp_glue.c,v LINUX-2-4-20-SCTP(1.1.6.3) 2004/02/09
  *  linked directly with the kernel.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <linux/config.h>
+#include <linux/sysctl.h>
+#include <linux/types.h>
+#include <linux/fcntl.h>
+#include <linux/random.h>
+#include <linux/init.h>
+#include <linux/socket.h>
+#include "net/net_sock.h"
 #include "net/net_snmp.h"
-#include <net/sctp.h>
+#include "net/sctp.h"
 
 #if	defined(CONFIG_SCTP_HMAC_MD5)
 #define SCTP_HMAC_DEFAULT SCTP_HMAC_MD5
