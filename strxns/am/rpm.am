@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/02/20 06:55:38 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/02/20 15:37:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 06:55:38 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 15:37:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -215,7 +215,7 @@ all-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rpms: $(AM_RPMSMAKETARGETS)
 
 sign srpm-sign: $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
-	@if ! $(RPM) -pipe  -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
+	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 		echo "$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $< || : ; \
 	fi
