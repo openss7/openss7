@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS queue.c 2.29 12/23/02 16:10:53 "
+#ident "@(#) LiS queue.c 2.31 5/30/03 21:40:39 "
 
 
 
@@ -76,7 +76,7 @@ find_qband(queue_t *q, int msg_class)
     struct qband	*qp ;
     uchar		 msgclass = (uchar) msg_class ;
 
-    if (q == NULL || msgclass > LIS_MAX_BAND) return(NULL) ;
+    if (q == NULL || msg_class > LIS_MAX_BAND) return(NULL) ;
 
     qp = q->q_bandp;
     while (qp != NULL)
@@ -128,7 +128,7 @@ find_qband(queue_t *q, int msg_class)
  * need to release and reacquire that lock if we decide to call qenable.
  */
 static INLINE void
-updatequeue(queue_t *q, mblk_t *mp, int from_insq, int *pswp)
+updatequeue(queue_t *q, mblk_t *mp, int from_insq, lis_flags_t *pswp)
 {
     uchar	 msg_class = mp->b_band;
     uchar	 msg_type  = mp->b_datap->db_type ;
@@ -536,8 +536,8 @@ lis_backq(queue_t *q)
 static void 
 lis_backenable(queue_t *q)
 {
-    int		 psw ;
-    int		 pswoq ;
+    lis_flags_t	 psw ;
+    lis_flags_t	 pswoq ;
     queue_t	*oq = q ;			/* original queue */
 
     LIS_QISRLOCK(oq, &pswoq) ;
@@ -594,7 +594,7 @@ mblk_t *
 lis_getq(queue_t *q)
 {
     mblk_t *rtn;
-    int     psw;
+    lis_flags_t     psw;
 
     if (q == NULL)
 	return NULL;			/* sanity check	*/
@@ -619,7 +619,7 @@ lis_getq(queue_t *q)
 int
 lis_putq(queue_t *q, mblk_t *mp)
 {
-    int psw;
+    lis_flags_t     psw;
     if (mp == NULL)
 	return 0;
 
@@ -654,7 +654,7 @@ lis_putq(queue_t *q, mblk_t *mp)
 int
 lis_putbq(queue_t *q, mblk_t *mp)
 {
-    int psw;
+    lis_flags_t     psw;
 
     if (mp == NULL) return 0;
 
@@ -690,7 +690,7 @@ lis_putbq(queue_t *q, mblk_t *mp)
 int
 lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
 {
-    int psw;
+    lis_flags_t     psw;
 
     if (mp == NULL) return 0;
 
@@ -744,7 +744,7 @@ void
 lis_rmvq(queue_t *q, mblk_t *mp)
 {
     mblk_t *bp;
-    int psw;
+    lis_flags_t     psw;
     if (mp == NULL) return;
     if (q == NULL)
     {
@@ -790,7 +790,7 @@ lis_rmvq(queue_t *q, mblk_t *mp)
  */
 void lis_put_rput_q(stdata_t *hd, mblk_t *mp)
 {
-    int psw;
+    lis_flags_t     psw;
     int need_qenable = 0 ;
 
     LIS_QISRLOCK(hd->sd_rq, &psw) ;
@@ -824,7 +824,7 @@ void lis_put_rput_q(stdata_t *hd, mblk_t *mp)
  */
 mblk_t *lis_get_rput_q(stdata_t *hd)
 {
-    int		 psw;
+    lis_flags_t     psw;
     mblk_t	*mp = NULL ;
 
     LIS_QISRLOCK(hd->sd_rq, &psw) ;
@@ -858,7 +858,7 @@ mblk_t *lis_get_rput_q(stdata_t *hd)
 void 
 lis_qenable(queue_t *q)
 {
-    int psw, pswq;
+    lis_flags_t psw, pswq;
     stdata_t *hd ;
 
     if (!LIS_CHECK_Q_MAGIC(q)) return ;
@@ -948,7 +948,7 @@ lis_setq(queue_t * q, struct qinit *rinit, struct qinit *winit)
 
     if (q)
     {
-	int psw;
+	lis_flags_t psw;
 
 	if (!LIS_CHECK_Q_MAGIC(q)) return ;
 
@@ -1001,7 +1001,7 @@ flush_worker(queue_t *q, int band, int flush_all)
     mblk_t	 *p_next;
     struct qband *qp ;
     int		  q_flag;
-    int		  psw;
+    lis_flags_t   psw;
     int		  mtype ;
 
     if (q == NULL) return;
@@ -1223,7 +1223,8 @@ int
 lis_qsize(queue_t *q)
 {
     mblk_t *mp;
-    int rtn = 0, psw;
+    int rtn = 0;
+    lis_flags_t psw;
     if (q == NULL) return 0;
 
     if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
@@ -1245,7 +1246,7 @@ int
 lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
     struct qband *qp ;
-    int		  psw;
+    lis_flags_t   psw;
 
     if (q == NULL || val == NULL) return(EINVAL) ;
 
@@ -1338,7 +1339,7 @@ int
 lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
     struct qband *qp ;
-    int		  psw;
+    lis_flags_t   psw;
 
     if (q == NULL) return(EINVAL) ;
 
@@ -1506,7 +1507,7 @@ lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 int 
 lis_bcanput(queue_t *q, unsigned char band)
 {
-    int		  opsw, psw;
+    lis_flags_t	  opsw, psw;
     struct qband *qp ;
     queue_t	 *oq = q;
 
@@ -1591,7 +1592,7 @@ lis_bcanputnext(queue_t *q, unsigned char band)
 int 
 lis_bcanputnext_anyband(queue_t *q)
 {
-    int		  psw;
+    lis_flags_t   psw;
     struct qband *qp ;
     queue_t	 *oq ;			/* original (next) queue */
 
@@ -1640,7 +1641,7 @@ lis_bcanputnext_anyband(queue_t *q)
  */
 int	lis_qcountstrm(queue_t *q)
 {
-    int		 psw;
+    lis_flags_t  psw;
     int		 nbytes = 0 ;
     queue_t	*oq = q ;
 
@@ -1669,7 +1670,7 @@ int	lis_qcountstrm(queue_t *q)
  */
 void	lis_qprocson(queue_t *rdq)
 {
-    int		psw ;
+    lis_flags_t psw;
     int		i ;
 
     for (i = 0; i < 2; i++)			/* do twice */
@@ -1696,7 +1697,7 @@ void	lis_qprocson(queue_t *rdq)
  */
 void	lis_qprocsoff(queue_t *rdq)
 {
-    int		psw ;
+    lis_flags_t psw;
     int		i ;
 
     for (i = 0; i < 2; i++)			/* do twice */

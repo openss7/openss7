@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS stream.c 2.12 10/29/02 22:38:48 "
+#ident "@(#) LiS stream.c 2.13 5/30/03 21:40:39 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -104,7 +104,7 @@ queuerun(int cpu_id)
 {
     queue_t		*q;
     stdata_t		*strmhd ;
-    int			 psw, pswq;
+    lis_flags_t		 psw, pswq;
     int			 procsoff ;
     lis_kcreds_t	 mycreds ;
 

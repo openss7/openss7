@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS safe.c 2.7 12/17/02 20:18:08 "
+#ident "@(#) LiS safe.c 2.8 5/30/03 21:40:39 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -59,7 +59,7 @@
 
 void lis_safe_noenable(queue_t *q, char *f, int l)
 {
-    int psw;
+    lis_flags_t     psw;
     if (!lis_check_q_magic(q,f,l)) return ;
     LIS_QISRLOCK(q, &psw) ;
     if (q == NULL) LOG(f, l, "NULL q in noenable");
@@ -69,7 +69,7 @@ void lis_safe_noenable(queue_t *q, char *f, int l)
 
 void lis_safe_enableok(queue_t *q, char *f, int l)
 {
-    int psw;
+    lis_flags_t     psw;
     if (!lis_check_q_magic(q,f,l)) return ;
     LIS_QISRLOCK(q, &psw) ;
     if (q == NULL) LOG(f, l, "NULL q in enableok");

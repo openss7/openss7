@@ -36,7 +36,7 @@
 #ifndef _HEAD_H
 #define _HEAD_H 1
 
-#ident "@(#) LiS head.h 2.24 12/17/02 21:16:50 "
+#ident "@(#) LiS head.h 2.25 5/30/03 21:41:02 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -303,7 +303,7 @@ struct stdata
 
 #define SET_SD_FLAG(hd,msk)						\
 		do {							\
-		    int psw;						\
+		    lis_flags_t psw;					\
 		    lis_spin_lock_irqsave(&(hd)->sd_lock,&psw) ;	\
 		    (hd)->sd_flag |= (msk) ;				\
 		    lis_spin_unlock_irqrestore(&(hd)->sd_lock,&psw) ;	\
@@ -312,7 +312,7 @@ struct stdata
 
 #define CLR_SD_FLAG(hd,msk)						\
 		do {							\
-		    int psw;						\
+		    lis_flags_t psw;					\
 		    lis_spin_lock_irqsave(&(hd)->sd_lock,&psw) ;	\
 		    (hd)->sd_flag &= ~(msk) ;				\
 		    lis_spin_unlock_irqrestore(&(hd)->sd_lock,&psw) ;	\

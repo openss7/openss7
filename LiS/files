@@ -3,6 +3,7 @@ FILES="\
 ./LiS-$LISVER/Configure \
 ./LiS-$LISVER/LSM \
 ./LiS-$LISVER/Makefile \
+./LiS-$LISVER/mkgenconf \
 ./LiS-$LISVER/README \
 ./LiS-$LISVER/VOLUNTEERS \
 ./LiS-$LISVER/drivers/str/Config \
@@ -16,6 +17,7 @@ FILES="\
 ./LiS-$LISVER/drivers/str/linux/ip_strm_mod.h \
 ./LiS-$LISVER/drivers/str/linux/ip_to_dlpi.c \
 ./LiS-$LISVER/drivers/str/linux/liskmod.c \
+./LiS-$LISVER/drivers/str/linux/mtdrv.c \
 ./LiS-$LISVER/drivers/str/log.c \
 ./LiS-$LISVER/drivers/str/loop.c \
 ./LiS-$LISVER/drivers/str/minimux.c \
@@ -83,6 +85,7 @@ FILES="\
 ./LiS-$LISVER/include/sys/LiS/mod.h \
 ./LiS-$LISVER/include/sys/LiS/msg.h \
 ./LiS-$LISVER/include/sys/LiS/msgutl.h \
+./LiS-$LISVER/include/sys/LiS/mtdrv.h \
 ./LiS-$LISVER/include/sys/LiS/nullstrm.h \
 ./LiS-$LISVER/include/sys/LiS/poll.h \
 ./LiS-$LISVER/include/sys/LiS/port-mdep.h \

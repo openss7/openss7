@@ -32,7 +32,7 @@
  * 
  */
 
-#ident "@(#) LiS sputbuf.c 2.5 2/8/01 21:24:01 "
+#ident "@(#) LiS sputbuf.c 2.6 5/30/03 21:40:40 "
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>
@@ -81,7 +81,7 @@ char         lis_strm_print_trace_buf[1024];
 void	lis_strm_print_trace(char *msg)
 {
     char	c ;
-    int		psw ;
+    lis_flags_t psw;
 
     if (lis_strm_in == NULL)
     {
@@ -144,7 +144,7 @@ void	lis_strm_putc(char c)
 ************************************************************************/
 long	lis_strm_readbuf(char *usr_ptr, long max_bytes)
 {
-    int 	psw ;
+    lis_flags_t psw;
     long	bytes_in_bfr ;
     long	bytes_to_end ;
     long	bytes_from_front ;

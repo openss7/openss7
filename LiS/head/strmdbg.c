@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS strdbg.c 2.23 12/15/02 18:00:04 "
+#ident "@(#) LiS strdbg.c 2.24 5/30/03 21:40:40 "
 
 #include <sys/stream.h>
 #include <sys/poll.h>
@@ -195,7 +195,7 @@ void	*lis_malloc(int nbytes, int class, int use_cache,
     long	*lp ;				/* ptr to guard word */
     int		 abytes ;			/* # bytes to allocate */
     int		 tbytes ;			/* total # of bytes */
-    int		 psw;
+    lis_flags_t  psw;
 
     LisUpCount(MEMALLOCS) ;			/* stats array */
 
@@ -320,7 +320,7 @@ int	lis_check_guard(void *ptr, char *msg)
 void	lis_free(void *ptr, char *file_name, int line_nr)
 {
     mem_link_t	*p ;
-    int		 psw;
+    lis_flags_t  psw;
     int		 rslt ;
 
     if (ptr == NULL) return ;
@@ -378,7 +378,7 @@ void	lis_free(void *ptr, char *file_name, int line_nr)
 void   lis_terminate_mem(void)
 {
     mem_link_t *p ;
-    int		psw ;
+    lis_flags_t psw;
     int		nbytes = 0 ;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
@@ -419,7 +419,7 @@ int	lis_check_mem(void)
 {
     mem_link_t		*p ;
     int			 rslt = 1 ;
-    int		 	 psw;
+    lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
@@ -531,7 +531,7 @@ void	lis_print_block(void *ptr)
 void	lis_print_mem(void)
 {
     mem_link_t		*p ;
-    int			 psw ;
+    lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
@@ -553,7 +553,7 @@ void	lis_print_mem(void)
 void lis_print_queues(void)
 {
     mem_link_t		*p ;
-    int		 	 psw;
+    lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)

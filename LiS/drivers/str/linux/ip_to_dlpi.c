@@ -244,7 +244,7 @@ int ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
     mblk_t *bp;
     minor_t minor;
     struct stroptions *sop;
-    int oldpl;
+    lis_flags_t oldpl;
 
     /*
      * already open
@@ -319,7 +319,7 @@ int ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 
 int ip2xinetclose(queue_t *q, int flag, cred_t *credp)
 {
-    int oldpl;;
+    lis_flags_t oldpl;
 
     if (q->q_ptr == NULL)
 	return (0);
@@ -361,7 +361,7 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
 {
 
     int i;
-    int oldpl;
+    lis_flags_t oldpl;
 
     lis_spin_lock_irqsave(ip2xinet_lock, &oldpl);
 
@@ -559,7 +559,7 @@ int ip2xinetlwsrv(queue_t *q)
     int i;
     struct net_device *dev = ip2xinet_devs;
     struct ip2xinet_priv *privp; 
-    int oldpl;
+    lis_flags_t oldpl;
 
     while ((mp = getq(q)))
     {
@@ -640,7 +640,7 @@ int ip2xinetlrput(queue_t *q, mblk_t *mp)
     struct ip2xinet_priv *privptr;
     struct net_device *dev;
     int i;
-    int oldpl;
+    lis_flags_t oldpl;
 
     lis_spin_lock_irqsave(ip2xinet_lock, &oldpl);
 
@@ -1081,7 +1081,7 @@ int ip2xinet_open(struct net_device *dev)
     int i;
     int err;
     struct ip2xinet_priv *privp = (struct ip2xinet_priv *)dev->priv;
-    int oldpl;
+    lis_flags_t oldpl;
 
     lis_spin_lock_irqsave(ip2xinet_lock, &oldpl);
 
@@ -1133,7 +1133,7 @@ int ip2xinet_release(struct net_device *dev)
 {
     queue_t *q;
     mblk_t *mp;
-    int oldpl;
+    lis_flags_t oldpl;
     struct ip2xinet_priv *privp = (struct ip2xinet_priv *)dev->priv;
     
     lis_spin_lock_irqsave(ip2xinet_lock, &oldpl);
@@ -1184,7 +1184,7 @@ int ip2xinet_release(struct net_device *dev)
  */
 int ip2xinet_config(struct net_device *dev, struct ifmap *map)
 {
-    int oldpl;
+    lis_flags_t oldpl;
     lis_spin_lock_irqsave(ip2xinet_lock, &oldpl);
     if (dev->flags & IFF_UP) /* can't act on a running interface */
     {
@@ -1358,7 +1358,7 @@ void ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
  */
 int ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 {
-    int oldpl;
+    lis_flags_t oldpl;
     if (skb == NULL) 
     {
         return 0;
@@ -1475,7 +1475,7 @@ int ip2xinet_hard_header(struct sk_buff *skb, struct net_device *dev,
  */
 int ip2xinet_change_mtu(struct net_device *dev, int new_mtu)
 {
-    int oldpl;
+    lis_flags_t oldpl;
 
     /* check ranges */
 

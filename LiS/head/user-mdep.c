@@ -30,14 +30,14 @@
  * 
  */
 
-#ident "@(#) LiS user-mdep.c 2.6 12/15/02 18:00:04 "
+#ident "@(#) LiS user-mdep.c 2.7 5/30/03 21:40:40 "
 
 #include "port-mdep.c"
 
 #include <sys/LiS/head.h>		/* for strread, strwrite, etc */
 
 int	lis_runq_sched ;		/* needed to resolve a reference */
-lis_atomic_t	lis_runq_active_flags[64] ;
+extern lis_atomic_t	lis_runq_active_flags[] ;
 
 struct file_operations
 lis_streams_fops = {

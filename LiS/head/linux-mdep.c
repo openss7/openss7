@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.102 4/24/03 16:54:37 "
+#ident "@(#) LiS linux-mdep.c 2.105 5/30/03 21:40:40 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -199,7 +199,7 @@ static struct inode * lis_get_inode( mode_t mode, dev_t dev );
 lis_spin_lock_t			lis_setqsched_lock ; /* one qsched at a time */
 lis_semaphore_t			lis_runq_sems[LIS_NR_CPUS] ;
 lis_semaphore_t			lis_runq_kill_sems[LIS_NR_CPUS] ;
-volatile unsigned long		lis_runq_wakeups[LIS_NR_CPUS] ;
+extern volatile unsigned long	lis_runq_wakeups[LIS_NR_CPUS] ; /* head.c */
 int				lis_runq_sched ;     /* q's are scheduled */
 lis_atomic_t			lis_inode_cnt ;
 lis_atomic_t                    lis_mnt_cnt;   /* for lis_mnt only, for now */
@@ -1954,9 +1954,10 @@ void lis_cleanup_file_opening(struct file *f, stdata_t *head,
         printk("lis_cleanup_file_opening(f@0x%p/%d,h@0x%p/%d/%d,%d,...)\n"
 	       "    << [%d]%s d@0x%p/%d%s i@0x%p/%d%s",
 	       f, (f?F_COUNT(f):0),
-	       head, open_fail,
+	       head,
 	       (head?LIS_SD_REFCNT(head):0),
 	       (head?LIS_SD_OPENCNT(head):0),
+	       open_fail,
 	       lis_atomic_read(&lis_mnt_cnt),
 	       (F_VFSMNT(f)==lis_mnt?" <lis_mnt>":""),
 	       f->f_dentry, D_COUNT(f->f_dentry),
@@ -3090,7 +3091,7 @@ int lis_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
     strrecvfd_t *sendfd;
     struct file *oldfp;
     int error;
-    int psw ;
+    lis_flags_t  psw;
 
     error = -EPIPE;
     if (!sendhd ||
@@ -3286,7 +3287,7 @@ void lis_free_passfp( mblk_t *mp )
     static struct tq_struct	 lis_tq ;
 #endif
     int				 emptyq ;
-    int				 psw ;
+    lis_flags_t 	         psw;
     strrecvfd_t			*sent;
     stdata_t			*recvhd;
 
@@ -3333,7 +3334,7 @@ int lis_recvfd( stdata_t *recvhd, strrecvfd_t *recv, struct file *fp )
     mblk_t *mp;
     strrecvfd_t *sent;
     int error;
-    int psw ;
+    lis_flags_t  psw;
 
     lis_bzero( recv, sizeof(strrecvfd_t) );
 
@@ -4092,7 +4093,7 @@ void	lis_setqsched(int can_call)		/* kernel thread style */
 #else
     int		my_cpu = 0 ;
 #endif
-    int		psw ;
+    lis_flags_t psw;
 
     lis_spin_lock_irqsave(&lis_setqsched_lock, &psw) ;
     lis_setqsched_cnts[my_cpu]++ ;	/* keep statistics */
@@ -4336,7 +4337,7 @@ void lis_restore_sigs(stdata_t *hd)
 void	lis_task_to_creds(lis_kcreds_t *cp)
 {
     int		i ;
-    int		psw ;
+    lis_flags_t psw;
 
     lis_spin_lock_irqsave(&lis_task_lock, &psw) ;
     cp->uid = current->uid ;
@@ -4359,7 +4360,7 @@ void	lis_task_to_creds(lis_kcreds_t *cp)
 void	lis_creds_to_task(lis_kcreds_t *cp)
 {
     int		i ;
-    int		psw ;
+    lis_flags_t psw;
 
     lis_spin_lock_irqsave(&lis_task_lock, &psw) ;
     current->uid = cp->uid ;

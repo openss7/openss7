@@ -28,7 +28,7 @@
  * 
  */
 
-#ident "@(#) LiS dki.c 2.7 3/27/01 19:53:11 "
+#ident "@(#) LiS dki.c 2.8 5/30/03 21:40:39 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
@@ -69,7 +69,7 @@ toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 {
     tlist_t	*tp ;
     tlist_t	*found ;
-    int		 psw ;
+    lis_flags_t  psw;
     int		 handle ;
     int		 unique ;
 
@@ -134,7 +134,7 @@ toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 toid_t	lis_untimeout(toid_t id)
 {
     tlist_t	*tp ;
-    int		 psw ;
+    lis_flags_t  psw;
 
     lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
     for (tp = (tlist_t *) lis_tlist_head; tp != NULL; tp = tp->next)
@@ -157,7 +157,7 @@ toid_t	lis_untimeout(toid_t id)
 
 void lis_terminate_dki(void)
 {
-	int psw;
+	lis_flags_t     psw;
 
 	/*
 	 *  In case of buggy drivers, timeouts could still happen.

@@ -31,7 +31,7 @@
  * 
  */
 
-#ident "@(#) LiS port-mdep.c 2.14 12/16/02 20:33:01 "
+#ident "@(#) LiS port-mdep.c 2.15 5/30/03 21:40:40 "
 
 #include <sys/stream.h>
 #include <sys/LiS/errmsg.h>
@@ -180,7 +180,7 @@ static struct timer_list timer_head =
  */
 void port_add_timer(struct timer_list * timer)
 {
-    int			 flags;
+    lis_flags_t		 flags;
     struct timer_list	*p;
 
     if (timer->next != NULL || timer->prev != NULL)
@@ -215,7 +215,7 @@ void port_add_timer(struct timer_list * timer)
  */
 int port_del_timer(struct timer_list * timer)
 {
-    int			 flags;
+    lis_flags_t		 flags;
     struct timer_list	*p;
 
     p = &timer_head;
@@ -270,7 +270,7 @@ void port_announce_time(long new_milli_secs)
 {
     static unsigned long milli_secs ;	/* time interval saved up */
     static int		 entered ;
-    int			 flags ;
+    lis_flags_t		 flags;
     struct timer_list	*timer;
 
     lis_spin_lock_irqsave(&port_timer_lock, &flags) ;

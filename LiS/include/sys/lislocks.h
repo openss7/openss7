@@ -29,7 +29,7 @@
 #ifndef SYS_LISLOCKS_H
 #define SYS_LISLOCKS_H	1
 
-#ident "@(#) LiS lislocks.h 1.10 4/11/03"
+#ident "@(#) LiS lislocks.h 1.12 5/30/03"
 
 #define	FL	char *file, int line
 
@@ -77,7 +77,7 @@ typedef volatile struct lis_spin_lock
 /*
  * Call the lock functions by these define names so as to automatically
  * pass in the file and line number information.  In the defines, "lock" means
- * lis_spin_lock_t *lock, and "flags" means int *flags.  So the usage is:
+ * lis_spin_lock_t *lock, and "flags" means lis_flags_t *flags. So the usage is:
  *
  * lis_spin_lock_irqsave(&mylock, &myflags)
  *
@@ -109,14 +109,22 @@ typedef volatile struct lis_spin_lock
 /*
  * These are the real routines.  Not to be called directly.
  */
+#ifdef INT_PSW
+typedef int		lis_flags_t ;
+#else
+typedef unsigned long	lis_flags_t ;
+#endif
+
 int	lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL) ;
 void	lis_spin_lock_fcn(lis_spin_lock_t *lock, FL) ;
 void	lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL) ;
 int	lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL) ;
 void	lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL) ;
 void	lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL) ;
-void	lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, FL) ;
-void	lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flags, FL) ;
+void	lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock,
+				  lis_flags_t *flags, FL) ;
+void	lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
+				       lis_flags_t *flags, FL) ;
 void	lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL) ;
 lis_spin_lock_t *
 	lis_spin_lock_alloc_fcn(const char *name, FL) ;
@@ -194,11 +202,15 @@ void	lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL) ;
 void	lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL) ;
 void	lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL) ;
 
-void	lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL) ;
-void	lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL) ;
+void	lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				     lis_flags_t *flags, FL) ;
+void	lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				      lis_flags_t *flags, FL) ;
 
-void	lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL) ;
-void	lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL);
+void	lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					  lis_flags_t *flags, FL) ;
+void	lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					   lis_flags_t *flags, FL);
 
 void	lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL) ;
 lis_rw_lock_t *
@@ -219,8 +231,8 @@ lis_rw_lock_t *
 #define	lis_splx(x)		lis_splx_fcn(x,__FILE__,__LINE__)
 #define	lis_spl0(x)		lis_spl0_fcn(__FILE__,__LINE__)
 
-int	lis_splstr_fcn(FL) ;
-void	lis_splx_fcn(int x, FL) ;
+lis_flags_t	lis_splstr_fcn(FL) ;
+void	lis_splx_fcn(lis_flags_t x, FL) ;
 void	lis_spl0_fcn(FL) ;
 void	lis_print_spl_track(void) ;
 int	lis_own_spl(void) ;		/* do I own the global spl lock? */

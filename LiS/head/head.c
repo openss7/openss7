@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.117 5/9/03 19:18:51 "
+#ident "@(#) LiS head.c 2.122 5/30/03 21:40:39 "
 
 /* BEWARE: should check:
  * tty stuff
@@ -282,7 +282,7 @@ static char		*lis_cp_fmt =		/* for printk */
 
 #define CPFL(p,a,func,f,l)						\
     do {								\
-	  int psw ;							\
+	  lis_flags_t psw ;						\
 	  lis_code_path_t *pp ;						\
 	  lis_spin_lock_irqsave(&lis_code_path_lock,&psw) ;		\
 	  pp = lis_code_path_ptr++ ;					\
@@ -527,7 +527,7 @@ stdata_t *lis_head_put_fcn(stdata_t *hd, const char *file, int line)
     if (hd)
     {
 	int oldcnt, newcnt;
-	int psw ;
+	lis_flags_t psw ;
 
 	lis_spin_lock_irqsave(&hd->sd_lock, &psw) ;
 	if ((oldcnt = LIS_SD_REFCNT(hd)) > 0)
@@ -727,7 +727,7 @@ lis_i_unlink(struct inode	*i,
     linkblk_t		  lnk;
     int			  err ;
     int			  rtn = 0 ;
-    int			  psw1, psw2 ;
+    lis_flags_t		  psw1, psw2 ;
     unsigned long  	  time_cell = 0 ;
 
     CLOCKON() ;
@@ -973,8 +973,8 @@ int	lis_i_link(struct inode	*i,
     linkblk_t		 lnk;
     strioctl_t		 ioc;
     int			 err ;
-    int			 psw ;
-    int			 psw1, psw2 ;
+    lis_flags_t 	 psw ;
+    lis_flags_t		 psw1, psw2 ;
     unsigned long  	 time_cell = 0 ;
 
 #define	RTN(v) do { CLOCKOFF(IOCTLTIME) ; return(v); } while (0)
@@ -1154,7 +1154,7 @@ set_readopt(int *flags, int rmode)
 static void
 add_to_scanl( caddr_t arg )
 {
-  int		 psw, pswq;
+  lis_flags_t	 psw, pswq;
   stdata_t	*hd = (stdata_t *) arg ;
   queue_t	*q ;
 
@@ -1708,8 +1708,8 @@ void
 lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
 {
     int		i ;
-    int		psw ;
-    int		psw_rq, psw_wq ;
+    lis_flags_t psw ;
+    lis_flags_t	psw_rq, psw_wq ;
     int		rslt ;
     const char	*name = NULL;
     queue_t     *next_q, *prev_q;
@@ -1987,7 +1987,7 @@ lis_qattach( stdata_t *head, struct streamtab *info, dev_t *devp,
     queue_t    *newq;
     queue_t    *q = (head ? (head->sd_rq ? head->sd_rq : NULL) : NULL);
     queue_t    *rq, *wq ;
-    int		psw, psw2;
+    lis_flags_t	psw, psw2;
     const char *name = (info ?
 			(info->st_rdinit ? 
 			 (info->st_rdinit->qi_minfo ?
@@ -2372,7 +2372,7 @@ open_mods( stdata_t *head, dev_t *devp, int flags, cred_t *creds )
 void lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp)
 {
     int		msgs_before = lis_qsize(q) ;
-    int		psw ;
+    lis_flags_t	psw ;
     mblk_t     *xp ;
 
     if ( LIS_DEBUG_FLUSH )
@@ -2774,7 +2774,7 @@ int	lis_strrsrv(queue_t *q)
 {
     mblk_t   	*mp ;
     stdata_t	*hd ;
-    int		 psw ;
+    lis_flags_t	 psw ;
     int		 need_qenable ;
 
     if (   !LIS_CHECK_Q_MAGIC(q)
@@ -2827,7 +2827,7 @@ int
 lis_strrput(queue_t *q, mblk_t *mp)
 {
     stdata_t	*hd ;
-    int		 psw ;
+    lis_flags_t  psw ;
 
     if (   !LIS_CHECK_Q_MAGIC(q)
         || (hd = q->q_str) == NULL
@@ -3606,6 +3606,7 @@ lis_stropen( struct inode *i, struct file *f )
     int		   err = 0;
     int		   hd_locked = 0;
     int		   stdata_locked = 0 ;	/* have stdata_sem */
+    int		   dev_is_clone ;	/* opening the clone driver */
     int		   maj, mnr;
     unsigned long  time_cell = 0;
     unsigned long  this_open ;
@@ -3683,7 +3684,7 @@ lis_stropen( struct inode *i, struct file *f )
      * so LiS has no choice but to implement them as char specials.)
      *
      * Re-opening any other existing {maj,min} mainly just causes
-     * an increment of the reference count, but it should be noted
+     * an increment of the reference/open count, but it should be noted
      * that a driver can do whatever it wants to do when CLONEOPEN
      * is set.  It will be passed a new head, but it can use an old
      * one if it chooses.  This routine must handle the case where
@@ -3709,11 +3710,9 @@ lis_stropen( struct inode *i, struct file *f )
 
 retry_from_start:			/* retry point for open/close races */
 
+    dev_is_clone = LIS_DEV_IS_CLONE(maj) ;
     if ((err = lis_down(&lis_stdata_sem)) < 0) 
-    {
-	CLOCKOFF(OPENTIME);
-	return(err);
-    }
+	goto error_rtn ;
 
     stdata_locked = 1 ;			/* need "up" when exit */
     if ((head = FILE_STR(f)) != NULL)
@@ -3724,14 +3723,18 @@ retry_from_start:			/* retry point for open/close races */
 	/*
 	 * Always get a new stream head structure for a clone open.
 	 */
-	if (LIS_DEV_IS_CLONE(maj) ||
+	if (dev_is_clone ||
 	    (head = lis_lookup_stdata(&odev, from, NULL)) == NULL)
 	{
 	    existing_head = 0 ;
 	    head = lis_head_get(NULL) ;	/* allocates new structure */
+	    CP(head,odev) ;
 	}
 	else
+	{
 	    lis_head_get(head) ;	/* incrs ref count */
+	    CP(head,odev) ;
+	}
 
 	if (!head)			/* can't proceed w/o a strm head */
 	{
@@ -3741,20 +3744,7 @@ retry_from_start:			/* retry point for open/close races */
 		       i, I_COUNT(i), f, F_COUNT(f), this_open);
 
 	    err = -ENOSR ;
-early_exit:				/* less to undo than at bottom */
-	    if (stdata_locked)
-		lis_up(&lis_stdata_sem);
-
-	    if (head)
-	    {
-		if (hd_locked)
-		    lis_up(&head->sd_opening) ;
-		lis_head_put(head) ;
-	    }
-
-	    CLOCKOFF(OPENTIME);
-	    lis_atomic_dec(&lis_in_syscall) ;
-	    return(err) ;
+	    goto error_rtn ;
 	}
 
 	/*
@@ -3769,9 +3759,11 @@ early_exit:				/* less to undo than at bottom */
 	head->sd_dev = odev ;
 	lis_up(&lis_stdata_sem);
 	stdata_locked = 0 ;
+	CP(head,odev) ;
 	if ((err = lis_down(&head->sd_opening)) < 0)
-	    goto early_exit ;
+	    goto error_rtn ;
 
+	CP(head,odev) ;
 	hd_locked = 1 ;			/* now have head's opening sem */
 	/*
 	 * Two simultaneous opens to the same stream could have the
@@ -3784,18 +3776,19 @@ early_exit:				/* less to undo than at bottom */
 	 * thread execution can be delayed by preemption.
 	 *
 	 * So we don't treat the "existing" stream head as a re-open
-	 * unless the reference count is > 0, which means that the
+	 * unless the open count is > 0, which means that the
 	 * full open procedure was performed on it.  Code below uses
-	 * the ref count to decide between first and subsequent opens.
+	 * the open count to decide between first and subsequent opens.
 	 */
 	if (existing_head && LIS_SD_OPENCNT(head) >= 1)
 	{
 	    if (!head->sd_inode)	/* really, an assertion */
 	    {				/* kind of busted, here */
 		err = -EINVAL;
-		goto early_exit ;
+		goto error_rtn ;
 	    }
 
+	    CP(head,odev) ;
 	    if (i != head->sd_inode)
 		i = lis_old_inode( f, head->sd_inode );
 	    SET_FILE_STR(f, head);
@@ -3812,9 +3805,11 @@ early_exit:				/* less to undo than at bottom */
      * Releasing stdata_sem could allow this stream to be closed by
      * another thread.
      */
+    CP(head,odev) ;
     if (!hd_locked && (err = lis_down(&head->sd_opening)) < 0)
-	goto early_exit ;
+	goto error_rtn ;
 
+    CP(head,odev) ;
     hd_locked = 1 ;			/* now have head's opening sem */
 
     /*
@@ -3836,9 +3831,13 @@ early_exit:				/* less to undo than at bottom */
      * flag being set.
      */
 reuse_head:				/* changed maj/mnr from clone open */
+    CP(head,odev) ;
     if (F_ISSET(head->sd_flag,STRCLOSE))
     {
+	SET_FILE_STR(f, NULL);		/* unhook from file */
+	CP(head,odev) ;
 	lis_up(&head->sd_opening) ;	/* unlock head struct */
+	hd_locked = 0 ;
 	lis_head_put(head) ;		/* give back use count */
 	goto retry_from_start ;
     }
@@ -3851,7 +3850,7 @@ reuse_head:				/* changed maj/mnr from clone open */
      */
     if (LIS_SD_OPENCNT(head) >= 1)
     {
-	CP(head,0) ;
+	CP(head,odev) ;
 	if (head->magic != STDATA_MAGIC)	/* paranoia */
 	{
 	    printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
@@ -3900,7 +3899,7 @@ reuse_head:				/* changed maj/mnr from clone open */
      * routine.  This is where we have to take clone devices into account.
      * See below for more.
      */
-    CP(head,0) ;
+    CP(head,odev) ;
     if (LIS_DEV_CAN_REOPEN(maj)) {
         /*
 	 *  cloned minor devices of this major can be reopened -
@@ -3909,6 +3908,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	 *  we can be sure it's valid if we need to check it
 	 *  (we don't keep 'sd_from' if cloning from a clone major)
 	 */
+	CP(head,odev) ;
 #if defined(LINUX) && defined(KERNEL_2_3)
         head->sd_from  = lis_dget(f->f_dentry);
 	if (f->f_vfsmnt)
@@ -3952,15 +3952,14 @@ reuse_head:				/* changed maj/mnr from clone open */
     head->sd_open_flags	= f->f_flags;
     ndev		= odev ;
 
-    if (   LIS_DEV_IS_FIFO(maj)
-	|| (LIS_DEV_IS_CLONE(maj) && LIS_DEV_IS_FIFO(mnr))
-       )
+    if ( LIS_DEV_IS_FIFO(maj) || (dev_is_clone && LIS_DEV_IS_FIFO(mnr)) )
     {
+	CP(head,odev) ;
 	err = lis_open_fifo(i, f, head, this_open, &ndev, &creds) ;
     }
     else
     {
-	CP(head,0) ;
+	CP(head,odev) ;
 	lis_setq( head->sd_rq, &strmhd_rdinit, &strmhd_wrinit );
 
 	lis_new_stream_name(head, f) ;
@@ -4010,6 +4009,8 @@ reuse_head:				/* changed maj/mnr from clone open */
 	 *
 	 * The lookup_stdata routine will find it for us.
 	 */
+	CP(head,odev) ;
+	CP(head,ndev) ;
 	if ((err = lis_down(&lis_stdata_sem)) < 0) 
 	    goto error_rtn ;
 #if defined(LINUX) && defined(KERNEL_2_3)
@@ -4020,10 +4021,28 @@ reuse_head:				/* changed maj/mnr from clone open */
 	other_hd = lis_lookup_stdata( &ndev, from, head );
 	lis_up(&lis_stdata_sem);		/* let go global semaphore */
 	memcpy(clone_name, head->sd_name, sizeof(clone_name)) ;
-	if (other_hd != NULL)			/* have stdata struct already */
+	/*
+	 * If the device id got changed by the clone driver then the
+	 * driver's open routine has been called by the clone driver
+	 * itself.
+	 *
+	 * If that device has not been opened then we will continue to
+	 * open it using this stream head.  However, if the target driver
+	 * picked a device that is already open we want to use the stream
+	 * head under which it was opened.  However, we don't want to call
+	 * the driver open routine since the clone driver has done so
+	 * already.
+	 *
+	 * If a non-clone driver changes its dev then we will presume that
+	 * we need to call the driver open routine for the new dev.
+	 *
+	 * The semantics here are a bit fuzzy and might lead to an extra
+	 * call to a driver open routine.
+	 */
+	if (other_hd != NULL)		/* have stdata struct already */
 	{					/* use it instead of head */
 	    lis_head_get(other_hd) ;
-	    CP(other_hd,0) ;
+	    CP(other_hd,ndev) ;
 	    if ( LIS_DEBUG_OPEN )
 		printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		       "    >> <clone->existing> h@0x%p/%d/%d \"%s\"\n",
@@ -4032,6 +4051,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 		       LIS_SD_REFCNT(other_hd), LIS_SD_OPENCNT(other_hd),
 		       other_hd->sd_name);
 	    
+	    CP(head,odev) ;
 	    lis_up(&head->sd_opening) ;		/* done with this head */
 	    lis_atomic_dec(&lis_in_syscall) ;	/* "done" with a system call */
 
@@ -4039,17 +4059,23 @@ reuse_head:				/* changed maj/mnr from clone open */
 	    lis_doclose(i, f, head, &creds) ;	/* will "put" the head */
 
 	    head = other_hd ;			/* use "found" stream */
-	    lis_down(&head->sd_opening) ;	/* permission to open */
-	    lis_atomic_inc(&lis_in_syscall) ;	/* processing a system call */
 	    odev = ndev ;			/* switch to new device */
-	    goto reuse_head ;
+	    CP(head,odev) ;
+	    if ((err = lis_down(&head->sd_opening)) < 0)
+		goto error_rtn ;
+	    CP(head,odev) ;
+	    lis_atomic_inc(&lis_in_syscall) ;	/* processing a system call */
+	    if (!dev_is_clone)
+		goto reuse_head ;		/* call new drvr open routine */
 	}
 
 	/*
-	 * It's a clone open but it is using a new stream.  This is the
-	 * common case.
+	 * It's a clone open using either a new or existing stream.  The
+	 * common case is using a new stream.  But we go through here
+	 * in either case.
 	 */
 	CP(head,ndev) ;
+	SET_FILE_STR(f, head);			/* point file to strm hd */
 	head->sd_strtab = LIS_DEVST(STR_MAJOR(ndev)).f_str;
 	head->sd_dev = ndev ;
 	head->sd_name[0] = 0 ;			/* regenerate name */
@@ -4091,7 +4117,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	 *  stream will be lis_major, and the i_dev minor will be the
 	 *  major of the stream's driver.
 	 */
-	CP(head,0) ;
+	CP(head,odev) ;
 	if (!head->sd_inode)
 	{
 	    CP(head,0) ;
@@ -4132,6 +4158,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 
 successful_rtn:					/* returning success */
 
+    CP(head,odev) ;
     lis_task_to_creds(&head->sd_kcreds) ;	/* save kernel creds */
     head->sd_creds = creds ;			/* LiS creds */
     err = 0;
@@ -4161,7 +4188,10 @@ successful_rtn:					/* returning success */
 
     lis_atomic_inc(&head->sd_opencnt) ;	/* count opens to stream */
     if (hd_locked)
+    {
+	CP(head,odev) ;
 	lis_up(&head->sd_opening) ;	/* allow other opens now */
+    }
 
     if (LIS_DEBUG_OPEN)
     {
@@ -4204,6 +4234,7 @@ successful_rtn:					/* returning success */
 
 error_rtn:				/* come here if fail */
 
+    CP(head,odev) ;
     if (stdata_locked)
 	lis_up(&lis_stdata_sem);
 
@@ -4234,7 +4265,10 @@ error_rtn:				/* come here if fail */
 	lis_cleanup_file_opening(f, head, err) ;
 #endif
 	if (hd_locked)			/* have opening semaphore */
+	{
+	    CP(head,odev) ;
 	    lis_up(&head->sd_opening) ;
+	}
 
 	if (LIS_SD_OPENCNT(head) == 0)	/* last open */
 	    lis_dismantle(head, &creds);/* deallocate queues */
@@ -4260,7 +4294,7 @@ lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
     mblk_t   *held;
     int		 chunk;
     int		 written=0; 
-    int		 flags ;
+    lis_flags_t	 flags ;
     int		 err,newmsg;
     unsigned long  time_cell = 0 ;
     struct inode  *i = FILE_INODE(fp);
@@ -4526,7 +4560,7 @@ static void lis_requeue(stdata_t *hd, mblk_t *mp)
 {
     mblk_t	*hdmp ;
     queue_t	*hd_rq;
-    int		 psw ;
+    lis_flags_t  psw ;
 
     hd_rq = hd->sd_rq;
     /*
@@ -4567,7 +4601,7 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
     stdata_t *hd;
     queue_t  *hd_rq = NULL ;
     mblk_t   *mp;
-    int		 psw;
+    lis_flags_t  psw ;
     int		 count=0;
     int		 qlocked = 0 ;
     int		 qisrlocked = 0 ;
@@ -5152,7 +5186,7 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
     int		 err= 0 ;
     int		 rtn = 0 ;
     int		 qlocked = 0 ;
-    int		 psw ;
+    lis_flags_t  psw ;
     stdata_t	*hd;
     strbuf_t	 kctl,kdat;
     mblk_t	*mp;
@@ -6799,8 +6833,8 @@ void	lis_wakeup_flush(caddr_t arg)
  */
 static void deschedule(queue_t *q)
 {
-    int		 psw;
-    int		 psw1, psw2 ;
+    lis_flags_t	 psw;
+    lis_flags_t	 psw1, psw2 ;
     queue_t	*rq, *wq ;
     queue_t	*p_scan ;
     queue_t	*p_prev ;
@@ -6936,8 +6970,8 @@ static void mark_closing(queue_t *sd_wq)
 {
     queue_t	*sd_rq ;
     queue_t	*q ;
-    int		 psw;
-    int		 psw_wq, psw_rq ;
+    lis_flags_t	 psw;
+    lis_flags_t	 psw_wq, psw_rq ;
 
     CP(sd_wq,0) ;
     do
@@ -6980,7 +7014,7 @@ static void mark_closing(queue_t *sd_wq)
 static void close_action(stdata_t *head)
 {
     int		rslt ;
-    int		psw ;
+    lis_flags_t	psw ;
 
     CP(head,0) ;
     SET_SD_FLAG(head, STRCLOSE) ;
@@ -7231,8 +7265,17 @@ lis_doclose( struct inode *i, struct file *f, stdata_t *head, cred_t *creds )
 
     lis_del_from_elist(&head->sd_siglist,PID(f),S_ALL);
 
-    lis_atomic_dec(&head->sd_opencnt) ;		 /* decr open count */
-    opencnt = LIS_SD_OPENCNT(head) ;             /* will return this */
+    /*
+     * opencnt might be zero if we are called from stropen to close
+     * the clone driver part of a clone open.  The open count for the
+     * stream head that was used for the clone driver still has its
+     * open count set to zero.
+     */
+    if ((opencnt = LIS_SD_OPENCNT(head)) > 0)
+    {
+	lis_atomic_dec(&head->sd_opencnt) ;		 /* decr open count */
+	opencnt-- ;
+    }
 
     /*
      * If the open count is now down to the plink count

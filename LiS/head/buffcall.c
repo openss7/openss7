@@ -33,7 +33,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS bufcall.c 2.5 2/4/03 17:47:06 "
+#ident "@(#) LiS bufcall.c 2.6 5/30/03 21:40:39 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -81,7 +81,7 @@ void	lis_dobufcall(int) ;
  */
 static void bc_timeout(unsigned long not_used)
 {
-    int	 psw;
+    lis_flags_t     psw;
 
     (void) not_used ;
     lis_spin_lock_irqsave(&lis_bc_lock, &psw) ;
@@ -102,7 +102,7 @@ static int bc_link( int size, void (*function)(long), long arg )
 {
     bcinfo_t		*bcinfo;
     bclist_t		*list ;
-    int			 psw;
+    lis_flags_t     	 psw;
     int			 id ;
     static int		 id_num ;
 
@@ -255,7 +255,7 @@ lis_unbufcall(int bcid)
 {
     bcinfo_t	*bcinfo ;
     bclist_t	*list ;
-    int		 psw;
+    lis_flags_t  psw;
 
     /*
      * Unfortunately, the table has to be searched with interrupts
@@ -312,7 +312,7 @@ lis_dobufcall(int cpu_id)
 {
     int			 cnt;
     int			 i ;
-    int			 psw;
+    lis_flags_t     	 psw;
     bclist_t		*list ;
     struct bcinfo	*bc;
     void	       (*fcn)(long);
@@ -384,7 +384,7 @@ void
 lis_init_bufcall(void)
 {
     int			 i ;
-    int			 psw;
+    lis_flags_t     	 psw;
     bclist_t		*list ;
 
     /*
@@ -417,7 +417,7 @@ lis_init_bufcall(void)
  */
 void lis_terminate_bufcall(void)
 {
-    int		psw ;
+    lis_flags_t     psw;
 
     lis_init_bufcall() ;
 

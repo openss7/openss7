@@ -33,7 +33,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS msg.c 2.10 11/5/02 17:28:00 "
+#ident "@(#) LiS msg.c 2.11 5/30/03 21:40:39 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -103,7 +103,7 @@ static struct mdbblock *
 allochdr(char *file_name, int line_nr)
 {
     struct mdbblock *rtn;
-    int psw;
+    lis_flags_t      psw;
     lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
     rtn = (struct mdbblock *) lis_mdbfreelist;
     /* Try to get an mdbblock from the free list */
@@ -167,7 +167,7 @@ allochdr(char *file_name, int line_nr)
 static void
 freehdr(mblk_t *bp)
 {
-    int psw;
+    lis_flags_t     psw;
 
     LisDownCount(HEADERS);
 
@@ -445,7 +445,7 @@ lis_freedb(mblk_t *bp, int free_hdr)
 	struct datab *dp = bp->b_datap;
 	dblk_t       *mydp = (dblk_t *) &((struct mdbblock *)bp)->datblk ;
 	char	     *db_base = NULL ;
-	int	      psw;
+	lis_flags_t   psw;
 
     	if (dp)
 	{

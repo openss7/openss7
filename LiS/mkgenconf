@@ -1,0 +1,20 @@
+#!/bin/sh
+mkgenconf_ident="@(#) LiS mkgenconf 1.1 5/30/03"
+. config.in
+#
+# Make genconf.h
+#
+# This is a generated header file that captures information
+# gleaned from the kernel.  linux-mdep.h uses it to get this
+# info without having to clutter the command line with lots
+# of "-D" options.
+#
+mk_genconf_h()
+{
+    f=$LIS_HOME/include/sys/LiS/genconf.h
+    echo '/* GENERATED FILE -- DO NOT MODIFY */' >$f
+    echo "#define GET_EMPTY_INODE $GET_EMPTY_INODE" >>$f
+    if [ "$INT_PSW..." = "y..." ]; then
+	echo "#define INT_PSW	1" >>$f
+    fi
+}

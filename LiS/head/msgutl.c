@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-#ident "@(#) LiS msgutl.c 2.10 10/25/02 15:38:13 "
+#ident "@(#) LiS msgutl.c 2.11 5/30/03 21:40:40 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -288,7 +288,7 @@ lis_dupb(mblk_t *mp)
     if (mp)
     {
         mblk_t *bp = allocb(0, BPRI_MED);
-	int     psw;
+	lis_flags_t psw;
 	if (bp)
 	{
 	    *bp = *mp;

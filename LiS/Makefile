@@ -1,4 +1,4 @@
-Makefile_ident="@(#) LiS Makefile 2.26 4/12/03"
+Makefile_ident="@(#) LiS Makefile 2.28 5/30/03"
 #
 # Makefile for the kernel STREAMS device drivers.
 #
@@ -11,6 +11,7 @@ Makefile_ident="@(#) LiS Makefile 2.26 4/12/03"
 
 LIS_HOME = $(shell pwd)
 include config.mk
+GENCONF	 = $(LIS_HOME)/include/sys/LiS/genconf.h
 
 #
 #  Our default target
@@ -138,7 +139,7 @@ config: $(CONFIG_TARGETS)
 ##   End of: Configuration                                             ##
 #########################################################################
 
-TODO = config
+TODO = config $(GENCONF)
 
 ifneq ($(LIS_TARG),user)
 TODO += libc util
@@ -203,6 +204,7 @@ uninstall:
 ifeq ($(CONFIG_STREAMS),m)
 	- ./update_conf.modules
 	- (cd $(MOD_INST_DIR); rm -f streams.o streams-*.o)
+	-/sbin/depmod -a
 endif
 
 else			# from LIS_TARG  == linux
@@ -323,3 +325,5 @@ user:
 tags:	files
 	ctags `cat files`
 
+$(GENCONF):	$(LIS_HOME)/config.in
+	$(LIS_HOME)/mkgenconf

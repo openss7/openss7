@@ -629,20 +629,6 @@ get_empty_inode_option()
 
 
 
-#
-# Make genconf.h
-#
-# This is a generated header file that captures information
-# gleaned from the kernel.  linux-mdep.h uses it to get this
-# info without having to clutter the command line with lots
-# of "-D" options.
-#
-mk_genconf_h()
-{
-    f=$LIS_HOME/include/sys/LiS/genconf.h
-    echo '/* GENERATED FILE -- DO NOT MODIFY */' >$f
-    echo "#define GET_EMPTY_INODE $GET_EMPTY_INODE" >>$f
-}
 
 #
 # Establish defaults
@@ -665,6 +651,7 @@ else
     DBG_OPT=D
     LIS_SHLIB=y
     MACHINE=`uname -m`
+    INT_PSW=y
 fi
 
 #
@@ -1127,6 +1114,24 @@ else
 fi
 
 #
+# INT_PSW
+#
+if [ "$INT_PSW..." = "..." ]; then
+    INT_PSW=y
+fi
+PROMPT="\
+When you make STREAMS, do you want to use int type for CPU flags?\n\
+Responding 'n' is more portable but may cause warnings when you\n\
+compile your driver code.\n\
+    y = int type for CPU flags\n\
+    n = unsigned long type for CPU flags\n\
+Please enter y or n"
+RESPONSE="y n"
+DEFAULT=$INT_PSW
+do_read_choice
+INT_PSW=$RESULT
+
+#
 # Some systems don't have a /usr/local/sbin directory.  Make one
 # if necessary.  We keep some LiS utilities in that directory.
 #
@@ -1141,7 +1146,8 @@ fi
 #
 if [ "$TARGET" = "l" ]; then
     if [ -f $KSRC/include/linux/vmalloc.h ]; then
-	if grep -q 'highmem\.h' $KSRC/include/linux/vmalloc.h; then
+	if grep -q "Red Hat Linux 7.1" /proc/version &&
+	   grep -q 'highmem\.h' $KSRC/include/linux/vmalloc.h; then
 	    RH_71_KLUDGE=y
 	fi
     fi
@@ -1195,19 +1201,13 @@ get_cc_from_makefile()
 
 CC_OPTIMIZE=-O3
 if   [ "$TARGET" = "l"  ]; then
-#    if [ -f $KSRC/Makefile ]; then
-#	echo
-#	echo "Choosing C compiler from kernel source Makefile."
-#	echo
-#	CC_NAME=`get_cc_from_makefile`
-#    else
-#	echo
-#	echo "File $KSRC/Makefile is not present.  The choice of which"
-#	echo "C compiler to use will be based upon the presence of"
-#	echo "kgcc, gcc3 or egcs rather than on the compiler used"
-#	echo "to build the kernel from source."
-#	echo
-	if [ -x /usr/bin/kgcc ]; then
+	if [ -x /usr/bin/kgcc ] && grep kgcc /proc/version; then
+	    CC_NAME=kgcc
+	elif [ -x /usr/bin/gcc3 ] && grep gcc3 /proc/version; then
+	    CC_NAME=gcc3
+	elif [ -x /usr/bin/egcs ] && grep egcs /proc/version; then
+	    CC_NAME=egcs
+	elif [ -x /usr/bin/kgcc ]; then
 	    CC_NAME=kgcc
 	elif [ -x /usr/bin/gcc3 ]; then
 	    CC_NAME=gcc3
@@ -1217,7 +1217,6 @@ if   [ "$TARGET" = "l"  ]; then
 	    CC_NAME=gcc
 	    CC_OPTIMIZE=-O2
 	fi
-#    fi
 else
     echo
     echo "Non-Linux install.  Using cc as default C compiler."
@@ -1305,7 +1304,7 @@ if [ "$TARGET" = "l" ]; then
     cfg_out MACHINE_INCL $MACHINE_INCL
     #cfg_out GET_EMPTY_INODE $GET_EMPTY_INODE 
     #cfg_out REGISTER_SYSCALLS $REGISTER_SYSCALLS
-    mk_genconf_h
+    cfg_out INT_PSW $INT_PSW
 fi
 cfg_out LIS_OLD_CONSTS $LIS_OLD_CONSTS
 cfg_out SOLARIS_STYLE_CMN_ERR $SOLARIS_STYLE_CMN_ERR

@@ -27,7 +27,7 @@
  * 
  */
 
-#ident "@(#) LiS port.c 2.12 11/5/02 16:50:41 "
+#ident "@(#) LiS port.c 2.14 5/30/03 21:39:56 "
 
 #include <sys/stream.h>
 #include <errno.h>
@@ -50,6 +50,8 @@
 ************************************************************************/
 int		 spin_lock_nest_level ;
 int		 spin_lock_error_count ;
+lis_atomic_t	 lis_spin_lock_count ;
+lis_atomic_t	 lis_spin_lock_contention_count ;
 lis_spin_lock_t	*most_recent_spin_lock ;
 
 
@@ -354,7 +356,7 @@ void	port_splx(int *saved_state)
 
 } /* port_splx */
 
-void	lis_splx_fcn(int x, char *file, int line)
+void	lis_splx_fcn(lis_flags_t x, char *file, int line)
 {
     port_splx(&x) ;
     (void) file ;
@@ -508,14 +510,15 @@ void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
     decr_spin_lock_count(lock) ;
 }
 
-void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, FL)
+void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
 {
     lock->spin_lock_mem[0]++ ;
     spin_lock_nest_level++ ;
     most_recent_spin_lock = lock ;
 }
 
-void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flags, FL)
+void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
+				       lis_flags_t *flags, FL)
 {
     if (--lock->spin_lock_mem[0] < 0)
 	spin_lock_error() ;

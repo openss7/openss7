@@ -170,7 +170,7 @@ STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 STATIC int tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	tirdwr_priv_t *priv;
-	int psw;
+	lis_flags_t    psw;
 	queue_t *hq;
 	mblk_t *mp;
 

@@ -18,10 +18,15 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS strtst.c 2.22 2/8/03 16:14:27 "
+#ident "@(#) LiS strtst.c 2.28 5/30/03 21:38:45 "
 
 #define	inline			/* make disappear */
 
+#if defined(LINUX) && !defined(DIRECT_USER)
+#define _REENTRANT
+#define _THREAD_SAFE
+#define _XOPEN_SOURCE	500		/* single unix spec */
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -33,6 +38,10 @@
 #include <sys/stropts.h>
 #include <sys/LiS/loop.h>		/* an odd place for this file */
 #include <sys/LiS/minimux.h>		/* an odd place for this file */
+#ifndef DIRECT_USER
+#include <sys/LiS/mtdrv.h>
+#include <pthread.h>
+#endif
 
 
 #include <string.h>
@@ -59,7 +68,7 @@
 #include <sys/strport.h>
 #include <sys/sad.h>
 
-#define	ALL_DEBUG_BITS	((unsigned long long) 0xFFFFFFFFFFFFFFFF)
+#define	ALL_DEBUG_BITS	( ~ ((unsigned long long) 0) )
 
 /************************************************************************
 *                      File Names                                       *
@@ -147,6 +156,29 @@ extern int	n_read_msgs(int fd) ;		/* forward decl */
 long	lis_mem_alloced ;
 
 
+#endif
+
+/************************************************************************
+*                              now                                      *
+*************************************************************************
+*									*
+* Return pointer to current time and date in ASCII.			*
+*									*
+************************************************************************/
+#ifndef DIRECT_USER
+static char *now(void)
+{
+    time_t	tim ;
+    char	*p ;
+    static char	buf[100] ;
+
+    tim = time(NULL) ;
+    strcpy(buf, ctime(&tim)) ;
+    p = strrchr(buf, '\n') ;
+    if (p != NULL)
+	*p = 0 ;
+    return(buf) ;
+}
 #endif
 
 /************************************************************************
@@ -5520,6 +5552,353 @@ void pullupmsg_test(void)
 }
 
 /************************************************************************
+*                             mt_open_test                              *
+*************************************************************************
+*									*
+* Using the mtdrv as a helper, test some open races that can only be	*
+* tested using multiple threads.					*
+*									*
+************************************************************************/
+#ifndef DIRECT_USER
+
+pthread_mutex_t		mt_state_lock ;
+volatile int		mt_state ;
+pthread_mutex_t		mt_quit ;
+
+void	 mt_set_state(int state)
+{
+    pthread_mutex_lock(&mt_state_lock) ;
+    mt_state = state ;
+    pthread_mutex_unlock(&mt_state_lock) ;
+}
+
+int	 mt_get_state(void)
+{
+    int		state ;
+    pthread_mutex_lock(&mt_state_lock) ;
+    state = mt_state ;
+    pthread_mutex_unlock(&mt_state_lock) ;
+    return(state) ;
+}
+
+int	mt_await_state(int statenr)
+{
+    int		st ;
+
+    while ((st = mt_get_state()) != statenr && st >= 0)
+	sleep(1) ;
+
+    return(st) ;
+}
+
+int	mt_ioctl(int fd, int cmd, int arg)
+{
+    struct strioctl	ioc ;
+
+    ioc.ic_cmd 	  = cmd ;
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(arg) ;
+    ioc.ic_dp	  = (char *) &arg ;
+
+    return(ioctl(fd, I_STR, &ioc)) ;
+}
+
+void	*mt_thread(void *arg)
+{
+    int		thrno = (int) arg ;
+    int		state = 0 ;
+    int		prev_state ;
+    int		fd = -1 ;
+    int		fdc = -1 ;
+    int		ctl_fd ;
+    char	buf[300] ;
+
+    print("%s: Thread%d: Starting up\n", now(), thrno) ;
+    sprintf(buf, "/dev/mtdrv.%d", thrno) ;
+    ctl_fd = open(buf, O_RDWR, 0) ;
+    if (ctl_fd < 0)
+    {
+	perror(buf) ;
+	mt_set_state(-1) ;
+    }
+
+    print("%s: Thread%d: opened %s\n", now(), thrno, buf) ;
+
+    do
+    {
+	prev_state = state ;
+	state = mt_get_state() ;
+	print("%s: Thread%d: state %d\n", now(), thrno, state) ;
+	switch (state)
+	{
+	case 0:				/* initial idle state */
+	    mt_await_state(1) ;
+	    break ;
+
+	case 1:
+	    /*
+	     * Thread 1 sets open sleep time while thread 2 iterates.
+	     * Then thread 1 opens the driver, which will sleep for
+	     * the indicated number of ticks.
+	     */
+	    if (prev_state == 1)
+	    {
+		mt_await_state(2) ;
+		break ;
+	    }
+
+	    if (thrno == 2)
+	    {
+		sleep(1) ;
+		break ;
+	    }
+
+	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 200) < 0)
+	    {
+		perror("ioctl: MTDRV_SET_OPEN_SLEEP") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    mt_set_state(2) ;
+
+	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno) ;
+	    fd = open("/dev/mtdrv.3", O_RDWR, 0) ;
+	    if (fd < 0)
+	    {
+		perror("mtdrv.3") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd) ;
+	    break ;
+
+	case 2:
+	    /*
+	     * Thread 1 does nothing. 
+	     * Thread 2 opens mtdrv.3, the same device that thread 1
+	     * should be sleeping on the open.  This tests serializing
+	     * opens to the same device from different threads.
+	     */
+	    if (prev_state == 2)
+	    {
+		mt_await_state(3) ;
+		break ;
+	    }
+
+	    if (thrno == 1)
+	    {
+		sleep(1) ;
+		break ;
+	    }
+
+	    sleep(1) ;
+	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno) ;
+	    fd = open("/dev/mtdrv.3", O_RDWR, 0) ;
+	    if (fd < 0)
+	    {
+		perror("mtdrv.3") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd) ;
+	    mt_set_state(3) ;
+	    break ;
+
+	case 3:
+	    /*
+	     * Thread 1 does nothing.
+	     * Thread 2 opens the clone device, which selects dev 3.
+	     * This is the third open of dev 3.
+	     */
+	    if (prev_state == 3)
+	    {
+		sleep(1) ;
+		break ;
+	    }
+
+	    if (thrno == 1)
+	    {
+		sleep(2) ;
+		print("%s: Thread%d: close fd=%d\n", now(), thrno, fd) ;
+		close(fd) ;
+		fd = -1 ;
+		break ;
+	    }
+
+	    if (mt_ioctl(ctl_fd, MTDRV_SET_CLONE_DEV, 3) < 0)
+	    {
+		perror("ioctl: MTDRV_SET_CLONE_DEV") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: opening mtdrv_clone\n", now(), thrno) ;
+	    fdc = open("/dev/mtdrv_clone", O_RDWR, 0) ;
+	    if (fdc < 0)
+	    {
+		perror("mtdrv_clone") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: mtdrv_clone opened fd=%d\n", now(), thrno, fdc) ;
+	    sleep(1) ;
+	    print("%s: Thread%d: close fd=%d\n", now(), thrno, fd) ;
+	    close(fd) ;
+	    fd = -1 ;
+	    print("%s: Thread%d: close fd=%d\n", now(), thrno, fdc) ;
+	    close(fdc) ;
+	    fdc = -1 ;
+	    mt_set_state(4) ;
+	    break ;
+
+	case 4:
+	    /*
+	     * Thread 1 sets open sleep time while thread 2 iterates.
+	     * Then thread 1 opens the driver, which will sleep for
+	     * the indicated number of ticks.
+	     */
+	    if (prev_state == 4)
+	    {
+		sleep(1) ;
+		break ;
+	    }
+
+
+	    if (thrno == 2)
+	    {
+		mt_await_state(5) ;
+		break ;
+	    }
+
+	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 200) < 0)
+	    {
+		perror("ioctl: MTDRV_SET_OPEN_SLEEP") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    mt_set_state(5) ;
+
+	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno) ;
+	    fd = open("/dev/mtdrv.3", O_RDWR, 0) ;	/* open will sleep */
+	    if (fd < 0)
+	    {
+		perror("mtdrv.3") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd) ;
+	    break ;
+
+	case 5:
+	    /*
+	     * Thread 1 does nothing.
+	     * Thread 2 opens the clone device, which selects dev 3.
+	     * Dev 3 is half-open at the moment by thread 1.
+	     */
+	    if (prev_state == 5)
+	    {
+		sleep(1) ;
+		break ;
+	    }
+
+
+	    if (thrno == 1)
+	    {
+		mt_await_state(-1) ;
+		break ;
+	    }
+
+	    if (mt_ioctl(ctl_fd, MTDRV_SET_CLONE_DEV, 3) < 0)
+	    {
+		perror("ioctl: MTDRV_SET_CLONE_DEV") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: opening mtdrv_clone\n", now(), thrno) ;
+	    fdc = open("/dev/mtdrv_clone", O_RDWR, 0) ;
+	    if (fdc < 0)
+	    {
+		perror("mtdrv_clone") ;
+		mt_set_state(-1) ;
+		break ;
+	    }
+
+	    print("%s: Thread%d: mtdrv_clone opened fd=%d\n", now(), thrno, fdc) ;
+	    print("%s: Thread%d: close fd=%d\n", now(), thrno, fdc) ;
+	    close(fdc) ;
+	    fdc = -1 ;
+	    sleep(1) ;			/* give thread 1 some time */
+	    mt_set_state(-1) ;
+	    break ;
+	}
+
+    } while (state >= 0) ;
+
+    print("%s: Thread%d: close fd=%d\n", now(), thrno, fd) ;
+    close(fd) ;
+    fd = -1 ;
+    close(ctl_fd) ;
+    print("%s: Thread%d: Exiting\n", now(), thrno) ;
+    pthread_mutex_unlock(&mt_quit) ;	/* awaken parent */
+
+    return((void *)0) ;
+}
+
+
+void mt_open_test(void)
+{
+    int		rslt ;
+    pthread_t	thr1 ;
+    pthread_t	thr2 ;
+    pthread_mutexattr_t	 attr ;
+
+    print("Begin multi-thread open test\n") ;
+    system("rmmod streams-mtdrv") ;
+    if (system("modprobe streams-mtdrv") != 0)
+    {
+	print("modprobe failed: %s\n", strerror(errno)) ;
+	xit() ;
+    }
+
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_DEFAULT) ;
+    pthread_mutex_init(&mt_state_lock, &attr) ;
+    pthread_mutex_init(&mt_quit, &attr) ;
+    pthread_mutex_lock(&mt_quit) ;
+
+    rslt = pthread_create(&thr1, NULL, mt_thread, (void *) 1) ;
+    if (rslt < 0)
+    {
+	fprintf(stderr, "Thread #%d: ", 1) ;
+	perror("pthread_create") ;
+	system("rmmod streams-mtdrv") ;
+	xit() ;
+    }
+
+    rslt = pthread_create(&thr2, NULL, mt_thread, (void *) 2) ;
+    if (rslt < 0)
+    {
+	fprintf(stderr, "Thread #%d: ", 2) ;
+	perror("pthread_create") ;
+	system("rmmod streams-mtdrv") ;
+	xit() ;
+    }
+
+    sleep(1) ;
+    mt_set_state(1) ;
+    pthread_mutex_lock(&mt_quit) ;		/* waits until thread exit */
+    print("multi-thread open test OK\n") ;
+    system("rmmod streams-mtdrv") ;
+}
+#endif
+
+/************************************************************************
 *                              main                                     *
 ************************************************************************/
 void test(void)
@@ -5540,6 +5919,13 @@ void test(void)
     print_mem() ;
     print("Memory allocated = %ld\n", lis_mem_alloced) ;
     wait_for_logfile("open/close test") ;
+
+#ifndef DIRECT_USER
+    mt_open_test();
+    print_mem() ;
+    print("Memory allocated = %ld\n", lis_mem_alloced) ;
+    wait_for_logfile("mt open test") ;
+#endif
 
     ioctl_test() ;
     print_mem() ;

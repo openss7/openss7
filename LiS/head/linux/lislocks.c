@@ -21,7 +21,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lislocks.c 1.21 4/17/03"
+#ident "@(#) LiS lislocks.c 1.23 5/30/03"
 
 #include <sys/LiS/linux-mdep.h>
 #include <sys/LiS/strmdbg.h>
@@ -66,7 +66,7 @@ lis_atomic_t	lis_spin_lock_contention_count ;
 ************************************************************************/
 
 lis_spin_lock_t		lis_spl_lock ;		/* for simulating spl fcns */
-int			lis_psw0 ;		/* base level psw value */
+lis_flags_t		lis_psw0 ;		/* base level psw value */
 #define	USE_SPINLOCK	0
 
 
@@ -92,7 +92,7 @@ typedef struct
     int			 cpu ;
     void		*addr ;		/* of lock or semaphore */
     void		*tskp ;		/* current task */
-    int			 flags ;
+    lis_flags_t		 flags ;
     int			 state ;
     char		*file ;
     int			 line ;
@@ -122,7 +122,7 @@ spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
     if ( LIS_DEBUG_SPL_TRACE )						\
     {									\
 	spl_track_t		*p ;					\
-	int			 flags ;				\
+	lis_flags_t		 flags ;				\
 									\
 	spin_lock_irqsave(&lis_spl_track_lock, flags) ;			\
 	p = lis_spl_track_ptr ;						\
@@ -145,7 +145,7 @@ spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
     if ( LIS_DEBUG_SPL_TRACE )						\
     {									\
 	spl_track_t		*p ;					\
-	int			 flags ;				\
+	lis_flags_t		 flags ;				\
 									\
 	spin_lock_irqsave(&lis_spl_track_lock, flags) ;			\
 	p = lis_spl_track_ptr ;						\
@@ -168,7 +168,7 @@ spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
     if ( LIS_DEBUG_SPL_TRACE )						\
     {									\
 	spl_track_t		*p ;					\
-	int			 flags ;				\
+	lis_flags_t		 flags ;				\
 									\
 	spin_lock_irqsave(&lis_spl_track_lock, flags) ;			\
 	p = lis_spl_track_ptr ;						\
@@ -191,7 +191,7 @@ spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
     if ( LIS_DEBUG_SPL_TRACE )						\
     {									\
 	spl_track_t		*p ;					\
-	int			 flags ;				\
+	lis_flags_t		 flags ;				\
 									\
 	spin_lock_irqsave(&lis_spl_track_lock, flags) ;			\
 	p = lis_spl_track_ptr ;						\
@@ -249,7 +249,13 @@ void	lis_print_spl_track(void)
 	    default:		typep = "Unkwn " ; break ;
 	    }
 
-	    printk("%u:%s State=%d Flgs=%03x %s #%u\n",
+	    printk("%u:%s State=%d "
+#ifdef INT_PSW
+		    "Flgs=%03x "
+#else
+		    "Flgs=%03lx "
+#endif
+		    "%s #%u\n",
 		    p->cntr,
 		    typep,
 		    p->state,
@@ -272,9 +278,9 @@ void	lis_print_spl_track(void)
 * Disable interrupts, return the previous state.			*
 *									*
 ************************************************************************/
-int	lis_splstr_fcn(char *file, int line)
+lis_flags_t	lis_splstr_fcn(char *file, int line)
 {
-    int			 prev ;
+    lis_flags_t	 prev ;
 
     lis_spin_lock_irqsave_fcn(&lis_spl_lock, &prev, file, line) ;
     return(prev) ;
@@ -288,7 +294,7 @@ int	lis_splstr_fcn(char *file, int line)
 * Restore state.							*
 *									*
 ************************************************************************/
-void	lis_splx_fcn(int x, char *file, int line)
+void	lis_splx_fcn(lis_flags_t x, char *file, int line)
 {
     lis_spin_unlock_irqrestore_fcn(&lis_spl_lock, &x, file, line) ;
 
@@ -464,7 +470,7 @@ int     lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 
 void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_l ;
 
     (void) l ;				/* compiler happiness in 2.2 */
@@ -494,7 +500,7 @@ void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 
 void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_l ;
 
     (void) l ;				/* avoid warning in non-SMP case */
@@ -519,9 +525,9 @@ void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
     }
 }
 
-void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, FL)
+void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_l ;
 
     (void) l ;				/* compiler happiness in 2.2 */
@@ -553,9 +559,10 @@ void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flags, FL)
+void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
+				       lis_flags_t *flags, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_l ;
 
     (void) l ;				/* avoid warning in non-SMP case */
@@ -648,7 +655,7 @@ lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL)
 
 void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* suppress compiler warning */
@@ -666,7 +673,7 @@ void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* suppress compiler warning */
@@ -684,7 +691,7 @@ void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* avoid warning in non-SMP case */
@@ -700,7 +707,7 @@ void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* avoid warning in non-SMP case */
@@ -716,7 +723,7 @@ void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* compiler happiness in 2.2 */
@@ -735,7 +742,7 @@ void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* compiler happiness in 2.2 */
@@ -754,7 +761,7 @@ void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* avoid warning in non-SMP case */
@@ -770,7 +777,7 @@ void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 
 void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* avoid warning in non-SMP case */
@@ -784,9 +791,10 @@ void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
     write_unlock_irq(r) ;
 }
 
-void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				     lis_flags_t *flags, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* compiler happiness in 2.2 */
@@ -804,9 +812,10 @@ void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				      lis_flags_t *flags, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* compiler happiness in 2.2 */
@@ -824,9 +833,10 @@ void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					  lis_flags_t *flags, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* avoid warning in non-SMP case */
@@ -840,9 +850,10 @@ void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL)
     read_unlock_irqrestore(r, (*flags)) ;
 }
 
-void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					   lis_flags_t *flags, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
     DCL_r ;
 
     (void) r ;				/* avoid warning in non-SMP case */
@@ -916,22 +927,26 @@ void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
     lis_spin_unlock_irq_fcn((lis_spin_lock_t *)lock, file, line) ;
 }
 
-void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				     lis_flags_t *flags, FL)
 {
     lis_spin_lock_irqsave_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
 }
 
-void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				      lis_flags_t *flags, FL)
 {
     lis_spin_lock_irqsave_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
 }
 
-void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					  lis_flags_t *flags, FL)
 {
     lis_spin_unlock_irqrestore_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
 }
 
-void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, FL)
+void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					   lis_flags_t *flags, FL)
 {
     lis_spin_unlock_irqrestore_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
 }
