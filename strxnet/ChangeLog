@@ -1,0 +1,18 @@
+# $Log: ChangeLog,v $
+# Revision 0.9.2.1  2004/06/06 03:48:44  brian
+# - Updated change logs.
+#
+
+2004-06-05 brian <bidulock@openss7.org>
+	* (am/rpm.am):
+	- build tools last so that debug rpm built properly on RH9
+	* (m4/rpm.m4):
+	- quoting error
+	* (m4/strconf.m4):
+	- build quoting problems
+	* (src/drivers/inet.c):
+	- changed MODULE_PARM to non-static
+	* (src/modules/timod.c):
+	- changed MODULE_PARM to non-static
+	* (src/modules/tirdwr.c):
+	- changed MODULE_PARM to non-static
