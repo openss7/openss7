@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: uw7ddi.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: uw7ddi.h,v 0.9.2.5 2004/03/18 11:17:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/03/18 11:17:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/18 11:17:49 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -195,23 +195,33 @@ __UW7_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 }
 __UW7_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
-	/* this will jam up sometimes */
 	pl_t old_pl = spl(pl);
+#ifdef HAVE_READ_TRYLOCK
+	if (read_trylock(lockp))
+		return (old_pl);
+#else
+	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
 		read_lock(lockp);
 		return (old_pl);
 	}
+#endif
 	splx(old_pl);
 	return (invpl);
 }
 __UW7_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
-	/* this will jam up sometimes */
 	pl_t old_pl = spl(pl);
+#ifdef HAVE_WRITE_TRYLOCK
+	if (write_trylock(lockp))
+		return (old_pl);
+#else
+	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
 		write_lock(lockp);
 		return (old_pl);
 	}
+#endif
 	splx(old_pl);
 	return (invpl);
 }
