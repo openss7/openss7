@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/15 22:11:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/15 22:11:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/15 22:11:07 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/15 22:11:07 $";
 
 #define __NO_VERSION__
 
@@ -261,6 +261,8 @@ mblk_t *copyb(mblk_t *bp)
 			bcopy(bp->b_rptr, mp->b_wptr, size);
 			mp->b_wptr += size;
 			mp->b_datap->db_type = bp->b_datap->db_type;
+			mp->b_band = bp->b_band;
+			mp->b_flag = bp->b_flag;
 		}
 	}
 	return (mp);
