@@ -28,7 +28,7 @@
 #ifndef SYS_LISPCI_H
 #define SYS_LISPCI_H	1
 
-#ident "@(#) LiS lispci.h 1.4 9/24/02"
+#ident "@(#) LiS lispci.h 1.7 4/28/03"
 
 /************************************************************************
 *                       PCI Device Structure                            *
@@ -123,6 +123,90 @@ void		 lis_pci_disable_device (lis_pci_dev_t *dev) ;
  * Internal routine, not to be called by user
  */
 void    lis_pci_cleanup(void) ;
+
+/************************************************************************
+*                         PCI Memory Allocation                         *
+*************************************************************************
+*									*
+* These routines are used to allocate memory with contiguous physical	*
+* addresses suitable for PCI DMA use.					*
+*									*
+* See /usr/src/linux/Documentation/DMA-mapping.txt for information on	*
+* the underlying kernel routines.					*
+*									*
+************************************************************************/
+
+typedef struct lis_dma_addr
+{
+    unsigned	   opaque[8] ;		/* opaque kernel structure */
+    int		   size ;		/* saved size */
+    void	  *vaddr ;		/* cpu virtual addr */
+    lis_pci_dev_t *dev ;		/* PCI device */
+    int		   direction ;		/* for map/unmap single */
+
+} lis_dma_addr_t ;
+
+/*
+ * Allocate 'size' bytes and return the CPU pointer to it via return value.
+ * Return the DMA address via 'dma_handle'.
+ */
+void	*lis_pci_alloc_consistent(lis_pci_dev_t	 *dev,
+				  size_t	  size,
+				  lis_dma_addr_t *dma_handle);
+
+/*
+ * Deallocate memory allocated above.  'vaddr' is the address returned
+ * by alloc_consistent.  'dma_handle' points to the DMA handle structure
+ * returned by the allocate routine.
+ */
+void	*lis_pci_free_consistent(lis_dma_addr_t *dma_handle);
+
+u32	lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle);
+u64	lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle);
+
+void	lis_pci_map_single(lis_pci_dev_t *dev,
+			   void		*ptr,
+			   size_t	 size,
+			   lis_dma_addr_t *dma_handle,
+			   int		 direction);
+
+void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle);
+
+/*
+ * Miscellaneous
+ */
+int	lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
+int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
+
+
+/************************************************************************
+*                       DMA Synchronization                             *
+*************************************************************************
+*									*
+* Using the DMA handles allocated above, synchronize memory with DMA.	*
+*									*
+************************************************************************/
+
+#define	LIS_SYNC_FOR_CPU	1	/* direction value */
+#define LIS_SYNC_FOR_DMA	2	/* direction value */
+#define LIS_SYNC_FOR_BOTH	3	/* direction value */
+
+void lis_pci_dma_sync_single(lis_dma_addr_t	*dma_handle,
+			     size_t		 size,
+			     int		 direction);
+
+/************************************************************************
+*                          Memory Barrier                               *
+*************************************************************************
+*									*
+* This can sometimes be helpful when trying to synchronize the CPU view	*
+* of memory across a number of CPUs, plus DMA accesses.			*
+*									*
+************************************************************************/
+
+void lis_membar(void) ;
+
+
 
 
 #endif				/* SYS_LISPCI_H from top of file */

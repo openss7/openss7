@@ -25,7 +25,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lispci.c 1.8 9/24/02"
+#ident "@(#) LiS lispci.c 1.11 4/28/03"
 
 #include <sys/stream.h>		/* gets all the right LiS stuff included */
 #include <sys/lispci.h>		/* LiS PCI header file */
@@ -397,3 +397,192 @@ void	lis_pci_cleanup(void)
     lis_pci_dev_list = NULL ;
 
 } /* lis_pci_cleanup */
+
+/************************************************************************
+*                         DMA Memory Allocation				*
+************************************************************************/
+
+void    *lis_pci_alloc_consistent(lis_pci_dev_t  *dev,
+				  size_t          size,
+				  lis_dma_addr_t *dma_handle)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    dma_addr_t	*dp = (dma_addr_t *) dma_handle->opaque ;
+    void	*vaddr ;
+    
+    dma_handle->size = size ;
+    dma_handle->dev  = dev ;
+    vaddr = pci_alloc_consistent(dev->kern_ptr, size, dp) ;
+    dma_handle->vaddr = vaddr ;
+
+    return(vaddr) ;
+#else						/* 2.2 kernel */
+    void	*vaddr ;
+    u32		*p = (u32 *) dma_handle->opaque ;
+
+    dma_handle->size = size ;
+    dma_handle->dev  = dev ;
+    vaddr = lis_get_free_pages_atomic(size) ;
+    dma_handle->vaddr = vaddr ;
+    p[0] = NULL ;
+    p[1] = NULL ;
+    if (vaddr != NULL)
+	*p = virt_to_bus(vaddr) ;
+
+    return(vaddr) ;
+#endif
+}
+
+void    *lis_pci_free_consistent(lis_dma_addr_t *dma_handle)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    if (dma_handle->vaddr != NULL)
+	pci_free_consistent(dma_handle->dev->kern_ptr,
+			    dma_handle->size,
+			    dma_handle->vaddr,
+			    *((dma_addr_t *) dma_handle->opaque)) ;
+    dma_handle->vaddr = NULL ;
+    return(NULL) ;
+#else						/* 2.2 kernel */
+    u32		*p = (u32 *) dma_handle->opaque ;
+
+    if (dma_handle->vaddr != NULL)
+	lis_free_pages(dma_handle->vaddr) ;
+
+    p[0] = NULL ;
+    p[1] = NULL ;
+    dma_handle->vaddr = NULL ;
+    return(NULL) ;
+#endif
+}
+
+u32     lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle)
+{
+    u32		*p = (u32 *) dma_handle->opaque ;
+
+    return(*p) ;
+}
+
+u64     lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle)
+{
+    u64		*p = (u64 *) dma_handle->opaque ;
+
+    return(*p) ;
+}
+
+void    lis_pci_map_single(lis_pci_dev_t *dev,
+			   void         *ptr,
+			   size_t        size,
+			   lis_dma_addr_t *dma_handle,
+			   int           direction)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    dma_addr_t	*dp = (dma_addr_t *) dma_handle->opaque ;
+
+    dma_handle->size      = size ;
+    dma_handle->dev       = dev ;
+    dma_handle->vaddr     = ptr ;
+    dma_handle->direction = direction ;
+    *dp = pci_map_single(dev->kern_ptr, ptr, size, direction);
+#else						/* 2.2 kernel */
+    u32		*p = (u32 *) dma_handle->opaque ;
+
+    dma_handle->size      = size ;
+    dma_handle->dev       = dev ;
+    dma_handle->vaddr     = ptr ;
+    dma_handle->direction = direction ;
+    p[0] = NULL ;
+    p[1] = NULL ;
+    if (ptr != NULL)
+	*p = virt_to_bus(ptr) ;
+#endif
+}
+
+void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    if (dma_handle->vaddr != NULL)
+	pci_unmap_single(dma_handle->dev->kern_ptr,
+			 *((dma_addr_t *) dma_handle->opaque),
+			 dma_handle->size,
+			 dma_handle->direction);
+
+    dma_handle->vaddr = NULL ;
+    return(NULL) ;
+#else						/* 2.2 kernel */
+    u32		*p = (u32 *) dma_handle->opaque ;
+
+    p[0] = NULL ;
+    p[1] = NULL ;
+    dma_handle->vaddr = NULL ;
+#endif
+}
+
+/************************************************************************
+*                      lis_pci_dma_sync_single                          *
+*************************************************************************
+*									*
+* Synchronize memory with DMA.						*
+*									*
+************************************************************************/
+void lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
+			     size_t              size,
+			     int                 direction)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    switch (direction)
+    {
+    case LIS_SYNC_FOR_CPU:	direction = PCI_DMA_FROMDEVICE ; break ;
+    case LIS_SYNC_FOR_DMA:	direction = PCI_DMA_TODEVICE ; break ;
+    case LIS_SYNC_FOR_BOTH:	direction = PCI_DMA_BIDIRECTIONAL ; break ;
+    default:			return ;
+    }
+
+    if (size > dma_handle->size)
+	size = dma_handle->size ;
+
+    pci_dma_sync_single(dma_handle->dev->kern_ptr,
+			*((dma_addr_t *) dma_handle->opaque),
+		        size,
+			direction);
+#else						/* 2.2 kernel */
+    /* nothing like this in 2.2 */
+#endif
+}
+
+/************************************************************************
+*                            Miscellaneous                              *
+************************************************************************/
+
+int     lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    return(pci_dma_supported(dev->kern_ptr, mask)) ;
+#else						/* 2.2 kernel */
+    return(0) ;
+#endif
+}
+
+int     lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
+{
+#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
+    return(pci_set_dma_mask(dev->kern_ptr, mask)) ;
+#else						/* 2.2 kernel */
+    return(0) ;
+#endif
+}
+
+
+/************************************************************************
+*                            Memory Barrier                             *
+*************************************************************************
+*									*
+* Our own routine.  Kernel versioning takes care of differences.	*
+*									*
+************************************************************************/
+void lis_membar(void)
+{
+    barrier();
+    mb();
+}
+

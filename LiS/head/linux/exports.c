@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS exports.c 1.10 3/20/03"
+#ident "@(#) LiS exports.c 1.12 4/28/03"
 
 #ifdef MODVERSIONS
 # ifdef LISMODVERS
@@ -219,6 +219,7 @@ EXPORT_SYMBOL(lis_major);
 EXPORT_SYMBOL(lis_malloc);
 EXPORT_SYMBOL(lis_mark_mem);
 EXPORT_SYMBOL(lis_max_mem);
+EXPORT_SYMBOL(lis_membar);
 EXPORT_SYMBOL(lis_milli_to_ticks);
 EXPORT_SYMBOL(lis_mknod);
 EXPORT_SYMBOL(lis_mount);
@@ -260,16 +261,25 @@ EXPORT_SYMBOL(lis_pcibios_strerror);
 EXPORT_SYMBOL(lis_pcibios_write_config_byte);
 EXPORT_SYMBOL(lis_pcibios_write_config_dword);
 EXPORT_SYMBOL(lis_pcibios_write_config_word);
+EXPORT_SYMBOL(lis_pci_alloc_consistent);
 EXPORT_SYMBOL(lis_pci_cleanup);
 EXPORT_SYMBOL(lis_pci_disable_device);
+EXPORT_SYMBOL(lis_pci_dma_handle_to_32);
+EXPORT_SYMBOL(lis_pci_dma_handle_to_64);
+EXPORT_SYMBOL(lis_pci_dma_supported);
+EXPORT_SYMBOL(lis_pci_dma_sync_single);
 EXPORT_SYMBOL(lis_pci_enable_device);
 EXPORT_SYMBOL(lis_pci_find_class);
 EXPORT_SYMBOL(lis_pci_find_device);
 EXPORT_SYMBOL(lis_pci_find_slot);
+EXPORT_SYMBOL(lis_pci_free_consistent);
+EXPORT_SYMBOL(lis_pci_map_single);
 EXPORT_SYMBOL(lis_pci_read_config_byte);
 EXPORT_SYMBOL(lis_pci_read_config_dword);
 EXPORT_SYMBOL(lis_pci_read_config_word);
+EXPORT_SYMBOL(lis_pci_set_dma_mask);
 EXPORT_SYMBOL(lis_pci_set_master);
+EXPORT_SYMBOL(lis_pci_unmap_single);
 EXPORT_SYMBOL(lis_pci_write_config_byte);
 EXPORT_SYMBOL(lis_pci_write_config_dword);
 EXPORT_SYMBOL(lis_pci_write_config_word);
