@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/03/08 00:22:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/08 11:54:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 11:54:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -262,14 +262,23 @@ dnl pull out versions from release number
     fi
     if test "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \)
     then
-	linux_cv_k_ko_modules='yes'
 	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [1], [Define for linux 2.5.48+ .ko kernel modules.])
+	kext=".ko"
+	linux_cv_k_ko_modules='yes'
+	KERNEL_NOVERSION="-D__NO_VERSION__"
+	KERNEL_EXPSYMTAB="-DEXPORT_SYMTAB"
+    else
+	kext=".o"
+	linux_cv_k_ko_modules='no'
+	KERNEL_NOVERSION="-D__NO_VERSION__"
+	KERNEL_EXPSYMTAB="-DEXPORT_SYMTAB"
     fi
     AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_minor -eq 4])
     AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_minor -eq 6])
     AM_CONDITIONAL([WITH_KO_MODULES], [test :${linux_cv_k_ko_modules:-no} = :yes])
-    if test :${linux_cv_k_ko_modules:-no} = :yes ; then kext=".ko" ; else kext=".o" ; fi
     AC_SUBST([kext])dnl
+    AC_SUBST([KERNEL_NOVERSION])dnl
+    AC_SUBST([KERNEL_EXPSYMTAB])dnl
 ])# _LINUX_CHECK_KERNEL_RELEASE
 # =========================================================================
 
@@ -1145,7 +1154,8 @@ dnl	linux_cv_k_cppflags="${linux_tmp:+-nostdinc -I${linux_tmp} }-DLINUX $linux_c
     CPPFLAGS="$linux_cv_k_cppflags"
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
 	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} modflag-check`" ])
-    KERNEL_MODFLAGS="$linux_cv_k_modflags"][dnl
+    KERNEL_MODFLAGS="$linux_cv_k_modflags"
+    AC_SUBST([KERNEL_MODFLAGS])dnl
 ])# _LINUX_SETUP_KERNEL_CFLAGS
 # =========================================================================
 
@@ -1726,9 +1736,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
     _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel symbol versioning],
 	[CONFIG_MODVERSIONS], [linux_cv_k_versions=yes], [linux_cv_k_versions=no])
-    AC_SUBST([KERNEL_MODFLAGS])dnl
-    KERNEL_NOVERSION="-D__NO_VERSION__"
-    AC_SUBST([KERNEL_NOVERSION])dnl
 ])# _LINUX_CHECK_KERNEL_VERSIONS
 # =========================================================================
 
