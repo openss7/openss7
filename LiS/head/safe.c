@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS safe.c 2.9 9/30/03 20:39:19 "
+#ident "@(#) LiS safe.c 2.11 12/27/03 15:34:34 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -51,7 +51,6 @@
 #define	LOG(fil, line, msg)	printk("%s: called from file %s #%d\n",  \
 					msg, fil, line)
 
-
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
@@ -60,7 +59,7 @@
 void lis_safe_noenable(queue_t *q, char *f, int l)
 {
     lis_flags_t     psw;
-    if (!lis_check_q_magic(q,f,l)) return ;
+    if (!LIS_QMAGIC(q,f,l)) return ;
     LIS_QISRLOCK(q, &psw) ;
     q->q_flag |= QNOENB;
     LIS_QISRUNLOCK(q, &psw) ;
@@ -69,7 +68,7 @@ void lis_safe_noenable(queue_t *q, char *f, int l)
 void lis_safe_enableok(queue_t *q, char *f, int l)
 {
     lis_flags_t     psw;
-    if (!lis_check_q_magic(q,f,l)) return ;
+    if (!LIS_QMAGIC(q,f,l)) return ;
     LIS_QISRLOCK(q, &psw) ;
     q->q_flag &= ~QNOENB;
     LIS_QISRUNLOCK(q, &psw) ;
@@ -77,7 +76,7 @@ void lis_safe_enableok(queue_t *q, char *f, int l)
 
 int lis_safe_canenable(queue_t *q, char *f, int l)
 {
-    if (lis_check_q_magic(q,f,l))
+    if (LIS_QMAGIC(q,f,l))
 	return !(q->q_flag & QNOENB);
 
     return 0;
@@ -87,10 +86,10 @@ queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
-    if (lis_check_q_magic(q,f,l))
+    if (LIS_QMAGIC(q,f,l))
     {
 	oq = q->q_other;
-	if (lis_check_q_magic(oq,f,l))
+	if (LIS_QMAGIC(oq,f,l))
 	    return (oq) ;
     }
 
@@ -101,14 +100,14 @@ queue_t *lis_safe_RD(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
-    if (lis_check_q_magic(q,f,l))
+    if (LIS_QMAGIC(q,f,l))
     {
 	if ((q->q_flag&QREADR))
 	    oq = q ;
 	else
 	    oq = q->q_other;
 
-	if (lis_check_q_magic(oq,f,l))
+	if (LIS_QMAGIC(oq,f,l))
 	    return (oq) ;
 
     }
@@ -119,14 +118,14 @@ queue_t *lis_safe_WR(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
-    if (lis_check_q_magic(q,f,l))
+    if (LIS_QMAGIC(q,f,l))
     {
 	if ((q->q_flag&QREADR))
 	    oq = q->q_other;
 	else
 	    oq = q ;
 
-	if (lis_check_q_magic(oq,f,l))
+	if (LIS_QMAGIC(oq,f,l))
 	    return (oq) ;
     }
 
@@ -135,9 +134,9 @@ queue_t *lis_safe_WR(queue_t *q, char *f, int l)
 
 int lis_safe_SAMESTR(queue_t *q, char *f, int l)
 {
-    if (   lis_check_q_magic(q,f,l)
+    if (   LIS_QMAGIC(q,f,l)
 	&& q->q_next != NULL
-	&& lis_check_q_magic(q->q_next,f,l)
+	&& LIS_QMAGIC((q->q_next),f,l)
        )
 	return ((q->q_flag&QREADR) == (q->q_next->q_flag&QREADR));
 
@@ -147,7 +146,7 @@ int lis_safe_SAMESTR(queue_t *q, char *f, int l)
 void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
 {
     if (   mp == NULL
-	|| !lis_check_q_magic(q,f,l)
+	|| !LIS_QMAGIC(q,f,l)
 	|| q->q_qinfo == NULL
 	|| q->q_qinfo->qi_putp == NULL
        )
@@ -176,8 +175,8 @@ void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
     queue_t    *qnxt = NULL ;
 
     if (   mp == NULL
-	|| !lis_check_q_magic(q,f,l)
-	|| !lis_check_q_magic(qnxt = q->q_next,f,l)
+	|| !LIS_QMAGIC(q,f,l)
+	|| !LIS_QMAGIC((qnxt = q->q_next),f,l)
        )
     {
 	LOG(f, l, "NULL q, mp or q_next in putnext");

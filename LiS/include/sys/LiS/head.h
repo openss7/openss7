@@ -36,7 +36,7 @@
 #ifndef _HEAD_H
 #define _HEAD_H 1
 
-#ident "@(#) LiS head.h 2.25 5/30/03 21:41:02 "
+#ident "@(#) LiS head.h 2.26 12/27/03 15:12:51 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -334,11 +334,19 @@ extern lis_atomic_t      lis_mnt_cnt;
 extern void    		 lis_task_to_creds(lis_kcreds_t *cp) ;
 extern void    		 lis_creds_to_task(lis_kcreds_t *cp) ;
 
+#if defined(CONFIG_DEV)
 extern stdata_t *lis_head_get_fcn(stdata_t *hd, const char *file, int line);
 extern stdata_t *lis_head_put_fcn(stdata_t *hd, const char *file, int line);
 
 #define lis_head_get(hd)	lis_head_get_fcn(hd, __LIS_FILE__, __LINE__)
 #define lis_head_put(hd)	lis_head_put_fcn(hd, __LIS_FILE__, __LINE__)
+#else
+extern stdata_t *lis_head_get_fcn(stdata_t *hd);
+extern stdata_t *lis_head_put_fcn(stdata_t *hd);
+
+#define lis_head_get(hd)	lis_head_get_fcn(hd)
+#define lis_head_put(hd)	lis_head_put_fcn(hd)
+#endif
 
 #endif			/* __KERNEL__ */
 

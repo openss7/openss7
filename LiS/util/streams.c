@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS streams.c 2.17 11/23/03 18:32:59 "
+#ident "@(#) LiS streams.c 2.18 12/27/03 15:13:10 "
 #include <sys/types.h>
 #undef GCOM_OPEN
 #include <sys/stropts.h>
@@ -211,6 +211,7 @@ void print_debug_bits(void)
     printf("-D<debug-bits -- \n") ;
     printf("DEBUG_SNDFD         0x00000001\n");
     printf("DEBUG_CP (code path)0x00000002\n");
+    printf("DEBUG_CACHE         0x00000004\n");
 
 } /* print_debug_bits */
 

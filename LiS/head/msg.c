@@ -33,7 +33,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS msg.c 2.11 5/30/03 21:40:39 "
+#ident "@(#) LiS msg.c 2.12 12/27/03 15:12:51 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -99,9 +99,18 @@ long	     lis_max_msg_mem ;		  /* maximum to allocate */
  * Use DBLK_ALLOC to get the memory.  Since a header (mblk) also
  * contains a small data block it must be DMA-able memory.
  */
+#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+#if defined(CONFIG_DEV)
 static struct mdbblock *
 allochdr(char *file_name, int line_nr)
+#else
+static struct mdbblock * allochdr(void)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file_name = "__FILE__" ;
+    static int   line_nr   = 0 ;
+#endif
     struct mdbblock *rtn;
     lis_flags_t      psw;
     lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
@@ -158,12 +167,25 @@ allochdr(char *file_name, int line_nr)
     return rtn;
 
 }/*allochdr*/
-
+#else
+/*
+ * This case (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE) is 
+ * covered/handled in include/sys/LiS/linux-mdep.h as:
+ *
+ *  #if defined(CONFIG_DEV)
+ *  #define allochdr(a,b) lis_kmem_cache_allochdr() 
+ *  #else
+ *  #define allochdr() lis_kmem_cache_allochdr()
+ *  #endif
+ *
+ */
+#endif
 /*  -------------------------------------------------------------------  */
 
 /* freehdr - return a header to the free list. For internal use.
  */
 
+#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
 static void
 freehdr(mblk_t *bp)
 {
@@ -200,12 +222,20 @@ freehdr(mblk_t *bp)
     lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
     LisUpCount(FREEHDRS);
 }/*freehdr*/
+#else /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+/*
+ *  This case - LINUX and USE_LINUX_KMEM_CACHE - is handled/covered 
+ *  in linux-mdep.h via #define freehdr(a) lis_msgb_cache_freehdr((a))
+ */
+#endif /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+
 
 /*  -------------------------------------------------------------------  */
 /* lis_msg_terminate - do the final shutdown of the msg memory subsystem.
  *
  * This will clean up any memory leaks.					*
  */
+#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
 void
 lis_terminate_msg(void)
 {
@@ -219,6 +249,12 @@ lis_terminate_msg(void)
 	FREE(p);
     }
 }
+#else  /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+/*
+ *  This case - LINUX and USE_LINUX_KMEM_CACHE - is handled/covered 
+ *  in linux-mdep.h via #define 
+ */
+#endif  /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
 
 
 /*  -------------------------------------------------------------------  */
@@ -227,9 +263,18 @@ lis_terminate_msg(void)
  * Use DBLK_ALLOC to allocate the memory.  STREAMS buffers must
  * be DMA-able.
  */
+#if defined(CONFIG_DEV)
 static char *
 allocdb(int size, char *file_name, int line_nr, int flags)
+#else
+static char *
+allocdb(int size, int flags)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file_name = "__FILE__" ;
+    static int   line_nr   = 0 ;
+#endif
     char *rtn;
 
     if (   lis_max_msg_mem != 0
@@ -331,7 +376,11 @@ lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr,
 struct msgb *
 lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 {
+#if defined(CONFIG_DEV)
     struct mdbblock *rtn = allochdr(file_name, line_nr);
+#else
+    struct mdbblock *rtn = allochdr();
+#endif
     char *buff;
     (void)priority;
     if (rtn == NULL)
@@ -340,7 +389,11 @@ lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
     if (size > FASTBUF)
     {
 	/* allocate data buffer */
+#if defined(CONFIG_DEV)
 	if ((buff = allocdb(size, file_name, line_nr, 0)) == NULL)
+#else
+	if ((buff = allocdb(size, 0)) == NULL)
+#endif
 	{
 	    /* failed; replace header in free list and return */
 	    freehdr((mblk_t *)rtn);
@@ -408,7 +461,11 @@ lis_esballoc(unsigned char *base, int size, int priority,
     struct mdbblock *rtn = NULL;
 
     (void)priority;
+#if defined(CONFIG_DEV)
     if (base && freeinfo && (rtn  = allochdr(file_name, line_nr)) != NULL)
+#else
+    if (base && freeinfo && (rtn  = allochdr()) != NULL)
+#endif
     	initb(rtn, base, size, freeinfo);
 
     if (rtn == NULL) return(NULL) ;

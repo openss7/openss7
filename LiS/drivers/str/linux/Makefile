@@ -76,7 +76,10 @@ endif  # ifdef CONFIG_MODULES
 #
 # Our default target
 #
-default: drivers.o strinet
+# We omit strinet.  Make it by hand if you need it.
+#
+default: drivers.o 
+#default: drivers.o strinet
 
 ifneq ($(strip $(MODLS) $(TMODLS)),)
 
@@ -93,17 +96,17 @@ endif
 #
 # Rules
 #
-clean: common-clean clean_strinet
+clean: common-clean
 	-rm -f $(OBJS:%=streams-%.o)
 	-rm -f $(TOBJS:%=streams-%.o)
 	-rm -f $(ZOBJS:%=%.o)
 
-realclean: clean common-realclean realclean_strinet
+realclean: clean common-realclean
 	-rm -f .depend.modules
 
-install:	common-install install_strinet
+install:	common-install
 
-uninstall:	common-uninstall uninstall_strinet
+uninstall:	common-uninstall
 
 # How to compile a loadable only known here ( $(TMODLS) )
 streams-%.o: %.c
@@ -130,6 +133,9 @@ liskmod.o:	liskmod.c
 
 #
 # OPEN SS7 strinet package
+#
+# You can make these targets by hand from here but they are
+# not made implicitly any more.
 #
 strinet:
 	cd ../strinet; ./make_strinet

@@ -6,7 +6,7 @@
 # clean		Do a make clean in strinet
 # realclean	Remove the subdirectory, leave the archive
 #
-#ident "@(#) LiS make_strinet 1.6 9/24/03"
+#ident "@(#) LiS make_strinet 1.7 12/27/03"
 
 if [ ! -f /usr/src/LiS/config.in ]; then
     echo "/usr/src/LiS/config.in missing.  Cannot make strinet"

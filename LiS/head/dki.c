@@ -28,11 +28,14 @@
  * 
  */
 
-#ident "@(#) LiS dki.c 2.11 8/18/03 14:06:47 "
+#ident "@(#) LiS dki.c 2.12 12/27/03 15:12:51 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
 
+lis_spin_lock_t	  lis_tlist_lock ;
+
+#if !(defined(LINUX) && defined(USE_LINUX_KMEM_TIMER))
 /************************************************************************
 *                       SVR4 Compatible timeout                         *
 *************************************************************************
@@ -59,7 +62,6 @@ typedef struct tlist
 
 } tlist_t ;
 
-lis_spin_lock_t	  lis_tlist_lock ;
 volatile tlist_t *lis_tlist_head ;	/* this list is no particular order */
 volatile int	  lis_tlist_handle ;	/* next handle to use */
 
@@ -126,7 +128,11 @@ toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 
     if (found == NULL)				/* must allocate a new one */
     {
+#if defined(CONFIG_DEV)
 	tp = (tlist_t *) LISALLOC(sizeof(*tp),file_name, line_nr) ;
+#else
+	tp = (tlist_t *) ALLOC(sizeof(*tp)) ;
+#endif
 	if (tp == NULL)
 	{
 	    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
@@ -195,6 +201,7 @@ void lis_terminate_dki(void)
 	}
         lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
 }
+#endif
 
 /************************************************************************
 *                           lis_create_node                             *

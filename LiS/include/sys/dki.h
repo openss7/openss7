@@ -31,7 +31,7 @@
 #ifndef	DKI_H
 #define	DKI_H		1
 
-#ident "@(#) LiS dki.h 2.8 11/19/02 21:18:02 "
+#ident "@(#) LiS dki.h 2.9 12/27/03 15:12:52 "
 
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
@@ -63,8 +63,13 @@
 #ifdef __KERNEL__
 
 typedef void	timo_fcn_t(caddr_t arg) ;
-typedef int	toid_t ;			/* SVR4 */
-typedef int	timeout_id_t ;			/* Solaris */
+#if defined(LINUX) && defined(USE_LINUX_KMEM_TIMER)
+typedef void 		*toid_t ;		/* SVR4 */
+typedef void	 	*timeout_id_t ;		/* Solaris */
+#else
+typedef unsigned long	 toid_t ;		/* SVR4 */
+typedef unsigned long	 timeout_id_t ;		/* Solaris */
+#endif
 
 #define	timeout(fcn,arg,ticks)	lis_timeout_fcn(fcn,arg,ticks,__FILE__, __LINE__)
 #define	untimeout		lis_untimeout
@@ -73,7 +78,17 @@ extern toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 			    char *file_name, int line_nr) ;
 extern toid_t	lis_untimeout(toid_t id) ;
 
+#if (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+/* 
+ * alternate construction in include/sys/LiS/linux-mdep.h
+ * for USE_LINUX_KMEM_CACHE 
+ */
+extern void lis_init_dki(void); 
+#endif
+#if !defined(USE_LINUX_KMEM_TIMER)
+/* lis_terminate_dki is a #define when USE_LINUX_KMEM_TIMER */
 extern void lis_terminate_dki(void);
+#endif
 
 #endif				/* __KERNEL__ */
 

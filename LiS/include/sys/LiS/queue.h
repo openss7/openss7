@@ -35,7 +35,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 1
 
-#ident "@(#) LiS queue.h 2.16 8/14/03 14:26:09 "
+#ident "@(#) LiS queue.h 2.17 12/27/03 15:12:52 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -147,7 +147,10 @@ struct queue
 #define	Q_MAGIC		((ulong) (0x93390000L | sizeof(queue_t)) )
 
 int     lis_check_q_magic(queue_t *q, char *filename, int linenr) ;
-#define	LIS_CHECK_Q_MAGIC(q)	lis_check_q_magic(q,__FILE__,__LINE__)
+#define LIS_QMAGIC(q,f,l) \
+	(((q) && ((q)->q_magic == Q_MAGIC)) || lis_check_q_magic((q),(f),(l)))
+#define	LIS_CHECK_Q_MAGIC(q)	LIS_QMAGIC((q),__FILE__,__LINE__)
+
 
 /*
  * Queue isr locking macro.  To be used ONLY internally by LiS.
@@ -217,6 +220,11 @@ struct qband {
  */
 
 #ifdef __KERNEL__
+#if (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+extern void lis_init_queues(void);
+extern void lis_terminate_queues(void);
+#endif
+
 /* Allocate a new queue pair
  * return NULL on failure 
  *

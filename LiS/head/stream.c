@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS stream.c 2.13 5/30/03 21:40:39 "
+#ident "@(#) LiS stream.c 2.14 12/27/03 15:12:51 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -59,8 +59,12 @@ extern lis_spin_lock_t	lis_bc_lock ;		/* buffcall.c */
 extern int		lis_down_nintr(lis_semaphore_t *sem) ;
 extern void		lis_wakeup_close_wt(void *q_str) ; /* wait.c */
 
+#if defined(CONFIG_DEV)
 extern void		lis_cpfl(void *p, long a, 
 				 const char *fcn, const char *f, int l);
+#else
+#define lis_cpfl(a,b,c,d,e)
+#endif
 
 
 /*  -------------------------------------------------------------------  */

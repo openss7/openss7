@@ -21,7 +21,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lislocks.c 1.24 6/10/03"
+#ident "@(#) LiS lislocks.c 1.25 12/27/03"
 
 #include <sys/LiS/linux-mdep.h>
 #include <sys/LiS/strmdbg.h>
@@ -37,13 +37,65 @@
 #endif
 
 #if defined(KERNEL_2_5)
+#if defined(CONFIG_DEV)
 #define	SAVE_FLAGS(x)		local_save_flags(x)
+#else 
+#define	SAVE_FLAGS(x)
+#endif
 #else
+#if defined(CONFIG_DEV)
 #define	SAVE_FLAGS(x)		save_flags(x)
+#else 
+#define	SAVE_FLAGS(x)
+#endif
 #endif
 
 #define FL	char *file, int line
 
+#if defined(CONFIG_DEV)
+#define SET_SPINNER				\
+	lock->spinner_file = file ;		\
+	lock->spinner_line = line ;		\
+	lock->spinner_cntr = ++lis_seq_cntr ; 
+
+#define SET_OWNER 				\
+	lock->owner_file = file ; 		\
+	lock->owner_line = line ; 		\
+	lock->owner_cntr = ++lis_seq_cntr ;
+
+#define SET_SPIN_UNLOCK				\
+	lock->unlocker_file = file ;		\
+	lock->unlocker_line = line ;		\
+	lock->unlocker_cntr = ++lis_seq_cntr ;
+
+#define	SPIN_FILL	lis_spin_lock_fill(lock, name, file, line) 
+
+#define	RW_LOCK_FILL	lis_rw_lock_fill(lock, name, file, line) 
+
+#define	SET_UPSEM				\
+	lsem->upper_file = file ;		\
+	lsem->upper_line = line ;		\
+	lsem->upper_cntr = ++lis_seq_cntr ;
+
+#define	SET_DSEM				\
+	lsem->downer_file = file ;		\
+	lsem->downer_line = line ;		\
+	lsem->downer_cntr = ++lis_seq_cntr ;
+
+#define	SET_SEMOWNER				\
+	lsem->owner_file = file ;		\
+	lsem->owner_line = line ;		\
+	lsem->owner_cntr = ++lis_seq_cntr ;
+#else
+#define SET_SPINNER	(void) prev ;
+#define SET_OWNER      	(void) prev ;
+#define SET_SPIN_UNLOCK	(void) prev ;
+#define	SET_UPSEM
+#define	SET_DSEM
+#define	SET_SEMOWNER
+#define	SPIN_FILL	lis_spin_lock_fill(lock, name) 
+#define	RW_LOCK_FILL	lis_rw_lock_fill(lock, name) 
+#endif
 
 /************************************************************************
 *                         Lock Contention                               *
@@ -118,6 +170,7 @@ spl_track_t		*lis_spl_track_ptr = lis_spl_track ;
  */
 spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
 
+#if defined(CONFIG_DEV)
 #define	LOCK_ENTRY(lock,typ,fil,lin,flgs)				\
     if ( LIS_DEBUG_SPL_TRACE )						\
     {									\
@@ -209,6 +262,12 @@ spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
 	p->cpu  = smp_processor_id();					\
 	p->state = atomic_read(&((struct semaphore *) &sem->sem_mem)->count); \
     }
+#else   
+#define	LOCK_ENTRY(lock,typ,fil,lin,flgs)
+#define	LOCK_EXIT(lock,typ,fil,lin,flgs)
+#define	SEM_ENTRY(sem,typ,fil,lin,flgs)
+#define	SEM_EXIT(sem,typ,fil,lin,flgs)
+#endif	/* CONFIG_DEV	*/
 
 /************************************************************************
 *                         Prototypes                                    *
@@ -391,10 +450,8 @@ void    lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
 
     (void) l ;				/* suppress compiler warning */
     lis_atomic_inc(&lis_spin_lock_count) ;
-    SAVE_FLAGS(prev) ;
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SAVE_FLAGS(prev);
+    SET_SPINNER
     if ((void *) current != lock->taskp)
     {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
@@ -403,9 +460,7 @@ void    lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
 	spin_lock(l) ;
 #endif
 	lock->taskp = (void *) current ;
-	lock->owner_file = file ;
-	lock->owner_line = line ;
-	lock->owner_cntr = ++lis_seq_cntr ;
+	SET_OWNER
     }
     lis_atomic_inc(&lock->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
@@ -426,9 +481,7 @@ void    lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
 	if (lis_atomic_read(&lock->nest) == 0)
 	{
 	    lock->taskp = NULL ;
-	    lock->unlocker_file = file ;
-	    lock->unlocker_line = line ;
-	    lock->unlocker_cntr = ++lis_seq_cntr ;
+	    SET_SPIN_UNLOCK
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	    spin_unlock(l) ;
 #endif
@@ -440,22 +493,20 @@ int     lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
     int		ret ;
+    lis_flags_t	prev ;
     DCL_l ;
 
     (void) l ;				/* avoid warning in non-SMP case */
+    (void) prev ;
     lis_atomic_inc(&lis_spin_lock_count) ;
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     if ((void *) current != lock->taskp)
     {
 	if ((ret = spin_trylock(l)) != 0)
 	{
 	    lis_atomic_inc(&lock->nest) ;
 	    lock->taskp = (void *) current ;
-	    lock->owner_file = file ;
-	    lock->owner_line = line ;
-	    lock->owner_cntr = ++lis_seq_cntr ;
+	    SET_OWNER
 	}
 	else
 	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
@@ -477,9 +528,7 @@ void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
     lis_atomic_inc(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
 
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     if ((void *) current != THELOCK->taskp)
     {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
@@ -490,9 +539,7 @@ void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 	cli() ;				/* global cli */
 #endif
 	THELOCK->taskp = (void *) current ;
-	lock->owner_file = file ;
-	lock->owner_line = line ;
-	lock->owner_cntr = ++lis_seq_cntr ;
+	SET_OWNER
     }
     lis_atomic_inc(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
@@ -513,9 +560,7 @@ void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
 	if (lis_atomic_read(&THELOCK->nest) == 0)
 	{
 	    THELOCK->taskp = NULL ;
-	    lock->unlocker_file = file ;
-	    lock->unlocker_line = line ;
-	    lock->unlocker_cntr = ++lis_seq_cntr ;
+	    SET_SPIN_UNLOCK
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	    spin_unlock_irq(l) ;
 #else					/* 2.2 kernel */
@@ -534,9 +579,7 @@ void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
     lis_atomic_inc(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
 
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     if ((void *) current != THELOCK->taskp)
     {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
@@ -551,9 +594,7 @@ void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
 	    *flags = 0xff ;		/* invalid */
 #endif
 	THELOCK->taskp = (void *) current ;
-	lock->owner_file = file ;
-	lock->owner_line = line ;
-	lock->owner_cntr = ++lis_seq_cntr ;
+	SET_OWNER
     }
     lis_atomic_inc(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
@@ -575,9 +616,7 @@ void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
 	if (lis_atomic_read(&THELOCK->nest) == 0)
 	{
 	    THELOCK->taskp = NULL ;
-	    lock->unlocker_file = file ;
-	    lock->unlocker_line = line ;
-	    lock->unlocker_cntr = ++lis_seq_cntr ;
+	    SET_SPIN_UNLOCK
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	    spin_unlock_irqrestore(l, (*flags)) ;
 #else					/* 2.2 kernel */
@@ -588,7 +627,11 @@ void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
     }
 }
 
+#if defined(CONFIG_DEV)
 static void lis_spin_lock_fill(lis_spin_lock_t *lock, const char *name, FL)
+#else
+static void lis_spin_lock_fill(lis_spin_lock_t *lock, const char *name)
+#endif
 {
     DCL_l ;
 
@@ -606,7 +649,7 @@ static void lis_spin_lock_fill(lis_spin_lock_t *lock, const char *name, FL)
 void    lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL)
 {
     memset((void *)lock, 0, sizeof(*lock)) ;
-    lis_spin_lock_fill(lock, name, file, line) ;
+    SPIN_FILL;
 }
 
 lis_spin_lock_t *
@@ -621,7 +664,7 @@ lis_spin_lock_alloc_fcn(const char *name, FL)
     if (lock == NULL) return(NULL) ;
 
     memset((void *)lock, 0, lock_size) ;
-    lis_spin_lock_fill(lock, name, file, line) ;
+    SPIN_FILL;
     lock->allocated = 1 ;
     return(lock) ;
 }
@@ -660,14 +703,10 @@ void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 
     (void) r ;				/* suppress compiler warning */
     SAVE_FLAGS(prev) ;
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     read_lock(r) ;
     lock->taskp = (void *) current ;
-    lock->owner_file = file ;
-    lock->owner_line = line ;
-    lock->owner_cntr = ++lis_seq_cntr ;
+    SET_OWNER
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
@@ -678,14 +717,10 @@ void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 
     (void) r ;				/* suppress compiler warning */
     SAVE_FLAGS(prev) ;
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     write_lock(r) ;
     lock->taskp = (void *) current ;
-    lock->owner_file = file ;
-    lock->owner_line = line ;
-    lock->owner_cntr = ++lis_seq_cntr ;
+    SET_OWNER
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
@@ -699,9 +734,7 @@ void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
     lock->taskp = NULL ;
-    lock->unlocker_file = file ;
-    lock->unlocker_line = line ;
-    lock->unlocker_cntr = ++lis_seq_cntr ;
+    SET_SPIN_UNLOCK
     read_unlock(r) ;
 }
 
@@ -715,9 +748,7 @@ void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
     lock->taskp = NULL ;
-    lock->unlocker_file = file ;
-    lock->unlocker_line = line ;
-    lock->unlocker_cntr = ++lis_seq_cntr ;
+    SET_SPIN_UNLOCK
     write_unlock(r) ;
 }
 
@@ -729,14 +760,10 @@ void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
     (void) r ;				/* compiler happiness in 2.2 */
     SAVE_FLAGS(prev) ;
 
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     read_lock_irq(r) ;
     THELOCK->taskp = (void *) current ;
-    lock->owner_file = file ;
-    lock->owner_line = line ;
-    lock->owner_cntr = ++lis_seq_cntr ;
+    SET_OWNER
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
@@ -748,14 +775,10 @@ void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
     (void) r ;				/* compiler happiness in 2.2 */
     SAVE_FLAGS(prev) ;
 
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     write_lock_irq(r) ;
     THELOCK->taskp = (void *) current ;
-    lock->owner_file = file ;
-    lock->owner_line = line ;
-    lock->owner_cntr = ++lis_seq_cntr ;
+    SET_OWNER
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
@@ -769,9 +792,7 @@ void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
     THELOCK->taskp = NULL ;
-    lock->unlocker_file = file ;
-    lock->unlocker_line = line ;
-    lock->unlocker_cntr = ++lis_seq_cntr ;
+    SET_SPIN_UNLOCK
     read_unlock_irq(r) ;
 }
 
@@ -785,9 +806,7 @@ void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
     THELOCK->taskp = NULL ;
-    lock->unlocker_file = file ;
-    lock->unlocker_line = line ;
-    lock->unlocker_cntr = ++lis_seq_cntr ;
+    SET_SPIN_UNLOCK
     write_unlock_irq(r) ;
 }
 
@@ -800,14 +819,10 @@ void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
     (void) r ;				/* compiler happiness in 2.2 */
     SAVE_FLAGS(prev) ;
 
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     read_lock_irqsave(r, (*flags)) ;
     THELOCK->taskp = (void *) current ;
-    lock->owner_file = file ;
-    lock->owner_line = line ;
-    lock->owner_cntr = ++lis_seq_cntr ;
+    SET_OWNER
     lis_atomic_inc(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
@@ -821,14 +836,10 @@ void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
     (void) r ;				/* compiler happiness in 2.2 */
     SAVE_FLAGS(prev) ;
 
-    lock->spinner_file = file ;
-    lock->spinner_line = line ;
-    lock->spinner_cntr = ++lis_seq_cntr ;
+    SET_SPINNER
     write_lock_irqsave(r, (*flags)) ;
     THELOCK->taskp = (void *) current ;
-    lock->owner_file = file ;
-    lock->owner_line = line ;
-    lock->owner_cntr = ++lis_seq_cntr ;
+    SET_OWNER
     lis_atomic_inc(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
@@ -844,9 +855,7 @@ void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
     THELOCK->taskp = NULL ;
-    lock->unlocker_file = file ;
-    lock->unlocker_line = line ;
-    lock->unlocker_cntr = ++lis_seq_cntr ;
+    SET_SPIN_UNLOCK
     read_unlock_irqrestore(r, (*flags)) ;
 }
 
@@ -861,13 +870,15 @@ void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
     THELOCK->taskp = NULL ;
-    lock->unlocker_file = file ;
-    lock->unlocker_line = line ;
-    lock->unlocker_cntr = ++lis_seq_cntr ;
+    SET_SPIN_UNLOCK
     write_unlock_irqrestore(r, (*flags)) ;
 }
 
+#if defined(CONFIG_DEV)
 static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name, FL)
+#else
+static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name)
+#endif
 {
     DCL_r ;
 
@@ -961,7 +972,7 @@ static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name, FL)
 void    lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
 {
     memset((void *)lock, 0, sizeof(*lock)) ;
-    lis_rw_lock_fill(lock, name, file, line) ;
+    RW_LOCK_FILL;
 }
 
 lis_rw_lock_t *
@@ -976,7 +987,7 @@ lis_rw_lock_alloc_fcn(const char *name, FL)
     if (lock == NULL) return(NULL) ;
 
     memset((void *)lock, 0, lock_size) ;
-    lis_rw_lock_fill(lock, name, file, line) ;
+    RW_LOCK_FILL;
     lock->allocated = 1 ;
     return(lock) ;
 }
@@ -1015,9 +1026,7 @@ void	lis_up_fcn(lis_semaphore_t *lsem, FL)
     struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
 
     SEM_EXIT(lsem,TRACK_UP,file,line,0) ;
-    lsem->upper_file = file ;		/* most recent "up" */
-    lsem->upper_line = line ;
-    lsem->upper_cntr = ++lis_seq_cntr ;
+    SET_UPSEM                           /* most recent "up" */
     lsem->taskp      = NULL ;
     up(sem) ;
 }
@@ -1027,17 +1036,13 @@ int	lis_down_fcn(lis_semaphore_t *lsem, FL)
     struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
     int			 ret ;
 
-    lsem->downer_file = file ;		/* most recent "down" */
-    lsem->downer_line = line ;
-    lsem->downer_cntr = ++lis_seq_cntr ;
+    SET_DSEM                            /* most recent "down" */
     ret = down_interruptible(sem) ;
     if (ret == 0)
     {
 	SEM_ENTRY(lsem,TRACK_DOWN,file,line,0) ;
 	lsem->taskp = (void *) current ;
-	lsem->owner_file = file ;	/* current owner */
-	lsem->owner_line = line ;
-	lsem->owner_cntr = ++lis_seq_cntr ;
+	SET_SEMOWNER                    /* current owner */
     }
     else
     {

@@ -36,7 +36,7 @@
 #ifndef _MSG_H
 #define _MSG_H 1
 
-#ident "@(#) LiS msg.h 2.4 4/15/03 19:01:51 "
+#ident "@(#) LiS msg.h 2.5 12/27/03 15:12:52 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -220,10 +220,16 @@ extern volatile struct mdbblock  *lis_mdbfreelist; /* msg block free list */
 extern void
 lis_strgiveback(unsigned long arg);
 
+#if defined(LINUX) 
+extern void lis_init_msg(void);
+#endif
+
 /*  lis_terminate_msg - do the final shutdown of the msg memory subsystem
  */
+#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
 extern void
 lis_terminate_msg(void);
+#endif
 
 /* allocb: allocate an M_DATA message block of the specified
  *	size. The priority is for compatibility only.
