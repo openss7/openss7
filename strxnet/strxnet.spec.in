@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/06 08:15:35 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/08/07 11:01:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/06 08:15:35 $ by $Author: brian $
+# Last Modified $Date: 2004/08/07 11:01:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -351,6 +351,8 @@ Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
 %endif
+Provides:       %{name}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Provides:       %{name}-%{_streams}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{core_name}
@@ -881,6 +883,9 @@ XNET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
+# Revision 0.9.2.28  2004/08/07 11:01:09  brian
+# - More rational provides structure.
+#
 # Revision 0.9.2.27  2004/08/06 08:15:35  brian
 # - Strapped out dev sub-package.
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/07/11 08:48:50 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/07 11:01:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/11 08:48:50 $ by $Author: brian $
+# Last Modified $Date: 2004/08/07 11:01:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -351,6 +351,8 @@ Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
 %endif
+Provides:       %{name}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Provides:       %{name}-%{_streams}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{core_name}
@@ -881,15 +883,21 @@ XNS package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.3  2004/07/11 08:48:50  brian
-# - Correct symbolic links again.
+# Revision 0.9.2.4  2004/08/07 11:01:14  brian
+# - More rational provides structure.
 #
-# Revision 0.9.2.2  2004/07/04 03:30:39  brian
-# - Builds rpms.
-#
-# Revision 0.9.2.1  2004/07/04 01:04:03  brian
-# - Initial import of strxns package.
-#
+
+* Sun Jul 11 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.3  2004/07/11 08:48:50  brian
+- Correct symbolic links again.
+
+* Sun Jul  4 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.2  2004/07/04 03:30:39  brian
+- Builds rpms.
+
+* Sun Jul  4 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2004/07/04 01:04:03  brian
+- Initial import of strxns package.
 
 * Sat Jul  3 2004 Brian Bidulock <bidulock@openss7.org>
 - Borrowed heavily from strxnet package.

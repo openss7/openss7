@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/06 14:35:41 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2004/08/07 11:05:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/06 14:35:41 $ by $Author: brian $
+# Last Modified $Date: 2004/08/07 11:05:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -143,18 +143,10 @@ rebuild:
 	@if test ! -f SRPMS/$(rpmdir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
-	kernels="`find $(DESTDIR)/lib/modules -type d -name '2\.4\.*'`" ; \
 	targets="$(AM_RPMTARGETS)" ; \
 	for t in $$targets ; do \
-		for k in $$kernels ; do \
-			k=`basename $$k` ; \
-			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
-				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
-			fi ; \
-		done ; \
-		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
-		$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
+		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+		$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
 	done
 
 resign: sign

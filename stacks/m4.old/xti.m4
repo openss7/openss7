@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.1 2004/06/28 08:59:38 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.2 2004/08/07 11:04:02 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/28 08:59:38 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/07 11:04:02 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -134,6 +134,10 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     else
         : # this should be an XOPEN flag
 # 	AC_DEFINE([_LIS_SOURCE], [1], [Define when compiling for LiS.])
+        AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
+            Define for SuSv3.  This is necessary for LiS and LFS and strxnet
+            for that matter.
+            ])
     fi
 ])# _XTI_CHECK_HEADERS
 # =========================================================================

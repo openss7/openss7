@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.5 2004/08/06 19:37:35 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.6 2004/08/07 11:05:40 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/06 19:37:35 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/07 11:05:40 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -128,19 +128,19 @@ AC_DEFUN([AC_NETPERF], [dnl
                     ])
                 fi
             fi
-            _SCTP
-            if test :"${sctp_cv_includes:-no}" = :no ; then
-                if test :"${with_sctp:-no}" != :no ; then
-                    AC_MSG_ERROR([
+        fi
+    fi
+    _SCTP
+    if test :"${sctp_cv_includes:-no}" = :no ; then
+        if test :"${with_sctp:-no}" != :no ; then
+            AC_MSG_ERROR([
 **** 
 **** You have specified --with-sctp, yet I cannot find your SCTP include
 **** directories.  SCTP include directories are necessary to compile the
 **** package when --with-sctp is specified.  Try specifying the include
 **** directory with --with-sctp=DIRECTORY and try again.
 **** 
-                    ])
-                fi
-            fi
+            ])
         fi
     fi
     CPPFLAGS="-I- -imacros ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
