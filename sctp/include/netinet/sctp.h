@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.3 2002/10/16 11:56:26 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.4 2003/03/06 12:32:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,19 +41,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/10/16 11:56:26 $ by $Author: brian $
+ Last Modified $Date: 2003/03/06 12:32:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #include <features.h>
 #include <sys/types.h>
 
-__BEGIN_DECLS enum {
+__BEGIN_DECLS
+
+enum {
 	SCTP_ESTABLISHED = 1,
 	SCTP_COOKIE_WAIT,
 	SCTP_COOKIE_ECHOED,
@@ -64,7 +66,8 @@ __BEGIN_DECLS enum {
 	SCTP_SHUTDOWN_RECEIVED,
 	SCTP_SHUTDOWN_RECVWAIT,
 	SCTP_LISTEN,
-	SCTP_SHUTDOWN_ACK_SENT
+	SCTP_SHUTDOWN_ACK_SENT,
+	SCTP_MAX_STATES
 };
 
 /*
@@ -72,38 +75,38 @@ __BEGIN_DECLS enum {
  */
 struct sctp_hbitvl {
 	struct sockaddr_in
-	 dest;				/* destination IP address       */
-	uint hb_act;			/* activation flag              */
-	uint hb_itvl;			/* interval in milliseconds     */
+	 dest;					/* destination IP address */
+	uint hb_act;				/* activation flag */
+	uint hb_itvl;				/* interval in milliseconds */
 };
 /*
  *  User SCTP_RTO socket option structure
  */
 struct sctp_rtoval {
 	struct sockaddr_in
-	 dest;				/* destination IP address       */
-	uint rto_initial;		/* RTO.Initial (milliseconds)   */
-	uint rto_min;			/* RTO.Min     (milliseconds)   */
-	uint rto_max;			/* RTO.Max     (milliseconds)   */
-	uint max_retrans;		/* Path.Max.Retrans (retires)   */
+	 dest;					/* destination IP address */
+	uint rto_initial;			/* RTO.Initial (milliseconds) */
+	uint rto_min;				/* RTO.Min (milliseconds) */
+	uint rto_max;				/* RTO.Max (milliseconds) */
+	uint max_retrans;			/* Path.Max.Retrans (retires) */
 };
 /*
  *  User SCTP_STATUS socket option structure
  */
 struct sctp_dstat {
 	struct sockaddr_in
-	 dest;				/* destination IP address       */
-	uint dst_cwnd;			/* congestion window            */
-	uint dst_unack;			/* unacknowledged chunks        */
-	uint dst_srtt;			/* smoothed round trip time     */
-	uint dst_rvar;			/* rtt variance                 */
-	uint dst_rto;			/* current rto                  */
-	uint dst_sst;			/* slow start threshold         */
+	 dest;					/* destination IP address */
+	uint dst_cwnd;				/* congestion window */
+	uint dst_unack;				/* unacknowledged chunks */
+	uint dst_srtt;				/* smoothed round trip time */
+	uint dst_rvar;				/* rtt variance */
+	uint dst_rto;				/* current rto */
+	uint dst_sst;				/* slow start threshold */
 };
 struct sctp_astat {
-	uint assoc_rwnd;		/* receive window               */
-	uint assoc_rbuf;		/* receive buffer               */
-	uint assoc_nrep;		/* destinations reported        */
+	uint assoc_rwnd;			/* receive window */
+	uint assoc_rbuf;			/* receive buffer */
+	uint assoc_nrep;			/* destinations reported */
 };
 
 /*
@@ -155,31 +158,50 @@ struct sctp_astat {
  *  HMAC settings for cookie verification for use with SCTP_MAC_TYPE socket
  *  option.
  */
-#define SCTP_HMAC_NONE		0	/* no hmac (all one's)              */
-#define SCTP_HMAC_SHA_1		1	/* SHA-1 coded hmac                 */
-#define SCTP_HMAC_MD5		2	/* MD5   coded hmac                 */
+#define SCTP_HMAC_NONE		0	/* no hmac (all one's) */
+#define SCTP_HMAC_SHA_1		1	/* SHA-1 coded hmac */
+#define SCTP_HMAC_MD5		2	/* MD5 coded hmac */
 
 /*
  *  CSUM settings for checksum algorithm selection with SCTP_CHKSUM_TYPE
  *  socket option.
  */
-#define SCTP_CSUM_ADLER32	0	/* Adler32 checksum output          */
-#define SCTP_CSUM_CRC32C	1	/* CRC-32c checksum output          */
+#define SCTP_CSUM_ADLER32	0	/* Adler32 checksum output */
+#define SCTP_CSUM_CRC32C	1	/* CRC-32c checksum output */
 
 /*
  *  Debugging flags for use with SCTP_DEBUG_OPTIONS socket option.
  */
-#define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets                 */
-#define SCTP_OPTION_BREAK	0x02	/* stream will break dest #1 and 2 one way  */
-#define SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways         */
-#define SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random       */
+#define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets */
+#define SCTP_OPTION_BREAK	0x02	/* stream will break dest #1 and 2 one way */
+#define SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways */
+#define SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random */
+
+/*
+ *  Partial reliability preference for use wtih SCTP_PR socket option
+ */
+#define SCTP_PR_NONE		0x0	/* no partial reliability */
+#define SCTP_PR_PREFERRED	0x1	/* partial reliability preferred */
+#define SCTP_PR_REQUIRED	0x2	/* partial reliability required */
+
+/*
+ *  Message retrieval dispositions for use with MSG_CONFIRM to  recvmsg()
+ */
+#define SCTP_DISPOSITION_NONE		0x0
+#define SCTP_DISPOSITION_UNSENT		0x1
+#define SCTP_DISPOSITION_SENT		0x2
+#define SCTP_DISPOSITION_GAP_ACKED	0x3
+#define SCTP_DISPOSITION_ACKED		0x4
 
 /* this should be in in.h */
 #ifndef IPPROTO_SCTP
 #define IPPROTO_SCTP        132	/* Stream Control Transmission Protocol */
 #endif
 
+/* this should be in socket.h */
+#ifndef SOL_SCTP
 #define SOL_SCTP            132	/* SCTP level */
+#endif
 
 __END_DECLS
 #endif				/* _NETINET_SCTP_H */
