@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: cdevsw.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: cdevsw.9.man,v 0.9.2.2 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CDEVSW 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH CDEVSW 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -184,14 +184,14 @@ to zero before registration.
 .B D_NSDEV
 .PP
 The following flags are provided for
-.BR Solaris \(rg
+.IR Solaris \(rg
 compatibility:
 .TP
 .B D_MP
 specifies that the driver is MT-SAFE.
 .PP
 The following inner perimeter flags are provided for
-.BR Solaris \(rg
+.IR Solaris \(rg
 compatibility:
 .TP
 .B D_MTPERMOD
@@ -231,7 +231,7 @@ This flag has no effect if none of
 are set (i.e. there is no inner perimeter).
 .PP
 The following outer perimeter flags are provided for
-.BR Solaris \(rg:
+.IR Solaris \(rg:
 .TP
 .B D_MTOUTEPERIM
 specifies that an outer perimeter exists and that the outer perimeter encircles all queue pairs in the module.

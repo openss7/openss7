@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: getmajor.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: getmajor.9.man,v 0.9.2.2 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMAJOR 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETMAJOR 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -165,10 +165,10 @@ is source-level compatible with
 .[
 svr42
 .]
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR LiS .
+.IR LiS .
 .[
 LiS
 .]
@@ -176,9 +176,9 @@ LiS
 .BR getmajor ()
 is binary compatible with LiS.
 Binary compatibility with SVR 4.2 and
-.BR Solaris \(rg
+.IR Solaris \(rg
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 is not guaranteed.
 .\"
 .\"
@@ -188,9 +188,9 @@ is not guaranteed.
 .[
 usldk
 .]
-.BR Solaris \(rg
+.IR Solaris \(rg
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 documentation.
 .\"
 .\"

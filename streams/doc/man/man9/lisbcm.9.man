@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: lisbcm.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: lisbcm.9.man,v 0.9.2.2 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LiSBCM 8 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS LiS BCM"
+.TH LiSBCM 8 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS LiS BCM"
 .\"
 .\"
 .SH NAME
@@ -94,7 +94,7 @@ is a
 LfS
 .]
 module that provides binary compatibility with
-.B LiS\c
+.I LiS\c
 .
 .[
 LiS
@@ -110,13 +110,13 @@ When compiled with kernel configuration flag
 set,
 .B Linux Fast-STREAMS
 will issue warnings whenever
-.B LiS BCM
+.I LiS BCM
 symbols are invoked.
 .\"
 .\"
 .PP
 Many of the symbols provided by
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -132,21 +132,21 @@ symbols for performance and efficiency.
 .\"
 .PP
 Many of the SVR 4.2 STREAMS functions provided by
-.B LiS
+.I LiS
 .[
 LiS
 .]
 contains bugs.  The symbols provided by the
 .I LiS BCM
 are not bug-for-bug compatible with
-.B LiS\c
+.I LiS\c
 .
 .[
 LiS
 .]
 This means that incorrect STREAMS drivers and modules that appear to run
 correctly under
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -155,7 +155,7 @@ may fail to operate with the
 .\"
 .\"
 .PP
-.B LiS
+.I LiS
 can permit erroneous STREAMS functions to appear to run correctly.
 The equivalent
 .B Linux Fast-STREAMS
@@ -165,7 +165,7 @@ functions are unforgiving of being passed
 pointers and out of range arguments.
 This means that incorrect STREAMS drivers and modules that appear to run
 correctly under
-.B LiS
+.I LiS
 .[
 LiS
 .]

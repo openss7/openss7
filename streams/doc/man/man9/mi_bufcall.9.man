@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.2 2004/03/02 10:58:15 brian Exp $
+.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/02 10:58:15 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_BUFCALL 9 "$Date: 2004/03/02 10:58:15 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
+.TH MI_BUFCALL 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -173,10 +173,10 @@ has no known bugs.
 .PP
 .BR mi_bufcall ()
 is anis
-.BR AIX \(rg
+.IR AIX \(rg
 specific function
 provided for source level compatibility with
-.BR AIX \(rg.
+.IR AIX \(rg.
 This symbol is only available when the kernel is compiled with configuration
 parameter
 .B CONFIG_STREAMS_AIXCOMPAT
@@ -185,7 +185,7 @@ set.
 .\"
 .SH CONFORMANCE
 .PP
-.BR AIX \(rg
+.IR AIX \(rg
 documentation.
 .\"
 .\"
@@ -193,10 +193,11 @@ documentation.
 .PP
 .BR mi_bufcall ()
 is an
-.BR AIX \(rg
+.IR AIX \(rg
 specific function
 that first appeared in
-.B AIX 4.1.
+.IR AIX \(rg
+4.1.
 .\"
 .\"
 .TI
