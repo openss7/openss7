@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.7 2005/03/14 09:27:44 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.10 2005/03/15 00:53:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/14 09:27:44 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 00:53:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -82,10 +82,10 @@ OpenSS7 release of @command{@value{PACKAGE_NAME}} from the links in the sections
 follow.
 
 By far the easiest form for installing and using
-@command{@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}} is to download and install
+@command{@value{PACKAGE}-@value{VERSION}} is to download and install
 binary RPM. If a binary RPM is not available for your distribution,  but your
 distribution supports RPM, the next best method for installing and using
-@command{@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}} is to download and rebuild the
+@command{@value{PACKAGE}-@value{VERSION}} is to download and rebuild the
 source RPM.  If your architecture does not support RPM at all, or you have
 special needs (such as cross-compiling for embedded targets), the final resort
 method is to download, configure, build and install from the source tarball.
@@ -113,7 +113,7 @@ each of the tree categories.
 @subsubheading Independent RPM
 Independent RPM are dependent on neither the Linux kernel version, nor the
 STREAM package.  For example, the source package
-@samp{@value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm},
+@samp{@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm},
 is not dependent on kernel or STREAMS.
 
 @noindent
@@ -122,36 +122,36 @@ architecture.  If you architecture is not on the list, you can build binary
 RPM from the source RPM (see @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-dev} package@footnote{Note that not all release
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-dev} package@footnote{Note that not all release
 packages contain devices.  Only packages that provide STREAMS character device
 drivers need devices, and then only when the @samp{specfs} is not being used.}
 contains the device definitions necessary to run applications programs developed
 for @value{PACKAGE_TITLE}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-devel} package contains library archives for static
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} STREAMS modules and
 drivers.  This also includes the header files and static libraries required to
 compile @value{PACKAGE_TITLE} applications programs.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-doc} package contains this manual in
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-doc} package contains this manual in
 plaintext, postscript, PDF and HTML forms, along with the meta-information from
 the @file{@value{PACKAGE_NAME}} package.
 It also contains all of the manual pages necessary for developing
 @value{PACKAGE_TITLE} applications and @value{PACKAGE_TITLE} STREAMS modules or
 drivers.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-lib} package@footnote{Note that not all release
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-lib} package@footnote{Note that not all release
 packages contain shared libraries, and, therefore, not all release packages
 contain this package.}
 contains the run-time shared libraries necessary to run application programs and
 utilities developed for the @file{@value{PACKAGE_NAME}} package.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-source} package@footnote{Note that not all releases
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-source} package@footnote{Note that not all releases
 have source RPM packages.  Release packages that do not contain kernel modules
 do not generate a source RPM package.}
 contains the source code necessary for building the @value{PACKAGE_TITLE}
@@ -173,19 +173,19 @@ architecture.  If your architecture is not on the list, you can build binary RPM
 from the source RPM (see @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-LiS-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-LiS-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-LiS-util} package provides administrative and
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-LiS-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
-@file{@value{PACKAGE_TARNAME}-LiS-util} package if you have LiS installed.
+@file{@value{PACKAGE}-LiS-util} package if you have LiS installed.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-streams-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-streams-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-streams-util} package provides administrative and
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-streams-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
-@file{@value{PACKAGE_TARNAME}-streams-util} package if you have streams installed.
+@file{@value{PACKAGE}-streams-util} package if you have streams installed.
 @end table
 
 @subsubheading Kernel-Dependent RPM
@@ -200,15 +200,15 @@ you can build binary RPM from the source RPM (see
 @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-core} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-core} package@footnote{Note that only release packages
 that contain kernel modules will contain a @file{core} subpackage.}
 contains the loadable kernel modules that depend only on the kernel.
 This package is heavily tied to the kernel for which it was compiled.  This
 particular package applies to kernel version @var{@value{_kversion}}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-info-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-info-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-info} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.} contains the module symbol version information for the
 @file{core} subpackage, above.  It is possible to load this subpackage and
@@ -217,22 +217,22 @@ modules (from the @file{core} subpackage above).
 This package is heavily tied to the kernel for which it was compiled.  This
 particular package applies to kernel verion @var{@value{_kversion}}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-LiS-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-LiS-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-LiS-core} package contains the kernel modules that
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-LiS-core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.
 This package is heavily tied to the STREAMS package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @var{@value{_kversion}}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-streams-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-streams-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-streams-core} package contains the kernel modules that
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-streams-core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.
 This package is heavily tied to the STREAMS package and kernel for which it was
 compiled.  This particular package applies to @file{streams} (@cite{Linux
 Fast-STREAMS}) on kernel version @var{@value{_kversion}}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-LiS-info-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-LiS-info-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-LiS-info} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-LiS-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{LiS-info} subpackage.} contains the module symbol version information for the
 @file{LiS-core} subpackage, above.  It is possible to load this subpackage and
@@ -242,8 +242,8 @@ This package is heavily tied to the STREAMS package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @var{@value{_kversion}}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-streams-info-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-streams-info-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE_TARNAME}-streams-info} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+The @file{@value{PACKAGE}-streams-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{streams-info} subpackage.} contains the module symbol version information for the
 @file{streams-core} subpackage, above.  It is possible to load this subpackage and
@@ -270,7 +270,7 @@ If you cannot obtain a binary RPM for your architecture, or would like to roll
 you own binary RPM, download the following source RPM.
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm, @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm}
+@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm, @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to
 build binary RPM for any supported architecture and for any 2.4 or 2.6 kernel,
 for either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.
@@ -290,8 +290,8 @@ For non-RPM architectures, such as @cite{NexusWare} embedded target, download
 the tarball as follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz, @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2, @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2}
+@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz, @value{PACKAGE}-@value{VERSION}.tar.gz}
+@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2, @value{PACKAGE}-@value{VERSION}.tar.bz2}
 These are the @command{tar} balls for the release.  These @command{tar} balls
 contain the @command{autoconf} distribution which includes all the source
 necessary for building and installing the package.  These tarballs will even
@@ -302,7 +302,7 @@ The tar ball may be downloaded easily with @command{wget} as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
 @end cartouche
 @end example
 
@@ -311,7 +311,7 @@ or
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz
 @end cartouche
 @end example
 
@@ -322,8 +322,8 @@ following commands:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
-% tar -xzvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz
+% tar -xzvf @value{PACKAGE}-@value{VERSION}.tar.gz
 @end cartouche
 @end example
 
@@ -332,14 +332,14 @@ or
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end cartouche
 @end example
 
 @noindent
 Either will create a subdirectory name
-@file{@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}}
+@file{@value{PACKAGE}-@value{VERSION}}
 containing all of the files and subdirectories for the
 @command{@value{PACKAGE_NAME}} package.
 
@@ -359,7 +359,7 @@ Project} with CVS archive access privileges then you can download release or
 mid-release versions of the @file{@value{PACKAGE_NAME}} package from the project CVS
 archive.
 
-The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE_TARNAME}}
+The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE}}
 subdirectory of @file{/var/cvs}.  For release tag information, see
 @ref{Releases}.
 
@@ -371,7 +371,7 @@ to check out a version from the archive:
 % export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
 % cvs login
 Password: *********
-% cvs co -r @value{PACKAGE_TARNAME}_@value{PACKAGE_VERSION} @value{PACKAGE_TARNAME}
+% cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE}
 % cvs logout
 @end cartouche
 @end example
@@ -411,12 +411,12 @@ GNU autoconf system, execute the following commands on the working directory:
 
 @example
 @cartouche
-% autoreconf -fiv @value{PACKAGE_TARNAME}
+% autoreconf -fiv @value{PACKAGE}
 @end cartouche
 @end example
 
 @noindent
-where, @file{@value{PACKAGE_TARNAME}} is the name of the directory to where the working
+where, @file{@value{PACKAGE}} is the name of the directory to where the working
 copy was checked out under the previous step.  This command generates the
 @command{configure} script and other missing pieces that are normally
 distributed with the release Tar Balls or RPMs.  The package can now be
@@ -429,7 +429,7 @@ may need to perform something like the following:
 @example
 @cartouche
 % PATH="/usr/local/bin:$PATH"
-% autoreconf -fiv @value{PACKAGE_TARNAME}
+% autoreconf -fiv @value{PACKAGE}
 @end cartouche
 @end example
 
@@ -468,44 +468,44 @@ This allows some degree of customization.  Relocations that are available on the
 binary RPM are as follows:
 
 @table @file
-@item @value{PACKAGE_TARNAME}-LiS-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-LiS-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}/lib/modules/@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
 @value{PACKAGE_NAME} STREAMS drivers and modules.
 @end table
 
-@item @value{PACKAGE_TARNAME}-LiS-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@itemx @value{PACKAGE_TARNAME}-streams-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-LiS-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-streams-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@itemx @value{PACKAGE}-streams-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-LiS-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-streams-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 (not relocatable)
 
-@item @value{PACKAGE_TARNAME}-LiS-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@itemx @value{PACKAGE_TARNAME}-streams-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-LiS-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-streams-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@itemx @value{PACKAGE}-streams-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-LiS-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-streams-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 @item @file{@value{_rootdir}@value{_includedir}}
 @item @file{@value{_rootdir}@value{_mandir}}
 @end table
 
-@item @value{PACKAGE_TARNAME}-LiS-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@itemx @value{PACKAGE_TARNAME}-streams-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-LiS-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-streams-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@itemx @value{PACKAGE}-streams-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-LiS-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-streams-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_datadir}/doc}
 @item @file{@value{_rootdir}@value{_infodir}}
 @end table
 
 @ignore
-@item @value{PACKAGE_TARNAME}-LiS-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@itemx @value{PACKAGE_TARNAME}-streams-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-LiS-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-streams-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@itemx @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains the run-time shared libraries necessary to
@@ -515,17 +515,17 @@ This relocatable directory contains the locale information for shared library fi
 @end table
 @end ignore
 
-@item @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_prefix}/src}
 This relocatable directory contains the source code.
 @end table
 
-@item @value{PACKAGE_TARNAME}-LiS-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@itemx @value{PACKAGE_TARNAME}-streams-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-LiS-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE_TARNAME}-streams-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@itemx @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@cindex @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains binary programs and utilities.
@@ -630,11 +630,9 @@ module specific are only applicable to SRPMs that build kernel modules.  STREAMS
 options are only applicable to SRPMs that provide or require STREAMS.
 
 @table @code
-
 @item --define "_kversion $PACKAGE_KVERSION"
 @vindex PACKAGE_KVERSION
 @opindex k-release
-
 Specifies the kernel version other than the running kernel for which to build.
 If @command{_kversion} is not defined when rebuilding, the environment variable
 @var{PACKAGE_KVERSION} is used.  If the environment variable
@@ -643,29 +641,35 @@ If @command{_kversion} is not defined when rebuilding, the environment variable
 kernel-dependent packages.  This option can also be defined in an
 @file{.rpmspec} file using the macro name @samp{_kversion}.
 
-@item --with modules
-@itemx --without modules
-@opindex modules
+@ignore
+@item --with checks
+@itemx --without checks
+@opindex checks
+@end ignore
 
-Specifies whether kernel modules packages are to be built.  The default is to
-build kernel module packages.  This option can be useful when rebuilding for
-multiple architectures and target kernels.  The @command{rebuild} automake
-target uses this feature to rebuild for all available architectures and kernels.
+@item --with autotest
+@item --without autotest
+@opindex autotest
+Enable preinstall checks.  Each packages supports a number of preinstall checks
+that can be performed by invoking the @samp{check} target with @command{make}.
+These currently consist of checking each kernel module for unresolved kernel
+symbols, checking for documentation for exported kernel module symbols, checking
+for documentation for exported library symbols, checking for standard options
+for build and installable programs, checking for documentation for built and
+installable programs.  Normally these checks are only run in maintainer mode,
+but can be enabled and disabled with this option.
 
-@item --with tools
-@itemx --without tools
-@opindex tools
-
-Specifies whether user space packages are to be built.  The default is to build
-user space packages.  This option can be useful when rebuilding for multiple
-architectures and target kernels.  The @command{rebuild} automake target uses
-this feature when rebuilding for all available architectures and kernels, to
-rebuild user packages once per architecture instead of once per kernel.
+@item --without k-optimize
+@itemx --define "_with_k_optimize --with-k-optimize=HOW"
+@opindex k-optimize
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
+@var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
+compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
+@code{-O0}.  The default is @var{normal}.  Use with care.
 
 @item --with cooked-manpages
 @itemx --without cooked-manpages
 @opindex cooked-manpages
-
 Some systems do not like @command{grefer} references in manpages.@footnote{In
 particular, some @cite{Debian} systems do not load the @command{groff}
 extensions package and do not have @command{grefer} installed.  Although this is
@@ -678,14 +682,12 @@ manpages uncooked: they are actually smaller that way.
 @item --with public
 @itemx --without public
 @opindex public
-
 Release public packages or private packages.  This option has no effect on the
 @file{@value{PACKAGE_NAME}} package.  The default is to release public packages.
 
 @item --with k-debug
 @itemx --without k-debug
 @opindex k-debug
-
 Specifies whether kernel debugging is to be performed on the build kernel
 modules.  Mutually exclusive with @code{test} and @code{safe} below.  This has
 the effect of removing static and inline attributes from functions and invoking
@@ -695,7 +697,6 @@ debugging.
 @item --with k-test
 @itemx --without k-test
 @opindex k-test
-
 Specifies whether kernel testing is to be performed.  Mutually exclusive with
 @code{debug} above and @code{safe} below.  This has the effect of removing
 static and inline attributes from functions and invoking most debugging macros
@@ -704,7 +705,6 @@ in the code.  The default is to not perform kernel testing.
 @item --with k-safe
 @itemx --without k-safe
 @opindex k-safe
-
 Specifies whether kernel saftey is to be performed.  Mutually exclusive with
 @code{debug} and @code{test} above.  This has the effect of invoking some more
 pedantic assertion macros in the code.  The default is not to apply kernel
@@ -713,7 +713,6 @@ safety.
 @item --with k-inline
 @itemx --without k-inline
 @opindex k-inline
-
 Specifies whether kernel @code{inline} functions are to be place inline.  This
 has the effect of adding the @command{-finline-functions} flag to @var{CFLAGS}
 for compiling kernel modules.  Linux 2.4 kernels are normally compiled
@@ -722,18 +721,35 @@ kernel modules with @command{-finline-functions} to get closer to @command{-O3}
 optimization.  For better optimization controls, @xref{Configuring the Tar
 Ball}.
 
+@ignore
 @item --with k-modversions
 @itemx --without k-modversions
 @opindex k-modversions
-
 Specifies whether kernel symbol versioning is to be applied to symbols exported
 by package kernel modules.  The default is to version exported module symbols.
 This package does not export symbols so this option has no effect.
+@end ignore
+
+@item --with k-tools
+@itemx --without k-tools
+@opindex k-tools
+Specifies whether user space packages are to be built.  The default is to build
+user space packages.  This option can be useful when rebuilding for multiple
+architectures and target kernels.  The @command{rebuild} automake target uses
+this feature when rebuilding for all available architectures and kernels, to
+rebuild user packages once per architecture instead of once per kernel.
+
+@item --with k-modules
+@itemx --without k-modules
+@opindex k-modules
+Specifies whether kernel modules packages are to be built.  The default is to
+build kernel module packages.  This option can be useful when rebuilding for
+multiple architectures and target kernels.  The @command{rebuild} automake
+target uses this feature to rebuild for all available architectures and kernels.
 
 @item --with lis
 @itemx --without lis
 @opindex lis
-
 Specifies that the package is to be rebuilt against @cite{Linux STREAMS}.  The
 default is to automatically identify whether @file{LiS} or @file{streams} is
 loaded on the build system and build accordingly.
@@ -741,7 +757,6 @@ loaded on the build system and build accordingly.
 @item --with lfs
 @itemx --without lfs
 @opindex lfs
-
 Specifies that the package is to be rebuilt against @cite{Linux Fast-STREAMS}.
 The default is to automatically identify whether @file{LiS} or @file{streams} is
 loaded on the build system and build accordingly.
@@ -770,7 +785,7 @@ tailor or customize the build and are described below.
 
 @c ----------------------------------------------------------------------------
 
-@node Environment Variables, , Configure Options, Configuring the Tar Ball
+@node Configure Options, Environment Variables, , Configuring the Tar Ball
 @subsubsection Configure Options
 @cindex configure options
 
@@ -783,9 +798,14 @@ that provide or require STREAMS.
 Following are the additional @command{configure} options, their meaning and use:
 
 @table @command
+@ignore
 @item --enable-checks
 @opindex checks
+@end ignore
 
+@item --enable-autotest
+@itemx --disable-autotest
+@opindex autotest
 Enable preinstall checks.  Each packages supports a number of preinstall checks
 that can be performed by invoking the @samp{check} target with @command{make}.
 These currently consist of checking each kernel module for unresolved kernel
@@ -797,7 +817,6 @@ but can be enabled and disabled with this option.
 
 @item --disable-compress-manpages
 @opindex compress-manpages
-
 Compress manpages with @samp{gzip -9} or @samp{bzip2 -9} or leave them
 uncompressed.  The default is to compress manpages with @samp{gzip -9}
 or @samp{bzip2 -9} if a single compressed manpage exists in the target
@@ -806,20 +825,17 @@ compression.
 
 @item --disable-public
 @opindex public
-
 Disable public release.  Has no effect on the @file{@value{PACKAGE_NAME}} release.
 No private components exist in @file{@value{PACKAGE_NAME}} releases.
 
 @item --disable-initscripts
 @opindex initscripts
-
 Disables the installation of init scripts.
 The default is to configure and install init scripts and their associated
 configuration files.
 
 @item --enable-tools
 @opindex tools
-
 Specifies whether user space programs and libraries are to be built and
 installed.  The default is to build and install user space programs and
 libraries.  This option can be useful when rebuilding for multiple architectures
@@ -829,95 +845,78 @@ to rebuild user packages once per architecture instead of once per kernel.
 
 @item --enable-modules
 @opindex modules
-
 Specifies whether kernel modules are to be built and installed.  The default is
 to build and install kernel modules.  This option can be useful when rebuilding
 for multiple architectures and target kernels, particularly under rpm.  The
 @command{rebuild} automake target uses this feature to rebuild for all available
 architectures and kernels.
-
 This option has no effect if there are no kernel modules in the package.
 
 @item --enable-arch
 @opindex arch
-
 Specifies whether architectural dependent package components are to be built and
 installed.  This option can be useful when rebuilding for multiple architectures
 and target kernels, particularly under dpkg.  The default is to configure, build
 and install architecture dependent package components.
-
 This option has no effect if there are no architecture dependent components in
 the package.
 
 @item --enable-indep
 @opindex indep
-
 Specifies whether architecture independent package components are to be built
 and installed.  This option can be useful when rebuilding for multiple
 architectures and target kernels, particularly under dpkg.  The default is to
 configure, build and install architecture independent package components.
-
 This options has no effect if there are no architecture independent components
 in the package.
 
 @item --enable-k-inline
 @opindex k-inline
-
 Enable kernel inline functions.  Most Linux kernels build without
 @command{-finline-functions}.  This option adds the @command{-finline-functions}
 and @command{-Winline} flags to the compilation of kernel modules.  Use with
 care.
-
 This option has no effect if there are no kernel modules in the package.
 
 @item --enable-k-safe
 @opindex k-safe
-
 Enable kernel module run-time safety checks.  Specifies whether kernel safety is
 to be performed.  This option is mutually exclusive with
 @command{--enable-k-test} and @command{--enable-k-debug} below.  This has the
 effect of invoking some more pedantic assertion macros in the code.  The default
 is not to apply kernel safety.
-
 This option has no effect if there are no kernel modules in the package.
 
 @item --enable-k-test
 @opindex k-test
-
 Enable kernel module run-teim testing.  Specifies whether kernel testing is to
 be performed.  This option is mutually exclusive with @command{--enable-k-safe}
 above and @command{--enable-k-debug} below.  This has the effect of remove
 @code{static} and @code{inline} attributes from functions and invoking most
 non-performance affecting debugging macros in the code.  The default is not to
 perform kernel testing.
-
 This option has no effect if there are no kernel modules in the package.
 
 @item --enable-k-debug
 @opindex k-debug
-
 Enable kernel module run-time debugging.  Specifies whether kernel debugging is
 to be performed.  This option is mutuallly exclusive with
 @command{--enable-k-safe} and @command{--enable-k-test} above.  This has the
 effect of removing @code{static} and @code{inline} attributes from functions and
 invoking all debuggin macros in the code (including performance-affecting debug
 macros).  The default is to not perform kernel debugging.
-
 This option has no effect if there are no kernel modules in the package.
 
 @itemx --disable-k-modversions
 @opindex k-modversions
-
 Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies
 whether kernel symbol versioning is to be used on symbols exported from built
 @command{@value{PACKAGE_NAME}} modules.  The default is to provide kernel symbol
 versioning on all exported symbols.
-
 This option has no effect if there are no kernel modules in the package.
 
 @item --with-gpg-user=GNUPGUSER
 @opindex gpg-user
-
 Specify the @command{gpg} @samp{GNUPGUSER} for signing RPMs and tarballs.  The
 default is the content of the environment variable @var{GNUPGUSER}.  If
 unspecified, the @command{gpg} program will normally use the user name of the
@@ -926,14 +925,12 @@ macro @samp{_gpg_name} will override this setting.
 
 @item --with-gpg-home=GNUPGHOME
 @opindex gpg-home
-
 Specify the @samp{GNUPGHOME} directory for signing RPMs and tarballs.  The
 default is the user's @file{~/.gpg} directory.  For building source RPMs, the
 RPM macro @samp{_gpg_path} will override this setting.
 
 @item --with-pkg-epoch=EPOCH
 @opindex pkg-epoch
-
 Specifies the epoch for the package.  This is neither used for RPM nor Debian
 packages, it applies to the tarball release as a whole.  The default is the
 contents of the @file{.pkgepoch} file in the source directory or, if that file
@@ -941,7 +938,6 @@ does not exist, zero (0).
 
 @item --with-pkg-release=RELEASE
 @opindex pkg-release
-
 Specifies the release for the package.  This is neither used for RPM nor Debian
 packages, it applies to the tarball release as a whole.  The default is the
 contents of the @file{.pkgrelease} file in the source directory or, if that file
@@ -950,7 +946,6 @@ package version number.
 
 @item --with-pkg-distdir=DIR
 @opindex pkg-distdir
-
 Specifies the distribution directory for the package.  This is used by the
 maintainer for building distributions of tarballs.  This is the directory into
 which archives are copied for distribution.  The default is the top build
@@ -958,7 +953,6 @@ directory.
 
 @item --with-cooked-manpages
 @opindex cooked-manpages
-
 Convert manual pages to remove macro dependencies and @command{grefer}
 references.  Some systems do not like @command{grefer} references in
 manpages.@footnote{In particular, some @cite{Debian} systems do not load the
@@ -972,19 +966,16 @@ that way).
 
 @item --with-rpm-epoch=PACKAGE_EPOCH
 @opindex rpm-epoch
-
 Specify the @samp{PACKAGE_EPOCH} for the RPM spec file.  The default is to use
 the RPM epoch conatined in the file @file{.rpmepoch}.
 
-@item --with-rpm-release=PACKAGE_RELEASE
+@item --with-rpm-release=PACKAGE_RPMRELEASE
 @opindex rpm-release
-
-Specify the @samp{PACKAGE_RELEASE} for the RPM rspec file.  The default is to
+Specify the @samp{PACKAGE_RPMRELEASE} for the RPM rspec file.  The default is to
 use the RPM release contained in the file @file{.rpmrelease}.
 
 @item --with-rpm-extra=PACKAGE_RPMEXTRA
 @opindex rpm-extra
-
 Specify the @samp{PACKAGE_RPMEXTRA} extra release information for the RPM spec
 file.  The default is to use the RPM extra release information contained in the
 file @file{.rpmextra}.  Otherwise, this value will be determined from automatic
@@ -992,7 +983,6 @@ detection of the RPM distribution.
 
 @item --with-rpm-topdir=PACKAGE_RPMTOPDIR
 @opindex rpm-topdir
-
 Specify the @samp{PACKAGE_RPMTOPDIR} top directory for RPMs.  If specified
 with a null @samp{PACKAGE_RPMTOPDIR}, the default directory for the RPM
 distribution will be used.  If this option is not provided on the command line,
@@ -1009,7 +999,6 @@ the build directory will be used as the RPM top directory as well.
 
 @item --with-k-release=PACKAGE_KRELEASE
 @opindex k-release
-
 Specify the @samp{PACKAGE_KRELEASE} release of the Linux kernel for which the
 build is targeted.  When not cross compiling, if this option is not set, the
 build will be targeted at the kernel running in the build environment (e.g.,
@@ -1019,7 +1008,6 @@ configure script will generate an error and terminate.
 @ignore
 @item --with-k-prefix=K-PREFIX-DIR
 @opindex k-prefix
-
 Specify the @samp{K-PREFIX-DIR} kernel directory prefix for install.  The
 default is the root directory (@file{/}) of the build machine.  This directory
 is normally located by the @command{configure} script and need only be provided
@@ -1028,7 +1016,6 @@ script error message.
 
 @item --with-k-rootdir=K-ROOTDIR
 @opindex k-rootdir
-
 Specify the @samp{K-ROOTDIR} root directory for configure.  The default is the
 setting of environment variable @var{DESTDIR}, and if @var{DESTDIR} is not set,
 the root directory (@file{/}) of the build machine.  This directory is normally
@@ -1039,22 +1026,18 @@ message.
 
 @item --with-k-linkage=PACKAGE_KLINKAGE
 @opindex k-linkage
-
 Specify the @samp{PACKAGE_KLINKAGE} for kernel module linkage.  This can be one
 of the following:
-
 @itemize
 @item @samp{loadable}
 -- loadable kernel modules
 @item @samp{linkable}
 -- linkable kernel objects
 @end itemize
-
 The default is to build loadable kernel modules.
 
 @item --with-k-modules=K-MODULES-DIR
 @opindex k-modules
-
 Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be
 installed.  The default is based on the option @command{--with-k-release},
 @command{--with-k-prefix} and @command{--with-k-rootdir}.  The default is
@@ -1066,7 +1049,6 @@ script error message.
 
 @item --with-k-build=K-BUILD-DIR
 @opindex k-build
-
 Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured
 kernel source resides.  The default is
 @file{@var{DESTDIR}/@var{K-MODULES-DIR}/build}.  This directory is normally
@@ -1076,7 +1058,6 @@ message.
 
 @item --with-k-sysmap=K-SYSMAP-FILE
 @opindex k-sysmap
-
 Specify the @samp{K-SYSMAP-FILE} kernel system map file.  The default is
 @file{@var{K-BUILD-DIR}/System.map}.  This file is normally located by the
 @command{configure} script and need only be provided for special cross-build
@@ -1084,7 +1065,6 @@ environments or when requested by a @command{configure} script error message.
 
 @item --with-k-includes=K-INCLUDES-DIR
 @opindex k-includes
-
 Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the
 build is targeted.  The default is
 @file{@var{DESTDIR}/@var{K-BUILD-DIR}/include}.  This directory is normally
@@ -1094,7 +1074,6 @@ message.
 
 @item --with-k-archdir=K-ARCHDIR
 @opindex k-archdir
-
 Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The
 default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/arch}.  This directory is
 normally located by the @command{configure} script and need only be provided for
@@ -1103,7 +1082,6 @@ script error message.
 
 @item --with-k-machdir=K-MACHDIR
 @opindex k-machdir
-
 Specify the @samp{K-MACHDIR} kernel source machine specific directory.  The
 default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/@var{target_cpu}}.  This
 directory is normally located by the @command{configure} script and need only be
@@ -1112,7 +1090,6 @@ provided for special cross-build environments or when requested by a
 
 @item --with-k-config=K-CONFIG
 @opindex k-config
-
 Specify the @samp{K-CONFIG} kernel configuration file.  The default is
 @file{@var{BOOT}/config-@var{K-RELEASE}}.  This configuration file is normally
 located by the @command{configure} script and need only be provided forspecial
@@ -1120,8 +1097,8 @@ cross-build environments or when requested by a @command{configure} script error
 message.
 
 @item --with-k-optimize=HOW
+@itemx --without-k-optimize
 @opindex k-optimize
-
 Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
 @var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
 compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
@@ -1130,44 +1107,36 @@ compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
 @item --with-lis[=LIS-DIR]
 @itemx --without-lis
 @opindex lis
-
 Specify the @samp{LIS-DIR} directory in which to find LiS headers.  Also
 specifies that the build is to be made against Linux STREAMS.  The default is
 @file{/usr/include/LiS} if it exists, @samp{no} otherwise.  This directory is
 normally located by the @command{configure} script and need only be provided for
 special cross-build environments or when requested by a @command{configure}
 script error message.
-
 This option has no effect on packages that do not use the STREAMS subsystem.
 
 @item --with-lfs[=LFS-DIR]
 @itemx --without-lfs
 @opindex lfs
-
 Specify the @samp{LFS-DIR} directory in which to find LfS headers.  Also
 specifies that the build is to be made against Linux Fast-STREAMS.  The default
 is @file{/usr/include/streams} if it exists, @samp{no} otherwise.  This
 directory is normally located by the @command{configure} script and need only be
 provided for special cross-build environments or when requested by a
 @command{configure} script error message.
-
 This option has no effect on packages that do not use the STREAMS subsystem.
 
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
-
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master
 file is written.  The default is @file{Config.master}.
-
 This option has no effect on packages that do not use the STREAMS subsystem and
 the strconf scripts.
 
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
-
 Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is
 @samp{230}.
-
 This option has no effect on packages that do not use the STREAMS subsystem and
 the strconf scripts.
 
@@ -1177,7 +1146,7 @@ the strconf scripts.
 
 @c ----------------------------------------------------------------------------
 
-@node Configure Options, Environment Variables, , Configuring the Tar Ball
+@node Environment Variables, , Configure Options, Configuring the Tar Ball
 @subsubsection Environment Variables
 @cindex configure environment variables
 
@@ -1186,195 +1155,162 @@ meaning and use:
 
 @vtable @var
 @item GPG
-
 GPG signature command.  This is used for signing distributions by the
 maintainer.  By default, @command{configure} will search for this tool.
 
 @item GNUPGUSER
-
 GPG user name.  This is used for signing distributions by the maintainer.
 
 @item GNUPGHOME
-
 GPG home directory.  This is used for signing distributions by the maintainer.
 
 @item GPGPASSWD
-
 GPG password for signing.  This is used for signing distributions by the
 maintainer.  This environment variable is not maintained by the
 @command{configure} script and should only be used on an isolated system.
 
 @item SOELIM
-
 Roff source elimination command.  This is only necessary when the option
 @command{--with-cooked-manpages} has been specified and @command{configure}
 cannot find the proper @command{soelim} command.  By default,
 @command{configure} will search for this tool.
 
 @item REFER
-
 Roff references command.  This is only necessary when the option
 @command{--with-cooked-manpages} has been specified and @command{configure}
 cannot find the proper @command{refer} command.  By default, @command{configure}
 will search for this tool.
 
 @item TBL
-
 Roff table command.  This is only necessary when the option
 @command{--with-cooked-manpages} has been specified and @command{configure}
 cannot find the proper @command{tbl} command.  By default, @command{configure}
 will search for this tool.
 
 @item PIC
-
 Roff picture command.  This is only necessary when the option
 @command{--with-cooked-manpages} has been specified and @command{configure}
 cannot find the proper @command{pic} command.  By default, @command{configure}
 will search for this tool.
 
 @item GZIP
-
 Default compression options provided to @command{GZIP_CMD}.
 
 @item GZIP_CMD
-
 Manpages (and kernel modules) compression commands.  This is only necessary when
 the option @command{--without-compressed-manpages} has @emph{not} been specified
 and @command{configure} cannot find the proper @command{gzip} command.  By
 default, @command{configure} will search for this tool.
 
 @item BZIP2
-
 Default compression options provided to @command{BZIP2_CMD}
 
 @item BZIP2_CMD
-
 Manpages compression commands.  This is only necessary when the option
 @command{--without-compressed-manpages} has @emph{not} been specified and
 @command{configure} cannot find the proper @command{bzip2} command.  By default,
 @command{configure} will search for this tool.
 
 @item MAKEWHATIS
-
 Manpages apropros database rebuild command.  By default, @command{configure}
 will search for this tool.  By default, @command{configure} will search for this
 tool.
 
 @item CHKCONFIG
-
 Chkconfig command.  This was used for installation of init scripts.  All
 pacakges now come with @command{init_install} and @command{init_remove} scripts
 used to install and remove init scripts on both RPM and debian systems.
 
 @item RPM
-
 Rpm command.  This is only necessary for RPM builds.  By default,
 @command{configure} will search for this tool.
 
 @item RPMBUILD
-
 Build RPM command.  This is only necessary for RPM builds.  By default,
 @command{configure} will search for this tool.  @command{rpm} will be used
 instead of @command{rpmbuild} only if @command{rpmbuild} cannot be found.
 
 @item DPKG
-
 Dpkg comand.
 This command is used for building debian packages.
 By default, @command{configure} will search for this tool.
 
 @item DPKG_SOURCE
-
 Dpkg-source command.
 This command is used for building debian dsc packages.
 By default, @command{configure} will search for this tool.
 
 @item DPKG_BUILDPACKAGE
-
 Dpkg-buildpackage command.
 This command is used for building debian deb packages.
 By default, @command{configure} will search for this tool.
 
 @item DEB_BUILD_ARCH
-
 Debian build architecture.
 This variable is used for building debian packages.
 The default is the autoconf build architecutre.
 
 @item DEB_BUILD_GNU_CPU
-
 Debian build cpu.
 This variable is used for building debian packages.
 The default is the autoconf build cpu.
 
 @item DEB_BUILD_GNU_SYSTEM
-
 Debian build os.
 This variable is used for building debian packages.
 The default is the autoconf build os.
 
 @item DEB_BUILD_GNU_TYPE
-
 Debian build alias.
 This variable is used for building debian packages.
 The default is the autoconf build alias.
 
 @item DEB_HOST_ARCH
-
 Debian host architecture.
 This variable is used for building debian packages.
 The default is the autoconf host architecture.
 
 @item DEB_HOST_GNU_CPU
-
 Debian host cpu.
 This variable is used for building debian packages.
 The default is the autoconf host cpu.
 
 @item DEB_HOST_GNU_SYSTEM
-
 Debian host os.
 This variable is used for building debian packages.
 The default is the autoconf host os.
 
 @item DEB_HOST_GNU_TYPE
-
 Debian host alias.
 This variable is used for building debian packages.
 The default is the autoconf host alias.
 
 @item LDCONFIG
-
 Configure loader command.  Command used to configure the loader when libraries
 are installed.  By default, @command{configure} will search for this tool.
 
 @item DESTDIR
-
 Cross build root directory.  Specifies the root directory for build and
 installation.  For example, for @cite{NexusWare} cross-builds, this is set to
 environment variable @var{NEXUSWARE_PREFIX} on configuration to point to the
 root of the cross-build tree for both configuration and installation.
 
 @item DEPMOD
-
 Build kernel module dependencies command.  This is used during installation of
 kernel modules to a running kernel to rebuild the modules dependency database.
 By default, @command{configure} will search for this tool.
 
 @item MODPROBE
-
 Probe kernel module dependencies command.  This is used during installation of
 kernel modules to a running kernel to remove old modules.  By default,
 @command{configure} will search for this tool.
 
 @item LSMOD
-
 List kernel modules command.  This is used during installation of kernel modules
 to a running kernel to detect old modules for removal.  By default,
 @command{configure} will search for this tool.
 
 @item LSOF
-
 List open files command.  This is used during installation of kernel modules to
 a running kernel to detect old modules for removal.  Processes owning the old
 kernel modules will be killed and the module removed.  If the process restarts,
@@ -1382,42 +1318,35 @@ the new module will be demand loaded.  By default, @command{configure} will
 search for this tool.
 
 @item GENKSYMS
-
 Generate kernel symbols command.  This is used for generating module symbol
 versions during build.  By default, @command{configure} will search for this
 tool.
 
 @item KGENKSYMS
-
 Linux 2.6 generate kernel symbols command.  This is used for generating module
 symbol version during build.  By default, @command{configure} will search for
 this tool.
 
 @item OBJDUMP
-
 Object dumping command.  This is used for listing information about object
 files.  By default, @command{configure} will search for this tool.
 
 @item NM
-
 Object symbol listing command.  This is used for listing information about
 object files.
 By default, @command{configure} will search for this tool.
 
 @item MODPOST_CACHE
-
 Cache file for modpost.  The version of the @command{modpost.sh} script that
 ships with each package can cache information to a cache file to speed multiple
 builds.  This environment variable is used to specify a cache file.
 
 @item AUTOM4TE
-
 Autom4te command.
 This is the executable used by autotest for pre- and post-installation checks.
 By default, @command{configure} will search for this tool.
 
 @item AUTOTEST
-
 Autotest macro build command.
 This is the executable used by autotest for pre- and post-installation checks.
 By default, @command{configure} will search for this tool.
@@ -1455,8 +1384,8 @@ The source RPM is rebuilt to binary RPMs as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/rpms/SRPMS/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
-% rpmbuild --rebuild -vv @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
+% wget http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
+% rpmbuild --rebuild -vv @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end cartouche
 @end example
 
@@ -1469,7 +1398,7 @@ are provided on the @command{rpm} command line.  For example:
 @cartouche
 % rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
   --define "_kversion @value{_kversion}" \ 
-  --with lis -- @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
+  --with lis -- @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end cartouche
 @end example
 
@@ -1498,9 +1427,9 @@ Folowing is an example of a native build against the running kernel:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% pushd @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
 % make
 % popd
@@ -1523,9 +1452,9 @@ in the release package for an example.
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% pushd @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
 % ./configure DESTDIR="/some/other/root" \ 
 	--with-k-release=2.4.18 --host sparc-linux
 % make
@@ -1588,9 +1517,9 @@ tree is rooted at @file{/u5/NexusWare}.)
 % source SETUP.sh
 % make
 % popd
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% pushd @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% pushd @value{PACKAGE}-@value{VERSION}
 % ./configure.nexusware --with-k-optimize=size
 % make
 % make install-strip
@@ -1629,7 +1558,7 @@ When modifying and rebuilding a @cite{NexusWare} kernel, it will be necessary to
 rebuild and install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make
 install-strip} stage or start again with @samp{./configure.nexusware}.  You can
 place the unpacked tarball in
-@file{@var{$NEXUSWARE_PREFIX}/usr/src/@value{PACKAGE_TARNAME}}, and add the following to
+@file{@var{$NEXUSWARE_PREFIX}/usr/src/@value{PACKAGE}}, and add the following to
 the top-level @cite{NexusWare} @file{Makefile} to make the build process a
 single step process instead of dual pass:
 
@@ -1646,8 +1575,8 @@ all:
         (cd utility; $(MAKE))
 #       uncomment for LiS build
         (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
-#       uncomment for @value{PACKAGE_TARNAME} build
-#       (cd usr/src/@value{PACKAGE_TARNAME}; ./configure.nexusware; $(MAKE) install-strip)
+#       uncomment for @value{PACKAGE} build
+#       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
         (cd build/generic; $(MAKE))
 ...
 @end cartouche
@@ -1660,12 +1589,12 @@ build the @cite{NexusWare} flash image as normal:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd /u5/NexusWare24
 % source SETUP.sh
 % pushd usr/src
-% tar -xjvf $@{DIRSTACK[2]@}/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% ln -sf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE} @value{PACKAGE_TARNAME}
+% tar -xjvf $@{DIRSTACK[2]@}/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% ln -sf @value{PACKAGE}-@value{VERSION} @value{PACKAGE}
 % popd
 % make
 % popd
@@ -1700,7 +1629,7 @@ rpm(8), *manpages*, The Manual Pages}.
 @example
 @cartouche
 % pushd RPMS/i686
-% rpm -ihv @value{PACKAGE_TARNAME}-*-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+% rpm -ihv @value{PACKAGE}-*-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @end cartouche
 @end example
 
@@ -1719,12 +1648,12 @@ will relocate the documentation and info directories:
 % rpm -ihv \ 
         --relocate '/usr/share/doc=/usr/local/share/doc' \ 
         --relocate '/usr/share/info=/usr/local/share/info' \ 
-        -- @value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+        -- @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
 @end cartouche
 @end example
 
 @noindent
-The previous example will install the @file{@value{PACKAGE_TARNAME}-doc} package by will
+The previous example will install the @file{@value{PACKAGE}-doc} package by will
 relocate the documentation an info directory contents to the @file{/usr/local}
 version.
 
@@ -1776,7 +1705,7 @@ following command:
 
 @example
 @cartouche
-% rpm -evv `rpm -qa | grep '^@value{PACKAGE_TARNAME}-'`
+% rpm -evv `rpm -qa | grep '^@value{PACKAGE}-'`
 @end cartouche
 @end example
 
@@ -1796,7 +1725,7 @@ files and source RPM file.  A command such as:
 
 @example
 @cartouche
-% find / -name '@value{PACKAGE_TARNAME}-*.rpm' -type f -print0 | xargs --null rm -f
+% find / -name '@value{PACKAGE}-*.rpm' -type f -print0 | xargs --null rm -f
 @end cartouche
 @end example
 
@@ -1816,12 +1745,12 @@ follows:
 
 @example
 @cartouche
-% cd /usr/src/@value{PACKAGE_TARNAME}
+% cd /usr/src/@value{PACKAGE}
 % make uninstall
 % cd ..
-% rm -fr @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
-% rm -f @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
-% rm -f @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% rm -fr @value{PACKAGE}-@value{VERSION}
+% rm -f @value{PACKAGE}-@value{VERSION}.tar.gz
+% rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end cartouche
 @end example
 
