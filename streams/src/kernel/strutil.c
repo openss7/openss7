@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:38 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/30 02:24:38 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -68,6 +68,9 @@ static char const ident[] =
 #include <linux/wait.h>		/* for wait queues */
 #include <linux/types.h>	/* for various types */
 #include <linux/interrupt.h>	/* for in_interrupt() */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 
 #include <sys/cmn_err.h>	/* for CE_ constants */
 #include <sys/strlog.h>		/* for SL_ constants */

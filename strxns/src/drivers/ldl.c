@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:32:16 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/30 02:24:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:32:16 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:32:16 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/30 02:24:46 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:32:16 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/30 02:24:46 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:32:16 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2005/03/30 02:24:46 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -1268,7 +1268,7 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	skb->mac.raw = skb->data;
 	skb->dev = ndev->dev;
 	atomic_add(skb->truesize, &ndev->wr_cur);
-	(struct ndev *) skb->sk = ndev;
+	skb->sk = (struct sock *) ndev;
 	skb->destructor = ndev_skb_destruct;
 
 	if (atomic_read(&ndev->wr_cur) <= ndev->wr_max) {

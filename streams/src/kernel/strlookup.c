@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/09 08:03:31 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/30 02:24:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/09 08:03:31 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/30 02:24:34 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/09 08:03:31 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/30 02:24:34 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -69,6 +69,9 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #include <linux/poll.h>
 #include <linux/fs.h>
 #include <linux/mount.h>	/* for vfsmount stuff */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 #include <asm/hardirq.h>
 
 #include <sys/kmem.h>		/* for kmem_ */

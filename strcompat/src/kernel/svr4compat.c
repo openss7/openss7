@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:29 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:29 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:29 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:33 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:29 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -97,6 +97,9 @@ static char const ident[] =
 #include <linux/spinlock.h>	/* for spinlock functions */
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/interrupt.h>	/* for local_irq functions */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 #if HAVE_KINC_ASM_SOFTIRQ_H
 #include <asm/softirq.h>	/* for local_bh_ functions */
 #endif
@@ -118,7 +121,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:29 $"
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:33 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"

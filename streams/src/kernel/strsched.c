@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/03/09 08:03:31 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/03/30 02:24:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/03/09 08:03:31 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/03/30 02:24:35 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/03/09 08:03:31 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/03/30 02:24:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -64,6 +64,9 @@ static char const ident[] =
 #include <linux/spinlock.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 #if HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif

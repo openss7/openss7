@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/30 02:24:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:36 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -55,6 +55,10 @@
 
 #undef STR
 #include <linux/interrupt.h>	/* for in_irq() and friends */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
+
 
 #ifndef __SCHED_EXTERN_INLINE
 #define __SCHED_EXTERN_INLINE extern __inline__

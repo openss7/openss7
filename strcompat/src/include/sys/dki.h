@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.2 2005/03/30 02:24:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:28 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DKI_H__
 #define __SYS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/30 02:24:28 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,8 +74,13 @@ typedef __kernel_dev_t minor_t;
 typedef struct cred {
 	uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
 	gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
+#ifdef NGROUPS
 	int cr_ngroups;
 	gid_t cr_groups[NGROUPS];
+#endif
+#ifdef NGROUPS_SMALL
+	struct group_info *cr_group_info;
+#endif
 } cred_t;
 
 #ifdef CONFIG_STREAMS_COMPAT_LIS

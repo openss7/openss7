@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
+ @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/30 02:24:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:31 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -282,6 +282,10 @@ extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 					   dma_addr_t *dma_handle);
 extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					     size_t len, int direction);
+extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					     size_t len, int direction);
+extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
 extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr);
 extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr);

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.11 $) $Date: 2005/03/29 17:22:43 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.13 $) $Date: 2005/03/30 05:42:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:22:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/30 05:42:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -422,7 +422,7 @@ dnl
 AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
-			  linux/cpumask.h linux/kref.h], [:], [:], [
+			  linux/cpumask.h linux/kref.h linux/security.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -442,6 +442,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device \
+			cpumask_scnprintf \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode], [:], [:], [
 #include <linux/compiler.h>

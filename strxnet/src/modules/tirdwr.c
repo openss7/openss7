@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/08 19:32:11 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/30 02:24:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:32:11 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/08 19:32:11 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/30 02:24:42 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/08 19:32:11 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/30 02:24:42 $";
 
 #include "os7/compat.h"
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/08 19:32:11 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/30 02:24:42 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -688,7 +688,8 @@ tirdwr_pop(queue_t *q)
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIRDWR_EPROTO)) {
 			if ((mp = allocb(sizeof(struct T_ordrel_req), BPRI_WAITOK))) {
-				struct T_ordrel_req *prim = ((typeof(prim)) mp->b_wptr)++;
+				struct T_ordrel_req *prim = (typeof(prim)) mp->b_wptr;
+				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;
 				prim->PRIM_type = T_ORDREL_REQ;
 				putnext(priv->wq, mp);
@@ -699,7 +700,8 @@ tirdwr_pop(queue_t *q)
 		   fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+			struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+			mp->b_wptr = (unsigned char *) (prim + 1);
 			mp->b_datap->db_type = M_PROTO;
 			prim->PRIM_type = T_DISCON_REQ;
 			prim->SEQ_number = 0;

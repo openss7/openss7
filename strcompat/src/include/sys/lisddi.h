@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lisddi.h,v 0.9.2.3 2005/03/02 17:41:27 brian Exp $
+ @(#) $Id: lisddi.h,v 0.9.2.4 2005/03/30 02:24:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/02 17:41:27 $"
+#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/30 02:24:29 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -70,6 +70,9 @@
 
 #include <linux/poll.h>
 #include <linux/interrupt.h>
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 
 #define LIS_MAXAPUSH	8
 #define LIS_FMNAMESZ	8
@@ -399,6 +402,10 @@ extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 					   dma_addr_t *dma_handle);
 extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					     size_t len, int direction);
+extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					     size_t len, int direction);
+extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
 extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev, dma64_addr_t dma_addr);
 extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma_addr);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/03/02 17:41:27 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2005/03/30 02:24:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/02 17:41:27 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/30 02:24:27 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -182,7 +182,11 @@ __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
 #if HAVE_KFUNC_PROCESS_GROUP
 		*(pid_t *) value_p = process_group(current);
 #else
+#if HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 		*(pid_t *) value_p = current->pgrp;
+#else
+		*(pid_t *) value_p = current->signal->pgrp;
+#endif
 #endif
 		return (0);
 	case UPROCP:
@@ -192,7 +196,11 @@ __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->pid;
 		return (0);
 	case PSID:
+#if HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 		*(pid_t *) value_p = current->session;
+#else
+		*(pid_t *) value_p = current->signal->session;
+#endif
 		return (0);
 	case TIME:
 	{

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,6 +92,9 @@ static char const ident[] =
 #include <asm/io.h>		/* for virt_to_page and friends */
 #include <linux/slab.h>		/* for kmalloc and friends */
 #include <linux/interrupt.h>	/* for in_interrupt() */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 #include <asm/irq.h>		/* for disable_irq */
 #include <asm/system.h>		/* for sti, cli */
 #include <asm/delay.h>		/* for udelay */
@@ -117,7 +120,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:32 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

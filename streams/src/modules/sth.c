@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:44 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/30 02:24:39 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -171,7 +171,7 @@ struct streamtab str_info = {
 	st_wrinit:&str_winit,
 };
 
-#define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
+#define stri_lookup(__f) ((__f)->private_data)
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1889,7 +1889,8 @@ static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int 
 	err = -ENOSR;
 	if (!(mp = allocb(sizeof(arg), BPRI_MED)))
 		goto error;
-	*((unsigned long *) mp->b_wptr)++ = arg;
+	*((unsigned long *) mp->b_wptr) = arg;
+	mp->b_wptr += sizeof(unsigned long);
 	{
 		long timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 		err = strsendioctl(file, cmd, current_creds, mp, TRANSPARENT, &timeo, &rval);
@@ -2093,7 +2094,7 @@ int stropen(struct inode *inode, struct file *file)
 		inode->i_pipe = (void *) sd;
 	}
 	/* always write file->private_data */
-	stri_lookup(file) = (void *) sd;
+	stri_lookup(file) = sd;
       wakeup_exit:
 	printd(("%s: waking up waiters on stream head\n", __FUNCTION__));
 	strwakeopen(file, sd);	/* clear STWOPEN bit - wake up anybody waiting on open bit */

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/03/27 12:27:09 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/03/30 02:24:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/27 12:27:09 $ by $Author: brian $
+# Last Modified $Date: 2005/03/30 02:24:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -791,7 +791,7 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h linux/slab.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/slab.h linux/hardirq.h linux/security.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -809,6 +809,8 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
 			pcibios_write_config_dword pcibios_write_config_word \
+			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
+			pci_dac_dma_sync_single_for_device \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -833,6 +835,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/namei.h>
 #endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
 ])
@@ -857,6 +862,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/time.h>		/* for struct timespec */
 ])
 dnl 
@@ -866,6 +874,8 @@ dnl specific information has been put in place instead.  We don't really care
 dnl one way to the other, but this check discovers which way is used.
 dnl 
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
+			 struct task_struct.session,
+			 struct task_struct.pgrp,
 			 struct super_block.s_fs_info,
 			 struct super_block.u.generic_sbp,
 			 struct file_system_type.read_super,
@@ -948,6 +958,9 @@ dnl
 #include <linux/namei.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/time.h>		/* for struct timespec */]],
 			[[struct timespec ts;
 int retval;

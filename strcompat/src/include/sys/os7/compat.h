@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.12 2005/03/13 23:49:44 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.13 2005/03/30 02:24:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/13 23:49:44 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:25 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -74,6 +74,9 @@
 #include <asm/system.h>
 #include <linux/interrupt.h>
 #include <linux/kdev_t.h>
+#if HAVE_KINC_LINUX_SECURITY_H
+#include <linux/security.h>
+#endif
 #if ! HAVE_KTYPE_IRQRETURN_T
 typedef void irqreturn_t;
 #endif

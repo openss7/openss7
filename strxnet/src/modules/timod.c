@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:32:10 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/30 02:24:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:32:10 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:32:10 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/30 02:24:41 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:32:10 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/30 02:24:41 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 19:32:10 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/30 02:24:41 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -893,7 +893,8 @@ timod_pop(queue_t *q)
 	case TS_WREQ_ORDREL:
 		if (!(priv->flags & TIMOD_EPROTO)) {
 			if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-				struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+				struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+				mp->b_wptr = (unsigned char *) (prim + 1);
 				mp->b_datap->db_type = M_PROTO;
 				prim->PRIM_type = T_ORDREL_REQ;
 				qreply(q, mp);
@@ -902,7 +903,8 @@ timod_pop(queue_t *q)
 		/* fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
-			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
+			struct T_discon_req *prim = (typeof(prim)) mp->b_wptr;
+			mp->b_wptr = (unsigned char *) (prim + 1);
 			mp->b_datap->db_type = M_PROTO;
 			prim->PRIM_type = T_DISCON_REQ;
 			prim->SEQ_number = 0;

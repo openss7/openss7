@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 02:24:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:26 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 02:24:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 02:24:30 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 02:24:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,6 +81,9 @@ static char const ident[] =
 #include <asm/pci.h>		/* for many pci functions */
 #endif
 #include <linux/interrupt.h>	/* for request_irq */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_irq() and friends */
+#endif
 #include <linux/ioport.h>	/* for check_region and friends */
 #include <asm/uaccess.h>	/* for verify_area and friends */
 #include <linux/timer.h>	/* for del_timer and friends */
@@ -114,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 02:24:30 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -904,7 +907,9 @@ EXPORT_SYMBOL_GPL(lis_del_timer);
 /* This one is just plain silly. */
 int lis_getint(unsigned char **p)
 {
-	return *(((int *) (*p))++);
+	int retval = *((int *)(*p));
+	p += sizeof(int);
+	return retval;
 }
 
 EXPORT_SYMBOL_GPL(lis_getint);
@@ -1484,11 +1489,29 @@ void lis_osif_do_settimeofday(struct timeval *tp)
 EXPORT_SYMBOL_GPL(lis_osif_do_settimeofday);
 
 #ifdef CONFIG_PCI
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
 				      int direction)
 {
 	return WARN(pci_dac_dma_sync_single(pdev, dma_addr, len, direction));
 }
+#endif
+
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
+				      int direction)
+{
+	return WARN(pci_dac_dma_sync_single_for_cpu(pdev, dma_addr, len, direction));
+}
+#endif
+
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
+				      int direction)
+{
+	return WARN(pci_dac_dma_sync_single_for_device(pdev, dma_addr, len, direction));
+}
+#endif
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single);
 void lis_osif_pci_disable_device(struct pci_dev *dev)
