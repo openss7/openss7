@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.5 2005/03/15 12:06:37 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.6 2005/04/05 04:30:00 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 12:06:37 $ by $Author: brian $
+% Last Modified $Date: 2005/04/05 04:30:00 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -2660,12 +2660,17 @@ the gcc (cc) command line for each C language file that contains any of the
 above include lines.
 
 @example
+@ignore
 -I/usr/src/LiS/include
+@end ignore
+-I/usr/include/LiS
 @end example
 
+@ignore
 This directive assumes that you used standard installation procedures for LiS so
 that the name @file{/usr/src/LiS} is a symbolic link to the LiS installation directory.
 @pgindex /usr/src/LiS
+@end ignore
 
 @subsubsection Linking Options
 
