@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2004/08/10 02:33:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2004/08/12 01:05:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,23 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/10 02:33:04 $ by $Author: brian $
+# Last Modified $Date: 2004/08/12 01:05:53 $ by $Author: brian $
 #
 # =============================================================================
+
+dist_bin_SCRIPTS		= \
+				  netperf_arr \
+				  netperf_packet_byte \
+				  netperf_sctp_range \
+				  netperf_sctp_rr \
+				  netperf_sctp_stream \
+				  netperf_snapshot \
+				  netperf_tcp_range \
+				  netperf_tcp_rr \
+				  netperf_tcp_stream \
+				  netperf_udp_range \
+				  netperf_udp_rr \
+				  netperf_udp_stream
 
 dist_sbin_SCRIPTS		= \
 				  sctp_stream_script \
@@ -118,7 +132,19 @@ man1_MANS			= \
 				  udp_stream_script.1 \
 				  snapshot_script.1 \
 				  arr_script.1 \
-				  packet_byte_script.1
+				  packet_byte_script.1 \
+				  netperf_arr.1 \
+				  netperf_packet_byte.1 \
+				  netperf_sctp_range.1 \
+				  netperf_sctp_rr.1 \
+				  netperf_sctp_stream.1 \
+				  netperf_snapshot.1 \
+				  netperf_tcp_range.1 \
+				  netperf_tcp_rr.1 \
+				  netperf_tcp_stream.1 \
+				  netperf_udp_range.1 \
+				  netperf_udp_rr.1 \
+				  netperf_udp_stream.1
 
 man8_MANS			= \
 				  netserver.8
@@ -136,6 +162,18 @@ dist_noinst_MANS		= \
 				  snapshot_script.man \
 				  arr_script.man \
 				  packet_byte_script.man \
+				  netperf_arr.man \
+				  netperf_packet_byte.man \
+				  netperf_sctp_range.man \
+				  netperf_sctp_rr.man \
+				  netperf_sctp_stream.man \
+				  netperf_snapshot.man \
+				  netperf_tcp_range.man \
+				  netperf_tcp_rr.man \
+				  netperf_tcp_stream.man \
+				  netperf_udp_range.man \
+				  netperf_udp_rr.man \
+				  netperf_udp_stream.man \
 				  netserver.man
 
 include am/man.am

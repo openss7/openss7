@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.6 2004/08/07 11:05:40 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.7 2004/08/12 01:05:53 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/07 11:05:40 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/12 01:05:53 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -335,6 +335,9 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     fi
     AC_MSG_RESULT([${netperf_cv_intervals:-no}])
     AC_MSG_CHECKING([for netperf do dlpi])
+    if test :"${xns_cvs_includes:-no}" = :no ; then
+        netperf_cv_do_dlpi=no
+    fi
     if test :"${netperf_cv_do_dlpi:-no}" = :yes ; then
         AC_DEFINE_UNQUOTED([DO_DLPI], [], [
             Define to include code to test the DLPI implementation.

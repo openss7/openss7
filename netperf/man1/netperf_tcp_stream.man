@@ -1,0 +1,365 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: netperf_tcp_stream.man,v 1.1.2.1 2004/08/12 01:05:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/08/12 01:05:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so netperf.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database netperf.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH NETPERF_TCP_STREAM 1 "$Date: 2004/08/12 01:05:54 $" "$Name:  $" "User Commands"
+.\"
+.\"
+.SH NAME
+.B netperf_tcp_stream
+\- perform scripted netperf TCP bulk transfer benchmark tests
+.\"
+.\"
+.SH SYNOPSIS
+.HP 8
+\fBnetperf_tcp_stream\fR\ [\fIoptions\fR]\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
+.HP 8
+\fBnetperf_tcp_stream\fR\ {\ \fB-h\fR\ |\ \fB--help\fR\ }
+.HP 8
+\fBnetperf_tcp_stream\fR\ {\ \fB-V\fR\ |\ \fB--version\fR\ }
+.HP 8
+\fBnetperf_tcp_stream\fR\ {\ \fB-C\fR\ |\ \fB--copying\fR\ }
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I
+HOSTNAME
+name of
+.BR netserver (8)
+host [\fIDefault:\fR \fBlocalhost\fR]
+.TP
+.B
+CPU
+calibrate CPU [\fIDefault:\fR no]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B netperf_tcp_stream
+is an OpenSS7 replacement for the
+.B tcp_stream_script
+that normally ships with
+.BR netperf (1).
+This script is a
+.BR bash (1)
+shell script front-end to
+.BR netperf (1).
+.PP
+.B netperf_tcp_stream
+performs
+.IR TCP_STREAM " or " XTI_TCP_STREAM
+tests.  It performs this test on a number of combinations of buffer sizes and
+send sizes.
+This test is intended as a benchmark test for TCP bulk data transfer behavior
+at several interesting data points.
+(See
+.BR netperf (1)
+for more information on these tests.)
+.\"
+.\"
+.SH OPTIONS
+.TP
+\fB-c\fR, \fB--calibrate\fR
+calibrate CPU [\fIDefault:\fR no]
+.TP
+\fB-H\fR, \fB--hostname=\fIHOSTNAME\fR
+name or address of netserver host [\fIDefault:\fR \fBlocalhost\fR]
+.TP
+\fB-p\fR, \fB--port=\fIPORTNUM\fR
+netserver port number [\fIDefault:\fR \fB12865\fR]
+.TP
+\fB-t\fR, \fB--testtime=\fISECONDS\fR
+duration of each test in seconds [\fIDefault:\fR 60]
+.TP
+\fB-b\fR, \fB--bufsize=\fISIZE\fR
+add an additional buffer size to the list
+.TP
+\fB-B\fR, \fB--bufsizes=\fR'\fISIZE\fR[ \fISIZE\fR]*'
+specify the list of buffer sizes to test [\fIDefault:\fR '\fB57344 32768 8192\fR']
+.TP
+\fB-s\fR, \fB--sendsize=\fISIZE\fR
+add an additional send size to the list
+.TP
+\fB-S\fR, \fB--sendsizes=\fR'\fISIZE\fR[ \fISIZE\fR]*'
+specify the list of send sizes to test [\fIDefault:\fR '\fB4096 8192 32768\fR']
+.TP
+\fB-x\fR, \fB--xti=\fR[\fIDEVICE\fR]
+use XTI
+.[
+xti
+.]
+interface instead of Sockets [\fIDefault:\fR no:\fB/dev/tcp\fR]
+.TP
+\fB-n\fR, \fB--dry-run\fR
+do not execute but verify actions [\fIDefault:\fR run]
+.TP
+\fB-q\fR, \fB--quiet\fR
+supress normal output
+.TP
+\fB-D\fR, \fB--debug\fR [\fILEVEL\fR]
+increase or set debugging verbosity [\fIDefault:\fR \fB0\fR]
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+increase or set output verbosity [\fIDefault:\fR \fB1\fR]
+.TP
+\fB-h\fR, \fB--help\fR
+prints this usage information and exits
+.TP
+\fB-V\fR, \fB--version\fR
+prints the version information and exits
+.TP
+\fB-C\fR, \fB--copying\fR
+prints copying permissions and exits
+.\"
+.\"
+.SH ENVIRONMENT
+.TP
+.B
+NETPERF_CMD
+default netperf command [\fIDefault:\fR \fBnetperf\fR]
+.TP
+.B
+NETPERF_TIME
+default test case duration [\fIDefault:\fR \fB60\fR]
+.TP
+.B
+NETPERF_PORT
+default netserver port number [\fIDefault:\fR \fB12865\fR]
+.TP
+.B
+NETPERF_SKTS
+default buffer sizes [\fIDefault:\fR `\fB57344 32768 8192\fR']
+.TP
+.B
+NETPERF_STATS
+default statistics options [\fIDefault:\fR `\fB-i 10,2 -I 99,5\fR']
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.BR strerr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors can result from inadequate permissions, inability to locate the
+.BR netperf (1)
+command; failure of the
+.BR netperf (1)
+command.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following example will peform a default
+.B netperf_tcp_stream
+test in loopback:
+.sp
+.RS 4
+.nf
+\fC\s-1$ /usr/bin/netperf_tcp_stream\s+1\fP
+.fi
+.RE
+.PP
+The following example will perform a verbose dry-run without executing any tests:
+.sp
+.RS 4
+.nf
+\fC\s-1$ /usr/bin/netperf_tcp_stream -nv\s+1\fP
+.fi
+.RE
+.PP
+Sample output of the dry run is as follows:
+.sp
+.RS 4
+.nf
+\fC\s-1\
+netperf_tcp_stream: error -- cannot find netperf executable
+Netperf netperf_tcp_stream script started at Wed Aug 11 17:18:48 MDT 2004
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 4096 -s 57344 -S 57344
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 8192 -s 57344 -S 57344
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 32768 -s 57344 -S 57344
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 4096 -s 32768 -S 32768
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 8192 -s 32768 -S 32768
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 32768 -s 32768 -S 32768
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 4096 -s 8192 -S 8192
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 8192 -s 8192 -S 8192
+
+
+------------------------------------
+
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t TCP_STREAM  -H localhost  -- -m 32768 -s 8192 -S 8192
+
+Tests completed at Wed Aug 11 17:18:48 MDT 2004
+
+If you wish to submit these results to the netperf database at
+http://www.cup.hp.com/netperf/NetperfPage.html, please submit each
+datapoint individually. Individual datapoints are separated by
+lines of dashes.
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.TP
+.B /dev/tcp
+the default XTI device
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/bin/netperf_tcp_stream
+contains the
+.B netperf_tcp_stream
+script
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR netperf (1),
+.BR netserver (8),
+.BR tcp_stream_script (1).
+.\"
+.\"
+.SH BUGS
+.PP
+.B netperf_tcp_stream
+has no known bugs.  Report bugs to <bugs@openss7.org>.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B netperf_tcp_stream
+arguments and output are consistent with
+.BR tcp_stream_script (1).
+.B netperf_tcp_stream
+has the advantage over
+.BR tcp_stream_script (1)
+that it supports testing of XTI interface as well as Sockets and provides
+caller access to all options.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B netperf_tcp_stream
+is a replacement for the
+.BR tcp_stream_script (1)
+originally distributed with
+.BR netperf (1).
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.AU
+.\"
+.\"
+.TI

@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: netperf.macros,v 1.1.2.1 2004/08/08 22:59:03 brian Exp $
+.\" @(#) $Id: netperf.macros,v 1.1.2.2 2004/08/12 01:05:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/08 22:59:03 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/12 01:05:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -262,7 +262,7 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.2.1 $); $Date: 2004/08/08 22:59:03 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -275,7 +275,7 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.2.1 $); $Date: 2004/08/08 22:59:03 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -290,7 +290,7 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.2.1 $); $Date: 2004/08/08 22:59:03 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -305,7 +305,7 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.2.1 $); $Date: 2004/08/08 22:59:03 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -318,7 +318,7 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.2.1 $); $Date: 2004/08/08 22:59:03 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
 ..
 .de AU
 .SH "AUTHOR"
