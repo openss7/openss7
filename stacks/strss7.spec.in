@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/02/07 22:23:14 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/10 12:56:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 22:23:14 $ by $Author: brian $
+# Last Modified $Date: 2005/02/10 12:56:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -493,20 +493,23 @@ if [ $1 = 1 ] ; then
     if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
         streams_dir=/%{_lib}/modules/%{kernel_version}/misc
         streams_prf=/%{_lib}/modules/preferred/misc
+        streams_dfl=/%{_lib}/modules/default/misc
         conf_new=%{_tmppath}/modules.conf.new.$$
         cp -f $conf_old $conf_new
 #       if not, check for an old non-rpm LiS
         if ( grep -q 'BEGIN LiS' $conf_old ) ; then
             conf_tmp=%{_tmppath}/modules.conf.tmp.$$
-            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o" -o -name "*.o.gz"`
             for p in $list ; do
-                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+                f=$(basename $p)
+                m=$(basename $(basename $f .gz) .o)
 #               Remove references to our modules from old installation.
                 sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
                 mv -f $conf_tmp $conf_new
 #               Remove conflicting modules.
-                rm -f $streams_dir/$m.o
-                rm -f $streams_prf/$m.o
+                rm -f $streams_dir/$f
+                rm -f $streams_prf/$f
+                rm -f $streams_dfl/$f
             done
         fi
 #       check for forced over installs of older LiS or LfS rpm installations
@@ -979,6 +982,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
+# Revision 0.9.2.8  2005/02/10 12:56:29  brian
+# - Minor adjustments for compressed modules.
+#
 # Revision 0.9.2.7  2005/02/07 22:23:14  brian
 # - Updated changelog.
 #
