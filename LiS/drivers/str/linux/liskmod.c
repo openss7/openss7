@@ -29,7 +29,7 @@
 ************************************************************************/
 
 
-#ident "@(#) LiS liskmod.c 1.7 05/07/02 20:41:46 "
+#ident "@(#) LiS liskmod.c 1.11 06/06/04 16:05:25 "
 
 #include <linux/version.h>
 
@@ -45,19 +45,19 @@
 #define	KERNEL_2_4
 #endif
 
-#ifdef MODULE
-#include <linux/module.h>
-#endif
-
 #ifdef MODVERSIONS
 # ifdef LISMODVERS
 #  include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
 # else
-#  include <linux/modversions.h>
+#  include <linux/modversions.h>	/* BEFORE module.h, kernel.h, ... */
 # endif
 #endif
 
-#include <linux/kernel.h>			/* for printk */
+#ifdef MODULE
+#include <linux/module.h>
+#endif
+
+#include <linux/kernel.h>		/* for printk */
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,3,0)
 #include <linux/sched.h>
@@ -78,13 +78,21 @@
 *									*
 ************************************************************************/
 
-int	init_module(void)
+#ifdef KERNEL_2_5
+int liskmod_init_module(void)
+#else
+int init_module(void)
+#endif
 {
     printk("LiS Kernel Module Loaded\n") ;
     return(0) ;			/* if we're here, we're OK */
 }
 
-void	cleanup_module(void)
+#ifdef KERNEL_2_5
+void liskmod_cleanup_module(void)
+#else
+void cleanup_module(void)
+#endif
 {
     printk("LiS Kernel Module Unloading\n") ;
 }
@@ -201,4 +209,21 @@ struct inode *igrab(struct inode *inode)
 
 # endif
 
+#endif
+
+/************************************************************************
+*                         Module Information                            *
+************************************************************************/
+
+#if defined(MODULE_LICENSE)
+MODULE_LICENSE("GPL");
+#endif
+#if defined(MODULE_AUTHOR)
+MODULE_AUTHOR("David Grothe <dave@gcom.com>");
+#endif
+#if defined(MODULE_DESCRIPTION)
+MODULE_DESCRIPTION("Linux Kernel Compatibility Code for Linux STREAMS (LiS)");
+#endif
+#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
+MODULE_INFO(vermagic, VERMAGIC_STRING);
 #endif

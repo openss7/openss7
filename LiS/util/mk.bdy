@@ -2,16 +2,16 @@
 # This is the common part of the makefiles in the util directory.
 #
 # "make all" is the standard thing to do to make the utility programs.
-# "make install" will install them in $(INST_SBIN)
-# "make uninstall" will remove them from $(INST_SBIN)
+# "make install" will install them in $(DESTDIR)$([s]bindir)
+# "make uninstall" will remove them from $(DESTDIR)$([s]bindir)
 # "make clean" to clean up the object code
 #
 # Targets install and uninstall do nothing for user-land utilities.
 #
-# Invoking makefile needs to include $(LIS_HOME)/config.mk and define:
+# Invoking makefile needs to include $(SRCDIR)/config.mk and define:
 #
-# OPT         Target specific compiler options
-# INST_SBIN   where to install the utilities
+# OPT      	Target specific compiler options
+# [s]bindir	where to install the utilities
 #
 
 ifeq ($(MAKINGSTRCONF),1)
@@ -26,44 +26,64 @@ ifneq ($(LIS_TARG),user)
 UTILS  += polltst
 endif
 
-
 ifneq ($(LIS_TARG),user)
 
-all: $(PGMS) $(UTILS) $(XUTILS)
+all: $(Q_CC) $(PGMS) $(UTILS) $(XUTILS)
+	$(nothing)
 
-install: streams makenodes polltst timetst strtst $(XINST)
-	install -d $(INST_SBIN)
-	install streams $(INST_SBIN)/streams
-	install makenodes $(INST_SBIN)/strmakenodes
-	install -d $(INST_BIN)
-	install polltst $(INST_BIN)/polltst
-	install timetst $(INST_BIN)/timetst
-	install strtst $(INST_BIN)/strtst
+install: .compiler streams makenodes polltst timetst strtst $(XINST)
+	$(Q_ECHO) $(qtag_INSTALL)$(relpwd)
+	$(Q)install -d $(DESTDIR)$(sbindir)
+	$(Q)install -m 0750 streams $(DESTDIR)$(sbindir)/streams
+	$(Q)install -m 0750 makenodes $(DESTDIR)$(sbindir)/strmakenodes
+	$(Q)install -d $(DESTDIR)$(bindir)
+	$(Q)install -m 0755 polltst $(DESTDIR)$(bindir)/polltst
+	$(Q)install -m 0755 timetst $(DESTDIR)$(bindir)/timetst
+	$(Q)install -m 0755 strtst $(DESTDIR)$(bindir)/strtst
+	$(Q)install -d $(DESTDIR)$(pkgdatadir)/$(relpwd)
+	$(Q)cat .compiler | \
+	    sed "s:^:CC=\(:" | sed "s:$$:\):" | \
+	    sed "s:$(SRCDIR)/include:$$\{pkgincludedir\}:g" | \
+	    sed "s:$(SRCDIR):$$\{pkgdatadir\}:g" | \
+	    sed "s:$(KINCL):$$\{KINCL\}:g" | \
+	    sed "s:$(KSRC):$$\{KSRC\}:g" | \
+	    cat > $(DESTDIR)$(pkgdatadir)/$(relpwd)/.compiler
 
 uninstall:	dummy $(XUNINST)
-	-rm -f $(INST_SBIN)/streams
-	-rm -f $(INST_SBIN)/strmakenodes
-	-rm -f $(INST_BIN)/polltst
-	-rm -f $(INST_BIN)/timetst
-	-rm -f $(INST_BIN)/strtst
+	-$(Q)rm -f $(DESTDIR)$(sbindir)/streams
+	-$(Q)rm -f $(DESTDIR)$(sbindir)/strmakenodes
+	-$(Q)rm -f $(DESTDIR)$(bindir)/polltst
+	-$(Q)rm -f $(DESTDIR)$(bindir)/timetst
+	-$(Q)rm -f $(DESTDIR)$(bindir)/strtst
 
 else
 
 all: $(UTILS) $(XUTILS)
 
 install:
+	$(nothing)
 
 uninstall:
+	$(nothing)
 
 endif
 
 
+# the following relates to the Q_CC variable, which may be set to .compiler if
+# this target's output is desired
+#
+.compiler:
+	$(Q_ECHO) $(qtag__WD_)$(relpwd)
+	$(Q_ECHO) $(qtag__CC_)$(CC)
+	@echo $(CC) > $@
+
 clean:
-	-rm -f *.o $(PGMS) $(UTILS) $(XUTILS) $(XCLEAN)
+	-$(Q_ECHO) $(qtag_CLEAN)$(relpwd)
+	-$(Q)rm -f *.o $(PGMS) $(UTILS) $(XUTILS) $(XCLEAN) .compiler
 
 realclean:	clean
-	-rm -f .depend
-	-rm -f strconf $(XREALCLEAN)
+	-$(Q)rm -f .depend
+	-$(Q)rm -f strconf $(XREALCLEAN)
 
 #
 # The userland target links the routine into the application
@@ -76,13 +96,15 @@ ifneq ($(LIS_TARG),user)
 # The source is created by strconf and is target specific.
 #
 makenodes: $(UTILOBJ)/makenodes.c
-	$(CC) -o $@ $^ $(ULOPTS)
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $^ $(ULOPTS)
 
 #
 # The streams utility needs some special handling.
 #
 streams: $(UTILDIR)/streams.c $(LIBDEPS)
-	$(CC) -U__KERNEL__ -DMEMPRINT -o $@ $^ $(ULOPTS)
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -U__KERNEL__ -DMEMPRINT -o $@ $^ $(ULOPTS)
 
 endif
 
@@ -90,26 +112,29 @@ endif
 # The strconf utility needs some special handling.
 #
 strconf: $(UTILDIR)/strconf.c
-	$(CC) -o $@ $^
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $^
 
 #
 # A rule to build other utility programs with source in $(UTILDIR)
 #
 %: $(UTILDIR)/%.c $(LIBDEPS)
-	$(CC) -o $@ $^ $(ULOPTS)
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $^ $(ULOPTS)
 
 #
 # A rule to build a target specific utility program with source in $(UTILOBJ)
 #
 %: %.c $(LIBDEPS)
-	$(CC) -o $@ $^ $(ULOPTS)
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $^ $(ULOPTS)
 
 #
 # A special service to people struggling with cpp.
 # This is not used by default.
 #
 %.E: $(UTILDIR)/%.c
-	$(CC) -E $^ >$@
+	$(Q)$(CC) -E $^ >$@
 
 
 #
@@ -118,11 +143,12 @@ strconf: $(UTILDIR)/strconf.c
 -include .depend
 
 dep:
-	$(CC) -M $(UTILS:%=$(UTILDIR)/%.c) >.depend
-	$(CC) -M $(UTILDIR)/strconf.c >>.depend
-	$(CC) -M $(UTILDIR)/streams.c >>.depend
+	$(Q_ECHO) $(qtag_DEP)$(relpwd)
+	$(Q)$(CC) -M $(UTILS:%=$(UTILDIR)/%.c) >.depend
+	$(Q)$(CC) -M $(UTILDIR)/strconf.c >>.depend
+	$(Q)$(CC) -M $(UTILDIR)/streams.c >>.depend
 ifneq ($(strip $(XUTILS:%=%.c)),)
-	-$(CC) -M $(XUTILS:%=%.c) >>.depend
+	-$(Q)$(CC) -M $(XUTILS:%=%.c) >>.depend
 endif
 
 dummy:			# no rule

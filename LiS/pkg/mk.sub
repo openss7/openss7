@@ -1,0 +1,98 @@
+ifneq ($(wildcard .config),)
+include .config
+else
+$(error $(shell pwd) - no .config found...)
+endif
+
+# pkg subdirectory makefile for backward compatibility
+
+# OBJECTS and MODULES are the output .o files produced in this directory
+# _only_.  Their paths relative to SRCDIR are saved to .objects and
+# .modules, resp., after the named files are built.  Other Makefiles can
+# then find and use these files appropriately.
+#
+# note that each item included in MODULES will be built as its own loadable
+# module.  Each should be named with a 'streams-' prefix to prevent module
+# name conflicts
+#
+KEEP_OBJECTS = $(wildcard *.o)
+ifeq ($(PKGCOMPILE),y)
+ifeq ($(PKGMODULES),y)
+COMPILE_MODULES += $(patsubst %.c,streams-%.o,$(wildcard *.c))
+else
+COMPILE_OBJECTS += $(patsubst %.c,%.o,$(wildcard *.c))
+endif
+endif
+
+OBJECTS = $(KEEP_OBJECTS) $(COMPILE_OBJECTS)
+MODULES	= $(COMPILE_MODULES)
+
+# we use the following to make .object paths relative to the parent of
+# this directory, instead of SRCDIR
+#
+relparent = $(call _relpath,$(shell cd ..; pwd))
+
+CC += -D__KERNEL__ -DLINUX $(XOPTS) -I$(LIS_INCL)/sys/LiS
+
+ifneq ($(MODULES),)
+MODOPT = -DMODULE
+ifeq ($(KBUILD_NEEDS_MODNAME),y)
+  MODOPT += -DKBUILD_MODNAME=$(*F:%=streams-%)
+endif
+endif
+
+#
+# Prototype makefile for package subdirectories
+#
+default: all
+	$(nothing)
+
+all: .objects
+	$(nothing)
+
+modules: .modules
+	$(nothing)
+
+.objects: $(OBJECTS)
+	$(Q)echo $(relpkgdeps) > $@
+
+.modules: $(MODULES)
+	$(Q)echo $(relpkgdeps) > $@
+
+ifneq ($(COMPILE_OBJECTS),)
+$(COMPILE_OBJECTS): %.o: %.c
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ -c $<
+endif
+
+ifneq ($(COMPILE_MODULES),)
+$(COMPILE_MODULES): streams-%.o: %.c
+	$(Q_ECHO) $(qtag_CCm)$(relpwdtarget)
+	$(Q)$(CC) $(MODOPT) -DLIS_OBJNAME=$* -o $@ -c $<
+endif
+
+# the following two rules can be used for compiling standalone objects
+# and modules, independent of the above targets
+#
+%.o: %.c
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ -c $<
+
+streams-%.o: %.c
+	$(Q_ECHO) $(qtag_CCm)$(relpwdtarget)
+	$(Q)$(CC) $(MODOPT) -DLIS_OBJNAME=$* -o $@ -c $<
+
+clean:
+	$(Q_ECHO) $(qtag_CLEAN)$(relpwd)
+	-$(Q)rm -f .objects .modules
+ifneq ($(COMPILE_OBJECTS),)
+	-$(Q)rm -f $(COMPILE_OBJECTS)
+endif
+ifneq ($(COMPILE_MODULES),)
+	-$(Q)rm -f $(COMPILE_MODULES)
+endif
+
+
+# dependencies
+
+$(OBJECTS): $(LIS_INCL)/sys/LiS/config.h

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# argn() usage: argn <n> <args>...
+#
+argn()
+{
+    n=$1;  shift;  echo -n $(eval "echo -n \$$n")
+}
+
+print_stat()
+{
+    psinfo="`argn 1 $*` `argn 5 $*`"
+    if [ "$psinfo" = " " ]; then
+	psinfo="(LiS not running)"
+	retval=1		# loaded but no queue runner running
+    else
+	retval=0		# loaded and running
+    fi
+    echo "LiS loaded: $psinfo"
+    return $retval
+}
+
+lsmod 2>/dev/null | grep -q -w "streams"
+if [ $? -eq 0 ]; then
+    streams -s >/dev/null 2>&1
+    lisps=`ps ax 2>/dev/null`
+    print_stat `echo "$lisps" | grep "LiS-"` | grep -v grep
+    exit $?
+fi
+
+echo "LiS not loaded"
+exit 2				# not loaded

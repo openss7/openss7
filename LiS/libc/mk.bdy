@@ -23,50 +23,80 @@ LIB_STATIC = $(LIBDIR)/$(LIBFILE_STATIC)
 CC += -c $(XOPTS)
 
 
-all: $(LIB_SHARED) $(LIB_PSHARED) $(LIB_STATIC)
+all: $(Q_CC) $(LIB_SHARED) $(LIB_PSHARED) $(LIB_STATIC)
+	$(nothing)
 
 $(LIB_SHARED): $(LIBOBJS)
-	$(LD) -shared -o $@ $^ -lc
+	$(Q_ECHO) $(qtag_LD)$(reltarget)
+	$(Q)$(LD) -shared -o $@ $^ -lc
 
 $(LIB_PSHARED): $(PRELDOBJS)
-	$(LD) -shared -o $@ $^ -lc
+	$(Q_ECHO) $(qtag_LD)$(reltarget)
+	$(Q)$(LD) -shared -o $@ $^ -lc
 
 $(LIB_STATIC): $(LIBOBJS)
-	-rm -f $@
-	$(AR) r $@ $^
-	$(RANLIB) $@
+	-$(Q)rm -f $@
+	$(Q_ECHO) $(qtag_AR)$(reltarget)
+	$(Q)$(AR) r $@ $^
+	$(Q_ECHO) $(qtag_RANLIB)$(reltarget)
+	$(Q)$(RANLIB) $@
+
 
 %.o: %.c
-	$(CC) -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $<
 
 %.o: $(LIBDIR)/%.c
-	$(CC) -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $<
+
 
 clean:
-	-rm -f *.o
-	-rm -f $(LIB)
+	$(Q_ECHO) $(qtag_CLEAN)$(relpwd)
+	-$(Q)rm -f *.o .compiler
+	-$(Q)rm -f $(LIB)
 
 realclean: clean
-	-rm -f .depend
-	-rm -f $(LIB_SHARED)
-	-rm -f $(LIB_STATIC)
+	-$(Q)rm -f .depend
+	-$(Q)rm -f $(LIB_SHARED)
+	-$(Q)rm -f $(LIB_STATIC)
 
-#
-# You may have to be root to do the install and uninstall targets
-#
-install: all
-	install -d $(INST_LIB)
-	install	$(LIB_SHARED) $(INST_LIB)/$(LIBFILE_SHARED)
-	install	$(LIB_PSHARED) $(INST_LIB)/$(LIBFILE_PSHARED)
-	install	$(LIB_STATIC) $(INST_LIB)/$(LIBFILE_STATIC)
-	$(LIBDIR)/Install $(INST_LIB)/$(LIBFILE_PSHARED)
+install: .compiler all
+	$(Q_ECHO) $(qtag_INSTALL)$(relpwd)
+ifneq ($(ARCH),s390x)
+	$(Q)install -d $(DEST_LIBDIR)
+	$(Q)install -m 0755 $(LIB_SHARED) $(DEST_LIBDIR)/$(LIBFILE_SHARED)
+	$(Q)install -m 0755 $(LIB_PSHARED) $(DEST_LIBDIR)/$(LIBFILE_PSHARED)
+	$(Q)install -m 0644 $(LIB_STATIC) $(DEST_LIBDIR)/$(LIBFILE_STATIC)
+else
+#	FIXME - someone should define this directory
+ifneq ($(lib64dir),)
+	$(Q)install -d $(DEST_LIB64DIR)
+	$(Q)install -m 0755 $(LIB_SHARED) $(DEST_LIB64DIR)/$(LIBFILE_SHARED)
+	$(Q)install -m 0755 $(LIB_PSHARED) $(DEST_LIB64DIR)/$(LIBFILE_PSHARED)
+	$(Q)install -m 0644 $(LIB_STATIC) $(DEST_LIB64DIR)/$(LIBFILE_STATIC)
+endif
+endif
+ifeq ($(DESTDIR),)
+	$(Q)ldconfig
+endif
+	$(Q)install -d $(DESTDIR)$(pkgdatadir)/$(relpwd)
+	$(Q)cat .compiler | \
+	    sed "s:^:CC=\(:" | sed "s:$$:\):" | \
+	    sed "s:$(SRCDIR)/include:$$\{pkgincludedir\}:g" | \
+	    sed "s:$(SRCDIR):$$\{pkgdatadir\}:g" | \
+	    sed "s:$(KINCL):$$\{KINCL\}:g" | \
+	    sed "s:$(KSRC):$$\{KSRC\}:g" | \
+	    cat > $(DESTDIR)$(pkgdatadir)/$(relpwd)/.compiler
 
-#
-# Remove all the library files from the standard directories.
-#
 uninstall:
-	$(LIBDIR)/Uninstall $(INST_LIB)/$(LIBFILE_PSHARED)
-	-rm -f $(INST_LIB)/$(LIBFILE_SHARED)
-	-rm -f $(INST_LIB)/$(LIBFILE_STATIC)
-	-rm -f $(INST_LIB)/$(LIBFILE_PSHARED)
+	$(nothing)
 
+
+# the following relates to the Q_CC variable, which may be set to .compiler if
+# this target's output is desired
+#
+.compiler:
+	$(Q_ECHO) $(qtag__WD_)$(relpwd)
+	$(Q_ECHO) $(qtag__CC_)$(CC)
+	@echo $(CC) > $@

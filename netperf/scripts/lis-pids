@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# argn() usage: argn <n> <args>...
+#
+argn()
+{
+    n=$1;  shift;  echo -n $(eval "echo -n \"\$$n\"")
+}
+
+lis_pids()
+{
+    ps ax 2>/dev/null |
+    grep "LiS-" | grep -v grep |
+    while read line; do
+	echo -n "$(argn 1 $line) "
+    done
+}
+
+{ pids=$(lis_pids); test -n "${pids}"; } && echo "${pids}"
+
+exit $?

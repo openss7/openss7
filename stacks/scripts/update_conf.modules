@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# A script for the automatic updating of the conf.modules file.
+# Use as a filter. Old LiS aliases are always removed.
+# If a single argument is given it should be the name of a file
+# containing new LiS aliases.
+
+if [ `id -u` -ne 0 ]; then
+    exit 0			# don't do this unless root
+fi
+ 
+# Argument checking
+if [ $# -gt 1 ]; then
+    exit 1
+fi
+if [ "$1..." != "..." ]; then
+    if [ ! -r $1 ]; then
+        exit 1
+    fi
+fi 
+
+# Constants
+LIS_BEGIN="#BEGIN LiS"
+LIS_END="#END LiS"
+
+# No word boundaries
+IFS=""
+
+update_conf_modules()
+{
+    # Remove old LiS aliases
+    COPY="true"
+    read L
+    while [ "$?" = "0" ]; do
+	if [ "$COPY" = "true" ]; then
+	    if [ "$L" = "$LIS_BEGIN" ]; then
+		COPY="false"
+	    else
+		echo $L
+	    fi
+	else
+	    if [ "$L" = "$LIS_END" ]; then
+		COPY="true"
+	    fi
+	fi
+	read L
+    done
+
+    if [ "$1..." != "..." ]; then
+	# Output new aliases
+	echo $LIS_BEGIN
+	cat $1
+	echo $LIS_END
+    fi
+}
+
+CONF=modules.conf			# new name
+if [ ! -f /etc/$CONF ]; then
+    CONF=conf.modules			# old name
+fi
+
+cp /etc/$CONF ${CONF}.save && \
+update_conf_modules $1 <${CONF}.save >/etc/$CONF && \
+exit 0

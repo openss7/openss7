@@ -20,34 +20,63 @@
 #
 # Targets and rules
 #
+default: all
+	$(nothing)
+
+all: $(Q_CC) drivers.o
+	$(nothing)
 
 drivers.o: $(DRVRS) $(TDRVRS)
-	$(LD) -r -o $@ $^
+	$(Q_ECHO) $(qtag_LD)$(relpwdtarget)
+	$(Q)$(LD) -r -o $@ $^
 
 # Compiling a target-specific object ( $(TDRVRS) )
 %.o: %.c
-	$(CC) -DLIS_OBJNAME=$* -c -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -DLIS_OBJNAME=$* -o $@ -c $<
 
 # Compiling a target-independent object ( $(DRVRS) )
 %.o: $(DRVRDIR)/%.c
-	$(CC) -DLIS_OBJNAME=$* -c -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -DLIS_OBJNAME=$* -o $@ -c $<
 
 %.E: $(DRVRDIR)/%.c
-	$(CC) -E $^ >$@
+	$(Q)$(CC) -E $^ >$@
+
 %.E: %.c
-	$(CC) -E $^ >$@
+	$(Q)$(CC) -E $^ >$@
+
 
 common-clean:
-	-rm -f $(DRVRS)
-	-rm -f $(TDRVRS)
-	-rm -f drivers.o
+	-$(Q)rm -f $(DRVRS)
+	-$(Q)rm -f $(TDRVRS)
+	-$(Q)rm -f drivers.o .compiler
 
 common-realclean: clean
-	-rm -f .depend
+	-$(Q)rm -f .depend
 
-common-install:
+common-install: .compiler
+	$(Q)install -d $(DESTDIR)$(pkgdatadir)/$(relpwd)
+	$(Q)cat .compiler | \
+	    sed "s:^:CC=\(:" | sed "s:$$:\):" | \
+	    sed "s:$(SRCDIR)/include:$$\{pkgincludedir\}:g" | \
+	    sed "s:$(SRCDIR):$$\{pkgdatadir\}:g" | \
+	    sed "s:$(KINCL):$$\{KINCL\}:g" | \
+	    sed "s:$(KSRC):$$\{KSRC\}:g" | \
+	    cat > $(DESTDIR)$(pkgdatadir)/$(relpwd)/.compiler
 
 common-uninstall:
+	$(nothing)
+
+
+# the following relates to the Q_CC variable, which may be set to .compiler if
+# this target's output is desired
+#
+.compiler:
+	$(Q_ECHO) $(qtag__WD_)$(relpwd)
+	$(Q_ECHO) $(qtag__CC_)$(CC)
+	@echo $(CC) > $@
+
 
 #
 # Dependency stuff
@@ -57,8 +86,9 @@ common-uninstall:
 
 common-dep:
 ifneq ($(strip $(DRVRS) $(TDRVRS)),)
-	$(CC) -M -DDEP $(DRVRS:%.o=$(DRVRDIR)/%.c) $(TDRVRS:%.o=%.c) >.depend
+	$(Q)$(CC) -M -DDEP $(DRVRS:%.o=$(DRVRDIR)/%.c) $(TDRVRS:%.o=%.c) >.depend
 else
-	>.depend
+	$(Q)>.depend
 endif
 
+FORCE:

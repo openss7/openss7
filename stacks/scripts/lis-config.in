@@ -1,0 +1,147 @@
+#!/bin/bash
+
+KVER=${KVER:-`uname -r`}
+
+if [ -f #{CONFIG} ]; then
+    . #{CONFIG}
+else
+    echo "#{CONFIG} not found!!"
+    exit 1
+fi
+
+setup_opts ()
+{
+    declare -a opts
+
+    save_IFS=$IFS
+    opts=( \
+	"version" "libs" "includes" \
+	"driver-cc" "driver-cflags" \
+	"head-cc" "head-cflags" \
+	"libc-cc" "libc-cflags" \
+	"pkg-cc" "pkg-cflags" \
+	"util-cc" "util-cflags" \
+	"help"
+	)
+    IFS=","
+    longopts="${opts[*]}"
+    IFS=$save_IFS
+    opts=(\
+	"?" "h"
+	)
+    IFS=""
+    shortopts="${opts[*]}"
+    IFS=$save_IFS
+
+}
+
+usage()
+{
+    echo "usage: $(basename $0) [option] ..."
+    echo "    where [option] may be:"
+    echo "	--version          -- print LiS version (<major>.<minor>)"
+    echo "	--libs             -- print '-l...' options for linking"
+    echo "	--includes         -- print '-I...' options for compiling"
+    echo "	--driver-cc        -- print CC used for 'drivers/str/linux'"
+    echo "	--driver-cflags    -- print CFLAGS used for 'drivers/str/linux'"
+    echo "	--head-cc          -- print CC used for 'head/linux'"
+    echo "	--head-cflags      -- print CFLAGS used for 'head/linux'"
+    echo "	--libc-cc          -- print CC used for 'libc/linux'"
+    echo "	--libc-cflags      -- print CFLAGS used for 'libc/linux'"
+    echo "	--pkg-cc           -- print CC used for 'pkg'"
+    echo "	--pkg-cflags       -- print CFLAGS used for 'pkg'"
+    echo "	--util-cc          -- print CC used for 'util/linux'"
+    echo "	--util-cflags      -- print CFLAGS used for 'util/linux'"
+    echo "	-?|-h|--help       -- print this summary"
+}
+
+setup_opts
+
+args=`getopt -n $(basename $0) -l $longopts -o $shortopts -- "$@"`
+if [ $? != 0 ]; then exit 1; fi
+eval set -- "$args"
+
+while true; do
+case "$1" in
+    --version)
+      . ${pkgdatadir}/version
+      echo $LISVER
+      shift
+      ;;
+    --libs)
+      echo "-l${package}"
+      shift
+      ;;
+    --includes)
+      kincl="-I${KSRC}/include ${KINCL_MACH_GENERIC} ${KINCL_MACH_DEFAULT}"
+      echo "-I${pkgincludedir} ${kincl}"
+      shift
+      ;;
+    --driver-cc)
+      . ${pkgdatadir}/drivers/str/linux/.compiler
+      echo "${CC[0]}"
+      shift
+      ;;
+    --driver-cflags)
+      . ${pkgdatadir}/drivers/str/linux/.compiler
+      unset CC[0];  echo "${CC[*]}"
+      shift
+      ;;
+    --head-cc)
+      . ${pkgdatadir}/head/linux/.compiler
+      echo "${CC[0]}"
+      shift
+      ;;
+    --head-cflags)
+      . ${pkgdatadir}/head/linux/.compiler
+      unset CC[0];  echo "${CC[*]}"
+      shift
+      ;;
+    --libc-cc)
+      . ${pkgdatadir}/libc/linux/.compiler
+      echo "${CC[0]}"
+      shift
+      ;;
+    --libc-cflags)
+      . ${pkgdatadir}/libc/linux/.compiler
+      unset CC[0];  echo "${CC[*]}"
+      shift
+      ;;
+    --pkg-cc)
+      . ${pkgdatadir}/pkg/.compiler
+      echo "${CC[0]}"
+      shift
+      ;;
+    --pkg-cflags)
+      . ${pkgdatadir}/pkg/.compiler
+      unset CC[0];  echo "${CC[*]}"
+      shift
+      ;;
+    --util-cc)
+      . ${pkgdatadir}/util/linux/.compiler
+      echo "${CC[0]}"
+      shift
+      ;;
+    --util-cflags)
+      . ${pkgdatadir}/util/linux/.compiler
+      unset CC[0];  echo "${CC[*]}"
+      shift
+      ;;
+    -\?|-h|--help)
+      usage
+      shift
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      usage
+      echo "$(basename $0): unrecognized option '$1'" >&2
+      exit 1
+      ;;
+  esac
+done
+
+exit 0

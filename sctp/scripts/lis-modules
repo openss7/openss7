@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# argn() usage: argn <n> <args>...
+#
+argn()
+{
+    n=$1;  shift;  echo -n $(eval "echo -n \"\$$n\"")
+}
+
+lis_modules()
+{
+    lsmod 2>/dev/null | grep '^streams' |
+    while read line; do
+	echo -n "$(argn 1 $line)"
+    done
+}
+
+{ modules=$(lis_modules); test -n "${modules}"; } && echo "${modules}"
+
+exit $?
