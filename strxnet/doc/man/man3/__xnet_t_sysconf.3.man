@@ -1,0 +1,1 @@
+.so t_sysconf.3.man

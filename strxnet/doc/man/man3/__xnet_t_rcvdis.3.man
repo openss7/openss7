@@ -1,0 +1,1 @@
+.so t_rcvdis.3.man

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/11/08 06:55:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/22 15:29:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:55:51 $ by $Author: brian $
+# Last Modified $Date: 2005/01/22 15:29:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -142,6 +142,7 @@ xnet_man_MANS	= \
 	man3/t_rcvleafchange.3 \
 	man3/t_rcvrel.3 \
 	man3/t_rcvreldata.3 \
+	man3/t_rcvopt.3 \
 	man3/t_rcvudata.3 \
 	man3/t_rcvuderr.3 \
 	man3/t_rcvv.3 \
@@ -160,8 +161,89 @@ xnet_man_MANS	= \
 	man3/t_sync.3 \
 	man3/t_sysconf.3 \
 	man3/t_unbind.3 \
+	man3/_t_errno.3 \
+	man3/_t_errstr.3 \
+	man3/__xnet_t_accept.3 \
+	man3/__xnet_t_addleaf.3 \
+	man3/__xnet_t_alloc.3 \
+	man3/__xnet_t_bind.3 \
+	man3/__xnet_t_close.3 \
+	man3/__xnet_t_connect.3 \
+	man3/__xnet_t_errno.3 \
+	man3/__xnet_t_error.3 \
+	man3/__xnet_t_free.3 \
+	man3/__xnet_t_getinfo.3 \
+	man3/__xnet_t_getprotaddr.3 \
+	man3/__xnet_t_getstate.3 \
+	man3/__xnet_t_listen.3 \
+	man3/__xnet_t_look.3 \
+	man3/__xnet_t_open.3 \
+	man3/__xnet_t_optmgmt.3 \
+	man3/__xnet_t_rcv.3 \
+	man3/__xnet_t_rcvconnect.3 \
+	man3/__xnet_t_rcvdis.3 \
+	man3/__xnet_t_rcvleafchange.3 \
+	man3/__xnet_t_rcvrel.3 \
+	man3/__xnet_t_rcvreldata.3 \
+	man3/__xnet_t_rcvopt.3 \
+	man3/__xnet_t_rcvudata.3 \
+	man3/__xnet_t_rcvuderr.3 \
+	man3/__xnet_t_rcvv.3 \
+	man3/__xnet_t_rcvvudata.3 \
+	man3/__xnet_t_removeleaf.3 \
+	man3/__xnet_t_snd.3 \
+	man3/__xnet_t_snddis.3 \
+	man3/__xnet_t_sndopt.3 \
+	man3/__xnet_t_sndrel.3 \
+	man3/__xnet_t_sndreldata.3 \
+	man3/__xnet_t_sndudata.3 \
+	man3/__xnet_t_sndv.3 \
+	man3/__xnet_t_sndvopt.3 \
+	man3/__xnet_t_sndvudata.3 \
+	man3/__xnet_t_strerror.3 \
+	man3/__xnet_t_sync.3 \
+	man3/__xnet_t_sysconf.3 \
+	man3/__xnet_t_unbind.3 \
+	man3/__xnet_t_accept_r.3 \
+	man3/__xnet_t_addleaf_r.3 \
+	man3/__xnet_t_alloc_r.3 \
+	man3/__xnet_t_bind_r.3 \
+	man3/__xnet_t_close_r.3 \
+	man3/__xnet_t_connect_r.3 \
+	man3/__xnet_t_error_r.3 \
+	man3/__xnet_t_getinfo_r.3 \
+	man3/__xnet_t_getprotaddr_r.3 \
+	man3/__xnet_t_getstate_r.3 \
+	man3/__xnet_t_listen_r.3 \
+	man3/__xnet_t_look_r.3 \
+	man3/__xnet_t_open_r.3 \
+	man3/__xnet_t_optmgmt_r.3 \
+	man3/__xnet_t_rcv_r.3 \
+	man3/__xnet_t_rcvconnect_r.3 \
+	man3/__xnet_t_rcvdis_r.3 \
+	man3/__xnet_t_rcvleafchange_r.3 \
+	man3/__xnet_t_rcvopt_r.3 \
+	man3/__xnet_t_rcvreldata_r.3 \
+	man3/__xnet_t_rcvudata_r.3 \
+	man3/__xnet_t_rcvuderr_r.3 \
+	man3/__xnet_t_rcvv_r.3 \
+	man3/__xnet_t_rcvvudata_r.3 \
+	man3/__xnet_t_removeleaf_r.3 \
+	man3/__xnet_t_snd_r.3 \
+	man3/__xnet_t_snddis_r.3 \
+	man3/__xnet_t_sndopt_r.3 \
+	man3/__xnet_t_sndrel_r.3 \
+	man3/__xnet_t_sndreldata_r.3 \
+	man3/__xnet_t_sndudata_r.3 \
+	man3/__xnet_t_sndv_r.3 \
+	man3/__xnet_t_sndvopt_r.3 \
+	man3/__xnet_t_sndvudata_r.3 \
+	man3/__xnet_t_sync_r.3 \
+	man3/__xnet_t_unbind_r.3 \
+	man3/__xnet_t_peek.3 \
 	man3/xnet.3 \
-	man3/xti.3
+	man3/xti.3 \
+	man8/strxnet_mknod.8
 
 sock_man_MANS	= \
 	man3/accept.3 \
@@ -284,6 +366,7 @@ xnet_dist_noinst_MANS	= \
 	man3/t_rcvleafchange.3.man \
 	man3/t_rcvrel.3.man \
 	man3/t_rcvreldata.3.man \
+	man3/t_rcvopt.3.man \
 	man3/t_rcvudata.3.man \
 	man3/t_rcvuderr.3.man \
 	man3/t_rcvv.3.man \
@@ -302,8 +385,89 @@ xnet_dist_noinst_MANS	= \
 	man3/t_sync.3.man \
 	man3/t_sysconf.3.man \
 	man3/t_unbind.3.man \
+	man3/_t_errno.3.man \
+	man3/_t_errstr.3.man \
+	man3/__xnet_t_accept.3.man \
+	man3/__xnet_t_addleaf.3.man \
+	man3/__xnet_t_alloc.3.man \
+	man3/__xnet_t_bind.3.man \
+	man3/__xnet_t_close.3.man \
+	man3/__xnet_t_connect.3.man \
+	man3/__xnet_t_errno.3.man \
+	man3/__xnet_t_error.3.man \
+	man3/__xnet_t_free.3.man \
+	man3/__xnet_t_getinfo.3.man \
+	man3/__xnet_t_getprotaddr.3.man \
+	man3/__xnet_t_getstate.3.man \
+	man3/__xnet_t_listen.3.man \
+	man3/__xnet_t_look.3.man \
+	man3/__xnet_t_open.3.man \
+	man3/__xnet_t_optmgmt.3.man \
+	man3/__xnet_t_rcv.3.man \
+	man3/__xnet_t_rcvconnect.3.man \
+	man3/__xnet_t_rcvdis.3.man \
+	man3/__xnet_t_rcvleafchange.3.man \
+	man3/__xnet_t_rcvrel.3.man \
+	man3/__xnet_t_rcvreldata.3.man \
+	man3/__xnet_t_rcvopt.3.man \
+	man3/__xnet_t_rcvudata.3.man \
+	man3/__xnet_t_rcvuderr.3.man \
+	man3/__xnet_t_rcvv.3.man \
+	man3/__xnet_t_rcvvudata.3.man \
+	man3/__xnet_t_removeleaf.3.man \
+	man3/__xnet_t_snd.3.man \
+	man3/__xnet_t_snddis.3.man \
+	man3/__xnet_t_sndopt.3.man \
+	man3/__xnet_t_sndrel.3.man \
+	man3/__xnet_t_sndreldata.3.man \
+	man3/__xnet_t_sndudata.3.man \
+	man3/__xnet_t_sndv.3.man \
+	man3/__xnet_t_sndvopt.3.man \
+	man3/__xnet_t_sndvudata.3.man \
+	man3/__xnet_t_strerror.3.man \
+	man3/__xnet_t_sync.3.man \
+	man3/__xnet_t_sysconf.3.man \
+	man3/__xnet_t_unbind.3.man \
+	man3/__xnet_t_accept_r.3.man \
+	man3/__xnet_t_addleaf_r.3.man \
+	man3/__xnet_t_alloc_r.3.man \
+	man3/__xnet_t_bind_r.3.man \
+	man3/__xnet_t_close_r.3.man \
+	man3/__xnet_t_connect_r.3.man \
+	man3/__xnet_t_error_r.3.man \
+	man3/__xnet_t_getinfo_r.3.man \
+	man3/__xnet_t_getprotaddr_r.3.man \
+	man3/__xnet_t_getstate_r.3.man \
+	man3/__xnet_t_listen_r.3.man \
+	man3/__xnet_t_look_r.3.man \
+	man3/__xnet_t_open_r.3.man \
+	man3/__xnet_t_optmgmt_r.3.man \
+	man3/__xnet_t_rcv_r.3.man \
+	man3/__xnet_t_rcvconnect_r.3.man \
+	man3/__xnet_t_rcvdis_r.3.man \
+	man3/__xnet_t_rcvleafchange_r.3.man \
+	man3/__xnet_t_rcvopt_r.3.man \
+	man3/__xnet_t_rcvreldata_r.3.man \
+	man3/__xnet_t_rcvudata_r.3.man \
+	man3/__xnet_t_rcvuderr_r.3.man \
+	man3/__xnet_t_rcvv_r.3.man \
+	man3/__xnet_t_rcvvudata_r.3.man \
+	man3/__xnet_t_removeleaf_r.3.man \
+	man3/__xnet_t_snd_r.3.man \
+	man3/__xnet_t_snddis_r.3.man \
+	man3/__xnet_t_sndopt_r.3.man \
+	man3/__xnet_t_sndrel_r.3.man \
+	man3/__xnet_t_sndreldata_r.3.man \
+	man3/__xnet_t_sndudata_r.3.man \
+	man3/__xnet_t_sndv_r.3.man \
+	man3/__xnet_t_sndvopt_r.3.man \
+	man3/__xnet_t_sndvudata_r.3.man \
+	man3/__xnet_t_sync_r.3.man \
+	man3/__xnet_t_unbind_r.3.man \
+	man3/__xnet_t_peek.3.man \
 	man3/xnet.3.man \
-	man3/xti.3.man
+	man3/xti.3.man \
+	man8/strxnet_mknod.8.man
 
 sock_dist_noinst_MANS	= \
 	man3/accept.3.man \

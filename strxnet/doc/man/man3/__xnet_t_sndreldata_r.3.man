@@ -1,0 +1,1 @@
+.so t_sndreldata.3.man

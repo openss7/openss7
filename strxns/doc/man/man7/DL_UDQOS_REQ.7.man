@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DL_UDQOS_REQ.7.man,v 0.9.2.2 2004/07/11 09:08:24 brian Exp $
+.\" @(#) $Id: DL_UDQOS_REQ.7.man,v 0.9.2.3 2005/01/22 15:29:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/07/11 09:08:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/22 15:29:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxns.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DL_UDQOS_REQ 7 "$Date: 2004/07/11 09:08:24 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
+.TH DL_UDQOS_REQ 7 "$Date: 2005/01/22 15:29:54 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_UDQOS_REQ (dl_udqos_req_t)
 \- requests the DLS provider to apply the specified quality of service
@@ -93,6 +93,13 @@ typedef struct {
 } dl_udqos_req_t;
 \fR\s+1
 .fi
+.SH DESCRIPTION
+.B DL_UDQOS_REQ
+requests the DLS provider to apply the specified quality of service
+parameter values to subsequent data unit transmissions.  These new values
+will remain in effect until another
+.B DL_UDQOS_REQ
+is issued.
 .SH PARAMETERS
 .TP
 .I dl_primitive

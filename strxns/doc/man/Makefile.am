@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/11/08 06:53:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/22 16:44:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:53:13 $ by $Author: brian $
+# Last Modified $Date: 2005/01/22 16:44:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -278,8 +278,10 @@ man_MANS = \
 	man7/N_unitdata_ind_t.7 \
 	man7/N_UNITDATA_REQ.7 \
 	man7/N_unitdata_req_t.7 \
+	man7/soon.7 \
 	man8/ldlconfig.8 \
-	man8/ldltest.8
+	man8/ldltest.8 \
+	man8/strxns_mknod.8
 
 dist_noinst_MANS = \
 	man4/XNS.4.man \
@@ -505,8 +507,10 @@ dist_noinst_MANS = \
 	man7/N_unitdata_ind_t.7.man \
 	man7/N_UNITDATA_REQ.7.man \
 	man7/N_unitdata_req_t.7.man \
+	man7/soon.7.man \
 	man8/ldlconfig.8.man \
-	man8/ldltest.8.man
+	man8/ldltest.8.man \
+	man8/strxns_mknod.8.man
 
 
 EXTRA_DIST = 

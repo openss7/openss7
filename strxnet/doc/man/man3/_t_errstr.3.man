@@ -1,0 +1,1 @@
+.so t_strerror.3.man

@@ -1,0 +1,1 @@
+.so t_rcvrel.3.man

@@ -1,0 +1,1 @@
+.so t_snd.3.man
