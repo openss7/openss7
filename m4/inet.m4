@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: inet.m4,v 0.9.2.8 2005/01/27 04:36:08 brian Exp $
+dnl @(#) $Id: inet.m4,v 0.9.2.10 2005/02/02 10:02:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/27 04:36:08 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/02 10:02:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -111,7 +111,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
             inet_where="strinet/src/include"
             for inet_d in . .. ; do
                 inet_dir="$srcdir/$inet_d/$inet_where"
-                inet_bld=`echo "$inet_here/$inet_d/$inet_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                inet_bld=`echo "$inet_here/$inet_d/$inet_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $inet_dir -a -r $inet_dir/$inet_what ; then
                     inet_dir=`(cd $inet_dir; pwd)`
                     inet_cv_includes="$inet_dir $inet_bld"

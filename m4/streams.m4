@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.33 2005/01/27 04:33:24 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.35 2005/02/02 10:02:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/27 04:33:24 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/02 10:02:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -233,13 +233,13 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
             for streams_d in . .. 
             do
                 streams_dir="$srcdir/$streams_d/$streams_where"
-                streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what 
                 then
                     streams_dir=`(cd $streams_dir; pwd)`
                     streams_cv_lis_includes="$streams_dir $streams_bld"
-                    streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                    streams_cv_lis_modmap=`echo "$streams_here/$streams_d/LiS/Modules.map" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                    streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+                    streams_cv_lis_modmap=`echo "$streams_here/$streams_d/LiS/Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
@@ -346,13 +346,13 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
             for streams_d in . .. 
             do
                 streams_dir="$srcdir/$streams_d/$streams_where"
-                streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what 
                 then
                     streams_dir=`(cd $streams_dir; pwd)`
                     streams_cv_lfs_includes="$streams_dir $streams_bld"
-                    streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                    streams_cv_lfs_modmap=`echo "$streams_here/$streams_d/streams/Modules.map" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                    streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+                    streams_cv_lfs_modmap=`echo "$streams_here/$streams_d/streams/Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
