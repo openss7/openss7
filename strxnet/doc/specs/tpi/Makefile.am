@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/10/19 06:34:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/11/05 00:30:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,18 +46,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/19 06:34:30 $ by $Author: brian $
+# Last Modified $Date: 2004/11/05 00:30:26 $ by $Author: brian $
 #
 # =============================================================================
 
-info_TEXINFOS		= tpi.texi
+info_TEXINFOS		= tpi.texi tpi_tcap.texi
 
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
 			$(top_srcdir)/scripts/texi/fdl.texi
 
 FIG_FIGS		= \
-			tpi_fig1.fig
+			tpi_fig1.fig \
+			tpi_ne17.fig \
+			tpi_ne18.fig
 
 TBL_TBLS		= \
 			tpi_fig2.tbl \
@@ -70,7 +72,9 @@ TBL_TBLS		= \
 			tpi_fig9.tbl \
 			tpi_fi10.tbl \
 			tpi_fi11.tbl \
-			tpi_fi12.tbl
+			tpi_fi12.tbl \
+			tpi_tabx.tbl \
+			tpi_tab8.tbl
 
 EXTRA_DIST		=
 

@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TR_ADDR_ACK.7.man,v 0.9.2.2 2004/10/25 09:16:18 brian Exp $
+.\" @(#) $Id: TR_ADDR_ACK.7.man,v 0.9.2.3 2004/11/05 00:53:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/25 09:16:18 $ by $Author: brian $
+.\" Modified $Date: 2004/11/05 00:53:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,11 +49,17 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TR_ADDR_ACK 7 "$Date: 2004/10/25 09:16:18 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TR_ADDR_ACK 7 "$Date: 2004/11/05 00:53:04 $" "$Name:  $" "Transaction Interface (TRI)"
+.
+.
+.
 .SH NAME
 .PP
 .B TR_ADDR_ACK
 \- Protocol Address Acknowledgement
+.
+.
+.
 .SH SYNOPSIS
 .PP
 This message consists of one
@@ -64,54 +70,105 @@ message block formatted as follows:
 \fC\s+1\
 typedef struct TR_addr_ack {
     ulong PRIM_type;          /* Always TR_ADDR_ACK */
-    ulong LOCADDR_length;
-    ulong LOCADDR_offset;
-    ulong REMADDR_length;
-    ulong REMADDR_offset;
+    ulong LOCADDR_length;     /* local address length */
+    ulong LOCADDR_offset;     /* local address offset */
+    ulong REMADDR_length;     /* remote address length */
+    ulong REMADDR_offset;     /* remote address offset */
 } TR_addr_ack_t;
 \fR\s-1
 .fi
+.
+.
+.
 .SH DESCRIPTION
 .PP
 This primitive indicates to the transaction user the local and remote protocol addresses currently
 associated with the transaction endpoint or association.
-.SH PARAMETERS
+.
+.
+.
+.SS Parameters
 .PP
 The fields of this message have the following meanings:
+.
 .TP 16
 .I PRIM_type
-the primitive type.  Always
+Indicates the primitive type: always
 .BR TR_ADDR_ACK .
+.
 .TP
 .I LOCADDR_length
-the length of the local address associated with the transaction endpoint.
+Indicates the length of the protocol address that was bound to the
+.IR stream .
+.
 .TP
 .I LOCADDR_offset
-the offset from the beginning of the
+Indicates the offset from the beginning of the
 .BR M_PCPROTO (9)
-message block where the local address begins. 
+message block where the protocol address begins.
+.
 .TP
 .I REMADDR_length
-the length of the remote address associated with the transaction endpoint.
+Indicates the length of the protocol address of the remote ASE.
+.
 .TP
 .I REMADDR_offset
-the offset from the beginning of the
+Indicates the offset from the beginning of the
 .BR M_PCPROTO (9)
-message block where the remote address begins. 
+message block where the protocol address begins.
+.
 .PP
 The proper alignment of the addresses in the
 .BR M_PCPROTO (9)
 message block is not guaranteed. 
-.SH RULES
+.
+.
+.
+.SS Modes
 .PP
+Both connection-mode and connectionless-mode.
+.
+.
+.
+.SS Originator
+.PP
+Transaction provider.
+.
+.
+.SS "Valid State"
+.PP
+This primitive is issued in response to a
+.BR TR_ADDR_REQ (7)
+primitive and is valid in any state where a response is pending to a
+.BR TR_ADDR_REQ (7).
+.
+.
+.SS "New State"
+.PP
+The new state remains unchanged.
+.
+.
+.
+.SS Rules
+.PP
+The following rules apply:
+.
+.IP \(em 4
 If the requested transaction identifier was -1 in the corresponding
 .BR TR_ADDR_REQ (7)
-primitive, and the transaction endpoint is not bound to a local address, the
+primitive, and the transaction endpoint is not bound to a local address,
+(i.e. it is in the
+.B TRS_UNINIT
+or
+.B TRS_UNBND
+state)
+the
 .I LOCADDR_length
 and
 .I LOCADDR_offset
 fields must be set to 0.
-.PP
+.
+.IP \(em
 If the requested transaction exists as identifed in the corresponding
 .BR TR_ADDR_REQ (7)
 primitive,
@@ -119,7 +176,8 @@ primitive,
 and
 .I LOCADDR_offset
 fields will be populated to reflect the local association address for the specified transaction.
-.PP
+.
+.IP \(em
 If the requested transaction identifier was -1 in the corresponding
 .BR TR_ADDR_REQ (7)
 primitive, the
@@ -127,7 +185,8 @@ primitive, the
 and
 .I REMADDR_offset
 fields must be set to 0.
-.PP
+.
+.IP \(em
 If the requested transaction exists as identified in the corresponding
 .BR TR_ADDR_REQ (7)
 primitive,
@@ -135,23 +194,31 @@ primitive,
 and
 .I REMADDR_offset
 fields will be populated to reflect the remote association address for the specified transaction.
-.SH MODES
-.PP
-Both connection-mode and connectionless-mode.
-.SH ORIGINATOR
-.PP
-Transaction provider.
+.
+.
+.
 .SH "FILES"
-.PP
-<ss7/tr.h>
+.
+.TP 16
+.I <ss7/tr.h>
+\- the TRI system header file.
+.
+.
+.
 .SH "SEE ALSO"
 .PP
 .BR tri (7),
 .BR M_PCPROTO (9),
 .BR TR_ADDR_REQ (7).
+.
+.
+.
 .SH HISTORY
 .PP
 The Transaction Interface first appeared for OpenSS7.
+.
+.
+.
 .SH CONFORMANCE
 .PP
 This interface conforms to TRI Revision 0.9.2, Draft 1.

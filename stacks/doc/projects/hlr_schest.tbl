@@ -1,0 +1,31 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center tab(:);
+lb|lbs
+l|nl.
+Description:Duration
+=
+High Performance GSM/UMTS GPRS HLR Evaluation Platform:2:months
+_
+Evaluation:1:month
+_
+Production Platform Installation and Acceptance:1.5:months
+=
+Total:4.5:months
+.TE

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/10/13 01:39:34 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2004/11/05 04:50:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 01:39:34 $ by $Author: brian $
+# Last Modified $Date: 2004/11/05 04:50:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -162,6 +162,9 @@ Obsoletes:      %{stitle} SIGTRAN H323 ISDN
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
+Requires:       modutils >= 2.4
+Requires:       modutils < 2.5
+Requires:       lsof
 %if %{BUILD_lfs}
 Requires:       %{_streams} >= 0.7a
 %endif
@@ -192,6 +195,14 @@ BuildRequires:  %{_streams}-devel >= 2:2.16.18
 #BuildRequires:  strxnet-devel >= %{epoch}:0.9.2
 #BuildRequires:  strinet-devel >= %{epoch}:0.9.2
 #BuildRequires:  strsctp-devel >= %{epoch}:0.9.2
+BuildRequires: groff
+BuildRequires: gzip
+BuildRequires: gnupg
+#BuildRequires: transfig >= 3.2
+#BuildRequires: ImageMagick
+#BuildRequires: tetex >= 1.0
+#BuildRequires: ghostscript >= 6.51
+BuildRequires: texinfo >= 4.0
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
@@ -776,9 +787,10 @@ fi
 %doc ABOUT-NLS
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
-%doc doc/manual
-%doc doc/specs
-%doc doc/drafts
+%doc doc/manual/*.pdf doc/manual/*.html # doc/manual/*.png
+%doc doc/specs/*/*.pdf doc/specs/*/*.html doc/specs/*/*.png
+%doc doc/projects/*.pdf doc/projects/*.html doc/projects/*.png
+%doc doc/drafts/*/draft*.pdf doc/drafts/*/draft*.txt
 %{_infodir}/*
 %endif
 
@@ -961,9 +973,19 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.34  2004/10/13 01:39:34  brian
-# - Added texinfo specs and fig support.
+# Revision 0.9.2.36  2004/11/05 04:50:21  brian
+# - Dist docs instead of building.
 #
+
+* Fri Nov  5 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.35  2004/11/05 01:01:54  brian
+- Added build prerequisites.
+- Added only pdf and html docs in doc directory.
+- ps docs are too large.
+
+* Wed Oct 13 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.34  2004/10/13 01:39:34  brian
+- Added texinfo specs and fig support.
 
 * Tue Aug 31 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.33  2004/08/31 09:17:20  brian

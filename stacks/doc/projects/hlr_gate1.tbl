@@ -1,0 +1,32 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center expand tab(:);
+rb|lbw(2.0i)|cb|cb|nb|nb
+r|lw(2.0i)|c|c|n|n.
+Key:Description:Start Date:End Date:Duration:Slack
+=
+Stage 1:Initial HL Req's:2004/09/23:2004/09/25:2:\-
+:Initial HLD:2004/09/23:2004/09/26:3:\-
+:Final HL Req's:2004/10/07:2004/10/08:1:\-
+:Final HLD:2004/10/12:2004/10/14:2:\-
+:_:_:_:_:_
+:High-Level Design:2004/09/23:2004/10/19:23:\-
+_
+Gate 1:High-Level Design Review:2004/10/19:2004/10/20:1:-4
+.TE

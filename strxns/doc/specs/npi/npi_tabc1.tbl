@@ -1,4 +1,5 @@
 .ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
 .in 0.5i
 .ll 6.0i
 .lt 6.0i
@@ -17,7 +18,8 @@
 
 .TS
 box center tab(:);
-r|c|c|c|c|c|c|c|c|c|c|c|c|c
+rb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb
+lb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb
 l|c|c|c|c|c|c|c|c|c|c|c|c|c.
 PRIM X:R1:R2:R3:R4:R5:R6:R7:R8:R9:R10:R11:R12:R13
 PRIM Y on queue

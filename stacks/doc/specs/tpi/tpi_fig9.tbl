@@ -1,4 +1,5 @@
 .ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
 .in 0.5i
 .ll 6.0i
 .lt 6.0i
@@ -14,11 +15,10 @@
 .nr LL 8.0i
 .nr LT 8.0i
 .\}
-
 .TS
 box center expand tab(:);
-r|c|c|c|c|c|c|c|c|c|c|c|c|c|c
-l|c|c|c|c|c|c|c|c|c|c|c|c|c|c
+rb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb
+lb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb
 l|c|c|c|c|c|c|c|c|c|c|c|c|c|c.
 state:0:3:5:6:7:8:9:10:11:12:13:14:15:16
 event:

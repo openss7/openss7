@@ -1,3 +1,3 @@
 
-SUBDIRS = manual man specs
+SUBDIRS = man manual specs projects
 

@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tri.texi,v 0.9.2.3 2004/10/19 10:03:49 brian Exp $
+% @(#) $Id: tri.texi,v 0.9.2.4 2004/11/05 00:32:33 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/10/19 10:03:49 $ by $Author: brian $
+% Last Modified $Date: 2004/11/05 00:32:33 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -209,7 +209,6 @@ or the performance or implementation of the contents thereof.}
 * Addendum for ITU-T Conformance::
 * Addendum for ANSI Conformance::
 * Addendum for ETSI Conformance::
-* TCAP Transport Provider TPI Addendum::
 * Mapping TRI Primitives::
 * State/Event Tables::
 * Primitive Precedence Tables::
@@ -636,7 +635,7 @@ the last TR user originated request or response primitive (listed in
 
 @menu
 * Transaction Initiation Phase::
-* Transaction Data Transfer::
+* Transaction Data Transfer Phase::
 * Transaction Termination Phase::
 @end menu
 
@@ -754,8 +753,8 @@ response token value determination are discussed in @ref{TR_BIND_REQ}, and
 @center @strong{@emph{Transaction Response Token Value Determination}}
 @end cartouche
 
-@node Transaction Data Transfer
-@subsection Transaction Data Transfer
+@node Transaction Data Transfer Phase
+@subsection Transaction Data Transfer Phase
 
 Flow control on the transaction association is done by management of the queue
 capacity, and by allowing objects of certain types to be inserted to the queues,
@@ -958,8 +957,7 @@ The mapping of TRI of TRI primitives to the primitives defined in ITU-T Q.771,
 ITU-T X.219 and ANSI T1.114 are shown in @ref{Mapping TRI Primitives}.  The
 state/event tables for these primitives are shown in @ref{State/Event Tables}.
 The precedence tables for the TRI primitives are shown in @ref{Primitive
-Precedence Tables}.  Rules for SS7 conformance are described in @ref{TCAP
-Transport Provider TPI Addendum}.
+Precedence Tables}.
 
 The following tables provide a summary of the TR primitives and their
 parameters.
@@ -995,20 +993,20 @@ These primitives apply to all transaction modes.
 @subsubsection Transaction Information Request
 @subsubheading TR_INFO_REQ
 @prindex TR_INFO_REQ
-This primitive request the TR provider to return the values of all supported
-protocol parameters (@pxref{TR_INFO_ACK}), and also the current state of the TR
-provider (as defined in @ref{State/Event Tables}).  This primitive does not
-affect the state of the TR provider and does not appear in the state tables.
+This primitive request the TR provider to return the values of all supported protocol parameters
+(@pxref{TR_INFO_ACK}), and also the current state of the TR provider (as defined in @ref{State/Event
+Tables}).  This primitive does not affect the state of the TR provider and does not appear in the
+state tables.
 @subsubheading Format
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block and its structure is as follows:
-@smallexample
+@example
 typedef struct TR_info_req @{
-        ulong PRIM_type;                /* Always TR_INFO_REQ */
+    ulong PRIM_type;          /* Always TR_INFO_REQ */
 @} TR_info_req_t;
 @tpindex TR_info_req_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1016,8 +1014,7 @@ The primitive has the following arguments:
 Indicates the primitive type.  Always @samp{TR_INFO_REQ}.
 @end vtable
 @subsubheading Valid States
-This primitive is valid in any state where a local acknowledgement is not
-pending.
+This primitive is valid in any state where a local acknowledgement is not pending.
 @subsubheading New State
 The new state remains unchanged.
 @subsubheading Rules
@@ -1049,23 +1046,23 @@ primitive described above under @ref{TR_INFO_REQ}.
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block and its structure is as follows:
-@smallexample
+@example
 typedef struct TR_info_ack @{
-        long PRIM_type;                 /* Always TR_INFO_ACK */
-        long ASDU_size;                 /* maximum ASDU size */
-        long EASDU_size;                /* maximum EASDU size */
-        long CDATA_size;                /* connect data size */
-        long DDATA_size;                /* discon data size */
-        long ADDR_size;                 /* address size */
-        long OPT_size;                  /* options size */
-        long TIDU_size;                 /* transaction i/f data unit size */
-        long SERV_type;                 /* service type */
-        long CURRENT_state;             /* current state */
-        long PROVIDER_flag;             /* type of TR provider */
-        long TRI_version;               /* version # of tri that is supported */
+    long PRIM_type;           /* Always TR_INFO_ACK */
+    long ASDU_size;           /* maximum ASDU size */
+    long EASDU_size;          /* maximum EASDU size */
+    long CDATA_size;          /* connect data size */
+    long DDATA_size;          /* discon data size */
+    long ADDR_size;           /* address size */
+    long OPT_size;            /* options size */
+    long TIDU_size;           /* transaction i/f data unit size */
+    long SERV_type;           /* service type */
+    long CURRENT_state;       /* current state */
+    long PROVIDER_flag;       /* type of TR provider */
+    long TRI_version;         /* version # of tri that is supported */
 @} TR_info_ack_t;
 @tpindex TR_info_ack_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1136,16 +1133,16 @@ message block.  The format of the @samp{M_PROTO}
 message block is as follows:@footnote{The format of the @var{TR_BIND_REQ}
 primitive is chosen to be as consistent as possible with the equivalent TPI and
 NPI primitives.}
-@smallexample
+@example
 typedef struct TR_bind_req @{
-        ulong PRIM_type;                /* Always TR_BIND_REQ */
-        ulong ADDR_length;              /* address length */
-        ulong ADDR_offset;              /* address offset */
-        ulong XACT_number;              /* maximum outstanding transaction reqs. */
-        ulong BIND_flags;               /* bind flags */
+    ulong PRIM_type;          /* Always TR_BIND_REQ */
+    ulong ADDR_length;        /* address length */
+    ulong ADDR_offset;        /* address offset */
+    ulong XACT_number;        /* maximum outstanding transaction reqs. */
+    ulong BIND_flags;         /* bind flags */
 @} TR_bind_req_t;
 @tpindex TR_bind_req_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1227,16 +1224,16 @@ protocol address has been activated.
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block.  The format of the @samp{M_PCPROTO} message block is as follows:
-@smallexample
+@example
 typedef struct TR_bind_ack @{
-        ulong PRIM_type;                /* Always TR_BIND_ACK */
-        ulong ADDR_length;              /* address length */
-        ulong ADDR_offset;              /* address offset */
-        ulong XACT_number;              /* open transactions */
-        ulong TOKEN_value;              /* value of "token" assigned to stream */
+    ulong PRIM_type;          /* Always TR_BIND_ACK */
+    ulong ADDR_length;        /* address length */
+    ulong ADDR_offset;        /* address offset */
+    ulong XACT_number;        /* open transactions */
+    ulong TOKEN_value;        /* value of "token" assigned to stream */
 @} TR_bind_ack_t;
 @tpindex TR_bind_ack_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1314,12 +1311,12 @@ previously associated with the @dfn{stream} and deactivate the @dfn{stream}.
 The format of the message is one @samp{M_PROTO}
 @prindex M_PROTO
 message block structured as follows:
-@smallexample
+@example
 typedef struct TR_unbind_req @{
-        ulong PRIM_type;                /* Always TR_UNBIND_REQ */
+    ulong PRIM_type;          /* Always TR_UNBIND_REQ */
 @} TR_unbind_req_t;
 @tpindex TR_unbind_req_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1352,100 +1349,209 @@ A system error occurred and the UNIX System error is indicated in the primitive.
 @page
 @node TR_ADDR_REQ
 @subsubsection Transaction Protocol Address Request
+
 @subsubheading TR_ADDR_REQ
 @prindex TR_ADDR_REQ
+
 This primitive requests that the TR provider return the local protocol address
 that is bound to the @dfn{stream} and the address of the remote ASE if a
 transaction association has been established.
+
 @subsubheading Format
+
 The format of the message is one @samp{M_PROTO}
 @prindex M_PROTO
 message block structured as follows:
-@smallexample
+
+@example
 typedef struct TR_addr_req @{
-        long PRIM_type;             /* always TR_ADDR_REQ */
+    long PRIM_type;           /* always TR_ADDR_REQ */
+    ulong TRANS_id;           /* Transaction id */
 @} TR_addr_req_t;
 @tpindex TR_addr_req_t
-@end smallexample
+@end example
+
 @subsubheading Parameters
+
 The primitive has the following arguments:
+
 @vtable @var
+
 @item PRIM_type
-Specifies the primitive type: always @samp{TR_ADDR_REQ}.
+Specifies the primitive type: always
+@samp{TR_ADDR_REQ}.
+
+@item TRANS_id
+Specifies the transaction association identifier for which address service is requested.
+If address service is requested for local bind address only, then the transaction identifier must be
+@samp{-1}.
+
 @end vtable
+
 @subsubheading Valid State
-This primitive is valid in any state where a local acknowledgement is not
-pending.
+
+This primitive is valid in any state where a local acknowledgement is not pending.
+
 @subsubheading New State
+
 The new state is unchanged.
+
 @subsubheading Rules
+
 For the rules governing the requests made by this primitive, see the
 @code{TR_ADDR_ACK} primitive described in @ref{TR_ADDR_ACK}.
+
 @subsubheading Acknowledgements
+
 This primitive requires the TR provider to generate one of the following
 acknowledgements upon receipt of the primitive:
+
 @itemize ---
+
 @item @emph{Successful:}
 Correct acknowledgement of the primitive is indicated with the
 @code{TR_ADDR_ACK} primitive described in @ref{TR_ADDR_ACK}.
+
 @item @emph{Non-fatal errors:}
 These errors will be indicated with the @code{TR_ERROR_ACK} primitive described
-in @ref{TR_ERROR_ACK}.  The allowable errors are as follows: There are no errors
-associated with the issuance of this primitive.
+in @ref{TR_ERROR_ACK}.  The allowable errors are as follows:
+
+@vtable @code
+
+@item TRBADID
+The transaction identifier specified in the primitive was incorrect or invalid.
+
+@item TRNOTSUPPORT
+This primitive is not supported by the transaction provider.
+
+@item TRSYSERR
+A system error has occured and the Linux system error is indicated in the primitive.
+
+@end vtable
+
 @end itemize
 
 @page
 @node TR_ADDR_ACK
 @subsubsection Transaction Protocol Address Acknowledgement
+
 @subsubheading TR_ADDR_ACK
 @prindex TR_ADDR_ACK
+
 This primitive indicates to the TR user the addresses of the local and remote
 ASE.  The local address is the protocol address that has been bound to the
 @dfn{stream}.  If an transaction association has been established, the remote
 address is the protocol address of the remote ASE.
+
 @subsubheading Format
+
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block structured as follows:
-@smallexample
+
+@example
 typedef struct TR_addr_ack @{
-        long PRIM_type;             /* always TR_ADDR_ACK */
-        long LOCADDR_length;        /* length of local address */
-        long LOCADDR_offset;        /* offset of local address */
-        long REMADDR_length;        /* length of remote address */
-        long REMADDR_offset;        /* offset of remote address */
+    long PRIM_type;           /* always TR_ADDR_ACK */
+    long LOCADDR_length;      /* length of local address */
+    long LOCADDR_offset;      /* offset of local address */
+    long REMADDR_length;      /* length of remote address */
+    long REMADDR_offset;      /* offset of remote address */
 @} TR_addr_ack_t;
 @tpindex TR_addr_ack_t
-@end smallexample
+@end example
+
 @subsubheading Parameters
+
 The primitive has the following arguments:
+
 @vtable @var
+
 @item PRIM_type
-Indicates the primitive type; always @samp{TR_ADDR_ACK}.
+Indicates the primitive type: always
+@samp{TR_ADDR_ACK}.
+
 @item LOCADDR_length
-Indicates the length of the protocol address that was bound to the @dfn{stream}.
+Indicates the length of the protocol address that was bound to the
+@dfn{stream}.
+
 @item LOCADDR_offset
-Indicates the offset from the beginning of the @samp{M_PCPROTO} message block
-where the protocol address begins.
+Indicates the offset from the beginning of the
+@samp{M_PCPROTO}
+message block where the protocol address begins.
+
 @item REMADDR_length
 Indicates the length of the protocol address of the remote ASE.
+
 @item REMADDR_offset
-Indicates the offset from the beginning of the @samp{M_PCPROTO} message block
-where the protocol address begins.
+Indicates the offset from the beginning of the
+@samp{M_PCPROTO}
+message block where the protocol address begins.
+
 @end vtable
+
+The proper alignement of the addresses in the
+@samp{M_PCPROTO}
+message block is not guaranteed.
+
+@subsubheading Modes
+
+Both connection-mode and connectionless-mode.
+
+@subsubheading Originator
+
+Transaction provider.
+
 @subsubheading Valid State
-This primitive is issued in response to a @samp{TR_ADDR_REQ} primitive and is
-valid in any state where a response is pending to a @samp{TR_ADDR_REQ}.
+
+This primitive is issued in response to a
+@samp{TR_ADDR_REQ}
+primitive and is valid in any state where a response is pending to a
+@samp{TR_ADDR_REQ}.
+
 @subsubheading New State
+
 The new state remains unchanged.
+
 @subsubheading Rules
+
 The following rules apply:
+
 @itemize ---
-@item If the interface is in the @samp{TRS_UNINIT} or @samp{TRS_UNBND} state,
-the values returned for @var{LOCADDR_length} and @var{LOCADDR_offset} must be
-zero (0).
-@item If the interface is in any state but @samp{TRS_DATAXFER}, the values
-returned for @var{REMADDR_length} and @var{REMADDR_offset} must be zero (0).
+
+@item If the requested transaction identifier was @samp{-1} in the corresponding
+@samp{TR_ADDR_REQ}
+primitive, and the transaction endpoint is not bound to a local address,
+(i.e. it is in the @samp{TRS_UNINIT} or @samp{TRS_UNBND} state)
+the
+@var{LOCADDR_length}
+and
+@var{LOCADDR_offset}
+fields must be set to @samp{0}.
+
+@item If the requested transaction exists as identifed in the corresponding
+@samp{TR_ADDR_REQ}
+primitive,
+@var{LOCADDR_length}
+and
+@var{LOCADDR_offset}
+fields will be populated to reflect the local association address for the specified transaction.
+
+@item If the requested transaction identifier was @samp{-1} in the corresponding
+@samp{TR_ADDR_REQ}
+primitive, the
+@var{REMADDR_length}
+and
+@var{REMADDR_offset}
+fields must be set to @samp{0}.
+
+@item If the requested transaction exists as identified in the corresponding
+@samp{TR_ADDR_REQ}
+primitive,
+@var{REMADDR_length}
+and
+@var{REMADDR_offset}
+fields will be populated to reflect the remote association address for the specified transaction.
+
 @end itemize
 
 @page
@@ -1465,15 +1571,15 @@ returned for @var{REMADDR_length} and @var{REMADDR_offset} must be zero (0).
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block structured as follows:
-@smallexample
+@example
 typedef struct TR_optmgmt_req @{
-        ulong PRIM_type;                /* Always TR_OPTMGMT_REQ */
-        ulong OPT_length;               /* options length */
-        ulong OPT_offset;               /* options offset */
-        ulong MGMT_flags;               /* options data flags */
+    ulong PRIM_type;          /* Always TR_OPTMGMT_REQ */
+    ulong OPT_length;         /* options length */
+    ulong OPT_offset;         /* options offset */
+    ulong MGMT_flags;         /* options data flags */
 @} TR_optmgmt_req_t;
 @tpindex TR_optmgmt_req_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1520,15 +1626,15 @@ A system error occurred and the UNIX System error is indicated in the primitive.
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block structured as follows:
-@smallexample
+@example
 typedef struct TR_optmgmt_ack @{
-        ulong PRIM_type;                /* Always TR_OPTMGMT_ACK */
-        ulong OPT_length;               /* options length */
-        ulong OPT_offset;               /* options offset */
-        ulong MGMT_flags;               /* options data flags */
+    ulong PRIM_type;          /* Always TR_OPTMGMT_ACK */
+    ulong OPT_length;         /* options length */
+    ulong OPT_offset;         /* options offset */
+    ulong MGMT_flags;         /* options data flags */
 @} TR_optmgmt_ack_t;
 @tpindex TR_optmgmt_ack_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1567,13 +1673,13 @@ primitives that require one.
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block structured as follows:
-@smallexample
+@example
 typedef struct TR_ok_ack @{
-        ulong PRIM_type;                /* Always TR_OK_ACK */
-        ulong CORRECT_prim;             /* correct primitive */
+    ulong PRIM_type;          /* Always TR_OK_ACK */
+    ulong CORRECT_prim;       /* correct primitive */
 @} TR_ok_ack_t;
 @tpindex TR_ok_ack_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1603,16 +1709,16 @@ action was taken on the primitive that cause the error.
 The format of the message is one @samp{M_PCPROTO}
 @prindex M_PCPROTO
 message block structured as follows:
-@smallexample
+@example
 typedef struct TR_error_ack @{
-        ulong PRIM_type;                /* Always TR_ERROR_ACK */
-        ulong ERROR_prim;               /* primitive in error */
-        ulong TRI_error;                /* TRI error code */
-        ulong UNIX_error;               /* UNIX error code */
-        ulong TRANS_id;                 /* Transaction id */
+    ulong PRIM_type;          /* Always TR_ERROR_ACK */
+    ulong ERROR_prim;         /* primitive in error */
+    ulong TRI_error;          /* TRI error code */
+    ulong UNIX_error;         /* UNIX error code */
+    ulong TRANS_id;           /* Transaction id */
 @} TR_error_ack_t;
 @tpindex TR_error_ack_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -1677,13 +1783,13 @@ Indicates that the TR provider does not support the requested capability.
 @section Connection-Oriented Mode Primitives
 
 @menu
-* Transaction Establishment Phase::
-* Transaction Data Transfer Phase::
-* Transaction Termination Phase::
+* Transaction Establishment::
+* Transaction Data Transfer::
+* Transaction Termination::
 @end menu
 
-@node Transaction Establishment Phase
-@subsection Transaction Establishment Phase
+@node Transaction Establishment
+@subsection Transaction Establishment
 
 @menu
 * TR_BEGIN_REQ::
@@ -1716,20 +1822,20 @@ message block, followed by zero or more @samp{M_DATA}
 message blocks if any user data is specified by the TR user.  The
 format of the @samp{M_PROTO} message block is as follows:
 
-@smallexample
+@example
 typedef struct TR_begin_req @{
-        ulong PRIM_type;                /* Always TR_BEGIN_REQ */
-        ulong CORR_id;                  /* Correlation Id */
-        ulong ASSOC_flags;              /* Association flags */
-        ulong DEST_length;              /* Destination address length */
-        ulong DEST_offset;              /* Destination address offset */
-        ulong ORIG_length;              /* Originating address length */
-        ulong ORIG_offset;              /* Originating address offset */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_BEGIN_REQ */
+    ulong CORR_id;            /* Correlation Id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_begin_req_t;
 @tpindex TR_begin_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -1810,7 +1916,7 @@ transaction provider that support it (@pxref{Addendum for ANSI Conformance}).
 
 @subsubheading Valid State
 
-This primitive is valid in transaction state @var{TR_IDLE}.  This primitive is
+This primitive is valid in transaction state @var{TRS_IDLE}.  This primitive is
 only valid in connection-oriented mode.
 
 @subsubheading New State
@@ -1845,17 +1951,17 @@ following acknowledgements upon receipt of the primitive:
 
 @item @emph{Successful Association Establishment:}
 This is indicated with the @samp{TR_BEGIN_CON} primitive described in
-@ref{TR_BEGIN_REQ}.  This results in the @var{TR_DATA_XFER} state for the
+@ref{TR_BEGIN_REQ}.  This results in the @var{TRS_DATA_XFER} state for the
 transaction.  Successful establishment and tear down can also be indicated with
 the @samp{TR_END_IND} primitive described in @ref{TR_END_IND}.  This results in
-the @var{TR_IDLE} state for the transaction.
+the @var{TRS_IDLE} state for the transaction.
 
 @item @emph{Unsuccessful Association Establishment:}
 This is indicated with the @samp{TR_ABORT_IND} primitive described in
 @ref{TR_ABORT_IND}.  For example, an association may be rejected because either
 the called transaction user cannot be reached, or the transaction provider or
 the called transaction user did not agree on the specified options.  This
-results in the @var{TR_IDLE} state for the transaction.
+results in the @var{TRS_IDLE} state for the transaction.
 
 @item @emph{Non-fatal errors:}
 These are indicated with the @samp{TR_ERROR_ACK} primitive.  The applicable
@@ -1918,20 +2024,20 @@ message block, followed by zero or more @samp{M_DATA}
 message blocks containing user data for the association, structured
 as follows:
 
-@smallexample
+@example
 typedef struct TR_begin_ind @{
-        ulong PRIM_type;                /* Always TR_BEGIN_IND */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong ASSOC_flags;              /* Association flags */
-        ulong DEST_length;              /* Destination address length */
-        ulong DEST_offset;              /* Destination address offset */
-        ulong ORIG_length;              /* Originating address length */
-        ulong ORIG_offset;              /* Originating address offset */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_BEGIN_IND */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_begin_ind_t;
 @tpindex TR_begin_ind_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2000,7 +2106,7 @@ transaction providers that support it (@pxref{Addendum for ANSI Conformance}).
 
 @subsubheading Valid State
 
-This primitive is valid in state @var{TR_IDLE}.  This primitive is only valid in
+This primitive is valid in state @var{TRS_IDLE}.  This primitive is only valid in
 connection-oriented mode.
 
 @subsubheading New State
@@ -2061,18 +2167,18 @@ message block, followed by zero or more @samp{M_DATA}
 message blocks containing user data for the association, structured
 as follows:
 
-@smallexample
+@example
 typedef struct TR_begin_res @{
-        ulong PRIM_type;                /* Always TR_BEGIN_RES */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong ASSOC_flags;              /* Association flags */
-        ulong ORIG_length;              /* Originating address length */
-        ulong ORIG_offset;              /* Originating address offset */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_BEGIN_RES */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_begin_res_t;
 @tpindex TR_begin_res_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2143,7 +2249,7 @@ is only valid in connection-oriented mode.
 
 @subsubheading New State
 
-The new state for the specified transaction is @var{TR_DATA_XFER}.
+The new state for the specified transaction is @var{TRS_DATA_XFER}.
 
 @subsubheading Rules
 
@@ -2213,88 +2319,148 @@ protocol address contained illegal information.
 @page
 @node TR_BEGIN_CON
 @subsubsection Transaction Begin Confirmation
+
 @subsubheading TR_BEGIN_CON
 @prindex TR_BEGIN_CON
+
 This primitive indicates to the source transaction user that a previous
 transaction association begin request has been confirmed on the specified
 responding protocol address.
+
 @subsubheading Format
+
 The format of the message is one @samp{M_PROTO}
 @prindex M_PROTO
 message block, followed by zero or more @samp{M_DATA}
 @prindex M_DATA
 message blocks containing user data for the association, structured as follows:
-@smallexample
+
+@example
 typedef struct TR_begin_con @{
-        ulong PRIM_type;                /* Always TR_BEGIN_CON */
-        ulong CORR_id;                  /* Correlation Id */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong ASSOC_flags;              /* Association flags */
-        ulong ORIG_length;              /* Originating address length */
-        ulong ORIG_offset;              /* Originating address offset */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_BEGIN_CON */
+    ulong CORR_id;            /* Correlation Id */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_begin_con_t;
 @tpindex TR_begin_con_t
-@end smallexample
-@subsubheading Parameters
-The primitive has the following arguments:
-@vtable @var
-@item PRIM_type
-Indicates the primitive type: always @samp{TR_BEGIN_CON}.
-@item CORR_id
-Indicates the correlation identifier used by the transport user to uniquely
-identify the transaction begin request of the stream to which this confirmation
-corresponds.
-@item TRANS_id
-Indicates the transaction identifier provided by the transport provider to
-uniquely identify the transaction on this stream.
-@item ASSOC_flags
-Specifies the option flags provided with the primitive.  See ``Flags'' below.
-Some flags may be provider specific.
-@item ORIG_length
-Indicates the length of the responding protocol address from which the
-confirmation was received.
-@item ORIG_offset
-Indicates the offset from the beginning of the @samp{M_PROTO} message block
-where the protocol address begins.
-@item OPT_length
-Indicates the length of the protocol options negotiated by the transaction peer.
-@item OPT_offset
-Indicates the offset from the beginning of the @samp{M_PROTO} message block
-where the protocol options begin.
-@end vtable
-@subsubheading Flags
-@vtable @var
-@item TR_NO_PERMISSION
-The value of this flag  may indicate either that the transaction peer gives
-permission (clear) to end the transaction association or refuses permission
-(set) to end the transaction association.  This flag is only valid for
-transaction providers that support it (@pxref{Addendum for ANSI Conformance}).
-@end vtable
-@subsubheading Valid State
-This primitive is valid in transaction state @var{TR_WCON_CREQ}.  This primitive
-is only valid in connection-oriented mode.
-@subsubheading New State
-The new state for the transaction is @var{TR_DATA_XFER}.
-@subsubheading Rules
-The following rules apply to the issuance of this primitive:
-@itemize ---
-@item It is not always necessary for the transport provider to provide the
-responding address in the @var{ORIG_length} and @var{ORIG_offiset} fields.
-Where the responding protocol address is the same as the destination protocol
-address for which the transaction initialization was requested, it is not
-necessary to provide the responding address in the @dfn{TR_BEGIN_CON}.  Where
-the responding protocol address is not provided, the @var{ORIG_length} and
-@var{ORIG_offset} fields are set to zero (0).
+@end example
 
-@item When the @samp{TR_NO_PERMISSION} flag is set, the transaction user must
-not issue a @samp{TR_END_REQ} primitive in response to this indication.
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+Indicates the primitive type: always
+@samp{TR_BEGIN_CON}.
+
+@item CORR_id
+Indicates the correlation identifier used by the transport user to uniquely identify the transaction
+begin request of the stream to which this confirmation corresponds.
+This is the transaction user assigned transaction identifier of the corresponding
+@samp{TR_BEGIN_REQ}
+that this message is confirming.
+
+@item TRANS_id
+Indicates the transaction identifier provided by the transport provider to uniquely identify the
+transaction on this stream.
+
+@item ASSOC_flags
+Indicates the option flags provided with the primitive.
+See ``Flags'' below.
+Some flags may be provider specific.
+
+@item ORIG_length
+Indicates the length of the responding protocol address from which the confirmation was received.
+
+@item ORIG_offset
+Indicates the offset from the beginning of the
+@samp{M_PROTO}
+message block where the responding protocol address begins.
+
+@item OPT_length
+Indicates the length of the confirmed protocol options negotiated by the transaction peer.
+
+@item OPT_offset
+Indicates the offset from the beginning of the
+@samp{M_PROTO}
+message block where the confirmed protocol options begin.
+
+@end vtable
+
+The proper alignment of the responding address and options in the
+@samp{M_PROTO}
+message block is not guaranteed.
+
+@subsubheading Flags
+
+The following association flags are defined:
+
+@vtable @var
+
+@item TR_NO_PERMISSION
+The value of this flag may indicate either that the transaction peer gives permission (clear) to end
+the transaction association or refuses permission (set) to end the transaction association.
+This flag is only valid for transaction providers that support it
+(@pxref{Addendum for ANSI Conformance}).
+
+@end vtable
+
+@subsubheading Mode
+
+This primitive is only valid in connection-oriented mode.
+
+@subsubheading Originator
+
+Transaction provider.
+
+@subsubheading Valid State
+
+This primitive is valid in transaction state
+@var{TRS_WCON_CREQ}.
+
+@subsubheading New State
+
+The new state for the transaction is
+@var{TRS_DATA_XFER}.
+
+@subsubheading Rules
+
+The following rules apply to the issuance of this primitive:
+
+@itemize ---
+
+@item It is not always necessary for the transport provider to provide the responding address in the
+@var{ORIG_length}
+and
+@var{ORIG_offiset}
+fields.
+Where the responding protocol address is the same as the destination protocol address for which the
+transaction initialization was requested, it is not necessary to provide the responding address in
+the
+@dfn{TR_BEGIN_CON}.
+Where the responding protocol address is not provided, the
+@var{ORIG_length}
+and
+@var{ORIG_offset}
+fields are set to zero (0).
+
+@item When the
+@samp{TR_NO_PERMISSION}
+flag is set, the transaction user must not issue a
+@samp{TR_END_REQ}
+primitive in response to this indication.
+
 @end itemize
 
 @page
-@node Transaction Data Transfer Phase
-@subsection Transaction Data Transfer Phase
+@node Transaction Data Transfer
+@subsection Transaction Data Transfer
 
 @menu
 * TR_CONT_REQ::
@@ -2335,16 +2501,16 @@ data carried in the following @samp{M_DATA} message block constitutes one TIDU;
 @end enumerate
 message block, followed by zero or more @samp{M_DATA} message blocks containing
 user data for the association, structured as follows:
-@smallexample
+@example
 typedef struct TR_cont_req @{
-        ulong PRIM_type;                /* Always TR_CONT_REQ */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong ASSOC_flags;              /* Association flags */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_CONT_REQ */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_cont_req_t;
 @tpindex TR_cont_req_t
-@end smallexample
+@end example
 @subsubheading Guidelines for use of @t{M_PROTO}
 The following guidelines must be followed with respect to the user of the
 @samp{M_PROTO} message block:
@@ -2374,7 +2540,7 @@ Specifies the primitive type: always @samp{TR_CONT_REQ}.
 Specifies the transaction identifier previously indicated by the transport
 provider to uniquely identify the transaction.  The transaction identifier must
 be specified by the transaction user unless there is only one transaction
-supported by the stream in transaction state @var{TR_DATA_XFER}.  When
+supported by the stream in transaction state @var{TRS_DATA_XFER}.  When
 specified, the transaction identifier must be the same as the transaction
 identifier that was indicated by the transaction provider in the corresponding
 @samp{TR_BEGIN_IND} or @samp{TR_BEGIN_CON}.
@@ -2414,7 +2580,7 @@ terminate the transaction association upon receipt of the corresponding
 that support this feature (@pxref{Addendum for ANSI Conformance}).
 @end vtable
 @subsubheading Valid State
-This primitive is valid in transaction state @var{TR_DATA_XFER}.  This primitive
+This primitive is valid in transaction state @var{TRS_DATA_XFER}.  This primitive
 is only valid in connection-oriented mode.
 @subsubheading New State
 The new state for the transaction remains unchanged.
@@ -2448,7 +2614,7 @@ primitive, or the flags field contained an unknown value.
 @end itemize
 @end table
 
-@b{NOTE:} If the interface is in the @var{TR_IDLE} state when the provider
+@b{NOTE:} If the interface is in the @var{TRS_IDLE} state when the provider
 receives the @samp{TR_CONT_REQ} primitive, then the transaction provider should
 discard the request without generating a fatal error.
 
@@ -2470,16 +2636,16 @@ The format of the message is one @samp{M_PROTO}
 message block, followed by zero or more @samp{M_DATA}
 @prindex M_DATA
 message blocks containing user data for the association, structured as follows:
-@smallexample
+@example
 typedef struct TR_cont_ind @{
-        ulong PRIM_type;                /* Always TR_CONT_IND */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong ASSOC_flags;              /* Association flags */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_CONT_IND */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_cont_ind_t;
 @tpindex TR_cont_ind_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -2524,7 +2690,7 @@ for transaction providers that support it (@pxref{Addendum for ANSI
 Conformance}).
 @end vtable
 @subsubheading Valid State
-This primitive is valid in transaction state @var{TR_DATA_XFER}.  This primitive
+This primitive is valid in transaction state @var{TRS_DATA_XFER}.  This primitive
 is only valid in connection-oriented mode.
 @subsubheading New State
 The new state for the transaction is unchanged.
@@ -2535,8 +2701,8 @@ not issue a @samp{TR_END_REQ} primitive in response to this indication.
 @end itemize
 
 @page
-@node Transaction Termination Phase
-@subsection Transaction Termination Phase
+@node Transaction Termination
+@subsection Transaction Termination
 
 @menu
 * TR_END_REQ::
@@ -2556,32 +2722,30 @@ message block, followed by zero or more @samp{M_DATA}
 @prindex M_DATA
 message blocks containing user data for the association, structured
 as follows:
-@smallexample
+@example
 typedef struct TR_end_req @{
-        ulong PRIM_type;                /* Always TR_END_REQ */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong TERM_scenario;            /* Termination scenario */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_END_REQ */
+    ulong TRANS_id;           /* Transaction id */
+    ulong TERM_scenario;      /* Termination scenario */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_end_req_t;
 @tpindex TR_end_req_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
 @item PRIM_type
 Specifies the primitive type: always @samp{TR_END_REQ}.
 @item TRANS_id
-Specifies the transaction identifier previously indicated by the transport
-provider to uniquely identify the transaction.  The transaction identifier must
-be specified by the transaction user unless there is only one transaction
-supported by the stream in transaction state @var{TR_DATA_XFER}.  When
-specified, the transaction identifier must be the same as the transaction
-identifier that was indicated by the transaction provider in the corresponding
-@samp{TR_BEGIN_IND} or @samp{TR_BEGIN_CON}.
+Specifies the transaction identifier previously indicated by the transport provider to uniquely
+identify the transaction.  The transaction identifier must be specified by the transaction user
+unless there is only one transaction supported by the stream in transaction state
+@var{TRS_DATA_XFER}.  When specified, the transaction identifier must be the same as the transaction
+identifier that was indicated by the transaction provider in the corresponding @samp{TR_BEGIN_IND}
+or @samp{TR_BEGIN_CON}.
 @item TERM_scenario
-Specifies the termination scenario.  Termination scenarios are provider
-specific.
+Specifies the termination scenario.  Termination scenarios are provider specific.
 @item OPT_length
 Specifies the length of the protocol options associated with the transaction
 association termination.  Supplying protocol options with the primitive is
@@ -2597,10 +2761,10 @@ protocol options in the @samp{M_PROTO} message block are the same as was
 specified by the transport user.
 @end vtable
 @subsubheading Valid State
-This primitive is valid in transaction state @var{TR_DATA_XFER}.  This primitive
+This primitive is valid in transaction state @var{TRS_DATA_XFER}.  This primitive
 is only valid in connection-oriented mode.
 @subsubheading New State
-The new state of the transaction is @var{TR_IDLE}.
+The new state of the transaction is @var{TRS_IDLE}.
 @subsubheading Rules
 @subsubheading Acknowledgements
 This primitive requires the TR provider to generate one of the following
@@ -2633,16 +2797,16 @@ message block, followed by zero or more @samp{M_DATA}
 @prindex M_DATA
 message blocks containing user data for the association, structured
 as follows:
-@smallexample
+@example
 typedef struct TR_end_ind @{
-        ulong PRIM_type;                /* Always TR_END_IND */
-        ulong CORR_id;                  /* Correlation id */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_END_IND */
+    ulong CORR_id;            /* Correlation id */
+    ulong TRANS_id;           /* Transaction id */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_end_ind_t;
 @tpindex TR_end_ind_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -2671,10 +2835,10 @@ Indicates the offset from the beginning of the @samp{M_PROTO} message block
 where the protocol options begin.
 @end vtable
 @subsubheading Valid State
-This primitive is valid in transaction states @var{TR_WCON_CREQ} or
-@var{TR_DATA_XFER}.  This primitive is only valid in connection-oriented mode.
+This primitive is valid in transaction states @var{TRS_WCON_CREQ} or
+@var{TRS_DATA_XFER}.  This primitive is only valid in connection-oriented mode.
 @subsubheading New State
-The new state for the transaction is @var{TR_IDLE}.
+The new state for the transaction is @var{TRS_IDLE}.
 @subsubheading Rules
 The following rules apply to the issuance of this primitive:
 @itemize ---
@@ -2693,136 +2857,223 @@ association corresponding to the @var{TRANS_id} indicated in the primitive.
 
 @page
 @node TR_ABORT_REQ
-@subsubsection Transaction Abort Request
+@subsubsection Transaction User Abort Request
+
 @subsubheading TR_ABORT_REQ
 @prindex TR_ABORT_REQ
+
 @subsubheading Format
+
 The format of the message is one @samp{M_PROTO}
 @prindex M_PROTO
 message block structured as follows:
-@smallexample
+
+@example
 typedef struct TR_abort_req @{
-        ulong PRIM_type;                /* Always TR_ABORT_REQ */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong ABORT_cause;              /* Cause of the abort */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_ABORT_REQ */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ABORT_cause;        /* Cause of the abort */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_abort_req_t;
 @tpindex TR_abort_req_t
-@end smallexample
+@end example
+
 @subsubheading Parameters
 The primitive has the following arguments:
+
 @vtable @var
+
 @item PRIM_type
 Specifies the primitive type: always @samp{TR_ABORT_REQ}.
+
 @item TRANS_id
-Specifies the transaction identifier previously indicated by the transport
-provider to uniquely identify the transaction.  The transaction identifier must
-be specified by the transaction user unless there is only one transaction
-supported by the stream in transaction state @var{TR_DATA_XFER}.  When
-specified, the transaction identifier must be the same as the transaction
-identifier that was indicated by the transaction provider in the corresponding
-@samp{TR_BEGIN_IND} or @samp{TR_BEGIN_CON}.
+Specifies the transaction identifier previously indicated by the transport provider to uniquely
+identify the association.
+The transaction identifier must be the same as the transaction identifier that was
+indicated by the transaction provider in the corresponding @samp{TR_BEGIN_IND} or
+@samp{TR_BEGIN_CON} primitive.
+
 @item ABORT_cause
-Specifies the reason for the abort.  Abort causes are provider specific.
+Specifies the (user) cause for the abort.
+Abort causes are provider specific.
+
 @item OPT_length
-Specifies the length of the protocol options associated with the transaction
-association refusal.  Supplying protocol options with the primitive is optional.
-If the transaction user does not provide protocol options with the primitive,
-the @var{OPT_length} and @var{OPT_offset} fields must be set to zero (0) by the
-transaction user.  The format of the protocol options are provider specific.
+Specifies the length of the protocol options associated with the abort.
+Supplying protocol options with the primitive is optional.
+If the transaction user does not provide protocol options with the primitive, the @var{OPT_length}
+and @var{OPT_offset} fields must be set to zero (0) by the transaction user.
+The format of the protocol options are provider specific.
+
 @item OPT_offset
-Specifies the offset from the beginning of the @samp{M_PROTO} message block
-where the protocol options begin.  Alignment of the protocol options in the
-@samp{M_PROTO} message block is not guaranteed.  However, the alignment of the
-protocol options in the @samp{M_PROTO} message block are the same as was
-specified by the transport user.
+Specifies the offset from the beginning of the @samp{M_PROTO} message block where the protocol
+options begin.
+Alignment of the protocol options in the @samp{M_PROTO} message block is not guaranteed.
+However, the alignment of the protocol options in the @samp{M_PROTO} message block are the same as
+was specified by the transport user.
+
 @end vtable
+
+@subsubheading Modes
+
+This primitive is only valid in connection-oriented mode.
+
+@subsubheading Originator
+
+Transaction user.
+
 @subsubheading Valid State
-This primitive is valid in any connection oriented transaction state other than
-@var{TR_IDLE}.  This primitive is only valid in connection-oriented mode.
+
+This primitive is valid in any connection oriented transaction state other than @var{TRS_IDLE}.
+
 @subsubheading New State
-The new state for the transaction is @var{TR_IDLE}.
-@subsubheading Rules
+
+The new state for the transaction is @var{TRS_IDLE}.
+
+@c @subsubheading Rules
+
 @subsubheading Acknowledgements
-This primitive requires the TR provider to generate one of the following
-acknowledgements upon receipt of the primitive:
+
+This primitive requires the TR provider to generate one of the following acknowledgements upon
+receipt of the primitive:
+
 @itemize ---
+
 @item @emph{Successful:}
-Correct acknowledgement of the primitive is indicated with the @samp{TR_OK_ACK}
-primitive described in @ref{TR_OK_ACK}.
+Correct acknowledgement of the primitive is indicated with the @samp{TR_OK_ACK} primitive described
+in @ref{TR_OK_ACK}.
+
 @item @emph{Non-fatal errors:}
-These errors will be indicated with the @samp{TR_ERROR_ACK} primitive described
-in @ref{TR_ERROR_ACK}.  The allowable errors are as follows:
+These errors will be indicated with the @samp{TR_ERROR_ACK} primitive described in
+@ref{TR_ERROR_ACK}.  The allowable errors are as follows:
+
 @vtable @code
+
+@item TRBADDATA
+The amount of user data specified was invalid.
+
+@item TRBADID
+The transaction identifier specified in the primitive was incorrect or invalid.
+
+@item TRNOTSUPPORT
+This primitive is not supported by the transaction provider.
+
 @item TROUTSTATE
-The primitive would place the transaction interface out of state for the
-indicated transaction.
+The primitive would place the transaction interface out of state for the indicated transaction.
+
 @item TRSYSERR
 A system error occurred and the UNIX System error is indicated in the primitive.
+
 @end vtable
+
 @end itemize
-The transport provider should not generate an error if it receives this
-primitive in the @var{TS_IDLE} state for the transaction.
+
+The transport provider should not generate an error if it receives this primitive in the
+@var{TRS_IDLE} state for the transaction.
 
 @page
 @node TR_ABORT_IND
-@subsubsection Transaction User Abort Indication
+@subsubsection Transaction Abort Indication
+
 @subsubheading TR_ABORT_IND
 @prindex TR_ABORT_IND
+
+This primitive indicates to the user that either a request for association has been denied or an
+existing association has been aborted.
+
 @subsubheading Format
+
 The format of the message is one @samp{M_PROTO}
 @prindex M_PROTO
 message block structured as follows:
-@smallexample
+
+@example
 typedef struct TR_abort_ind @{
-        ulong PRIM_type;                /* Always TR_ABORT_IND */
-        ulong CORR_id;                  /* Correlation id */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
-        ulong ABORT_cause;              /* Cause of the abort */
-        ulong ORIGINATOR;               /* Originator P or U */
+    ulong PRIM_type;          /* Always TR_ABORT_IND */
+    ulong CORR_id;            /* Correlation id */
+    ulong TRANS_id;           /* Transaction id */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+    ulong ABORT_cause;        /* Cause of the abort */
+    ulong ORIGINATOR;         /* Originator P or U */
 @} TR_abort_ind_t;
 @tpindex TR_abort_ind_t
-@end smallexample
+@end example
+
 @subsubheading Parameters
+
 The primitive has the following arguments:
+
 @vtable @var
+
 @item PRIM_type
 Indicates the primitive type: always @samp{TR_ABORT_IND}.
+
 @item CORR_id
-Indicates the correlation identifier previously specified by the transport user
-to uniquely identify an outstanding transaction request that has not yet
-received transaction confirmation.  For all other cases, this field must be set
-to zero (0).
+Indicates the correlation identifier previously specified by the transport user to uniquely identify
+an outstanding transaction request that has not yet received transaction confirmation.
+For all other cases, this field must be set to zero (0).
+
 @item TRANS_id
-Indicates the transaction identifier previously indicated by the transport
-provider to uniquely identify the transaction.  The transaction identifier must
-be indicated by the transaction provider.  The transaction identifier must be
-the same as the transaction identifier that was indicated in the corresponding
-@samp{TR_BEGIN_IND} or @samp{TR_BEGIN_CON} (if any).
+Indicates the transaction identifier previously indicated by the transport provider to uniquely
+identify the transaction.
+The transaction identifier must be indicated by the transaction provider.
+The transaction identifier must be the same as the transaction identifier that was indicated in the
+corresponding
+@samp{TR_BEGIN_IND}
+or
+@samp{TR_BEGIN_CON}
+primitive (if any).
+
 @item OPT_length
 Indicates the length of the protocol options associated with the transaction
-association termination.  Protocol options are only indicated by the transaction
-provider when they were supplied by the underlying protocol.  If the transport
-provider does not indicate protocol options, the @var{OPT_length} and
-@var{OPT_offset} fields must be set to zero (0).  The format of the protocol
-options are provider specific.
+association termination.
+Protocol options are only indicated by the transaction provider when they were supplied by the
+underlying protocol.
+If the transport provider does not indicate protocol options, the
+@var{OPT_length}
+and
+@var{OPT_offset}
+fields must be set to zero (0).
+The format of the protocol options are provider specific.
+
 @item OPT_offset
-Indicates the offset from the beginning of the @samp{M_PROTO} message block
-where the protocol options begin.
+Indicates the offset from the beginning of the
+@samp{M_PROTO}
+message block where the protocol options begin.
+
 @item ABORT_cause
-Indicates the cause of the abort.  Abort causes are provider specific.
+Indicates the cause of the abort.
+Abort causes are provider specific.
+
 @item ORIGINATOR
-Indicates the originator of the abort.  This filed can have values @code{T_USER}
-or @code{T_PROVIDER} or @code{T_UNSPECIFIED}.
+Indicates the originator of the abort.
+This field can have values
+@code{TR_USER}
+or
+@code{TR_PROVIDER}
+or
+@code{TR_UNSPECIFIED}.
+
 @end vtable
+
+@subsubheading Modes
+
+This primitive is only valid in connection-oriented mode.
+
+@subsubheading Originator
+
+Transaction provider.
+
 @subsubheading Valid State
+
 This primitive is valid in any connection oriented transaction state other than
-@var{TR_IDLE}.  This primitive is only valid in connection-oriented mode.
+@var{TRS_IDLE}.
+
 @subsubheading New State
-@subsubheading Rules
+
+The new state for the transaction is
+@var{TRS_IDLE}.
 
 @page
 @node Connectionless Mode Primitives
@@ -2851,18 +3102,18 @@ message block, followed by zero or more @samp{M_DATA}
 @prindex M_DATA
 message blocks containing user data for the association, structured
 as follows:
-@smallexample
+@example
 typedef struct TR_uni_req @{
-        ulong PRIM_type;                /* Always TR_UNI_REQ */
-        ulong DEST_length;              /* Destination address length */
-        ulong DEST_offset;              /* Destination address offset */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
-        ulong ORIG_length;              /* Originating address length */
-        ulong ORIG_offset;              /* Originating address offset */
+    ulong PRIM_type;          /* Always TR_UNI_REQ */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
 @} TR_uni_req_t;
 @tpindex TR_uni_req_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -2932,18 +3183,18 @@ message block, followed by zero or more @samp{M_DATA}
 message blocks containing user data for the association, where each
 @samp{M_DATA} message block contains at least one byte of data, structured as
 follows:
-@smallexample
+@example
 typedef struct TR_uni_ind @{
-        ulong PRIM_type;                /* Always TR_UNI_REQ */
-        ulong DEST_length;              /* Destination address length */
-        ulong DEST_offset;              /* Destination address offset */
-        ulong ORIG_length;              /* Originating address length */
-        ulong ORIG_offset;              /* Originating address offset */
-        ulong OPT_length;               /* Options structure length */
-        ulong OPT_offset;               /* Options structure offset */
+    ulong PRIM_type;          /* Always TR_UNI_REQ */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
 @} TR_uni_ind_t;
 @tpindex TR_uni_ind_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -2991,15 +3242,15 @@ The format of the message is one @samp{M_PCPROTO}
 message block, followed by zero or more @samp{M_DATA}
 @prindex M_DATA
 message blocks containing user data for the association, structured as follows:
-@smallexample
+@example
 typedef struct TR_notice_ind @{
-        ulong PRIM_type;                /* Always TR_NOTICE_IND */
-        ulong CORR_id;                  /* Correlation id */
-        ulong TRANS_id;                 /* Transaction id */
-        ulong REPORT_cause;             /* SCCP return cause */
+    ulong PRIM_type;          /* Always TR_NOTICE_IND */
+    ulong CORR_id;            /* Correlation id */
+    ulong TRANS_id;           /* Transaction id */
+    ulong REPORT_cause;       /* SCCP return cause */
 @} TR_notice_ind_t;
 @tpindex TR_notice_ind_t
-@end smallexample
+@end example
 @subsubheading Parameters
 The primitive has the following arguments:
 @vtable @var
@@ -3212,14 +3463,14 @@ message to flush both the read and write queues after receiving a successful
 The following rules apply only to the connection-oriented transaction services:
 
 @itemize @bullet
-@item If the interface is in the @samp{TS_DATA_XFER}, @samp{TS_WIND_ORDREL} or
-@samp{TS_WACK_ORDREL} state, the transaction provider must send up a
+@item If the interface is in the @samp{TRS_DATA_XFER}, @samp{TRS_WIND_ORDREL} or
+@samp{TRS_WACK_ORDREL} state, the transaction provider must send up a
 @var{M_FLUSH}
 @prindex M_FLUSH
 message to flush both the read and write queues before sending up a
 @var{TR_ABORT_IND}.
-@item If the interface is in the @samp{TS_DATA_XFER}, @samp{TS_WIND_ORDREL} or
-@samp{TS_WACK_ORDREL} state, the transaction provider must send up a
+@item If the interface is in the @samp{TRS_DATA_XFER}, @samp{TRS_WIND_ORDREL} or
+@samp{TRS_WACK_ORDREL} state, the transaction provider must send up a
 @var{M_FLUSH}
 @prindex M_FLUSH
 message to flush both the read and write queues after receiving a successful
@@ -3658,7 +3909,7 @@ Set to the current version.
 @section ETSI Quality of Service Model and Description
 @subsection QoS Overview
 
-@section TRI Primitives: Rules for ETSI Conformance
+@section TRI Primitives: Rules for ETSI ETS 300 287 Conformance
 @subsection Addressing
 @subsubsection Address Format
 
@@ -3699,760 +3950,22 @@ Set to the current version.
 @subsubheading TR_UNI_IND
 @subsubheading TR_NOTICE_IND
 
-
-@node TCAP Transport Provider TPI Addendum
-@unnumbered TCAP Transport Provider TPI Addendum
-
-The Transaction Interface (TRI) is written as an addendum to the XTI/TPI (X/Open
-Transport Interface/Transport Provider Interface).  No new primitive or
-semantics have been added to the interface, merely a definition of the
-protocol-specific and provider-specific aspects of TCAP Transport.
-
-TCAP Transport is very close to the XTI mOSI transport specification.  The major
-difference is that SCCP Network Layer Addresses and options are used instead of
-ISO Presentation Layer addresses and options.  Aside from that, TCAP Transport
-resembles X.219 (ROSE) ISO/OSI Transport.
-
-@section Addressing
-
-TCAP uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
-
-@subsection Address Format
-
-The address format for a TCAP address is as follows:
-
-@section Options
-
-@subsection TCAP Level Options
-
-@subsubsection Application Context Name
-
-@subsubsection User Information
-
-@subsection SCCP Level Options
-
-@unnumberedsubsubsec SCCP Quality of Service Options
-
-The TCAP interface uses protocol level T_SS7_SCCP for options at the SCCP level.
-SCCP QOS parameters are communicated to the underlying transport using the
-option name T_SCCP_QOS.  There are three QOS structures which can be used in
-this fashion are listed in @emph{Table 7} as follows:
-
-@image{tri_tabx} @center Table 7@strong{@emph{.  SCCP QOS Option Values}}
-
-Quality of service structure @code{N_qos_sel_sccp_t} has the following fields:
-
-@table @emph
-@item n_qos_type
-This is the NPI Quality of Service structure type and is always set to
-@code{N_QOS_SEL_SCCP}, @code{N_QOS_OPT_SEL_SCCP}, or @code{N_QOS_RANGE_SCCP}.
-@item protocol_class
-This is the protocol class.  The @emph{protocol_class} field can be one of the
-following: @code{N_QOS_PCLASS_0} (SCCP connectionless protocol class 0),
-@code{N_QOS_PCLASS_1} (for SCCP connectionless protocol class 1),
-@code{N_QOS_PCLASS_2} (for SCCP connection-oriented protocol class 2),
-@code{N_QOS_PCLASS_3} (for SCCP connection-oriented protocol class 3) or
-@code{QOS_UNKNOWN}.
-
-@code{N_QOS_PCLASS_2} and @code{N_QOS_PCLASS_3} are not applicable to TCAP.
-@item option_flags
-If the @emph{options_flags} field has bit @code{N_QOS_OPT_RETERR} set then the
-SCCP will return the PDU on error.
-@item importance
-This is the importance of the message for consideration for SCCP flow control.
-This value is not normally set by the user.  It can be any integer number from 0
-to 7, or QOS_UNKNOWN.
-@item sequence_selection
-This affects the SLS (Signalling Link Selection) value that will be used for
-protocol classes @code{N_QOS_PCLASS_0} and @code{N_QOS_PCLASS_1}.  This value is
-not normally set by the user and can be an integer value or @code{QOS_UNKNOWN}.
-@item message_priority
-This affects the MP (Message Priority) value that will be used for specific
-messages in all protocol classes.  This value is not normally set by the use and
-can be any integer value from 0 to 3 or the value @code{QOS_UNKNOWN}.
-@end table
-
-@section T_INFO_ACK Values
-
-The following discusses the values which may be returned in the T_INFO_ACK
-primitive in response to a T_INFO_REQ primitive.
-
-@table @emph
-@item TSDU_size
-TCAP has effectively no limit to the amount of data which can be sent in a
-particular invoke or result user data.  TCAP includes a ``more'' bit concept in
-that an Invoke Not Last and Return Result Not Last can be used to indicated that
-the next Invoke or Return Result are part of the same user data sequence.  ITU-T
-does not include the Not Last concept for Invokes.  As a result, for ANSI and
-other TCAPs supporting the Invoke Not Last user data, TSDU_size will be set to
-T_INFINITE (-1).  For other TCAPs not supporting Invoke Not Last, the TSDU_size
-will be set to the maximum size of a single user data sequence derived from the
-maximum size of the underlying SCCP network.  This may still be T_INFINITE (-1)
-as the underlying SCCP connectionless network may support unlimited size NSDUs.
-@item ETSDU_size
-TCAP has no expedited data service and the value of ETSDU_size is set to
-T_UNKNOWN (-2).
-@item CDATA_size
-TCAP can send connection data (user data) with the initial Begin (Query) or
-first Continue (Conversation) package and can also send Application Context and
-User Information in either package.  These messages correspond to TR-BEGIN and
-the first TR-CONTINUE after receiving a TR-BEGIN and these correspond to
-T_CONN_REQ and T_CONN_RES.  Because the underlying SCCP connectionless network
-may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or
-may be set to the maximum amount of connection data (including Application
-Context, User Information and user data) which can be sent or received in either
-package.  This informs the user as to wht size to make data buffers associated
-with connection indications and confirmations (T_CONN_IND, T_CONN_CON) and how
-much data can be sent with connection requests and responses (T_CONN_REQ,
-T_CONN_RES).
-@item DDATA_size
-TCAP can send disconnect data (user data) with the final End (Response) package.
-These messages correspond to the TR-END primitive and the T_DISCON_REQ or
-T_DISCON_IND.  Again, because the underlying SCCP connectionless network may
-support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be
-set to the maximum amount of disconnection data which can be sent or received in
-the End (Response) package.  This informs the user as to what size to make data
-buffers associated with disconnection indications (T_DISCON_IND) and how much
-data can be sent with disconnection requests (T_DISCON_REQ).
-@item ADDR_size
-This is the maximum TCAP address size which can be communicated across the
-interface.  This address size is the maximum size of the defined SCCP address
-structure (@code{sizeof sccp_addr_t}) which also will include address digits up
-to a maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.  This informs the
-user as to what size it should reserve for control buffers so as to receive
-control information without buffer truncation.
-@item OPT_size
-This is the maximum size of the options field used in any TPI message and is the
-sum of the maximum option sizes of one of each of the options that can occur
-together.  This informs the user as to what size is should reserve for control
-buffers to ensure that received control messages which include options can be
-contained within the buffer without truncation.
-@item TIDU_size
-Even though a TCAP provider can support unlimited TSDU size, it cannot normally
-support unlimited TIDU size.  This is because the underlying SCCP NSDU may be
-limited in size.  The TCAP provider is not responsible for segmenting user data
-sequences offered to the provider from the user in as M_DATA.
-@prindex M_DATA
-This is the maximum size of the TIDU which corresponds to the maximum size of
-the underlying NSDU.  Because the underlying SCCP provider may have no limit on
-the NSDU size (i.e., it supports segmentation of connectionless NSDUs) this may
-be more in the manner of a optimal recommendation to the user rather than an
-absolute maximum.  Because of this, a given TCAP provider might not reject TIDUs
-which are larger than this value.
-@item SERV_type
-There are two service type supported by an ACSE provider: T_COTS and T_CLTS.
-T_CLTS (ACSE Connectionless Class) is a connectionless transaction service with
-no error notification.  T_COTS (ACSE Connection-Oriented Class) is a
-connection-oriented transaction services with or without error notification.
-The value reflected here is dependent on the setting of option T_ACSE_PCLASS or
-T_TCAP_PCLASS.
-@item CURRENT_state
-Provides the current state of the Transport Provider.  TCAP providers use the
-same states as other TPI providers.
-@item PROVIDER_flag
-TPI provider flags which are set are SENDZERO (because TCAP supports the sending
-of packages without user data) and XPG4_1 (to indicate that the transport
-provider supports the latest TPI semantics).
-@end table
-
-
-@section Supported Services
-
-@subsection Common Transport Services
-
-@subsubsection Information Service
-
-@subsubheading T_INFO_REQ
-
-@subsubheading T_INFO_ACK
-
-@subsubheading T_ADDR_REQ
-
-@subsubheading T_ADDR_ACK
-
-@subsubsection Bind Service
-
-@subsubheading T_BIND_REQ
-
-@subsubheading T_BIND_ACK
-
-@subsubsection Options Management Service
-
-@subsubheading T_OPTMGMT_REQ
-
-@subsubheading T_OPTMGMT_ACK
-
-@subsection Connection-Mode Services
-
-@subsubsection Connection Establishment
-
-@subsubheading T_CONN_REQ
-
-@subsubheading T_CONN_IND
-
-@subsubheading T_CONN_RES
-
-@subsubheading T_CONN_CON
-
-@subsubsection Data Transfer
-
-@subsubheading T_DATA_REQ
-
-@subsubheading T_DATA_IND
-
-@subsubheading T_EXDATA_REQ
-
-@subsubheading T_EXDATA_IND
-
-@subsubheading T_OPTDATA_REQ
-
-@subsubheading T_OPTDATA_IND
-
-@subsubsection Connection Release
-
-@subsubheading T_DISCON_REQ
-
-@subsubheading T_DISCON_IND
-
-@subsubheading T_ORDREL_REQ
-
-@subsubheading T_ORDREL_IND
-
-@subsubsection Connection-Less Mode Services
-
-@subsubheading T_UNITDATA_REQ
-
-@subsubheading T_UNITDATA_IND
-
-@subsubheading T_UDERROR_IND
-
-@subsubsection Component Services
-
-@subsubheading T_INVOKE_REQ
-
-@subsubheading T_INVOKE_IND
-
-@subsubheading T_RESULT_REQ
-
-@subsubheading T_RESULT_IND
-
-@subsubheading T_ERROR_REQ
-
-@subsubheading T_ERROR_IND
-
-@subsubheading T_CANCEL_REQ
-
-@subsubheading T_CANCEL_IND
-
-@subsubheading T_REJECT_REQ
-
-@subsubheading T_REJECT_IND
-
-
 @node Mapping TRI Primitives
 @appendix Mapping TRI Primitives
 
 @menu
 * Mapping TRI Primitives to ITU-T Q.771::
-* Mapping TRI Primitives to ITU-T X.219::
 * Mapping TRI Primitives to ANSI T1.114::
+* Mapping TRI Primitives to ITU-T X.219::
 @end menu
 
+@page
 @node Mapping TRI Primitives to ITU-T Q.771
 @section Mapping TRI Primitives to ITU-T Q.771
 
-@subsection State Mapping
-
-@cartouche
-@image{tri_ne17,4in} @center Figure 18@strong{@emph{.  TR Sub-Layer State Machine}}
-@end cartouche
-
-@cartouche
-@image{tri_ne18,4in} @center Figure 19@strong{@emph{.  TR Sub-Layer State Machine}}
-@end cartouche
-
-@subsection Primitive Mapping
-
-@image{tri_tab8} @center Table 8@strong{@emph{.  Primitive Mapping}}
-
-@subsubsection TR-UNI
-
-@subsubheading Request
-
-The Q.771 TR-UNI and TC-UNI Requests map onto the TPI T_UNITDATA_REQ primitive
-as shown in Table 9.
-
-@center Table 9@strong{@emph{.  TR-UNI Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TR-UNI Request @tab T_UNITDATA_REQ 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab DEST_offset, DEST_length 
-@item Originating Address @tab implicit (see note 1) 
-@item User Data @tab M_DATA blocks 
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TC-UNI Request @tab T_UNITDATA_REQ 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab DEST_offset, DEST_length 
-@item Application Context Name @tab OPT_offset, OPT_length 
-@item Originating Address @tab implicit (see note 1) 
-@item Dialogue ID @tab implicit (see note 2) 
-@item User Information @tab OPT_offset, OPT_length 
-@item Components Present @tab M_DATA blocks 
-@end multitable 
-
-Notes:
-@enumerate 
-@item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address which is bound to the stream in a previous T_BIND_REQ
-operation and which is returned as the LOCADDR in a T_ADDR_ACK.
-@item The @emph{Dialogue ID} is implicit to the stream.  Each stream supports
-only one dialogue at a time.
-@end enumerate 
-
-@subsubheading Indication
-
-The Q.771 TR-UNI and TC-UNI Indications map onto the T_UNITDATA_IND primitive as
-shown in Table 10.
-
-Table 10@strong{@emph{.  TR-UNI Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TR-UNI Indication @tab T_UNITDATA_IND 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab implicit (see note 1) 
-@item Originating Address @tab SRC_offset, SRC_length 
-@item User Data @tab M_DATA blocks 
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} 
-@item TC-UNI Indication @tab T_UNITDATA_IND 
-@item Quality of Service @tab OPT_offset, OPT_length 
-@item Destination Address @tab implicit (see npte 1) 
-@item Application Context Name @tab OPT_offset, OPT_length 
-@item Originating Address @tab SRC_offset, SRC_length 
-@item User Information @tab OPT_offset, OPT_length 
-@item Components Present @tab M_DATA blocks 
-@end multitable 
-
-Notes:
-@enumerate 
-@item The @emph{Destination Address} parameter is implicit to the stream and is
-taken to be the address which is bound to the stream.
-@end enumerate 
-
-@subsubsection TR-BEGIN
-
-@subsubheading Request
-
-The Q.771 TR-BEGIN and TC-BEGIN Requests map onto the T_CONN_REQ primitive as
-shown in Table 11.
-
-@center Table 11@strong{@emph{.  T-Begin Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Originating Address @tab implicit (see note 1)
-@item Transaction ID @tab implicit (see note 2)
-@item User Data @tab M_DATA blocks
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Dialogue ID @tab implicit (see note 2)
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address which is bound to the stream in a previous T_BIND_REQ
-operation and which is returned as the LOCADDR in a T_ADDR_ACK.
-@item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the
-stream.  Each stream only supports one dialogue at a time.
-@end enumerate 
-
-@subsubheading Indication
-
-The Q.771 TR-BEGIN and TC-BEGIN Indications map onto the T_CONN_IND primitive as
-shown in Table 12.
-
-@c Table 12@strong{@emph{.  T-Begin Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Originating Address @tab SRC_offset, SRC_length
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-BEGIN Indication @tab T_CONN_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab SRC_offset, SRC_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Destination Address} parameter is implicit to the stream and is
-the address to which the stream was bound with the previous T_BIND_REQ operation
-and which is returned as as the LOCADDR in a T_ADDR_ACK.
-@end enumerate 
-
-@subsubsection TR-CONTINUE
-
-@subsubheading Confirming Request
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Requests confirming a transaction map onto
-the T_CONN_RES primitive as shown in Table 13.
-
-Table 13@strong{@emph{.  T-Continue Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Request @tab T_CONN_RES
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Request @tab T_CONN_RES
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Originating Address} parameter is implicit to the stream and is
-taken from the address which is bound to the stream in a previous T_BIND_REQ
-operation and which is returned as the LOCADDR in a T_ADDR_ACK.
-@end enumerate 
-
-@subsubheading Confirming Indication
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Indications confirming a transaction map
-onto the T_CONN_CON primitive as shown in Table 14.
-
-@center Table 14@strong{@emph{.  T-Continue Indication Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Indication @tab T_CONN_CON
-@item Quality of Service @tab PT_offset, OPT_length
-@item Originating Address @tab RES_length, RES_offset
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Indication @tab T_CONN_CON
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab RES_length, RES_offset
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Responding Address} parameter is delivered in the primitive but
-may be ignored by the TR-User.
-@end enumerate 
-
-@subsubheading Subsequent Request
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Requests continuing a transaction map onto
-the T_OPTDATA_REQ primitive as shown in Table 15.
-
-@center Table 15@strong{@emph{.  T-Continue Request Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Request @tab T_OPTDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Transaction ID @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Request @tab T_OPTDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Dialogue ID @tab implicit (see note 1)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab OPT_offset, OPT_length
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are
-implicit to the stream.  Each stream supports only one dialogue at a time.
-@end enumerate 
-
-@subsubheading Subsequent Indication
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Indications continuing a transaction map
-onto the T_OPTDATA_IND primitive as shown in Table 16.
-
-@center Table 16@strong{@emph{.  T-Continue Indication Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Indication @tab T_OPTDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Transaction ID @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Indication @tab T_OPTDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Dialogue ID @tab implicit (see note 1)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab OPT_offset, OPT_length
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are
-implicit to the stream.  Each stream supports only one dialogue at a time.
-@end enumerate 
-
-@subsubsection TR-END
-
-@subsubheading Request
-
-The Q.771 TR-END and TC-END Requests map onto the T_ORDREL_REQ primitive as
-shown in Table 17.
-
-@center Table 17@strong{@emph{.  TR-END Request Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-END Request @tab T_ORDREL_REQ
-@item Quality of Service @tab implicit (see notes)
-@item Transaction ID @tab implicit (see notes)
-@item Termination @tab implied (see notes)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-END Request @tab T_ORDREL_REQ
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab
-@item User Information @tab implicit (see notes)
-@item Termination @tab implied (see notes)
-@end multitable 
-Notes:
-@enumerate 
-@item Pre-arranged or basic terminations are distinguished by operation class
-and options parameters.
-@item User data in M_DATA blocks can be associated with the primitive.
-@end enumerate 
-
-@subsubheading Indication
-
-The Q.771 TR-END and TC-END Indications map onto the T_ORDREL_IND primitive as
-shown in Table 18.
-
-@center Table 18@strong{@emph{.  TR-END Indication Mapping}}
-
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item R-END Indication @tab T_ORDREL_IND
-@item Quality of Service @tab implicit (see notes)
-@item Transaction ID @tab implicit (see notes)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-END Indication @tab T_ORDREL_IND
-@item Quality of Service @tab it (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@end multitable 
-Notes:
-@enumerate 
-@item 
-@item 
-@item
-@end enumerate 
-
-@subsubsection TR-U-ABORT
-
-@subsubheading Request
-
-The Q.771 TR-U-ABORT and TC-U-ABORT Requests map onto the T_DISCON_REQ primitive
-as shown in Table 19.
-
-@center Table 19@strong{@emph{.  TR-U-ABORT Request Mapping}}
-
-@multitable @columnfractions .43 .43 .14
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} @tab @strong{Notes} 
-@item TR-U-ABORT Request @tab T_DISCON_REQ @tab 
-@item Quality of Service @tab implicit (see notes) @tab (1) 
-@item Transaction ID @tab SEQ_number @tab (2) 
-@item User Data @tab M_DATA blocks @tab 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} @tab 
-@item TC-U-ABORT Request @tab T_DISCON_REQ @tab 
-@item Quality of Service @tab implicit (see notes) @tab (1) 
-@item Dialogue ID @tab SEQ_number @tab (2) 
-@item Abort reason @tab (implied by presence or absence of Application Context Name) @tab (3) 
-@item Application Context Name @tab implicit (see notes) @tab (3) 
-@item Components Present @tab M_DATA blocks @tab 
-@item User Information @tab implicit (see notes) @tab (3) 
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Quality of Service} parameter is implicit to the stream.  Each
-Operation Class 1, 2 or 3 stream (structured dialogue) either has a sequence
-control value associated with the stream or a new sequence control is selected
-for each package in a transaction.  Thus, this parameter does not need to be
-specified by the T-User.  If the T-User wants to change the return option or
-sequence control associated with a TR-U-ABORT, this can be performed with the
-T_OPTMGMT_REQ primitive before the T_DISCON_REQ primitive is issued.
-@item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the
-stream when the transaction association is fully formed.  When the transaction
-association has not been confirmed and an TR-U-ABORT is issued, the SEQ_number
-parameter identifies the transaction or dialogue in question.
-@end enumerate 
-
-@subsubheading Indication
-
-The TR-U-ABORT Indication primitive of Q.771 maps onto the T_DISCON_IND
-primitive.
-
-@center Table 20@strong{@emph{.  TR-U-ABORT Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-U-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab (not provided)
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-@item TC-U-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Abort reason @tab DISCON_reason
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@end multitable 
-Notes:
-@enumerate 
-@item The T_DISCON_IND reason distinguishes between TR-U-ABORT and TR-P-ABORT.
-@item QOS parameters are not provided to the TR-User even when available at the
-transport provider.
-@item User Data may be provided with the disconnect in M_DATA message blocks
-associated with the @samp{M_PROTO}
-@prindex M_PROTO
-message block for the T_DISCON_IND.
-@end enumerate 
-
-@subsubsection TR-P-ABORT
-
-@subsubheading Indication
-
-The TR-P-ABORT Indication primitive of Q.771 maps onto the T_DISCON_IND
-primitive.
-
-@center Table 21@strong{@emph{.  TR-P-ABORT Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-P-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab (not provided)
-@item Transaction ID @tab SEQ_number
-@item P-Abort @tab DISCON_reason
-@end multitable 
-
-@enumerate 
-@item The T_DISCON_IND reason distinguishes between TR-U-ABORT and TR-P-ABORT.
-@item QOS parameters are not provided to the user on abort even when available
-at the transport provider.
-@end enumerate 
-
-@subsubsection TR-NOTICE
-
-@subsubheading Indication
-
-The TR-NOTICE Indication primitive of Q.771 maps onto the T_UDERROR_IND and
-T_DISCON_IND primitives.
-
-@center Table 22@strong{@emph{.  TR-NOTICE Indication Mapping}}
-@multitable @columnfractions .5 .5 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-NOTICE Indication @tab T_UDERROR_IND
-@item Transaction ID @tab implicit (see note 1)
-@item Report Cause @tab ERROR_type
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-NOTICE Indication @tab T_UDERROR_IND
-@item Transaction ID @tab implicit (see note1)
-@item Report Cause @tab ERROR_type
-@end multitable 
-Notes:
-@enumerate 
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are
-implicit to the stream.  Each stream supports only one dialogue at a time.
-@end enumerate 
-
-@subsection Parameter Mapping
-
-@subsubsection TR Sub-Layer Parameters
-
-@subsubsection Quality of Service
-The @emph{Quality of Service} parameters map to the @code{N_QOS_SEL_SCCP}
-quality of service parameter set which can be placed in the @emph{OPT_length}
-and @emph{OPT_offset} fields of the appropriate messages.  The
-@code{N_qos_sel_sccp_t} structure has the Return Option and Sequence Control
-parameters referenced in the Q.771 recommendations.
-
-@subsubheading Destination Address
-
-The @emph{Destination Address} is an SCCP Called Party Address in the format
-specified for the @uref{http://www.openss7.org/spi_idx.html,SCCP Newtork}.  This
-parameter is contained in the @emph{DEST_length} and @emph{DEST_offset} fields
-of the appropriate TPI primitives.  It is also contained in the
-@emph{REMADDR_length} and @emph{REMADDR_offset} fields of the T_ADDR_ACK
-management primitive.
-
-@subsubheading Originating Address
-
-The @emph{Originating Address} is an SCCP Calling Party Address in the format
-specified for the @uref{http://www.openss7.org/spi_idx.html,SCCP Newtork}.  This
-parameter is contained in the @emph{SRC_length} and @emph{SRC_offset} or
-@emph{RES_length} and @emph{RES_offset} fields of the appropriate TPI
-primitives.  It is also contained in the @emph{LOCADDR_length} and
-@emph{LOCADDR_offset} fields in the T_ADDR_ACK management primitive.
-
-@subsubheading P-Abort
-
-@subsubheading Transaction ID
-
-The @emph{Transaction ID} parameter is normally implicit to the stream for a
-fully associated transaction.  Each stream supports only one fully associated
-transactions.  For unaccepted or unconfirmed transactions, the @emph{SEQ_number}
-field of the appropriate TPI primitive is use to identify the transaction.  The
-@emph{Transaction ID} is, therefore, implicit to the connection or connection
-indication.
-
-@subsubheading Termination
-
-Whether the termination is pre-arranged or basic is a characteristic of the
-stream.
-
-@subsubheading User Data
-
-@subsubheading Report Cause
+@page
+@node Mapping TRI Primitives to ANSI T1.114
+@section Mapping TRI Primitives to ANSI T1.114
 
 @page
 @node Mapping TRI Primitives to ITU-T X.219
@@ -4529,10 +4042,6 @@ stream.
 @subsubheading Diagnostic
 @subsubheading Application Context Identifier
 @subsubheading Application Context Name List
-
-@page
-@node Mapping TRI Primitives to ANSI T1.114
-@section Mapping TRI Primitives to ANSI T1.114
 
 @node State/Event Tables
 @appendix State/Event Tables
@@ -4630,4 +4139,8 @@ transpires.
 
 @c @printindex vr
 
+@page
+@shortcontents
+@page
+@contents
 @bye

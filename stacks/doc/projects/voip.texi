@@ -1,0 +1,3219 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: voip.texi,v 0.9.2.1 2004/11/05 00:41:06 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/11/05 00:41:06 $ by $Author: brian $
+%
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c %**start of header
+@setfilename voip.info
+@settitle OpenSS7 VoIP Switch
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* VoIP GW: (voip).			OpenSS7 VoIP Switch
+@end direntry
+
+@include texi/args.texi
+
+@ifinfo
+@noindent
+This file documents the OpenSS7 VoIP Switch
+
+@noindent
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+
+@noindent
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+@noindent
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+@noindent
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+@end ifinfo
+
+@titlepage
+@title OpenSS7 VoIP Switch
+@subtitle PRELIMINARY Application Notes
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@sp 2
+@subtitle Copyright @copyright{} 2004  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document provides Application Notes for The OpenSS7 VoIP Switch.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@ifnottex
+@ifinfo
+@node Top
+@top OpenSS7 VoIP Switch
+@end ifinfo
+@ifnotinfo
+@node Top
+@top
+@end ifnotinfo
+@end ifnottex
+
+@macro tabfig {image, number, caption}
+
+@iftex
+@float Table,Table \number\
+@image{\image\}
+@caption{\caption\}
+@end float
+@end iftex
+@ifnottex
+@image{\image\} @anchor{Table \number\}@center @emph{Table \number\.@:  \caption\}
+@end ifnottex
+
+@end macro
+
+@macro tabref {number}
+@iftex
+@emph{@ref{Table \number\}}
+@end iftex
+@ifnottex
+@emph{@ref{Table \number\}}
+@end ifnottex
+@end macro
+
+@macro figure {image, number, caption}
+
+@iftex
+@cartouche
+@float Figure,Figure \number\
+@image{\image\}
+@caption{\caption\}
+@end float
+@end cartouche
+@end iftex
+@ifnottex
+@image{\image\} @anchor{Figure \number\}@center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end ifnottex
+
+@end macro
+
+@macro figuresized {image, number, caption, size}
+
+@iftex
+@cartouche
+@float Figure,Figure \number\
+@image{\image\,\size\}
+@caption{\caption\}
+@end float
+@end cartouche
+@end iftex
+@ifnottex
+@image{\image\,\size\} @anchor{Figure \number\}@center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end ifnottex
+
+@end macro
+
+@macro figref {number}
+@iftex
+@emph{@ref{Figure \number\}}
+@end iftex
+@ifnottex
+@emph{@ref{Figure \number\}}
+@end ifnottex
+@end macro
+
+@menu
+* Executive Overview::
+* Preface::
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* Reference Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Platform Architecture::
+* System Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Index::
+@end menu
+
+@node Executive Overview
+@unnumbered Executive Overview
+
+This document provides a Application Notes for the OpenSS7 VoIP Switch.  The initial and primary
+purposes of this equiment is to provide a scalable, carrier-grade platforn for interconnecting VoIP
+backbone networks to the PSTN using SS7.
+
+@subsubheading The OpenSS7 Project
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
+developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
+Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+software under terms less restrictive than the GPL.
+
+@subsubheading The OpenSS7 VoIP Switch
+
+OpenSS7 can provide VoIP gateway capabilities in a high-performance, low-cost, small-footprint
+platform leaveraging the GNU/Linux operating system distributions and tools, and utilizing low-cost
+commodity, or high-quality standardized hardware.
+
+For details on platform applications, see @ref{Application Architecture}, @ref{Network
+Architecture}, @ref{Optional Application Support}, and @ref{Optional Network Support}.
+
+@subsubheading Open Source Software
+
+The OpenSS7 Project leverages the widespread use of GNU/Linux operation systems, distributions, and
+FSF tools such as @samp{autoconf} and @dfn{RPM}.  For example, this document was formatted for PDF,
+HTML, info and plain text using the GNU @dfn{texinfo} system, @samp{autoconf}, and the @TeX{}
+formatting system.
+
+The open source model avoids proprietary lock-in and permits in-house or outsourced development.
+All source code is available for use and modification by the end customer.  All build tools,
+documentation and associated resources are generally available.  The availability of the source code
+and complete documentation eases problem resolution and can offer upgrades and fixes even in advance
+of client problem reports.  
+
+For details on software solutions, see @ref{Protocol Architecture}, @ref{Software Architecture},
+@ref{Optional Protocol Support}, and @ref{Optional Software Support}.
+
+@subsubheading Commodity Hardware
+
+By best utilizing commodity PC or standardized CompactPCI hardware, OpenSS7 makes available the
+highest performance platforms available on the market at back-to-school prices.  When carrier-grade
+and large scale is not essential, 3GHz Pentium class servers in hardened rack mount chassis can be
+used at a fraction of the cost, and yet outperform, other solutions.  Where carrier-grade is
+necessary, embedded Linux on standardized PICMG 2.16 NEBS compliant chassis make for a higher cost,
+but more reliable alternative.
+
+For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Rapid Development
+
+The OpenSS7 Project has already developed protocol components completing the SS7 and SIGTRAN
+signalling stacks including MTP Level 2 and Level 3, ISUP, SCCP, TCAP; and SCTP, M2PA, M2UA, M3UA,
+SUA and TUA.  Development of a VoIP Switch to meet initial field requirements needs only the
+development of some intermediate and auxillary modules.
+
+For details on scheduling, see @ref{Logistics}.
+
+@subsubheading An Evolving Solution
+
+The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
+for an ever expanding capability is demonstrated by the additional options available as described in
+@ref{Optional Application Support}, @ref{Optional Network Support},
+@ref{Optional Protocol Support}, @ref{Optional Software Support},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Conclusions
+
+In summary, an OpenSS7 VoIP Switch an excellent application of the OpenSS7 SS7 and VoIP stacks and
+can be provided at a affordable price on short time-lines, while offering an evolution path for
+future deployment applications.
+
+@sp 4
+
+@flushright
+@email{bidulock@@openss7.org, Brian Bidulock}
+The OpenSS7 Project
+@end flushright
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex Document information
+
+@subsection Abstract
+@cindex Document abstract
+
+This document provides Application Notes for the OpenSS7 VoIP Switch.
+
+@subsection Objective
+@cindex Document objective
+
+The objective of this document is to provide Application Notes for the development of a low cost,
+high-performance, VoIP Switch using OpenSS7 SS7 stack components, software, and compatible systems
+and hardware.
+
+@subsection Intent
+@cindex Document intent
+
+The intent of this document is to act as Application Notes for an OpenSS7 project for a VoIP Switch.
+As Application Notes, this document discusses components and systems which are not necessarily
+complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any
+software, system or feature listed herein.
+
+@subsection Audience
+@cindex Document audience
+
+This document is intended for a technical audience.  The reaser should be familiar with most most
+ETSI, ITU-T and ANSI, Signalling System No. 7 recommendations, H.323, H.225, H.245, as well as IETF
+drafts and RFCS for RTP, SIP, SIP-T, MEGACO, MGCP, and SIGTRAN protocols.
+
+@subsection Revisions
+@cindex Document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+@ignore
+@subsubsection Version Control
+
+@smallexample
+
+$Log: voip.texi,v $
+Revision 0.9.2.1  2004/11/05 00:41:06  brian
+- Added HLR and VoIP HLDs and Applications Notes.
+
+
+@end smallexample
+@end ignore
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed or
+postscript) version of this document is an @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+@cindex Document disclaimer
+
+@noindent
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@section Document Organization
+@cindex Document organization
+
+This document is organized as follows:
+
+@ifnottex
+@menu
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* Reference Architecture::
+* System Architecture::
+* Platform Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Index::
+@end menu
+@end ifnottex
+@iftex
+@table @emph
+@item @ref{Introduction}
+Introduction to the OpenSS7 VoIP Switch application.
+@item @ref{Application Architecture}
+The application requirements and architecture.
+@item @ref{Network Architecture}
+The network architecture for the application.
+@item @ref{Reference Architecture}
+The reference architecture for the application.
+@item @ref{System Architecture}
+The architecture of the VoIP Switch system.
+@item @ref{Platform Architecture}
+The architecture of the VoIP Switch platform.
+@item @ref{Protocol Architecture}
+The protocol architecture supporting the application.
+@item @ref{Software Architecture}
+The software architecture supporting the protocol stack and application.
+@item @ref{Hardware Architecture}
+The hardware architecture supporting the protocol stack and application.
+@item @ref{Logistics}
+Project logistics for completion of the VoIP GW application.
+@item @ref{Optional Application Support}
+Additional application support not directly contributing to the current objective.
+@item @ref{Optional Network Support}
+Additional network interface support not directly contributing to the current objective.
+@item @ref{Optional Protocol Support}
+Additional protocol component support not directly contributing to the current objective.
+@item @ref{Optional Software Support}
+Additional software support not directly contributing to the current objective.
+@item @ref{Optional Hardware Support}
+Additional hardware support not directly contributing to the current objective.
+@item @ref{Programmatic Interfaces}
+Programmatic interfaces to selected protocol components.
+@item @ref{Platform Sizing}
+Detailed platform sizing considerations.
+@item @ref{Index}
+Index of concepts.
+@end table
+@end iftex
+
+
+@node Introduction
+@chapter Introduction
+@cindex Introduction
+
+This document provides Application Notes for an OpenSS7 patform to provide scalable VoIP Switch
+capabilities.  The primary driver for the OpenSS7 VoIP Switch is to provide a system capable of
+interconnecting a VoIP backbone to the PSTN using SS7.  This document provide a high-level designa
+nd proposal for a production system to provide this capability at a number of scale points.
+
+The proposal utilizes, where possible, existing OpenSS7 SS7 and VoIP stack components and provides a
+development plan for components that are specific to the OpenSS7 VoIP Switch initial requirements.
+
+This document discusses the resulting software configuration that will be put in place on the
+production system, the platform configuration for the production system, and a network configuration
+for deployment.  Also discussed is an overview of the project management logistics for successful
+completion over the course of this development project.
+
+It is intended that the document be a ``living'' document, that is updated over the course of this
+development project.
+
+@menu
+* The OpenSS7 VoIP Switch::
+* Project Drivers::
+* Scope::
+@end menu
+
+@node The OpenSS7 VoIP Switch
+@section The OpenSS7 VoIP Switch
+@cindex The OpenSS7 VoIP Switch
+
+This project provides an OpenSS7 VoIP Switch platform that provides interconnection to the PSTN
+using SS7 ISUP trunks and is capable of routing calls to and from the PSTN and a VoIP backbone
+network using SIP-T, H.323 or BICC signalling an RTP transport.
+
+@node Project Drivers
+@section Project Drivers
+@cindex Project drivers
+
+The lead purpose of the OpenSS7 VoIP Switch is to provide PTSN interconnection to an existing VoIP
+backbone and deployment infrastructure that lacks same.
+
+@node Scope
+@section Scope
+@cindex Scope
+
+Because of early deployment drivers yet requirements for scale, the OpenSS7 VoIP Switch platform is
+contructed using standardized PICMG 2.16 telephony hardware in a NEBS 3/ETSI compliant chassis
+providing carrier-grade serviciablity and reliability.  Non-carrier-grade platforms utilizing
+commodity PC hardware for lower scale installations are possible.
+
+@menu
+* Phases::
+* Gates::
+@end menu
+
+@node Phases
+@subsection Phases
+@cindex Project phases
+
+The longer term project is broken into the following phases:
+
+@table @dfn
+@item Phase 1 @footnote{Although some reference is made to capabilities supporting other phases, @dfn{Phase 1} and @dfn{Phase 2} are the focus of this document.}
+The initial phase of the project is intended to provide the capabilities of the OpenSS7 VoIP Switch
+for PSTN to VoIP backbone tandem for H.323.
+@item Phase 2
+The second phase of the project adds tandem gateway capabilities for SIP-T.
+@item Phase 3
+The third phase of the project adds network service capabilities.
+@item Phase 4
+The fourth phase of the project adds softswitch capabilities.
+@item Phase 5
+The fifth phase of the project completes a VoIP (NGN) switch.
+@end table
+
+Although some reference is made to capabilities supporting other phases, @dfn{Phase 1} and
+@dfn{Phase 2} are the focus of this document.
+
+@node Gates
+@subsection Gates
+@cindex Project gates
+
+Each phase of the project consists of seven gates.  The seven gates are defined as follows:
+
+@table @dfn
+
+@item Gate 0 --- Concept
+
+@noindent
+@dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
+High-Level Design.  This is an internal OpenSS7 gate.
+
+@item Gate 1 --- High Level Design
+
+@dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
+consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
+once the High-Level Design has been published and work is begun on a detailed design.
+@footnote{This document is a High-Level Design an Proposal document and it meets the internal
+requirements for passing Gate 1 of Phase 1 and Phase 2 of the VoIP GW project.  An external review of
+this document by a Beta or Gamma client or sponsor is pending.}
+
+@item Gate 2 --- Detailed Design
+
+@dfn{Gate 2} is passed when the detailed design has been reviewed to the satisfaction of the
+consumers of the project and the developers on the project.  This is an external as well as an
+internal review gate.  OpenSS7 passes this gate once the Detailed Design has been published and work
+base begin on development and implementation of the design.
+@footnote{OpenSS7 requires a contractual commitment for purchase from a Beta or Gamma client, or
+funding from a Sponsor of the OpenSS7 Project, before this gate can be passed and development
+started.}
+Passing this gate moves from the design stage to the development stage of the project.
+
+@item Gate 3 --- Development and Implementation
+
+@dfn{Gate 3} is passed when the software and systems development and implementation to the detailed
+design is complete and testing has begun.  This is an internal review gate.  OpenSS7 internally
+passes this gate when software is code complete and hardware has been installed for testing.
+
+@item Gate 4 --- System Test
+
+@dfn{Gate 4} is passed once the product implementation meets all internal ad hoc and formal
+conformance test suites and internal testing is complete.  This is an internal review gate.  OpenSS7
+passes this gate internally once conformance testing is complete.  Passing this gate moves from the
+development stage to the support stage of the project.
+
+@item Gate 5 --- Acceptance Test
+
+@dfn{Gate 5} is passed once the product implementation has passed external Gamma client acceptance
+testing.  This is an external review gate.  OpenSS7 passes this gate internally once participation
+in external acceptance testing is complete.
+
+@item Gate 6 --- Project Complete
+
+@dfn{Gate 6} is passed once all support obligations for the product implementation have been
+discharged.  This is an internal review gate.  OpenSS7 passes this gate once support agreements have
+terminated.
+
+@end table
+
+For more details on Gate scheduling for Phase 1 and Phase 2 of the VoIP GW project, @pxref{Schedule}.
+
+@node Application Architecture
+@chapter Application Architecture
+@cindex Application architecture
+
+The OpenSS7 VoIP Switch is intended to provide high performance and high density PSTN to VoIP
+backbone gateway adding SS7 interconnection capability to an existing or back-end VoIP network.
+
+@section Application Requirements
+
+Application requirements have been broken into 5 phases using the timeboxing approach.
+
+@subsection Phase 1 Requirements
+
+Phase 1 requirements provide a VoIP gateway capability that will connect an existing H.323 VoIP
+network to the PSTN using SS7 ISUP trunks.
+
+@itemize ---
+@item Integral Media Gateway for RTP/RTCP to G.703/G.704 G.711 A- and mu-law.
+@item Integral Signalling Gateway for SS7 ISUP and SS7 TCAP.
+@item Local Number Portability.
+@item Lawful Intercept.
+@end itemize
+
+@itemize ---
+@item Integral Media Gateway Controller for H.323
+@item Integral Back End functions for H.323.
+@item Integral H.323 Gatekeeper.
+@end itemize
+
+@subsection Phase 2 Requirements
+
+Phase 2 requirements provide SIP-T capabilities.
+
+@itemize ---
+@item Integral Media Gateway Controller for SIP-T.
+@item Integral Back End functions for SIP-T.
+@item Integral SIP redirect/proxy server.
+@end itemize
+
+@subsection Phase 3 Requirements
+
+Phase 3 requirements provide network service capabilities.
+
+@itemize ---
+@item ENUM support.
+@item AAA support.
+@item EAP authentication.
+@item External PLMN authentication.
+@item GSM MSC/VLR capabilities.
+@item ETSI Tiphon 4 interworking.
+@item ISDN support on E interface.
+@end itemize
+
+@subsection Phase 4 Requirements
+
+Phase 4 requirements expose internal interfaces to provide softswitch capabilities.
+
+@itemize ---
+@item J Interface (SIGTRAN) exposed.
+@item N Interface (MGCP, H.248/MEGACO) exposed.
+@end itemize
+
+@subsection Phase 5 Requirements
+
+Phase 5 requirements complete full VoIP (NGN) switching.
+
+@itemize ---
+@item Support for directly attached H.323, SIP and MGCP IP Phone terminals.
+@item Full RAS support for internal H.323 gatekeeper and SIP proxy server.
+@item Full class 5 residential/business feature set.
+@end itemize
+
+@section Solution Architecture
+
+Although the functions of @dfn{Media Gateway Controller}, @dfn{Media Gateway} and @dfn{Signalling
+Gateway} have been decomposed, and in the past these functional groups have been implemented on
+separate physical platforms, modern compute capacity and densities permit these functions to be
+integrated into a single phyical platform without limitation.  Open standard interfaces are utilized
+internal to the platform to permit a decomposed model to be split out and to permit ETSI Tiphon
+Version 4 compatibility.
+
+@subsection OpenSS7 VoIP Switch for Deployment
+
+In light of the foregoing, the solution architecture takes the form of an integrated VoIP switch
+capability of providing a number of functional groups in the traditional models.  The OpenSS7 VoIP
+Switch integrates the following functional groups while still permitting standard interfaces to be
+exposed for maximum deployment flexibility:
+
+@itemize ---
+@item Integral @dfn{Media Gateway Controller} for H.323 and SIP-T.
+@item Integral @dfn{Media Gateway} for RTP/RTCP to PDH G.703/704 G.711 conversion.
+@item Integral @dfn{Signalling Gateway} for SS7 ISUP, TCAP and ISDN signalling conversion.
+@item Integral @dfn{Gatekeeper} for H.323 and @dfn{redirect/proxy} server for SIP-T.
+@end itemize
+
+@section Call Flows
+
+This section provides some illustrative application call flows:@footnote{This section is not
+intended as a @dfn{Detailed Design}, but provides illustration only for these @dfn{Application Notes}.
+Refer to RFC XXXX for detailed information.}
+
+@node Network Architecture
+@chapter Network Architecture
+@cindex Network architecture
+
+@figref{1}
+illustrates the network configuration for the OpenSS7 VoIP Switch in a deployment scenario.  The
+gateway device is positioned and attached to the SS7 network (PSTN) and the IP network (VoIP).
+
+@figure{voip_netconf,1,Network Architecture}
+
+The VoIP Switch device is positioned between the SS7 network and the IP network providing VoIP
+communications.
+
+The device is attached to the telephone network with two-way SS7 Inter Machine Trunks (IMTs) and SS7
+signalling links.  SS7 signalling links may be either A-links to STPs in the SS7 network, or F-links
+directly to interconnect SS7 switching offices within the telephone network.  SSPs within the
+telephone network to which the devices is interconnected would have to be configured to deliver
+calls for the device to SS7 ISUP trunks interconnected to the device.  For the purposes of the
+telephone network, the VoIP Switch would appear as a National intermediate office, but could also
+act as an International intermediate office or International incoming or outgoing office.
+Configuration as a National originating or terminating office is also possible.  Full continuity
+testing, blocking and management of ISUP circuits is provided for by the OpenSS7 ISUP protocol
+module.
+
+The device is attached to the SS7 utilizing CPC-388 or lesser grade OpenSS7 SS7 link and media
+channel TDM interface cards,
+@footnote{For other hardware alternatives, @pxref{Hardware Architecture}}
+terminating SS7 A-links or F-links, either 64kbps Q.703 links or full span
+@cindex Q.703 Annex B
+Q.703 Annex B 2.048Mbps high-speed links, or via a signalling gateway device terminating SS7 Level
+2, 3 or 4 and transporting M2UA or M3UA back-haul signalling to the gateway device over
+@cindex SCTP
+SCTP.
+@cindex M2UA
+@cindex M3UA
+
+The device is configured to perform routing of calls incoming from the telephone network based on
+ENUM lookups and INAP/SPIRITS triggers to RTP streams controlled by SIP or H.323 within the OpenSS7
+complex.
+@footnote{Q.699 compliant (ISUP-H.245 interworking) conversion will be performed for H.323.  SIP-T
+compliant ISUP-SIP conversion (RFC 3398) will be performed for SIP.}
+The device is also responsible for switching and converting 64kbps digital paths from the IMTs
+terminated on the telephone network side to RTP media streams (using any encoding) on the OpenSS7
+complex side.  Full interworking of echo suppression/silence detection/comfort tone between ISUP and
+RTP will be performed.  This switching is performed using the OpenSS7 internal Media Switch (MG)
+switching which provides for non-blocking switching of voice channels across TE410, CPC 384 or
+CPC 388 devices in the platform, as well as switching and conversion between RTP streams on dual
+Ethernet rails.
+@cindex TE410
+@cindex CPC 384
+@cindex CPC 388
+
+On the OpenSS7 complex side of the device, calls are connected to RTP streams on attached Ethernet
+and routed using the Client IP network.  The VoIP Switch will act as a SIP proxy and H.323
+Gatekeeper querying on-board or off-board ENUM DNS servers, and performing SIP/H.323 signalling to
+clients or other proxy/gatekeepers across the IP network.  It could also be capable of INAP SSP/IP
+operation as well as a SPIRITS.
+
+Calls outgoing from the OpenSS7 complex to the telephone network will be directed on the basis of
+subscription or by proxy/gatekeeper origination to the interconnected IMT trunks with or without
+number analysis.
+
+Existing equipment may also be attached with ISDN PRI connections directly to the VoIP switch with
+the device acting in Network mode.  This permits local PBX to be attached using ISDN.  The VoIP
+switch would also be capable of BICC switching between VoIP switches as well as M2UA/M3UA
+distribution of signalling links and signalling points to permit a distributed and fully redundant
+IP architecture.
+
+The telephone network side of the device signals using an ETSI ISUP Version 2 compliant National
+variant to the local interconnect controlling E1 facilities.  The OpenSS7 side of the device signals
+using SIP-T or H.323 directly to SIP proxies or H.323 GK and terminal devices within the IP network.
+The device is also responsible for switching E1 voice channels into RTP streams.
+
+The purpose of the VoIP Switch device is to provide SS7 ISUP access directly into the OpenSS7 VoIP
+environment, without the need for additional expensive or proprietary equipment.
+
+On the VoIP network side of the device, the platform is connected on an internal LAN with multiple
+Ethernet segments and IP subnetworks through a Layer 2 switch to VoIP backbone routers.  SIP calls
+originating within the VoIP network are accepted and responded to by the VoIP Switch application.
+Outgoing calls are tandemed to the PSTN over SS7 ISUP signalling and circuits.  RTP channels are
+terminated on the gateway device and converted to 64kbps A-law ISUP TDM circuits.
+
+From the viewpoint of the SS7 network, the gateway device acts as an SS7 SSP intermediate or
+originating/terminating switch with its own SS7 signalling point code.  From the viewpoint of the
+VoIP network, the gateway device acts as SIP or H.323 gateway, or a BICC intermediate switch.
+
+@node Reference Architecture
+@chapter Reference Architecture
+@cindex Reference architecture
+
+@figref{2}
+illustrates the VoIP Switch reference interfaces form the ETSI Tiphon model.
+
+@figure{tiphon,2,VoIP Switch Reference Architecture}
+
+@node VoIP Switch Reference Entities
+@section VoIP Switch Reference Entities
+@cindex VoIP gateway reference entities
+
+The following functional entities are used to decompose functions in the VoIP switch and network:
+
+@menu
+* Terminal::
+* Gatekeeper::
+* Media Gateway Controller::
+* Media Gateway::
+* Signalling Gateway::
+* Back End::
+@end menu
+
+@node Terminal
+@subsection Terminal
+
+The H.323 or SIP terminal support the A or B interface.  The A interface is used for communicating
+with H.323 Gatekeepers or other H.323 Terminals, or SIP FS, PS or UAC.
+
+Terminal devices are extenal to the VoIP Switch.  In initial phases, terminal device interface
+(see @pxref{Reference Interface A}) will only be supported via external H.323 Gatekeepers, SIP
+forwarding servers or SIP proxy servers.  Terminal device attachment for H.323, SIP and H.248
+terminals will be supported in later phases.
+
+@subsubsection H.323 Terminal
+
+@subsubsection SIP Terminal
+
+@subsubsection H.248/MEGACO Terminal
+
+@node Gatekeeper
+@subsection Gatekeeper
+
+The H.323 Gatekeeper, SIP forwarding server, or SIP proxy server, supports the A, C, D and G
+interfaces.
+
+The VoIP Switch will support an internal Gatekeeper function that will initially support the D
+interface, and support the A interface in later phases.  Initially the G and F interfaces will be
+internal to the platform, and will be exposed in later phases.
+
+@node Media Gateway Controller
+@subsection Media Gateway Controller
+
+The H.323 or SIP Media Gateway Controller supports the C, F, J and N interfaces.
+
+The VoIP Switch will incorporate an integral Media Gateway Controller function.  In initial phases,
+the C, F, J and N interfaces will be internal to the platform.  In subsequent phases, these
+interfaces will be exposed.
+
+@subsubsection H.323 MGC
+
+@subsubsection SIP MGC
+
+The SIP @dfn{Media Gateway Controller} is primarily responsible for conversion of SCN signalling
+from the PSTN on the @dfn{J Interface} to VoIP signalling to the H.323 Gatekeeper or SIP
+redirect/proxy server on the @dfn{C Interface}.  Also, the SIP MGC must coordinate this conversion
+with the control of media conversion from G.703/704 G.711 A- and mu-law circuits from the PSTN to
+RTP/RTCP channels within the VoIP network.
+
+Conversion between SS7 ISUP signalling and SIP-T signalling is described in
+
+@node Media Gateway
+@subsection Media Gateway
+
+The Media Gateway supports the N and B interfaces.
+
+The VoIP Switch will incorporate an integral Media Gateway function.  In initial phases, the N
+interface will be internal to the platform.  In subsequent phases, the N interface will be exposed.
+
+The current document is concerned with media gateway functionality for media gateways supporting SS7
+ISUP trunks (G.703/704) and ISDN PRI trunks (G.703/704).
+
+@node Signalling Gateway
+@subsection Signalling Gateway
+
+The Signalling Gateway supports the J and E.b interfaces.
+
+The VoIP Switch will incorporate an integral Signalling Gateway function.  In initial phases, the J
+interface will be internal to the platform.  In subsequent phases, the J interface will be exposed.
+
+The current document is concerned with signalling gateway functionality for SS7 ISUP, SS7 TCAP, and
+ISDN Q.931/921 signalling.
+
+@node Back End
+@subsection Back End
+
+The back end supports the F and G interfaces.
+
+The VoIP switch will incorporate an integral Back End function.  In initial phases, the F and G
+interfaces will be internal to the platform.  In subsequent phases, the F and G interfaces will be
+exposed.
+
+The current document is concerned about operational support systems, bulling systems, and service
+menagement systems.  I addition, database services (AIN/SPIRITS/etc) are considerered at this
+interface.
+
+@node VoIP Switch Reference Interfaces
+@section VoIP Switch Reference Interfaces
+@cindex VoIP gateway reference interfaces
+
+@menu
+* Reference Interface A::
+* Reference Interface B::
+* Reference Interface C::
+* Reference Interface D::
+* Reference Interface E::
+* Reference Interface F::
+* Reference Interface G::
+* Reference Interface J::
+* Reference Interface N::
+@end menu
+
+@node Reference Interface A
+@subsection Reference Interface A
+
+This is the interface of the H.323 Terminal or SIP Terminal to the H.323 Gate Keeper or SIP Proxy.
+
+@figref{3}
+illustrates the protocols at the @dfn{A Interface}.
+
+@figure{voip_ifa,3,A Interface}
+
+@subsubsection Interface A --- H.323
+
+@figref{3a}
+illustrates the use of H.323 based protocols at the @dfn{A Interface}.
+
+@figure{voip_ifa_h323,3a,A Interface --- H.323}
+
+Protocols at this interface for H.323 operation include:
+
+@itemize ---
+@item H.323
+@item H.225.0
+@item Q.931
+@item H.245
+@item TCP
+@item SCTP
+@end itemize
+
+@subsubsection Interface A --- SIP
+
+@figref{3b}
+illustrates the use of SIP based protocols at the @dfn{A Interface}.
+
+@figure{voip_ifa_sipt,3b,A Interface --- SIPT}
+
+Protocols at this interface for SIP operation include:
+
+@itemize ---
+@item SIP (UAC--UAS)
+@item SDP
+@item HTTP/1.1
+@item TCP
+@item SCTP
+@end itemize
+
+In initial phases of the VoIP Switch project, the A interface will not be directly supported.  The A
+Interface will be suppored in later phases of the project.
+
+@node Reference Interface B
+@subsection Reference Interface B
+
+This is the interface of the Terminal to the Media Gateway.
+
+@c @figure{voip_ifb,4,B Interface}
+
+Protocols at this interface include:
+
+@itemize ---
+@item RTP/RTCP
+@item UDP
+@item IP
+@end itemize
+
+@node Reference Interface C
+@subsection Reference Interface C
+
+This is the interface of the Media Gateway Controller to the H.323 Gate Keeper or SIP Proxy.
+
+@figref{5}
+illustrates the protocols at the @dfn{C Interface}.
+
+@figure{voip_ifc,5,C Interface}
+
+In initial phases of the VoIP Switch project, the C interface will be internal to the platform.  The
+C Interface will be exposed in later phases of the project.
+
+@subsubsection Interface C --- H.323
+
+@figref{5a}
+illustrates the protocols supporting H.323 at the @dfn{C Interface}.
+
+@figure{voip_ifc_h323,5a,C Interface --- H.323}
+
+Protocols at this interface for H.323 operation include:
+
+@itemize ---
+@item H.323
+@item H.225.0
+@item Q.931
+@item H.245
+@item TCP
+@item SCTP
+@end itemize
+
+@subsubsection Interface C --- SIP
+
+@figref{5b}
+illustrates the protocols supporting SIP-T at the @dfn{C Interface}.
+
+@figure{voip_ifc_sipt,5b,C Interface --- SIP}
+
+Protocols at this interface for SIP operation include:
+
+@itemize ---
+@item SIP (SIP-T)
+@item SDP (ISUP)
+@item HTTP/1.1
+@item TCP
+@item SCTP
+@end itemize
+
+@subsubsection Interface C --- BICC
+
+@c @figure{voip_ifc_bicc,5c,C Interface --- BICC}
+
+Protocols at this interface for BICC operation include:
+
+@itemize ---
+@item BICC
+@item TCP
+@item SCTP
+@end itemize
+
+@node Reference Interface D
+@subsection Reference Interface D
+
+This is the interface of the H.323 Gate Keeper or SIP Proxy to the H.323 Gate Keeper or SIP Proxy.
+
+@figref{6}
+illustrates the protocols at the @dfn{D Interface}.
+
+@figure{voip_ifd,6,D Interface}
+
+@subsubsection Interface D --- H.323
+
+@figref{6a}
+illustrates the protocols supporting H.323 at the @dfn{D Interface}.
+
+@figure{voip_ifd_h323,6a,D Interface --- H.323}
+
+Protocols at this interface for H.323 operation include:
+
+@itemize ---
+@item H.323
+@item H.225.0
+@item H.245
+@item TCP
+@item SCTP
+@end itemize
+
+@subsubsection Interface D --- SIP
+
+@figref{6b}
+illustrates the protocols supporting SIPT at the @dfn{D Interface}.
+
+@figure{voip_ifd_sipt,6b,D Interface --- SIPT}
+
+Protocols at this interface for SIP operation include:
+
+@itemize ---
+@item SIP (SIP-T)
+@item SDP
+@item HTTP/1.1
+@item TCP
+@item SCTP
+@end itemize
+
+@subsubsection Interface D --- BICC
+
+@c @figure{voip_ifd_bicc,6c,D Interface --- BICC}
+
+Protocols at this interface for BICC operation include:
+
+@itemize ---
+@item BICC
+@item TCP
+@item SCTP
+@end itemize
+
+@node Reference Interface E
+@subsection Reference Interface E
+
+This is the interface of the Gateway to the Switched Circuit Network.  It consists of two
+interfaces: a signalling interfaces (E.b) and a circuit interface (E.a).
+
+@menu
+* Reference Interface E.a::
+* Reference Interface E.b::
+@end menu
+
+@node Reference Interface E.a
+@subsubsection Reference Interface E.a
+
+This is the circuit interface from the gateway to the switched circuit network.
+
+@c @figure{voip_ifea,7,E.a Interface}
+
+@subsubheading Interface E.a --- ATM
+
+@c @figure{voip_ifea_atm,7a,E.a Interface --- ATM}
+
+Protocols at this interface for ATM operation include:
+
+@itemize ---
+@item ATM AAL2
+@item ATM AAL3
+@end itemize
+
+@subsubheading Interface E.a --- PDH
+
+@c @figure{voip_ifea_pdh,7a,E.a Interface --- PDH}
+
+Protocols at this interface for PDH operation include:
+
+@itemize ---
+@item G.703
+@item G.704
+@end itemize
+
+@node Reference Interface E.b
+@subsubsection Reference Interface E.b
+
+This is the signalling interface from the gateway to the switched circuit network.
+
+@figure{voip_ifeb,8,E.b Interface}
+
+@subsubheading Interface E.b --- SS7
+
+@figref{8a}
+illustrates protocols in support of SS7 signalling at the @dfn{E.b Interface}.
+
+@figure{voip_ifeb_ss7,8a,E.b Interface --- SS7}
+
+Protocols at this interface for SS7 operation include:
+
+@itemize ---
+@item TCAP
+@item SCCP
+@item ISUP
+@item SS7-MTP
+@end itemize
+
+@subsubheading Interface E.b --- ISDN
+
+@c @figref{8b}
+illustrates protocols in support of ISDN signalling at the @dfn{E.b Interface}.
+
+@c @figure{voip_ifeb_isdn,8b,E.b Interface --- ISDN}
+
+Protocols at this interface for ISDN operation include:
+
+@itemize ---
+@item ISDN Q.931
+@item ISDN Q.921
+@end itemize
+
+@subsubheading Interface E.b --- ATM
+
+@figref{8c}
+illustrates protocols in support of ATM signalling at the @dfn{E.b Interface}.
+
+@figure{voip_ifeb_atm,8c,E.b Interface --- ATM}
+
+Protocols at this interface for ATM operation include:
+
+@itemize ---
+@item B-ISUP
+@item MTP3b
+@item SSCOP
+@item AAL5
+@end itemize
+
+@node Reference Interface F
+@subsection Reference Interface F
+
+This is the interface of the Media Gateway Controller to Back End OSS.
+
+@c @figure{voip_iff,9,F Interface}
+
+Protocols at this interface include:
+
+@itemize ---
+@item ENUM
+@item SPIRITS
+@item AAA
+@end itemize
+
+@node Reference Interface G
+@subsection Reference Interface G
+
+This is the interface of the H.323 Gatekeeper or SIP Proxy to the back end OSS.
+
+@c @figure{voip_ifg,10,G Interface}
+
+Protocols at this interface include:
+
+@itemize ---
+@item ENUM
+@item SPIRITS
+@item AAA
+@end itemize
+
+In initial phases of the VoIP Switch, the G Interface will be internal to the platform.  The G
+Interface will be exposed in later phases.
+
+@node Reference Interface J
+@subsection Reference Interface J
+
+This is the interface of the Media Gateway Controller to the Signalling Gateway.
+
+@figref{11}
+illustrates the protocols at the @dfn{J Interface}.
+
+@figure{voip_ifj,11,J Interface}
+
+In initial phases of the VoIP Switch, the J interafe will be internal to the platform.  The J
+Interface will be exposed in later phases.
+
+@subsubsection Interface J -- SS7
+
+@figref{11a}
+illustrates the protocols in support of SS7 signalling at the @dfn{J Interface}.
+
+@figure{voip_ifj_ss7,11a,J Interface --- SS7}
+
+Protocols at this interface for SS7 operation include:
+
+@itemize ---
+@item TUA
+@item SUA
+@item ISUA
+@item M3UA
+@item M2UA
+@item M2PA
+@item SCTP
+@item TALI
+@item TCP
+@end itemize
+
+@subsubsection Interface J -- ISDN
+
+@figref{11b}
+illustrates the protocols in support of ISDN signalling at the @dfn{J Interface}.
+
+@figure{voip_ifj_isdn,11b,J Interface --- ISDN}
+
+Protocols at this interface for ISDN operation include:
+
+@itemize ---
+@item IUA
+@item DUA
+@item SCTP
+@end itemize
+
+@subsubsection Interface J -- GR303/V5.2
+
+@figref{11c}
+illustrates the protocols in support of GR303/V5.2 signalling at the @dfn{J Interface}.
+
+@figure{voip_ifj_gr303v5,11c,J Interface --- GR303/V5.2}
+
+Protocols at this interface for GR303/V5.2 operation include:
+
+@itemize ---
+@item V5UA
+@item GR303UA
+@item SCTP
+@end itemize
+
+@node Reference Interface N
+@subsection Reference Interface N
+
+This is the interface of the Media Gateway Controller to the Media Gateway.
+
+@c @figure{voip_ifj,12,N Interface}
+
+Protocols at this interface include:
+
+@itemize ---
+@item MGCP
+@item H.248/MEGACO
+@item TCP
+@item SCTP
+@end itemize
+
+In initial phases of the VoIP Switch, the N interface will be internal to the platform.  The N
+Interface will be exposed in later phases.
+
+@node Protocol Architecture
+@chapter Protocol Architecture
+@cindex Protocol architecture
+
+@c @figref{6}
+illustrates the protocol configuration for the OpenSS7 VoIP Switch system.  The protocol stack uses
+the following OpenSS7 stack components:
+
+@c @figure{voip_proto,6,Protocol Architecture}
+
+The following Protocol Stacks are provided as part fo the OpenSS7 SS7 and VoIP stacks:
+
+@menu
+* Applications::
+* SS7 Stack::
+* SIGTRAN Stack::
+* ISDN Stack::
+* VoIP Stack::
+* MG Stack::
+@end menu
+
+@node Applications
+@section Applications
+
+@menu
+* OpenSwitch Call Framework Application::
+@end menu
+
+@node OpenSwitch Call Framework Application
+@subsection OpenSwitch Call Framework Application
+@cindex OpenSwitch call framework application
+
+The OpenSwitch Call Framework Application uses the OpenSwitch C++ call framework supporting Call
+Control Interface (CCI) based called control, Media Gateway Interface (MGI) based media switching
+and conversion, and Transaction Component Interface (TCI) based transactions.  This is the module
+that performs call control, transaction services, and media switching conversion.  This component is
+also responsible for triggers, digit translations, call and feature usage record generation,
+operational measurements, call and feature statistics and maintenance.  To perform its functions it
+interfaces with ISUP, ISDN, BICC, SIP and H.323 signalling stacks using the published Call Control
+Interface (CCI), interfaces with the Media Gateway (MG) switching and conversion control stack using
+the published Media Gateway Interface (MGI), and interfaces with the transaction engine using the
+published Transaction Component Interface (TCI). Because the CCI, MGI and TCI are largely
+independent of the protocol stack providing call control signalling, the protocol stack providing
+media switchingconversion services, and the protocol stack providing transaction services, the
+OpenSwitch Call Framework application can be migrated to other ISUP and ISDN related protocols (e.g.
+BSSAP) and to other MG control protocols (e.g. MGCP or H.248) without significant impact on the
+OpenSwitch Call Framework.
+
+
+@node SS7 Stack
+@section SS7 Stack
+
+SS7 stack components provide support for protocols in the protocol profile at the @dfn{E.b
+Interface} (@pxref{Reference Interface E.b}).  They provide @dfn{Signalling Gateway (SG)} function
+within the OpenSS7 VoIP Switch for support of SS7 SIGTRAN protocols at the @dfn{J Interface},
+(@pxref{Reference Interface J}).
+@footnote{Initial phases of the OpenSS7 VoIP Switch use the @dfn{J Interface} internal to the
+platform.  Subsequent phases expose the @dfn{J Interface}.}
+
+@menu
+* ISUP/BICC/ISDN Operations Maintenance and Administration::
+* Integrated Services Digital Network (ISDN) User Part (ISUP)::
+* Transaction Capabilities Application Part (TCAP) Driver::
+* Signalling Connection Control Part (SCCP) Driver::
+* Global Title Translations (GTT)::
+* Message Transfer Part (MTP)::
+* Signalling Link (SL) Module::
+* Signalling Data Terminal (SDT) Module::
+@end menu
+
+@node ISUP/BICC/ISDN Operations Maintenance and Administration
+@subsection ISUP/BICC/ISDN Operations Maintenance and Administration
+@cindex ISUP/BICC/ISDN operations maintenance and administration
+
+The ISUP/BICC/ISDN OAM&P module is responsible for configuration of the SS7 and ISDN stacks,
+maintenance, statistics collection, operational measurements, management events and controls, log
+and alarm generation.  This is a daemon process that is typically customized to meet a specific
+application.
+
+@node Integrated Services Digital Network (ISDN) User Part (ISUP)
+@subsection Integrated Services Digital Network (ISDN) User Part (ISUP)
+@cindex ISUP
+
+The ISUP driver performs the call functions necessary for switching calls under ISUP control.  The
+driver is capable of acting in originating, intermediate and terminating switching roles in both the
+National and International networks.  The driver provides interface to the OpenSwitch Call Framework
+application using the OpenSS7 Call Control Interface (CCI).  This is the same interface that is used
+by the BICC, ISDN, SIP and H.323 drivers as well as OpenSS7 BSSAP, V5.2 and GR303 drivers.
+
+@c @figuresized{isup,40,Integrated Services Digital Network (ISDN) User Part (ISUP) Module,3in}
+
+The ISUP drvier supports all CCITT/ITU-T version (Blue Book forward), ETSI and ANSI versions (1992
+forward), including circuit management.  The ISUP driver provides a specialized Call Control
+Interface (CCI) to its users and accepts an Message Transfer Part Interface (MTPI) from below.
+
+The ISUP driver is a @dfn{STREAMS} driver that runs in the Linux Kernel for maximum performance.
+The primary scale limiting characteristics of the ISUP drvier is the number of simultaneous
+calls and the rate of call attempts.  Each simultaenous call requires state information and dynamic
+call information.  Call identifier indexed hash tables must be appropriately sized and the mean and
+maximum simultaneous calls should be known for proper sizing.
+
+The Integrated Services Digital Network (ISDN) User Part (ISUP) @dfn{STREAMS} driver is responsible
+for providing ISUP services on top of a Message Transfer Part (MTP) or MTP Level 3 User Adaptation
+Layer (M3UA) stream.
+
+The OpenSS7 ISUP module supports all ISUP functions with the exception of performing actions on the
+bearer circuits.  Actions on the bearer circuits are expected to be performed by the ISUP User
+utilizing the @dfn{Media Gateway (MG)} stack components.
+
+Message Transfer Part (MTP) streams as linked beneath the ISUP module to provide MTP services to
+ISUP.  Alternately, a SIGTRAN MTP Level 3 User Adatapation Layer (M3UA) or OpenSS7 @dfn{STREAMS}
+over
+@cindex SCTP
+SCTP stream may be linked.
+
+The OpenSS7 ISUP driver contains all the necessary state machines, timers, circuit management and
+error handling as required by the ITU-T, ETSI and ANSI specifications.
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{isup(4), isup(4), isup(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+isup, @b{isup}(4)}.
+@end ifnotinfo
+
+@node Transaction Capabilities Application Part (TCAP) Driver
+@subsection Transaction Capabilities Application Part (TCAP) Driver
+@cindex TCAP
+
+The transaction capabilities application part driver performs the essential transaction functions of
+the SS7 signalling stack.  SCCP or SUA streams are linked under the driver and the driver provides
+the functions of a TCAP SSP or SCP, MSC or HLR, SMSC and other TCAP nodes.  Transaction Capabilities
+Application Part streams bound to INAP, MAP or LNP TCAP-SAPs are accessed by the transaction
+application using the Transaction Component Interface (TCI).
+
+@figuresized{tcap,15,Transaction Capabilities Application Part (TCAP) Modules,3in}
+
+The TCAP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including operation classes 1 through 5.  The TCAP driver provides a specialized TR and TC
+interface to its users and accepts an X/Open NPI Version 2.0 interface from beneath.  In addition, a
+TPI Version 2.0 user interface supporting an X/Open XNS 5.2 mOSI XTI library interface is provided.
+
+The TCAP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The primary scale limiting characteristic of the TCAP driver is the number of simultaneous open
+transactions.  Each open transaction requires a number of timers, state information and dynamic
+transaction information such as addressing.  Transaction Identifier indexed hash tables must be
+appropriately sized and the mean and maximum simultaneous open transactions should be known for
+proper sizing.
+
+The Transaction Capabilities Application Part (TCAP) @dfn{STREAMS} module is responsible for
+providing TCAP services on top of a Signalling Connection Control Part (SCCP) or SCCP-User
+Adaptation Layer (SUA) stream.  In addition, it is possible to use an ISO/OSI Network Service
+Provider to provide the network services to TCAP.
+
+The OpenSS7 TCAP component has message encoding and decoding for ITU-T/ETSI Application Context TCAP
+and ANSI Private TCAP.  Interfaces provided to TCAP users include an XTI/mOSI capable TPI Version
+2.0 interface, a Transaction Interface (TRI) as described in ITU-T Q.791, and a Component Interface
+(TCI) as also described in ITU-T Q.791.  The ITU-T Q.791 TR and TC interfaces are support Java
+JTCAP.
+
+Of these interfaces, the Transaction Interface (TRI) and Component Interface (TCI) are most
+efficient.  This is because it is not necessary to open a new stream for each transaction as is the
+case with the TPI interface and the XTI/mOSI.
+
+The OpenSS7 TCAP module supports all Operations Classes.
+
+A SIGTRAN TCAP-User Adaptation  Layer (TUA) or OpenSS7 @dfn{STREAMS} over
+@cindex SCTP
+SCTP multiplexing driver can be used between the TCAP and the TCAP-User to export the TCAP/TCAP-User
+interface between a provider and user host.
+
+Signalling Connection Control Part (SCCP) streams are linked beneath the TCAP module to provide SCCP
+services to TCAP.  Alternately, a SIGTRAN SCCP-User Adaptation Layer (SUA) or OpenSS7 @dfn{STREAMS}
+over
+@cindex SCTP
+SCTP stream may be linked.
+
+The OpenSS7 TCAP module contains all the necessary state machines, timers, transaction error
+handling and component error handling as required by the ITU-T, ETSI and ANSI specifications.
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{tcap(4), tcap(4), tcap(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+tcap, @b{tcap}(4)}.
+@end ifnotinfo
+
+@node Signalling Connection Control Part (SCCP) Driver
+@subsection Signalling Connection Control Part (SCCP) Driver
+@cindex SCCP
+
+The signalling connection control part driver performs the essential transport functions of the SS7
+signalling stack.  Message Transfer Part or MTP3 User Adaptation Layer streams are linked under the
+driver and the driver provides the functions of a SCCP endpoint or relay with full global title
+translations.  Signalling Connection Control Part streams bound to TCAP SCCP-SAPs are linked under
+the TCAP driver to form a complete SS7 stack in support of call transactions.
+
+@figuresized{sccp,16,Signalling Connection Control Part (SCCP) Module,3in}
+
+The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
+SCCP driver provides an extended NPI Version 2.0 interface to its users and accepts an NPI Version
+2.0 (Connectionless) MTP interface from beneath or a specialized OpenSS7 MTPI interface.  In
+addition, a TPI Version 2.0 user interface supporting an X/Open XNS 5.2 XTI library interface is
+provided.
+
+The SCCP driver also provide GTT streams for servicing Global Title Translations requests.  These
+streams can be used by a user-space program for servicing GTT requests from a local or remote
+database, or can have specialized @dfn{STREAMS} modules pushed to perform rule-based GTT in the
+operating system kernel.
+
+The SCCP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+The Signalling Connection Control Part (SCCP) @dfn{STREAMS} module is responsible for providing SCCP
+services on top of a Message Transfer Part (MTP) Level 3 (MTP3) or MTP3-User Adaptation Layer (M3UA)
+@cindex M3UA
+stream.  In addition, it is possible to use an ISO/OSI connectionless Network Service Provider to
+provide the network services to SCCP.
+
+The OpenSS7 SCCP component has message encoding and decoding for ITU-T/ETSI and ANSI SCCP.
+Interfaces provided to SCCP users include an XTI/OSI capable TPI Version 2.0 interface, an NPI
+Version 2.0 interface, and an SCCP-specific interface.
+
+The OpenSS7 SCCP module supports all Protocol Classes.
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sccp(4), sccp(4), sccp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sccp, @b{sccp}(4)}.
+@end ifnotinfo
+
+@node Global Title Translations (GTT)
+@subsection Global Title Translations (GTT)
+
+The Signalling Connection Control Part (SCCP) Global Title Translations (GTT) module is responsible
+for responding to SCCP-GTT translations originating from the SCCP module beneath and is responsible
+for generating outgoing SCCP-GTT translations to the SCCP module beneath.  To perform its function,
+the SCCP-GTT indexes all information based on the SCCP Address, including dynamic (state) and
+provisioned (result) information.  For performance in both a testing and production environment, the
+module provides three levels of database partitioning and caching:
+
+@table @emph
+@item Rules
+Rules can be provided that are used to determine provisioned information based on components of
+the index (GT).  These rules can be used to generate a rather large simulated database without
+maintaining or accessing large database record areas.  The rule base provides a simulated
+partitioned database.  Each rule refers to a template or partial template of provisioned data.
+@item Templates
+Templates can be provided that specify a profile of provisioned information for a class of
+indexes (GT).  Templates provide a compact local in-kernel cache of templates.  Indexes reference
+templates rather than complete records.
+@item Records
+Records can be provided that specify the provisioned information for the specific index (GT).
+Records provide a local in-kernel cache of specified records.  Records are unique for each index.
+@item Translations
+The application can be queried by indicating the index (GT) and the module awaits a response
+containing the provisioned information.  Translations provide access to an external database or
+algorithm.
+
+For the OpenSS7 VoIP Switch, messages can be routed on Translation Type or on the basis of the
+Subsystem Number alone, resulting in a simple rule provided to the SCCP-GTT.  If the OpenSS7 VoIP
+Switch application is not expected to perform in any other role, the OpenSS7 VoIP Switch application
+can bind as the "Default Destination" for all SCCP Unitdata messages, obviating the need for GTT.
+@end table
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sccp(4), sccp(4), sccp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sccp, @b{sccp}(4)}.
+@end ifnotinfo
+
+@node Message Transfer Part (MTP)
+@subsection Message Transfer Part (MTP)
+@cindex MTP
+
+The message transfer part driver performs the essential network functions of the SS7 signalling
+stack.  Signalling link streams (see below) are linked under the driver and the driver provides the
+functions of a Signalling End Point (SEP) or Signalling Transfer Point (STP).
+
+Message Transfer Part streams bound to ISUP MTP-SAPs are linked under the ISUP driver above to form
+a complete SS7 stack in support of call switching.
+@footnote{Message Transfer Part streams bound to ISUP MTP-SAPs are linked under the ISUP driver
+above to form a complete SS7 stack in support of call switching.  Message Transfer Part streams
+bound to SCCP MTP-SAPs are linked under the SCCP driver above to form a complete SS7 stack in
+support of transaction services.}
+
+@figuresized{mtp3,17,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
+
+The MTP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including full transfer function.  The MTP driver provides a specialized MTP interface to
+its users, in addition to an NPI Version 2.0 connectionless interface.  A TPI Version 2.0
+(connectionless) user interface support X/Open XNS 5.2 XTI library functions is also provided.
+
+The MTP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+The Message Transfer Part (MTP) Level 3 (MTP3) module is responsible for providing MTP services to
+its users.
+
+The Message Transfer Part (MTP) Level 2 (MTP2) module is responsible for providing MTP services to
+its users.
+
+@figuresized{mtp2,18,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
+
+These are an existing OpenSS7 SS7 stack components; for documentation, see:
+@ifinfo
+@ref{mtp(4), mtp(4), mtp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+mtp, @b{mtp}(4)}.
+@end ifnotinfo
+
+@node Signalling Link (SL) Module
+@subsection Signalling Link (SL) Module
+@cindex SL
+
+The signalling link module performs HDLC and SS7 Message Transfer Part Level 2 (Link) functions on a
+raw communications channel provided by the X400P driver and the E400P card.  This module
+converts between the channel media stream (raw octet stream) and an SS7 signalling link signalling
+stream.  These streams comprise SS7 signalling links and are linked under the MTP driver.
+
+The signalling link module performs HDLC and SS7 Message Transfer Part Level 2 (Link) functions on a
+raw communications channel, such as that provided by the X400P driver and the E400P card.
+@cindex E400P
+This module converts between the channel media stream (raw octet stream) and an SS7 signalling link
+signalling stream.  These streams comprise SS7 signalling links and are linked under the MTP driver.
+
+The SL module supports CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SL module provides a specialized SL interface to its users, in addition to an NCR Comten CDI
+Version 2.0 Style 2 connectionless interface.
+
+The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+
+The Signalling Link (SL) module is responsible for providing SL services to its users.
+
+@figuresized{sl,29,Signalling Link (SL) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sl(4), sl(4), sl(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sl, @b{sl}(4)}.
+@end ifnotinfo
+
+@node Signalling Data Terminal (SDT) Module
+@subsection Signalling Data Terminal (SDT) Module
+@cindex SDT
+
+The signalling data terminal module performs HDLC and lower level SS7 Message Transfer Part Level 2
+(Link) functions including DAEDR, DAEDT, AERM, SUERM and SU Compression/Repetition on a raw
+communications channel or span, such as that provided by OpenSS7 Channel Drivers.  This module
+converts between the raw channel media stream (raw octet stream) and an SS7 signalling data terminal
+stream.  These streams comprise SS7 signalling data terminals and are pushed beneath the SL module.
+
+The SDT module supports CCITT/ITU-T version (Blue Book forward), ETSI and ANSI versions (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SDT module provides a specialized SDT interface to its users, in addition to an NCR Comten CDI
+Version 2.0 Style 2 connectionless interface.
+
+The Signalling Data Terminal (SDT) module is responsible for providing SDT services to its users.
+
+@figuresized{sdt,20,Signalling Data Terminal (SDT) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sdt(4), sdt(4), sdt(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sdt, @b{sdt}(4)}.
+@end ifnotinfo
+
+
+@node SIGTRAN Stack
+@section SIGTRAN Stack
+
+SIGTRAN stack components provide support for protocols in the protocol profile at the @dfn{J
+Interface},
+@footnote{Initial phases of the OpenSS7 VoIP Switch use the @dfn{J Interface} internal to the
+platform.  Subsequent phases expose the @dfn{J Interface}, @pxref{Reference Interface J}.}
+in support of SS7, ISDN and GR303/V5.2 signalling protocols at @dfn{E.b Interface}.
+@footnote{@xref{Reference Interface E.b}.}
+
+@menu
+* SS7 User Adaptation Layers::
+* ISDN User Adaptation Layers::
+* GR303/V5.2 User Adaptation Layers::
+@end menu
+
+@node SS7 User Adaptation Layers
+@subsection SS7 User Adaptation Layers
+@cindex SS7 User Adaptation Layers
+
+SS7 User Adaptation Layers provide transport of SS7 signalling between the @dfn{Media Gateway
+Controller} and @dfn{Signalling Gateway} functions in the OpenSS7 VoIP Switch at the @dfn{J
+Interface}.
+@footnote{@xref{Reference Interface J}.}
+These protocols at the @dfn{J Interface} support SS7 signalling protocols at the @dfn{E.b
+Interface}.
+@footnote{@xref{Reference Interface E.b}.}
+
+@menu
+* ISUP User Adaptation Layer (ISUA)::
+* TCAP User Adaptation Layer (TUA)::
+* SCCP User Adaptation Layer (SUA)::
+* MTP3 User Part Adaptation Layer (M3UA)::
+* MTP2 User Part Adaptation Layer (M2UA)::
+* MTP2 User Peer-to-Peer Adaptation Layer (M2PA)::
+* Tekelec's Adaptation Layer Interface (TALI)::
+@end menu
+
+@node ISUP User Adaptation Layer (ISUA)
+@subsubsection ISUP User Adaptation Layer (ISUA)
+@cindex ISUA
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{isua(4), isua(4), isua(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+isua, @b{isua}(4)}.
+@end ifnotinfo
+
+@node TCAP User Adaptation Layer (TUA)
+@subsubsection TCAP User Adaptation Layer (TUA)
+@cindex TUA
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{tua(4), tua(4), tua(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+tua, @b{tua}(4)}.
+@end ifnotinfo
+
+@node SCCP User Adaptation Layer (SUA)
+@subsubsection SCCP User Adaptation Layer (SUA)
+@cindex SUA
+
+The SUA driver provides the OpenSS7 VoIP Switch with the ability to act as an SUA AS (Application Server) in
+conjunction with an SUA SG (Signalling Gateway).  In this project, the SG function is performed by
+existing lab equipment.  The SUA driver accepts the transport of the SCCP to SCCP-User interface
+from the SG to the OpenSS7 VoIP Switch.  The SUA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the
+transport services for exporting the SCCP-User interface.  The SUA driver provides the same
+interfaces to its users as the OpenSS7 SCCP.
+
+The SUA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{sua(4), sua(4), sua(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sua, @b{sua}(4)}.
+@end ifnotinfo
+
+@node MTP3 User Part Adaptation Layer (M3UA)
+@subsubsection MTP3 User Part Adaptation Layer (M3UA)
+@cindex M3UA
+
+The M3UA provides transport of MTP3 User signalling between an MTP provider such as the OpenSS7 MTP
+driver and an MTP User such as the OpenSS7 ISUP driver.  The M3UA driver links SCTP transport
+streams under the driver and provides for both ASP, SGP and combined ASP/SGP operation.  The M3UA is
+used for redundancy and for distributing SS7 MTP3 across multiple hosts.
+The M3UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport
+services for exporting the MTP-User interface.  The M3UA driver provides the same interface to its
+users as the OpenSS7 MTP.
+
+The M3UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{m3ua(4), m3ua(4), m3ua(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+m3ua, @b{m3ua}(4)}.
+@end ifnotinfo
+
+@node MTP2 User Part Adaptation Layer (M2UA)
+@subsubsection MTP2 User Part Adaptation Layer (M2UA)
+@cindex M2UA
+
+The M2UA provides transport of MTP2 User signalling between an SL provider such as the OpenSS7 SL
+module and an SL User such as the OpenSS7 MTP driver.  The M2UA driver links SCTP transport streams
+under the driver and provides for both ASP, SGP and combined ASP/SGP operation.  The M2UA is used
+for redundancy and for sharing SS7 signalling links across multiple hosts.
+
+The M2UA driver provides the OpenSS7 VoIP Switch with the ability to act as an M2UA AS (Application
+Server) in conjunction with an M2UA SG (Signalling Gateway).  The M2UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport services for exporting the SL-User
+interface.  The M2UA driver provides the same interface to its users as the OpenSS7 SL module.
+
+@node MTP2 User Peer-to-Peer Adaptation Layer (M2PA)
+@subsubsection MTP2 User Peer-to-Peer Adaptation Layer (M2PA)
+@cindex M2PA
+
+@node Tekelec's Adaptation Layer Interface (TALI)
+@subsubsection Tekelec's Adaptation Layer Interface (TALI)
+@cindex TALI
+
+@node ISDN User Adaptation Layers
+@subsection ISDN User Adaptation Layers
+@cindex ISDN User Adaptation Layers
+
+ISDN User Adaptation Layers provide transport of ISDN signalling between the @dfn{Media Gateway
+Controller} and @dfn{Signalling Gateway} functions in the OpenSS7 VoIP Switch at the @dfn{J
+Interface}.
+@footnote{@xref{Reference Interface J}.}
+These protocols at the @dfn{J Interface} support ISDN signalling protocols at the @dfn{E.b
+Interface}.
+@footnote{@xref{Reference Interface E.b}.}
+
+@menu
+* ISDN Q.921 User Adaptation Layer (IUA)::
+* DPNSS/DASS User Adaptation Layer (DUA)::
+@end menu
+
+@node ISDN Q.921 User Adaptation Layer (IUA)
+@subsubsection ISDN Q.921 User Adaptation Layer (IUA)
+@cindex IUA
+
+@node DPNSS/DASS User Adaptation Layer (DUA)
+@subsubsection DPNSS/DASS User Adaptation Layer (DUA)
+@cindex DUA
+
+@node GR303/V5.2 User Adaptation Layers
+@subsection GR303/V5.2 User Adaptation Layers
+@cindex GR303/V5.2 User Adaptation Layers
+
+@menu
+* GR303 User Adaptation Layer (GR303UA)::
+* V5.2 User Adaptation Layer (V5UA)::
+@end menu
+
+@node GR303 User Adaptation Layer (GR303UA)
+@subsubsection GR303 User Adaptation Layer (GR303UA)
+@cindex GR303UA
+
+@node V5.2 User Adaptation Layer (V5UA)
+@subsubsection V5.2 User Adaptation Layer (V5UA)
+@cindex V5UA
+
+@node ISDN Stack
+@section ISDN Stack
+
+@menu
+* Integrated Services Digital Network (ISDN)::
+* Integrated Services Digital Network (ISDN) Data Link (DL) Module::
+@end menu
+
+@node Integrated Services Digital Network (ISDN)
+@subsection Integrated Services Digital Network (ISDN)
+@cindex ISDN
+
+The ISDN (Q.931) driver performs the call functions necessary for switching calls under ISDN
+control.  This includes both Network and User modes of operation.  The driver provides interface to
+the Q.699 call control application using the open OpenSS7 Call Control Interface (CCI).  This is the
+same interface that is used by the ISUP driver as well as OpenSS7 BSSAP, BICC, SIP, H.323, V5.2, and
+GR303 drivers.
+
+@node Integrated Services Digital Network (ISDN) Data Link (DL) Module
+@subsection Integrated Services Digital Network (ISDN) Data Link (DL) Module
+@cindex ISDN DL
+
+The data link module performs HDLC and ISDN Q.921 functions on a raw communications channel provided
+by the X400P driver and the E400P card.  This module converts between the channel media
+stream (raw octet stream) and the ISDN Data Link (Q.921) signalling stream.  These streams comprise
+ISDN D-channels and are linked under the ISDN driver.
+
+@node VoIP Stack
+@section VoIP Stack
+
+@menu
+* SIP/H.323 Operations Maintenance and Administration::
+* Bearer Independent Call Control (BICC)::
+* Session Initiation Protocol (SIP) Driver::
+* H.323 Driver::
+* H.245 Data Link Module::
+@end menu
+
+@node SIP/H.323 Operations Maintenance and Administration
+@subsection SIP/H.323 Operations Maintenance and Administration
+@cindex SIP/H.323 operations maintenance and administration
+
+The SIP/H.323 OAM&P module is responsible for configuration of the SIP and H.323 stacks,
+maintenance, statistics collection, operational measurements, management events and controls, log
+and alarm generation.  This is a daemon process that is typically customized to meet a specific
+application.
+
+@node Bearer Independent Call Control (BICC)
+@subsection Bearer Independent Call Control (BICC)
+@cindex BICC
+
+The BICC driver performs the call functions necessary for switching calls under BICC control.  The
+driver is capable of acting in originating, intermediate and terminating switching roles in both the
+National and International networks.  The driver provides interface to the OpenSwitch Call Framework
+application using the OpenSS7 Call Control Interface (CCI).  This is the same interface that is used
+by the ISUP, ISDN, SIP and H.323 drivers as well as OpenSS7 BSSAP, V5.2 and GR303 drivers.
+
+@node Session Initiation Protocol (SIP) Driver
+@subsection Session Initiation Protocol (SIP) Driver
+@cindex SIP
+
+The SIP driver performs the call functions necessary for switching calls under SIP control.  The
+driver is capable of acting as a SIP proxy or forwarding server and performing SIP-T ISUP/SIP
+interworking.  The driver provides interface to the OpenSwitch Call Framework application using the
+OpenSS7 Call Control Interface (CCI).  This is the same interface that is used by ISUP, BICC, ISDN
+and H.323 drivers as well as OpenSS7 BSSAP, V5.2 and GR303 drivers.
+
+@node H.323 Driver
+@subsection H.323 Driver
+@cindex H.323
+
+The H.323 driver performs the call functions necessary for switching calls under H.323 control.
+This includes both Network and User modes of operation and provides an integrated Gatekeeper.  The
+driver provides interface to the OpenSwitch Call Framework using the open OpenSS7 Call Control
+Interface (CCI).  This is the same interface that is used by the ISUP, BICC, ISDN and SIP drivers as
+well as OpenSS7 BSSAP, V5.2 and GR303 drivers.
+
+@node H.245 Data Link Module
+@subsection H.245 Data Link Module
+@cindex H.245 DL
+
+The data link modules performs H.245 encapsulation over TCP/IP provided by the INET driver.  This
+module converts between the TCP/IP transport and the Data Link Provider Interface (DLPI) common to
+H.245 and the ISDN Data Link (Q.921) signalling streams.  These streams are equivalent to ISDN
+D-channels and are linked under the H.323 driver in the same fashion as the Q.921 Data Link streams
+are linked under the ISDN driver.
+
+
+
+@node MG Stack
+@section MG Stack
+
+The @dfn{MG Stack} provides the @dfn{Media Gateway} functional capabilities for the VoIP Switch.  In
+initial phases of the VoIP Switch, this functionality is integral to the VoIP Switch platform and
+protocols used at the @dfn{N Interface} will not be exposed until subsequent phases of the project.
+
+The purpose of the @dfn{Media Gateway} function is to provide conversion between various media
+streams and channels and to provide switching capability between media streams and channels
+regardless of stream or channel type.
+
+Conferencing, switching and conversion of media streams and channels is performed under the control
+of a @dfn{Media Gateway} control protocol at the @dfn{N Interface}.  The MG stack provides external
+protocols and internal interfaces at the @dfn{N Interface}.  It also provides some lower level
+interfaces and protocols (multiplex and channel) that are utilized by the media gateway protocol
+modules to perform their functions.  Multiplex and channel drivers provide a suitable abstraction of
+underlying interface hardware for this purpose.
+
+The following drivers and modules provide both the control plane and data plane capability required
+by the @dfn{Media Gateway}:
+
+@menu
+* H.248/MEGACO Driver::
+* MGCP Driver::
+* Media Gateway (MG) Driver::
+* Channel Multiplex Module (MX)::
+* Real-Time Protocol/Real-Time Control Protocol (RTP/RTCP)::
+* TE410 Channel Driver (X400P-CH)::
+@end menu
+
+@node H.248/MEGACO Driver
+@subsection H.248/MEGACO Driver
+@cindex H.248
+@cindex MEGACO
+
+The MEGACO
+@footnote{H.248.1, "Gateway Control Protocol Version 1", (March 2002), Geneva, IUT-T
+Telecommunication Standardization Sector of ITU.}
+
+The MEGACO driver provides two roles: a @dfn{Media Gateway Controller} role and a @dfn{Media
+Gateway} role.
+
+In the @dfn{Media Gateway Controller} role, the MEGACO driver provides the OpenSS7 @dfn{Media
+Gateway Inteface (MGI)} primitive interface at upper streams and accepts IP transport streams (TCP
+or SCTP) linked underneath the driver to communication with the @dfn{Media Gateway}.
+
+In the @dfn{Media Gateway} role, the MEGACO driver provides a configuration control stream at the
+upper interface and accepts both IP transport stream (TCP or SCTP) linked underneath the driver, as
+well as @dfn{Media Gateway Interface (MGI)} streams linked underneath the driver to provide for
+control of a local media gateway from a remote @dfn{Media Gateway Controller}.
+
+The driver can act in both roles simultaneously, providing a proxy between a @dfn{Media Gateway
+Controller} and a @dfn{Media Gateway}.
+
+Although initial phases of the VoIP Switch will use this protocol at the @dfn{N Interface},
+@footnote{@xref{Reference Interface N}.} this interface will not be exposed until subsequent phases
+of the project.
+
+@node MGCP Driver
+@subsection MGCP Driver
+@cindex MGCP
+
+The MGCP
+@footnote{RFC 2705, "Media Gateway Control Protocol (MGCP) Version 1.0," (October, 1999), The
+Internet Society.@*RFC 3435, "Media Gateway Control Protocol (MGCP) Version 1.0," (January 2003),
+The Internet Society.}
+
+The MGCP driver provides two roles: a @dfn{Media Gateway Controller} role and a @dfn{Media
+Gateway} role.
+
+In the @dfn{Media Gateway Controller} role, the MGCP driver provides the OpenSS7 @dfn{Media
+Gateway Inteface (MGI)} primitive interface at upper streams and accepts IP transport streams (TCP
+or SCTP) linked underneath the driver to communication with the @dfn{Media Gateway}.
+
+In the @dfn{Media Gateway} role, the MGCP driver provides a configuration control stream at the
+upper interface and accepts both IP transport stream (TCP or SCTP) linked underneath the driver, as
+well as @dfn{Media Gateway Interface (MGI)} streams linked underneath the driver to provide for
+control of a local media gateway from a remote @dfn{Media Gateway Controller}.
+
+The driver can act in both roles simultaneously, providing a proxy between a @dfn{Media Gateway
+Controller} and a @dfn{Media Gateway}.
+
+Although initial phases of the VoIP Switch will use this protocol at the @dfn{N Interface},
+@footnote{@xref{Reference Interface N}.} this interface will not be exposed until subsequent phases
+of the project.
+
+@node Media Gateway (MG) Driver
+@subsection Media Gateway (MG) Driver
+@cindex MG
+
+The media gateway driver provides for switching between media streams within and across multiplexed
+media streams provided by the MX module below.  This component currently provides for local
+switching within the host platform, but has been designed to permit remote MG control using MGCP and
+MEGACO (H.248).  It also provides for continuity test tone generation, detection and loop back.  It
+performs conference on the fly and is also responsible for tone generation, playing announcements
+and detecting in-band DTMF digits.  The MG driver interfaces to the Q.699 Call Control application
+using the open OpenSS7 Media Gateway Interface (MGI) specification which permits for local switch
+fabric control as well as remote MG control using protocols such as MGCP and MEGACO (H.248).
+
+@node Channel Multiplex Module (MX)
+@subsection Channel Multiplex Module (MX)
+@cindex MX
+
+The function of the MX module is to provide access to multiple 64kbps channels over a single
+multiplexed media stream.
+
+@node Real-Time Protocol/Real-Time Control Protocol (RTP/RTCP)
+@subsection Real-Time Protocol/Real-Time Control Protocol (RTP/RTCP)
+@cindex RTP/RTCP
+
+The real-time protocol/real-time control protocol module is a MX (Multiplexdriver that runs over
+UDP, TCP or SCTP and provides an MX interface that can be linked under the Media Gateway (MG)
+driver.  RTP streams are managed by the Media Gateway (MG) driver in the same fashion as 64kbps
+channels, GSM 05.03 channels and other communications channels.
+
+@node TE410 Channel Driver (X400P-CH)
+@subsection TE410 Channel Driver (X400P-CH)
+@cindex TE405/410
+
+The function of the TE410 Channel driver is to provide for the termination of 64kbps digital
+paths on both the telephone network and OpenSS7 complex side of the device.  This driver provides
+direct access to the 64kbp digital path to OpenSS7 media and signalling protocol modules as well as
+providing E1 management, framing, coding, alarms, and synchronization.
+
+
+@node IP Transport Stack
+@section IP Transport Stack
+
+@menu
+* User Datagram Protocol (UDP)::
+* Transmission Control Protocol (TCP)::
+* Stream Control Transmission Protocol (SCTP)::
+@end menu
+
+@node User Datagram Protocol (UDP)
+@subsection User Datagram Protocol (UDP)
+@cindex UDP
+
+The INET driver provides a STREAMS interface (TPI) to the native Linux NET4 TCP/IP scokets
+implementation of UDP.  This permits UDP TPI streams to be linked as a basic transport under other
+OpenSS7 stack components such as the RTP/RTCP MX driver.
+
+@node Transmission Control Protocol (TCP)
+@subsection Transmission Control Protocol (TCP)
+@cindex TCP
+
+The INET driver provides a STREAMS interface (TPI) to the native Linux NET4 TCP/IP sockets
+implementation of TCP.  This permits TCP TPI streams to be linked as a basic transport under other
+OpenSS7 stack components such as SIP, H.323, MGCP, H.248 and TALI.
+
+@node Stream Control Transmission Protocol (SCTP)
+@subsection Stream Control Transmission Protocol (SCTP)
+@cindex SCTP
+
+OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
+transport protocol and provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS} SCTP
+implementation provides an NPI Version 2.0 and TPI Version 2.0 interface to its users.  Also
+supported is an X/Open XNS 5.2 XTI library.  The Linux Native SCTP implementation provides a Sockets
+interface.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{sctp(4), sctp(4), sctp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sctp, @b{sctp}(4)}.
+@end ifnotinfo
+
+@node Software Architecture
+@chapter Software Architecture
+@cindex Software architecture
+
+This chapter details the software configuration of OpenSS7 solutions.  Open SS7 stack software is
+based on the @dfn{STREAMS} facility running on the Linux Operating System.  The provides for use of
+the Linux Operating System while maintaining portability and consistency with major UNIX operating
+systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
+
+@menu
+* Linux Operating System::
+* STREAMS Facility::
+* OpenSS7 SS7 and SIGTRAN Stack::
+@end menu
+
+@node Linux Operating System
+@section Linux Operating System
+@cindex Linux
+
+The OpenSS7 @dfn{STREAMS} releases and stacks currently support the 2.4 Linux Kernel.  A Linux
+kernel version greater than or equal to 2.4.18 is recommended.  The Linux 2.5 and 2.6 kernel series
+are not yet supported.  The Linux 2.5 series will likely not ever be supported.  Linux 2.6 kernel
+series will be supported once the kernel releases stabilize.  Linux 2.4 kernels released by popular
+distributions are supported.  These include kernel.org releases, RedHat (7.2, 9, EL3), WhiteBox EL3,
+Fedora Core 1 (FC1), Debian Woody, SuSE 8.2.  Currently our preferred distribution is Fedora Core 1
+with all updates applied.
+@cindex RedHat
+@cindex WhiteBox EL3
+@cindex Debian
+@cindex SuSE
+@cindex Fedora
+
+@node STREAMS Facility
+@section STREAMS Facility
+@cindex STREAMS
+
+Although OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+stacks compile and install on PPC (MPC 8260), HPPA, and other processor architectures supported by
+the Linux 2.4 kernel.
+
+@menu
+* Linux STREAMS (LiS)::
+@end menu
+
+@node Linux STREAMS (LiS)
+@subsection Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+@cindex LiS
+
+@dfn{Linux STREAMS (LiS)}
+@footnote{At the time that this document what written, GCOM had just announced that it is no longer
+supporting the Open Source Linux STREAMS package.  The OpenSS7 Project continues to support our
+autoconf/RPM 2.16.18 releases of LiS until such time that Linux Fast-STREAMS is complete and
+available as a replacement.  The newer 2.18 GCOM releases are not supported.}
+is a mixture of LGPL and GPL code that is available from GCOM.  OpenSS7
+provides stabilized autoconf/RPM releases of LiS on the OpenSS7 Project website.  Current
+recommendations for the use of LiS is the LiS-2.16.18-19 release available from the OpenSS7 Project
+website.  Direct releases from GCOM are not recommended as the OpenSS7 releases have a number of
+patches that correct difficulties with the GCOM releases.  Also, OpenSS7 Project releases of
+LiS-2.16.18-19 include the OpenSS7  X/Open XNS 5.2 compatible XTI Library, timod and tirdwr modules,
+and corrected INET and LDL drivers.
+
+@node OpenSS7 SS7 and VoIP Stack
+@section OpenSS7 SS7 and VoIP Stack
+@cindex OpenSS7 SS7 and VoIP stack
+
+The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facility.  Protocol
+modules within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
+drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
+multiplexing drivers above a real or pseudo-device driver using @dfn{STREAMS} I_PUSH and I_LINK
+facilities.  As STEAMS modules (and drivers) run within the context of the Operating System Kernel
+using message-based scheduling, greatly increased performance is experienced over equivalent
+user-space applications.  @dfn{STREAMS} modules and drivers communicate by passing @dfn{STREAMS}
+message blocks upstream and downstream with bidirectional queueing and 256 levels of priority.  In
+addition, @dfn{STREAMS} provides memory management, timer, locking, synchronization, flow control
+and other facilities commonly used by protocol modules.
+
+@figure{osimap,21,SS7 to ISO/OSI Mapping}
+
+Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
+specialized interfaces.  Many of the OpenSS7 protocols modules provide TPI Version 2.0 interfaces
+with support for the OpenSS7 XTI/TLI Library.
+
+@figuresized{stack,22,STREAMS SS7/SIGTRAN Stack Architecture,3in}
+
+@figref{22} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
+pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
+equivalent SIGTRAN User Adaptation Layer (UA) can be used.  So, for example, between MTP Level 3 and
+its Users, the M3UA
+@cindex M3UA
+protocol can be employed.  Each UA provides the same lower layer interface and
+upper layer interface.  So, M3UA
+@cindex M3UA
+provides an MTP/MTP-User interface at its lower layer interface as
+well as at its upper layer interface.
+
+@node Hardware Architecture
+@chapter Hardware Architecture
+@cindex Hardware architecture
+
+@figref{23} illustrates the hardware configuration for the OpenSS7 VoIP Switch
+evaluation platform.
+
+@figuresized{platconf,23,Platform Architecture,5in}
+
+The VoIP Switch prototype platform consists of a high-end ix86 single or multi processor PC loaded
+with Linux running a 2.4 production kernel, LiS 2.16.18-22 and the OpenSS7 stack software.
+
+As a highly scalable and carrier grade alternative, the prototype system could use the CPC 388 cards
+@cindex CPC 388
+running embedded Linux 2.4.18 (NexusWare24) on MPC8260 and performing backplane switching on H.100
+and Ethernet rails on PCIMG 2.16 packet bus loaded with NexusWare (Linux 2.4.18), LiS 2.16.18-22 and
+the OpenSS7 stack software.
+
+SS7 ISUP IMTs and signalling links are terminated on the telephone network side of the device on one
+of a number of TE410, CPC-384 or CPC-388 cards installed in either platform.  On the other side
+of the platform, RTP connections are terminated on dual Ethernet devices or the PCIMG 2.16 packet
+bus.  Signalling is performed over the same IP connections using BICC/M3UA (NNI), SIP (UNI) or H.245
+(UNI).  The OpenSS7 complex side of the device is attached directly to the IP backbone and signals
+to remote BICC switches, SIP proxies/clients or H.323 gatekeepers/clients.
+
+The VoIP Switch prototype device performs conversion between the 64kbps voice channels terminated on
+the TE410, CPC-384 or CPC-388 cards on the telephone network side of the device to RTP streams
+on dual 10/100/1000 baseT or PICMG 2.16 packet bus using host or MPC8260 resources.
+
+OAM&P of the prototype platform is performed over an internal LAN connection.
+
+Hardware requirements are as follows:
+@itemize
+@item
+1 x medium end (2.0 GHz) single processor, 19" rack mount, hardened chassis PC, 110 VAC commercial
+power.
+@item
+2 x E400 Cards (or equivalent).
+@cindex E400P
+@item
+4 x 100baseT Ethernet NICs (3com 905B or equivalent).
+@end itemize
+
+For a redundant configuration (two hosts serving the same gateway), twice the hardware is
+required.
+
+@menu
+* Interface Devices::
+@end menu
+
+@node Interface Devices
+@section Interface Devices
+@cindex Interface devices
+
+@menu
+* T400P/E400P::
+* TE405/410::
+* A101/102/104c::
+* PCI 384::
+* Other Interface Cards::
+@end menu
+
+The interface device hardware cards listed below are supported for the OpenSS7 Platform.  All of the
+interface device hardware listed here has good price-performance, however, varying levels of
+performance (and therefore price) is available.  These cards are available either directly from the
+card manufacturer or are also resold by @uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+For the VoIP Switch application, either the CPC 388 cards are recommended.
+@cindex CPC 388
+
+The following interface device hardware is available for the OpenSS7 Platform:
+
+@node T400P/E400P
+@subsection T400P/E400P
+@cindex T400P
+@cindex E400P
+
+The T400P and E400P cards are 4-span T1 or E1 cards manufactured by
+@uref{http://www.govarion.com/, Varion}.  These cards were previously manufactured by
+@uref{http://www.digium.com/, Digium}.
+@figref{24} shows a picture of a T400P card.
+
+@figure{v400p,24,T400P/E400P}
+
+The T400P and E400P cards have the lowest level of signalling performance due to the lack of
+on-board HDLC functions.  Transfers to the host processor over the PCI bus use PCI I/O ports and
+memory mapping.
+
+@subsubheading Driver
+
+These cards are supported by the X400 driver.
+
+The function of the T/E400P Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the T400P and E400P cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item Dallas framer.
+@cindex Dallas framer
+@item PLX PCI 9030 PCI bus chip.
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Uses OpenSS7 Soft-HDLC engine for SS7, ISDN and ISO.
+@item 96 channels per card (T400P)
+@item 124 channels per card (E400P).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the T400P and E400P cards:
+
+@itemize @bullet
+@item Low cost.
+@item PC Compatibility.
+@item Released by Jim Dixon under the GNU Public License.
+@item Open Hardware design: schematics, artwork and Gerber plots available.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a number of Open Source drivers.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the T400P and E400P cards:
+
+@itemize @bullet
+@item Lower performance.
+@item No on-board HLDC.
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item I/O Port and Memory Map instead of PCI DMA bus-mastering and burst transfers.
+@item Does not run on high speed buses.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+Ultimately, the performance limiting factor of the T400P and E400P cards is the bandwidth of
+the PCI bus and the ability of the processor to perform Soft-HDLC and TDM switching in software.  A
+350MHz processor is capable of processing the bandwidth of an entire E400P card (124 signalling
+links) with a combined link throughput of 8.192 Mbps.
+
+For the OpenSS7 VoIP Switch, this performance is more than adequate.  A medium grade 2GHz
+PC should be capable of handling 2 cards (248 SS7 links) with adequate excess capacity available for
+background operations.
+
+These cards are very cost-effective and can provide 64kbps SS7 links at average incremental
+interface cost of approximately $8.00 USD per signalling link.
+
+@node TE405/410
+@subsection TE405/410
+@cindex TE405
+@cindex TE410
+
+The TE405/410 cards are 4-span E1/T1 cards manufactured by @uref{http://www.digium.com/,
+Digium}.
+These cards are a higher performance replacement for the T400P and E400P cards.
+@figref{25} shows a picture of a T405P card.
+
+@figure{t400p-ss7,25,TE405/410}
+
+The TE405 and TE410 cards have a low level of signalling performance due to the lack of
+on-board HDLC functions.  However, transfers to the host process over the PCI bus use bus-mastering
+PCI burst DMA transfers, unlike their T400P and E400P predecessors.
+
+@subsubheading Driver
+
+These cards are supported by the TE400 driver.
+
+The function of the TE405/410 Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the TE405 and TE410 cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item PMC Sierra framer
+@cindex PMC Sierra framer
+@item PLX PCI 9030 PCI bus chip.
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Uses OpenSS7 Soft-HDLC engine for SS7, ISDN and ISO.
+@item 96 channels per card (T1).
+@item 124 channels per card (E1).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the TE405 and TE410 cards:
+
+@itemize @bullet
+@item Lower cost.
+@item PCI DMA bus-mastering and burst transfers.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a number of Open Source drivers.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the TE405 and TE410 cards:
+
+@itemize @bullet
+@item Lower performance, although better than predecessor.
+@item No on-board HLDC.
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+As with their predecessors, the performance limiting factor of the TE405 and TE410 cards is
+the bandwidth of the PCI bus and the ability of the processor to perform Soft-HDLC and TDM switching
+in software.  A 350MHz processor is capable of processing the bandwidth of an entire TE405 card
+(124 signalling link) with a combined linke throughput of 8.192 Mbps.
+
+For the OpenSS7 VoIP Switch, this performance is more than adequate.  A medium grade 2GHz PC should
+be capable of handling 2 cards (248 SS7 links) with adequate excess capacity available for
+background operations.
+
+These cards are cost-effective and can provide 64kbps SS7 links at average incremental interface
+cost of approximately $12.00 USD per signalling link.
+
+@node A101/102/104c
+@subsection A101/102/104c
+@cindex A101c
+@cindex A102c
+@cindex A104c
+
+The A101/102/104c cards are 1-, 2- and 4-span E1, T1 or J1 cards manufactured by
+@uref{http://www.sangoma.com/, Sangoma}.
+@figref{26} shows a picture of an A101c card.
+
+@figure{a101c,26,A101/102/104c}
+
+The A10Xc cards have an increased level of signalling performance due to availability of on-board
+HDLC processing.  Transfers to the host are performed using bus-mastering PCI DMA burst transfers
+for lower host processor overhead.  These cards do not support direct on-board TDM switching;
+neither do they have integrated Ethernet.
+
+@subsubheading Driver
+
+These cards are supported by the A100 driver.
+
+The function of the A100 Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the A101c, A102c and A104c cards:
+
+@itemize @bullet
+@item 1, 2 or 4 E1 spans per card.
+@item PMC Comet framer.
+@cindex Comet framer
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Can use OpenSS7 Soft-HDLC engines for SS7, ISDN and ISO.
+@item Also provides for onboard HLDC (SS7 DAEDR/DAEDT AERM/SUERM).
+@item 24, 48 and 96 channels per card (T1 A101, A102 and A104).
+@item 31, 62 and 124 channels per card (E1 A101, A102 and A104).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the A101, A102 and A104 cards:
+
+@itemize @bullet
+@item Low cost.
+@item PC Comaptibility.
+@item Homolgomation and world-wide support.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a wide range of Open Source drivers.
+@item Linux kernel WAN support.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the A101, A102 and A104 cards:
+
+@itemize @bullet
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+The performance limiting factor of the A101c, A102c and A104c cards is the bandwidth of the PCI bus
+and the ability of the processor to perform TDM switching is software.
+
+For the OpenSS7 VoIP Switch, this performance is more than adequate, particularly as TDM switching
+is not a requirement for this pure signalling application.  Although these cards lack integrated
+Ethernet support, for the non-redundant switching application, and where interworking between
+SIGTRAN and SS7 is not required, this is not a limitation.
+
+These cards have excellent price-performance and can provide 64kbps SS7 links at average incremental
+interface cost of approximately $12.00 USD per signalling link.
+
+@node PCI 384
+@subsection PCI 384
+@cindex PCI 384
+
+The PCI 384 card is a 4-span E1/T1/J1 cards with 10/100baseT Ethernet manufactured by
+@uref{http://www.pti.com/, Performance Technologies}.
+@figref{27} shows a picture of an PCI 384 card.
+
+@figure{t400p-ss7,27,PCI 384}
+
+The PCI 384 cards have the highest level of signalling performance because they have an on-board
+PowerQUICC II processor that performs Layer 2 (HDLC) and even some Layer 3 functions.  Transfers to
+the host are performed over SIGTRAN protocols using the on-board Ethernet interface, or over the PCI
+bus in a bus mastering mode.  OpenSS7 @dfn{STREAMS} drivers and modules run directly on the card.
+
+The PCI 384 cards have an integral H.110 bus that can be connected using ribbon cable between cards
+providing for non-blocking switching of 4096 channels between cards.  In E1 mode, these cards each
+provide 124 channels of SS7, ISDN or voice.  In T1 or J1 mode, these cards each provide 96 channels
+of SS7, ISDN or voice.
+
+The PCI 384 card accepts the same software as the CPC 388 (@pxref{CPC 388}) card for a carrier-grade
+evolution path.
+@cindex CPC 388
+
+@subsubheading Driver
+
+These cards are supported by the CPC-388 drivers.
+
+The function of the CPC-388 MG driver is to provide for the switching and termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital patchs to OpenSS7 meida and signalling protocol modules as well as
+providing T1 or E1 management, protection switching, monitoring, framing, coding, alarms, and
+synchronization.  It also provides to the switching of TDM channels on card and between cards via
+the H.110 TDM bus.
+
+@subsubheading Features
+
+Following are the features of the PCI 384 cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item FALC framer.
+@cindex FALC framer
+@item Motorola PowerQUICC II MPC 8260 200Mhz processor running embedded Linux.
+@item PowerSpan Bus-mastering PCI interface with mailbox support.
+@item OpenSS7 SS7, SIGTRAN, ISDN and VoIP stacks run on-card.
+@item Minimal host processor transfer over PCI bus.
+@item Scalable to 4096 channels.
+@item Can utilizes OpenSS7 Soft-HDLC engine on-card for SS7, ISDN and ISO.
+@item 96 channels per card (T1).
+@item 124 channels per card (E1).
+@item Full span addressable.
+@item Internal H.110 expansion bus.
+@item Integrated 10/100baseT Ethernet (MPC8260 FCC).
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the PCI 384 cards:
+
+@itemize @bullet
+@item Highest performance.
+@item Internal H.110 bus.
+@item Internal/External 10/100baseT Ethernet.
+@item On-board TDM switch.
+@item Flash programmable MPC8260 chip.
+@item Field upgradable.
+@item Software compatible with CPC 388 (@pxref{CPC 388}).
+@item OpenSource NexusWare Linux Kernel distribution.
+@item Multiple cards can synchronize of of same H.110 bus.
+@cindex CPC 388
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the PCI 384 cards:
+
+@itemize @bullet
+@item Higher cost.
+@item Non-redundant.
+@item Cannot be hot-swapped.
+@end itemize
+
+
+@node Other Interface Cards
+@subsection Other Interface Cards
+@cindex Other interface cards
+
+Additional interface cards could be implemented in other phases of the project.  For additional
+information, @pxref{Optional Hardware Support}.
+
+@node Platform Architecture
+@chapter Platform Architecture
+@cindex Platform architecture
+
+This section details the platform architecture.  The solution platform architecture consists of the
+computing platform and associated hardware, interfaces and peripherals.
+
+@figref{13} illustrates the solution platform rack configuration.
+
+@figure{rack,13,Rack Mount Components}
+
+The solution platform consists of the following:
+
+@itemize ---
+@item One hardened PC (2U) chassis per system.
+@item One 10/100/1000 Mblks (10/100/1000baseT) RJ-45c Layer 2 Ethernet Switch.
+@end itemize
+
+@heading Platform Capacity
+
+The PC chassis is equipped with the following:
+@footnote{For detailed sizing considerations, @pxref{Platform Sizing}.}
+
+@menu
+* PT CPC 388 Based Platform::
+* HP cc3310 Based Platform::
+* Dell PowerEdge 2650 Based Platform::
+@end menu
+
+@node PT CPC 388 Based Platform
+@section PT CPC 388 Based Platform
+@cindex CPC 388
+
+@node HP cc3310 Based Platform
+@section HP cc3310 Based Platform
+@cindex HP cc3310
+
+@node Dell PowerEdge 2650 Based Platform
+@section Dell PowerEdge 2650 Based Platform
+@cindex Dell PowerEdge 2650
+
+@node System Architecture
+@chapter System Architecture
+@cindex System architecture
+
+This section details the solution system architecture.  The solution system architecture consists of
+the computing platforms and their placement within the local installation environment.
+
+The solution system has the following requirements: 
+
+@itemize ---
+@item 19" rack
+@item 110 to 220 VAC or -48 VDC electical power.
+@item Commercial cooling.
+@item Bantam to RJ48c patch panel.
+@end itemize
+
+@menu
+* PT CPC 388 Based System::
+* HP cc3310 Based System::
+* Dell PowerEdge 2650 Based System::
+@end menu
+
+@node PT CPC 388 Based System
+@section PT CPC 388 Based System
+@cindex CPC 388
+
+@node HP cc3310 Based System
+@section HP cc3310 Based System
+@cindex HP cc3310
+
+@node Dell PowerEdge 2650 Based System
+@section Dell PowerEdge 2650 Based System
+@cindex Dell PowerEdge 2650
+
+@node Logistics
+@chapter Logistics
+@cindex Logistics
+
+@menu
+* Schedule::
+@end menu
+
+@section Hardware
+
+@subsection Sizing Considerations
+
+@section Software
+
+@section Consulting
+
+@node Schedule
+@section Schedule
+@cindex schedule
+
+@subsection Gate 0 --- Concept
+
+@subsection Gate 1 --- High-Level Design
+
+@subsection Gate 2 --- Detailed Design
+
+@subsection Gate 3 --- Development and Implementation
+
+@subsection Gate 4 --- System Test
+
+@subsection Gate 5 --- Acceptance Testing
+
+@subsection Gate 6 --- Support Complete
+
+@section Cost
+
+@node Optional Application Support
+@appendix Optional Application Support
+@cindex Optional application support
+
+@section Other Solution Architecture
+
+@subsection ISDN to ISUP Conversion
+
+@node Optional Network Support
+@appendix Optional Network Support
+@cindex Optional network support
+
+@section VoIP Switch Reference Interfaces
+
+@node Optional Protocol Support
+@appendix Optional Protocol Support
+@cindex Optional protocol support
+
+@menu
+* Other Protocol Components
+@end menu
+
+@node Other Protocol Components
+@section Other Protocol Components
+@cindex Other protocol components
+
+@menu
+* SCCP User Adaptation Layer (SUA) Driver::
+* MTP Level 3 Broadband (MTP3b) Module::
+* Service Specific Connection Oriented Protocol (SSCOP) Driver::
+* MTP Level 2 User Adaptation Layer (M2UA) Driver::
+@end menu
+
+@node SCCP User Adaptation Layer (SUA) Driver
+@subsection SCCP User Adaptation Layer (SUA) Driver
+@cindex SCCP User Adaptation Layer (SUA) Driver
+@cindex SUA
+
+The SUA driver provides the OpenSS7 VoIP Switch with the ability to act as an SUA AS (Application
+Server) in conjunction with an SUA SG (Signalling Gateway).  In this project, the SG function is
+performed by existing lab equipment.  The SUA driver accepts the transport of the SCCP to SCCP-User
+interface from the SG to the MGC.  The SUA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the
+transport services for exporting the SCCP-User interface.  The SUA driver provides the same
+interfaces to its users as the OpenSS7 SCCP.
+
+The SUA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+@node MTP Level 3 Broadband (MTP3b) Module
+@subsection MTP Level 3 Broadband (MTP3b) Module
+@cindex MTP Level 3 Broadband (MTP3b) Module
+@cindex MTP3b
+
+@node Service Specific Connection Oriented Protocol (SSCOP) Driver
+@subsection Service Specific Connection Oriented Protocol (SSCOP) Driver
+@cindex Service Specific Connection Oriented Protocol (SSCOP) Driver
+@cindex SSCOP
+
+@node MTP Level 2 User Adaptation Layer (M2UA) Driver
+@subsection MTP Level 2 User Adaptation Layer (M2UA) Driver
+@cindex MTP Level 2 User Adaptation Layer (M2UA) Driver
+@cindex M2UA
+
+The M2UA driver provides the OpenSS7 VoIP Switch with the ability to act as an M2UA AS (Application
+Server) in conjunction with an M2UA SG (Signalling Gateway). In this project, the SG function is
+performed by existing lab equipment.  The M2UA driver accepts the transport of the SL to SL-User
+interface from the SG to the MGC.  The M2UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport
+services for exporting the SL-User interface.  The M2UA driver provides the same interface to its
+users as the OpenSS7 SL module.
+
+@node Optional Software Support
+@appendix Optional Software Support
+@cindex Optional software support
+
+@section Operating System Options
+
+@section STREAMS Options
+
+@subsection Linux Fast-STREAMS (LfS)
+
+@node Optional Hardware Support
+@appendix Optional Hardware Support
+@cindex Optional hardware support
+
+@menu
+* Other Interface Devices::
+@end menu
+
+@node Other Interface Devices
+@section Other Interface Devices
+@cindex Other interface devices
+
+This section provides information on additional interface cards available for use with the OpenSS7
+SS7, SIGTRAN, ISDN and VoIP stacks:
+
+@menu
+* ACB56::
+* CPC 388::
+* CPC 396::
+* PCA 200E::
+* BRI::
+@end menu
+
+@iftex
+@table @asis
+
+@item @ref{ACB56}
+An EISA V.35 card.
+
+@item @ref{CPC 388}
+A CompactPCI Octal E1/T1/J1 card with embedded Linux.
+@cindex CPC 388
+
+@item @ref{CPC 396}
+A CompactPCI Dual T3 card with embedded Linux.
+
+@item @ref{PCA 200E}
+A 155 MHz ATM card.
+
+@item @ref{BRI}
+An ISDN BRI card.
+
+@end table
+@end iftex
+
+@node ACB56
+@subsection ACB56
+@cindex ACB56
+
+The ACB56 cards are single V.35 56/64kbps synchronous cards manufactured by
+SeaLevel Systems and distributed by ICS.
+@figref{A-13} shows a picture of an ACB56 card.
+
+@figure{acb56,A-13,ACB56}
+
+@subsubheading Driver
+
+The driver for the ACB56 card provides, CH, SDL or SDT access to the card.  The CH or SDL driver
+places the Zilog part into transparent mode and passes octets directly off the line to the channel
+or signalling data link driver.  The SDT driver places the Zilog part into HDLC mode and performs
+SS7 HDLC using the Zilog SCC.  The SDT driver performs better, of course, than the CH or SDL
+drivers, however, the Zilog SCC HDLC is incapable of performing some SS7 functions that are provided
+by the OpenSS7 SDT (SS7-HDLC) module for the CH or SDL drivers.
+
+@subsubheading Features
+
+Following are some features of the ACB56 card:
+@itemize
+@item 1 x V.35 56kbps or 64 kbps synchronous port on DB-25 connector.
+@item DB-25 to N-type cable available.
+@item 56 kbps or 64kbps DTE mode.
+@item 56 kbps DCE mode.
+@item Based on Zilog 80585 Serial Communications Controller (SCC).
+@item ISA Bus.
+@item Supports dual-channel ISA DMA.
+@item Also supports RS-232C although not useful for SS7.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the ACB56 card:
+@itemize
+@item Provides V.35 interface where necessary.
+@end itemize
+
+The ACB56 card has few advantages.  It only provides low-cost V.35 interface where absolutely
+necessary.  Any other V.35 capable card might be a better choice.
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the ACB56 card:
+@itemize
+@item ISA bus.
+@item Low density.
+@item Limited number of cards per host due to ISA IRQ and DMA limitations.
+@item Needs external CSU/DSU.
+@item Does not support TDM voice channels.
+@end itemize
+
+Due to its disadvantages, another V.35 card (PCI based, higher density, integrated CSU/DSU) should
+be considered where V.35 interface is completely necessary.
+
+The OpenSS7 VoIP Switch does not have a requirement for V.35 interface and this card is not used on
+the deployment platform.  If V.35 interface becomes a requirement at a later date, a different card
+will be selected.  The selected card will have a higher density, PCI with PCI DMA and bus-mastering,
+integrated CSU/DSU, and other features absent from the ACB56 card.
+
+@node CPC 388
+@subsection CPC 388
+@cindex CPC 388
+
+The CPC 388 cards are 8-span E1/T1/J1 cards with dual-port Ethernet in a CompactPCI PCMIG 2.15 card
+manufactured by @uref{http://www.pti.com/, Performance Technologies}.
+@figref{A-14} shows a picture of an CPC 388 card.
+
+@figure{cpc388,A-14,CPC 388}
+
+The CPC 388 cards have a high level of signalling performance because they have an on-board
+PowerQUICC II processor running an embedded Linux operating system (NexusWare based on YellowDog).
+The embedded processor performs Layer 2 (HDLC) and even some Layer 3 functions and higher functions.
+These cards can run as stand-alone hosts or can transfer to a host SBC over the PCMIG 2.15 dual
+Ethernet bus or CompactPCI bus.  OpenSS7 @dfn{STREAMS} drivers and modules, as well as complete
+applications can be run directly on the card.
+
+The CPC 388 cards have an integral H.110 bus and TDM switch that communicate over the PCMIG 2.15 TDM
+bus.  This provides for non-blocking switching of up to 4096 TDM channels across the backplane.  In
+E1 mode (and with an E1 RTM), these cards provide 248 channels of SS7, ISDN or voice.  In T1 or J1
+mode, these cards each provide 192 channels of SS7, ISDN or voice.
+
+The CPC 388 cards accept the same software as the PCI 384 cards (and dual T3 CPC 396 cards,
+@cindex CPC 396
+@pxref{CPC 396}) providing a carrier-grade evolution path from m the PCI 384.
+
+@subsubheading Driver
+
+@itemize @bullet
+@item Provides @dfn{STREAMS} Media Gateway (MG) Interface that controls onboard TDM switch and H.110 bus.
+@item Provides Soft-HDLC for Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B operation.
+@item Provides G.804/AF-PHY-00016 ATM/PDH E1 or T1 SAAL.
+@end itemize
+
+@subsubheading Features
+
+Following are the features of the CPC 388 cards:
+
+@itemize @bullet
+@item Octal E1/T1/J1 (requires appropriate RTM).
+@item Dual E1/T1/J1 monitoring ports.
+@item Dual QuadFALC framers.
+@item Mitel/Zarlink MT 20098 H.110 switch.
+@item Dual FCC 10/100baseT Ethernet Ports (RTM RJ-45 or J5 connector).
+@item Tundra PowerSpan CompactPCI interface.
+@item 200MHz Motorola PowerQUICC II (MPC8260) processor.
+@item 256 Mb SDRAM.
+@item 128 Mb Flash.
+@item Runs NexusWare embedded Linux operating system.
+@item 2 serial ports.
+@item Individual E1/T1/J1 status LEDs on front panel.
+@item Blue ejector LED.
+@item Hot swappable (per PCMIG 2.15).
+@item NEBS Compliant (lights on front, wires on back)
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the CPC 388 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the CPC 388 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@node CPC 396
+@subsection CPC 396
+@cindex CPC 396
+
+The CPC 396 cards are dual T3 cards with dual-port Ethernet in a CompactPCI PCMIG 2.15 card
+manufactured by @uref{http://www.pti.com/, Performance Technologies}.
+@figref{A-15} shows a picture of an CPC 396 card.
+
+@figure{cpc396,A-15,CPC 396}
+
+@subsubheading Driver
+
+@subsubheading Features
+
+Following are the features of the CPC 396 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the CPC 396 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the CPC 396 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@node PCA 200E
+@subsection PCA 200E
+@cindex PCA 200E
+
+The PCA 200E card is a 155MHz ATM card manufactured by Marconi (formerly FORE).
+@figref{A-16} shows a picture of an PCA 200E card.
+
+@figure{pca200e,A-16,PCA 200E}
+
+The PCA 200E cards have a good level of signalling performance because they have an on-board 25MHz
+i960 Intel RISC processor performing cell processing using buffer rings in the same manner as an
+Ethernet controller.
+
+@subsubheading Driver
+
+@subsubheading Features
+
+Following are the features of the PCA 200E cards:
+
+@itemize @bullet
+@item 155 MHz ATM, ST/SC SM/MM and RJ-45 UTP 5
+@item AAL1, AAL2, AAL3 and AAL5 modes.
+@item Integrated 25 MHz i960 RISC cell processor.
+@item Enhance SAR Processor (ESP) ASIC
+@item Special-purpose hardware for AAL5 and AAL3/4, HEC, and CRC calculations.
+@item Dual-ported RAM and Buffer Ring technique similar to Ethernet Controller.
+@item Serial communications emulation.
+@item Supports ABR
+@item ATM cell processing per ANSI T1S1.5/92-002R3, ITU I.361, ATM Form UNI v3.0, 3.1, 4.0
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the PCA 200E cards:
+
+@itemize @bullet
+@item Inexpensive (about $200 a card).
+@item Supports MTP3b.
+@item Can support 3GPP UMTS Iu User and Control Plane over PVCs.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the PCA 200E cards:
+
+@itemize @bullet
+@item Does not support traditional SS7 links.
+@item Requires external ATM switch or point-to-point ATM connection.
+@end itemize
+
+@node BRI
+@subsection BRI
+@cindex BRI
+
+A BRI card.
+
+@figure{bri,A-17,BRI}
+
+@subsubheading Driver
+
+@subsubheading Features
+
+Following are the features of the BRI cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the BRI cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the BRI cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+
+@node Programmatic Interfaces
+@appendix Programmatic Interfaces
+@cindex Programmatic interfaces
+
+@node Platform Sizing
+@appendix Platform Sizing
+@cindex Platform sizing
+
+@node Index
+@unnumbered Index
+@printindex cp
+
+@page
+@shortcontents
+@page
+@contents
+@bye

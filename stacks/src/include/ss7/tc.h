@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.4 2004/10/19 10:03:51 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.5 2004/11/05 00:56:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/10/19 10:03:51 $ by $Author: brian $
+ Last Modified $Date: 2004/11/05 00:56:30 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  Primitive definitions for TC-Users and TC-Providers.
@@ -225,8 +225,8 @@ typedef struct TC_unbind_req {
  *  TC_OK_ACK
  */
 typedef struct TC_ok_ack {
-	ulong PRIM_type;
-	ulong CORRECT_prim;
+	ulong PRIM_type;		/* Always TC_OK_ACK */
+	ulong CORRECT_prim;		/* correct primitive */
 } TC_ok_ack_t;
 
 /*
@@ -431,7 +431,7 @@ typedef struct TC_cont_req TC_conv_req_t;
  *  Also TC_CONV_IND for ASNI.
  */
 typedef struct TC_begin_con {
-	ulong PRIM_type;		/* Always TC_CONT_IND */
+	ulong PRIM_type;		/* Always TC_BEGIN_CON */
 	ulong OPT_length;		/* Options associated with the primitive */
 	ulong OPT_offset;		/* Options associated wtih the primitive */
 	ulong DIALOG_id;		/* Dialog Identifier */

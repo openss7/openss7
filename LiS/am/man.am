@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/10/13 09:47:52 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/11/05 01:03:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 09:47:52 $ by $Author: brian $
+# Last Modified $Date: 2004/11/05 01:03:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,40 +67,40 @@ if COOKED_MANPAGES
 $(man_MANS):: %: %.man
 	@p=`echo $@ | sed -e 's|/[^/]*$$||'` ; \
 	$(mkdir_p) $$p ; \
-	echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
+	echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
 $(man1_MANS):: %.1: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
 
 $(man2_MANS):: %.2: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
 
 $(man3_MANS):: %.3: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
 
 $(man4_MANS):: %.4: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
 
 $(man5_MANS):: %.5: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
 
 $(man6_MANS):: %.6: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
 
 $(man7_MANS):: %.7: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
 
 $(man8_MANS):: %.8: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
+	@echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
 
 $(man_MANS):: $(man_MACROS)
 $(man1_MANS):: $(man_MACROS)

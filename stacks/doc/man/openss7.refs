@@ -323,99 +323,6 @@
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3436.txt
 
-%K rfc2976
-%L RFC 2976
-%R RFC 2976
-%A Steve Donovan
-%E Steve Donovan
-%Q The Internet Society
-%T The SIP INFO Method
-%D October 2000
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2976.txt
-
-%K rfc3204
-%L RFC 3204
-%R RFC 3204
-%A Eric Zimmerer
-%A Aparna Vemuri
-%A Jon Peterson
-%A Lyndon Ong
-%A Francois Audet
-%A Ho Zonoun
-%A M. Watson
-%E Eric Zimmerer
-%Q The Internet Society
-%T MIME Media Types for ISUP and QSIG Objects
-%D December 2001
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3204.txt
-
-%K rfc3261
-%K siprfc
-%L RFC 3261
-%R RFC 3261
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%A Gonzalo Camarillo
-%A Alan Johnston
-%A Jon Peterson
-%A Robert Sparks
-%A Mark Handley
-%A Eve Schooler
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T SIP: Session Initiation Protocol
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3261.txt
-
-%K rfc3262
-%L RFC 3262
-%R RFC 3262
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T Reliability of Provisional Responses in the Session Initiation Protocol (SIP)
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3262.txt
-
-%K rfc3263
-%L RFC 3263
-%R RFC 3263
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T Session Initiation Protocol (SIP): Locating SIP Servers
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3263.txt
-
-%K rfc3265
-%L RFC 3265
-%R RFC 3265
-%A Adam Roach
-%E Adam Roach
-%Q The Internet Society
-%T Session Initiation Protocol (SIP)-Specific Event Notification
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3265.txt
-
-%K rfc3361
-%L RFC 3361
-%R RFC 3361
-%A Henning Schulzrinne
-%E Henning Schulzrinne
-%Q The Internet Society
-%T Dynamic Host Configuration Protocol (DHCP-for-IPv4) Option for Session Initiation Protocol (SIP) Servers
-%D August 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3361.txt
-
 %K rfc3310
 %L RFC 3310
 %R RFC 3310
@@ -429,30 +336,6 @@
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3310.txt
 
-%K rfc3311
-%L RFC 3311
-%R RFC 3311
-%A Jonathan Rosenberg
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T The Session Initiation Protocol UPDATE Method
-%D September 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3311.txt
-
-%K rfc3312
-%L RFC 3312
-%R RFC 3312
-%A Gonzalo Camarillo
-%A Bill Marshall
-%A Jonathan Rosenberg
-%E Gonzalo Camarillo
-%Q The Internet Society
-%T Integration of Resource Management and Session Initiation Protocol (SIP)
-%D October 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3312.txt
-
 %K rfc3420
 %L RFC 3420
 %R RFC 3420
@@ -463,107 +346,6 @@
 %D November 2002
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3420.txt
-
-%K rfc3323
-%L RFC 3323
-%R RFC 3323
-%A Jon Peterson
-%E Jon Peterson
-%Q The Internet Society
-%T A Privacy Mechanism for the Session Initiation Protocol (SIP)
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3323.txt
-
-%K rfc3325
-%L RFC 3325
-%R RFC 3325
-%A Cullen Jennings
-%A Jon Peterson
-%A Mark Watson
-%E Cullen Jennings
-%Q The Internet Society
-%T Privacy Extensions to the Session Initiation Protocol (SIP) for Asserted Identity with Trusted Networks
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3325.txt
-
-%K rfc3428
-%L RFC 3428
-%R RFC 3428
-%A Ben Campbell
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%A Christian Huitema
-%A David Gurle
-%E Ben Campbell
-%Q The Internet Society
-%T Session Initiation Protocol (SIP) Extension for Instant Messaging
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3428.txt
-
-%K rfc3326
-%L RFC 3326
-%R RFC 3326
-%A Henning Schulzrinne
-%A David R. Oran
-%A Gonzalo Camarillo
-%E Henning Schulzrinne
-%Q The Internet Society
-%T The Reason Header Field for the Session Initiation Protocol (SIP)
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3326.txt
-
-%K rfc3327
-%L RFC 3327
-%R RFC 3327
-%A Dean Willis
-%A Bernie Hoeneisen
-%E Dean Willis
-%Q The Internet Society
-%T Session Initiation Protocol (SIP) Extension Header Field for Registering Non-Adjacent Contacts
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3327.txt
-
-%K rfc3329
-%L RFC 3329
-%R RFC 3329
-%A Jari Arkko
-%A Vesa Torvinen
-%A Gonzalo Camarillo
-%A Aki Niemi
-%A Tao Haukka
-%E Jari Arkko
-%Q The Internet Society
-%T Security Mechansim Agreement for the Session Initiation Protocol (SIP)
-%D January 2003
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3329.txt
-
-%K rfc3313
-%L RFC 3313
-%R RFC 3313
-%A Bill Marshall
-%E Bill Marshall
-%T Privacy Session Initiation Protocol (SIP) Extensions for Media Authorization
-%D January 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3313.txt
-
-%K rfc3515
-%L RFC 3515
-%R RFC 3515
-%A Robert J. Sparks
-%E Robert J. Sparks
-%Q The Internet Society
-%T The Session Initiation Protocol (SIP) Refer Method
-%D April 2003
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3515.txt
 
 %K rfc3525
 %L RFC 3525
@@ -610,7 +392,7 @@
 %D August 2000
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc3885.txt
+%U http://www.ietf.org/rfc/rfc2885.txt
 
 %K rfc2805
 %L RFC 2805
@@ -621,7 +403,7 @@
 %D April 2000
 %Q The Internet Society
 %I The Internet Society
-%U http://www.ietf.org/rfc/rfc3805.txt
+%U http://www.ietf.org/rfc/rfc2805.txt
 
 %K rfc2897
 %L RFC 2897
@@ -774,6 +556,267 @@
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3094.txt
 
+%K rfc2976
+%L RFC 2976
+%R RFC 2976
+%A Steve Donovan
+%E Steve Donovan
+%Q The Internet Society
+%T The SIP INFO Method
+%D October 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2976.txt
+
+%K rfc3204
+%L RFC 3204
+%R RFC 3204
+%A Eric Zimmerer
+%A Aparna Vemuri
+%A Jon Peterson
+%A Lyndon Ong
+%A Francois Audet
+%A Ho Zonoun
+%A M. Watson
+%E Eric Zimmerer
+%Q The Internet Society
+%T MIME Media Types for ISUP and QSIG Objects
+%D December 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3204.txt
+
+%K rfc3261
+%K siprfc
+%L RFC 3261
+%R RFC 3261
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%A Gonzalo Camarillo
+%A Alan Johnston
+%A Jon Peterson
+%A Robert Sparks
+%A Mark Handley
+%A Eve Schooler
+%E Jonathan Rosenberg
+%Q The Internet Society
+%T SIP: Session Initiation Protocol
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3261.txt
+
+%K rfc3262
+%L RFC 3262
+%R RFC 3262
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Jonathan Rosenberg
+%Q The Internet Society
+%T Reliability of Provisional Responses in the Session Initiation Protocol (SIP)
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3262.txt
+
+%K rfc3263
+%L RFC 3263
+%R RFC 3263
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Jonathan Rosenberg
+%Q The Internet Society
+%T Session Initiation Protocol (SIP): Locating SIP Servers
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3263.txt
+
+%K rfc3265
+%L RFC 3265
+%R RFC 3265
+%A Adam Roach
+%E Adam Roach
+%Q The Internet Society
+%T Session Initiation Protocol (SIP)-Specific Event Notification
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3265.txt
+
+%K rfc3311
+%L RFC 3311
+%R RFC 3311
+%A Jonathan Rosenberg
+%E Jonathan Rosenberg
+%Q The Internet Society
+%T The Session Initiation Protocol UPDATE Method
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3311.txt
+
+%K rfc3312
+%L RFC 3312
+%R RFC 3312
+%A Gonzalo Camarillo
+%A Bill Marshall
+%A Jonathan Rosenberg
+%E Gonzalo Camarillo
+%Q The Internet Society
+%T Integration of Resource Management and Session Initiation Protocol (SIP)
+%D October 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3312.txt
+
+%K rfc3313
+%L RFC 3313
+%R RFC 3313
+%A Bill Marshall
+%E Bill Marshall
+%T Privacy Session Initiation Protocol (SIP) Extensions for Media Authorization
+%D January 2003
+%Q The Internet Society
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3313.txt
+
+%K rfc3323
+%L RFC 3323
+%R RFC 3323
+%A Jon Peterson
+%E Jon Peterson
+%Q The Internet Society
+%T A Privacy Mechanism for the Session Initiation Protocol (SIP)
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3323.txt
+
+%K rfc3325
+%L RFC 3325
+%R RFC 3325
+%A Cullen Jennings
+%A Jon Peterson
+%A Mark Watson
+%E Cullen Jennings
+%Q The Internet Society
+%T Privacy Extensions to the Session Initiation Protocol (SIP) for Asserted Identity with Trusted Networks
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3325.txt
+
+%K rfc3326
+%L RFC 3326
+%R RFC 3326
+%A Henning Schulzrinne
+%A David R. Oran
+%A Gonzalo Camarillo
+%E Henning Schulzrinne
+%Q The Internet Society
+%T The Reason Header Field for the Session Initiation Protocol (SIP)
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3326.txt
+
+%K rfc3327
+%L RFC 3327
+%R RFC 3327
+%A Dean Willis
+%A Bernie Hoeneisen
+%E Dean Willis
+%Q The Internet Society
+%T Session Initiation Protocol (SIP) Extension Header Field for Registering Non-Adjacent Contacts
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3327.txt
+
+%K rfc3329
+%L RFC 3329
+%R RFC 3329
+%A Jari Arkko
+%A Vesa Torvinen
+%A Gonzalo Camarillo
+%A Aki Niemi
+%A Tao Haukka
+%E Jari Arkko
+%Q The Internet Society
+%T Security Mechansim Agreement for the Session Initiation Protocol (SIP)
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3329.txt
+
+%K rfc3361
+%L RFC 3361
+%R RFC 3361
+%A Henning Schulzrinne
+%E Henning Schulzrinne
+%Q The Internet Society
+%T Dynamic Host Configuration Protocol (DHCP-for-IPv4) Option for Session Initiation Protocol (SIP) Servers
+%D August 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3361.txt
+
+%K rfc3372
+%K bcp63
+%L BCP 63
+%R BCP 63 (RFC 3372)
+%A Aparna Vemuri
+%A Jon Peterson
+%E Aparna Vemuri
+%T Session Initiation Protocol for Telephones (SIP-T): Context and Architectures
+%D September 2002
+%Q The Internet Society
+%I The Internet Society
+%U http://www.ietf.org/rfc/bcp/bcp63.txt
+
+%K rfc3398
+%L RFC 3398
+%R RFC 3398
+%A Gonzalo Camarillo
+%A Adam Roach
+%A Jon Peterson
+%A Lyndon Ong
+%E Gonzalo Camarillo
+%T Integrated Services Digital Network (ISDN) User Part (ISUP) to Session Initiation Protocol (SIP) Mapping
+%D December 2002
+%Q The Internet Society
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3398.txt
+
+%K rfc3428
+%L RFC 3428
+%R RFC 3428
+%A Ben Campbell
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%A Christian Huitema
+%A David Gurle
+%E Ben Campbell
+%Q The Internet Society
+%T Session Initiation Protocol (SIP) Extension for Instant Messaging
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3428.txt
+
+%K rfc3515
+%L RFC 3515
+%R RFC 3515
+%A Robert J. Sparks
+%E Robert J. Sparks
+%Q The Internet Society
+%T The Session Initiation Protocol (SIP) Refer Method
+%D April 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3515.txt
+
+%K rfc3666
+%K bcp76
+%L BCP 76
+%R BCP 76 (RFC 3666)
+%A Alan Johnston
+%A Steve Donovan
+%A Robert Sparks
+%A Chris Cunningham
+%A Kevin Summers
+%E Alan Johnston
+%T Session Initiation Protocol (SIP) Public Switched Telephone Network (PSTN) Call Flows
+%D December 2003
+%Q The Internet Society
+%I The Internet Society
+%U http://www.ietf.org/rfc/bcp/bcp76.txt
+
 %L SIPT
 %R draft-ietf-sipping-sipt-04.txt
 %A Aparna Vemuri
@@ -799,6 +842,74 @@
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sipping-isup-06.txt
+
+%K preSPIRITS
+%K rfc2995
+%L RFC 2995
+%R RFC 2995
+%A Hui-Lan Lu
+%A Igor Faynberg
+%A John Voelker
+%A Mark Weissman
+%A Weizhong Zhang
+%A Sung-Yurn Rhim
+%A Jinkyung Hwang
+%A Shinji Ago
+%A S. Moeenuddin
+%A S. Hadvani
+%A Soren Nyckelgard
+%A John Yoakum
+%A Lewis Robart
+%E Hui-Lan Lu
+%T Pre-SPIRITS Implementations of PSTN-initiated Services
+%D November 2000
+%Q The Internet Society
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2995.txt
+
+%K rfc3136
+%L RFC 3136
+%R RFC 3136
+%A Lev Slutsman
+%A Igor Faynberg
+%A Mark Weissman
+%E Lev Slutsman
+%Q The Internet Society
+%I The Internet Society
+%T The SPIRITS Architecture
+%D June 2001
+%U http://www.ietf.org/rfc/rfc3136.txt
+
+%K rfc3199
+%L RFC 3199
+%R RFC 3199
+%E Igor Faynberg
+%A Igor Faynberg
+%A Jorge Gato
+%A Hui-Lan Lu
+%A Lev Slutsman
+%Q The Internet Society
+%I The Internet Society
+%T Service in the Public Switched Telephone Newtork/Intelligent Network (PSTN/IN) Requesting %InTernet Service (SPIRITS) Protocol Requirements
+%D August 2002
+%U http://www.ietf.org/rfc/rfc3199.txt
+
+%K rfc3910
+%L RFC 3910
+%R RFC 3910
+%E Vijay K. Gurbani
+%A Vijay K. Gurbani
+%A Alec Brusilovsky
+%A Igor Faynberg
+%A Jorge Gato
+%A Hui-Lan Lu
+%A Musa Unmehopa
+%Q The Internet Society
+%I The Internet Society
+%T The SPIRITS (Services in PSTN requesting Internet Services) Protocol
+%D October 2004
+%U http://www.ietf.org/rfc/rfc3910.txt
+
 
 %K bob
 %L SMull

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/10/25 10:33:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/11/05 00:53:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/25 10:33:47 $ by $Author: brian $
+# Last Modified $Date: 2004/11/05 00:53:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -863,6 +863,9 @@ ss7_man_MANS = \
 	man7/tpi_sscop.7 \
 	man7/tpi_tcap.7 \
 	man7/tri.7 \
+	man7/tri_itut.7 \
+	man7/tri_ansi.7 \
+	man7/tri_etsi.7 \
 	man7/TR_ABORT_IND.7 \
 	man7/TR_ABORT_REQ.7 \
 	man7/TR_ADDR_ACK.7 \
@@ -2175,6 +2178,9 @@ ss7_dist_noinst_MANS = \
 	man7/tpi_sscop.7.man \
 	man7/tpi_tcap.7.man \
 	man7/tri.7.man \
+	man7/tri_itut.7.man \
+	man7/tri_ansi.7.man \
+	man7/tri_etsi.7.man \
 	man7/TR_ABORT_IND.7.man \
 	man7/TR_ABORT_REQ.7.man \
 	man7/TR_ADDR_ACK.7.man \

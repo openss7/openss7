@@ -1,4 +1,5 @@
 .ie '\*(.T'ps' \{\
+\X'ps: papersize letter'
 .in 0.5i
 .ll 6.0i
 .lt 6.0i
@@ -14,12 +15,11 @@
 .nr LL 8.0i
 .nr LT 8.0i
 .\}
-
 .TS
 box center tab(:);
-r|c|c|c|c
-c|c|c|c|c
-l|c|c|c|c
+rb|cb|cb|cb|cb
+cb|cb|cb|cb|cb
+lb|cb|cb|cb|cb
 l|c|c|c|c.
 Object X:BEGIN:CONT:END:ABORT
 _:

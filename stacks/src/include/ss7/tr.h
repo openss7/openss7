@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tr.h,v 0.9.2.3 2004/10/19 10:03:51 brian Exp $
+ @(#) $Id: tr.h,v 0.9.2.4 2004/11/05 00:56:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/10/19 10:03:51 $ by $Author: brian $
+ Last Modified $Date: 2004/11/05 00:56:30 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TR_H__
 #define __SS7_TR_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define TR_INFO_REQ		 0	/* Information request */
 #define TR_BIND_REQ		 1	/* Bind to network address */
@@ -180,6 +180,25 @@ typedef struct TR_bind_ack {
 	ulong XACT_number;		/* open transactions */
 	ulong TOKEN_value;		/* value of "token" assigned to stream */
 } TR_bind_ack_t;
+
+/*
+ *  TR_ADDR_REQ.  This primitive consists of one M_PROTO message block.
+ */
+typedef struct TR_addr_req {
+	ulong PRIM_type;		/* Always TR_ADDR_REQ */
+	ulong TRANS_id;			/* Transaction id */
+} TR_addr_req_t;
+
+/*
+ *  TR_ADDR_ACK.  This primitive consists of one M_PCPROTO message block.
+ */
+typedef struct TR_addr_ack {
+	ulong PRIM_type;		/* Always TR_ADDR_ACK */
+	ulong LOCADDR_length;		/* local address length */
+	ulong LOCADDR_offset;		/* local address offset */
+	ulong REMADDR_length;		/* remote address length */
+	ulong REMADDR_offset;		/* remote address offset */
+} TR_addr_ack_t;
 
 /*
  *  TR_UNBIND_REQ.  This primtive consists of one M_PROTO message block.

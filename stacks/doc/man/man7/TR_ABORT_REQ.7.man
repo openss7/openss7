@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TR_ABORT_REQ.7.man,v 0.9.2.2 2004/10/25 09:16:18 brian Exp $
+.\" @(#) $Id: TR_ABORT_REQ.7.man,v 0.9.2.3 2004/11/05 00:53:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/25 09:16:18 $ by $Author: brian $
+.\" Modified $Date: 2004/11/05 00:53:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,11 +49,17 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TR_ABORT_REQ 7 "$Date: 2004/10/25 09:16:18 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TR_ABORT_REQ 7 "$Date: 2004/11/05 00:53:04 $" "$Name:  $" "Transaction Interface (TRI)"
+.
+.
+.
 .SH NAME
 .PP
 .B TR_ABORT_REQ
-\- Abort Request
+non-fatal \- Abort Request
+.
+.
+.
 .SH SYNOPSIS
 .PP
 This message consists of one
@@ -76,75 +82,142 @@ typedef struct TR_abort_req {
 } TR_abort_req_t;
 \fR\s+1
 .fi
+.
+.
+.
 .SH DESCRIPTION
 .PP
 This primitive requests that the transaction provider deny a request for association, or abort an
 existing association.
-.SH PARAMETERS
-.PP
+.
+.
+.SS Parameters
 .PP
 The fields of this message have the following meanings:
+.
 .TP 16
 .I PRIM_type
-identifies the primitive type.
-Always
+Specifies the primitive type: always
 .BR TR_ABORT_REQ .
+.
 .TP
 .I TRANS_id
-specifies the indentifier of the existing transaction association or incoming transaction
-association attempt being aborted.
+Specifies the transaction identifier previously indicated by the transport provider to uniquely
+identify the association.
+The transaction identifier must be the same as the transaction identifier that was indicated by the
+transaction provider in the corresponding
+.BR TR_BEGIN_IND (7)
+or
+.BR TR_BEGIN_CON (7)
+primitive.
+.
 .TP
 .I ABORT_cause
-specifies the (user) cause of the abort.
+Specifies the (user) cause for the abort.
+Abort causes are provider specific.
+.
 .TP
 .I OPT_length
-specifies the length of the protocol options associated with the abort.
+Specifies the length of the protocol options associated with the abort.
+Supplying protocol options with the primitive is optional.
+If the transaction user does not provide protocol options with the primitive, the
+.I OPT_length
+and
+.I OPT_offset
+fields must be set to zero (0) by the transaction user.
+The format of the protocol options are provider specific.
+.
 .TP
 .I OPT_offset
-specifies the offset from the beginning of the
+Specifies the offset from the beginning of the
 .BR M_PROTO (9)
 message block where the protocol options begin.
-.SH RULES
+Alignment of the protocol options in the
+.BR M_PROTO (9)
+message block is not guaranteed.
+However, the alignment of the protocol options in the
+.BR M_PROTO (9)
+message block are the same as was specified by the transport user.
+.
+.
+.SS Modes
 .PP
-This primitive requires the transaction provider to generate the following acknowledgment on receipt
-of the primitive, and the transaction user must wait for the acknowledgment before issuing any other
+This primitive is only valid in connection-oriented mode.
+.
+.
+.SS Originator
+.PP
+Transaction user.
+.
+.
+.SS "Valid State"
+.PP
+This primitive is valid in any connection oriented transaction state other than
+.BR TRS_IDLE .
+.
+.
+.SS "New State"
+.PP
+The new state for the transaction is
+.BR TRS_IDLE .
+.
+.
+.
+.SH ACKNOWLEDGEMENTS
+.PP
+This primitive requires the transaction provider to generate the following acknowledgement on receipt
+of the primitive, and the transaction user must wait for the acknowledgement before issuing any other
 primitives:
+.
+.
 .SS Successful
-Correct acknowledgment of the primitive is indicated via the
+Correct acknowledgement of the primitive is indicated via the
 .BR TR_OK_ACK (7)
 primitive.
+.
+.
 .SS Non-fatal errors
 These errors will be indicated via the
 .BR TR_ERROR_ACK (7)
 primitive.
+.
+.
+.
 .SH ERRORS
 .PP
-The allowable errors are as follows:
+The allowable non-fatal errors are as follows:
+.
 .TP 16
 .RB [ TRBADDATA ]
 The amount of user data specified was invalid.
+.
 .TP
 .RB [ TRBADID ]
 The transaction identifier specified in the primitive was incorrect or invalid.
+.
 .TP
 .RB [ TRNOTSUPPORT ]
 This primitive is not supported by the transaction provider.
+.
 .TP
 .RB [ TROUTSTATE ]
 The primitive would place the transaction interface out of state.
+.
 .TP
 .RB [ TRSYSERR ]
 A system error has occurred and the Linux system error is indicated in
 the primitive.
-.SH MODES
-.PP
-Only connection-mode.
-.SH ORIGINATOR
-.PP
-Transaction user.
+.
+.
+.
 .SH "FILES"
-.PP
-<ss7/tr.h>
+.
+.TP 16
+.I <ss7/tr.h>
+\- the TRI system header file.
+.
+.
+.
 .SH "SEE ALSO"
 .PP
 .BR tri (7),
@@ -154,9 +227,15 @@ Transaction user.
 .BR TR_BEGIN_IND (7),
 .BR TR_END_REQ (7),
 .BR TR_END_IND (7).
+.
+.
+.
 .SH HISTORY
 .PP
 The Transaction Interface first appeared in OpenSS7.
+.
+.
+.
 .SH CONFORMANCE
 .PP
 This interface conforms to TRI Revision 0.9.2, Draft 1.

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.12 2004/10/19 10:03:44 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.13 2004/11/05 00:57:16 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/10/19 10:03:44 $ by $Author: brian $
+dnl Last Modified $Date: 2004/11/05 00:57:16 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -164,20 +164,21 @@ AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify bzero getcwd gethostby
 AC_SS7
 
 AC_CONFIG_FILES([Makefile
-		 src/include/Makefile
+		 scripts/texi/args.texi
 		 src/Makefile
+		 src/include/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
-		 scripts/texi/args.texi
+		 doc/projects/Makefile
 		 doc/specs/Makefile
 		 doc/specs/tri/Makefile
 		 doc/specs/tci/Makefile
 		 doc/specs/mapi/Makefile
 		 doc/specs/npi/Makefile
 		 doc/specs/tpi/Makefile
-		 intl/Makefile
 		 m4/Makefile
+		 intl/Makefile
 		 po/Makefile.in])
 
 AC_OUTPUT

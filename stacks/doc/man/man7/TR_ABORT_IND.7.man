@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TR_ABORT_IND.7.man,v 0.9.2.2 2004/10/25 09:16:18 brian Exp $
+.\" @(#) $Id: TR_ABORT_IND.7.man,v 0.9.2.3 2004/11/05 00:53:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/25 09:16:18 $ by $Author: brian $
+.\" Modified $Date: 2004/11/05 00:53:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,11 +49,17 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TR_ABORT_IND 7 "$Date: 2004/10/25 09:16:18 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TR_ABORT_IND 7 "$Date: 2004/11/05 00:53:04 $" "$Name:  $" "Transaction Interface (TRI)"
+.
+.
+.
 .SH NAME
 .PP
 .B TR_ABORT_IND
 \- Abort Indication
+.
+.
+.
 .SH SYNOPSIS
 .PP
 This message consists of a
@@ -62,69 +68,135 @@ message block formatted as follows:
 .sp
 .nf
 \fC\s-1\
-typedef struct TR_abort_req {
-    ulong PRIM_type;          /* Always TR_ABORT_REQ */
+typedef struct TR_abort_ind {
+    ulong PRIM_type;          /* Always TR_ABORT_IND */
+    ulong CORR_id;            /* Correlation id */
     ulong TRANS_id;           /* Transaction id */
-    ulong ABORT_cause;        /* Cause of the abort */
     ulong OPT_length;         /* Options structure length */
     ulong OPT_offset;         /* Options structure offset */
-} TR_abort_req_t;
+    ulong ABORT_cause;        /* Cause of the abort */
+    ulong ORIGINATOR;         /* Originator P or U */
+} TR_abort_ind_t;
 \fR\s+1
 .fi
+.
+.
+.
 .SH DESCRIPTION
 .PP
 This primitive indicates to the user that either a request for association has been denied or an
 existing association has been aborted.
-The format of this message is one
-.BR M_PROTO (9)
-message block possibly followed by one or more
-.BR M_DATA (9)
-message blocks if there is any user data associated with the primitive.
-.SH PARAMETERS
+.SS Parameters
 .PP
 .PP
 The fields of this message have the following meanings:
+.
 .TP 16
 .I PRIM_type
-identifies the primitive type.
+Indicates the primitive type.
 Always
-.BR TR_ABORT_REQ .
+.BR TR_ABORT_IND .
+.
+.TP
+.I CORR_id
+Indicates the correlation identifier previously specified by the transport user to uniquely identify
+an outstanding transaction request that has not yet received transaction confirmation.
+For all other cases, this field must be set to zero (0).
+.
 .TP
 .I TRANS_id
-is the transaction identifier that identifies which association was aborted.
-.TP
-.I ABORT_cause
-is the cause of the abort.
-The cause codes are protocol specific.
+Indicates the transaction identifier previously indicated by the transport provider to uniquely
+identify the transaction.
+The transaction identifier must be indicated by the transaction provider.
+The transaction identifier must be the same as the transaction identifier that was indicated in the
+corresponding
+.BR TR_BEGIN_IND (7)
+or
+.BR TR_BEGIN_CON (7)
+primitive (if any).
+.
 .TP
 .I OPT_length
-is the length of the protocol options associated with the abort.
+Indicates the length of the protocol options associated with the transaction
+association termination.
+Protocol options are only indicated by the transaction provider when they were supplied by the
+underlying protocol.
+If the transport provider does not indicate protocol options, the
+.I OPT_length
+and
+.I OPT_offset
+fields must be set to zero (0).
+The format of the protocol options are provider specific.
+.
 .TP
 .I OPT_offset
-is the offset from the beginning of the
+Indicates the offset from the beginning of the
 .BR M_PROTO (9)
-message block where the protocol options start.
-.SH MODES
+message block where the protocol options begin.
+.
+.TP
+.I ABORT_cause
+Indicates the cause of the abort.
+Abort causes are provider specific.
+.
+.TP
+.I ORIGINATOR
+Indicates the originator of the abort.
+This field can have values
+.B TR_USER
+or
+.B TR_PROVIDER
+or
+.BR TR_UNSPECIFIED .
+.
+.
+.SS Modes
 .PP
-Only connection-mode.
-.SH ORIGINATOR
+This primitive is only valid in connection-oriented mode.
+.
+.
+.SS Originator
 .PP
 Transaction provider.
-.SH "FILES"
+.
+.
+.SS "Valid State"
 .PP
-<ss7/tr.h>
+This primitive is valid in any connection oriented transaction state other than
+.BR TRS_IDLE .
+.
+.
+.SS "New State"
+.PP
+The new state for the transaction is
+.BR TRS_IDLE .
+.
+.
+.
+.SH "FILES"
+.TP 16
+.I <ss7/tr.h>
+\- the TRI system header file.
+.
+.
+.
 .SH "SEE ALSO"
 .PP
 .BR tri (7),
 .BR M_PROTO (9),
 .BR M_DATA (9),
-.BR TR_BEGIN_REQ (7),
-.BR TR_ABORT_REQ (7),
-.BR TR_END_REQ (7),
-.BR TR_END_IND (7).
+.BR TR_BEGIN_IND (7),
+.BR TR_BEGIN_CON (7),
+.BR TR_ABORT_REQ (7).
+.
+.
+.
 .SH HISTORY
 .PP
 The Transaction Interface first appeared in OpenSS7.
+.
+.
+.
 .SH CONFORMANCE
 .PP
 This interface conforms to TRI Revision 0.9.2, Draft 1.

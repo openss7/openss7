@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TR_BEGIN_CON.7.man,v 0.9.2.2 2004/10/25 09:16:18 brian Exp $
+.\" @(#) $Id: TR_BEGIN_CON.7.man,v 0.9.2.3 2004/11/05 00:53:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/25 09:16:18 $ by $Author: brian $
+.\" Modified $Date: 2004/11/05 00:53:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,11 +49,17 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TR_BEGIN_CON 7 "$Date: 2004/10/25 09:16:18 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TR_BEGIN_CON 7 "$Date: 2004/11/05 00:53:05 $" "$Name:  $" "Transaction Interface (TRI)"
+.
+.
+.
 .SH NAME
 .PP
 .B TR_BEGIN_CON
 \- Connection Confirm
+.
+.
+.
 .SH SYNOPSIS
 .PP
 This message consists of one
@@ -79,66 +85,157 @@ typedef struct TR_begin_con {
 } TR_begin_con_t;
 \fR\s+1
 .fi
+.
+.
+.
 .SH DESCRIPTION
 .PP
 This primitive indicates to the user that an association begin request has been confirmed on the
 specified responding address.
-.SH PARAMETERS
+.
+.
+.SS Parameters
 .PP
+The fields of this message have the following meanings:
+.
 .TP 16
 .I PRIM_type
-identifies the primitive type.
-Always
+indicates the primitive type: always
 .BR TR_BEGIN_CON .
+.
 .TP
 .I CORR_id
-is the transaction user assigned transaction identifier of the corresponding
+indicates the correlation identifier used by the transport user to uniquely identify the transaction
+begin request of the stream to which this confirmation corresponds.
+This is the transaction user assigned transaction identifier of the corresponding
 .BR TR_BEGIN_REQ (7)
 that this message is confirming.
+.
 .TP
 .I ASSOC_flags
-are the responding association options flags.
+indicates the option flags provided with the primitive.
+See
+.RB \(lq Flags \(rq
+below.
+Some flags may be provider specific.
+.
 .TP
 .I TRANS_id
-is the transaction provider assigned transaction identifier for the confirmed association.
+indicates the transaction identifier provided by the transport provider to uniquely identify the
+transaction on this stream.
+.
 .TP
 .I ORIG_length
-is the length of the responding address that the association was accepted.
+indicates the length of the responding protocol address from which the confirmation was received.
+.
 .TP
 .I ORIG_offset
-is the offset (from the beginning of the
+indicates the offset from the beginning of the
 .BR M_PROTO (9)
-message block) where the responding address begins.
+message block where the responding protocol address begins.
+.
 .TP
 .I OPT_length
-is the length of the confirmed options associated with the primitive.
+indicates the length of the confirmed protocol options negotiated by the transaction peer.
+.
 .TP
 .I OPT_offset
-is the offset from the beginning of the
+indicates the offset from the beginning of the
 .BR M_PROTO (9)
-message block) of the confirmed options associated with the primitive.
+message block where the confirmed protocol options begin.
 .PP
 The proper alignment of the responding address and options in the
 .BR M_PROTO (9)
 message block is not guaranteed.
-.SH MODES
+.
+.
+.SS Flags
 .PP
-Only connection-mode.
-.SH ORIGINATOR
+The following association flags are defined:
+.
+.TP
+.B TR_NO_PERMISSION
+The value of this flag may indicate either that the transaction peer gives permission (clear) to end
+the transaction association or refuses permission (set) to end the transaction association.
+This flag is only valid for transaction providers that support it (see
+.BR tri_ansi (7)).
+.
+.
+.SS Modes
+.PP
+This primitive is only valid in connection-oriented mode.
+.
+.
+.SS Originator
 .PP
 Transaction provider.
-.SH "FILES"
+.
+.
+.SS Rules
 .PP
-<ss7/tr.h>
+The following rules apply:
+.
+.IP \(em 4
+It is not always necessary for the transport provider to provide the responding address in the
+.I ORIG_length
+and
+.I ORIG_offiset
+fields.
+Where the responding protocol address is the same as the destination protocol address for which the
+transaction initialization was requested, it is not necessary to provide the responding address in
+the
+.BR TR_BEGIN_CON .
+Where the responding protocol address is not provided, the
+.I ORIG_length
+and
+.I ORIG_offset
+fields are set to zero (0).
+.
+.IP \(em
+When the
+.B TR_NO_PERMISSION
+flag is set, the transaction user must not issue a
+.BR TR_END_REQ (7)
+primitive in response to this indication.
+.
+.
+.SS "Valid States"
+.PP
+This primitive is valid in transaction state
+.BR TRS_WCON_CREQ .
+.
+.
+.SS "New State"
+.PP
+The new state for the transaction is
+.BR TRS_DATA_XFER .
+.
+.
+.
+.SH "FILES"
+.
+.TP 16
+.I <ss7/tr.h>
+\- the TRI system header file.
+.
+.
+.
 .SH "SEE ALSO"
 .PP
 .BR tri (7),
+.BR tri_ansi (7),
 .BR M_PROTO (9),
 .BR M_DATA (9),
 .BR TR_BEGIN_REQ (7).
+.
+.
+.
 .SH HISTORY
 .PP
 The Transaction Interface first appeared in OpenSS7.
+.
+.
+.
 .SH CONFORMANCE
 .PP
 This interface conforms to TRI Revision 0.9.2, Draft 1.
