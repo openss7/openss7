@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: test-sctp.c,v 0.9 2004/01/17 08:26:30 brian Exp $
+ @(#) $Id: test-sctp.c,v 0.9.2.2 2004/02/22 09:11:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -30,13 +30,13 @@
 
  -----------------------------------------------------------------------------
 
- Modified $Date: 2004/01/17 08:26:30 $ by $Author: brian $
+ Modified $Date: 2004/02/22 09:11:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-static char const ident[] = "$Id: test-sctp.c,v 0.9 2004/01/17 08:26:30 brian Exp $";
+static char const ident[] = "$Id: test-sctp.c,v 0.9.2.2 2004/02/22 09:11:24 brian Exp $";
 
-/*
+/* 
  *  This file is for testing the sctp_n driver.
  */
 
@@ -56,11 +56,17 @@ static char const ident[] = "$Id: test-sctp.c,v 0.9 2004/01/17 08:26:30 brian Ex
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
 
 #define BUFSIZE 300
 #define FFLUSH(stream)
+
+int verbose = 1;
 
 union {
 	np_ulong prim;
@@ -77,7 +83,8 @@ typedef struct addr {
 	struct in_addr addr[1];
 } addr_t;
 
-void print_error(ulong error)
+void
+print_error(ulong error)
 {
 	switch (error) {
 	case NBADADDR:
@@ -133,7 +140,8 @@ void print_error(ulong error)
 	return;
 }
 
-void print_prim(ulong prim)
+void
+print_prim(ulong prim)
 {
 	switch (prim) {
 	case N_CONN_REQ:
@@ -183,7 +191,8 @@ void print_prim(ulong prim)
 	return;
 }
 
-void print_state(ulong state)
+void
+print_state(ulong state)
 {
 	switch (state) {
 	case NS_UNBND:
@@ -245,7 +254,8 @@ void print_state(ulong state)
 	return;
 }
 
-void print_addr(char *add_ptr, size_t add_len)
+void
+print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	int i;
@@ -260,7 +270,8 @@ void print_addr(char *add_ptr, size_t add_len)
 	printf("\n");
 }
 
-void print_qos(char *qos_ptr, size_t add_len)
+void
+print_qos(char *qos_ptr, size_t add_len)
 {
 	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
 	switch (qos->n_qos_type) {
@@ -293,7 +304,8 @@ void print_qos(char *qos_ptr, size_t add_len)
 	printf("\n");
 }
 
-void print_msg(int fd)
+void
+print_msg(int fd)
 {
 	if (ctrl.len > 0) {
 		switch (cmd.prim) {
@@ -567,7 +579,8 @@ void print_msg(int fd)
 	}
 }
 
-int get_only(int fd, int wait)
+int
+get_only(int fd, int wait)
 {
 	int ret;
 	do {
@@ -589,7 +602,8 @@ int get_only(int fd, int wait)
 	} while (1);
 }
 
-int put_only(int fd, int flags)
+int
+put_only(int fd, int flags)
 {
 	print_msg(fd);
 	if (putmsg(fd, &ctrl, NULL, flags) < 0) {
@@ -599,14 +613,16 @@ int put_only(int fd, int flags)
 	return (0);
 }
 
-void put_and_get(int fd, int flags)
+void
+put_and_get(int fd, int flags)
 {
 	if (put_only(fd, flags))
 		return;
 	get_only(fd, 10);
 }
 
-int sctp_n_open(void)
+int
+sctp_n_open(void)
 {
 	int fd;
 	printf("\nOPEN: sctp_n\n");
@@ -616,7 +632,9 @@ int sctp_n_open(void)
 	}
 	return (fd);
 }
-void sctp_close(int fd)
+
+void
+sctp_close(int fd)
 {
 	printf("\n%d-CLOSE:\n", fd);
 	if (close(fd) < 0) {
@@ -624,14 +642,16 @@ void sctp_close(int fd)
 		return;
 	}
 }
-void sctp_info_req(int fd)
+void
+sctp_info_req(int fd)
 {
 	ctrl.len = sizeof(cmd.npi.info_req);
 	cmd.prim = N_INFO_REQ;
 	put_and_get(fd, RS_HIPRI);
 }
 
-void sctp_bind_req(int fd, addr_t * addr, int coninds)
+void
+sctp_bind_req(int fd, addr_t * addr, int coninds)
 {
 	ctrl.len = sizeof(cmd.npi.bind_req) + sizeof(*addr);
 	cmd.prim = N_BIND_REQ;
@@ -644,13 +664,17 @@ void sctp_bind_req(int fd, addr_t * addr, int coninds)
 	bcopy(addr, (&cmd.npi.bind_req) + 1, sizeof(*addr));
 	put_and_get(fd, RS_HIPRI);
 }
-void sctp_unbind(int fd)
+
+void
+sctp_unbind(int fd)
 {
 	ctrl.len = sizeof(cmd.npi.unbind_req);
 	cmd.prim = N_UNBIND_REQ;
 	put_and_get(fd, RS_HIPRI);
 }
-void sctp_conn_req(int fd, addr_t * addr)
+
+void
+sctp_conn_req(int fd, addr_t * addr)
 {
 	N_qos_sel_conn_sctp_t qos = { 0, };
 	qos.n_qos_type = N_QOS_SEL_CONN_SCTP;
@@ -667,7 +691,9 @@ void sctp_conn_req(int fd, addr_t * addr)
 	bcopy(&qos, (cmd.cbuf + sizeof(cmd.npi.conn_req) + sizeof(*addr)), sizeof(qos));
 	put_only(fd, RS_HIPRI);
 }
-void sctp_discon(int fd)
+
+void
+sctp_discon(int fd)
 {
 	ctrl.len = sizeof(cmd.npi.discon_req);
 	cmd.prim = N_DISCON_REQ;
@@ -677,7 +703,9 @@ void sctp_discon(int fd)
 	cmd.npi.discon_req.SEQ_number = 0;
 	put_only(fd, RS_HIPRI);
 }
-void sctp_data(int fd, int fd2, const char *data)
+
+void
+sctp_data(int fd, int fd2, const char *data)
 {
 	N_qos_sel_data_sctp_t qos;
 	qos.n_qos_type = N_QOS_SEL_DATA_SCTP;
@@ -691,12 +719,15 @@ void sctp_data(int fd, int fd2, const char *data)
 	put_and_get(fd, RS_HIPRI);
 	get_only(fd2, 1);
 }
-void sctp_wait(int fd)
+
+void
+sctp_wait(int fd)
 {
 	get_only(fd, 1);
 }
 
-int main()
+int
+do_tests(void)
 {
 	int fd1, fd2;
 	addr_t addr1, addr2;
@@ -746,4 +777,178 @@ int main()
 	printf("Done.\n");
 
 	return (0);
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "qvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "qvhV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	splash(argc, argv);
+	do_tests();
+	exit(0);
 }

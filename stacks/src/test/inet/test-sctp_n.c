@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:15 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:51:36 $
 
  -----------------------------------------------------------------------------
 
@@ -52,16 +52,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:25:15 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/02/22 08:51:36 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:15 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:51:36 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:15 $";
+    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:51:36 $";
 
-/*
+/* 
  *  This file is for testing the sctp_n driver.  It is provided for the
  *  purpose of testing the OpenSS7 sctp_n driver only.
  */
@@ -81,6 +81,10 @@ static char const ident[] =
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
 #if 0
 #include "../include/sys/npi.h"
 #include "../include/sys/npi_sctp.h"
@@ -88,6 +92,11 @@ static char const ident[] =
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
 #endif
+
+static int verbose = 1;
+static int summary = 0;
+static int timer_scale = 1;
+static int show_msg = 0;
 
 #define BUFSIZE 5*4096
 #define FFLUSH(stream)
@@ -161,7 +170,8 @@ N_qos_sel_info_sctp_t qos_info = {
 	0				/* options */
 };
 
-char *err_string(ulong error)
+char *
+err_string(ulong error)
 {
 	switch (error) {
 	case NBADADDR:
@@ -199,12 +209,14 @@ char *err_string(ulong error)
 	}
 }
 
-void print_error(ulong error)
+void
+print_error(ulong error)
 {
 	printf("%s\n", err_string(error));
 }
 
-char *prim_string(ulong prim)
+char *
+prim_string(ulong prim)
 {
 	switch (prim) {
 	case N_CONN_REQ:
@@ -264,12 +276,14 @@ char *prim_string(ulong prim)
 	}
 }
 
-void print_prim(ulong prim)
+void
+print_prim(ulong prim)
 {
 	printf("%s", prim_string(prim));
 }
 
-void print_state(ulong state)
+void
+print_state(ulong state)
 {
 	switch (state) {
 	case NS_UNBND:
@@ -331,7 +345,8 @@ void print_state(ulong state)
 	return;
 }
 
-void print_addr(char *add_ptr, size_t add_len)
+void
+print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	size_t anum =
@@ -353,7 +368,8 @@ void print_addr(char *add_ptr, size_t add_len)
 	printf("\n");
 }
 
-void print_proto(char *pro_ptr, size_t pro_len)
+void
+print_proto(char *pro_ptr, size_t pro_len)
 {
 	uint32_t *p = (uint32_t *) pro_ptr;
 	size_t pnum = pro_len / sizeof(p[0]);
@@ -369,7 +385,8 @@ void print_proto(char *pro_ptr, size_t pro_len)
 	printf("\n");
 }
 
-void print_qos(char *qos_ptr, size_t qos_len)
+void
+print_qos(char *qos_ptr, size_t qos_len)
 {
 	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
 	if (qos_len) {
@@ -437,7 +454,8 @@ void print_qos(char *qos_ptr, size_t qos_len)
 	printf("\n");
 }
 
-void print_size(ulong size)
+void
+print_size(ulong size)
 {
 	switch (size) {
 	case -1UL:
@@ -452,7 +470,8 @@ void print_size(ulong size)
 	}
 }
 
-void print_msg(int fd)
+void
+print_msg(int fd)
 {
 	if (ctrl.len > 0) {
 		switch (show) {
@@ -1339,7 +1358,8 @@ void print_msg(int fd)
 	FFLUSH(stdout);
 }
 
-void print_less(int fd)
+void
+print_less(int fd)
 {
 	switch (show) {
 	case 1:
@@ -1385,12 +1405,15 @@ void print_less(int fd)
 	show = 0;
 	return;
 }
-void print_more(void)
+
+void
+print_more(void)
 {
 	show = 1;
 }
 
-int get_msg(int fd, int wait)
+int
+get_msg(int fd, int wait)
 {
 	int ret;
 	int flags = 0;
@@ -1455,7 +1478,8 @@ int get_msg(int fd, int wait)
 	} while (1);
 }
 
-int expect(int fd, int wait, int want)
+int
+expect(int fd, int wait, int want)
 {
 	int got;
 	if ((got = get_msg(fd, wait)) == want)
@@ -1493,7 +1517,8 @@ int expect(int fd, int wait, int want)
 	}
 }
 
-int put_msg(int fd, int band, int flags, int wait)
+int
+put_msg(int fd, int band, int flags, int wait)
 {
 	int ret;
 	struct strbuf *mydata = data.len ? &data : NULL;
@@ -1549,7 +1574,8 @@ int put_msg(int fd, int band, int flags, int wait)
 	} while (1);
 }
 
-int sctp_n_open(void)
+int
+sctp_n_open(void)
 {
 	int fd;
 	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0)
@@ -1578,7 +1604,9 @@ int sctp_n_open(void)
 		}
 	return (fd);
 }
-int sctp_close(int fd)
+
+int
+sctp_close(int fd)
 {
 	int ret;
 	if ((ret = close(fd)) < 0)
@@ -1607,7 +1635,9 @@ int sctp_close(int fd)
 		}
 	return (ret);
 }
-int sctp_info_req(int fd)
+
+int
+sctp_info_req(int fd)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.npi.info_req);
@@ -1615,7 +1645,8 @@ int sctp_info_req(int fd)
 	return put_msg(fd, 0, MSG_HIPRI, 0);
 }
 
-int sctp_optmgmt_req(int fd, ulong flags)
+int
+sctp_optmgmt_req(int fd, ulong flags)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.npi.optmgmt_req) + sizeof(qos_info);
@@ -1627,7 +1658,8 @@ int sctp_optmgmt_req(int fd, ulong flags)
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
-int sctp_bind_req(int fd, addr_t * addr, int coninds)
+int
+sctp_bind_req(int fd, addr_t * addr, int coninds)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.npi.bind_req) + sizeof(*addr);
@@ -1641,14 +1673,18 @@ int sctp_bind_req(int fd, addr_t * addr, int coninds)
 	bcopy(addr, (&cmd.npi.bind_req) + 1, sizeof(*addr));
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int sctp_unbind_req(int fd)
+
+int
+sctp_unbind_req(int fd)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.npi.unbind_req);
 	cmd.prim = N_UNBIND_REQ;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int sctp_conn_req(int fd, addr_t * addr, const char *dat)
+
+int
+sctp_conn_req(int fd, addr_t * addr, const char *dat)
 {
 	if (!dat)
 		data.len = 0;
@@ -1667,7 +1703,9 @@ int sctp_conn_req(int fd, addr_t * addr, const char *dat)
 	bcopy(&qos_conn, (cmd.cbuf + sizeof(cmd.npi.conn_req) + sizeof(*addr)), sizeof(qos_conn));
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int sctp_conn_res(int fd, int fd2, const char *dat)
+
+int
+sctp_conn_res(int fd, int fd2, const char *dat)
 {
 	if (!dat)
 		data.len = 0;
@@ -1686,7 +1724,9 @@ int sctp_conn_res(int fd, int fd2, const char *dat)
 	cmd.npi.conn_res.QOS_length = 0;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int sctp_discon_req(int fd, ulong seq)
+
+int
+sctp_discon_req(int fd, ulong seq)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.npi.discon_req);
@@ -1697,7 +1737,9 @@ int sctp_discon_req(int fd, ulong seq)
 	cmd.npi.discon_req.SEQ_number = seq;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int sctp_data_req(int fd, ulong flags, const char *dat, int wait)
+
+int
+sctp_data_req(int fd, ulong flags, const char *dat, int wait)
 {
 	if (!dat)
 		return (FAILURE);
@@ -1711,7 +1753,9 @@ int sctp_data_req(int fd, ulong flags, const char *dat, int wait)
 	bcopy(&qos_data, cmd.cbuf + sizeof(cmd.npi.data_req), sizeof(qos_data));
 	return put_msg(fd, 0, MSG_BAND, wait);
 }
-int sctp_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
+
+int
+sctp_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 {
 	int ret;
 	if (!dat)
@@ -1731,7 +1775,9 @@ int sctp_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 	data.buf = dbuf;
 	return (ret);
 }
-int sctp_exdata_req(int fd, const char *dat)
+
+int
+sctp_exdata_req(int fd, const char *dat)
 {
 	if (!dat)
 		return (FAILURE);
@@ -1744,7 +1790,9 @@ int sctp_exdata_req(int fd, const char *dat)
 	bcopy(&qos_data, cmd.cbuf + sizeof(cmd.npi.exdata_req), sizeof(qos_data));
 	return put_msg(fd, 1, MSG_BAND, 0);
 }
-int sctp_datack_req(int fd, ulong tsn)
+
+int
+sctp_datack_req(int fd, ulong tsn)
 {
 	int ret;
 	data.len = 0;
@@ -1756,12 +1804,15 @@ int sctp_datack_req(int fd, ulong tsn)
 	qos_data.tsn = 0;
 	return (ret);
 }
-int sctp_wait(int fd, int wait)
+
+int
+sctp_wait(int fd, int wait)
 {
 	return get_msg(fd, wait);
 }
 
-void sctp_sleep(unsigned long t)
+void
+sctp_sleep(unsigned long t)
 {
 	switch (show) {
 	case 1:
@@ -1778,7 +1829,8 @@ void sctp_sleep(unsigned long t)
 		printf(" ...done\n");
 }
 
-int begin_tests(void)
+int
+begin_tests(void)
 {
 	addr1.port = htons(10000);
 	inet_aton("127.0.0.3", &addr1.addr[0]);
@@ -1800,12 +1852,14 @@ int begin_tests(void)
 	return (SUCCESS);
 }
 
-int end_tests(void)
+int
+end_tests(void)
 {
 	return (SUCCESS);
 }
 
-int preamble_0(void)
+int
+preamble_0(void)
 {
 	if ((fd1 = sctp_n_open()) < 0)
 		return (FAILURE);
@@ -1816,7 +1870,9 @@ int preamble_0(void)
 
 	return (SUCCESS);
 }
-int postamble_0(void)
+
+int
+postamble_0(void)
 {
 	do {
 		if (sctp_close(fd1) == FAILURE)
@@ -1831,7 +1887,8 @@ int postamble_0(void)
 	return (FAILURE);
 }
 
-int preamble_1(void)
+int
+preamble_1(void)
 {
 	state = 0;
 	for (;;) {
@@ -1901,7 +1958,8 @@ int preamble_1(void)
 	}
 }
 
-int preamble_2(void)
+int
+preamble_2(void)
 {
 	state = 0;
 	for (;;) {
@@ -1939,7 +1997,8 @@ int preamble_2(void)
 	}
 }
 
-int preamble_2b(void)
+int
+preamble_2b(void)
 {
 	state = 0;
 	for (;;) {
@@ -1985,7 +2044,8 @@ int preamble_2b(void)
 	}
 }
 
-int preamble_2c(void)
+int
+preamble_2c(void)
 {
 	state = 0;
 	for (;;) {
@@ -2014,11 +2074,14 @@ int preamble_2c(void)
 	}
 }
 
-int preamble_3(void)
+int
+preamble_3(void)
 {
 	return preamble_1();
 }
-int preamble_3b(void)
+
+int
+preamble_3b(void)
 {
 	qos_info.i_streams = 32;
 	qos_info.o_streams = 32;
@@ -2026,35 +2089,46 @@ int preamble_3b(void)
 	qos_conn.o_streams = 32;
 	return preamble_2();
 }
-int preamble_4(void)
+
+int
+preamble_4(void)
 {
-//      qos_info.options = SCTP_OPTION_RANDOM;
+	// qos_info.options = SCTP_OPTION_RANDOM;
 	qos_info.options = SCTP_OPTION_DROPPING;
 	return preamble_2();
 }
-int preamble_5(void)
+
+int
+preamble_5(void)
 {
-//      qos_info.options = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	// qos_info.options = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
 	qos_info.options = SCTP_OPTION_BREAK;
 	return preamble_2();
 }
-int preamble_6(void)
+
+int
+preamble_6(void)
 {
 	qos_info.options = SCTP_OPTION_RANDOM;
 	return preamble_3b();
 }
-int preamble_7(void)
+
+int
+preamble_7(void)
 {
 	qos_info.hmac = SCTP_HMAC_SHA_1;
 	return preamble_1();
 }
-int preamble_8(void)
+
+int
+preamble_8(void)
 {
 	qos_info.hmac = SCTP_HMAC_MD5;
 	return preamble_1();
 }
 
-int postamble_1(void)
+int
+postamble_1(void)
 {
 	uint failed = -1;
 	state = 0;
@@ -2109,7 +2183,8 @@ int postamble_1(void)
 		return (SUCCESS);
 	}
 }
-int postamble_2(void)
+int
+postamble_2(void)
 {
 	uint failed = -1;
 	state = 0;
@@ -2189,14 +2264,15 @@ int postamble_2(void)
 	}
 }
 
-/*
+/* 
  *  Do options management.
  */
 #define desc_case_1 "\
 Test Case 1(a):\n\
 Checks that options management can be performed on several streams\n\
 and that one stream can be bound and unbound."
-int test_case_1(void)
+int
+test_case_1(void)
 {
 	state = 0;
 	for (;;) {
@@ -2232,14 +2308,15 @@ int test_case_1(void)
 	}
 }
 
-/*
+/* 
  *  Bind and unbind three streams.
  */
 #define desc_case_1b "\
 Test Case 1(b):\n\
 Checks that three streams can be bound and unbound with\n\
 on stream as listener."
-int test_case_1b(void)
+int
+test_case_1b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2279,14 +2356,15 @@ int test_case_1b(void)
 	}
 }
 
-/*
+/* 
  *  Attempt a connection with no listener.
  */
 #define desc_case_2 "\
-Test Case 2:\n\
+Test Case 2(a):\n\
 Attempts a connection with no listener.  The connection attempt\n\
 should time out."
-int test_case_2(void)
+int
+test_case_2(void)
 {
 	int i;
 	state = 0;
@@ -2335,14 +2413,15 @@ int test_case_2(void)
 	}
 }
 
-/*
+/* 
  *  Attempt and withdraw a connection request.
  */
-#define desc_case_2a "\
+#define desc_case_2b "\
 Test Case 2(a):\n\
 Attempts and then withdraws a connection request.  The connection\n\
 should disconnect at both ends."
-int test_case_2a(void)
+int
+test_case_2b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2370,14 +2449,15 @@ int test_case_2a(void)
 	}
 }
 
-/*
+/* 
  *  Attempt and refuse a connection request.
  */
 #define desc_case_3 "\
-Test Case 3:\n\
+Test Case 3(a):\n\
 Attempts a connection which is refused by the receiving end.\n\
 The connection should disconnect at the attempting end."
-int test_case_3(void)
+int
+test_case_3(void)
 {
 	state = 0;
 	for (;;) {
@@ -2405,14 +2485,15 @@ int test_case_3(void)
 	}
 }
 
-/*
+/* 
  *  Attempt and delayed refuse a connection request.
  */
 #define desc_case_3b "\
 Test Case 3(b):\n\
 Attempts a delayed refusal of a connection requrest.  This delayed\n\
 refusal should come after the connector has already timed out."
-int test_case_3b(void)
+int
+test_case_3b(void)
 {
 	int i;
 	state = 0;
@@ -2447,14 +2528,15 @@ int test_case_3b(void)
 	}
 }
 
-/*
+/* 
  *  Accept a connection.
  */
 #define desc_case_4 "\
-Test Case 4:\n\
+Test Case 4(a):\n\
 Accept a connection and then disconnect.  This connection attempt\n\
 should be successful."
-int test_case_4(void)
+int
+test_case_4(void)
 {
 	state = 0;
 	for (;;) {
@@ -2491,7 +2573,7 @@ int test_case_4(void)
 	}
 }
 
-/*
+/* 
  *  Attempt and delayed accept a connection request.
  */
 #define desc_case_4b "\
@@ -2499,7 +2581,8 @@ Test Case 4(b):\n\
 Attempt a connection and delay the acceptance of the connection request.\n\
 This should result in a disconnection indication after the connection is\n\
 accepted.  "
-int test_case_4b(void)
+int
+test_case_4b(void)
 {
 	int i;
 	state = 0;
@@ -2544,14 +2627,15 @@ int test_case_4b(void)
 	}
 }
 
-/*
+/* 
  *  Accept a connection.
  */
 #define desc_case_5 "\
-Test Case 5:\n\
+Test Case 5(a):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_NONE signature on its cookie."
-int test_case_5(void)
+int
+test_case_5(void)
 {
 	state = 0;
 	for (;;) {
@@ -2588,14 +2672,15 @@ int test_case_5(void)
 	}
 }
 
-/*
+/* 
  *  Accept a connection (MD5 hashed cookie)
  */
 #define desc_case_5b "\
 Test Case 5(b):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_MD5 signature on its cookie."
-int test_case_5b(void)
+int
+test_case_5b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2632,14 +2717,15 @@ int test_case_5b(void)
 	}
 }
 
-/*
+/* 
  *  Accept a connection (SHA1 hashed cookie)
  */
 #define desc_case_5c "\
 Test Case 5(c):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_SHA_1 signature on its cookie."
-int test_case_5c(void)
+int
+test_case_5c(void)
 {
 	state = 0;
 	for (;;) {
@@ -2676,16 +2762,17 @@ int test_case_5c(void)
 	}
 }
 
-/*
+/* 
  *  Connect with data.
  */
 #define desc_case_6 "\
-Test Case 6:\n\
+Test Case 6(a):\n\
 Attempt and accept a connection where data is also passed in the\n\
 connection request and the connection response.  This should result\n\
 in DATA chunks being bundled with the COOKIE-ECHO and COOKIE-ACK\n\
 chunks in the SCTP messages."
-int test_case_6(void)
+int
+test_case_6(void)
 {
 	int i;
 	state = 0;
@@ -2732,13 +2819,14 @@ int test_case_6(void)
 	}
 }
 
-/*
+/* 
  *  Connect and send partial data.
  */
 #define desc_case_6b "\
 Test Case 6(b):\n\
 Connect and send partial data (i.e., data with more flag set)."
-int test_case_6b(void)
+int
+test_case_6b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2795,7 +2883,7 @@ int test_case_6b(void)
 	}
 }
 
-/*
+/* 
  *  Connect and send partial data.
  */
 #define desc_case_6c "\
@@ -2803,7 +2891,8 @@ Test Case 6(c):\n\
 Connect and send partial data and expedited data on multiple streams.\n\
 Expedited data should be delivered between ordered data fragments on\n\
 the same stream and delivered to the user first."
-int test_case_6c(void)
+int
+test_case_6c(void)
 {
 	int i;
 	state = 0;
@@ -2896,13 +2985,14 @@ int test_case_6c(void)
 	}
 }
 
-/*
+/* 
  *  Test fragmentation by sending very large packets.
  */
 #define desc_case_7 "\
 Test Case 7(a):\n\
 Connect and send very large packets to test fragmentation."
-int test_case_7(void)
+int
+test_case_7(void)
 {
 	unsigned char lbuf[100000];
 	int i = 0, j = 0, k = 0, f = 0;
@@ -2958,21 +3048,22 @@ int test_case_7(void)
 			}
 			state = 6;
 		case 6:
-//                              if ( expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE
-//                                || expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE ) break;
+			// if ( expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE
+			// || expect(fd1, NORMAL_WAIT, N_DATACK_IND) == FAILURE ) break;
 			return (SUCCESS);
 		}
 		return (FAILURE);
 	}
 }
 
-/*
+/* 
  *  Test coallescing packets by sending many small fragmented pieces.
  */
 #define desc_case_7b "\
 Test Case 7(b):\n\
 Connect and send many small packets to test coallescing of packets."
-int test_case_7b(void)
+int
+test_case_7b(void)
 {
 	int s = 0, r = 0;
 	size_t snd_bytes = 0;
@@ -3039,15 +3130,16 @@ int test_case_7b(void)
 	}
 }
 
-/*
+/* 
  *  Connect with data.
  */
 #define desc_case_8 "\
-Test Case 8:\n\
+Test Case 8(a):\n\
 Connect with data in the connection request and response, and\n\
 send data with receipt confirmation set.  Check that the data\n\
 returns an acknowledgement when it is SACK'ed by the other end."
-int test_case_8(void)
+int
+test_case_8(void)
 {
 	int i, j;
 	state = 0;
@@ -3146,7 +3238,7 @@ int test_case_8(void)
 	}
 }
 
-/*
+/* 
  *  Data with default receipt confirmation.
  */
 #define desc_case_8b "\
@@ -3154,7 +3246,8 @@ Test Case 8(b):\n\
 Connect with data and transfer data with default receipt confirmation.\n\
 This would require that an explicit acknowledgement is requested for\n\
 each data (but we don't support this as SCTP cannot handle it)."
-int test_case_8b(void)
+int
+test_case_8b(void)
 {
 	int i;
 	uint32_t tsn1[10], tsn3[10];
@@ -3227,14 +3320,15 @@ int test_case_8b(void)
 	}
 }
 
-/*
+/* 
  *  Delivering ordered data under noise.
  */
 #define desc_case_9a "\
 Test Case 9(a):\n\
 Delivery of ordered data under noise with acknowledgement."
 #define TEST_PACKETS 300
-int test_case_9a(void)
+int
+test_case_9a(void)
 {
 	int i = 0, j = 0, k = 0, l = 0, m = 0, n = 0, f = 0;
 	int wait = 0;
@@ -3303,13 +3397,14 @@ int test_case_9a(void)
 	}
 }
 
-/*
+/* 
  *  Delivering out-of-order data under noise.
  */
 #define desc_case_9b "\
 Test Case 9(b):\n\
 Delivery of un-ordered data under noise."
-int test_case_9b(void)
+int
+test_case_9b(void)
 {
 	int i = 0, j = 0, l = 0, m = 0, f = 0;
 	int wait = 0;
@@ -3373,13 +3468,14 @@ int test_case_9b(void)
 #define TEST_PACKETS 10
 #define TEST_STREAMS 32
 #define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
-/*
+/* 
  *  Delivering ordered data in multiple streams under noise.
  */
 #define desc_case_9c "\
 Test Case 9(c):\n\
 Delivery of ordered data in multiple streams under noise."
-int test_case_9c(void)
+int
+test_case_9c(void)
 {
 	int i[TEST_STREAMS] = { 0, };
 	int j[TEST_STREAMS] = { 0, };
@@ -3472,13 +3568,14 @@ int test_case_9c(void)
 	}
 }
 
-/*
+/* 
  *  Delivering ordered and unordered data in multiple streams under noise.
  */
 #define desc_case_9d "\
 Test Case 9(d):\n\
 Delivery of ordered and un-ordered data in multiple streams under noise."
-int test_case_9d(void)
+int
+test_case_9d(void)
 {
 	int i[TEST_STREAMS] = { 0, };
 	int j[TEST_STREAMS] = { 0, };
@@ -3650,13 +3747,14 @@ int test_case_9d(void)
 	}
 }
 
-/*
+/* 
  *  Data for destination failure testing.
  */
 #define desc_case_10a "\
 Test Case 10(a):\n\
 Delivery of ordered data with destination failure."
-int test_case_10a(void)
+int
+test_case_10a(void)
 {
 	int i, j, k;
 	state = 0;
@@ -3701,18 +3799,20 @@ int test_case_10a(void)
 	}
 }
 
-long time_sub(struct timeval *t1, struct timeval *t2)
+long
+time_sub(struct timeval *t1, struct timeval *t2)
 {
 	return ((t1->tv_sec - t2->tv_sec) * 1000000 + (t1->tv_usec - t2->tv_usec));
 }
 
-/*
+/* 
  *  Data for destination failure testing.
  */
 #define desc_case_10b "\
 Test Case 10(b):\n\
 Delivery of ordered data with destination failure."
-int test_case_10b(void)
+int
+test_case_10b(void)
 {
 #define SETS 1000
 #define REPS 1
@@ -3737,7 +3837,11 @@ int test_case_10b(void)
 			show = 0;
 			for (j = 0; j < SETS; j++) {
 				for (i = 0; i < REPS; i++) {
-//                                              if ( sctp_data_req(fd1, N_RC_FLAG, "This is a much longer test pattern that is being used to see whether we can generate some congestion and it is called Test Pattern-1", 0) == FAILURE ) break;
+					// if ( sctp_data_req(fd1, N_RC_FLAG, "This is a much
+					// longer test pattern that is being used to see whether we 
+					// 
+					// can generate some congestion and it is called Test
+					// Pattern-1", 0) == FAILURE ) break;
 					if (sctp_data_req(fd1, N_RC_FLAG, "Test Pattern-1", 0) ==
 					    FAILURE)
 						break;
@@ -3821,131 +3925,421 @@ int test_case_10b(void)
 }
 
 struct test_case {
-	const char *name;
-	int (*preamble) (void);
-	int (*testcase) (void);
-	int (*postamble) (void);
+	const char *numb;		/* test case number */
+	const char *name;		/* test case name */
+	int (*preamble) (void);		/* test case preamble */
+	int (*testcase) (void);		/* test case proper */
+	int (*postamble) (void);	/* test case postamble */
+	int run;			/* whether to run this test */
+	int result;			/* results of test */
 } tests[] = {
 	{
-	desc_case_1, &preamble_0, &test_case_1, &postamble_0}
-	, {
-	desc_case_1b, &preamble_0, &test_case_1b, &postamble_0}
-	, {
-	desc_case_2, &preamble_0, &test_case_2, &postamble_0}
-	, {
-	desc_case_2a, &preamble_1, &test_case_2a, &postamble_1}
-	, {
-	desc_case_3, &preamble_1, &test_case_3, &postamble_1}
-	, {
-	desc_case_3b, &preamble_1, &test_case_3b, &postamble_1}
-	, {
-	desc_case_4, &preamble_1, &test_case_4, &postamble_1}
-	, {
-	desc_case_4b, &preamble_1, &test_case_4b, &postamble_1}
-	, {
-	desc_case_5, &preamble_1, &test_case_5, &postamble_1}
-	, {
-	desc_case_5b, &preamble_8, &test_case_5b, &postamble_1}
-	, {
-	desc_case_5c, &preamble_7, &test_case_5c, &postamble_1}
-	, {
-	desc_case_6, &preamble_2b, &test_case_6, &postamble_2}
-	, {
-	desc_case_6b, &preamble_2, &test_case_6b, &postamble_2}
-	, {
-	desc_case_6c, &preamble_3b, &test_case_6c, &postamble_2}
-	, {
-	desc_case_7, &preamble_2, &test_case_7, &postamble_2}
-	, {
-	desc_case_7b, &preamble_2, &test_case_7b, &postamble_2}
-	, {
-	desc_case_8, &preamble_2b, &test_case_8, &postamble_2}
-	, {
-	desc_case_8b, &preamble_2c, &test_case_8b, &postamble_2}
-	, {
-	desc_case_9a, &preamble_4, &test_case_9a, &postamble_2}
-	, {
-	desc_case_9b, &preamble_4, &test_case_9b, &postamble_2}
-	, {
-	desc_case_9c, &preamble_6, &test_case_9c, &postamble_2}
-	, {
-	desc_case_9d, &preamble_6, &test_case_9d, &postamble_2}
-	, {
-	desc_case_10a, &preamble_5, &test_case_10a, &postamble_2}
-	, {
-	desc_case_10b, &preamble_5, &test_case_10b, &postamble_2}
+	"1(a)", desc_case_1, &preamble_0, &test_case_1, &postamble_0, 0, 0}, {
+	"1(b)", desc_case_1b, &preamble_0, &test_case_1b, &postamble_0, 0, 0}, {
+	"2(a)", desc_case_2, &preamble_0, &test_case_2, &postamble_0, 0, 0}, {
+	"2(b)", desc_case_2b, &preamble_1, &test_case_2b, &postamble_1, 0, 0}, {
+	"3(a)", desc_case_3, &preamble_1, &test_case_3, &postamble_1, 0, 0}, {
+	"3(b)", desc_case_3b, &preamble_1, &test_case_3b, &postamble_1, 0, 0}, {
+	"4(a)", desc_case_4, &preamble_1, &test_case_4, &postamble_1, 0, 0}, {
+	"4(b)", desc_case_4b, &preamble_1, &test_case_4b, &postamble_1, 0, 0}, {
+	"5(a)", desc_case_5, &preamble_1, &test_case_5, &postamble_1, 0, 0}, {
+	"5(b)", desc_case_5b, &preamble_8, &test_case_5b, &postamble_1, 0, 0}, {
+	"5(c)", desc_case_5c, &preamble_7, &test_case_5c, &postamble_1, 0, 0}, {
+	"6(a)", desc_case_6, &preamble_2b, &test_case_6, &postamble_2, 0, 0}, {
+	"6(b)", desc_case_6b, &preamble_2, &test_case_6b, &postamble_2, 0, 0}, {
+	"6(c)", desc_case_6c, &preamble_3b, &test_case_6c, &postamble_2, 0, 0}, {
+	"7(a)", desc_case_7, &preamble_2, &test_case_7, &postamble_2, 0, 0}, {
+	"7(b)", desc_case_7b, &preamble_2, &test_case_7b, &postamble_2, 0, 0}, {
+	"8(a)", desc_case_8, &preamble_2b, &test_case_8, &postamble_2, 0, 0}, {
+	"8(b)", desc_case_8b, &preamble_2c, &test_case_8b, &postamble_2, 0, 0}, {
+	"9(a)", desc_case_9a, &preamble_4, &test_case_9a, &postamble_2, 0, 0}, {
+	"9(b)", desc_case_9b, &preamble_4, &test_case_9b, &postamble_2, 0, 0}, {
+	"9(c)", desc_case_9c, &preamble_6, &test_case_9c, &postamble_2, 0, 0}, {
+	"9(d)", desc_case_9d, &preamble_6, &test_case_9d, &postamble_2, 0, 0}, {
+	"10(a)", desc_case_10a, &preamble_5, &test_case_10a, &postamble_2, 0, 0}, {
+	"10(b)", desc_case_10b, &preamble_5, &test_case_10b, &postamble_2, 0, 0}, {
+	NULL,}
 };
 
-int main()
+int
+do_tests(void)
 {
 	int i;
 	int result = INCONCLUSIVE;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	printf("Simple test program for streams-sctp driver.\n");
+	int num_exit;
+	if (verbose) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout,
+			"\n\nRFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Program.\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
 	if (begin_tests() == SUCCESS) {
-		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)); i++) {
-			printf("\n%s\n", tests[i].name);
-			printf
-			    ("---------------------------------Preamble-----------------------------------\n");
-			if (tests[i].preamble() != SUCCESS) {
-				printf
-				    ("                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-				     state);
+		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+			if (tests[i].result)
+				continue;
+			if (!tests[i].run) {
+				tests[i].result = INCONCLUSIVE;
+				continue;
+			}
+			if (verbose) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "\nTest Case SCTP NPI:%s:\n%s\n", tests[i].numb,
+					tests[i].name);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			fprintf(stdout,
+				"---------------------------------Preamble-----------------------------------\n");
+			if (tests[i].preamble && tests[i].preamble() != SUCCESS) {
+				fprintf(stdout,
+					"                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
+					state);
 				result = INCONCLUSIVE;
 			} else {
-				printf
-				    ("--------------------|--------------Test-------------|--|--------------------\n");
-				if (tests[i].testcase() == FAILURE) {
-					printf
-					    ("                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    \n");
+				fprintf(stdout,
+					"--------------------|--------------Test-------------|--|--------------------\n");
+				if (tests[i].testcase && tests[i].testcase() == FAILURE) {
+					fprintf(stdout,
+						"                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    \n");
 					result = FAILURE;
 				} else {
-					printf
-					    ("                    |************ PASSED ***********|**|                    \n");
+					fprintf(stdout,
+						"                    |************ PASSED ***********|**|                    \n");
 					result = SUCCESS;
 				}
 			}
-			printf
-			    ("--------------------|------------Postamble----------|--|--------------------\n");
-			if (tests[i].postamble() != SUCCESS) {
-				printf
-				    ("                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-				     state);
+			fprintf(stdout,
+				"--------------------|------------Postamble----------|--|--------------------\n");
+			if (tests[i].postamble && tests[i].postamble() != SUCCESS) {
+				fprintf(stdout,
+					"                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
+					state);
 				if (result == SUCCESS)
 					result = INCONCLUSIVE;
 			}
-			printf
-			    ("----------------------------------------------------------------------------\n");
+			fprintf(stdout,
+				"----------------------------------------------------------------------------\n");
 			switch (result) {
 			case SUCCESS:
 				successes++;
-				printf("*********\n");
-				printf("********* Test Case SUCCESSFUL\n");
-				printf("*********\n\n");
+				fprintf(stdout, "*********\n");
+				fprintf(stdout, "********* Test Case SUCCESSFUL\n");
+				fprintf(stdout, "*********\n\n");
 				break;
 			case FAILURE:
 				failures++;
-				printf("XXXXXXXXX\n");
-				printf("XXXXXXXXX Test Case FAILED\n");
-				printf("XXXXXXXXX\n\n");
+				fprintf(stdout, "XXXXXXXXX\n");
+				fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+				fprintf(stdout, "XXXXXXXXX\n\n");
 				break;
 			default:
 			case INCONCLUSIVE:
 				inconclusive++;
-				printf("?????????\n");
-				printf("????????? Test Case INCONCLUSIVE\n");
-				printf("?????????\n\n");
+				fprintf(stdout, "?????????\n");
+				fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
+				fprintf(stdout, "?????????\n\n");
 				break;
 			}
+			tests[i].result = result;
 		}
 	} else
-		printf("Test setup failed!\n");
+		fprintf(stdout, "Test setup failed!\n");
 	end_tests();
-	printf("Done.\n\n");
-	printf("========= %2d successes   \n", successes);
-	printf("========= %2d failures    \n", failures);
-	printf("========= %2d inconclusive\n", inconclusive);
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (summary && verbose) {
+		fprintf(stdout, "\n\n");
+		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+			if (tests[i].run) {
+				fprintf(stdout, "Test Case SCTP NPI:%-10s  ", tests[i].numb);
+				switch (tests[i].result) {
+				case SUCCESS:
+					fprintf(stdout, "SUCCESS\n");
+					break;
+				case FAILURE:
+					fprintf(stdout, "FAILURE\n");
+					break;
+				default:
+				case INCONCLUSIVE:
+					fprintf(stdout, "INCONCLUSIVE\n");
+					break;
+				}
+			}
+		}
+		fflush(stdout);
+	}
+	fprintf(stdout, "Done.\n\n");
+	fprintf(stdout, "========= %2d successes   \n", successes);
+	fprintf(stdout, "========= %2d failures    \n", failures);
+	fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
+	lockf(fileno(stdout), F_ULOCK, 0);
 	return (0);
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -f, --fast [SCALE]\n\
+        Increase speed of tests by scaling timers [default: 50]\n\
+    -s, --summary\n\
+        Print a test case summary at end of testing [default: off]\n\
+    -o, --onetest [TESTCASE]\n\
+        Run a single test case.\n\
+    -t, --tests [RANGE]\n\
+        Run a range of test cases.\n\
+    -m, --messages\n\
+        Display messages. [default: off]\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	size_t l, n;
+	int range = 0;
+	struct test_case *t;
+	int tests_to_run = 0;
+	for (t = tests; t->numb; t++) {
+		if (!t->result) {
+			t->run = 1;
+			tests_to_run++;
+		}
+	}
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"fast",	optional_argument,	NULL, 'f'},
+			{"summary",	no_argument,		NULL, 's'},
+			{"onetest",	required_argument,	NULL, 'o'},
+			{"tests",	required_argument,	NULL, 't'},
+			{"messages",	no_argument,		NULL, 'm'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "f::so:t:mqvhV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'f':
+			if (optarg)
+				timer_scale = atoi(optarg);
+			else
+				timer_scale = 50;
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n",
+				timer_scale);
+			break;
+		case 's':
+			summary = 1;
+			break;
+		case 'o':
+			if (!range) {
+				for (t = tests; t->numb; t++)
+					t->run = 0;
+				tests_to_run = 0;
+			}
+			range = 1;
+			for (n = 0, t = tests; t->numb; t++)
+				if (!strncmp(t->numb, optarg, 16)) {
+					if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+					}
+				}
+			if (!n) {
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
+					optarg);
+				fflush(stderr);
+				goto bad_option;
+			}
+			break;
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 't':
+			l = strnlen(optarg, 16);
+			if (!range) {
+				for (t = tests; t->numb; t++)
+					t->run = 0;
+				tests_to_run = 0;
+			}
+			range = 1;
+			for (n = 0, t = tests; t->numb; t++)
+				if (!strncmp(t->numb, optarg, l)) {
+					if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+					}
+				}
+			if (!n) {
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
+					optarg);
+				fflush(stderr);
+				goto bad_option;
+			}
+			break;
+		case 'm':
+			show_msg = 1;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	if (!tests_to_run) {
+		if (verbose) {
+			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
+			fflush(stderr);
+		}
+		exit(2);
+	}
+	splash(argc, argv);
+	do_tests();
+	exit(0);
 }

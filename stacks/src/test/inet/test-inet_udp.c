@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:15 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:49:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -52,19 +52,35 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:25:15 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/02/22 08:49:20 $ by <bidulock@openss7.org>
+
+ -----------------------------------------------------------------------------
+ $Log: test-inet_udp.c,v $
+ Revision 0.9.2.1  2004/02/22 08:49:20  brian
+ - Added --help and --version options to all executables.
+
+ Revision 1.1.4.1  2004/01/12 23:33:19  brian
+ - Updated LiS-2.16.18 gcom release to autoconf.
+
+ Revision 1.1.2.3  2004/01/07 11:34:54  brian
+ - Updated copyright dates.
+
+ Revision 1.1.2.2  2004/01/04 11:31:24  brian
+ - Corrected xti include.
+
+ Revision 1.1.2.1  2003/12/23 11:12:24  brian
+ - Added INET streams test programs.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:15 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:49:20 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:15 $";
+    "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:49:20 $";
 
 /*
  *  Simple test program for INET streams.
  */
-#include <stropts.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -80,10 +96,19 @@ static char const ident[] =
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <sys/tpi.h>
-#include <sys/tpi_inet.h>
-#include <sys/xti_ip.h>
-#include <sys/xti_inet.h>
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
+#include <stropts.h>
+
+#define NEED_T_USCALAR_T
+
+#include <xti.h>
+#include <tihdr.h>
+#include <xti_inet.h>
+
+int verbose = 1;
 
 #define BUFSIZE 5*4096
 #define FFLUSH(stream)
@@ -131,7 +156,9 @@ unsigned short port1 = 10000, port2 = 10001, port3 = 10002;
 /*
  *  Options
  */
-/* data options */
+/*
+ * data options 
+ */
 struct {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
 	t_scalar_t tos_val __attribute__ ((packed));
@@ -160,7 +187,9 @@ struct {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
 , 0};
 
-/* receive data options */
+/*
+ * receive data options 
+ */
 typedef struct rdat_opt {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
 	t_scalar_t tos_val __attribute__ ((packed));
@@ -175,7 +204,9 @@ typedef struct rdat_opt {
 	struct t_opthdr tsn_hdr __attribute__ ((packed));
 	t_scalar_t tsn_val __attribute__ ((packed));
 } rdat_opt_t;
-/* connect options */
+/*
+ * connect options 
+ */
 struct {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
 	t_scalar_t tos_val __attribute__ ((packed));
@@ -203,14 +234,16 @@ struct {
 	, T_NO, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
 	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_ISTREAMS, T_SUCCESS}
 	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_OSTREAMS, T_SUCCESS}
 , 1};
 
-/* management options */
+/*
+ * management options 
+ */
 struct {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
 	t_scalar_t tos_val __attribute__ ((packed));
@@ -300,50 +333,51 @@ struct {
 	, 0, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}
 	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_COOKIE_LIFE, T_SUCCESS}
 	, 60000, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_SACK_DELAY, T_SUCCESS}
 	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}
 	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}
 	, 12, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}
 	, 12, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_HEARTBEAT_ITVL, T_SUCCESS}
 	, 200, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_RTO_INITIAL, T_SUCCESS}
 	, 0, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}
 	, 0, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}
 	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_OSTREAMS, T_SUCCESS}
 	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_ISTREAMS, T_SUCCESS}
 	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_COOKIE_INC, T_SUCCESS}
 	, 1000, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_THROTTLE_ITVL, T_SUCCESS}
 	, 50, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE,
-		    T_SUCCESS}
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP,
+		    T_SCTP_MAC_TYPE, T_SUCCESS}
 	, SCTP_HMAC_NONE, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
 , 0};
 
-char *err_string(ulong error)
+char *
+err_string(ulong error)
 {
 	switch (error) {
 	case TBADADDR:
@@ -409,12 +443,14 @@ char *err_string(ulong error)
 	}
 }
 
-void print_error(ulong error)
+void
+print_error(ulong error)
 {
 	printf("%s\n", err_string(error));
 }
 
-char *prim_string(ulong prim)
+char *
+prim_string(ulong prim)
 {
 	switch (prim) {
 	case T_CONN_REQ:
@@ -480,12 +516,14 @@ char *prim_string(ulong prim)
 	}
 }
 
-void print_prim(ulong prim)
+void
+print_prim(ulong prim)
 {
 	printf("%s", prim_string(prim));
 }
 
-void print_state(ulong state)
+void
+print_state(ulong state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -546,23 +584,24 @@ void print_state(ulong state)
 	printf("\n");
 }
 
-void print_addr(char *add_ptr, size_t add_len)
+void
+print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
 	if (add_len) {
 		if (add_len != sizeof(*a))
 			printf("Aaarrg! add_len = %d, ", add_len);
-		printf("%d.%d.%d.%d:%d",
-		       (a->sin_addr.s_addr >> 0) & 0xff,
+		printf("%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff,
 		       (a->sin_addr.s_addr >> 8) & 0xff,
-		       (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff,
-		       ntohs(a->sin_port));
+		       (a->sin_addr.s_addr >> 16) & 0xff,
+		       (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		printf("(no address)");
 	printf("\n");
 }
 
-void print_opt(char *opt_ptr, size_t opt_len)
+void
+print_opt(char *opt_ptr, size_t opt_len)
 {
 	struct t_opthdr *oh = (struct t_opthdr *) opt_ptr;
 	size_t opt_rem = opt_len;
@@ -785,7 +824,8 @@ void print_opt(char *opt_ptr, size_t opt_len)
 	printf("\n");
 }
 
-void print_size(ulong size)
+void
+print_size(ulong size)
 {
 	switch (size) {
 	case -1UL:
@@ -800,7 +840,8 @@ void print_size(ulong size)
 	}
 }
 
-void print_msg(int fd)
+void
+print_msg(int fd)
 {
 	if (ctrl.len > 0) {
 		switch (show) {
@@ -1202,7 +1243,8 @@ void print_msg(int fd)
 						    ("T_OPTDATA_IND <-----|<--(%03lu:-U-)----|  [%010lu]   |                    \n",
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
+									      OPT_offset))->
+						     sid_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
 									      OPT_offset))->
@@ -1212,10 +1254,12 @@ void print_msg(int fd)
 						    ("T_OPTDATA_IND <-----|<--(%03lu:%03lu)----|  [%010lu]   |                    \n",
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
+									      OPT_offset))->
+						     sid_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->ssn_val,
+									      OPT_offset))->
+						     ssn_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
 									      OPT_offset))->
@@ -1362,7 +1406,8 @@ void print_msg(int fd)
 						    ("                    |  [%010lu]  |---(%03lu:-U-)->|--+-----> T_OPTDATA_IND\n",
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
+									      OPT_offset))->
+						     tsn_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
 									      OPT_offset))->
@@ -1372,10 +1417,12 @@ void print_msg(int fd)
 						    ("                    |  [%010lu]  |---(%03lu:%03lu)->|--+-----> T_OPTDATA_IND\n",
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
+									      OPT_offset))->
+						     tsn_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
+									      OPT_offset))->
+						     sid_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
 									      OPT_offset))->
@@ -1522,7 +1569,8 @@ void print_msg(int fd)
 						    ("                    |  [%010lu]  |----(%03lu:-U-)--->|-----> T_OPTDATA_IND\n",
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
+									      OPT_offset))->
+						     tsn_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
 									      OPT_offset))->
@@ -1532,10 +1580,12 @@ void print_msg(int fd)
 						    ("                    |  [%010lu]  |----(%03lu:%03lu)--->|-----> T_OPTDATA_IND\n",
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
+									      OPT_offset))->
+						     tsn_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
+									      OPT_offset))->
+						     sid_val,
 						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
 									      cmd.tpi.optdata_ind.
 									      OPT_offset))->
@@ -1578,7 +1628,8 @@ void print_msg(int fd)
 	FFLUSH(stdout);
 }
 
-void print_less(int fd)
+void
+print_less(int fd)
 {
 	switch (show) {
 	case 1:
@@ -1624,12 +1675,15 @@ void print_less(int fd)
 	show = 0;
 	return;
 }
-void print_more(void)
+
+void
+print_more(void)
 {
 	show = 1;
 }
 
-int get_msg(int fd, int wait)
+int
+get_msg(int fd, int wait)
 {
 	int ret;
 	int flags = 0;
@@ -1655,7 +1709,9 @@ int get_msg(int fd, int wait)
 		return (cmd.tpi.type);
 	}
 	if (!wait) {
-		/* printf("Nothing to get on getmsg\n"); */
+		/*
+		 * printf("Nothing to get on getmsg\n"); 
+		 */
 		return (FAILURE);
 	}
 	do {
@@ -1663,7 +1719,9 @@ int get_msg(int fd, int wait)
 			{fd, POLLIN | POLLPRI, 0}
 		};
 		if (!(ret = poll(pfd, 1, wait))) {
-			/* printf("Timeout on poll for getmsg\n"); */
+			/*
+			 * printf("Timeout on poll for getmsg\n"); 
+			 */
 			return (FAILURE);
 		}
 		if (ret == 1 || ret == 2) {
@@ -1683,10 +1741,12 @@ int get_msg(int fd, int wait)
 			printf("ERROR: poll: [%d] %s\n", errno, strerror(errno));
 			return (FAILURE);
 		}
-	} while (1);
+	}
+	while (1);
 }
 
-int expect(int fd, int wait, int want)
+int
+expect(int fd, int wait, int want)
 {
 	int got;
 	if ((got = get_msg(fd, wait)) == want)
@@ -1724,7 +1784,8 @@ int expect(int fd, int wait, int want)
 	}
 }
 
-int put_msg(int fd, int band, int flags, int wait)
+int
+put_msg(int fd, int band, int flags, int wait)
 {
 	int ret;
 	struct strbuf *mydata = data.len ? &data : NULL;
@@ -1749,7 +1810,9 @@ int put_msg(int fd, int band, int flags, int wait)
 		return (SUCCESS);
 	}
 	if (!wait) {
-		/* printf("Nothing put on putpmsg\n"); */
+		/*
+		 * printf("Nothing put on putpmsg\n"); 
+		 */
 		return (FAILURE);
 	}
 	do {
@@ -1758,7 +1821,9 @@ int put_msg(int fd, int band, int flags, int wait)
 			{fd, flag, 0}
 		};
 		if (!(ret = poll(pfd, 1, wait))) {
-			/* printf("Timeout on poll for putpmsg\n"); */
+			/*
+			 * printf("Timeout on poll for putpmsg\n"); 
+			 */
 			return (FAILURE);
 		}
 		if (ret == 1 || ret == 2) {
@@ -1777,10 +1842,12 @@ int put_msg(int fd, int band, int flags, int wait)
 			printf("%d-ERROR: poll: [%d] %s\n", fd, errno, strerror(errno));
 			return (FAILURE);
 		}
-	} while (1);
+	}
+	while (1);
 }
 
-int put_fdi(int fd, int fd2, int offset, int flags)
+int
+put_fdi(int fd, int fd2, int offset, int flags)
 {
 	fdi.flags = flags;
 	fdi.fildes = fd2;
@@ -1795,7 +1862,8 @@ int put_fdi(int fd, int fd2, int offset, int flags)
 	return (SUCCESS);
 }
 
-int inet_open(const char *name)
+int
+inet_open(const char *name)
 {
 	int fd;
 	if ((fd = open(name, O_NONBLOCK | O_RDWR)) < 0)
@@ -1824,7 +1892,9 @@ int inet_open(const char *name)
 		}
 	return (fd);
 }
-int inet_close(int fd)
+
+int
+inet_close(int fd)
 {
 	int ret;
 	if ((ret = close(fd)) < 0)
@@ -1853,7 +1923,9 @@ int inet_close(int fd)
 		}
 	return (ret);
 }
-int inet_info_req(int fd)
+
+int
+inet_info_req(int fd)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.info_req);
@@ -1861,7 +1933,8 @@ int inet_info_req(int fd)
 	return put_msg(fd, 0, MSG_HIPRI, 0);
 }
 
-int inet_optmgmt_req(int fd, ulong flags)
+int
+inet_optmgmt_req(int fd, ulong flags)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.optmgmt_req) + sizeof(opt_optm);
@@ -1873,7 +1946,8 @@ int inet_optmgmt_req(int fd, ulong flags)
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
-int inet_bind_req(int fd, struct sockaddr_in *addr, int coninds)
+int
+inet_bind_req(int fd, struct sockaddr_in *addr, int coninds)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.bind_req) + sizeof(*addr);
@@ -1884,14 +1958,18 @@ int inet_bind_req(int fd, struct sockaddr_in *addr, int coninds)
 	bcopy(addr, (&cmd.tpi.bind_req) + 1, sizeof(*addr));
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int inet_unbind_req(int fd)
+
+int
+inet_unbind_req(int fd)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.unbind_req);
 	cmd.tpi.type = T_UNBIND_REQ;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int inet_unitdata_req(int fd, struct sockaddr_in *addr, const char *dat, size_t len, int wait)
+
+int
+inet_unitdata_req(int fd, struct sockaddr_in *addr, const char *dat, size_t len, int wait)
 {
 	int ret;
 	if (!dat)
@@ -1908,15 +1986,17 @@ int inet_unitdata_req(int fd, struct sockaddr_in *addr, const char *dat, size_t 
 	cmd.tpi.unitdata_req.OPT_length = sizeof(opt_data);
 	cmd.tpi.unitdata_req.OPT_offset = sizeof(cmd.tpi.unitdata_req) + sizeof(*addr);
 	bcopy(addr, (cmd.cbuf + sizeof(cmd.tpi.unitdata_req)), sizeof(*addr));
-	bcopy(&opt_data, (cmd.cbuf + sizeof(cmd.tpi.unitdata_req) + sizeof(*addr)),
-	      sizeof(opt_data));
+	bcopy(&opt_data,
+	      (cmd.cbuf + sizeof(cmd.tpi.unitdata_req) + sizeof(*addr)), sizeof(opt_data));
 	ret = put_msg(fd, 0, MSG_BAND, wait);
 	data.maxlen = BUFSIZE;
 	data.len = 0;
 	data.buf = dbuf;
 	return (ret);
 }
-int inet_conn_req(int fd, struct sockaddr_in *addr, const char *dat)
+
+int
+inet_conn_req(int fd, struct sockaddr_in *addr, const char *dat)
 {
 	if (!dat)
 		data.len = 0;
@@ -1934,7 +2014,9 @@ int inet_conn_req(int fd, struct sockaddr_in *addr, const char *dat)
 	bcopy(&opt_conn, (cmd.cbuf + sizeof(cmd.tpi.conn_req) + sizeof(*addr)), sizeof(opt_conn));
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int inet_conn_res(int fd, int fd2, const char *dat)
+
+int
+inet_conn_res(int fd, int fd2, const char *dat)
 {
 	if (!dat)
 		fdi.databuf.len = 0;
@@ -1950,7 +2032,9 @@ int inet_conn_res(int fd, int fd2, const char *dat)
 	cmd.tpi.conn_res.OPT_length = 0;
 	return put_fdi(fd, fd2, 4, 0);
 }
-int inet_discon_req(int fd, ulong seq)
+
+int
+inet_discon_req(int fd, ulong seq)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.discon_req);
@@ -1958,14 +2042,18 @@ int inet_discon_req(int fd, ulong seq)
 	cmd.tpi.discon_req.SEQ_number = seq;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int inet_ordrel_req(int fd)
+
+int
+inet_ordrel_req(int fd)
 {
 	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.ordrel_req);
 	cmd.tpi.type = T_ORDREL_REQ;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
-int inet_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
+
+int
+inet_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 {
 	int ret;
 	if (!dat)
@@ -1984,7 +2072,9 @@ int inet_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 	data.buf = dbuf;
 	return (ret);
 }
-int inet_data_req(int fd, ulong flags, const char *dat, int wait)
+
+int
+inet_data_req(int fd, ulong flags, const char *dat, int wait)
 {
 	if (!dat)
 		return (FAILURE);
@@ -1997,7 +2087,9 @@ int inet_data_req(int fd, ulong flags, const char *dat, int wait)
 	cmd.tpi.data_req.MORE_flag = flags & T_MORE;
 	return put_msg(fd, 0, MSG_BAND, wait);
 }
-int inet_exdata_req(int fd, ulong flags, const char *dat)
+
+int
+inet_exdata_req(int fd, ulong flags, const char *dat)
 {
 	if (!dat)
 		return (FAILURE);
@@ -2010,7 +2102,9 @@ int inet_exdata_req(int fd, ulong flags, const char *dat)
 	cmd.tpi.exdata_req.MORE_flag = flags & T_MORE;
 	return put_msg(fd, 1, MSG_BAND, 0);
 }
-int inet_optdata_req(int fd, ulong flags, const char *dat, int wait)
+
+int
+inet_optdata_req(int fd, ulong flags, const char *dat, int wait)
 {
 	if (!dat)
 		return (FAILURE);
@@ -2026,12 +2120,15 @@ int inet_optdata_req(int fd, ulong flags, const char *dat, int wait)
 	bcopy(&opt_data, cmd.cbuf + sizeof(cmd.tpi.optdata_req), sizeof(opt_data));
 	return put_msg(fd, flags & T_ODF_EX ? 1 : 0, MSG_BAND, wait);
 }
-int inet_wait(int fd, int wait)
+
+int
+inet_wait(int fd, int wait)
 {
 	return get_msg(fd, wait);
 }
 
-void inet_sleep(unsigned long t)
+void
+inet_sleep(unsigned long t)
 {
 	switch (show) {
 	case 1:
@@ -2048,7 +2145,8 @@ void inet_sleep(unsigned long t)
 		printf(" ...done\n");
 }
 
-int begin_tests(void)
+int
+begin_tests(void)
 {
 	addr1.sin_family = AF_INET;
 	addr1.sin_port = htons(port1);
@@ -2067,21 +2165,26 @@ int begin_tests(void)
 	return (SUCCESS);
 }
 
-int end_tests(void)
+int
+end_tests(void)
 {
 	return (SUCCESS);
 }
 
-int preamble_X(void)
-{
-	return (SUCCESS);
-}
-int postamble_X(void)
+int
+preamble_X(void)
 {
 	return (SUCCESS);
 }
 
-int preamble_0(void)
+int
+postamble_X(void)
+{
+	return (SUCCESS);
+}
+
+int
+preamble_0(void)
 {
 	if ((fd1 = inet_open(device)) < 0)
 		return (FAILURE);
@@ -2093,7 +2196,8 @@ int preamble_0(void)
 	return (SUCCESS);
 }
 
-int postamble_0(void)
+int
+postamble_0(void)
 {
 	do {
 		if (inet_close(fd1) == FAILURE)
@@ -2108,7 +2212,8 @@ int postamble_0(void)
 	return (FAILURE);
 }
 
-int preamble_1(void)
+int
+preamble_1(void)
 {
 	state = 0;
 	for (;;) {
@@ -2178,7 +2283,8 @@ int preamble_1(void)
 	}
 }
 
-int preamble_2(void)
+int
+preamble_2(void)
 {
 	state = 0;
 	for (;;) {
@@ -2216,7 +2322,8 @@ int preamble_2(void)
 	}
 }
 
-int preamble_2b(void)
+int
+preamble_2b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2261,11 +2368,14 @@ int preamble_2b(void)
 		return (FAILURE);
 	}
 }
-int preamble_3(void)
+int
+preamble_3(void)
 {
 	return preamble_1();
 }
-int preamble_3b(void)
+
+int
+preamble_3b(void)
 {
 	opt_optm.rcv_val = T_YES;
 	opt_optm.ist_val = 32;
@@ -2274,39 +2384,53 @@ int preamble_3b(void)
 	opt_conn.ost_val = 32;
 	return preamble_2();
 }
-int preamble_4(void)
+
+int
+preamble_4(void)
 {
 	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
 	return preamble_2();
 }
-int preamble_4b(void)
+
+int
+preamble_4b(void)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_2();
 }
-int preamble_5(void)
+
+int
+preamble_5(void)
 {
-//      opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	// opt_optm.dbg_val =
+	// SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
 	opt_optm.dbg_val = SCTP_OPTION_BREAK;
 	return preamble_2();
 }
-int preamble_6(void)
+
+int
+preamble_6(void)
 {
 	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
 	return preamble_3b();
 }
-int preamble_7(void)
+
+int
+preamble_7(void)
 {
 	opt_optm.mac_val = SCTP_HMAC_SHA_1;
 	return preamble_1();
 }
-int preamble_8(void)
+
+int
+preamble_8(void)
 {
 	opt_optm.mac_val = SCTP_HMAC_MD5;
 	return preamble_1();
 }
 
-int postamble_1(void)
+int
+postamble_1(void)
 {
 	uint failed = -1;
 	state = 0;
@@ -2363,7 +2487,8 @@ int postamble_1(void)
 	}
 }
 
-int postamble_2(void)
+int
+postamble_2(void)
 {
 	uint failed = -1;
 	state = 0;
@@ -2444,7 +2569,8 @@ int postamble_2(void)
 	}
 }
 
-int postamble_3(void)
+int
+postamble_3(void)
 {
 	uint failed = -1;
 	state = 0;
@@ -2539,7 +2665,8 @@ int postamble_3(void)
 #define desc_case_0 "\
 Test Case 0:\n\
 Checks that three streams can be opened and closed."
-int test_case_0(void)
+int
+test_case_0(void)
 {
 	state = 0;
 	for (;;) {
@@ -2579,7 +2706,8 @@ int test_case_0(void)
 #define desc_case_0b "\
 Test Case 0(b):\n\
 Checks that information can be requested on each of three streasm."
-int test_case_0b(void)
+int
+test_case_0b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2620,7 +2748,8 @@ int test_case_0b(void)
 Test Case 1(a):\n\
 Checks that options management can be performed on several streams\n\
 and that one stream can be bound and unbound."
-int test_case_1(void)
+int
+test_case_1(void)
 {
 	state = 0;
 	for (;;) {
@@ -2682,7 +2811,8 @@ int test_case_1(void)
 Test Case 1(b):\n\
 Checks that three streams can be bound and unbound with\n\
 one stream as listener."
-int test_case_1b(void)
+int
+test_case_1b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2728,7 +2858,8 @@ int test_case_1b(void)
 #define desc_case_2L "\
 Test Case 2: (Connectionless)\n\
 Attempts to transfer connectionless data."
-int test_case_2L(void)
+int
+test_case_2L(void)
 {
 	const char msg[] = "This is a test connectionless message.";
 	state = 0;
@@ -2762,7 +2893,8 @@ int test_case_2L(void)
 Test Case 2:\n\
 Attempts a connection with no listener.  The connection attempt\n\
 should time out."
-int test_case_2(void)
+int
+test_case_2(void)
 {
 	int i;
 	state = 0;
@@ -2822,7 +2954,8 @@ int test_case_2(void)
 Test Case 2(a):\n\
 Attempts and then withdraws a connection request.  The connection\n\
 should disconnect at both ends."
-int test_case_2a(void)
+int
+test_case_2a(void)
 {
 	state = 0;
 	for (;;) {
@@ -2865,7 +2998,8 @@ int test_case_2a(void)
 Test Case 3:\n\
 Attempts a connection which is refused by the receiving end.\n\
 The connection should disconnect at the attempting end."
-int test_case_3(void)
+int
+test_case_3(void)
 {
 	state = 0;
 	for (;;) {
@@ -2900,7 +3034,8 @@ int test_case_3(void)
 Test Case 3(b):\n\
 Attempts a delayed refusal of a connection requrest.  This delayed\n\
 refusal should come after the connector has already timed out."
-int test_case_3b(void)
+int
+test_case_3b(void)
 {
 	int i;
 	state = 0;
@@ -2948,7 +3083,8 @@ int test_case_3b(void)
 Test Case 4:\n\
 Accept a connection and then disconnect.  This connection attempt\n\
 should be successful."
-int test_case_4(void)
+int
+test_case_4(void)
 {
 	state = 0;
 	for (;;) {
@@ -3002,7 +3138,8 @@ Test Case 4(b):\n\
 Attempt a connection and delay the acceptance of the connection request.\n\
 This should result in a disconnection indication after the connection is\n\
 accepted.  "
-int test_case_4b(void)
+int
+test_case_4b(void)
 {
 	int i;
 	state = 0;
@@ -3062,7 +3199,8 @@ int test_case_4b(void)
 Test Case 5:\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_NONE signature on its cookie."
-int test_case_5(void)
+int
+test_case_5(void)
 {
 	state = 0;
 	for (;;) {
@@ -3115,7 +3253,8 @@ int test_case_5(void)
 Test Case 5(b):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_MD5 signature on its cookie."
-int test_case_5b(void)
+int
+test_case_5b(void)
 {
 	state = 0;
 	for (;;) {
@@ -3168,7 +3307,8 @@ int test_case_5b(void)
 Test Case 5(c):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_SHA_1 signature on its cookie."
-int test_case_5c(void)
+int
+test_case_5c(void)
 {
 	state = 0;
 	for (;;) {
@@ -3223,7 +3363,8 @@ Attempt and accept a connection where data is also passed in the\n\
 connection request and the connection response.  This should result\n\
 in DATA chunks being bundled with the COOKIE-ECHO and COOKIE-ACK\n\
 chunks in the SCTP messages."
-int test_case_6(void)
+int
+test_case_6(void)
 {
 	int i;
 	state = 0;
@@ -3278,7 +3419,8 @@ int test_case_6(void)
 #define desc_case_6b "\
 Test Case 6(b):\n\
 Connect and send partial data (i.e., data with more flag set)."
-int test_case_6b(void)
+int
+test_case_6b(void)
 {
 	state = 0;
 	for (;;) {
@@ -3316,7 +3458,8 @@ Test Case 6(c):\n\
 Connect and send partial data and expedited data on multiple streams.\n\
 Expedited data should be delivered between ordered data fragments on\n\
 the same stream and delivered to the user first."
-int test_case_6c(void)
+int
+test_case_6c(void)
 {
 	int i;
 	state = 0;
@@ -3399,7 +3542,8 @@ int test_case_6c(void)
 #define desc_case_7 "\
 Test Case 7(a):\n\
 Connect and send very large packets to test fragmentation."
-int test_case_7(void)
+int
+test_case_7(void)
 {
 	unsigned char lbuf[100000];
 	int i = 0, j = 0, k = 0, f = 0;
@@ -3459,7 +3603,8 @@ int test_case_7(void)
 #define desc_case_7b "\
 Test Case 7(b):\n\
 Connect and send many small packets to test coallescing of packets."
-int test_case_7b(void)
+int
+test_case_7b(void)
 {
 	int s = 0, r = 0;
 	size_t snd_bytes = 0;
@@ -3532,7 +3677,8 @@ int test_case_7b(void)
 #define desc_case_8 "\
 Test Case 8(a):\n\
 Connect, transfer data and perform orderly release."
-int test_case_8(void)
+int
+test_case_8(void)
 {
 	state = 0;
 	for (;;) {
@@ -3605,7 +3751,8 @@ int test_case_8(void)
 Test Case 8(b):\n\
 Connect, transfer data and perform orderly release but transfer\n\
 data after release has been initiated"
-int test_case_8b(void)
+int
+test_case_8b(void)
 {
 	state = 0;
 	for (;;) {
@@ -3695,7 +3842,8 @@ Test Case 8(c):\n\
 Connect, transfer data and perform orderly release but attempt\n\
 to perform a simultaneous release from both sides.  (This might\n\
 or might not result in a simultaneous release attempt.)"
-int test_case_8c(void)
+int
+test_case_8c(void)
 {
 	state = 0;
 	for (;;) {
@@ -3767,7 +3915,8 @@ int test_case_8c(void)
 #define desc_case_8d "\
 Test Case 8(d):\n\
 Connect, transfer data and perform orderly release under noise."
-int test_case_8d(void)
+int
+test_case_8d(void)
 {
 	int i;
 	state = 0;
@@ -3833,7 +3982,8 @@ int test_case_8d(void)
 Test Case 9(a):\n\
 Delivery of ordered data under noise with acknowledgement."
 #define TEST_PACKETS 300
-int test_case_9a(void)
+int
+test_case_9a(void)
 {
 	int i = 0, j = 0, l = 0, m = 0, f = 0;
 	int wait = 0;
@@ -3879,8 +4029,8 @@ int test_case_9a(void)
 				wait = 20;
 			if (f > TEST_PACKETS * 10)
 				goto test_case_9a_failure;
-			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS ||
-			    m < TEST_PACKETS)
+			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS
+			    || m < TEST_PACKETS)
 				continue;
 			return (SUCCESS);
 		}
@@ -3898,7 +4048,8 @@ int test_case_9a(void)
 #define desc_case_9b "\
 Test Case 9(b):\n\
 Delivery of un-ordered data under noise."
-int test_case_9b(void)
+int
+test_case_9b(void)
 {
 	int i = 0, j = 0, l = 0, m = 0, f = 0;
 	int wait = 0;
@@ -3944,8 +4095,8 @@ int test_case_9b(void)
 				wait = 20;
 			if (f > TEST_PACKETS * 10)
 				goto test_case_9b_failure;
-			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS ||
-			    m < TEST_PACKETS)
+			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS
+			    || m < TEST_PACKETS)
 				continue;
 			return (SUCCESS);
 		}
@@ -3968,7 +4119,8 @@ int test_case_9b(void)
 #define desc_case_9c "\
 Test Case 9(c):\n\
 Delivery of ordered data in multiple streams under noise."
-int test_case_9c(void)
+int
+test_case_9c(void)
 {
 	int i[TEST_STREAMS] = { 0, };
 	int j[TEST_STREAMS] = { 0, };
@@ -4053,7 +4205,8 @@ int test_case_9c(void)
 #define desc_case_9d "\
 Test Case 9(d):\n\
 Delivery of ordered and un-ordered data in multiple streams under noise."
-int test_case_9d(void)
+int
+test_case_9d(void)
 {
 	int i[TEST_STREAMS] = { 0, };
 	int j[TEST_STREAMS] = { 0, };
@@ -4176,8 +4329,8 @@ int test_case_9d(void)
 			}
 			if (++s >= TEST_STREAMS)
 				s = 0;
-			if (I >= TEST_TOTAL && L >= TEST_TOTAL && O >= TEST_TOTAL &&
-			    Q >= TEST_TOTAL)
+			if (I >= TEST_TOTAL && L >= TEST_TOTAL && O >= TEST_TOTAL
+			    && Q >= TEST_TOTAL)
 				wait = 20;
 			if (f > TEST_TOTAL * 10)
 				goto test_case_9d_failure;
@@ -4188,9 +4341,8 @@ int test_case_9d(void)
 			if (J < TEST_TOTAL || M < TEST_TOTAL || P < TEST_TOTAL || R < TEST_TOTAL)
 				continue;
 			for (s = 0; s < TEST_STREAMS; s++) {
-				if (j[s] != TEST_PACKETS
-				    || m[s] != TEST_PACKETS || p[s] != TEST_PACKETS ||
-				    r[s] != TEST_PACKETS)
+				if (j[s] != TEST_PACKETS || m[s] != TEST_PACKETS
+				    || p[s] != TEST_PACKETS || r[s] != TEST_PACKETS)
 					goto test_case_9d_failure;
 			}
 			return (SUCCESS);
@@ -4215,7 +4367,8 @@ int test_case_9d(void)
 #define desc_case_10a "\
 Test Case 10(a):\n\
 Delivery of ordered data with destination failure."
-int test_case_10a(void)
+int
+test_case_10a(void)
 {
 	int i, j, k;
 	state = 0;
@@ -4252,7 +4405,8 @@ int test_case_10a(void)
 	}
 }
 
-long time_sub(struct timeval *t1, struct timeval *t2)
+long
+time_sub(struct timeval *t1, struct timeval *t2)
 {
 	return ((t1->tv_sec - t2->tv_sec) * 1000000 + (t1->tv_usec - t2->tv_usec));
 }
@@ -4263,7 +4417,8 @@ long time_sub(struct timeval *t1, struct timeval *t2)
 #define desc_case_10b "\
 Test Case 10(b):\n\
 Delivery of ordered data with destination failure."
-int test_case_10b(void)
+int
+test_case_10b(void)
 {
 #define SETS 1000
 #define REPS 1
@@ -4285,7 +4440,10 @@ int test_case_10b(void)
 			show = 0;
 			for (j = 0; j < SETS; j++) {
 				for (i = 0; i < REPS; i++) {
-//                                              inet_data_req(fd1, 0, "This is a much longer test pattern that is being used to see whether we can generate some congestion and it is called Test Pattern-1", 0);
+					// inet_data_req(fd1, 0, "This is a much longer test
+					// pattern that is being used to see whether we can
+					// generate some congestion and it is called Test
+					// Pattern-1", 0);
 					inet_data_req(fd1, 0, "Test Pattern-1", 0);
 					times[j * REPS + i].req = when;
 					times[j * REPS + i].req_idx = n++;
@@ -4330,8 +4488,9 @@ int test_case_10b(void)
 		total /= k;
 		printf
 		    ("                    |                |                 |                    \n");
-		printf("                    |        average = %9ld usec  |                    \n",
-		       total);
+		printf
+		    ("                    |        average = %9ld usec  |                    \n",
+		     total);
 		printf
 		    ("                    |                |                 |                    \n");
 		return (ret);
@@ -4406,7 +4565,8 @@ struct test_case {
 #endif
 };
 
-int main()
+int
+run_tests(void)
 {
 	int i;
 	int result = INCONCLUSIVE;
@@ -4478,4 +4638,119 @@ int main()
 	printf("========= %2d failures    \n", failures);
 	printf("========= %2d inconclusive\n", inconclusive);
 	return (0);
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		static struct option long_options[] = {
+			{"quiet", 0, 0, 'q'},
+			{"verbose", 2, 0, 'v'},
+			{"help", 0, 0, 'h'},
+			{"version", 0, 0, 'V'},
+			{"?", 0, 0, 'h'},
+		};
+		c = getopt_long_only(argc, argv, "v:hqV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "v:hqV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				for (; optind < argc; optind++)
+					fprintf(stderr, "%s ", argv[optind]);
+				fprintf(stderr, "\n");
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/*
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	run_tests();
+	exit(0);
 }
