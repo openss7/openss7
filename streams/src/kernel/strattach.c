@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/01 09:52:19 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/02 13:13:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/01 09:52:19 $ by $Author: brian $
+ Last Modified $Date: 2005/04/02 13:13:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/01 09:52:19 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/02 13:13:37 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/01 09:52:19 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/02 13:13:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -98,7 +98,7 @@ static int (*check_mnt) (struct vfsmount * mnt)
 #else
 static inline int check_mnt(struct vfsmount *mnt)
 {
-	return mt->mnt_namespace == current->namepsace;
+	return mnt->mnt_namespace == current->namepsace;
 }
 #endif
 #if defined HAVE_GRAFT_TREE_ADDR

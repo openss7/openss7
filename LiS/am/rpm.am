@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/04/02 04:39:26 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/04/02 13:23:34 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 04:39:26 $ by $Author: brian $
+## Last Modified $Date: 2005/04/02 13:23:34 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -248,7 +248,7 @@ lfs-rpm:
 @WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs" --define "_without_indep --without-indep"' each-rpm
 
 noa-rpm:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm
 
 rpms: noa-rpm lis-rpm lfs-rpm one-rpm
 
