@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/11/08 06:52:06 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/12/17 02:35:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:52:06 $ by $Author: brian $
+# Last Modified $Date: 2004/12/17 02:35:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ $(STRCONF_INPUT): $(CONFIG_CLEAN_FILES) $(STRCONF_CONFIGS)
 
 EXTRA_DIST += $(STRCONF_CONFIGS)
 
-clean-strconf:
+distclean-strconf:
 	rm -f $(STRCONF_INPUT)
 	rm -f $(STRCONF_CONFIG)
 	rm -f $(STRCONF_MODCONF)
@@ -97,12 +97,12 @@ EXTRA_SCRIPTS += scripts/strconf-sh
 
 else
 
-clean-strconf:
+distclean-strconf:
 
 endif
 
-CLEAN_LOCAL += clean-strconf
+DISTCLEAN_LOCAL += distclean-strconf
 
-.PHONY: clean-strconf
+.PHONY: distclean-strconf
 
 # vim: ft=automake
