@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2004/08/12 01:05:54 $
+# @(#) $RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2004/08/13 04:34:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/12 01:05:54 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/13 04:34:57 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_snapshot,v $
+# Revision 1.1.2.9  2004/08/13 04:34:57  brian
+# - Move device to test specific options.
+#
 # Revision 1.1.2.8  2004/08/12 01:05:54  brian
 # - Added benchmark scripts and documentation.
 #
@@ -106,7 +109,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.8 $)'
+ident='$RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.9 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -730,10 +733,10 @@ function netperf_tcp_warmup()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 2>&1 >/dev/null"
+	$ECHO "$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device 2>&1 >/dev/null"
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 2>&1 >/dev/null
+	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device 2>&1 >/dev/null
     fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO
@@ -744,10 +747,10 @@ function netperf_tcp_warmup()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m   96 2>&1 >/dev/null"
+	$ECHO "$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m   96 $device 2>&1 >/dev/null"
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m   96 2>&1 >/dev/null
+	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m   96 $device 2>&1 >/dev/null
     fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO
@@ -759,10 +762,10 @@ function netperf_tcp_warmup()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase$device -H $hostname $calibration -- -r 1,1                    2>&1 >/dev/null"
+	$ECHO "$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -r 1,1                    $device 2>&1 >/dev/null"
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase$device -H $hostname $calibration -- -r 1,1                    2>&1 >/dev/null
+	$netperf ${port:+-p }$port -P 0 -l $warmtime -t $testcase -H $hostname $calibration -- -r 1,1                    $device 2>&1 >/dev/null
     fi
     if test ${verbose:-1} -gt 1 ; then
 	$ECHO
@@ -787,11 +790,11 @@ function netperf_sctp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 57344 -S 57344 -m 4096"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 57344 -S 57344 -m 4096 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 57344 -S 57344 -m 4096
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 57344 -S 57344 -m 4096 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -802,11 +805,11 @@ function netperf_sctp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -818,11 +821,11 @@ function netperf_sctp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 1,1"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 1,1
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -842,11 +845,11 @@ function netperf_tcp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 57344 -S 57344 -m 4096"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 57344 -S 57344 -m 4096 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 57344 -S 57344 -m 4096
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 57344 -S 57344 -m 4096 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -857,11 +860,11 @@ function netperf_tcp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -873,11 +876,11 @@ function netperf_tcp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 1,1"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 1,1
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -897,11 +900,11 @@ function netperf_udp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 1,1"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 1,1
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 1,1 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -912,11 +915,11 @@ function netperf_udp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 516,4"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 516,4 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -r 516,4
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r 516,4 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -928,11 +931,11 @@ function netperf_udp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 4096
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 4096 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO
@@ -943,11 +946,11 @@ function netperf_udp_tests()
 	$ECHO
 	$ECHO "------------------------------------"
 	$ECHO "Testing with the following command line:"
-	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 1024"
+	$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 1024 $device"
 	$ECHO
     fi
     if test :${run:-yes} != :no ; then
-	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $hostname $calibration -- -s 32768 -S 32768 -m 1024
+	$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -s 32768 -S 32768 -m 1024 $device
     fi
     if test ${verbose:-1} -gt 0 ; then
 	$ECHO

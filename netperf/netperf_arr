@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_arr,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/12 13:55:38 $
+# @(#) $RCSfile: netperf_arr,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2004/08/13 04:34:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/12 13:55:38 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/13 04:34:57 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_arr,v $
+# Revision 1.1.2.3  2004/08/13 04:34:57  brian
+# - Move device to test specific options.
+#
 # Revision 1.1.2.2  2004/08/12 13:55:38  brian
 # - Worked up arr script.
 #
@@ -109,7 +112,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_arr,v $ $Name:  $($Revision: 1.1.2.2 $)'
+ident='$RCSfile: netperf_arr,v $ $Name:  $($Revision: 1.1.2.3 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -789,11 +792,11 @@ function netperf_rr_tests()
 		    $ECHO
 		    $ECHO "------------------------------------"
 		    $ECHO "Testing with the following command line:"
-		    $ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $host $calibration -- -r $rrsize &"
+		    $ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $host $calibration -- -r $rrsize $device &"
 		    $ECHO
 		fi
 		if test :${run:-yes} != :no ; then
-		    $netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase$device -H $host $calibration -- -r $rrsize &
+		    $netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $host $calibration -- -r $rrsize $device &
 		fi
 		if test ${verbose:-1} -gt 0 ; then
 		    $ECHO

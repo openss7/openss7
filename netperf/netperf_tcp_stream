@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2004/08/11 19:45:30 $
+# @(#) $RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2004/08/13 04:34:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/11 19:45:30 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/13 04:34:58 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_tcp_stream,v $
+# Revision 1.1.2.7  2004/08/13 04:34:58  brian
+# - Move device to test specific options.
+#
 # Revision 1.1.2.6  2004/08/11 19:45:30  brian
 # - Add verbose and debugging capability.
 #
@@ -109,7 +112,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 1.1.2.6 $)'
+ident='$RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 1.1.2.7 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -391,6 +394,7 @@ do
 	--debug=* | --debu=* | --deb=* | --de=* | --d=* | \
 	--verbose=* | --verbos=* | --verbo=* | --verb=* | \
 	--port=* | --por=* | --po=* | --p=* | \
+	--xti=* | --xt=* | --x=* | \
 	--hostname=* | --hostnam=* | --hostna=* | --hostn=* | --host=* | --hos=* | --ho=* | --h=* | \
 	--testtime=* | --testime=* | --testtim=* | --testim=* | --time=* | --t=* | \
 	--bufsizes=* | --bufsize=* | --bufsiz=* | --bufsi=* | --bufs=* | --buf=* | --bu=* | --b=* | \
@@ -442,118 +446,67 @@ do
     # Have we seen a non-optional argument yet?
     case $arg in
 	--help | --h | --\? | -h | -\?)
-	    show_help=yes
-	    if test ":$command" = ":" ; then command=none ; fi
-	    ;;
+	    show_help=yes ; if test ":$command" = ":" ; then command=none ; fi ;;
 	--version | --versio | --versi | --vers | -V)
-	    show_version=yes
-	    if test ":$command" = ":" ; then command=none ; fi
-	    ;;
+	    show_version=yes ; if test ":$command" = ":" ; then command=none ; fi ;;
 	--copying | --copyin | --copyi | --copy | --cop | --co | --c | -C)
-	    show_copying=yes
-	    if test ":$command" = ":" ; then command=none ; fi
-	    ;;
+	    show_copying=yes ; if test ":$command" = ":" ; then command=none ; fi ;;
 	--verbose | --verbos | --verbo | --verb)
-	    prevopt="$arg"
-	    prev=verbose
-	    ;;
+	    prevopt="$arg" ; prev=verbose ;;
 	-v)
-	    ((verbose++))
-	    ;;
+	    ((verbose++)) ;;
 	--verbose=* | --verbos=* | --verbo=* | --verb=*)
-	    verbose="$optarg"
-	    ;;
+	    verbose="$optarg" ;;
 	--debug | --debu | --deb)
-	    prevopt="$arg"
-	    prev=debug
-	    ;;
+	    prevopt="$arg" ; prev=debug ;;
 	-D)
-	    $ECHO "$program: enabling shell trace mode" 1>&2
-	    set -x
-	    ;;
+	    $ECHO "$program: enabling shell trace mode" 1>&2 ; set -x ;;
 	--debug=* | --debu=* | --deb=*)
-	    debug="$optarg"
-	    ;;
+	    debug="$optarg" ;;
 	--dry-run | --dryrun | --n | -n)
-	    run=no
-	    ;;
+	    run=no ;;
 	--quiet | --silent | -q)
-	    show=no
-	    verbose=0
-	    debug=0
-	    ;;
+	    show=no ; verbose=0 ; debug=0 ;;
 	--port | --por | --po | --p | -p)
-	    prevopt=$arg
-	    prev=port
-	    ;;
+	    prevopt=$arg ; prev=port ;;
 	--port=* | --por=* | --po=* | --p=* | -p*)
-	    port="$optarg"
-	    ;;
+	    port="$optarg" ;;
 	--testtime | --testime | --testtim | --testim | --time | --t | -t)
-	    prevopt="$arg"
-	    prev=testtime
-	    ;;
+	    prevopt="$arg" ; prev=testtime ;;
 	--testtime=* | --testime=* | --testtim=* | --testim=* | --time=* | --t=* | -t*)
-	    testtime="$optarg"
-	    ;;
+	    testtime="$optarg" ;;
 	--hostname | --hostnam | --hostna | --hostn | --host | --hos | --ho | --h | -H)
-	    prevopt="$arg"
-	    prev=hostname
-	    ;;
+	    prevopt="$arg" ; prev=hostname ;;
 	--hostname=* | --hostnam=* | --hostna=* | --hostn=* | --host=* | --hos=* | --ho=* | --h=* | -H*)
-	    hostname="$optarg"
-	    ;;
+	    hostname="$optarg" ;;
 	--bufsize | --bufsiz | --bufsi | --bufs | --buf | --bu | --b | -b)
-	    prevopt="$arg"
-	    prev=bufsize
-	    ;;
+	    prevopt="$arg" ; prev=bufsize ;;
 	--bufsize=* | --bufsiz=* | --bufsi=* | --bufs=* | --buf=* | --bu=* | --b=* | -b*)
-	    bufsizes="$bufsizes${bufsizes:+ }$optarg"
-	    ;;
+	    bufsizes="$bufsizes${bufsizes:+ }$optarg" ;;
 	--bufsizes | -B)
-	    prevopt="$arg"
-	    prev=bufsizes
-	    ;;
+	    prevopt="$arg" ; prev=bufsizes ;;
 	--bufsizes=* | -B*)
-	    bufsizes="$optarg"
-	    ;;
+	    bufsizes="$optarg" ;;
 	--sndsize | --sndsiz | --sndsi | --snds | --snd | --sn | --s | -s)
-	    prevopt="$arg"
-	    prev=sndsize
-	    ;;
+	    prevopt="$arg" ; prev=sndsize ;;
 	--sndsize=* | --sndsiz=* | --sndsi=* | --snds=* | --snd=* | --sn=* | --s=* | -s*)
-	    sndsizes="$sndsizes${sndsizes:+ }$optarg"
-	    ;;
+	    sndsizes="$sndsizes${sndsizes:+ }$optarg" ;;
 	--sndsizes | -S)
-	    prevopt="$arg"
-	    prev=sndsizes
-	    ;;
+	    prevopt="$arg" ; prev=sndsizes ;;
 	--sndsizes=* | -S*)
-	    sndsizes="$optarg"
-	    ;;
+	    sndsizes="$optarg" ;;
 	--calibrate | --calibrat | --calibra | --calibr | --calib | --cali | --cal | --ca | --c | -c)
-	    calibrate=yes
-	    ;;
+	    calibrate=yes ;;
 	--xti | --xt | --x | -x)
-	    xti=yes
-	    prevopt="$arg"
-	    prev=device
-	    ;;
+	    xti=yes ; prevopt="$arg" ; prev=device ;;
 	--xti=* | --xt=* | --x=* | -x*)
-	    xti=yes
-	    device="$optarg"
-	    ;;
-	--)
-	    # end of options
-	    more_options=no
-	    ;;
+	    xti=yes ; device="$optarg" ;;
+	--) # end of options
+	    more_options=no ;;
 	-* | \+*)
-	    option_unrec $arg
-	    ;;
-	*)
-	    # permute all non-options to the end
-	    nonopt="${nonopt}${nonopt:+ }$arg"
-	    ;;
+	    option_unrec $arg ;;
+	*)  # permute all non-options to the end
+	    nonopt="${nonopt}${nonopt:+ }$arg" ;;
     esac
 done
 
@@ -710,10 +663,10 @@ function netperf_tcp_test()
 		$ECHO
 		$ECHO "------------------------------------"
 		$ECHO
-		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase $tcpdev -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize"
+		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $tcpdev"
 	    fi
 	    if test :${run:-yes} != :no ; then
-		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase $tcpdev -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize
+		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $tcpdev
 	    fi
 	    if test ${verbose:-1} -gt 0 ; then
 		$ECHO

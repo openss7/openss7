@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_udp_range,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2004/08/12 01:05:54 $
+# @(#) $RCSfile: netperf_udp_range,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2004/08/13 04:34:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/12 01:05:54 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/13 04:34:58 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_udp_range,v $
+# Revision 1.1.2.6  2004/08/13 04:34:58  brian
+# - Move device to test specific options.
+#
 # Revision 1.1.2.5  2004/08/12 01:05:54  brian
 # - Added benchmark scripts and documentation.
 #
@@ -112,7 +115,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_udp_range,v $ $Name:  $($Revision: 1.1.2.5 $)'
+ident='$RCSfile: netperf_udp_range,v $ $Name:  $($Revision: 1.1.2.6 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -736,10 +739,10 @@ function netperf_udp_test()
 		$ECHO
 		$ECHO "------------------------------------"
 		$ECHO
-		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase $udpdev -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize"
+		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $udpdev"
 	    fi
 	    if test :${run:-yes} != :no ; then
-		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase $udpdev -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize
+		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $udpdev
 	    fi
 	    if test ${verbose:-1} -gt 0 ; then
 		$ECHO

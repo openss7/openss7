@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_sctp_rr,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2004/08/11 19:45:30 $
+# @(#) $RCSfile: netperf_sctp_rr,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2004/08/13 04:34:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/11 19:45:30 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/13 04:34:57 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_sctp_rr,v $
+# Revision 1.1.2.5  2004/08/13 04:34:57  brian
+# - Move device to test specific options.
+#
 # Revision 1.1.2.4  2004/08/11 19:45:30  brian
 # - Add verbose and debugging capability.
 #
@@ -106,7 +109,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_sctp_rr,v $ $Name:  $($Revision: 1.1.2.4 $)'
+ident='$RCSfile: netperf_sctp_rr,v $ $Name:  $($Revision: 1.1.2.5 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -707,10 +710,10 @@ function netperf_sctp_test()
 		$ECHO
 		$ECHO "------------------------------------"
 		$ECHO
-		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase $sctpdev -H $hostname $calibration -- -r $rrsize -s $bufsize -S $bufsize"
+		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r $rrsize -s $bufsize -S $bufsize $sctpdev"
 	    fi
 	    if test :${run:-yes} != :no ; then
-		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase $sctpdev -H $hostname $calibration -- -r $rrsize -s $bufsize -S $bufsize
+		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -r $rrsize -s $bufsize -S $bufsize $sctpdev
 	    fi
 	    if test ${verbose:-1} -gt 0 ; then
 		$ECHO
