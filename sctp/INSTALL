@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: INSTALL,v 0.9.2.3 2002/05/08 13:06:13 brian Exp $
+# $Id: INSTALL,v 0.9.2.5 2002/05/14 12:53:19 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -29,18 +29,18 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
+# Last Modified $Date: 2002/05/14 12:53:19 $ by $Author: brian $
 # 
 # *****************************************************************************
 
-This is the linux-sctp-0.2 prerelease.  It can be obtained from the
-download area of http://www.openss7.org as linux-sctp-0.2.tgz.
+This is the linux-sctp-0.2.4 prerelease.  It can be obtained from the
+download area of http://www.openss7.org as linux-sctp-0.2.4.tgz.
 
-The tarball linux-sctp-0.2.tgz unpacks with the command
+The tarball linux-sctp-0.2.4.tgz unpacks with the command
 
-        tar -xzvf linux-sctp-0.2.tgz
+        tar -xzvf linux-sctp-0.2.4.tgz
 
-into the following files and directories under linux-sctp-0.2:
+into the following files and directories under linux-sctp-0.2.4:
 
         INSTALL     - Installation instructions
         LICENSE     - GNU Public License
@@ -48,6 +48,10 @@ into the following files and directories under linux-sctp-0.2:
         doc         - Miscellaneous documentation
         man         - sctp.7 man page for Linux
         patch-0.2   - patch file to patch Linux 2.4.18 kernel sources
+	patch-0.2.1 - additional patch file
+	patch-0.2.2 - additional patch file
+	patch-0.2.3 - additional patch file
+	patch-0.2.4 - additional patch file
         test        - Test files and Ethereal dumps from ETSI bakeoff.
 
 The patch for the Linux 2.4.18 kernel is in the file patch-0.2  This
@@ -61,7 +65,14 @@ patch file is in ~/linux-sctp-0.2 use the patch command as follows to
 patch the linux kernel sources in /usr/src/linux-2.4.18
 
         cd /usr/src/linux-2.4.18
-        gzip -dc ~/linux-sctp-0.2/patch-0.2.gz | patch -p1
+        gzip -dc ~/linux-sctp-0.2/patch-0.2.gz | patch -p0
+
+Then the additional patches should be applied as follows:
+
+        gzip -dc ~/linux-sctp-0.2/patch-0.2.1.gz | patch -p0
+        gzip -dc ~/linux-sctp-0.2/patch-0.2.2.gz | patch -p0
+        gzip -dc ~/linux-sctp-0.2/patch-0.2.3.gz | patch -p0
+        gzip -dc ~/linux-sctp-0.2/patch-0.2.4.gz | patch -p0
 
 Note: make sure that you do not have the environment variable
 POSIXLY_CORRECT set or this patch will not apply correctly.  For csh do:
@@ -212,22 +223,23 @@ I set these as follows:
 	CONFIG_SCTP_ADLER_32=y
 	CONFIG_SCTP_CRC_32C=y
 	# CONFIG_SCTP_THROTTLE_PASSIVEOPENS is not set
-	CONFIG_SCTP_DEBUG=y
+	CONFIG_SCTP_SAFE=y
 	CONFIG_SCTP_ERROR_GENERATOR=y
 
 Once you compile install and reboot on the new kernel, you will be able
 to open SCTP sockets.  If you configure SCTP as a module (as I do), the
 module will be loaded on demand when an SCTP socket is opened.
 
-A header file is included in the package (in include/netinet/sctp.h).
-This file can either be included with:
+Header files are included in the package (in include).  These files can
+either be included with:
 
 	#include <netinet/sctp.h>
+        #include <linux/sysctl.h>
 
-and either placed in your /usr/src/include/netinet/ directory or
-included with a compile line command such as:
+and either placed in your /usr/src/include/ subdirectories or included
+with a compile line command such as:
 
-	gcc -I~/linux-sctp-0.2/include -o test test.c
+	gcc -I~/linux-sctp-0.2.4/include -o test test.c
 
 Read the SCTP man page (in man/sctp.7) and look at the test programs
 under the test directory.  You can place the manual page in you man
@@ -237,6 +249,6 @@ to your system, or just view it with less or man -f.
 To compile the test programs just change to the test program directory
 and type make:
 
-        cd ~/linux-sctp-0.2/test
+        cd ~/linux-sctp-0.2.4/test
         make
 

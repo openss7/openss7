@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: test9.c,v 0.9.2.2 2001/04/24 16:28:43 brian Exp $
+ @(#) $Id: test9.c,v 0.9.2.3 2002/05/14 09:38:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,34 +22,34 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2001/04/24 16:28:43 $ by $Author: brian $
+ Last Modified $Date: 2002/05/14 09:38:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test9.c,v $
- Revision 0.9.2.2  2001/04/24 16:28:43  brian
- Initial revision
+ Revision 0.9.2.3  2002/05/14 09:38:55  brian
+ Updated test files and includes.
 
- Revision 0.1  2001/04/24 16:28:43  brian
- Initial revision
+ Revision 0.2  2002/05/14 09:38:55  brian
+ Updated test files and includes.
+
+ Revision 0.1.1.1  2001/04/24 16:28:43  brian
+ Import of Linux SCTP Prerelease1
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2001/04/24 16:28:43 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2002/05/14 09:38:55 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/sctp.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
 
 int s[7];
 
@@ -197,6 +197,11 @@ main() {
 
 //	test_connect(0,1,2);
 
+	printf("Closing connected socket\n");
+	sleep(5);
 	close(s[0]);
+
+	printf("Closing listening socket\n");
+	sleep(5);
 	close(s[1]);
 }

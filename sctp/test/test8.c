@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: test8.c,v 0.9.2.2 2001/04/17 23:46:58 brian Exp $
+ @(#) $Id: test8.c,v 0.9.2.3 2002/05/14 09:38:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,34 +22,34 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2001/04/17 23:46:58 $ by $Author: brian $
+ Last Modified $Date: 2002/05/14 09:38:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test8.c,v $
- Revision 0.9.2.2  2001/04/17 23:46:58  brian
- Initial revision
+ Revision 0.9.2.3  2002/05/14 09:38:55  brian
+ Updated test files and includes.
 
- Revision 0.1  2001/04/17 23:46:58  brian
- Initial revision
+ Revision 0.2  2002/05/14 09:38:55  brian
+ Updated test files and includes.
+
+ Revision 0.1.1.1  2001/04/17 23:46:58  brian
+ Import of Linux SCTP Prerelease1
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2001/04/17 23:46:58 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2002/05/14 09:38:55 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/sctp.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
 
 int s[7];
 
@@ -159,8 +159,8 @@ int test_connect(int n, int a, int m)
 
 main() {
 	inet_aton("0.0.0.0",	    &addr[0].sin_addr);
-	inet_aton("127.0.0.0",	    &addr[1].sin_addr);
-	inet_aton("127.0.0.1",	    &addr[2].sin_addr);
+	inet_aton("127.0.0.1",	    &addr[1].sin_addr);
+	inet_aton("127.0.0.2",	    &addr[2].sin_addr);
 	inet_aton("192.168.0.3",    &addr[3].sin_addr);
 	inet_aton("172.16.13.17",   &addr[4].sin_addr);
 	inet_aton("192.168.0.255",  &addr[5].sin_addr);

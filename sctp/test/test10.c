@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: test10.c,v 0.9.2.2 2001/04/24 16:29:07 brian Exp $
+ @(#) $Id: test10.c,v 0.9.2.3 2002/05/14 09:38:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,34 +22,34 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2001/04/24 16:29:07 $ by $Author: brian $
+ Last Modified $Date: 2002/05/14 09:38:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test10.c,v $
- Revision 0.9.2.2  2001/04/24 16:29:07  brian
- Initial revision
+ Revision 0.9.2.3  2002/05/14 09:38:55  brian
+ Updated test files and includes.
 
- Revision 0.1  2001/04/24 16:29:07  brian
- Initial revision
+ Revision 0.2  2002/05/14 09:38:55  brian
+ Updated test files and includes.
+
+ Revision 0.1.1.1  2001/04/24 16:29:07  brian
+ Import of Linux SCTP Prerelease1
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2001/04/24 16:29:07 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2002/05/14 09:38:55 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/sctp.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
 
 int s[7];
 
@@ -121,6 +121,15 @@ int test_open(int n)
 //		return -1;
 //	}
 	return 0;
+}
+int test_nonblock(int n)
+{
+	if ( fcntl(s[n], F_SETFL, O_NONBLOCK) < 0 )
+	{
+		perror(__FUNCTION__);
+		fprintf(stderr, "^^^^^^^^\n");
+		return -1;
+	}
 }
 
 int test_multi_bind(int n, int a, int m)
@@ -234,29 +243,30 @@ main() {
 
 	test_open(0);
 	test_open(1);
-
+	if ( test_nonblock(1) )
+		goto dead;
 	if ( test_multi_bind(0,0,1) )
 		goto dead;
 	if ( test_listen(0) )
 		goto dead;
 	if ( test_multi_bind(1,1,1) )
 		goto dead;
-	if ( test_connect(1,0,1) )
-		goto dead;
+	test_connect(1,0,1);
 	if ( test_accept(0,2) )
 		goto dead;
 
 	test_open(3);
 	test_open(4);
 
+	if ( test_nonblock(4) )
+		goto dead;
 	if ( test_multi_bind(3,2,1) )
 		goto dead2;
 	if ( test_listen(3) )
 		goto dead2;
 //	if ( test_multi_bind(4,3,1) )
 //		goto dead2;
-	if ( test_connect(4,2,1) )
-		goto dead2;
+	test_connect(4,2,1);
 	if ( test_accept(3,5) )
 		goto dead2;
 
