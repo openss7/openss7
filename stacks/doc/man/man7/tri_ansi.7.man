@@ -1,0 +1,234 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: tri_ansi.7.man,v 0.9.2.1 2004/10/26 05:33:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/26 05:33:00 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TRI-ANSI 7 "$Date: 2004/10/26 05:33:00 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.PP
+.B TRI-ANSI
+\- Transaction Interface \(em Corrigendum for ANSI T1.114 Conformance
+.SH SYNOPSIS
+.PP
+.B #include <ss7/tr.h>
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.
+.
+.SH DESCRIPTION
+.PP
+.B TRI-ANSI
+provides a
+.I stream
+supporting the Transaction Interface
+.BR "" ( tri (7))
+.[
+tri
+.]
+to the Transaction Capabilities Application Part
+.BR "" ( tcap (4))
+for ANSI T1.114/1992
+.[
+t1.114
+.]
+operation.
+This
+.IR STREAMS (4)
+interface provides the
+.BR tcap (4)
+protocol service interface using the TR-primitives of the
+.BR tri (7).
+This interface is intended solely for use by user programs or protocol modules requiring the
+.BR tri (7)
+interface, such as
+.BR map (4).
+.
+.
+.SH "ADDRESS FORMATS"
+.PP
+.SH "QUALITY OF SERVICE"
+.PP
+.SH "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+The following local management primitves are implemented for the ANSI T1.114 TCAP provider as
+described in the following subsections:
+.SS TR_INFO_REQ
+This primitive is implemented as described in
+.BR TR_INFO_REQ (7)
+with no additional considerations.
+.SS TR_INFO_ACK
+This primitive is implemented as described in
+.BR TR_INFO_ACK (7)
+with no additional considerations.
+.SS TR_ADDR_REQ
+This primitive is implemented as described in
+.BR TR_ADDR_REQ (7)
+with no additional considerations.
+.SS TR_ADDR_ACK
+This primitive is implemented as described in
+.BR TR_ADDR_ACK (7)
+with no additional considerations.
+.SS TR_BIND_REQ
+This primitive is implemented as described in
+.BR TR_BIND_REQ (7)
+with no additional considerations.
+.SS TR_BIND_ACK
+This primitive is implemented as described in
+.BR TR_BIND_ACK (7)
+with no additional considerations.
+.SS TR_UNBIND_REQ
+This primitive is implemented as described in
+.BR TR_UNBIND_REQ (7)
+with no additional considerations.
+.SS TR_OPTMGMT_REQ
+This primitive is implemented as described in
+.BR TR_OPTMGMT_REQ (7)
+with no additional considerations.
+.SS TR_OPTMGMT_ACK
+This primitive is implemented as described in
+.BR TR_OPTMGMT_ACK (7)
+with no additional considerations.
+.SS TR_OK_ACK
+This primitive is implemented as described in
+.BR TR_OK_ACK (7)
+with no additional considerations.
+.SS TR_ERROR_ACK
+This primitive is implemented as described in
+.BR TR_ERROR_ACK (7)
+with no additional considerations.
+.SH "CONNECTION-ORIENTED MODE PRIMITIVES"
+.PP
+The following connection-oriented mode primitves are implemented for the ANSI T1.114 TCAP provider
+as described in the following subsections:
+.SS TR_BEGIN_REQ
+This primitive is implemented as described in
+.BR TR_BEGIN_REQ (7)
+with no additional considerations.
+.SS TR_BEGIN_IND
+This primitive is implemented as described in
+.BR TR_BEGIN_IND (7)
+with no additional considerations.
+.SS TR_BEGIN_RES
+This primitive is implemented as described in
+.BR TR_BEGIN_RES (7)
+with no additional considerations.
+.SS TR_BEGIN_CON
+This primitive is implemented as described in
+.BR TR_BEGIN_CON (7)
+with no additional considerations.
+.SS TR_CONT_REQ
+This primitive is implemented as described in
+.BR TR_CONT_REQ (7)
+with no additional considerations.
+.SS TR_CONT_IND
+This primitive is implemented as described in
+.BR TR_CONT_IND (7)
+with no additional considerations.
+.SS TR_END_REQ
+This primitive is implemented as described in
+.BR TR_END_REQ (7)
+with no additional considerations.
+.SS TR_END_IND
+This primitive is implemented as described in
+.BR TR_END_IND (7)
+with no additional considerations.
+.SS TR_ABORT_REQ
+This primitive is implemented as described in
+.BR TR_ABORT_REQ (7)
+with no additional considerations.
+.SS TR_ABORT_IND
+This primitive is implemented as described in
+.BR TR_ABORT_IND (7)
+with no additional considerations.
+.SH "CONNECTIONLESS MODE PRIMITIVES"
+.PP
+The following connectionless mode primitves are implemented for the ANSI T1.114 TCAP provider as
+described in the following subsections:
+.SS TR_UNI_REQ
+This primitive is implemented as described in
+.BR TR_UNI_REQ (7)
+with no additional considerations.
+.SS TR_UNI_IND
+This primitive is implemented as described in
+.BR TR_UNI_IND (7)
+with no additional considerations.
+.SS TR_NOTICE_IND
+This primitive is implemented as described in
+.BR TR_NOTICE_IND (7)
+with no additional considerations.
+.SH IOCTLS
+.PP
+.SH "ERROR HANDLING"
+.PP
+.SH ERRORS
+.PP
+.SH CAVEATS
+.PP
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND INCOMPLETE
+.AU
+.VR
+.SH "SEE ALSO"
+.PP
+.BR tcap (4),
+.BR tua (4),
+.BR tri (7),
+.BR tpi (7),
+.BR streamio (2),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR putpmsg (2),
+.BR getpmsg (2),
+.BR read (2),
+.BR write (2).
+.[
+$LIST$
+.]
+.TI
