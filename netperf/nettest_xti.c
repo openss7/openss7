@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/12 06:30:26 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/20 20:55:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/12 06:30:26 $ by $Author: brian $
+ Last Modified $Date: 2004/08/20 20:55:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/12 06:30:26 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/20 20:55:58 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/12 06:30:26 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/20 20:55:58 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -3630,7 +3630,18 @@ recv_xti_tcp_stream()
   /* now just rubber stamp the thing. we want to use the same fd? so */
   /* we will just equate s_data with s_listen. this seems a little */
   /* hokey to me, but then I'm a BSD biggot still. raj 2/95 */
-  s_data = s_listen;
+
+  s_data = create_xti_endpoint(xti_tcp_stream_request->xti_device, T_INET_TCP);
+
+  if (s_data == INVALID_SOCKET) {
+    fprintf(where,
+	    "recv_xti_tcp_stream: t_open: errno %d t_errno %d\n",
+	    errno,
+	    t_errno);
+    close(s_listen);
+    exit(1);
+  }
+
   if (t_accept(s_listen,
 	       s_data,
 	       &call_req) == -1) {
@@ -3639,9 +3650,12 @@ recv_xti_tcp_stream()
 	    errno,
 	    t_errno);
     fflush(where);
+    close(s_data);
     close(s_listen);
     exit(1);
   }
+
+  close(s_listen);
   
   if (debug) {
     fprintf(where,

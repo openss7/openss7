@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $
+ @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/08/20 20:55:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/12 08:56:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/20 20:55:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/08/20 20:55:58 $"
 
-static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $";
+static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/08/20 20:55:58 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -409,7 +409,7 @@ Usgae:\n\
 void
 print_netperf_help(int argc, char *argv[])
 {
-	fprintf(stdout, "\
+        fprintf(stdout, "\
 Usgae:\n\
     %1$s [-t, --testname=TESTNAME] [options] -- [test options]\n\
     %1$s [-t, --testname=TESTNAME] -- {-h, --help}\n\
@@ -428,57 +428,57 @@ Options:\n\
     -L, --copying\n\
         display copying permission and exit\n\
     -4, --ipv4\n\
-	use ipv4 for the control socket (default)\n\
+        use ipv4 for the control socket (default)\n\
     -6, --ipv6\n\
-	use ipv6 for the control socket\n\
+        use ipv6 for the control socket\n\
     -a, --loc-align=[LOC-SND-ALIGN][,][LOC-RCV-ALIGN]\n\
-	set local send and receive buffer alignements\n\
+        set local send and receive buffer alignements\n\
     -A, --rem-align=[REM-SND-ALIGN][,][REM-SND-ALIGN]\n\
-	set remote send and receive buffer alignements\n\
+        set remote send and receive buffer alignements\n\
     -b, --burst=BURST\n\
-	set number of burst packets per interval\n\
+        set number of burst packets per interval\n\
     -c, --loc-cpu [LOC-RATE]\n\
-	request (set) local cpu rate\n\
+        request (set) local cpu rate\n\
     -C, --rem-cpu [REM-RATE]\n\
-	request (set) remote cpu rate\n\
+        request (set) remote cpu rate\n\
     -d, --debug\n\
-	debugging output\n\
+        debugging output\n\
     -D, --demo\n\
-	demo mode: not support on Linux\n\
+        demo mode: not support on Linux\n\
     -f, --format={G|H|K|g|m|k}\n\
-	printed units of measure for bulk transfer tests\n\
-	capital letters are powers of 2, lowercase are powers of 10\n\
+        printed units of measure for bulk transfer tests\n\
+        capital letters are powers of 2, lowercase are powers of 10\n\
     -F, --fillfile=FILL-FILE\n\
-	prefill buffers with data from this file\n\
+        prefill buffers with data from this file\n\
     -H, --host=REMOTE-HOST\n\
-	hostname (or IP address) of netserver\n\
+        hostname (or IP address) of netserver\n\
     -i, --interations=[MIN][,][MAX]\n\
-	minimum and maximum interations for confidence level\n\
+        minimum and maximum interations for confidence level\n\
     -I, --interval=LEVEL[,INTVL]\n\
-	set confidence level (95 or 99) and width of confidence interval\n\
-	in percentage [Default: 99,10]\n\
+        set confidence level (95 or 99) and width of confidence interval\n\
+        in percentage [Default: 99,10]\n\
     -k, --loc-count=[LOC-DIRTY][,][LOC-CLEAN]\n\
-	set counts for local dirty and clean buffers\n\
+        set counts for local dirty and clean buffers\n\
     -K, --rem-count=[REM-DIRTY][,][REM-CLEAN]\n\
-	set counts for remote dirty and clean buffers\n\
+        set counts for remote dirty and clean buffers\n\
     -l, --length=TESTLEN\n\
-	set test length (positive: seconds, negative: packets)\n\
+        set test length (positive: seconds, negative: packets)\n\
     -n, --numcpus=NUMCPUS\n\
-	set number of CPUs\n\
+        set number of CPUs\n\
     -o, --loc-offset=[LOC-SND-OFFSET][,][LOC-RCV-OFFSET]\n\
-	set local send and receive buffer offset\n\
+        set local send and receive buffer offset\n\
     -O, --rem-offset=[REM-SND-OFFSET][,][REM-RCV-OFFSET]\n\
-	set remote send and receive buffer offset\n\
+        set remote send and receive buffer offset\n\
     -p, --port=PORTNUM\n\
-	set port number of netserver [Default: 12865]\n\
+        set port number of netserver [Default: 12865]\n\
     -P, --print={0|1}\n\
-	whether to print test headers [Default: 1:yes]\n\
+        whether to print test headers [Default: 1:yes]\n\
     -v, --verbose=VERBOSITY\n\
-	set output verbosity level\n\
+        set output verbosity level\n\
     -w, --rate=RATE\n\
-	send packet rate (packets per millisecond)\n\
+        send packet rate (packets per millisecond)\n\
     -W, --width=[SND-WIDTH][,][RCV-WIDTH]\n\
-	width of user space send or receive buffer rings\n\
+        width of user space send or receive buffer rings\n\
 ", argv[0]);
 }
 

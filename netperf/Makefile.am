@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2004/08/12 09:10:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2004/08/20 20:55:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/12 09:10:06 $ by $Author: brian $
+# Last Modified $Date: 2004/08/20 20:55:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -180,16 +180,14 @@ MANMACRO_PFX			= netperf
 
 include am/man.am
 
-info_TEXINFOS			= netperf.texi
-DVIS				= netperf.dvi
-PSS				= netperf.ps
-PDFS				= netperf.pdf
-HTMLS				= netperf.html
-INFO_DEPS			= $(srcdir)/netperf.info
+info_TEXINFOS		= netperf.texi
 
-MAKEINFOHTML			= $(MAKEINFO) --html --no-split
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
-EXTRA_DIST			+= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+EXTRA_DIST		+= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+
+all-local: info ps pdf html
 
 #
 #   Rules for making rpms

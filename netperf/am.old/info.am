@@ -1,7 +1,6 @@
-# vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2004/08/20 20:56:02 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/20 20:56:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,37 +50,13 @@
 #
 # =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.8 dist-bzip2 std-options -Wall
+info_TEXINFOS		= $(PACKAGE_TARNAME).texi
 
-ACLOCAL_AMFLAGS = -I m4
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
-#
-# Have the makefile regenerate libtool if necessary
-#
-$(OBJECTS): libtool
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status --recheck
+EXTRA_DIST		+= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
 
-#
-# I use vim, not emacs.  The following triggers Automake 1.8 to include
-# targets for making vim tags files along with emacs TAGS files.
-#
-CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SYMBOL,EXPORT_SYMBOL_NOVERS,EXPORT_SYMBOL_GPL
-
-#
-# A rule to generate an ifnames.log file
-#
-ifnames:
-	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
-
-distclean-logs:
-	rm -f *.log
-
-distclean-local: distclean-logs
-
-#
-# Collected phonys from other automake fragments.
-#
-.PHONY: ifnames distclean-logs
+all-local: info ps pdf html
 
 # vim: ft=automake

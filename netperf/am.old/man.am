@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2004/08/12 08:38:14 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2004/08/20 20:56:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/12 08:38:14 $ by $Author: brian $
+# Last Modified $Date: 2004/08/20 20:56:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -232,7 +232,7 @@ if COMPRESS_MANPAGES
 #
 post-manpages:
 	@$(NORMAL_INSTALL)
-	@if test -n "`find $(DESTDIR)$(mandir) -name \"*.gz\" 2>/dev/null`" ; then \
+	@if test -n "`find $(DESTDIR)$(mandir) -name \"*.gz\" 2>/dev/null`" -o -n "$(INSTALL_STRIP_FLAG)" ; then \
 		if test -n "$(GZIP)" ; then \
 			list="$(man_MANS)" ; if test -n "$$list" ; then \
 				for f in $$list ; do \

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2004/08/07 11:05:25 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2004/08/20 20:56:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/07 11:05:25 $ by $Author: brian $
+# Last Modified $Date: 2004/08/20 20:56:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,11 +55,22 @@ if PUBLIC_RELEASE
 
 rpmdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
 
+$(rpmdir).lsm: $(PACKAGE_NAME).lsm
+	cat $< > $@
+
+LSM = $(rpmdir).lsm $(PACKAGE_NAME).lsm
+
 else
 
 rpmdir = $(PACKAGE_NAME)-bin-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
 
+LSM =
+
 endif
+
+EXTRA_DIST += $(LSM)
+
+all-am: $(LSM)
 
 RPM_ARCHIVES = $(rpmdir).tar.gz $(rpmdir).tar.bz2
 
@@ -76,6 +87,7 @@ RPMOPTS = -vv \
 	--define "__binary_payload w9.bzdio" \
 	--define "_topdir `(cd $(top_builddir); pwd)`" \
 	--define "_icon openss7-logo-small.gif" \
+	--define "_kversion $(PACKAGE_KVERSION)" \
 	$(PACKAGE_OPTIONS)
 
 RPMBOPTS = -vv \
@@ -143,10 +155,18 @@ rebuild:
 	@if test ! -f SRPMS/$(rpmdir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
+	kernels="`find $(DESTDIR)/lib/modules -type d -name '2\.4\.*'`" ; \
 	targets="$(AM_RPMTARGETS)" ; \
 	for t in $$targets ; do \
-		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
-		$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
+		for k in $$kernels ; do \
+			k=`basename $$k` ; \
+			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
+				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define \"_kversion $$k\" --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define "_kversion $$k" --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
+			fi ; \
+		done ; \
+		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+		$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
 	done
 
 resign: sign
@@ -201,6 +221,18 @@ resign: sign
 
 endif
 
+distclean-lsms:
+	@if test -n "$(LSM)" ; then \
+		echo "rm -f $(LSM)" ; \
+		rm -f $(LSM) ; \
+	fi
+
+distclean-archives:
+	@if test -n "$(DIST_ARCHIVES)" ; then \
+		echo "rm -f $(DIST_ARCHIVES)" ; \
+		rm -f $(DIST_ARCHIVES) ; \
+	fi
+
 distclean-rpms:
 	rm -f openss7-logo-small.gif
 	rm -fr BUILD RPMS SOURCES SPECS SRPMS
@@ -215,8 +247,8 @@ distclean-sign:
 		rm -f $$f.asc ; \
 	done
 
-distclean-local: distclean-rpms distclean-sign
+distclean-local: distclean-lsms distclean-archives distclean-rpms distclean-sign
 
-.PHONY: srpm rpms sign rebuild resign distclean-rpms distclean-sign
+.PHONY: srpm rpms sign rebuild resign distclean-lsms distclean-archives distclean-rpms distclean-sign
 
 # vim: ft=automake
