@@ -29,7 +29,7 @@
 #ifndef SYS_LISLOCKS_H
 #define SYS_LISLOCKS_H	1
 
-#ident "@(#) LiS lislocks.h 1.12 5/30/03"
+#ident "@(#) LiS lislocks.h 1.13 6/6/03"
 
 #define	FL	char *file, int line
 
@@ -184,7 +184,7 @@ typedef volatile struct lis_rw_lock
 #define	lis_rw_lock_init(lock,name)	\
 			     lis_rw_lock_init_fcn(lock,name,__FILE__,__LINE__)
 #define	lis_rw_lock_alloc(lock,name)	\
-			    lis_rw_lock_alloc_fcn(lock,name,__FILE__,__LINE__)
+			    lis_rw_lock_alloc_fcn(name,__FILE__,__LINE__)
 #define lis_rw_lock_free(lock)	\
 				lis_rw_lock_free_fcn(lock,__FILE__,__LINE__)
 /*
