@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/20 09:54:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/07 06:09:43 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,14 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:40 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:09:43 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   General fules
-#
+##
+## General rules
+##
 include am/openss7.am
+
+dist_sysconf_DATA =
 
 lib_LTLIBRARIES			=
 
@@ -206,7 +208,8 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSCTPmodl.a
-ADDON_OBJS			= sctp.o
+ADDON_MODS			= sctp.o
+ADDON_OBJS			= $(libSCTPmodl_a_OBJECTS)
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= libSCTPmodl.a
@@ -242,10 +245,14 @@ libSCTPmodl_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPmodl_a_OBJECTS: $(libSCTPmodl_a_DEPENDENCIES)
 
-sctp.o: $(libSCTPmodl_a_OBJECTS)
-	$(LD) -r -o $@ $^
+sctp.o: stamp-verobjs
+	@list=`$(ECHO) " $(libSCTPmodl_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
 
 endif
+
+EXTRA_DIST			+= $(sctp_source_FILES)
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
@@ -255,46 +262,87 @@ EXTRA_TEX			+= \
 				scripts/texi/install.texi \
 				scripts/texi/lesser.texi
 
-EXTRA_DIST			+= $(EXTRA_TEX) $(sctp_source_FILES)
+EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+=
+EXTRA_SCRIPTS			+= configure.nexusware
 
-export KERNEL_MODULES		= $(ADDON_OBJS)
-export KERNEL_PRELOADS		= sctp.o
-export KERNEL_MODCONF		=
-export KERNEL_SUBDIR		= kernel/net/ipv4
-export KMODCONF_EXT		= $(PACKAGE_TARNAME)
-export KERNEL_MODMAPS		=
+##
+## Rules for building kernel objects
+##
+KERNEL_OBJECTS			= $(ADDON_OBJS)
+KERNEL_MODULES			= $(ADDON_MODS)
+KERNEL_PRELOADS			= sctp.o
+KERNEL_MODCONF			=
+KERNEL_SUBDIR			= kernel/net/ipv4
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			=
 
-include am/sctp.am
+kpre				=
+
+include am/kernel.am
+
+##
+## Rules for building libraries
+##
+include am/libraries.am
+
+##
+## Rules for generating versioned kernel symbols
+##
+include am/genksyms.am
+
+##
+## Rules for generating STREAMS configuration
+##
+include am/strconf.am
 
 if RPM_BUILD_USER
 
 SUBDIRS = include doc
+if INSTALL_INITSCRIPTS
+
+if WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		=
+
+else
+
+dist_initrd_SCRIPTS		=
 
 endif
 
-#
-# Rules for lsms
-#
+dist_config_DATA		=
+
+dist_sysconf_DATA		+=
+
+endif
+
+##
+## Rules for init scripts
+##
+include am/init.am
+
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-# Rules for making rpms
-#
+##
+## Rules for making rpms
+##
 AM_RPMFLAGS 			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS 			=
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
 
 MAINTAINERCLEANFILES	+= \

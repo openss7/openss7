@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/20 09:54:41 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:20:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,21 +48,25 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:41 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 12:20:34 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xns.m4])
-m4_include([m4/xti.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
+m4_include([m4/libraries.m4])
+m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
+m4_include([m4/streams.m4])
+m4_include([m4/xns.m4])
+m4_include([m4/xti.m4])
 
 # =============================================================================
 # AC_SCTP
@@ -72,17 +76,15 @@ AC_DEFUN([AC_SCTP], [dnl
     _SCTP_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
+    _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    USER_LDFLAGS="${LDADD}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    _XNS
-    _XTI
-    SCTP_INCLUDES="-I- -imacros ./config.h"
+    _LDCONFIG
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDADD"
+    _SCTP_SETUP
+    SCTP_INCLUDES="-imacros ./config.h"
     SCTP_INCLUDES="${SCTP_INCLUDES}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}"
     SCTP_INCLUDES="${SCTP_INCLUDES}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}"
     SCTP_INCLUDES="${SCTP_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
@@ -97,14 +99,14 @@ AC_DEFUN([AC_SCTP], [dnl
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
     AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([SCTP_INCLUDES])dnl
-    AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
+    AC_SUBST([SCTP_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
-    _SCTP_SETUP
-    _SCTP_OUTPUT dnl
+    _SCTP_OUTPUT
+    _AUTOTEST
 ])# AC_SCTP
 # =============================================================================
 
@@ -209,6 +211,11 @@ AC_DEFUN([_SCTP_OTHER_SCTP], [dnl
 # _SCTP_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_SETUP], [dnl
+    _LINUX_KERNEL
+    _GENKSYMS
+    _LINUX_STREAMS
+    _XNS
+    _XTI
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _SCTP_OTHER_SCTP
@@ -252,14 +259,14 @@ AC_DEFUN([_SCTP_CHECK_SCTP], [dnl
     if test :"$with_sctp2" = :yes ; then
 	with_sctp='no'
 	sctp_cv_sctp_version=2
-	AC_DEFINE_UNQUOTED([SCTP_VERSION_2], [], [
+	AC_DEFINE([SCTP_VERSION_2], [1], [
 	    Define for SCTP Version 2.  This define is needed by test programs
 	    and other programs that need to determine the difference between
 	    the address format and options conventions for the two versions.])
     else
 	with_sctp='yes'
 	sctp_cv_sctp_version=1
-	AC_DEFINE_UNQUOTED([SCTP_VERSION_1], [], [
+	AC_DEFINE([SCTP_VERSION_1], [1], [
 	    Define for SCTP Version 1.  This define is needed by test programs
 	    and other programs that need to determine the difference between
 	    the address format and options conventions for the two versions.])
@@ -294,7 +301,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 		    [linux_cv_have_ip_route_output='no'])
 	    ])
 	if test :$linux_cv_have_ip_route_output = :yes ; then
-	    AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [], [Define if you have the explicit
+	    AC_DEFINE([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [1], [Define if you have the explicit
 		version of ip_route_output.])
 	fi
     ])
@@ -381,7 +388,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			   xfrm_policy_delete,
 			   __xfrm_sk_clone_policy])
     if test :"${linux_cv_have_ip_route_output:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT], [], [Most 2.4 kernels have
+	AC_DEFINE([HAVE_IP_ROUTE_OUTPUT], [1], [Most 2.4 kernels have
 	the function ip_route_output() defined.  Newer RH kernels (EL3) use
 	the 2.6 functions and do not provide ip_route_output().  Define this
 	macro if your kernel provides ip_route_output().])
@@ -467,7 +474,7 @@ dnl fi
     if test :"${sctp_cv_inet_protocol_style:+set}" = :set ; then
 	case "$sctp_cv_inet_protocol_style" in
 	    old)
-		AC_DEFINE_UNQUOTED([HAVE_OLD_STYLE_INET_PROTOCOL], [], [Most
+		AC_DEFINE([HAVE_OLD_STYLE_INET_PROTOCOL], [1], [Most
 		2.4 kernels have the old style struct inet_protocol and the
 		old prototype for inet_add_protocol() and inet_del_protocol()
 		defined in <net/protocol.h>.  Some more recent RH kernels
@@ -476,7 +483,7 @@ dnl fi
 		and prototypes.])
 		;;
 	    new)
-		AC_DEFINE_UNQUOTED([HAVE_NEW_STYLE_INET_PROTOCOL], [], [Most
+		AC_DEFINE([HAVE_NEW_STYLE_INET_PROTOCOL], [1], [Most
 		2.4 kernels have the old style struct inet_protocol and the
 		old prototype for inet_add_protocol() and inet_del_protocol()
 		defined in <net/protocol.h>.  Some more recent RH kernels
@@ -490,13 +497,13 @@ dnl fi
 	with_sctp2='no'
     fi
     if test :"${sctp_cv_dst_entry_path:-no}" = :yes ; then
-	AC_DEFINE_UNQUOTED([HAVE_STRUCT_DST_ENTRY_PATH], [], [Newer RHEL3
+	AC_DEFINE([HAVE_STRUCT_DST_ENTRY_PATH], [1], [Newer RHEL3
 	kernels change the destination entry structure.  Define this macro to
 	use the newer structure.])
     fi
     _LINUX_KERNEL_ENV([
 	AC_CHECK_TYPES([struct sockaddr_storage], [
-	    AC_DEFINE_UNQUOTED([HAVE_STRUCT_SOCKADDR_STORAGE], [], [Most 2.4
+	    AC_DEFINE([HAVE_STRUCT_SOCKADDR_STORAGE], [1], [Most 2.4
 		kernels do not define struct sockaddr_storage.  Define to 1 if
 		your kernel supports struct sockaddr_storage.])], [:], [
 #include <linux/config.h>

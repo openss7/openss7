@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/02/20 09:54:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/07 10:22:08 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,14 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:42 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 10:22:08 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   General rules
-#
+##
+## General rules
+##
 include am/openss7.am
+
+dist_sysconf_DATA =
 
 lib_LTLIBRARIES			= 
 
@@ -125,6 +127,7 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
+ADDON_MODS			= 
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
@@ -233,6 +236,7 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
+ADDON_MODS			= 
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
@@ -277,48 +281,129 @@ endif
 xnet_source_FILES		= $(mods_source_FILES)
 
 EXTRA_DIST			+= $(xnet_source_FILES)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+=
 
-export KERNEL_MODULES		= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
-export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
-export KMODCONF_EXT		= $(PACKAGE_TARNAME)
-export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
-export KERNEL_MODMAPS		= $(STREAMS_MODMAP)
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX)
+dist_noinst_SCRIPTS		+= configure.nexusware
+EXTRA_SCRIPTS			+= configure.nexusware
+
+##
+## Rules for building kernel objects
+##
+KERNEL_OBJECTS			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_MODS)
+KERNEL_PRELOADS			=
+KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+
+kpre				= streams-
 
 include am/kernel.am
 
+##
+## Rules for building libraries
+##
 include am/libraries.am
+##
+##PKGINCL			= include/sys/$(PACKAGE_NAME)
+##
+##AUTOCONFIG_H			= $(PKGINCL)/config.h
+##
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
+EXPORT_SRCFILES			=
+
+EXPORT_VERFILES			=
+
+GENKSYMS_CPPFLAGS		= \
+				-I./src/drivers -I$(srcdir)/src/drivers \
+				-I./src/modules -I$(srcdir)/src/modules \
+				$(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+##
+## Rules for generating versioned kernel symbols
+##
+include am/genksyms.am
+
+##
+## Rules for generating STREAMS configuration
+##
 include am/strconf.am
 
 if RPM_BUILD_USER
 
-SUBDIRS = src intl m4 po doc
+SUBDIRS = src intl m4 po doc tests
 
 endif
 
-#
-# Rules for lsms
-#
+if INSTALL_INITSCRIPTS
+
+if WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		=
+
+else
+
+dist_initrd_SCRIPTS		=
+
+endif
+
+dist_config_DATA		=
+
+dist_sysconf_DATA		+=
+
+endif
+
+##
+## Rules for init scripts
+##
+include am/init.am
+
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-#   Rules for making rpms
-#
+##
+## Rules for making rpms
+##
 AM_RPMFLAGS 			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS 			=
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
+
+MAINTAINERCLEANFILES	+= \
+			$(top_srcdir)/aclocal.m4 \
+			$(top_srcdir)/config.h.in \
+			$(top_srcdir)/configure \
+			$(top_srcdir)/COPYING \
+			$(top_srcdir)/INSTALL \
+			$(top_srcdir)/scripts/compile \
+			$(top_srcdir)/scripts/config.guess \
+			$(top_srcdir)/scripts/config.sub \
+			$(top_srcdir)/scripts/depcomp \
+			$(top_srcdir)/scripts/install-sh \
+			$(top_srcdir)/scripts/ltmain.sh \
+			$(top_srcdir)/scripts/missing \
+			$(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2005/02/25 10:56:40 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2005/03/07 06:09:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 10:56:40 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:09:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -280,6 +280,7 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 %if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
 # clean out binaries and auxilliary files
 make mostlyclean
+rm -fr include2
 # punch rpm release to Custom
 echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
@@ -578,6 +579,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.21  2005/03/07 06:09:26  brian
+# - More spec changes for 2.6.
+#
 # Revision 1.1.2.20  2005/02/25 10:56:40  brian
 # - Don't specify build architecture.
 #

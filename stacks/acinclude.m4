@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/20 09:54:41 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/07 06:10:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,21 +48,24 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:41 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:10:04 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xopen.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
 m4_include([m4/libraries.m4])
+m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
+m4_include([m4/streams.m4])
+m4_include([m4/xopen.m4])
 
 # =============================================================================
 # AC_SS7
@@ -72,35 +75,37 @@ AC_DEFUN([AC_SS7], [dnl
     _SS7_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
+    _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
     _LDCONFIG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    _XOPEN
-    SS7_INCLUDES="-I- -imacros ./config.h"
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDFLAGS"
+    _SS7_SETUP
+    SS7_INCLUDES="-imacros ./config.h"
     SS7_INCLUDES="${SS7_INCLUDES}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}"
     SS7_INCLUDES="${SS7_INCLUDES}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}"
     SS7_INCLUDES="${SS7_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     SS7_INCLUDES="${SS7_INCLUDES} -I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
     AC_MSG_NOTICE([final user    INCLUDES  = $SS7_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([SS7_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
-    _SS7_SETUP
-    _SS7_OUTPUT dnl
+    _SS7_OUTPUT
+    _AUTOTEST
 ])# AC_SS7
 # =============================================================================
 
@@ -115,6 +120,10 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
 # _SS7_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_SETUP], [dnl
+    _LINUX_KERNEL
+    _GENKSYMS
+    _LINUX_STREAMS
+    _XOPEN
 ])# _SS7_SETUP
 # =============================================================================
 

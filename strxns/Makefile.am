@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/02/20 09:54:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/07 08:58:33 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,42 +46,44 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:42 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 08:58:33 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   General rules
-#
+##
+## General rules
+##
 include am/openss7.am
 
-lib_LTLIBRARIES			= 
+dist_sysconf_DATA 		=
+
+lib_LTLIBRARIES			=
 
 if PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+libexec_PROGRAMS		= \
+				  ldltest
 
 EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig
 
-libexec_PROGRAMS		= \
-				  ldltest
 
 sbin_PROGRAMS			= \
 				  ldlconfig \
 				  @PACKAGE_TARNAME@_mknod
-
-ldlconfig_SOURCES		= src/util/ldlconfig.c
-ldlconfig_LDADD			= $(STREAMS_LDADD)
-ldlconfig_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
-ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNS_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+ldlconfig_SOURCES		= src/util/ldlconfig.c
+ldlconfig_LDADD			= $(STREAMS_LDADD)
+ldlconfig_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD)
@@ -93,6 +95,7 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
+ADDON_MODS			= 
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNSmods.a libXNSdrvs.a $(ADDON_LIBS)
@@ -110,13 +113,13 @@ nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  config.h strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
-libXNSmods_a_DEPENDENCIES	= ./config.h ./strconf.h
+libXNSmods_a_DEPENDENCIES	= config.h strconf.h
 libXNSmods_a_CPPFLAGS		= \
 				  -I./src/include/os7 \
 				  -I$(srcdir)/src/include/os7 \
@@ -140,13 +143,13 @@ nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  config.h strconf.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libXNSdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
+libXNSdrvs_a_DEPENDENCIES	= config.h strconf.h
 libXNSdrvs_a_CPPFLAGS		= \
 				  -I./src/include/os7 \
 				  -I$(srcdir)/src/include/os7 \
@@ -157,6 +160,7 @@ libXNSdrvs_a_CPPFLAGS		= \
 				  $(KERNEL_CPPFLAGS) \
 				  $(KERNEL_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
 
@@ -165,28 +169,28 @@ endif
 else
 
 if RPM_BUILD_USER
+libexec_PROGRAMS		= \
+				  ldltest
 
 EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig
 
-libexec_PROGRAMS		= \
-				  ldltest
 
 sbin_PROGRAMS			= \
 				  ldlconfig \
 				  @PACKAGE_TARNAME@_mknod
-
-ldlconfig_SOURCES		= src/util/ldlconfig.c
-ldlconfig_LDADD			= $(STREAMS_LDADD)
-ldlconfig_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
-ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNS_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+ldlconfig_SOURCES		= src/util/ldlconfig.c
+ldlconfig_LDADD			= $(STREAMS_LDADD)
+ldlconfig_CPPFLAGS		= $(XNS_INCLUDES) $(USER_CPPFLAGS)
+ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDADD			= $(STREAMS_LDADD)
@@ -198,6 +202,7 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
+ADDON_MODS			= 
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNSmods.a libXNSdrvs.a $(ADDON_LIBS)
@@ -215,13 +220,13 @@ nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 
 nodist_libXNSmods_a_SOURCES	= $(mods_source_FILES)
 
-libXNSmods_a_DEPENDENCIES	= ./config.h ./strconf.h
+libXNSmods_a_DEPENDENCIES	= config.h strconf.h
 libXNSmods_a_CPPFLAGS		= \
 				  -I./src/include/os7 \
 				  -I$(srcdir)/src/include/os7 \
@@ -245,13 +250,13 @@ nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
-				  ./config.h ./strconf.h
+				  strconf.h
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
 nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
-libXNSdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
+libXNSdrvs_a_DEPENDENCIES	= config.h strconf.h
 libXNSdrvs_a_CPPFLAGS		= \
 				  -I./src/include/os7 \
 				  -I$(srcdir)/src/include/os7 \
@@ -270,46 +275,129 @@ endif
 endif
 
 EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
-dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+=
 
-export KERNEL_MODULES		= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
-export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
-export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
-export KMODCONF_EXT		= $(PACKAGE_TARNAME)
-export KERNEL_MODMAPS		= $(STREAMS_MODMAP)
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX)
+dist_noinst_SCRIPTS		+= configure.nexusware
+EXTRA_SCRIPTS			+= configure.nexusware
+
+##
+## Rules for building kernel objects
+##
+KERNEL_OBJECTS			= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_MODS)
+KERNEL_PRELOADS			=
+KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+
+kpre				= streams-
 
 include am/kernel.am
 
+##
+## Rules for building libraries
+##
+##include am/libraries.am
+##
+##PKGINCL			= include/sys/$(PACKAGE_NAME)
+##
+##AUTOCONFIG_H			= $(PKGINCL)/config.h
+##
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
+
+EXPORT_SRCFILES			=
+
+EXPORT_VERFILES			=
+
+GENKSYMS_CPPFLAGS		= \
+				-I./src/drivers -I$(srcdir)/src/drivers \
+				-I./src/modules -I$(srcdir)/src/modules \
+				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+##
+## Rules for generating versioned kernel symbols
+##
+include am/genksyms.am
+
+##
+## Rules for generating STREAMS configuration
+##
 include am/strconf.am
 
 if RPM_BUILD_USER
 
-SUBDIRS = src doc
+SUBDIRS = src doc tests
 
 endif
 
-#
-# Rules for lsms
-#
+if INSTALL_INITSCRIPTS
+
+if WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		=
+
+else
+
+dist_initrd_SCRIPTS		=
+
+endif
+
+dist_config_DATA		=
+
+dist_sysconf_DATA		+=
+
+endif
+
+##
+## Rules for init scripts
+##
+include am/init.am
+
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-#   Rules for making rpms
-#
-AM_RPMFLAGS 			= --define "_kversion $(kversion)"
-AM_SRPMFLAGS 			=
+##
+## Rules for making rpms
+##
+AM_RPMFLAGS			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS			=
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
+
+MAINTAINERCLEANFILES	+= \
+			$(top_srcdir)/aclocal.m4 \
+			$(top_srcdir)/config.h.in \
+			$(top_srcdir)/configure \
+			$(top_srcdir)/COPYING \
+			$(top_srcdir)/INSTALL \
+			$(top_srcdir)/scripts/compile \
+			$(top_srcdir)/scripts/config.guess \
+			$(top_srcdir)/scripts/config.sub \
+			$(top_srcdir)/scripts/depcomp \
+			$(top_srcdir)/scripts/install-sh \
+			$(top_srcdir)/scripts/ltmain.sh \
+			$(top_srcdir)/scripts/missing \
+			$(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake

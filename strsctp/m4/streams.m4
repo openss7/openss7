@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/07 12:20:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 12:20:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,12 +72,15 @@
 # _LINUX_STREAMS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])
+    AC_REQUIRE([_GENKSYMS])
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
     _LINUX_STREAMS_OUTPUT
     AC_SUBST([STREAMS_CPPFLAGS])
     AC_SUBST([STREAMS_LDADD])
     AC_SUBST([STREAMS_MODMAP])
+    AC_SUBST([STREAMS_SYMVER])
 ])# _LINUX_STREAMS
 # =============================================================================
 
@@ -237,6 +240,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
 		    streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_cv_lis_modmap=`echo "$streams_here/$streams_d/LiS/Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_symver=`echo "$streams_here/$streamd_d/LiS/Modules.symver" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -262,7 +266,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		then
 		    streams_cv_lis_includes="$streams_dir"
 		    streams_cv_lis_ldadd="-lLiS"
-		    streams_cv_lis_modmap=''
+		    streams_cv_lis_modmap=
+		    streams_cv_lis_symver=
 		    break
 		fi
 	    done
@@ -285,23 +290,26 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	streams_cv_lis_modversions='no'
 	if test -n "$streams_cv_lis_includes"
 	then
-	    # old place for modversions
-	    if test -f "$streams_dir/sys/LiS/modversions.h" 
-	    then
-		streams_cv_lis_modversions='yes'
-		break
-	    fi
-	    # new place for modversions
-	    if test -n $linux_cv_k_release 
-	    then
-dnl             if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" 
+	    for streams_dir in $streams_cv_lis_includes
+	    do
+		# old place for modversions
+		if test -f "$streams_dir/sys/LiS/modversions.h" 
 		then
-		    streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
 		    streams_cv_lis_modversions='yes'
 		    break
 		fi
-	    fi
+		# new place for modversions
+		if test -n $linux_cv_k_release 
+		then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" 
+		    then
+			streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
+			streams_cv_lis_modversions='yes'
+			break
+		    fi
+		fi
+	    done
 	fi
     ])
     AC_CACHE_CHECK([for streams lis sys/LiS/module.h], [streams_cv_lis_module], [dnl
@@ -349,6 +357,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    streams_cv_lfs_includes="$streams_dir $streams_bld"
 		    streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_cv_lfs_modmap=`echo "$streams_here/$streams_d/streams/Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_symver=`echo "$streams_here/$streams_d/streams/Modules.symver" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -374,7 +383,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		then
 		    streams_cv_lfs_includes="$streams_dir"
 		    streams_cv_lfs_ldadd="-lstreams"
-		    streams_cv_lfs_modmap=''
+		    streams_cv_lfs_modmap=
+		    streams_cv_lfs_symver=
 		    break
 		fi
 	    done
@@ -395,28 +405,31 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     fi
     AC_CACHE_CHECK([for streams lfs sys/streams/modversions.h], [streams_cv_lfs_modversions], [dnl
 	streams_cv_lfs_modversions='no'
-	if test -n "$streams_cv_lfs_includes"
+	if test :"${linux_cv_k_ko_modules:-no}" = :no
 	then
-	    for streams_dir in $streams_cv_lfs_includes
-	    do
-		# old place for modversions
-		if test -f "$streams_dir/sys/streams/modversions.h" 
-		then
-		    streams_cv_lfs_modversions='yes'
-		    break
-		fi
-		# new place for modversions
-		if test -n $linux_cv_k_release 
-		then
-dnl                 if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" 
+	    if test -n "$streams_cv_lfs_includes"
+	    then
+		for streams_dir in $streams_cv_lfs_includes
+		do
+		    # old place for modversions
+		    if test -f "$streams_dir/sys/streams/modversions.h" 
 		    then
-			streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
 			streams_cv_lfs_modversions='yes'
 			break
 		    fi
-		fi
-	    done
+		    # new place for modversions
+		    if test -n $linux_cv_k_release 
+		    then
+dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" 
+			then
+			    streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
+			    streams_cv_lfs_modversions='yes'
+			    break
+			fi
+		    fi
+		done
+	    fi
 	fi
     ])
 ])# _LINUX_STREAMS_LFS_CHECK_HEADERS
@@ -443,13 +456,13 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT], [dnl
 AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
     if test :"${streams_cv_lis_modversions:-no}" != :no 
     then
-	AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [], [Define when the
+	AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [1], [Define when the
 	    LiS release supports module versions such as the OpenSS7 autoconf
 	    release of LiS.])
     fi
     if test :"${streams_cv_lis_module:-no}" != :no 
     then
-	AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODULE_H], [], [Define when the LiS
+	AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODULE_H], [1], [Define when the LiS
 	    release provides its own module.h file such as 2.17 GCOM LiS
 	    releases.])
     fi
@@ -523,6 +536,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
     STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lis_ldadd"
     STREAMS_MODMAP="$streams_cv_lis_modmap"
+    STREAMS_SYMVER="$streams_cv_lis_symver"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =============================================================================
 
@@ -532,15 +547,17 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
 AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     if test :"${streams_cv_lfs_modversions:-no}" != :no 
     then
-	AC_DEFINE_UNQUOTED([HAVE_SYS_STREAMS_MODVERSIONS_H], [], [Define when
+	AC_DEFINE_UNQUOTED([HAVE_SYS_STREAMS_MODVERSIONS_H], [1], [Define when
 	    the Linux Fast-STREAMS release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
     STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lfs_ldadd"
     STREAMS_MODMAP="$streams_cv_lfs_modmap"
-    AC_DEFINE_UNQUOTED([HAVE_BCID_T], [], [Linux Fast-STREAMS has this type.])
-    AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [], [Linux Fast-STREAMS has this type.])
+    STREAMS_SYMVER="$streams_cv_lfs_symver"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
+    AC_DEFINE_UNQUOTED([HAVE_BCID_T], [1], [Linux Fast-STREAMS has this type.])
+    AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [1], [Linux Fast-STREAMS has this type.])
 ])# _LINUX_STREAMS_LFS_DEFINES
 # =============================================================================
 

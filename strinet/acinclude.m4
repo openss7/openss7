@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/20 09:54:41 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/07 12:20:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,21 +48,25 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:41 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 12:20:34 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xopen.m4])
-m4_include([m4/xti.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
+m4_include([m4/libraries.m4])
+m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
+m4_include([m4/streams.m4])
+m4_include([m4/xopen.m4])
+m4_include([m4/xti.m4])
 
 # =============================================================================
 # AC_INET
@@ -72,32 +76,36 @@ AC_DEFUN([AC_INET], [dnl
     _INET_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
+    _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    with_inet='yes'
-    _XOPEN
-    _XTI
-    INET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    _LDCONFIG
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDFLAGS"
+    _INET_SETUP
+    INET_INCLUDES="-imacros ./config.h"
+    INET_INCLUDES="${INET_INCLUDES} ${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}"
+    INET_INCLUDES="${INET_INCLUDES} ${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    INET_INCLUDES="${INET_INCLUDES} -I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
     AC_MSG_NOTICE([final user    INCLUDES  = $INET_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([INET_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
-    _INET_SETUP
-    _INET_OUTPUT dnl
+    _INET_OUTPUT
+    _AUTOTEST
 ])# AC_INET
 # =============================================================================
 
@@ -112,6 +120,13 @@ AC_DEFUN([_INET_OPTIONS], [dnl
 # _INET_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_SETUP], [dnl
+    _LINUX_KERNEL
+    _GENKSYMS
+    _INET_CONFIG_KERNEL
+    _LINUX_STREAMS
+    with_inet='yes'
+    _XOPEN
+    _XTI
     AC_CACHE_CHECK([for sctp openss7 kernel], [inet_cv_openss7_sctp], [dnl
 	_LINUX_KERNEL_ENV([dnl
 	    AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
@@ -125,6 +140,36 @@ AC_DEFUN([_INET_SETUP], [dnl
 	    ], [inet_cv_openss7_sctp=yes], [inet_cv_openss7_sctp=no]) ]) ])
     AM_CONDITIONAL([WITH_OPENSS7_SCTP], test :"${inet_cv_openss7_sctp:-no}" = :yes)dnl
 ])# _INET_SETUP
+# =============================================================================
+
+# =============================================================================
+# _INET_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# and 2.6 kernels.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+])
+    _LINUX_CHECK_MEMBER([struct sock.__sk_common], [:],
+	[AC_DEFINE([HAVE_OLD_SOCK_STRUCTURE], [1], [Define to 1 if you have the older Linux 2.4
+	 style struct sock.  Otherwise leave undefined for the new Linux 2.6 struct sock.)], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <net/sock.h>
+])
+])# _INET_CONFIG_KERNEL
 # =============================================================================
 
 # =============================================================================

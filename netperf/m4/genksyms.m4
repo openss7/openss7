@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/05 11:08:50 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 09:46:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/05 11:08:50 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 09:46:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -189,7 +189,12 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
 	if test :$MODPOST_CACHE != : ; then
 	    ksyms_cv_modpost_cache="$MODPOST_CACHE"
 	else
-	    ksyms_cv_modpost_cache='modpost.cache'
+	    if test -f ../modpost.cache -a -r ../modpost.cache
+	    then
+		ksyms_cv_modpost_cache="`(cd ..; pwd)`/modpost.cache"
+	    else
+		ksyms_cv_modpost_cache="modpost.cache"
+	    fi
 	fi
     ])
     MODPOST_CACHE="$ksyms_cv_modpost_cache"
@@ -211,9 +216,11 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     ])
     MODPOST_OPTIONS="$ksyms_cv_modpost_options"
     AC_SUBST([MODPOST_OPTIONS])dnl
+    MODPOST_INPUTS="$MODPOST_SYSVER"
+    AC_SUBST([MODPOST_INPUTS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
-	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP and $MODPOST_MODDIR])
-	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST -vv${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR} -s $MODPOST_SYSVER"
+	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_MODDIR and $MODPOST_INPUTS])
+	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST -vv${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_INPUTS:+ -i '$MODPOST_INPUTS'} -s $MODPOST_SYSVER"
     ], [dnl
 rootdir="$rootdir"
 kversion="$kversion"
@@ -225,6 +232,7 @@ MODPOST_SYSMAP="$MODPOST_SYSMAP"
 MODPOST_MODDIR="$MODPOST_MODDIR"
 MODPOST_CACHE="$MODPOST_CACHE"
 MODPOST_OPTIONS="$MODPOST_OPTIONS"
+MODPOST_INPUTS="$MODPOST_INPUTS"
     ])
 ])# _KSYMS_OUTPUT_MODPOST_CONFIG
 # =============================================================================

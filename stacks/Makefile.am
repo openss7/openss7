@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/02/20 09:54:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/07 06:09:43 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,14 +46,18 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:41 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:09:43 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   General rules
-#
+##
+## General rules
+##
 include am/openss7.am
+
+dist_sysconf_DATA 		=
+
+lib_LTLIBRARIES			=
 
 if PUBLIC_RELEASE
 
@@ -102,7 +106,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
-@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
@@ -206,6 +210,7 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
+ADDON_MODS			= 
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
@@ -307,7 +312,7 @@ libSS7mods_a_CPPFLAGS		= \
 				  -I$(srcdir)/src/include/os7 \
 				  -I./src/modules \
 				  -I$(srcdir)/src/modules \
-				  -imacros ./strconf.h \
+				  -imacros strconf.h \
 				  $(SS7_INCLUDES) \
 				  $(KERNEL_CPPFLAGS) \
 				  $(KERNEL_MODFLAGS)
@@ -480,6 +485,7 @@ endif
 if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
+ADDON_MODS			= 
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
@@ -543,12 +549,12 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/allocb.h \
 				  src/include/os7/bufpool.h \
 				  src/include/os7/bufq.h \
+				  src/include/os7/compat.h \
 				  src/include/os7/debug.h \
 				  src/include/os7/lock.h \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
-				  src/include/os7/compat.h \
 				  strconf.h
 
 if WITH_LIS
@@ -579,7 +585,15 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules -I$(srcdir)/src/modules -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules \
+				  -I$(srcdir)/src/modules \
+				  -imacros strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
@@ -613,7 +627,15 @@ m3ua_source_FILES		= $(nodist_EXTRA_libSS7m3ua_a_SOURCES)
 nodist_libSS7m3ua_a_SOURCES	= $(m3ua_source_FILES)
 
 libSS7m3ua_a_DEPENDENCIES	= config.h strconf.h
-libSS7m3ua_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/m3ua -I$(srcdir)/src/modules/m3ua -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7m3ua_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules/m3ua \
+				  -I$(srcdir)/src/modules/m3ua \
+				  -imacros strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7m3ua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7m3ua_a_OBJECTS:		$(libSS7m3ua_a_DEPENDENCIES)
 
@@ -644,7 +666,15 @@ sscop_source_FILES		= $(nodist_EXTRA_libSS7sscop_a_SOURCES)
 nodist_libSS7sscop_a_SOURCES	= $(sscop_source_FILES)
 
 libSS7sscop_a_DEPENDENCIES	= config.h strconf.h
-libSS7sscop_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/sscop -I$(srcdir)/src/modules/sscop -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7sscop_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules/sscop \
+				  -I$(srcdir)/src/modules/sscop \
+				  -imacros strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7sscop_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sscop_a_OBJECTS:		$(libSS7sscop_a_DEPENDENCIES)
 
@@ -679,7 +709,15 @@ sua_source_FILES		= $(nodist_EXTRA_libSS7sua_a_SOURCES)
 nodist_libSS7sua_a_SOURCES	= $(sua_source_FILES)
 
 libSS7sua_a_DEPENDENCIES	= config.h strconf.h
-libSS7sua_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/sua -I$(srcdir)/src/modules/sua -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7sua_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules/sua \
+				  -I$(srcdir)/src/modules/sua \
+				  -imacros strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7sua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sua_a_OBJECTS:		$(libSS7sua_a_DEPENDENCIES)
 
@@ -701,7 +739,15 @@ tua_source_FILES		= $(nodist_EXTRA_libSS7tua_a_SOURCES)
 nodist_libSS7tua_a_SOURCES	= $(tua_source_FILES)
 
 libSS7tua_a_DEPENDENCIES	= config.h strconf.h
-libSS7tua_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/tua -I$(srcdir)/src/modules/tua -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7tua_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules/tua \
+				  -I$(srcdir)/src/modules/tua \
+				  -imacros strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7tua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tua_a_OBJECTS:		$(libSS7tua_a_DEPENDENCIES)
 
@@ -722,7 +768,15 @@ tali_source_FILES		= $(nodist_EXTRA_libSS7tali_a_SOURCES)
 nodist_libSS7tali_a_SOURCES	= $(tali_source_FILES)
 
 libSS7tali_a_DEPENDENCIES	= config.h strconf.h
-libSS7tali_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/tali -I$(srcdir)/src/modules/tali -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7tali_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules/tali \
+				  -I$(srcdir)/src/modules/tali \
+				  -imacros strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7tali_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tali_a_OBJECTS:		$(libSS7tali_a_DEPENDENCIES)
 
@@ -811,62 +865,75 @@ ss7_source_FILES		= $(mods_source_FILES) \
 				  $(tua_source_FILES) \
 				  $(tali_source_FILES)
 
-EXTRA_DOCS += \
-	doc/drafts/isua/draft-bidulock-sigtran-isua-02.pdf \
-	doc/drafts/isua/draft-bidulock-sigtran-isua-02.ps \
-	doc/drafts/isua/draft-bidulock-sigtran-isua-02.txt \
-	doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.pdf \
-	doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.ps \
-	doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.txt \
-	doc/drafts/m2pa/draft-george-sigtran-m2pa-interop-01.txt \
-	doc/drafts/m2pa/draft-ietf-sigtran-m2pa-11.txt \
-	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.pdf \
-	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.ps \
-	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.txt \
-	doc/drafts/tua/draft-bidulock-sigtran-tua-03.pdf \
-	doc/drafts/tua/draft-bidulock-sigtran-tua-03.ps \
-	doc/drafts/tua/draft-bidulock-sigtran-tua-03.txt \
-	doc/drafts/ua/draft-bidulock-sigtran-aspext-03.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-aspext-03.ps \
-	doc/drafts/ua/draft-bidulock-sigtran-aspext-03.txt \
-	doc/drafts/ua/draft-bidulock-sigtran-corid-03.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-corid-03.ps \
-	doc/drafts/ua/draft-bidulock-sigtran-corid-03.txt \
-	doc/drafts/ua/draft-bidulock-sigtran-datamodel-00.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.ps \
-	doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.txt \
-	doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.ps \
-	doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.txt \
-	doc/drafts/ua/draft-bidulock-sigtran-regext-03.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-regext-03.ps \
-	doc/drafts/ua/draft-bidulock-sigtran-regext-03.txt \
-	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.pdf \
-	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
-	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
+EXTRA_DIST			+= $(ss7_source_FILES)
 
-EXTRA_TEX += \
-	scripts/texinfo.cnf \
-	scripts/texi/args.texi.in \
-	scripts/texi/fdl.texi \
-	scripts/texi/gpl.texi \
-	scripts/texi/install.texi \
-	scripts/texi/lesser.texi
+EXTRA_DOCS 			+= \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-02.pdf \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-02.ps \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-02.txt \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.pdf \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.ps \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.txt \
+				doc/drafts/m2pa/draft-george-sigtran-m2pa-interop-01.txt \
+				doc/drafts/m2pa/draft-ietf-sigtran-m2pa-11.txt \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.pdf \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.ps \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.txt \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-03.pdf \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-03.ps \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-03.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-03.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-03.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-03.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-03.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-03.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-03.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-datamodel-00.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-03.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-03.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-03.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.pdf \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
 
+EXTRA_DIST			+= $(EXTRA_DOCS)
 
-EXTRA_DIST			+= $(ss7_source_FILES) $(EXTRA_DOCS) $(EXTRA_TEX)
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
-EXTRA_SCRIPTS			+=
+EXTRA_SCRIPTS			+= configure.nexusware
 
-export KERNEL_MODULES		= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
-export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
-export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
-export KMODCONF_EXT		= $(PACKAGE_TARNAME)
-export KERNEL_MODMAPS		= $(STREAMS_MODMAP)
+##
+## Rules for building kernel objects
+##
+KERNEL_OBJECTS			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_MODS)
+KERNEL_PRELOADS			=
+KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+
+kpre				= streams-
 
 include am/kernel.am
 
+##
+## Rules for building libraries
+##
 include am/libraries.am
 
 if RPM_BUILD_USER
@@ -928,27 +995,96 @@ if WITH_XNET
 SUBDIRS += intl m4 po
 endif
 
-#
-# Rules for lsms
-#
+PKGINCL				= include/sys/$(PACKAGE_NAME)
+
+AUTOCONFIG_H			= $(PKGINCL)/config.h
+
+EXTRA_DIST			+= $(AUTOCONFIG_H).in
+
+EXPORT_SRCFILES			=
+
+EXPORT_VERFILES			=
+
+GENKSYMS_CPPFLAGS		= \
+				-I./src/drivers -I$(srcdir)/src/drivers \
+				-I./src/modules -I$(srcdir)/src/modules \
+				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+##
+## Rules for generating versioned kernel symbols
+##
+include am/genksyms.am
+
+##
+## Rules for generating STREAMS configuration
+##
+include am/strconf.am
+
+if RPM_BUILD_USER
+
+SUBDIRS = src doc
+
+endif
+
+if INSTALL_INITSCRIPTS
+
+if WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		=
+
+else
+
+dist_initrd_SCRIPTS		=
+
+endif
+
+dist_config_DATA		=
+
+dist_sysconf_DATA		+=
+
+endif
+
+##
+## Rules for init scripts
+##
+include am/init.am
+
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-#   Rules for making rpms
-#
-AM_RPMFLAGS 			= --define "_kversion $(kversion)"
-AM_SRPMFLAGS 			=
+##
+## Rules for making rpms
+##
+AM_RPMFLAGS			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS			=
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
+
+MAINTAINERCLEANFILES	+= \
+			$(top_srcdir)/aclocal.m4 \
+			$(top_srcdir)/config.h.in \
+			$(top_srcdir)/configure \
+			$(top_srcdir)/COPYING \
+			$(top_srcdir)/INSTALL \
+			$(top_srcdir)/scripts/compile \
+			$(top_srcdir)/scripts/config.guess \
+			$(top_srcdir)/scripts/config.sub \
+			$(top_srcdir)/scripts/depcomp \
+			$(top_srcdir)/scripts/install-sh \
+			$(top_srcdir)/scripts/ltmain.sh \
+			$(top_srcdir)/scripts/missing \
+			$(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake

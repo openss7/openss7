@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/20 09:54:43 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/07 08:57:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,20 +48,24 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 08:57:56 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xopen.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
+m4_include([m4/libraries.m4])
+m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
+m4_include([m4/streams.m4])
+m4_include([m4/xopen.m4])
 
 # =============================================================================
 # AC_XNS
@@ -71,31 +75,35 @@ AC_DEFUN([AC_XNS], [dnl
     _XNS_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
+    _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    with_xns='yes'
-    _XOPEN
-    XNS_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    _LDCONFIG
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDFLAGS"
+    _XNS_SETUP
+    XNS_INCLUDES="-imacros ./config.h"
+    XNS_INCLUDES="${XNS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    XNS_INCLUDES="${XNS_INCLUDES} -I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
     AC_MSG_NOTICE([final user    INCLUDES  = $XNS_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([XNS_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
-    _XNS_SETUP
-    _XNS_OUTPUT dnl
+    _XNS_OUTPUT
+    _AUTOTEST
 ])# AC_XNS
 # =============================================================================
 
@@ -110,14 +118,113 @@ AC_DEFUN([_XNS_OPTIONS], [dnl
 # _XNS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_SETUP], [dnl
+    _LINUX_KERNEL
+    _XNS_CONFIG_KERNEL
+    _GENKSYMS
+    _LINUX_STREAMS
+    with_xns='yes'
+    _XOPEN
 ])# _XNS_SETUP
+# =============================================================================
+
+# =============================================================================
+# _XNS_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# and 2.6 kernels.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+])
+    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
+			process_group cpu_raise_softirq check_region pcibios_init \
+			pcibios_find_class pcibios_find_device pcibios_present \
+			pcibios_read_config_byte pcibios_read_config_dword \
+			pcibios_read_config_word pcibios_write_config_byte \
+			pcibios_write_config_dword pcibios_write_config_word \
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti dev_init_buffers], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+])
+    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+])
+    _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
+			 struct super_block.s_fs_info,
+			 struct super_block.u.generic_sbp,
+			 struct file_system_type.read_super,
+			 struct file_system_type.get_sb,
+			 struct super_operations.read_inode2,
+			 struct kstatfs.f_type,
+			 struct packet_type.af_packet_priv,
+			 struct packet_type.data,
+			 struct packet_type.next,
+			 struct packet_type.list], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/netdevice.h>
+])
+])# _XNS_CONFIG_KERNEL
 # =============================================================================
 
 # =============================================================================
 # _XNS_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OUTPUT], [dnl
-    _XNS_STRCONF dnl
+    _XNS_STRCONF
 ])# _XNS_OUTPUT
 # =============================================================================
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/20 09:54:39 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 06:10:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,55 +48,64 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:39 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:10:03 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/genksyms.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xopen.m4])
-m4_include([m4/xti.m4])
-m4_include([m4/xns.m4])
-m4_include([m4/sctp.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
 m4_include([m4/libraries.m4])
+m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
+m4_include([m4/streams.m4])
+m4_include([m4/xopen.m4])
+m4_include([m4/xti.m4])
+m4_include([m4/xns.m4])
+m4_include([m4/sctp.m4])
 
 # =============================================================================
 # AC_OS7
 # -----------------------------------------------------------------------------
 AC_DEFUN([AC_OS7], [dnl
-    _OS7_OPTIONS
     _OPENSS7_PACKAGE([OpenSS7], [OpenSS7 Master Package])
+    _OS7_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
+    _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
     _LDCONFIG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    _XNS
-    _XTI
-    _INET
-    _SCTP
-dnl AC_MSG_NOTICE([final user CPPFLAGS  = $USER_CPPFLAGS])
-dnl AC_MSG_NOTICE([final user CFLAGS    = $USER_CFLAGS])
-dnl AC_MSG_NOTICE([final kern CPPFLAGS  = $KERNEL_CPPFLAGS])
-dnl AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
-dnl AC_MSG_NOTICE([final kern MODFLAGS  = $KERNEL_MODFLAGS])
-dnl AC_MSG_NOTICE([final kern NOVERSION = $KERNEL_NOVERSION])
-#   vars=`(set) 2>&1 | egrep '^(ac|man|rpm|linux|xns|xti|inet|sctp|streams)_cv_.*=' | sed -e 's|=.*||;s|^|declare -x |;s|$|; |'`
-#   echo $vars
-#   eval "$vars"
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDFLAGS"
+    _OS7_SETUP
+    OS7_INCLUDES="-imacros ./config.h"
+    OS7_INCLUDES="${OS7_INCLUDES} -I./src/include -I${srcdir}/src/include"
+    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
+    AC_MSG_NOTICE([final user    INCLUDES  = $OS7_INCLUDES])
+    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
+    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+    AC_SUBST([USER_CPPFLAGS])dnl
+    AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
+    AC_SUBST([OS7_INCLUDES])dnl
+    CPPFLAGS=
+    CFLAGS=
+    _OS7_OUTPUT
+    _AUTOTEST
 ])# AC_OS7
 # =============================================================================
 
@@ -185,6 +194,34 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	AC_CONFIG_SUBDIRS([stacks])
     fi
 ])# _OS7_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _OS7_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OS7_SETUP], [dnl
+    _LINUX_KERNEL
+    _GENKSYMS
+    _LINUX_STREAMS
+    _XNS
+    _XTI
+    _INET
+    _SCTP
+])# _OS7_SETUP
+# =============================================================================
+
+# =============================================================================
+# _OS7_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OS7_OUTPUT], [dnl
+])# _OS7_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _OS7_
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OS7_], [dnl
+])# _OS7_
 # =============================================================================
 
 # =============================================================================

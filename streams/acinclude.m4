@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/03/02 17:41:26 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/07 12:20:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/02 17:41:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 12:20:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,8 +62,8 @@ m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
 m4_include([m4/libraries.m4])
-m4_include([m4/strconf.m4])
 m4_include([m4/autotest.m4])
+m4_include([m4/strconf.m4])
 
 # =============================================================================
 # AC_LFS
@@ -77,32 +77,30 @@ AC_DEFUN([AC_LFS], [dnl
     _RPM_SPEC
     _DEB_DPKG
     _LDCONFIG
-    LFS_INCLUDES="-DLFS=1 -imacros ./config.h -I./include -I${srcdir}/include"
-    AC_SUBST([LFS_INCLUDES])dnl
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
-    AC_SUBST([USER_LDFLAGS])dnl
+    _LFS_SETUP
+    LFS_INCLUDES="-DLFS=1 -imacros ./config.h"
+dnl LFS_INCLUDES="$(LFS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    LFS_INCLUDES="${LFS_INCLUDES} -I./include -I${srcdir}/include"
+    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
+    AC_MSG_NOTICE([final user    INCLUDES  = $LFS_INCLUDES])
+    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
+dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
-    AC_MSG_NOTICE([final user CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final user INCLUDES  = $LFS_INCLUDES])
-    _LFS_SETUP
-    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-	KERNEL_MODFLAGS="$KERNEL_MODFLAGS -include ./include/sys/streams/modversions.h"
-    fi
-    AC_MSG_NOTICE([final kern MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kern NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kern CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final kern LDFLAGS   = $KERNEL_LDFLAGS])
+    AC_SUBST([USER_LDFLAGS])dnl
+    AC_SUBST([LFS_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
-    _LFS_STRCONF
-    AM_CONDITIONAL(WITH_LFS, false)dnl
-    AM_CONDITIONAL(WITH_LIS, false)dnl
+    _LFS_OUTPUT
     _AUTOTEST
 ])# AC_LFS
 # =============================================================================
@@ -721,6 +719,9 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
+    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	KERNEL_MODFLAGS="$KERNEL_MODFLAGS -include ./include/sys/streams/modversions.h"
+    fi
     _LFS_CHECK_KERNEL
     _LFS_SETUP_DEBUG
     _LFS_SETUP_MODULE
@@ -765,7 +766,8 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
 # and 2.6 kernels.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
-    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h linux/locks.h asm/softirq.h], [:], [:], [
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -774,7 +776,13 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
-    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked process_group cpu_raise_softirq check_region pcibios_init pcibios_find_class pcibios_find_device pcibios_present pcibios_read_config_byte pcibios_read_config_dword pcibios_read_config_word pcibios_write_config_byte pcibios_write_config_dword pcibios_write_config_word MOD_DEC_USE_COUNT MOD_INC_USE_COUNT], [:], [:], [
+    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
+			process_group cpu_raise_softirq check_region pcibios_init \
+			pcibios_find_class pcibios_find_device pcibios_present \
+			pcibios_read_config_byte pcibios_read_config_dword \
+			pcibios_read_config_word pcibios_write_config_byte \
+			pcibios_write_config_dword pcibios_write_config_word \
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -867,12 +875,9 @@ dnl
 		    [linux_cv_have_iop_lookup_nameidata='yes'],
 		    [linux_cv_have_iop_lookup_nameidata='no'])
 	    ])
-	    AH_TEMPLATE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA],
-		    [Set if inode_operation lookup function takes nameidata pointer.])
 	    if test :$linux_cv_have_iop_lookup_nameidata = :yes ; then
-		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1])
-	    else
-		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [0])
+		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1],
+		    [Set if inode_operation lookup function takes nameidata pointer.])
 	    fi
 	    AC_CACHE_CHECK([for kernel do_settimeofday with timespec],
 			   [linux_cv_have_timespec_settimeofday], [dnl
@@ -906,7 +911,7 @@ retval = do_settimeofday(&ts);]]) ],
 		[linux_cv_have_timespec_settimeofday='no'])
 	    ])
 	    if test :$linux_cv_have_timespec_settimeofday = :yes ; then
-		AC_DEFINE_UNQUOTED([HAVE_TIMESPEC_DO_SETTIMEOFDAY], [],
+		AC_DEFINE([HAVE_TIMESPEC_DO_SETTIMEOFDAY], [1],
 		    [Define if do_settimeofday takes struct timespec and returns int.])
 	    fi
 	])
@@ -951,14 +956,14 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [dnl
     AC_CACHE_CHECK([for kernel symbol support for fattach/fdetach], [lfs_cv_fattach], [dnl
 	lfs_cv_fattach="$lfs_fattach" ])
     if test :"${lfs_cv_fattach:-no}" != :no ; then
-	AC_DEFINE_UNQUOTED([HAVE_KERNEL_FATTACH_SUPPORT], [1],
+	AC_DEFINE([HAVE_KERNEL_FATTACH_SUPPORT], [1],
 	[If the addresses for the necessary symbols above are defined, then
 	define this to include fattach/fdetach support.])
     fi
     AC_CACHE_CHECK([for kernel symbol support for pipe], [lfs_cv_pipe], [dnl
 	lfs_cv_pipe="$lfs_pipe" ])
     if test :${lfs_cv_pipe:-no} != :no ; then
-	AC_DEFINE_UNQUOTED([HAVE_KERNEL_PIPE_SUPPORT], [1],
+	AC_DEFINE([HAVE_KERNEL_PIPE_SUPPORT], [1],
 	[If the addresses for the necessary symbols above are defined, then
 	define this to include pipe support.])
     fi
@@ -1026,17 +1031,13 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _LFS_
+# _LFS_OUTPUT
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_], [dnl
-])# _LFS_
-# =============================================================================
-
-# =============================================================================
-# _LFS_
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_], [dnl
-])# _LFS_
+AC_DEFUN([_LFS_OUTPUT], [dnl
+    _LFS_STRCONF
+    AM_CONDITIONAL(WITH_LFS, false)dnl
+    AM_CONDITIONAL(WITH_LIS, false)dnl
+])# _LFS_OUTPUT
 # =============================================================================
 
 # =============================================================================
@@ -1057,6 +1058,13 @@ dnl strconf_cv_strload='strload.conf'
     strconf_cv_package='LfS'
     _STRCONF
 ])# _LFS_STRCONF
+# =============================================================================
+
+# =============================================================================
+# _LFS_
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_], [dnl
+])# _LFS_
 # =============================================================================
 
 # =============================================================================

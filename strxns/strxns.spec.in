@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/02/25 10:56:41 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/03/07 06:09:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 10:56:41 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:09:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,25 +66,33 @@
 #    define PACKAGE_KVERSION environment variable
 #    just let it default to `uname -r`
 #
+#{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's|.*=||')}}
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
 %global kernel_version %{_kversion}
 %global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
-%global core_name core-%{_kversion}
-%global info_name info-%{_kversion}
-%global epoch @PACKAGE_EPOCH@
-%global majbase @STRCONF_MAJBASE@
-%global makedev @STRCONF_MAKEDEV@
-%global base @PACKAGE_TARNAME@
-%global title @PACKAGE_TITLE@
-%global stitle @PACKAGE_SHORTTITLE@
+%global core_name   core-%{_kversion}
+%global info_name   info-%{_kversion}
+%global epoch       @PACKAGE_EPOCH@
+%global majbase     @STRCONF_MAJBASE@
+%global makedev     @STRCONF_MAKEDEV@
+%global base        @PACKAGE_LCNAME@
+%global title       @PACKAGE_TITLE@
+%global stitle      @PACKAGE_SHORTTITLE@
 
-%global modules     ldl ip_strm_mod ip_to_dlpi
+%global modules     @KERNEL_MODULES@
+#global preloads    
 %global libraries   xns
 %global tools       strxns_mknod ldlconfig ldltest
 %global infofiles   %{name}
+#global initfiles
+
+%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56].*$|0|;s|^2\.4.*$|1|')
+%global have_initfiles %{?initfiles:1}%{!?initfiles:0}
+%global have_libraries %{?libraries:1}%{!?libraries:0}
+%global have_preloads %{?preloads:1}%{!?preloads:0}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -176,9 +184,11 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
 BuildRequires:  kernel-source = %{kernel_source}
 BuildRequires:  modutils >= 2.4.12
 %endif
-BuildRequires:  %{_streams}-%{info_name} >= %{_strvers}
 BuildRequires:  %{_streams}-devel >= %{_strvers}
+%if %{without_ko_modules}
+BuildRequires:  %{_streams}-%{info_name} >= %{_strvers}
 %buildreq_prov %{_streams}-devel %{_streams}-%{info_name}
+%endif
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
@@ -200,13 +210,23 @@ BuildRequires:  gcc = 2.95.3
 %endif
 # these are some needs of the configure script
 # to manipulate manual pages:
+BuildRequires:  /usr/bin/groff
 BuildRequires:  /usr/bin/soelim
 BuildRequires:  /usr/bin/refer
 BuildRequires:  /usr/bin/tbl
 BuildRequires:  /usr/bin/pic
 BuildRequires:  /usr/bin/gzip
+%if %{without_ko_modules}
 # to generate kernel symbols:
 BuildRequires:  /sbin/genksyms
+%endif
+# to build documentation
+#BuildRequires: transfig >= 3.2
+#BuildRequires: ImageMagick
+#BuildRequires: tetex >= 1.0
+#BuildRequires: ghostscript >= 6.51
+# to install documentation
+BuildRequires: texinfo >= 4.0
 # find the rest automagically
 Autoreq:        true
 
@@ -256,6 +276,7 @@ fi
 
 %define cache_file %{_builddir}/%{_target_platform}-%{kernel_version}-config.cache
 %define csite_file %{_builddir}/%{_target_platform}-config.site
+%define mpost_file %{_builddir}/%{_target_platform}-%{kernel_version}-modpost.cache
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
@@ -270,6 +291,7 @@ fi
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
     CXXCPP="${CXXCPP:-$CPP}" \
     CONFIG_SITE="%{csite_file}" \
+    MODPOST_CACHE="%{mpost_file}" \
     --cache-file="%{cache_file}" \
     --host=%{_target_platform} \
     --prefix=%{_prefix} \
@@ -344,6 +366,7 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 %if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
 # clean out binaries and auxilliary files
 make mostlyclean
+rm -fr include2
 # punch rpm release to Custom
 echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
@@ -403,8 +426,8 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
 #   installing new on the running kernel, we have to worry about previous
 #   loaded modules for the old version or a non-rpm version
-    for m in %{modules} ; do
-        m="streams-$m"
+    mods="%{modules}" ; for p in $mods ; do
+        m=`echo $p | sed -r -e 's|^.*/||;s|lib.*_a-|streams-|;s|.(k)?o(.gz)?$||'`
         if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           module running, kick the stack
             /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
@@ -436,9 +459,10 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
+%if %{without_ko_modules}
 #   Check that our line is in the modules.%{base} file
     conf_old=/etc/modules.conf
-    if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
+    if ! grep -q 'include.*modules.%{base}' $conf_old ; then
         streams_dir=/%{_lib}/modules/%{kernel_version}/misc
         streams_prf=/%{_lib}/modules/preferred/misc
         streams_dfl=/%{_lib}/modules/default/misc
@@ -501,6 +525,25 @@ if [ $1 = 1 ] ; then
         cp -fb --suffix=.rpmsave $conf_new $conf_old
         rm -f $conf_new
     fi
+%endif
+%if %{have_preloads}
+%if %{without_ko_modules}
+    preloads=modules
+%else
+    preloads=modprobe.preload
+%endif
+    if [ -f /etc/$preloads ] ; then
+        cp -f /etc/$preloads %{_tmppath}/$preloads.new.$$
+        pres="%{preloads}" ; for p in $pres ; do
+            m=`echo $p | sed -r -e 's|^.*/||;s|.(k)?o(.gz)?$||'`
+            sed -e "/^$m\>/d" %{_tmppath}/$preloads.new.$$ > %{_tmppath}/$preloads.tmp.$$
+            mv -f %{_tmppath}/$preloads.tmp.$$ %{_tmppath}/$preloads.new.$$
+        done
+        chmod --reference=/etc/$preloads %{_tmppath}/$preloads.new.$$
+        cp -fb --suffix=.rpmsave %{_tmppath}/$preloads.new.$$ /etc/$preloads
+        rm -f %{_tmppath}/$preloads.new.$$
+    fi
+%endif
 fi
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   this is a running kernel, do a /sbin/depmod on the modules directory for
@@ -516,8 +559,8 @@ fi
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
 #   worry about which modules are running
-    for m in %{modules} ; do
-        m="streams-$m"
+    mods="%{modules}" ; for p in $mods ; do
+        m=`echo $p | sed -r -e 's|^.*/||;s|lib.*_a-|streams-|;s|.(k)?o(.gz)?$||'`
         if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           modules running, kick the stack
             /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
@@ -548,6 +591,7 @@ fi
 %postun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 
+%if %{without_ko_modules}
 if [ $1 = 0 ]; then
 #   this is the last stage of a removal we are going away: we need to see if
 #   we need to remove our line from modules.conf and remove our devices
@@ -565,6 +609,7 @@ if [ $1 = 0 ]; then
         rm -f %{_tmppath}/modules.conf.tmp.$$
     fi
 fi
+%endif
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   this is a running kernel, do a /sbin/depmod on the modules directory for
     /sbin/depmod -ae
@@ -577,8 +622,8 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   one more kick at killing any loaded modules on uninstall, last stage of
 #   the upgrade on a running kernel for upgrade.
     reboot='no'
-    for m in %{modules} ; do
-        m="streams-$m"
+    mods="%{modules}" ; for p in $mods ; do
+        m=`echo $p | sed -r -e 's|^.*/||;s|lib.*_a-|streams-|;s|.(k)?o(.gz)?$||'`
         if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           modules running, kick the stack
             /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
@@ -623,7 +668,9 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/%{base}
+%if %{without_ko_modules}
 %attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
+%endif
 /%{_lib}/modules/%{kernel_version}/%{base}/*
 %endif
 
@@ -632,6 +679,7 @@ fi
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
 Group:          System Environment/Base
+Conflicts:      %{_conflict}-dev
 Requires:       dev >= 3.3
 Obsoletes:      %{name}-devs
 Autoreq:        true
@@ -703,6 +751,7 @@ The %{name}-%{_streams}-lib package contains the run-time shared libraries
 necessary to run applications programs and utilities developed for OpenSS7
 %{_STREAMS} STREAMS %{stitle}.
 
+%if %{have_libraries}
 %pre %{_streams}-lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then
@@ -720,6 +769,7 @@ else
     :
 #   upgrade, let RPM do its job
 fi
+%endif
 
 %post %{_streams}-lib
 # ---------------------------------------------------------------------------
@@ -822,7 +872,7 @@ fi
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
 Group:          Development/System
 Prefix:         %{_libdir}
-Prefix:         %{_includedir}
+Prefix:         %{_includedir}/%{name}
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
 Icon:           %{_xpm}
@@ -848,7 +898,8 @@ STREAMS %{stitle} application programs.
 %if %{BUILD_libs}
 %{_libdir}/*.a
 %endif
-%{_includedir}/*
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
 %endif
 
 # ===========================================================================
@@ -890,6 +941,9 @@ Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
+%if %{have_initfiles}
+Prefix:         %{_sysconfdir}
+%endif
 Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{_streams}-lib >= %{_strvers}
 Obsoletes:      %{name}-%{_streams}-utils
@@ -918,12 +972,40 @@ if [ $1 = 0 ]; then
         while [ -n "$location" -a -x "$location" ] ; do
             eval "rm -f $location"
             location="`which $tool 2>/dev/null`"
+            while [ -n "$location" -a -x "$location" ] ; do
+                eval "rm -f $location"
+                location="`which $tool 2>/dev/null`"
+            done
         done
     done
 else
     :
 #   upgrade, let rpm do its job
 fi
+
+%if %{have_initfiles}
+%post util
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then
+#   this is the end of a fresh install, add init scripts if we have chkconfig
+    if which chkconfig >/dev/null 2>&1 ; then
+        list='%{initfiles}' ; for i in $list ; do
+            chkconfig -add $i || :
+        done
+    fi
+fi
+
+%preun util
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ] ; then
+#   uninstalling for good, remove init scripts if we have chkconfig
+    if which chkconfig >/dev/null 2>&1 ; then
+        list='%{initfiles}' ; for i in $list ; do
+            chkconfig -del $i || :
+        done
+    fi
+fi
+%endif
 
 %if %{BUILD_tools}
 %files %{_streams}-util
@@ -932,12 +1014,18 @@ fi
 #%{_bindir}/*
 %{_sbindir}/*
 %{_libexecdir}/*test*
+%if %{have_initfiles}
+%config %{_sysconfdir}/*
+%endif
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.46  2005/03/07 06:09:27  brian
+# - More spec changes for 2.6.
+#
 # Revision 0.9.2.45  2005/02/25 10:56:41  brian
 # - Don't specify build architecture.
 #

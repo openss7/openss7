@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/20 09:54:42 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/07 06:10:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,21 +48,24 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:42 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:10:04 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xopen.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
 m4_include([m4/libraries.m4])
+m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
+m4_include([m4/streams.m4])
+m4_include([m4/xopen.m4])
 
 # =============================================================================
 # AC_XNET
@@ -72,32 +75,35 @@ AC_DEFUN([AC_XNET], [dnl
     _XNET_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
+    _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
     _LDCONFIG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    with_xnet='yes'
-    _XOPEN
-    XNET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDFLAGS"
+    _XNET_SETUP
+    XNET_INCLUDES="-imacros ./config.h"
+    XNET_INCLUDES="${XNET_INCLUDES} ${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    XNET_INCLUDES="${XNET_INCLUDES} -I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
     AC_MSG_NOTICE([final user    INCLUDES  = $XNET_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([XNET_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
-    _XNET_SETUP
-    _XNET_OUTPUT dnl
+    _XNET_OUTPUT
+    _AUTOTEST
 ])# AC_XNET
 # =============================================================================
 
@@ -112,6 +118,11 @@ AC_DEFUN([_XNET_OPTIONS], [dnl
 # _XNET_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNET_SETUP], [dnl
+    _LINUX_KERNEL
+    _GENKSYMS
+    _LINUX_STREAMS
+    with_xnet='yes'
+    _XOPEN
 ])# _XNET_SETUP
 # =============================================================================
 

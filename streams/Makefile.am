@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/03/05 11:08:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/03/07 06:09:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/05 11:08:48 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 06:09:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -354,6 +354,9 @@ EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+= configure.nexusware
 
+##
+## Rules for building kernel objects
+##
 KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
 KERNEL_MODULES			= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
 KERNEL_PRELOADS			=
@@ -362,8 +365,13 @@ KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			=
 
+kpre				= streams-
+
 include am/kernel.am
 
+##
+## Rules for building libraries
+##
 include am/libraries.am
 
 if RPM_BUILD_USER
@@ -617,8 +625,14 @@ GENKSYMS_CPPFLAGS		= \
 				-I./src/modules -I$(srcdir)/src/modules \
 				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
+##
+## Rules for generating versioned kernel symbols
+##
 include am/genksyms.am
 
+##
+## Rules for generating STREAMS configuration
+##
 include am/strconf.am
 
 if RPM_BUILD_USER
