@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/04/01 09:52:10 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/04/01 18:08:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 09:52:10 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 18:08:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1065,7 +1065,7 @@ retval = do_settimeofday(&ts);]]) ],
 AC_DEFUN([_LFS_CONFIG_FATTACH], [dnl
     lfs_pipe=yes
     lfs_fattach=yes
-    _LINUX_KERNEL_SYMBOLS[[mount_sem, check_mnt])
+    _LINUX_KERNEL_SYMBOLS([mount_sem, check_mnt])
     _LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([graft_tree], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([do_umount], [lfs_fattach=no; lfs_pipe=no])

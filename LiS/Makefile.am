@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.7 $) $Date: 2005/03/24 01:38:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/04/01 18:35:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 01:38:17 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 18:35:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -161,9 +161,14 @@ libLiSdrvr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $
 libLiSdrvr_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLiSdrvr_a_OBJECTS): $(libLiSdrvr_a_DEPENDENCIES)
 
+drivers/str/linux/relay3.c: drivers/str/relay.c
+	mkdir -p `echo '$@' | sed -e 's|/[^/]*$$||'`
+	cp -f $< $@
+
 libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 				  drivers/str/linux/liskmod.c \
-				  drivers/str/linux/mtdrv.c
+				  drivers/str/linux/mtdrv.c \
+				  drivers/str/linux/relay3.c
 
 libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
