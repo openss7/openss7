@@ -1,0 +1,1105 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $"
+
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $";
+
+#define __NO_VERSION__
+
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
+#include <linux/module.h>
+#include <linux/modversions.h>
+#include <linux/init.h>
+
+#ifdef CONFIG_KMOD
+#include <linux/kmod.h>
+#endif
+#include <linux/kernel.h>	/* for FASTCALL */
+#include <linux/sched.h>	/* for current */
+#include <linux/file.h>		/* for fput */
+#include <linux/poll.h>
+#include <linux/fs.h>
+#include <asm/hardirq.h>
+
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
+
+#include <sys/kmem.h>		/* for kmem_ */
+#include <sys/stream.h>
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
+#include <sys/ddi.h>
+
+#include "sys/config.h"
+#include "strdebug.h"
+#include "sth.h"		/* for stream operations */
+#include "strsched.h"		/* for di_alloc and di_put */
+#include "strlookup.h"		/* extern verification */
+
+/* we want macro versions of these */
+
+#undef getmajor
+#define getmajor(__ino) (((__ino)>>16)&0x0000ffff)
+
+#undef getminor
+#define getminor(__ino) (((__ino)>>0)&0x0000ffff)
+
+#undef makedevice
+#define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
+
+/* these don't need to be so big */
+
+#define STRMOD_HASH_ORDER 5
+#define STRDEV_HASH_ORDER 5
+#define STRNOD_HASH_ORDER 5
+
+#define STRMOD_HASH_SIZE (1 << STRMOD_HASH_ORDER)
+#define STRDEV_HASH_SIZE (1 << STRDEV_HASH_ORDER)
+#define STRNOD_HASH_SIZE (1 << STRNOD_HASH_ORDER)
+
+#define STRMOD_HASH_MASK ((unsigned long)(STRMOD_HASH_SIZE-1))
+#define STRDEV_HASH_MASK ((unsigned long)(STRDEV_HASH_SIZE-1))
+#define STRNOD_HASH_MASK ((unsigned long)(STRNOD_HASH_SIZE-1))
+
+#define strmod_hash_slot(_modid) \
+	(fmodsw_hash + (((_modid) + ((_modid) >> STRMOD_HASH_ORDER) + ((_modid) >> 2 * STRMOD_HASH_ORDER)) & STRMOD_HASH_MASK))
+
+#define strdev_hash_slot(_major) \
+	(cdevsw_hash + (((_major) + ((_major) >> STRDEV_HASH_ORDER) + ((_major) >> 2 * STRDEV_HASH_ORDER)) & STRDEV_HASH_MASK))
+
+#define strnod_hash_slot(_minor) \
+	(nodesw_hash + (((_minor) + ((_minor) >> STRNOD_HASH_ORDER) + ((_minor) >> 2 * STRNOD_HASH_ORDER)) & STRNOD_HASH_MASK))
+
+rwlock_t cdevsw_lock = RW_LOCK_UNLOCKED;
+rwlock_t fmodsw_lock = RW_LOCK_UNLOCKED;
+rwlock_t nodesw_lock = RW_LOCK_UNLOCKED;
+
+struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here */
+struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
+struct list_head nodesw_list = LIST_HEAD_INIT(nodesw_list);	/* Minors go here */
+
+#if	defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(cdevsw_list);
+#endif
+#if	defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(fmodsw_list);
+#endif
+#if	defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(nodesw_list);
+#endif
+
+struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
+struct list_head cdevsw_hash[STRDEV_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
+struct list_head nodesw_hash[STRNOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
+
+int cdev_count = 0;
+int fmod_count = 0;
+int node_count = 0;
+
+#if defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(cdev_count);
+EXPORT_SYMBOL_GPL(fmod_count);
+EXPORT_SYMBOL_GPL(node_count);
+#endif
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Hash functions
+ *
+ *  -------------------------------------------------------------------------
+ */
+/**
+ *  init_fmod_hash: - initialize the list_head structures in the fmod hash
+ */
+STATIC INLINE void init_fmod_hash(void)
+{
+	int i;
+	for (i = 0; i < STRMOD_HASH_SIZE; i++)
+		INIT_LIST_HEAD((fmodsw_hash + i));
+}
+
+/**
+ *  init_cdev_hash: - initialize the list_head structures in the cdev hash
+ */
+STATIC INLINE void init_cdev_hash(void)
+{
+	int i;
+	for (i = 0; i < STRDEV_HASH_SIZE; i++)
+		INIT_LIST_HEAD((cdevsw_hash + i));
+}
+
+/**
+ *  init_node_hash: - initialize the list_head structures in the node hash
+ */
+STATIC INLINE void init_node_hash(void)
+{
+	int i;
+	for (i = 0; i < STRNOD_HASH_SIZE; i++)
+		INIT_LIST_HEAD((nodesw_hash + i));
+}
+
+/**
+ *  __devi_lookup: - look up a devi by major device number in devi hashes
+ *  @major: major device number to look up
+ *
+ *  Look up a STREAMS device information structure by external major device number in the devinfo
+ *  hashes without locking or acquisition of the result.  This function can be called multiple times
+ *  with the same @major with very little performance impact.
+ */
+struct devinfo *__devi_lookup(major_t major)
+{
+	struct list_head *pos, *slot = strdev_hash_slot(major);
+	list_for_each(pos, slot) {
+		struct devinfo *devi = list_entry(pos, struct devinfo, di_hash);
+		if (devi->major == major) {
+			/* cache to front */
+			list_del(&devi->di_hash);
+			list_add(&devi->di_hash, slot);
+			return (devi);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__devi_lookup);
+
+/**
+ *  __cdev_lookup: - look up a cdev by major device number in cdev hashes
+ *  @major: major device number to look up
+ *
+ *  Look up a STREAMS driver by major device number in the cdevsw hashes without locking or
+ *  acquisition of the result.  This function can be called multiple times with the same @major with
+ *  very little performance impact.
+ */
+struct cdevsw *__cdev_lookup(major_t major)
+{
+	struct devinfo *devi;
+	if ((devi = __devi_lookup(major)))
+		return (devi->di_dev);
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__cdev_lookup);
+
+/**
+ *  __cdrv_lookup: - look up a cdev by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *
+ *  Look up a STREAMS module by module identifier in the fmodsw hashes without locking or
+ *  acquisition of the result.  This function can be called multiple times with the same @modid with
+ *  very little performance impact.
+ */
+struct cdevsw *__cdrv_lookup(modID_t modid)
+{
+	struct list_head *pos, *slot = strmod_hash_slot(modid);
+	list_for_each(pos, slot) {
+		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_hash);
+		if (cdev->d_modid == modid) {
+			/* cache to front */
+			list_del(&cdev->d_hash);
+			list_add(&cdev->d_hash, slot);
+			return (cdev);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__cdrv_lookup);
+
+/**
+ *  __node_lookup: - look up a node by cdev and minor device number in node hashes
+ *  @cdev: pointer to character device switch entry
+ *  @minor: minor device number
+ */
+struct devnode *__node_lookup(struct cdevsw *cdev, minor_t minor)
+{
+	struct list_head *pos, *slot = strnod_hash_slot(minor);
+	list_for_each(pos, slot) {
+		struct devnode *node = list_entry(pos, struct devnode, n_hash);
+		if (node->n_dev == cdev && node->n_minor == minor) {
+			/* pull to head of slot */
+			list_del(&node->n_hash);
+			list_add(&node->n_hash, slot);
+			return (node);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__node_lookup);
+
+/**
+ *  __fmod_lookup: - look up a fmod by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *
+ *  Look up a STREAMS module by module identifier in the fmodsw hashes without locking or
+ *  acquisition of the result.  This function can be called multiple times with the same @modid with
+ *  very little performance impact.
+ */
+struct fmodsw *__fmod_lookup(modID_t modid)
+{
+	struct list_head *pos, *slot = strmod_hash_slot(modid);
+	list_for_each(pos, slot) {
+		struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_hash);
+		if (fmod->f_modid == modid) {
+			/* pull to front of slot */
+			list_del(&fmod->f_hash);
+			list_add(&fmod->f_hash, slot);
+			return (fmod);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__fmod_lookup);
+
+struct cdevsw *__cdev_search(const char *name)
+{
+	struct list_head *pos, *slot = &cdevsw_list;
+	list_for_each(pos, slot) {
+		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_list);
+		if (!strncmp(cdev->d_name, name, FMNAMESZ)) {
+			/* pull to front of slot */
+			list_del(&cdev->d_list);
+			list_add(&cdev->d_list, slot);
+			return (cdev);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__cdev_search);
+
+struct fmodsw *__fmod_search(const char *name)
+{
+	struct list_head *pos, *slot = &fmodsw_list;
+	list_for_each(pos, slot) {
+		struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_list);
+		if (!strncmp(fmod->f_name, name, FMNAMESZ)) {
+			/* pull to front of slot */
+			list_del(&fmod->f_list);
+			list_add(&fmod->f_list, slot);
+			return (fmod);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__fmod_search);
+
+struct devnode *__node_search(struct cdevsw *cdev, const char *name)
+{
+	struct list_head *pos, *slot = &cdev->d_minors;
+	list_for_each(pos, slot) {
+		struct devnode *node = list_entry(pos, struct devnode, n_list);
+		if (!strncmp(node->n_name, name, FMNAMESZ)) {
+			/* pull to head of slot */
+			list_del(&node->n_list);
+			list_add(&node->n_list, slot);
+			return (node);
+		}
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL_GPL(__node_search);
+
+void *__smod_search(const char *name)
+{
+	void *fmod = NULL;
+	if (!fmod)
+		fmod = __cdev_search(name);
+	if (!fmod)
+		fmod = __fmod_search(name);
+	return (fmod);
+}
+
+EXPORT_SYMBOL_GPL(__smod_search);
+
+/*
+ *  cdev_lookup: - look up a cdev by major device number in cdev hashes
+ *  @major: major device number to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct cdevsw *cdev_lookup(major_t major, int load)
+{
+	struct cdevsw *cdev = NULL;
+#ifdef CONFIG_KMOD
+	int reload;
+	read_lock(&cdevsw_lock);
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char devname[64];
+			if ((cdev = __cdev_lookup(major)))
+				break;
+			if (!load)
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "char-major-%d", major);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+			if ((cdev = __cdev_lookup(major)))
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "streams-major-%d", major);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+#ifdef CONFIG_DEVFS
+			if ((cdev = __cdev_lookup(major)))
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "/dev/streams/%d", major);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+#endif				/* CONFIG_DEVFS */
+		} while (0);
+		/* try to acquire the module */
+		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
+			break;
+		cdev = NULL;
+	}
+	read_unlock(&cdevsw_lock);
+#else
+	read_lock(&cdevsw_lock);
+	cdev = __cdev_lookup(major);
+	read_unlock(&cdevsw_lock);
+#endif				/* CONFIG_KMOD */
+	return (cdev);
+}
+
+/*
+ *  cdrv_lookup: - look up a cdev by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct cdevsw *cdrv_lookup(modID_t modid, int load)
+{
+	struct cdevsw *cdev = NULL;
+#ifdef CONFIG_KMOD
+	int reload;
+	read_lock(&fmodsw_lock);
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char modname[64];
+			if ((cdev = __cdrv_lookup(modid)))
+				break;
+			if (!load)
+				break;
+			read_unlock(&fmodsw_lock);
+			snprintf(modname, sizeof(modname), "streams-modid-%d", modid);
+			request_module(modname);
+			read_lock(&fmodsw_lock);
+			if ((cdev = __cdrv_lookup(modid)))
+				break;
+		} while (0);
+		/* try to acquire the module */
+		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
+			break;
+		cdev = NULL;
+	}
+	read_unlock(&fmodsw_lock);
+#else
+	read_lock(&fmodsw_lock);
+	cdev = __cdrv_lookup(modid);
+	read_unlock(&fmodsw_lock);
+#endif				/* CONFIG_KMOD */
+	return (cdev);
+}
+
+/*
+ *  fmod_lookup: - look up a fmod by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
+{
+	struct fmodsw *fmod = NULL;
+#ifdef CONFIG_KMOD
+	int reload;
+	read_lock(&fmodsw_lock);
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char modname[64];
+			if ((fmod = __fmod_lookup(modid)))
+				break;
+			if (!load)
+				break;
+			read_unlock(&fmodsw_lock);
+			snprintf(modname, sizeof(modname), "streams-modid-%d", modid);
+			request_module(modname);
+			read_lock(&fmodsw_lock);
+			if ((fmod = __fmod_lookup(modid)))
+				break;
+		} while (0);
+		/* try to acquire the module */
+		if (fmod && fmod->f_str && try_inc_mod_count(fmod->f_kmod))
+			break;
+		fmod = NULL;
+	}
+	read_unlock(&fmodsw_lock);
+#else
+	read_lock(&fmodsw_lock);
+	fmod = __fmod_lookup(modid);
+	read_unlock(&fmodsw_lock);
+#endif				/* CONFIG_KMOD */
+	return (fmod);
+}
+
+/**
+ *  devi_lookup: - look up a devinfo by device and major device number
+ *  @cdev:	cdevsw structure for the driver
+ *  @major:	major device number to look up
+ */
+STATIC struct devinfo *devi_lookup(const struct cdevsw *cdev, major_t major)
+{
+	struct devinfo *devi = NULL;
+	read_lock(&cdevsw_lock);
+	if (cdev && cdev->d_majors.next) {
+		register struct list_head *pos;
+		list_for_each(pos, &cdev->d_majors) {
+			struct devinfo *d = list_entry(pos, struct devinfo, di_list);
+			if (d->major == major) {
+				devi = d;
+				break;
+			}
+		}
+	}
+	read_unlock(&cdevsw_lock);
+	return (devi);
+}
+
+/*
+ *  node_lookup: - look up a devnode by device and minor device number
+ *  @cdev:	cdevsw structure for the driver
+ *  @minor:	minor device number to look up
+ */
+STATIC struct devnode *node_lookup(const struct cdevsw *cdev, minor_t minor)
+{
+	struct devnode *node = NULL;
+	read_lock(&cdevsw_lock);
+	if (cdev && cdev->d_minors.next) {
+		register struct list_head *pos;
+		list_for_each(pos, &cdev->d_minors) {
+			struct devnode *n = list_entry(pos, struct devnode, n_list);
+			if (n->n_minor == minor) {
+				node = n;
+				break;
+			}
+		}
+	}
+	read_unlock(&cdevsw_lock);
+	return (node);
+}
+
+/**
+ *  cdev_search: - look up a cdev by name
+ *  @name: name to look up
+ *  @load: whether to demand load kernel modules
+ *
+ *  The search is exhaustive.  If this function is called multiple times with the same name, the
+ *  peformance impact will be minimal.  If the device is not found by name, an attempt will be made
+ *  to demand load the kernel module "streams-%s" and then "/dev/streams/%s".
+ */
+STATIC struct cdevsw *cdev_search(const char *name, int load)
+{
+	struct cdevsw *cdev = NULL;
+#ifdef CONFIG_KMOD
+	int reload;
+#endif
+	read_lock(&cdevsw_lock);
+#ifdef CONFIG_KMOD
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char devname[64];
+			if ((cdev = __cdev_search(name)))
+				break;
+			if (!load)
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "streams-%s", name);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+#ifdef CONFIG_DEVFS
+			if ((cdev = __cdev_search(name)))
+				break;
+			read_unlock(&cdevsw_lock);
+			snprintf(devname, sizeof(devname), "/dev/streams/%s", name);
+			request_module(devname);
+			read_lock(&cdevsw_lock);
+#endif				/* CONFIG_DEVFS */
+		} while (0);
+		/* try to acquire the module */
+		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
+			break;
+		cdev = NULL;
+	}
+#else				/* CONFIG_KMOD */
+	cdev = __cdev_search(name);
+#endif				/* CONFIG_KMOD */
+	read_unlock(&cdevsw_lock);
+	return (cdev);
+}
+
+/*
+ *  fmod_search: - look up a fmod by name
+ *  @name: name to look up
+ *  @load: whether to demand load kernel modules
+ *
+ *  The search is exhaustive.  If this function is called multiple times with the same name, the
+ *  peformance impact will be minimal.  If the module is not found by name, an attempt will be made
+ *  to demand load the kernel module "streams-%s".
+ */
+STATIC struct fmodsw *fmod_search(const char *name, int load)
+{
+	struct fmodsw *fmod = NULL;
+#ifdef CONFIG_KMOD
+	int reload;
+#endif
+	read_lock(&fmodsw_lock);
+#ifdef CONFIG_KMOD
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char devname[64];
+			if ((fmod = __fmod_search(name)))
+				break;
+			if (!load)
+				break;
+			read_unlock(&fmodsw_lock);
+			snprintf(devname, sizeof(devname), "streams-%s", name);
+			request_module(devname);
+			read_lock(&fmodsw_lock);
+		} while (0);
+		/* try to acquire the module */
+		if (fmod && fmod->f_str && try_inc_mod_count(fmod->f_kmod))
+			break;
+		fmod = NULL;
+	}
+#else				/* CONFIG_KMOD */
+	fmod = __fmod_search(name);
+#endif				/* CONFIG_KMOD */
+	read_unlock(&fmodsw_lock);
+	return (fmod);
+}
+
+/*
+ *  node_search: - looke up a minor device node by name
+ *  @cdev: character device major structure
+ *  @name: name to look up
+ */
+STATIC struct devnode *node_search(const struct cdevsw *cdev, const char *name)
+{
+	struct devnode *node = NULL;
+	read_lock(&cdevsw_lock);
+	if (cdev && cdev->d_minors.next) {
+		register struct list_head *pos;
+		list_for_each(pos, &cdev->d_minors) {
+			struct devnode *n = list_entry(pos, struct devnode, n_list);
+			if (!strncmp(n->n_name, name, FMNAMESZ)) {
+				node = n;
+				break;
+			}
+		}
+	}
+	read_unlock(&cdevsw_lock);
+	return (node);
+}
+
+#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
+ || defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
+/**
+ *  fmod_str:	- look up a fmod by streamtab
+ *  @str:	streamtab to look up
+ */
+struct fmodsw *fmod_str(const struct streamtab *str)
+{
+	struct fmodsw *fmod = NULL;
+	struct list_head *pos;
+	read_lock(&fmodsw_lock);
+	list_for_each(pos, &fmodsw_list) {
+		fmod = list_entry(pos, struct fmodsw, f_list);
+		if (fmod->f_str == str)
+			break;
+		fmod = NULL;
+	}
+	read_unlock(&fmodsw_lock);
+	return (fmod);
+}
+
+#if defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
+ || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_SYMBOL_GPL(fmod_str);
+#endif
+/**
+ *  cdev_str:	- look up a cdev by streamtab
+ *  @str:	streamtab to look up
+ */
+struct cdevsw *cdev_str(const struct streamtab *str)
+{
+	struct cdevsw *cdev = NULL;
+	struct list_head *pos;
+	read_lock(&cdevsw_lock);
+	list_for_each(pos, &cdevsw_list) {
+		cdev = list_entry(pos, struct cdevsw, d_list);
+		if (cdev->d_str == str)
+			break;
+		cdev = NULL;
+	}
+	read_unlock(&cdevsw_lock);
+	return (cdev);
+}
+
+#if defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
+ || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_SYMBOL_GPL(cdev_str);
+#endif
+#endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Get and put devices and modules.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  cdev_get: - get a reference to a STREAMS device
+ *  @major: (internal) major device number of the STREAMS device
+ *
+ *  Context: When the calling context can block, an attempt will be made to load the driver by major
+ *  device number.
+ */
+struct cdevsw *cdev_get(major_t major)
+{
+	return cdev_lookup(major, !in_interrupt());
+}
+
+/**
+ *  cdev_put:	- put a reference to a STREAMS device
+ *  @cdev:	STREAMS device structure pointer to put
+ */
+void cdev_put(struct cdevsw *cdev)
+{
+	if (cdev && cdev->d_kmod)
+		__MOD_DEC_USE_COUNT(cdev->d_kmod);
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_AIX_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_LIS_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_UW7_MODULE || \
+    defined CONFIG_STREAMS_CLONE_MODULE
+EXPORT_SYMBOL_GPL(cdev_get);
+EXPORT_SYMBOL_GPL(cdev_put);
+#endif
+
+/**
+ *  cdrv_get:	- get a reference to a STREAMS driver
+ *  @modid:	module id number of the STREAMS driver
+ */
+struct cdevsw *cdrv_get(modID_t modid)
+{
+	return cdrv_lookup(modid, !in_interrupt());
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_SYMBOL_GPL(cdrv_get);
+#endif
+
+/**
+ *  cdrv_put:	- put a reference to a STREAMS driver
+ *  @cdev:	STREAMS driver structure pointer to put
+ */
+void cdrv_put(struct cdevsw *cdev)
+{
+	cdev_put(cdev);
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL_GPL(cdrv_put);
+#endif
+
+/**
+ *  fmod_get: - get a reference to a STREAMS module
+ *  @modid: module id number of the STREAMS module
+ *
+ *  Context: When the calling context can block, an attempt will be made to load the module by
+ *  module identifier.
+ */
+struct fmodsw *fmod_get(modID_t modid)
+{
+	return fmod_lookup(modid, !in_interrupt());
+}
+
+EXPORT_SYMBOL_GPL(fmod_get);
+
+/**
+ *  fmod_put: - put a reference to a STREAMS module
+ *  @fmod: STREAMS module structure pointer to put
+ *
+ */
+void fmod_put(struct fmodsw *fmod)
+{
+	if (fmod && fmod->f_kmod)
+		__MOD_DEC_USE_COUNT(fmod->f_kmod);
+}
+
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(fmod_put);
+#endif
+
+/**
+ *  devi_get: - get a reference to a major device node (devinfo)
+ *  @cdev:	cdevsw structure for device
+ *  @major:	major device number
+ */
+struct devinfo *devi_get(const struct cdevsw *cdev, major_t major)
+{
+	return devi_lookup(cdev, major);
+}
+
+EXPORT_SYMBOL_GPL(devi_get);
+
+/**
+ *  node_get: - get a reference to a minor device node (devnode)
+ *  @cdev:	cdevsw structure for device
+ *  @minor:	minor device number
+ */
+struct devnode *node_get(const struct cdevsw *cdev, minor_t minor)
+{
+	return node_lookup(cdev, minor);
+}
+
+EXPORT_SYMBOL_GPL(node_get);
+
+/**
+ *  cdev_find: - find a STREAMS device by its name
+ *  @name:	the name to find
+ *
+ *  Attempt to find a STREAMS device by name.  If the device cannot be found by name, attempt to
+ *  load the kernel module streams-%s where %s is the name requested and check again.
+ *
+ *  Return Value: A pointer to the STREAMS device, with use count incremented, or %NULL if not found
+ *  and could not be loaded.
+ *
+ *  Context: When the calling context can block, an attempt will be made to load the driver by name.
+ */
+struct cdevsw *cdev_find(const char *name)
+{
+	return cdev_search(name, !in_interrupt());
+}
+
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL_GPL(cdev_find);
+#endif
+
+/**
+ *  cdev_match: - find a STREAMS device by extended name
+ *  @name:	the name to find
+ *
+ *  Attempt to find a STREAMS device by extended name.  If the device cannot be found by extended
+ *  name, attempt to load the kernel module streams-%s where %s is the name requested and check
+ *  again.
+ *
+ *  Return Value: A pointer to the STREAMS device, with use count incremented, or %NULL if not found
+ *  and could not be loaded.
+ *
+ *  Context: When the calling context can block, an attempt will be made to load the driver by name.
+ */
+struct cdevsw *cdev_match(const char *name)
+{
+	int i;
+	char root[FMNAMESZ + 1];
+	snprintf(root, sizeof(root), "%s", name);
+	for (i = 0; i < FMNAMESZ && root[i] != '.'; i++) ;
+	root[i] = '\0';
+	return cdev_find(root);
+}
+
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
+EXPORT_SYMBOL_GPL(cdev_match);
+#endif
+
+/**
+ *  fmod_find: - get a reference to a STREAMS module
+ *  @name: name of the module
+ *
+ *  Attempt to find a STREAMS module by name.  If the module cannot be found by name, attempt to
+ *  load the kernel module streams-%s where %s is the name requested and check again.
+ *
+ *  Return Value: A pointer to the STREAMS module, with use count incremented, or %NULL if not found
+ *  and could not be loaded.
+ *
+ *  Context: When the calling context can block, an attempt will be made to load the module by name.
+ */
+struct fmodsw *fmod_find(const char *name)
+{
+	return fmod_search(name, !in_interrupt());
+}
+
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(fmod_find);
+#endif
+
+struct devnode *node_find(const struct cdevsw *cdev, const char *name)
+{
+	return node_search(cdev, name);
+}
+
+EXPORT_SYMBOL_GPL(node_find);
+
+/*
+ *  spec_dir_alloc: - allocate a specfs directory entry
+ *  @parent: parenty directory entry
+ *  @name: directory name
+ *  @opaque: opaque data for iget4
+ */
+STATIC struct dentry *spec_dir_alloc(struct dentry *parent, const char *name, long ino, void *opaque)
+{
+	struct dentry *dentry;
+	struct inode *base = parent->d_inode;
+	struct qstr str;
+	ptrace(("strreg: allocating dentry %s for parent %s ino %ld opaque %p\n", name, parent->d_name.name, ino, opaque));
+	str.name = name;
+	str.len = strnlen(name, FMNAMESZ);
+	str.hash = full_name_hash(str.name, str.len);
+	down(&base->i_sem);
+	if ((dentry = d_alloc(parent, &str)))
+		d_add(dentry, iget4(base->i_sb, ino, NULL, opaque));
+	up(&base->i_sem);
+	if (dentry && !dentry->d_inode) {
+		dput(dentry);
+		dentry = NULL;
+	}
+	return (dentry);
+}
+
+/*
+ *  spec_dir_delete: - delete a specfs directory entry
+ *  @parent: parent directory entry
+ *  @child: child directory entry to delete
+ */
+STATIC void spec_dir_delete(struct dentry *parent, struct dentry *child)
+{
+	struct inode *base, *inode;
+	ptrace(("strreg: deallocating dentry %s from parent %s\n", child->d_name.name, parent->d_name.name));
+	if (!child || !parent)
+		return;
+	base = parent->d_inode;
+	inode = child->d_inode;
+	triple_down(&base->i_sem, &base->i_zombie, &inode->i_zombie);
+	dget(child);
+	switch (atomic_read(&child->d_count)) {
+	default:
+		shrink_dcache_parent(child);
+		if (atomic_read(&child->d_count) != 2)
+			break;
+	case 2:
+		d_drop(child);
+	}
+	inode->u.generic_ip = NULL;
+	inode->i_nlink--;
+	inode->i_flags |= S_DEAD;
+	double_up(&base->i_zombie, &inode->i_zombie);
+	d_delete(child);
+	dput(child);
+	dput(child);
+	up(&base->i_sem);
+}
+
+void fmod_add(struct fmodsw *fmod, modID_t modid)
+{
+	fmod->f_modid = modid;
+	list_add(&fmod->f_list, &fmodsw_list);
+	list_add(&fmod->f_hash, strmod_hash_slot(modid));
+	fmod_count++;
+}
+
+EXPORT_SYMBOL_GPL(fmod_add);
+
+void fmod_del(struct fmodsw *fmod)
+{
+	/* remove from list and hash */
+	list_del_init(&fmod->f_list);
+	list_del_init(&fmod->f_hash);
+}
+
+EXPORT_SYMBOL_GPL(fmod_del);
+
+int cdev_add(struct dentry *root, struct cdevsw *cdev, modID_t modid)
+{
+	/* get a dentry if required */
+	if (!cdev->d_dentry &&
+	    !(cdev->d_dentry = spec_dir_alloc(root, cdev->d_name, modid, cdev))) {
+		ptrace(("couldn't allocate dentry\n"));
+		return (-ENOMEM);
+	}
+	cdev->d_modid = modid;
+	list_add(&cdev->d_list, &cdevsw_list);
+	list_add(&cdev->d_hash, strmod_hash_slot(modid));
+	if (!cdev->d_majors.next)
+		INIT_LIST_HEAD(&cdev->d_majors);
+	if (!cdev->d_minors.next)
+		INIT_LIST_HEAD(&cdev->d_minors);
+	if (!cdev->d_apush.next)
+		INIT_LIST_HEAD(&cdev->d_apush);
+	if (!cdev->d_stlist.next)
+		INIT_LIST_HEAD(&cdev->d_stlist);
+	cdev_count++;
+	return (0);
+}
+
+EXPORT_SYMBOL_GPL(cdev_add);
+
+void cdev_del(struct dentry *root, struct cdevsw *cdev)
+{
+	/* put away dentry if necessary */
+	spec_dir_delete(root, xchg(&cdev->d_dentry, NULL));
+	/* remove from list and hash */
+	list_del_init(&cdev->d_list);
+	list_del_init(&cdev->d_hash);
+	cdev_count--;
+}
+
+EXPORT_SYMBOL_GPL(cdev_del);
+
+void devi_add(struct devinfo *devi, struct cdevsw *cdev, major_t major)
+{
+	devi->major = major;
+	devi->minor = 0;	/* FIXME */
+	/* add to list and hash */
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	if (list_empty(&cdev->d_majors))
+		cdev->d_major = major;
+	list_add_tail(&devi->di_list, &cdev->d_majors);
+	list_add_tail(&devi->di_hash, strdev_hash_slot(major));
+}
+
+EXPORT_SYMBOL_GPL(devi_add);
+
+void devi_del(struct devinfo *devi, struct cdevsw *cdev)
+{
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
+	list_del_init(&devi->di_list);	/* not necessary - see di_put() */
+	list_del_init(&devi->di_hash);	/* not necessary - see di_put() */
+	if (list_empty(&cdev->d_majors))
+		cdev->d_major = 0;
+}
+
+EXPORT_SYMBOL_GPL(devi_del);
+
+int node_add(struct devnode *node, struct cdevsw *cdev, minor_t minor)
+{
+	node->n_dev = cdev;
+	node->n_modid = cdev->d_modid;
+	node->n_minor = minor;
+	/* get dentry if required */
+	if (!node->n_dentry
+	    && !(node->n_dentry =
+		 spec_dir_alloc(cdev->d_dentry, node->n_name,
+				makedevice(node->n_modid, node->n_minor), node))) {
+		ptrace(("couldn't allocate dentry\n"));
+		return (-ENOMEM);
+	}
+	if (!node->n_str)
+		node->n_str = cdev->d_str;
+	if (!node->n_mode & S_IFMT)
+		node->n_mode = cdev->d_mode;
+	if (!node->n_mode & S_IFMT)
+		node->n_mode = S_IFCHR;
+	/* add to list and hash */
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	list_add(&node->n_list, &cdev->d_minors);
+	list_add(&node->n_hash, strnod_hash_slot(minor));
+	node_count++;
+	return (0);
+}
+
+EXPORT_SYMBOL_GPL(node_add);
+
+void node_del(struct devnode *node, struct cdevsw *cdev)
+{
+	/* put away dentry if required */
+	spec_dir_delete(cdev->d_dentry, xchg(&node->n_dentry, NULL));
+	node->n_dev = NULL;
+	node->n_modid = -1;
+	node->n_minor = -1;
+	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
+	list_del_init(&node->n_list);
+	list_del_init(&node->n_hash);
+	node_count--;
+}
+
+EXPORT_SYMBOL_GPL(node_del);
+
+int strlookup_init(void)
+{
+	init_fmod_hash();
+	init_cdev_hash();
+	init_node_hash();
+	return (0);
+}
+
+void strlookup_exit(void)
+{
+	return;
+}
+

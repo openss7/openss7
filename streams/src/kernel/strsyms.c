@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/27 08:55:41 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/01 12:04:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:41 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/27 08:55:41 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/01 12:04:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/27 08:55:41 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/01 12:04:39 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -88,7 +88,6 @@ static char const ident[] =
 #include <sys/cmn_err.h>
 
 #include <sys/strlog.h>
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -120,7 +119,6 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strspecfs.h"
 #include "strsched.h"
 #include "strreg.h"
 #include "sth.h"		/* for str_minfo */

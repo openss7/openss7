@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:14 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -68,7 +68,6 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -77,12 +76,12 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strreg.h"		/* for struct str_args */
+//#include "strreg.h"
 #include "strsad.h"		/* for autopush functions */
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -399,6 +398,18 @@ static struct cdevsw sad_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
+static struct devnode sad_node_admin = {
+	n_name:"admin",
+	n_flag:0,
+	n_mode:S_IFCHR,
+};
+
+static struct devnode sad_node_user = {
+	n_name:"user",
+	n_flag:0,
+	n_mode:S_IFCHR,
+};
+
 static int __init sad_init(void)
 {
 	int err;
@@ -413,10 +424,14 @@ static int __init sad_init(void)
 	if (major == 0 && err > 0)
 		major = err;
 	bzero(&sads, sizeof(sads));
+	register_strnod(&sad_cdev, &sad_node_admin, 0);
+	register_strnod(&sad_cdev, &sad_node_user, 1);
 	return (0);
 };
 static void __exit sad_exit(void)
 {
+	unregister_strnod(&sad_cdev, 1);
+	unregister_strnod(&sad_cdev, 0);
 	unregister_strdev(&sad_cdev, major);
 };
 

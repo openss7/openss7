@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 21:53:26 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:17:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $";
 
 //#define __NO_VERSION__
 
@@ -78,7 +78,6 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
@@ -87,17 +86,18 @@ static char const ident[] =
 #include "sys/config.h"
 #include "strdebug.h"
 #include "strsched.h"		/* for allocsd */
-#include "strreg.h"		/* For str_args */
+#include "strargs.h"		/* for str_args */
+#include "strreg.h"		/* for strm_open() */
 #include "sth.h"		/* extern verification */
 #include "strsysctl.h"		/* for sysctls */
 #include "strsad.h"		/* for autopush */
 #include "strutil.h"		/* for q locking and puts and gets */
-#include "strattach.h"		/* for do_fattach/do_fdetach/do_spipe */
-#include "strspecfs.h"		/* for strm_open() and str_args */
+#include "strattach.h"		/* for do_fattach/do_fdetach */
+#include "strpipe.h"		/* for do_spipe */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1914,14 +1914,10 @@ int strmmap(struct file *file, struct vm_area_struct *vma)
  *  @inode: shadow special filesystem device inode
  *  @file: shadow special filesystem file pointer
  *
- *  Because stropen() is called by cdev_open() on the filesystem device, the inode represented here
- *  is the shadow inode and the file is the shadow file pointer.  We don't have to do any swapping,
- *  just return the error code.  Because it is a specfs inode, the dentry has our d_fsdata.
- *
- *  There are two ways to arrive here, we were called by a dentry_open() from cdev_open() in which
- *  case the streams arguments are attached to the d_fsdata member of the dentry.  The other way is
- *  via a direct open of this device within the mounted shadow special filesystem.  In that case, we
- *  do not have any fsdata attached.
+ *  stropen() can be called by strm_open() which was called on an extenal filesystem inode, or by
+ *  spec_dev_open() which was called on the internal shadow special filesystem inode.  Either way,
+ *  the @file and @inode represented here are internal shadow special filesystem generated file and
+ *  inode pointers.
  */
 int stropen(struct inode *inode, struct file *file)
 {
@@ -2854,7 +2850,7 @@ static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int strpipe(int fds[2])
 {
-	return do_spipe(fds);	/* see strspecfs.c */
+	return do_spipe(fds, specfs_mnt);	/* see strpipe.c */
 }
 
 /**
@@ -3412,58 +3408,76 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
  *
  *  cdev_open() is only used to open a stream from a character device node in an external
  *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
- *  sdev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or sockets.
- *  Those devices provide their own file operations to the main operating system.  The character
- *  device number from the inode is used to determine the shadow special file system (internal)
- *  inode and chain the open call.
+ *  spec_dev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or
+ *  sockets.  Those devices provide their own file operations to the main operating system.  The
+ *  character device number from the inode is used to determine the shadow special file system
+ *  (internal) inode and chain the open call.
  *
  *  This is the separation point where we convert the external device number to an internal device
  *  number.  The external device number is contained in inode->i_rdev.
  */
 STATIC int cdev_open(struct inode *inode, struct file *file)
 {
-	struct str_args args;
-	struct cdevsw *cdev;
-	major_t major;
-	minor_t minor;
+	struct cdevsw *cdev = NULL;
+	int dflag;
+	dev_t dev;
 	switch (inode->i_mode & S_IFMT) {
+#if 0
+		struct devnode *node;
+#endif
+		major_t major;
+		minor_t minor;
 	case S_IFCHR:
 		major = MAJOR(kdev_t_to_nr(inode->i_rdev));
-		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 		if (!(cdev = cdev_get(major)))
-			return (-ENXIO);
+			goto enxio;
+		dflag = cdev->d_flag;
 		major = cdev->d_modid;
+		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+#if 0
+		/* FIXME: convert to internal minor */
+		if ((node = node_search(cdev, minor)))
+			dflag = node->n_flag;
+#endif
+		dev = makedevice(major, minor);
 		break;
 	case S_IFIFO:
 		if (!(cdev = cdev_find("fifo")))
-			return (-ENXIO);
+			goto enxio;
+		dflag = 0;
 		major = cdev->d_modid;
 		minor = 0;
+		dev = makedevice(major, minor);
 		break;
 	case S_IFSOCK:
 		if (!(cdev = cdev_find("sock")))
-			return (-ENXIO);
+			goto enxio;
+		dflag = 0;
 		major = cdev->d_modid;
 		minor = 0;
+		dev = makedevice(major, minor);
 		break;
 	default:
-		return (-EIO);
+	      enxio:
+		return (-ENXIO);
 	}
-	if (!cdev->d_fop || !cdev->d_fop->open) {
+	if (cdev->d_fop && cdev->d_fop->open) {
+		struct str_args args;
+		args.mnt = specfs_mnt;
+		args.inode = inode;
+		args.file = file;
+		args.dev = dev;
+		args.name.name = args.buf;
+		args.name.len = snprintf(args.buf, sizeof(args.buf), "%lu", args.dev);
+		args.name.hash = args.dev;
+		args.oflag = make_oflag(file);
+		args.sflag = (dflag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+		args.crp = current_creds;
 		cdev_put(cdev);
-		return (-EIO);
+		return strm_open(inode, file, &args);
 	}
-	args.inode = inode;
-	args.file = file;
-	args.dev = makedevice(major, minor);
-	args.name.name = args.buf;
-	args.name.len = snprintf(args.buf, sizeof(args.buf), "%u", args.dev);
-	args.name.hash = args.dev;
-	args.oflag = make_oflag(file);
-	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
-	args.crp = current_creds;
 	cdev_put(cdev);
-	return strm_open(inode, file, &args);
+	return (-EIO);
 }
 
 STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
@@ -3515,20 +3529,29 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
  */
 int register_strdev(struct cdevsw *cdev, major_t major)
 {
-	int err;
-	if (!cdev)
-		return (-EINVAL);
-	if ((err = register_strdrv(cdev)) < 0)
-		return (err);
+	int result;
+	struct devinfo *devi;
+	if ((result = register_strdrv(cdev, specfs_mnt)) < 0 && result != -EBUSY)
+		goto no_strdrv;
+	if (!(devi = di_alloc(cdev))) {
+		result = -ENOMEM;
+		goto no_devi;
+	}
 	if (!cdev->d_fop)
 		cdev->d_fop = &strm_f_ops;
-	cdev->d_mode = (cdev->d_mode & S_IFMT) | S_IFCHR;
-	if ((err = register_cmajor(cdev, major, &cdev_f_ops)) < 0) {
-		unregister_strdrv(cdev);
-		return (err);
-	}
-	return (err);
+	if (!(cdev->d_mode & S_IFMT))
+		cdev->d_mode = (cdev->d_mode & ~S_IFMT) | S_IFCHR;
+	if ((result = register_cmajor(cdev, devi, major, &cdev_f_ops)) < 0)
+		goto no_cmajor;
+	return (result);
+      no_cmajor:
+	di_put(devi);
+      no_devi:
+	unregister_strdrv(cdev, specfs_mnt);
+      no_strdrv:
+	return (result);
 }
+
 EXPORT_SYMBOL_GPL(register_strdev);
 
 /**
@@ -3564,12 +3587,16 @@ EXPORT_SYMBOL_GPL(register_strdev);
  */
 int unregister_strdev(struct cdevsw *cdev, major_t major)
 {
-	int err, ret = 0;
-	if ((err = unregister_cmajor(cdev, major)) < 0)
-		ret = err;
-	if ((err = unregister_strdrv(cdev)) < 0 && ret == 0)
-		ret = err;
-	return (ret);
+	int err;
+	struct devinfo *devi;
+	if (!(devi = devi_get(cdev, major)))
+		return (-ENODEV);
+	if ((err = unregister_cmajor(cdev, devi, major)) < 0)
+		return (err);
+	di_put(devi);
+	if ((err = unregister_strdrv(cdev, specfs_mnt)) < 0 && err != -EBUSY)
+		return (err);
+	return (0);
 }
 EXPORT_SYMBOL_GPL(unregister_strdev);
 
@@ -3596,24 +3623,50 @@ static struct fmodsw sth_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
+struct vfsmount *specfs_mnt = NULL;
+
+/* bleedin' mercy! */
+static inline void put_filesystem(struct file_system_type *fs)
+{
+	if (fs->owner)
+		__MOD_DEC_USE_COUNT(fs->owner);
+}
+
 int __init sth_init(void)
 {
-	int err;
+	int result;
+	struct file_system_type *fstype;
 #ifdef CONFIG_STREAMS_STH_MODULE
 	printk(KERN_INFO STH_BANNER);
 #else
 	printk(KERN_INFO STH_SPLASH);
 #endif
 	str_minfo.mi_idnum = modid;
-	if ((err = register_strmod(&sth_fmod)) < 0)
-		return (err);
-	if (modid == 0 && err >= 0)
-		modid = err;
+	if ((result = register_strmod(&sth_fmod)) < 0)
+		goto no_strmod;
+	if (modid == 0 && result >= 0)
+		modid = result;
+	if (!(fstype = get_fs_type("specfs"))) {
+		result = -ENODEV;
+		goto no_fstype;
+	}
+	if (IS_ERR(specfs_mnt = kern_mount(fstype))) {
+		result = PTR_ERR(specfs_mnt);
+		goto no_mount;
+	}
+	put_filesystem(fstype);
 	return (0);
-};
+      no_mount:
+	put_filesystem(fstype);
+      no_fstype:
+	unregister_strmod(&sth_fmod);
+      no_strmod:
+	return (result);
+}
 
 void __exit sth_exit(void)
 {
+	kern_umount(specfs_mnt);
 	unregister_strmod(&sth_fmod);
 }
 

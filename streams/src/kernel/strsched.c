@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/29 08:28:17 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/01 12:04:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:17 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/29 08:28:17 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/01 12:04:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/29 08:28:17 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/01 12:04:39 $";
 
 #define __NO_VERSION__
 
@@ -89,12 +89,11 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
+#include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
 #include <sys/ddi.h>
-#include <sys/kmem.h>
 
 #include "sys/config.h"
 #include "strdebug.h"
@@ -472,6 +471,9 @@ struct devinfo *di_alloc(struct cdevsw *cdev)
 	}
 	return (di);
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL_GPL(di_alloc);
+#endif
 struct devinfo *di_get(struct devinfo *di)
 {
 	if (di) {
@@ -508,6 +510,9 @@ void di_put(struct devinfo *di)
 	}
 	swerr();
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL_GPL(di_put);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------

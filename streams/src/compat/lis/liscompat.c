@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:08 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:17 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -110,7 +110,6 @@ static char const ident[] =
 
 #define _LIS_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -123,7 +122,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:17 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2130,6 +2129,8 @@ int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, con
 {
 	struct cdevsw *cdev;
 	int err;
+	if (nminor > MAX_CHRDEV)
+		return (-EINVAL);	/* handle multiple majors later */
 	if ((cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)) == NULL)
 		return (-ENOMEM);
 	cdev->d_name = name;
@@ -2138,7 +2139,7 @@ int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, con
 	cdev->d_kmod = NULL;
 	atomic_set(&cdev->d_count, 0);
 	INIT_LIST_HEAD(&cdev->d_majors);
-	INIT_LIST_HEAD(&cdev->d_nodes);
+	INIT_LIST_HEAD(&cdev->d_minors);
 	INIT_LIST_HEAD(&cdev->d_apush);
 	INIT_LIST_HEAD(&cdev->d_stlist);
 	if ((err = WARN(register_strdev(cdev, major))) < 0)

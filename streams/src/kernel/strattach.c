@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $";
 
 #define __NO_VERSION__
 
@@ -85,12 +85,9 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/dki.h>
-
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strattach.h"
-#include "strspecfs.h"
+#include "strattach.h"		/* header verification */
 
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
 

@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $Id: strlookup.h,v 0.9 2004/06/01 12:04:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -46,15 +45,39 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRREG_H__
-#define __LOCAL_STRREG_H__
+#ifndef __LOCAL_STRLOOKUP_H__
+#define __LOCAL_STRLOOKUP_H__
 
-#include "strargs.h"
+extern rwlock_t cdevsw_lock;
+extern rwlock_t fmodsw_lock;
 
-extern int strm_open(struct inode *i, struct file *f, struct str_args *argp);
+extern int cdev_count;
+extern int fmod_count;
 
-#endif				/* __LOCAL_STRREG_H__ */
+extern struct list_head cdevsw_list;
+extern struct list_head fmodsw_list;
+
+extern void fmod_add(struct fmodsw *fmod, modID_t modid);
+extern void fmod_del(struct fmodsw *fmod);
+extern int cdev_add(struct dentry *root, struct cdevsw *cdev, modID_t modid);
+extern void cdev_del(struct dentry *root, struct cdevsw *cdev);
+extern void devi_add(struct devinfo *devi, struct cdevsw *cdev, major_t major);
+extern void devi_del(struct devinfo *devi, struct cdevsw *cdev);
+extern int node_add(struct devnode *node, struct cdevsw *cdev, minor_t minor);
+extern void node_del(struct devnode *node, struct cdevsw *cdev);
+
+#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
+ || defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
+extern struct fmodsw *fmod_str(const struct streamtab *str);
+extern struct cdevsw *cdev_str(const struct streamtab *str);
+#endif
+
+/* initialization for specfs */
+extern int strlookup_init(void);
+extern void strlookup_exit(void);
+
+#endif				/* __LOCAL_STRLOOKUP_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:40 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:40 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:40 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,7 +76,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:40 $"
+#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/01 12:04:38 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -95,14 +95,12 @@ MODULE_SUPPORTED_DEVICE(STREAMS_DEVICE);
 MODULE_LICENSE(STREAMS_LICENSE);
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
 #include "strprocfs.h"
-#include "strspecfs.h"
 #include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"
 #include "strsched.h"
@@ -332,23 +330,15 @@ static int __init streams_init(void)
 #endif
 	if ((result = strprocfs_init()))
 		goto no_procfs;
-	if ((result = strspecfs_init()))
-		goto no_specfs;
 	if ((result = strsysctl_init()))
 		goto no_strsysctl;
 	if ((result = strsched_init()))
 		goto no_strsched;
-	if ((result = strreg_init()))
-		goto no_strreg;
 	modules_init();
 	return (0);
-      no_strreg:
-	strsched_exit();
       no_strsched:
 	strsysctl_exit();
       no_strsysctl:
-	strspecfs_exit();
-      no_specfs:
 	strprocfs_exit();
       no_procfs:
 	return (result);
@@ -357,10 +347,8 @@ static int __init streams_init(void)
 static void __exit streams_exit(void)
 {
 	modules_exit();
-	strreg_exit();
 	strsched_exit();
 	strsysctl_exit();
-	strspecfs_exit();
 	strprocfs_exit();
 }
 

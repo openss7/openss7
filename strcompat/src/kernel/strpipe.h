@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $Id: strpipe.h,v 0.9 2004/06/01 12:04:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -46,15 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRREG_H__
-#define __LOCAL_STRREG_H__
+#ifndef __LOCAL_STRPIPE_H__
+#define __LOCAL_STRPIPE_H__
 
-#include "strargs.h"
+long do_spipe(int *fds, struct vfsmount *mnt);
 
-extern int strm_open(struct inode *i, struct file *f, struct str_args *argp);
-
-#endif				/* __LOCAL_STRREG_H__ */
+#endif				/* __LOCAL_STRPIPE_H__ */

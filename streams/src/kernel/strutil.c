@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/27 08:55:41 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/01 12:04:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:41 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/27 08:55:41 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/01 12:04:39 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/27 08:55:41 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/01 12:04:39 $";
 
 #define __NO_VERSION__
 
@@ -83,7 +83,6 @@ static char const ident[] =
 #include <sys/strlog.h>		/* for SL_ constants */
 #include <sys/kmem.h>		/* for kmem_alloc */
 
-#include <sys/stropts.h>	/* streams definitions */
 #include <sys/stream.h>		/* streams definitions */
 #include <sys/strsubr.h>	/* for implementation definitions */
 #include <sys/strconf.h>	/* for syscontrols */
@@ -1110,6 +1109,68 @@ unsigned long freezestr(queue_t *q)
 	return ((q->q_iflags = flags));
 }
 EXPORT_SYMBOL(freezestr);
+
+/**
+ *  getadmin: - get the administrative function associated with a module identifier
+ *  @modid: the module identifier
+ *
+ *  Obtains the qi_qadmin function pointer for the module identifier by the module identifier
+ *  @modid.
+ *
+ *  Return Value: Returns a function pointer to the qi_qadmin() procedure for the module, which may be
+ *  %NULL, or returns %NULL on failure.
+ *
+ *  Context: Can be called from any context.  When called from a blocking context, the function has
+ *  the side-effect that the identified module may be loaded by module identifier.  The kernel
+ *  module demand loaded will have the module name or alias "streams-modid-%u".
+ */
+qi_qadmin_t getadmin(modID_t modid)
+{
+	qi_qadmin_t qadmin = NULL;
+	struct fmodsw *fmod;
+	if ((fmod = fmod_get(modid))) {
+		struct streamtab *st;
+		struct qinit *qi;
+		if ((st = fmod->f_str) && (qi = st->st_rdinit))
+			qadmin = qi->qi_qadmin;
+		fmod_put(fmod);
+	}
+	return (qadmin);
+}
+
+EXPORT_SYMBOL(getadmin);
+
+/**
+ *  getmid: - get the module identifier associated with a module name
+ *  @name: the name of the module
+ *
+ *  Obtains the module id of the named module.
+ *
+ *  Return Value: Returns the module identifier associated with the named module or zero (0) if no
+ *  module of the specified name can be found on the system.
+ *
+ *  Context: Can be called from any context.  When called from a blocking context, the function has
+ *  the side-effect that the named module may be loaded by module name.  The kernel module demand
+ *  loaded will have the module name or alias "streams-%s".
+ */
+modID_t getmid(const char *name)
+{
+	struct fmodsw *fmod;
+	struct cdevsw *cdev;
+	if ((fmod = fmod_find(name))) {
+		modID_t modid = fmod->f_modid;
+		fmod_put(fmod);
+		return (modid);
+	}
+	if ((cdev = cdev_find(name))) {
+		modID_t modid = cdev->d_modid;
+		cdev_put(cdev);
+		return (modid);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL(getmid);
 
 /*
  *  __getq:

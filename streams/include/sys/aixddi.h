@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: aixddi.h,v 0.9.2.5 2004/05/09 07:22:32 brian Exp $
+ @(#) $Id: aixddi.h,v 0.9.2.6 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/09 07:22:32 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AXIDDI_H__
 #define __SYS_AXIDDI_H__
 
-#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/09 07:22:32 $"
+#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,6 +69,10 @@
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 extern int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *dev, int flag, int sflag,
 			cred_t *credp);

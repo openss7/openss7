@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $Id: strargs.h,v 0.9 2004/06/01 12:04:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -46,15 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRREG_H__
-#define __LOCAL_STRREG_H__
+#ifndef __LOCAL_STRARGS_H__
+#define __LOCAL_STRARGS_H__
 
-#include "strargs.h"
+/* arguments definition */
+typedef struct str_args {
+	struct vfsmount *mnt;
+	struct inode *inode;
+	struct file *file;
+	dev_t dev;
+	int oflag;
+	int sflag;
+	cred_t *crp;
+	struct qstr name;
+	char buf[32];
+} str_args_t;
 
-extern int strm_open(struct inode *i, struct file *f, struct str_args *argp);
-
-#endif				/* __LOCAL_STRREG_H__ */
+#endif				/* __LOCAL_STRARGS_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.10 2004/05/27 08:55:14 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.11 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:14 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/27 08:55:14 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -62,7 +62,6 @@
 #include <linux/slab.h>		/* for kmem_cache_t */
 
 #include <sys/stream.h>
-#include <sys/stropts.h>
 #include <sys/sad.h>
 
 #if 0
@@ -516,17 +515,56 @@ extern void freechain(mblk_t *mp, mblk_t **mpp);
 extern struct qband *allocqb(void);
 extern void freeqb(qband_t *qb);
 
+#if 0
 /* from strreg.c */
+extern struct cdevsw *cdev_get(major_t major); /* aixcompat liscompat uw7compat clone strsad sth */
+extern void cdev_put(struct cdevsw *cdev); /* aixcompat liscompat uw7compat clone nsdev strsad specfs sth */
+extern struct cdevsw *cdrv_get(modID_t modid); /* strm_open() uw7compat strsad strspecfs strutil sth */
+extern void cdrv_put(struct cdevsw *cdev); /* strm_open() strsad strutil sth */
+extern struct cdevsw *cdev_find(const char *name); /* specfs sth */
+extern struct cdevsw *cdev_match(const char *name); /* nsdev */
+//extern struct fmodsw *fmod_get(modID_t modid);
+extern void fmod_put(struct fmodsw *smod); /* liscompat, suncompat getmid() strsad strutil */
+extern struct fmodsw *fmod_find(const char *name);
+extern struct devnode *node_find(const struct cdevsw *cdev, const char *name); /* specfs */
+extern struct devnode *node_get(const struct cdevsw *cdev, minor_t minor); /* strm_open() */
+#endif
+
+
+/* from strlookup.c */
+extern struct list_head cdevsw_list;	/* Drivers go here */
+extern struct list_head fmodsw_list;	/* Modules go here */
+extern struct list_head nodesw_list;	/* Minors go here */
+extern int cdev_count;			/* Driver count */
+extern int fmod_count;			/* Module count */
+extern int node_count;			/* Node count */
+extern struct devinfo *__devi_lookup(major_t major);
+extern struct cdevsw *__cdev_lookup(major_t major);
+extern struct cdevsw *__cdrv_lookup(modID_t modid);
+extern struct devnode *__node_lookup(struct cdevsw *cdev, minor_t minor);
+extern struct fmodsw *__fmod_lookup(modID_t modid);
+extern struct cdevsw *__cdev_search(const char *name);
+extern struct fmodsw *__fmod_search(const char *name);
+extern struct devnode *__node_search(struct cdevsw *cdev, const char *name);
+extern void *__smod_search(const char *name);
+extern struct fmodsw *fmod_str(const struct streamtab *str);
+extern struct cdevsw *cdev_str(const struct streamtab *str);
 extern struct cdevsw *cdev_get(major_t major);
 extern void cdev_put(struct cdevsw *cdev);
 extern struct cdevsw *cdrv_get(modID_t modid);
 extern void cdrv_put(struct cdevsw *cdev);
+extern struct fmodsw *fmod_get(modID_t modid);
+extern void fmod_put(struct fmodsw *fmod);
 extern struct cdevsw *cdev_find(const char *name);
 extern struct cdevsw *cdev_match(const char *name);
-//extern struct fmodsw *fmod_get(modID_t modid);
-extern void fmod_put(struct fmodsw *smod);
 extern struct fmodsw *fmod_find(const char *name);
 extern struct devnode *node_find(const struct cdevsw *cdev, const char *name);
 extern struct devnode *node_get(const struct cdevsw *cdev, minor_t minor);
+extern struct devinfo *devi_get(const struct cdevsw *cdev, major_t major);
+
+/* from strreg.c */
+extern int register_cmajor(struct cdevsw *cdev, struct devinfo *devi, major_t major, struct file_operations *fops);
+extern int unregister_cmajor(struct cdevsw *cdev, struct devinfo *devi, major_t major);
+
 
 #endif				/* __SYS_STRSUBR_H__ */

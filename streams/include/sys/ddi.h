@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2004/05/04 21:36:56 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:56 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -72,25 +72,33 @@
 #include <asm/delay.h>		/* for udelay */
 #include <sys/dki.h>
 
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
+
 __EXTERN_INLINE major_t getmajor(dev_t dev)
 {
-	major_t major = ((dev >> 16) & 0x0000ffff);
-	if (major == 0)
+	ulong major = ((dev >> 16) & 0x0000ffff);
+#if 0
+	if (!major)
 		major = MAJOR(dev);
+#endif
 	return (major);
 }
 __EXTERN_INLINE minor_t getminor(dev_t dev)
 {
-	major_t major = ((dev >> 16) & 0x0000ffff);
-	minor_t minor = dev & 0x0000ffff;
-	if (major == 0)
+	ulong minor = (dev & 0x0000ffff);
+#if 0
+	ulong major = ((dev >> 16) & 0x0000ffff);
+	if (!major)
 		minor = MINOR(dev);
+#endif
 	return (minor);
 }
 __EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor)
 {
-	ulong maj = major;
-	ulong min = minor;
+	ulong maj = major & 0x0000ffff;
+	ulong min = minor & 0x0000ffff;
 	return ((maj << 16) | min);
 }
 

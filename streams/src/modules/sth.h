@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/05 23:10:11 $
+ @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/01 12:04:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:11 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STH_H__
 #define __LOCAL_STH_H__
 
-//extern loff_t strllseek(struct file *file, loff_t off, int whence);
-//extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
-//extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
-//extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
-//extern int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
-//extern int strmmap(struct file *filp, struct vm_area_struct *vma);
-//extern int stropen(struct inode *inode, struct file *file);
-//extern int strflush(struct file *file);
-//extern int strclose(struct inode *inode, struct file *file);
-//extern int strfasync(int fd, struct file *file, int on);
-//extern ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len,
-//			loff_t *ppos);
-//extern ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count,
-//			 loff_t *ppos);
-//extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
-//			   loff_t *ppos, int more);
+#if 0
+extern loff_t strllseek(struct file *file, loff_t off, int whence);
+extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
+extern ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos);
+extern unsigned int strpoll(struct file *file, struct poll_table_struct *poll);
+extern int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
+extern int strmmap(struct file *filp, struct vm_area_struct *vma);
+extern int stropen(struct inode *inode, struct file *file);
+extern int strflush(struct file *file);
+extern int strclose(struct inode *inode, struct file *file);
+extern int strfasync(int fd, struct file *file, int on);
+extern ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len,
+			loff_t *ppos);
+extern ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count,
+			 loff_t *ppos);
+extern ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size,
+			   loff_t *ppos, int more);
+#endif
 extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp,
 		      int *flagsp);
 extern int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
@@ -81,11 +83,7 @@ extern struct smodule_info str_minfo;	/* for strsysctl.c */
 extern int strrput(queue_t *q, mblk_t *mp);
 extern int strwsrv(queue_t *q);
 
-/* make SVR4.2 oflag from file flags and mode */
-#define make_oflag(__f) \
-	(((__f)->f_flags & ~O_ACCMODE) | \
-	 ((__f)->f_mode & O_ACCMODE) | \
-	 ((__f)->f_flags & FNDELAY ? (O_NONBLOCK | O_NDELAY) : 0))
+extern struct vfsmount *specfs_mnt;
 
 extern int sth_init(void);
 extern void sth_exit(void);

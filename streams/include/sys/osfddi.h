@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: osfddi.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: osfddi.h,v 0.9.2.5 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSFDDI_H__
 #define __SYS_OSFDDI_H__
 
-#ident "@(#) $RCSfile: osfddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: osfddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,6 +69,10 @@
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 extern int streams_close_comm(queue_t *, int, cred_t *);
 extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);

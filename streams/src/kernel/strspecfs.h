@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:05 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,33 +46,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:05 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCCAL_STRSPECFS_H__
 #define __LOCCAL_STRSPECFS_H__
 
-extern struct vfsmount *specfs_mnt;
+#define SPEC_SBI_MAGIC 0XFEEDDEAF
+struct spec_sb_info {
+	u32 sbi_magic;
+	int sbi_setuid;
+	int sbi_setgid;
+	uid_t sbi_uid;
+	gid_t sbi_gid;
+	umode_t sbi_mode;
+};
 
-/* arguments definition */
-typedef struct str_args {
-	struct inode *inode;
-	struct file *file;
-	dev_t dev;
-	int oflag;
-	int sflag;
-	cred_t *crp;
-	struct qstr name;
-	char buf[32];
-} str_args_t;
+extern struct file_operations spec_dev_f_ops;
 
-extern int strm_open(struct inode *i, struct file *f, struct str_args *argp);
-
-long do_spipe(int *fd);
-
+#if 0
 /* initialization for main */
 extern int strspecfs_init(void);
 extern void strspecfs_exit(void);
+#endif
 
 #endif				/* __LOCCAL_STRSPECFS_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lisddi.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: lisddi.h,v 0.9.2.4 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -160,6 +160,10 @@ typedef struct lis_strrecvfd {
 } strrecvfd_t;
 
 struct stdata;
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 extern void *lis__kfree(void *ptr);
 extern void *lis__kmalloc(int nbytes, int class, int use_cache);

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2004/05/25 07:52:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2004/06/01 12:03:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/25 07:52:43 $ by $Author: brian $
+# Last Modified $Date: 2004/06/01 12:03:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,30 +119,51 @@ endif
 if RPM_BUILD_KERNEL
 
 noinst_LIBRARIES		= \
+				libLfSspecfs.a \
 				libLfSkernel.a \
 				libLfSdrivers.a \
 				libLfSmodules.a \
 				libLfScompat.a
 
-libLfSkernel_a_SOURCES		= \
+libLfSspecfs_a_SOURCES		= \
+				src/kernel/strspecfs.c \
+				src/kernel/strspecfs.h \
+				src/kernel/strlookup.c \
+				src/kernel/strlookup.h \
+				src/kernel/strreg.c \
+				src/kernel/strreg.h \
 				src/kernel/strattach.c \
 				src/kernel/strattach.h \
+				src/kernel/strpipe.c \
+				src/kernel/strpipe.h \
+				src/kernel/strargs.h \
+				src/kernel/strdebug.h
+
+libLfSspecfs_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
+libLfSspecfs_a_CPPFLAGS		= \
+				-I./src/kernel -I$(srcdir)/src/kernel \
+				-I./src/drivers -I$(srcdir)/src/drivers \
+				-I./src/modules -I$(srcdir)/src/modules \
+				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfSspecfs_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libLfSspecfs_a_OBJECTS): $(libLfSspecfs_a_DEPENDENCIES)
+
+
+libLfSkernel_a_SOURCES		= \
 				src/kernel/strmain.c \
 				src/kernel/strprocfs.c \
 				src/kernel/strprocfs.h \
 				src/kernel/strsched.c \
 				src/kernel/strsched.h \
-				src/kernel/strspecfs.c \
-				src/kernel/strspecfs.h \
 				src/kernel/strsysctl.c \
 				src/kernel/strsysctl.h \
 				src/kernel/strsyms.c \
 				src/kernel/strutil.c \
 				src/kernel/strutil.h \
-				src/kernel/strreg.c \
-				src/kernel/strreg.h \
 				src/kernel/strsad.c \
 				src/kernel/strsad.h \
+				src/kernel/strargs.h \
 				src/kernel/strdebug.h
 
 libLfSkernel_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
@@ -260,6 +281,9 @@ libLfScompat_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfScompat_a_OBJECTS): $(libLfScompat_a_DEPENDENCIES)
 
+specfs.o: $(libLfSspecfs_a_OBJECTS)
+	$(LD) -r -o $@ $^
+
 streams.o: $(libLfSkernel_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
@@ -269,7 +293,7 @@ EXTRA_DIST =
 dist_noinst_SCRIPTS =
 EXTRA_SCRIPTS =
 
-KERNEL_MODULES			= streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
+KERNEL_MODULES			= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= streams
 KMODCONF_EXT			= streams
@@ -480,6 +504,8 @@ EXPORT_SRCFILES = \
 	src/compat/svr4/svr4compat.c \
 	src/compat/uw7/uw7compat.c \
 	src/kernel/strattach.c \
+	src/kernel/strlookup.c \
+	src/kernel/strpipe.c \
 	src/kernel/strreg.c \
 	src/kernel/strsad.c \
 	src/kernel/strsched.c \
@@ -498,6 +524,8 @@ EXPORT_VERFILES = \
 	include/sys/streams/versions/svr4compat.ver \
 	include/sys/streams/versions/uw7compat.ver \
 	include/sys/streams/versions/strattach.ver \
+	include/sys/streams/versions/strlookup.ver \
+	include/sys/streams/versions/strpipe.ver \
 	include/sys/streams/versions/strreg.ver \
 	include/sys/streams/versions/strsad.ver \
 	include/sys/streams/versions/strsched.ver \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:14 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -68,7 +68,6 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -76,16 +75,15 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strreg.h"		/* for struct str_args */
+#include "strreg.h"
 #include "strsched.h"		/* fort sd_get/sd_put */
 #include "strsad.h"		/* for autopush */
 #include "sth.h"
-#include "strspecfs.h"		/* for str_args */
 #include "pipe.h"		/* extern verification */
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

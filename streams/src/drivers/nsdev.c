@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 21:53:25 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,6 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -80,13 +79,12 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strspecfs.h"	    /* for strm_open() and str_args */
-#include "strreg.h"
+#include "strreg.h"	    /* for strm_open() */
 #include "sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -173,6 +171,7 @@ static int nsdevopen(struct inode *inode, struct file *file)
 		return (-EIO);
 	if (!(cdev = cdev_match(argp->file->f_dentry->d_name.name)))
 		return (-ENOENT);
+	// argp->mnt = argp->mnt;
 	// argp->inode = argp->inode;
 	// argp->file = argp->file;
 	argp->dev = makedevice(cdev->d_modid, getminor(argp->dev));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:13 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -68,13 +68,12 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
+#include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 #include <sys/strlog.h>
-#include <sys/kmem.h>
 
 #include "sys/config.h"
 #include "strdebug.h"
@@ -82,7 +81,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

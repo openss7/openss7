@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.17 2004/05/29 21:53:25 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.18 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 21:53:25 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 21:53:25 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -88,6 +88,11 @@ typedef long intptr_t;
 #define intptr_t intptr_t
 #endif
 
+#ifndef __streams_dev_t
+typedef unsigned long __streams_dev_t;
+#define __streams_dev_t __streams_dev_t
+#endif
+
 #include <asm/system.h>		/* for xchg */
 #include <asm/bitops.h>		/* for set_bit */
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
@@ -100,6 +105,10 @@ typedef long intptr_t;
 #include <sys/dki.h>		/* for cred_t */
 /* caller should have already included this, but make sure */
 #include <sys/stropts.h>	/* for some defines */
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
@@ -571,13 +580,12 @@ struct fmodsw {
 	uint f_flag;			/* module flags */
 	uint f_modid;			/* module id */
 	atomic_t f_count;		/* open count */
-	struct inode *f_inode;		/* specfs inode */
 	int f_sqlvl;			/* q sychronization level */
 	struct syncq *f_syncq;		/* synchronization queue */
 	struct module *f_kmod;		/* kernel module */
 };
 
-struct file_operations;
+struct cdevsw;
 
 struct devnode {
 	struct list_head n_list;	/* list of all nodes for this device */
@@ -587,10 +595,19 @@ struct devnode {
 	uint n_flag;			/* node flags */
 	uint n_modid;			/* node module id */
 	atomic_t n_count;		/* open count */
-	struct inode *n_inode;		/* specfs inode */
+	int n_sqlvl;			/* q sychronization level */
+	struct syncq *n_syncq;		/* synchronization queue */
+	struct module *n_kmod;		/* kernel module */
+	/* above must match fmodsw */
 	int n_minor;			/* node minor device number */
+	struct dentry *n_dentry;	/* specfs directory entry */
+	mode_t n_mode;			/* inode mode */
+	/* above must match cdevsw */
+	struct cdevsw *n_dev;		/* character device */
 };
 #define N_MAJOR		0x01	/* major device node */
+
+struct file_operations;
 
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
@@ -600,16 +617,17 @@ struct cdevsw {
 	uint d_flag;			/* driver flags */
 	uint d_modid;			/* driver moidule id */
 	atomic_t d_count;		/* open count */
-	struct inode *d_inode;		/* specfs inode */
 	int d_sqlvl;			/* q sychronization level */
 	struct syncq *d_syncq;		/* synchronization queue */
 	struct module *d_kmod;		/* kernel module */
 	/* above must match fmodsw */
 	int d_major;			/* base major device number */
+	struct dentry *d_dentry;	/* specfs directory entry */
 	mode_t d_mode;			/* inode mode */
+	/* above must match devnode */
 	struct file_operations *d_fop;	/* file operations */
 	struct list_head d_majors;	/* major device nodes for this device */
-	struct list_head d_nodes;	/* minor device nodes */
+	struct list_head d_minors;	/* minor device nodes for this device */
 	struct list_head d_apush;	/* autopush list */
 	struct stdata *d_plinks;	/* permanent links for this device */
 	struct list_head d_stlist;	/* stream head list for this device */

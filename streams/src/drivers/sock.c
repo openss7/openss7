@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sock.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $
+ @(#) $RCSfile: sock.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/01 12:04:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sock.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $"
+#ident "@(#) $RCSfile: sock.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/01 12:04:34 $"
 
 static char const ident[] =
-    "$RCSfile: sock.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $";
+    "$RCSfile: sock.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/01 12:04:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,7 +73,6 @@ static char const ident[] =
 #include <sys/streams/modversions.h>
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -83,7 +82,7 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strreg.h"		/* for struct str_args */
+#include "strreg.h"
 #include "strsched.h"		/* fort sd_get/sd_put */
 #include "strsad.h"		/* for autopush */
 #include "sth.h"
@@ -91,7 +90,7 @@ static char const ident[] =
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/01 12:04:34 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Library (SOCKSYS) Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

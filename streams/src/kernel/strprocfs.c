@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 21:53:25 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 21:53:25 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 21:53:25 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:38 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 21:53:25 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/01 12:04:38 $";
 
 #define __NO_VERSION__
 
@@ -76,7 +76,7 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strreg.h"
+#include "strlookup.h"
 #include "strsched.h"
 #include "strprocfs.h"		/* extern verification */
 
@@ -354,11 +354,11 @@ static int get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }, d_flag");
 	len += snprintf(page + len, maxlen - len, ", d_modid");
 	len += snprintf(page + len, maxlen - len, ", d_count");
-	len += snprintf(page + len, maxlen - len, ", d_inode");
 	len += snprintf(page + len, maxlen - len, ", d_sqlvl");
 	len += snprintf(page + len, maxlen - len, ", d_syncq");
 	len += snprintf(page + len, maxlen - len, ", d_kmod");
 	len += snprintf(page + len, maxlen - len, ", d_major");
+	len += snprintf(page + len, maxlen - len, ", d_dentry");
 	len += snprintf(page + len, maxlen - len, ", d_mode");
 	len += snprintf(page + len, maxlen - len, ", d_fop");
 	len += snprintf(page + len, maxlen - len, ", d_apush { ");
@@ -378,11 +378,11 @@ static int get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", d->d_flag);
 	len += snprintf(page + len, maxlen - len, ", %d", d->d_modid);
 	len += snprintf(page + len, maxlen - len, ", %hu", atomic_read(&d->d_count));
-	len += snprintf(page + len, maxlen - len, ", %p", d->d_inode);
 	len += snprintf(page + len, maxlen - len, ", %d", d->d_sqlvl);
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_syncq);
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_kmod);
 	len += snprintf(page + len, maxlen - len, ", %d", d->d_major);
+	len += snprintf(page + len, maxlen - len, ", %p", d->d_dentry);
 	len += snprintf(page + len, maxlen - len, ", %d", d->d_mode);
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_fop);
 	len += snprintf(page + len, maxlen - len, ", { ");
@@ -463,7 +463,6 @@ static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }, f_flag");
 	len += snprintf(page + len, maxlen - len, ", f_modid");
 	len += snprintf(page + len, maxlen - len, ", f_count");
-	len += snprintf(page + len, maxlen - len, ", f_inode");
 	len += snprintf(page + len, maxlen - len, ", f_sqlvl");
 	len += snprintf(page + len, maxlen - len, ", f_syncq");
 	len += snprintf(page + len, maxlen - len, ", f_kmod");
@@ -481,7 +480,6 @@ static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", f->f_flag);
 	len += snprintf(page + len, maxlen - len, ", %d", f->f_modid);
 	len += snprintf(page + len, maxlen - len, ", %d", atomic_read(&f->f_count));
-	len += snprintf(page + len, maxlen - len, ", %p", f->f_inode);
 	len += snprintf(page + len, maxlen - len, ", %d", f->f_sqlvl);
 	len += snprintf(page + len, maxlen - len, ", %p", f->f_syncq);
 	len += snprintf(page + len, maxlen - len, ", %p", f->f_kmod);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:13 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:13 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:13 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:13 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -207,7 +207,6 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define ttl USING_AF_INET_TTL_MEMBER_NAME
 #endif
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
@@ -228,7 +227,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:13 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.7 2004/05/04 21:36:56 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.8 2004/06/01 12:04:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
+ Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/04 21:36:56 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/01 12:04:02 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,6 +61,10 @@
 #include <linux/fs.h>		/* for file_operations */
 
 #include <sys/sad.h>		/* for strapush */
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
@@ -355,13 +359,13 @@ extern int lis_unregister_strmod(struct streamtab *strtab);
 #warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
-extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
+extern int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor);
 extern int register_strdev(struct cdevsw *cdev, major_t major);
-extern int register_strdrv(struct cdevsw *cdev);
+extern int register_strdrv(struct cdevsw *cdev, struct vfsmount *mnt);
 extern int register_strmod(struct fmodsw *fmod);
-extern int unregister_cmajor(struct cdevsw *cdev, major_t major);
+extern int unregister_strnod(struct cdevsw *cdev, minor_t minor);
 extern int unregister_strdev(struct cdevsw *cdev, major_t major);
-extern int unregister_strdrv(struct cdevsw *cdev);
+extern int unregister_strdrv(struct cdevsw *cdev, struct vfsmount *mnt);
 extern int unregister_strmod(struct fmodsw *fmod);
 
 extern int autopush_add(struct strapush *sap);
