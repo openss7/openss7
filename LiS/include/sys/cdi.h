@@ -1,7 +1,7 @@
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
-#ident "@(#) cdi.h %R%.%L% %G%"
+#ident "@(#) cdi.h 1.20 11/17/03"
 
 /*
  * cdi.h header for Communications Device Interface
