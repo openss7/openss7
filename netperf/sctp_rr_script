@@ -1,0 +1,159 @@
+#!/bin/sh
+# =============================================================================
+# 
+# @(#) $RCSfile: sctp_rr_script,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/06 12:44:04 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/08/06 12:44:04 $ by $Author: brian $
+#
+# =============================================================================
+
+#
+# This is an example script for using netperf. Feel free to modify it 
+# as necessary, but I would suggest that you copy this one first.
+#
+# 
+# This version has been modified to take advantage of the confidence
+# interval support in revision 2.0 of netperf. it has also been altered
+# to make submitting its resutls to the netperf database easier
+# raj 11/94
+#
+# usage: sctp_rr_script hostname [CPU]
+#
+
+if [ $# -gt 2 ]; then
+  echo "try again, correctly -> sctp_rr_script hostname [CPU]"
+  exit 1
+fi
+
+if [ $# -eq 0 ]; then
+  echo "try again, correctly -> sctp_rr_script hostname [CPU]"
+  exit 1
+fi
+
+# where the programs are
+#NETHOME=/usr/local/netperf
+#NETHOME="/opt/netperf"
+NETHOME=.
+
+# at what port will netserver be waiting? If you decide to run
+# netserver at a differnet port than the default of 12865, then set
+# the value of PORT apropriately
+#PORT="-p some_other_portnum"
+PORT=""
+
+# The test length in seconds
+TEST_TIME=60
+
+# How accurate we want the estimate of performance: 
+#      maximum and minimum test iterations (-i)
+#      confidence level (99 or 95) and interval (percent)
+STATS_STUFF="-i 10,3 -I 99,5"
+
+# The socket sizes that we will be testing - using zero will let it 
+# be the system default.
+SOCKET_SIZES="0"
+
+# The request,response sizes that we will be using. The netperf
+# command parser will treat "1" the same as "1,1" - I use 1,1 to
+# remember that it is "request,response"
+RR_SIZES="1,1 64,64 100,200 128,8192"
+
+# if there are two parms, parm one it the hostname and parm two will
+# be a CPU indicator. actually, anything as a second parm will cause
+# the CPU to be measured, but we will "advertise" it should be "CPU"
+
+if [ $# -eq 2 ]; then
+  REM_HOST=$1
+  LOC_CPU="-c"
+  REM_CPU="-C"
+fi
+
+if [ $# -eq 1 ]; then
+  REM_HOST=$1
+fi
+
+# If we are measuring CPU utilization, then we can save beaucoup
+# time by saving the results of the CPU calibration and passing
+# them in during the real tests. So, we execute the new CPU "tests"
+# of netperf and put the values into shell vars.
+case $LOC_CPU in
+\-c) LOC_RATE=`$NETHOME/netperf $PORT -t LOC_CPU`;;
+*) LOC_RATE=""
+esac
+
+case $REM_CPU in
+\-C) REM_RATE=`$NETHOME/netperf $PORT -t REM_CPU -H $REM_HOST`;;
+*) REM_RATE=""
+esac
+
+# This disables header display
+NO_HDR="-P 0"
+
+for SOCKET_SIZE in $SOCKET_SIZES
+ do
+  for RR_SIZE in $RR_SIZES
+   do
+   echo
+   echo ------------------------------------------------------
+   echo Testing with the following command line:
+   # we echo the command line for cut and paste to th database
+   echo $NETHOME/netperf $PORT -l $TEST_TIME -H $REM_HOST -t SCTP_RR \
+        $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF --\
+        -r $RR_SIZE -s $SOCKET_SIZE -S $SOCKET_SIZE
+   echo
+   # since we have the confidence interval stuff, we do not
+   # need to repeat a test multiple times from the shell
+   $NETHOME/netperf $PORT -l $TEST_TIME -H $REM_HOST -t SCTP_RR \
+   $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF --\
+   -r $RR_SIZE -s $SOCKET_SIZE -S $SOCKET_SIZE
+ done
+done
+echo
+echo If you wish to submit these results to the netperf database at
+echo http://www.cup.hp.com/netperf/NetperfPage.html, please submit each
+echo datapoint individually. Individual datapoints are separated by
+echo lines of dashes. 

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xns.m4,v 1.1.2.2 2004/08/06 12:44:08 brian Exp $
+dnl @(#) $Id: sctp.m4,v 1.1.2.1 2004/08/06 12:44:08 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -57,51 +57,61 @@ dnl
 dnl =========================================================================
 
 # =========================================================================
-# _XNS
+# _SCTP
 # -------------------------------------------------------------------------
-# Check for the existence of XNS header files, particularly sys/npi.h.  NPI
-# headers files are required for building the NPI interface for SCTP.  Without
-# NPI header files, the NPI interface to SCTP will not be built.
+# Check for the existence of SCTP header files, particularly sys/xti_sctp.h.
+# SCTP headers files are required for building the XTI interface for SCTP.
+# Without SCTP header files, the SCTP interface to SCTP will not be built.
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNS], [dnl
-    AC_REQUIRE([_STREAMS])dnl
-    _XNS_OPTIONS
-    _XNS_SETUP dnl
-])# _XNS
+AC_DEFUN([_SCTP], [dnl
+    AC_REQUIRE([_XTI])dnl
+    _SCTP_OPTIONS
+    _SCTP_SETUP dnl
+    _SCTP_OPENSS7
+])# _SCTP
 # =========================================================================
 
 # =========================================================================
 # 
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNS_OPTIONS], [dnl
-    AC_ARG_WITH([xns],
-        AC_HELP_STRING([--with-xns=HEADERS],
-            [specify the XNS header file directory.
-            @<:@default=$INCLUDEDIR/strxns@:>@]),
-        [with_xns="$withval"],
-        [with_xns=''])
-])# _XNS_OPTIONS
+AC_DEFUN([_SCTP_OPTIONS], [dnl
+    AC_ARG_WITH([sctp],
+        AC_HELP_STRING([--with-sctp=HEADERS],
+            [specify the SCTP header file directory.
+            @<:@default=$INCLUDEDIR/strsctp@:>@]),
+        [with_sctp="$withval"],
+        [with_sctp=''])
+])# _SCTP_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _XNS_SETUP
+# _SCTP_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNS_SETUP], [dnl
-    # Test for the existence of Linux STREAMS XNS header files.  The package
-    # normally requires XNS header files to compile.
-    if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
-        xns_cv_includes="$with_xns"
+AC_DEFUN([_SCTP_SETUP], [dnl
+    # Test for the existence of Linux STREAMS SCTP header files.  The package
+    # normally requires SCTP header files to compile.
+    if test ":${with_sctp:-no}" != :no -a :"${with_sctp:-no}" != :yes ;  then
+        sctp_cv_includes="$with_sctp"
     else
-        eval "xns_search_path=\"
-            $streams_cv_rootdir$includedir/strxns
-            $streams_cv_rootdir$streams_cv_prefix$oldincludedir/strxns
-            $streams_cv_rootdir$streams_cv_prefix/usr/include/strxns
-            $streams_cv_rootdir$streams_cv_prefix/usr/local/include/strxns
-            $streams_cv_rootdir$streams_cv_prefix/usr/src/strxns/src/include
-            $streams_cv_rootdir$oldincludedir/strxns
-            $streams_cv_rootdir/usr/include/strxns
-            $streams_cv_rootdir/usr/local/include/strxns
-            $streams_cv_rootdir/usr/src/strxns/src/include
+        eval "sctp_search_path=\"
+            $streams_cv_rootdir$includedir/strsctp
+            $streams_cv_rootdir$streams_cv_prefix$oldincludedir/strsctp
+            $streams_cv_rootdir$streams_cv_prefix/usr/include/strsctp
+            $streams_cv_rootdir$streams_cv_prefix/usr/local/include/strsctp
+            $streams_cv_rootdir$streams_cv_prefix/usr/src/strsctp/src/include
+            $streams_cv_rootdir$oldincludedir/strsctp
+            $streams_cv_rootdir/usr/include/strsctp
+            $streams_cv_rootdir/usr/local/include/strsctp
+            $streams_cv_rootdir/usr/src/strsctp/src/include
+            $streams_cv_rootdir$includedir/strinet
+            $streams_cv_rootdir$streams_cv_prefix$oldincludedir/strinet
+            $streams_cv_rootdir$streams_cv_prefix/usr/include/strinet
+            $streams_cv_rootdir$streams_cv_prefix/usr/local/include/strinet
+            $streams_cv_rootdir$streams_cv_prefix/usr/src/strinet/src/include
+            $streams_cv_rootdir$oldincludedir/strinet
+            $streams_cv_rootdir/usr/include/strinet
+            $streams_cv_rootdir/usr/local/include/strinet
+            $streams_cv_rootdir/usr/src/strinet/src/include
             $streams_cv_rootdir$includedir/strxnet
             $streams_cv_rootdir$streams_cv_prefix$oldincludedir/strxnet
             $streams_cv_rootdir$streams_cv_prefix/usr/include/strxnet
@@ -129,38 +139,55 @@ AC_DEFUN([_XNS_SETUP], [dnl
             $streams_cv_rootdir/usr/include/LiS
             $streams_cv_rootdir/usr/local/include/LiS
             $streams_cv_rootdir/usr/src/LiS/include\""
-        xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        xns_cv_includes=
-        for xns_dir in $xns_search_path ; do
-            AC_MSG_CHECKING([for xns include directory $xns_dir])
-            if test -d "$xns_dir" -a -r "$xns_dir/sys/npi.h" ; then
-                xns_cv_includes="$xns_dir"
+        sctp_search_path=`echo "$sctp_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+        sctp_cv_includes=
+        for sctp_dir in $sctp_search_path ; do
+            AC_MSG_CHECKING([for sctp include directory $sctp_dir])
+            if test -d "$sctp_dir" -a -r "$sctp_dir/sys/xti_sctp.h" ; then
+                sctp_cv_includes="$sctp_dir"
                 AC_MSG_RESULT([yes])
                 break
             fi
             AC_MSG_RESULT([no])
         done
     fi
-    AC_MSG_CHECKING([for xns include directory])
-    AC_MSG_RESULT([${xns_cv_includes:-no}])
-    if test :"${xns_cv_includes:-no}" = :no ; then
+    AC_MSG_CHECKING([for sctp include directory])
+    AC_MSG_RESULT([${sctp_cv_includes:-no}])
+    if test :"${sctp_cv_includes:-no}" = :no ; then
         :
 #        AC_MSG_ERROR([
 #***
-#*** Could not find XNS include directories.  This package requires the
-#*** presence of XNS include directories to compile.  Specify the location of
-#*** XNS include directories with option --with-xns to configure and try again.
+#*** Could not find SCTP include directories.  This package requires the
+#*** presence of SCTP include directories to compile.  Specify the location of
+#*** SCTP include directories with option --with-sctp to configure and try again.
 #***
 #        ])
     fi
-])# _XNS_SETUP
+])# _SCTP_SETUP
 # =========================================================================
 
 # =========================================================================
-# _XNS_
+# _SCTP_OPENSS7
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNS_], [dnl
-])# _XNS_
+AC_DEFUN([_SCTP_OPENSS7], [dnl
+    AC_CACHE_CHECK([for sctp openss7 kernel], [sctp_cv_openss7], [dnl
+        AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp_headers\>], [
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <netinet/sctp.h>
+#ifdef SCTP_DISPOSITION_UNSENT
+        yes_we_have_openss7_kernel_sctp_headers
+#endif
+        ], [sctp_cv_openss7=yes], [sctp_cv_openss7=no])
+    ])
+])# _SCTP_OPENSS7
+# =========================================================================
+
+# =========================================================================
+# _SCTP_
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_], [dnl
+])# _SCTP_
 # =========================================================================
 
 dnl =========================================================================
@@ -171,3 +198,4 @@ dnl
 dnl =========================================================================
 dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
+

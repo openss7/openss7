@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 1.1.2.1 2004/08/05 10:50:17 brian Exp $
+dnl @(#) $Id: streams.m4,v 1.1.2.2 2004/08/06 12:44:08 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/05 10:50:17 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 12:44:08 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -193,47 +193,50 @@ AC_DEFUN([_STREAMS_SETUP], [
 *** 
             ])
         fi
-        AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS include directories.  This package
-*** requires the presence of STREAMS include directories.  Specify the correct
-*** location of Linux GCOM STREAMS (LiS) include directories with the --with-lis
-*** option to configure, or the correct location of Linux Fast STREAMS (LfS)
-*** include directories with the --with-lfs option to configure, and try again.
-*** 
-        ])
-    fi
-    AC_MSG_RESULT([${streams_cv_includes:-no}])
-    # need to add arguments for LiS or LfS so they will be passed to rpm
-    AC_MSG_CHECKING([for streams added configure arguments])
-    case "$streams_cv_package" in
-        LiS)
-            if test -z "$with_lis" ; then
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lis"
-dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
-            fi
-            AC_MSG_RESULT([--with-lis])
-            ;;
-        LfS)
-            if test -z "$with_lfs" ; then
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lfs"
-dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
-            fi
-            AC_MSG_RESULT([--with-lfs])
-            ;;
-        *)
-            AC_MSG_ERROR([
+#        AC_MSG_ERROR([
+#*** 
+#*** Configure could not find the STREAMS include directories.  This package
+#*** requires the presence of STREAMS include directories.  Specify the correct
+#*** location of Linux GCOM STREAMS (LiS) include directories with the --with-lis
+#*** option to configure, or the correct location of Linux Fast STREAMS (LfS)
+#*** include directories with the --with-lfs option to configure, and try again.
+#*** 
+#        ])
+        STREAMS_CPPFLAGS=
+        STREAMS_LDADD=
+    else
+        AC_MSG_RESULT([${streams_cv_includes:-no}])
+        # need to add arguments for LiS or LfS so they will be passed to rpm
+        AC_MSG_CHECKING([for streams added configure arguments])
+        case "$streams_cv_package" in
+            LiS)
+                if test -z "$with_lis" ; then
+                    PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lis"
+dnl                 ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
+                fi
+                AC_MSG_RESULT([--with-lis])
+                ;;
+            LfS)
+                if test -z "$with_lfs" ; then
+                    PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lfs"
+dnl                 ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
+                fi
+                AC_MSG_RESULT([--with-lfs])
+                ;;
+            *)
+                AC_MSG_ERROR([
 ***
 *** Configure script error.  Try specifying --with-lis or --with-lfs and
 *** run configure again.
 ***
-            ])
-            ;;
-    esac
-    STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
-    STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
-    AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_package:-LiS}" = :LiS])
-    AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_package:-LiS}" = :LfS])
+                ])
+                ;;
+        esac
+        STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
+        STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
+    fi
+    AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_package:-no}" = :LiS])
+    AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_package:-no}" = :LfS])
 ])# _STREAMS_SETUP
 # =========================================================================
 

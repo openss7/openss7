@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 12:43:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 12:43:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 12:43:59 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 12:43:59 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -480,6 +480,7 @@ create_data_socket(int family, int type, int protocol, int address, unsigned sho
 	one = 0;
 	if(setsockopt(temp_socket,
 		      SOL_SCTP,
+		      SCTP_NODELAY,
 		      (char *)&one,
 		      sizeof(one)) == SOCKET_ERROR) {
 	  fprintf(where,
@@ -13077,9 +13078,11 @@ Send   Recv    Send   Recv\n\
     /* a bit more conservative I imagine - raj 3/95 */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
-				     IPPROTO_TCP);
+				     IPPROTO_TCP,
+				     sctp_tran_rr_request->ipaddress,
+				     sctp_tran_rr_request->port);
   
-    if (send_socket == INAVLID_SOCKET) {
+    if (send_socket == INVALID_SOCKET) {
       perror("netperf: send_sctp_tran_rr: sctp stream data socket");
       exit(1);
     }
@@ -13151,6 +13154,10 @@ newport:
     /* Connect up to the remote port on the data socket. Since this is */
     /* a test for RFC_1644-style transactional TCP, we can use the */
     /* sendto() call instead of calling connect and then send() */
+
+#ifndef MSG_EOF
+#define MSG_EOF MSG_FIN
+#endif
 
     /* send the request */
     if((len=sendto(send_socket,
@@ -13544,7 +13551,9 @@ recv_sctp_tran_rr()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
-				IPPROTO_SCTP);
+				IPPROTO_SCTP,
+				INADDR_ANY,
+				sctp_tran_rr_request->port);
   
   if (s_listen == INVALID_SOCKET) {
     netperf_response.content.serv_errno = errno;
@@ -13575,6 +13584,7 @@ recv_sctp_tran_rr()
     exit(1);
   }
 
+#ifdef SCTP_NOPUSH
   /* we want to disable the implicit PUSH on all sends. at some point, */
   /* this might want to be a parm to the test raj 3/95 */
   if (setsockopt(s_listen,
@@ -13590,6 +13600,7 @@ recv_sctp_tran_rr()
     close(s_listen);
     send_response();
   }
+#endif
 
   /* Now, let's set-up the socket to listen for connections */
   if (listen(s_listen, 5) == SOCKET_ERROR) {
@@ -14150,9 +14161,11 @@ Send   Recv    Send   Recv\n\
     /* a bit more conservative I imagine - raj 3/95 */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
-				     IPPROTO_TCP);
+				     IPPROTO_TCP,
+				     tcp_tran_rr_request->ipaddress,
+				     tcp_tran_rr_request->port);
   
-    if (send_socket == INAVLID_SOCKET) {
+    if (send_socket == INVALID_SOCKET) {
       perror("netperf: send_tcp_tran_rr: tcp stream data socket");
       exit(1);
     }
@@ -14617,7 +14630,9 @@ recv_tcp_tran_rr()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
-				IPPROTO_TCP);
+				IPPROTO_TCP,
+				INADDR_ANY,
+				tcp_tran_rr_request->port);
   
   if (s_listen == INVALID_SOCKET) {
     netperf_response.content.serv_errno = errno;
@@ -14648,6 +14663,7 @@ recv_tcp_tran_rr()
     exit(1);
   }
 
+#ifdef TCP_NOPUSH
   /* we want to disable the implicit PUSH on all sends. at some point, */
   /* this might want to be a parm to the test raj 3/95 */
   if (setsockopt(s_listen,
@@ -14663,6 +14679,7 @@ recv_tcp_tran_rr()
     close(s_listen);
     send_response();
   }
+#endif
 
   /* Now, let's set-up the socket to listen for connections */
   if (listen(s_listen, 5) == SOCKET_ERROR) {
@@ -15091,7 +15108,9 @@ Send   Recv    Send   Recv\n\
     /*set up the data socket                        */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
-				     IPPROTO_SCTP);
+				     IPPROTO_SCTP,
+				     sctp_rr_request->ipaddress,
+				     sctp_rr_request->port);
   
     if (send_socket == INVALID_SOCKET){
       perror("netperf: send_sctp_nbrr: sctp stream data socket");
@@ -15692,7 +15711,7 @@ recv_sctp_nbrr()
 	sizeof(myaddr_in));
   myaddr_in.sin_family      = AF_INET;
   myaddr_in.sin_addr.s_addr = INADDR_ANY;
-  myaddr_in.sin_port        = htons((unsigned_short)sctp_rr_request->port);
+  myaddr_in.sin_port        = htons((unsigned short)sctp_rr_request->port);
   
   /* Grab a socket to listen on, and then listen on it. */
   
@@ -15713,7 +15732,9 @@ recv_sctp_nbrr()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
-				IPPROTO_SCTP);
+				IPPROTO_SCTP,
+				INADDR_ANY,
+				sctp_rr_request->port);
   
   if (s_listen == INVALID_SOCKET) {
     netperf_response.content.serv_errno = errno;
@@ -16152,7 +16173,9 @@ Send   Recv    Send   Recv\n\
     /*set up the data socket                        */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
-				     IPPROTO_TCP);
+				     IPPROTO_TCP,
+				     tcp_rr_request->ipaddress,
+				     tcp_rr_request->port);
   
     if (send_socket == INVALID_SOCKET){
       perror("netperf: send_tcp_nbrr: tcp stream data socket");
@@ -16753,7 +16776,7 @@ recv_tcp_nbrr()
 	sizeof(myaddr_in));
   myaddr_in.sin_family      = AF_INET;
   myaddr_in.sin_addr.s_addr = INADDR_ANY;
-  myaddr_in.sin_port        = htons((unsigned_short)tcp_rr_request->port);
+  myaddr_in.sin_port        = htons((unsigned short)tcp_rr_request->port);
   
   /* Grab a socket to listen on, and then listen on it. */
   
@@ -16774,7 +16797,9 @@ recv_tcp_nbrr()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
-				IPPROTO_TCP);
+				IPPROTO_TCP,
+				INADDR_ANY,
+				tcp_rr_request->port);
   
   if (s_listen == INVALID_SOCKET) {
     netperf_response.content.serv_errno = errno;

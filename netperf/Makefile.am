@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/05 20:28:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2004/08/06 13:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,15 +46,18 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/05 20:28:22 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 13:23:20 $ by $Author: brian $
 #
 # =============================================================================
 
-sbin_SCRIPTS			= \
+dist_sbin_SCRIPTS		= \
+				  sctp_stream_script \
 				  tcp_stream_script \
 				  udp_stream_script \
+				  sctp_rr_script \
 				  tcp_rr_script \
 				  udp_rr_script \
+				  sctp_range_script \
 				  tcp_range_script \
 				  snapshot_script \
 				  arr_script \
@@ -99,6 +102,8 @@ netserver_LDFLAGS		= libnetperf.la $(NETPERF_LDADD)
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
 EXTRA_DIST			=
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS) $(sbin_PROGRAMS)
 
 man1_MANS			= netperf.1
 dist_noinst_MANS		= netperf.man

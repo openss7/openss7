@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 1.1.2.1 2004/08/05 10:50:06 brian Exp $
+dnl @(#) $Id: configure.ac,v 1.1.2.3 2004/08/06 14:35:38 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/05 10:50:06 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 14:35:38 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -87,9 +87,14 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
+AM_PROG_INSTALL_STRIP
+AC_ARG_VAR([LD], [Linker loader command])
+AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
+AC_SUBST([LIBTOOL_DEPS])
+AC_PROG_GCC_TRADITIONAL
 
 #
 # Checks for libraries.
@@ -97,8 +102,8 @@ AC_PROG_LIBTOOL
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([m], [main])
 #AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([LiS], [putpmsg])
-AC_CHECK_LIB([streams], [putpmsg])
+#AC_CHECK_LIB([LiS], [putpmsg])
+#AC_CHECK_LIB([streams], [putpmsg])
 AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
 AC_CHECK_LIB([nsl], [main])
@@ -133,10 +138,10 @@ AC_HEADER_STDBOOL
 #
 AC_FUNC_ERROR_AT_LINE
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
-AC_FUNC_MALLOC
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MMAP
 AC_FUNC_SELECT_ARGTYPES
-AC_FUNC_SETPGRP
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_CHECK_FUNCS([alarm bzero bcopy gethostbyname gethrtime gettimeofday inet_ntoa memset munmap pstat_getdynamic select socket sqrt strcasecmp strchr strstr strtoul uname])
