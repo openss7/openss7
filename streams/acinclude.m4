@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/03/24 02:11:03 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/03/24 14:05:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:03 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 14:05:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1067,7 +1067,7 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_OUTPUT], [dnl
     _LFS_STRCONF
-    AM_CONDITIONAL(WITH_LFS, false)dnl
+    AM_CONDITIONAL(WITH_LFS, true)dnl
     AM_CONDITIONAL(WITH_LIS, false)dnl
 ])# _LFS_OUTPUT
 # =============================================================================

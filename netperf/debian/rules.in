@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/03/24 02:09:13 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/03/24 14:05:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/24 02:09:13 $ by $Author: brian $
+## Last Modified $Date: 2005/03/24 14:05:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -102,8 +102,15 @@ pkg_lfs_scripts_files	=
 pkg_control_files	=
 pkg_scripts_files	= $(pkg_lis_scripts_files) $(pkg_lfs_scripts_files)
 
-##$(pkg_scripts_files):
-##	@f=`echo "$@" | sed -r -e 's|^.*/||;s|-(lis|streams)-|-|'` ; \
+##debian/$(PACKAGE_LCNAME)-streams-$(core_name).preinst \
+##debian/$(PACKAGE_LCNAME)-streams-$(core_name).postinst \
+##debian/$(PACKAGE_LCNAME)-streams-$(core_name).prerm \
+##debian/$(PACKAGE_LCNAME)-streams-$(core_name).postrm \
+##debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
+##debian/$(PACKAGE_LCNAME)-lis-$(core_name).postinst \
+##debian/$(PACKAGE_LCNAME)-lis-$(core_name).prerm \
+##debian/$(PACKAGE_LCNAME)-lis-$(core_name).postrm:
+##	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,;s,$(core_name),core,;s,$(info_name),info,'` ; \
 ##	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
 ##	test "$@" -ef "$$d$$f" && exit 0 ; \
 ##	test -f "$@" -a "$@" -nt "$$d$$f" || { \
@@ -140,21 +147,21 @@ debian/$(PACKAGE_LCNAME)-doc.manpages:
 debian/$(PACKAGE_LCNAME)-doc.install:
 	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
 	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis.install
 
 debian/$(PACKAGE_LCNAME)-lis.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams.install
 
 debian/$(PACKAGE_LCNAME)-streams.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
 
@@ -381,6 +388,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.7  2005/03/24 14:05:26  brian
+# - improved master build
+#
 # Revision 1.1.2.6  2005/03/24 02:09:13  brian
 # - improved debian build
 #

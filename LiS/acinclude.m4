@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/03/24 01:38:17 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.9 $) $Date: 2005/03/24 14:05:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 01:38:17 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 14:05:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -960,7 +960,7 @@ dnl
     LIS_MAJOR_BASE="$STRCONF_MAJBASE"
     _LIS_OUTPUT_CONFIG_IN dnl
     AM_CONDITIONAL(WITH_LFS, false)dnl
-    AM_CONDITIONAL(WITH_LIS, false)dnl
+    AM_CONDITIONAL(WITH_LIS, true)dnl
 dnl
 dnl Missing templates.
 dnl

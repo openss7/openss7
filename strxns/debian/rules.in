@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/24 02:09:16 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/24 14:05:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/24 02:09:16 $ by $Author: brian $
+## Last Modified $Date: 2005/03/24 14:05:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -95,8 +95,8 @@ name = $(PACKAGE)
 
 srcdir=@srcdir@
 kernel_version=@kversion@
-kernel_number=$(shell echo $(kversion) | sed -e s'|-.*$||')
-kernel_release=$(shell echo $(kversion) | sed -e s'|-|.|g')
+kernel_number=$(shell echo $(kversion) | sed -e s',-.*$,,')
+kernel_release=$(shell echo $(kversion) | sed -e s',-,.,g')
 core_name = core-$(kversion)-$(krelease)
 info_name = info-$(kversion)-$(krelease)
 epoch = @PACKAGE_RPMEPOCH@
@@ -125,8 +125,10 @@ pkg_lis_scripts_files	=
 pkg_lfs_control_files	=
 pkg_lfs_scripts_files	=
 pkg_control_files	=
-pkg_scripts_files	= $(pkg_lis_scripts_files) $(pkg_lfs_scripts_files)
+pkg_scripts_files	=
 
+##debian/$(PACKAGE_LCNAME)-streams-lib.preinst #
+##debian/$(PACKAGE_LCNAME)-lis-lib.preinst #
 debian/$(PACKAGE_LCNAME)-streams-$(core_name).preinst \
 debian/$(PACKAGE_LCNAME)-streams-$(core_name).postinst \
 debian/$(PACKAGE_LCNAME)-streams-$(core_name).prerm \
@@ -135,7 +137,7 @@ debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
 debian/$(PACKAGE_LCNAME)-lis-$(core_name).postinst \
 debian/$(PACKAGE_LCNAME)-lis-$(core_name).prerm \
 debian/$(PACKAGE_LCNAME)-lis-$(core_name).postrm:
-	@f=`echo "$@" | sed -r -e 's|^.*/||;s|-(lis|streams)-|-|;s|$(core_name)|core|;s|$(info_name)|info|'` ; \
+	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,;s,$(core_name),core,;s,$(info_name),info,'` ; \
 	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
 	test "$@" -ef "$$d$$f" && exit 0 ; \
 	test -f "$@" -a "$@" -nt "$$d$$f" || { \
@@ -151,9 +153,8 @@ pkg_lfs_scripts_files	+= debian/$(PACKAGE_LCNAME)-streams-$(core_name).preinst \
 pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams-$(core_name).install
 
 debian/$(PACKAGE_LCNAME)-streams-$(core_name).install:
-	( echo '$(mytmpdir)$(kmoduledir)/*' ; \
-	  echo '$(mytmpdir)$(modutildir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_lis_scripts_files	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
 			   debian/$(PACKAGE_LCNAME)-lis-$(core_name).postinst \
@@ -163,10 +164,27 @@ pkg_lis_scripts_files	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
 pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).install
 
 debian/$(PACKAGE_LCNAME)-lis-$(core_name).install:
-	( echo '$(mytmpdir)$(kmoduledir)/*' ; \
-	  echo '$(mytmpdir)$(modutildir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
+##pkg_lfs_scripts_files	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
+##
+##pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams-lib.install
+##
+##debian/$(PACKAGE_LCNAME)-streams-lib.install:
+##	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+##	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+##	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+##
+##pkg_lis_scripts_files	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
+##
+##pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
+##
+##debian/$(PACKAGE_LCNAME)-lis-lib.install:
+##	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+##	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+##	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+##
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
@@ -190,7 +208,7 @@ debian/$(PACKAGE_LCNAME)-doc.manpages:
 debian/$(PACKAGE_LCNAME)-doc.install:
 	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
 	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
 
@@ -202,13 +220,13 @@ pkg_control_files	+= debian/$(PACKAGE_LCNAME)-devel.install
 debian/$(PACKAGE_LCNAME)-devel.install:
 	( echo '$(mytmpdir)$(pkgincludedir)/*.h' ; \
 	  echo '$(mytmpdir)$(pkgincludedir)/sys/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 #pkg_control_files	+= debian/$(PACKAGE_LCNAME)-source.install
 
 #debian/$(PACKAGE_LCNAME)-source.install:
 #	( echo '$(mytmpdir)/usr/src/*' ) \
-#	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+#	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams-util.install
 
@@ -216,9 +234,7 @@ debian/$(PACKAGE_LCNAME)-streams-util.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ; \
 	  echo '$(mytmpdir)$(libexecdir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
-@INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
-@INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
 pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis-util.install
 
@@ -226,10 +242,28 @@ debian/$(PACKAGE_LCNAME)-lis-util.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ; \
 	  echo '$(mytmpdir)$(libexecdir)/*' ) \
-	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
-@INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
-@INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
 
+@INSTALL_INITSCRIPTS_TRUE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-init.install
+
+debian/$(PACKAGE_LCNAME)-init.install:
+	( echo '$(mytmpdir)$(configdir)/*' ; \
+	  echo '$(mytmpdir)$(initrddir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-init.modules
+
+debian/$(PACKAGE_LCNAME)-init.modules:
+	( echo 'prune modules.$(PACKAGE_LCNAME)' ; \
+	  echo 'if -f /lib/modules/`uname -r`/modules.$(PACKAGE_LCNAME)' ; \
+	  echo 'include /lib/modules/`uname -r`/modules.$(PACKAGE_LCNAME)' ; \
+	  echo 'endif' ) > $@
+
+##@INSTALL_INITSCRIPTS_TRUE@pkg_scripts_files	+= debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh
+##
+##debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh:
+##	cp -f -- $(srcdir)/src/util/init/streams.sh $@
+##
 cache_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
 csite_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-config.site
 mpost_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
@@ -421,7 +455,7 @@ binary-common:
 	dh_installchangelogs -v
 	dh_installdocs -v -A debian/README.Debian debian/TODO.Debian
 	dh_installdebconf -v
-	dh_installinit -v
+	dh_installinit -v --init-script=@PACKAGE_LCNAME@.sh
 	dh_installinfo -v
 	dh_installman -v
 	dh_strip -v
@@ -442,10 +476,12 @@ binary-indep: build install
 # Build architecture-dependent files here.
 binary-lis: build-lis install-lis
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name) binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-util binary-common
 
 binary-lfs: build-lfs install-lfs
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name) binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-util binary-common
 
 binary-arch: binary-lis binary-lfs build install
@@ -463,6 +499,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.7  2005/03/24 14:05:28  brian
+# - improved master build
+#
 # Revision 0.9.2.6  2005/03/24 02:09:16  brian
 # - improved debian build
 #

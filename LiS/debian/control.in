@@ -11,9 +11,10 @@ Package: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
+Provides: STREAMS-core, @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
 Conflicts: streams-core, streams-core-@kversion@, streams-core-@kversion@-@krelease@
-Depends: kernel-image-@kversion@ (= @krelease@)
+Depends: kernel-image-@kversion@ (= @krelease@),
+ @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@)
 Description: Core kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel SVR 4 STREAMS facility.
@@ -25,7 +26,7 @@ Package: @PACKAGE_LCNAME@-info-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-info, @PACKAGE_LCNAME@-info-@kversion@
+Provides: STREAMS-info, @PACKAGE_LCNAME@-info, @PACKAGE_LCNAME@-info-@kversion@
 Depends: kernel-image-@kversion@ (= @krelease@)
 Description: Kernel module versions for @PACKAGE_TITLE@
  Kernel modules symbol information for development of kernel modules against the
@@ -38,8 +39,10 @@ Package: @PACKAGE_LCNAME@-lib
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lib
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-0)
+Provides: STREAMS-lib
+Conflicts: streams-lib
+Depends: ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Shared libraries for @PACKAGE_TITLE@
  Run-time shared libraries necessary to run applications programs and utilities
  developed for @PACKAGE_TITLE@.
@@ -48,30 +51,43 @@ Package: @PACKAGE_LCNAME@-util
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util
-Depends: @PACKAGE_LCNAME@-lib (= @VERSION@-0)
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-0)
+Provides: STREAMS-util
+Conflicts: streams-util
+Depends: @PACKAGE_LCNAME@-lib (= @VERSION@-@PACKAGE_DEBRELEASE@), ${shlib:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@
  Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@; also init scripts and configuration files.
+ @PACKAGE_TITLE@.
 
 Package: @PACKAGE_LCNAME@-devel
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE_LCNAME@-devel
-Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-0)
+Provides: STREAMS-devel
+Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: C headers and static libraries for @PACKAGE_TITLE@
  Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
  drivers; user-space headers and static libraries required to compile
  @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
  info files for both kernel and user-space functions.
 
+Package: @PACKAGE_LCNAME@-init
+Architecture: all
+Section: base
+Priority: optional
+Provides: STREAMS-init
+Conflicts: streams-init
+Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
+Description: Init scripts and config files for @PACKAGE_TITLE@
+ SysV init scripts and configuration files for @PACKAGE_TITLE@
+ for LiS or STREAMS.
+
 Package: @PACKAGE_LCNAME@-dev
 Architecture: all
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-dev
+Provides: STREAMS-dev
+Conflicts: streams-dev
 Description: Character devices for @PACKAGE_TITLE@
  Character special device definitions necessary to run applications programs and
  utilities developed for @PACKAGE_TITLE@.
@@ -80,7 +96,8 @@ Package: @PACKAGE_LCNAME@-doc
 Architecture: all
 Section: doc
 Priority: optional
-Provides: @PACKAGE_LCNAME@-doc
+Provides: STREAMS-doc
+Conflicts: streams-doc
 Description: Documentation and man pages for @PACKAGE_TITLE@
  Pdf and html documentation for installation and the development of
  @PACKAGE_TITLE@ applications, modules and drivers.
@@ -89,7 +106,7 @@ Package: @PACKAGE_LCNAME@-source
 Architecture: all
 Section: devel
 Priority: optional
-Provides: @PACKAGE_LCNAME@-source
+Provides: STREAMS-source
 Description: Source code for @PACKAGE_TITLE@
  Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
  utilities necessary to create and distribute this dpkg -- required for

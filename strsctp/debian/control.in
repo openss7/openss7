@@ -11,9 +11,10 @@ Package: @PACKAGE_LCNAME@-lis-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@
+Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@
 Conflicts: streams-core, @PACKAGE_LCNAME@-streams-core
-Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0)
+Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0),
+ @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0)
 Description: Core LiS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for LiS.
@@ -26,9 +27,10 @@ Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@
-Conflicts: LiS-core, @PACKAGE_LCNAME@-lis-core
-Depends: kernel-image-@kversion@ (= @krelease@), streams-core-@kversion@-@krelease@ (>= 0.7a.3-0)
+Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@
+Conflicts: lis-core, @PACKAGE_LCNAME@-lis-core
+Depends: kernel-image-@kversion@ (= @krelease@), streams-core-@kversion@-@krelease@ (>= 0.7a.3-0),
+ @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@), streams-core-@kversion@-@krelease@ (>= 0.7a.3-0)
 Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
@@ -41,43 +43,50 @@ Package: @PACKAGE_LCNAME@-lis-util
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-lis-util
+Provides: @PACKAGE_LCNAME@-util
 Conflicts: @PACKAGE_LCNAME@-streams-util
-Depends: lis-lib (>= 2.18.1-0), @PACKAGE_LCNAME@-lis-lib (= @VERSION@-0)
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-0)
+Depends: lis-lib (>= 2.18.1-0), ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and LiS
  Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@ for LiS; also init scripts and configuration files.
+ @PACKAGE_TITLE@ for LiS.
 
 Package: @PACKAGE_LCNAME@-streams-util
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-streams-util
+Provides: @PACKAGE_LCNAME@-util
 Conflicts: @PACKAGE_LCNAME@-lis-util
-Depends: streams-lib (>= 2.18.1-0), @PACKAGE_LCNAME@-streams-lib (= @VERSION@-0)
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-0)
+Depends: streams-lib (>= 0.7a.3-0), ${shlibs:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
  Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@ for STREAMS; also init scripts and configuration files.
+ @PACKAGE_TITLE@ for STREAMS.
 
 Package: @PACKAGE_LCNAME@-devel
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE_LCNAME@-devel
-Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-0)
+Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: C headers and static libraries for @PACKAGE_TITLE@
  Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
  drivers; user-space headers and static libraries required to compile
  @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
  info files for both kernel and user-space functions.
 
+Package: @PACKAGE_LCNAME@-init
+Architecture: all
+Section: base
+Priority: optional
+Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
+Description: Init scripts and config files for @PACKAGE_TITLE@
+ SysV init scripts and configuration files for @PACKAGE_TITLE@
+ for LiS or STREAMS.
+
 Package: @PACKAGE_LCNAME@-dev
 Architecture: all
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-dev
 Description: Character devices for @PACKAGE_TITLE@
  Character special device definitions necessary to run applications programs and
  utilities developed for @PACKAGE_TITLE@.
@@ -86,7 +95,6 @@ Package: @PACKAGE_LCNAME@-doc
 Architecture: all
 Section: doc
 Priority: optional
-Provides: @PACKAGE_LCNAME@-doc
 Description: Documentation and man pages for @PACKAGE_TITLE@
  Pdf and html documentation for installation and the development of
  @PACKAGE_TITLE@ applications, modules and drivers.
@@ -95,7 +103,6 @@ Package: @PACKAGE_LCNAME@-source
 Architecture: all
 Section: devel
 Priority: optional
-Provides: @PACKAGE_LCNAME@-source
 Description: Source code for @PACKAGE_TITLE@
  Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
  utilities necessary to create and distribute this dpkg -- required for

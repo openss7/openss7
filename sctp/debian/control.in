@@ -11,8 +11,9 @@ Package: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
-Depends: kernel-image-@kversion@ (= @krelease@)
+Provides: SCTP-core, @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
+Depends: kernel-image-@kversion@ (= @krelease@),
+ @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@)
 Description: Core kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_TITLE@ Linux/BSD NET4
@@ -24,29 +25,40 @@ Package: @PACKAGE_LCNAME@-util
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-0)
+Provides: SCTP-util
+Depends: ${shlib:Depends}
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@
  Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@; also init scripts and configuration files.
+ @PACKAGE_TITLE@.
 
 Package: @PACKAGE_LCNAME@-devel
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE_LCNAME@-devel
-Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-0)
+Provides: SCTP-devel
+Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: C headers and static libraries for @PACKAGE_TITLE@
  Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
  drivers; user-space headers and static libraries required to compile
  @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
  info files for both kernel and user-space functions.
 
+Package: @PACKAGE_LCNAME@-init
+Architecture: all
+Section: base
+Priority: optional
+Provides: SCTP-init
+Conflicts: lis-init
+Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
+Description: Init scripts and config files for @PACKAGE_TITLE@
+ SysV init scripts and configuration files for @PACKAGE_TITLE@.
+
 Package: @PACKAGE_LCNAME@-doc
 Architecture: all
 Section: doc
 Priority: optional
-Provides: @PACKAGE_LCNAME@-doc
+Provides: SCTP-doc
 Description: Documentation and man pages for @PACKAGE_TITLE@
  Pdf and html documentation for installation and the development of
  @PACKAGE_TITLE@ applications, modules and drivers.
@@ -55,7 +67,7 @@ Package: @PACKAGE_LCNAME@-source
 Architecture: all
 Section: devel
 Priority: optional
-Provides: @PACKAGE_LCNAME@-source
+Provides: SCTP-source
 Description: Source code for @PACKAGE_TITLE@
  Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
  utilities necessary to create and distribute this dpkg -- required for

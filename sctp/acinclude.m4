@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/14 09:36:45 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/03/24 14:05:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 09:36:45 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 14:05:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,6 +75,10 @@ AC_DEFUN([AC_SCTP], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
+    AC_CONFIG_FILES([debian/sctp-core.preinst
+		     debian/sctp-core.postinst
+		     debian/sctp-core.prerm
+		     debian/sctp-core.postrm])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
