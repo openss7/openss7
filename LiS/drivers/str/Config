@@ -159,6 +159,9 @@ node	/dev/fifo.0          c  0666    fifo            0
 #node	/dev/inet/rawip	     c	0666	inet		41
 #node	/dev/inet/arp	     c	0666	inet		39
 #node	/dev/inet/rip	     c	0666	inet		39
+node	/dev/ticots_ord	     c	0666	inet		42
+node	/dev/ticots	     c	0666	inet		43
+node	/dev/ticlts	     c	0666	inet		44
 
 #
 # Device specifications
