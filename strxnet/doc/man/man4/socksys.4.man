@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: socksys.4.man,v 0.9.2.1 2004/05/16 02:35:40 brian Exp $
+.\" @(#) $Id: socksys.4.man,v 0.9.2.2 2004/07/24 05:16:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/16 02:35:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/07/24 05:16:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SOCKSYS 4 "$Date: 2004/05/16 02:35:40 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH SOCKSYS 4 "$Date: 2004/07/24 05:16:02 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -633,9 +633,25 @@ I/O control but it does not.
 .\"
 .SH CONFORMANCE
 .PP
-XNS 5
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR "XNS 5.2" ,
 .[
 xns
+.]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 / POSIX ,
+.[
+susv3
 .]
 .\"
 .\"
@@ -652,4 +668,4 @@ svr4
 .[
 $LIST$
 .]
-.TI
+.T4

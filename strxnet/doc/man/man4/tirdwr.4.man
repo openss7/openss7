@@ -1,7 +1,7 @@
-'\" rtp
+'\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tirdwr.4.man,v 0.9.2.3 2004/05/16 02:35:40 brian Exp $
+.\" @(#) $Id: tirdwr.4.man,v 0.9.2.4 2004/07/24 05:16:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -47,13 +47,8 @@
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
-.\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/16 02:35:40 $ by $Author: brian $
+.\" Modified $Date: 2004/07/24 05:16:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -71,67 +66,420 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIRDWR 4 "$Date: 2004/05/16 02:35:40 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH TIRDWR 4 "$Date: 2004/07/24 05:16:03 $" "$Name:  $" "OpenSS7 XTI/TLI Devices"
 .\"
 .\"
 .SH NAME
 .B tirdwr
-\- a STREAMS TLI read/write module
+\- a STREAMS XTI/TLI read write compaibility module
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/stropts.h>
+.B #include <sys/stropt.h>
 .br
-.B #include <sys/tihdr.h>
-.br
-.B #include <sys/tirdwr.h>
+.B #include <xti.h>
 .HP 8
-.BI "int " t " = open(" \fR\*(lq/dev/tcp\*(rq\fP ", " 0 );
+.BI "" tli_stream " = t_open(" tli_device ", " 0 );
+.PD 0
 .HP 8
-.BI "int " retval "= ioctl(" t ", " \fRI_PUSH\fP ", " \fR\*(lqtirdwr\*(rq\fP );
+.BI t_connect( tli_stream ", " sndcall );
+.PD
+.HP 8
+.BI read( tli_stream ", " ... );
+.HP 8
+.BI write( tli_stream ", " ... );
+.HP 8
+.BI ioctl( tli_stream ", " \fRI_PUSH\fP ", " \*(lqtirdwr\*(rq );
+.PD 0
+.HP 8
+.BI ioctl( tli_stream ", " \fRI_POP\fP ", " \*(lqtirdwr\*(rq );
+.HP 8
+.BI close( tli_stream );
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
 .B tirdwr
-is a module that provides
+module is a STREAMS module that provides a transport user supporting the
+.I \(lqTransport Provider Interface\(rq
+(TPI)
+.[
+TPI Revision 5
+.]
+with an alternate interface to a transport protocol provider supporting TPI.
+This alternate interface allows the transport user to communicate with the
+transport protocol provider using the
 .BR read (2),
 .BR readv (2),
 .BR write (2)
 and
 .BR writev (2)
-support for streams supporting the Transport Provider Interface
-.BR tpi (7).
-.[
-TPI Revision 2.0.0
-.]
+system calls.  It can also continue to use the
+.BR putmsg (2),
+.BR putpmsg (2s),
+.BR getmsg (2)
+and
+.BR getpmsg (2s)
+system calls, but these functions will only transfer data messages between the
+user process and device stream.
+.PP
+The user places the
+.B tirdwr
+module on a device stream by calling the STREAMS
+.BR I_PUSH
+ioctl
+.RB (see " streamio" (7)).
+Once the module has been pushed, the user cannot make further
+.BR xti (3)
+library calls.  Attempts to do so will result in failure with
+.IR errno (3)
+set to
+.RB [ EPROTO ].
+The user removes the
+.B tirdwr
+module from a device by calling the STREAMS
+.B I_POP
+ioctl
+.RB (see " streamio" (7)),
+or by closing the stream with
+.BR t_close (3)
+or
+.BR close (2).
+.PP
+The behavior of the
+.B tirdwr
+module when pushed or popped, or subjected to
+.BR xti (3)
+library calls and system calls is described below:
+.\"
+.\"
+.SS "I_PUSH
+.PP
+The actions taken when the
+.B tirdwr
+module are as follows:
+.IP \(bu \w'\(bu\ \ 'u
+When the
+.B tirdwr
+module is pushed on the stream, and as part of the
+.BR qopen (9)
+procedure for the module, the module check if there are any messages with
+control parts that it would not have normally passed that are queued for read
+at the stream head.  If such messages exist, the
+.B tirdwr
+returns error
+.RB [ EPROTO ]
+to the module open routine and fails the push on the stream.
+.IP \(bu
+If no such messages exist, the module is successfully pushed onto the stream.
+.\"
+.\"
+.SS "Write
+.PP
+The actions taken when data is written to the stream with
+.BR write "(2), " writev "(2), " putmsg "(2) or " putpmsg (2s)
+are as follows:
+.IP \(bu \w'\(bu\ \ 'u
+All non-zero length
+.B M_DATA
+messages with no control portions are passed downstream.
+Zero-length
+.B N_DATA
+messages are freed and not passed downstream.
+.IP \(bu
+A messages with control portions result in a
+.B M_ERROR
+message being passed upstream with read and write error
+.RB [ EPROTO ].
+This results in all further system calls on the stream failing with an
+.IR errno (3)
+of
+.RB [ EPROTO ].
+.\"
+.\"
+.SS "Read
+.PP
+The actions taken when data arrives at the lower interface to the
+.B tirdwr
+module are as follows:
+.IP \(bu \w'\(bu\ \ 'u
+.B M_DATA
+messages will be passed through transparently.
+.IP \(bu
+.BR T_EXDATA_IND (7)
+(or
+.BR T_OPTDATA_IND (7)
+indicating expedited data)
+will cause an
+.B M_ERROR
+message to be issued with a read and write side error of
+.RB [ EPROTO ].
+This will cause all further system calls on the stream to fail with
+.IR errno (3)
+set to
+.RB [ EPROTO ].
+.IP \(bu
+.BR T_DATA_IND (7)
+(or
+.BR T_OPTDATA_IND (7)
+indicating normal data)
+will have the control portions stripped and only the
+.B M_DATA
+blocks in the message will be passed upstream.
+Zero length data portions will not be passed upstream, but will be freed.
+.IP \(bu
+.BR T_ORDREL_IND (7)
+received will cause the stream to be marked as having received a
+.BR T_ORDREL_IND (7),
+and a zero-length
+.B M_DATA
+message will be passed upstream causing the last
+.BR read (2)
+operation to return zero (0) indicating end of file.
+.IP \(bu
+.BR T_DISCON_IND (7)
+received will cause an
+.B M_HANGUP
+message to be issued to the stream head.
+This will cause all further write system calls
+.RB ( write "(2), " writev "(2), " putmsg "(2) and " putpmsg (2s))
+to fail with
+.IR errno (3)
+set to
+.RB [ ENXIO ].
+All further read system calls
+.RB ( read "(2), " readv "(2), " getmsg "(2) and " getpmsg (2s))
+will continue to read data until all pending data is read.  Read system calls
+will return zero (0) indicating end of file once all pending data has been
+read.
+.IP \(bu
+All other messages with control portions result in a
+.B M_ERROR
+message being sent upstream with a
+.RB [ EPROTO ]
+read and write error code.  This will cause all subsequent system calls on the
+stream to fail with
+.IR errno (3)
+set to
+.RB [ EPROTO ].
+This does not occur in normal usage.
+.\"
+.\"
+.SS "XTI/TLI Library Calls
+.PP
+The actions taken in response to XTI/TLI Library Calls are as follows:
+.IP \(bu \w'\(bu\ \ 'u
+All XTI/TLI library calls that perform an operation generating an
+.BR M_PROTO ,
+.B M_PCPROTO
+or
+.B M_IOCTL
+on the stream will result in failure of that and all subsequent
+.BR xti (3)
+library and system calls with error
+.RB [ EPROTO ].
+.\"
+.\"
+.SS "I_POP
+.PP
+The actions taken when the
+.B tirdwr
+module is popped are as follows:
+.IP \(bu \w'\(bu\ \ 'u
+If a
+.BR T_ORDREL_IND (7)
+has been previously received by the
+.B tirdwr
+module for the stream, no
+.BR T_DISCON_IND (7)
+has been received for the stream
+and the stream has not otherwise encountered an error, a
+.BR T_ORDREL_REQ (7)
+is issued downstream before closing the
+.B tirdwr
+module.
+.IP \(bu
+If no
+.BR T_ORDREL_IND (7)
+or
+.BR T_DISCON_IND (7)
+has been received for the stream, a
+.BR T_DISCON_REQ (7)
+is issued downstream before closing the
+.B tirdwr
+module.
+.IP \(bu
+If an error has been encountered on the stream and no
+.BR T_DISCON_IND (7)
+has been received for the stream, a
+.BR T_DISCON_REQ (7)
+is issued downstream before closing the
+.B tirdwr
+module.
+.\"
+.\"
+.SH USAGE
 .PP
 .B tirdwr
-performs the following functions:
-.IP (1) \w'(000)'u
-.IP (2) \w'(000)'u
-.IP (3) \w'(000)'u
-.IP (4) \w'(000)'u
-.IP (5) \w'(000)'u
-.IP (6) \w'(000)'u
-.IP (7) \w'(000)'u
+is only suitable for connection-oriented transport service providers of type
+.I T_COTS
+or
+.IR T_COTS_ORD .
+.PP
+The
+.B tirdwr
+module is typically pushed on an XTI/TLI stream after it has been opened,
+bound and placed in the connected state using
+.BR xti (3)
+library calls.
+Once the stream is in the connected state, the
+.B tirdwr
+module is pushed and further access to the stream is formed using only the
+.BR read "(2), " readv "(2), " write "(2) and " writev (2)
+system calls.
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+Upon success, a
+.BR read (2),
+.BR readv (2),
+.BR write "(2) or "
+.BR writev (2)
+system call will return zero or the number of bytes read or written.  If the
+number of bytes read is zero it indicates end of file.
+Upon failure, these calls will return -1.
+.\"
+.\"
+.SH ERRORS
+.PP
+When a 
+.BR read (2),
+.BR readv (2),
+.BR write "(2) or "
+.BR writev (2)
+system call fails, it returns -1 and sets
+.IR errno (3)
+to an appropriate error number as documented on the appropriate manual page.
+In addition, tirdwr may return the following errors in response to a
+.BR read (2),
+.BR readv (2),
+.BR write "(2) or "
+.BR writev (2):
+.TP 12
+.RB [ EPROTO ]
+The stream user has violoated the read-write protocol.  This error will be
+returned on all subsequent read or write operations.  The stream must be
+closed and re-opened.
+.TP 12
+.RB [ ENXIO ]
+An attempt was made to write to the stream, however, the transport connection
+was disconnected in an unorderly fashion.  All subsequent write operations on
+the stream will fail with this error.  Read operations will continue to read
+buffered data.  This is similar to the
+.RB [ EPIPE ]
+error of
+.BR pipe (2s).
 .\"
 .\"
 .SH NOTICES
 .PP
+Any data associated with abortive disconnect
+.BR T_DISCON_IND (7)
+or orderly release
+.BR T_ORDREL_IND (7)
+is discarded.  It is unclear whether this is correct behavior or not.
+.PP
+Due to interaction with the
+.BR read "(2), " readv "(2), " write "(2) and " writev (2)
+system calls, the priority
+forms of the
+.BR getmsg "(2), " getpmsg "(2s), " putmsg "(2) and " putpmsg (2s)
+system calls,
+and non-zero band form of the
+.BR getpmsg "(2s) and " putpmsg (2s)
+system calls,
+cannot be used with
+.BR tirdwr .
+Use of the
+.BR putmsg (2)
+or
+.BR putpmsg (2s)
+system calls in this fashion will result in an
+.RB [ EPROTO ]
+error being returned and subsequent failure of all system calls on the stream.
+Use of the
+.BR getmsg (2)
+or
+.BR getpmsg (2s)
+system calls cannot be detected by the module and should be avoided by the
+user.
+.PP
+When system calls
+.BR putmsg "(2) and " putpmsg (2s)
+are used in conjunction with
+.BR tirdwr ,
+no control part can be specified.
+Specification of a control part will result in an
+.RB [ EPROTO ]
+error and failure of all subsequent system calls on the stream.
+When system calls
+.BR getmsg "(2) and " getpmsg (2s)
+are used in conjunction with
+.BR tirdwr ,
+no control part will be returned.
+.\"
+.\"
+.SH MODULES
+.PP
+.B tirdwr
+.I STREAMS
+module.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR read (2),
-.BR readv (2),
+.BR T_ORDREL_IND (7),
+.BR T_DISCON_IND (7),
+.IR errno (3),
 .BR write (2),
+.BR read (2),
+.BR T_OPTDATA_IND (7),
+.BR T_DISCON_REQ (7),
+.BR xti (3),
 .BR writev (2),
-.BR timod (4).
+.BR tpi (7),
+.BR timod (4),
+.BR t_open (3),
+.BR t_connect (3),
+.BR socksys (4),
+.BR sockmod (4),
+.BR readv (2),
+.BR read (2), 
+.BR qopen (9),
+.BR putpmsg (2s),
+.BR putmsg (2),
+.BR getpmsg (2s),
+.BR getmsg (2),
+.BR T_ORDREL_REQ (7),
+.BR T_EXDATA_IND (7),
+.BR T_DATA_IND (7).
+.\"
+.\"
+.SH FILES
+.PP
+.I /lib/modules/\`uname -r\`/streams-timod.o
 .\"
 .\"
 .SH BUGS
+.PP
+.B tirdwr
+has been tested with the
+.I /usr/bin/test-tirdwr
+conformance test suite.
 .PP
 .B tirdwr
 has no known bugs.
@@ -141,158 +489,226 @@ has no known bugs.
 .PP
 .B tirdwr
 is compatible with
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.BR LiS ,
-.[
-LiS
-.]
-with the following exceptions:
-.IP \(em \w'\(em\(em'u
-An implementation of
-.B tirdwr
-is provided with the
-.B LiS
-.[
-LiS
-.]
-package, implemented by Ole Husgaard.
-This implementation is buggy.
-Ole Husgaard's implementation of
-.B tirdwr
-for
-.B LiS
-.[
-LiS
-.]
-has a number of bugs:
-.IP \(em
-Although
-.IR STREAMS (4)
-handles packet reads and writes from the stream head using the
-.B MSGDELIM
-flag,
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-does not examine or generate
-.B MSGDELIM
-flags.  This means that
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-is unsuitable for use with packet-oriented connection-mode transport service
-providers such as OSI conforming transport service providers.  (In fact,
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-doesn't handle expedited data transfer at all.)
-.IP \(em
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-does not handle expedited data transfers correctly.  The correct behavior is to
-generate a
-.B SIGURG
-signal as an
-.B M_SIG
-message and send it upstread before the
-.BR T_EXDATA_IND (7)
-converted to an
-.BR M_DATA .
-This signals the reader that the next read operation will read expedited
-data rather than normal data.
-.IP \(em
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-does not handle
-.BR T_OPTDATA_IND (7)
-messages.
-.IP \(em
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-performs an error on disconnection or orderly release, but does not generate
-the proper signals for asynchronous file I/O.
-.IP \(em
-.B LiS
-.[
-LiS
-.]
-.B tirdwr
-performs an orderly release when popped and an orderly release is outstanding.
-This situation should be dealt with by the TPI driver rather than the
-read/write module.  The read/write module should be able to be pushed and
-popped from an idle stream in any state without affecting the stream in any
-way.
-.IP \(em
-.I Linux Fast-STREAMS
-.[
-LfS
-.]
-.B tirdwr
-is not bug for bug compatible with the
-.B LiS
-implementation.
-.\"
-.\"
-.SH "CONFORMING TO"
-.PP
-SVID,
-.[
-svid
-.]
-XID,
-.[
-xbd5
-.]
-XNS5,
+.BR "XNS 5.2"
 .[
 xns
 .]
-SUSv2,
+and
+.BR "SVR 4.2" ,
+.[
+svr42spg
+.]
+and descriptions for
+.BR UnixWare7 \(rg,
+.[
+uw7doc
+.]
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+.BR DigitalUNIX \(rg,
+.[
+osfdoc
+.]
+.BR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.BR Solaris \(rg,
+.[
+soldoc
+.]
+.BR SUPER-UX \(rg,
+.[
+suxdoc
+.]
+with the following portability considerations:
+.PP
+This
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation of
+.B tirdwr
+was backported to
+.B LiS
+.[
+LiS
+.]
+to repair serious bugs in the previous
+.B LiS
+implementation.
+.B LiS
+previously had a implementation of
+.B tirdwr
+that was full of bugs.  This implementation is free of these many bugs and is,
+therefore, not compatible with the old buggy
+.BR tirdwr .
+Following are the bugs exhibited by the old implementation:
+.IP \(em \w'\(em\ \ 'u
+Zero length data messages, whether they have a control portion or not, are not
+supposed to be passed upstream by the
+.B tirdwr
+module.  This is because a zero-length data message will generate an
+end-of-file condition for
+.BR read "(2), " readv "(2), " getmsg "(2) and " getpmsg (2s).
+The
+.B tirdwr
+module that comes with
+.B LiS
+.[
+lis
+.]
+passes all
+.B M_DATA
+and
+.BR T_DATA_IND (7)
+.B M_DATA
+portions upstream without examining them to see if they contain zero-length
+data messages.  This is a bug with no work around.
+.
+When a
+.BR T_DISCON_IND (7)
+primitive is received by the
+.B tirdwr
+module, it is supposed to cause all further write system calls
+.RB ( write "(2), " writev "(2), " putmsg "(2) and " putpmsg (2s))
+to fail with error
+.RB [ ENXIO ];
+however, all read system calls
+.RB ( read "(2), " readv "(2), " getmsg "(2) and " getpmsg (2s))
+system calls are supposed to succeed.
+This corresponds to a hungup stream head that has been sent a
+.B M_HANGUP
+message.
+The
+.B tirdwr
+module that comes with
+.B LiS
+.[
+lis
+.]
+uses the
+.BR putctl1 (9)
+form of the
+.B M_ERROR
+message which causes all system calls to fail with error
+.RB [ ENXIO ].
+This is a bug with no workaround.
+.IP \(em
+When the
+.B tirdwr
+module is pushed on a TI stream, all XTI/TLI library calls are supposed to
+fail and return error
+.RB [ EPROTO ],
+causing all further system calls to fail on the stream.
+The
+.B tirdwr
+module that comes with
+.B LiS
+.[
+lis
+.]
+passes
+.BR M_IOCTL ", " M_IOCDATA ", " M_IOCACK ", " M_IOCNAK ", " M_COPYIN " and " M_COPYOUT
+messages transparently, meaning that a number of XTI/TLI functions will not
+generate an error.  This is a bug.  A workaround is to refrain from calling
+XTI/TLI functions on streams upon which
+.B tirdwr
+has been pushed.
+.IP \(em
+When a
+.B tirdwr
+module receives an
+.B M_READ
+message from upstream and a
+.BR T_ORDREL_IND (7)
+has been received and processed for the stream, a zero-length
+.B M_DATA
+block
+or a read size
+.B M_ERROR
+message should be sent upstream in response to reassert end-of-file and to
+keep the reader from blocking indefinitely on read system calls after an
+orderly release.
+The
+.B tirdwr
+module that comes with
+.B LiS
+.[
+lis
+.]
+does not perform this function.  Coupled with passing zero-length data
+messages on the read side, this can cause problem with loopback transports and
+make it difficult to determine when an end-of-file has actually occurred and
+yet not block indefinitely in synchronous file mode.
+.IP \(em
+When the
+.B tirdwr
+module is popped (closed) and no
+.BR T_ORDREL_IND (7)
+or
+.BR T_DISCON_IND (7)
+has been received for the stream, or if the stream has
+encountered an error and has not received a
+.BR T_DISCON_IND (7),
+the
+.B tirdwr
+module should send a
+.BR T_DISCON_REQ (7)
+downstream before completing the close.
+The
+.B tirdwr
+mdoule that comes with
+.B LiS
+.[
+lis
+.]
+does not send
+.BR T_DISCON_REQ (7)
+in any circumstance.
+The workaround is to always close the stream instead of popping the module
+using
+.IR I_POP .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR "XNS 5.2" ,
+.[
+xns
+.]
+.BR SUSv2 ,
 .[
 susv2
 .]
-SUSv3.
+.BR SUSv3 / POSIX ,
 .[
 susv3
 .]
 .\"
 .\"
 .SH HISTORY
-.HP 4
-A
+.PP
 .B tirdwr
-module was provided in
-.B SVR 4\c
-.
+first appeared in
+.B SVR 3
 .[
-svr4
-.]
-and is described in the
-TPI.
-.[
-TPI Revision 2.0.0
+svr3
 .]
 .\"
 .\"
 .[
 $LIST$
 .]
-.TI
-
+.T4
