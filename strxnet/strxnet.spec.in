@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/17 08:33:33 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/18 07:14:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/17 08:33:33 $ by $Author: brian $
+# Last Modified $Date: 2004/05/18 07:14:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,12 +82,16 @@
 %{?_without_modules: %{expand: %%define BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%define BUILD_tools   0}}
 %{?_without_lis:     %{expand: %%define BUILD_lis     0}}
+%{?_without_lis:     %{expand: %%define BUILD_lfs     1}}
 %{?_without_lfs:     %{expand: %%define BUILD_lfs     0}}
+%{?_without_lfs:     %{expand: %%define BUILD_lis     1}}
 
 %{?_with_modules:    %{expand: %%define BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%define BUILD_tools   1}}
 %{?_with_lis:        %{expand: %%define BUILD_lis     1}}
+%{?_with_lis:        %{expand: %%define BUILD_lfs     0}}
 %{?_with_lfs:        %{expand: %%define BUILD_lfs     1}}
+%{?_with_lfs:        %{expand: %%define BUILD_lis     0}}
 
 # we have some more options that control configure for the build
 
@@ -140,7 +144,7 @@ BuildRequires:  gcc >= 2.96
 BuildRequires:  LiS-devel >= 2.16.18
 %endif
 %if %{BUILD_lfs}
-BuildRequires:  streams-devel >= 0.9.2
+BuildRequires:  streams-devel >= 0.7a
 %endif
 Autoreq:        true
 
@@ -856,7 +860,12 @@ Summary:        OpenSS7 STREAMS INET headers, lib and doc.
 Group:          Development/System
 Requires:       %{name}-lib = %{version}-%{base_release}
 Requires:       %{name}-doc = %{version}-%{base_release}
-Requires:       LiS-devel >= 2.16.16
+%if %{BUILD_lis}
+Requires:       LiS-devel >= 2.16.18
+%endif
+%if %{BUILD_lfs}
+Requires:       streams-devel >= 0.7a
+%endif
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
@@ -1000,9 +1009,16 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.7  2004/05/17 08:33:33  brian
-# - More relocations and script typo.
+# Revision 0.9.2.9  2004/05/18 07:14:09  brian
+# - More adjustments for dual LiS/LfS build.
 #
+# Revision 0.9.2.8  2004/05/18 04:41:17  brian
+# - Changes for Linux Fast-STREAMS build.
+#
+
+* Mon May 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.7  2004/05/17 08:33:33  brian
+- More relocations and script typo.
 
 * Sun May 16 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.6  2004/05/16 19:19:27  brian

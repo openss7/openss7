@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:35 $ by $Author: brian $
+ Last Modified $Date: 2004/05/18 07:14:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -65,40 +65,60 @@ static char const ident[] =
  *  library has superior syncrhonization across a fork() and provides a
  *  conforming t_sync() library call.
  */
-
-#if defined(_LIS_SOURCE) && !defined(MODULE)
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
 #   error ****
-#   error ****  timod can only compile as a module under LiS.
-#   error ****  This is normally because LiS has been grossly misconfigured.
-#   error ****  Report bugs to <bugs@openss7.org>.
+#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error ****  to compile the timod module.
 #   error ****
 #endif
 
 #ifdef LINUX
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <linux/modversions.h>
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifdef MODVERSIONS
+#	include <linux/modversions.h>
+#   endif
+#   include <linux/module.h>
+#   include <linux/modversions.h>
+#   ifndef __GENKSYMS__
+#	if defined HAVE_SYS_LIS_MOVERSIONS_H
+#	    include <sys/LiS/modversions.h>
+#	elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#	    include <sys/streams/modversions.h>
+#	endif
+#   endif
+#   include <linux/init.h>
 #endif
 
-#include <linux/init.h>
-
-#include <sys/stream.h>
-#include <sys/stropts.h>
+#include <sys/kmem.h>
 #include <sys/cmn_err.h>
+
+#include <sys/stropts.h>
+#include <sys/stream.h>
+
+#ifdef _LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+#endif
 
 /*
    These are for TPI definitions 
  */
-#include <sys/tihdr.h>
-#include <sys/timod.h>
+#if defined HAVE_TIHDR_H
+#   include <tihdr.h>
+#else
+#   include <sys/tihdr.h>
+#endif
+#if defined HAVE_TIMOD_H
+#   include <timod.h>
+#else
+#   include <sys/timod.h>
+#endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
+#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -132,7 +152,7 @@ MODULE_LICENSE(TIMOD_LICENSE);
 #endif
 
 static modID_t modid = TIMOD_MOD_ID;
-MODULE_PARM(modid, "b");
+MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for TIMOD.");
 
 static struct module_info timod_minfo = {
@@ -1023,7 +1043,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  */
 #if defined _LFS_SOURCE
 static struct fmodsw timod_fmod = {
-	f_name:CONFIG_STREAMS_TIMOD_NAME,
+	f_name:TIMOD_MOD_NAME,
 	f_str:&timod_info,
 	f_flag:0,
 	f_kmod:THIS_MODULE,
@@ -1033,7 +1053,7 @@ static int
 timod_register_module(void)
 {
 	int err;
-	if ((err = register_strmod(modid, &timod_fmod)) < 0)
+	if ((err = register_strmod(&timod_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -1042,7 +1062,7 @@ timod_register_module(void)
 static void
 timod_unregister_module(void)
 {
-	return (void) unregister_strmod(modid, &timod_fmod);
+	return (void) unregister_strmod(&timod_fmod);
 }
 
 #elif defined _LIS_SOURCE
@@ -1070,11 +1090,6 @@ timod_unregister_module(void)
 	return (void) lis_unregister_strmod(&timod_info);
 }
 
-#else
-#   error ****
-#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
-#   error ****  to compile the timod module.
-#   error ****
 #endif
 
 static int __init

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,36 +46,51 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:35 $ by $Author: brian $
+ Last Modified $Date: 2004/05/18 07:14:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $";
 
-#if defined(_LIS_SOURCE) && !defined(MODULE)
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
 #   error ****
-#   error ****  tirdwr can only compile as a module under LiS.
-#   error ****  This is normally because LiS has been grossly misconfigured.
-#   error ****  Report bugs to <bugs@openss7.org>.
+#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error ****  to compile the tirdwr module.
 #   error ****
 #endif
 
 #ifdef LINUX
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
-#include <linux/module.h>
-#include <linux/modversions.h>
-#include <linux/init.h>
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifdef MODVERSIONS
+#	include <linux/modversions.h>
+#   endif
+#   include <linux/module.h>
+#   include <linux/modversions.h>
+#   include <linux/init.h>
+#   ifndef __GENKSYMS__
+#	if defined HAVE_SYS_LIS_MOVERSIONS_H
+#	    include <sys/LiS/modversions.h>
+#	elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#	    include <sys/streams/modversions.h>
+#	endif
+#   endif
 #endif
 
-#include <sys/stream.h>
+#include <sys/kmem.h>
 #include <sys/cmn_err.h>
+
+#include <sys/stropts.h>
+#include <sys/stream.h>
+
+#ifdef _LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+#endif
 
 /*
    These are for TPI definitions 
@@ -91,7 +106,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -175,6 +190,7 @@ static struct streamtab tirdwr_info = {
  *
  *  =========================================================================
  */
+#ifdef _LIS_SOURCE
 /*
    LiS does not define these... 
  */
@@ -183,6 +199,9 @@ typedef int bcid_t;
 #endif
 #if !defined(HAVE_BUFCALL_ID_T)
 typedef int bufcall_id_t;
+#endif
+#else
+#include <linux/slab.h>
 #endif
 
 typedef struct tirdwr {
@@ -302,7 +321,7 @@ tirdwr_rdzero(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->rdzero_bcid = bufcall(0, BPRI_HI, &tirdwr_rdzero_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call");
+			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call", TIRDWR_MOD_NAME);
 	}
 }
 static void
@@ -328,7 +347,7 @@ tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->hangup_bcid = bufcall(0, BPRI_HI, &tirdwr_hangup_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call");
+			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call", TIRDWR_MOD_NAME);
 	}
 }
 static void
@@ -350,7 +369,7 @@ tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->eproto_bcid = bufcall(2, BPRI_HI, &tirdwr_eproto_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate eproto buffer call");
+			cmn_err(CE_WARN, "%s: could not allocate eproto buffer call", TIRDWR_MOD_NAME);
 	}
 }
 
@@ -669,6 +688,7 @@ tirdwr_push(queue_t *q)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
+#ifdef _LIS_SOURCE
 		lis_flags_t psw;
 		/*
 		   Under LiS we can't freeze the stream but we can lock the queue.  This is not a
@@ -682,13 +702,20 @@ tirdwr_push(queue_t *q)
 		   instead. 
 		 */
 		LIS_QISRLOCK(hq, &psw);
+#else
+		unsigned long psw = freezestr(q);
+#endif
 		for (mp = hq->q_first; mp && !err; mp = mp->b_next)
 			switch (mp->b_datap->db_type) {
 			case M_PROTO:
 			case M_PCPROTO:
 				err = EPROTO;
 			}
+#ifdef _LIS_SOURCE
 		LIS_QISRUNLOCK(hq, &psw);
+#else
+		unfreezestr(q, psw);
+#endif
 	}
 	return (err);
 }
@@ -835,7 +862,7 @@ static int
 tirdwr_register_module(void)
 {
 	int err;
-	if ((err = register_strmod(modid, &tirdwr_fmod)) < 0)
+	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -844,7 +871,7 @@ tirdwr_register_module(void)
 static void
 tirdwr_unregister_module(void)
 {
-	return (void) unregister_strmod(modid, &tirdwr_fmod);
+	return (void) unregister_strmod(&tirdwr_fmod);
 }
 
 #elif defined _LIS_SOURCE
@@ -872,11 +899,6 @@ tirdwr_unregister_module(void)
 	return (void) lis_unregister_strmod(&tirdwr_info);
 }
 
-#else
-#   error ****
-#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
-#   error ****  to compile the tirdwr module.
-#   error ****
 #endif
 
 static int __init
