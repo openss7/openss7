@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/23 09:18:39 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/23 22:26:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 09:18:39 $ by $Author: brian $
+# Last Modified $Date: 2004/05/23 22:26:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,7 +127,7 @@ sign: srpm
 
 rebuild:
 	@if test -f SRPMS/$(rpmdir).src.rpm ; then :; else \
-		$(MAKE) $(MAKEFLAGS) srpm ; \
+		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
 	kernels=`find $(DESTDIR)/lib/modules -type d -name "2\.4\.*"` ; \
 	targets="$(AM_RPMTARGETS)" ; \
