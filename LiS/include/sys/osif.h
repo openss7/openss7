@@ -246,6 +246,14 @@
 #undef pci_dac_dma_sync_single
 #endif
 #define pci_dac_dma_sync_single lis_osif_pci_dac_dma_sync_single
+#ifdef pci_dac_dma_sync_single_for_cpu
+#undef pci_dac_dma_sync_single_for_cpu
+#endif
+#define pci_dac_dma_sync_single_for_cpu lis_osif_pci_dac_dma_sync_single_for_cpu
+#ifdef pci_dac_dma_sync_single_for_device
+#undef pci_dac_dma_sync_single_for_device
+#endif
+#define pci_dac_dma_sync_single_for_device lis_osif_pci_dac_dma_sync_single_for_device
 #ifdef sg_dma_address
 #undef sg_dma_address
 #endif
@@ -560,6 +568,10 @@ extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev,
 extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
 					dma64_addr_t dma_addr)_RP;
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
+			    dma64_addr_t dma_addr, size_t len, int direction)_RP;
+extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev,
+			    dma64_addr_t dma_addr, size_t len, int direction)_RP;
+extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev,
 			    dma64_addr_t dma_addr, size_t len, int direction)_RP;
 #endif					/* S390 or S390X */
 #endif					/* 2.4.13 */

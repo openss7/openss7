@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/14 12:29:35 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/29 17:19:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 12:29:35 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:19:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -97,12 +97,16 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
 	GENKSYMS=/sbin/genksyms
     fi
     AC_ARG_VAR([KGENKSYMS], [Generate kernel symbols command])
-    eval "ksyms_dir=\"$kbuilddir/scripts/genksyms\""
-    AC_PATH_TOOL([KGENKSYMS], [genksyms], [], [$ksyms_dir])
+    eval "ksyms_dirs=\"$kbuilddir $ksrcdir\""
+    ksyms_path=
+    for ksyms_tmp in $ksyms_dirs ; do
+	ksyms_path="${ksyms_path:+$ksyms_path:}${ksyms_tmp}/scripts/genksyms"
+    done
+    AC_PATH_TOOL([KGENKSYMS], [genksyms], [], [$ksyms_path])
     if test :"${KGENKSYMS:-no}" = :no ; then
 	if test :"$linux_cv_k_ko_modules" = :yes
 	then
-	    AC_MSG_WARN([Could not find executable kernel genksyms program in $kbuilddir/scripts/genksyms.])
+	    AC_MSG_WARN([Could not find executable kernel genksyms program in $ksyms_path.])
 	fi
 	KGENKSYMS='${kbuilddir}/scripts/genksyms/genksyms'
     fi
@@ -136,12 +140,22 @@ dnl
 AC_DEFUN([_KSYMS_OUTPUT_MODSYMS_CONFIG], [dnl
     AC_CACHE_CHECK([for modsyms script], [MODSYMS_SCRIPT], [MODSYMS_SCRIPT="$ac_aux_dir/modsyms.sh"])
     AC_CACHE_CHECK([for modsyms command], [MODSYMS], [MODSYMS="${CONFIG_SHELL:-$SHELL} $MODSYMS_SCRIPT"])
-    AC_CACHE_CHECK([for modsyms file], [MODSYMS_SYMVER], [MODSYMS_SYMVER="Modules.symver"])
+    AC_CACHE_CHECK([for modsyms file], [MODSYMS_SYMVER], [MODSYMS_SYMVER="Module.symvers"])
     AC_CACHE_CHECK([for modsyms system map], [MODSYMS_SYSMAP], [dnl
-	if test :${linux_cv_k_running:-no} = :no ; then
-	    MODSYMS_SYSMAP="$ksysmap"
+	if test ":${kmodver:-no}" != :no
+	then
+	    MODSYMS_SYSMAP="$kmodver"
 	else
-	    MODSYMS_SYSMAP="$ksyms"
+	    MODSYMS_SYSMAP="$ksysmap"
+	fi
+	if test :${linux_cv_k_running:-no} = :yes ; then
+	    if test -n "$kallsyms" ; then
+		MODSYMS_SYSMAP="$kallsyms"
+	    else
+		if test -n "$ksyms" ; then
+		    MODSYMS_SYSMAP="$ksyms"
+		fi
+	    fi
 	fi
     ])
     AC_CACHE_CHECK([for modsyms module dir], [MODSYMS_MODDIR], [MODSYMS_MODDIR="$kmoduledir"])
@@ -182,12 +196,12 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     AC_SUBST([MODPOST])dnl
     AC_CACHE_CHECK([for modpost sys file], [ksyms_cv_modpost_sysver], [dnl
 	ksyms_dir="`pwd`"
-	ksyms_cv_modpost_sysver="$ksyms_dir/System.symver"])
+	ksyms_cv_modpost_sysver="$ksyms_dir/System.symvers"])
     MODPOST_SYSVER="$ksyms_cv_modpost_sysver"
     AC_SUBST([MODPOST_SYSVER])dnl
     AC_CACHE_CHECK([for modpost mod file], [ksyms_cv_modpost_modver], [dnl
 	ksyms_dir="`pwd`"
-	ksyms_cv_modpost_modver="$ksyms_dir/Modules.symver"])
+	ksyms_cv_modpost_modver="$ksyms_dir/Module.symvers"])
     MODPOST_MODVER="$ksyms_cv_modpost_modver"
     AC_SUBST([MODPOST_MODVER])dnl
     AC_CACHE_CHECK([for modpost system map], [ksyms_cv_modpost_sysmap], [dnl
@@ -232,7 +246,7 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     ])
     MODPOST_OPTIONS="$ksyms_cv_modpost_options"
     AC_SUBST([MODPOST_OPTIONS])dnl
-    MODPOST_INPUTS="$MODPOST_SYSVER"
+    MODPOST_INPUTS="$MODPOST_SYSVER $kmodver"
     AC_SUBST([MODPOST_INPUTS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
 	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_MODDIR and $MODPOST_INPUTS])

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.10 $) $Date: 2005/03/26 03:11:52 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.11 $) $Date: 2005/03/29 17:22:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:52 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:22:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -311,8 +311,8 @@ AC_DEFUN([_LIS_LINUX_SETUP], [dnl
 AC_DEFUN([_LIS_SETUP_LIS], [dnl
     _LIS_CONFIG_SYSCALLS
     _LIS_CHECK_KERNEL
-    LIS_KSRC="${kbuilddir}"
-    LIS_KINCL="${kincludedir}"
+    LIS_KSRC="${ksrcdir:-$kbuilddir}"
+    LIS_KINCL="${ksrcdir:-$kbuilddir}/include"
     LIS_NOKSRC=0
     if test :"${linux_cv_k_running:-no}" = :no
     then
@@ -370,8 +370,8 @@ dnl AC_DEFINE([LISMODVERS], [1])
     _LIS_SIGMASKLOCK
     _LIS_RCVOID
     _LIS_OLD_GCOM_CONFIG_IN
-    LIS_KINCL_MACH_GENERIC="-I${kbuilddir}/include/asm-${linux_cv_k_mach}/mach-generic"
-    LIS_KINCL_MACH_DEFAULT="-I${kbuilddir}/include/asm-${linux_cv_k_mach}/mach-default"
+    LIS_KINCL_MACH_GENERIC="-I${ksrcdir:-$kbuilddir}/include/asm-${linux_cv_k_mach}/mach-generic"
+    LIS_KINCL_MACH_DEFAULT="-I${ksrcdir:-$kbuilddir}/include/asm-${linux_cv_k_mach}/mach-default"
     _LIS_GET_EMPTY_INODE
     _LIS_SET_CPUS_ALLOWED
     _LIS_INT_PSW
@@ -422,7 +422,7 @@ dnl
 AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
-			  linux/cpumask.h], [:], [:], [
+			  linux/cpumask.h linux/kref.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -440,6 +440,8 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
 			pcibios_write_config_dword pcibios_write_config_word \
+			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
+			pci_dac_dma_sync_single_for_device \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode], [:], [:], [
 #include <linux/compiler.h>
@@ -899,7 +901,9 @@ dnl     functions, then this is probably the cause.])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SET_CPUS_ALLOWED], [dnl
     _LINUX_CHECK_FUNC([set_cpus_allowed],
-	[LIS_SET_CPUS_ALLOWED=y],
+	[LIS_SET_CPUS_ALLOWED=y
+	 AC_DEFINE([SET_CPUS_ALLOWED], [1], [Set if you have function set_cpus_allowed to tell LiS
+	 to use the available function.]) ],
 	[LIS_SET_CPUS_ALLOWED=n], [
 #include <linux/compiler.h>
 #include <linux/config.h>

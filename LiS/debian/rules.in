@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.10 $) $Date: 2005/03/28 11:05:34 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.11 $) $Date: 2005/03/29 17:17:48 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/28 11:05:34 $ by $Author: brian $
+## Last Modified $Date: 2005/03/29 17:17:48 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -176,6 +176,7 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "README" ; \
 	  echo "THANKS" ; \
 	  echo "manual" ; \
+	  echo "LSM" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -358,6 +359,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.11  2005/03/29 17:17:48  brian
+# - Updated lsms and added LSM to distribution.
+#
 # Revision 1.1.4.10  2005/03/28 11:05:34  brian
 # - export deb host arch
 #

@@ -1092,7 +1092,11 @@ static void lis_cdev_put(struct dentry *d)
 	if (inode && inode->i_cdev)
 	    printk(">> i->i_cdev: c@0x%p/%d/%x \"%s\"\n",
 		inode->i_cdev,
+#if HAVE_KINC_LINUX_KREF_H
+		K_ATOMIC_READ(&inode->i_cdev->kobj.kref.refcount),
+#else
 		K_ATOMIC_READ(&inode->i_cdev->kobj.refcount),
+#endif
 		DEV_TO_INT(inode->i_cdev->dev),
 		(inode->i_cdev->owner ?
 		 inode->i_cdev->owner->name : "No-Owner")) ;
@@ -4287,7 +4291,7 @@ int	lis_thread_runqueues(void *p)
 	    static int	msg_cnt ;
 	    char	buf[200] ;
 
-#if 0 && defined(KERNEL_2_5)
+#if defined(KERNEL_2_5)
 	    cpumask_scnprintf(buf, sizeof(buf), current->cpus_allowed) ;
 #else
 	    sprintf(buf, "0x%lx", current->cpus_allowed) ;

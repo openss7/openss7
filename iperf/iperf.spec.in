@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.29 $) $Date: 2005/03/28 07:42:28 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.30 $) $Date: 2005/03/29 17:16:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/28 07:42:28 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:16:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -438,7 +438,7 @@ fi
 %doc ABOUT-NLS
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS LICENSE
-%doc %{name}-%{version}.lsm
+%doc LSM %{name}-%{version}.lsm
 #%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -568,9 +568,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.29  2005/03/28 07:42:28  brian
-# - better debian build
+# Revision 1.1.2.30  2005/03/29 17:16:25  brian
+# - Updated lsms and added LSM to distribution.
 #
+
+* Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.29  2005/03/28 07:42:28  brian
+- better debian build
 
 * Tue Mar 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.28  2005/03/22 19:44:13  brian

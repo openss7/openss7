@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/03/22 00:11:56 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/29 17:19:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/22 00:11:56 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:19:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -261,7 +261,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
 		    streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_symver=`echo "$streams_bld/../Modules.symver" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -407,7 +407,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    streams_cv_lfs_includes="$streams_dir $streams_bld"
 		    streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_symver=`echo "$streams_bld/../Modules.symver" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done

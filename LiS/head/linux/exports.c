@@ -356,7 +356,15 @@ EXPORT_SYMBOL_GPL(lis_osif_pci_dac_set_dma_mask);
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_supported);
 EXPORT_SYMBOL_GPL(lis_osif_pci_unmap_page);
 EXPORT_SYMBOL_GPL(lis_osif_pci_map_page);
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single);
+#endif
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single_for_cpu);
+#endif
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single_for_device);
+#endif
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_to_offset);
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_to_page);
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_page_to_dma);

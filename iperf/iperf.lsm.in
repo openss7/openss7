@@ -1,19 +1,19 @@
 Begin4
-Title:			@PACKAGE_NAME@
-Version:		@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Title:			@PACKAGE@
+Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
 Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		@PACKAGE_NAME@ is an OpenSS7 release of the DAST netperf
+Description:		@PACKAGE@ is an OpenSS7 release of the DAST netperf
 			package configured to run with OpenSS7 Linux Native
 			Stream Control Transmission Protocol (SCTP).
 Keywords:		SCTP, Iperf
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
-			950kB iperf-@PACKAGE_VERSION@.tar.gz
+			150kB iperf-@PACKAGE_VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			800kB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.bz2
-			950kB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.gz
+			292kB @PACKAGE@-@VERSION@.tar.bz2
+			376kB @PACKAGE@-@VERSION@.tar.gz
 Platforms:		UNIX, Windows
 Requires:		sctp-0.2.20-1
 Copying-policy:		GPL

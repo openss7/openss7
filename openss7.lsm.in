@@ -1,0 +1,21 @@
+Begin4
+Title:			@PACKAGE@ - "OpenSS7 Master Package"
+Version:		@VERSION@
+Entered-date:		@PACKAGE_DATE@
+Entered-by:		bidulock@openss7.org (Brian Bidulock)
+Description:		@PACKAGE@ is a collection of SCTP and STREAMS
+			protocol stacks for IP and SS7.
+Keywords:		STREAMS, SCTP, SVR 4.2 MP, SS7, SIGTRAN, VoIP, ISDN
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Original-Site:		http://www.openss7.org/
+			24MB @PACKAGE@-@VERSION@.tar.bz2
+			27MB @PACKAGE@-@VERSION@.tar.gz
+Primary-Site:		http://www.openss7.org/
+			24MB @PACKAGE@-@VERSION@.tar.bz2
+			27MB @PACKAGE@-@VERSION@.tar.gz
+Platforms:		Linux
+Requires:		Linux kernel 2.4 or 2.6
+Copying-policy:		GPL
+Comment:		Report bugs to @PACKAGE_BUGREPORT@
+End

@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/16 05:47:24 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/29 17:21:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 05:47:24 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:21:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/16 05:47:24 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/29 17:21:57 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -123,6 +123,8 @@ modpost_alphano=$modpost_Letters$modpost_numbers
 modpost_uppercase="$SED y%*$modpost_letters%P$modpost_LETTERS%;s%[^_$modpost_alphano]%_%g"
 
 modpost_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+modpost_fnameize="$SED -r -e s%.*/%%;s%(\.mod)?\.(k)?o(\.gz)?$%%"
+modpost_fpathize="$SED -r -e s%(\.mod)?\.(k)?o(\.gz)?$%%"
 
 # defaults
 
@@ -130,9 +132,9 @@ defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion 
 
 #default_sysmap=/boot/System.map-`uname -r`
 #default_moddir=/lib/modules/`uname -r`
-#default_infile=/lib/modules/`uname -r`/build/Modules.symver
-#default_outfile=./Modules.symver
-#default_sysfile=./System.symver
+#default_infile=/lib/modules/`uname -r`/build/Module.symvers
+#default_outfile=./Module.symvers
+#default_sysfile=./System.symvers
 #default_unload=${CONFIG_MODULE_UNLOAD:-n}
 #default_modversions=${CONFIG_MODVERSIONS:-n}
 #default_allsrcversion=${CONFIG_MODULE_SRCVERSION_ALL:-n}
@@ -705,7 +707,7 @@ write_sources() {
 }
 
 #
-# Dump out defined crcs symbols and module names for our modules in Modules.sysver format to
+# Dump out defined crcs symbols and module names for our modules in Module.symvers format to
 # --outfile.  Nothing more.  This is so that we can save these definitions for use by other kernel
 # modules.
 #
@@ -714,6 +716,7 @@ write_dump_ours() {
     symcnt=0
     for name in $my_mod_names ; do
 	token=`echo "$name" | $modpost_tokenize`
+	eval "path=\"\$mod_${token}_path\""
 	eval "syms=\"\$mod_${token}_syms\""
 	command_info "dumping module symbols for module $name"
 	((modcnt++))
@@ -722,7 +725,7 @@ write_dump_ours() {
 	    eval "crc=\"\$mod_${token}_sym_${sym}_crc\""
 	    if test :"$crc" != : ; then
 		((count++))
-		printf "0x%08x\t%s\t%s\n" $crc $sym $name
+		printf "0x%08x\t%s\t%s\n" $crc $sym ${path:-$name}
 	    else
 		command_warn "symbol without crc $sym"
 	    fi
@@ -784,14 +787,14 @@ write_cache() {
 }
 
 #
-# Read in defined crcs symbols and module name for kernel and kernel modules in Modules.sysver
-# format from and --infile files.  Nothing more.  This is if a Modules.sysver exists somewhere that
+# Read in defined crcs symbols and module name for kernel and kernel modules in Module.symvers
+# format from and --infile files.  Nothing more.  This is if a Module.symvers exists somewhere that
 # we can read.
 #
 read_dump() {
     count=0
     progress=0
-    while read crc sym name junk ; do
+    while read crc sym path junk ; do
 	((count++))
 	((progress++))
 	if test $progress -ge 100 ; then
@@ -802,14 +805,16 @@ read_dump() {
 	    command_warn "line $count junk on line $junk"
 	    continue
 	fi
+	name=`echo "$path" | $modpost_fnameize`
 	case " $mod_names " in
 	    (*" $name "*) ;;
 	    (*) # command_info "adding sys module name $name"
 		mod_names="$mod_names${mod_names:+ }$name" ;;
 	esac
-	token=`echo "$name" | $modpost_tokenize`
-	eval "mod_${token}_syms=\"\$mod_${token}_syms $sym\""
-	eval "mod_${token}_sym_${sym}_crc=\"$crc\""
+	tok=`echo "$name" | $modpost_tokenize`
+	eval "mod_${tok}_path=\"$path\""
+	eval "mod_${tok}_syms=\"\$mod_${tok}_syms $sym\""
+	eval "mod_${tok}_sym_${sym}_crc=\"$crc\""
 	eval "sym_${sym}_name=\"$name\""
 	eval "sym_${sym}_crc=\"$crc\""
 	cache_dirty=yes
@@ -944,7 +949,7 @@ read_sysmap() {
 read_module() {
     filename="$1"
     test :"filename" != : -a -f "$filename" || return 1
-    name=`$ECHO "$filename" | sed -r -e 's|.*/||;s|(\.mod)?\.(k)?o(\.gz)?$||'`
+    name=`echo "$filename" | $modpost_fnameize`
     test :"$name" != : || return 1
     if $ECHO "$filename" | grep -qc1 '\.gz$' ; then
 	# shoot, we have a .gz ending
@@ -958,7 +963,11 @@ read_module() {
     case " $my_mod_names " in
 	(*" $name "*) ;;
 	(*) # command_info "adding ext module name $name"
-	    my_mod_names="$my_mod_names${my_mod_names:+ }$name" ;;
+	    my_mod_names="$my_mod_names${my_mod_names:+ }$name"
+	    path=`echo "$filename" | $modpost_fpathize`
+	    tok=`echo "$name" | $modpost_tokenize`
+	    eval "mod_${tok}_path=\"$path\""
+	    ;;
     esac
     command_info "processing module $name in file $filename"
     nm -s $file | egrep '(\<A\>|\<U\>|\<(_)?init_module\>|\<(_)?cleanup_module\>|\<(_)?__this_module\>)' >.tmp.$$.map
@@ -983,7 +992,7 @@ read_modules() {
 #
 # This one is for reading in an existing kernel object module (.ko), possibly gzipped, and reading
 # the exported symbols from the module.  These are identified by the __crc_ prefix.  This is in case
-# we do not have a Modules.symver hanging around and need to collect the symbol information from the
+# we do not have a Module.symvers hanging around and need to collect the symbol information from the
 # existing kernel modules themselves.
 #
 read_kobject() {
@@ -991,7 +1000,7 @@ read_kobject() {
     test -n "$filename" -a -f "$filename" || return 1
     # not all files have appropriate syms
     zgrep -E -qc1 '\<(_)?__crc_' $filename || return 0
-    name=`$ECHO "$filename" | sed -r -e 's|.*/||;s|(\.mod)?\.(k)?o(\.gz)?$||'`
+    name=`echo "$filename" | $modpost_fnameize`
     test -n "$name" || return 1
     if $ECHO "$filename" | grep -qc1 '\.gz$' ; then
 	# shoot, we have a .gz ending
@@ -1005,7 +1014,11 @@ read_kobject() {
     case " $mod_names " in
 	(*" $name "*) ;;
 	(*) # command_info "adding sys module name $name"
-	    mod_names="$mod_names${mod_names:+ }$name" ;;
+	    mod_names="$mod_names${mod_names:+ }$name"
+	    path=`echo "$filename" | $modpost_fpathize`
+	    tok=`echo "$name" | $modpost_tokenize`
+	    eval "mod_${tok}_path=\"$path\""
+	    ;;
     esac
     base=`echo "$filename" | sed -e 's|^'$moddir/'||;s|^kernel/||'`
     command_info "processing module $name in file $base"
@@ -1034,10 +1047,10 @@ function process_command()
     else
 	test :"$sysmap" != :  && command_info "sysmaps= \`$sysmap'"
 	read_sysmap
-	test :"$moddir" != :  && command_info "moddir=  \`$moddir'"
-	read_kobjects
 	test :"$infile" != : && command_info "infiles= \`$infile'"
 	read_infiles
+	test :"$moddir" != :  && command_info "moddir=  \`$moddir'"
+	read_kobjects
     fi
     if test :"$modules" != : ; then
 	test :"$modules" != : && command_info "modules= \`$modules'"

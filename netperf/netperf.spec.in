@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2005/03/28 07:42:29 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2005/03/29 17:16:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/28 07:42:29 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:16:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -352,7 +352,7 @@ other architectures as well.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc ACKNWLDGMNTS AUTHORS ChangeLog COPYING COPYRIGHT INSTALL netperf_hp.ps NEWS README README.ovms Release_Notes THANKS *.pdf *.html
-%doc %{name}-%{version}.lsm
+%doc LSM %{name}-%{version}.lsm
 %{_bindir}/*
 %{_sbindir}/*
 %{_infodir}/*
@@ -364,9 +364,13 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.19  2005/03/28 07:42:29  brian
-# - better debian build
+# Revision 1.1.2.20  2005/03/29 17:16:32  brian
+# - Updated lsms and added LSM to distribution.
 #
+
+* Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.19  2005/03/28 07:42:29  brian
+- better debian build
 
 * Tue Mar 22 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.18  2005/03/22 19:44:13  brian

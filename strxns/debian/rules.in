@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/28 11:05:55 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/29 17:18:21 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/28 11:05:55 $ by $Author: brian $
+## Last Modified $Date: 2005/03/29 17:18:21 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -113,7 +113,7 @@ modules = streams-ip_strm_mod streams-ip_to_dlpi streams-ldl
 preloads =
 libraries =
 tools = strxns_mknod ldlconfig ldltest
-infofiles = $(name)
+infofiles = $(name) npi tpi
 initfiles = 
 
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
@@ -199,6 +199,8 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "README" ; \
 	  echo "THANKS" ; \
 	  echo "doc/manual" ; \
+	  echo "doc/specs" ; \
+	  echo "LSM" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -430,6 +432,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.12  2005/03/29 17:18:21  brian
+# - Updated lsms and added LSM to distribution.
+#
 # Revision 0.9.2.11  2005/03/28 11:05:55  brian
 # - export deb host arch
 #

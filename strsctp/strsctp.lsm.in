@@ -1,9 +1,9 @@
 Begin4
-Title:			@PACKAGE_NAME@
-Version:		@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Title:			@PACKAGE@
+Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
 Entered-by:		bidulock@openss7.org (Brian Bidulock)
-Description:		The @PACKAGE_NAME@ package includes kernel modules,
+Description:		The @PACKAGE@ package includes kernel modules,
 	SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
 	daemons, and development environment for the development and execution
 	of Stream Control Transmission Protocol (SCTP) protocol stack components
@@ -15,13 +15,14 @@ Keywords:		SCTP, TPI, NPI
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Original-site:		http://www.openss7.org/
-			800kB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.bz2
-			950kB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.gz
+			1.3MB @PACKAGE@-@VERSION@.tar.bz2
+			1.6MB @PACKAGE@-@VERSION@.tar.gz
 Primary-site:		http://www.openss7.org/
-			800kB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.bz2
-			950kB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.gz
-Platforms:		Linux 2.4
-Requires:		LiS-2.16.18-21 or streams-0.7a-1 SVR 4.2 STREAMS,
+			1.3MB @PACKAGE@-@VERSION@.tar.bz2
+			1.6MB @PACKAGE@-@VERSION@.tar.gz
+Platforms:		Linux
+Requires:		Linux kernel 2.4 or 2.6,
+			LiS-2.18.1 or streams-0.7a.3 SVR 4.2 STREAMS
 			strxns-0.9.2-1, strxnet-0.9.2-1
 Copying-policy:		GPL
 Comment:		Report bugs to @PACKAGE_BUGREPORT@

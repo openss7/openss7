@@ -462,13 +462,29 @@ unsigned long  _RP lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
     return(pci_dac_dma_to_offset(pdev, dma_addr)) ;
 }
 
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 void  _RP lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 			    dma64_addr_t dma_addr, size_t len, int direction)
 {
-#if defined(KERNEL_2_6)
     pci_dac_dma_sync_single(pdev, dma_addr, len, direction) ;
-#endif
 }
+#endif
+
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
+void  _RP lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev,
+			    dma64_addr_t dma_addr, size_t len, int direction)
+{
+    pci_dac_dma_sync_single_for_cpu(pdev, dma_addr, len, direction) ;
+}
+#endif
+
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
+void  _RP lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev,
+			    dma64_addr_t dma_addr, size_t len, int direction)
+{
+    pci_dac_dma_sync_single_for_device(pdev, dma_addr, len, direction) ;
+}
+#endif
 
 #endif                                  /* 2.4.13 */
 

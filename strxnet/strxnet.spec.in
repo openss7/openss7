@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/03/28 07:42:30 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/03/29 17:16:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/28 07:42:30 $ by $Author: brian $
+# Last Modified $Date: 2005/03/29 17:16:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -823,7 +823,7 @@ fi
 %doc ABOUT-NLS
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
-%doc %{name}-%{version}.lsm
+%doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -1323,9 +1323,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.80  2005/03/28 07:42:30  brian
-# - better debian build
+# Revision 0.9.2.81  2005/03/29 17:16:51  brian
+# - Updated lsms and added LSM to distribution.
 #
+
+* Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.80  2005/03/28 07:42:30  brian
+- better debian build
 
 * Sat Mar 26 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.79  2005/03/26 03:11:10  brian

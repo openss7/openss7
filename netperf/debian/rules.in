@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2005/03/28 11:05:18 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2005/03/29 17:17:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/28 11:05:18 $ by $Author: brian $
+## Last Modified $Date: 2005/03/29 17:17:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -138,6 +138,7 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "Release_Notes" ; \
 	  echo "netperf.pdf" ; \
 	  echo "netperf.html" ; \
+	  echo "LSM" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
 pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
@@ -320,6 +321,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.12  2005/03/29 17:17:51  brian
+# - Updated lsms and added LSM to distribution.
+#
 # Revision 1.1.2.11  2005/03/28 11:05:18  brian
 # - non kernel builds should not use kernel cache
 #
