@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/20 18:20:58 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/23 08:40:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/20 18:20:58 $ by $Author: brian $
+# Last Modified $Date: 2004/05/23 08:40:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -631,8 +631,10 @@ OpenSS7 STREAMS INET applications, modules and drivers.
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
     for n in %{name} libxnet ; do
-        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --info-dir=%{_infodir} $n
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
         fi
     done
 fi
@@ -641,8 +643,10 @@ fi
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     for n in %{name} libxnet ; do
-        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} $n
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
         fi
     done
 fi
@@ -825,12 +829,17 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.11  2004/05/20 18:20:58  brian
-# - make before DESTDIR on install
+# Revision 0.9.2.12  2004/05/23 08:40:54  brian
+# - Corrected info install.
 #
-# Revision 0.9.2.10  2004/05/20 00:03:43  brian
-# - Split and factor packages by STREAMS dependency.
-#
+
+* Thu May 20 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.11  2004/05/20 18:20:58  brian
+- make before DESTDIR on install
+
+* Thu May 20 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.10  2004/05/20 00:03:43  brian
+- Split and factor packages by STREAMS dependency.
 
 * Tue May 18 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.9  2004/05/18 07:14:09  brian
