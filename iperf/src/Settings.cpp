@@ -558,7 +558,7 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             mExtSettings->mTCPWin = byte_atoi(outarg);
 
             if ( mExtSettings->mTCPWin < 2048 ) {
-                fprintf( stderr, warn_window_small, mExtSettings->mTCPWin );
+                fprintf( stderr, isSCTP( mExtSettings ) ? sctp_window_small : warn_window_small, mExtSettings->mTCPWin );
             }
             break;
 

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.17 2004/12/29 07:22:19 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.18 2004/12/30 07:40:35 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/29 07:22:19 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/30 07:40:35 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -806,6 +806,34 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             with the SCTP module.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_error_generator])
+# CONFIG_SCTP_TCP_COMPATIBLE
+    AC_MSG_CHECKING([for sctp tcp compatibility])
+    AC_ARG_ENABLE([sctp-tcp-compatible],
+        AS_HELP_STRING([--disable-tcp-compatible],
+            [disable SCTP TCP compatibility. @<:@default=enabled@:>@]),
+        [sctp_cv_tcp_compatible="$enableval"],
+        [sctp_cv_tcp_compatible='yes'])
+    if test :"$sctp_cv_tcp_compatible" = :yes ; then
+        AC_DEFINE_UNQUOTED([CONFIG_SCTP_TCP_COMPATIBLE], [], [
+            This enables support for SOCK_STREAM type TCP compatible sockets
+            in addition to the normal SCTP SOCK_SEQPACKET sockets.  These work
+            good and are normally enabled.  Define this symbol.])dnl
+    fi
+    AC_MSG_RESULT([$sctp_cv_tcp_compatible])
+# CONFIG_SCTP_UDP_COMPATIBLE
+    AC_MSG_CHECKING([for sctp rudp compatibility])
+    AC_ARG_ENABLE([sctp-udp-compatible],
+        AS_HELP_STRING([--enable-udp-compatible],
+            [enable SCTP RUDP compatibility. @<:@default=disabled@:>@]),
+        [sctp_cv_udp_compatible="$enableval"],
+        [sctp_cv_udp_compatible='no'])
+    if test :"$sctp_cv_udp_compatible" = :yes ; then
+        AC_DEFINE_UNQUOTED([CONFIG_SCTP_UDP_COMPATIBLE], [], [
+            This enables support for SOCK_RDM type RUDP compatible sockets in
+            addition to the normal SCTP SOCK_SEQPACKET sockets.  These have
+            not been tested.  This is experimental stuff.])dnl
+    fi
+    AC_MSG_RESULT([$sctp_cv_udp_compatible])
 ])# _SCTP_CONFIG
 # =========================================================================
 

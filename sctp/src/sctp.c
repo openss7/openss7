@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/12/29 07:22:20 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/12/30 07:38:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/29 07:22:20 $ by $Author: brian $
+ Last Modified $Date: 2004/12/30 07:38:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/12/29 07:22:20 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/12/30 07:38:48 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/12/29 07:22:20 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/12/30 07:38:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -112,9 +112,9 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 
 #include "linux/hooks.h"
 #include "os7_namespace.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.12 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.13 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
-#define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
+#define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -761,41 +761,44 @@ extern kmem_cache_t *sctp_bind_cachep;
 extern kmem_cache_t *sctp_dest_cachep;
 extern kmem_cache_t *sctp_srce_cachep;
 extern kmem_cache_t *sctp_strm_cachep;
-/* *INDENT-OFF* */
 STATIC void sctp_init_caches(void)
 {
-	if (!sctp_bind_cachep)
-	if (!(sctp_bind_cachep = kmem_cache_create("sctp_bind_bucket", sizeof(struct sctp_bind_bucket),
-					0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-	if (!(sctp_bind_cachep = kmem_find_general_cachep(sizeof(struct sctp_bind_bucket), GFP_ATOMIC)))
+	if (!sctp_bind_cachep
+	    && !(sctp_bind_cachep =
+		 kmem_cache_create("sctp_bind_bucket", sizeof(struct sctp_bind_bucket), 0,
+				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_bind cache.\n", __FUNCTION__);
-	if (!sctp_dest_cachep)
-	if (!(sctp_dest_cachep = kmem_cache_create("sctp_daddr", sizeof(struct sctp_daddr),
-					0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-	if (!(sctp_dest_cachep = kmem_find_general_cachep(sizeof(struct sctp_daddr), GFP_ATOMIC)))
+	if (!sctp_dest_cachep
+	    && !(sctp_dest_cachep =
+		 kmem_cache_create("sctp_daddr", sizeof(struct sctp_daddr), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_daddr cache.\n", __FUNCTION__);
-	if (!sctp_srce_cachep)
-	if (!(sctp_srce_cachep = kmem_cache_create("sctp_saddr", sizeof(struct sctp_saddr),
-					0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-	if (!(sctp_srce_cachep = kmem_find_general_cachep(sizeof(struct sctp_saddr), GFP_ATOMIC)))
+	if (!sctp_srce_cachep
+	    && !(sctp_srce_cachep =
+		 kmem_cache_create("sctp_saddr", sizeof(struct sctp_saddr), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_saddr cache.\n", __FUNCTION__);
-	if (!sctp_strm_cachep)
-	if (!(sctp_strm_cachep = kmem_cache_create("sctp_strm", sizeof(struct sctp_strm),
-					0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-	if (!(sctp_strm_cachep = kmem_find_general_cachep(sizeof(struct sctp_strm), GFP_ATOMIC)))
+	if (!sctp_strm_cachep
+	    && !(sctp_strm_cachep =
+		 kmem_cache_create("sctp_strm", sizeof(struct sctp_strm), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_strm cache.\n", __FUNCTION__);
 }
-/* *INDENT-ON* */
 #if defined CONFIG_SCTP_MODULE
 STATIC void sctp_term_caches(void)
 {
-	/* this has cause a kernel crash in the past */
-#if 0
-	kmem_cache_shrink(sctp_bind_cachep);
-	kmem_cache_shrink(sctp_dest_cachep);
-	kmem_cache_shrink(sctp_srce_cachep);
-	kmem_cache_shrink(sctp_strm_cachep);
-#endif
+	if (sctp_bind_cachep)
+		if (kmem_cache_destroy(sctp_bind_cachep))
+			printk(KERN_WARNING "%s: did not destroy sctp_bind_cachep\n", __FUNCTION__);
+	if (sctp_dest_cachep)
+		if (kmem_cache_destroy(sctp_dest_cachep))
+			printk(KERN_WARNING "%s: did not destroy sctp_dest_cachep\n", __FUNCTION__);
+	if (sctp_srce_cachep)
+		if (kmem_cache_destroy(sctp_srce_cachep))
+			printk(KERN_WARNING "%s: did not destroy sctp_srce_cachep\n", __FUNCTION__);
+	if (sctp_strm_cachep)
+		if (kmem_cache_destroy(sctp_strm_cachep))
+			printk(KERN_WARNING "%s: did not destroy sctp_strm_cachep\n", __FUNCTION__);
 }
 #endif
 

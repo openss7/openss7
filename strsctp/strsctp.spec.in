@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/12/29 21:33:32 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/12/30 08:07:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/29 21:33:32 $ by $Author: brian $
+# Last Modified $Date: 2004/12/30 08:07:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -891,7 +891,7 @@ to create and distribute this rpm.
 %dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
 %{_usrsrc}/%{name}
 %{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
-%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.*
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*
 %endif
 
 # ===========================================================================
@@ -933,6 +933,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
+# Revision 0.9.2.17  2004/12/30 08:07:03  brian
+# - Fix globbing on source package.
+#
 # Revision 0.9.2.16  2004/12/29 21:33:32  brian
 # - Straighten out cache and site files.
 #

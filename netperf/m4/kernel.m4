@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/12/24 12:04:25 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/12/30 07:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/24 12:04:25 $ by $Author: brian $
+# Last Modified $Date: 2004/12/30 07:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -372,6 +372,37 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
         linux_cv_k_modules="$linux_cv_k_prefix/lib/modules/${linux_cv_k_release}"
     fi
     AC_MSG_RESULT([${linux_cv_k_modules:-no}])
+    AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
+        if test -r $linux_cv_k_modules/modules.dep
+        then
+            if ( grep -q '\.o\.gz:' $linux_cv_k_modules/modules.dep )
+            then
+                linux_cv_k_compress='yes'
+            else
+                linux_cv_k_compress='no'
+            fi
+        else
+            linux_cv_k_compress='unknown'
+        fi
+    ])
+    case $linux_cv_k_compress in
+        yes)
+            COMPRESS_KERNEL_MODULES='gzip -9'
+            ;;
+        no)
+            COMPRESS_KERNEL_MODULES=
+            ;;
+        unknown | *)
+            COMPRESS_KERNEL_MODULES=
+            AC_MSG_WARN([
+**** 
+**** Strange, the modules directory is $linux_cv_k_modules
+**** but the file $linux_cv_k_modules/modules.dep does
+**** not exist.  This could cause some problems later.
+**** ])
+            ;;
+    esac
+    AC_SUBST([COMPRESS_KERNEL_MODULES])dnl
     kmoduledir="${linux_cv_k_modules}"
     AC_SUBST([kmoduledir])dnl
 ])# _LINUX_CHECK_KERNEL_MODULES

@@ -92,6 +92,8 @@ extern const char client_datagram_size[];
 
 extern const char server_datagram_size[];
 
+extern const char sctp_window_size[];
+
 extern const char tcp_window_size[];
 
 extern const char udp_buffer_size[];
@@ -147,6 +149,8 @@ extern const char reportCSV_bw_jitter_loss_format[];
  * ------------------------------------------------------------------- */
 
 extern const char warn_window_requested[];
+
+extern const char sctp_window_small[];
 
 extern const char warn_window_small[];
 

@@ -135,17 +135,17 @@ Client/Server:\n\
   -f, --format    [kmKM]   format to report: Kbits, Mbits, KBytes, MBytes\n\
   -i, --interval  #        seconds between periodic bandwidth reports\n\
   -l, --len       #[KM]    length of buffer to read or write (default 8 KB)\n\
-  -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)\n\
+  -m, --print_mss          print SCTP/TCP maximum segment size (MTU - SCTP/TCP/IP header)\n\
   -o, --output    <filename> output the report or error message to this specified file\n\
   -p, --port      #        server port to listen on/connect to\n\
   -q, --seqpacket          for SCTP use SOCK_SEQPACKET instead of SOCK_STREAM\n\
   -u, --udp                use UDP rather than TCP\n\
-  -w, --window    #[KM]    TCP window size (socket buffer size)\n\
+  -w, --window    #[KM]    SCTP/TCP window size (socket buffer size)\n\
   -z, --sctp               use SCTP (rather than UDP or TCP)\n\
   -B, --bind      <host>   bind to <host>, an interface or multicast address\n\
   -C, --compatibility      for use with older versions does not sent extra msgs\n\
-  -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
-  -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm\n\
+  -M, --mss       #        set SCTP/TCP maximum segment size (MTU - 40 bytes)\n\
+  -N, --nodelay            set SCTP/TCP no delay, disabling Nagle's Algorithm\n\
   -V, --IPv6Version        Set the domain to IPv6\n\
 \n\
 Server specific:\n\
@@ -176,7 +176,7 @@ Miscellaneous:\n\
 \n\
 [KM] Indicates options that support a K or M suffix for kilo- or mega-\n\
 \n\
-The TCP window size option can be set by the environment variable\n\
+The SCTP/TCP window size option can be set by the environment variable\n\
 TCP_WINDOW_SIZE. Most other options can be set by an environment variable\n\
 IPERF_<long option name>, such as IPERF_BANDWIDTH.\n\
 \n\
@@ -191,16 +191,16 @@ Client/Server:\n\
   -f, --format    [kmKM]   format to report: Kbits, Mbits, KBytes, MBytes\n\
   -i, --interval  #        seconds between periodic bandwidth reports\n\
   -l, --len       #[KM]    length of buffer to read or write (default 8 KB)\n\
-  -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)\n\
+  -m, --print_mss          print SCTP/TCP maximum segment size (MTU - SCTP/TCP/IP header)\n\
   -p, --port      #        server port to listen on/connect to\n\
   -q, --seqpacket          for SCTP use SOCK_SEQPACKET instead of SOCK_STREAM\n\
   -u, --udp                use UDP rather than TCP\n\
-  -w, --window    #[KM]    TCP window size (socket buffer size)\n\
+  -w, --window    #[KM]    SCTP/TCP window size (socket buffer size)\n\
   -z, --sctp               use SCTP (rather than UDP or TCP)\n\
   -B, --bind      <host>   bind to <host>, an interface or multicast address\n\
   -C, --compatibility      for use with older versions does not sent extra msgs\n\
-  -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
-  -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm\n\
+  -M, --mss       #        set SCTP/TCP maximum segment size (MTU - 40 bytes)\n\
+  -N, --nodelay            set SCTP/TCP no delay, disabling Nagle's Algorithm\n\
   -V, --IPv6Version        Set the domain to IPv6\n\
 \n\
 Server specific:\n\
@@ -228,7 +228,7 @@ Miscellaneous:\n\
 \n\
 [KM] Indicates options that support a K or M suffix for kilo- or mega-\n\
 \n\
-The TCP window size option can be set by the environment variable\n\
+The SCTP/TCP window size option can be set by the environment variable\n\
 TCP_WINDOW_SIZE. Most other options can be set by an environment variable\n\
 IPERF_<long option name>, such as IPERF_BANDWIDTH.\n\
 \n\
@@ -274,6 +274,9 @@ const char client_datagram_size[] =
 
 const char server_datagram_size[] =
 "Receiving %d byte datagrams\n";
+
+const char sctp_window_size[] =
+"SCTP window size";
 
 const char tcp_window_size[] =
 "TCP window size";
@@ -378,6 +381,10 @@ const char reportCSV_bw_jitter_loss_format[] =
 
 const char warn_window_requested[] =
 " (WARNING: requested %s)";
+
+const char sctp_window_small[] = "\
+WARNING: SCTP window size set to %d bytes. A small window size\n\
+will give poor performance. See the Iperf documentation.\n";
 
 const char warn_window_small[] = "\
 WARNING: TCP window size set to %d bytes. A small window size\n\

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/12/29 21:33:18 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/12/30 08:06:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/29 21:33:18 $ by $Author: brian $
+# Last Modified $Date: 2004/12/30 08:06:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -855,7 +855,7 @@ to create and distribute this rpm.
 %dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
 %{_usrsrc}/%{name}
 %{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
-%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.*
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*
 %endif
 
 # ===========================================================================
@@ -897,6 +897,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.27  2004/12/30 08:06:42  brian
+# - Fix globbing on source package.
+#
 # Revision 0.9.2.26  2004/12/29 21:33:18  brian
 # - Straighten out cache and site files.
 #

@@ -153,12 +153,12 @@ void reporter_reportsettings( ReporterData *data ) {
     printf( seperator_line );
     if ( data->mThreadMode == kMode_Listener ) {
         printf( server_port,
-                (isUDP( data ) ? "UDP" : "TCP"), 
+                (isUDP( data ) ? "UDP" : isSCTP( data ) ? "SCTP" : "TCP"), 
                 data->mPort );
     } else {
         printf( client_port,
                 data->mHost,
-                (isUDP( data ) ? "UDP" : "TCP"),
+                (isUDP( data ) ? "UDP" : isSCTP( data ) ? "SCTP" : "TCP"),
                 data->mPort );
     }
     if ( data->mLocalhost != NULL ) {
@@ -179,7 +179,7 @@ void reporter_reportsettings( ReporterData *data ) {
     byte_snprintf( buffer, sizeof(buffer), win,
                    toupper( data->info.mFormat));
     printf( "%s: %s", (isUDP( data ) ? 
-                                udp_buffer_size : tcp_window_size), buffer );
+                                udp_buffer_size : isSCTP( data ) ? sctp_window_size : tcp_window_size), buffer );
 
     if ( win_requested == 0 ) {
         printf( " %s", window_default );
