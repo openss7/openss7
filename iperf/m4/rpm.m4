@@ -102,32 +102,188 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
             [specify the DISTRO for the RPM spec file. @<:@default=none@:>@]),
         [with_rpm_distro="$withval"],
         [with_rpm_distro=""])
-    AC_CACHE_CHECK([for rpm distribution vendor], [rpm_cv_dist_vendor], [dnl
+    AC_CACHE_CHECK([for rpm distribution], [rpm_cv_dist_flavor], [dnl
         rpm_cv_dist_vendor=
-        rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
-        rpm_tmp=`echo $rpm_tmp | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||'`
-        rpm_tmp=`echo $rpm_tmp | sed -e 's| Linux.*$||'`
-        case $rpm_tmp in
-            Red?Hat|Mandrake|Debian|SuSE)
-                rpm_cv_dist_vendor="$rpm_tmp"
-                ;;
-        esac
+        rpm_cv_dist_flavor=
+        #
+        # NOTE:- for LSB compliant systems we should also be able to
+        #  find /etc/lsb-release and if we source that file we should
+        #  see:
+        #
+        #    LSB_VERSION=               # the version supported
+        #    DISTRIB_ID="SuSE"          # the distribution id
+        #    DISTRIB_RELEASE="8.0"      # the distribution release
+        #    DISTRIB_DESCRIPTION="SuSE Linux 8.0 (i386)"   # the distribution line
+        #
+        # first check for a release file
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/fedora-release
+        then
+            rpm_cv_dist_vendor=redhat
+            rpm_cv_dist_flavor="Fedora Core"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/mandrake-release
+        then
+            rpm_cv_dist_vendor=mandrake
+            rpm_cv_dist_flavor="Mandrake Linux"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/redhat-release
+        then
+            rpm_cv_dist_vendor=redhat
+            rpm_cv_dist_flavor="Red Hat Linux"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/SuSE-release
+        then
+            rpm_cv_dist_vendor=suse
+            rpm_cv_dist_flavor="SuSE Linux"
+        fi
+        # look in /etc/lsb-release
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/lsb-release
+        then
+            . /etc/lsb-release
+            rpm_tmp="$DISTRIB_DESCRIPTION"
+            case $rpm_tmp in
+                *Fedora?Core*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="$DISTRIB_ID"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Mandrake*)
+                    rpm_cv_dist_vendor=mandrake
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Red?Hat*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *SuSE*)
+                    rpm_cv_dist_vendor=suse
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Debian*)
+                    rpm_cv_dist_vendor=debian
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *)
+                    rpm_cv_dist_vendor=unknown
+                    rpm_cv_dist_flavor="${DISTRIB_ID:-Unknown} Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+            esac
+        fi
+        # look in /etc/issue
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/issue
+        then
+            rpm_tmp=`cat /etc/issue | grep 'Linux\|Fedora' | head -1`
+            case $rpm_tmp in
+                *Fedora?Core*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Fedora Core"
+                    ;;
+                *Mandrake*)
+                    rpm_cv_dist_vendor=mandrake
+                    rpm_cv_dist_flavor="Mandrake Linux"
+                    ;;
+                *Red?Hat*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Red Hat Linux"
+                    ;;
+                *SuSE*)
+                    rpm_cv_dist_vendor=suse
+                    rpm_cv_dist_flavor="SuSE Linux"
+                    ;;
+                *Debian*)
+                    rpm_cv_dist_vendor=debian
+                    rpm_cv_dist_flavor="Debian Linux"
+                    ;;
+            esac
+        fi
+        # fall back to checking the compiler
+        if test -z "$rpm_cv_dist_vendor"
+        then
+            rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
+            case $rpm_tmp in
+                *Fedora?Core*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Fedora Core"
+                    ;;
+                *Mandrake*)
+                    rpm_cv_dist_vendor=mandrake
+                    rpm_cv_dist_flavor="Mandrake Linux"
+                    ;;
+                *Red?Hat*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Red Hat Linux"
+                    ;;
+                *SuSE*)
+                    rpm_cv_dist_vendor=suse
+                    rpm_cv_dist_flavor="SuSE Linux"
+                    ;;
+                *Debian*)
+                    rpm_cv_dist_vendor=debian
+                    rpm_cv_dist_flavor="Debian Linux"
+                    ;;
+                *)
+                    rpm_cv_dist_vendor=unknown
+                    rpm_cv_dist_flavor="Unknown Linux"
+                    ;;
+            esac
+        fi
     ])
     AC_CACHE_CHECK([for rpm distribution release], [rpm_cv_dist_release], [dnl
         rpm_cv_dist_release=
-        if test ":${rpm_cv_dist_vendor:-unknown}" != :unknown
+        # first check for a release file
+        if test -z "$rpm_cv_dist_release" -a -r /etc/fedora-release
+        then
+            rpm_tmp=`cat /etc/fedora-release | grep 'Fedora Core'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/mandrake-release
+        then
+            rpm_tmp=`cat /etc/mandrake-release | grep 'Mandrake Linux'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/redhat-release
+        then
+            rpm_tmp=`cat /etc/redhat-release | grep 'Red Hat Linux'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/SuSE-release
+        then
+            rpm_tmp=`cat /etc/SuSE-release | grep 'SuSE Linux'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        # look in /etc/issue
+        if test -z "$rpm_cv_dist_release" -a -r /etc/issue
+        then
+            rpm_tmp=`cat /etc/issue | grep Linux`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release"
         then
             rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
             rpm_tmp=`echo $rpm_tmp | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||'`
-            rpm_tmp=`echo $rpm_tmp | sed -e 's|^.*Linux ||'`
-            if test -n "$rpm_tmp"
-            then
-                rpm_cv_dist_release="$rpm_tmp"
-            fi
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
         fi
     ])
-    PACKAGE_RPMDIST="${rpm_cv_dist_vendor:-Unknown} Linux ${rpm_cv_dist_release:-Unknown}"
-    case $rpm_cv_dist_vendor in
+    PACKAGE_RPMDIST="${rpm_cv_dist_vendor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
+    case $rpm_cv_dist_flavor in
+        Fedora?Core)
+            case $rpm_cv_dist_release in
+                1)
+                    PACKAGE_RPMEXTRA=".FC1"
+                    ;;
+                2)
+                    PACKAGE_RPMEXTRA=".FC2"
+                    ;;
+                3)
+                    PACKAGE_RPMEXTRA=".FC3"
+                    ;;
+            esac
+            ;;
         Red?Hat)
             case $rpm_cv_dist_release in
                 7.0|7.1|7.2|7.3)

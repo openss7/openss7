@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/11/24 14:31:59 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/12/01 22:33:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/24 14:31:59 $ by $Author: brian $
+# Last Modified $Date: 2004/12/01 22:33:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1182,7 +1182,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
             [specify whether symbol versioning is to be used on symbols
             exported from built modules.  @<:@default=yes@:>@]),
         [enable_k_modversions="$enableval"],
-        [enable_k_modversions='yes'])
+        [enable_k_modversions="$linux_cv_k_versions"])
     AC_MSG_CHECKING([for kernel module symbol versioning])
     if test :"${enable_k_modversions:-no}" = :yes
     then
