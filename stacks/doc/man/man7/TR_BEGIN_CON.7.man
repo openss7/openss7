@@ -1,0 +1,141 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_BEGIN_CON.7.man,v 0.9.2.1 2004/10/24 11:47:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_BEGIN_CON 7 "$Date: 2004/10/24 11:47:38 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.B TR_BEGIN_CON
+\- Connection Confirm
+.SH SYNOPSIS
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+blocks if any user data is associated with the primitive.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_begin_con {
+    ulong PRIM_type;          /* Always TR_BEGIN_CON */
+    ulong CORR_id;            /* Correlation Id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+} TR_begin_con_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This primitive indicates to the user that an association begin request has been confirmed on the
+specified responding address.
+.SH PARAMETERS
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TR_BEGIN_CON .
+.TP
+.I CORR_id
+is the transaction user assigned transaction identifier of the corresponding
+.BR TR_BEGIN_REQ (7)
+that this message is confirming.
+.TP
+.I ASSOC_flags
+are the responding association options flags.
+.TP
+.I TRANS_id
+is the transaction provider assigned transaction identifier for the confirmed association.
+.TP
+.I ORIG_length
+is the length of the responding address that the association was accepted.
+.TP
+.I ORIG_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the responding address begins.
+.TP
+.I OPT_length
+is the length of the confirmed options associated with the primitive.
+.TP
+.I OPT_offset
+is the offset from the beginning of the
+.BR M_PROTO (9)
+message block) of the confirmed options associated with the primitive.
+.PP
+The proper alignment of the responding address and options in the
+.BR M_PROTO (9)
+message block is not guaranteed.
+.SH MODES
+Only connection-mode.
+.SH ORIGINATOR
+Transaction provider.
+.SH "SEE ALSO"
+.BR tri (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TR_BEGIN_REQ (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

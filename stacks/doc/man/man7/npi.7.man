@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: npi.7.man,v 0.9.2.2 2004/05/12 10:15:04 brian Exp $
+.\" @(#) $Id: npi.7.man,v 0.9.2.3 2004/10/24 11:47:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/05/12 10:15:04 $ by $Author: brian $
+.\" Modified $Date: 2004/10/24 11:47:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NPI 7 "$Date: 2004/05/12 10:15:04 $" "$Name:  $" "Linux STREAMS"
+.TH NPI 7 "$Date: 2004/10/24 11:47:44 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B NPI
 \- Network Provider Interface
@@ -69,7 +69,7 @@ of conforming network layer service providers without specific knowledge of the
 provider's protocol.  The service interface is designed to support any
 connection-mode network protocol and connectionless network protocol.  This
 interface only specifies access to network layer service providers, and does
-not address issues concerning network layer management,protocol performance,
+not address issues concerning network layer management, protocol performance,
 and performance analysis tools.
 .PP
 The specification assumes that the reader is familiar with the OSI reference
@@ -77,19 +77,40 @@ model terminology, ISO/CCITT Network Layer Service, and
 .IR STREAMS (4).
 .SS "Related Documentation"
 .IP \(em 4
-1986 CCITT X.213 Recommendation [1]
+1986 CCITT X.213 Recommendation
+.[
+x.213
+.]
 .IP \(em 4
-ISO 8348 [2]
+ISO 8348
+.[
+8348
+.]
 .IP \(em 4
-ISO 8348/AD1 [3]
+ISO 8348/AD1
+.[
+8348-1
+.]
 .IP \(em 4
-ISO 8473 [4]
+ISO 8473
+.[
+8473
+.]
 .IP \(em 4
-ISO 8208 [5]
+ISO 8208
+.[
+8208
+.]
 .IP \(em 4
-ISO 8878 [6]
+ISO 8878
+.[
+8878
+.]
 .IP \(em 4
-System V Interface Definition, Issue 2 - Volume 3 [7]
+System V Interface Definition, Issue 2 - Volume 3
+.[
+svid
+.]
 .SS "Role"
 .PP
 This document specifies an interface that supports the service provided by the
@@ -187,11 +208,11 @@ and
 system calls.
 .SS "NPI Services"
 The features of the NPI are defined in terms of the services provided by the
-NS provider,and the individual primitives that may flow between the NS user
+NS provider, and the individual primitives that may flow between the NS user
 and the NS provider.
 .PP
 The services supported by the NPI are based on two distinct modes of
-communication,connection (CONS) and connectionless (CLNS).  In addition, the
+communication, connection (CONS) and connectionless (CLNS).  In addition, the
 NPI supports services for local management.
 .SS "CONS"
 The main features of the connection mode communication are:
@@ -516,7 +537,7 @@ A queue is empty until a connect object has been entered and can be returned
 to this state, with loss of its contents, by the NS provider.
 .IP \(em 4
 Objects may be entered into a queue as a result of the actions of the source
-NS user,subject to control by the NS provider;
+NS user, subject to control by the NS provider;
 .IP \(em 4
 Objects may also be entered into a queue by the NS provider.
 .IP \(em 4
@@ -572,7 +593,7 @@ has
 been entered into the queue.  Alternatively, the called NS user can enter a
 disconnect object into the queue instead of the connect object to terminate
 the NC.  The NC establishment procedure will fail if the NS provider is unable
-to establish an NC,or if the destination NS user is unable to accept the
+to establish an NC, or if the destination NS user is unable to accept the
 .BR N_CONN_IND (7)
 (see NC Release primitive definition).
 .PP
@@ -743,7 +764,7 @@ the
 that have not been delivered to the other NS user
 before the
 .BR N_RESET_IND (7)/ N_RESET_CON (7)
-are issued by the NS provider,should be
+are issued by the NS provider, should be
 discarded by the NS provider.
 .IP ii. 4
 Any

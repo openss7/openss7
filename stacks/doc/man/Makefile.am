@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/10/13 09:47:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/10/24 11:47:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 09:47:10 $ by $Author: brian $
+# Last Modified $Date: 2004/10/24 11:47:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -764,6 +764,78 @@ ss7_man_MANS = \
 	man7/tpi_sscop.7 \
 	man7/tpi_tcap.7 \
 	man7/tri.7 \
+	man7/TR_ABORT_IND.7 \
+	man7/TR_ABORT_REQ.7 \
+	man7/TR_ADDR_ACK.7 \
+	man7/TR_ADDR_REQ.7 \
+	man7/TR_BEGIN_CON.7 \
+	man7/TR_BEGIN_IND.7 \
+	man7/TR_BEGIN_REQ.7 \
+	man7/TR_BEGIN_RES.7 \
+	man7/TR_BIND_ACK.7 \
+	man7/TR_BIND_REQ.7 \
+	man7/TR_CONT_IND.7 \
+	man7/TR_CONT_REQ.7 \
+	man7/TR_END_IND.7 \
+	man7/TR_END_REQ.7 \
+	man7/TR_ERROR_ACK.7 \
+	man7/TR_INFO_ACK.7 \
+	man7/TR_INFO_REQ.7 \
+	man7/TR_NOTICE_IND.7 \
+	man7/TR_OK_ACK.7 \
+	man7/TR_OPTMGMT_ACK.7 \
+	man7/TR_OPTMGMT_REQ.7 \
+	man7/TR_UNBIND_REQ.7 \
+	man7/TR_UNI_IND.7 \
+	man7/TR_UNI_REQ.7 \
+	man7/TR_abort_ind.7 \
+	man7/TR_abort_ind_t.7 \
+	man7/TR_abort_req.7 \
+	man7/TR_abort_req_t.7 \
+	man7/TR_addr_ack.7 \
+	man7/TR_addr_ack_t.7 \
+	man7/TR_addr_req.7 \
+	man7/TR_addr_req_t.7 \
+	man7/TR_begin_con.7 \
+	man7/TR_begin_con_t.7 \
+	man7/TR_begin_ind.7 \
+	man7/TR_begin_ind_t.7 \
+	man7/TR_begin_req.7 \
+	man7/TR_begin_req_t.7 \
+	man7/TR_begin_res.7 \
+	man7/TR_begin_res_t.7 \
+	man7/TR_bind_ack.7 \
+	man7/TR_bind_ack_t.7 \
+	man7/TR_bind_req.7 \
+	man7/TR_bind_req_t.7 \
+	man7/TR_cont_ind.7 \
+	man7/TR_cont_ind_t.7 \
+	man7/TR_cont_req.7 \
+	man7/TR_cont_req_t.7 \
+	man7/TR_end_ind.7 \
+	man7/TR_end_ind_t.7 \
+	man7/TR_end_req.7 \
+	man7/TR_end_req_t.7 \
+	man7/TR_error_ack.7 \
+	man7/TR_error_ack_t.7 \
+	man7/TR_info_ack.7 \
+	man7/TR_info_ack_t.7 \
+	man7/TR_info_req.7 \
+	man7/TR_info_req_t.7 \
+	man7/TR_notice_ind.7 \
+	man7/TR_notice_ind_t.7 \
+	man7/TR_ok_ack.7 \
+	man7/TR_ok_ack_t.7 \
+	man7/TR_optmgmt_ack.7 \
+	man7/TR_optmgmt_ack_t.7 \
+	man7/TR_optmgmt_req.7 \
+	man7/TR_optmgmt_req_t.7 \
+	man7/TR_unbind_req.7 \
+	man7/TR_unbind_req_t.7 \
+	man7/TR_uni_ind.7 \
+	man7/TR_uni_ind_t.7 \
+	man7/TR_uni_req.7 \
+	man7/TR_uni_req_t.7 \
 	man8/acb56.8 \
 	man8/bicc.8 \
 	man8/bua.8 \
@@ -1905,6 +1977,78 @@ ss7_dist_noinst_MANS = \
 	man7/tpi_sscop.7.man \
 	man7/tpi_tcap.7.man \
 	man7/tri.7.man \
+	man7/TR_ABORT_IND.7.man \
+	man7/TR_ABORT_REQ.7.man \
+	man7/TR_ADDR_ACK.7.man \
+	man7/TR_ADDR_REQ.7.man \
+	man7/TR_BEGIN_CON.7.man \
+	man7/TR_BEGIN_IND.7.man \
+	man7/TR_BEGIN_REQ.7.man \
+	man7/TR_BEGIN_RES.7.man \
+	man7/TR_BIND_ACK.7.man \
+	man7/TR_BIND_REQ.7.man \
+	man7/TR_CONT_IND.7.man \
+	man7/TR_CONT_REQ.7.man \
+	man7/TR_END_IND.7.man \
+	man7/TR_END_REQ.7.man \
+	man7/TR_ERROR_ACK.7.man \
+	man7/TR_INFO_ACK.7.man \
+	man7/TR_INFO_REQ.7.man \
+	man7/TR_NOTICE_IND.7.man \
+	man7/TR_OK_ACK.7.man \
+	man7/TR_OPTMGMT_ACK.7.man \
+	man7/TR_OPTMGMT_REQ.7.man \
+	man7/TR_UNBIND_REQ.7.man \
+	man7/TR_UNI_IND.7.man \
+	man7/TR_UNI_REQ.7.man \
+	man7/TR_abort_ind.7.man \
+	man7/TR_abort_ind_t.7.man \
+	man7/TR_abort_req.7.man \
+	man7/TR_abort_req_t.7.man \
+	man7/TR_addr_ack.7.man \
+	man7/TR_addr_ack_t.7.man \
+	man7/TR_addr_req.7.man \
+	man7/TR_addr_req_t.7.man \
+	man7/TR_begin_con.7.man \
+	man7/TR_begin_con_t.7.man \
+	man7/TR_begin_ind.7.man \
+	man7/TR_begin_ind_t.7.man \
+	man7/TR_begin_req.7.man \
+	man7/TR_begin_req_t.7.man \
+	man7/TR_begin_res.7.man \
+	man7/TR_begin_res_t.7.man \
+	man7/TR_bind_ack.7.man \
+	man7/TR_bind_ack_t.7.man \
+	man7/TR_bind_req.7.man \
+	man7/TR_bind_req_t.7.man \
+	man7/TR_cont_ind.7.man \
+	man7/TR_cont_ind_t.7.man \
+	man7/TR_cont_req.7.man \
+	man7/TR_cont_req_t.7.man \
+	man7/TR_end_ind.7.man \
+	man7/TR_end_ind_t.7.man \
+	man7/TR_end_req.7.man \
+	man7/TR_end_req_t.7.man \
+	man7/TR_error_ack.7.man \
+	man7/TR_error_ack_t.7.man \
+	man7/TR_info_ack.7.man \
+	man7/TR_info_ack_t.7.man \
+	man7/TR_info_req.7.man \
+	man7/TR_info_req_t.7.man \
+	man7/TR_notice_ind.7.man \
+	man7/TR_notice_ind_t.7.man \
+	man7/TR_ok_ack.7.man \
+	man7/TR_ok_ack_t.7.man \
+	man7/TR_optmgmt_ack.7.man \
+	man7/TR_optmgmt_ack_t.7.man \
+	man7/TR_optmgmt_req.7.man \
+	man7/TR_optmgmt_req_t.7.man \
+	man7/TR_unbind_req.7.man \
+	man7/TR_unbind_req_t.7.man \
+	man7/TR_uni_ind.7.man \
+	man7/TR_uni_ind_t.7.man \
+	man7/TR_uni_req.7.man \
+	man7/TR_uni_req_t.7.man \
 	man8/acb56.8.man \
 	man8/bicc.8.man \
 	man8/bua.8.man \

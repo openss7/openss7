@@ -1,0 +1,174 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_CONT_REQ.7.man,v 0.9.2.1 2004/10/24 11:47:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_CONT_REQ 7 "$Date: 2004/10/24 11:47:38 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.PP
+.B TR_CONT_REQ
+\- Transaction Continue Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+message blocks where each
+.BR M_DATA (9)
+message block contains zero or more bytes of data.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_cont_req {
+    ulong PRIM_type;          /* Always TR_CONT_REQ */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+} TR_cont_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the transaction provider that this message contains a transaction
+service data unit.
+.PP
+Note that the maximum transaction service data unit size allowed by the transaction provider is
+indicated to the transaction user with the
+.BR TR_INFO_ACK (7)
+primitive.
+.SH PARAMETERS
+.PP
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TR_CONT_REQ .
+.TP
+.I TRANS_id
+is the transaction identifier assigned by the transaction provider for the association to which the
+data belongs.
+.TP
+.I ASSOC_flags
+are the association options flags associated with the data.  Association flags are provider
+specific.
+.TP
+.I OPT_length
+is the length of the protocol options associated with the data.
+.TP
+.I OPT_offset
+is the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the protocol options begin.
+.SH RULES
+.PP
+The transaction provider must also recognize a message of one or more
+.BR M_DATA (9)
+message blocks without the leading
+.BR M_PROTO (9)
+message block as a
+.B TR_CONT_REQ
+primitive.
+This message type will be initiated from the
+.BR write (2)
+operating system service routine.
+.PP
+This primitive does not require any acknowledgments, although it may generate a fatal error.
+This is indicated via a
+.BR M_ERROR (9)
+message type which results in the failure of all operating system service routines on the stream.
+.SH ERRORS
+.PP
+The allowable errors are as follows:
+.TP 16
+.RB [ EPROTO ]
+This indicates one of the following unrecoverable protocol conditions:
+.RS
+.IP - 3
+The transaction service interface was found to be in an incorrect state.
+If the transaction association is in the
+.B TRS_IDLE
+state when the provider receives the
+.B TR_CONT_REQ
+primitive, then the transaction provider should just drop the message without generating a fatal
+error.
+.IP -
+The amount of transaction user data associated with the primitive defines a transaction service data
+unit larger than that allowed by the transaction provider.
+.SH MODES
+.PP
+Only connection-mode.
+.SH ORIGINATOR
+.PP
+Transaction user.
+.SH "SEE ALSO"
+.PP
+.BR tri (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR M_ERROR (9),
+.BR TR_INFO_ACK (7),
+.BR TR_CONT_IND (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

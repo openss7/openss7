@@ -1,7 +1,7 @@
 '\" rt
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tci.7.man,v 0.9.2.2 2004/10/24 11:47:44 brian Exp $
+.\" @(#) $Id: TR_NOTICE_IND.7.man,v 0.9.2.1 2004/10/24 11:47:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/24 11:47:44 $ by $Author: brian $
+.\" Modified $Date: 2004/10/24 11:47:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,14 +49,68 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TCI 7 "$Date: 2004/10/24 11:47:44 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH TR_NOTICE_IND 7 "$Date: 2004/10/24 11:47:39 $" "$Name:  $" "Transaction Interface (TRI)"
 .SH NAME
-.B TCI
-\- Transaction Component Interface
+.PP
+.B TR_NOTICE_IND
+\- Transaction Notice Indication
+.SH SYNOPSIS
+.PP
+This message consists of a
+.BR M_PROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_notice_ind {
+    ulong PRIM_type;          /* Always TR_NOTICE_IND */
+    ulong CORR_id;            /* Correlation id */
+    ulong TRANS_id;           /* Transaction id */
+    ulong REPORT_cause;       /* SCCP return cause */
+} TR_notice_ind_t;
+\fR\s+1
+.fi
 .SH DESCRIPTION
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
+.PP
+This primitive indicates to the transaction user that a datagram produced an error.
+.SH PARAMETERS
+.PP
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TR_NOTICE_IND .
+.TP
+.I CORR_id
+is the transaction user assigned transaction identifier.
+.TP
+.I TRANS_id
+is the transaction provider assigned transaction identifier.
+.TP
+.I REPORT_cause
+defines the protocol dependent error code.
+.SH MODES
+.PP
+Only connectionless-mode.
+.SH ORIGINATOR
+.PP
+Transaction provider.
+.SH "SEE ALSO"
+.PP
+.BR tri (7),
+.BR M_PROTO (9),
+.BR TR_UNI_REQ (7),
+.BR TR_UNI_IND (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

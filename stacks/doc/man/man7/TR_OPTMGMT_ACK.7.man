@@ -1,0 +1,197 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_OPTMGMT_ACK.7.man,v 0.9.2.1 2004/10/24 11:47:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:39 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_OPTMGMT_ACK 7 "$Date: 2004/10/24 11:47:39 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME 
+.PP
+.B TR_OPTMGMT_ACK
+\- Option Management Acknowledgment
+.SH SYNOPSIS
+.PP
+This message consists of a
+.BR M_PCPROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_optmgmt_ack {
+    ulong PRIM_type;          /* Always T_OPTMGMT_ACK */
+    ulong OPT_length;         /* options length */
+    ulong OPT_offset;         /* options offset */
+    ulong MGMT_flags;         /* options data flags */
+} TR_optmgmt_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This indicates to the transaction user that the options management request has completed.
+.SH PARAMETERS
+.PP
+.TP 16
+.I PRIM_type
+indicates the primitive type
+Always
+.BR TR_OPTMGMT_ACK .
+.TP
+.I OPT_length
+is the length of the protocol options associated with the primitive
+.TP
+.I OPT_offset
+is the offset from the beginning of the
+.BR M_PCPROTO (9)
+block where the options begin.
+The proper alignment of the options is not guaranteed.
+.TP
+.I MGMT_flags
+should be the same as those specified in the
+.BR TR_OPTMGMT_REQ (7)
+primitive with any additional flags as specified below.
+.SH RULES
+.PP
+The following rules apply to the
+.B TR_OPTMGMT_ACK
+primitive.:
+.IP - 3
+If the value of
+.I MGMT_flags
+in the
+.BR TR_OPTMGMT_REQ (7)
+primitive is
+.BR TR_DEFAULT ,
+the provider should return the default provider options without changing the existing options
+associated with the
+.IR stream .
+.IP -
+If the value of
+.I MGMT_flags
+in the
+.BR TR_OPTMGMT_REQ (7)
+primitive is
+.BR TR_CHECK ,
+the provider should return the options as specified in the
+.BR TR_OPTMGMT_REQ (7)
+primitive along with the additional flags
+.BR TR_SUCCESS " or " TR_FAILURE
+which indicate to the user whether the specified options are supportable by the provider.
+The provider should not change any existing options associated with the
+.IR stream .
+.IP -
+If the value of
+.I MGMT_flags
+in the
+.BR TR_OPTMGMT_REQ (7)
+primitive is
+.BR TR_NEGOTIATE ,
+the provider should set and negotiate the option as specified by the following rules:
+.RS
+.IP - 3
+If the
+.I OPT_length
+field of the
+.BR TR_OPTMGMT_REQ (7)
+primitive is 0, then the transaction provider is to set and return the default options associated
+with the
+.I stream
+in the
+.B TR_OPTMGMT_ACK
+primitive.
+.IP -
+If options are specified in the
+.BR TR_OPTMGMT_REQ (7)
+primitive, then the transaction provider should negotiate those options, set the negotiated options
+and return the negotiated options in the
+.B TR_OPTMGMT_ACK
+primitive.
+It is the user's responsibility to check the negotiated options returned in the
+.B TR_OPTMGMT_ACK
+primitive and take appropriate action.
+.RE
+.IP - 3
+If the value of
+.I MGMT_flags
+in the
+.BR TR_OPTMGMT_REQ (7)
+primitive is
+.BR TR_CURRENT ,
+the provider should return the currently effective option values without changing any existing
+options associated with the
+.IR stream .
+.SH ERRORS
+.PP
+If the above rules result in an error condition, the transaction provider must issue a
+.BR TR_ERROR_ACK (7)
+primitive to the transaction user specifying the error as defined in the description of the
+.BR TR_OPTMGMT_REQ (7)
+primitive.
+.SH MODES
+.PP
+Both connection-mode and connectionless-mode.
+.SH ORIGINATOR
+.PP
+Transaction provider.
+.SH "SEE ALSO"
+.PP
+.BR tri (7),
+.BR M_PCPROTO (9),
+.BR TR_OPTMGMT_REQ (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,155 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_BEGIN_IND.7.man,v 0.9.2.1 2004/10/24 11:47:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_BEGIN_IND 7 "$Date: 2004/10/24 11:47:38 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.B TR_BEGIN_IND
+\- Association Begin Indication
+.SH SYNOPSIS
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+blocks if any user data is associated with the primitive.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_begin_ind {
+    ulong PRIM_type;          /* Always TR_BEGIN_IND */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+} TR_begin_ind_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This primitive indicates to the transaction user that an assocation begin request to the user has
+been made by the user at the specified originating address.
+.SH PARAMETERS
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TR_BEGIN_IND .
+.TP
+.I TRANS_id
+is the transaction identifier assigned by the transaction provider to this transaction association.
+Transaction identifiers provided by the transaction provider always have the high bit set to 1 and
+are different from -1.
+The begin indication is always the first message to which the transaction provider attaches any
+newly assigned transaction identifier.
+.TP
+.I ASSOC_flags
+are the association options flags for the indication.
+.TP
+.I DEST_length
+is the length of the destination address.
+The destination address is indicated where it is different from the bound address associated with
+the
+.I stream
+upon which the indication is issued, or when the
+.I stream
+is bound to more than one address (e.g. a list of application contexts) and the destination address
+is more specific than the binding criteria and equivalent information is not contained in the
+originating address.
+.TP
+.I DEST_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the destination address begins.
+.TP
+.I ORIG_length
+is the length of the originating address
+.TP
+.I ORIG_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the originating address begins.
+.TP
+.I OPT_length
+is the length of the requested options associated with the primitive.
+.TP
+.I OPT_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) of the requested options associated with the primitive.
+.PP
+The proper alignment of the destination address, originating address, and options in the
+.BR M_PROTO (9)
+message block is not guaranteed.
+.SH MODES
+Only connection-mode.
+.SH ORIGINATOR
+transaction provider.
+.SH "SEE ALSO"
+.BR TR_BEGIN_RES (7),
+.BR TR_ABORT_REQ (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

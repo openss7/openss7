@@ -1,0 +1,135 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_END_IND.7.man,v 0.9.2.1 2004/10/24 11:47:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:39 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_END_IND 7 "$Date: 2004/10/24 11:47:39 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.PP
+.B TR_END_IND
+\- Transaction End Indication
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block
+followed by zero or more
+.BR M_DATA (9)
+blocks if any user data is associated with the primitive.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_end_ind {
+    ulong PRIM_type;          /* Always TR_END_IND */
+    ulong CORR_id;            /* Correlation id */
+    ulong TRANS_id;           /* Transaction id */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+} TR_end_ind_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the transaction user that the user on the other side of the association
+is finished sending data.
+.SH PARAMETERS
+.PP
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+.TP
+.I CORR_id
+is the transaction user assigned transaction identifier corresponding to a
+.BR TR_BEGIN_REQ (7)
+primitive issued by the transaction user.
+This field is -1, unless the
+.B TR_END_IND
+is in response to a
+.BR TR_BEGIN_REQ (7).
+.TP
+.I TRANS_id
+is the transaction provider assigned transaction identifier.
+.TP
+.I OPT_length
+is the length of the protocol options associated with the primitive and user data.
+.TP
+.I OPT_offset
+is the offest from the beginning of the
+.BR M_PROTO (9)
+message block where the protocol options begin.
+.SH MODES
+.PP
+Only connection-mode.
+.SH ORIGINATOR
+.PP
+Transaction provider.
+.SH "SEE ALSO"
+.PP
+.BR tri (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TR_END_REQ(7),
+.BR TR_ABORT_IND (7),
+.BR TR_ABORT_REQ (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

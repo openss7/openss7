@@ -1,7 +1,7 @@
 '\" rt
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tci.7.man,v 0.9.2.2 2004/10/24 11:47:44 brian Exp $
+.\" @(#) $Id: TR_OK_ACK.7.man,v 0.9.2.1 2004/10/24 11:47:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/24 11:47:44 $ by $Author: brian $
+.\" Modified $Date: 2004/10/24 11:47:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -49,14 +49,54 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TCI 7 "$Date: 2004/10/24 11:47:44 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH TR_OK_ACK 7 "$Date: 2004/10/24 11:47:39 $" "$Name:  $" "Transaction Interface (TRI)"
 .SH NAME
-.B TCI
-\- Transaction Component Interface
+.B TR_OK_ACK
+\- Success Acknowledgment
+.SH SYNOPSIS
+This message consists of one
+.BR M_PCPROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_ok_ack {
+    ulong PRIM_type;          /* Always T_OK_ACK */
+    ulong CORRECT_prim;       /* correct primitive */
+} TR_ok_ack_t;
+\fR\s+1
+.fi
 .SH DESCRIPTION
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
+This primitive indicates to the transaction user that the previous transaction-user-originated
+primitive was received successfully by the transaction provider.
+It does not indicate to the transaction user any transaction protocol action taken due to issuing
+the primitive.
+This may only be initiated as an acknowledgment for those primitives that require one.
+.SH PARAMETERS
+.TP 16
+.I PRIM_type
+identifies the primitive.
+.TP
+.I CORRECT_prim
+contains the successfully received primitive type.
+.SH MODES
+Both connection-mode and connectionless-mode.
+.SH ORIGINATOR
+Transaction provider.
+.SH "SEE ALSO"
+.BR tri (7),
+.BR M_PCPROTO (9),
+.BR TR_ERROR_ACK (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

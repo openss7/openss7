@@ -1,1 +1,1721 @@
-.so soon.7.man
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: tri.7.man,v 0.9.2.2 2004/10/24 11:47:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:44 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TRI 7 "$Date: 2004/10/24 11:47:44 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B TRI
+\- Transaction Interface
+.SH DESCRIPTION
+.
+.
+.
+.PP
+This document specifies a
+.IR STREAMS (4)-based
+kernel-level instantiation of the ITU-T Q.771 TCAP TR service definition.
+.[
+q.771
+.]
+The Transaction Interface (TRI) enables the user of an TCAP/ASCE service to access and use any of a
+variety of conforming TCAP/ACSE service providers without specific knowledge of the provider's
+protocol.
+The service interface is designed to support any connection-mode and connectionless TCAP/ACSE
+protocol.
+This interface only specifies access to the TCAP/ACSE layer service providers, and does not address
+issues concerning TCAP/ACSE management, protocol performance and performance analysis tools.
+.
+.PP
+The specification assumes that the reader the reader is familiar with
+SS7 terminology,
+.[
+q.700
+.]
+ISO/OSI reference model terminology,
+.[
+x.210
+.]
+the Transaction Capabilities Application Part (Q.771),
+.[
+q.771
+.]
+ISO/CCITT Association Control Service Element (ACSE) service (X.217),
+.[
+x.217
+.]
+and
+.IR STREAMS (4).
+.[
+svid
+.]
+.
+.PP
+.B TRI
+specifies an interface that supports the services provided by the Transaction Capabilities
+Application Part
+.RB ( tcap (4))
+for ITU-T applications as described in ITU-T Recommendation Q.771
+.[
+q.771
+.]
+.B TRI
+also supports the Association Control Server Element (ACSE) described in ITU-T Recommendation X.217.
+.[
+x.217
+.]
+These specifications are targeted for use be developers and testers of protocol modules that
+require transaction service.
+.
+.SS "The Transaction Sub-Layer"
+.PP
+The Transaction Sub-Layer
+.[
+q.771
+.]
+provides a subset of the ACSE service interface.
+.[
+x.217
+.]
+The transaction sub-layer provides a means to manage transactions between applications.
+It is responsible for the control of service associations between application service entities.
+.
+.
+.SS "Model of the TRI"
+.PP
+The
+.B TRI
+defines the services provided by the transaction sub-layer to the transaction user at the boundary
+between the transaction sub-layer and the transaction component sub-layer or transaction user
+entity.
+For TCAP, this is the interface between the TR sub-layer and the TC sub-layer.
+.[
+q.771
+.]
+For ISO/OSI, this is the interface between the ACSE
+.[
+x.217
+.]
+and ROSE.
+.[
+x.219
+.]
+.
+.PP
+The interface consists of a set of primitives defined as
+.IR STREAMS (4)
+messages that provide access to the transaction sub-layer services, and are transferred between the
+transaction service user entity and the transaction service provider.
+These primitives are of two types; ones that originate from the transaction service user, and others
+that originate from the transaction service provider.
+The primitives that originate from the transaction service user make requests to the transaction
+service provider, or respond to an indication of an event of the transaction service provider.
+The primitives that originate from the transaction service provider are either confirmations of a
+request, or are indications to the transaction service user that an event has occurred.
+.PP
+The
+.B TRI
+allows the transaction service provider to be configured with any transaction sub-layer (such as any
+of the TCAP National variants, or even an OSI ACSE provider) that conforms to the
+.BR TRI .
+A transaction sub-layer user can also be a user program that conforms to the
+.B TRI
+and accesses the transaction service provider via the
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system calls.
+.
+.
+.SS "TRI Services"
+.PP
+The features of the
+.B TRI
+are defined in terms of the services provided by the transaction service provider, and the
+individual primitives that may flow between the transaction service user and the transaction service
+provider.
+.PP
+The services supported by the
+.B TRI
+are based on two distinct modes of communication: connection-oriented tranaction service (COTS) and
+connectionless transaction service (CLTS).
+Also, the
+.B TRI
+supports services for local management.
+.TP
+.BR COTS
+The main features of connection mode communications are:
+.RS
+.IP a. 4
+It is virtual circuit oriented;
+.IP b. 4
+it provides transfer of data along a pre-established path;
+.IP c. 4
+it provides reliable data transfer.
+.PP
+There are three phases to each instance of communication: Association Establishment; Data Transfer;
+and Association Termination.
+Units of data arrive at their destination in the same order as they departed their source and the
+data is protected against duplication or loss of data units with some specified quality of service.
+.RE
+.TP
+.BR CLTS
+The main features of connectionless mode communication are:
+.RS
+.IP a. 4
+It is datagram oriented;
+.IP b. 4
+it provides transfer of data in self contained units;
+.IP c. 4
+there is no logical relationship between these units of data;
+.IP d. 4
+it is unreliable.
+.PP
+Connectionless mode communication has no separate phases.
+Each unit of data is transmitted from source to destination independently, appropriate addressing
+information is included with each unit of data.
+As the units of data are transmitted independently from source to destination, there are, in
+general, no guarantees of proper sequence and completeness of the data stream.
+.RE
+.
+.
+.TP
+.B "Local Management"
+The
+.B TRI
+specifications also define a set of local management functions that apply to COTS and CLTS modes of
+communication.
+These services have local significance only.
+.PP
+Tables 1, 2 and 3 summarizes the
+.B TRI
+service primitives by their state and service.
+.
+.PP
+.in 0
+.TS
+center tab(:);
+cbss.
+Table 1.  Service Primitives for Local Management
+.T&
+|lbw(14n)|lbw(14n)lbw(21n)|
+|l|l|l|.
+_
+STATE:SERVICE:PRIMITIVES
+=
+T{
+.ad l
+.hy 0
+Local
+.br
+Management
+T}:T{
+.ad l
+.hy 0
+Information
+.br
+Reporting
+T}:T{
+.ad l
+.hy 0
+.BR TR_INFO_REQ (7),
+.BR TR_INFO_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+:_:_
+:Bind:T{
+.ad l
+.hy 0
+.BR TR_BIND_REQ (7),
+.BR TR_BIND_ACK (7),
+.BR TR_UNBIND_REQ (7),
+.BR TR_OK_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Options
+.br
+Management
+T}:T{
+.ad l
+.hy 0
+.BR TR_OPTMGMT_REQ (7),
+.BR TR_OK_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Address
+T}:T{
+.ad l
+.hy 0
+.BR TR_ADDR_REQ (7),
+.BR TR_ADDR_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+_
+.T&
+cbss.
+
+Table 2.  Service Primitives for Connection Mode Data Transfer
+.T&
+|lbw(14n)|lbw(14n)lbw(21n)|
+|l|l|l|.
+_
+STATE:SERVICE:PRIMITIVES
+=
+T{
+.ad l
+.hy 0
+Association
+.br
+Establishment
+T}:T{
+.ad l
+.hy 0
+Association
+.br
+Establishment
+T}:T{
+.ad l
+.hy 0
+.BR TR_BEGIN_REQ (7),
+.BR TR_BEGIN_IND (7),
+.BR TR_BEGIN_RES (7),
+.BR TR_BEGIN_CON (7),
+.BR TR_OK_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+_
+T{
+.ad l
+.hy 0
+Connection
+.br
+Mode Data
+.br
+Transfer
+T}:T{
+.ad l
+.hy 0
+Data
+.br
+Transfer
+T}:T{
+.ad l
+.hy 0
+.BR TR_CONT_REQ (7),
+.BR TR_CONT_IND (7)
+T}
+_
+T{
+.ad l
+.hy 0
+Association
+.br
+Release
+T}:T{
+.ad l
+.hy 0
+Association
+.br
+Release
+T}:T{
+.ad l
+.hy 0
+.BR TR_END_REQ (7),
+.BR TR_END_IND (7),
+.BR TR_OK_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+:_:_
+:T{
+.ad l
+.hy 0
+Association
+.br
+Abort
+T}:T{
+.ad l
+.hy 0
+.BR TR_ABORT_REQ (7),
+.BR TR_ABORT_IND (7),
+.BR TR_OK_ACK (7),
+.BR TR_ERROR_ACK (7)
+T}
+_
+.T&
+cbss.
+
+Table 3.  Service Primitives for Connectionless Mode Data Transfer
+.T&
+|lbw(14n)|lbw(14n)lbw(21n)|
+|l|l|l|.
+_
+STATE:SERVICE:PRIMITIVES
+=
+T{
+.ad l
+.hy 0
+Connectionless
+.br
+Mode
+.br
+Data Transfer
+T}:T{
+.ad l
+.hy 0
+Data
+.br
+Transfer
+T}:T{
+.ad l
+.hy 0
+.BR TR_UNI_REQ (7),
+.BR TR_UNI_IND (7),
+.BR TR_NOTICE_IND (7)
+T}
+_
+.TE
+.sp 2
+.
+.SH "TRI SERVICES DEFINITION"
+.PP
+This section describes the services of the
+.B TRI
+primitives.
+Time-sequence diagrams that illustrate the sequence of primitives are included.
+(Conventions for the time-sequence diagrams are defined in ITU-T X.210.)
+.[
+x.210
+.]
+The format of the primitives are defined separately.
+.
+.
+.SS "Local Management Service Definition"
+The services defined in this section are outside the scope of the International standards.
+These services apply to both connection and connectionless modes of communication.
+They are invoked for the initialization and tear down of a
+.I stream
+connected to the transaction service provider.
+They are also used to manage options supported by the transaction service provider and to report
+information on the supported parameter values.
+.PP
+.B Information Service:-
+.br
+The information service provides the transaction services user with the ability to query the
+transaction service provider concerning options and parameters specific to the transaction service
+provider and concerning with the transaction association.
+The information services use the following primitives:
+.IP \(em 4
+.BR TR_INFO_REQ (7):
+Requests information concerning the transaction service provider, protocol limits, modes and
+options.
+This primitive requires local acknowledgement with the
+.BR TR_INFO_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TR_INFO_ACK (7):
+Provides information concerning the transaction service provider, protocol limits, modes and
+options.
+.PP
+.B Bind Service:-
+.br
+The bind service provides the transaction service user with the ability to bind the requesting
+.I stream
+to a association address.
+The bind service also permits the negotiation of the number of outstanding transaction begin
+indication on a connection mode transaction service provider.
+The bind service uses the following primitives:
+.IP \(em 4
+.BR TR_BIND_REQ (7):
+Requests the binding of the requesting
+.I stream
+to a transaction association address.
+This primitive requires local acknowledgement with the
+.BR TR_BIND_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TR_BIND_ACK (7):
+Provides acknowledgement of the bound transaction association address and the number of negotiated
+outstanding incoming transaction association indications.
+.PP
+.B Unbind Service:-
+.br
+The unbind service provides the transaction service user with the ability to unbind the requesting
+.I stream
+from the association address to which it is currently bound.
+The unbind service uses the following primitives:
+.IP \(em 4
+.BR TR_UNBIND_REQ (7):
+Requests that the requesting
+.I stream
+be unbound from the transaction assocation address previously bound.
+This primitive requires local acknowledgement with the
+.BR TR_OK_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.PP
+.B Options Management Service:-
+.br
+The options management service provides a mechanism whereby the trnsaction service user can query
+and negotiate parameters associated with the transaction service provider and the association.
+The options management service uses the following primitives:
+.IP \(em 4
+.BR TR_OPTMGMT_REQ (7):
+Requests the management of transaction service provider options.
+This primitive requires local acknowledgement using the
+.BR TR_OPTMGMT_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TR_OPTMGMT_ACK (7):
+Provides acknowledgement of the management of transction service provider options.
+.PP
+.B Address Service:-
+.br
+The address service provides the transaction services user with the ability to query bound and
+connected association addresses.
+The address service uses the following primitives:
+.IP \(em 4
+.BR TR_ADDR_REQ (7):
+Requests the bound and connected association addresses.
+This primitive requires local acknowledgement using the
+.BR TR_ADDR_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TR_ADDR_ACK (7):
+Provides acknowledgement of the bound and connected association addresses.
+.PP
+.B Receipt Acknowledgement Service:-
+.br
+The receipt acknowledgement service provides an indication to the transaction service user of the
+positive or negative acknowledgement of the previous primitive issued by the transaction service
+user.
+The receipt acknowledgement service uses the following primitives:
+.IP \(em 4
+.BR TR_OK_ACK (7):
+Provides positive acknowledgement of the request and response primitives that require local
+acknowledgement.
+.IP \(em
+.BR TR_ERROR_ACK (7):
+Provides negative acknowldgement of the request and response primitives that require local
+acknowledgement.
+.
+.SS "Connection-Mode Transaction Services Definition"
+.PP
+The transaction service provider provides the following connection-mode transaction services:
+.
+.PP
+.B Association Establishment Service:-
+.br
+The assocation establishment service provides the transaction service user with the ability to form
+outgoing transaction associations, as well as accept or reject incoming transaction associations.
+The association establishment service uses the following primitives:
+.IP \(em 4
+.BR TR_BEGIN_REQ (7):
+Requests association to a peer association address.
+This primitive requires local acknowledgement using the
+.BR TR_OK_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TR_BEGIN_IND (7):
+Provides indication of an association request from a peer transaction user.
+.IP \(em
+.BR TR_BEGIN_RES (7):
+Responds to an outstanding association indication.
+This primitive requires local acknowledgement using the
+.BR TR_OK_ACK (7)
+or
+.BR TR_ERROR_ACK (7)
+primitives.
+.IP \(em
+.BR TR_BEGIN_CON (7):
+Provides confirmation of an association to a peer transaction user.
+.
+.PP
+.B Connection-Mode Data Transfer Service:-
+.br
+The connection-mode data transfer service provides the transaction service user with the ability to
+transfer connection-mode data between the transaction service user and the transaction service
+provider.
+It also provides the ability to exchange data in transaction interface data units smaller than the
+overall transaction service data unit.
+The connection-mode data transfer service uses the following primitives:
+.IP \(em 4
+.BR TR_CONT_REQ (7):
+Requests the transfer of data on a transaction association.
+.IP \(em
+.BR TR_CONT_IND (7):
+Provides indication of the reception of data on a transaction association.
+.
+.PP
+.B Association Abort Service:-
+.br
+The association abort service provides the transaction user with the ability to generate an abortive
+release of an existing transaction association, refuse and incoming transaction association, or
+accept the abort of a transaction association.
+The association abort service uses the following primitives:
+.IP \(em 4
+.BR TR_ABORT_REQ (7):
+Requests that a transaction association be aborted.
+.IP \(em
+.BR TR_ABORT_IND (7):
+Provides indication that a transaction association has been aborted.
+.
+.PP
+.B Association Release Service:-
+.br
+The association release service provides the transaction service user with the ability to perform or
+accept termination of an existing transaction association.
+The association release service uses the following primitives
+.IP \(em 4
+.BR TR_END_REQ (7):
+Requests that a transaction association be terminated.
+.IP \(em
+.BR TR_END_IND (7):
+Provides indication that a transaction association is termianted.
+.
+.
+.SS "Connectionless-Mode Transaction Services Definition"
+.PP
+The transaction service provider provides the following connectionless-mode transaction service:
+.PP
+.B Connectionless-Mode Data Transfer Service:-
+.br
+The connectionless-mode data transfer service provides the transaction user with the ability to
+transfer connectionless-mode data between the transaction services user and the transaction services
+provider.
+It also provides indication to the transaction services user of some protool errors related to the
+transfer of unit data.
+The connectionless-mode data transfer service uses the following primitives:
+.IP \(em 4
+.BR TR_UNI_REQ (7):
+Requests the transfer of unidirectional data.
+.IP \(em
+.BR TR_UNI_IND (7):
+Provides indication of the reception of unidirectional data.
+.IP \(em
+.BR TR_NOTICE_IND (7):
+Provides indication of errors encountered in the transmission of unidirectional data.
+.
+.
+.SH "RULES"
+.
+.SS "Note about Structure Elements"
+.PP
+Although the structure elements shown in the individual manual pages are declared as
+.B ulong
+data types, the value the transaction provider assigns to those elements that refer to this not must
+not be greater than the maximum value of an
+.B int
+data type because the corresponding user level structure elements is declared as
+.BR int .
+.PP
+To avoid compatibility issues between 32-bit kernels and 64-bit applications (and visa versa),
+structure elements are declared as 32-bit on all architectures.
+.
+.
+.SS "Rules for Flushing Queues"
+.PP
+The following rules pertain to flushing the stream queues.
+No other flushes should be needed to keep the queues in the proper condition.
+.IP \(bu 3
+The transaction providers must be aware that they will receive
+.BR M_FLUSH (9)
+messaes from upstream.
+These flush requests are issued to ensure that the providers receive certain messages and
+primitives.
+It is the responsibility of the providers to act appropriately as deemed necessary by the providers.
+.IP \(bu
+The transaction provider must send up a
+.BR M_FLUSH (9)
+message to flush both the read and write queues after receiving a successful
+.BR TR_UNBIND_REQ (9)
+message and prior to issuing the
+.BR TR_OK_ACK (9)
+primitive.
+.PP
+The following rules pertain only to the connection-mode transaction providers:
+.IP \(bu 3
+If the interface is in the
+.BR TR_DATA_XFER ", " TR_WIND_END ", or " TR_WACK_END
+state, the transaction proivder must send up a
+.BR M_FLUSH (9)
+message to flush both the read and write queues before sending up a
+.BR TR_ABORT_IND (7)
+primitive.
+.IP \(bu
+If the interface is in the
+.BR TR_DATA_XFER ", " TR_WIND_END ", or " TR_WACK_END
+state, the transaction provider must send up a
+.BR M_FLUSH (9)
+message to flush both the read and write queues after receiving a successful
+.BR TR_ABORT_REQ (7)
+message and before issuing the
+.BR TR_OK_ACK (7)
+primitive.
+.
+.
+.SH "SEQUENCE OF PRIMITIVES"
+.PP
+The allowable sequence of primitives are described in the state diagrams and tables below for both
+the connection-mode and connectionless-mode transaction services.
+.
+.
+.PP
+The following tables describe the possible events that may occur on the interface and the possible
+states as viewed by the transaction user that the interface may enter due to an event.  The events
+map directly to the transaction service interface primitives.
+.PP
+.TS
+center tab(:);
+cbsssss.
+Table 4.  Possible States
+.T&
+|cbs|cbss|cb|
+|nl|lss|l|.
+_
+State:Description:Service Type
+=
+0:TRS_UNBND:T{
+.ad l
+.hy 0
+unbound
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+1:TRS_WACK_BREQ:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR TR_BIND_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+2:TRS_WACK_UREQ:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR TR_UNBIND_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+3:TRS_IDLE:T{
+.ad l
+.hy 0
+idle \(em no connection
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+4:TRS_WACK_OPTREQ:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR TR_OPTMGMT_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+5:TRS_WACK_CREQ:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR TR_BEGIN_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+6:TRS_WCON_CREQ:T{
+.ad l
+.hy 0
+awaiting confirmation of
+.BR TR_BEGIN_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+7:TRS_WRES_CIND:T{
+.ad l
+.hy 0
+awaiting response of
+.BR TR_BEGIN_IND (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+8:TRS_WACK_CRES:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR TR_BEGIN_RES (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+9:TRS_DATA_XFER:T{
+.ad l
+.hy 0
+data transfer
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+10:TRS_WIND_ORDREL:T{
+.ad l
+.hy 0
+awaiting
+.BR TR_END_IND (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+11:TRS_WACK_ORDREL:T{
+.ad l
+.hy 0
+awaiting
+.BR TR_END_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+12:TRS_WACK_DREQ6:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR T_ABORT_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+13:TRS_WACK_DREQ7:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR T_ABORT_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+14:TRS_WACK_DREQ9:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR T_ABORT_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+15:TRS_WACK_DREQ10:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR T_ABORT_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+16:TRS_WACK_DREQ11:T{
+.ad l
+.hy 0
+awaiting acknowledgement of
+.BR T_ABORT_REQ (7)
+T}:T{
+.ad l
+.hy 0
+TR_COTS, TR_CLTS
+T}
+_
+.TE
+.sp 2
+.
+.
+.SS "Stream States"
+.TP
+.B Local Management
+.PP
+Table 5 shows the state table for the initialization and maintenance of
+.I stream
+state.
+It is important to note that, like TPI,
+.[
+TPI Revision 2.0.0
+.]
+.I stream
+state is applicable to the entire stream.
+.PP
+.TS
+center tab(:);
+cbsssss.
+Table 5.  Initialization State Table
+.T&
+|rb|cb|cb|cb|cb|cb|
+|lb|cb|cb|cb|cb|cb|
+|l|c|c|c|c|c|.
+_
+State:0:1:2:3:4
+Event:
+=
+TR_BIND_REQ:1:
+_
+TR_UNBIND_REQ::::2
+_
+TR_OPTMGMT_REQ::::4
+_
+TR_BIND_ACK::3
+_
+TR_OPTMGMT_ACK:::::3
+_
+TR_ERROR_ACK::0:3::3
+_
+TR_OK_ACK:::0
+_
+.TE
+.sp 2
+.PP
+The following rules regard the maintenance of the state of the interface:
+.IP \(bu 3
+It is the responsibility of the transaction provider to keep record of the state of the interface as
+viewed by the transaction user.
+.IP \(bu
+The transaction provider must never issue a primitive that places the interface out of state.
+.IP \(bu
+The uninitialized state of a
+.I stream
+is the initial and final state, and it must be bound (see
+.BR TR_BIND_REQ (7)
+primitive)
+before the transaction provider may view it as an active
+.IR stream .
+.IP \(bu
+If the transaction provider send an
+.BR M_ERROR (9)
+message upstream, it should also drop any further messages received on its write side of the
+.IR stream .
+.
+.SS "Transaction States"
+.TP
+.B Connection-Mode Transaction States
+.PP
+Table 6 shows the state table for the connection-mode transaction services.  It is important to
+note that, unlike TPI,
+.[
+TPI Revision 2.0.0
+.]
+this state transition is per-transaction instead of per-stream.
+All transaction begin and end life in the
+.B TRS_IDLE
+state.
+.PP
+.in 0
+.TS
+expand center tab(:);
+cbssssssssssssss.
+Table 6.  Transaction State Table, COTS
+.T&
+|rb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|
+|lb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|
+|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|.
+_
+State:0:3:5:6:7:8:9:10:11:12:13:14:15:16
+Event:
+=
+TR_BEGIN_REQ::5
+_
+TR_BEGIN_RES:::::8
+_
+TR_ABORT_REQ::::12:13::14:15:16
+_
+TR_CONT_REQ:::::::9::11
+_
+TR_END_REQ:::::::10::3
+_
+TR_BEGIN_IND::7
+_
+TR_BEGIN_CON::::9
+_
+TR_CONT_IND:::::::9:10
+_
+TR_END_IND:::::::11:3
+_
+TR_ABORT_IND::::3:3:3:3:3:3
+_
+TR_ERROR_ACK:::3:::7::::6:7:9:10:11
+_
+TR_OK_ACK:::6:::3:3:::3:3:3:3:3
+_
+.TE
+.sp 2
+.PP
+The following rules apply only to the connection-mode transaction services:
+.IP \(bu 3
+A transaction association release procedure can be initiated at any time during the transaction
+association establishment or data transfer phase.
+.IP \(bu
+The state tables for the connection-mode transaction service providers include the management of the
+transaction identification numbering and individual transaction state.
+It is the responsiblity of the transaction provider to keep trasnaction state separate from
+.I stream
+interface state.
+.IP \(bu
+The state of a transaction service interface of a
+.I stream
+cannot be transferred to another
+.IR stream .
+.
+.TP
+.B Connectionless-Mode Transaction States
+.PP
+Table 7 shows the state table for connectionless-mode transaction services.  It is important to
+knot that, unlike TPI,
+.[
+TPI Revision 2.0.0
+.]
+this state transition is per-transaction instead of per-stream.
+All transaction begin and end life in the
+.B TRS_IDLE
+state.
+.PP
+.TS
+center tab(:);
+cbs.
+Table 7.  Transaction State Table, CLTS
+.T&
+|rb|cb|
+|lb|cb|
+|l|c|.
+_
+State:3
+Event
+=
+TR_UNI_REQ:3
+_
+TR_UNI_IND:3
+_
+TR_NOTICE_IND:3
+_
+.TE
+.sp 2
+.
+.
+.SH "PRIMITIVE PRECEDENCE"
+.PP
+The following rules apply to the precedence of transaction primitives with respect to their position
+on a
+.IR stream :
+.IP \(bu 3
+The transaction provider has responsibility for determining precedence on its
+.I stream
+write queue,
+.IP \(bu
+The transaction user has responsibility for determining precedence on its
+.I stream
+read queue,
+.IP \(bu
+All primtiives on the stream are assumed to be placed on the queue in the correct sequence.
+.PP
+The following rules apply only to the connection-mode tansaction services:
+.IP \(bu 3
+There is no guarantee of delivery of user data once a
+.BR TR_ABORT_REQ
+primitive has been issued.
+.PP
+The following describes the precedence of the transaction primtives for both the
+.I stream
+read and write queues.
+.PP
+Table 8 shows the precedence of primitives for the
+.I stream
+write queue.
+.PP
+.in 0
+.TS
+expand center tab(:);
+cbssssssssssss.
+Table 8.  Stream Write Queue Precedence Table
+.T&
+|rbs|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|
+|lbs|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|
+|nl|c|c|c|c|c|c|c|c|c|c|c|.
+_
+Object X:1:2:3:4:5:6:7:8:9:10:11
+Object Y:
+=
+1:TR_ADDR_REQ:
+_
+2:TR_BEGIN_REQ::::4
+_
+3:TR_BEGIN_RES::::3
+_
+4:TR_ABORT_REQ:
+_
+5:TR_CONT_REQ::::5:1:::::1
+_
+6:TR_BIND_REQ:
+_
+7:TR_UNBIND_REQ:
+_
+8:TR_INFO_REQ:
+_
+9:TR_UNI_REQ:::::::::1
+_
+10:TR_OPTMGMT_REQ:
+_
+11:TR_END_REQ:
+_
+.TE
+.
+.PP
+.TS
+center tab(:);
+nlsss.
+Key
+_
+blank:T{
+.hy 0
+.ad l
+not applicable / queue should be empty
+T}
+1:T{
+.hy 0
+.ad l
+X has no precedence over Y
+T}
+2:T{
+.hy 0
+.ad l
+X has precedence over Y
+T}
+3:T{
+.hy 0
+.ad l
+X has precedence over Y and Y must be removed
+T}
+4:T{
+.hy 0
+.ad l
+X has precedence over Y and both X and Y must be removed
+T}
+5:T{
+.hy 0
+.ad l
+X may have precedence over Y (choice of user) and if X does, then it is the same as 3
+T}
+.TE
+.
+.PP
+Table 9 shows the precedence of primitives for the
+.I stream
+read queue.
+.PP
+.in 0
+.TS
+expand center tab(:);
+cbssssssssssssss.
+Table 9.  Stream Read Queue Precedence Table
+.T&
+|rbs|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|
+|lbs|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|
+|nl|c|c|c|c|c|c|c|c|c|c|c|c|c|.
+_
+Object X:1:2:3:4:5:6:7:8:9:10:11:12:13
+Object Y:
+=
+1:TR_ADDR_ACK:
+_
+2:TR_BEGIN_IND::::4
+_
+3:TR_BEGIN_CON::::3:1:1
+_
+4:TR_ABORT_IND::1::::::2:2
+_
+5:TR_CONT_IND::::5:1::::1::::1
+_
+6:TR_INFO_ACK:
+_
+7:TR_BIND_ACK::1
+_
+8:TR_ERROR_ACK::1:1:1:1
+_
+9:TR_OK_ACK::1:1:1:1
+_
+10:TR_UNI_IND::::::::2::1:2:2
+_
+11:TR_NOTICE_IND::::::::1::1:1:1
+_
+12:TR_OPTMGMT_ACK::1::::::::1:1
+_
+13:TR_END_IND::1::5::::2:2
+_
+.TE
+.
+.PP
+.TS
+center tab(:);
+nlsss.
+Key
+_
+blank:T{
+.hy 0
+.ad l
+not applicable / queue should be empty
+T}
+1:T{
+.hy 0
+.ad l
+X has no precedence over Y
+T}
+2:T{
+.hy 0
+.ad l
+X has precedence over Y
+T}
+3:T{
+.hy 0
+.ad l
+X has precedence over Y and Y must be removed
+T}
+4:T{
+.hy 0
+.ad l
+X has precedence over Y and both X and Y must be removed
+T}
+5:T{
+.hy 0
+.ad l
+X may have precedence over Y (choice of user) and if X does, then it is the same as 3
+T}
+.TE
+.
+.
+.SH "ERROR HANDLING"
+.PP
+There are two error handling facilities available to the transaction user: one to handle non-fatal
+errors and one to handle fatal errors.
+.SS "Non-fatal Errors"
+.PP
+The non-fatal errors are those that a transaction user can correct, and are reported in the form of
+an error acknowledgement to the appropriate primitive in error.
+Only those primitives that require acknowledgements may generate a non-fatal error acknowledgement.
+These acknowledgements always report a syntactical error in the specified primitive when the
+transaction provider receives the primitive.
+The primitive descriptions in the individual manual pages define those primitive and rules regarding
+the acknowledgement of them.
+These errors are reported to the transaction user via the
+.BR TR_ERROR_ACK (7)
+primitive, and give the transaction user the option of reissuing the transaction service primitive
+that cause the error.
+The
+.BR TR_ERROR_ACK (7)
+primitive also indicates to the transaction user that no action was taken by the transaction
+provider upon receipt of the primitive that caused the error.
+These errors do not change the state of the transaction service interface as seen by the transaction
+user.
+The state of the interface after the issuance of a
+.BR TR_ERROR_ACK (7)
+primitive should be the same as it was before the transaction provider received the interface
+primitive that was in error.
+The allowable errors that can be reported on the receipt of a transaction user initiated primitive
+are presented in the description of the appropriate primitives.
+.
+.SS "Fatal Errors"
+.PP
+Fatal errors are those that cannot be corrected by the transaction user, or those errors which
+result is an uncorrectable error in the interface or the transaction provider.
+.PP
+The most common of these errors are listed under the appropriate primitives.
+The transaction provider should issue fatal errors only if the transaction user can not correct the
+condition that cause the error or if the transaction provider has no means of reporting a
+transaction user correctable error.
+If the transaction provider detects an uncorrectable non-protocol error internal to the transaction
+provider, the provider should issue a fatal error to the user.
+.PP
+Fatal errors are indicated to the transaction user using the
+.IR STREAMS (4)
+message type
+.BR M_ERROR (9)
+with the Linux system error
+.B EPROTO
+(see
+.BR errno (3)).
+This is the only type of error that the transaction provider should use to indicate a fatal protocol
+error to the transaction user.
+The message
+.BR M_ERROR (9)
+will result in the failure of all operating system service routines on the
+.IR stream .
+The only way for the user to recover from a fatal error is to ensure that all processes close the
+special file associated with the
+.I stream .
+At that point, the user may reopen the special file associated with the
+.IR stream .
+.
+.
+.SH COMPATIBILITY
+.PP
+For the most part, the
+.B TRI
+is compatible with the
+.I mOSI
+specification for the
+.RI \(lq "Transport Provider Interface (TPI)" \(rq
+.[
+TPI Revision 2.0.0
+.]
+described in XNS 5.2.
+.[
+xns 5.2
+.]
+The primary differences between the Transaction Interface (TRI) and mOSI are as follows:
+.IP \(bu 3
+The TPI
+.[
+TPI Revision 2.0.0
+.]
+and mOSI
+.[
+xns 5.2
+.]
+were not designed to take a large scale short time-scale transactional load.
+It is inefficient to have to create a different
+.I stream
+to accomodate each transaction.
+For a system that scale to 10's of thousands of open transactions, this could lead to running out of
+available open file descriptors, limiting the number of simultaneous open transactions to
+.B _POSIX_OPEN_MAX
+per process, which on
+.BR Linux \(rg
+is 16.
+.IP
+Therefore,
+.B TRI
+permits mutliple open transactions to be processed simutaneoulsy on the same open
+.I stream
+by including the transaction id in each of the service primitives.
+This is, by the way, consistent with the primitive interface described for the TR sub-layer in
+Q.771.
+.[
+q.771
+.]
+.IP \(bu
+Some of the primitives that correspond to TPI primitives, have additional fields described over and
+above the corresponding TPI primitive.
+This is to accomodate cases where the TR sub-layer specification provides for optional arguments to
+primitive (such as ORIG_length and ORIG_offset) where TPI expects these values to be implicit to the
+requesting
+.IR stream .
+.
+.
+.SS "Mapping of Primitives to Q.771"
+.PP
+The following table maps the transaction primitive as seen by the transaction provider to the
+.I STREAMS (4)
+message types used to realize the primitives and to the Q.771 TCAP
+.[
+q.771
+.]
+transaction sub-layer service definition primitives.
+.PP
+.in 0
+.TS
+center tab(:);
+cbss.
+Table 10.  Mapping Q.771 to Transaction Service Primitives
+.T&
+|lb|lb|lb|
+|lb|lb|lb|
+|lb|lb|lb|
+|l|l|l|.
+_
+Transport:STREAMS:Q.771 TCAP
+Primitives:Message:Transaction Sub-
+:Types:Layer Primitives
+=
+T{
+.ad l
+.hy 0
+.BR TR_BEGIN_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-BEGIN Request
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_BEGIN_IND (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-BEGIN Indication
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_BEGIN_RES (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-CONTINUE Request
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_BEGIN_CON (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-CONTINUE Indication
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_CONT_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-CONTINUE Request
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_CONT_IND (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-CONTINUE Indication
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_END_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-END Request,
+.br
+TR-END Response
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_END_IND (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-END Indication,
+.br
+TR-END Confirmation
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_ABORT_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-U-ABORT Request
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_ABORT_IND (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-U-ABORT Indication,
+.br
+TR-P-ABORT Indication.
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_UNI_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-UNIDIRECTIONAL Request
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_UNI_IND (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-UNIDIRECTIONAL Indication
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_NOTICE_IND (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+TR-NOTICE Indication
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_ADDR_ACK (7)
+T}:M_PCPROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_ADDR_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_BIND_ACK (7)
+T}:M_PCPROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_BIND_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_ERROR_ACK (7)
+T}:M_PCPROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_INFO_ACK (7)
+T}:M_PCPROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_INFO_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_OK_ACK (7)
+T}:M_PCPROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_OPTMGMT_ACK (7)
+T}:M_PCPROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_OPTMGMT_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+T{
+.ad l
+.hy 0
+.BR TR_UNBIND_REQ (7)
+T}:M_PROTO:T{
+.ad l
+.hy 0
+not defined in Q.771
+T}
+_
+.TE
+.sp 2
+.
+.
+.SH "SEE ALSO"
+.BR putmsg (2),
+.BR getmsg (2),
+.BR TR_ABORT_IND (7),
+.BR TR_ABORT_REQ (7),
+.BR TR_ADDR_ACK (7),
+.BR TR_ADDR_REQ (7),
+.BR TR_BEGIN_CON (7),
+.BR TR_BEGIN_IND (7),
+.BR TR_BEGIN_REQ (7),
+.BR TR_BEGIN_RES (7),
+.BR TR_BIND_ACK (7),
+.BR TR_BIND_REQ (7),
+.BR TR_CONT_IND (7),
+.BR TR_CONT_REQ (7),
+.BR TR_END_IND (7),
+.BR TR_END_REQ (7),
+.BR TR_ERROR_ACK (7),
+.BR TR_INFO_ACK (7),
+.BR TR_INFO_REQ (7),
+.BR TR_NOTICE_IND (7),
+.BR TR_OK_ACK (7),
+.BR TR_OPTMGMT_ACK (7),
+.BR TR_OPTMGMT_REQ (7),
+.BR TR_UNBIND_REQ (7),
+.BR TR_UNI_IND (7),
+.BR TR_UNI_REQ (7).
+.
+.SH "HISTORY"
+.PP
+This interface is new to OpenSS7 for Linux Fast-STREAMS.
+.
+.SH "CONFORMANCE"
+.PP
+.
+.
+.
+.[
+$LIST$
+.]
+.TA

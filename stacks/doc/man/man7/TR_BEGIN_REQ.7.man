@@ -1,0 +1,230 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_BEGIN_REQ.7.man,v 0.9.2.1 2004/10/24 11:47:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_BEGIN_REQ 7 "$Date: 2004/10/24 11:47:38 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.PP
+.B TR_BEGIN_REQ
+\- Begin Request
+.SH SYNOPSIS
+.PP
+This message consists of one
+.BR M_PROTO (9)
+message block followed by zero or more
+.BR M_DATA (9)
+blocks if any user data is specified by the transaction user.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_begin_req {
+    ulong PRIM_type;          /* Always TR_BEGIN_REQ */
+    ulong CORR_id;            /* Correlation id */
+    ulong ASSOC_flags;        /* Association flags */
+    ulong DEST_length;        /* Destination address length */
+    ulong DEST_offset;        /* Destination address offset */
+    ulong ORIG_length;        /* Originating address length */
+    ulong ORIG_offset;        /* Originating address offset */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+} TR_begin_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive requests that the transaction provider begin an association with the specified
+destination.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TR_BEGIN_REQ .
+.TP
+.I CORR_id
+is the transaction identifier to be used for the association.
+.TP
+.I ASSOC_flags
+are the options flags for the association.
+.TP
+.I DEST_length
+is the length of the destination address.
+.TP
+.I DEST_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the destination address begins.
+.TP
+.I ORIG_length
+is the length of the originating address.
+.TP
+.I ORIG_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) where the originating address begins.
+.TP
+.I OPT_length
+is the length of the requested options associated with the primitive.
+.TP
+.I OPT_offset
+is the offset (from the beginning of the
+.BR M_PROTO (9)
+message block) of the
+requested options associated with the primitive.
+.PP
+The proper alignment of the destination address, originating address, and options in the
+.BR M_PROTO (9)
+message block is not guaranteed.
+The destination address, originating address, and options in the
+.BR M_PROTO (9)
+message block are however, aligned the same as they were received from the transaction user.
+.TP 8
+.B Note:
+The information located by the defined structures may not be in the proper alignment in the message
+blocks, so the casting of structure definitions over these fields may produce incorrect results.
+It is advised that the transaction providers supply exact format specifications for the appropriate
+information to the transaction users.
+.SH RULES
+.PP
+If the originating address does not differ from the bound address for the requesting
+.I stream
+it is not necessary to include it, and
+.I ORIG_length
+and
+.I ORIG_offset
+should be set to 0.
+.PP
+Transaction user selected transaction identifiers, used in the
+.I CORR_id
+field, must have the high bit set to 0.  Transaction identifiers with the high bit set to 1 are
+reserved for assignment by the transaction provider.
+.PP
+This primitive requires the transaction provider to generate one of the following acknowledgments on
+receipt of the primitive, and the transaction user must wait for the acknowledgment before issuing
+any other primitives:
+.SS Successful
+Correct acknowledgment of the primitive is indicated via the
+.BR TR_OK_ACK (7)
+primitive.
+.SS Non-fatal errors
+These errors will be indicated via the
+.BR TR_ERROR_ACK (7)
+primitive.
+.SH ERRORS
+.PP
+The allowable errors are as follows:
+.TP 16
+.RB [ TRACCES ]
+This indicates that the user did not have proper permissions for the use of the requested address or
+options.
+.TP
+.RB [ TRBADID ]
+This indicates that the
+.I CORR_id
+was invalid or contained illegal information.
+.TP
+.RB [ TRADDRBUSY ]
+The transaction provider does not support multiple associations to the same destination address.
+This error indicates that a associations already exists for the requested destination.
+.TP
+.RB [ TRBADADDR ]
+This indicates that the protocol address was in an incorrect format or the address contained invalid
+information.
+It is not intended to indicate protocol associations errors, such as an unreachable destination.
+Those error types are indicated via the
+.BR TR_ABORT_IND (7)
+primitive.
+.TP
+.RB [ TRBADDATA ]
+The amount of user data specified was invalid.
+.TP
+.RB [ TRBADOPT ]
+This indicates that the options were in an incorrect format, or they contained invalid information.
+.TP
+.RB [ TRNOTSUPPORT ]
+This primitive is not supported by the transaction provider.
+.TP
+.RB [ TROUTSTATE ]
+The primitive would place the transaction interface out of state.
+.TP
+.RB [ TRSYSERR ]
+A system error has occurred and the Linux system error is indicated in the primitive.
+.SH MODES
+.PP
+Only connection-mode.
+.SH ORIGINATOR
+.PP
+Transaction user.
+.SH "SEE ALSO"
+.PP
+.BR tri (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TR_BEGIN_CON (7),
+.BR TR_ABORT_IND (7),
+.BR TR_ERROR_ACK (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,157 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_ABORT_REQ.7.man,v 0.9.2.1 2004/10/24 11:47:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:38 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_ABORT_REQ 7 "$Date: 2004/10/24 11:47:38 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.B TR_ABORT_REQ
+\- Abort Request
+.SH SYNOPSIS
+This message consists of one
+.BR M_PROTO (9)
+message block followed by one or more
+.BR M_DATA (9)
+message blocks if there is any user data specified by the transaction user.
+The format of the
+.BR M_PROTO (9)
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_abort_req {
+    ulong PRIM_type;          /* Always TR_ABORT_REQ */
+    ulong TRANS_id;           /* Transaction id */
+    ulong ABORT_cause;        /* Cause of the abort */
+    ulong OPT_length;         /* Options structure length */
+    ulong OPT_offset;         /* Options structure offset */
+} TR_abort_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This primitive requests that the transaction provider deny a request for association, or abort an
+existing association.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+identifies the primitive type.
+Always
+.BR TR_ABORT_REQ .
+.TP
+.I TRANS_id
+specifies the indentifier of the existing transaction association or incoming transaction
+association attempt being aborted.
+.TP
+.I ABORT_cause
+specifies the (user) cause of the abort.
+.TP
+.I OPT_length
+specifies the length of the protocol options associated with the abort.
+.TP
+.I OPT_offset
+specifies the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the protocol options begin.
+.SH RULES
+This primitive requires the transaction provider to generate the following acknowledgment on receipt
+of the primitive, and the transaction user must wait for the acknowledgment before issuing any other
+primitives:
+.SS Successful
+Correct acknowledgment of the primitive is indicated via the
+.BR TR_OK_ACK (7)
+primitive.
+.SS Non-fatal errors
+These errors will be indicated via the
+.BR TR_ERROR_ACK (7)
+primitive.
+.SH ERRORS
+The allowable errors are as follows:
+.TP 16
+.RB [ TRBADDATA ]
+The amount of user data specified was invalid.
+.TP
+.RB [ TRBADID ]
+The transaction identifier specified in the primitive was incorrect or invalid.
+.TP
+.RB [ TRNOTSUPPORT ]
+This primitive is not supported by the transaction provider.
+.TP
+.RB [ TROUTSTATE ]
+The primitive would place the transaction interface out of state.
+.TP
+.RB [ TRSYSERR ]
+A system error has occurred and the Linux system error is indicated in
+the primitive.
+.SH MODES
+Only connection-mode.
+.SH ORIGINATOR
+Transaction user.
+.SH "SEE ALSO"
+.BR tri (7),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR TR_ABORT_IND (7),
+.BR TR_BEGIN_IND (7),
+.BR TR_END_REQ (7),
+.BR TR_END_IND (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA

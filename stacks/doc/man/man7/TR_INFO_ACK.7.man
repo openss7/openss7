@@ -1,0 +1,205 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: TR_INFO_ACK.7.man,v 0.9.2.1 2004/10/24 11:47:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/10/24 11:47:39 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TR_INFO_ACK 7 "$Date: 2004/10/24 11:47:39 $" "$Name:  $" "Transaction Interface (TRI)"
+.SH NAME
+.PP
+.B TR_INFO_ACK
+\- Protocol Information Acknowledgment
+.SH SYNOPSIS
+.PP
+This message consists of a
+.BR M_PCPROTO (9)
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct TR_info_ack {
+    long PRIM_type;           /* Always TR_INFO_ACK */
+    long TSDU_size;           /* maximum TSDU size */
+    long ETSDU_size;          /* maximum ETSDU size */
+    long CDATA_size;          /* connect data size */
+    long DDATA_size;          /* discon data size */
+    long ADDR_size;           /* address size */
+    long OPT_size;            /* options size */
+    long TIDU_size;           /* transaction i/f data unit size */
+    long SERV_type;           /* service type */
+    long CURRENT_state;       /* current state */
+    long PROVIDER_flag;       /* type of TR provider */
+    long TRPI_version;        /* version # of trpi that is supported */
+} TR_info_ack_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive indicates to the transaction user any relevant protocol-dependent parameters.
+It should be initiated in response to the
+.BR TR_INFO_REQ (7)
+primitive described above.
+The format of this message is one
+.BR M_PCPROTO (9)
+message block.
+.SH PARAMETERS
+.PP
+The fields of this message have the following meanings:
+.TP 16
+.I PRIM_type
+This indicates the primitive type.
+.TP
+.I TSDU_size
+A value greater than zero specifies the maximum size of a transaction service data unit (TSDU); a
+value of zero specifies that the transaction provider does not support the concept of TSDU, although
+it does support the sending of a data stream with no logical boundaries preserved across an
+association; a value of -1 specifies that there is no limit on the size of a TSDU; and a value of -2
+specifies that the transfer of normal data is not supported by the transaction provider.
+.TP
+.I ETSDU_size
+A value greater than zero specifies the maximum size of an expedited transaction service data unit
+(ETSDU); a value of zero specifies that the transaction provider does not support the concept of
+ETSDU, although it does support the sending of an expedited data stream with no logical boundaries
+preserved across an assocation; a value of -1 specifies that there is no limit on the size of an
+ETSDU; and a value of -2 specifies that the transfer of expedited data is not supported by the
+transaction provider.
+.TP
+.I CDATA_size
+A value greater than or equal to zero specifies the maximum amount of data that may be associated
+with association establishment primitives; and a value of -2 specifies that the transaction provider
+does not allow data to be sent with association establishment primitives.
+.TP
+.I DDATA_size
+A value greater than or equal to zero specifies the maximum amount of data that may be associated
+with the association termination primitives; and a value of -2 specifies that the transaction provider does not
+allow data to be sent with the association termination primitives.
+.TP
+.I ADDR_size
+A value greater than or equal to zero indicates the maximum size of a transaction protocol address;
+and a value of -2 specifies that the transaction provider does not provide user access to
+transaction protocol addresses.
+.TP
+.I OPT_size
+A value greater than or equal to zero indicates the maximum number of bytes of protocol-specific
+options supported by the provider; and a value of -2 specifies that the transaction provider does
+not support user-settable options.
+.TP
+.I TIDU_size
+This is the amount of user data that may be present in a single
+.BR TR_CONT_REQ (7)
+primitive.
+This is the size of the transaction protocol interface data unit, and should not exceed the tunable
+system limit, if non-zero, for the size of a
+.IR STREAMS (4)
+message.
+.TP
+.I SERV_type
+This field specifies the service type supported by the transaction provider, and is a bitwize OR of
+zero or more of the following:
+.RS
+.TP 10
+.B TR_COTS
+The provider service is a connection oriented transaction service.
+.TP
+.B TR_CLTS
+The provider service is a connectionless transaction service.
+.RE
+.TP
+.I CURRENT_state
+This is the current state of the transaction provider.
+.TP
+.I PROVIDER_flag
+This field specifies additional properties specific to the transaction provider and may alter the
+way the transaction user communicates.
+The following flags may be set by the provider:
+.RS
+.TP 10
+.B SENDZERO
+This flag indicates that the transaction provider supports the sending of zero-length TSDUs.
+.TP
+.B XPG4_1
+This flag indicates that the transaction provider supports XPG4 semantics.
+.RE
+.TP
+.I TRPI_version
+is the version of the interface.
+.SH RULES
+.PP
+The following rules apply when the type of service is
+.BR TR_CLTS :
+.IP - 3
+The ETSDU_size, CDATA_size and DDATA_size fields should be -2.
+.IP -
+The TSDU_size should equal the TIDU_size.
+.SH MODES
+.PP
+Both connection-mode and connectionless-mode.
+.SH ORIGINATOR
+.PP
+Transaction provider.
+.SH "SEE ALSO"
+.PP
+.BR tri (7),
+.BR M_PCPROTO (9),
+.BR TR_CONT_REQ (7),
+.BR TR_INFO_REQ (7),
+.BR TR_ADDR_REQ (7),
+.BR TR_ADDR_ACK (7).
+.SH HISTORY
+.PP
+The Transaction Interface first appeared in OpenSS7.
+.SH CONFORMANCE
+.PP
+This interface conforms to TRI Revision 0.9.2, Draft 1.
+.[
+tri
+.]
+.[
+$LIST$
+.]
+.TA
