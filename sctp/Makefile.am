@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/01/18 01:01:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/01/26 22:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 01:01:42 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ lib_LTLIBRARIES			=
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= 
+EXTRA_PROGRAMS			+= 
 
 libexec_PROGRAMS		= \
 				  test-tcps \
@@ -209,7 +209,7 @@ ADDON_LIBS			= libSCTPmodl.a
 ADDON_OBJS			= sctp.o
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
-EXTRA_LIBRARIES			= libSCTPmodl.a
+EXTRA_LIBRARIES			+= libSCTPmodl.a
 
 nodist_EXTRA_libSCTPmodl_a_SOURCES = \
 				  src/sctp_adler32.h \
@@ -245,13 +245,13 @@ sctp.o: $(libSCTPmodl_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
 KERNEL_MODULES			= $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		=
+EXTRA_KERNEL_MODULES		+=
 
 endif
 
-EXTRA_DIST			= $(sctp_source_FILES)
+EXTRA_DIST			+= $(sctp_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
-EXTRA_SCRIPTS			=
+EXTRA_SCRIPTS			+=
 
 KERNEL_SUBDIR			= kernel/net/ipv4
 

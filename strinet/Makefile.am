@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/24 23:03:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/26 22:12:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 23:03:11 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ if PUBLIC_RELEASE
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp
@@ -101,7 +101,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libINETmods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
@@ -135,7 +135,7 @@ libINETmods_a_CPPFLAGS		= \
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libINETmods_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
@@ -143,7 +143,7 @@ else
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp
@@ -185,7 +185,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libINETmods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
@@ -219,7 +219,7 @@ libINETmods_a_CPPFLAGS		= \
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libINETmods_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
@@ -227,9 +227,9 @@ endif
 
 inet_source_FILES		= $(mods_source_FILES)
 
-EXTRA_DIST			= $(inet_source_FILES)
+EXTRA_DIST			+= $(inet_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
-EXTRA_SCRIPTS			=
+EXTRA_SCRIPTS			+=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_TARNAME)

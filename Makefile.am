@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/23 21:21:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/26 22:13:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,32 +46,12 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/23 21:21:50 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:13:02 $ by $Author: brian $
 #
 # =============================================================================
 
 include am/openss7.am
 
-srpm-recursive rpms-recursive rebuild-recursive sign-recursive resign-recursive:
-	@set fnord $$MAKEFLAGS ; \
-	amf=$$2 ; \
-	target=`echo $@ | sed -e 's|-recursive||'` ; \
-	list='$(SUBDIRS)' ; for subdir in $$list ; do \
-	     	test "$$subdir" = "." && continue ; \
-		echo "Making $$target in $$subdir" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$target) \
-		    || case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; \
-	test -z "$$fail"
-
-srpm: srpm-recursive
-
-rpms: rpms-recursive
-
-rebuild: rebuild-recursive
-
-sign: sign-recursive
-
-resign: resign-recursive
+include am/rpm.am
 
 SUBDIRS	= @subdirs@

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/01/26 08:28:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/01/26 22:12:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 08:28:21 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,7 +69,7 @@ libexec_PROGRAMS		= \
 				  test-x100p \
 				  test-x400p
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  perftest \
 				  test-inet_raw \
 				  test-inet_tcp \
@@ -209,7 +209,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/inet/inet.c \
@@ -315,7 +315,7 @@ libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
 KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
@@ -344,7 +344,7 @@ libexec_PROGRAMS		= \
 				  test-x400p-sdt2 \
 				  test-x400p-sl
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  perftest \
 				  test-inet_raw \
 				  test-inet_tcp \
@@ -484,7 +484,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= libSS7sscop.a libSS7m3ua.a libSS7sua.a libSS7tua.a libSS7tali.a
+EXTRA_LIBRARIES			+= libSS7sscop.a libSS7m3ua.a libSS7sua.a libSS7tua.a libSS7tali.a
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/cd/cd.c \
@@ -731,7 +731,7 @@ streams-tali.o: $(libSS7tali_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
 KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
+EXTRA_KERNEL_MODULES		+= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
 
 endif
 
@@ -813,7 +813,7 @@ ss7_source_FILES		= $(mods_source_FILES) \
 				  $(tua_source_FILES) \
 				  $(tali_source_FILES)
 
-EXTRA_DOCS = \
+EXTRA_DOCS += \
 	doc/drafts/isua/draft-bidulock-sigtran-isua-02.pdf \
 	doc/drafts/isua/draft-bidulock-sigtran-isua-02.ps \
 	doc/drafts/isua/draft-bidulock-sigtran-isua-02.txt \
@@ -848,7 +848,7 @@ EXTRA_DOCS = \
 	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
 	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
 
-EXTRA_TEX = \
+EXTRA_TEX += \
 	scripts/texinfo.cnf \
 	scripts/texi/args.texi.in \
 	scripts/texi/fdl.texi \
@@ -857,9 +857,9 @@ EXTRA_TEX = \
 	scripts/texi/lesser.texi
 
 
-EXTRA_DIST			= $(ss7_source_FILES) $(EXTRA_DOCS) $(EXTRA_TEX)
+EXTRA_DIST			+= $(ss7_source_FILES) $(EXTRA_DOCS) $(EXTRA_TEX)
 dist_noinst_SCRIPTS		= configure.nexusware
-EXTRA_SCRIPTS			=
+EXTRA_SCRIPTS			+=
 
 KERNEL_MODCONF			= conf.modules
 KERNEL_SUBDIR			= strss7

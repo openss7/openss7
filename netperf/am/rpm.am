@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/24 12:27:20 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/01/26 21:17:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 21:17:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,7 +119,7 @@ EXTRA_DIST += $(PACKAGE_TARNAME).spec $(PACKAGE_TARNAME).gif $(PACKAGE_TARNAME).
 #   This builds an SRPM for the current target.  Note: rpm demands icon in
 #   current directory
 #
-srpm:
+srpm-am:
 	$(MAKE) $(AM_MAKEFLAGS) distdir='$(tardir)' dist
 	$(mkinstalldirs) $(PACKAGE_RPMTOPDIR)/BUILD $(PACKAGE_RPMTOPDIR)/SRPMS $(PACKAGE_RPMTOPDIR)/SPECS $(PACKAGE_RPMTOPDIR)/SOURCES $(PACKAGE_RPMTOPDIR)/RPMS
 	cp -f $(top_srcdir)/$(PACKAGE_TARNAME).gif .
@@ -131,7 +131,7 @@ srpm:
 #   to build rpms for the current target, we also build any defined
 #   AM_RPMTARGETS
 #
-am-rpms: srpm
+all-rpms: srpm
 	@targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
 	for t in $$targets ; do \
 		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t --" $(PACKAGE_RPMTOPDIR)/SRPMS/$(tardir).src.rpm; \
@@ -139,10 +139,10 @@ am-rpms: srpm
 	done
 
 lis-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' am-rpms
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
 
 lfs-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' am-rpms
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' all-rpms
 
 AM_RPMSMAKETARGETS =
 
@@ -156,13 +156,13 @@ if WITH_LIS
 else
 if WITH_LFS
 else
-AM_RPMSMAKETARGETS += am-rpms
+AM_RPMSMAKETARGETS += all-rpms
 endif
 endif
 
-rpms: $(AM_RPMSMAKETARGETS)
+rpms-am: $(AM_RPMSMAKETARGETS)
 
-sign:
+sign-am:
 	@archives="$(RPM_ARCHIVES)" ; \
 	for f in $$archives ; do \
 		if test ! -f $$f ; then \
@@ -191,7 +191,7 @@ sign:
 #   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
 #   --without popt syntax, so we have to expand them to --defines.
 #
-am-rebuild:
+all-rebuild:
 	@if test ! -f $(PACKAGE_RPMTOPDIR)/SRPMS/$(tardir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
@@ -210,10 +210,10 @@ am-rebuild:
 	done
 
 lis-rebuild:
-	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' am-rebuild || :
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' all-rebuild || :
 
 lfs-rebuild:
-	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' am-rebuild || :
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' all-rebuild || :
 
 AM_REBUILDMAKETARGETS =
 
@@ -227,13 +227,13 @@ if WITH_LIS
 else
 if WITH_LFS
 else
-AM_REBUILDMAKETARGETS += am-rebuild
+AM_REBUILDMAKETARGETS += all-rebuild
 endif
 endif
 
-rebuild: $(AM_REBUILDMAKETARGETS)
+rebuild-am: $(AM_REBUILDMAKETARGETS)
 
-resign: sign
+resign-am: sign
 	@list="`find $(PACKAGE_RPMTOPDIR)/RPMS -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 	if test -z "$$list" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) rebuild ; \
@@ -249,12 +249,12 @@ EXTRA_DIST += .rpmepoch .rpmrelease
 
 else
 
-srpm:
+srpm-am:
 	$(MAKE) $(AM_MAKEFLAGS) distdir='$(tardir)' dist
 
-rpms: srpm
+rpms-am: srpm
 
-sign:
+sign-am:
 	@archives="$(RPM_ARCHIVES)" ; \
 	for f in $$archives ; do \
 		if test ! -f $$f ; then \
@@ -272,7 +272,7 @@ sign:
 		fi ; \
 	done
 
-rebuild:
+rebuild-am:
 	@archives="$(RPM_ARCHIVES)" ; \
 	for f in $$archives ; do \
 		if test ! -f $$f ; then \
@@ -281,7 +281,7 @@ rebuild:
 		fi ; \
 	done
 
-resign: sign
+resign-am: sign
 
 endif
 
@@ -383,7 +383,7 @@ DISTCLEAN_LOCAL += distclean-lsms distclean-archives distclean-srpm distclean-rp
 MAINTAINER_CLEAN_LOCAL += maintainer-clean-lsms maintainer-clean-archives maintainer-clean-srpm \
 	maintainer-clean-rpms maintainer-clean-sign
 
-.PHONY: srpm rpms am-rpms lis-rpms lfs-rpms sign rebuild am-rebuild lis-rebuild lfs-rebuild resign \
+.PHONY: srpm rpms all-rpms lis-rpms lfs-rpms sign rebuild all-rebuild lis-rebuild lfs-rebuild resign \
 	clean-lsms clean-archives clean-rpms clean-sign distclean-lsms distclean-archives \
 	distclean-srpm distclean-rpms distclean-sign maintainer-clean-lsms \
 	maintainer-clean-archives maintainer-clean-srpm maintainer-clean-rpms maintainer-clean-sign

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/01/24 23:03:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/01/26 22:12:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 23:03:10 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -331,7 +331,7 @@ streams.o: $(libLfSkernel_a_OBJECTS)
 
 endif
 
-EXTRA_TEX			= \
+EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
 				scripts/texi/args.texi.in \
 				scripts/texi/fdl.texi \
@@ -339,9 +339,9 @@ EXTRA_TEX			= \
 				scripts/texi/install.texi \
 				scripts/texi/lesser.texi
 
-EXTRA_DIST			= $(EXTRA_TEX)
+EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		= configure.nexusware
-EXTRA_SCRIPTS			=
+EXTRA_SCRIPTS			+=
 
 KERNEL_MODULES			= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
@@ -368,7 +368,7 @@ libstreams_la_LDFLAGS		= -no-undefined -version-info 0:0:0
 libstreams_la_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
 
-EXTRA_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
 #bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)

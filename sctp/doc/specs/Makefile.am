@@ -1,5 +1,7 @@
 
-EXTRA_DIST = \
+include ../../am/openss7.am
+
+EXTRA_DIST += \
 	draft-ietf-sigtran-sctp-mib-09.txt \
 	draft-ietf-tsvwg-addip-sctp-07.txt \
 	draft-ietf-tsvwg-sctpimpguide-08.txt \

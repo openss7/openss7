@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/24 23:03:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/26 22:12:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 23:03:11 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,7 +66,7 @@ libexec_PROGRAMS			= \
 					  test-sctp_ns \
 					  test-sctp_t
 
-EXTRA_PROGRAMS				= \
+EXTRA_PROGRAMS				+= \
 					  test-sctp \
 					  test-sctp_n \
 					  test-sctp_nc \
@@ -115,7 +115,7 @@ ADDON_LIBS				= libSCTPsctp.a
 ADDON_OBJS				= streams-sctp.o
 
 noinst_LIBRARIES			= $(ADDON_LIBS)
-EXTRA_LIBRARIES				= libSCTPsctp.a
+EXTRA_LIBRARIES				+= libSCTPsctp.a
 
 sctp_source_FILES			= \
 					  src/drivers/sctp.c \
@@ -218,7 +218,7 @@ streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
 KERNEL_MODULES				= $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES			=
+EXTRA_KERNEL_MODULES			+=
 
 endif
 
@@ -233,7 +233,7 @@ libexec_PROGRAMS			= \
 					  test-sctp_ns \
 					  test-sctp_t
 
-EXTRA_PROGRAMS				= \
+EXTRA_PROGRAMS				+= \
 					  test-sctp \
 					  test-sctp_n \
 					  test-sctp_nc \
@@ -282,7 +282,7 @@ ADDON_LIBS				= libSCTPsctp.a
 ADDON_OBJS				= streams-sctp.o
 
 noinst_LIBRARIES			= $(ADDON_LIBS)
-EXTRA_LIBRARIES				= libSCTPsctp.a
+EXTRA_LIBRARIES				+= libSCTPsctp.a
 
 sctp_source_FILES			= \
 					  src/drivers/sctp.c \
@@ -385,16 +385,16 @@ streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
 KERNEL_MODULES				= $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES			=
+EXTRA_KERNEL_MODULES			+=
 
 endif
 
 endif
 
-EXTRA_DIST				= $(sctp_source_FILES) $(sctp2_source_FILES)
+EXTRA_DIST				+= $(sctp_source_FILES) $(sctp2_source_FILES)
 
 dist_noinst_SCRIPTS			= configure.nexusware
-EXTRA_SCRIPTS				=
+EXTRA_SCRIPTS				+=
 
 KERNEL_MODCONF				= conf.modules
 KERNEL_SUBDIR				= @PACKAGE_TARNAME@

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2005/01/25 03:41:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2005/01/26 22:12:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/25 03:41:15 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -191,7 +191,7 @@ EXTRA_info_TEXINFOS		= \
 				  scripts/texi/lesser.texi \
 				  scripts/texi/install.texi
 
-EXTRA_DIST			= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes
+EXTRA_DIST			+= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes
 
 include am/info.am
 

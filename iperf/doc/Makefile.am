@@ -52,8 +52,8 @@
 
 include ../am/openss7.am
 
-SUBDIRS = man
+EXTRA_DIST += index.html ui_license.html dast.gif
 
-EXTRA_DIST = index.html ui_license.html dast.gif
+SUBDIRS = man
 
 # vim: ft=automake

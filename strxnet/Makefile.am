@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/24 23:03:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/01/26 22:12:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 23:03:12 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,7 +61,7 @@ if PUBLIC_RELEASE
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  test-tirdwr \
 				  test-timod \
 				  test-xnet \
@@ -128,7 +128,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
@@ -162,7 +162,7 @@ libXNETmods_a_CPPFLAGS		= \
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
@@ -170,7 +170,7 @@ else
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  test-tirdwr \
 				  test-timod \
 				  test-xnet \
@@ -237,7 +237,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
@@ -270,7 +270,7 @@ libXNETmods_a_CPPFLAGS		= \
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
@@ -278,9 +278,9 @@ endif
 
 xnet_source_FILES		= $(mods_source_FILES)
 
-EXTRA_DIST			= $(xnet_source_FILES)
+EXTRA_DIST			+= $(xnet_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
-EXTRA_SCRIPTS			=
+EXTRA_SCRIPTS			+=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KMODCONF_EXT			= $(PACKAGE_TARNAME)

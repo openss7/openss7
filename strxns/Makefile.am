@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/24 23:03:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/26 22:12:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 23:03:12 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 22:12:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,7 +61,7 @@ if PUBLIC_RELEASE
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig
 
@@ -96,7 +96,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNSmods.a libXNSdrvs.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/modules/ip_strm_mod.c \
@@ -159,7 +159,7 @@ libXNSdrvs_a_CPPFLAGS		= \
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
@@ -167,7 +167,7 @@ else
 
 if RPM_BUILD_USER
 
-EXTRA_PROGRAMS			= \
+EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig
 
@@ -202,7 +202,7 @@ ADDON_LIBS			=
 ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libXNSmods.a libXNSdrvs.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= 
+EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/modules/ip_strm_mod.c \
@@ -265,15 +265,15 @@ libXNSdrvs_a_CPPFLAGS		= \
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		= 
+EXTRA_KERNEL_MODULES		+= 
 
 endif
 
 endif
 
-EXTRA_DIST			= $(mods_source_FILES) $(drvs_source_FILES)
+EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
-EXTRA_SCRIPTS			=
+EXTRA_SCRIPTS			+=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
