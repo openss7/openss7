@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-#ident "@(#) LiS stream.h 2.7 6/4/02 16:39:25 "
+#ident "@(#) LiS stream.h 2.8 7/23/03 15:53:08 "
 
 /*
  * Always use the safe routines.  A driver writer can make
@@ -170,6 +170,8 @@ extern "C" {
 #define  SAMESTR     LIS_SAMESTR    
 #define	 strqset	lis_strqset
 #define	 strqget	lis_strqget
+extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l);
+#define put(q,m)	lis_safe_putmsg((q),(m),__FILE__,__LINE__)
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
