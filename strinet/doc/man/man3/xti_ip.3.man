@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_ip.3.man,v 0.9.2.1 2004/08/06 09:09:57 brian Exp $
+.\" @(#) $Id: xti_ip.3.man,v 0.9.2.2 2005/01/22 16:38:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/06 09:09:57 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/22 16:38:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strinet.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-IP 3 "$Date: 2004/08/06 09:09:57 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-IP 3 "$Date: 2005/01/22 16:38:35 $" "$Name:  $" "X/Open Transport Interface"
 .SH "NAME"
 .B xti_ip
 \- X/Open Transport Interface \- Corrigendum for Internet Protocol (IP) Conformance
@@ -86,6 +86,8 @@ sort-adjacent-labels
 .B #include <xti_inet.h>
 .HP
 .BI "int " ip_stream " = t_open(" ip_device ", " flags );
+.SH "OVERVIEW"
+.PP
 .SH "DESCRIPTION"
 .PP
 .SH "OPTIONS"
@@ -336,12 +338,16 @@ that provide IP conforming TPI devices as follows:
 These devices are provided by the
 .B strinet
 package.
+.SH COMPATIBILITY
+.PP
 .SH "CONFORMING TO"
 .PP
 The Open Group XNS Issue 5.2.
 .[
 xns
 .]
+.SH HISTORY
+.PP
 .\"
 .\"
 .[

@@ -1,1 +1,1 @@
-.so timod.4.man
+.so tcp.4.man

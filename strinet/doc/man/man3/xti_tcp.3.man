@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.1 2004/08/06 09:09:57 brian Exp $
+.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.2 2005/01/22 16:38:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/06 09:09:57 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/22 16:38:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strinet.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-TCP 3 "$Date: 2004/08/06 09:09:57 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-TCP 3 "$Date: 2005/01/22 16:38:35 $" "$Name:  $" "X/Open Transport Interface"
 .\"
 .\"
 .SH "NAME"
@@ -90,6 +90,10 @@ sort-adjacent-labels
 .B #include <xti_tcp.h>
 .HP
 .BI "int " tcp_xtistr " = t_open(" \fR\*(lq/dev/tcp\*(rq\fI ", " flags );
+.\"
+.\"
+.SH OVERVIEW
+.PP
 .\"
 .\"
 .SH DESCRIPTION
@@ -1661,7 +1665,15 @@ For more information on the TPI TCP device, see
 .BR tcp (4).
 .\"
 .\"
-.SH "VERSIONS"
+.SH COMPATIBILITY
+.PP
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.SH HISTORY
 .PP
 The
 .B TCP-TPI

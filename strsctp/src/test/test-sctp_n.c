@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 11:09:17 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:57:38 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -42,23 +42,18 @@
  or agency of the Government other than DoD, it is classified as "Restricted
  Computer Software" and the Government's rights in the Software are defined
  in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+ any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
  of the NASA Supplement to the FAR (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2004/09/02 11:09:17 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/22 16:57:38 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 11:09:17 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:57:38 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 11:09:17 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:57:38 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -77,6 +72,7 @@ static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -218,6 +214,7 @@ enum {
 #undef HZ
 #define HZ 1000
 
+#if 0
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
@@ -260,11 +257,13 @@ static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
+#endif
 
 long test_start = 0;
 
 static int state;
 
+#if 0
 /* 
  *  Return the current time in milliseconds.
  */
@@ -340,6 +339,7 @@ static int check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif
 
 static int time_event(int event)
 {
@@ -401,11 +401,13 @@ static int start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+#if 0
 static int start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int stop_tt(void)
 {
@@ -928,7 +930,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	len += snprintf(buf + len, sizeof(buf) - len, "\0");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
 #else				/* SCTP_VERSION_2 */
@@ -970,7 +972,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	len += snprintf(buf + len, sizeof(buf) - len, "\0");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
 #endif				/* SCTP_VERSION_2 */
@@ -1173,7 +1175,7 @@ void print_event_conn(int fd, int event)
 		fprintf(stdout, "N_RESET_CON   <-----|<- - - - - - - /               |  |                    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.npi.type, state);
+		fprintf(stdout, "????%4d????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.npi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1280,7 +1282,7 @@ void print_event_list(int fd, int event)
 		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> N_RESET_CON    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", cmd.npi.type, state);
+		fprintf(stdout, "                    |                               |?-+---? ????%4d????   [%d]\n", cmd.npi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1367,7 +1369,7 @@ void print_event_resp(int fd, int event)
 		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> N_DISCON_IND   [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", cmd.npi.type, state);
+		fprintf(stdout, "                    |                               |  |?--? ????%4d????   [%d]\n", cmd.npi.type, state);
 		break;
 	case __EVENT_DATACK_REQ:
 		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- N_DATACK_REQ   [%d]\n", state);
@@ -2823,6 +2825,7 @@ int test_case_3_1_conn(int fd)
 	state++;
 	if (expect(fd, LONG_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	goto success;
       success:
 	state++;
 	return (__RESULT_SUCCESS);
@@ -3824,7 +3827,6 @@ int test_case_8_2_conn(int fd)
 
 int test_case_8_2_list(int fd)
 {
-	int i;
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4447,7 +4449,7 @@ int test_case_10_2_conn(int fd)
 	}
 	atotal /= j;
 	fprintf(stdout, "                    |               |               |  |                    \n");
-	fprintf(stdout, "                    |  ack average = %9ld usec |  |                    \n");
+	fprintf(stdout, "                    |  ack average = %9ld usec |  |                    \n", atotal);
 	fprintf(stdout, "                    |               |               |  |                    \n");
 	fflush(stdout);
 	lockf(fileno(stdout), F_ULOCK, 0);
@@ -4784,7 +4786,7 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 {
 	int children = 0;
 	pid_t got_chld, conn_chld = 0, resp_chld = 0, list_chld = 0;
-	int got_stat, conn_stat, resp_stat, list_stat;
+	int got_stat, conn_stat = __RESULT_SUCCESS, resp_stat = __RESULT_SUCCESS, list_stat = __RESULT_SUCCESS;
 	start_tt(5000);
 	if (conn_side) {
 		switch ((conn_chld = fork())) {
@@ -5096,7 +5098,6 @@ int do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	int num_exit;
 	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nRFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Program.\n");
@@ -5272,7 +5273,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -5301,6 +5302,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -5313,6 +5315,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -5332,9 +5335,11 @@ Options:\n\
         Increase verbosity or set to LEVEL [default: 1]\n\
 	This option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        Prints this usage message and exits\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        Prints the version and exits\n\
+    -C, --copying\n\
+        Prints copyright and permission and exits\n\
 ", argv[0]);
 }
 
@@ -5366,13 +5371,14 @@ int main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "l::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
+		c = getopt(argc, argv, "l::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -5484,6 +5490,9 @@ int main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			splash(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -5496,6 +5505,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

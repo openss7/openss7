@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:59 $
+ @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:57:38 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -42,24 +42,18 @@
  or agency of the Government other than DoD, it is classified as "Restricted
  Computer Software" and the Government's rights in the Software are defined
  in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+ any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
  of the NASA Supplement to the FAR (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2004/08/21 10:53:59 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/22 16:57:38 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:59 $"
+#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:57:38 $"
 
-static char const ident[] =
-    "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:59 $";
+static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:57:38 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -557,7 +551,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -588,6 +582,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -601,6 +596,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -622,16 +618,17 @@ Options:\n\
         Increase verbosity or set to LEVEL [default: 1]\n\
         This option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        Prints this usage message and exits\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        Prints the version and exits\n\
+    -C, --copying\n\
+        Prints copyright and permission and exits\n\
 ", argv[0]);
 }
 
 int
 main(int argc, char **argv)
 {
-	int c;
 	char *hostl = "127.0.0.1";
 	char *hostr = "127.0.0.1";
 	char hostbufl[HOST_BUF_LEN];
@@ -657,13 +654,14 @@ main(int argc, char **argv)
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l:r:t:p:w:qvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "l:r:t:p:w:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l:r:t:p:w:qvhV?");
+		c = getopt(argc, argv, "l:r:t:p:w:qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -706,6 +704,9 @@ main(int argc, char **argv)
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			splash(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -718,6 +719,7 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

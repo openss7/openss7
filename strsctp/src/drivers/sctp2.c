@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 16:14:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/13 12:55:44 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 16:14:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 16:14:37 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 16:14:37 $";
 
 #include "compat.h"
 
@@ -160,7 +160,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 16:14:37 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5184,12 +5184,13 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
 	size_t dlen = ndups * sizeof(uint32_t);
 	size_t clen = sizeof(*m) + glen + dlen;
 	size_t plen = PADC(clen);
-	assert(sp);
 #ifdef SCTP_CONFIG_ECN
 	struct sctp_ecne *e;
-	size_t elen = ((sp->sackf & SCTP_SACKF_ECN) ? sizeof(*e) : 0);
+	size_t elen;
 #endif				/* SCTP_CONFIG_ECN */
+	assert(sp);
 #ifdef SCTP_CONFIG_ECN
+	elen = ((sp->sackf & SCTP_SACKF_ECN) ? sizeof(*e) : 0);
 	plen += PADC(elen);
 #endif				/* SCTP_CONFIG_ECN */
 	if ((1 << sp->state) & ~(SCTPF_RECEIVING))
@@ -9335,7 +9336,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			/* move to the acks */
 			dp = bufq_head(&sp->rtxq);
 			for (; dp && before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_next) {
-				sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+				sctp_tcb_t *cb = SCTP_TCB(dp);
 				struct sctp_daddr *sd = cb->daddr;
 				cb->flags |= SCTPCB_FLAG_NACK;
 				if (sd && !(sd->flags & SCTP_DESTF_ELIGIBLE)
@@ -9348,7 +9349,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			}
 			/* sack the acks */
 			for (; dp && !after(SCTP_TCB(dp)->tsn, end); dp = dp->b_next) {
-				sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+				sctp_tcb_t *cb = SCTP_TCB(dp);
 				struct sctp_daddr *sd = cb->daddr;
 				cb->flags |= SCTPCB_FLAG_ACK;
 				if (sd && !(sd->flags & SCTP_DESTF_ELIGIBLE)

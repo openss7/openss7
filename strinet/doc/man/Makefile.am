@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/11/08 06:55:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:38:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:55:51 $ by $Author: brian $
+# Last Modified $Date: 2005/01/22 16:38:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,6 @@ man_MANS = \
 	man3/xti_udp.3 \
 	man3/xti_tcp.3 \
 	man4/egp.4 \
-	man4/eth.4 \
 	man4/ggp.4 \
 	man4/icmp.4 \
 	man4/idp.4 \
@@ -80,7 +79,8 @@ man_MANS = \
 	man4/xtios.4 \
 	man7/tpi_ip.7 \
 	man7/tpi_udp.7 \
-	man7/tpi_tcp.7
+	man7/tpi_tcp.7 \
+	man8/strinet_mknod.8
 
 if WITH_OPENSS7_SCTP
 man_MANS += \
@@ -96,7 +96,6 @@ dist_noinst_MANS = \
 	man3/xti_tcp.3.man \
 	man3/xti_sctp.3.man \
 	man4/egp.4.man \
-	man4/eth.4.man \
 	man4/ggp.4.man \
 	man4/icmp.4.man \
 	man4/idp.4.man \
@@ -120,7 +119,8 @@ dist_noinst_MANS = \
 	man7/tpi_ip.7.man \
 	man7/tpi_udp.7.man \
 	man7/tpi_tcp.7.man \
-	man7/tpi_sctp.7.man
+	man7/tpi_sctp.7.man \
+	man8/strinet_mknod.8.man
 
 EXTRA_DIST = 
 

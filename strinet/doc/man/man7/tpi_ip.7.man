@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.1 2004/08/06 09:10:10 brian Exp $
+.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.2 2005/01/22 16:38:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/06 09:10:10 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/22 16:38:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strinet.macros
@@ -71,10 +71,15 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI-IP 7 "$Date: 2004/08/06 09:10:10 $" "$Name:  $" "Transport Provider Interface"
+.TH TPI-IP 7 "$Date: 2005/01/22 16:38:35 $" "$Name:  $" "Transport Provider Interface"
 .SH NAME
 .B tpi_ip
 \- Transport Provider Interface (TPI) \- Internet Protocol (IP) Corrigendum
+.SH SYNOPSIS
+.HP 12
+.B #include <sys/tpi_ip.h>
+.SH DESCRIPTION
+.SH "SEE ALSO"
 .SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.

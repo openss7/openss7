@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 10:07:37 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:38:22 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 10:07:37 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/22 16:38:22 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.3  2005/01/22 16:38:22  brian
+ - Fixed compiler warnings.
+
  Revision 0.9.2.2  2004/09/02 10:07:37  brian
  - Updates for LFS compile.
 
@@ -94,9 +97,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 10:07:37 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:38:22 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 10:07:37 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:38:22 $";
 
 /*
  *  Simple test program for INET streams.
@@ -114,6 +117,7 @@ static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -253,6 +257,7 @@ enum {
 #undef HZ
 #define HZ 1000
 
+#if 0
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
@@ -295,11 +300,13 @@ static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
+#endif
 
 long test_start = 0;
 
 static int state;
 
+#if 0
 /* 
  *  Return the current time in milliseconds.
  */
@@ -379,6 +386,7 @@ check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif
 
 static int
 time_event(int event)
@@ -444,12 +452,14 @@ start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+#if 0
 static int
 start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int
 stop_tt(void)
@@ -1173,7 +1183,7 @@ addr_string(char *add_ptr, size_t add_len)
 			     (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	snprintf(buf + len, sizeof(buf) - len, "\0");
+	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
 
@@ -1418,11 +1428,11 @@ value_string(struct t_opthdr *oh)
 		case T_IP_OPTIONS:
 			break;
 		case T_IP_TOS:
-			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+			if ((oh->len = sizeof(*oh) + sizeof(unsigned char)))
 				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
 			return buf;
 		case T_IP_TTL:
-			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+			if ((oh->len = sizeof(*oh) + sizeof(unsigned char)))
 				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
 			return buf;
 		case T_IP_REUSEADDR:
@@ -1451,7 +1461,7 @@ value_string(struct t_opthdr *oh)
 			return yesno_string(oh);
 		case T_TCP_MAXSEG:
 			if (oh->len == sizeof(*oh) + sizeof(t_uscalar_t))
-				snprintf(buf, sizeof(buf), "%lu", *((t_uscalar_t *) T_OPT_DATA(oh)));
+				snprintf(buf, sizeof(buf), "%lu", (ulong)*((t_uscalar_t *) T_OPT_DATA(oh)));
 			return buf;
 		case T_TCP_KEEPALIVE:
 			return yesno_string(oh);
@@ -1568,12 +1578,13 @@ print_options(int fd, char *opt_ptr, size_t opt_len)
 	if (verbose < 4)
 		return;
 	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+#if 0
 		char *level = level_string(oh);
+#endif
 		char *name = name_string(oh);
 		char *status = status_string(oh);
 		char *value = value_string(oh);
 		int len = oh->len - sizeof(*oh);
-		unsigned char *val = _T_OPT_DATA_OFS(oh, 0);
 		if (len < 0)
 			break;
 		if (fd == conn_fd) {
@@ -1830,7 +1841,7 @@ print_event_conn(int fd, int event)
 		fprintf(stdout, "T_CAPABILITY_ACK<--/|                               |  |                    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1989,7 +2000,7 @@ print_event_resp(int fd, int event)
 		fprintf(stdout, "                    |                               |  |\\-->T_CAPABILITY_ACK[%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -2148,7 +2159,7 @@ print_event_list(int fd, int event)
 		fprintf(stdout, "                    |                               |\\-+--->T_CAPABILITY_ACK[%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -4559,7 +4570,7 @@ test_run(struct test_side *conn_side, struct test_side *resp_side, struct test_s
 {
 	int children = 0;
 	pid_t got_chld, conn_chld = 0, resp_chld = 0, list_chld = 0;
-	int got_stat, conn_stat, resp_stat, list_stat;
+	int got_stat, conn_stat = __RESULT_SUCCESS, resp_stat = __RESULT_SUCCESS, list_stat = __RESULT_SUCCESS;
 	start_tt(5000);
 	if (conn_side) {
 		switch ((conn_chld = fork())) {
@@ -4863,7 +4874,6 @@ do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	int num_exit;
 	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nXNS 5.2/TPI Rev 2 - OpenSS7 INET Driver - TCP - Conformance Test Program.\n");
@@ -5069,6 +5079,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -5082,6 +5093,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -5106,6 +5118,8 @@ Options:\n\
         Prints this usage message and exists\n\
     -V, --version\n\
         Prints the version and exists\n\
+    -C, --copying\n\
+        Prints copyring and permission and exists\n\
 ", argv[0]);
 }
 
@@ -5138,12 +5152,13 @@ main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "l::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
+		c = getopt(argc, argv, "l::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -5255,6 +5270,9 @@ main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			splash(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -5267,6 +5285,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

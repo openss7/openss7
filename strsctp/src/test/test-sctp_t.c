@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:57:38 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -42,24 +42,18 @@
  or agency of the Government other than DoD, it is classified as "Restricted
  Computer Software" and the Government's rights in the Software are defined
  in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+ any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
  of the NASA Supplement to the FAR (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified $Date: 2004/08/21 11:04:34 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/22 16:57:38 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:57:38 $"
 
-static char const ident[] =
-    "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:57:38 $";
 
 /* 
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -78,6 +72,7 @@ static char const ident[] =
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -240,6 +235,7 @@ enum {
 #undef HZ
 #define HZ 1000
 
+#if 0
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
@@ -282,11 +278,13 @@ static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
+#endif
 
 long test_start = 0;
 
 static int state;
 
+#if 0
 /* 
  *  Return the current time in milliseconds.
  */
@@ -362,6 +360,7 @@ static int check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif
 
 static int time_event(int event)
 {
@@ -423,11 +422,13 @@ static int start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+#if 0
 static int start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int stop_tt(void)
 {
@@ -1068,7 +1069,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	len += snprintf(buf + len, sizeof(buf) - len, "\0");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
 void print_addrs(int fd, char *add_ptr, size_t add_len)
@@ -1113,7 +1114,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	len += snprintf(buf + len, sizeof(buf) - len, "\0");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
 void print_addrs(int fd, char *add_ptr, size_t add_len)
@@ -1349,7 +1350,7 @@ char *yesno_string(struct t_opthdr *oh)
 char *number_string(struct t_opthdr *oh)
 {
 	static char buf[32];
-	snprintf(buf, 32, "%d\0", *((t_scalar_t *) T_OPT_DATA(oh)));
+	snprintf(buf, 32, "%d", *((t_scalar_t *) T_OPT_DATA(oh)));
 	return (buf);
 }
 
@@ -1380,11 +1381,11 @@ char *value_string(int fd, struct t_opthdr *oh)
 		case T_IP_OPTIONS:
 			break;
 		case T_IP_TOS:
-			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+			if ((oh->len = sizeof(*oh) + sizeof(unsigned char)))
 				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
 			return buf;
 		case T_IP_TTL:
-			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+			if ((oh->len = sizeof(*oh) + sizeof(unsigned char)))
 				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
 			return buf;
 		case T_IP_REUSEADDR:
@@ -1413,7 +1414,7 @@ char *value_string(int fd, struct t_opthdr *oh)
 			return yesno_string(oh);
 		case T_TCP_MAXSEG:
 			if (oh->len == sizeof(*oh) + sizeof(t_uscalar_t))
-				snprintf(buf, sizeof(buf), "%lu", *((t_uscalar_t *) T_OPT_DATA(oh)));
+				snprintf(buf, sizeof(buf), "%lu", (ulong)*((t_uscalar_t *) T_OPT_DATA(oh)));
 			return buf;
 		case T_TCP_KEEPALIVE:
 			return yesno_string(oh);
@@ -1510,12 +1511,13 @@ void print_options(int fd, char *opt_ptr, size_t opt_len)
 {
 	struct t_opthdr *oh;
 	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+#if 0
 		char *level = level_string(oh);
+#endif
 		char *name = name_string(oh);
 		char *status = status_string(oh);
 		char *value = value_string(fd, oh);
 		int len = oh->len - sizeof(*oh);
-		unsigned char *val = _T_OPT_DATA_OFS(oh, 0);
 		if (len < 0)
 			break;
 		if (verbose < 4)
@@ -1749,14 +1751,14 @@ void print_event_conn(int fd, int event)
 		parse_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03d:-U-) ->\\               |  |                    [%d]\n", sid[fd], state);
+				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03d:-U-) ->\\               |  |                    [%d]\n", (int)sid[fd], state);
 			else
-				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03d:-U-) ->\\               |  |                    [%d]\n", sid[fd], state);
+				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03d:-U-) ->\\               |  |                    [%d]\n", (int)sid[fd], state);
 		} else {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03d:%03d) ->\\               |  |                    [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03d:%03d) ->\\               |  |                    [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
-				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03d:%03d) ->\\               |  |                    [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03d:%03d) ->\\               |  |                    [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		break;
@@ -1765,15 +1767,15 @@ void print_event_conn(int fd, int event)
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
 			exp[fd] = 1;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03d:-U-)- /               |  |                    [%d]\n", sid[fd], state);
+				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03d:-U-)- /               |  |                    [%d]\n", (int)sid[fd], state);
 			else
-				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03d:-U-)- /               |  |                    [%d]\n", sid[fd], state);
+				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03d:-U-)- /               |  |                    [%d]\n", (int)sid[fd], state);
 		} else {
 			exp[fd] = 0;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03d:%03d)- /               |  |                    [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03d:%03d)- /               |  |                    [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
-				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03d:%03d)- /               |  |                    [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03d:%03d)- /               |  |                    [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
 		break;
@@ -1796,7 +1798,7 @@ void print_event_conn(int fd, int event)
 		fprintf(stdout, "T_CAPABILITY_ACK<--/|                               |  |                    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1910,14 +1912,14 @@ void print_event_resp(int fd, int event)
 		parse_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               /<- - (%03d:-U-) + -|<--- T_OPTDATA_REQ+ [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               /<- - (%03d:-U-) + -|<--- T_OPTDATA_REQ+ [%d]\n", (int)sid[fd], state);
 			else
-				fprintf(stdout, "                    |               /<- - (%03d:-U-) + -|<--- T_OPTDATA_REQ  [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               /<- - (%03d:-U-) + -|<--- T_OPTDATA_REQ  [%d]\n", (int)sid[fd], state);
 		} else {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               /<- - (%03d:%03d) + -|<--- T_OPTDATA_REQ+ [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               /<- - (%03d:%03d) + -|<--- T_OPTDATA_REQ+ [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
-				fprintf(stdout, "                    |               /<- - (%03d:%03d) + -|<--- T_OPTDATA_REQ  [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               /<- - (%03d:%03d) + -|<--- T_OPTDATA_REQ  [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		break;
@@ -1926,15 +1928,15 @@ void print_event_resp(int fd, int event)
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
 			exp[fd] = 1;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               \\ - - (%03d:-U-) +->|---> T_OPTDATA_IND+ [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               \\ - - (%03d:-U-) +->|---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], state);
 			else
-				fprintf(stdout, "                    |               \\ - - (%03d:-U-) +->|---> T_OPTDATA_IND  [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               \\ - - (%03d:-U-) +->|---> T_OPTDATA_IND  [%d]\n", (int)sid[fd], state);
 		} else {
 			exp[fd] = 0;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               \\ - - (%03d:%03d) +->|---> T_OPTDATA_IND+ [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               \\ - - (%03d:%03d) +->|---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
-				fprintf(stdout, "                    |               \\ - - (%03d:%03d) +->|---> T_OPTDATA_IND  [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               \\ - - (%03d:%03d) +->|---> T_OPTDATA_IND  [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
 		break;
@@ -1957,7 +1959,7 @@ void print_event_resp(int fd, int event)
 		fprintf(stdout, "                    |                               |  |\\-->T_CAPABILITY_ACK[%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -2070,14 +2072,14 @@ void print_event_list(int fd, int event)
 	case __EVENT_OPTDATA_REQ:
 		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               /<- -(%03d:-U-)- |<-+---- T_OPTDATA_REQ+ [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               /<- -(%03d:-U-)- |<-+---- T_OPTDATA_REQ+ [%d]\n", (int)sid[fd], state);
 			else
-				fprintf(stdout, "                    |               /<- -(%03d:-U-)- |<-+---- T_OPTDATA_REQ  [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               /<- -(%03d:-U-)- |<-+---- T_OPTDATA_REQ  [%d]\n", (int)sid[fd], state);
 		} else {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               /<- -(%03d:%03d)- |<-+---- T_OPTDATA_REQ+ [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               /<- -(%03d:%03d)- |<-+---- T_OPTDATA_REQ+ [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
-				fprintf(stdout, "                    |               /<- -(%03d:%03d)- |<-+---- T_OPTDATA_REQ  [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               /<- -(%03d:%03d)- |<-+---- T_OPTDATA_REQ  [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		break;
@@ -2085,15 +2087,15 @@ void print_event_list(int fd, int event)
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
 			exp[fd] = 1;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               \\ - -(%03d:-U-)->|--+---> T_OPTDATA_IND+ [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               \\ - -(%03d:-U-)->|--+---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], state);
 			else
-				fprintf(stdout, "                    |               \\ - -(%03d:-U-)->|--+---> T_OPTDATA_IND  [%d]\n", sid[fd], state);
+				fprintf(stdout, "                    |               \\ - -(%03d:-U-)->|--+---> T_OPTDATA_IND  [%d]\n", (int)sid[fd], state);
 		} else {
 			exp[fd] = 0;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "                    |               \\ - -(%03d:%03d)->|--+---> T_OPTDATA_IND+ [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               \\ - -(%03d:%03d)->|--+---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
-				fprintf(stdout, "                    |               \\ - -(%03d:%03d)->|--+---> T_OPTDATA_IND  [%d]\n", sid[fd], ssn[fd], state);
+				fprintf(stdout, "                    |               \\ - -(%03d:%03d)->|--+---> T_OPTDATA_IND  [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
 		break;
@@ -2116,7 +2118,7 @@ void print_event_list(int fd, int event)
 		fprintf(stdout, "                    |                               |\\-+--->T_CAPABILITY_ACK[%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -3158,6 +3160,7 @@ int postamble_2_conn(int fd)
 	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
+	goto unbind;
       unbind:
 	if (postamble_1_conn(fd) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
@@ -3367,7 +3370,6 @@ Attempts a connection with no listener.  The connection attempt\n\
 should time out."
 int test_case_2_1_conn(int fd)
 {
-	int i;
 	if (sctp_optmgmt_req(fd, T_NEGOTIATE) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -3534,7 +3536,6 @@ Attempts a delayed refusal of a connection requrest.  This delayed\n\
 refusal should come after the connector has already timed out."
 int test_case_3_2_conn(int fd)
 {
-	int i;
 	if (expect(fd, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -3668,7 +3669,6 @@ This should result in a disconnection indication after the connection is\n\
 accepted.  "
 int test_case_4_2_conn(int fd)
 {
-	int i;
 	if (expect(fd, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5281,6 +5281,7 @@ int test_case_10_2_conn(int fd)
 	lockf(fileno(stdout), F_ULOCK, 0);
 	show = 1;
 	return (__RESULT_SUCCESS);
+	goto failure;
       failure:
 	show = 1;
 	return (__RESULT_FAILURE);
@@ -5619,7 +5620,7 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 {
 	int children = 0;
 	pid_t got_chld, conn_chld = 0, resp_chld = 0, list_chld = 0;
-	int got_stat, conn_stat, resp_stat, list_stat;
+	int got_stat, conn_stat = __RESULT_SUCCESS, resp_stat = __RESULT_SUCCESS, list_stat = __RESULT_SUCCESS;
 	start_tt(5000);
 	if (conn_side) {
 		switch ((conn_chld = fork())) {
@@ -5939,7 +5940,6 @@ int do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	int num_exit;
 	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nRFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Program.\n");
@@ -6115,7 +6115,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -6144,6 +6144,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -6156,6 +6157,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -6175,9 +6177,11 @@ Options:\n\
         Increase verbosity or set to LEVEL [default: 1]\n\
 	This option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        Prints this usage message and exits\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        Prints the version and exits\n\
+    -C, --copying\n\
+        Prints copyright and permissions and exits\n\
 ", argv[0]);
 }
 
@@ -6209,13 +6213,14 @@ int main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "l::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
+		c = getopt(argc, argv, "l::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -6327,6 +6332,9 @@ int main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			splash(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -6339,6 +6347,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);
