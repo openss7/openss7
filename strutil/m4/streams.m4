@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.14 2004/11/06 09:16:50 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.15 2004/11/07 09:31:10 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/06 09:16:50 $ by $Author: brian $
+dnl Last Modified $Date: 2004/11/07 09:31:10 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -321,7 +321,7 @@ dnl AC_MSG_CHECKING([for streams lfs include directory])
             streams_cv_lfs_modversions='yes'
         else
             # new place for modversions
-            if test -n "$streams_cv_lfs_infludes" -a -f "$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
+            if test -n "$streams_cv_lfs_includes" -a -f "$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
                 streams_cv_lfs_includes="$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu -I$streams_lfs_includes"
                 streams_cv_lfs_modversions='yes'
             else
