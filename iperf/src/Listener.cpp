@@ -280,6 +280,9 @@ void Listener::Run( void ) {
     }
 } // end Run 
 
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
 /* -------------------------------------------------------------------
  * Setup a socket listening on a port.
  * For TCP, this calls bind() and listen().
@@ -294,7 +297,19 @@ void Listener::Listen( ) {
     SockAddr_localAddr( mSettings );
 
     // create an internet TCP socket
-    int type = (isUDP( mSettings )  ?  SOCK_DGRAM  :  SOCK_STREAM);
+    int type, protocol = 0;
+    if ( isSCTP( mSettings ) ) {
+	if ( isSeqpacket( mSettings ) ) {
+	    type = SOCK_SEQPACKET;
+	} else {
+	    type = SOCK_STREAM;
+	    protocol = IPPROTO_SCTP;
+	}
+    } else if ( isUDP( mSettings ) ) {
+	type = SOCK_DGRAM;
+    } else {
+	type = SOCK_STREAM;
+    }
     int domain = (SockAddr_isIPv6( &mSettings->local ) ? 
 #ifdef HAVE_IPV6
                   AF_INET6
@@ -306,13 +321,13 @@ void Listener::Listen( ) {
 #ifdef WIN32
     if ( SockAddr_isMulticast( &mSettings->local ) ) {
         // Multicast on Win32 requires special handling
-        mSettings->mSock = WSASocket( domain, type, 0, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF );
+        mSettings->mSock = WSASocket( domain, type, protocol, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF );
         WARN_errno( mSettings->mSock == INVALID_SOCKET, "socket" );
 
     } else
 #endif
     {
-        mSettings->mSock = socket( domain, type, 0 );
+        mSettings->mSock = socket( domain, type, protocol );
         WARN_errno( mSettings->mSock == INVALID_SOCKET, "socket" );
     } 
 
@@ -548,7 +563,11 @@ void Listener::UDPSingleServer( ) {
                         hdr = (server_hdr*) (UDP_Hdr+1);
         
                         hdr->flags        = htonl( HEADER_VERSION1 );
+#ifdef HAVE_INT64_t
                         hdr->total_len1   = htonl( (long) (stats->TotalLen >> 32) );
+#else
+                        hdr->total_len1   = 0;
+#endif
                         hdr->total_len2   = htonl( (long) (stats->TotalLen & 0xFFFFFFFF) );
                         hdr->stop_sec     = htonl( (long) stats->endTime );
                         hdr->stop_usec    = htonl( (long)((stats->endTime - (long)stats->endTime)

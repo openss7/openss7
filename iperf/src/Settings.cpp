@@ -95,6 +95,7 @@ const struct option long_options[] =
 {"num",        required_argument, NULL, 'n'},
 {"output",     required_argument, NULL, 'o'},
 {"port",       required_argument, NULL, 'p'},
+{"seqpacket",	     no_argument, NULL, 'q'},
 {"tradeoff",         no_argument, NULL, 'r'},
 {"server",           no_argument, NULL, 's'},
 {"time",       required_argument, NULL, 't'},
@@ -103,6 +104,7 @@ const struct option long_options[] =
 {"window",     required_argument, NULL, 'w'},
 {"reportexclude", required_argument, NULL, 'x'},
 {"reportstyle",required_argument, NULL, 'y'},
+{"sctp",	     no_argument, NULL, 'z'},
 
 // more esoteric options
 {"bind",       required_argument, NULL, 'B'},
@@ -138,6 +140,7 @@ const struct option env_options[] =
 {"IPERF_PRINT_MSS",        no_argument, NULL, 'm'},
 {"IPERF_NUM",        required_argument, NULL, 'n'},
 {"IPERF_PORT",       required_argument, NULL, 'p'},
+{"IPERF_SEQPACKET",	   no_argument, NULL, 'q'},
 {"IPERF_TRADEOFF",         no_argument, NULL, 'r'},
 {"IPERF_SERVER",           no_argument, NULL, 's'},
 {"IPERF_TIME",       required_argument, NULL, 't'},
@@ -146,6 +149,7 @@ const struct option env_options[] =
 {"TCP_WINDOW_SIZE",  required_argument, NULL, 'w'},
 {"IPERF_REPORTEXCLUDE", required_argument, NULL, 'x'},
 {"IPERF_REPORTSTYLE",required_argument, NULL, 'y'},
+{"IPERF_SCTP",		   no_argument, NULL, 'z'},
 
 // more esoteric options
 {"IPERF_BIND",       required_argument, NULL, 'B'},
@@ -167,7 +171,7 @@ const struct option env_options[] =
 
 #define SHORT_OPTIONS()
 
-const char short_options[] = "1b:c:df:hi:l:mn:o:p:rst:uvw:x:y:B:CDF:IL:M:NP:RS:T:UVW";
+const char short_options[] = "1b:c:df:hi:l:mn:o:p:qrst:uvw:x:y:zB:CDF:IL:M:NP:RS:T:UVW";
 
 /* -------------------------------------------------------------------
  * defaults
@@ -436,6 +440,10 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             mExtSettings->mPort = atoi( optarg );
             break;
 
+	case 'q':
+	    setSeqpacket( mExtSettings );
+	    break;
+
         case 'r': // test mode tradeoff
             if ( mExtSettings->mThreadMode != kMode_Client ) {
                 fprintf( stderr, warn_invalid_server_option, option );
@@ -538,6 +546,11 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             }
             break;
 
+	case 'z': // SCTP instead of UDP or TCP
+	    if ( !isSCTP( mExtSettings ) ) {
+		setSCTP( mExtSettings );
+	    }
+	    break;
 
             // more esoteric options
         case 'B': // specify bind address

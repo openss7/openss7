@@ -182,7 +182,11 @@ void Server::write_UDP_AckFIN( ) {
             hdr = (server_hdr*) (UDP_Hdr+1);
 
             hdr->flags        = htonl( HEADER_VERSION1 );
+#ifdef HAVE_INT64_T
             hdr->total_len1   = htonl( (long) (stats->TotalLen >> 32) );
+#else
+            hdr->total_len1   = 0;
+#endif
             hdr->total_len2   = htonl( (long) (stats->TotalLen & 0xFFFFFFFF) );
             hdr->stop_sec     = htonl( (long) stats->endTime );
             hdr->stop_usec    = htonl( (long)((stats->endTime - (long)stats->endTime)

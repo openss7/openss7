@@ -281,12 +281,14 @@ void Client::InitiateServer() {
     }
 }
 
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
 /* -------------------------------------------------------------------
  * Setup a socket connected to a server.
  * If inLocalhost is not null, bind to that address, specifying
  * which outgoing interface to use.
  * ------------------------------------------------------------------- */
-
 void Client::Connect( ) {
     int rc;
     SockAddr_remoteAddr( mSettings );
@@ -294,8 +296,19 @@ void Client::Connect( ) {
     assert( mSettings->inHostname != NULL );
 
     // create an internet socket
-    int type = ( isUDP( mSettings )  ?  SOCK_DGRAM : SOCK_STREAM);
-
+    int type, protocol = 0;
+    if ( isSCTP( mSettings ) ) {
+	if ( isSeqpacket( mSettings ) ) {
+	    type = SOCK_SEQPACKET;
+	} else {
+	    type = SOCK_STREAM;
+	    protocol = IPPROTO_SCTP;
+	}
+    } else if ( isUDP( mSettings ) ) {
+	type = SOCK_DGRAM;
+    } else {
+	type = SOCK_STREAM;
+    }
     int domain = (SockAddr_isIPv6( &mSettings->peer ) ? 
 #ifdef HAVE_IPV6
                   AF_INET6
@@ -304,7 +317,7 @@ void Client::Connect( ) {
 #endif
                   : AF_INET);
 
-    mSettings->mSock = socket( domain, type, 0 );
+    mSettings->mSock = socket( domain, type, protocol );
     WARN_errno( mSettings->mSock == INVALID_SOCKET, "socket" );
 
     SetSocketOptions( mSettings );

@@ -77,6 +77,9 @@
 #include "PerfSocket.hpp"
 #include "util.h"
 
+#ifndef SOL_SCTP
+#define SOL_SCTP 132
+#endif
 /* -------------------------------------------------------------------
  * Set socket options before the listen() or connect() calls.
  * These are optional performance tuning factors.
@@ -101,7 +104,28 @@ void SetSocketOptions( thread_Settings *inSettings ) {
     }
 #endif
 
-    if ( !isUDP( inSettings ) ) {
+    if ( isSCTP( inSettings ) ) {
+#ifdef SCTP_MAXSEG
+	// set SCTP maximum segment size
+	if ( inSettingss->mMSS > 0 ) {
+	    int MSS = inSettings->mMSS;
+	    Socklen_t len = sizeof(MSS);
+	    int rc = setsockopt( inSettings->mSock, SOL_SCTP, SCTP_MAXSEG,
+				 (char *) &MSS, len );
+	    WARN_errno( rc == SOCKET_ERROR, "setsockopt SCTP_MAXSEG" );
+	}
+#endif
+#ifdef SCTP_NODELAY
+	// set SCTP nodelay option
+	if ( isNoDelay( inSettings ) ) {
+	    int nodelay = 1;
+	    Socklen_t len = sizeof(nodelay);
+	    int rc = setsockopt( inSettings->mSock, SOL_SCTP, SCTP_NODLEAY,
+				 (char *) &nodelay, len );
+	    WARN_errno( rc == SOCKET_ERROR, "setsockopt SCTP_NODELAY" );
+	}
+#endif
+    } else if ( !isUDP( inSettings ) ) {
         // set the TCP maximum segment size
         setsock_tcp_mss( inSettings->mSock, inSettings->mMSS );
 
