@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xns.m4,v 0.9.2.1 2004/08/21 10:53:56 brian Exp $
+dnl @(#) $Id: xns.m4,v 0.9.2.2 2004/12/18 11:15:01 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/21 10:53:56 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/18 11:15:01 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -67,7 +67,8 @@ AC_DEFUN([_XNS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XNS_OPTIONS
-    _XNS_SETUP dnl
+    _XNS_SETUP
+    AC_SUBST([XNS_CPPFLAGS])
 ])# _XNS
 # =========================================================================
 
@@ -76,11 +77,11 @@ AC_DEFUN([_XNS], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_XNS_OPTIONS], [dnl
     AC_ARG_WITH([xns],
-        AC_HELP_STRING([--with-xns=HEADERS],
-            [specify the XNS header file directory.
-            @<:@default=$INCLUDEDIR/strxns@:>@]),
-        [with_xns="$withval"],
-        [with_xns=''])
+                AC_HELP_STRING([--with-xns=HEADERS],
+                               [specify the XNS header file directory.
+                                @<:@default=$INCLUDEDIR/strxns@:>@]),
+                [with_xns="$withval"],
+                [with_xns=''])
 ])# _XNS_OPTIONS
 # =========================================================================
 
@@ -88,72 +89,103 @@ AC_DEFUN([_XNS_OPTIONS], [dnl
 # _XNS_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_XNS_SETUP], [dnl
+    _XNS_CHECK_HEADERS
+    _XNS_DEFINES
+])# _XNS_SETUP
+# =========================================================================
+
+# =========================================================================
+# _XNS_CHECK_HEADERS
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS XNS header files.  The package
     # normally requires XNS header files to compile.
-    if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
-        xns_cv_includes="$with_xns"
-    else
-        eval "xns_search_path=\"
-            $linux_cv_k_rootdir$includedir/strxns
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxns
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxns
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxns
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxns/src/include
-            $linux_cv_k_rootdir$oldincludedir/strxns
-            $linux_cv_k_rootdir/usr/include/strxns
-            $linux_cv_k_rootdir/usr/local/include/strxns
-            $linux_cv_k_rootdir/usr/src/strxns/src/include
-            $linux_cv_k_rootdir$includedir/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxnet/src/include
-            $linux_cv_k_rootdir$oldincludedir/strxnet
-            $linux_cv_k_rootdir/usr/include/strxnet
-            $linux_cv_k_rootdir/usr/local/include/strxnet
-            $linux_cv_k_rootdir/usr/src/strxnet/src/include
-            $linux_cv_k_rootdir$includedir/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/streams/src/include
-            $linux_cv_k_rootdir$oldincludedir/streams
-            $linux_cv_k_rootdir/usr/include/streams
-            $linux_cv_k_rootdir/usr/local/include/streams
-            $linux_cv_k_rootdir/usr/src/streams/include
-            $linux_cv_k_rootdir$includedir/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include
-            $linux_cv_k_rootdir$oldincludedir/LiS
-            $linux_cv_k_rootdir/usr/include/LiS
-            $linux_cv_k_rootdir/usr/local/include/LiS
-            $linux_cv_k_rootdir/usr/src/LiS/include\""
-        xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        xns_cv_includes=
-        for xns_dir in $xns_search_path ; do
-            AC_MSG_CHECKING([for xns include directory $xns_dir])
-            if test -d "$xns_dir" -a -r "$xns_dir/sys/npi.h" ; then
-                xns_cv_includes="$xns_dir"
-                AC_MSG_RESULT([yes])
-                break
-            fi
-            AC_MSG_RESULT([no])
-        done
-    fi
-    AC_MSG_CHECKING([for xns include directory])
-    AC_MSG_RESULT([${xns_cv_includes:-no}])
-    if test :"${xns_cv_includes:-no}" = :no ; then
-        AC_MSG_ERROR([
+    AC_CACHE_CHECK([for xns include directory], [xns_cv_includes], [dnl
+        if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
+            xns_cv_includes="$with_xns"
+        else
+            # XNS header files are normally found in the strxns package now.
+            # They used to be part of the strxnet add-on package and even
+            # older versions are part of the LiS or LfS release packages.
+            eval "xns_search_path=\"
+                $linux_cv_k_rootdir$includedir/strxns
+                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxns
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxns
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxns
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxns/src/include
+                $linux_cv_k_rootdir$oldincludedir/strxns
+                $linux_cv_k_rootdir/usr/include/strxns
+                $linux_cv_k_rootdir/usr/local/include/strxns
+                $linux_cv_k_rootdir/usr/src/strxns/src/include
+                $linux_cv_k_rootdir$includedir/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxnet/src/include
+                $linux_cv_k_rootdir$oldincludedir/strxnet
+                $linux_cv_k_rootdir/usr/include/strxnet
+                $linux_cv_k_rootdir/usr/local/include/strxnet
+                $linux_cv_k_rootdir/usr/src/strxnet/src/include\""
+            case "$streams_cv_package" in
+                LiS)
+                    # XNS header files used to be part of the LiS package.
+                    eval "xns_search_path=\"$xns_search_path
+                        $linux_cv_k_rootdir$includedir/LiS
+                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include
+                        $linux_cv_k_rootdir$oldincludedir/LiS
+                        $linux_cv_k_rootdir/usr/include/LiS
+                        $linux_cv_k_rootdir/usr/local/include/LiS
+                        $linux_cv_k_rootdir/usr/src/LiS/include\""
+                    ;;
+                LfS)
+                    # XNS header files used to be part of the LfS package.
+                    eval "xns_search_path=\"$xns_search_path
+                        $linux_cv_k_rootdir$includedir/streams
+                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/streams
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/streams
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/streams
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/streams/src/include
+                        $linux_cv_k_rootdir$oldincludedir/streams
+                        $linux_cv_k_rootdir/usr/include/streams
+                        $linux_cv_k_rootdir/usr/local/include/streams
+                        $linux_cv_k_rootdir/usr/src/streams/include\""
+                    ;;
+            esac
+            xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+            for xns_dir in $xns_search_path ; do
+                if test -d "$xns_dir" -a -r "$xns_dir/sys/npi.h" ; then
+                    xns_cv_includes="$xns_dir"
+                    break
+                fi
+            done
+        fi
+        if test :"${xns_cv_includes:-no}" = :no ; then
+            AC_MSG_ERROR([
 ***
 *** Could not find XNS include directories.  This package requires the
 *** presence of XNS include directories to compile.  Specify the location of
 *** XNS include directories with option --with-xns to configure and try again.
-***
-        ])
-    fi
-])# _XNS_SETUP
+*** ])
+        fi
+    ])
+])# _XNS_CHECK_HEADERS
+# =========================================================================
+
+# =========================================================================
+# _XNS_DEFINES
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNS_DEFINES], [dnl
+    for xns_include in $xns_cv_includes ; do
+        XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-I${xns_include}"
+    done
+    AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
+        Define for SuSv3.  This is necessary for LiS and LfS and strxns for
+        that matter.
+    ])
+])# _XNS_DEFINES
 # =========================================================================
 
 # =========================================================================

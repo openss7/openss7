@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.18 2004/11/08 06:52:32 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.19 2004/12/18 11:13:03 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/08 06:52:32 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/18 11:13:03 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -93,12 +93,12 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS], [
     AC_ARG_WITH([lis],
         AS_HELP_STRING([--with-lis=HEADERS],
             [specify the LiS header file directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
-        [with_lis=$withval],
+        [with_lis="$withval"],
         [with_lis=''])
     AC_ARG_WITH([lfs],
         AS_HELP_STRING([--with-lfs=HEADERS],
-            [specify the LfS header file directory. @<:@default=INCLUDEDIR/LfS@:>@]),
-        [with_lfs=$withval],
+            [specify the LfS header file directory.  @<:@default=INCLUDEDIR/LfS@:>@]),
+        [with_lfs="$withval"],
         [with_lfs=''])
 ])# _LINUX_STREAMS_OPTIONS
 # =========================================================================
@@ -107,57 +107,36 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS], [
 # _LINUX_STREAMS_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_SETUP], [
-    streams_cv_package=
-    streams_cv_includes=
     if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
         _LINUX_STREAMS_LIS_CHECK_HEADERS
-        if test :"${streams_cv_lis_includes:-no}" != :no ; then
-            streams_cv_includes="$streams_cv_lis_includes"
-            streams_cv_package="LiS"
-        fi
     fi
     if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
         _LINUX_STREAMS_LFS_CHECK_HEADERS
-        if test :"${streams_cv_lfs_includes:-no}" != :no ; then
-            streams_cv_includes="$streams_cv_lfs_includes"
-            streams_cv_package="LfS"
-        fi
     fi
-    AC_MSG_CHECKING([for streams include directory])
-    if test :"${streams_cv_package:-no}" = :no ; then
-        if test :"${with_lis:-no}" != :no ; then
-            AC_MSG_ERROR([
-*** 
-*** Linux GCOM STREAMS was specified with the --with-lis flag, however,
-*** configure could not find the LiS include directories.  This package requires
-*** the presense of LiS include directories when the --with-lis flag is
-*** specified.  Specify the correct location of LiS include directories with the
-*** argument to option --with-lis to configure and try again.
-*** 
-            ])
+    AC_CACHE_CHECK([for streams include directory], [streams_cv_includes], [
+        if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+            if test :"${streams_cv_lis_includes:-no}" != :no ; then
+                streams_cv_includes="$streams_cv_lis_includes"
+            fi
         fi
-        if test :"${with_lfs:-no}" != :no ; then
-            AC_MSG_ERROR([
-*** 
-*** Linux Fast STREAMS was specified with the --with-lfs flag, however,
-*** configure could not find the LfS include directories.  This package requires
-*** the presense of LfS include directories when the --with-lfs flag is
-*** specified.  Specify the correct location of LfS include directories with the
-*** argument to option --with-lfs to configure and try again.
-*** 
-            ])
+        if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+            if test :"${streams_cv_lfs_includes:-no}" != :no ; then
+                streams_cv_includes="$streams_cv_lfs_includes"
+            fi
         fi
-        AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS include directories.  This package
-*** requires the presence of STREAMS include directories.  Specify the correct
-*** location of Linux GCOM STREAMS (LiS) include directories with the --with-lis
-*** option to configure, or the correct location of Linux Fast STREAMS (LfS)
-*** include directories with the --with-lfs option to configure, and try again.
-*** 
-        ])
-    fi
-    AC_MSG_RESULT([${streams_cv_includes:-no}])
+    ])
+    AC_CACHE_CHECK([for streams package], [streams_cv_package], [
+        if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+            if test :"${streams_cv_lis_includes:-no}" != :no ; then
+                streams_cv_package="LiS"
+            fi
+        fi
+        if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+            if test :"${streams_cv_lfs_includes:-no}" != :no ; then
+                streams_cv_package="LfS"
+            fi
+        fi
+    ])
     # need to add arguments for LiS or LfS so they will be passed to rpm
     AC_MSG_CHECKING([for streams added configure arguments])
     case "$streams_cv_package" in
@@ -176,19 +155,38 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
             AC_MSG_RESULT([--with-lfs])
             ;;
         *)
+            if test :"${with_lis:-no}" != :no ; then
+                AC_MSG_ERROR([
+*** 
+*** Linux GCOM STREAMS was specified with the --with-lis flag, however,
+*** configure could not find the LiS include directories.  This package requires
+*** the presense of LiS include directories when the --with-lis flag is
+*** specified.  Specify the correct location of LiS include directories with the
+*** argument to option --with-lis to configure and try again.
+*** ])
+            fi
+            if test :"${with_lfs:-no}" != :no ; then
+                AC_MSG_ERROR([
+*** 
+*** Linux Fast STREAMS was specified with the --with-lfs flag, however,
+*** configure could not find the LfS include directories.  This package requires
+*** the presense of LfS include directories when the --with-lfs flag is
+*** specified.  Specify the correct location of LfS include directories with the
+*** argument to option --with-lfs to configure and try again.
+*** ])
+            fi
             AC_MSG_ERROR([
-***
-*** Configure script error.  Try specifying --with-lis or --with-lfs and
-*** run configure again.
-***
-            ])
+*** 
+*** Configure could not find the STREAMS include directories.  This package
+*** requires the presence of STREAMS include directories.  Specify the correct
+*** location of Linux GCOM STREAMS (LiS) include directories with the --with-lis
+*** option to configure, or the correct location of Linux Fast STREAMS (LfS)
+*** include directories with the --with-lfs option to configure, and try again.
+*** ])
             ;;
     esac
     for streams_include in $streams_cv_includes ; do
         STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
-    done
-    for streams_include in $streams_cv_xti_includes ; do
-        STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_include}"
     done
     AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_package:-LiS}" = :LiS])
     AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_package:-LiS}" = :LfS])
@@ -201,78 +199,75 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
     # Test for the existence of Linux STREAMS header files.  The package normally requires either
     # Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
-dnl AC_MSG_CHECKING([for streams lis include directory])
-    if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes
-    then
-        streams_cv_lis_includes="$with_lis"
-    else
-        eval "streams_search_path=\"
-            $linux_cv_k_rootdir$includedir/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include
-            $linux_cv_k_rootdir$oldincludedir/LiS
-            $linux_cv_k_rootdir/usr/include/LiS
-            $linux_cv_k_rootdir/usr/local/include/LiS
-            $linux_cv_k_rootdir/usr/src/LiS/include\""
-        streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        streams_cv_lis_includes=
-        for streams_dir in $streams_search_path ; do
-            AC_MSG_CHECKING([for streams lis include directory $streams_dir])
-            if test -d "$streams_dir" -a -r "$streams_dir/sys/stream.h"
-            then
-                streams_cv_lis_includes="$streams_dir"
-                AC_MSG_RESULT([yes])
+    AC_CACHE_CHECK([for streams lis include directory], [streams_cv_lis_includes], [
+        if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes
+        then
+            streams_cv_lis_includes="$with_lis"
+        else
+            streams_cv_lis_includes=
+            eval "streams_search_path=\"
+                $linux_cv_k_rootdir$includedir/LiS
+                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include
+                $linux_cv_k_rootdir$oldincludedir/LiS
+                $linux_cv_k_rootdir/usr/include/LiS
+                $linux_cv_k_rootdir/usr/local/include/LiS
+                $linux_cv_k_rootdir/usr/src/LiS/include\""
+            streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+            for streams_dir in $streams_search_path ; do
+                if test -d "$streams_dir" -a -r "$streams_dir/sys/stream.h"
+                then
+                    streams_cv_lis_includes="$streams_dir"
+                    break
+                fi
+            done
+        fi
+        if test :"${streams_cv_lis_includes:-no}" = :no
+        then
+            AC_MSG_WARN([
+*** 
+*** Configure could not find the LiS STREAMS include directories.  If you
+*** wish to use the LiS STREAMS package you will need to specify the location
+*** of the Linux STREAMS (LiS) include directories with the --with-lis
+*** option to configure and try again.  Perhaps you just forgot to load the
+*** LiS STREAMS package?  The LiS STREAMS package is available from the
+*** download page at http://www.openss7.org/ and comes in a tarball named
+*** something like "LiS-2.16.18-22.tar.gz".
+*** ])
+        fi
+    ])
+    AC_CACHE_CHECK([for streams lis sys/LiS/modversions.h], [streams_cv_lis_modversions], [
+        streams_cv_lis_modversions='no'
+        if test -n "$streams_cv_lis_includes"
+        then
+            # old place for modversions
+            if test -f "$streams_dir/sys/LiS/modversions.h" ; then
+                streams_cv_lis_modversions='yes'
                 break
             fi
-            AC_MSG_RESULT([no])
-        done
-    fi
-    AC_MSG_CHECKING([for streams lis include directory])
-    AC_MSG_RESULT([${streams_cv_lis_includes:-no}])
-    # Some of our older RPM releases of LiS put the xti header files into their own subdirectory
-    # (/usr/include/xti/).  The current version places them in with the LiS header files.  This
-    # tests whether we need an additional -I/usr/include/xti in the streams includes line.  This
-    # check can be dropped when the older RPM releases of LiS fall out of favor.
-    AC_MSG_CHECKING([for streams lis xns/xti header files])
-    streams_cv_xti_includes=
-    streams_dir=`echo "$streams_cv_lis_includes" | sed -e 's|/*$||;s|usr/src/LiS/include|usr/src/LiS/include/LiS|;s|LiS$|xti|'`
-    if test -d "$streams_dir" -a -r "$streams_dir/xti.h" ; then
-        streams_cv_xti_includes="$streams_dir"
-    fi
-    AC_MSG_RESULT([${streams_cv_xti_includes:-no}])
-    AC_CACHE_CHECK([for streams lis sys/LiS/modversions.h], [streams_cv_lis_modversions], [
-        # old place for modversions
-        if test -n "$streams_cv_lis_includes" -a -f "$streams_cv_lis_includes/sys/LiS/modversions.h" ; then
-            streams_cv_lis_modversions='yes'
-        else
             # new place for modversions
-            if test -n "$streams_cv_lis_includes" -a -f "$streams_cv_lis_includes/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" ; then
-                streams_cv_lis_includes="$streams_cv_lis_includes/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
+            if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" ; then
+                streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
                 streams_cv_lis_modversions='yes'
-            else
-                streams_cv_lis_modversions='no'
+                break
             fi
         fi
     ])
-    if test :"${streams_cv_lis_modversions:-no}" != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [], [Define when the
-            LiS release supports module versions such as the OpenSS7 autoconf
-            release of LiS.])
-    fi
     AC_CACHE_CHECK([for streams lis sys/LiS/module.h], [streams_cv_lis_module], [
-        if test -n "$streams_cv_lis_includes" -a -f "$streams_cv_lis_includes/sys/LiS/module.h" ; then
-            streams_cv_lis_module='yes'
-        else
-            streams_cv_lis_module='no'
+        streams_cv_lis_module='no'
+        if test -n "$streams_cv_lis_includes"
+        then
+            for streams_dir in $streams_cv_lis_includes
+            do
+                if test -f "$streams_dir/sys/LiS/module.h" ; then
+                    streams_cv_lis_module='yes'
+                    break
+                fi
+            done
         fi
     ])
-    if test :"${streams_cv_lis_module:-no}" != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODULE_H], [], [Define when the LiS
-            release provides its own module.h file such as 2.17 GCOM LiS
-            releases.])
-    fi
 ])# _LINUX_STREAMS_LIS_CHECK_HEADERS
 # =========================================================================
 
@@ -282,60 +277,65 @@ dnl AC_MSG_CHECKING([for streams lis include directory])
 AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [
     # Test for the existence of Linux Fast-STREAMS header files.  The package normally requires
     # either Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
-dnl AC_MSG_CHECKING([for streams lfs include directory])
-    if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes
-    then
-        streams_cv_lfs_includes="$with_lfs"
-    else
-        eval "streams_search_path=\"
-            $linux_cv_k_rootdir$includedir/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/streams
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/streams/include
-            $linux_cv_k_rootdir$oldincludedir/streams
-            $linux_cv_k_rootdir/usr/include/streams
-            $linux_cv_k_rootdir/usr/local/include/streams
-            $linux_cv_k_rootdir/usr/src/streams/include\""
-        streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        streams_cv_lfs_includes=
-        for streams_dir in $streams_search_path ; do
-            AC_MSG_CHECKING([for streams lfs include directory $streams_dir])
-            if test -d "$streams_dir" -a -r "$streams_dir/sys/stream.h"
-            then
-                streams_cv_lfs_includes="$streams_dir"
-                AC_MSG_RESULT([yes])
-                break
-            fi
-            AC_MSG_RESULT([no])
-        done
-    fi
-    AC_MSG_CHECKING([for streams lfs include directory])
-    AC_MSG_RESULT([${streams_cv_lfs_includes:-no}])
-    # For Linux Fast-STREAMS, xti includes are part of the release /usr/include/streams
-    # subdirectory.
-    AC_MSG_CHECKING([for streams lfs xns/xti header files])
-    streams_cv_xti_includes=
-    AC_MSG_RESULT([${streams_cv_xti_includes:-no}])
-    AC_CACHE_CHECK([for streams lfs sys/streams/modversions.h], [streams_cv_lfs_modversions], [
-        # old place for modversions
-        if test -n "$streams_cv_lfs_includes" -a -f "$streams_cv_lfs_includes/sys/streams/modversions.h" ; then
-            streams_cv_lfs_modversions='yes'
+    AC_CACHE_CHECK([for streams lfs include directory], [streams_cv_lfs_includes], [
+        if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes
+        then
+            streams_cv_lfs_includes="$with_lfs"
         else
-            # new place for modversions
-            if test -n "$streams_cv_lfs_includes" -a -f "$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
-                streams_cv_lfs_includes="$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
-                streams_cv_lfs_modversions='yes'
-            else
-                streams_cv_lfs_modversions='no'
-            fi
+            streams_cv_lfs_includes=
+            eval "streams_search_path=\"
+                $linux_cv_k_rootdir$includedir/streams
+                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/streams
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/streams
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/streams
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/streams/include
+                $linux_cv_k_rootdir$oldincludedir/streams
+                $linux_cv_k_rootdir/usr/include/streams
+                $linux_cv_k_rootdir/usr/local/include/streams
+                $linux_cv_k_rootdir/usr/src/streams/include\""
+            streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+            for streams_dir in $streams_search_path ; do
+                if test -d "$streams_dir" -a -r "$streams_dir/sys/stream.h"
+                then
+                    streams_cv_lfs_includes="$streams_dir"
+                    break
+                fi
+            done
         fi
     ])
-    if test :"${streams_cv_lfs_modversions:-no}" != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_STREAMS_MODVERSIONS_H], [], [Define when
-            the Linux Fast-STREAMS release supports module versions such as
-            the OpenSS7 autoconf releases.])
+    if test :"${streams_cv_lfs_includes:-no}" = :no
+    then
+        AC_MSG_WARN([
+*** 
+*** Configure could not find the LfS STREAMS include directories.  If you
+*** wish to use the LfS STREAMS package you will need to specify the location
+*** of the Linux Fast STREAMS (LfS) include directories with the --with-lfs
+*** option to configure and try again.  Perhaps you just forgot to load the
+*** LfS STREAMS package?  The LfS STREAMS package is available from the
+*** download page at http://www.openss7.org/ and comes in a tarball named
+*** something like "streams-0.7a-1.tar.gz".
+*** ])
     fi
+    AC_CACHE_CHECK([for streams lfs sys/streams/modversions.h], [streams_cv_lfs_modversions], [
+        streams_cv_lfs_modversions='no'
+        if test -n "$streams_cv_lfs_includes"
+        then
+            for streams_dir in $streams_cv_lfs_includes
+            do
+                # old place for modversions
+                if test -f "$streams_dir/sys/streams/modversions.h" ; then
+                    streams_cv_lfs_modversions='yes'
+                    break
+                fi
+                # new place for modversions
+                if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
+                    streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
+                    streams_cv_lfs_modversions='yes'
+                    break
+                fi
+            done
+        fi
+    ])
 ])# _LINUX_STREAMS_LFS_CHECK_HEADERS
 # =========================================================================
 
@@ -358,6 +358,16 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT], [
 # _LINUX_STREAMS_LIS_DEFINES
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
+    if test :"${streams_cv_lis_modversions:-no}" != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [], [Define when the
+            LiS release supports module versions such as the OpenSS7 autoconf
+            release of LiS.])
+    fi
+    if test :"${streams_cv_lis_module:-no}" != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODULE_H], [], [Define when the LiS
+            release provides its own module.h file such as 2.17 GCOM LiS
+            releases.])
+    fi
     case "$linux_cv_march" in
 	alpha*)			: ;;
 	arm*)			: ;;
@@ -434,6 +444,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
 # _LINUX_STREAMS_LFS_DEFINES
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [
+    if test :"${streams_cv_lfs_modversions:-no}" != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_STREAMS_MODVERSIONS_H], [], [Define when
+            the Linux Fast-STREAMS release supports module versions such as
+            the OpenSS7 autoconf releases.])
+    fi
     STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD='-lstreams'
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [], [Linux Fast-STREAMS has this type.])

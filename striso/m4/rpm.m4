@@ -301,10 +301,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                     White?Box*)
                         case $rpm_cv_dist_release in
                             3.0)
-                                rpm_cv_dist_extra=".E3"
+                                rpm_cv_dist_extra=".WB3"
                                 ;;
                             4.0)
-                                rpm_cv_dist_extra=".E4"
+                                rpm_cv_dist_extra=".WB4"
                                 ;;
                         esac
                         ;;
@@ -401,7 +401,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
         [if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
          if test -r ${d}.rpmrelease
          then with_rpm_release="`cat ${d}.rpmrelease`"
-         else with rpm_release=1
+         else with_rpm_release=1
          fi])
     AC_MSG_CHECKING([for rpm release])
     AC_MSG_RESULT([${with_rpm_release:-1}])

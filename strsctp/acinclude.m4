@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.4 2004/11/08 06:53:43 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/12/18 11:15:25 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/08 06:53:43 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/18 11:15:25 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -85,7 +85,7 @@ AC_DEFUN([AC_SCTP], [dnl
     _LINUX_STREAMS
     _XNS
     _XTI
-    SCTP_INCLUDES="-I- -imacros ./config.h${xns_cv_includes:+ -I}${xns_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS} -I./src/include -I${srcdir}/src/include"
+    SCTP_INCLUDES="-I- -imacros ./config.h${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS} -I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    INCLUDES  = $SCTP_INCLUDES])

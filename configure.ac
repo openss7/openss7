@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.1 2004/12/17 21:52:43 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.2 2004/12/18 10:97:02 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7], [0.9.2], [bugs@openss7.org])
 
@@ -97,6 +97,6 @@ AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero get
 
 AC_OPENSS7
 
-AC_CONFIG_SUBDIRS(../LiS ../strxns ../strxnet ../strinet ../strsctp)
+AC_CONFIG_SUBDIRS(LiS strxns strxnet strinet strsctp)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/12/17 21:52:43 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.2 2004/12/18 11:17:02 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,52 +53,66 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/17 21:52:43 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/18 11:17:02 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-m4_include([m4/openss7.m4])
-m4_include([m4/kernel.m4])
-m4_include([m4/genksyms.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/xopen.m4])
-m4_include([m4/xti.m4])
-m4_include([m4/xns.m4])
-m4_include([m4/sctp.m4])
-m4_include([m4/man.m4])
-m4_include([m4/public.m4])
-m4_include([m4/rpm.m4])
-m4_include([m4/libraries.m4])
-m4_include([m4/strconf.m4])
+#dnl m4_include([m4/openss7.m4])
+#dnl m4_include([m4/kernel.m4])
+#dnl m4_include([m4/genksyms.m4])
+#dnl m4_include([m4/streams.m4])
+#dnl m4_include([m4/xopen.m4])
+#dnl m4_include([m4/xti.m4])
+#dnl m4_include([m4/xns.m4])
+#dnl m4_include([m4/sctp.m4])
+#dnl m4_include([m4/man.m4])
+#dnl m4_include([m4/public.m4])
+#dnl m4_include([m4/rpm.m4])
+#dnl m4_include([m4/libraries.m4])
+#dnl m4_include([m4/strconf.m4])
 
 # =========================================================================
 # AC_OPENSS7
 # -------------------------------------------------------------------------
 AC_DEFUN([AC_OPENSS7], [dnl
-    _OPENSS7_PACKAGE([OPENSS7], [OpenSS7 Master Package])
-    _MAN_CONVERSION
-    _PUBLIC_RELEASE
-    _RPM_SPEC
-    _LDCONFIG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    _XNS
-    _XTI
-    _XOPEN
-    CPPFLAGS="-I- -include ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $SCTP_INCLUDES])
-    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])dnl
-    AC_SUBST([USER_CFLAGS])dnl
+#dnl     _OPENSS7_PACKAGE([OPENSS7], [OpenSS7 Master Package])
+#dnl     _MAN_CONVERSION
+#dnl     _PUBLIC_RELEASE
+#dnl     _RPM_SPEC
+#dnl     _LDCONFIG
+#dnl     # user CPPFLAGS and CFLAGS
+#dnl     USER_CPPFLAGS="${CPPFLAGS}"
+#dnl     USER_CFLAGS="${CFLAGS}"
+#dnl     _LINUX_KERNEL
+#dnl     _LINUX_STREAMS
+#dnl     _XNS
+#dnl     _XTI
+#dnl     _XOPEN
+#dnl     CPPFLAGS="-I- -include ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+#dnl     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+#dnl     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+#dnl     AC_MSG_NOTICE([final user    INCLUDES  = $SCTP_INCLUDES])
+#dnl     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+#dnl     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+#dnl     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+#dnl     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+#dnl     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+#dnl     AC_SUBST([USER_CPPFLAGS])dnl
+#dnl     AC_SUBST([USER_CFLAGS])dnl
+declare -x ac_srcdir="$srcdir"
+declare -x ac_builddir='.'
+declare -x ac_abs_srcdir=`(cd $ac_srcdir ; pwd)`
+declare -x ac_abs_builddir=`(cd $ac_builddir ; pwd)`
+declare -x ac_top_srcdir="$ac_srcdir"
+declare -x ac_top_builddir="$ac_builddir"
+declare -x ac_abs_top_srcdir=`(cd $ac_top_srcdir; pwd)`
+declare -x ac_abs_top_builddir=`(cd $ac_top_builddir; pwd)`
+declare -x streams_cv_package='LiS'
+declare -x streams_cv_includes="$ac_abs_top_builddir/LiS/include $ac_abs_top_srcdir/LiS/include"
+declare -x streams_cv_lis_includes="$ac_abs_top_builddir/LiS/include $ac_abs_top_srcdir/LiS/include"
+declare -x streams_cv_lfs_includes="$ac_abs_top_builddir/streams/include $ac_abs_top_srcdir/streams/include"
+declare -x xti_cv_includes="$ac_abs_top_builddir/strxnet/src/include $ac_abs_top_srcdir/strxnet/src/include"
+declare -x xns_cv_includes="$ac_abs_top_builddir/strxns/src/include $ac_abs_top_srcdir/strxns/src/include"
 ])# AC_OPENSS7
 # =========================================================================
 

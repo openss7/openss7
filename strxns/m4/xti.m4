@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.3 2004/08/31 05:23:54 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.4 2004/12/18 11:13:21 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/31 05:23:54 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/18 11:13:21 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -63,7 +63,8 @@ AC_DEFUN([_XTI], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XTI_OPTIONS
-    _XTI_SETUP dnl
+    _XTI_SETUP
+    AC_SUBST([XTI_CPPFLAGS])
 ])# _XTI
 # =========================================================================
 
@@ -75,7 +76,7 @@ AC_DEFUN([_XTI_OPTIONS], [dnl
                 AC_HELP_STRING([--with-xti=HEADERS],
                                [specify the XTI header file directory.
                                @<:@default=$INCLUDEDIR/xti@:>@]),
-                [with_xti=$withval],
+                [with_xti="$withval"],
                 [with_xti=''])
 ])# _XTI_OPTIONS
 # =========================================================================
@@ -96,48 +97,66 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS XTI header files.  The package
     # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
     # files (or both) to compile.
-    if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
-        xti_cv_includes="$with_xti"
-    else
-        eval "xti_search_path=\"
-            $linux_cv_k_rootdir$includedir/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxnet
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxnet/src/include
-            $linux_cv_k_rootdir$oldincludedir/strxnet
-            $linux_cv_k_rootdir/usr/include/strxnet
-            $linux_cv_k_rootdir/usr/local/include/strxnet
-            $linux_cv_k_rootdir/usr/src/strxnet/src/include\""
-        xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        xti_cv_includes=
-        for xti_dir in $xti_search_path ; do
-            AC_MSG_CHECKING([for xit include directory $xti_dir])
-            if test -d "$xti_dir" -a -r "$xti_dir/xti.h" ; then
-                xti_cv_includes="$xti_dir"
-                AC_MSG_RESULT([yes])
-                break
-            fi
-            AC_MSG_RESULT([no])
-        done
-    fi
-    AC_MSG_CHECKING([for xti include directory])
-    AC_MSG_RESULT([${xti_cv_includes:-no}])
-    if test :"${xti_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
+    AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [
+        if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
+            xti_cv_includes="$with_xti"
+        else
+            eval "xti_search_path=\"
+                $linux_cv_k_rootdir$includedir/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxnet
+                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxnet/src/include
+                $linux_cv_k_rootdir$oldincludedir/strxnet
+                $linux_cv_k_rootdir/usr/include/strxnet
+                $linux_cv_k_rootdir/usr/local/include/strxnet
+                $linux_cv_k_rootdir/usr/src/strxnet/src/include \""
+            case "$streams_cv_package" in
+                LiS)
+                    # Some of our oldest RPM releases of LiS put the xti header files into their own
+                    # subdirectory (/usr/include/xti/).  The old version places them in with the LiS
+                    # header files.  The current version has them separate as part of the strxnet
+                    # package.  This tests whether we need an additional -I/usr/include/xti in the
+                    # streams includes line.  This check can be dropped when the older RPM releases
+                    # of LiS fall out of favor.
+                    eval "xti_search_path=\"$xti_search_path
+                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS/xti
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS/xti
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS/xti
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include/xti
+                        $linux_cv_k_rootdir$oldincludedir/LiS/xti
+                        $linux_cv_k_rootdir/usr/include/LiS/xti
+                        $linux_cv_k_rootdir/usr/local/include/LiS/xti
+                        $linux_cv_k_rootdir/usr/src/LiS/include/xti
+                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/xti
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/xti
+                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/xti
+                        $linux_cv_k_rootdir$oldincludedir/xti
+                        $linux_cv_k_rootdir/usr/include/xti
+                        $linux_cv_k_rootdir/usr/local/include/xti\""
+                    ;;
+                LfS)
+                    # LfS has always been separate.
+                    ;;
+            esac
+            xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+            for xti_dir in $xti_search_path ; do
+                if test -d "$xti_dir" -a -r "$xti_dir/xti.h" ; then
+                    xti_cv_includes="$xti_dir"
+                    break
+                fi
+            done
+        fi
+        if test :"${xti_cv_includes:-no}" = :no ; then
+            AC_MSG_RESULT([ERROR])
+            AC_MSG_ERROR([
 *** 
 *** Could not find XTI include directories.  This package requires the
 *** presence of XTI include directories to compile.  Specify the location of
 *** XTI include directories with option --with-xti to configure and try again.
-*** 
-	])
-    else
-        :
-        AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
-            Define for SuSv3.  This is necessary for LiS and LfS and strxnet
-            for that matter.
-            ])
-    fi
+*** ])
+        fi
+    ])
 ])# _XTI_CHECK_HEADERS
 # =========================================================================
 
@@ -145,6 +164,13 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 # _XTI_DEFINES
 # -------------------------------------------------------------------------
 AC_DEFUN([_XTI_DEFINES], [dnl
+    for xti_include in $xti_cv_includes ; do
+        XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-I${xti_include}"
+    done
+    AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
+        Define for SuSv3.  This is necessary for LiS and LfS and strxnet for
+        that matter.
+    ])
 ])# _XTI_DEFINES
 # =========================================================================
 
