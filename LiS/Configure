@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.57 3/26/03"
+Configure_version="2.58 4/12/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -1020,7 +1020,7 @@ Do you want to do that now?"
     #
     # If we have a kernel configuration now, source it.
     #
-    if [ -f $KSRC/.config ]; then
+    if [ $NEED_KCONFIG -eq 1 -a -f $KSRC/.config ]; then
         . $KSRC/.config
     fi
 

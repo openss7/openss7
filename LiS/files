@@ -14,6 +14,7 @@ FILES="\
 ./LiS-$LISVER/drivers/str/linux/connld.c \
 ./LiS-$LISVER/drivers/str/linux/ip_strm_mod.c \
 ./LiS-$LISVER/drivers/str/linux/ip_strm_mod.h \
+./LiS-$LISVER/drivers/str/linux/ip_to_dlpi.c \
 ./LiS-$LISVER/drivers/str/linux/liskmod.c \
 ./LiS-$LISVER/drivers/str/log.c \
 ./LiS-$LISVER/drivers/str/loop.c \
@@ -30,6 +31,7 @@ FILES="\
 ./LiS-$LISVER/drivers/str/tokqnx.c \
 ./LiS-$LISVER/drivers/str/user/makefile \
 ./LiS-$LISVER/drivers/str/timod.c \
+./LiS-$LISVER/drivers/str/strinet/* \
 ./LiS-$LISVER/dummy.c \
 ./LiS-$LISVER/head/buffcall.c \
 ./LiS-$LISVER/head/cmn_err.c \
