@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/09 03:40:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/16 11:51:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 03:40:15 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:51:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -335,7 +335,6 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 # syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
 # properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
-    PACKAGE_RPMOPTIONS=
     arg=
     for arg_part in $ac_configure_args ; do
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then

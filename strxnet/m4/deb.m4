@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/09 03:40:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/16 11:51:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 03:40:15 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:51:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -189,7 +189,6 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
 # _DEB_DPKG_SETUP_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
-    PACKAGE_DEBOPTIONS=
     arg=
     for arg_part in $ac_configure_args ; do
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
