@@ -1,15 +1,124 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% =========================================================================
+%
+% @(#) $Id: tri.texi,v 0.9.2.2 2004/10/13 08:18:18 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/10/13 08:18:18 $ by $Author: brian $
+%
+% =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
 @setfilename tri.info
 @settitle Transaction Interface
 @c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* TRI: (tri).			Transaction Interface Specification.
+@end direntry
+
+@include texi/args.texi
+
+@ifinfo
+This files documents the Transaction Interface.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATA}, for
+@value{PACKAGE_TITLE} version @value{PACKAVE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2004 @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000 @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved. @*
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copyring, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@ignore
+@shorttitlepage Transaction Interface --- Application Program Interface
+@end ignore
 @titlepage
-@title Transaction Interface
-@subtitle Application Program Interface
-@subtitle Version:
-@subtitle October 9, 2001
-@author @uref{mailto:bidulock@@openss7.org,Brian F. G. Bidulock}
+@titlefont{Transaction Interface}
+@sp 0.5
+@title Application Program Interface
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
@@ -43,6 +152,16 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 
 @vskip 0pt
 @end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @emph{Released under GFDL} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @emph{Released under GFDL} @| @| @thispage
+@end iftex
+@page
 
 @c Define an index of primitives
 @defindex pr
@@ -67,30 +186,25 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @end ifnotinfo
 @end ifnottex
 
-@iftex
-@headings off
-@everyheading @thistitle @| @| @thischaptername
-@c @oddheading @thistitle @| @| @thischaptername
-@c @evenheading @thischaptername @| @| @thistitle
-@everyfooting DRAFT Version 0.9.2 @| @emph{Released under the GFDL} @| @thispage
-@c @oddfooting DRAFT Version 0.9.2 @| @emph{This document is subject to NDA} @| @thispage
-@c @evenfooting @thispage @| @emph{This document is subject to NDA} @| DRAFT Version 0.9.3
-@end iftex
-
 @menu
 * Preface::
 * Introduction::
-* The Transaction Layer::
+* The Transaction Sub-Layer::
 * TRI Services Definition::
 * TRI Primitives::
 * Diagnostics Requirements::
-* References::
+* Transaction Service Interface Sequence of Primitives::
 * Addendum for ITU-T Conformance::
+* TCAP Transport Provider TPI Addendum::
 * Mapping TRI Primitives to ITU-T Q.771::
 * State/Event Tables::
 * Primitive Precedence Tables::
 * TRI Header File Listing::
-* GNU Free Documentation License::
+* License::
+* Glossary::
+* Acronyms::
+* References::
+* Index::
 @end menu
 
 @node Preface
@@ -273,10 +387,10 @@ and @ref{Connectionless Mode Primitives}.
 The features of the TRI are defined in terms of the services provided by the service provider, and the individual
 primitives that may flow between the service user and the service provider.
 
-The services supported by the TRI are based on two distinct modes of communication, connectoin (CONS) and connectionless
-(CLNS).  Also, the TRI supports services for local management.
+The services supported by the TRI are based on two distinct modes of communication, connection-mode association service
+(COAS) and connectionless association service (CLAS).  Also, the TRI supports services for local management.
 
-@subsection CONS
+@subsection COAS
 
 The main features of the connection mode communication are:
 
@@ -290,7 +404,7 @@ There are three phases to each instance of communication: Association Establishm
 Release.  Units of data arrive at the destination in the same order as they departed their source and the data is
 protected against duplication or loss of data units within some specified quality of service.
 
-@subsection CLNS
+@subsection CLAS
 
 The main features of the connectionless mode communication are:
 
@@ -361,7 +475,7 @@ completeness of the data stream.
 
 @subsection Local Management
 
-The TRI specifications also define a set of local management functions that apply to both CONS and CLNS modes of
+The TRI specifications also define a set of local management functions that apply to both COAS and CLAS modes of
 communication.  These services have local significance only.
 
 Table 1 and Table 2 summarizes the TRI service primitives by their state and service.
@@ -369,27 +483,64 @@ Table 1 and Table 2 summarizes the TRI service primitives by their state and ser
 @sp 1
 @center Table 1@strong{@emph{.  Service Primitives for Connection Mode Association}}
 
-@multitable @columnfractions .175 .175 .65
-@item @strong{STATE}		@tab @strong{SERVICE}		@tab @strong{PRIMITIVES} 
-@item Local Management		@tab Information Reporting	@tab TR_INFO_REQ, TR_INFO_ACK, TR_ERROR_ACK@*@*
-@item				@tab Bind			@tab TR_BIND_REQ, TR_BIND_ACK, TR_UNBIND_ACK,@*TR_OK_ACK, TR_ERROR_ACK@*
-@item				@tab Options Management		@tab TR_OPTMGMT_REQ, TR_OK_ACK, TR_ERROR_ACK@*@*
-@item Association Establishment	@tab Transaction Begin		@tab TR_BEGIN_REQ, TR_BEGIN_IND, TR_BEGIN_RES,@*TR_BEGIN_CON, TR_TOKEN_REQ, TR_TOKEN_ACK,@*TR_OK_ACK, TR_ERROR_ACK@*
-@item Association Data Transfer	@tab Transaction Continue	@tab TR_CONT_REQ, TR_CONT_IND@*@*
-@item Association Release	@tab Transaction End		@tab TR_END_REQ, TR_END_IND@*@*
-@item				@tab Transaction Abort		@tab TR_ABORT_REQ, TR_ABORT_IND@*@*
-@end multitable 
+@multitable @columnfractions .20 .20 .60
+@item @strong{STATE}
+@tab @strong{SERVICE}
+@tab @strong{PRIMITIVES}
+
+@item Local@*Management
+@tab Information@*Reporting
+@tab TR_INFO_REQ, TR_INFO_ACK,@*TR_ERROR_ACK
+
+@item
+@tab Bind
+@tab TR_BIND_REQ, TR_BIND_ACK,@*TR_UNBIND_ACK, TR_OK_ACK,@*TR_ERROR_ACK
+
+@item
+@tab Options@*Management
+@tab TR_OPTMGMT_REQ, TR_OK_ACK,@*TR_ERROR_ACK
+
+@item Association@*Establishment
+@tab Transaction@*Begin
+@tab TR_BEGIN_REQ, TR_BEGIN_IND,@*TR_BEGIN_RES, TR_BEGIN_CON,@*TR_TOKEN_REQ, TR_TOKEN_ACK,@*TR_OK_ACK, TR_ERROR_ACK
+
+@item Association@*Data Transfer
+@tab Transaction@*Continue
+@tab TR_CONT_REQ, TR_CONT_IND
+
+@item Association@*Release
+@tab Transaction@*End
+@tab TR_END_REQ, TR_END_IND
+
+@item
+@tab Transaction@*Abort
+@tab TR_ABORT_REQ, TR_ABORT_IND
+@end multitable
 
 @sp 1
 @center Table 2@strong{@emph{.  Service Primitives for Connectionless Mode Association}}
 
-@multitable @columnfractions .175 .175 .65
-@item @strong{STATE}		@tab @strong{SERVICE}		@tab @strong{PRIMITIVES} 
-@item Local Management		@tab Information Reporting	@tab TR_INFO_REQ, TR_INFO_ACK, TR_ERROR_ACK@*@*
-@item				@tab Bind			@tab TR_BIND_REQ, TR_BIND_ACK, TR_UNBIND_ACK,@*TR_OK_ACK, TR_ERROR_ACK@*
-@item				@tab Options Management		@tab TR_OPTMGMT_REQ, TR_OK_ACK, TR_ERROR_ACK@*@*
-@item Association Unitdata	@tab Transaction Unidirectional	@tab TR_UNI_REQ, TR_UNI_IND@*@*
-@end multitable 
+@multitable @columnfractions .20 .20 .60
+@item @strong{STATE}
+@tab @strong{SERVICE}
+@tab @strong{PRIMITIVES}
+
+@item Local@*Management
+@tab Information@*Reporting
+@tab TR_INFO_REQ, TR_INFO_ACK,@*TR_ERROR_ACK
+
+@item
+@tab Bind
+@tab TR_BIND_REQ, TR_BIND_ACK,@*TR_UNBIND_ACK, TR_OK_ACK,@*TR_ERROR_ACK
+
+@item
+@tab Options@*Management
+@tab TR_OPTMGMT_REQ, TR_OK_ACK,@*TR_ERROR_ACK
+
+@item Association@*Unitdata
+@tab Transaction@*Unidirectional
+@tab TR_UNI_REQ, TR_UNI_IND
+@end multitable
 
 @node TRI Services Definition
 @chapter TRI Services Definition
@@ -400,10 +551,10 @@ used.  The format of the primitives will be defined later in this document.
 
 @section Local Management Services Definition
 
-The services defined in this section are outside the scope of the international standards.  These services apply to all
-association modes.  They are involved for the initialization/de-initialization of a stream connected to the TR provider.
-They are also used to manage options supported by the TR provider and to report information on the supported parameter
-values.
+The services defined in this section are outside the scope of the international standards.  These services apply to both
+connection-mode as well as connectionless modes of communication.  They are involved for the
+initialization/de-initialization of a stream connected to the TR provider.  They are also used to manage options
+supported by the TR provider and to report information on the supported parameter values.
 
 @subsection Transaction Information Reporting Service
 This service provides information on the options supported by the TR provider.
@@ -422,17 +573,18 @@ to the TR user.
 The sequence of primitives for transaction information management is shown in @emph{Figure 2}.
 
 @cartouche
-@center Figure 2@strong{@emph{.  Sequence of Primitives Transaction Information Reporting Service}}
+@center Figure 2@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{Transaction Information Reporting Service}}
 @image{tri_new1,3.5in}
 @end cartouche
 
 @subsection TR User Bind Service
 
 This service allows an originating address to be associated with a stream.  It allows the TR user to negotiate the
-number of transaction indications that can remain unacknowledged for that TR user (a transaction indication is
-considered unacknowledged while it is awaiting a corresponding transaction response or abort request from the TR user).
-This service also defines a mechanism that allows a stream (bound to the address of the TR user) to be reserved to
-handle incoming transactions only.  This stream is referred to as the listener stream.
+number of transaction begin indications that can remain unacknowledged for that TR user (a transaction begin indication
+is considered unacknowledged while it is awaiting a corresponding transaction response or abort request from the TR
+user).  This service also defines a mechanism that allows a stream (bound to the address of the TR user) to be reserved
+to handle incoming transactions only.  This stream is referred to as the listener stream.
 
 @itemize 
 @item TR_BIND_REQ:
@@ -442,30 +594,32 @@ allowable outstanding transaction indications for that address.
 @item TR_BIND_ACK:
 @prindex TR_BIND_ACK
 This primitive is in response to the TR_BIND_REQ primitive and indicates to the user that the specified TR user has been
-bound to an originating address.
+bound to a protocol address.
 @end itemize 
 
 The sequence of primitives for the TR user bind service is shown in @emph{Figure 3}.
 
 @cartouche
-@center Figure 3@strong{@emph{.  Sequence of Primitives TR User Bind Service}}
+@center Figure 3@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{TR User Bind Service}}
 @image{tri_new2,3.5in}
 @end cartouche
 
 @subsection TR User Unbind Service
 
-This service allows the TR user to be unbound from a network address.
+This service allows the TR user to be unbound from a protocol address.
 
 @itemize 
 @item TR_UNBIND_REQ:
 @prindex TR_UNBIND_REQ
-This primitive requests that the TR user be unbound from the network address it had previously been bound to.
+This primitive requests that the TR user be unbound from the protocol address it had previously been bound to.
 @end itemize 
 
 The sequence of primitives for the TR user unbind service is shown in @emph{Figure 4}.
 
 @cartouche
-@center Figure 4@strong{@emph{.  Sequence of Primitives TR User Unbind &amp; Receipt Acknowledgement Services}}
+@center Figure 4@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{TR User Unbind &amp; Receipt Acknowledgement Services}}
 @image{tri_new3,3.5in}
 @end cartouche
 
@@ -494,7 +648,8 @@ provider, and to indicate the default selection of return option.
 @emph{Figure 5} shows the sequence of primitives for transaction options management.
 
 @cartouche
-@center Figure 5@strong{@emph{.  Sequence of Primitives Options Management Service}}
+@center Figure 5@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{Options Management Service}}
 @image{tri_new4,3.5in}
 @end cartouche
 
@@ -510,7 +665,8 @@ response primitive (listed in ?) on the stream.
 @emph{Figure 6} shows the sequence of primitives for the error management primitive.
 
 @cartouche
-@center Figure 6@strong{@emph{.  Sequence of Primitives Error Acknowledgement Service}}
+@center Figure 6@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{Error Acknowledgement Service}}
 @image{tri_new5,3.5in}
 @end cartouche
 
@@ -590,7 +746,7 @@ TR_BEGIN_IND
 @prindex TR_BEGIN_IND
 (see Transaction Termination primitive definition).
 
-@subsubsection User Primitives for Successful Transaction Establishment
+@subsubsection User Primitives Successful Transaction Establishment
 
 @itemize 
 @item TR_BEGIN_REQ:
@@ -601,7 +757,7 @@ This primitive requests that the TR provider form a transaction association with
 This primitive requests that the TR provider accept a previous transaction indication.
 @end itemize 
 
-@subsubsection Provider Primitives for Successful Transaction Establishment
+@subsubsection Provider Primitives Successful Transaction Establishment
 
 @itemize 
 @item TR_BEGIN_IND:
@@ -618,7 +774,8 @@ The sequence of primitives in a successful transaction initiation is defined by 
 diagrams as shown in @emph{Figure 7}.
 
 @cartouche
-@center Figure 7@strong{@emph{.  Sequence of Primitives: Successful Transaction Initiation}}
+@center Figure 7@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Successful Transaction Initiation}}
 @image{tri_new6,3.5in}
 @end cartouche
 
@@ -627,7 +784,8 @@ in @emph{Figure 8} (procedures for transaction initiation response token value d
 discussed in sections 4.1.3 and 4.1.4).
 
 @cartouche
-@center Figure 8@strong{@emph{.  Sequence of Primitives: Transaction Response Token Value Determination}}
+@center Figure 8@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Transaction Response Token Value Determination}}
 @image{tri_new7,3.5in}
 @end cartouche
 
@@ -662,7 +820,8 @@ TR_ABORT_IND
 primitive occurs.
 
 @cartouche
-@center Figure 9@strong{@emph{.  Sequence of Primitives: Component Transfer}}
+@center Figure 9@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Component Transfer}}
 @image{tri_new8,3.5in}
 @end cartouche
 
@@ -713,22 +872,26 @@ transaction has been terminated abnormally.
 The sequence of primitives are shown in the time sequence diagrams in the figures that follow:
 
 @cartouche
-@center Figure 10@strong{@emph{.  Sequence of Primitives: TR User Invoked Termination}}
+@center Figure 10@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TR User Invoked Termination}}
 @image{tri_new9,3.5in}
 @end cartouche
 
 @cartouche
-@center Figure 11@strong{@emph{.  Sequence of Primitives: Simultaneous TR User Invoked Termination}}
+@center Figure 11@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Simultaneous TR User Invoked Termination}}
 @image{tri_ne10,3.5in}
 @end cartouche
 
 @cartouche
-@center Figure 12@strong{@emph{.  Sequence of Primitives: TR Provider Invoked Termination}}
+@center Figure 12@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TR Provider Invoked Termination}}
 @image{tri_ne11,3.5in}
 @end cartouche
 
 @cartouche
-@center Figure 13@strong{@emph{.  Sequence of Primitives: Simultaneous TR User and TR Provider Invoked Termination}}
+@center Figure 13@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Simultaneous TR User and TR Provider Invoked Termination}}
 @image{tri_ne12,3.5in}
 @end cartouche
 
@@ -742,7 +905,8 @@ TR_ABORT_REQ
 will indicate TR user invoked termination.  The sequence of primitives is shown in @emph{Figure 14}.
 
 @cartouche
-@center Figure 14@strong{@emph{.  Sequence of Primitives: TR User Rejection of a Transaction Initiation Attempt}}
+@center Figure 14@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TR User Rejection of a Transaction Initiation Attempt}}
 @image{tri_ne13,3.5in}
 @end cartouche
 
@@ -752,7 +916,8 @@ TR_ABORT_IND.
 The originator of the primitive indicates a TR provider invoked release.  This is shown in @emph{Figure 15}.
 
 @cartouche
-@center Figure 15@strong{@emph{.  Sequence of Primitives: TR Provider Rejection of a Transaction Initiation Attempt}}
+@center Figure 15@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TR Provider Rejection of a Transaction Initiation Attempt}}
 @image{tri_ne14,3.5in}
 @end cartouche
 
@@ -781,7 +946,8 @@ address.
 @emph{Figure 16} shows the sequence of primitives for the connectionless mode of transfer.
 
 @cartouche
-@center Figure 16@strong{@emph{.  Sequence of Primitives: Connectionless Mode Data Transfer}}
+@center Figure 16@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Connectionless Mode Data Transfer}}
 @image{tri_ne15,3.5in}
 @end cartouche
 
@@ -796,7 +962,8 @@ produced an error.  This primitive is specific to CLAS.
 primitive.
 
 @cartouche
-@center Figure 17@strong{@emph{.  Sequence of Primitives: CLAS Error Indication Service}}
+@center Figure 17@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{CLAS Error Indication Service}}
 @image{tri_ne16,3.5in}
 @end cartouche
 
@@ -805,16 +972,21 @@ primitive.
 This section describes the format and parameters of the TRI primitives.  In addition, it discusses the states in which
 the primitive is valid, the resulting state, and the acknowledgement that the primitive expects.
 
-The mapping of TRI of TRI primitives to the primitives defined in ITU-T Q.771 are shown in @ref{Mapping of TCAP to TPI}.
-The state/event tables for these primitives are shown in @ref{State/Event Tables}.  The precedence tables for the TRI
-primitives are shown in @ref{Primitive Precedence Tables}.  Rules for SS7 conformance are described in @ref{TCAP
-Transport Provider TPI Addendum}.
+@menu
+* Management Primitives::
+* Connection-Oriented Mode Primitives::
+@end menu
+
+The mapping of TRI of TRI primitives to the primitives defined in ITU-T Q.771 are shown in @ref{Mapping TRI Primitives
+to ITU-T Q.771}.  The state/event tables for these primitives are shown in @ref{State/Event Tables}.  The precedence
+tables for the TRI primitives are shown in @ref{Primitive Precedence Tables}.  Rules for SS7 conformance are described
+in @ref{TCAP Transport Provider TPI Addendum}.
 
 The following tables provide a summary of the TR primitives and their parameters.
 
 @sp 1
 @center Table 4@strong{@emph{.  Transaction Initiation Transaction Service Primitives}}
-@multitable @columnfractions .20 .20 .60
+@multitable @columnfractions .25 .25 .50
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS} 
 @item TR Initiation @tab TR_BEGIN_REQ @tab () 
 @item @tab TR_BEGIN_IND @tab () 
@@ -824,7 +996,7 @@ The following tables provide a summary of the TR primitives and their parameters
 
 @sp 1
 @center Table 5@strong{@emph{.  Transaction Continuation Transaction Service Primitives}}
-@multitable @columnfractions .20 .20 .60
+@multitable @columnfractions .25 .25 .50
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS} 
 @item TR Continuation @tab TR_CONT_REQ @tab () 
 @item @tab TR_CONT_IND @tab () 
@@ -832,7 +1004,7 @@ The following tables provide a summary of the TR primitives and their parameters
 
 @sp 1
 @center Table 6@strong{@emph{.  Transaction Termination Transaction Service Primitives}}
-@multitable @columnfractions .20 .20 .60
+@multitable @columnfractions .25 .25 .50
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS} 
 @item TR Termination @tab TR_END_REQ @tab () 
 @item @tab TR_END_IND @tab () 
@@ -844,6 +1016,19 @@ The following tables provide a summary of the TR primitives and their parameters
 @node Management Primitives
 @section Management Primitives
 These primitives apply to all association modes.
+@menu
+* TR_INFO_REQ::
+* TR_INFO_ACK::
+* TR_BIND_REQ::
+* TR_BIND_ACK::
+* TR_UNBIND_REQ::
+* TR_ADDR_REQ::
+* TR_ADDR_ACK::
+* TR_OPTMGMT_REQ::
+* TR_OPTMGMT_ACK::
+* TR_OK_ACK::
+* TR_ERROR_ACK::
+@end menu
 @subsection Transaction Information
 @node TR_INFO_REQ
 @subsubsection Transaction Information Request
@@ -930,11 +1115,11 @@ primitive.
 Specifies the maximum number of octets of data that may be associated with a transaction termination
 primitive.
 @item ADDR_size
-Specifies the maximum size (in decimal digits) of a network address.
+Specifies the maximum size (in decimal digits) of a protocol address.
 @item ADDR_length
 @itemx ADDR_offset
 Specifies the length in bytes and offset from the beginning of the @samp{M_PCPROTO} message block of the
-network address bound on the stream on which the TR_INFO_REQ was issued (a network address is bound
+protocol address bound on the stream on which the TR_INFO_REQ was issued (a protocol address is bound
 to a stream via a TR_BIND_REQ).
 @item QOS_length
 @itemx QOS_offset
@@ -958,7 +1143,7 @@ to a stream via a TR_BIND_REQ).
 @subsubheading TR_BIND_REQ
 This primitive requests that the TR provider bind a protocol address to the @dfn{stream}, negotiate the number of
 dialogue indications allowed to be outstanding by the TR provider for the specified protocol address, and
-activate@footnote{A @dfn{stream} is viewed as active when the transport provider may receive and transmit APDUs (ACSE
+activate@footnote{A @dfn{stream} is viewed as active when the association provider may receive and transmit APDUs (ACSE
 protocol data units) associated with the @dfn{stream}.} the @dfn{stream} associated with the protocol address.
 @prindex TR_BIND_REQ
 @subsubheading Format
@@ -1272,14 +1457,15 @@ Specifies the primitive type: always @samp{TR_OPTMGMT_REQ}.
 @subsubheading Valid State
 @subsubheading New State
 @subsubheading Rules
-For the rules governing the requests made by this primitive, see the @code{TR_OPTMGMT_ACK} primitive described in @ref{TR_OPTMGMT_ACK}.
+For the rules governing the requests made by this primitive, see the @var{TR_OPTMGMT_ACK} primitive described in
+@ref{TR_OPTMGMT_ACK}.
 @subsubheading Acknowledgements
 This primitive requires the TR provider to generate one of the following acknowledgements upon receipt of the primitive:
 @itemize ---
 @item @emph{Successful:}
-Correct acknowledgement of the primitive is indicated with the @code{TR_OPTMGMT_ACK} primitive described in @ref{TR_OPTMGMT_ACK}.
+Correct acknowledgement is indicated with the @var{TR_OPTMGMT_ACK} primitive described in @ref{TR_OPTMGMT_ACK}.
 @item @emph{Non-fatal errors:}
-These errors will be indicated with the @code{TR_ERROR_ACK} primitive described in @ref{TR_ERROR_ACK}.  The allowable
+These errors will be indicated with the @var{TR_ERROR_ACK} primitive described in @ref{TR_ERROR_ACK}.  The allowable
 errors are as follows:
 @vtable @code
 @item TROUTSTATE
@@ -1433,6 +1619,18 @@ Indicates that the TR provider does not support the requested capability.
 @page
 @node Connection-Oriented Mode Primitives
 @section Connection-Oriented Mode Primitives
+@menu
+* TR_BEGIN_REQ::
+* TR_BEGIN_IND::
+* TR_BEGIN_RES::
+* TR_BEGIN_CON::
+* TR_CONT_REQ::
+* TR_CONT_IND::
+* TR_END_REQ::
+* TR_END_IND::
+* TR_ABORT_REQ::
+* TR_ABORT_IND::
+@end menu
 @subsection Association Establishment Phase
 The transaction begin service provides means to start a transaction between two TR-users.  This may be accompanied by
 the transfer of TR-user information contained in @samp{M_DATA}
@@ -1856,10 +2054,10 @@ A system error occurred and the UNIX System error is indicated in the primitive.
 @end itemize
 
 @page
-@node TR_UABORT_IND
+@node TR_ABORT_IND
 @subsubsection Transaction User Abort Indication
-@subsubheading TR_UABORT_IND
-@prindex TR_UABORT_IND
+@subsubheading TR_ABORT_IND
+@prindex TR_ABORT_IND
 @subsubheading Format
 The format of the message is one @samp{M_PROTO}
 @prindex M_PROTO
@@ -1893,33 +2091,14 @@ Indicates the primitive type: always @samp{TR_ABORT_IND}.
 @subsubheading Rules
 
 @page
-@node TR_PABORT_IND
-@subsubsection Transaction Provider Abort Indication
-@subsubheading TR_PABORT_IND
-@prindex TR_PABORT_IND
-@subsubheading Format
-The format of the message is one @samp{M_PROTO}
-@prindex M_PROTO
-message block structured as follows:
-@smallexample
-typedef struct
-@{
-@}
-TR_xxxx_t;
-@tpindex TR_xxxx_t
-@end smallexample
-@subsubheading Parameters
-The primitive has the following arguments:
-@subsubheading Valid State
-@subsubheading New State
-@subsubheading Rules
-
-@page
 @node Connectionless Mode Primitives
 @section Connectionless Mode Primitives
-
+@menu
+* TR_UNI_REQ::
+* TR_UNI_IND::
+* TR_NOTICE_IND::
+@end menu
 @subsection Transaction Phase
-
 @node TR_UNI_REQ
 @subsubsection Transaction Unidirectional Request
 @subsubheading TR_UNI_REQ
@@ -2140,8 +2319,8 @@ user may reopen the file associated with the @dfn{stream}.
 @node Transaction Service Interface Sequence of Primitives
 @chapter Transaction Service Interface Sequence of Primitives
 
-The allowable sequence of primitives are described in the state diagrams and tables for both the structured and
-unstructured dialogue mode transaction services described in @ref{State/Event Tables}.
+The allowable sequence of primitives are described in the state diagrams and tables for both the connection-oriented and
+connectionless mode mode transaction services described in @ref{State/Event Tables}.
 
 @section Rules for State Maintenance
 
@@ -2160,14 +2339,14 @@ transaction user.
 upstream, it should also drop any furhter messages received on its write side of the @dfn{stream}.
 @end itemize
 
-@subsection Structured Transaction Service Rules for State Maintenace
+@subsection Connection-Oriented Transaction Service Rules for State Maintenace
 
-The following rules apply only to the structured dialogue transaction services:
+The following rules apply only to the connection-oriented mode transaction services:
 
 @itemize @bullet
 @item A transaction association end procedure can be initiated at any time during the transaction association
 establishment or component transfer phases.
-@item The state tables for the structured mode transaction service providers include the management of the correlation
+@item The state tables for the connection-oriented mode transaction service providers include the management of the correlation
 and transaction identifiers when a transaction provider sends multiple @samp{TR_BEGIN_IND} indications or accepts
 multiple @samp{TR_BEGIN_REQ} requests without waiting for the response or confirmation to the previous indication or
 request.  It is the responsibility of the transaction provider not to change state until all the indicationes or
@@ -2194,22 +2373,22 @@ after the completion of the transfer.
 
 @subsection General Rules for Precedence of Primitives
 
-The following rules apply to the precedence of transport interface primitives with respect to their position on a
+The following rules apply to the precedence of association interface primitives with respect to their position on a
 @dfn{stream}:@footnote{The @dfn{stream} queue which contains a transaction user initiated primitives is referred to as
 the @dfn{stream} write queue.  The @dfn{stream} queue which contains the transaction provider initiated primitives is
 referred to as the @dfn{stream} read queue.}
 @itemize @bullet
 @item The transaction provider has responsibility for determining precedence of its @dfn{stream} write queue, as per the
 rules defined in @ref{Primitive Precedence Tables}.  The appendix specifies the rules for precedence for both the
-structured and unstructured transaction services.
+connection-oreinted and connectionless transaction services.
 @item The transaction user has the responsibility for determining precedence on its @dfn{stream} read queue, as per the
 rules defined in @ref{Primitive Precedence Tables}.
 @item All primitives on the @dfn{stream} are assumed to be placed on the queue in the correct sequence as defined above.
 @end itemize
 
-@subsection Structured Transaction Service Rules for Precedence of Primitives
+@subsection Connection-Oriented Transaction Service Rules for Precedence of Primitives
 
-The following rules apply only to the structured transport services:
+The following rules apply only to the connection-oriented transaction services:
 
 @itemize @bullet
 @item There is no guarantee of delivery of user data once a @var{TR_ABORT_REQ} primitive has been issued.
@@ -2233,9 +2412,9 @@ message to flush both the read and write queues after receiving a successful @va
 issuing the @var{TR_OK_ACK} primitive.
 @end itemize
 
-@subsection Structured Transaction Service Rules for Flushing Queues
+@subsection Connection-Oriented Transaction Service Rules for Flushing Queues
 
-The following rules apply only to the structured transaction services:
+The following rules apply only to the connection-oriented transaction services:
 
 @itemize @bullet
 @item If the interface is in the @samp{TS_DATA_XFER}, @samp{TS_WIND_ORDREL} or @samp{TS_WACK_ORDREL} state, the
@@ -2256,18 +2435,18 @@ issuing the @var{TR_OK_ACK} primitive.
 
 This section describes the formats and rules that are specified to ITU-T Q.771 operation.  The addendum must be used
 along with the generic TRI as defined in the main document when implementing a TR provider that will be configured with
-the ITU-T Q.771 (TCAP) Transport Layer.
+the ITU-T Q.771 (TCAP) Transaction Sub-Layer.
 
 @section Quality of Service: Model and Description
 
-The ``Quality of Service'' characteristics apply to both structured and unstructured transaction services.
+The ``Quality of Service'' characteristics apply to both connection-oriented and connectionless transaction services.
 
 @subsection QoS Overview
 
 QoS (Quality of Service) is described in terms of QoS parameters.  There are two types of QoS parameters:
 @enumerate
 @item Those that are ``negotiated'' on a per-association basis during transaction association
-establishment.@footnote{The unstructured transaction services do not support end-to-end QoS parameter negotiation.}
+establishment.@footnote{The connectionless transaction services do not support end-to-end QoS parameter negotiation.}
 @item Those that are not ``negotiated'' and their values are selected or determined by local management methods.
 @end enumerate
 
@@ -2293,25 +2472,26 @@ The TCAP interface uses protocol level @var{T_SS7_SCCP} for options at the SCCP 
 communicated to the underlying transaction provider using the option name @var{T_SCCP_QOS}.  There are three QoS
 structure that can be used in this fashion as follows:
 
-@multitable @columnfractions .15 .25 .15 .45
-@item @b{Option Name} @tab @b{Type of Option Value} @tab @b{Legal Option Value} @tab
-@b{Meaning}
+@multitable @columnfractions .17 .26 .62
+@item @b{Option Name} @tab @b{Option Type} @tab @b{Meaning}
 
-@item @var{T_SCCP_QOS} @tab @var{N_qos_sel_sccp_t}      @tab See text. @tab
+@item @var{T_SCCP_QOS} @tab @var{N_qos_sel_sccp_t}      @tab
 For use with
-@var{TR_UNI_REQ},@*
+@var{TR_UNI_REQ},
 @var{TR_BEGIN_REQ},
-@var{TR_BEGIN_RES},@*
+@var{TR_BEGIN_RES},
 @var{TR_CONT_REQ},
-@var{TR_END_REQ},@*
-@var{TR_ABORT_REQ}.@*
-@item @var{T_SCCP_QOS} @tab @var{N_qos_opt_sel_sccp_t}  @tab See text. @tab
+@var{TR_END_REQ},
+@var{TR_ABORT_REQ}.
+
+@item @var{T_SCCP_QOS} @tab @var{N_qos_opt_sel_sccp_t}  @tab
 For use with
-@var{TR_BEGIN_REQ},@*
-@var{TR_BEGIN_RES}.@*
-@item @var{T_SCCP_QOS} @tab @var{N_qos_range_sccp_t}    @tab See text. @tab
+@var{TR_BEGIN_REQ},
+@var{TR_BEGIN_RES}.
+
+@item @var{T_SCCP_QOS} @tab @var{N_qos_range_sccp_t}    @tab
 For use with
-@var{TR_INFO_ACK}.@*
+@var{TR_INFO_ACK}.
 @end multitable
 
 Quality of service struct @var{N_qos_sel_sccp_t} has the following fields:
@@ -2320,11 +2500,15 @@ Quality of service struct @var{N_qos_sel_sccp_t} has the following fields:
 This is the NPI Quality of Service structure type and is always set to @samp{N_QOS_SEL_SCCP}, @samp{N_QOS_OPT_SEL_SCCP},
 or @samp{N_QOS_RANGE_SCCP}.
 @item protocol_class
-This is the protocol class.  The @var{protocol_class} field can be one of the following: @samp{N_QOS_PCLASS_0} (SCCP
-connectionless protocol class 0), @samp{N_QOS_PCLASS_1} (for SCCP connectionless protocol class 1),
-@samp{N_QOS_PCLASS_2} (for SCCP connection-oriented protocol class 2), @samp{N_QOS_PCLASS_3} (for SCCP
-connection-oriented protocol class 3) or @samp{QOS_UNKNOWN}.  @samp{N_QOS_PCLASS_2} and @samp{N_QOS_PCLASS_3} are not
-applicable to TCAP.
+This is the protocol class.  The @var{protocol_class} field can be one of the following:
+@itemize @bullet
+@item @samp{N_QOS_PCLASS_0} (SCCP connectionless protocol class 0),
+@item @samp{N_QOS_PCLASS_1} (for SCCP connectionless protocol class 1),
+@item @samp{N_QOS_PCLASS_2} (for SCCP connection-oriented protocol class 2),
+@item @samp{N_QOS_PCLASS_3} (for SCCP connection-oriented protocol class 3) or
+@item @samp{QOS_UNKNOWN}.
+@end itemize
+@samp{N_QOS_PCLASS_2} and @samp{N_QOS_PCLASS_3} are not applicable to TCAP.
 @item option_flags
 If the @var{options_flags} field has bit @samp{N_QOS_OPT_RETERR} set then the SCCP will return the PDU on error.
 @item importance
@@ -2346,10 +2530,8 @@ value is not normally set by the use and can be any integer value from 0 to 3 or
 @subsubheading Parameters
 The following discusses the values which may be returned in a @var{TR_INFO_ACK} primitive in response to a
 @var{TR_INFO_REQ} primitive.
-@multitable @columnfractions .20 .80
-@item @var{ASDU_size}
-@vrindex ASDU_size
-@tab
+@vtable @var
+@item ASDU_size
 Depending on the underlying SCCP layer, TCAP can have effectively no limit to the amount of components that can be sent
 in a particular transaction.  Protocol variants or versions of SCCP that support XUDT and segmentation-reassembly of
 protocol class 0 or 1 messages will set @var{ASDU_size} to @samp{T_INFINITE} (@samp{-1}).  For protocol variants of SCCP
@@ -2357,53 +2539,41 @@ or other underlying network providers that do not support segmentation/reassembl
 et @var{ASDU_size} to the maximum size (number of octets) of components that can be guaranteed transferred when
 associated with a single @var{TR_BEGIN_RES} or @var{TR_CONT_REQ} message.
 
-@item @var{EASDU_size}
-@vrindex EASDU_size
-@tab
+@item EASDU_size
 TCAP has no expedited data service and the value of @var{EASDU_size} is set to @samp{T_UNKNOWN} (@samp{-2}).
 
-@item @var{CDATA_size}
-@vrindex CDATA_size
-@tab
-TCAP can send components with the initial Begin(Query) or first Continue(Conversation) package and can also send
+@item CDATA_size
+TCAP can send components with the initial Begin (Query) or first Continue (Conversation) package and can also send
 @dfn{Application Context} and @dfn{User Information} in either package.  These messages correspond to @dfn{TR-BEGIN} and
 the first @dfn{TR-CONTINUE} after receiving a @dfn{TR-BEGIN} and they correspond to @var{TR_BEGIN_REQ} and
-@var{TR_BEGIN_RES}.  Because the underlying SCCP connectionless transport may support unlimited size NSDUs, this value
+@var{TR_BEGIN_RES}.  Because the underlying SCCP connectionless network may support unlimited size NSDUs, this value
 may be set to @samp{T_INFINITE} (@samp{-1}) or may be set to the maximum amount of user data (including @dfn{Application
 Context}, @dfn{User Information} and Components) that can be sent or received in either package.  This informs the user
 as to what size to make data buffers associated with association begin indications and confirmations
 (@var{TR_BEGIN_IND}, @var{TR_BEGIN_CON}) and how much data can be sent with association begin requests and responses
 (@var{TR_BEGIN_REQ}, @var{TR_BEGIN_RES}).
 
-@item @var{DDATA_size}
-@vrindex DDATA_size
-@tab
-TCAP can send association end data (components) with the final End(Response) package.  These messages correspond to the
+@item DDATA_size
+TCAP can send association end data (components) with the final End (Response) package.  These messages correspond to the
 @dfn{TR-END} primitive and the @var{TR_END_REQ} or @var{TR_END_IND}.  Again, because the underlying SCCP connectionless
 network may support unlimited size NSDUs, this value may be set to @samp{T_INFINITE} (@samp{-1}) or may be set to the
-maximum amount of association end data that can be sent or received in the End(Response) package.  This informs the user
+maximum amount of association end data that can be sent or received in the End (Response) package.  This informs the user
 as to what size to make data buffers associated with association end indications (@var{TR_END_IND}) and how much data
 can be sent with association end requests (@var{TR_END_REQ}).
 
-@item @var{ADDR_size}
-@vrindex ADDR_size
-@tab
+@item ADDR_size
 This is the maximum TCAP address size that can be communicated across the interface.  This address size is the maximum
-sizeo of the defined SCCP address structure (@samp{sizeof(sccp_addr_t)}) that also will include address digits up to a
+sizeo of the defined SCCP address structure (@samp{sizeof sccp_addr_t}) that also will include address digits up to a
 maximum of @var{SCCP_MAX_ADDR_LENGTH} octets of digits.  This informs the user as to what size it should reserver for
 control buffers so as to receive control information without buffer truncation.
 
-@item @var{OPT_size}
-@vrindex OPT_size
-@tab
+@item OPT_size
 This is the maximum size of the options field used in any TRI message (@pxref{TRI Primitives}) and is the sum of the
 maximum option sizes of one of each of the options that can occur together.  This informs the user as to what size it
 should reserve for control buffers to ensure that received control messages that include options cna be contained within
 the buffer without truncation.
 
-@item @var{TIDU_size}
-@vrindex TIDU_size
-@tab
+@item TIDU_size
 Although a TCAP provider can support unlimited ASDU size, it cannot normally support unlimited TIDU size.  This is
 because the underlying SCCP NSDU may be limited in size.  The TCAP provider is not responsible for segmenting component
 sequences offered to the provider from the user in an @var{M_DATA}
@@ -2413,29 +2583,21 @@ Because the underlying SCCP provider may have no limit on the NSDU size (i.e, it
 NSDUs) this may be more in the manner of a optimal recommendation to the user rather than an absolute maximum.  Because
 of this, a given TCAP provider might not reject TIDUs which are larger than this value.
 
-@item @var{SERV_type}
-@vrindex SERV_type
-@tab
-There are two service types supported by a transaction provider: structured and unstructured.  Unstructured (TCAP
-operation class 4) is a connectionless unidirectional unstructured transaction service with no error notification.
-Structured (TCAP operation classes 1, 2, and 3) are connection-oriented structured transaction services with or without
-error notification.  The value reflected here is dependent on the setting of option @var{T_TCAP_OCLASS}.
+@item SERV_type
+There are two service types supported by a transaction provider: connection-oriented association service (COAS) and
+connectionless association service (CLAS).  CLAS is a connectionless unidirectional association service with no error
+notification.  COAS is a connection-oriented association services with or without error notification.  The value
+reflected here is dependent on the setting of option @var{T_ACSE_PCLASS} or @var{T_TCAP_OCLASS}.
 
-@item @var{CURRENT_state}
-@vrindex CURRENT_state
-@tab
+@item CURRENT_state
 Provides the current state of the transaction interface.  TCAP providers use the same states as other TRI providers.
 
-@item @var{PROVIDER_flag}
-@vrindex PROVIDER_flag
-@tab
+@item PROVIDER_flag
 Unused.
 
-@item @var{TRI_version}
-@vrindex TRI_version
-@tab
+@item TRI_version
 Set to the current version.
-@end multitable
+@end vtable
 @subsubheading TR_ADDR_REQ
 @subsubheading TR_ADDR_ACK
 @subsubsection Bind Service
@@ -2444,7 +2606,7 @@ Set to the current version.
 @subsubsection Options Management Service
 @subsubheading TR_OPTMGMT_REQ
 @subsubheading TR_OPTMGMT_ACK
-@subsection Structured Transaction Services
+@subsection Connection-Oriented Transaction Services
 @subsubsection Association Begin
 @subsubheading TR_BEGIN_REQ
 @subsubheading TR_BEGIN_IND
@@ -2458,7 +2620,7 @@ Set to the current version.
 @subsubsection TR_ABORT_IND
 @subsubheading TR_END_REQ
 @subsubheading TR_END_IND
-@subsection Unstructured Transaction Services
+@subsection Connectionless Transaction Services
 @subsubheading TR_UNI_REQ
 @subsubheading TR_UNI_IND
 @subsubheading TR_NOTICE_IND
@@ -2502,11 +2664,17 @@ three QOS structures which can be used in this fashion are listed in @emph{Table
 
 Table 7@strong{@emph{.  SCCP QOS Option Values}}
 
-@multitable @columnfractions .25 .34 .15 .26
-@item @strong{Option Name} @tab @strong{Type of Option Value} @tab @strong{Legal Option Value} @tab @strong{Meaning}
-@item _SCCP_QOS @tab N_qos_sel_sccp_t @tab see text @tab For use with T_UNITDATA_REQ, T_OPTDATA_REQ 
-@item T_SCCP_QOS @tab N_qos_opt_sel_sccp_t @tab see text @tab For use with T_CONN_REQ, T_CONN_RES 
-@item T_SCCP_QOS @tab N_qos_range_sccp_t @tab see text @tab For use with T_INFO_ACK 
+@multitable @columnfractions .17 .26 .62
+@item @b{Option Name} @tab @b{Option Type} @tab @b{Meaning}
+
+@item T_SCCP_QOS @tab N_qos_sel_sccp_t	    @tab
+For use with @var{T_UNITDATA_REQ},@* @var{T_OPTDATA_REQ}.
+
+@item T_SCCP_QOS @tab N_qos_opt_sel_sccp_t  @tab
+For use with @var{T_CONN_REQ}, @var{T_CONN_RES}.
+
+@item T_SCCP_QOS @tab N_qos_range_sccp_t    @tab
+For use with @var{T_INFO_ACK}.
 @end multitable 
 
 Quality of service structure @code{N_qos_sel_sccp_t} has the following fields:
@@ -2550,29 +2718,29 @@ includes a ``more'' bit concept in that an Invoke Not Last and Return Result Not
 next Invoke or Return Result are part of the same component sequence.  ITU-T does not include the Not Last concept for
 Invokes.  As a result, for ANSI and other TCAPs supporting the Invoke Not Last components, TSDU_size will be set to
 T_INFINITE (-1).  For other TCAPs not supporting Invoke Not Last, the TSDU_size will be set to the maximum size of a
-single component sequence derived from the maximum size of the underlying SCCP transport.  This may still be T_INFINITE
-(-1) as the underlying SCCP connectionless transport may support unlimited size NSDUs.
+single component sequence derived from the maximum size of the underlying SCCP network.  This may still be T_INFINITE
+(-1) as the underlying SCCP connectionless network may support unlimited size NSDUs.
 @item ETSDU_size
 TCAP has no expedited data service and the value of ETSDU_size is set to T_UNKNOWN (-2).
 @item CDATA_size
-TCAP can send connection data (components) with the initial Begin(Query) or first Continue(Conversation) package and can
+TCAP can send connection data (components) with the initial Begin (Query) or first Continue (Conversation) package and can
 also send Application Context and User Information in either package.  These messages correspond to TR-BEGIN and the
 first TR-CONTINUE after receiving a TR-BEGIN and these correspond to T_CONN_REQ and T_CONN_RES.  Because the underlying
-SCCP connectionless transport may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set
+SCCP connectionless network may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set
 to the maximum amount of connection data (including Application Context, User Information and Components) which can be
 sent or received in either package.  This informs the user as to wht size to make data buffers associated with
 connection indications and confirmations (T_CONN_IND, T_CONN_CON) and how much data can be sent with connection requests
 and responses (T_CONN_REQ, T_CONN_RES).
 @item DDATA_size
-TCAP can send disconnect data (components) with the final End(Response) package.  These messages correspond to the
-TR-END primitive and the T_DISCON_REQ or T_DISCON_IND.  Again, because the underlying SCCP connectionless transport may
-support unlimited size NSDUs, this value may be set to T_INFINITE(-1) or may be set to the maximum amount of
-disconnection data which can be sent or received in the End(Response) package.  This informs the user as to what size to
+TCAP can send disconnect data (components) with the final End (Response) package.  These messages correspond to the
+TR-END primitive and the T_DISCON_REQ or T_DISCON_IND.  Again, because the underlying SCCP connectionless network may
+support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set to the maximum amount of
+disconnection data which can be sent or received in the End (Response) package.  This informs the user as to what size to
 make data buffers associated with disconnection indications (T_DISCON_IND) and how much data can be sent with
 disconnection requests (T_DISCON_REQ).
 @item ADDR_size
 This is the maximum TCAP address size which can be communicated across the interface.  This address size is the maximum
-size of the defined SCCP address structure (@code{sizeof(sccp_addr_t)}) which also will include address digits up to a
+size of the defined SCCP address structure (@code{sizeof sccp_addr_t}) which also will include address digits up to a
 maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.  This informs the user as to what size it should reserve for
 control buffers so as to receive control information without buffer truncation.
 @item OPT_size
@@ -2590,10 +2758,10 @@ underlying SCCP provider may have no limit on the NSDU size (i.e., it supports s
 this may be more in the manner of a optimal recommendation to the user rather than an absolute maximum.  Because of
 this, a given TCAP provider might not reject TIDUs which are larger than this value.
 @item SERV_type
-There are two service type supported by a TCAP provider: T_COTS and T_CLTS.  T_CLTS (TCAP operation class 4) is a
-connectionless unidirectional unstructured transaction service with no error notification.  T_COTS (TCAP operation
-classes 1, 2 and 3) are connection-oriented structured transaction services with or without error notification.  The
-value reflected here is dependent on the setting of option T_TCAP_PCLASS.
+There are two service type supported by an ACSE provider: T_COTS and T_CLTS.  T_CLTS (ACSE Connectionless Class) is a
+connectionless association service with no error notification.  T_COTS (ACSE Connection-Oriented Class) is a
+connection-oriented association services with or without error notification.  The value reflected here is dependent on
+the setting of option T_ACSE_PCLASS or T_TCAP_PCLASS.
 @item CURRENT_state
 Provides the current state of the Transport Provider.  TCAP providers use the same states as other TPI providers.
 @item PROVIDER_flag
@@ -2695,8 +2863,8 @@ XPG4_1 (to indicate that the transport provider supports the latest TPI semantic
 @unnumberedsubsubsec T_REJECT_IND
 
 
-@node Mapping of TCAP to TPI
-@appendix Mapping of TCAP to TPI
+@node Mapping TRI Primitives to ITU-T Q.771
+@appendix Mapping TRI Primitives to ITU-T Q.771
 
 @section State Mapping
 
@@ -3203,6 +3371,13 @@ Whether the termination is pre-arranged or basic is a characteristic of the stre
 @node TRI Header File Listing
 @appendix TRI Header File Listing
 
+@node License
+@unnumbered License
+
+@menu
+* GNU Free Documentation License::
+@end menu
+
 @include texi/fdl.texi
 
 @node Glossary
@@ -3210,20 +3385,19 @@ Whether the termination is pre-arranged or basic is a characteristic of the stre
 
 @table @emph
 @item Signalling Data Link Service Data Unit
-A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
-connection to the other.
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link connection to the
+other.
 @item Data transfer
-The phase in connection and connectionless modes that supports the transfer of data between to
-signalling data link users.
+The phase in connection and connectionless modes that supports the transfer of data between to signalling data link
+users.
 @item SDL provider
-The signalling data link layer protocol that provides the services of the signalling data link
-interface.
+The signalling data link layer protocol that provides the services of the signalling data link interface.
 @item SDL user
-The user-level application or user-level or kernel-level protocol that accesses the services of the
-signalling data link layer.
+The user-level application or user-level or kernel-level protocol that accesses the services of the signalling data link
+layer.
 @item Local management
-The phase in connection and connectionless modes in which a SDL user initializes a stream and
-attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+The phase in connection and connectionless modes in which a SDL user initializes a stream and attaches a PPA address to
+the stream.  Primitives in this phase generate local operations only.
 @item PPA
 The point at which a system attaches itself to a physical communications medium.
 @item PPA identifier

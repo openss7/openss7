@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.2 2004/10/12 09:49:07 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.3 2004/10/13 08:18:16 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/10/12 09:49:07 $ by $Author: brian $
+% Last Modified $Date: 2004/10/13 08:18:16 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -68,15 +68,12 @@
 
 @include texi/args.texi
 
-@set VERSION 0.9.1
-@set UPDATED 2004-1-14
-
 @defindex op
 
 @ifinfo
 This file document the @value{PACKAGE_TITLE} package.
 
-This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
 @cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
@@ -85,6 +82,7 @@ Copyright @copyright{} 1997-2000 @email{bidulock@@openss7.org, Brian F. G. Bidul
 
 All Rights Reserved. @*
 
+@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
@@ -96,11 +94,13 @@ this one except for the removal of this paragraph (this paragraph not being
 relevant to the printed manual).
 
 @end ignore
+@noindent
 Permission is granted to copy and distribute modified versions of this manual
 under the conditions for verbatim copyring, provided the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
+@noindent
 Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
@@ -181,9 +181,7 @@ Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
 * Releases::			Releases of the package
 * Installation::		Installation of the package
 
-* GPL::				GNU General Public License
-* LGPL::			GNU Lesser General Public License
-* FDL::				GNU Free Documentation License
+* Licenses::			Collection of GNU licenses
 
 * Indices::			Index of Indices
 @end menu
@@ -230,6 +228,12 @@ Installation
 * Installing::			Installing the package
 * Removal::			Removal of the package
 * Loading::			Loading the package
+
+Licenses
+
+* GNU General Public License::
+* GNU Lesser General Public License::
+* GNU Free Documentation License::
 
 Indices
 
@@ -311,11 +315,12 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @cindex notice
 
 @cindex licensing
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
-Please note, however, that there are different licensing terms for the manual pages and some of the
-documentation (derived from X/Open publications and other sources).  Consult the permission notices
-contains in the documentation for more information.  This document is released under the @cite{GNU
-Free Documentation License} (@pxref{FDL}) with all sections invariant.
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from X/Open publications and other sources).
+Consult the permission notices contains in the documentation for more information.  This document is
+released under the @cite{GNU Free Documentation License} (@pxref{GNU Free Documentation License})
+with all sections invariant.
 
 @node Overview
 @section Overview
@@ -840,35 +845,26 @@ Device Drivers
 @c --------------------------------------------------------------------------
 @c --------------------------------------------------------------------------
 
-@node GPL
-@appendix GPL
-@cindex license GPL
+@node Licenses
+@unnumbered Licenses
+
+@menu
+* GNU General Public License::
+* GNU Lesser General Public License::
+* GNU Free Documentation License::
+@end menu
 
 @include texi/gpl.texi
-
-@c --------------------------------------------------------------------------
-@c --------------------------------------------------------------------------
-
-@node LGPL
-@appendix LGPL
-@cindex license LGPL
-
+@page
 @include texi/lesser.texi
-
-@c --------------------------------------------------------------------------
-@c --------------------------------------------------------------------------
-
-@node FDL
-@appendix FDL
-@cindex license FDL
-
+@page
 @include texi/fdl.texi
 
 @c --------------------------------------------------------------------------
 @c --------------------------------------------------------------------------
 
 @node Indices
-@appendix Indices
+@unnumbered Indices
 @cindex indices
 
 @menu
@@ -881,27 +877,27 @@ Device Drivers
 @end menu
 
 @node Concept Index
-@appendixsec Concept Index
+@section Concept Index
 @printindex cp
 
 @node Type Index
-@appendixsec Type Index
+@section Type Index
 @printindex tp
 
 @node Function Index
-@appendixsec Function and Macro Index
+@section Function and Macro Index
 @printindex fn
 
 @node Variable Index
-@appendixsec Variable and Constant Macro Index
+@section Variable and Constant Macro Index
 @printindex vr
 
 @node File Index
-@appendixsec Program and File Index
+@section Program and File Index
 @printindex pg
 
 @node Option Index
-@appendixsec Index of Configuration Options
+@section Index of Configuration Options
 @printindex op
 
 @c --------------------------------------------------------------------------

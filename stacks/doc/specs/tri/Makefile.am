@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/10/13 01:39:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/10/13 09:47:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 01:39:40 $ by $Author: brian $
+# Last Modified $Date: 2004/10/13 09:47:11 $ by $Author: brian $
 #
 # =============================================================================
 
 info_TEXINFOS		= tri.texi
 
-EXTRA_info_TEXINFOS	= 
+EXTRA_info_TEXINFOS	= \
+			texi/args.texi \
+			$(top_srcdir)/scripts/texi/fdl.texi
 
 FIG_FIGS		= \
 			tri_ne10.fig \
@@ -74,6 +76,8 @@ FIG_FIGS		= \
 			tri_new8.fig \
 			tri_new9.fig \
 			tri_new.fig
+
+EXTRA_DIST		=
 
 include ../../../am/info.am
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/10/13 01:53:34 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/10/13 09:47:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 01:53:34 $ by $Author: brian $
+# Last Modified $Date: 2004/10/13 09:47:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,63 +61,61 @@ DVIPS			= dvips -t letter
 	$(MAKEINFO) $(AM_MAKEINFOTEXTFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) \
 	-o $@ $<
 
-FIG_PSS  = $(FIG_FIGS:%.fig=%.ps)
+TXTS = $(info_TEXINFOS:%.texi=%.txt)
+
+txt-am: $(TXTS)
+
+txt: txt-am
+
+clean-txt:
+	if test -n "$(TXTS)" ; then \
+		echo "rm -f $(TXTS)" ; \
+		rm -f $(TXTS) ; \
+	fi
+
+#FIG_PSS  = $(FIG_FIGS:%.fig=%.ps)
 FIG_EPSS = $(FIG_FIGS:%.fig=%.eps)
 FIG_PDFS = $(FIG_FIGS:%.fig=%.pdf)
 FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
 FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
 
-EXTRA_DIST		= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS) $(FIG_FIGS) $(FIG_TXTS)
+EXTRA_DIST		+= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS) $(FIG_FIGS) $(FIG_TXTS)
 
-$(FIG_PSS) : %.ps  : %.fig ; fig2dev -L  ps $< $@
+#$(FIG_PSS) : %.ps  : %.fig ; fig2dev -L  ps $< $@
 $(FIG_EPSS): %.eps : %.fig ; fig2dev -L eps $< $@
 $(FIG_PDFS): %.pdf : %.fig ; fig2dev -L pdf $< $@
 $(FIG_PNGS): %.png : %.eps ; convert -antialias $< -geometry '400' $@
-
-info-fig:
-	@ figs="$(FIG_FIGS)" ; for i in $$figs ; do \
-		d=`echo $$i | sed -e 's|\.fig|.txt|'` ; \
-		if test -f $$i ; then s=$$i ; else s=$(srcdir)/$$i ; fi ; \
-		if test -f $$s ; then \
-			if test $$d -ot $$s ; then \
-				echo "cp -f $$s $$d" ; \
-				cp -f $$s $$d ; \
-			fi ; \
-		else \
-			echo "touch $$d" ; \
-			touch $$d ; \
-		fi ; \
-	done 
-
-$(FIG_FIGS:%.fig=%.txt)): info-fig
-
-.PHONY: info-fig texi-am
+$(FIG_TXTS):
+	if test -f $(srcdir)/$@ ; then \
+		echo "cp -pf $(srcdir)/$@ $@" ; \
+		cp -pf $(srcdir)/$@ $@ ; \
+	else \
+		echo "touch $@" ; \
+		touch $@ ; \
+	fi
 
 #
 # I know this is ugly and GNU make specified, but...  If you are using autoconf we
 # pretty much assume you have some GNU tools around...
+# also, automake misses dependencies for ps files
 #
 
-$(DVIS)      : texi-am $(FIG_EPSS) $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
-$(PSS)       : texi-am $(FIG_PSS)  $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
-$(PDFS)      : texi-am $(FIG_PDFS) $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
-$(HTMLS)     : texi-am $(FIG_PNGS) $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
+$(DVIS)      : %.dvi  : %.texi $(FIG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PSS)       : %.ps   : %.dvi  $(FIG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PDFS)      : %.pdf  : %.texi $(FIG_PDFS) $(EXTRA_info_TEXINFOS)
+$(HTMLS)     : %.html : %.texi $(FIG_PNGS) $(EXTRA_info_TEXINFOS)
+$(TXTS)	     : %.txt  : %.texi $(FIG_TXTS) $(EXTRA_info_TEXINFOS)
+
 #
 # distcheck is not run in maintainer mode, and we need this, otherwise distcheck
 # breaks because it otherwise attempts to place the info files into the source
 # directory for some arcane reason
 #
 if MAINTAINER_MODE
-$(INFO_DEPS) : texi-am $(FIG_TXTS) $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
+$(INFO_DEPS) : %.info : %.texi $(FIG_TXTS) $(EXTRA_info_TEXINFOS)
 endif
 
-#dvi	     : texi-am $(FIG_EPSS) dvi-am
-#ps	     : texi-am $(FIG_PSS)  ps-am
-#pdf	     : texi-am $(FIG_PDFS) pdf-am
-#html	     : texi-am $(FIG_PNGS) html-am
-#info	     : texi-am $(FIG_TXTS) info-am
-
-texi-am:
+texi/args.texi:
 	@ if test ! -e texi -a -e $(top_builddir)/scripts/texi ; then \
 		echo "$(LN_S) $(top_builddir)/scripts/texi texi" ; \
 		$(LN_S) $(top_builddir)/scripts/texi texi ; \
@@ -136,8 +134,10 @@ clean-texi:
 		rm -f texi ; \
 	fi
 
-clean-local: clean-figs clean-texi
+.PHONY: clean-txt clean-figs clean-texi
 
-all-local: dvi ps pdf html
+clean-local: clean-txt clean-figs clean-texi
+
+all-local: ps pdf html info txt
 
 # vim: ft=automake

@@ -86,7 +86,7 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 * State/Event Tables::
 * Primitive Precedence Tables::
 * MAPI Header File Listing::
-* GNU Free Documentation License::
+* License::
 @end menu
 
 @node Preface
@@ -8843,6 +8843,13 @@ Release 6.6.0.
 
 @node MAPI Header File Listing
 @appendix MAPI Header File Listing
+
+@node License
+@unnumbered License
+
+@menu
+* GNU Free Documentation License::
+@end menu
 
 @include texi/fdl.texi
 
