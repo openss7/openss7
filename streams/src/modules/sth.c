@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 12:09:42 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 21:24:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $";
 
 //#define __NO_VERSION__
 
@@ -95,10 +95,11 @@ static char const ident[] =
 #include "strutil.h"		/* for q locking and puts and gets */
 #include "strattach.h"		/* for do_fattach/do_fdetach */
 #include "strpipe.h"		/* for do_spipe */
+#include "clone.h"		/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3577,8 +3578,15 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
  */
 int register_strdev(struct cdevsw *cdev, major_t major)
 {
-	int err;
+	int err, clone_registered = 0;
 	struct devinfo *devi;
+	if ((err = register_strdrv(cdev, specfs)) < 0) {
+		if (err != -EBUSY)
+			goto no_strdrv;
+		if ((err = register_clone(cdev)) < 0)
+			goto no_devi;
+		clone_registered = 1;
+	}
 	if ((err = register_strdrv(cdev, specfs)) < 0 && err != -EBUSY)
 		goto no_strdrv;
 	if (!(devi = di_alloc(cdev))) {
@@ -3595,6 +3603,8 @@ int register_strdev(struct cdevsw *cdev, major_t major)
       no_cmajor:
 	di_put(devi);
       no_devi:
+	if (clone_registered)
+		unregister_clone(cdev);
 	unregister_strdrv(cdev, specfs);
       no_strdrv:
 	return (err);
@@ -3637,6 +3647,7 @@ int unregister_strdev(struct cdevsw *cdev, major_t major)
 {
 	int err;
 	struct devinfo *devi;
+	unregister_clone(cdev);
 	if (!(devi = devi_get(cdev, major)))
 		return (-ENODEV);
 	if ((err = unregister_cmajor(cdev, devi, major)) < 0)

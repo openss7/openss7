@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2004/06/02 12:09:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2004/06/02 21:24:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/02 12:09:31 $ by $Author: brian $
+# Last Modified $Date: 2004/06/02 21:24:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -184,6 +184,7 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/clone.c \
 				src/drivers/fifo.c \
 				src/drivers/fifo.h \
+				src/drivers/nsdev.c \
 				src/drivers/pipe.c \
 				src/drivers/pipe.h \
 				include/log.h \
@@ -192,7 +193,6 @@ libLfSdrivers_a_SOURCES		= \
 				include/sys/strlog.h \
 				src/drivers/log.h \
 				src/drivers/log.c
-#				src/drivers/nsdev.c
 #				src/drivers/sfx.c
 #				src/drivers/spx.c
 
