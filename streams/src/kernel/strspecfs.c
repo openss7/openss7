@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/07 17:34:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
+ Last Modified $Date: 2004/06/07 17:34:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/07 17:34:25 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/07 17:34:25 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/07 17:34:25 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1412,6 +1412,7 @@ STATIC struct super_block *specfs_read_super(struct super_block *sb, void *data,
 		goto free_fail;
 	if (!(inode = new_inode(sb)))
 		goto free_fail;
+	inode->i_ino = -1UL;	/* unused (non-zero) inode number */
 	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 	inode->i_blocks = 0;
 	inode->i_blksize = PAGE_SIZE;

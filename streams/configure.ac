@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.18 2004/06/06 23:55:32 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.19 2004/06/07 17:34:19 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/06 23:55:32 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/07 17:34:19 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.18 2004/06/06 23:55:32 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.19 2004/06/07 17:34:19 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
@@ -73,8 +73,6 @@ AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
-
-AC_CONFIG_TESTDIR([tests])
 
 AC_CANONICAL_TARGET
 
@@ -171,8 +169,6 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 src/modules/Config
-		 src/drivers/Config
-		 tests/atlocal
-		 tests/Makefile])
+		 src/drivers/Config])
 
 AC_OUTPUT

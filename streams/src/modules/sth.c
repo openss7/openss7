@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/07 17:34:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:56 $ by $Author: brian $
+ Last Modified $Date: 2004/06/07 17:34:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/07 17:34:28 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/07 17:34:28 $";
 
 //#define __NO_VERSION__
 
@@ -99,7 +99,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/07 17:34:28 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3496,7 +3496,7 @@ int register_strdev(struct cdevsw *cdev, major_t major)
 		cdev->d_fop = &strm_f_ops;
 	if (!(cdev->d_mode & S_IFMT))
 		cdev->d_mode = (cdev->d_mode & ~S_IFMT) | S_IFCHR;
-	if ((err = register_cmajor(cdev, major, &cdev_f_ops)))
+	if ((err = register_cmajor(cdev, major, &cdev_f_ops)) < 0)
 		return (err);
 	register_clone(cdev);
 	return (err);

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/25 07:52:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/07 17:43:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/25 07:52:45 $ by $Author: brian $
+# Last Modified $Date: 2004/06/07 17:43:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1025,26 +1025,26 @@ include am/strconf.am
 
 if WITH_INET
 
-install-devices: $(STRMAKENODES)
-	$(STRMAKENODES)
-	DESTDIR=$(DESTDIR) $(INET_MKDEV)
+install-devices: $(STRMAKENODES) $(INET_MKDEV)
+	./$(STRMAKENODES)
+	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)
 
 uninstall-devices:
-	$(STRMAKENODES) --remove
-	DESTDIR=$(DESTDIR) $(INET_RMDEV)
+	./$(STRMAKENODES) --remove
+	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)
 
 else
 
 install-devices: $(STRMAKENODES)
-	$(STRMAKENODES)
+	./$(STRMAKENODES)
 
 uninstall-devices:
-	$(STRMAKENODES) --remove
+	./$(STRMAKENODES) --remove
 
 endif
 
 dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += scripts/inet_mkdev scripts/inet_rmdev
+EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV) 
 
 SUBDIRS = doc src intl m4 po
 

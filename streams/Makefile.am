@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2004/06/06 23:55:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2004/06/07 17:43:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/06 23:55:32 $ by $Author: brian $
+# Last Modified $Date: 2004/06/07 17:43:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -568,9 +568,6 @@ uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
 	./$(STRMAKENODES) --remove
 	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)
 
-dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-
 else
 
 install-devices: $(STRMAKENODES)
@@ -580,6 +577,9 @@ uninstall-devices: $(STRMAKENODES)
 	./$(STRMAKENODES) --remove
 
 endif
+
+dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 endif
 

@@ -1,7 +1,7 @@
 dnl vim: ft=config
 dnl =========================================================================
 dnl
-dnl @(#) $Id: testsuite.at,v 0.9.2.2 2004/06/07 17:34:33 brian Exp $
+dnl @(#) $Id: dummy4.m4,v 0.9 2004/06/07 17:34:33 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -56,16 +56,11 @@ dnl Last Modified $Date: 2004/06/07 17:34:33 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-m4_include([package.m4])
+AT_SETUP([dummy test4])
+AT_KEYWORDS([dummy])
+AT_CHECK([exit 0], [], [ignore])
+AT_XFAIL_IF(true)
+echo "This is another dummy test"
+exit 1
+AT_CLEANUP
 
-AT_INIT([testsuite])
-
-# AT_TESTED([test-timod test-tirdwr test-xnet test-xnet_thr test-inet_udp test-inet_raw test-inet_tcp])
-
-AT_ARG_OPTION([dummy_option], AS_HELP_STRING([--dummy_option], [specify dummy option]))
-AC_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify dummy optarg]))
-
-m4_include([dummy1.m4])
-m4_include([dummy2.m4])
-m4_include([dummy3.m4])
-m4_include([dummy4.m4])

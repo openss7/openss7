@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/25 07:52:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/07 17:43:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/25 07:52:44 $ by $Author: brian $
+# Last Modified $Date: 2004/06/07 17:43:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -354,25 +354,25 @@ INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
 
 install-devices: $(STRMAKENODES) $(INET_MKDEV)
-	$(STRMAKENODES)
-	DESTDIR=$(DESTDIR) $(INET_MKDEV)
+	./$(STRMAKENODES)
+	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)
 
 uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
-	$(STRMAKENODES) --remove
-	DESTDIR=$(DESTDIR) $(INET_RMDEV)
-
-dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += scripts/inet_mkdev scripts/inet_rmdev
+	./$(STRMAKENODES) --remove
+	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)
 
 else
 
 install-devices: $(STRMAKENODES)
-	$(STRMAKENODES)
+	./$(STRMAKENODES)
 
 uninstall-devices: $(STRMAKENODES)
-	$(STRMAKENODES) --remove
+	./$(STRMAKENODES) --remove
 
 endif
+
+dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 endif
 

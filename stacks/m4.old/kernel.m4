@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 12:48:50 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/07 17:45:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:50 $ by $Author: brian $
+# Last Modified $Date: 2004/06/07 17:45:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -142,6 +142,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_SETUP_KERNEL_CFLAGS
     _LINUX_SETUP_KERNEL_DEBUG
     _LINUX_CHECK_KERNEL_VERSIONS
+    _LINUX_CHECK_KERNEL_MODVERSIONS
     PACKAGE_KNUMBER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
     AC_SUBST([PACKAGE_KNUMBER])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_KNUMBER], ["$PACKAGE_KNUMBER"], [The Linux
@@ -998,8 +999,30 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
     AC_SUBST([KERNEL_MODFLAGS])dnl
     KERNEL_NOVERSION="-D__NO_VERSION__"
     AC_SUBST([KERNEL_NOVERSION])dnl
-    AM_CONDITIONAL([KERNEL_VERSIONS], test x"$linux_cv_k_versions" = xyes)dnl
+dnl AM_CONDITIONAL([KERNEL_VERSIONS], test x"$linux_cv_k_versions" = xyes)dnl
 ])# _LINUX_CHECK_KERNEL_VERSIONS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_MODVERSIONS
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
+    AC_ARG_ENABLE([k-modversions],
+        AS_HELP_STRING([--enable-k-modversions],
+            [specify whether symbol versioning is to be used on symbols
+            exported from built modules.  @<:@default=yes@:>@]),
+        [enable_k_modversions="$enableval"],
+        [enable_k_modversions='yes'])
+    AC_MSG_CHECKING([for kernel module symbol versioning])
+    if test :"${enable_k_modversions:-no}" = :yes
+    then
+        linux_cv_k_modversions='yes'
+    else
+        linux_cv_k_modversions='no'
+    fi
+    AC_MSG_RESULT([$linux_cv_k_modversions])
+    AM_CONDITIONAL([KERNEL_VERSIONS], test x"$linux_cv_k_modversions" = xyes)dnl
+])# _LINUX_CHECK_KERNEL_MODVERSIONS
 # =========================================================================
 
 # =============================================================================
@@ -1073,11 +1096,12 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [dnl
             fi
         fi
         AS_VAR_SET([linux_symbol_export], ["$linux_tmp"]) ])
-    AS_VAR_POPDEF([linux_symbol_export])dnl
+    linux_tmp=AS_VAR_GET([linux_symbol_export])
     if test :"${linux_tmp:-no}" != :no 
     then :; $3
     else :; _LINUX_KERNEL_SYMBOL_ADDR([$1], [$2], [$3])
     fi
+    AS_VAR_POPDEF([linux_symbol_export])dnl
 ])# _LINUX_KERNEL_SYMBOL_EXPORT
 # =============================================================================
 
