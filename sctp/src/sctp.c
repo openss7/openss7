@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/12/21 08:13:25 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/12/22 11:27:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/21 08:13:25 $ by $Author: brian $
+ Last Modified $Date: 2004/12/22 11:27:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/12/21 08:13:25 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/12/22 11:27:54 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/12/21 08:13:25 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/12/22 11:27:54 $";
 
 #include <linux/config.h>
 #include <linux/sysctl.h>
@@ -61,8 +61,6 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include <linux/random.h>
 #include <linux/init.h>
 #include <linux/socket.h>
-#include "net/net_sock.h"
-#include "net/net_snmp.h"
 #include <net/sock.h>
 #include <linux/ipsec.h>
 #include <linux/poll.h>
@@ -76,11 +74,13 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #endif
 
 #include <net/inet_common.h>
-#if defined HAVE_NET_XFRM_H
+#ifdef HAVE_NET_XFRM_H
 #include <net/xfrm.h>
 #endif
 #include <net/icmp.h>
-#include <net/sctp.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
 #include <net/ip.h>
 #ifdef	CONFIG_IP_MASQUERADE
 #include <net/ip_masq.h>
@@ -99,9 +99,13 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
 
-#include "linux/hooks.h"
+#include "include/linux/hooks.h"
+#include "include/net/net_sctp.h"
+#include "include/net/net_sock.h"
+#include "include/net/net_snmp.h"
+#include "include/os7_namespace.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.7 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.8 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
@@ -3467,7 +3471,9 @@ STATIC void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, struct sk_buff *skb)
 			sh->check = 0;
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum_generate(sh, plen));
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS
 			SCTP_INC_STATS(SctpOutSCTPPacks);
+#endif
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev,
 				sctp_queue_xmit);
 			return;
@@ -3542,7 +3548,9 @@ STATIC void sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb,
 			sh->check = 0;
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum(sk, sh, plen));
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS
 			SCTP_INC_STATS(SctpOutSCTPPacks);
+#endif
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev,
 				sctp_queue_xmit);
 			return;
@@ -3697,7 +3705,9 @@ STATIC void sctp_send_msg(struct sock *sk, struct sctp_daddr *sd,
 		sh->check = 0;
 		if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 			sh->check = htonl(cksum(sk, sh, plen));
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS
 		SCTP_INC_STATS(SctpOutSCTPPacks);
+#endif
 		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 		/* Whenever we transmit something, we expect a reply to our v_tag, so we put
 		   ourselves in the 1st level vtag caches expecting a quick reply. */
@@ -3939,7 +3949,9 @@ sctp_bundle_sack(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***s
 			e->ch.flags = 0;
 			e->ch.len = __constant_htons(sizeof(*e));
 			e->l_tsn = htonl(sp->l_lsn);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 			SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 		}
 #endif
 		sp->sackf &= ~SCTP_SACKF_ANY;
@@ -3949,7 +3961,9 @@ sctp_bundle_sack(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***s
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 		return (0);
 	}
       outstate:
@@ -4037,7 +4051,9 @@ STATIC INLINE int sctp_bundle_fsn(struct sock *sk, struct sctp_daddr *sd,
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 		return (0);
 	}
       outstate:
@@ -4081,7 +4097,9 @@ sctp_bundle_cwr(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***sp
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 		return (0);
 	}
       outstate:
@@ -4112,7 +4130,9 @@ sctp_bundle_error(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	}
 	return (0);
       wait_for_next_packet:
@@ -4201,7 +4221,9 @@ sctp_bundle_urgent(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb **
 		ensure(sk->wmem_queued > 0, sk->wmem_queued = 0);
 		skb_get(skb);
 		__skb_queue_tail(&sp->rtxq, skb);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTUNORDERCHUNKS
 		SCTP_INC_STATS(SctpOutUnorderChunks);
+#endif
 	}
 	return (0);
       wait_for_next_packet:
@@ -4248,7 +4270,9 @@ sctp_bundle_normal(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb **
 		ensure(sk->wmem_queued >= 0, sk->wmem_queued = 0);
 		skb_get(skb);
 		__skb_queue_tail(&sp->rtxq, skb);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTORDERCHUNKS
 		SCTP_INC_STATS(SctpOutOrderChunks);
+#endif
 	}
 	return (0);
       wait_for_next_packet:
@@ -5467,7 +5491,9 @@ STATIC int sctp_send_init(struct sock *sk)
 		pr->ph.len = __constant_htons(sizeof(*pr));
 	}
 #endif
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_mod_timer(&sp->timer_init, sd->rto);
 	abnormal(sp->retry);
 	sctp_change_state(sk, SCTP_COOKIE_WAIT);
@@ -5620,7 +5646,9 @@ sctp_send_init_ack(struct sock *sk, uint32_t saddr, uint32_t daddr,
 		up->ph.len = __constant_htons(ulen);
 		memcpy((up + 1), unrec->data, unrec->len);
 	}
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_xmit_msg(saddr, daddr, skb, sk);
 	return;
 }
@@ -5647,7 +5675,9 @@ STATIC int sctp_send_cookie_echo(struct sock *sk, caddr_t kptr, size_t klen)
 	m->ch.flags = 0;
 	m->ch.len = htons(clen);
 	memcpy(skb_put(skb, PADC(klen)), kptr, klen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_change_state(sk, SCTP_COOKIE_ECHOED);
 	sctp_mod_timer(&sp->timer_cookie, sd->rto);
 	sctp_bundle_more(sk, sd, skb, 1);	/* don't nagle */
@@ -5685,7 +5715,9 @@ STATIC void sctp_send_cookie_ack(struct sock *sk, struct sk_buff *cp)
 	m->ch.type = SCTP_CTYPE_COOKIE_ACK;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	/* process data bundled with cookie echo on new socket */
 	if (sctp_return_more(cp) > 0) {
 		sctp_recv_msg(sk, skb_get(cp));
@@ -5735,7 +5767,9 @@ STATIC void sctp_send_heartbeat(struct sock *sk, struct sctp_daddr *sd)
 	h->hb_info.daddr = sd->daddr;
 	h->hb_info.mtu = sd->mtu;
 	memset(skb_put(skb, PADC(fill)), 0, fill);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
       enobufs:
@@ -5765,7 +5799,9 @@ STATIC void sctp_send_heartbeat_ack(struct sock *sk, caddr_t hptr, size_t hlen)
 	m->ch.flags = 0;
 	m->ch.len = htons(clen);
 	memcpy(skb_put(skb, PADC(hlen)), hptr, hlen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
 	return;
@@ -5800,14 +5836,18 @@ STATIC void sctp_send_abort(struct sock *sk)
 	m->ch.type = SCTP_CTYPE_ABORT;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
       enobufs:
       noroute:
 	if (sk->state != SCTP_LISTEN) {
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPABORTEDS
 		if (sk->state != SCTP_CLOSED)
 			SCTP_INC_STATS(SctpAborteds);
+#endif
 		sctp_change_state(sk, SCTP_CLOSED);
 	}
       notneeded:
@@ -5845,14 +5885,18 @@ STATIC void sctp_send_abort_error(struct sock *sk, int errn, void *aptr, size_t 
 	eh->code = htons(errn);
 	eh->len = htons(elen);
 	memcpy(skb_put(skb, PADC(alen)), aptr, alen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
       enobufs:
       noroute:
 	if (sk->state != SCTP_LISTEN) {
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPABORTEDS
 		if (sk->state != SCTP_CLOSED)
 			SCTP_INC_STATS(SctpAborteds);
+#endif
 		sctp_change_state(sk, SCTP_CLOSED);
 	}
 	return;
@@ -5898,7 +5942,9 @@ STATIC int sctp_send_shutdown(struct sock *sk)
 	if (timer_pending(&sp->timer_asconf))
 		del_timer(&sp->timer_asconf);
 #endif
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_mod_timer(&sp->timer_shutdown, sd->rto);
 	/* SCTP IG 2.12 says 5 * RTO.Max but we do 5 * RTO */
 	if (sk->state != SCTP_SHUTDOWN_SENT)
@@ -5948,7 +5994,9 @@ STATIC int sctp_send_shutdown_ack(struct sock *sk)
 	m->ch.type = SCTP_CTYPE_SHUTDOWN_ACK;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	if (timer_pending(&sp->timer_sack))
 		del_timer(&sp->timer_sack);
 #ifdef CONFIG_SCTP_ADD_IP
@@ -5995,7 +6043,9 @@ STATIC void sctp_send_shutdown_complete(struct sock *sk)
 	m->ch.type = SCTP_CTYPE_SHUTDOWN_COMPLETE;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
 	return;
@@ -6170,7 +6220,9 @@ STATIC void sctp_send_asconf(struct sock *sk)
 		}
 	}
 	sp->sackf &= ~SCTP_SACKF_ASC;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_bundle_more(sk, sd, skb, 1);
 	/* ADD-IP 4.1 (A4) */
 	sctp_mod_timer(&sp->timer_asconf, sd->rto);
@@ -6207,7 +6259,9 @@ STATIC void sctp_send_asconf_ack(struct sock *sk, caddr_t rptr, size_t rlen)
 	m->ch.len = htons(clen);
 	m->asn = ntohl(sp->p_asn++);
 	memcpy(m + 1, rptr, rlen);	/* copy in response TLVs */
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_bundle_more(sk, sd, skb, 1);
 	sctp_send_msg(sk, sd, skb);
 	freechunks(xchg(&sp->reply, skb));
@@ -6264,7 +6318,9 @@ void sctp_send_abort_ootb(uint32_t daddr, uint32_t saddr, struct sctphdr *sh)
 	m->ch.type = SCTP_CTYPE_ABORT;
 	m->ch.flags = 1;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_xmit_ootb(daddr, saddr, skb);
 	return;
       noroute:
@@ -6299,7 +6355,9 @@ sctp_send_abort_error_ootb(uint32_t daddr, uint32_t saddr,
 	eh->code = htons(errn);
 	eh->len = htons(elen);
 	memcpy(skb_put(skb, PADC(alen)), aptr, alen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_xmit_ootb(daddr, saddr, skb);
 	return;
       noerror:
@@ -6335,7 +6393,9 @@ void sctp_send_abort_init(struct sock *sk, uint32_t daddr, uint32_t saddr,
 	m->ch.type = SCTP_CTYPE_ABORT;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_xmit_msg(saddr, daddr, skb, sk);
 	return;
       noroute:
@@ -6372,7 +6432,9 @@ STATIC void sctp_send_abort_error_init(struct sock *sk, uint32_t daddr,
 	eh->code = htons(errn);
 	eh->len = htons(elen);
 	memcpy(skb_put(skb, PADC(alen)), aptr, alen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_xmit_msg(saddr, daddr, skb, sk);
 	return;
       noerror:
@@ -6401,7 +6463,9 @@ STATIC void sctp_send_shutdown_complete_ootb(uint32_t daddr, uint32_t saddr,
 	m->ch.type = SCTP_CTYPE_SHUTDOWN_COMPLETE;
 	m->ch.flags = 1;
 	m->ch.len = __constant_htons(clen);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
+#endif
 	sctp_xmit_ootb(daddr, saddr, skb);
 	return;
       enobufs:
@@ -6787,7 +6851,9 @@ STATIC void sctp_deliver_data(struct sock *sk, struct sk_buff *skb)
 						st->ssn = cb->ssn;
 					} else
 						st->n.more |= SCTP_STRMF_MORE;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINORDERCHUNKS
 					SCTP_INC_STATS(SctpInOrderChunks);
+#endif
 				} else {
 					__skb_queue_tail(&sp->expq, skp);
 					sctp_exdata_ind(sk, cb->dlen);
@@ -6795,7 +6861,9 @@ STATIC void sctp_deliver_data(struct sock *sk, struct sk_buff *skb)
 						st->x.more &= ~SCTP_STRMF_MORE;
 					else
 						st->x.more |= SCTP_STRMF_MORE;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINUNORDERCHUNKS
 					SCTP_INC_STATS(SctpInUnorderChunks);
+#endif
 				}
 				sp->nunds--;
 			} else {
@@ -6941,7 +7009,9 @@ STATIC int sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 					st->ssn = cb->ssn;
 				} else
 					st->n.more |= SCTP_STRMF_MORE;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINORDERCHUNKS
 				SCTP_INC_STATS(SctpInOrderChunks);
+#endif
 			} else {
 				__skb_queue_tail(&sp->expq, skd);
 				sctp_exdata_ind(sk, dlen);
@@ -6949,7 +7019,9 @@ STATIC int sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 					st->x.more &= ~SCTP_STRMF_MORE;
 				else
 					st->x.more |= SCTP_STRMF_MORE;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINUNORDERCHUNKS
 				SCTP_INC_STATS(SctpInUnorderChunks);
+#endif
 			}
 			sp->r_ack++;
 #ifdef CONFIG_SCTP_PARTIAL_RELIABILITY
@@ -8431,7 +8503,9 @@ STATIC int sctp_recv_cookie_ack(struct sock *sk, struct sk_buff *skb)
 	/* RFC 2960 5.1 (E) */
 	sctp_change_state(sk, SCTP_ESTABLISHED);
 	sctp_ack_calc(sk, &sp->timer_cookie);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPACTIVEESTABS
 	SCTP_INC_STATS_BH(SctpActiveEstabs);
+#endif
 	/* start idle timers */
 	usual(sp->daddr);
 	for (sd = sp->daddr; sd; sd = sd->next)
@@ -8641,7 +8715,9 @@ STATIC int sctp_recv_shutdown_ack(struct sock *sk, struct sk_buff *skb)
 	case SCTP_SHUTDOWN_ACK_SENT:
 //              sctp_ack_calc(sk, &SCTP_PROT(sk)->timer_shutdown);     /* WHY? */
 		sctp_send_shutdown_complete(sk);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPSHUTDOWNS
 		SCTP_INC_STATS_BH(SctpShutdowns);
+#endif
 		sctp_discon_ind(sk, 0);
 		break;
 	default:
@@ -8676,7 +8752,9 @@ STATIC int sctp_recv_shutdown_complete(struct sock *sk, struct sk_buff *skb)
 	switch (sk->state) {
 	case SCTP_SHUTDOWN_ACK_SENT:
 //              sctp_ack_calc(sk, &SCTP_PROT(sk)->timer_shutdown); /* WHY? */
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPSHUTDOWNS
 		SCTP_INC_STATS_BH(SctpShutdowns);
+#endif
 		sctp_discon_ind(sk, 0);
 		break;
 	default:
@@ -9217,7 +9295,9 @@ STATIC int sctp_recv_msg(struct sock *sk, struct sk_buff *skb)
 		case SCTP_CTYPE_COOKIE_ECHO:
 			break;
 		default:
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES
 			SCTP_INC_STATS_BH(SctpOutOfBlues);
+#endif
 			return sctp_rcv_ootb(skb);
 		}
 	}
@@ -9227,7 +9307,9 @@ STATIC int sctp_recv_msg(struct sock *sk, struct sk_buff *skb)
 		if ((type = ch->type) == SCTP_CTYPE_DATA) {
 			err = sctp_recv_data(sk, skb);
 		} else {
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINCTRLCHUNKS
 			SCTP_INC_STATS(SctpInCtrlChunks);
+#endif
 			switch (type) {
 			case SCTP_CTYPE_INIT:
 				err = sctp_recv_init(sk, skb);
@@ -10102,7 +10184,9 @@ STATIC struct sock *sctp_conn_res(struct sock *lsk, struct sk_buff *skb, int *er
 		atomic_read(&sctp_socket_count)));
 	sk->use_write_queue = 0;
 	sctp_send_cookie_ack(sk, skb);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPPASSIVEESTABS
 	SCTP_INC_STATS_USER(SctpPassiveEstabs);
+#endif
 	bh_unlock_sock(sk);
 	return sk;
       error:
@@ -11387,7 +11471,9 @@ STATIC int sctp_sendmsg(struct sock *sk, struct msghdr *msg, int len)
 				} else if (skb->len >= amps) {
 					*head = NULL;
 					sk->wmem_queued += PADC(skb->len);
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPFRAGUSRMSGS
 					SCTP_INC_STATS_USER(SctpFragUsrMsgs);
+#endif
 				}
 				continue;
 			} else {
@@ -11610,10 +11696,12 @@ STATIC int sctp_recvmsg(struct sock *sk, struct msghdr *msg, int len,
 #ifdef CONFIG_SCTP_TCP_COMPATIBLE
 					}
 #endif
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPREASMUSRMSGS
 				if (!(flags & MSG_CONFIRM))
 					if (!(cb)->flags & SCTPCB_FLAG_FIRST_FRAG)
 						SCTP_INC_STATS_USER
 						    (SctpReasmUsrMsgs);
+#endif
 			}
 #ifdef CONFIG_SCTP_TCP_COMPATIBLE
 			if (sk->type != SOCK_STREAM) {
@@ -11834,7 +11922,9 @@ STATIC int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 			bh_unlock_sock(nsk);
 			return (0);
 		}
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES
 		SCTP_INC_STATS_BH(SctpOutOfBlues);
+#endif
 #ifndef CONFIG_SCTP_DISCARD_OOTB
 		return sctp_rcv_ootb(skb);
 #endif
@@ -12415,7 +12505,9 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 	struct sctpchdr *ch = (typeof(ch)) skb_pull(skb, sizeof(*sh));
 	if (skb->pkt_type != PACKET_HOST)
 		goto bad_pkt_type;
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINSCTPPACKS
 	SCTP_INC_STATS_BH(SctpInSCTPPacks);
+#endif
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
 	if (skb->len & 0x3)
@@ -12480,7 +12572,9 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 	ptrace(("ERROR: Chunk length incorrect\n"));
 	goto discard_it;
       bad_checksum:
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPCHECKSUMERRORS
 	SCTP_INC_STATS_BH(SctpChecksumErrors);
+#endif
 	ptrace(("ERROR: Bad checksum\n"));
 	goto discard_it;
       no_sctp_socket:
@@ -12495,7 +12589,9 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 		sh->check = htonl(skb->csum);
 	}
 	ptrace(("ERROR: Received OOTB packet\n"));
+#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES
 	SCTP_INC_STATS_BH(SctpOutOfBlues);
+#endif
 #if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
 	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb))
 		goto discard_it;

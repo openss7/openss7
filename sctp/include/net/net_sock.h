@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: net_sock.h,v 0.9.2.4 2004/12/20 19:40:16 brian Exp $
+ @(#) $Id: net_sock.h,v 0.9.2.5 2004/12/22 11:27:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/20 19:40:16 $ by $Author: brian $
+ Last Modified $Date: 2004/12/22 11:27:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __OPENSS7_NET_SOCK_H__
-#define __OPENSS7_NET_SOCK_H__
+#ifndef __OS7_NET_NET_SOCK_H__
+#define __OS7_NET_NET_SOCK_H__
 
-#ident "@(#) $RCSfile: net_sock.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: net_sock.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <linux/config.h>
 #include <linux/timer.h>
@@ -127,24 +127,24 @@ struct atm_vcc;
 #include <asm/atomic.h>
 #include <net/dst.h>
 
-struct sctp_opt;
-struct sctp_skb_cb;
-struct sctp_bind_bucket {
+struct __os7_sctp_opt;
+struct __os7_sctp_skb_cb;
+struct __os7_sctp_bind_bucket {
 	unsigned short port;
 	unsigned short fastreuse;
-	struct sctp_bind_bucket *next;
-	struct sctp_opt *owners;
-	struct sctp_bind_bucket **prev;
+	struct __os7_sctp_bind_bucket *next;
+	struct __os7_sctp_opt *owners;
+	struct __os7_sctp_bind_bucket **prev;
 };
-struct sctp_dup {
-	struct sctp_dup *next;
-	struct sctp_dup **prev;
+struct __os7_sctp_dup {
+	struct __os7_sctp_dup *next;
+	struct __os7_sctp_dup **prev;
 	__u32 tsn;
 };
-struct sctp_strm {
-	struct sctp_strm *next;		/* linkage to stream list */
-	struct sctp_strm **prev;	/* linkage to stream list */
-	struct sctp_opt *sp;
+struct __os7_sctp_strm {
+	struct __os7_sctp_strm *next;	/* linkage to stream list */
+	struct __os7_sctp_strm **prev;	/* linkage to stream list */
+	struct __os7_sctp_opt *sp;
 	__u16 sid;			/* stream identifier */
 	__u16 ssn;			/* stream sequence number */
 	struct {
@@ -153,17 +153,17 @@ struct sctp_strm {
 		uint more;		/* more data in (E)TSDU */
 	} x, n;				/* expedited (x) and normal (n) */
 };
-struct sctp_saddr {
-	struct sctp_saddr *next;	/* linkage for srce address list */
-	struct sctp_saddr **prev;	/* linkage for srce address list */
-	struct sctp_opt *sp;		/* linkage for srce address list */
+struct __os7_sctp_saddr {
+	struct __os7_sctp_saddr *next;	/* linkage for srce address list */
+	struct __os7_sctp_saddr **prev;	/* linkage for srce address list */
+	struct __os7_sctp_opt *sp;	/* linkage for srce address list */
 	__u32 saddr;			/* srce address (network order) */
 	uint flags;			/* flags for this address */
 };
-struct sctp_daddr {
-	struct sctp_daddr *next;	/* linkage for dest address list */
-	struct sctp_daddr **prev;	/* linkage for dest address list */
-	struct sctp_opt *sp;		/* linkage for dest address list */
+struct __os7_sctp_daddr {
+	struct __os7_sctp_daddr *next;	/* linkage for dest address list */
+	struct __os7_sctp_daddr **prev;	/* linkage for dest address list */
+	struct __os7_sctp_opt *sp;	/* linkage for dest address list */
 	__u32 daddr;			/* dest address (network order) */
 	__u32 saddr;			/* srce address (network order) */
 	uint dif;			/* device interface */
@@ -198,34 +198,34 @@ struct sctp_daddr {
 	struct dst_entry *dst_cache;	/* destination cache */
 	size_t packets;			/* packet count */
 };
-struct sctp_opt {
-	struct sctp_opt *bnext;		/* linkage for bind hash */
-	struct sctp_opt **bprev;	/* linkage for bind hash */
-	struct sctp_bind_bucket *bindb;	/* linkage for bind hash */
-	struct sctp_opt *lnext;		/* linkage for list hash */
-	struct sctp_opt **lprev;	/* linkage for list hash */
-	struct sctp_opt *pnext;		/* linkage for ptag hash */
-	struct sctp_opt **pprev;	/* linkage for ptag hash */
-	struct sctp_opt *vnext;		/* linkage for vtag hash */
-	struct sctp_opt **vprev;	/* linkage for vtag hash */
-	struct sctp_opt *tnext;		/* linkage for tcb hash */
-	struct sctp_opt **tprev;	/* linkage for tcb hash */
+struct __os7_sctp_opt {
+	struct __os7_sctp_opt *bnext;	/* linkage for bind hash */
+	struct __os7_sctp_opt **bprev;	/* linkage for bind hash */
+	struct __os7_sctp_bind_bucket *bindb;	/* linkage for bind hash */
+	struct __os7_sctp_opt *lnext;	/* linkage for list hash */
+	struct __os7_sctp_opt **lprev;	/* linkage for list hash */
+	struct __os7_sctp_opt *pnext;	/* linkage for ptag hash */
+	struct __os7_sctp_opt **pprev;	/* linkage for ptag hash */
+	struct __os7_sctp_opt *vnext;	/* linkage for vtag hash */
+	struct __os7_sctp_opt **vprev;	/* linkage for vtag hash */
+	struct __os7_sctp_opt *tnext;	/* linkage for tcb hash */
+	struct __os7_sctp_opt **tprev;	/* linkage for tcb hash */
 	uint hashent;			/* vtag cache entry */
 	uint options;			/* options flags */
 	uint nonagle;			/* Nagle setting */
-	struct sctp_saddr *saddr;	/* list of loc addresses */
-	struct sctp_daddr *daddr;	/* list of rem addresses */
+	struct __os7_sctp_saddr *saddr;	/* list of loc addresses */
+	struct __os7_sctp_daddr *daddr;	/* list of rem addresses */
 	size_t sanum;			/* number of srce addresses in list */
 	size_t danum;			/* number of dest addresses in list */
-	struct sctp_daddr *taddr;	/* primary transmit dest address */
-	struct sctp_daddr *raddr;	/* retransmission dest address */
-	struct sctp_daddr *caddr;	/* last received dest address */
-	struct sctp_strm *ostrm;	/* list of outbound streams */
-	struct sctp_strm *istrm;	/* list if inbound streams */
+	struct __os7_sctp_daddr *taddr;	/* primary transmit dest address */
+	struct __os7_sctp_daddr *raddr;	/* retransmission dest address */
+	struct __os7_sctp_daddr *caddr;	/* last received dest address */
+	struct __os7_sctp_strm *ostrm;	/* list of outbound streams */
+	struct __os7_sctp_strm *istrm;	/* list if inbound streams */
 	size_t osnum;			/* number of outbound stream struct */
 	size_t isnum;			/* number of inbound stream struct */
-	struct sctp_strm *ostr;		/* current output stream */
-	struct sctp_strm *istr;		/* current input stream */
+	struct __os7_sctp_strm *ostr;	/* current output stream */
+	struct __os7_sctp_strm *istr;	/* current input stream */
 	__u16 req_ostr;			/* requested outbound streams */
 	__u16 max_istr;			/* maximum inbound streams */
 	ulong max_sack;			/* maximum sack delay */
@@ -260,11 +260,11 @@ struct sctp_opt {
 	struct sk_buff_head urgent_queue;	/* urgent queue */
 	struct sk_buff_head error_queue;	/* error queue */
 	struct sk_buff_head out_of_order_queue;	/* out of order queue */
-	struct sctp_skb_cb *gaps;	/* gaps acks for this stream */
+	struct __os7_sctp_skb_cb *gaps;	/* gaps acks for this stream */
 	size_t ngaps;			/* number of gap reports in list */
 	size_t nunds;			/* number of undelivered in list */
 	struct sk_buff_head duplicate_queue;	/* duplicate queue */
-	struct sctp_skb_cb *dups;	/* dup tsns for this stream */
+	struct __os7_sctp_skb_cb *dups;	/* dup tsns for this stream */
 	size_t ndups;			/* number of dup reports in list */
 	struct sk_buff_head retrans_queue;	/* retransmit queue */
 	size_t nrtxs;			/* number of retransmits in list */
@@ -306,4 +306,4 @@ struct sctp_opt {
 	struct timer_list timer_life;	/* lifetime timer */
 };
 
-#endif				/* __OPENSS7_NET_SOCK_H__ */
+#endif				/* __OS7_NET_NET_SOCK_H__ */

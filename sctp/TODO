@@ -7,6 +7,12 @@ Things to do to convert to autoconf:
   not as a define in linux/in.h so we will have to run a check against kernel
   headers.
 
+  *done*
+
+    What I did was add the #ifndef the hooks.h file included after all other
+    includes.  That way if the enum is there and not the define, the define
+    gets done anyway.
+
 - we have our own linux/sctp.h  Our linux/sctp.h is not installed.  You will
   find the lksctp linux/sctp.h in the headers for some more recent c headers.
   It is lucky it is really in the wrong place: it should be in netinet/sctp.h
@@ -16,9 +22,26 @@ Things to do to convert to autoconf:
   include the sctphdr in the h (transport header) union.  We are in real
   trouble if the size of sctphdr exceeds the existing union.
 
+  *done*
+
+    What I did was change all references to h.sh to use the macro SCTP_SKB_SH
+    that was already defined.  The definition of SCTP_SKB_SH is based on the
+    presence or absence of this field.  This field is, however, normally
+    absent because lksctp failed to fill it in.
+
+    We don't have to check the size of this because the transport header union
+    is a union of pointers.  What needs to be checked here is the size of the
+    control block in the sk_buff (sizeof sk_buff.cb) against the size of our
+    sctp_skb_cb structure that we cast the control block to.  This was done
+    using a compiler trick to compare sizes of complex data structures.
+
 - we need to define SOL_SCTP that should be in linux/socket.h for the socket
   layer.  Some lksctp kernels already have it defined.  It needs to be the
   protoco number of 132 so there is no conflict there.
+
+  *done*
+
+    Same treatment as IPPROTO_SCTP above.
 
 - we need to add sysctl definitions for /proc/sys/net/ipv4 to linux/sysctl.h
   Again, I added these to /proc/sys/net/ipv4 whereas lksctp adds to
@@ -33,13 +56,26 @@ Things to do to convert to autoconf:
   definitions for inet_bind(), inet_multi_getname() and inet_ioctl() that are
   all missing from net/inet_common.h
 
+  *done*
+
+    The necessary symbols have been ripped in acinclude.m4 and hooked in 
+
 - we have our own net/sctp.h  lksctp doesn't have one so we're ok there.
+
+  *done*
+
+    Yes, we just include it.
 
 - net/snmp.h needs definitions for SCTP mibs.  lksctp has stolen ours here but
   have missed some definitions: SctpMaxAssoc and SctpDiscontinuityTime.
   Fortunately we don't really use these two.  Unfortunately, lksctp versions
   are not cacheline_aligned.  As it is only a structure definition, we don't
-  need to override it.
+  need to override it, but could anyway.
+
+  *done*
+
+    Instead of overriding, we just use as much of the defined mib as possible.
+    If no other mib is defined, we use our own from net/net_snmp.h
 
 - we need to override struct sock in net/sock.h to include sctp_opt for
   af_sctp  On earlier kernels we can simply override the struct but must check
@@ -50,26 +86,48 @@ Things to do to convert to autoconf:
 - unexported netsyms: we will have to rip the following symbols if not
   exported:
 
-	EXPORT_SYMBOL(sysctl_wmem_default)
-	EXPORT_SYMBOL(sysctl_rmem_default)
-	EXPORT_SYMBOL(inet_bind)
-	EXPORT_SYMBOL(inet_multi_getname)
-	EXPORT_SYMBOL(inet_ioctl)
-	EXPORT_SYMBOL(ip_cmsg_send);
-	EXPORT_SYMBOL(ip_getsockopt);
-	EXPORT_SYMBOL(ip_setsockopt);
-	EXPORT_SYMBOL(ip_options_echo);
-	EXPORT_SYMBOL(ip_rt_update_pmtu);
-	EXPORT_SYMBOL(ip_rt_mtu_expires);
-	EXPORT_SYMBOL(ip_rt_min_pmtu);
-	EXPORT_SYMBOL(ip_build_and_send_pkt);
-	EXPORT_SYMBOL(sysctl_ip_nonlocal_bind);
 	EXPORT_SYMBOL(icmp_err_convert);
 	EXPORT_SYMBOL(icmp_statistics);
-	#ifdef CONFIG_SYSCTL
-	extern int sysctl_ip_dynaddr;
+	EXPORT_SYMBOL(inet_bind)
+	EXPORT_SYMBOL(inet_ioctl)
+	EXPORT_SYMBOL(inet_multi_getname)
+	EXPORT_SYMBOL(ip_build_and_send_pkt);
+	EXPORT_SYMBOL(ip_cmsg_send);
+	EXPORT_SYMBOL(ip_getsockopt);
+	EXPORT_SYMBOL(ip_options_echo);
+	EXPORT_SYMBOL(ip_rt_min_pmtu);
+	EXPORT_SYMBOL(ip_rt_mtu_expires);
+	EXPORT_SYMBOL(ip_rt_update_pmtu);
+	EXPORT_SYMBOL(ip_setsockopt);
 	EXPORT_SYMBOL(sysctl_ip_dynaddr);
-	#endif
+	EXPORT_SYMBOL(sysctl_ip_nonlocal_bind);
+	EXPORT_SYMBOL(sysctl_rmem_default)
+	EXPORT_SYMBOL(sysctl_wmem_default)
+
+  *done*
+
+  Actually, we rip a longer list as follows:
+
+	EXPORT_SYMBOL(icmp_err_convert);
+        EXPORT_SYMBOL(icmp_statistics);
+        EXPORT_SYMBOL(inet_bind);
+        EXPORT_SYMBOL(inet_getname);
+        EXPORT_SYMBOL(inet_ioctl);
+        EXPORT_SYMBOL(inet_multi_getname);
+        EXPORT_SYMBOL(ip_cmsg_send);
+        EXPORT_SYMBOL(ip_getsockopt);
+        EXPORT_SYMBOL(ip_route_output_flow);
+        EXPORT_SYMBOL(__ip_route_output_key);
+        EXPORT_SYMBOL(ip_rt_min_pmtu);
+        EXPORT_SYMBOL(ip_rt_mtu_expires);
+        EXPORT_SYMBOL(ip_rt_update_pmtu);
+        EXPORT_SYMBOL(ipsec_sk_policy);
+        EXPORT_SYMBOL(ip_setsockopt);
+        EXPORT_SYMBOL(sysctl_ip_dynaddr);
+        EXPORT_SYMBOL(sysctl_ip_nonlocal_bind);
+        EXPORT_SYMBOL(__xfrm_policy_check);
+        EXPORT_SYMBOL(xfrm_policy_delete);
+        EXPORT_SYMBOL(__xfrm_sk_clone_policy);
 
 - we need to figure out what to do net/ipv4/af_inet.c to get sctp to autoload
   correctly.  Also, we need to override any other loaded sctp.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.5 2004/02/09 21:24:19 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.6 2004/12/22 11:27:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/09 21:24:19 $ by $Author: brian $
+ Last Modified $Date: 2004/12/22 11:27:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #include <features.h>
 #include <sys/types.h>
@@ -60,152 +60,151 @@
 __BEGIN_DECLS
 
 enum {
-	SCTP_ESTABLISHED = 1,
-	SCTP_COOKIE_WAIT,
-	SCTP_COOKIE_ECHOED,
-	SCTP_SHUTDOWN_PENDING,
-	SCTP_SHUTDOWN_SENT,
-	SCTP_UNREACHABLE,
-	SCTP_CLOSED,
-	SCTP_SHUTDOWN_RECEIVED,
-	SCTP_SHUTDOWN_RECVWAIT,
-	SCTP_LISTEN,
-	SCTP_SHUTDOWN_ACK_SENT,
-	SCTP_MAX_STATES
+	__OS7_SCTP_ESTABLISHED = 1,
+	__OS7_SCTP_COOKIE_WAIT,
+	__OS7_SCTP_COOKIE_ECHOED,
+	__OS7_SCTP_SHUTDOWN_PENDING,
+	__OS7_SCTP_SHUTDOWN_SENT,
+	__OS7_SCTP_UNREACHABLE,
+	__OS7_SCTP_CLOSED,
+	__OS7_SCTP_SHUTDOWN_RECEIVED,
+	__OS7_SCTP_SHUTDOWN_RECVWAIT,
+	__OS7_SCTP_LISTEN,
+	__OS7_SCTP_SHUTDOWN_ACK_SENT,
+	__OS7_SCTP_MAX_STATES
 };
 
 /*
- *  User SCTP_HB socket option structure
+ *  User __OS7_SCTP_HB socket option structure
  */
-struct sctp_hbitvl {
-	struct sockaddr_in
-	 dest;					/* destination IP address */
-	uint hb_act;				/* activation flag */
-	uint hb_itvl;				/* interval in milliseconds */
+struct __os7_sctp_hbitvl {
+	struct sockaddr_in dest;	/* destination IP address */
+	uint hb_act;			/* activation flag */
+	uint hb_itvl;			/* interval in milliseconds */
 };
 /*
- *  User SCTP_RTO socket option structure
+ *  User __OS7_SCTP_RTO socket option structure
  */
-struct sctp_rtoval {
-	struct sockaddr_in
-	 dest;					/* destination IP address */
-	uint rto_initial;			/* RTO.Initial (milliseconds) */
-	uint rto_min;				/* RTO.Min (milliseconds) */
-	uint rto_max;				/* RTO.Max (milliseconds) */
-	uint max_retrans;			/* Path.Max.Retrans (retires) */
+struct __os7_sctp_rtoval {
+	struct sockaddr_in dest;	/* destination IP address */
+	uint rto_initial;		/* RTO.Initial (milliseconds) */
+	uint rto_min;			/* RTO.Min (milliseconds) */
+	uint rto_max;			/* RTO.Max (milliseconds) */
+	uint max_retrans;		/* Path.Max.Retrans (retires) */
 };
 /*
- *  User SCTP_STATUS socket option structure
+ *  User __OS7_SCTP_STATUS socket option structure
  */
-struct sctp_dstat {
-	struct sockaddr_in
-	 dest;					/* destination IP address */
-	uint dst_cwnd;				/* congestion window */
-	uint dst_unack;				/* unacknowledged chunks */
-	uint dst_srtt;				/* smoothed round trip time */
-	uint dst_rvar;				/* rtt variance */
-	uint dst_rto;				/* current rto */
-	uint dst_sst;				/* slow start threshold */
+struct __os7_sctp_dstat {
+	struct sockaddr_in dest;	/* destination IP address */
+	uint dst_cwnd;			/* congestion window */
+	uint dst_unack;			/* unacknowledged chunks */
+	uint dst_srtt;			/* smoothed round trip time */
+	uint dst_rvar;			/* rtt variance */
+	uint dst_rto;			/* current rto */
+	uint dst_sst;			/* slow start threshold */
 };
-struct sctp_astat {
-	uint assoc_rwnd;			/* receive window */
-	uint assoc_rbuf;			/* receive buffer */
-	uint assoc_nrep;			/* destinations reported */
+struct __os7_sctp_astat {
+	uint assoc_rwnd;		/* receive window */
+	uint assoc_rbuf;		/* receive buffer */
+	uint assoc_nrep;		/* destinations reported */
 };
 
 /*
  *  User-settable options (used with setsockopt).
  */
-#define SCTP_NODELAY		 1	/* don't delay send to defrag or bundle chunks */
-#define SCTP_MAXSEG		 2	/* set artificial path MTU */
-#define SCTP_CORK		 3	/* control sending of partial chunks */
-#define SCTP_RECVSID		 4	/* control addition of stream id ancillary data */
-#define SCTP_RECVPPI		 5	/* control addition of payload proto id ancillary data */
-#define SCTP_RECVSSN		 6
-#define SCTP_RECVTSN		 7
-#define SCTP_SID		 8	/* stream id default and ancillary data */
-#define SCTP_PPI		 9	/* payload protocol id default and ancillary data */
-#define SCTP_SSN		10
-#define SCTP_TSN		11
-#define SCTP_HB			12	/* control heartbeat setting and interval */
-#define SCTP_RTO		13	/* control and check RTO values */
-#define SCTP_COOKIE_LIFE	14
-#define SCTP_SACK_DELAY		15
-#define SCTP_PATH_MAX_RETRANS	16
-#define SCTP_ASSOC_MAX_RETRANS	17
-#define SCTP_MAX_INIT_RETRIES	18
-#define SCTP_HEARTBEAT_ITVL	19
-#define SCTP_RTO_INITIAL	20
-#define SCTP_RTO_MIN		21
-#define SCTP_RTO_MAX		22
-#define SCTP_OSTREAMS		23
-#define SCTP_ISTREAMS		24
-#define SCTP_COOKIE_INC		25
-#define SCTP_THROTTLE_ITVL	26
-#define SCTP_MAC_TYPE		27
-#define SCTP_CKSUM_TYPE		28
-#define SCTP_DEBUG_OPTIONS	29
-#define SCTP_STATUS		30
-#define SCTP_ALI		31
-#define SCTP_PR			32
-#define SCTP_DISPOSITION	33
-#define SCTP_LIFETIME		34
-#define SCTP_ADD		35
-#define SCTP_ADD_IP		36
-#define SCTP_DEL_IP		37
-#define SCTP_SET		38
-#define SCTP_SET_IP		39
-#define SCTP_ECN		40
-#define SCTP_MAX_BURST		41
+#define __OS7_SCTP_NODELAY		 1	/* don't delay send to defrag or bundle chunks */
+#define __OS7_SCTP_MAXSEG		 2	/* set artificial path MTU */
+#define __OS7_SCTP_CORK			 3	/* control sending of partial chunks */
+#define __OS7_SCTP_RECVSID		 4	/* control addition of stream id ancillary data */
+#define __OS7_SCTP_RECVPPI		 5	/* control addition of payload proto id ancillary
+						   data */
+#define __OS7_SCTP_RECVSSN		 6
+#define __OS7_SCTP_RECVTSN		 7
+#define __OS7_SCTP_SID			 8	/* stream id default and ancillary data */
+#define __OS7_SCTP_PPI			 9	/* payload protocol id default and ancillary data */
+#define __OS7_SCTP_SSN			10
+#define __OS7_SCTP_TSN			11
+#define __OS7_SCTP_HB			12	/* control heartbeat setting and interval */
+#define __OS7_SCTP_RTO			13	/* control and check RTO values */
+#define __OS7_SCTP_COOKIE_LIFE		14
+#define __OS7_SCTP_SACK_DELAY		15
+#define __OS7_SCTP_PATH_MAX_RETRANS	16
+#define __OS7_SCTP_ASSOC_MAX_RETRANS	17
+#define __OS7_SCTP_MAX_INIT_RETRIES	18
+#define __OS7_SCTP_HEARTBEAT_ITVL	19
+#define __OS7_SCTP_RTO_INITIAL		20
+#define __OS7_SCTP_RTO_MIN		21
+#define __OS7_SCTP_RTO_MAX		22
+#define __OS7_SCTP_OSTREAMS		23
+#define __OS7_SCTP_ISTREAMS		24
+#define __OS7_SCTP_COOKIE_INC		25
+#define __OS7_SCTP_THROTTLE_ITVL	26
+#define __OS7_SCTP_MAC_TYPE		27
+#define __OS7_SCTP_CKSUM_TYPE		28
+#define __OS7_SCTP_DEBUG_OPTIONS	29
+#define __OS7_SCTP_STATUS		30
+#define __OS7_SCTP_ALI			31
+#define __OS7_SCTP_PR			32
+#define __OS7_SCTP_DISPOSITION		33
+#define __OS7_SCTP_LIFETIME		34
+#define __OS7_SCTP_ADD			35
+#define __OS7_SCTP_ADD_IP		36
+#define __OS7_SCTP_DEL_IP		37
+#define __OS7_SCTP_SET			38
+#define __OS7_SCTP_SET_IP		39
+#define __OS7_SCTP_ECN			40
+#define __OS7_SCTP_MAX_BURST		41
 
 /*
- *  HMAC settings for cookie verification for use with SCTP_MAC_TYPE socket
+ *  HMAC settings for cookie verification for use with __OS7_SCTP_MAC_TYPE socket
  *  option.
  */
-#define SCTP_HMAC_NONE		0	/* no hmac (all one's) */
-#define SCTP_HMAC_SHA_1		1	/* SHA-1 coded hmac */
-#define SCTP_HMAC_MD5		2	/* MD5 coded hmac */
+#define __OS7_SCTP_HMAC_NONE		0	/* no hmac (all one's) */
+#define __OS7_SCTP_HMAC_SHA_1		1	/* SHA-1 coded hmac */
+#define __OS7_SCTP_HMAC_MD5		2	/* MD5 coded hmac */
 
 /*
- *  CSUM settings for checksum algorithm selection with SCTP_CHKSUM_TYPE
+ *  CSUM settings for checksum algorithm selection with __OS7_SCTP_CHKSUM_TYPE
  *  socket option.
  */
-#define SCTP_CSUM_ADLER32	0	/* Adler32 checksum output */
-#define SCTP_CSUM_CRC32C	1	/* CRC-32c checksum output */
+#define __OS7_SCTP_CSUM_ADLER32		0	/* Adler32 checksum output */
+#define __OS7_SCTP_CSUM_CRC32C		1	/* CRC-32c checksum output */
 
 /*
- *  Debugging flags for use with SCTP_DEBUG_OPTIONS socket option.
+ *  Debugging flags for use with __OS7_SCTP_DEBUG_OPTIONS socket option.
  */
-#define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets */
-#define SCTP_OPTION_BREAK	0x02	/* stream will break dest #1 and 2 one way */
-#define SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways */
-#define SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random */
+#define __OS7_SCTP_OPTION_DROPPING	0x01	/* stream will drop packets */
+#define __OS7_SCTP_OPTION_BREAK		0x02	/* stream will break dest #1 and 2 one way */
+#define __OS7_SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways */
+#define __OS7_SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random */
 
 /*
- *  Partial reliability preference for use wtih SCTP_PR socket option
+ *  Partial reliability preference for use wtih __OS7_SCTP_PR socket option
  */
-#define SCTP_PR_NONE		0x0	/* no partial reliability */
-#define SCTP_PR_PREFERRED	0x1	/* partial reliability preferred */
-#define SCTP_PR_REQUIRED	0x2	/* partial reliability required */
+#define __OS7_SCTP_PR_NONE		0x0	/* no partial reliability */
+#define __OS7_SCTP_PR_PREFERRED		0x1	/* partial reliability preferred */
+#define __OS7_SCTP_PR_REQUIRED		0x2	/* partial reliability required */
 
 /*
  *  Message retrieval dispositions for use with MSG_CONFIRM to  recvmsg()
  */
-#define SCTP_DISPOSITION_NONE		0x0
-#define SCTP_DISPOSITION_UNSENT		0x1
-#define SCTP_DISPOSITION_SENT		0x2
-#define SCTP_DISPOSITION_GAP_ACKED	0x3
-#define SCTP_DISPOSITION_ACKED		0x4
+#define __OS7_SCTP_DISPOSITION_NONE		0x0
+#define __OS7_SCTP_DISPOSITION_UNSENT		0x1
+#define __OS7_SCTP_DISPOSITION_SENT		0x2
+#define __OS7_SCTP_DISPOSITION_GAP_ACKED	0x3
+#define __OS7_SCTP_DISPOSITION_ACKED		0x4
 
 /* this should be in in.h */
 #ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP        132	/* Stream Control Transmission Protocol */
+#define IPPROTO_SCTP	132	/* Stream Control Transmission Protocol */
 #endif
 
 /* this should be in socket.h */
 #ifndef SOL_SCTP
-#define SOL_SCTP            132	/* SCTP level */
+#define SOL_SCTP	132	/* SCTP level */
 #endif
 
 __END_DECLS
+
 #endif				/* _NETINET_SCTP_H */

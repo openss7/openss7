@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/12/21 12:23:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/12/22 11:27:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 12:23:07 $ by $Author: brian $
+# Last Modified $Date: 2004/12/22 11:27:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -87,8 +87,6 @@ libSCTPmodl_a_DEPENDENCIES	= $(CONFIG_HEADER)
 libSCTPmodl_a_CPPFLAGS		= \
 				  -I./src \
 				  -I$(srcdir)/src \
-				  -I./include \
-				  -I$(srcdir)/include \
 				  $(SCTP_INCLUDES) \
 				  $(KERNEL_CPPFLAGS) \
 				  $(KERNEL_MODFLAGS)

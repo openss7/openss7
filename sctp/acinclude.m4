@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.10 2004/12/21 22:20:50 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.12 2004/12/22 12:11:51 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/21 22:20:50 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/22 12:11:51 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -73,7 +73,7 @@ AC_DEFUN([AC_SCTP], [dnl
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _RPM_SPEC
-    SCTP_INCLUDES="-I- -imacros ./config.h -I./include -I${srcdir}/include"
+    SCTP_INCLUDES="-I- -imacros ./config.h"
     AC_SUBST([SCTP_INCLUDES])dnl
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
@@ -170,8 +170,41 @@ AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
 # _SCTP_CHECK_KERNEL
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
+    sctp_cv_other_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP], [
+        sctp_cv_other_sctp='yes'
+        AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** Ths is NOT a recommended situation.  Installing OpenSS7 SCTP on such a
+**** bastadized kernel will most likely result in an unstable situation.  Try
+**** a different kernel, or try recompiling your kernel with lksctp set to no.
+**** ])
+    ])
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE],
+                               [sctp_cv_other_sctp='yes'])
+    if test :$sctp_cv_other_sctp = :yes ; then
+        AC_DEFINE_UNQUOTED([HAVE_LKSCTP_SCTP], [], [Some more recent 2.4.25
+            and greater kernels have this poorman version of SCTP included in
+            the kernel.  Define this symbol if you have such a bastardized
+            kernel.  When we have such a kernel we need to define lksctp's
+            header wrapper defines so that none of the lksctp header files are
+            included (we use our own instead).])
+    else
+        _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp patched in], [CONFIG_SCTP],
+                                   [sctp_cv_other_sctp='yes'])
+        _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp as module], [CONFIG_SCTP_MODULE],
+                                   [sctp_cv_other_sctp='yes'])
+        if test :$sctp_cv_other_sctp = :yes ; then
+            AC_DEFINE_UNQUOTED([HAVE_OPENSS7_SCTP], [], [Some kernels may
+                already have the premium OpenSS7 implementation of SCTP
+                included.  A number of kernel rpms were released this way and
+                some distros have picked up OpenSS7 patches.  If this is the
+                case you are done.])dnl
+        fi
+    fi
     _LINUX_KERNEL_ENV([dnl
-        AC_CACHE_CHECK([for sctp ip_route_output], [sctp_cv_have_ip_route_output], [dnl
+        AC_CACHE_CHECK([for kernel ip_route_output], [linux_cv_have_ip_route_output], [dnl
             CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
@@ -181,15 +214,15 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/icmp.h>
 #include <net/route.h>]],
                 [[ip_route_output(NULL, 0, 0, 0, 0);]]) ],
-                    [sctp_cv_have_ip_route_output='yes'],
-                    [sctp_cv_have_ip_route_output='no'])
+                    [linux_cv_have_ip_route_output='yes'],
+                    [linux_cv_have_ip_route_output='no'])
             ])
-        if test :$sctp_cv_have_ip_route_output = :yes ; then
+        if test :$linux_cv_have_ip_route_output = :yes ; then
             AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [], [Define if you have the explicit
                 version of ip_route_output.])
         fi
-        ])
-    _LINUX_CHECK_HEADERS([net/xfrm.h], [], [], [
+    ])
+    _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [
 #include <linux/config.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
@@ -206,8 +239,9 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/proc_fs.h>
 #include <net/protocol.h>
 #include <net/inet_common.h>
-        ])
-    _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
+    ])
+    _LINUX_CHECK_TYPES([struct sockaddr_storage,
+                        struct sctp_mib], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -217,10 +251,12 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-        ])
+#include <net/snmp.h>
+    ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
                           struct inet_protocol.no_policy,
                           struct dst_entry.path,
+                          struct sk_buff.h.sh,
                           struct sock.protinfo.af_inet.ttl,
                           struct sock.protoinfo.af_inet.uc_ttl,
                           struct sock.tp_pinfo.af_sctp], [], [], [
@@ -234,66 +270,193 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
 #include <net/protocol.h>
+#ifdef HAVE_NET_DST_H
 #include <net/dst.h>
-        ])
-    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_err_convert])
-    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
-    _LINUX_KERNEL_SYMBOL_EXPORT([inet_bind])
-    _LINUX_KERNEL_SYMBOL_EXPORT([inet_getname])
-    _LINUX_KERNEL_SYMBOL_EXPORT([inet_ioctl])
-    _LINUX_KERNEL_SYMBOL_EXPORT([inet_multi_getname])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_cmsg_send])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_getsockopt])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_flow])
-    _LINUX_KERNEL_SYMBOL_EXPORT([__ip_route_output_key])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ipsec_sk_policy])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_setsockopt])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
-    _LINUX_KERNEL_SYMBOL_EXPORT([__xfrm_policy_check])
-    _LINUX_KERNEL_SYMBOL_EXPORT([xfrm_policy_delete])
-    _LINUX_KERNEL_SYMBOL_EXPORT([__xfrm_sk_clone_policy])
-    sctp_cv_other_sctp='no'
-    _LINUX_CHECK_KERNEL_CONFIG([for lksctp compiled in], [CONFIG_IP_SCTP],
-    [sctp_cv_other_sctp='yes'])
-    _LINUX_CHECK_KERNEL_CONFIG([for lksctp as module], [CONFIG_IP_SCTP_MODULE],
-    [sctp_cv_other_sctp='yes'])
-    if test :$sctp_cv_other_sctp = :yes ; then
-        AH_VERBATIM([HAVE_LKSCTP_SCTP],
-                    m4_text_wrap([Some more recent 2.4.25 and greater kernels have this poorman
-                                  version of SCTP included in the kernel.  Define this symbol if you
-                                  have such a bastardized kernel.  When we have such a kernel we
-                                  need to define lksctp's header wrapper defines so that none of the
-                                  lksctp header files are included (we use our own instead).  */],
-                                  [   ], [/* ])[
-#undef HAVE_LKSCTP_SCTP
-#ifdef HAVE_LKSCTP_SCTP
-#define __net_sctp_command_h__ 1
-#define __net_sctp_compat_h__ 1
-#define __net_sctp_h__ 1
-#define __net_sctp_user_h__ 1
-#define __sctp_constants_h__ 1
-#define __sctp_structs_h__ 1
-#define __sctp_tsnmap_h__ 1
-#define __sctp_ulpevent_h__ 1
-#define __sctp_ulpqueue_h__ 1
-#endif])
-        AC_DEFINE([HAVE_LKSCTP_SCTP])
+#endif
+    ])
+    _LINUX_KERNEL_SYMBOLS([icmp_err_convert,
+                           icmp_statistics,
+                           inet_bind,
+                           inet_getname,
+                           inet_ioctl,
+                           inet_multi_getname,
+                           ip_cmsg_send,
+                           ip_getsockopt,
+                           ip_route_output_flow,
+                           __ip_route_output_key,
+                           ip_rt_min_pmtu,
+                           ip_rt_mtu_expires,
+                           ip_rt_update_pmtu,
+                           ipsec_sk_policy,
+                           ip_setsockopt,
+                           sysctl_ip_dynaddr,
+                           sysctl_ip_nonlocal_bind,
+                           __xfrm_policy_check,
+                           xfrm_policy_delete,
+                           __xfrm_sk_clone_policy])
+    _LINUX_KERNEL_ENV([dnl
+        AC_CACHE_CHECK([for kernel struct sk_buff.cb size], [linux_cv_sk_buff_cb_size], [dnl
+            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src $SCTP_INCLUDES $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            AC_COMPILE_IFELSE([
+                AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include "include/net/net_sock.h"
+#include "include/linux/linux_sctp.h"
+#include "include/net/net_sctp.h"
+                ]], [[
+struct sk_buff system_sk_buff_structure;
+struct __os7_sctp_skb_cb mycb;
+if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
+    invoke_some_function_that_does_not_exist(NULL, 0, 0);
+}]]) ],
+                [if ( objdump -r conftest.$ac_objext | grep -q invoke_some_function_that_does_not_exist ) 2>/dev/null
+                 then
+                     linux_cv_sk_buff_cb_size='toosmall'
+                 else
+                     linux_cv_sk_buff_cb_size='ok'
+                 fi],
+                [linux_cv_sk_buff_cb_size='unknown'])
+            ])
+    ])
+    case :${linux_cv_sk_buff_cb_size:-unknown} in
+        :ok)
+            ;;
+        :toosmall)
+            AC_MSG_ERROR([
+**** 
+**** 
+**** ERROR: The size of the control block (cb) in struct sk_buff is plain too
+**** small to accept the size of the sctp_skb_cb.  There is nothing that can
+**** be done about this as the size of the cb is compiled into the kernel.
+**** You have no choice but to increase the size and recompile your kernel
+**** before attempting to rebuild SCTP.
+**** ])
+            ;;
+        *)
+            AC_MSG_WARN([
+**** 
+**** WARNING: Configure cannot determine whether the size of your sk_buff
+**** control block is large enough to accomodate the sctp_skb_cb structure.
+**** There is a check which prohibits the kernel module from loading if that
+**** winds up being the case.  If your module does not load later or fails a
+**** depmod -ae, due to an unresolved symbol with a peculiar name, then you
+**** may need to recompile your kernel with a larger cb size and rebuild and
+**** reinstall SCTP on the new kernel.
+**** ])
+            ;;
+    esac
+    _LINUX_KERNEL_ENV([dnl
+        AC_CACHE_CHECK([for kernel struct sock.tp_pinfo size], [linux_cv_sock_tp_pinfo_size], [dnl
+            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src $SCTP_INCLUDES $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            AC_COMPILE_IFELSE([
+                AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include "include/net/net_sock.h"
+#include "include/linux/linux_sctp.h"
+#include "include/net/net_sctp.h"
+                ]], [[
+extern size_t the_size_of_tcp_opt;
+extern size_t the_size_of_os7_sctp_opt;
+struct sock system_sock_structure;
+struct __os7_sctp_opt myopt;
+if (sizeof(system_sock_structure.tp_pinfo) < sizeof(myopt)) {
+    the_size_of_tcp_opt = sizeof(struct tcp_opt);
+    the_size_of_os7_sctp_opt = sizeof(struct __os7_sctp_opt);
+    invoke_some_function_that_does_not_exist(NULL, 0, 0);
+}
+                ]])
+                ], [dnl
+    if ( objdump -r conftest.$ac_objext | grep -q invoke_some_function_that_does_not_exist ) 2>/dev/null
+    then
+        linux_cv_sock_tp_pinfo_size='toosmall'
+        cp -f conftest.$ac_objext error_object.$ac_objext
     else
-        _LINUX_CHECK_KERNEL_CONFIG([for openss7 sctp patched in], [CONFIG_SCTP],
-        [sctp_cv_other_sctp='yes'])
-        _LINUX_CHECK_KERNEL_CONFIG([for openss7 sctp as module], [CONFIG_SCTP_MODULE],
-        [sctp_cv_other_sctp='yes'])
-        if test :$sctp_cv_other_sctp = :yes ; then
-            AC_DEFINE_UNQUOTED([HAVE_OPENSS7_SCTP], [], [Some kernels may
-                already have the premium OpenSS7 implementation of SCTP
-                included.  A number of kernel rpms were released this way and
-                some distros have picked up OpenSS7 patches.  If this is the
-                case you are done.])dnl
-        fi
+        linux_cv_sock_tp_pinfo_size='ok'
+    fi], [dnl
+        linux_cv_sock_tp_pinfo_size='unknown'])
+        ])
+    ])
+    case :$linux_cv_sock_tp_pinfo_size in
+        :ok)
+            ;;
+        :toosmall)
+            # Another question, is lksctp bigger than tcp?
+            AC_MSG_ERROR([
+**** 
+**** ERROR: The size of the socket private information union (tp_pinfo) in
+**** struct sock is plain too small to accept the size of the sctp_opt private
+**** structure.  There is nothing that can be done about this as the size of
+**** the private information union is compiled into the kernel.  You have no
+**** choice but to increase the size and recompile your kernel before
+**** attempting to rebuild SCTP.
+**** ])
+            ;;
+        *)
+            AC_MSG_WARN([
+**** 
+**** WARNING: Configure cannot determine whether the size of your socket
+**** private information union is large enough to accomodate the sctp_opt
+**** structure.  There is a check which prohibits the kernel module from
+**** loading if that winds up being the case.  If your module does not load
+**** later or failes a depmod -ae, due to an unresolved symbol with a peculiar
+**** name, then you may need to recompile your kernel with a larger tp_pinfo
+**** size and rebuild and reinstall SCTP on the new kernel.
+**** ])
+            ;;
+    esac
+    if test :$linux_cv_type_struct_sctp_mib = :yes ; then
+        _LINUX_CHECK_MEMBERS([struct sctp_mib.SctpRtoAlgorithm,
+                              struct sctp_mib.SctpRtoMin,
+                              struct sctp_mib.SctpRtoMax,
+                              struct sctp_mib.SctpRtoInitial,
+                              struct sctp_mib.SctpMaxAssoc,
+                              struct sctp_mib.SctpValCookieLife,
+                              struct sctp_mib.SctpMaxInitRetr,
+                              struct sctp_mib.SctpCurrEstab,
+                              struct sctp_mib.SctpActiveEstabs,
+                              struct sctp_mib.SctpPassiveEstabs,
+                              struct sctp_mib.SctpAborteds,
+                              struct sctp_mib.SctpShutdowns,
+                              struct sctp_mib.SctpOutOfBlues,
+                              struct sctp_mib.SctpChecksumErrors,
+                              struct sctp_mib.SctpOutCtrlChunks,
+                              struct sctp_mib.SctpOutOrderChunks,
+                              struct sctp_mib.SctpOutUnorderChunks,
+                              struct sctp_mib.SctpInCtrlChunks,
+                              struct sctp_mib.SctpInOrderChunks,
+                              struct sctp_mib.SctpInUnorderChunks,
+                              struct sctp_mib.SctpFragUsrMsgs,
+                              struct sctp_mib.SctpReasmUsrMsgs,
+                              struct sctp_mib.SctpOutSCTPPacks,
+                              struct sctp_mib.SctpInSCTPPacks,
+                              struct sctp_mib.SctpDiscontinuityTime], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/snmp.h>
+                              ])
     fi
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue_exclusive])

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/12/21 22:20:52 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/12/22 11:26:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 22:20:52 $ by $Author: brian $
+# Last Modified $Date: 2004/12/22 11:26:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,7 +84,7 @@ AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
         CPPFLAGS="$KERNEL_CPPFLAGS"
         CFLAGS="$KERNEL_CFLAGS"
         LDFLAGS="$KERNEL_LDFLAGS"
-        $1
+$1
         # move user flags back where they were
         CPPFLAGS="$linux_tmp_cppflags"
         CFLAGS="$linux_tmp_cflags"
@@ -104,6 +104,8 @@ AC_DEFUN([_LINUX_KERNEL_ENV], [dnl
         linux_env='kernel'
         _LINUX_KERNEL_ENV_BARE([$1])
         linux_env='user'
+    else :;
+$1
     fi
 ])# _LINUX_KERNEL_ENV
 # =============================================================================
@@ -1291,7 +1293,8 @@ AC_DEFUN([_LINUX_CHECK_HEADERS_internal], [dnl
     for lk_header in $1
     do
     _LINUX_CHECK_HEADER_internal($lk_header,
-        [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$lk_header)) $2],
+        [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$lk_header))
+$2],
         [$3],
         [$4])dnl
     done
@@ -1355,8 +1358,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
 #endif
         ], [AS_VAR_SET([linux_config], ['yes'])], [AS_VAR_SET([linux_config], ['no'])]) ])
     linux_tmp=AS_VAR_GET([linux_config])
-    if test :"${linux_tmp:-no}" = :yes ; then :; $3
-    else :; $4
+    if test :"${linux_tmp:-no}" = :yes ; then :;
+$3
+    else :;
+$4
     fi
     AS_VAR_POPDEF([linux_config])dnl
 ])# _LINUX_CHECK_KERNEL_CONFIG_internal
@@ -1440,12 +1445,13 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [dnl
         AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:-no}"]) ])
     linux_tmp=AS_VAR_GET([linux_symbol_addr])
     if test :"${linux_tmp:-no}" != :no 
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1_ADDR), AS_VAR_GET([linux_symbol_addr]),
+    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_ADDR), AS_VAR_GET([linux_symbol_addr]),
             [The symbol $1 is not exported by most kernels.  Define this to
             the address of $1 in the kernel system map so that kernel modules
             can be properly supported.])
-        $3
-    else :; $2
+$3
+    else :;
+$2
     fi
     AS_VAR_POPDEF([linux_symbol_addr])dnl
 ])# _LINUX_KERNEL_SYMBOL_ADDR
@@ -1496,15 +1502,46 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [dnl
         AS_VAR_SET([linux_symbol_export], ["$linux_tmp"]) ])
     linux_tmp=AS_VAR_GET([linux_symbol_export])
     if test :"${linux_tmp:-no}" != :no 
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1_EXPORT), [], [The symbol $1
+    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_EXPORT), [], [The symbol $1
             is not exported by most kernels.  Define this if the symbol $1
             is exported by your kernel so that kernel modules can be supported
             properly.])
-        $3
+$3
     else :; _LINUX_KERNEL_SYMBOL_ADDR([$1], [$2], [$3])
     fi
     AS_VAR_POPDEF([linux_symbol_export])dnl
 ])# _LINUX_KERNEL_SYMBOL_EXPORT
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_SYMBOL(SYMBOL, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_SYMBOL], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])
+    AS_VAR_PUSHDEF([linux_symbol], [linux_cv_$1[]_symbol])dnl
+    _LINUX_KERNEL_SYMBOL_EXPORT([$1], [dnl
+        AS_VAR_SET([linux_symbol], ['no'])], [dnl
+        AS_VAR_SET([linux_symbol], ['yes'])])
+    if test :AS_VAR_GET([linux_symbol]) != :yes
+    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_SYMBOL), [], [The symbol $1
+            is not exported by most kernels.  Define this is the symbol $1 is
+            either exported by your kernel, or can be stripped from the symbol
+            map, so that kernel modules can be supported properly.])
+$2
+    else :;
+$3
+    fi
+    AS_VAR_POPDEF([linux_symbol])
+])# _LINUX_KERNEL_SYMBOL
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_SYMBOLS(SYMBOLS, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_SYMBOLS], [dnl
+    m4_foreach([LK_Symbol], [$1], [dnl
+        _LINUX_KERNEL_SYMBOL(LK_Symbol, [$2], [$3])])
+])# _LINUX_KERNEL_SYMBOLS
 # =============================================================================
 
 # =============================================================================

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: hooks.h.in,v 0.9.2.4 2004/12/21 00:40:59 brian Exp $
+ @(#) $Id: hooks.h.in,v 0.9.2.5 2004/12/22 11:27:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/21 00:40:59 $ by $Author: brian $
+ Last Modified $Date: 2004/12/22 11:27:45 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -285,11 +285,13 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 		dst->ops->update_pmtu(dst, mtu);
 }
 #else
-static inline u32
+#ifndef dst_pmtu
+static __inline__ u32
 dst_pmtu(struct dst_entry *dst)
 {
 	return (dst->pmtu);
 }
+#endif
 static void
 dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 {
@@ -301,7 +303,7 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 #undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
 #endif
 #ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
-static inline int
+static __inline__ int
 ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 {
 	struct flowi fl = {.oif = oif,
