@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_usecwait.9.man,v 0.9.2.7 2004/08/24 08:42:43 brian Exp $
+.\" @(#) $Id: drv_usecwait.9.man,v 0.9.2.8 2005/01/20 07:28:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/20 07:28:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DRV_USECWAIT 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DRV_USECWAIT 9 "$Date: 2005/01/20 07:28:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -86,6 +86,13 @@ sort-adjacent-labels
 .B #include <sys/dki.h>
 .HP
 .BI "void drv_usecwait(unsigned long " usec );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I usec
+the number of microseconds to wait.
 .\"
 .\"
 .SH DESCRIPTION

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setq.9.man,v 0.9.2.4 2004/08/24 08:42:47 brian Exp $
+.\" @(#) $Id: setq.9.man,v 0.9.2.5 2005/01/20 07:28:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/20 07:28:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SETQ 9 "$Date: 2004/08/24 08:42:47 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH SETQ 9 "$Date: 2005/01/20 07:28:18 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -166,7 +166,7 @@ multiplexer queue parameters against the stream head queue pair.
 has no known bugs.
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 Symbol
 .BR lis_setq ()
@@ -180,7 +180,7 @@ This function is not exported by SVR 4.2 MP DDI/DKI or
 
 .\"
 .\"
-.SH COMPLIANCE
+.SH CONFORMANCE
 .PP
 .BR setq ()
 is compliant with the description of the internal

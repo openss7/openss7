@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_getiminor.9.man,v 0.9.2.6 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: ddi_getiminor.9.man,v 0.9.2.7 2005/01/20 07:28:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/20 07:28:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_GETIMINOR 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS SUNDDI"
+.TH DDI_GETIMINOR 9 "$Date: 2005/01/20 07:28:17 $" "$Name:  $" "Linux Fast-STREAMS SUNDDI"
 .\"
 .\"
 .SH NAME
@@ -129,6 +129,18 @@ returns the internal minor device number.
 .PP
 .BR ddi_getiminor ()
 always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR ddi_getiminor ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR ddi_getiminor ()
+is MP-Safe.
 .\"
 .\"
 .SH NOTICES

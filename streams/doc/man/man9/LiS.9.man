@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 0.9.2.6 2004/08/24 08:42:39 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 0.9.2.8 2005/01/20 11:08:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:39 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/20 11:08:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LiS 9 "$Date: 2004/08/24 08:42:39 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH LiS 9 "$Date: 2005/01/20 11:08:02 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .SH NAME
 .I LiS
 \- introduction to \fISTREAMS\fR kernel functions
@@ -85,6 +85,8 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .br
 .B #include <sys/dki.h>
+.SH OVERVIEW
+.PP
 .SH DESCRIPTION
 .PP
 .SS "Header Files"
@@ -300,10 +302,6 @@ pull up bytes in a STREAMS message
 .BR msgsize (9)
 \-
 calculate the size of the message blocks in a STREAMS message
-.\".HP
-.\".BR msgutil (9)
-.\"\-
-.\"STREAMS message utilities
 .HP
 .BR pullupmsg (9)
 \-
@@ -560,6 +558,10 @@ stop a timer
 .PP
 .SH ERRORS
 .PP
+.SH CONTEXT
+.PP
+.SH MP-STREAMS
+.PP
 .SH NOTICES
 .PP
 .SH "SEE ALSO"
@@ -613,7 +615,6 @@ stop a timer
 .BR msgdsize (9),
 .BR msgpullup (9),
 .BR msgsize (9),
-.\".BR msgutil (9),
 .BR noenable (9),
 .BR OTHER (9),
 .BR OTHERQ (9),
@@ -651,8 +652,16 @@ stop a timer
 .BR untimeout (9),
 .BR WR (9),
 .BR xmsgsize (9).
-
-
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
 .SH VERSIONS
 .PP
 This manpage was written for

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/19 07:35:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/20 07:28:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/19 07:35:08 $ by $Author: brian $
+# Last Modified $Date: 2005/01/20 07:28:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -648,7 +648,6 @@ man_MANS = \
 	man9/msgpullup_physreq.9 \
 	man9/msgscgth.9 \
 	man9/msgsize.9 \
-	man9/msgutil.9 \
 	man9/nochpoll.9 \
 	man9/nodesw_lock.9 \
 	man9/nodev.9 \
@@ -754,7 +753,6 @@ man_MANS = \
 	man9/streams_open_ocomm.9 \
 	man9/streams_put.9 \
 	man9/streamtab.9 \
-	man9/stream_utils.9 \
 	man9/strgetpmsg.9 \
 	man9/str_install.9 \
 	man9/str_install_AIX.9 \
@@ -1404,7 +1402,6 @@ dist_noinst_MANS = \
 	man9/msgpullup_physreq.9.man \
 	man9/msgscgth.9.man \
 	man9/msgsize.9.man \
-	man9/msgutil.9.man \
 	man9/nochpoll.9.man \
 	man9/nodesw_lock.9.man \
 	man9/nodev.9.man \
@@ -1510,7 +1507,6 @@ dist_noinst_MANS = \
 	man9/streams_open_ocomm.9.man \
 	man9/streams_put.9.man \
 	man9/streamtab.9.man \
-	man9/stream_utils.9.man \
 	man9/strgetpmsg.9.man \
 	man9/str_install.9.man \
 	man9/str_install_AIX.9.man \

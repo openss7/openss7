@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.8 2004/08/24 08:42:40 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.10 2005/01/20 11:08:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/20 11:08:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS 9 "$Date: 2004/08/24 08:42:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STREAMS 9 "$Date: 2005/01/20 11:08:02 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -106,6 +106,10 @@ sort-adjacent-labels
 .B #include <sys/cmn_err.h>
 .br
 .B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
 .\"
 .\"
 .SH DESCRIPTION
@@ -951,8 +955,6 @@ internal functions listed below:
 .BR lis_msgpullup "(9)\ \-\ pull up bytes in a STREAMS message
 .HP
 .BR lis_msgsize "(9)\ \-\ calculate the size of message blocks in a STREAMS message
-.\".HP
-.\".BR lis_msgutil "(9)\ .\"\-\ 
 .HP
 .BR lis_noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
 .HP
@@ -1024,8 +1026,6 @@ internal functions listed below:
 .HP
 .BR lis_SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
 .HP
-.BR lis_stream_utils "(9)\ \-\ 
-.HP
 .BR lis_strqget "(9)\ \-\ gets information about a STREAMS message queue
 .HP
 .BR lis_strqset "(9)\ \-\ sets attributes of a STREAMS message queue
@@ -1064,6 +1064,14 @@ internal functions listed below:
 .\"
 .\"
 .SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
 .PP
 .\"
 .\"
@@ -1669,7 +1677,6 @@ drivers and modules.
 .BR lis_msgdsize (9),
 .BR lis_msgpullup (9),
 .BR lis_msgsize (9),
-.BR lis_msgutil (9),
 .BR lis_noenable (9),
 .BR lis_OTHER (9),
 .BR lis_OTHERQ (9),
@@ -1704,7 +1711,6 @@ drivers and modules.
 .BR lis_safe_SAMESTR (9),
 .BR lis_safe_WR (9),
 .BR lis_SAMESTR (9),
-.BR lis_stream_utils (9),
 .BR lis_strqget (9),
 .BR lis_strqset (9),
 .BR lis_testb (9),
@@ -1734,7 +1740,6 @@ drivers and modules.
 .BR msgdsize (9),
 .BR msgpullup (9),
 .BR msgsize (9),
-.BR msgutil (9),
 .BR noenable (9),
 .BR OTHERQ (9),
 .BR pullupmsg (9),
@@ -1784,7 +1789,6 @@ drivers and modules.
 .BR SAMESTR (9),
 .BR setq (9),
 .BR streamtab (9),
-.BR stream_utils (9),
 .BR strlog (9),
 .BR strqget (9),
 .BR strqset (9),
