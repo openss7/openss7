@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/30 11:35:48 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/31 20:21:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/30 11:35:48 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 20:21:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -103,7 +103,7 @@ AC_DEFUN([AC_XNS], [dnl
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _XNS_SETUP
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(CONFIG_HEADER)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(CONFIG_HEADER)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.13 2005/03/31 13:14:51 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.14 2005/03/31 20:20:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/31 13:14:51 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/31 20:20:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1309,7 +1309,7 @@ the top build directory will be used as the RPM top directory as well.
 
 @item --with-deb-epoch=EPOCH
 @opindex deb-epoch
-Speicfy the @samp{PACKAGE_DEBEPOCH} for the DEB control file.  The default is to
+Specify the @samp{PACKAGE_DEBEPOCH} for the DEB control file.  The default is to
 use the DEB epoch contained int he file @file{.debepoch}.
 
 @item --with-deb-release=RELEASE

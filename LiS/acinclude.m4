@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.15 $) $Date: 2005/03/31 06:53:00 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.16 $) $Date: 2005/03/31 20:21:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 06:53:00 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 20:21:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,7 +102,7 @@ AC_DEFUN([AC_LIS], [dnl
     USER_LDFLAGS="$LDFLAGS"
     _LIS_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-DLIS=1'
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(CONFIG_HEADER)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(CONFIG_HEADER)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/include -I$(top_srcdir)/include'
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then

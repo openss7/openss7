@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.3 2005/03/15 13:39:56 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.4 2005/03/31 20:19:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 13:39:56 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/31 20:19:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -136,8 +136,8 @@ This section discusses compatibility with major prerequisites.
 @item Fedora Core 2 (FC2)
 @item SuSE 9.1 Personal
 @item Mandrakelinux 10.0 (MDK100)
-@item SuSE 9.2 Professional
-@item Mandrakelinux 11.0 (MDK110)
+@item SuSE 9.2 Professional (SuSE9.2)
+@item Mandrakelinux 10.1 (MDK101)
 @item RedHat Enterprise Linux 4 (EL4)
 @item Fedora Core 3 (FC3)
 @end itemize

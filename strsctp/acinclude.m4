@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/31 06:53:26 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/31 20:21:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 06:53:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 20:21:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,7 +104,7 @@ AC_DEFUN([AC_SCTP], [dnl
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDADD"
     _SCTP_SETUP
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(CONFIG_HEADER)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
