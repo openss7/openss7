@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/20 14:29:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 14:29:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -134,7 +134,10 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 	    do
 		if test -w "$config_site" -o ! -e "$config_site"
 		then
-		    cat "$cache_file" | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|ksyms_cv_|rpm_cv_|strconf_cv_|sctp_cv_|xns_cv_|lis_cv_|lfs_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_)' > "$config_site" 2>/dev/null
+		    if touch "$config_site" >/dev/null 2>&1
+		    then
+			cat "$cache_file" | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|ksyms_cv_|rpm_cv_|strconf_cv_|sctp_cv_|xns_cv_|lis_cv_|lfs_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_)' > "$config_site" 2>/dev/null
+		    fi
 		fi
 	    done
 	fi], [cache_file="$cache_file" ; CONFIG_SITE="$CONFIG_SITE"])
