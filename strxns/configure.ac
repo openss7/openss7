@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.11 2005/01/25 16:07:13 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.12 2005/02/11 09:30:06 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/25 16:07:13 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/11 09:30:06 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -74,6 +74,8 @@ AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_TARGET
+
+_DISTRO
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION-1)
 AM_MAINTAINER_MODE
