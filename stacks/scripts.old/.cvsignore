@@ -1,0 +1,6 @@
+.*
+config.guess
+config.rpath
+config.sub
+ltmain.sh
+mkinstalldirs

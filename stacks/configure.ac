@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/04/25 07:29:32 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/05/12 08:01:36 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/25 07:29:32 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/12 08:01:36 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -88,9 +88,12 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
+AM_GNU_GETTEXT_VERSION(0.14.1)
 
 # Checks for libraries.
 AC_CHECK_LIB([LiS], [putpmsg])
+AC_CHECK_LIB([streams], [putpmsg])
+AC_CHECK_LIB([xnet], [t_open])
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -109,6 +112,7 @@ AC_HEADER_TIME
 AC_C_VOLATILE
 
 # Checks for library functions.
+AM_GNU_GETTEXT
 if test :"${cross_compiling:-no}" != :yes ; then : AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
@@ -123,6 +127,9 @@ AC_CONFIG_FILES([Makefile
 		 src/include/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/Makefile])
+		 doc/manual/Makefile
+		 intl/Makefile
+		 po/Makefile.in
+		 m4/Makefile])
 
 AC_OUTPUT

@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.1 2004/04/14 10:33:04 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.2 2004/05/12 08:01:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,25 +40,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:04 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/05/12 08:01:39 $ by $Author: brian $
+
+ $Log: xti_sctp.h,v $
+ Revision 0.9.2.2  2004/05/12 08:01:39  brian
+ - Added in xti library and STREAMS modules.
+
+ Revision 1.1.2.1  2004/04/13 12:12:52  brian
+ - Rearranged header files.
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
-
-#ifndef t_uscalar_t
-#define t_uscalar_t ulong
-#define t_scalar_t  long
-#endif
-
-typedef struct sctp_addr {
-	uint16_t port __attribute__ ((packed));
-	uint32_t addr[0] __attribute__ ((packed));
-} sctp_addr_t;
-#define sctp_addr_t sctp_addr_t
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 
@@ -88,22 +88,45 @@ typedef struct sctp_addr {
 #define T_SCTP_THROTTLE_ITVL		20
 #define T_SCTP_MAC_TYPE			21
 
-#ifndef SCTP_HMAC_NONE
-#define SCTP_HMAC_NONE      0
-#define SCTP_HMAC_SHA_1     1
-#define SCTP_HMAC_MD5       2
-#endif
+#define T_SCTP_HMAC_NONE	0
+#define T_SCTP_HMAC_SHA1	1
+#define T_SCTP_HMAC_MD5		2
 
-#define T_SCTP_HB			22
+#define T_SCTP_CKSUM_TYPE		22
+
+#define T_SCTP_CSUM_ADLER32	0
+#define T_SCTP_CSUM_CRC32C	1
+
+#define T_SCTP_ECN			23
+#define T_SCTP_ALI			24
+#define T_SCTP_ADD			25
+#define T_SCTP_SET			26
+#define T_SCTP_ADD_IP			27
+#define T_SCTP_DEL_IP			28
+#define T_SCTP_SET_IP			29
+#define T_SCTP_PR			30
+#define T_SCTP_LIFETIME			31
+
+#define T_SCTP_DISPOSITION		32
+
+#define T_SCTP_DISPOSITION_NONE		0
+#define T_SCTP_DISPOSITION_UNSENT	1
+#define T_SCTP_DISPOSITION_SENT		2
+#define T_SCTP_DISPOSITION_GAP_ACKED	3
+#define T_SCTP_DISPOSITION_ACKED	4
+
+#define T_SCTP_MAX_BURST		33
+
+#define T_SCTP_HB			34
 typedef struct t_sctp_hb {
-	uint32_t hb_dest;		/* destination address */
+	t_uscalar_t hb_dest;		/* destination address */
 	t_uscalar_t hb_onoff;		/* activation flag */
 	t_uscalar_t hb_itvl;		/* interval in milliseconds */
 } t_sctp_hb_t;
 
-#define T_SCTP_RTO			23
+#define T_SCTP_RTO			35
 typedef struct t_sctp_rto {
-	uint32_t rto_dest;		/* destination address */
+	t_uscalar_t rto_dest;		/* destination address */
 	t_uscalar_t rto_initial;	/* RTO.Initial (milliseconds) */
 	t_uscalar_t rto_min;		/* RTO.Min (milliseconds) */
 	t_uscalar_t rto_max;		/* RTO.Max (milliseconds) */
@@ -113,8 +136,8 @@ typedef struct t_sctp_rto {
 /*
  *  Read-only options...
  */
-#define T_SCTP_MAXSEG			24
-#define T_SCTP_STATUS			25
+#define T_SCTP_MAXSEG			36
+#define T_SCTP_STATUS			37
 typedef struct t_sctp_dest_status {
 	t_uscalar_t dest_addr;		/* dest address */
 	t_uscalar_t dest_cwnd;		/* dest congestion window */
@@ -132,7 +155,7 @@ typedef struct t_sctp_status {
 	t_sctp_dest_status_t curr_dest[0];	/* current primary dest */
 } t_sctp_status_t;
 
-#define T_SCTP_DEBUG			26
+#define T_SCTP_DEBUG			38
 
 #ifndef SCTP_OPTION_DROPPING
 #define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets */
@@ -142,3 +165,4 @@ typedef struct t_sctp_status {
 #endif
 
 #endif				/* _SYS_XTI_SCTP_H */
+

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:40 $
+ @(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,34 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/12 08:01:40 $ by $Author: brian $
+ Last Modified $Date: 2004/05/12 08:01:38 $ by $Author: brian $
 
- $Log: xti_udp.h,v $
- Revision 0.9.2.1  2004/05/12 08:01:40  brian
+ $Log: tiuser.h,v $
+ Revision 0.9.2.1  2004/05/12 08:01:38  brian
  - Added in xti library and STREAMS modules.
 
- Revision 1.1.2.1  2004/04/13 12:12:52  brian
+ Revision 1.1.2.1  2004/04/13 12:12:51  brian
  - Rearranged header files.
 
  *****************************************************************************/
 
-#ifndef _SYS_XTI_UDP_H
-#define _SYS_XTI_UDP_H
+#ifndef _TIUSER_H
+#define _TIUSER_H
 
-#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-/* 
- * UDP level
- */
-#define T_INET_UDP		17	/* UDP level (same as protocol number) */
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
-/* 
- * UDP level Options
- */
-#define T_UDP_CHECKSUM		1	/* checksum computation (???) */
+#include <sys/tiuser.h>
 
-#endif				/* _SYS_XTI_UDP_H */
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
+#endif				/* _TIUSER_H */

@@ -1,0 +1,303 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR OpenSS7 Corporation
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: LiS 2.16.16\n"
+"Report-Msgid-Bugs-To: bidulock@openss7.org\n"
+"POT-Creation-Date: 2004-05-12 01:31-0600\n"
+"PO-Revision-Date: 2004-01-06 18:11-0700\n"
+"Last-Translator: Brian Bidulock <bidulock@openss7.org>\n"
+"Language-Team: German <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TRANS No error is indicated in the t_errno variable.  The last operation was a
+#. TRANS success.  t_errno will not be set to this value (zero) by the library,
+#. TRANS the user must set t_errno to zero before the XTI library call an when
+#. TRANS the call is successful, the t_errno value will be unaffected.  There is
+#. TRANS no requirement that this value be set after a successful call, and calls
+#. TRANS are even permitted to change t_errno to some other value, when the call
+#. TRANS is actually successful.
+#.
+#: src/lib/libxnet/xnet.c:5412
+msgid "No error"
+msgstr "Erfolgreich"
+
+#. TRANS The format of the supplied transport endpoint address is of an incorrect
+#. TRANS format.  This is not used to provide protocol errors but merely indicate
+#. TRANS an error in the syntactic formatting of the address.
+#.
+#: src/lib/libxnet/xnet.c:5418
+msgid "Bad address format"
+msgstr "Ungültige Adresse"
+
+#. TRANS The format of the supplied transport options is of an incorrect format.
+#. TRANS This is not used to provide protocol errors but merely indicate an error
+#. TRANS in the the syntactic formatting of the options.
+#.
+#: src/lib/libxnet/xnet.c:5424
+msgid "Bad options format"
+msgstr "Ungültige Option"
+
+#. TRANS The user does not have sufficient permissions or priveledge to execute
+#. TRANS the XTI library call, or to use the specified address, or to use the
+#. TRANS specified options.
+#.
+#: src/lib/libxnet/xnet.c:5430
+msgid "Bad permissions"
+msgstr "Keine Berechtigung"
+
+#. TRANS The file descriptor is not known to the XTI library.
+#.
+#: src/lib/libxnet/xnet.c:5434
+msgid "Bad file descriptor"
+msgstr "Ungültiger Dateideskriptor"
+
+#. TRANS The user did not provide an address on the call and the XTI library or
+#. TRANS underlying transport service provider is unable to choose and assign an
+#. TRANS address on the user's behalf.
+#.
+#: src/lib/libxnet/xnet.c:5440
+msgid "Unable to allocate an address"
+msgstr "Kann keinen Adresse anlegen"
+
+#. TRANS The arguments of the XTI library call are correct, however, the
+#. TRANS transport endpoint or transport provider endpoint state machine is in a
+#. TRANS state in which the XTI library call is not permitted.  The C-Locale text
+#. TRANS is traditional and does not really reflect the situation very well.
+#.
+#: src/lib/libxnet/xnet.c:5447
+msgid "Would place interface out of state"
+msgstr "Fehler im (intern verwendeten) endlichen Automaten"
+
+#. TRANS When a transport connection indication is received it is given a
+#. TRANS connection indication sequence number which is used to later accept or
+#. TRANS reject the connection.  In this case, the user supplied sequence number
+#. TRANS is invalid (does not correspond to an outstanding connection
+#. TRANS indication).
+#.
+#: src/lib/libxnet/xnet.c:5455
+msgid "Bad call sequence number"
+msgstr ""
+
+#. TRANS A UNIX system error has occured and the errno variable indicates the
+#. TRANS UNIX system error.
+#.
+#: src/lib/libxnet/xnet.c:5460
+msgid "System error"
+msgstr ""
+
+#. TRANS The XTI library call is otherwise correct, however, an asynchrnous event
+#. TRANS has occured requiring the user to call the t_look() XTI library call to
+#. TRANS process the asychronous event before proceeding.
+#.
+#: src/lib/libxnet/xnet.c:5466
+msgid "Has to t_look() for event"
+msgstr ""
+
+#. TRANS The amount of data specified is incorrect.  Where an IO vector is
+#. TRANS supplied, the IO vector count is out of range (zero or greater than
+#. TRANS T_MAX_IOV), otherwise, when sending data, if the amount of data is zero,
+#. TRANS the transport service provider does not permit zero-length sends, if the
+#. TRANS amount of data is non-zero, then the amount of data exceeds protocol
+#. TRANS limits provided by the transport service provider in response to a a
+#. TRANS t_getinfo() XTI library call.
+#.
+#: src/lib/libxnet/xnet.c:5476
+msgid "Bad amount of data"
+msgstr ""
+
+#. TRANS The user provided a buffer to the XTI library call into which to receive
+#. TRANS addresses or options, however, the size of the buffer was too small to
+#. TRANS accept the addresses or options that were received.  In the C-locale
+#. TRANS this is termed a buffer overflow.
+#.
+#: src/lib/libxnet/xnet.c:5483
+msgid "Buffer was too small"
+msgstr ""
+
+#. TRANS The user called a send function that would have otherwise blocked due to
+#. TRANS flow control, however, O_NONBLOCK was set on the file descriptor.  This
+#. TRANS error indicates that the call was abandonned due to flow control
+#. TRANS conditions.  If O_NONBLOCK had not been set, the call would have blocked
+#. TRANS due to flow control.
+#.
+#: src/lib/libxnet/xnet.c:5491
+msgid "Would block due to flow control"
+msgstr ""
+
+#. TRANS The user called an XTI library call for a transport endpoint for which
+#. TRANS O_NONBLOCK is set, and the library call was expecting to receive a data
+#. TRANS indictation and no such indication was present.  If O_NONBLOCK had not
+#. TRANS been set, the call would have blocked awaiting the indication.
+#.
+#: src/lib/libxnet/xnet.c:5498
+msgid "No data indication"
+msgstr ""
+
+#. TRANS The user called an XTI library call for a transport endpoint for which
+#. TRANS O_NONBLOCK is set, and the library call was expecting to receive a
+#. TRANS disconnect indication and no such indication was present.  If O_NONBLOCK
+#. TRANS had not been set, the call would have blocked awaiting the indication.
+#.
+#: src/lib/libxnet/xnet.c:5505
+msgid "No disconnect indication"
+msgstr ""
+
+#. TRANS The user called an XTI library call for a transport endpoint for which
+#. TRANS O_NONBLOCK is set, and the library call was expecting to receive a
+#. TRANS unit data indication and no such indication was present.  If O_NONBLOCK
+#. TRANS had not been set, the call would have blocked awaiting the indication.
+#.
+#: src/lib/libxnet/xnet.c:5512
+msgid "No unitdata error indication"
+msgstr ""
+
+#. TRANS The flags argument supplied ot the XTI library call were invalid or
+#. TRANS contained illegal information considerting the transport service or
+#. TRANS transport service provider type.
+#.
+#: src/lib/libxnet/xnet.c:5518
+msgid "Bad flags"
+msgstr ""
+
+#. TRANS The user called an XTI library call for a transport endpoint for which
+#. TRANS O_NONBLOCK is set, and the library call was expecting to receive a
+#. TRANS orederly release indication and no such indication was present.  If
+#. TRANS O_NONBLOCK had not been set, the call would have blocked awaiting the
+#. TRANS indication.
+#.
+#: src/lib/libxnet/xnet.c:5526
+msgid "No orderly release indication"
+msgstr ""
+
+#. TRANS Some XTI library calls can only be used on connection-oriented transport
+#. TRANS service providers, others only on connection-oriented transport service
+#. TRANS providers with orderly release, others only on connectionless transport
+#. TRANS service providers.  In addition, some messages exchanged with the
+#. TRANS underlying transport service provider might not be supported by that
+#. TRANS provider.  This message indications that the user has called an XTI
+#. TRANS function that is either not supported for the given transport endpoint,
+#. TRANS or that the underlying transport provider does not support the TPI
+#. TRANS primitives supplied by the XTI library.
+#.
+#: src/lib/libxnet/xnet.c:5538
+msgid "Not supported"
+msgstr ""
+
+#. TRANS Most XTI library calls require the transport endpoint state machine to
+#. TRANS be in a given state.  Due to parallel events, the transport endpoint
+#. TRANS state machine can be changing state when an XTI library function is
+#. TRANS called.  This error indicates that the transport endpoint state machine
+#. TRANS was changing state at the time that the call as generated and that the
+#. TRANS call failed for that reason.
+#.
+#: src/lib/libxnet/xnet.c:5547
+msgid "State is currently changing"
+msgstr ""
+
+#. TRANS The t_alloc() and t_free() functions take a structure type as an
+#. TRANS argument.  This error indicates that the structure type provided to
+#. TRANS these calls is either invalid or not supported by the XTI library.
+#.
+#: src/lib/libxnet/xnet.c:5553
+msgid "Structure type not supported"
+msgstr ""
+
+#. TRANS An attempt was made to open a device name (e.g. /dev/tcp) that did not
+#. TRANS correspond to a transport service provider or did not exist in the
+#. TRANS filesystem.
+#.
+#: src/lib/libxnet/xnet.c:5559
+msgid "Bad transport provider name"
+msgstr ""
+
+#. TRANS An attempt was made to listen on a stream that was bound with an number
+#. TRANS of oustanding connection indications negotiated as zero (that is, a
+#. TRANS non-listening stream).
+#.
+#: src/lib/libxnet/xnet.c:5565
+msgid "Listener queue length limit is zero"
+msgstr ""
+
+#. TRANS A supplied address used to bind a transport endpoint to a specific local
+#. TRANS address has failed because that address is in by another transport
+#. TRANS endpoint and the transport service provider or protoocol does not permit
+#. TRANS multiple transport endpoints to be bound to the same address.  The
+#. TRANS address is considered "busy".
+#.
+#: src/lib/libxnet/xnet.c:5573
+msgid "Address already in use"
+msgstr ""
+
+#. TRANS An attempt was made to initiate an outgoing transport connection on a
+#. TRANS transport endpoint that is listening, and the listening transport
+#. TRANS endpoint has outstanding transport connection indications that have not
+#. TRANS been satisfied by accepting or refusing the connection indication.
+#.
+#: src/lib/libxnet/xnet.c:5580
+msgid "Outstanding connect indications"
+msgstr ""
+
+#. TRANS A connection indication can only be accepted on a stream that
+#. TRANS corresponds to the same transport provider that generated the connection
+#. TRANS indication.  An attempt was made to accept an outstanding connection
+#. TRANS indication on an accepting stream that corresponds to a transport
+#. TRANS service provider other than the transport service provider from which
+#. TRANS the connection indication was received.
+#.
+#: src/lib/libxnet/xnet.c:5589
+msgid "Not same transport provider"
+msgstr ""
+
+#. TRANS A connection indication can only be accepted on a stream that is in the
+#. TRANS unbound or idle states.  An attempt was made to accept a connection
+#. TRANS indication on a listening stream for which outstanding connection
+#. TRANS indications exist (qlen > 0).
+#.
+#: src/lib/libxnet/xnet.c:5596
+msgid "Connection acceptor has qlen > 0"
+msgstr ""
+
+#. TRANS A connection indication can only be accepted on a stream that is in the
+#. TRANS unbound or idle states.  When in the idle state, the transport service
+#. TRANS provider may require that the accepting stream already be bound to the
+#. TRANS same transport address as that for which the connection indication was
+#. TRANS provided.
+#.
+#: src/lib/libxnet/xnet.c:5604
+msgid "Connection acceptor bound to different address"
+msgstr ""
+
+#. TRANS A listening stream can only accept the sepcific number of connection
+#. TRANS indications that was negotiated between the user and the transport
+#. TRANS service provider at the time that the stream was bound as a listening
+#. TRANS stream.  An attempt to t_listen on a listening transport endpoint which
+#. TRANS already has the maximum number of outstanding connection indications
+#. TRANS will receive this error.
+#.
+#: src/lib/libxnet/xnet.c:5613
+msgid "Connection indicator queue is full"
+msgstr ""
+
+#. TRANS A problem in synchronization between the XTI library and the underlying
+#. TRANS transport service provider was detected, or, an error for which no other
+#. TRANS explanation or error code is available was detected.  This is a
+#. TRANS catch-all error code and thus has the vague C-locale "protocol error"
+#. TRANS description.
+#.
+#: src/lib/libxnet/xnet.c:5621
+msgid "Protocol error"
+msgstr ""
+
+#. TRANS The transport service provider might return special error codes that are
+#. TRANS not known to the XTI library.  This message is used to describe all
+#. TRANS error codes not known to the XTI library.
+#.
+#: src/lib/libxnet/xnet.c:5627
+msgid "Unknown"
+msgstr ""

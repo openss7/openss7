@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:39 $
+ @(#) $RCSfile: xti_xti.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,91 +46,50 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/12 08:01:39 $ by $Author: brian $
+ Last Modified $Date: 2004/05/12 08:01:40 $ by $Author: brian $
 
- $Log: xti_mosi.h,v $
- Revision 0.9.2.1  2004/05/12 08:01:39  brian
+ $Log: xti_xti.h,v $
+ Revision 0.9.2.1  2004/05/12 08:01:40  brian
  - Added in xti library and STREAMS modules.
 
- Revision 1.1.2.1  2004/04/13 12:12:52  brian
+ Revision 1.1.2.1  2004/04/13 12:12:53  brian
  - Rearranged header files.
 
  *****************************************************************************/
 
-#ifndef _SYS_XTI_MOSI_H
-#define _SYS_XTI_MOSI_H
+#ifndef _SYS_XTI_XTI_H
+#define _SYS_XTI_XTI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: xti_xti.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-/*
-   mosi address structure 
+#ifndef t_scalar_t
+typedef int32_t t_scalar_t;
+#define t_scalar_t t_scalar_t
+#endif
+
+/* OPTIONS ON XTI LEVEL */
+
+/* 
+ *  XTI Level
  */
+#define XTI_GENERIC	0xffff
 
-struct t_mosiaddr {
-	t_uscalar_t flags;
-	t_scalar_t osi_ap_inv_id;
-	t_scalar_t osi_ae_inv_id;
-	unsigned int osi_apt_len;
-	unsigned int osi_aeq_len;
-	unsigned int osi_paddr_len;
-	unsigned char osi_addr[MAX_ADDR];
+/* 
+ *  XTI-level Options
+ */
+#define XTI_DEBUG	0x0001	/* enable debugging */
+#define XTI_LINGER	0x0080	/* linger on close if data present */
+#define XTI_RCVBUF	0x1002	/* receive buffer size */
+#define XTI_RCVLOWAT	0x1004	/* receive low-water mark */
+#define XTI_SNDBUF	0x1001	/* send buffer size */
+#define XTI_SNDLOWAT	0x1003	/* send low-water mark */
+
+/* 
+ * Structure used with linger option.
+ */
+struct t_linger {
+	t_scalar_t l_onoff;		/* option on/off */
+	t_scalar_t l_linger;		/* linger time */
 };
 
-#define T_ISO_APCO	0x0200
-#define T_ISO_APCL	0x0300
-#define T_AP_CNTX_NAME	0x1
-#define T_AP_PCL	0x2
-
-#define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthder)).
-
-/*
-   presentation context definition and result list option 
- */
-
-struct t_ap_pco_el {
-	t_scalar_t count;
-	t_scalar_t offset;
-};
-
-/*
-   presentation context item header 
- */
-
-struct t_ap_pc_item {
-	t_scalar_t pci;			/* unique odd integer */
-	t_scalar_t res;			/* result of negotiation */
-};
-
-/*
-   presentation context item element 
- */
-
-struct t_app_syn_off {
-	t_scalar_t size;		/* length of syntax object identifier contents */
-	t_scalar_t offset;		/* offset of object identifier for the syntax */
-};
-
-/*
-   values for res of a presentation context item 
- */
-
-#define T_PCL_ACCEPT		    0x0000	/* pres. context accepted */
-#define T_PCL_USER_REJ		    0x0100	/* pres. context rejected by perr application */
-#define T_PCL_PREJ_RSN_NSPEC	    0x0200	/* prov. reject: no reason specified */
-#define T_PCL_PREJ_A_SYTX_NSUP	    0x0201	/* prov. reject: abstract syntax not supported */
-#define T_PCL_PREJ_T_SYTX_NSUP	    0x0202	/* prov. reject: transfer syntax not supported */
-#define T_PCL_PREJ_LMT_DCS_EXCEED   0x0203	/* prov. reject: local limit on DCS exceeded */
-
-/*
-   reason codes for disconnection 
- */
-
-#define T_AC_U_AARE_NONE	    0x0001	/* con rej by peer user: no reason given */
-#define T_AC_C_U_AARE_ACN	    0x0002	/* con rej: application context name not supported */
-#define T_AC_U_AARE_APT		    0x0003	/* con rej: AP title not recognized */
-#define T_AC_U_AARE_AEQ		    0x0005	/* con rej: AE qualifier not recognized */
-#define T_AC_U_AARE_PEER_AUTH	    0x000e	/* con rej: authentication required */
-#define T_AC_P_ABRT_NSPEC	    0x0011	/* aborted by peer: not reason given */
-#define T_AC_P_AARE_VERSION	    0x0012	/* con rej: no common version */
-
-#endif				/* _SYS_XTI_MOSI_H */
+#endif				/* _SYS_XTI_XTI_H */

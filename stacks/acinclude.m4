@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2004/05/11 09:24:42 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.7 2004/05/12 08:01:36 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/11 09:24:42 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/12 08:01:36 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -95,7 +95,8 @@ AC_DEFUN([AC_SS7], [
     AC_SUBST([SS7_INCLUDES])
     CPPFLAGS=
     CFLAGS=
-    _SS7_STRCONF
+    _SS7_SETUP
+    _SS7_OUTPUT
 ])# AC_SS7
 # =========================================================================
 
@@ -103,17 +104,375 @@ AC_DEFUN([AC_SS7], [
 # _SS7_OPTIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_SS7_OPTIONS], [
-    AC_ARG_ENABLE([inet],
-                  AS_HELP_STRING([--enable-inet],
-                                 [enable inet package. @<:@default=no@:>@]),
-                  [enable_inet=$enableval],
-                  [enable_inet=''])
-    AC_ARG_ENABLE([sctp2],
-                  AS_HELP_STRING([--enable-sctp2],
-                                 [enable sctp2 package. @<:@default=no@:>@]),
-                  [enable_sctp2=$enableval],
-                  [enable_sctp2=''])
+    AC_ARG_WITH([tli],
+        AS_HELP_STRING([--with-tli], [include tli modules.
+            @<:@default=no@:>@]),
+        [with_tli=$enableval],
+        [with_tli=''])
+    AC_ARG_WITH([inet],
+        AS_HELP_STRING([--with-inet], [include inet package.
+            @<:@default=no@:>@]),
+        [with_inet=$enableval],
+        [with_inet=''])
+    AC_ARG_WITH([xnet],
+        AS_HELP_STRING([--with-xnet], [include xnet library.
+            @<:@default=no@:>@]),
+        [with_xnet=$enableval],
+        [with_xnet=''])
+    AC_ARG_WITH([sctp2],
+        AS_HELP_STRING([--with-sctp2], [include sctp2 package.
+            @<:@default=no@:>@]),
+        [with_sctp2=$enableval],
+        [with_sctp2=''])
 ])# _SS7_OPTIONS
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP], [
+    _SS7_CHECK_TLI
+    _SS7_CHECK_INET
+    _SS7_CHECK_XNET
+    _SS7_CHECK_SCTP2
+])# _SS7_SETUP
+# =========================================================================
+
+# =========================================================================
+# _SS7_CHECK_TLI
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_TLI], [
+    AC_CACHE_CHECK([for package usable tli modules], [ss7_cv_tli], [
+        #
+        # Check if there are usable timod or tirdwr modules.
+        #
+        ss7_cv_tli=no
+        if test -d $linux_cv_k_modules/misc -a -f $linux_cv_k_modules/misc/streams-timod.o ; then
+            if ( grep -q 'FAST STREAMS' $linux_cv_k_modules/misc/streams-timod.o ) 2>/dev/null ; then
+                ss7_cv_tli=yes
+            fi
+        fi
+    ])
+    AC_MSG_CHECKING([for package tli module addon])
+    case :"$with_tli" in
+        :yes) ss7_cv_need_tli=yes ;;
+        :no)  ss7_cv_need_tli=no ;;
+        :*) if test :"$ss7_cv_tli" = :yes
+            then ss7_cv_need_tli=no
+            else ss7_cv_need_tli=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$ss7_cv_need_tli])
+    if test :"$ss7_cv_need_tli" = :yes ; then
+        :
+        _SS7_SETUP_TLI
+    fi
+    AM_CONDITIONAL([WITH_TLI], test :"$ss7_cv_need_tli" = :yes )
+])# _SS7_CHECK_TLI
+# =========================================================================
+
+# =========================================================================
+# _SS7_CHECK_INET
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_INET], [
+    AC_CACHE_CHECK([for package usable inet driver], [ss7_cv_inet], [
+        ss7_cv_inet=no
+        if test -d $linux_cv_k_modules/misc -a -f $linux_cv_k_modules/misc/streams-inet.o ; then
+            if ( grep -q 'FAST STREAMS' $linux_cv_k_modules/misc/streams-inet.o ) 2>/dev/null ; then
+                ss7_cv_inet=yes
+            fi
+        fi
+    ])
+    AC_MSG_CHECKING([for package inet driver addon])
+    case :"$with_inet" in
+        :yes) ss7_cv_need_inet=yes ;;
+        :no)  ss7_cv_need_inet=no ;;
+        :*) if test :"$ss7_cv_inet" = :yes
+            then ss7_cv_need_inet=no
+            else ss7_cv_need_inet=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$ss7_cv_need_inet])
+    if test :"$ss7_cv_need_inet" = :yes ; then
+        :
+        _SS7_SETUP_INET
+    fi
+    AM_CONDITIONAL([WITH_INET], test :"$ss7_cv_need_inet" = :yes )
+])# _SS7_CHECK_INET
+# =========================================================================
+
+# =========================================================================
+# _SS7_CHECK_XNET
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_XNET], [
+    AC_CACHE_CHECK([for package usable xnet library], [ss7_cv_xnet], [
+        ss7_cv_xnet="$ac_cv_lib_xnet_t_open"
+    ])
+    AC_MSG_CHECKING([for package xnet library addon])
+    case :"$with_xnet" in
+        :yes) ss7_cv_need_xnet=yes ;;
+        :no)  ss7_cv_need_xnet=no ;;
+        :*) if test :"$ss7_cv_xnet" = :yes
+            then ss7_cv_need_xnet=no
+            else ss7_cv_need_xnet=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$ss7_cv_need_xnet])
+    if test :"$ss7_cv_need_xnet" = :yes ; then
+        :
+        _SS7_SETUP_XNET
+    fi
+    AM_CONDITIONAL([WITH_XNET], test :"$ss7_cv_need_xnet" = :yes )
+])# _SS7_CHECK_XNET
+# =========================================================================
+
+# =========================================================================
+# _SS7_CHECK_SCTP2
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_SCTP2], [
+    AC_MSG_CHECKING([for package sctp version 2])
+    if test :"${with_sctp2:-no}" != :no ; then
+        AC_MSG_RESULT([yes])
+        _SS7_SETUP_SCTP2
+    else
+        AC_MSG_RESULT([no])
+    fi
+    AM_CONDITIONAL([WITH_SCTP2], test :"${with_sctp2:-no}" != :no )
+])# _SS7_CHECK_SCTP2
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_TLI
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_TLI], [
+])# _SS7_SETUP_TLI
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_INET
+# -------------------------------------------------------------------------
+# tcp_openreq_cachep            <-- extern, declared in <net/tcp.h>
+# tcp_set_keepalive             <-- extern, declared in <net/tcp.h>
+# ip_tos2prio                   <-- extern, declared in <net/route.h>
+# sysctl_rmem_default           <-- extern, declared in net/core/sock.c
+# sysctl_wmem_default           <-- extern, declared in net/core/sock.c
+# sysctl_tcp_fin_timeout        <-- extern, declared in net/ipv4/tcp.c
+# -----------------------------------------------------------------------------
+# New ones: (All only exported with IPv6 as module.)
+# tcp_sync_mss                  <-- extern, declared in <net/tcp.h>
+# tcp_write_xmit                <-- extern, declared in <net/tcp.h>
+# tcp_cwnd_application_limited  <-- extern, declared in <net/tcp.h>
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_INET], [
+    AC_CACHE_CHECK([for package OpenSS7 Kernel SCTP], [ss7_cv_openss7_sctp], [
+        _LINUX_KERNEL_ENV([
+            AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/sctp.h>
+#ifdef SCTPCB_FLAG_CONF
+    yes_we_have_openss7_kernel_sctp
+#endif
+            ], [ss7_cv_openss7_sctp=yes], [ss7_cv_openss7_sctp=no])
+        ])
+    ])
+    if test :"${ss7_cv_openss7_sctp:-no}" = :yes ; then
+        AC_DEFINE([HAVE_OPENSS7_SCTP], [1],
+            [Define if your kernel supports the OpenSS7 Linux Kernel Sockets SCTP patches.  This
+            enables support in the INET driver for STREAMS on top of the OpenSS7 Linux Kernel
+            Sockets SCTP implementation.])
+    fi
+    AC_CACHE_CHECK([for symbol usable tcp_openreq_cachep address], [ss7_cv_tcp_openreq_cachep_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_tcp_openreq_cachep_addr=`($EGREP '\<tcp_openreq_cachep' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_tcp_openreq_cachep_addr="${ss7_cv_tcp_openreq_cachep_addr:+0x}$ss7_cv_tcp_openreq_cachep_addr"
+            ss7_cv_tcp_openreq_cachep_addr="${ss7_cv_tcp_openreq_cachep_addr:-no}"
+    ])
+    if test :${ss7_cv_tcp_openreq_cachep_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_TCP_OPENREQ_CACHEP_ADDR], [$ss7_cv_tcp_openreq_cachep_addr],
+            [The symbol tcp_openreq_cachep is not exported by most kernels.  Define this to the
+            address of tcp_openreq_cachep in the kernel system map so that the inet driver can be
+            properly supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable tcp_set_keepalive address], [ss7_cv_tcp_set_keepalive_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_tcp_set_keepalive_addr=`($EGREP '\<tcp_set_keepalive' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_tcp_set_keepalive_addr="${ss7_cv_tcp_set_keepalive_addr:+0x}$ss7_cv_tcp_set_keepalive_addr"
+            ss7_cv_tcp_set_keepalive_addr="${ss7_cv_tcp_set_keepalive_addr:-no}"
+    ])
+    if test :${ss7_cv_tcp_set_keepalive_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_TCP_SET_KEEPALIVE_ADDR], [$ss7_cv_tcp_set_keepalive_addr],
+            [The symbol tcp_set_keepalive is not exported by most kernels.  Define this to the
+            address of tcp_set_keepalive in the kernel system map so that the inet driver can be
+            properly supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable ip_tos2prio address], [ss7_cv_ip_tos2prio_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_ip_tos2prio_addr=`($EGREP '\<ip_tos2prio' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_ip_tos2prio_addr="${ss7_cv_ip_tos2prio_addr:+0x}$ss7_cv_ip_tos2prio_addr"
+            ss7_cv_ip_tos2prio_addr="${ss7_cv_ip_tos2prio_addr:-no}"
+    ])
+    if test :${ss7_cv_ip_tos2prio_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_IP_TOS2PRIO_ADDR], [$ss7_cv_ip_tos2prio_addr],
+            [The symbol ip_tos2prio is not exported by most kernels.  Define this to the address of
+            ip_tos2prio in the kernel system map so that the inet driver can be properly
+            supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable sysctl_rmem_default address], [ss7_cv_sysctl_rmem_default_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_sysctl_rmem_default_addr=`($EGREP '\<sysctl_rmem_default' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_sysctl_rmem_default_addr="${ss7_cv_sysctl_rmem_default_addr:+0x}$ss7_cv_sysctl_rmem_default_addr"
+            ss7_cv_sysctl_rmem_default_addr="${ss7_cv_sysctl_rmem_default_addr:-no}"
+    ])
+    if test :${ss7_cv_sysctl_rmem_default_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_RMEM_DEFAULT_ADDR], [$ss7_cv_sysctl_rmem_default_addr],
+            [The symbol sysctl_rmem_default is not exported by most kernels.  Define this to the
+            address of sysctl_rmem_default in the kernel system map so that the inet driver can be
+            properly supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable sysctl_wmem_default address], [ss7_cv_sysctl_wmem_default_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_sysctl_wmem_default_addr=`($EGREP '\<sysctl_wmem_default' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_sysctl_wmem_default_addr="${ss7_cv_sysctl_wmem_default_addr:+0x}$ss7_cv_sysctl_wmem_default_addr"
+            ss7_cv_sysctl_wmem_default_addr="${ss7_cv_sysctl_wmem_default_addr:-no}"
+    ])
+    if test :${ss7_cv_sysctl_wmem_default_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_WMEM_DEFAULT_ADDR], [$ss7_cv_sysctl_wmem_default_addr],
+            [The symbol sysctl_wmem_default is not exported by most kernels.  Define this to the
+            address of sysctl_wmem_default in the kernel system map so that the inet driver can be
+            properly supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable sysctl_tcp_fin_timeout address], [ss7_cv_sysctl_tcp_fin_timeout_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_sysctl_tcp_fin_timeout_addr=`($EGREP '\<sysctl_tcp_fin_timeout' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_sysctl_tcp_fin_timeout_addr="${ss7_cv_sysctl_tcp_fin_timeout_addr:+0x}$ss7_cv_sysctl_tcp_fin_timeout_addr"
+            ss7_cv_sysctl_tcp_fin_timeout_addr="${ss7_cv_sysctl_tcp_fin_timeout_addr:-no}"
+    ])
+    if test :${ss7_cv_sysctl_tcp_fin_timeout_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR], [$ss7_cv_sysctl_tcp_fin_timeout_addr],
+            [The symbol sysctl_tcp_fin_timeout is not exported by most kernels.  Define this to the
+            address of sysctl_tcp_fin_timeout in the kernel system map so that the inet driver can
+            be properly supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable tcp_sync_mss address], [ss7_cv_tcp_sync_mss_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_tcp_sync_mss_addr=`($EGREP '\<tcp_sync_mss' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_tcp_sync_mss_addr="${ss7_cv_tcp_sync_mss_addr:+0x}$ss7_cv_tcp_sync_mss_addr"
+            ss7_cv_tcp_sync_mss_addr="${ss7_cv_tcp_sync_mss_addr:-no}"
+    ])
+    if test :${ss7_cv_tcp_sync_mss_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_TCP_SYNC_MSS_ADDR], [$ss7_cv_tcp_sync_mss_addr],
+            [The symbol tcp_sync_mss is not exported by most kernels.  Define this to the address of
+            tcp_sync_mss in the kernel system map so that the inet driver can be properly
+            supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable tcp_write_xmit address], [ss7_cv_tcp_write_xmit_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_tcp_write_xmit_addr=`($EGREP '\<tcp_write_xmit' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_tcp_write_xmit_addr="${ss7_cv_tcp_write_xmit_addr:+0x}$ss7_cv_tcp_write_xmit_addr"
+            ss7_cv_tcp_write_xmit_addr="${ss7_cv_tcp_write_xmit_addr:-no}"
+    ])
+    if test :${ss7_cv_tcp_write_xmit_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_TCP_WRITE_XMIT_ADDR], [$ss7_cv_tcp_write_xmit_addr],
+            [The symbol tcp_write_xmit is not exported by most kernels.  Define this to the address
+            of tcp_write_xmit in the kernel system map so that the inet driver can be properly
+            supported.])
+    fi
+    AC_CACHE_CHECK([for symbol usable tcp_cwnd_application_limited address],
+            [ss7_cv_tcp_cwnd_application_limited_addr], [
+            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+                ss7_cv_tcp_cwnd_application_limited_addr=`($EGREP '\<tcp_cwnd_application_limited' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            fi
+            ss7_cv_tcp_cwnd_application_limited_addr="${ss7_cv_tcp_cwnd_application_limited_addr:+0x}$ss7_cv_tcp_cwnd_application_limited_addr"
+            ss7_cv_tcp_cwnd_application_limited_addr="${ss7_cv_tcp_cwnd_application_limited_addr:-no}"
+    ])
+    if test :${ss7_cv_tcp_cwnd_application_limited_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR], [$ss7_cv_tcp_cwnd_application_limited_addr],
+            [The symbol tcp_cwnd_application_limited is not exported by most kernels.  Define this
+            to the address of tcp_cwnd_application_limited in the kernel system map so that the inet
+            driver can be properly supported.])
+    fi
+    _LINUX_KERNEL_ENV([
+        AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
+            [ss7_cv_af_inet_ttl_member_name='ttl'],
+            [:],
+            [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+            ])
+        AC_CHECK_MEMBER([struct sock.protinfo.af_inet.uc_ttl],
+            [ss7_cv_af_inet_ttl_member_name='uc_ttl'],
+            [:],
+            [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+            ])
+        ])
+    if test :"${ss7_cv_af_inet_ttl_member_name:+set}" = :set ; then
+        AC_DEFINE_UNQUOTED([USING_AF_INET_TTL_MEMBER_NAME], [$ss7_cv_af_inet_ttl_member_name],
+            [Most kernels call the time-to-live member of the af_inet structure ttl.  For some
+            reason (probably because the old ttl member as 'int' and the new uc_ttl member is
+            'unsigned char') reported by Bala Viswanathan <balav@lsil.com> to the linux-streams
+            mailing list, EL3 renames the member to uc_ttl on some kernels.  Define this to the
+            member name used (ttl or uc_ttl) so that the inet driver can be properly supported.  If
+            this is not defined, 'ttl' will be used as a default.])
+    else
+        AC_MSG_WARN([
+***
+*** You have really mangled kernel header files with regards to the 'sock'
+*** structure.  The 'sock' structure on Linux 2.4 should have an af_inet.ttl
+*** member (used in stock kernels) or an af_inet.uc_ttl member (used on some RH
+*** kernels).  Your kernel headers are so bad that <net/sock.h> has neither
+*** member defined.  Winging it with 'ttl' as the member name.
+***
+        ])
+    fi
+])# _SS7_SETUP_INET
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_XNET
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_XNET], [
+])# _SS7_SETUP_XNET
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_SCTP2
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_SCTP2], [
+])# _SS7_SETUP_SCTP2
+# =========================================================================
+
+# =========================================================================
+# _SS7_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_OUTPUT], [
+    _SS7_STRCONF
+])# _SS7_OUTPUT
 # =========================================================================
 
 # =========================================================================

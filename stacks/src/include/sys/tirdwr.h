@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:40 $
+ @(#) $Id: tirdwr.h,v 0.9.2.1 2004/05/12 08:01:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; either version 2.1 of the License, or (at your option)
- any later version.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/12 08:01:40 $ by $Author: brian $
-
- $Log: xti_udp.h,v $
- Revision 0.9.2.1  2004/05/12 08:01:40  brian
- - Added in xti library and STREAMS modules.
-
- Revision 1.1.2.1  2004/04/13 12:12:52  brian
- - Rearranged header files.
+ Last Modified $Date: 2004/05/12 08:01:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _SYS_XTI_UDP_H
-#define _SYS_XTI_UDP_H
+#ifndef _SYS_TIRDWR_H
+#define _SYS_TIRDWR_H
 
-#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:39 $"
 
-/* 
- * UDP level
- */
-#define T_INET_UDP		17	/* UDP level (same as protocol number) */
+#if !defined _TIRDWR_H && !defined __KERNEL__
+#error ****
+#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
+#error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <tirdwr.h>
+#error **** INSTEAD OF <sys/tirdwr.h>.
+#error ****
+#endif				/* !defined _TIRDWR_H && !defined __KERNEL__ */
 
-/* 
- * UDP level Options
- */
-#define T_UDP_CHECKSUM		1	/* checksum computation (???) */
+/* No definitions.  Nevertheless, this header file should exist to indicate the existence of
+   support for the tirdwr(4) module. */
 
-#endif				/* _SYS_XTI_UDP_H */
-
+#endif				/* _SYS_TIRDWR_H */
