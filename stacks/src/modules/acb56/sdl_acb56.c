@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:09:58 $
+ @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/27 02:18:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:09:58 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 02:18:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:09:58 $"
+#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/27 02:18:35 $"
 
-static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:09:58 $";
+static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/27 02:18:35 $";
 
 /*
  *  This is an implementation of the Signalling Data Link for the SeaLevel
@@ -140,13 +140,13 @@ int acb56_debug = 2;
 #define LSSU_SIB 0x5
 #endif
 
-static int debug = -1;
-static int io[] = { -1, -1, -1, -1, -1 };
-static int irq[] = { -1, -1, -1, -1, -1 };
-static int dma_rx[] = { -1, -1, -1, -1, -1 };
-static int dma_tx[] = { -1, -1, -1, -1, -1 };
-static int mode[] = { -1, -1, -1, -1, -1 };
-static int clock[] = { -1, -1, -1, -1, -1 };
+int debug = -1;
+int io[] = { -1, -1, -1, -1, -1 };
+int irq[] = { -1, -1, -1, -1, -1 };
+int dma_rx[] = { -1, -1, -1, -1, -1 };
+int dma_tx[] = { -1, -1, -1, -1, -1 };
+int mode[] = { -1, -1, -1, -1, -1 };
+int clock[] = { -1, -1, -1, -1, -1 };
 
 MODULE_PARM(debug, "i");	/* debug flag */
 MODULE_PARM(io, "1-5i");	/* i/o port for the i'th card */
