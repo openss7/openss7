@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/06 12:43:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/07 08:38:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/06 12:43:08 $ by $Author: brian $
+# Last Modified $Date: 2004/04/07 08:38:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,13 +71,13 @@ EXTRA_PROGRAMS			= \
 				  test-xnet_thr
 
 sbin_PROGRAMS			= \
-				  xnetmakenodes
+				  @PACKAGE_TARNAME@_mknod
 
-xnetmakenodes_SOURCES		= xnetmakenodes.c
-xnetmakenodes_DEPENDENCIES	= strconf.h
-xnetmakenodes_LDDADD		=
-xnetmakenodes_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-xnetmakenodes_CFLAGS		= @USER_CFLAGS@
+@PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+@PACKAGE_TARNAME@_mknod_CFLAGS		= @USER_CFLAGS@
 
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
 test_inet_raw_LDFLAGS		= -lLiS
@@ -179,13 +179,13 @@ EXTRA_PROGRAMS			= \
 				  test-xnet_thr
 
 sbin_PROGRAMS			= \
-				  xnetmakenodes
+				  @PACKAGE_TARNAME@_mknod
 
-xnetmakenodes_SOURCES		= xnetmakenodes.c
-xnetmakenodes_DEPENDENCIES	= strconf.h
-xnetmakenodes_LDDADD		=
-xnetmakenodes_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-xnetmakenodes_CFLAGS		= @USER_CFLAGS@
+@PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+@PACKAGE_TARNAME@_mknod_CFLAGS		= @USER_CFLAGS@
 
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
 test_inet_raw_LDFLAGS		= -lLiS
@@ -271,10 +271,10 @@ endif
 include am/libraries.am
 
 KERNEL_MODCONF			= conf.modules
-KERNEL_SUBDIR			= xnet
-KMODCONF_EXT			= xnet
+KERNEL_SUBDIR			= @PACKAGE_TARNAME@
+KMODCONF_EXT			= @PACKAGE_TARNAME@
 
-MANMACRO_PFX			= strxnet
+MANMACRO_PFX			= @PACKAGE_TARNAME@
 mansrcdir			= $(srcdir)/doc/man
 
 include am/kernel.am
@@ -1028,7 +1028,7 @@ uninstall-nobase_includeHEADERS:
 
 STRCONF_SCRIPT	    = $(auxdir)/strconf-sh
 STRCONF		    = $(SHELL) $(STRCONF_SCRIPT) -b190
-STRMAKENODES	    = xnetmakenodes
+STRMAKENODES	    = @PACKAGE_TARNAME@_mknod
 
 Config.master: $(strconf_FILES)
 	cat /dev/null > Config.master
@@ -1047,11 +1047,11 @@ strconf.h: Config.master $(STRCONF_SCRIPT)
 devices.lst: Config.master $(STRCONF_SCRIPT)
 	$(STRCONF) --strmknods=devices.lst Config.master
 
-xnetmakenodes.c: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --makenodes=xnetmakenodes.c Config.master
+@PACKAGE_TARNAME@_mknod.c: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --makenodes=@PACKAGE_TARNAME@_mknod.c Config.master
 
 clean-config:
-	rm -f Config.master conf.modules strconf.h devices.lst xnetmakenodes.c
+	rm -f Config.master conf.modules strconf.h devices.lst @PACKAGE_TARNAME@_mknod.c
 
 .PHONY: clean-config
 
@@ -1061,10 +1061,10 @@ $(libXNETmods_a_OBJECTS): strconf.h
 $(libXNETdrvs_a_OBJECTS): strconf.h
 
 install-devices: $(STRMAKENODES)
-	$(STRMAKENODES)
+	./$(STRMAKENODES)
 
 uninstall-devices: $(STRMAKENODES)
-	$(STRMAKENODES) --remove
+	./$(STRMAKENODES) --remove
 
 all-am: conf.modules strconf.h devices.lst
 
@@ -1073,11 +1073,11 @@ xnet_source_FILES		= $(mods_source_FILES) $(drvs_source_FILES)
 EXTRA_DOCS = 
 
 EXTRA_DIST = \
-	strxnet.spec \
+	@PACKAGE_TARNAME@.spec \
 	openss7-logo-small.gif \
 	$(noinst_man_MANS) \
-	doc/man/strxnet.macros \
-	doc/man/strxnet.refs \
+	doc/man/@PACKAGE_TARNAME@.macros \
+	doc/man/@PACKAGE_TARNAME@.refs \
 	$(strconf_FILES) \
 	$(xnet_source_FILES) \
 	$(EXTRA_DOCS)
