@@ -1,0 +1,295 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: RW_RDLOCK.9.man,v 0.9.2.3 2004/03/17 12:35:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/17 12:35:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH RW_RDLOCK 9 "$Date: 2004/03/17 12:35:16 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B RW_RDLOCK
+\- acquire a read/write lock in read mode
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/ksynch.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "pl_t RW_RDLOCK(rwlock_t *" lockp ", pl_t " pl );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I lockp
+A pointer to the read/write lock to acquire in read mode.
+.TP
+.I pl
+A priority level to set if required before attempting to acquire the lock.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR RW_ALLOC (9),
+.BR RW_DEALLOC (9),
+.BR RW_RDLOCK (),
+.BR RW_WRLOCK (9),
+.BR RW_TRYRDLOCK (9),
+.BR RW_TRYWRLOCK (9)
+and
+.BR RW_UNLOCK (9)
+are a set of primitive functions for allocating, deallocating, read locking,
+write locking, read lock attempt, write lock attempt and unlocking a
+read/write lock of type
+.BR rwlock_t .
+.PP
+.BR RW_RDLOCK ()
+sets the priority level specified by the
+.I pl
+argument using
+.BR spl (9)
+and then acquires the read/write lock specified by the
+.I lockp
+argument in read mode.
+If the lock cannot be acquired immediately, the calling processor will spin
+(or block) waiting for the lock to be released.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR RW_RDLOCK ()
+returns the priority level that was prevailing at the time that
+.BR RW_RDLOCK ()
+was called.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR RW_RDLOCK ()
+is always successful.  If
+.BR RW_RDLOCK ()
+is called with invalid or uninitialized arguments, the results will be
+indeterminate.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR RW_RDLOCK ()
+can be called from any context.
+.PP
+It is not necessary to raise the priority level using the
+.I pl
+argument if there is never an attempt to take a read lock on
+.I lockp
+from interrupt service routine context.
+.PP
+When called from interrupt service routine context, the caller must not lower
+the prevailing priority level with the
+.I pl
+argument.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR RW_RDLOCK ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Read/write locks of type
+.BR rwlock_t
+are not fully recursive.  Calling
+.BR RW_RDLOCK ()
+for a read/write lock that has been locked for write by the calling processor with
+.BR RW_WRLOCK ()
+will result in single party deadlock.
+.PP
+.BR RW_RDLOCK ()
+is a
+.IR "SVR 4.2" -specific
+function:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR RW_RDLOCK ()
+is implemented by calling
+.BR spl (9)
+with the
+.I pl
+argument and then taking a read lock on the
+.I lockp
+using
+.BR read_lock (9).
+The old interrupt priority level returned from
+.BR spl (9)
+is returned to the caller.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR RW_ALLOC (9),
+.BR RW_DEALLOC (9),
+.\".BR RW_RDLOCK (9),
+.BR RW_TRYRDLOCK (9),
+.BR RW_TRYWRLOCK (9),
+.BR RW_UNLOCK (9),
+.BR RW_WRLOCK (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR RW_RDLOCK ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR RW_RDLOCK ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR RW_RDLOCK ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.IR Linux \(rg.
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR RW_RDLOCK ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR RW_RDLOCK ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for more compatbility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR RW_RDLOCK ()
+first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
