@@ -1,1 +1,1 @@
-.so readv.2.man
+.so readv.2s.man

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/01/18 01:01:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/01/18 20:24:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 01:01:56 $ by $Author: brian $
+# Last Modified $Date: 2005/01/18 20:24:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,9 +75,9 @@ sbin_PROGRAMS			= \
 				@PACKAGE_TARNAME@_mknod
 
 dist_sbin_SCRIPTS		= \
-				$(srcdir)/src/util/strclean \
-				$(srcdir)/src/util/strload \
-				$(srcdir)/src/util/strsetup
+				src/util/strclean \
+				src/util/strload \
+				src/util/strsetup
 
 libexec_PROGRAMS		= \
 				test-clone \
