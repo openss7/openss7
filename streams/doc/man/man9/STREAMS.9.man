@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.2 2004/03/10 08:45:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/10 08:45:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STREAMS 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -794,15 +794,39 @@ internal functions listed below:
 .PP
 .PD 0
 .HP
+.BR ddi_create_minor_node "(9)\ \-\ 
+.HP
+.BR ddi_driver_major "(9)\ \-\ 
+.HP
+.BR ddi_driver_name "(9)\ \-\ 
+.HP
 .BR ddi_get_cred "(9)\ \-\ 
 .HP
 .BR ddi_getiminor "(9)\ \-\ 
+.HP
+.BR ddi_get_instance "(9)\ \-\ 
 .HP
 .BR ddi_get_lbolt "(9)\ \-\ 
 .HP
 .BR ddi_get_pid "(9)\ \-\ 
 .HP
+.BR ddi_get_soft_state "(9)\ \-\ 
+.HP
 .BR ddi_get_time "(9)\ \-\ 
+.HP
+.BR ddi_remove_minor_node "(9)\ \-\ 
+.HP
+.BR ddi_removing_power "(9)\ \-\ 
+.HP
+.BR ddi_soft_state "(9)\ \-\ 
+.HP
+.BR ddi_soft_state_fini "(9)\ \-\ 
+.HP
+.BR ddi_soft_state_free "(9)\ \-\ 
+.HP
+.BR ddi_soft_state_init "(9)\ \-\ 
+.HP
+.BR ddi_soft_state_zalloc "(9)\ \-\ 
 .HP
 .BR ddi_umem_alloc "(9)\ \-\ 
 .HP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_soft_state_zalloc.9.man,v 0.9.2.1 2004/03/10 08:45:54 brian Exp $
+.\" @(#) $Id: mod_remove.9.man,v 0.9 2004/03/10 08:45:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -71,55 +71,65 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_SOFT_STATE_ZALLOC 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MOD_REMOVE 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B ddi_soft_state_zalloc
-\-
+.B mod_remove
+\- removes a loadable kernel module from the \fISTREAMS\fR executive
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .B #define _SUN_SOURCE
 .br
-.B #include <sys/ddi.h>
-.br
-.B #include <sys/sunddi.h>
+.B #include <sys/modctl.h>
 .HP
-int \fBddi_soft_state_zalloc\fR(int \fIyyy\fR);
+int \fBmod_remove\fR(struct modlinkage *\fImodlinkage\fR);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I yyy
+.I modlinkage
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
+must be called from a module
+.BR _fini (9)
+routine.
+The same
+.I modlinkage
+structure as was referenced in the
+.BR mod_install (9)
+call from
+.BR _init (9)
+must be referenced in the
+.BR mod_remove ()
+call in
+.BR _fini (9).
 .\"
 .\"
 .SH RETURN
 .PP
 When
-.BR ddi_soft_state_zalloc ()
-succeeds, it returns 
-.BR DDI_SUCCESS ;
+.BR mod_remove ()
+succeeds, it returns zero (0);
 when it fails, it returns
-.BR DDI_FAILURE .
+non-zero.
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 fails when 
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 can be called from
 .\"
 .\"
@@ -129,7 +139,7 @@ can be called from
 .\"
 .SH NOTICES
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 is a
 .IR Solaris \(rg-specific
 function:
@@ -141,20 +151,54 @@ must also have been compiled with
 defined.
 .\"
 .\"
+.SH EXAMPLE
+.PP
+Following is an example of the canonical
+.BR _fini (9)
+function using
+.BR mod_remove ():
+.RS
+.nf
+\fC\s-1
+int
+_fini(void)
+{
+        int result;
+
+        result = mod_remove(&xxx_modlinkage);
+        if (result != 0) {
+                return (result);
+        }
+
+        ddi_soft_state_fini(&xxx_statep);
+
+        return (0);
+}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR mod_install (9),
+.BR mod_info (9),
+.BR _init (9),
+.BR _info (9),
+.BR _fini (9),
+.BR ddi_soft_state_fini (9),
 .BR suncompat (9).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 is compatible with
 .IR Solaris \(rg
 with the following portablity considerations:
@@ -162,7 +206,7 @@ with the following portablity considerations:
 .IP \(em
 .IP \(em
 .IP \(em
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 is provided for source level compatibility with
 .IR Solaris \(rg
 for the purpose of porting
@@ -178,14 +222,14 @@ differ from that of
 .IR Solaris \(rg,
 binaries are incompatible.
 .IP \(em
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 only provides functionality comparable to
 .IR Solaris \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -202,7 +246,7 @@ soldoc
 .\"
 .SH HISTORY
 .PP
-.BR ddi_soft_state_zalloc ()
+.BR mod_remove ()
 first appeared in
 .IR Solaris \(rg
 2.5.

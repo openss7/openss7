@@ -1,0 +1,347 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.1 2004/03/10 08:45:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/10 08:45:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B ddi_create_minor_node
+\- create a minor node for this device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/stat.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+int \fBddi_create_minor_node(\fRdev_info_t *\fIdip\fR, char *\fIname\fR, int
+\fItype\fR, minor_t \fIminor\fR, char *\fInode\fR, int
+\fIflag\fB);\fR
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I dip
+A pointer to the device's
+.B dev_info
+structure.
+.TP
+.I name
+The name to assign to the minor device node.
+.TP
+.I type
+The type of device.  This can be one of the following:
+.RS
+.TP
+.B S_IFCHR
+Character minor device.
+.TP
+.B S_IFBLK
+Block minor device.
+(Block devices are not supported by
+.BR "Linux Fast-STREAMS" .)
+.[
+lfs
+.]
+.RE
+.TP
+.I minor
+The minor number for this minor device.
+.TP
+.I node
+A string that uniquely identifies the type of node.  (Only
+.I STREAMS
+devices are supported by
+.BR "Linux Fast-STREAMS" .)
+.[
+lfs
+.]
+.RS
+.TP
+.B DDI_PSEUDO
+A pseudo device.
+.RE
+.TP
+.I flag
+If the device is a clone device then this flag is set to
+.B CLONE_DEV
+else it is set to
+.BR 0 .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR ddi_create_minor_node ()
+provides the necessary information to enable the system to created the
+.B /dev
+and
+.B /dev/streams
+directory.  The name is used to create the minor name of a
+.I STREAMS
+character special file under the
+.B /dev/streams
+directory.  At-sign
+.RI ( @ ),
+slash
+.RI ( / ),
+and space re not allowed.  The
+.I type
+argument specifies whether this is a block or character device.  The
+.I minor
+argument is the minor number for the device.  The
+.I node
+argument is used to create the names in the
+.B /dev
+directory that refers to the names in the
+.B /dev/streams
+directory.
+The
+.I flag
+argument determines if this is a clone device or not, and to which device class
+the node belongs.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR ddi_create_minor_node ()
+succeeds, it returns 
+.BR DDI_SUCCESS ;
+when it fails, it returns
+.BR DDI_FAILURE .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR ddi_create_minor_node ()
+fails when there is no available memory to create the minor device data
+structures for this device node.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR ddi_create_minor_node ()
+can only be called from User Context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR ddi_create_minor_node ()
+is a
+.IR Solaris \(rg-specific
+function:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+defined.
+.PP
+.BR ddi_create_minor_node ()
+creates a minor node in the shadow special device file system.  Symbolic links
+should be created from the
+.B /dev
+file system to the shadow special device file system, normally mounted on
+.BR /dev/streams .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.RS
+.nf
+\fC\s-1
+ddi_create_minor_node(dip, "nuls", S_IFCHR, 0, DDI_PSEUDO, CLONE_DEV);
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR attach (9),
+.BR detach (9),
+.BR ddi_remove_minor_node (9),
+.BR mknod (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ddi_create_minor_node ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ddi_create_minor_node ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.IR Linux \(rg.
+Because the
+.B dev_info
+structure for
+.B Lnux Fast-STREAMS
+.[
+lfs
+.]
+differs from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.PP
+.BR ddi_create_minor_node ()
+is compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em
+.BR ddi_create_minor_node ()
+does not recognize any flags other than
+.B CLONE_DEV
+or
+.BR 0 .
+.IP \(em
+.BR ddi_create_minor_node ()
+cannot create minor nodes for block devices and will fail if passed the
+.B S_IFBLK
+type.
+.IP \(em
+.BR ddi_create_minor_node ()
+ignores the string passed in the
+.I node
+argument.
+.IP \(em
+.BR ddi_create_minor_node ()
+does not (necessarily) create devices in a
+.B /devices
+directory.  Devices appear wherever the shadow special device file system is
+mounted, normally,
+.BR /dev/streams .
+.IP ""
+If the shadow special device file system is mounted, a symbolic link is created
+from the
+.B /dev
+directory into the
+.B /dev/streams
+directory at the correct location.
+If the shadow special device file system is not mounted, the function performs
+a
+.BR mknod (2)
+in-kernel system call to create the device in the
+.B /dev
+directory.
+.IP ""
+This difference in behaviour should not cause compatibility problems because
+device nodes are referenced from within the
+.B /dev
+directory as usual.
+.IP \(em
+.BR ddi_create_minor_node ()
+does not support any of the clustering considerations provided by
+.IR Solaris \(rg.
+.IP ""
+.IR Linux \(rg
+is alway treated as a non-clustered system.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Solaris \(rg
+SUNDDI documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ddi_create_minor_node ()
+first appeared in
+.IR Solaris \(rg
+2.5.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

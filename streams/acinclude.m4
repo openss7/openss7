@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.8 2004/03/09 22:55:18 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.9 2004/03/10 08:46:30 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/09 22:55:18 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/10 08:46:30 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -220,6 +220,14 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [
             AC_DEFINE_UNQUOTED([_NONE], [], [Define for maximum performance
             and minimum size.  This has the effect of disabling all safety
             debugging macros.])
+            ;;
+    esac
+    case "$lfs_cv_debug" in
+        _DEBUG | _TEST)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to peform
+            internal structure tracking within the STREAMS executive as well
+            as to provide additional /proc filesystem files for examining
+            internal structures.]
             ;;
     esac
 ])# _LFS_SETUP_DEBUG
