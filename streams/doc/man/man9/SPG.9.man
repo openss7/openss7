@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.5 2004/04/18 21:37:40 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.6 2004/06/04 17:34:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/18 21:37:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/06/04 17:34:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SPG 9 "$Date: 2004/04/18 21:37:40 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
+.TH SPG 9 "$Date: 2004/06/04 17:34:33 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
 .\"
 .\"
 .SH NAME
@@ -412,28 +412,54 @@ by user applications.
 .PP
 A number of adminstrative utilities are provided that assist with the
 assignment of device names and numbers and are useful in boot scripts:
-.TS
-expand tab(:);
-lclssss.
-\fBautopush\fR(8):\-:T{
-verify modules and establish autopush lists
-T}
-\fBinsf\fR(8):\-:T{
-install special device files
-T}
-\fBscls\fR(8):\-:T{
-list STREAMS drivers
-T}
-\fBstrinfo\fR(8):\-:T{
-provide information on STREAMS drivers and modules
-T}
-\fBstrload\fR(8):\-:T{
-load or unload STREAMS drivers and modules
-T}
-\fBstrsetup\fR(8):\- :T{
-create STREAMS devices
-T}
-.TE
+.\".TS
+.\"expand tab(:);
+.\"lclssss.
+.\"\fBautopush\fR(8):\-:T{
+.\"verify modules and establish autopush lists
+.\"T}
+.\"\fBinsf\fR(8):\-:T{
+.\"install special device files
+.\"T}
+.\"\fBscls\fR(8):\-:T{
+.\"list STREAMS drivers
+.\"T}
+.\"\fBstrinfo\fR(8):\-:T{
+.\"provide information on STREAMS drivers and modules
+.\"T}
+.\"\fBstrload\fR(8):\-:T{
+.\"load or unload STREAMS drivers and modules
+.\"T}
+.\"\fBstrsetup\fR(8):\- :T{
+.\"create STREAMS devices
+.\"T}
+.\".TE
+.TP \w'strsetup(8)\(em'u
+.BR autopush (8)
+\-\ verify modules and establish autopush lists
+.PD 0
+.TP
+.BR insf (8)
+\-\ install special device files
+.TP
+.BR scls (8)
+\-\ list
+.I STREAMS
+drivers
+.TP
+.BR strinfo (8)
+\-\ provide information on
+.I STREAMS
+drivers and modules
+.TP
+.BR strload (8)
+\-\ load or unload STREAMS drivers and modules
+.TP
+.BR strsetup (8)
+\-\ create
+.I STREAMS
+devices
+.PD
 .PP
 Another approach to establishment of dynamically allocated major device
 numbers is to use the
@@ -601,7 +627,7 @@ The
 .BR nsdev (4)
 driver provides for a Named STREAMS device.  This is a device numbering
 approach unique to
-.BR Linux Fast-STREAMS .
+.BR "Linux Fast-STREAMS" .
 The
 .BR nsdev (4)
 driver operates similar to the
@@ -614,7 +640,7 @@ device.
 The following table summarizes the approach (assuming that the major device
 numbers assigned to the
 .BR nsdev (4)
-device are 74, 75, 76 and 77 and the major device numbers assigne to the
+device are 74, 75, 76 and 77 and the major device numbers assigned to the
 .BR inet (4)
 driver are 32, 35 and 37):
 .PP
@@ -627,8 +653,9 @@ nsdev;external;internal;sflag
 lc|c|c|c.
 _
 inet;74:000;32:000;32:000;DRVOPEN
-inet99;74:099;32:099;32:099;DRVOPEN
-inet512;76:000;37:000;32:512;DRVOPEN
+inet.udp;74:017;32:017;32:017;DRVOPEN
+inet.99;74:099;32:099;32:099;DRVOPEN
+inet.512;76:000;37:000;32:512;DRVOPEN
 _
 .TE
 .PP
@@ -646,12 +673,12 @@ kernel module using
 .BR request_module (9)
 and try again: where,
 .I prefix
-is the prefix of the device name up to the first character corresponding to a
-digit (0-9).
+is the prefix of the device name up to the first point character (corresponding to a
+digit \(lq.\(rq).
 So, in the example above, if the
 .RI \(lq inet \(rq
 driver was not loaded, but at attempt was made to open the
-.BR /dev/inet99
+.BR /dev/inet.99
 device,
 .I STREAMS
 would request the
@@ -661,19 +688,24 @@ This approach simplifies kernel module loading as well as device numbering and
 makes it easier for boot scripts to intialize devices.
 .\"
 .PP
-.B Mountable spec Filesystem
+.B Mountable specfs Filesystem
 .PP
 Another approach to creation and assignment of device numbers is the mountable
-spec filesystem.  The spec filesystem can be mounted to provide an in-kernel
+.BR specfs (5)
+filesystem.  The
+.BR specfs (5)
+filesystem can be mounted to provide an in-kernel
 device directory similar to the
 .B Linux
 devfs filesystem and the
 .IR Solaris \(rg
 devices filesystem.
-The spec filesystem should normally be mounted on the
+The
+.BR specfs (5)
+filesystem should normally be mounted on the
 .B /dev/streams
 subdirectory by system initialization scripts using a command such as:
-.BR "mount -t spec none /dev/streams" .
+.BR "mount -t specfs none /dev/streams" .
 See
 .BR mount (8)
 for more information.
@@ -693,7 +725,9 @@ each instance of the device will appear as a character device named with the
 instance number of the device and having the external (real) major and
 external (real) minor device number.
 .PP
-The mounted spec filesystem also has the characteristic that if a device
+The mounted
+.BR specfs (5)
+filesystem also has the characteristic that if a device
 subdirectory
 .BI /dev/streams/ devname /
 does not exist, but an attempt is made to read such a directory,
@@ -738,15 +772,18 @@ _
 .TE
 .PP
 In fact, it does not matter what the character device major or minor device
-number is of node in the spec filesystem.  This is because the inode in the
+number is of node in the
+.BR specfs (5)
+filesystem.  This is because the inode in the
 filesystem is directy associated with the
 .B streamtab (9)
 structure and instance number without using the normal
 .B Linux
 character device mechanisms.
 When a device instance exceeds the extended minor device numbering space
-assigned to a device driver in the spec filesystem, device number displayed
-by
+assigned to a device driver in the
+.BR specfs (5)
+filesystem, device number displayed by
 .BR stat (2),
 .BR lstat (2)
 or
