@@ -28,7 +28,7 @@
  *
  */
 
-#ident "@(#) LiS relay.c 2.3 3/19/01 22:03:39 "
+#ident "@(#) LiS relay.c 2.4 10/23/03 19:37:07 "
 
 /*  -------------------------------------------------------------------  */
 
@@ -157,6 +157,8 @@ struct streamtab relay2_info =
 static int
 relay_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
+  printk("relay_open(dev=0x%x, flag=0x%x, sflag=0x%x)\n",
+				  DEV_TO_INT(*devp), flag, sflag) ;
   if (sflag == CLONEOPEN)
       return(EINVAL) ;
 
@@ -171,6 +173,7 @@ relay_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 static int
 relay_wput (queue_t *q, mblk_t *mp)
 {
+    lis_print_msg(mp, "relay_wput", PRINT_DATA_RDWR) ;
     putnext(q, mp) ;			/* relay downstream */
     return(0) ;
 }
@@ -182,6 +185,7 @@ relay_wput (queue_t *q, mblk_t *mp)
 static int
 relay_rput (queue_t *q, mblk_t *mp)
 {
+    lis_print_msg(mp, "relay_rput", PRINT_DATA_RDWR) ;
     putnext(q, mp) ;			/* relay upstream */
     return(0) ;
 }
@@ -219,5 +223,6 @@ relay_rsrv (queue_t *q)
 static int
 relay_close (queue_t *q, int dummy, cred_t *credp)
 {
+    printk("relay_close\n") ;
     return 0;
 }
