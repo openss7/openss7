@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS stream.c 2.14 12/27/03 15:12:51 "
+#ident "@(#) LiS stream.c 2.25 09/10/04 16:34:18 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -62,8 +62,10 @@ extern void		lis_wakeup_close_wt(void *q_str) ; /* wait.c */
 #if defined(CONFIG_DEV)
 extern void		lis_cpfl(void *p, long a, 
 				 const char *fcn, const char *f, int l);
+#define CP(p,a)		lis_cpfl((p),(a),__FUNCTION__,__LIS_FILE__,__LINE__)
 #else
 #define lis_cpfl(a,b,c,d,e)
+#define CP(p,a)		do {} while (0)
 #endif
 
 
@@ -107,12 +109,11 @@ static void
 queuerun(int cpu_id)
 {
     queue_t		*q;
+    volatile queue_t    *vq ;
     stdata_t		*strmhd ;
     lis_flags_t		 psw, pswq;
     int			 procsoff ;
-    lis_kcreds_t	 mycreds ;
 
-    lis_task_to_creds(&mycreds) ;
     lis_queuerun_cnts[cpu_id]++ ;
     if (LIS_DEBUG_MONITOR_MEM)
 	lis_check_mem() ;
@@ -124,24 +125,29 @@ queuerun(int cpu_id)
      * simultaneously, subject to spin lock protection.
      */
     lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
-    for (((volatile queue_t *)q) = lis_scanqhead;
+    for (vq = lis_scanqhead, q = (queue_t *)vq;
 	 q != NULL;
-	 ((volatile queue_t *)q) = lis_scanqhead
+	 vq = lis_scanqhead, q = (queue_t *)vq
 	)
     {
-	lis_currq[cpu_id] = q ;			/* for debugging */
-	lis_atomic_dec(&lis_runq_req_cnt) ;	/* one less thing to do */
-	if (!LIS_CHECK_Q_MAGIC(q))
-	{
-	    printk("queuerun: scan queue is broken\n") ;
-	    lis_scanqhead = NULL ;
-	    continue ;
-	}
 
 	lis_scanqhead = q->q_scnxt ;
 	q->q_scnxt    = NULL ;
 	if (q == lis_scanqtail)			/* entry at end of list */
 	    lis_scanqtail = NULL ;
+
+	K_ATOMIC_DEC(&lis_runq_req_cnt) ;	/* one less thing to do */
+	lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
+
+	lis_currq[cpu_id] = q ;			/* for debugging */
+	if (!LIS_CHECK_Q_MAGIC(q))
+	{
+	    printk("queuerun: scan queue is broken\n") ;
+	    lis_scanqhead = NULL ;
+	    lis_scanqtail = NULL ;
+	    K_ATOMIC_SET(&lis_runq_req_cnt, 0) ;
+	    goto scan_loop_bottom ;
+	}
 
 	LIS_QISRLOCK(q, &pswq) ;
 	q->q_flag |=  QRUNNING ;		/* protects from lis_qdetach */
@@ -149,24 +155,26 @@ queuerun(int cpu_id)
 	procsoff = (q->q_flag & (QCLOSING | QPROCSOFF)) ;
 	strmhd = (stdata_t *) q->q_str ;
 	LIS_QISRUNLOCK(q, &pswq) ;
-	lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
 
-	lis_lockq(q) ;				/* see "locking order" above */
+	if (lis_lockq(q) < 0)			/* see "locking order" above */
+	{
+	    LIS_QISRLOCK(q, &pswq) ;
+	    q->q_flag &=  ~QRUNNING ;
+	    LIS_QISRUNLOCK(q, &pswq) ;
+	    goto scan_loop_bottom ;
+	}
 
 	if (   !procsoff
 	    && strmhd != NULL
 	    && strmhd->sd_wmsg != NULL)		/* held msg waiting */
 	{
 	    lis_runq_cnts[cpu_id]++ ;
-	    lis_creds_to_task(&strmhd->sd_kcreds) ;
 	    lis_putnext(LIS_WR(q),strmhd->sd_wmsg);	/* send it */
-	    lis_creds_to_task(&mycreds) ;
 	    strmhd->sd_wmsg = NULL ;		/* don't reuse msg */
 	}
 
 	lis_unlockq(q) ;
 
-	lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
 	LIS_QISRLOCK(q, &pswq) ;
 	q->q_flag &= ~QRUNNING ;		/* see note at head of func */
 	if (F_ISSET(q->q_flag, QWAITING) && q->q_wakeup_sem != NULL)
@@ -177,8 +185,9 @@ queuerun(int cpu_id)
 	else
 	    LIS_QISRUNLOCK(q, &pswq) ;
 
-        lis_head_put((stdata_t *)q->q_str) ;	/* balance ins scanq */
-
+        lis_head_put(strmhd) ;			/* balance ins scanq */
+scan_loop_bottom:
+	lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ; /* for loop iteration */
     }
 
     lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
@@ -188,9 +197,7 @@ queuerun(int cpu_id)
     {
       lis_runq_cnts[cpu_id]++ ;
       lis_spin_unlock_irqrestore(&lis_bc_lock, &psw) ;
-      lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
-      lis_atomic_dec(&lis_runq_req_cnt) ;	/* one less thing to do */
-      lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
+      K_ATOMIC_DEC(&lis_runq_req_cnt) ;	/* one less thing to do */
       lis_dobufcall(cpu_id);
     }
     else
@@ -201,20 +208,12 @@ queuerun(int cpu_id)
      * threads can do the same simultaneously.
      */
     lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
-    for (((volatile queue_t *)q) = lis_qhead;
+    for (vq = lis_qhead, q = (queue_t *)vq;
 	 q != NULL;
-	 ((volatile queue_t *)q) = lis_qhead
+	 vq = lis_qhead, q = (queue_t *)vq
         )
     {
-	lis_currq[cpu_id] = q ;			/* for debugging */
-	lis_atomic_dec(&lis_runq_req_cnt) ;	/* one less thing to do */
-	if (!LIS_CHECK_Q_MAGIC(q))
-	{
-	    printk("queuerun: service queue is broken\n") ;
-	    lis_qhead = NULL ;
-	    continue ;
-	}
-
+#if 0			/* minimize time holding qhead_lock */
 	lis_cpfl((void *) lis_qhead, (long) lis_qtail,
 				__FUNCTION__, __FILE__, __LINE__) ;
 	if (   (lis_qhead != NULL && lis_qtail == NULL)
@@ -223,12 +222,13 @@ queuerun(int cpu_id)
 	    printk("LiS: queuerun before: Qhead error: "
 		   "lis_qhead=%lx lis_qtail=%lx\n",
 		   lis_qhead, lis_qtail) ;
-
+#endif
 	lis_qhead = q->q_link ;			/* remove it from the list */
 	q->q_link = NULL ;
 	if (q == lis_qtail)			/* entry at end of list */
 	    lis_qtail = NULL ;
 
+#if 0			/* minimize time holding qhead_lock */
 	lis_cpfl((void *) lis_qhead, (long) lis_qtail,
 				__FUNCTION__, __FILE__, __LINE__) ;
 	if (   (lis_qhead != NULL && lis_qtail == NULL)
@@ -238,16 +238,36 @@ queuerun(int cpu_id)
 		   "lis_qhead=%lx lis_qtail=%lx\n",
 		   lis_qhead, lis_qtail) ;
 
+#endif
+	K_ATOMIC_DEC(&lis_runq_req_cnt) ;	/* one less thing to do */
+	lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
+
+	lis_currq[cpu_id] = q ;			/* for debugging */
+	if (!LIS_CHECK_Q_MAGIC(q))
+	{
+	    printk("queuerun: service queue is broken\n") ;
+	    lis_qhead = NULL ;
+	    lis_qtail = NULL ;
+	    K_ATOMIC_SET(&lis_runq_req_cnt, 0) ;
+	    goto qsched_loop_bottom ;
+	}
+
 	LIS_QISRLOCK(q, &pswq) ;
+	CP(q->q_str, q->q_flag) ;
 	q->q_flag |=  QRUNNING ;		/* protects from lis_qdetach */
 	q->q_flag &= ~QENAB;			/* allow qenable again */
 	procsoff = (q->q_flag & QPROCSOFF) ;	/* queue procs off */
 	strmhd = (stdata_t *) q->q_str ;
 	LIS_QISRUNLOCK(q, &pswq) ;
 
-	lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
+	if (lis_lockq(q) < 0)			/* see "locking order" above */
+	{
+	    LIS_QISRLOCK(q, &pswq) ;
+	    q->q_flag &=  ~QRUNNING ;
+	    LIS_QISRUNLOCK(q, &pswq) ;
+	    goto qsched_loop_bottom ;
+	}
 
-	lis_lockq(q) ;				/* see "locking order" above */
 	LisDownCount(QSCHEDS) ;
 
 	/* call its service procedure, if any */
@@ -257,10 +277,8 @@ queuerun(int cpu_id)
 	    && q->q_qinfo->qi_srvp		/* has svc proc */
 	   )
 	{
-	    lis_cpfl(strmhd, (long)q, __FUNCTION__, __FILE__, __LINE__) ;
-	    lis_creds_to_task(&strmhd->sd_kcreds) ;
+	    CP(strmhd, (long)q) ;
 	    (*q->q_qinfo->qi_srvp)(q);		/* enter svc proc w/q locked */
-	    lis_creds_to_task(&mycreds) ;
 
 	    if (lis_own_spl())			/* driver did not do splx */
 	    {
@@ -275,17 +293,27 @@ queuerun(int cpu_id)
 
 	lis_unlockq(q) ;
 
-	lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
 	LIS_QISRLOCK(q, &pswq) ;
+	CP(q->q_str, q->q_flag) ;
 	q->q_flag &= ~QRUNNING ;		/* see note at head of func */
 	if (F_ISSET(q->q_flag, QWAITING) && q->q_wakeup_sem != NULL)
 	{
-	    lis_cpfl(strmhd, (long)q, __FUNCTION__, __FILE__, __LINE__) ;
+	    CP(strmhd, (long)q) ;
 	    LIS_QISRUNLOCK(q, &pswq) ;		/* release b4 wakeup */
 	    lis_up(q->q_wakeup_sem) ;	/* safe because qdetach is waiting */
 	}
 	else
+	if (F_ISSET(q->q_flag, QWANTENAB))	/* enabled while running */
+	{
+	    CP(strmhd, (long)q) ;
+	    LIS_QISRUNLOCK(q, &pswq) ;
+	    lis_retry_qenable(q) ;		/* reschedule the queue */
+	}
+	else
+	{
+	    CP(q->q_str, q->q_flag) ;
 	    LIS_QISRUNLOCK(q, &pswq) ;		/* last touch of q */
+	}
 
 	/*
 	 * Balance the head_get done by qenable if this is a stream
@@ -295,6 +323,9 @@ queuerun(int cpu_id)
 	    && (strmhd->sd_wq == q || strmhd->sd_rq == q)
 	   )
 	    lis_head_put(strmhd) ;
+
+qsched_loop_bottom:
+	lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;	/* for loop */
     }
 
     /*
@@ -305,10 +336,10 @@ queuerun(int cpu_id)
      * lis_qhead_lock.  All incr/decrs of lis_runq_req_cnt are protected by
      * this lock so we know that it won't change while we evaluate conditions.
      */
-    if (   lis_atomic_read(&lis_runq_req_cnt) != 0
+    if (   K_ATOMIC_READ(&lis_runq_req_cnt) != 0
 	&& lis_scanqhead == NULL && lis_qhead == NULL && lis_strbcflag == 0
        )
-	lis_atomic_set(&lis_runq_req_cnt, 0) ;
+	K_ATOMIC_SET(&lis_runq_req_cnt, 0) ;
 
     lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
 
@@ -331,17 +362,17 @@ lis_run_queues(int cpu)
 {
     extern int	lis_runq_sched ;	/* linux-mdep.c BH code */
 
-    while (lis_atomic_read(&lis_runq_req_cnt) > 0)
+    while (K_ATOMIC_READ(&lis_runq_req_cnt) > 0)
     {
 #if !defined(__SMP__)			/* only for single-threaded */
-	if (lis_atomic_read(&lis_queues_running)) /* recursion protection */
+	if (K_ATOMIC_READ(&lis_queues_running)) /* recursion protection */
 	    return;
 #endif
-	lis_atomic_inc(&lis_queues_running);
-	lis_atomic_inc(&lis_runq_active_flags[cpu]) ;
+	K_ATOMIC_INC(&lis_queues_running);
+	K_ATOMIC_INC(&lis_runq_active_flags[cpu]) ;
 	queuerun(cpu);			/* really run the queues */
-	lis_atomic_dec(&lis_runq_active_flags[cpu]) ;
-	lis_atomic_dec(&lis_queues_running);
+	K_ATOMIC_DEC(&lis_runq_active_flags[cpu]) ;
+	K_ATOMIC_DEC(&lis_queues_running);
     }
 
     lis_runq_sched = 0 ;		/* OK to V semaphore now */
