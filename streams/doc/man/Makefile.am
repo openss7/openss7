@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/26 22:21:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:41:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/26 22:21:46 $ by $Author: brian $
+# Last Modified $Date: 2004/04/30 10:41:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1040,11 +1040,7 @@ man_MANS = \
 	man9/qwriter.9 \
 	man9/RD.9 \
 	man9/register_inode.9 \
-	man9/register_inode_major.9 \
-	man9/register_inode_minor.9 \
 	man9/register_strdev.9 \
-	man9/register_strdev_major.9 \
-	man9/register_strdev_minor.9 \
 	man9/register_strmod.9 \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
@@ -1115,11 +1111,7 @@ man_MANS = \
 	man9/unlinkb.9 \
 	man9/UNLOCK.9 \
 	man9/unregister_inode.9 \
-	man9/unregister_inode_major.9 \
-	man9/unregister_inode_minor.9 \
 	man9/unregister_strdev.9 \
-	man9/unregister_strdev_major.9 \
-	man9/unregister_strdev_minor.9 \
 	man9/unregister_strmod.9 \
 	man9/untimeout.9 \
 	man9/unweldq.9 \
@@ -2119,11 +2111,7 @@ dist_noinst_MANS = \
 	man9/qwriter.9.man \
 	man9/RD.9.man \
 	man9/register_inode.9.man \
-	man9/register_inode_major.9.man \
-	man9/register_inode_minor.9.man \
 	man9/register_strdev.9.man \
-	man9/register_strdev_major.9.man \
-	man9/register_strdev_minor.9.man \
 	man9/register_strmod.9.man \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
@@ -2194,11 +2182,7 @@ dist_noinst_MANS = \
 	man9/unlinkb.9.man \
 	man9/UNLOCK.9.man \
 	man9/unregister_inode.9.man \
-	man9/unregister_inode_major.9.man \
-	man9/unregister_inode_minor.9.man \
 	man9/unregister_strdev.9.man \
-	man9/unregister_strdev_major.9.man \
-	man9/unregister_strdev_minor.9.man \
 	man9/unregister_strmod.9.man \
 	man9/untimeout.9.man \
 	man9/unweldq.9.man \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
+#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -174,7 +174,8 @@ static int __init connld_init(void)
 #else
 	printk(KERN_INFO CONNLD_SPLASH);
 #endif
-	if ((err = register_strmod(modid, &connld_fmod)) < 0)
+	connld_minfo.mi_idnum = modid;
+	if ((err = register_strmod(&connld_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -183,7 +184,7 @@ static int __init connld_init(void)
 static void __exit connld_exit(void)
 {
 	int err;
-	if ((err = unregister_strmod(modid, &connld_fmod)) < 0)
+	if ((err = unregister_strmod(&connld_fmod)) < 0)
 		return (void) (err);
 	return (void) (0);
 };

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] = "$RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile: strclone.c,v $ $Name:  $($Revision: 0.9.2
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:32 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -188,7 +188,7 @@ static int __init clone_init(void)
 #else
 	printk(KERN_INFO CLONE_SPLASH);
 #endif
-	if ((err = register_inode(makedevice(major, 0), &clone_cdev, &clone_ops)) < 0)
+	if ((err = register_inode(major, &clone_cdev, &clone_ops)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
@@ -197,7 +197,7 @@ static int __init clone_init(void)
 static void __exit clone_exit(void)
 {
 	int err;
-	if ((err = unregister_inode(makedevice(major, 0), &clone_cdev)))
+	if ((err = unregister_inode(major, &clone_cdev)))
 		return (void) (err);
 	return (void) (0);
 };

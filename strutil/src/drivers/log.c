@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/22 12:08:32 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -315,7 +315,6 @@ static struct streamtab log_info = {
       st_wrinit:&log_wqinit,
 };
 
-#ifndef _LIS_
 static struct cdevsw log_cdev = {
       d_name:CONFIG_STREAMS_LOG_NAME,
       d_str:&log_info,
@@ -324,7 +323,6 @@ static struct cdevsw log_cdev = {
       d_mode:S_IFCHR,
       d_kmod:THIS_MODULE,
 };
-#endif
 
 static int __init
 log_init(void)
@@ -335,13 +333,8 @@ log_init(void)
 #else
 	printk(KERN_INFO LOG_SPLASH);
 #endif
-#ifndef _LIS_
-	if ((err = register_strdev(makedevice(major, 0), &log_cdev)) < 0)
+	if ((err = register_strdev(major, &log_cdev)) < 0)
 		return (err);
-#else
-	if ((err = lis_register_strdev(major, &log_info, 255, CONFIG_STREAMS_LOG_NAME)) < 0)
-		return (err);
-#endif
 	if (err > 0)
 		major = err;
 	return (0);
@@ -349,11 +342,7 @@ log_init(void)
 static void __exit
 log_exit(void)
 {
-#ifndef _LIS_
-	unregister_strdev(makedevice(major, 0), &log_cdev);
-#else
-	lis_unregister_strdev(major);
-#endif
+	unregister_strdev(major, &log_cdev);
 }
 
 module_init(log_init);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] = "$RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define XNET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XNET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $"
 #define XNET_DEVICE	"SVR 4.2 Sockets Library NET4 Support"
 #define XNET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XNET_LICENSE	"GPL"
@@ -744,7 +744,7 @@ static int __init xnet_init(void)
 #else
 	printk(KERN_INFO XNET_SPLASH);
 #endif
-	if ((err = register_strdev(makedevice(major, 0), &xnet_cdev)) < 0)
+	if ((err = register_strdev(major, &xnet_cdev)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -753,8 +753,7 @@ static int __init xnet_init(void)
 static void __exit xnet_exit(void)
 {
 	int err;
-	dev_t dev = makedevice(major, 0);
-	if ((err = unregister_strdev(dev, &xnet_cdev)))
+	if ((err = unregister_strdev(major, &xnet_cdev)))
 		return (void) (err);
 	return (void) (0);
 }

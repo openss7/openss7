@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:03 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:03 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -87,7 +87,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:03 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -203,7 +203,7 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_LIST:
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
-				int i, j, count;
+				int i = 0, count;
 				struct sc_list *list;
 				struct sc_mlist *mlist;
 				struct list_head *pos;
@@ -230,24 +230,26 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 					mlist = (typeof(mlist)) dp->b_rptr;
 					/* list all devices */
 					read_lock(&cdevsw_lock);
-					for (i = 0, j = 0; i < MAX_STRDEV && j < count; i++) {
-						struct cdevsw *cdev;
-						if ((cdev = cdevsw[i])) {
+					list_for_each(pos, &cdevsw_list) {
+						if (i < count) {
+							struct cdevsw *cdev =
+							    list_entry(pos, struct cdevsw, d_list);
 							struct qinit *qinit =
 							    cdev->d_str->st_rdinit;
-							mlist->major = i;
+							mlist->major = cdev->d_major;
 							mlist->mi = *qinit->qi_minfo;
 							if (qinit->qi_mstat)
 								mlist->ms = *qinit->qi_mstat;
-							j++;
+							i++;
 							mlist++;
-						}
+						} else
+							break;
 					}
 					read_unlock(&cdevsw_lock);
 					/* list all modules */
 					read_lock(&fmodsw_lock);
 					list_for_each(pos, &fmodsw_list) {
-						if (j < count) {
+						if (i < count) {
 							struct fmodsw *fmod =
 							    list_entry(pos, struct fmodsw, f_list);
 							struct qinit *qinit =
@@ -256,14 +258,14 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 							mlist->mi = *qinit->qi_minfo;
 							if (qinit->qi_mstat)
 								mlist->ms = *qinit->qi_mstat;
-							j++;
+							i++;
 							mlist++;
 						} else
 							break;
 					}
 					read_unlock(&fmodsw_lock);
 					/* zero all excess elements */
-					for (; j < count; j++, mlist++) {
+					for (; i < count; i++, mlist++) {
 						mlist->major = -1;
 					}
 					mp->b_datap->db_type = M_COPYOUT;
@@ -383,7 +385,8 @@ static int __init sc_init(void)
 #else
 	cmn_err(CE_NOTE, SC_SPLASH);
 #endif
-	if ((err = register_strmod(modid, &sc_fmod)) < 0)
+	sc_minfo.mi_idnum = modid;
+	if ((err = register_strmod(&sc_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -393,7 +396,7 @@ static int __init sc_init(void)
 static void __exit sc_exit(void)
 {
 	int err;
-	if ((err = unregister_strmod(modid, &sc_fmod)))
+	if ((err = unregister_strmod(&sc_fmod)))
 		return (void) (err);
 	return (void) (0);
 };

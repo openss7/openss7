@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $";
 
 /* 
  *  This is TIRDWR an TLI read/write module for TPI Version 2 transport
@@ -86,7 +86,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
+#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -345,7 +345,8 @@ static int __init tirdwr_init(void)
 #else
 	printk(KERN_INFO TIRDWR_SPLASH);
 #endif
-	if ((err = register_strmod(modid, &tirdwr_fmod)) < 0)
+	tirdwr_minfo.mi_idnum = modid;
+	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -354,7 +355,7 @@ static int __init tirdwr_init(void)
 static void __exit tirdwr_exit(void)
 {
 	int err;
-	if ((err = unregister_strmod(modid, &tirdwr_fmod)) < 0)
+	if ((err = unregister_strmod(&tirdwr_fmod)) < 0)
 		return (void) (err);
 	return (void) (0);
 };

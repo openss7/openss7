@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -539,7 +539,7 @@ static int __init sfx_init(void)
 #else
 	printk(KERN_INFO SFX_SPLASH);
 #endif
-	if ((err = register_inode(makedevice(major, 0), &sfx_cdev, &sfx_ops)) < 0)
+	if ((err = register_inode(major, &sfx_cdev, &sfx_ops)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
@@ -548,7 +548,7 @@ static int __init sfx_init(void)
 static void __exit sfx_exit(void)
 {
 	int err;
-	if ((err = unregister_inode(makedevice(major, 0), &sfx_cdev)))
+	if ((err = unregister_inode(major, &sfx_cdev)))
 		return (void) (err);
 	return (void) (0);
 };

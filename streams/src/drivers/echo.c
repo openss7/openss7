@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -66,17 +66,10 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include <sys/kmem.h>
 #include <sys/stropts.h>
 #include <sys/stream.h>
-#ifndef _LIS_
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
-#endif
 #include <sys/ddi.h>
-
-#ifndef _LIS_
 #include "sys/config.h"
-#else
-#include "sys/LiS/config.h"
-#endif
 
 //#include "strdebug.h"
 //#include "strreg.h"		/* for struct str_args */
@@ -84,7 +77,7 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.7 $
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -104,22 +97,11 @@ MODULE_LICENSE(ECHO_LICENSE);
 #ifndef CONFIG_STREAMS_ECHO_NAME
 #define CONFIG_STREAMS_ECHO_NAME "echo"
 #endif
-#ifndef _LIS_
 #ifndef CONFIG_STREAMS_ECHO_MODID
 #error CONFIG_STREAMS_ECHO_MODID must be defined.
 #endif
 #ifndef CONFIG_STREAMS_ECHO_MAJOR
 #error CONFIG_STREAMS_ECHO_MAJOR must be defined.
-#endif
-#else
-#ifndef ECHO__ID
-#error ECHO__ID must be defined.
-#endif
-#ifndef ECHO__CMAJOR_0
-#error ECHO__CMAJOR_0 must be defined.
-#endif
-#define CONFIG_STREAMS_ECHO_MODID ECHO__ID
-#define CONFIG_STREAMS_ECHO_MAJOR ECHO__CMAJOR_0
 #endif
 
 static unsigned short major = CONFIG_STREAMS_ECHO_MAJOR;
@@ -280,7 +262,6 @@ static struct streamtab echo_info = {
 	st_wrinit:&echo_wqinit,
 };
 
-#ifndef _LIS_
 static struct cdevsw echo_cdev = {
 	d_name:CONFIG_STREAMS_ECHO_NAME,
 	d_str:&echo_info,
@@ -289,7 +270,6 @@ static struct cdevsw echo_cdev = {
 	d_mode:S_IFCHR,
 	d_kmod:THIS_MODULE,
 };
-#endif
 
 static int __init echo_init(void)
 {
@@ -299,24 +279,15 @@ static int __init echo_init(void)
 #else
 	printk(KERN_INFO ECHO_SPLASH);
 #endif
-#ifndef _LIS_
-	if ((err = register_strdev(makedevice(major, 0), &echo_cdev)) < 0)
+	if ((err = register_strdev(major, &echo_cdev)) < 0)
 		return (err);
-#else
-	if ((err = lis_register_strdev(major, &echo_info, 255, CONFIG_STREAMS_ECHO_NAME)) < 0)
-		return (err);
-#endif
 	if (err > 0)
 		major = err;
 	return (0);
 };
 static void __exit echo_exit(void)
 {
-#ifndef _LIS_
-	unregister_strdev(makedevice(major, 0), &echo_cdev);
-#else
-	lis_unregister_strdev(major);
-#endif
+	unregister_strdev(major, &echo_cdev);
 };
 
 module_init(echo_init);

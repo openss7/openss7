@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] = "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"
@@ -368,7 +368,7 @@ static int __init unix_init(void)
 #else
 	printk(KERN_INFO UNIX_SPLASH);
 #endif
-	if ((err = register_strdev(makedevice(major, 0), &unix_cdev)) < 0)
+	if ((err = register_strdev(major, &unix_cdev)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -376,7 +376,7 @@ static int __init unix_init(void)
 }
 static void __exit unix_exit(void)
 {
-	unregister_strdev(makedevice(major, 0), &unix_cdev);
+	unregister_strdev(major, &unix_cdev);
 }
 
 module_init(unix_init);

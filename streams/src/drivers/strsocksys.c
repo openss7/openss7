@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:01 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -188,7 +188,7 @@ static int __init socksys_init(void)
 #else
 	printk(KERN_INFO SOCKSYS_SPLASH);
 #endif
-	if ((err = register_strdev(makedevice(major, 0), &socksys_cdev)) < 0)
+	if ((err = register_strdev(major, &socksys_cdev)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -197,8 +197,7 @@ static int __init socksys_init(void)
 static void __exit socksys_exit(void)
 {
 	int err;
-	dev_t dev = makedevice(major, 0);
-	if ((err = unregister_strdev(dev, &socksys_cdev)))
+	if ((err = unregister_strdev(major, &socksys_cdev)))
 		return (void) (err);
 	return (void) (0);
 }

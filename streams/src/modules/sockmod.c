@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SOCKMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
+#define SOCKMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
 #define SOCKMOD_DEVICE		"SVR 4.2 Socket Library Module for TLI Devices"
 #define SOCKMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKMOD_LICENSE		"GPL"
@@ -322,7 +322,8 @@ static int __init sockmod_init(void)
 {
 	int err;
 	printk(KERN_INFO SOCKMOD_BANNER);
-	if ((err = register_strmod(modid, &sockmod_fmod)) < 0)
+	sockmod_minfo.mi_idnum = modid;
+	if ((err = register_strmod(&sockmod_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
@@ -331,7 +332,7 @@ static int __init sockmod_init(void)
 static void __exit sockmod_exit(void)
 {
 	int err;
-	if ((err = unregister_strmod(modid, &sockmod_fmod)))
+	if ((err = unregister_strmod(&sockmod_fmod)))
 		return (void) (err);
 	return (void) (0);
 };

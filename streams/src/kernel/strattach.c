@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:33 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:33 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:02 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:33 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:02 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
-#include <linux/module.h>
+#include <linux/version.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
+
 #include <linux/slab.h>
 #include <linux/smp_lock.h>
 #include <linux/init.h>
@@ -80,6 +82,7 @@ static char const ident[] =
 #endif
 
 #include "strattach.h"
+#include "strspecfs.h"		/* for specfs_mnt */
 
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
 
@@ -204,3 +207,112 @@ long do_fdetach(const char *file_name)
 }
 
 #endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */
+
+#if defined HAVE_KERNEL_PIPE_SUPPORT
+#define SPEC_SBI_MAGIC 0XFEEDDEEAF
+struct spec_sb_info {
+	u32 magic;
+	int setuid;
+	int setgid;
+	uid_t uid;
+	gid_t gid;
+	umode_t mode;
+};
+
+extern struct file_operations pipe_f_ops;
+
+static struct inode *get_spipe_inode(void)
+{
+	struct inode *inode;
+	if ((inode = new_inode(specfs_mnt->mnt_sb))) {
+		struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
+		inode->i_uid = sbi->setuid ? sbi->uid : current->fsuid;
+		inode->i_gid = sbi->setgid ? sbi->gid : current->fsgid;
+		inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
+		inode->u.generic_ip = NULL;
+		inode->i_mode = S_IFIFO | sbi->mode;
+		inode->i_fop = fops_get(&pipe_f_ops);
+		inode->i_rdev = to_kdev_t(NODEV);
+	}
+	return (inode);
+}
+
+long do_spipe(int *fds)
+{
+	struct qstr str1, str2;
+	struct file *file1, *file2;
+	struct inode *inode1, *inode2;
+	struct dentry *dentry1, *dentry2;
+	char name[32];
+	int fd1, fd2;
+	int err;
+	err = -ENFILE;
+	if (!(file1 = get_empty_filp()))
+		goto no_file1;
+	if (!(file2 = get_empty_filp()))
+		goto no_file2;
+	if (!(inode1 = get_spipe_inode()))
+		goto no_inode1;
+	if (!(inode2 = get_spipe_inode()))
+		goto no_inode2;
+	if ((fd1 = err = get_unused_fd()) < 0)
+		goto no_fd1;
+	if ((fd2 = err = get_unused_fd()) < 0)
+		goto no_fd2;
+	snprintf(name, sizeof(name), "[%lu]", inode1->i_ino);
+	str1.name = name;
+	str1.len = strlen(name);
+	str1.hash = inode1->i_ino;
+	if (!(dentry1 = d_alloc(specfs_mnt->mnt_sb->s_root, &str1)))
+		goto no_dentry1;
+	d_add(dentry1, inode1);
+	snprintf(name, sizeof(name), "[%lu]", inode2->i_ino);
+	str2.name = name;
+	str2.len = strlen(name);
+	str2.hash = inode1->i_ino;
+	if (!(dentry2 = d_alloc(specfs_mnt->mnt_sb->s_root, &str2)))
+		goto no_dentry2;
+	d_add(dentry2, inode2);
+	/* file 1 */
+	file1->f_vfsmnt = mntget(specfs_mnt);
+	file1->f_dentry = dget(dentry1);
+	file1->f_pos = 0;
+	file1->f_flags = O_RDWR;
+	file1->f_op = &pipe_f_ops;
+	file1->f_mode = 3;
+	file1->f_version = 0;
+	/* file 2 */
+	file2->f_vfsmnt = mntget(specfs_mnt);
+	file2->f_dentry = dget(dentry2);
+	file1->f_pos = 0;
+	file1->f_flags = O_RDWR;
+	file1->f_op = &pipe_f_ops;
+	file1->f_mode = 3;
+	file1->f_version = 0;
+	/* */
+	fd_install(fd1, file1);
+	fd_install(fd2, file2);
+	fds[0] = fd1;
+	fds[1] = fd2;
+	return (0);
+      no_dentry2:
+	dput(dentry1);
+      no_dentry1:
+	put_unused_fd(fd2);
+      no_fd2:
+	put_unused_fd(fd1);
+      no_fd1:
+	iput(inode2);
+      no_inode2:
+	iput(inode1);
+      no_inode1:
+	put_filp(file2);
+      no_file2:
+	put_filp(file1);
+      no_file1:
+	goto error;
+      error:
+	return (err);
+}
+#endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
+

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2004/04/28 01:30:32 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2004/04/30 10:42:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:32 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:00 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -544,13 +544,12 @@ struct fmodsw {
 
 struct fmodsw {
 	struct list_head f_list;	/* list of all structures */
-	struct list_head f_hash;	/* list of hashes in slot */
+	struct list_head f_hash;	/* list of module hashes in slot */
 	const char *f_name;		/* module name */
 	struct streamtab *f_str;	/* pointer to streamtab for module */
 	uint f_flag;			/* module flags */
 	int f_regs;			/* number of registrations */
 	atomic_t f_count;		/* open count */
-	int f_index;			/* module index */
 	int f_sqlvl;			/* q sychronization level */
 	struct syncq *f_syncq;		/* synchronization queue */
 	struct module *f_kmod;		/* kernel module */
@@ -566,25 +565,27 @@ struct devnode {
 	uint n_flag;			/* node flags */
 	atomic_t n_count;		/* open count */
 	int n_index;			/* node index */
+	struct inode *n_inode;		/* specfs device inode */
 };
 #define N_MAJOR		0x01	/* major device node */
 
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
-	struct list_head d_hash;	/* list of hashes in slot */
+	struct list_head d_mod_hash;	/* list of module hashes in slot */
 	const char *d_name;		/* driver name */
 	struct streamtab *d_str;	/* pointer to streamtab for driver */
 	uint d_flag;			/* driver flags */
-	int d_regs;			/* number of registrations */
 	atomic_t d_count;		/* open count */
-	int d_index;			/* device index */
 	int d_sqlvl;			/* q sychronization level */
 	struct syncq *d_syncq;		/* synchronization queue */
 	struct module *d_kmod;		/* kernel module */
 	struct inode *d_inode;		/* specfs directory inode */
+	/* above must match fmodsw */
 	mode_t d_mode;			/* inode mode */
+	int d_major;			/* major device number */
 	struct file_operations *d_fop;	/* file operations */
-	struct list_head d_nodes;	/* major device nodes */
+	struct list_head d_hash;	/* list of device hashes in slot */
+	struct list_head d_nodes;	/* minor device nodes */
 	struct list_head d_apush;	/* autopush list */
 	struct stdata *d_plinks;	/* permanent links for this device */
 	struct list_head d_stlist;	/* stream head list for this device */
@@ -904,7 +905,7 @@ extern void setqsched(void);
 extern unsigned long freezestr(queue_t *q);
 extern void unfreezestr(queue_t *q, unsigned long pl);
 
-#ifdef _SOL_SOURCE
+#ifdef _SUN_SOURCE
 #define unfreezestr(__q) unfreezestr((__q), -1UL)
 #define freezestr(__q) (void)freezestr((__q))
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:33 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:33 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:02 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:33 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:02 $";
 
 #define __NO_VERSION__
 
@@ -160,32 +160,28 @@ static queue_t *queue_guess(queue_t *q)
 #endif
 
 /**
- *  mdbblock_alloc - allocate a combined message/data block
- *  @q:the queue with which to associate the allocation for debugging
- *  @priority:the priority of the allocation
- *  @func:allocating function pointer
+ *  mdbblock_alloc: - allocate a combined message/data block
+ *  @q: the queue with which to associate the allocation for debugging
+ *  @priority: the priority of the allocation
+ *  @func: allocating function pointer
  *
- *  This is not exported, but is called by the streams D3DK functions
- *  allocb(), dupb(), eballoc() and pullupmsg() to allocate a combined
- *  message/data block.  Because mdbblock_free() does a fast free to the free
- *  list, we first check if a mdbblock is sitting on the per-cpu free list.
- *  If there is no memory block available then we take one from the memory
- *  cache.  Unfortunately we must shut out interrupts briefly otherwise an ISR
- *  running on the same processor freeing while we are allocating will hose
- *  the free list.
+ *  This is not exported, but is called by the streams D3DK functions allocb(), dupb(), eballoc()
+ *  and pullupmsg() to allocate a combined message/data block.  Because mdbblock_free() does a fast
+ *  free to the free list, we first check if a mdbblock is sitting on the per-cpu free list.  If
+ *  there is no memory block available then we take one from the memory cache.  Unfortunately we
+ *  must shut out interrupts briefly otherwise an ISR running on the same processor freeing while we
+ *  are allocating will hose the free list.
  *
- *  We reimplement the SVR3 priority scheme with a twist.  BPRI_HI is allowed
- *  to use the current free list for high priority tasks.  BPRI_MED is not
- *  allowed the free list but may grow the cache if necessary to get a block.
- *  BPRI_LO is only allowed to get a free block from the cache and is not
- *  allowed to grow the cache.
+ *  We reimplement the SVR3 priority scheme with a twist.  BPRI_HI is allowed to use the current
+ *  free list for high priority tasks.  BPRI_MED is not allowed the free list but may grow the cache
+ *  if necessary to get a block.  BPRI_LO is only allowed to get a free block from the cache and is
+ *  not allowed to grow the cache.
  *
- *  Return Values:This function will return NULL when there are no more
- *  blocks.
+ *  Return Values: This function will return NULL when there are no more blocks.
  *
- *  Because misbehaving STREAMS modules and drivers normaly leak message
- *  blocks at an amazing rate, we also return an allocation failure if the
- *  number of message blocks exceeds a tunable threshold.
+ *  Because misbehaving STREAMS modules and drivers normaly leak message blocks at an amazing rate,
+ *  we also return an allocation failure if the number of message blocks exceeds a tunable
+ *  threshold.
  */
 mblk_t *mdbblock_alloc(uint priority, void *func)
 {
@@ -238,25 +234,22 @@ mblk_t *mdbblock_alloc(uint priority, void *func)
 }
 
 /**
- *  mdbblock_free - free a combined message/data block
+ *  mdbblock_free: - free a combined message/data block
  *  @mp:    the mdbblock to free
  *
- *  This is not exported but is called by the streams D3DK function freeb()
- *  when freeing a &struct mddbblock.  For speed, we just link the block into
- *  the per-cpu free list.  Other queue proceudres calling allocb() or
- *  esballoc() in the same runqueues() pass can use them without locking the
- *  memory caches.  At the end of the runqueues() pass, any remaining blocks
- *  will be freed back to the kmem cache.  Whenever we place the first block
- *  on the free list or whenever there are streams waiting on buffers, we
- *  raise the softirq to ensure that another runqueues() pass will occur.
+ *  This is not exported but is called by the streams D3DK function freeb() when freeing a &struct
+ *  mddbblock.  For speed, we just link the block into the per-cpu free list.  Other queue
+ *  proceudres calling allocb() or esballoc() in the same runqueues() pass can use them without
+ *  locking the memory caches.  At the end of the runqueues() pass, any remaining blocks will be
+ *  freed back to the kmem cache.  Whenever we place the first block on the free list or whenever
+ *  there are streams waiting on buffers, we raise the softirq to ensure that another runqueues()
+ *  pass will occur.
  *
- *  This function uses the fact that it is using a per-cpu list to avoid
- *  locking.  It uses the atomic xchg() function to ensure the integrity of
- *  the list while interrupts are still enabled.
+ *  This function uses the fact that it is using a per-cpu list to avoid locking.  It uses the
+ *  atomic xchg() function to ensure the integrity of the list while interrupts are still enabled.
  *  
- *  To reduce latency on allocation to a minimum, we null the state of the
- *  blocks when they are placed to the free list rather than when they are
- *  allocated.
+ *  To reduce latency on allocation to a minimum, we null the state of the blocks when they are
+ *  placed to the free list rather than when they are allocated.
  */
 void mdbblock_free(mblk_t *mp)
 {
@@ -278,10 +271,12 @@ void mdbblock_free(mblk_t *mp)
 }
 
 /* 
- *  freeblocks() is invoked by runqueues() when there are blocks to free (i.e.
- *  the FREEBLKS flag is set on the thread).  It frees all blocks from the
- *  free list.  We first steal the entire list and then work on them one by
- *  one.
+ *  freeblocks: - free message blocks
+ *  @t:	    the STREAMS executive thread
+ *
+ *  freeblocks() is invoked by runqueues() when there are blocks to free (i.e.  the %FREEBLKS flag is
+ *  set on the thread).  It frees all blocks from the free list.  We first steal the entire list and
+ *  then work on them one by one.
  */
 static void freeblocks(struct strthread *t)
 {
@@ -593,9 +588,10 @@ void mi_put(struct modinfo *mi)
  *  -------------------------------------------------------------------------
  */
 
-/* 
- *  FLUSHQ
- *  -------------------------------------------------------------------------
+/*
+ *  __rmvq:	- remove a message from a queue
+ *  @q:		queue from which to remove the message
+ *  @mp:	message to remove
  */
 static int __rmvq(queue_t *q, mblk_t *mp)
 {
@@ -635,6 +631,13 @@ static int __rmvq(queue_t *q, mblk_t *mp)
 	mp->b_next = mp->b_prev = NULL;
 	return (backenable);
 }
+
+/*
+ *  __flushq:	- flush messages from a queue
+ *  @q:		queue from which to flush messages
+ *  @flag:	how, %FLUSHDATA or %FLUSHALL
+ *  @mppp:	pointer to a pointer to the end of a message chain
+ */
 static int __flushq(queue_t *q, int flag, mblk_t ***mppp)
 {
 	mblk_t *mp, *mp_next;
@@ -679,10 +682,17 @@ static int __flushq(queue_t *q, int flag, mblk_t ***mppp)
 	}
 	return (backenable);
 }
+
+void freechain(mblk_t *mp, mblk_t **mpp);
+
+/**
+ *  flushq:	- flush messages from a queue
+ *  @q:		the queue to flush
+ *  @flag:	how to flush: %FLUSHDATA or %FLUSHALL
+ */
 void flushq(queue_t *q, int flag)
 {
 	int backenable;
-	void freechain(mblk_t *mp, mblk_t **mpp);
 	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long flags;
 	qwlock(q, &flags);
@@ -720,11 +730,10 @@ static void queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	}
 }
 
-/* 
- *  ALLOCQ
- *  -------------------------------------------------------------------------
- *  Can be called by the module writer to get a private queue pair, but must
- *  then be called with NULL.
+/**
+ *  allocq:	- allocate a queue pair
+ *
+ *  Can be called by the module writer to get a private queue pair.
  */
 queue_t *allocq(void)
 {
@@ -751,11 +760,11 @@ queue_t *allocq(void)
 	return (rq);
 }
 
-/* 
- *  FREEQ
- *  -------------------------------------------------------------------------
- *  Can be called by the module writer on private queue pairs allocated with
- *  allocq().  All message blocks will be flushed.
+/*
+ *  __freeq:	- free a queue pair
+ *  @rq:	read queue of queue pair
+ *
+ *  Frees a queue pair allocated with allocq().  Does not flush messages or clear use bits.
  */
 static void __freeq(queue_t *rq)
 {
@@ -778,11 +787,19 @@ static void __freeq(queue_t *rq)
 	/* put back in cache */
 	kmem_cache_free(si->si_cache, rq);
 }
+
+void freechain(mblk_t *mp, mblk_t **mpp);
+/**
+ *  freeq:	- free a queue pair
+ *  @rq:	read queue of queue pair
+ *
+ *  Can be called by the module writer on private queue pairs allocated with allocq().  All message
+ *  blocks will be flushed.
+ */
 void freeq(queue_t *rq)
 {
 	queue_t *wq = rq + 1;
 	mblk_t *mp = NULL, **mpp = &mp;
-	void freechain(mblk_t *mp, mblk_t **mpp);
 	clear_bit(QUSE_BIT, &rq->q_flag);
 	clear_bit(QUSE_BIT, &wq->q_flag);
 	__flushq(rq, FLUSHALL, &mpp);
@@ -1018,9 +1035,18 @@ static struct strevent *find_event(int event_id)
 	return (*sep);
 }
 
-/* Note that, for MP safety, bufcalls are always raised against the same processor that invoked the 
-   buffer call.  This means that the callback function will not execute until after the caller hits 
-   a pre-emption point. */
+/*
+ *  __bufcall:	- generate a buffer callback
+ *  @q:		queue against which to synchronize callback
+ *  @size:	size of message block requested
+ *  @priority:	priority of message block request
+ *  @function:	callback function
+ *  @arg:	argument to callback function
+ *
+ *  Notices: Note that, for MP safety, bufcalls are always raised against the same processor that
+ *  invoked the buffer call.  This means that the callback function will not execute until after the
+ *  caller exits or hits a pre-emption point.
+ */
 static inline bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
 			       long arg)
 {
@@ -1039,11 +1065,11 @@ static inline bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*f
 }
 
 /**
- *  BUFCALL - schedule a buffer callout
- *  @size:the number of bytes of data buffer needed
- *  @priority:the priority of the buffer allocation (ignored)
- *  @function:the callback function when bytes and headers are available
- *  @arg:a client argument to pass to the callback function
+ *  bufcall:	- schedule a buffer callout
+ *  @size:	the number of bytes of data buffer needed
+ *  @priority:	the priority of the buffer allocation (ignored)
+ *  @function:	the callback function when bytes and headers are available
+ *  @arg:	a client argument to pass to the callback function
  */
 bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
@@ -1052,12 +1078,12 @@ bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /**
- *  QBUFCALL - schedule a buffer callout
- *  @q:queue used for synchronization
- *  @size:the number of bytes of data buffer needed
- *  @priority:the priority of the buffer allocation (ignored)
- *  @function:the callback function when bytes and headers are available
- *  @arg:a client argument to pass to the callback function
+ *  qbufcall:	- schedule a buffer callout
+ *  @q:		queue used for synchronization
+ *  @size:	the number of bytes of data buffer needed
+ *  @priority:	the priority of the buffer allocation (ignored)
+ *  @function:	the callback function when bytes and headers are available
+ *  @arg:	a client argument to pass to the callback function
  */
 bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg)
 {
@@ -1069,10 +1095,10 @@ bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (v
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
 /**
- *  MI_BUFCALL - enable a queue when a buffer available
- *  @q:queue used for synchronization
- *  @size:the number of bytes of data buffer needed
- *  @priority:the priority of the buffer allocation (ignored)
+ *  mi_bufcall:	- enable a queue when a buffer available
+ *  @q:		queue used for synchronization
+ *  @size:	the number of bytes of data buffer needed
+ *  @priority:	the priority of the buffer allocation (ignored)
  */
 void mi_bufcall(queue_t *q, int size, int priority)
 {
@@ -1084,17 +1110,17 @@ void mi_bufcall(queue_t *q, int size, int priority)
 #endif
 
 /**
- *  ESBBCALL - schedule a buffer callout
- *  @priority:the priority of the buffer allocation (ignored)
- *  @function:the callback function when bytes and headers are available
- *  @arg:a client argument to pass to the callback function
+ *  esbbcall:	- schedule a buffer callout
+ *  @priority:	the priority of the buffer allocation (ignored)
+ *  @function:	the callback function when bytes and headers are available
+ *  @arg:	a client argument to pass to the callback function
  */
 __EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
 
 /**
- *  UNBUFCALL - cancel a buffer callout
- *  @bcid:buffer call id returned by bufcall() or esbbcall()
- *  NOTICES:Don't ever call this function with an expired bufcall id.
+ *  unbufcall:	- cancel a buffer callout
+ *  @bcid:	buffer call id returned by bufcall() or esbbcall()
+ *  Notices:	Don't ever call this function with an expired bufcall id.
  */
 void unbufcall(bcid_t bcid)
 {
@@ -1105,10 +1131,10 @@ void unbufcall(bcid_t bcid)
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /**
- *  QUNBUFCALL - cancel a buffer callout
- *  @q:queue used for synchronization
- *  @bcid:buffer call id returned by qbufcall()
- *  NOTICES:Don't ever call this function with an expired bufcall id.
+ *  qunbufcall:	- cancel a buffer callout
+ *  @q:		queue used for synchronization
+ *  @bcid:	buffer call id returned by qbufcall()
+ *  Notices:	Don't ever call this function with an expired bufcall id.
  */
 void qunbufcall(queue_t *q, bufcall_id_t bcid)
 {
@@ -1116,12 +1142,13 @@ void qunbufcall(queue_t *q, bufcall_id_t bcid)
 }
 #endif
 
-/* 
- *  TIMEOUT
- *  -------------------------------------------------------------------------
- *  Note that, for MP safety, timeouts are always raised against the same
- *  processor that invoked the timeout.  This means that the callback function
- *  will not execute until after the caller hits a pre-emption point.
+/**
+ *  timeout:	- issue a timeout callback
+ *  @arg:	client data
+ *
+ *  Notices:	Note that, for MP safety, timeouts are always raised against the same processor that
+ *  invoked the timeout.  This means that the callback function will not execute until after the
+ *  caller hits a pre-emption point.
  */
 static void timeout_function(unsigned long arg)
 {
@@ -1178,9 +1205,9 @@ toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
 }
 #endif
 
-/* 
- *  UNTIMEOUT
- *  -------------------------------------------------------------------------
+/**
+ *  untimeout:	- cancel a timeout callback
+ *  @toid:	timeout identifier
  */
 clock_t untimeout(toid_t toid)
 {
@@ -1205,9 +1232,18 @@ clock_t quntimeout(queue_t *q, timeout_id_t toid)
 }
 #endif
 
-/* 
- *  WELDQ
- *  -------------------------------------------------------------------------
+/*
+ *  __weldq:	- weld/unweld two queue pairs together/apart
+ *  @q1:	first queue to weld/unweld
+ *  @q2:	second queue to weld/unweld
+ *  @q3:	third queue to weld/unweld
+ *  @q4:	forth queue to weld/unweld
+ *  @func:	callback function after weld/unweld complete
+ *  @arg:	argument to callback function
+ *  @protq:	queue to use for synchronization
+ *  @type:	event type (%SE_WELD or %SE_UNWELD)
+ *
+ *  Issues the STREAMS event necessary to weld two queue pairs together with synchronization.
  */
 static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		   weld_arg_t arg, queue_t *protq, int type)
@@ -1229,6 +1265,23 @@ static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_
 	}
 	return (EAGAIN);
 }
+
+/**
+ *  weldq:	- weld two queue pairs together
+ *  @q1:	first queue to weld (to @q3)
+ *  @q2:	second queue to weld (to @q4)
+ *  @q3:	third queue to weld (from @q1)
+ *  @q4:	forth queue to weld (from @q2)
+ *  @func:	callback function after weld complete
+ *  @arg:	argument to callback function
+ *  @protq:	queue to use for synchronization
+ *
+ *  weldq() ssues a request to the STREAMS schedule to weld two queue pairs together (@q1 to @q3 and
+ *  @q4 to @q2) with synchronization against @protq.  Once the weld is complete the @func callback
+ *  with be called with argument @arg.
+ *
+ *  Notices: The @func callback function will be called by the same CPU upon which weldq() was issued.
+ */
 int weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
 	  queue_t *protq)
 {
@@ -1248,9 +1301,22 @@ int weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, w
 	return __weldq(q1, q2, q3, q4, func, arg, protq, SE_WELDQ);
 }
 
-/* 
- *  UNWELDQ
- *  -------------------------------------------------------------------------
+/**
+ *  unweldq:	- unweld two queue pairs from each other
+ *  @q1:	first queue to unweld (from @q3)
+ *  @q2:	second queue to unweld (from @q4)
+ *  @q3:	third queue to unweld
+ *  @q4:	fouth queue to unweld
+ *  @func:	callback function after weld complete
+ *  @arg:	argument to callback function
+ *  @protq:	queue to use for synchronization
+ *
+ *  unwelq() issues a request to the STREAMS scheduler to unweld two queue pairs from each other
+ *  (@q1 from @q3 and @q4 from @q2) with synchronization against @protq.  Once the unwelding is
+ *  complete, the @func callback function will be called with argument @arg.
+ *
+ *  Notices: The @func callback function will be called by the same CPU upon which unweldq() was issued.
+ *
  */
 int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_arg_t arg,
 	    queue_t *protq)
@@ -1271,11 +1337,18 @@ int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 	return __weldq(q1, NULL, q3, NULL, func, arg, protq, SE_UNWELDQ);
 }
 
-/* 
- *  STREAMS_PUT
- *  -------------------------------------------------------------------------
- */
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) || defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
+/*
+ *  defer_func:	- defer a STREAMS procedure call
+ *  @func:	function call to defer
+ *  @q:		associated queue
+ *  @mp:	associated message block
+ *  @arg:	associated argument
+ *  @perim:	sychornization perimiter
+ *  @type:	function call type, currently %SE_STRPUT or %SE_WRITER
+ *
+ *  Deferrable functions that use defer_func() are streams_put() and qwriter().
+ */
 static int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
 		      int perim, int type)
 {
@@ -1297,6 +1370,26 @@ static int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, v
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
+/**
+ *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
+ *  @func:  put function (often the put() function)
+ *  @q:	    queue against which to defer the call
+ *  @mp:    message block to pass to the callback function
+ *  @priv:  private data to pass to the callback function (often @q)
+ *
+ *  streams_put() will defer the function @func until it can synchronize with @q.  Once the @q has
+ *  been syncrhonized, the STREAMS scheduler will call the callback function @func with arguments
+ *  @priv and @mp.  streams_put() is closely related to qwrite() below.
+ *
+ *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
+ *  streams_put().  @func is guarateed not to run until the caller exits or preempts.
+ *
+ *  Usage: streams_put() is intended to be called from contexts outside of the STREAMS scheduler
+ *  (e.g. interrupt service routines) where @func is intended to run under the STREAMS scheduler.
+ *
+ *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
+ *  guaranteed to be executed within the STREAMS scheduler.
+ */
 void streams_put(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *priv)
 {
 	if (defer_func(func, q, mp, priv, 0, SE_STRPUT) == 0)
@@ -1304,19 +1397,21 @@ void streams_put(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *
 	never();
 }
 #endif
-#if 0
-void __defer_put(queue_t *q, mblk_t *mp)
-{
-	if (defer_func((void (*)(void *, mblk_t *)) put, q, mp, q, 0, SE_STRPUT) == 0)
-		return;
-	never();
-}
-#endif
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-/* 
- *  QWRITER
- *  ---------------------------------------------------------------------------
+/**
+ *  qwriter:	- deferred call to a callback function.
+ *  @qp:	a pointer to the RD() queue of a queue pair
+ *  @mp:	message pointer to pass to writer function
+ *  @func:	writer function
+ *  @perimeter:	perimeter to enter
+ *
+ *  qwriter() will defer the function @func until it can enter @perimeter associated with queue pair
+ *  @qp.  Once the @perimeter has been entered, the STREAMS executive will call the callback
+ *  function @func with arguments @qp and @mp.  qwriter() is closely related to streams_put() above.
+ *
+ *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
+ *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
  */
 void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter)
 {
@@ -1353,10 +1448,18 @@ static void defer_event(syncq_t *sq, struct strevent *se, unsigned long *flagsp)
 	unlock_syncq(sq, flagsp);
 }
 
+/*
+ *  sq_stream:	- execute deferred %SE_STREAM event
+ *  @se:	deferred event
+ */
 static void sq_stream(struct strevent *se)
 {
 }
 
+/*
+ *  sq_bufcall:	- execute deferred %SE_BUFCALL event
+ *  @se:	deferred event
+ */
 static void sq_bufcall(struct strevent *se)
 {
 	queue_t *q = se->x.b.queue;
@@ -1376,6 +1479,10 @@ static void sq_bufcall(struct strevent *se)
 		defer_event(osq, se, &flags);
 }
 
+/*
+ *  sq_timeout:	- execute deferred %SE_TIMEOUT event
+ *  @se:	deferred event
+ */
 static void sq_timeout(struct strevent *se)
 {
 	queue_t *q = se->x.t.queue;
@@ -1400,6 +1507,10 @@ static void sq_timeout(struct strevent *se)
 		defer_event(osq, se, &flags);
 }
 
+/*
+ *  sq_weldq:	- execute deferred %SE_WELDQ event
+ *  @se:	deferred event
+ */
 static void sq_weldq(struct strevent *se)
 {
 	queue_t *q = se->x.w.queue;
@@ -1441,6 +1552,10 @@ static void sq_weldq(struct strevent *se)
 		defer_event(osq, se, &flags);
 }
 
+/*
+ *  sq_unweldq:	- execute deferred %SE_UNWELDQ event
+ *  @se:	deferred event
+ */
 static void sq_unweldq(struct strevent *se)
 {
 	queue_t *q = se->x.w.queue;
@@ -1482,6 +1597,10 @@ static void sq_unweldq(struct strevent *se)
 		defer_event(osq, se, &flags);
 }
 
+/*
+ *  sq_strput:	- execute deferred %SE_STRPUT event
+ *  @se:	deferred event
+ */
 static void sq_strput(struct strevent *se)
 {
 	queue_t *q = se->x.p.queue;
@@ -1510,6 +1629,10 @@ static void sq_strput(struct strevent *se)
 	hrunlock(q);
 }
 
+/*
+ *  sq_writer:	- execute deferred %SE_WRITER event
+ *  @se:	deferred event
+ */
 static void sq_writer(struct strevent *se)
 {
 	queue_t *q = se->x.p.queue;
@@ -1544,6 +1667,10 @@ static void sq_writer(struct strevent *se)
 	hrunlock(q);
 }
 
+/*
+ *  sq_putp:	- execute deferred %SE_PUTP event
+ *  @se:	deferred event
+ */
 static void sq_putp(struct strevent *se)
 {
 	/* this will defer itself if necessary */
@@ -1551,21 +1678,26 @@ static void sq_putp(struct strevent *se)
 	event_free(se);
 }
 
-/* 
- *  KMEM_ALLOC
- *  -------------------------------------------------------------------------
+/**
+ *  kmem_alloc:	- allocate memory
+ *  @size:	amount of memory to allocate in bytes
+ *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
 
-/* 
- *  KMEM_ZALLOC
- *  -------------------------------------------------------------------------
+/**
+ *  kmem_zalloc: - allocate and zero memory
+ *  @size:	amount of memory to allocate in bytes
+ *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
 
-/* 
- *  KMEM_FREE
- *  -------------------------------------------------------------------------
+/**
+ *  kmem_free:	- free memory
+ *  @addr:	address of memory
+ *  @size:	amount of memory to free
+ *
+ *  Frees memory allocated with kmem_alloc() or kmem_zalloc().
  */
 void kmem_free(void *addr, size_t size)
 {
@@ -1579,9 +1711,16 @@ void kmem_free(void *addr, size_t size)
 
 /* 
  *  -------------------------------------------------------------------------
+ *
+ *  STREAMS Scheduler SOFTIRQ kernel thread runs
+ *
  *  -------------------------------------------------------------------------
  */
 
+/*
+ *  timeouts:	- process timeouts
+ *  @t:		STREAMS execution thread
+ */
 static inline void timeouts(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -1617,6 +1756,10 @@ static inline void timeouts(struct strthread *t)
 		local_irq_restore(flags);
 }
 
+/*
+ *  doevents:	- process STREAMS events
+ *  @t:		STREAMS execution thread
+ */
 static inline void doevents(struct strthread *t)
 {
 	register struct strevent *se, *se_next;
@@ -1673,7 +1816,6 @@ static inline void doevents(struct strthread *t)
 			case SE_WRITER:
 			{
 				hwlock(se->x.p.queue, &flags);
-
 				qpwlock(se->x.p.queue);
 				if (se->x.p.func)
 					se->x.p.func(se->x.p.arg, se->x.p.mp);
@@ -1689,6 +1831,10 @@ static inline void doevents(struct strthread *t)
 		local_irq_restore(flags);
 }
 
+/*
+ *  backlog:	- process message backlog
+ *  @t:		STREAMS execution thread
+ */
 static inline void backlog(struct strthread *t)
 {
 	register syncq_t *sq, *sq_link;
@@ -1742,16 +1888,17 @@ static inline void backlog(struct strthread *t)
 		local_irq_restore(flags);
 }
 
-/* 
- *  First order of business for runqueues() is to call bufcalls if there are
- *  bufcalls waiting and there are now blocks available.  We only keep track
- *  of blocks and memory that the streams subsystem frees, so streams modules
- *  will only be allowed to proceed if other modules free something.
- *  Unfortunately, this means that the streams subsystem can lock.  If all
- *  modules hang onto their memory and blocks, and request more, and fail on
- *  allocation, then the streams subsystem will hang until an external event
- *  kicks it.  Therefore, we kick the chain every time an allocation is
- *  successful.
+/*
+ *  bufcalls:	- process bufcalls
+ *  @t:		STREAMS execution thread
+ *
+ *  First order of business for runqueues() is to call bufcalls if there are bufcalls waiting and
+ *  there are now blocks available.  We only keep track of blocks and memory that the streams
+ *  subsystem frees, so streams modules will only be allowed to proceed if other modules free
+ *  something.  Unfortunately, this means that the streams subsystem can lock.  If all modules hang
+ *  onto their memory and blocks, and request more, and fail on allocation, then the streams
+ *  subsystem will hang until an external event kicks it.  Therefore, we kick the chain every time
+ *  an allocation is successful.
  */
 static inline void bufcalls(struct strthread *t)
 {
@@ -1788,6 +1935,10 @@ static inline void bufcalls(struct strthread *t)
 		local_irq_restore(flags);
 }
 
+/*
+ *  queuerun:	- process service procedures
+ *  @t:		STREAMS execution thread
+ */
 static inline void queuerun(struct strthread *t)
 {
 	register queue_t *q, *q_link;
@@ -1824,9 +1975,8 @@ static inline void queuerun(struct strthread *t)
 		local_irq_restore(flags);
 }
 
-/* 
- *  SETQSCHED
- *  -------------------------------------------------------------------------
+/**
+ *  setqsched:	- schedule execution of queue procedures
  */
 void inline setqsched(void)
 {
@@ -1835,12 +1985,13 @@ void inline setqsched(void)
 		raise_softirq(STREAMS_SOFTIRQ);
 }
 
-/* 
- *  QSCHEDULE
- *  -------------------------------------------------------------------------
- *  Note that, for MP safety,  queues are always scheduled against the same
- *  cpu that enabled the queue.  This means that the service procedure will
- *  not run until after the caller hits a pre-emption point.
+/**
+ *  qschedule:	- schedule a queue for service
+ *  @q:		queue to schedule for service
+ *
+ *  Notices: Note that, for MP safety, queues are always scheduled against the same CPU that enabled
+ *  the queue.  This means that the service procedure will not run until after the caller exits or
+ *  hits a pre-emption point.
  */
 static void qschedule(queue_t *q)
 {
@@ -1853,12 +2004,11 @@ static void qschedule(queue_t *q)
 }
 
 /**
- *  SQSCHED - schedule a synchronization queue
- *  @sq:the synchronization queue to schedule
+ *  sqsched - schedule a synchronization queue
+ *  @sq: the synchronization queue to schedule
  *
- *  DESCRIPTION:SQSCHED schedules the synchronization queue @sq to have its
- *  backlog of events serviced, if necessary.  SQSCHED is called when the last
- *  thread leaves a sychronization queue (barrier).
+ *  sqsched() schedules the synchronization queue @sq to have its backlog of events serviced, if
+ *  necessary.  sqsched() is called when the last thread leaves a sychronization queue (barrier).
  */
 void sqsched(syncq_t *sq)
 {
@@ -1872,9 +2022,9 @@ void sqsched(syncq_t *sq)
 	}
 }
 
-/* 
- *  ENABLEQ
- *  -------------------------------------------------------------------------
+/**
+ *  enableq:	- enable a queue service procedure
+ *  @q:		queue for which service procedure is to be enabled
  */
 int enableq(queue_t *q)
 {
@@ -1885,27 +2035,36 @@ int enableq(queue_t *q)
 	return (0);
 }
 
-/* 
- *  QENABLE
- *  -------------------------------------------------------------------------
+/**
+ *  qenable:	- schedule a queue for execution
+ *  @q:		queue to schedule for service
+ *
+ *  Another name for qschedule().
  */
 void qenable(queue_t *q)
 {
 	(void) qschedule(q);
 }
 
-/* 
- *  ENABLEOK
- *  -------------------------------------------------------------------------
+/**
+ *  enableok:	- permit scheduling of a queue service procedure
+ *  @q:		queue to permit service procedure scheduling
  */
 __EXTERN_INLINE void enableok(queue_t *q);
 
-/* 
- *  NOENABLE
- *  -------------------------------------------------------------------------
+/**
+ *  noenable:	- defer scheduling of a queue service procedure
+ *  @q:		queue to defer service procedure scheduling
  */
 __EXTERN_INLINE void noenable(queue_t *q);
 
+/*
+ *  freechains:	- free chains of message blocks
+ *  @t:		STREAMS execution thread
+ *
+ *  Free chains of message blocks outstanding from flush operations that were left over at the end
+ *  of the CPU run.
+ */
 static inline void freechains(struct strthread *t)
 {
 	register mblk_t *mp, *mp_next;
@@ -1927,6 +2086,15 @@ static inline void freechains(struct strthread *t)
 		local_irq_restore(flags);
 }
 
+/*
+ *  freechain:	- place a chain of message blocks on the free list
+ *  @mp:	head of message block chain
+ *  @mpp:	
+ *
+ *  Frees a chain of message blocks to the freechains list.  The freechains list contians one big
+ *  chain of message blocks formed by concatenating these freed chains.  They will be dealt with at
+ *  the end of the STREAMS scheduler SOFTIRQ run.
+ */
 void freechain(mblk_t *mp, mblk_t **mpp)
 {
 	struct strthread *t = this_thread;
@@ -1935,6 +2103,10 @@ void freechain(mblk_t *mp, mblk_t **mpp)
 		raise_softirq(STREAMS_SOFTIRQ);
 }
 
+/*
+ *  runqueues:	- run scheduled STRAMS events on the current processor
+ *  @unused:	unused
+ */
 static void runqueues(struct softirq_action *unused)
 {
 	struct strthread *t = this_thread;
@@ -2094,6 +2266,9 @@ static struct cacheinfo {
 
 /* Note: that we only have one cache for both MSGBLOCKs and MDBBLOCKs */
 
+/*
+ *  str_term_caches:	- terminate caches
+ */
 static void str_term_caches(void)
 {
 	int j;
@@ -2113,6 +2288,9 @@ static void str_term_caches(void)
 	}
 }
 
+/*
+ *  str_init_caches:	- initialize caches
+ */
 static int str_init_caches(void)
 {
 	int j;
@@ -2143,7 +2321,10 @@ static int str_init_caches(void)
 
 static typeof(&open_softirq) _open_softirq = (typeof(_open_softirq)) HAVE_OPEN_SOFTIRQ_ADDR;
 
-	int strsched_init(void)
+/**
+ *  strsched_init:  - initialize the STREAMS scheduler
+ */
+int strsched_init(void)
 {
 	int result, i;
 	if ((result = str_init_caches()) < 0)

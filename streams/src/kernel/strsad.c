@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:33 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:33 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:02 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:33 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:02 $";
 
 #define __NO_VERSION__
 
@@ -134,13 +134,13 @@ struct strapush *autopush_find(dev_t dev)
 	unsigned long flags;
 	struct cdevsw *cdev;
 	struct apinfo *api = NULL;
-	if ((cdev = sdev_get(getmajor(dev))) == NULL)
+	if ((cdev = cdev_get(getmajor(dev))) == NULL)
 		goto notfound;
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
 		ap_grab(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	sdev_put(cdev);
+	cdev_put(cdev);
       notfound:
 	return ((struct strapush *) api);
 }
@@ -175,12 +175,12 @@ int autopush_add(struct strapush *sap)
 			goto error;
 	}
 	err = -ENOSTR;
-	if ((cdev = sdev_get(sap->sap_major)) == NULL)
+	if ((cdev = cdev_get(sap->sap_major)) == NULL)
 		goto error;
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	sdev_put(cdev);
+	cdev_put(cdev);
       error:
 	return (err);
 }
@@ -194,12 +194,12 @@ int autopush_del(struct strapush *sap)
 	if (sap->sap_major >= MAX_CHRDEV)
 		goto error;
 	err = -ENODEV;
-	if ((cdev = sdev_get(sap->sap_major)) == NULL)
+	if ((cdev = cdev_get(sap->sap_major)) == NULL)
 		goto error;
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	sdev_put(cdev);
+	cdev_put(cdev);
       error:
 	return (err);
 }
@@ -213,8 +213,8 @@ int autopush_vml(struct str_mlist *smp, int nmods)
 		len = strnlen(smp->l_name, FMNAMESZ + 1);
 		if (len == 0 || len == FMNAMESZ + 1)
 			goto einval;
-		if ((fmod = smod_find(smp->l_name)) != NULL)
-			smod_put(fmod);
+		if ((fmod = fmod_find(smp->l_name)) != NULL)
+			fmod_put(fmod);
 		else
 			rtn = 1;
 	}

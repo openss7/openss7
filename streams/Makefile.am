@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/04/24 21:27:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/04/30 10:41:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/24 21:27:04 $ by $Author: brian $
+# Last Modified $Date: 2004/04/30 10:41:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -390,6 +390,7 @@ EXPORT_SRCFILES = \
 	src/compat/svr4/svr4compat.c \
 	src/compat/uw7/uw7compat.c \
 	src/drivers/strpipe.c \
+	src/drivers/strfifo.c \
 	src/kernel/strsyms.c
 
 EXPORT_VERFILES = \
@@ -401,6 +402,7 @@ EXPORT_VERFILES = \
 	include/sys/versions/svr4compat.ver \
 	include/sys/versions/uw7compat.ver \
 	include/sys/versions/strpipe.ver \
+	include/sys/versions/strfifo.ver \
 	include/sys/versions/strsyms.ver
 
 PKGINCL = include/sys

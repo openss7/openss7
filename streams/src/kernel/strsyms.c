@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/28 01:30:34 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/28 01:30:34 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/30 10:42:02 $";
 
 #define __NO_VERSION__
 #define EXPORT_SYMTAB
@@ -158,9 +158,9 @@ EXPORT_SYMBOL(flushq);		/* stream.h */
 EXPORT_SYMBOL(freeb);		/* stream.h */
 EXPORT_SYMBOL(freemsg);		/* stream.h */
 EXPORT_SYMBOL(freezestr);	/* stream.h */
-EXPORT_SYMBOL(getadmin);	/* stream.h */
+EXPORT_SYMBOL(getadmin);	/* stream.h, strreg.c */
 EXPORT_SYMBOL(getmajor);	/* ddi.h */
-EXPORT_SYMBOL(getmid);		/* stream.h */
+EXPORT_SYMBOL(getmid);		/* stream.h, strreg.c */
 EXPORT_SYMBOL(getminor);	/* ddi.h */
 EXPORT_SYMBOL(getq);		/* stream.h */
 EXPORT_SYMBOL(insq);		/* stream.h */
@@ -231,7 +231,7 @@ EXPORT_SYMBOL(msgsize);		/* stream.h LiS */
 EXPORT_SYMBOL(qcountstrm);	/* stream.h LiS */
 EXPORT_SYMBOL(xmsgsize);	/* stream.h LiS */
 
-#ifdef _AIX_STREAMS_SOURCE
+#ifdef _AIX_SOURCE
 EXPORT_SYMBOL(mi_bufcall);	/* aixddi.h */
 #endif
 
@@ -243,18 +243,10 @@ EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
 #endif
 
 EXPORT_SYMBOL_GPL(register_inode);	/* strconf.h */
-EXPORT_SYMBOL_GPL(register_inode_major);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(register_inode_minor);      /* strconf.h */
 EXPORT_SYMBOL_GPL(register_strdev);	/* strconf.h */
-EXPORT_SYMBOL_GPL(register_strdev_major);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(register_strdev_minor);     /* strconf.h */
 EXPORT_SYMBOL_GPL(register_strmod);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_inode);	/* strconf.h */
-EXPORT_SYMBOL_GPL(unregister_inode_major);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(unregister_inode_minor);    /* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strdev);	/* strconf.h */
-EXPORT_SYMBOL_GPL(unregister_strdev_major);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(unregister_strdev_minor);   /* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strmod);	/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_add);	/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_del);	/* strconf.h */
@@ -268,8 +260,6 @@ EXPORT_SYMBOL_GPL(specfs_mnt);	/* strspecfs.h */
 	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
 	defined(CONFIG_STREAMS_SC_MODULE) || \
 	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-EXPORT_SYMBOL(fmodsw);		/* strreg.h */
-EXPORT_SYMBOL(cdevsw);		/* strreg.h */
 EXPORT_SYMBOL(strm_open);	/* strreg.h */
 EXPORT_SYMBOL(sdev_open);	/* strreg.h */
 EXPORT_SYMBOL(fmodsw_list);	/* strreg.h */
@@ -309,12 +299,13 @@ EXPORT_SYMBOL(strwritev);	/* strhead.h */
 EXPORT_SYMBOL(apush_get);	/* strconf.h */
 EXPORT_SYMBOL(apush_set);	/* strconf.h */
 EXPORT_SYMBOL(apush_vml);	/* strconf.h */
-EXPORT_SYMBOL(sdev_get);	/* strsubr.h */
-EXPORT_SYMBOL(sdev_put);	/* strsubr.h */
-EXPORT_SYMBOL(sdev_find);	/* strsubr.h */
-EXPORT_SYMBOL(smod_get);	/* strsubr.h */
-EXPORT_SYMBOL(smod_put);	/* strsubr.h */
-EXPORT_SYMBOL(smod_find);	/* strsubr.h */
+EXPORT_SYMBOL(cdev_get);	/* strsubr.h, strreg.c */
+EXPORT_SYMBOL(cdev_put);	/* strsubr.h, strreg.c */
+EXPORT_SYMBOL(cdev_find);	/* strsubr.h, strreg.c */
+EXPORT_SYMBOL(fmod_get);	/* strsubr.h, strreg.c */
+EXPORT_SYMBOL(fmod_put);	/* strsubr.h, strreg.c */
+EXPORT_SYMBOL(fmod_find);	/* strsubr.h, strreg.c */
+EXPORT_SYMBOL(node_find);	/* strsubr.h, strreg.c */
 EXPORT_SYMBOL(vcmn_err);	/* cmn_err.h */
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
 EXPORT_SYMBOL(do_fattach);	/* strattach.h */

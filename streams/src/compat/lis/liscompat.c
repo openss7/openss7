@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:32 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:32 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:32 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -118,7 +118,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:32 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -595,9 +595,9 @@ streamtab_t *lis_find_strdev(major_t major)
 	struct streamtab *st = NULL;
 	if (major < MAX_CHRDEV) {
 		struct cdevsw *cdev;
-		if ((cdev = sdev_get(major)) != NULL) {
+		if ((cdev = cdev_get(major)) != NULL) {
 			st = cdev->d_str;
-			sdev_put(cdev);
+			cdev_put(cdev);
 		}
 	}
 	return st;
@@ -2132,7 +2132,6 @@ EXPORT_SYMBOL_GPL(lis_fdetach_stream);
 int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const char *name)
 {
 	struct cdevsw *cdev;
-	dev_t dev = makedevice(major, 0);
 	int err;
 	if ((cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)) == NULL)
 		return (-ENOMEM);
@@ -2142,7 +2141,7 @@ int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, con
 	cdev->d_kmod = NULL;
 	atomic_set(&cdev->d_count, 0);
 	INIT_LIST_HEAD(&cdev->d_apush);
-	if ((err = WARN(register_strdev_major(dev, cdev))) < 0)
+	if ((err = WARN(register_strdev(major, cdev))) < 0)
 		kmem_free(cdev, sizeof(*cdev));
 	return (err);
 }
@@ -2156,16 +2155,15 @@ EXPORT_SYMBOL_GPL(lis_register_strdev);
 int lis_unregister_strdev(major_t major)
 {
 	struct cdevsw *cdev;
-	dev_t dev = makedevice(major, 0);
 	int err;
 	if (0 >= major || major >= MAX_CHRDEV)
 		return (-EINVAL);
-	if ((cdev = sdev_get(major)) == NULL)
+	if ((cdev = cdev_get(major)) == NULL)
 		return (-ENOENT);
-	sdev_put(cdev);
-	/* we should be able to accept a cdev of NULL so that we don't need to export sdev_get and
-	   sdev_put when liscomp is loaded as a module */
-	if ((err = unregister_strdev_major(dev, cdev)) == 0)
+	cdev_put(cdev);
+	/* we should be able to accept a cdev of NULL so that we don't need to export cdev_get and
+	   cdev_put when liscomp is loaded as a module */
+	if ((err = unregister_strdev(major, cdev)) == 0)
 		kmem_free(cdev, sizeof(*cdev));
 	return (err);
 }
@@ -2180,7 +2178,6 @@ EXPORT_SYMBOL_GPL(lis_unregister_strdev);
 modID_t lis_register_strmod(struct streamtab *strtab, const char *name)
 {
 	struct fmodsw *fmod;
-	modID_t modid = 0;
 	int err;
 	if ((fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)) == NULL)
 		return (-ENOMEM);
@@ -2190,7 +2187,7 @@ modID_t lis_register_strmod(struct streamtab *strtab, const char *name)
 	fmod->f_flag = D_MP | D_MTPERQ;	/* mark LiS compatibility for qopen and qclose */
 	fmod->f_kmod = NULL;
 	atomic_set(&fmod->f_count, 0);
-	if ((err = register_strmod(modid, fmod)) < 0)
+	if ((err = register_strmod(fmod)) < 0)
 		kmem_free(fmod, sizeof(*fmod));
 	return (err);
 }
@@ -2204,15 +2201,14 @@ EXPORT_SYMBOL_GPL(lis_register_strmod);
 int lis_unregister_strmod(struct streamtab *strtab)
 {
 	struct fmodsw *fmod;
-	modID_t modid = 0;
 	int err;
 	/* this is ugly, we have to ignore "name" for deregistration */
-	/* we should be able to accept a cdev of NULL so that we don't need to export smod_find and
-	   smod_put when liscomp is loaded as a module */
-	if ((fmod = smod_find(strtab->st_rdinit->qi_minfo->mi_idname)) == NULL)
+	/* we should be able to accept a cdev of NULL so that we don't need to export fmod_find and
+	   fmod_put when liscomp is loaded as a module */
+	if ((fmod = fmod_find(strtab->st_rdinit->qi_minfo->mi_idname)) == NULL)
 		return (-ENOENT);
-	smod_put(fmod);
-	if ((err = WARN(unregister_strmod(modid, fmod))) == 0)
+	fmod_put(fmod);
+	if ((err = WARN(unregister_strmod(fmod))) == 0)
 		kmem_free(fmod, sizeof(*fmod));
 	return (err);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -629,6 +629,8 @@ static struct file_operations fifo_f_ops ____cacheline_aligned = {
 #endif
 };
 
+EXPORT_SYMBOL(fifo_f_ops);
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -813,7 +815,7 @@ static int __init fifo_init(void)
 #else
 	printk(KERN_INFO FIFO_SPLASH);
 #endif
-	if ((err = register_inode(makedevice(major, 0), &fifo_cdev, &fifo_ops)) < 0)
+	if ((err = register_inode(major, &fifo_cdev, &fifo_ops)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
@@ -822,7 +824,7 @@ static int __init fifo_init(void)
 static void __exit fifo_exit(void)
 {
 	int err;
-	if ((err = unregister_inode(makedevice(major, 0), &fifo_cdev)))
+	if ((err = unregister_inode(major, &fifo_cdev)))
 		return (void) (err);
 	return (void) (0);
 };

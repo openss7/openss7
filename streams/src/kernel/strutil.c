@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:34 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:34 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $";
 
 #define __NO_VERSION__
 
@@ -144,9 +144,14 @@ static inline struct mdbblock *mb_to_mdb(mblk_t *mb)
 	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
 }
 
-/* 
- *  ADJMSG
- *  -------------------------------------------------------------------------
+/**
+ *  adjmsg:	- adjust a message
+ *  @mp:	message to adjust
+ *  @length:	length to trim
+ *
+ *  Trims -@length bytes from the head of the message or @length bytes from the end of the message.
+ *
+ *  Return Values: (1) - success; (0) - failure
  */
 int adjmsg(mblk_t *mp, ssize_t length)
 {
@@ -211,9 +216,10 @@ int adjmsg(mblk_t *mp, ssize_t length)
 	return (0);
 }
 
-/* 
- *  ALLOCB
- *  -------------------------------------------------------------------------
+/**
+ *  allocb:	- allocate a message block
+ *  @size:	size of message block in bytes
+ *  @priority:	priority of the allocation
  */
 mblk_t *allocb(size_t size, uint priority)
 {
@@ -243,17 +249,21 @@ mblk_t *allocb(size_t size, uint priority)
 	return (NULL);
 }
 
-/* 
- *  ALLOCB_PHYSREQ
- *  -------------------------------------------------------------------------
+/**
+ *  allocb_physreq:	- allocate a message block with physical requirements
+ *  @size:		number of bytes to allocate
+ *  @priority:		priority of the allocation
+ *  @physreq_ptr:	physical requirements of the message block
  */
 __EXTERN_INLINE mblk_t *allocb_physreq(size_t size, uint priority, void *physreq_ptr);
 
-/* 
- *  COPYB
- *  -------------------------------------------------------------------------
- *  Unlike LiS we do not align the copy.  The driver must me wary of
- *  alignment.
+/**
+ *  copyb:	- copy a message block
+ *  @bp:	the message block to copy
+ *
+ *  Return Values: Returns the copy of the message or %NULL on failure.
+ *
+ *  Notices: Unlike LiS we do not align the copy.  The driver must me wary of alignment.
  */
 mblk_t *copyb(mblk_t *bp)
 {
@@ -271,9 +281,11 @@ mblk_t *copyb(mblk_t *bp)
 	return (mp);
 }
 
-/* 
- *  COPYMSG
- *  -------------------------------------------------------------------------
+/**
+ *  copymsg:	- copy a message
+ *  @msg:	message to copy
+ *
+ *  Copies all the message blocks in message @msg and returns a pointer to the copied message.
  */
 mblk_t *copymsg(mblk_t *msg)
 {
@@ -288,15 +300,15 @@ mblk_t *copymsg(mblk_t *msg)
 	return (NULL);
 }
 
-/* 
- *  DATAMSG
- *  -------------------------------------------------------------------------
+/**
+ *  datamsg:	- test for data message type
+ *  @type:	type to test
  */
 __EXTERN_INLINE int datamsg(unsigned char type);
 
-/* 
- *  DUPB
- *  -------------------------------------------------------------------------
+/**
+ *  dupb:	- duplicates a message block
+ *  @bp:	message block to duplicate
  */
 mblk_t *dupb(mblk_t *bp)
 {
@@ -314,14 +326,18 @@ mblk_t *dupb(mblk_t *bp)
 	return (mp);
 }
 
-/* 
- *  DUPMSG
- *  -------------------------------------------------------------------------
+/**
+ *  dupmsg:	- duplicate a message
+ *  @msg:	message to duplicate
+ *
+ *  Duplicates an entire message using dupb() to duplicate each of the message blocks in the
+ *  message.  Returns a pointer to the duplicate message.
  */
-mblk_t *dupmsg(mblk_t *bp)
+mblk_t *dupmsg(mblk_t *msg)
 {
-	mblk_t *mp = NULL, **mpp = &mp;
-	for (; bp; bp = bp->b_cont, mpp = &(*mpp)->b_cont)
+	mblk_t *mp = NULL;
+	register mblk_t *bp, **mpp = &mp;
+	for (bp = msg; bp; bp = bp->b_cont, mpp = &(*mpp)->b_cont)
 		if (!(*mpp = dupb(bp)))
 			goto error;
 	return (mp);
@@ -330,9 +346,12 @@ mblk_t *dupmsg(mblk_t *bp)
 	return (NULL);
 }
 
-/* 
- *  ESBALLOC
- *  -------------------------------------------------------------------------
+/**
+ *  esballoc:	- allocate a message block with an external buffer
+ *  @base:	base address of message buffer
+ *  @size:	size of the message buffer
+ *  @priority:	priority of message block header allocation
+ *  @freeinfo:	free routine callback
  */
 mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 {
@@ -355,9 +374,9 @@ mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freein
 	return (mp);
 }
 
-/* 
- *  FREEB
- *  -------------------------------------------------------------------------
+/**
+ *  freeb:	- free a message block
+ *  @mp:	message block to free
  */
 void freeb(mblk_t *mp)
 {
@@ -391,45 +410,51 @@ void freeb(mblk_t *mp)
 	return;
 }
 
-/* 
- *  FREEMSG
- *  -------------------------------------------------------------------------
+/**
+ *  freemsg:	- free a message
+ *  @mp:	the message to free
  */
 __EXTERN_INLINE void freemsg(mblk_t *mp);
 
-/* 
- *  ISDATABLK
- *  -------------------------------------------------------------------------
+/**
+ *  isdatablk:	- test data block for data type
+ *  @dp:	data block to test
  */
 __EXTERN_INLINE int isdatablk(dblk_t * dp);
 
-/* 
- *  ISDATAMSG
- *  -------------------------------------------------------------------------
+/**
+ *  isdatamsg:	- test a message block for data type
+ *  @mp:	message block to test
  */
 __EXTERN_INLINE int isdatamsg(mblk_t *mp);
 
-/* 
- *  LINKB
- *  -------------------------------------------------------------------------
+/**
+ *  linkb:	- link message block onto message
+ *  @mp1:	message onto which to link
+ *  @mp2:	message block to link
  */
 __EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
 
-/* 
- *  LINKMSG
- *  -------------------------------------------------------------------------
+/**
+ *  linkmsg:	- link messages
+ *  @mp1:	message onto which to link
+ *  @mp2:	message to link
  */
 __EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
 
-/* 
- *  MSGDSIZE
- *  -------------------------------------------------------------------------
+/**
+ *  msgdsize:	- calculate size of data in message
+ *  @mp:	message across which to calculate data bytes
  */
 __EXTERN_INLINE size_t msgdsize(mblk_t *mp);
 
-/* 
- *  MSGPULLUP
- *  -------------------------------------------------------------------------
+/**
+ *  msgpullup:	- pull up bytes into a message
+ *  @mp:	message to pull up
+ *  @length:	number of bytes to pull up
+ *
+ *  Pulls up @length  bytes into the returned message.  This is for handling heades as a contiguous
+ *  range of bytes.
  */
 mblk_t *msgpullup(mblk_t *msg, ssize_t length)
 {
@@ -491,15 +516,19 @@ mblk_t *msgpullup(mblk_t *msg, ssize_t length)
 	return (mp);
 }
 
-/* 
- *  MSGSIZE
- *  -------------------------------------------------------------------------
+/**
+ *  msgsize:	- calculate size of a message
+ *  @mp:	message for which to calculate size
  */
 __EXTERN_INLINE size_t msgsize(mblk_t *mp);
 
-/* 
- *  PULLUPMSG
- *  -------------------------------------------------------------------------
+/**
+ *  pullupmsg:	- pull up bytes into first data block in message
+ *  @mp:	message to pull up
+ *  @len:	number of bytes to pull up
+ *
+ *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling heades
+ *  as a contiguous range of bytes.
  */
 int pullupmsg(mblk_t *mp, ssize_t len)
 {
@@ -577,42 +606,44 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 	return (0);
 }
 
-/* 
- *  RMVB
- *  -------------------------------------------------------------------------
+/**
+ *  rmvb:   - remove a message block from a message
+ *  @mp:    message from which to remove the block
+ *  @bp:    the block to remove
  */
 __EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp);
 
-/* 
- *  TESTB
- *  -------------------------------------------------------------------------
+/**
+ *  testb:	- test allocate of a message block
+ *  @size:	size of buffer for which to test
+ *  @priority:	allocation priority to test
  */
 __EXTERN_INLINE int testb(size_t size, uint priority);
 
-/* 
- *  UNLINKB
- *  -------------------------------------------------------------------------
+/**
+ *  unlinkb:	- unlink first block of message
+ *  @mp:	message to unlink
  */
 __EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
 
-/* 
- *  XMSGSIZE
- *  -------------------------------------------------------------------------
- *  This is not bug-to-bug compatible with LiS.  Some differences: LiS wraps
- *  at a message size of 65636 and cannot handle message blocks larger than
- *  65636.  LiS will consider a non-zero initial block (such as that left by
- *  adjmsg()) as the first message block type when it should not.  This
- *  implementation does not wrap the size, and skips initial zero-length
- *  message blocks.  This implementation of xmsgsize does not span non-zero
- *  blocks of different types.
+/**
+ *  xmsgsize:	- calculate size in message of same type as first data block
+ *
+ *  Notices: This is not bug-to-bug compatible with LiS.  Some differences: LiS wraps at a message
+ *  size of 65636 and cannot handle message blocks larger than 65636.  LiS will consider a non-zero
+ *  initial block (such as that left by adjmsg()) as the first message block type when it should
+ *  not.  This implementation does not wrap the size, and skips initial zero-length message blocks.
+ *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
 __EXTERN_INLINE size_t xmsgsize(mblk_t *mp);
 
-/* 
- *  APPQ
- *  -------------------------------------------------------------------------
- */
 static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
+/**
+ *  appq:	- append a message onto a queue
+ *  @q:		the queue to append to
+ *  @emp:	existing message on queue
+ *  @nmp:	the message to append
+ */
 int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -636,15 +667,15 @@ int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	}
 }
 
-/* 
- *  BACKQ
- *  -------------------------------------------------------------------------
+/**
+ *  backq:	- find the queue upstream from this one
+ *  @q:		this queue
  */
 __EXTERN_INLINE queue_t *backq(queue_t *q);
 
-/* 
- *  QBACKENABLE
- *  -------------------------------------------------------------------------
+/**
+ *  qbackenable: - backenable a queue
+ *  @q:		the queue to backenable
  */
 void qbackenable(queue_t *q)
 {
@@ -658,9 +689,8 @@ void qbackenable(queue_t *q)
 	return;
 }
 
-/* 
- *  BCANGET
- *  -------------------------------------------------------------------------
+/*
+ *  __bcangetany:
  */
 static int __bcangetany(queue_t *q)
 {
@@ -668,6 +698,10 @@ static int __bcangetany(queue_t *q)
 	for (qb = q->q_bandp; qb && qb->qb_first; qb = qb->qb_next) ;
 	return (qb ? qb->qb_band : 0);
 }
+
+/*
+ *  __bcanget:
+ */
 static int __bcanget(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
@@ -676,7 +710,13 @@ static int __bcanget(queue_t *q, unsigned char band)
 		qb = NULL;
 	return (qb ? band : 0);
 }
+
 static int __canget(queue_t *q);
+/**
+ *  bcanget:	- check whether messages are on a queue
+ *  @q:		queue to check
+ *  @band:	band to check
+ */
 int bcanget(queue_t *q, int band)
 {
 	int result;
@@ -697,16 +737,8 @@ int bcanget(queue_t *q, int band)
 	return (result);
 }
 
-/* 
- *  BCANPUT
- *  -------------------------------------------------------------------------
- *  Don't call these functions with NULL q pointers!  To walk the list of
- *  queues we take a reader lock on the stream head.  We can use simple spins
- *  on the queue because we have already locked out interrupts if outside and
- *  interrupt handler.  We only need a read lock because the bit semantics on
- *  the queue band are atomic.
- *
- *  Use bcanput or bcanputnext with band -1 to check for any writable non-zero band.
+/*
+ *  __bcanputany:
  */
 static int __bcanputany(queue_t *q)
 {
@@ -725,6 +757,10 @@ static int __bcanputany(queue_t *q)
 	swerr();
 	return (0);
 }
+
+/*
+ *  __bcanput:
+ */
 static int __bcanput(queue_t *q, unsigned char band)
 {
 	queue_t *q_next;
@@ -749,7 +785,20 @@ static int __bcanput(queue_t *q, unsigned char band)
 	swerr();
 	return (0);
 }
+
 static int __canput(queue_t *q);
+/**
+ *  bcanput:	- check whether message can be put to a queue
+ *  @q:		queue to check
+ *  @band:	band to check
+ *
+ *  Notices: Don't call these functions with NULL q pointers!  To walk the list of queues we take a
+ *  reader lock on the stream head.  We can use simple spins on the queue because we have already
+ *  locked out interrupts if outside and interrupt handler.  We only need a read lock because the
+ *  bit semantics on the queue band are atomic.
+ *
+ *  Use bcanput or bcanputnext with band -1 to check for any writable non-zero band.
+ */
 int bcanput(queue_t *q, int band)
 {
 	int result;
@@ -769,9 +818,10 @@ int bcanput(queue_t *q, int band)
 	return (result);
 }
 
-/* 
- *  BCANPUTNEXT
- *  -------------------------------------------------------------------------
+/**
+ *  bcanputnext: - check whether messages can be put to queue after this one
+ *  @q:		this queue
+ *  @band:	band to check
  */
 int bcanputnext(queue_t *q, int band)
 {
@@ -792,18 +842,14 @@ int bcanputnext(queue_t *q, int band)
 	return (result);
 }
 
-/* 
- *  CANENABLE
- *  -------------------------------------------------------------------------
+/**
+ *  canenable:	- check whether service procedure will run
+ *  @q:		queue to check
  */
 __EXTERN_INLINE int canenable(queue_t *q);
 
-/* 
- *  CANGET
- *  -------------------------------------------------------------------------
- *  We treat a canget that fails like a getq that returns null visa vi
- *  backenable.  That way poll and strread that use this will properly
- *  backenable the queue.
+/*
+ *  __canget:
  */
 static int __canget(queue_t *q)
 {
@@ -815,6 +861,14 @@ static int __canget(queue_t *q)
 	}
 	return (result);
 }
+
+/**
+ *  canget:	- check whether messages are on queue
+ *  @q:		queue to check
+ *
+ *  We treat a canget that fails like a getq that returns null visa vi backenable.  That way poll
+ *  and strread that use this will properly backenable the queue.
+ */
 int canget(queue_t *q)
 {
 	int result;
@@ -827,11 +881,8 @@ int canget(queue_t *q)
 	return (result & 1);
 }
 
-/* 
- *  CANPUT
- *  -------------------------------------------------------------------------
- *  Don't call these functions with NULL q pointers!  To walk the list of
- *  queues we take a reader lock on the stream head.
+/*
+ *  __canput:
  */
 static int __canput(queue_t *q)
 {
@@ -848,6 +899,14 @@ static int __canput(queue_t *q)
 	swerr();
 	return (0);
 }
+
+/**
+ *  canput:	- check wheter message can be put to a queue
+ *  @q:		the queue to check
+ *
+ *  Don't call these functions with NULL q pointers!  To walk the list of queues we take a reader
+ *  lock on the stream head.
+ */
 int canput(queue_t *q)
 {
 	int result;
@@ -857,9 +916,9 @@ int canput(queue_t *q)
 	return (result);
 }
 
-/* 
- *  CANPUTNEXT
- *  -------------------------------------------------------------------------
+/**
+ *  canputnext: - check whether messages can be put to the queue after this one
+ *  @q:		this queue
  */
 int canputnext(queue_t *q)
 {
@@ -870,11 +929,11 @@ int canputnext(queue_t *q)
 	return (result);
 }
 
-/* 
- *  FLUSHBAND
- *  -------------------------------------------------------------------------
+/*
+ *  __find_qband:
+ *
+ * Find a queue band.  This must be called with the queue read or write locked.
  */
-/* Find a queue band.  This must be called with the queue read or write locked.  */
 static inline struct qband *__find_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb;
@@ -883,7 +942,11 @@ static inline struct qband *__find_qband(queue_t *q, unsigned char band)
 		return (qb);
 	return (NULL);
 }
+
 static int __rmvq(queue_t *q, mblk_t *mp);
+/*
+ *  __flushband:
+ */
 static int __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 {
 	mblk_t *mp, *mp_next;
@@ -975,6 +1038,13 @@ static int __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 	}
 	return (backenable);
 }
+
+/**
+ *  flushband:	- flush message from a queue band
+ *  @q:		the queue to flush
+ *  @band:	the band to flush
+ *  @flag:	how to flush, %FLUSHALL or %FLUSHDATA
+ */
 void flushband(queue_t *q, int band, int flag)
 {
 	int backenable;
@@ -991,9 +1061,9 @@ void flushband(queue_t *q, int band, int flag)
 	freechain(mp, mpp);
 }
 
-/* 
- *  FREEZESTR
- *  -------------------------------------------------------------------------
+/**
+ *  freezestr:	- freeze a stream for direct queue access
+ *  @q:		queue to freeze
  */
 unsigned long freezestr(queue_t *q)
 {
@@ -1003,11 +1073,11 @@ unsigned long freezestr(queue_t *q)
 	return ((q->q_iflags = flags));
 }
 
-/* 
- *  GETQ
- *  -------------------------------------------------------------------------
+/*
+ *  __getq:
+ *
+ *  Faster than __rmvq, same idea
  */
-/* faster than __rmvq, same idea */
 mblk_t *__getq(queue_t *q, int *be)
 {
 	mblk_t *mp;
@@ -1018,6 +1088,11 @@ mblk_t *__getq(queue_t *q, int *be)
 		*be = 1;
 	return (mp);
 }
+
+/**
+ *  getq:	- get messags from a queue
+ *  @q:		the queue from which to get messages
+ */
 mblk_t *getq(queue_t *q)
 {
 	mblk_t *mp;
@@ -1031,11 +1106,11 @@ mblk_t *getq(queue_t *q)
 	return (mp);
 }
 
-/* 
- *  INSQ
- *  -------------------------------------------------------------------------
+/*
+ *  __get_qband:
+ *
+ *  Find or create a queue band.  This must be called with the queue write locked.
  */
-/* Find or create a queue band.  This must be called with the queue write locked.  */
 static struct qband *__get_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb, *qp, **qbp;
@@ -1056,7 +1131,11 @@ static struct qband *__get_qband(queue_t *q, unsigned char band)
 	}
 	return (qb);
 }
+
 int __putq(queue_t *q, mblk_t *mp);
+/*
+ *  __insq:
+ */
 static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int enable = 0;
@@ -1112,6 +1191,13 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	/* insert at end */
 	return __putq(q, nmp);
 }
+
+/**
+ *  insq:	- insert a message before another on a queue
+ *  @q:		the queue into which to insert
+ *  @emp:	the existing message before which to insert
+ *  @nmp:	the new message to insert
+ */
 int insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	int result;
@@ -1135,17 +1221,14 @@ int insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	}
 }
 
-/* 
- *  OTHERQ
- *  -------------------------------------------------------------------------
+/**
+ *  OTHERQ:	- find the other queue in a queue pair
+ *  @q:		one queue
  */
 __EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
 
-/* 
- *  PUT
- *  -------------------------------------------------------------------------
- *  Your put routines must be MT-safe.  That simple.  Don't put to put
- *  routines that don't exist.
+/*
+ *  __put:
  */
 static void __put(queue_t *q, mblk_t *mp)
 {
@@ -1154,6 +1237,10 @@ static void __put(queue_t *q, mblk_t *mp)
 	if (unlikely(waitqueue_active(&qu->qu_qwait)))
 		wake_up_all(&qu->qu_qwait);
 }
+
+/*
+ *  _put:
+ */
 static void _put(queue_t *q, mblk_t *mp)
 {
 	struct syncq *isq;
@@ -1191,6 +1278,14 @@ static void _put(queue_t *q, mblk_t *mp)
 		}
 	}
 }
+
+/**
+ *  put:	- call a queue's qi_putq() procedure
+ *  @q:		the queue's procedure to call
+ *  @mp:	the message to place on the queue
+ *
+ *  Your put routines must be MT-safe.  That simple.  Don't put to put routines that don't exist.
+ */
 void put(queue_t *q, mblk_t *mp)
 {
 	hrlock(q);
@@ -1198,9 +1293,10 @@ void put(queue_t *q, mblk_t *mp)
 	hrunlock(q);
 }
 
-/* 
- *  PUTNEXT
- *  -------------------------------------------------------------------------
+/**
+ *  putnext:	- put a message on the queue next to this one
+ *  @q:		this queue
+ *  @mp:	message to put
  */
 void putnext(queue_t *q, mblk_t *mp)
 {
@@ -1209,9 +1305,8 @@ void putnext(queue_t *q, mblk_t *mp)
 	hrunlock(q);
 }
 
-/* 
- *  PUTBQ
- *  -------------------------------------------------------------------------
+/*
+ *  __putbq:
  */
 static int __putbq(queue_t *q, mblk_t *mp)
 {
@@ -1295,6 +1390,12 @@ static int __putbq(queue_t *q, mblk_t *mp)
 	/* couldn't allocate a band structure! */
 	return (0);		/* failure */
 }
+
+/**
+ *  putbq:	- put a message back on a queue
+ *  @q:		queue to place back message
+ *  @mp:	message to place back
+ */
 int putbq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -1326,48 +1427,62 @@ int putbq(queue_t *q, mblk_t *mp)
 	}
 }
 
-/* 
- *  PUTCTL1
- *  -------------------------------------------------------------------------
+/**
+ *  putctl1:	- put a 1-byte control message to a queue
+ *  @q:		the queue to put to
+ *  @type:	the message type
+ *  @param:	the 1 byte parameter
  */
 __EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
 
-/* 
- *  PUTCTL2
- *  -------------------------------------------------------------------------
+/**
+ *  putctl2:	- put a 2-byte control message to a queue
+ *  @q:		the queue to put to
+ *  @type:	the message type
+ *  @param1:	the first 1 byte parameter
+ *  @param2:	the second 1 byte parameter
  */
 __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2);
 
-/* 
- *  PUTCTL
- *  -------------------------------------------------------------------------
+/**
+ *  putctl:	- put a control message to a queue
+ *  @q:		the queue to put to
+ *  @type:	the message type
  */
 __EXTERN_INLINE int putctl(queue_t *q, int type);
 
-/* 
- *  PUTNEXTCTL
- *  -------------------------------------------------------------------------
+/**
+ *  putnextctl:	- put a control message to the queue after this one
+ *  @q:		this queue
+ *  @type:	the message type
  */
 __EXTERN_INLINE int putnextctl(queue_t *q, int type);
 
-/* 
- *  PUTNEXTCTL1
- *  -------------------------------------------------------------------------
+/**
+ *  putnextctl1: - put a 1-byte control message to the queue after this one
+ *  @q:		this queue
+ *  @type:	the message type
+ *  @param:	the 1 byte parameter
  */
 __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
 
-/* 
- *  PUTNEXTCTL2
- *  -------------------------------------------------------------------------
+/**
+ *  putnextctl2: - put a 2-byte control message to the queue after this one
+ *  @q:		this queue
+ *  @type:	the message type
+ *  @param1:	the first 1 byte parameter
+ *  @param2:	the second 1 byte parameter
  */
 __EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
 
-/* 
- *  PUTQ
- *  -------------------------------------------------------------------------
- *  Optomized for arriving at an empty queue.  This is because in a smoothly
- *  running system queues should be empty.  This is a little better than LiS
- *  in that it does not examine the band of messages on the queue.
+/*
+ *  __putq:	- put a message block to a queue
+ *  @q:		queue to which to put the message
+ *  @mp:	message to put
+ *
+ *  Optomized for arriving at an empty queue.  This is because in a smoothly running system queues
+ *  should be empty.  This is a little better than LiS in that it does not examine the band of
+ *  messages on the queue.
  */
 int __putq(queue_t *q, mblk_t *mp)
 {
@@ -1449,6 +1564,12 @@ int __putq(queue_t *q, mblk_t *mp)
 	/* couldn't allocate a band structure! */
 	return (0);		/* failure */
 }
+
+/**
+ *  putq:	- put a message block to a queue
+ *  @q:		queue to which to put the message
+ *  @mp:	message to put
+ */
 int putq(queue_t *q, mblk_t *mp)
 {
 	int result;
@@ -1476,17 +1597,16 @@ int putq(queue_t *q, mblk_t *mp)
 	}
 }
 
-/**
- *  QATTACH - attach a stream head, module or driver queue pair to a stream head
- *
- *  @sd:stream head data structure identifying stream
- *  @fmod:&struct fmodsw pointer identifying module or driver
- *  @devp:&dev_t pointer providing opening device number
- *  @oflag:open flags
- *  @sflag:streams flag, can be DRVOPEN, CLONEOPEN, MODOPEN
- *  @crp:&cred_t pointer to credentials of opening task
- */
 int setsq(queue_t *q, struct fmodsw *fmod, int mux);
+/**
+ *  qattach: - attach a stream head, module or driver queue pair to a stream head
+ *  @sd:	stream head data structure identifying stream
+ *  @fmod:	&struct fmodsw pointer identifying module or driver
+ *  @devp:	&dev_t pointer providing opening device number
+ *  @oflag:	open flags
+ *  @sflag:	streams flag, can be %DRVOPEN, %CLONEOPEN, %MODOPEN
+ *  @crp:	&cred_t pointer to credentials of opening task
+ */
 int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct streamtab *st;
@@ -1507,19 +1627,19 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 		/* magic garden */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
-			if (!(sdev = sdev_get(getmajor(*devp))))
+			if (!(sdev = cdev_get(getmajor(*devp))))
 				goto enoent;
 			if (!(st = sdev->d_str))
 				goto put_noent;
 			setsq(q, (struct fmodsw *) sdev, 0);
-			sdev_put(sdev);
+			cdev_put(sdev);
 		}
 	} else if (odev != *devp)
 		swerr();
 	qprocson(q);		/* in case qopen() forgot */
 	return (0);
       put_noent:
-	sdev_put(sdev);
+	cdev_put(sdev);
       enoent:
 	err = -ENOENT;
 	qdetach(q, oflag, crp);	/* need to call close */
@@ -1538,11 +1658,10 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 }
 
 /**
- *  QCLOSE - invoke a queue pair's qi_qclose entry point
- *
- *  @q:read queue of the queue pair to close
- *  @oflag:open flags
- *  @crp:credentials of closing task
+ *  qclose:	- invoke a queue pair's qi_qclose entry point
+ *  @q:		read queue of the queue pair to close
+ *  @oflag:	open flags
+ *  @crp:	credentials of closing task
  */
 int qclose(queue_t *q, int oflag, cred_t *crp)
 {
@@ -1555,21 +1674,19 @@ int qclose(queue_t *q, int oflag, cred_t *crp)
 }
 
 /**
- *  QDELETE - delete a queue pair from a stream
+ *  qdelete:	- delete a queue pair from a stream
+ *  @rq:	read queue of queue pair to delete
  *
- *  @rq:read queue of queue pair to delete
- *
- *  DESCRIPTION:QDELETE half-deletes the queue pair identified by @rq from the
- *  stream to which it belongs.  The q->q_next pointers of the queue pair to
- *  be deleted, @rq, are adjusted, but the stream remains unaffected.
- *  qprocsoff() must be called before calling QDELETE to properly remove the
+ *  qdelete() half-deletes the queue pair identified by @rq from the stream to which it belongs.
+ *  The q->q_next pointers of the queue pair to be deleted, @rq, are adjusted, but the stream
+ *  remains unaffected.  qprocsoff() must be called before calling qdelete() to properly remove the
  *  queue pair from the stream.
  *
- *  CONTEXT:QDELETE should only be called from the qattach() or qdetach()
- *  procedure or a stream head open or close procedure.
+ *  Context: qdelete() should only be called from the qattach() or qdetach() procedure or a stream
+ *  head open or close procedure.
  *
- *  NOTICES:@rq should have already been removed from a queue with qprocsoff()
- *  and must be a valid pointer or bad things will happen.
+ *  Notices: rq should have already been removed from a queue with qprocsoff() and must be a valid
+ *  pointer or bad things will happen.
  */
 void qdelete(queue_t *q)
 {
@@ -1588,21 +1705,20 @@ void qdelete(queue_t *q)
 }
 
 /**
- *  QDETACH - detach a queue pair from a stream
- *  @q:read queue pointer of queue pair to detach
- *  @flags:open flags of closing task
- *  @crp:credentials of closing task
+ *  qdetach:	- detach a queue pair from a stream
+ *  @q:		read queue pointer of queue pair to detach
+ *  @flags:	open flags of closing task
+ *  @crp:	credentials of closing task
  *
- *  DESCRIPTION:QDETACH calls the module queue pair qi_qclose procedure and
- *  then removes the queue pair from the stream.
+ *  qdetach() calls the module queue pair qi_qclose procedure and then removes the queue pair from
+ *  the stream.
  *
- *  RETURN:QDETACH returns any error returned by the module's qi_qclose
- *  procedure.
+ *  Return: qdetach() returns any error returned by the module's qi_qclose procedure.
  *
- *  ERRORS:QDETACH can return any error returned by the module's qi_qclose
- *  procedure.  This error is not returned to the user.
+ *  Errors: qdetach() can return any error returned by the module's qi_qclose procedure.  This error
+ *  is not returned to the user.
  *
- *  CONTEXT:QDETACH is meant to be called in user context.
+ *  Context: qdetach() is meant to be called in user context.
  */
 int qdetach(queue_t *q, int flags, cred_t *crp)
 {
@@ -1613,21 +1729,19 @@ int qdetach(queue_t *q, int flags, cred_t *crp)
 }
 
 /**
- *  QINSERT - insert a queue pair below another in a stream
- *  @brq:read queue of queue pair beneath which to insert
- *  @irq:read queue of queue pair to insert
+ *  qinsert:	- insert a queue pair below another in a stream
+ *  @brq:	read queue of queue pair beneath which to insert
+ *  @irq:	read queue of queue pair to insert
  *
- *  DESCRIPTION:QINSERT half-inserts the queue pair identified by @irq beneath
- *  the queue pair on the stream identified by @brq.  This is only a
- *  half-insert.  The q->q_next pointers of the queue pair to be inserted,
- *  @irq, are adjusted, but the stream remains unaffected.  qprocson() must be
- *  called on @irq to complete the insertion and properly set flags.
+ *  qinsert() half-inserts the queue pair identified by @irq beneath the queue pair on the stream
+ *  identified by @brq.  This is only a half-insert.  The q->q_next pointers of the queue pair to be
+ *  inserted, @irq, are adjusted, but the stream remains unaffected.  qprocson() must be called on
+ *  @irq to complete the insertion and properly set flags.
  *
- *  CONTEXT:QINSERT is only meant to be called from the qattach() procedure or
- *  a stream head open procedure.
+ *  Context: qinsert() is only meant to be called from the qattach() procedure or a stream head open
+ *  procedure.
  *
- *  NOTICES:@irq should not already be inserted on a queue or bad things will
- *  happen.
+ *  Notices: irq should not already be inserted on a queue or bad things will happen.
  */
 void qinsert(queue_t *brq, queue_t *irq)
 {
@@ -1648,12 +1762,12 @@ void qinsert(queue_t *brq, queue_t *irq)
 }
 
 /**
- *  QOPEN - call a module's qi_qopen entry point
- *  @q:the read queue of the module queue pair to open
- *  @devp:pointer to the opening and returned device number
- *  @oflag:open flags
- *  @sflag:stream flag, can be DRVOPEN, MODOPEN, CLONEOPEN
- *  @crp:pointer to the opening task's credential structure
+ *  qopen:	- call a module's qi_qopen entry point
+ *  @q:		the read queue of the module queue pair to open
+ *  @devp:	pointer to the opening and returned device number
+ *  @oflag:	open flags
+ *  @sflag:	stream flag, can be %DRVOPEN, %MODOPEN, %CLONEOPEN
+ *  @crp:	pointer to the opening task's credential structure
  */
 int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
@@ -1664,22 +1778,19 @@ int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 }
 
 /**
- *  QPROCSOFF - turn off qi_putp and qi_srvp procedures for a queue pair
- *  @q:read queue pointer for the queue pair to turn procs off
+ *  qprocsoff:	- turn off qi_putp and qi_srvp procedures for a queue pair
+ *  @q:		read queue pointer for the queue pair to turn procs off
  *
- *  DESCRIPTION:QPROCSOFF marks the queue pair as being owned by the stream
- *  head (disabling further put procedures), marks it as being noenabled,
- *  (which disables further srv procedures), and bypasses the module by
- *  adjusting the q->q_next pointers of upstream modules for each queue in the
- *  queue pair.  This effectively bypasses the module.
+ *  qprocsoff() marks the queue pair as being owned by the stream head (disabling further put
+ *  procedures), marks it as being noenabled, (which disables further srv procedures), and bypasses
+ *  the module by adjusting the q->q_next pointers of upstream modules for each queue in the queue
+ *  pair.  This effectively bypasses the module.
  *
- *  CONTEXT:QPROCSOFF should only be called from qattach() or a stream head 
- *  head open procedure.  The user should call QPROCSOFF from the qclose()
- *  procedure before returning.
+ *  Context: qprocsoff() should only be called from qattach() or a stream head head open procedure.
+ *  The user should call qprocsoff() from the qclose() procedure before returning.
  *
- *  NOTICES:QPROCSOFF does not fully delete the queue pair from the stream.
- *  It is still half-attached.  Use qdelete() to complete the final removal of
- *  the queue pair from the stream.
+ *  Notices: qprocsoff() does not fully delete the queue pair from the stream.  It is still
+ *  half-attached.  Use qdelete() to complete the final removal of the queue pair from the stream.
  */
 void qprocsoff(queue_t *q)
 {
@@ -1712,21 +1823,19 @@ void qprocsoff(queue_t *q)
 }
 
 /**
- *  QPROCSON - trun on qi_putp and qi_srvp procedure for a queeu pair
- *  @q:read queue pointer for the queue pair to turn procs on
+ *  qprocson:	- trun on qi_putp and qi_srvp procedure for a queeu pair
+ *  @q:		read queue pointer for the queue pair to turn procs on
  *
- *  DESCRIPTION:QPROCSON marks the queue pair as being not owned by the stream
- *  head (enabling put procedures), marks it as being enabled (enabling srv
- *  procedures), and intalls the module by adjusting the q->q_next pointers of
- *  the upstream modules for each queue in the queue pair.  This effectively
+ *  qprocson() marks the queue pair as being not owned by the stream head (enabling put procedures),
+ *  marks it as being enabled (enabling srv procedures), and intalls the module by adjusting the
+ *  q->q_next pointers of the upstream modules for each queue in the queue pair.  This effectively
  *  undoes the bypass created by qprocsoff().
  *
- *  CONTEXT:QPROCSON should only be called from qattach(), qdetach() or a
- *  stream head close procedure.  The user should call QPROCSON from the
- *  qopen() procedure before returning.
+ *  Context: qprocson() should only be called from qattach(), qdetach() or a stream head close
+ *  procedure.  The user should call qprocson() from the qopen() procedure before returning.
  *
- *  NOTICES:QPROCSON does fully inserts the queue pair into the stream.  It
- *  must be half-inserted with qinsert() before QPROCSON can be called.
+ *  Notices: qprocson() does fully inserts the queue pair into the stream.  It must be half-inserted
+ *  with qinsert() before qprocson() can be called.
  */
 void qprocson(queue_t *q)
 {
@@ -1755,9 +1864,11 @@ void qprocson(queue_t *q)
 	}
 }
 
-/* 
- *  QPOP
- *  -------------------------------------------------------------------------
+/**
+ *  qpop:	- pop a moudle from a stream
+ *  @sd:	stream head
+ *  @oflag:	open flags to call module open procedure
+ *  @crp:	credential pointer for module open procedure
  */
 int qpop(struct stdata *sd, int oflag, cred_t *crp)
 {
@@ -1775,9 +1886,13 @@ int qpop(struct stdata *sd, int oflag, cred_t *crp)
 	return (-EPERM);
 }
 
-/* 
- *  QPUSH
- *  -------------------------------------------------------------------------
+/**
+ *  qpush:	- push a module onto a stream
+ *  @sd:	stream head
+ *  @name:	name of the module to push
+ *  @devp:	device number pointer
+ *  @oflag:	open flags to call module open procedure
+ *  @crp:	credential pointer for module open procedure
  */
 int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *crp)
 {
@@ -1785,13 +1900,13 @@ int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *c
 	struct fmodsw *fmod;
 	if (sd->sd_pushcnt >= sysctl_str_nstrpush)
 		goto enosr;
-	if (!(fmod = smod_find(name)))
+	if (!(fmod = fmod_find(name)))
 		goto einval;
 	if ((err = qattach(sd, fmod, devp, oflag, MODOPEN, crp)) != 0)
 		goto error;
 	sd->sd_pushcnt++;
       error:
-	smod_put(fmod);
+	fmod_put(fmod);
 	return (err);
       einval:
 	return (-EINVAL);
@@ -1799,21 +1914,24 @@ int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *c
 	return (-ENOSR);
 }
 
-/* 
- *  QREPLY
- *  -------------------------------------------------------------------------
+/**
+ *  qreply:	- reply with a message
+ *  @q:		queue from which to reply
+ *  @mp:	message reply
  */
 __EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp);
 
-/* 
- *  QSIZE
- *  -------------------------------------------------------------------------
+/**
+ *  qsize:	- calculate number of messages on a queue
+ *  @q:		queue to count messages
  */
 __EXTERN_INLINE ssize_t qsize(queue_t *q);
 
-/* 
- *  QCOUNTSTRM (only for LiS compatibility)
- *  -------------------------------------------------------------------------
+/**
+ *  qcountstrm:	- count the numer of messages along a stream
+ *  @q:		queue to begin with
+ *
+ *  Notices: qcountstrm() is only for LiS compatibility.
  */
 ssize_t qcountstrm(queue_t *q)
 {
@@ -1827,15 +1945,14 @@ ssize_t qcountstrm(queue_t *q)
 	return (count);
 }
 
-/* 
- *  RD
- *  -------------------------------------------------------------------------
+/**
+ *  RD:		- find read queue from write queu
+ *  @q:		write queue pointer
  */
 __EXTERN_INLINE queue_t *RD(queue_t *q);
 
-/* 
- *  RMVQ
- *  -------------------------------------------------------------------------
+/*
+ *  __rmvq:
  */
 static int __rmvq(queue_t *q, mblk_t *mp)
 {
@@ -1875,6 +1992,12 @@ static int __rmvq(queue_t *q, mblk_t *mp)
 	mp->b_next = mp->b_prev = NULL;
 	return (backenable);
 }
+
+/**
+ *  rmvq:	- remove a messge from a queue
+ *  @q:		queue from which to remove message
+ *  @mp:	message to remove
+ */
 void rmvq(queue_t *q, mblk_t *mp)
 {
 	unsigned long flags;
@@ -1889,15 +2012,14 @@ void rmvq(queue_t *q, mblk_t *mp)
 		qbackenable(q);
 }
 
-/* 
- *  SAMESTR
- *  -------------------------------------------------------------------------
+/**
+ *  SAMESTR:	- check whether this and next queue have the same stream head
+ *  @q:		this queue
  */
 __EXTERN_INLINE int SAMESTR(queue_t *q);
 
-/* 
- *  SETQ
- *  -------------------------------------------------------------------------
+/*
+ *  __setq:
  */
 static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
@@ -1913,6 +2035,13 @@ static void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	q->q_hiwat = winit->qi_minfo->mi_hiwat;
 	q->q_lowat = winit->qi_minfo->mi_lowat;
 }
+
+/**
+ *  setq:	- set queue characteristics
+ *  @q:		read queue in queue pair to set
+ *  @rinit:	read queue init structure
+ *  @winit:	write queue initi structure
+ */
 void setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	unsigned long flags;
@@ -1930,9 +2059,12 @@ void setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 
 struct syncq syncq_global;
 
-/* 
- *  SETSQ
- *  -------------------------------------------------------------------------
+/**
+ *  setsq:	- set synchornization charateristics on a queue pair
+ *  @q:		read queue in queue pair to set
+ *  @fmod:	module to which queue pair belongs
+ *  @mux:	non-zero for lower multiplexing driver queue pair
+ *
  *  Set synchronization queue associated with a new queue pair.
  */
 int setsq(queue_t *q, struct fmodsw *fmod, int mux)
@@ -1998,9 +2130,12 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux)
 	return (-ENOMEM);
 }
 
-/* 
- *  STRQGET
- *  -------------------------------------------------------------------------
+/**
+ *  strqget:	- get characteristics of a queue
+ *  @q:		queue to query
+ *  @what:	what characteristic to get
+ *  @band:	from which queue band
+ *  @val:	location of return value
  */
 int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
@@ -2079,9 +2214,12 @@ int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 	return (-err);
 }
 
-/* 
- *  STRQSET
- *  -------------------------------------------------------------------------
+/**
+ *  strqset:	- set characteristics of a queue
+ *  @q:		queue to set
+ *  @what:	what characteristic to set
+ *  @band:	to which queue band
+ *  @val:	value to set
  */
 int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
@@ -2150,11 +2288,16 @@ int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 	return (-err);
 }
 
-/* 
- *  STRLOG
- *  -------------------------------------------------------------------------
- */
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
+/**
+ *  strlog:	- log a STREAMS message
+ *  @mid:	module id
+ *  @sid:	stream id
+ *  @level:	severity level
+ *  @flag:	flags controlling distribution
+ *  @fmt:	printf(3) format
+ *  @...:	format specific arguments
+ */
 int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	unsigned long flags;
@@ -2187,9 +2330,10 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 	return (1);
 }
 
-/* 
- *  UNFREEZESTR
- *  -------------------------------------------------------------------------
+/**
+ *  unfreezestr:	- thaw a stream frozen with freezestr()
+ *  @q:			the queue in the stream to thaw
+ *  @flags:		spl flags
  */
 void unfreezestr(queue_t *q, unsigned long flags)
 {
@@ -2198,17 +2342,16 @@ void unfreezestr(queue_t *q, unsigned long flags)
 	hwunlock(q, &flags);
 }
 
-/* 
- *  WR
- *  -------------------------------------------------------------------------
+/**
+ *  WR:		- get write queue in queue pair
+ *  @q:		read queue pointer
  */
 __EXTERN_INLINE queue_t *WR(queue_t *q);
 
-/* 
- *  CMN_ERR
- *  -------------------------------------------------------------------------
- */
 static spinlock_t cmn_err_lock = SPIN_LOCK_UNLOCKED;
+/*
+ *  vcmn_err:
+ */
 void vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	unsigned long flags;
@@ -2235,6 +2378,13 @@ void vcmn_err(int err_lvl, const char *fmt, va_list args)
 	spin_unlock_irqrestore(&cmn_err_lock, flags);
 	return;
 }
+
+/**
+ *  cmn_err:	- print a command error
+ *  @err_lvl:	severity
+ *  @fmt:	printf(3) format
+ *  @...:	format arguments
+ */
 void cmn_err(int err_lvl, const char *fmt, ...)
 {
 	va_list args;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.7 $)
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -399,7 +399,7 @@ static int __init sad_init(void)
 #else
 	printk(KERN_INFO SAD_SPLASH);
 #endif
-	if ((err = register_strdev(makedevice(major, 0), &sad_cdev)) < 0)
+	if ((err = register_strdev(major, &sad_cdev)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -408,7 +408,7 @@ static int __init sad_init(void)
 };
 static void __exit sad_exit(void)
 {
-	unregister_strdev(makedevice(major, 0), &sad_cdev);
+	unregister_strdev(major, &sad_cdev);
 };
 
 module_init(sad_init);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,15 +74,11 @@ static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.7 $
 // #include "strreg.h" /* for struct str_args */
 // #include "strsched.h" /* for ap_get/ap_put */
 
-#ifndef _LIS_
 #include "sys/config.h"
-#else
-#include "sys/LiS/config.h"
-#endif
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -102,23 +98,11 @@ MODULE_LICENSE(NULS_LICENSE);
 #ifndef CONFIG_STREAMS_NULS_NAME
 #define CONFIG_STREAMS_NULS_NAME "nuls"
 #endif
-
-#ifndef _LIS_
 #ifndef CONFIG_STREAMS_NULS_MODID
 #error CONFIG_STREAMS_NULS_MODID must be defined.
 #endif
 #ifndef CONFIG_STREAMS_NULS_MAJOR
 #error CONFIG_STREAMS_NULS_MAJOR must be defined.
-#endif
-#else
-#ifndef NULS__CMAJOR_0
-#error NULS__CMAJOR_0 must be defined.
-#endif
-#ifndef NULS__ID
-#error NULS__ID must be defined.
-#endif
-#define CONFIG_STREAMS_NULS_MAJOR NULS__CMAJOR_0
-#define CONFIG_STREAMS_NULS_MODID NULS__ID
 #endif
 
 static unsigned short major = CONFIG_STREAMS_NULS_MAJOR;
@@ -278,7 +262,6 @@ static struct streamtab nuls_info = {
       st_wrinit:&nuls_wqinit,
 };
 
-#ifndef _LIS_
 static struct cdevsw nuls_cdev = {
       d_name:CONFIG_STREAMS_NULS_NAME,
       d_str:&nuls_info,
@@ -287,7 +270,6 @@ static struct cdevsw nuls_cdev = {
       d_mode:S_IFCHR,
       d_kmod:THIS_MODULE,
 };
-#endif
 
 static int __init
 nuls_init(void)
@@ -298,13 +280,8 @@ nuls_init(void)
 #else
 	printk(KERN_INFO NULS_SPLASH);
 #endif
-#ifndef _LIS_
-	if ((err = register_strdev(makedevice(major, 0), &nuls_cdev)) < 0)
+	if ((err = register_strdev(major, &nuls_cdev)) < 0)
 		return (err);
-#else
-	if ((err = lis_register_strdev(major, &nuls_info, 255, CONFIG_STREAMS_NULS_NAME)) < 0)
-		return (err);
-#endif
 	if (err > 0)
 		major = err;
 	return (0);
@@ -312,11 +289,7 @@ nuls_init(void)
 static void __exit
 nuls_exit(void)
 {
-#ifndef _LIS_
-	unregister_strdev(makedevice(major, 0), &nuls_cdev);
-#else
-	lis_unregister_strdev(major);
-#endif
+	unregister_strdev(major, &nuls_cdev);
 };
 
 module_init(nuls_init);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -72,9 +72,6 @@ extern int fmod_count;
 
 extern struct list_head cdevsw_list;
 extern struct list_head fmodsw_list;
-
-extern struct cdevsw *cdevsw[MAX_STRDEV];
-extern struct fmodsw *fmodsw[MAX_STRMOD];
 
 extern int strm_open(struct inode *, struct file *);
 extern int sdev_open(struct inode *i, struct file *f, struct vfsmount *mnt, struct str_args *argp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
 
-static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 10:42:01 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -161,25 +161,25 @@ static int nsdevopen(struct inode *inode, struct file *file)
 	struct qstr *name = &dentry->d_name;
 	int retry = 0;
 	do {
-		int i, j, maj_max = 0, len_max = 0;
+		int i, len_max = 0;
 		const struct cdevsw *cdev, *cdev_max = NULL;
+		struct list_head *pos;
 		read_lock(&cdevsw_lock);
 		/* do a name search looking for the device */
-		for (i = 0; i < MAX_CHRDEV; i++)
-			if ((cdev = cdevsw[i])) {
-				for (j = 0; j < name->len && j < FMNAMESZ + 1; j++)
-					if (cdev->d_name[j] != name->name[j])
-						break;
-				if (j > len_max) {
-					maj_max = i;
-					len_max = j;
-					cdev_max = cdev;
-				}
+		list_for_each(pos, &cdevsw_list) {
+			cdev = list_entry(pos, struct cdevsw, d_list);
+			for (i = 0; i < name->len && i < FMNAMESZ + 1; i++)
+				if (cdev->d_name[i] != name->name[i])
+					break;
+			if (i > len_max) {
+				len_max = i;
+				cdev_max = cdev;
 			}
+		}
 		read_unlock(&cdevsw_lock);
 		/* aww come on ... at least 3 char match */
 		if (cdev_max && (len_max == name->len || len_max > 2)) {
-			argp->dev = makedevice(maj_max, getminor(argp->dev));
+			argp->dev = makedevice(cdev_max->d_major, getminor(argp->dev));
 			argp->sflag = DRVOPEN;	/* this is a directed open */
 			return strm_open(inode, file);
 		}
@@ -244,7 +244,7 @@ static int __init nsdev_init(void)
 #else
 	printk(KERN_INFO NSDEV_SPLASH);
 #endif
-	if ((err = register_inode(makedevice(major, 0), &nsdev_cdev, &nsdev_ops)) < 0)
+	if ((err = register_inode(major, &nsdev_cdev, &nsdev_ops)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
@@ -253,7 +253,7 @@ static int __init nsdev_init(void)
 static void __exit nsdev_exit(void)
 {
 	int err;
-	if ((err = unregister_inode(makedevice(major, 0), &nsdev_cdev)))
+	if ((err = unregister_inode(major, &nsdev_cdev)))
 		return (void) (err);
 	return (void) (0);
 };

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strdev.9.man,v 0.9.2.4 2004/04/19 02:58:20 brian Exp $
+.\" @(#) $Id: register_strdev.9.man,v 0.9.2.5 2004/04/30 10:41:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/30 10:41:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH REGISTER_STRDEV 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH REGISTER_STRDEV 9 "$Date: 2004/04/30 10:41:59 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
@@ -81,9 +81,9 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <linxu/stream.h>
+.B #include <sys/stream.h>
 .br
-.B #include <sys/strconfig.h>
+.B #include <sys/strconf.h>
 .HP
 .BI "int register_strdev(dev_t " dev ", struct cdevsw *" cdev );
 .\"
@@ -163,7 +163,7 @@ The
 component of
 .I dev
 can also be set to zero (0)
-to indicate that
+to indicate that the
 .I STREAMS
 executive should assign an available major device number.
 This is only valid if the
@@ -184,7 +184,7 @@ driver described by
 and returns a positive number returning the specified or assigned major device
 number.  Upon failure,
 .BR register_strdev ()
-performs does not effect registration and returns a negative error number.
+does not effect registration and returns a negative error number.
 .\"
 .\"
 .SH ERRORS

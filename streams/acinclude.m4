@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.16 2004/04/26 20:01:41 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.17 2004/04/30 10:41:58 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/26 20:01:41 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/30 10:41:58 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -440,6 +440,21 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         AC_DEFINE_UNQUOTED([HAVE_KERNEL_FATTACH_SUPPORT], [1],
         [If the addresses for the necessary symbols above are defined, then
         define this to include fattach/fdetach support.])
+    fi
+    AC_CACHE_CHECK([for ability to support pipe], [lfs_cv_pipe], [
+        case "$lfs_cv_clone_mnt_addr:$lfs_cv_check_mnt_addr:$lfs_cv_graft_tree_addr:$lfs_cv_do_umount_addr" in
+            no:*:*:* | *:no:*:* | *:*:no:* | *:*:*:no)
+                lfs_cv_pipe=no
+                ;;
+            *)
+                lfs_cv_pipe=yes
+                ;;
+        esac
+    ])
+    if test :${lfs_cv_pipe:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_KERNEL_PIPE_SUPPORT], [1],
+        [If the addresses for the necessary symbols above are defined, then
+        define this to include pipe support.])
     fi
 ])# _LFS_CONFIG_FATTACH
 # =========================================================================
