@@ -31,7 +31,7 @@
  *    gram@aztec.co.za
  */
 
-#ident "@(#) LiS stats.c 2.3 11/10/00 15:54:56 "
+#ident "@(#) LiS stats.c 2.4 03/30/04 09:19:49 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -58,9 +58,9 @@ lis_atomic_t lis_strstats[STRMAXSTAT][4] ;
 /*  -------------------------------------------------------------------  */
 /*                          lis_stat_neg				 */
 
-#define	AR	lis_atomic_read
-#define	AA	lis_atomic_add
-#define	AS	lis_atomic_set
+#define	AR	K_ATOMIC_READ
+#define	AA	K_ATOMIC_ADD
+#define	AS	K_ATOMIC_SET
 
 void	lis_stat_neg(void)
 {
