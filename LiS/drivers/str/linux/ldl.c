@@ -301,6 +301,7 @@ struct pt
 {
 	struct packet_type pt;	/* Packet type filter			*/
 	dl_ulong magic;		/* Debugging paranoia (==0 iff free)	*/
+	lis_rw_lock_t lock;	/* listening SAP list synchronization	*/
 	struct sap *listen;	/* listening SAP list (==NULL iff free)	*/
 	struct pt *next;	/* List of all struct pt		*/
 };
@@ -359,10 +360,12 @@ ldl_gstats_ioctl_t	ldl_gstats ;
 STATIC unsigned long	ldl_debug_mask ;
 
 STATIC struct pt *first_pt;
+STATIC lis_spin_lock_t first_pt_lock;
 STATIC struct ndev *first_ndev;
 STATIC struct dl dl_dl[LDL_N_MINOR];
 
 STATIC struct dl *first_open;
+STATIC lis_spin_lock_t first_open_lock;
 
 STATIC int initialized = 0;
 STATIC int n_hangup;
@@ -568,6 +571,8 @@ void ldl_init(void)
 
 	n_hangup = 0;
 
+	lis_spin_lock_init(&first_pt_lock, "LiS DLPI packet type list lock");
+	lis_spin_lock_init(&first_open_lock, "LiS DLPI open driver list lock");
 	initialized = 1;
 }
 
@@ -582,13 +587,13 @@ void ldl_init(void)
  *  sap_create  - create and add another packet type (sap) to a device.
  *
  *  Returns 0 on success, -1 on failure.
+ *
+ *  Notice that sap_create is always called under SPLSTR()
  */
 STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 {
-	int psw;
-	struct pt *pt;
+	struct pt *pt, *npt;
 	struct sap *sap;
-	int new_pt = 0;
 
 	ASSERT(dl != NULL);
 	ASSERT(dl->magic == DL_MAGIC);
@@ -596,54 +601,14 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 
 	saptype = htons(saptype);
 
-	SPLSTR(psw);
-
-	/* Does Linux already pass us this packet type on this device? */
-	for (pt = first_pt; pt; pt = pt->next)
-		if (pt->pt.type == saptype && pt->pt.dev == dl->ndev->dev)
-			break;
-	if (!pt) {
-		if ((pt = ALLOC(sizeof *pt)) != NULL) {
-			++pt_n_alloc;
-			new_pt = 1;
-			memset(pt, 0, sizeof *pt);
-		} else
-			return -1;
-	}
-
-	if ((sap = ALLOC(sizeof *sap)) == NULL) {
-		if (new_pt) {
-			FREE(pt);
-			--pt_n_alloc;
-		}
+	if ((sap = ALLOC(sizeof *sap)) == NULL)
 		return -1;
-	}
 	++sap_n_alloc;
 	memset(sap, 0, sizeof *sap);
 
-	if (pt->listen == NULL) {
-		/* New, unused packet_type */
-		ASSERT(pt->magic == 0);
-		pt->magic = PT_MAGIC;
-		pt->pt.type = saptype;
-		pt->pt.dev = dl->ndev->dev;
-		pt->pt.func = rcv_func;
-		pt->pt.data = NULL;
-		pt->pt.next = NULL;
-		dev_add_pack(&pt->pt);
-	} else {
-		/* Re-use of packet_type */
-		ASSERT(pt->magic == PT_MAGIC);
-		ASSERT(pt->pt.type == saptype);
-		ASSERT(pt->pt.func == rcv_func);
-	}
-
 	sap->magic = SAP_MAGIC;
 	sap->dl = dl;
-	sap->pt = pt;
 	sap->sap = dlsap;
-	sap->next_listen = pt->listen;
-	pt->listen = sap;
 	if (dl->sap == NULL) {
 		/* This is a primary bind */
 		sap->next_sap = NULL;
@@ -654,7 +619,65 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		dl->subs = sap;
 	}
 
-	SPLX(psw);
+	/* Does Linux already pass us this packet type on this device? */
+	npt = NULL;
+	lis_spin_lock(&first_pt_lock);
+	do {
+		for (pt = first_pt; pt; pt = pt->next)
+			if (pt->pt.type == saptype &&
+			    pt->pt.dev == dl->ndev->dev)
+				break;
+		if (pt == NULL) {
+			if (npt == NULL) {
+				lis_spin_unlock(&first_pt_lock);
+				if ((npt = ALLOC(sizeof *pt)) == NULL) {
+					FREE(sap);
+					sap_n_alloc--;
+					return -1;
+				}
+				++pt_n_alloc;
+				memset(npt, 0, sizeof *npt);
+				lis_spin_lock(&first_pt_lock);
+			} else {
+				npt->next = first_pt;
+				first_pt = pt = npt;
+			}
+		} else if (npt != NULL) {
+			FREE(npt);
+			npt = NULL;
+			pt_n_alloc--;
+		}
+	} while (pt == NULL);
+	sap->pt = pt;
+
+	if (pt->listen == NULL) {
+		/* New, unused packet_type */
+		ASSERT(pt->magic == 0);
+		/* No need to synchronize with rcv_func() */ 
+		sap->next_listen = pt->listen;
+		pt->listen = sap;
+		lis_rw_lock_init(&pt->lock, "LiS SAP listening list");
+		pt->magic = PT_MAGIC;
+		pt->pt.type = saptype;
+		pt->pt.dev = dl->ndev->dev;
+		pt->pt.func = rcv_func;
+		pt->pt.data = NULL;
+		pt->pt.next = NULL;
+		lis_spin_unlock(&first_pt_lock);
+		dev_add_pack(&pt->pt);
+	} else {
+		/* Re-use of packet_type */
+		ASSERT(pt->magic == PT_MAGIC);
+		ASSERT(pt->pt.type == saptype);
+		ASSERT(pt->pt.func == rcv_func);
+
+		lis_rw_write_lock(&pt->lock);
+		sap->next_listen = pt->listen;
+		pt->listen = sap;
+		lis_rw_write_unlock(&pt->lock);
+		lis_spin_unlock(&first_pt_lock);
+	}
+
 	return 0;
 }
 
@@ -666,7 +689,7 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 {
 	int psw;
-	struct pt *pt;
+	struct pt *pt, *opt;
 	struct sap **sapp_dl, **sapp_pt;
 
 	ASSERT(dl != NULL);
@@ -675,53 +698,76 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 	ASSERT(sap->magic == SAP_MAGIC);
 	ASSERT(dl->subs != NULL || sap == dl->sap);
 
-	SPLSTR(psw);
-	if (dl->subs != NULL)
-		sapp_dl = &dl->subs;
-	else
-		sapp_dl = &dl->sap;
-	for(;;) {
-		if (*sapp_dl == NULL) {
-			/* Not found, but it should be there: Emergency brake */
-			SPLX(psw);
-			ASSERT("Emergency brake" == NULL);
-			return -1;
-		}
-		ASSERT((*sapp_dl)->magic == SAP_MAGIC);
-		ASSERT((*sapp_dl)->dl == dl);
-		if (*sapp_dl == sap)
-			break;
-		sapp_dl = &(*sapp_dl)->next_sap;
-	}
-	ASSERT(*sapp_dl == sap);
 	pt = sap->pt;
 	ASSERT(pt != NULL);
 	ASSERT(pt->magic == PT_MAGIC);
 
-	sapp_pt = &pt->listen;
-	for (;;) {
-		ASSERT(*sapp_pt != NULL);
-		if (*sapp_pt == NULL) {
-			/* Not found, but it should be there: Emergency brake */
-			SPLX(psw);
-			ASSERT("Emergency brake" == NULL);
-			return -1;
+	SPLSTR(psw);
+	lis_spin_lock(&first_pt_lock);
+	lis_rw_write_lock(&pt->lock);
+	if (pt->listen == sap && sap->next_listen == NULL) {
+		/* It is the last use of this packet_type */
+		lis_rw_write_unlock(&pt->lock);
+		if (pt == first_pt)
+			first_pt = pt->next;
+		else {
+			for (opt = first_pt; opt->next != NULL; opt = opt->next)
+				if (opt->next == pt) {
+					opt->next = pt->next;
+					break;
+				}
 		}
-		if (*sapp_pt == sap)
-			break;
-		sapp_pt = &(*sapp_pt)->next_listen;
-	}
-	ASSERT(*sapp_pt == sap);
-
-	*sapp_dl = sap->next_sap;
-	*sapp_pt = sap->next_listen;
-	if (pt->listen == NULL) {
-		/* It was the last use of this packet_type */
+		lis_spin_unlock(&first_pt_lock);
 		dev_remove_pack(&pt->pt);
 		pt->magic = 0;
 		FREE(pt);
 		--pt_n_alloc;
+	} else {
+		lis_spin_unlock(&first_pt_lock);
+		sapp_pt = &pt->listen;
+		for (;;) {
+			ASSERT(*sapp_pt != NULL);
+			if (*sapp_pt == NULL) {
+				/*
+				 * Not found, but it should be there:
+				 * Emergency brake
+				 */
+				lis_rw_write_unlock(&pt->lock);
+				SPLX(psw);
+				return -1;
+			}
+			if (*sapp_pt == sap)
+				break;
+			sapp_pt = &(*sapp_pt)->next_listen;
+		}
+		*sapp_pt = sap->next_listen;
+		lis_rw_write_unlock(&pt->lock);
 	}
+
+	if (dl->sap == sap) {
+		ASSERT(dl->subs == NULL);
+		dl->sap = NULL;
+	} else {
+		sapp_dl = &dl->subs;
+		for(;;) {
+			ASSERT(*sapp_dl != NULL);
+			if (*sapp_dl == NULL) {
+				/*
+				 * Not found, but it should be there:
+				 * Emergency brake
+				 */
+				SPLX(psw);
+				return -1;
+			}
+			ASSERT((*sapp_dl)->magic == SAP_MAGIC);
+			ASSERT((*sapp_dl)->dl == dl);
+			if (*sapp_dl == sap)
+				break;
+			sapp_dl = &(*sapp_dl)->next_sap;
+		}
+		*sapp_dl = sap->next_sap;
+	}
+
 	sap->dl = NULL;
 	sap->pt = NULL;
 	sap->magic = 0;
@@ -1250,9 +1296,11 @@ device_notification(struct notifier_block *notifier,
 			ndev_down(d, event != NETDEV_DOWN);
 			if (n_hangup) {
 				SPLX(psw);
+				lis_spin_lock(&first_open_lock);
 				for (dl = first_open; dl; dl = dl->next_open)
 					if ((dl->flags & LDLFLAG_HANGUP) != 0)
 						hangup_do(dl);
+				lis_spin_unlock(&first_open_lock);
 				return NOTIFY_DONE;
 			}
 		}
@@ -2370,26 +2418,10 @@ STATIC int rcv_func(struct sk_buff *skb,
 	unsigned char *fr_ptr, fr_buf[LDL_MAX_HDR_LEN];
 	int fr_len;
 
-	static int entered = 0; /* Debugging paranoia */
-
-	if (entered++) {
-#ifdef KERNEL_2_1
-		dev_kfree_skb(skb);
-#else
-		dev_kfree_skb(skb, FREE_WRITE);
-#endif
-		printk("ldl: rcv_func: Reentry. This should not happen.\n");
-		--entered;
-		return 0;
-	}
-
 	ASSERT(dev->type == ARPHRD_ETHER || dev->type == ARPHRD_LOOPBACK
 	       || dev->type == ARPHRD_IEEE802 || IS_ARPHRD_IEEE802_TR(dev)
 	       || dev->type == ARPHRD_HDLC);
 		/*	ARPHRD_FDDI	*/
-	ASSERT(((struct pt *)pt)->magic == PT_MAGIC);
-	sap = ((struct pt *)pt)->listen;
-	ASSERT(sap != NULL);
 
 	fr_len = skb->tail - skb->mac.raw;
 	if ((dp = allocb(2 + fr_len, BPRI_LO)) != NULL) {
@@ -2426,7 +2458,11 @@ STATIC int rcv_func(struct sk_buff *skb,
 	    ldl_bfr_dump("ldl_rcv_func", fr_ptr, fr_len,
 			 ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
 
-	do {
+	lis_rw_read_lock(&((struct pt *)pt)->lock);
+	ASSERT(((struct pt *)pt)->magic == PT_MAGIC);
+
+	for (sap = ((struct pt *)pt)->listen;
+	     sap != NULL; sap = sap->next_listen) {
 		dl = sap->dl;
 		ASSERT(dl != NULL);
 		ASSERT(dl->magic == DL_MAGIC);
@@ -2437,8 +2473,7 @@ STATIC int rcv_func(struct sk_buff *skb,
 				dl_rcv_put(dp, last, 1);
 			last = dl;
 		}
-		sap = sap->next_listen;
-	} while (sap != NULL);
+	}
 
 	if (last != NULL) {
 		/* Deliver to the last listener */
@@ -2448,8 +2483,7 @@ STATIC int rcv_func(struct sk_buff *skb,
 		if (dp != NULL)
 			freeb(dp);
 	}
-
-	--entered;
+	lis_rw_read_unlock(&((struct pt *)pt)->lock);
 
 	return 0;
 }
@@ -2498,6 +2532,7 @@ STATIC void send_uderror(struct dl *dl, char *addr, int addrlen,
 #define TXE_BADMTU	3
 #define TXE_NOMEM	4
 #define	TXE_NULL	5
+#define	TXE_BADPRIO	6
 
 STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
 {
@@ -2505,7 +2540,11 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
 	static dl_unitdata_req_t	dummy ;	/* all zeros */
 
 	ginc(net_tx_fail_cnt) ;
-	printk("ldl: tx_failed(%d)\n", err);
+	if (ldl_debug_mask & LDL_DEBUG_TX) {
+		ldl_mp_dump("ldl: tx_failed", mp,
+			    ldl_debug_mask & LDL_DEBUG_ALLDATA);
+		printk("ldl: tx_failed(%d)\n", err);
+	}
 
 	if (mp->b_datap->db_ref == 0)		/* bug hunting */
 	{
@@ -2536,6 +2575,10 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
 		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
 			     reqp->dl_dest_addr_length, DL_UNDELIVERABLE, 0);
 		break;
+	    case TXE_BADPRIO:
+		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
+			     reqp->dl_dest_addr_length, DL_UNSUPPORTED, 0);
+		break;
 	    default:
 		ASSERT(0);
 	}
@@ -2545,7 +2588,7 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
 }
 
 /*
- *  Return transmission priority, or -1 in case of congestion
+ *  Return transmission priority, or -1 in case of congestion, or -2 if invalid
  */
 #ifndef KERNEL_2_1
 STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
@@ -2561,6 +2604,9 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
 			p_max = 0;
 		else
 			p_max = reqp->dl_priority.dl_max;
+		if (p_min < 0 || p_max < 0 || p_min > 100 || p_max > 100)
+			return -2; /* invalid */
+
 		if (p_max < dl->priority)
 			p_max = dl->priority;
 		if (p_max > p_min)
@@ -2606,10 +2652,13 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
 			if (p_max > p_min)
 				p_max = p_min;
 		}
-
-		return pri_dlpi2netdevice(p_max);
 	} else
-		return pri_dlpi2netdevice(dl->priority);
+		p_max = dl->priority;
+
+	if (p_max < 0 || p_max > 100)
+		return -2; /* invalid */
+
+	return pri_dlpi2netdevice(p_max);
 }
 #endif
 
@@ -2663,7 +2712,7 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 		dlen = 0;
 	
 	if ((pri = tx_pri(dl, reqp)) < 0)
-		return RETRY;
+		return pri == -1 ? RETRY : tx_failed(dl, mp, TXE_BADPRIO);
 
 	if ((skb = alloc_skb(dlen + dl->machdr_reserve, GFP_ATOMIC)) == NULL)
 		return tx_failed(dl, mp, TXE_NOMEM);
@@ -2750,7 +2799,7 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 		return tx_failed(dl, mp, TXE_OUTSTATE);
 
 	if ((pri = tx_pri(dl, NULL)) < 0)
-		return RETRY;
+		return pri == -1 ? RETRY : tx_failed(dl, mp, TXE_BADPRIO);
 
 	dlen = msgdsize(mp);
 	if (dlen > dl->mtu || dlen < dl->machdr_len)
@@ -4052,21 +4101,29 @@ STATIC int dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 
 	ASSERT(initialized);
 
+	lis_spin_lock(&first_open_lock);
+
 	if (sflag == CLONEOPEN) {
 		for (i = 1; i < LDL_N_MINOR; i++)
 			if (dl_dl[i].rq == NULL)
 				break;
-		if (i == LDL_N_MINOR)
+		if (i == LDL_N_MINOR) {
+			lis_spin_unlock(&first_open_lock);
 			return ENXIO;
+		}
 	} else {
-		if ((i = getminor(*devp)) >= LDL_N_MINOR)
+		if ((i = getminor(*devp)) >= LDL_N_MINOR) {
+			lis_spin_unlock(&first_open_lock);
 			return EBUSY;
+		}
 	}
 	/* *devp = makedevice(major(*devp), i); */
 	*devp = MKDEV(MAJOR(*devp), i);
 
-	if (q->q_ptr != NULL)
+	if (q->q_ptr != NULL) {
+		lis_spin_unlock(&first_open_lock);
 		return 0;
+	}
 
 	ASSERT(dl_dl[i].magic == 0);
 	dl_dl[i].magic = DL_MAGIC;
@@ -4082,8 +4139,12 @@ STATIC int dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	dl_dl[i].next_open = first_open;
 	first_open = &dl_dl[i];
 
-	if (dl_dl[i].next_open == NULL && notifier_register() < 0)
-		printk("ldl: dl_open: Unable to add notifier\n");
+	if (dl_dl[i].next_open == NULL) {
+		lis_spin_unlock(&first_open_lock);
+		if (notifier_register() < 0)
+			printk("ldl: dl_open: Unable to add notifier\n");
+	} else
+		lis_spin_unlock(&first_open_lock);
 
 #ifdef MODULE
         MOD_INC_USE_COUNT;
@@ -4119,10 +4180,10 @@ STATIC int dl_close(queue_t *q, int flag, cred_t *crp)
 	}
 
 	SPLX(psw);
+
+	lis_spin_lock(&first_open_lock);
 	dl->rq = q->q_ptr = WR(q)->q_ptr = NULL;
 	dl->magic = 0;
-
-	SPLSTR(psw);
 
 	for (dlp = &first_open; *dlp; dlp = &(*dlp)->next_open)
 		if (*dlp == dl)
@@ -4133,10 +4194,12 @@ STATIC int dl_close(queue_t *q, int flag, cred_t *crp)
 	else
 		printk("ldl: dl_close: Endpoint not on open list\n");
 
-	SPLX(psw);
-
-	if (first_open == NULL && notifier_unregister() < 0)
-		printk("ldl: dl_close: Unable to remove notifier\n");
+	if (first_open == NULL) {
+		lis_spin_unlock(&first_open_lock);
+		if (notifier_unregister() < 0)
+			printk("ldl: dl_close: Unable to remove notifier\n");
+	} else
+		lis_spin_unlock(&first_open_lock);
 
 #ifdef MODULE
         MOD_DEC_USE_COUNT;
