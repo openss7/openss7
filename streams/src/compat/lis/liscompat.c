@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/02 17:41:28 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/07 09:48:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 09:48:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/02 17:41:28 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/07 09:48:44 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/02 17:41:28 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/07 09:48:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/02 17:41:28 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/07 09:48:44 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1454,7 +1454,11 @@ void lis_iounmap(void *ptr)
 EXPORT_SYMBOL_GPL(lis_iounmap);
 void lis_osif_cli(void)
 {
+#ifdef HAVE_KFUNC_CLI
 	WARN(cli());
+#else
+	WARN(local_irq_disable());
+#endif
 	return;
 }
 
@@ -1549,7 +1553,11 @@ EXPORT_SYMBOL_GPL(lis_osif_pci_unregister_driver);
 #endif
 void lis_osif_sti(void)
 {
+#if HAVE_KFUNC_STI
 	WARN(sti());
+#else
+	WARN(local_irq_enable());
+#endif
 	return;
 }
 

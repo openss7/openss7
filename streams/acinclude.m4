@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/07 12:20:33 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/07 13:39:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 12:20:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 13:39:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,6 +84,9 @@ AC_DEFUN([AC_LFS], [dnl
     LFS_INCLUDES="-DLFS=1 -imacros ./config.h"
 dnl LFS_INCLUDES="$(LFS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     LFS_INCLUDES="${LFS_INCLUDES} -I./include -I${srcdir}/include"
+    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	KERNEL_MODFLAGS="$KERNEL_MODFLAGS -include ./include/sys/streams/modversions.h"
+    fi
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
@@ -719,9 +722,6 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
-    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-	KERNEL_MODFLAGS="$KERNEL_MODFLAGS -include ./include/sys/streams/modversions.h"
-    fi
     _LFS_CHECK_KERNEL
     _LFS_SETUP_DEBUG
     _LFS_SETUP_MODULE
@@ -767,12 +767,15 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/slab.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
@@ -788,6 +791,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
@@ -809,6 +815,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
@@ -841,6 +850,9 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #if HAVE_KINC_LINUX_STATFS_H
@@ -860,6 +872,9 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #if HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
@@ -888,6 +903,9 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #if HAVE_KINC_LINUX_KDEV_T_H

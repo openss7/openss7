@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.2 2005/01/22 06:43:15 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.3 2005/03/07 09:48:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:43:15 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 09:48:11 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -98,4 +98,16 @@
 #undef _TEST
 
 #undef CONFIG_STREAMS_OVERRIDE_FIFOS
+
+#undef HAVE_KFUNC_PROCESS_GROUP
+
+#undef HAVE_KFUNC_TO_KDEV_T
+
+#undef HAVE_TIMESPEC_DO_SETTIMEOFDAY
+
+#undef HAVE_KTYPE_IRQRETURN_T
+
+#undef HAVE_READ_TRYLOCK
+
+#undef HAVE_WRITE_TRYLOCK
 
