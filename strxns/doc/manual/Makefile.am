@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/14 12:35:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/14 23:03:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,16 +46,26 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/14 12:35:56 $ by $Author: brian $
+# Last Modified $Date: 2004/08/14 23:03:11 $ by $Author: brian $
 #
 # =============================================================================
 
 info_TEXINFOS		= strxns.texi
 
+EXTRA_info_TEXINFOS	= \
+			  args.texi \
+			  install.texi \
+			  releases.texi \
+			  gpl.texi \
+			  lesser.texi \
+			  fdl.texi
+
 AM_MAKEINFOFLAGS	= --force --footnote-style=separate
 AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
-EXTRA_DIST		= args.texi gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+EXTRA_DIST		= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS)
+
+$(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
 
 all-local: info ps pdf html
 
