@@ -1,1 +1,1 @@
-.so CC_QUERY_REQ.7.man
+.so man7/CC_QUERY_REQ.7.man

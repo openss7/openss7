@@ -1,1 +1,1 @@
-.so get_sleep_lock.9.man
+.so man9/get_sleep_lock.9.man

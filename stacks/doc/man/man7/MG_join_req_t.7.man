@@ -1,1 +1,1 @@
-.so MG_JOIN_REQ.7.man
+.so man7/MG_JOIN_REQ.7.man

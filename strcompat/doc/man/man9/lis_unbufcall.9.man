@@ -1,1 +1,1 @@
-.so unbufcall.9.man
+.so man9/unbufcall.9.man

@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_sscop.3.man,v 0.9.2.3 2005/01/26 07:57:38 brian Exp $
+.\" @(#) $Id: xti_sscop.3.man,v 0.9.2.4 2005/02/07 11:49:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/26 07:57:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/02/07 11:49:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -73,20 +73,57 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-SSCOP 3 "$Date: 2005/01/26 07:57:38 $" "$Name:  $" "X/Open Transport Interface"
-.SH "NAME"
+.TH XTI-SSCOP 3 "$Date: 2005/02/07 11:49:53 $" "$Name:  $" "X/Open Transport Interface"
+.\"
+.\"
+.SH NAME
 .B xti_sscop
 \- X/Open Transport Interface \- Corrigendum for Service Specific Connection Oriented Protocol (SSCOP)
-.SH "DESCRIPTION"
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ss7.h>
+.br
+.B #include <xti_mtp.h>
+.br
+.B #include <xti_sccp.h>
+.br
+.B #include <xti_tcap.h>
+.br
+.B #include <xti_mosi.h>
+.\"
+.\"
+.HP
+.BI "int " tcap_xistr " = t_open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.\"
+.\"
 .SH "ADDRESS FORMAT"
-.SH "OPTIONS"
-.SH "FUNCTIONS"
-.SH "CAVEATS"
+.\"
+.\"
+.SH OPTIONS
+.\"
+.\"
+.SH FUNCTIONS
+.\"
+.\"
+.SH CAVEATS
+.\"
+.\"
 .SH "SEE ALSO"
 .BR xti (3),
 .BR xnet (3).
-.SH "DEVICES"
-.SH "VERSIONS"
+.\"
+.\"
+.SH DEVICES
+.\"
+.\"
+.SH VERSIONS
 .\"
 .\"
 .XX

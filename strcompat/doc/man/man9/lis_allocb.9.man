@@ -1,1 +1,1 @@
-.so allocb.9.man
+.so man9/allocb.9.man

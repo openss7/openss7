@@ -1,1 +1,1 @@
-.so copyout.9.man
+.so man9/copyout.9.man

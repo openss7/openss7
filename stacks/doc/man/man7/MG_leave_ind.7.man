@@ -1,1 +1,1 @@
-.so MG_LEAVE_IND.7.man
+.so man7/MG_LEAVE_IND.7.man

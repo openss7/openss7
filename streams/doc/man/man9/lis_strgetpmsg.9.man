@@ -1,1 +1,1 @@
-.so strgetpmsg.9.man
+.so man9/strgetpmsg.9.man

@@ -1,1 +1,1 @@
-.so CH_ATTACH_REQ.7.man
+.so man7/CH_ATTACH_REQ.7.man

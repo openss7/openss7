@@ -1,1 +1,1 @@
-.so MG_ATTACH_ACK.7.man
+.so man7/MG_ATTACH_ACK.7.man

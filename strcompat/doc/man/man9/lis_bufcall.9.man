@@ -1,1 +1,1 @@
-.so bufcall.9.man
+.so man9/bufcall.9.man

@@ -1,1 +1,1 @@
-.so CH_DATA_IND.7.man
+.so man7/CH_DATA_IND.7.man

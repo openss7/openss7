@@ -1,1 +1,1 @@
-.so cci_bicc.7.man
+.so man7/cci_bicc.7.man

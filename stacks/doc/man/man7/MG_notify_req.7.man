@@ -1,1 +1,1 @@
-.so MG_NOTIFY_REQ.7.man
+.so man7/MG_NOTIFY_REQ.7.man

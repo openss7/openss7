@@ -1,1 +1,1 @@
-.so CC_INFO_TIMEOUT_IND.7.man
+.so man7/CC_INFO_TIMEOUT_IND.7.man

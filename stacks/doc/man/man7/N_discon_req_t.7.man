@@ -1,1 +1,1 @@
-.so N_DISCON_REQ.7.man
+.so man7/N_DISCON_REQ.7.man

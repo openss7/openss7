@@ -1,1 +1,1 @@
-.so dupmsg.9.man
+.so man9/dupmsg.9.man

@@ -1,1 +1,1 @@
-.so timeout.9.man
+.so man9/timeout.9.man

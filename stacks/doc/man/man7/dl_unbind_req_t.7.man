@@ -1,1 +1,1 @@
-.so DL_UNBIND_REQ.7.man
+.so man7/DL_UNBIND_REQ.7.man

@@ -1,1 +1,1 @@
-.so adjmsg.9.man
+.so man9/adjmsg.9.man

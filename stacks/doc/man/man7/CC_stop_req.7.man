@@ -1,1 +1,1 @@
-.so CC_STOP_REQ.7.man
+.so man7/CC_STOP_REQ.7.man

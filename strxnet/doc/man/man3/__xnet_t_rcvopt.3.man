@@ -1,1 +1,1 @@
-.so t_rcvopt.3.man
+.so man3/t_rcvopt.3.man

@@ -1,1 +1,1 @@
-.so MG_ACTION_REQ.7.man
+.so man7/MG_ACTION_REQ.7.man

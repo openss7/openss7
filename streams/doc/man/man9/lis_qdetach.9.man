@@ -1,1 +1,1 @@
-.so qdetach.9.man
+.so man9/qdetach.9.man

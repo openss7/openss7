@@ -1,1 +1,1 @@
-.so SV_DEALLOC.9.man
+.so man9/SV_DEALLOC.9.man

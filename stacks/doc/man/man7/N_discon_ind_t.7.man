@@ -1,1 +1,1 @@
-.so N_DISCON_IND.7.man
+.so man7/N_DISCON_IND.7.man

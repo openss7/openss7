@@ -1,1 +1,1 @@
-.so apush_get.9.man
+.so man9/apush_get.9.man

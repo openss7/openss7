@@ -1,1 +1,1 @@
-.so CD_ERROR_IND.7.man
+.so man7/CD_ERROR_IND.7.man

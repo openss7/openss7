@@ -1,1 +1,1 @@
-.so CC_REGISTER_IND.7.man
+.so man7/CC_REGISTER_IND.7.man

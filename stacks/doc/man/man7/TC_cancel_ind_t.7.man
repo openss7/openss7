@@ -1,1 +1,1 @@
-.so TC_CANCEL_IND.7.man
+.so man7/TC_CANCEL_IND.7.man

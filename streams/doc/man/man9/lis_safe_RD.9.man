@@ -1,1 +1,1 @@
-.so RD.9.man
+.so man9/RD.9.man

@@ -1,1 +1,1 @@
-.so rmvq.9.man
+.so man9/rmvq.9.man

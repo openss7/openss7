@@ -1,1 +1,1 @@
-.so cdevsw.9.man
+.so man9/cdevsw.9.man

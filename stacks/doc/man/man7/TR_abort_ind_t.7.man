@@ -1,1 +1,1 @@
-.so TR_ABORT_IND.7.man
+.so man7/TR_ABORT_IND.7.man

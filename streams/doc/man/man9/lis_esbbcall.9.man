@@ -1,1 +1,1 @@
-.so esbbcall.9.man
+.so man9/esbbcall.9.man

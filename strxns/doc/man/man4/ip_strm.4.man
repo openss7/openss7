@@ -1,1 +1,1 @@
-.so ip_strms_mod.4.man
+.so man4/ip_strms_mod.4.man

@@ -1,1 +1,1 @@
-.so DL_DISABMULTI_REQ.7.man
+.so man7/DL_DISABMULTI_REQ.7.man

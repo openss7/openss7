@@ -1,1 +1,1 @@
-.so setqsched.9.man
+.so man9/setqsched.9.man

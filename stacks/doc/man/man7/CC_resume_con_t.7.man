@@ -1,1 +1,1 @@
-.so CC_RESUME_CON.7.man
+.so man7/CC_RESUME_CON.7.man

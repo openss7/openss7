@@ -1,1 +1,1 @@
-.so TC_NOTICE_IND.7.man
+.so man7/TC_NOTICE_IND.7.man

@@ -1,1 +1,1 @@
-.so CD_OK_ACK.7.man
+.so man7/CD_OK_ACK.7.man

@@ -1,1 +1,1 @@
-.so DL_GET_STATISTICS_REQ.7.man
+.so man7/DL_GET_STATISTICS_REQ.7.man

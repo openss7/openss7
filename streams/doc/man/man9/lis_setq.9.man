@@ -1,1 +1,1 @@
-.so setq.9.man
+.so man9/setq.9.man

@@ -1,1 +1,1 @@
-.so TR_UNI_REQ.7.man
+.so man7/TR_UNI_REQ.7.man

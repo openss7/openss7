@@ -1,1 +1,1 @@
-.so TC_ABORT_REQ.7.man
+.so man7/TC_ABORT_REQ.7.man

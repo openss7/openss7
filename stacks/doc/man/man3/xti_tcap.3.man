@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_tcap.3.man,v 0.9.2.4 2005/01/26 07:57:38 brian Exp $
+.\" @(#) $Id: xti_tcap.3.man,v 0.9.2.5 2005/02/07 11:49:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/26 07:57:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/02/07 11:49:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -73,10 +73,15 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-TCAP 3 "$Date: 2005/01/26 07:57:38 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-TCAP 3 "$Date: 2005/02/07 11:49:53 $" "$Name:  $" "X/Open Transport Interface"
 .\"
 .\"
-.SH "NAME"
+.SH NAME
+.B xti_tcap
+\- X/Open Transport Interface \- Corregendum for Transaction Capabilities Application Part (TCAP)
+.\"
+.\"
+.SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .br
@@ -95,7 +100,7 @@ sort-adjacent-labels
 .BI "int " tcap_xistr " = t_open(" device ", " flags );
 .\"
 .\"
-.SH "DESCRIPTION"
+.SH DESCRIPTION
 .PP
 This section describes the protocol-sepcific information that is relevant of
 TCAP transport providers.  This section also described the protoocl-specific
@@ -118,7 +123,7 @@ structure as defined in
 .BR xti_sccp (3).
 .\"
 .\"
-.SH "OPTIONS"
+.SH OPTIONS
 .PP
 Options are formatted according to the
 .B t_opthdr
@@ -195,7 +200,7 @@ Application Part, yeat are used by SS7 protocol levels representing MTP Users.
 .B T_TCAP_APPCTX
 .\"
 .\"
-.SH "FUNCTIONS"
+.SH FUNCTIONS
 .PP
 .\"
 .\"
@@ -279,7 +284,7 @@ Application Part, yeat are used by SS7 protocol levels representing MTP Users.
 .PP
 .\"
 .\"
-.SH "CAVEATS"
+.SH CAVEATS
 .PP
 .\"
 .\"
@@ -292,7 +297,7 @@ Application Part, yeat are used by SS7 protocol levels representing MTP Users.
 .BR xti_sccp (3).
 .\"
 .\"
-.SH "DEVICES"
+.SH DEVICES
 .PP
 There are number of TCAP devices providing the Transport Provider Interface
 that provide TCAP conforming TPI devices as follows:
@@ -310,7 +315,7 @@ For more information on the SIGTRAN TUA device, see
 .BR tua (4).
 .\"
 .\"
-.SH "VERSIONS"
+.SH VERSIONS
 .PP
 The
 .B TCAP-TPI

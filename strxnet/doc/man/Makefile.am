@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/26 22:12:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/07 11:51:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:42 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 11:51:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -184,6 +184,7 @@ xnet_man_MANS	= \
 	man3/__xnet_t_rcvdis.3 \
 	man3/__xnet_t_rcvleafchange.3 \
 	man3/__xnet_t_rcvrel.3 \
+	man3/__xnet_t_rcvrel_r.3 \
 	man3/__xnet_t_rcvreldata.3 \
 	man3/__xnet_t_rcvopt.3 \
 	man3/__xnet_t_rcvudata.3 \
@@ -408,6 +409,7 @@ xnet_dist_noinst_MANS	= \
 	man3/__xnet_t_rcvdis.3.man \
 	man3/__xnet_t_rcvleafchange.3.man \
 	man3/__xnet_t_rcvrel.3.man \
+	man3/__xnet_t_rcvrel_r.3.man \
 	man3/__xnet_t_rcvreldata.3.man \
 	man3/__xnet_t_rcvopt.3.man \
 	man3/__xnet_t_rcvudata.3.man \

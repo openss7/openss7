@@ -1,1 +1,1 @@
-.so CC_UNBLOCKING_CON.7.man
+.so man7/CC_UNBLOCKING_CON.7.man

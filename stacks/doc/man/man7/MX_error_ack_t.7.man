@@ -1,1 +1,1 @@
-.so MX_ERROR_ACK.7.man
+.so man7/MX_ERROR_ACK.7.man

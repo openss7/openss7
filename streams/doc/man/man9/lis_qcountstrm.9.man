@@ -1,1 +1,1 @@
-.so qcountstrm.9.man
+.so man9/qcountstrm.9.man

@@ -1,1 +1,1 @@
-.so CD_MODEM_SIG_POLL.7.man
+.so man7/CD_MODEM_SIG_POLL.7.man

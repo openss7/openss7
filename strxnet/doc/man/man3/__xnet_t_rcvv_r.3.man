@@ -1,1 +1,1 @@
-.so t_rcvv.3.man
+.so man3/t_rcvv.3.man

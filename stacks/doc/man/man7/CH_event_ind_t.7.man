@@ -1,1 +1,1 @@
-.so CH_EVENT_IND.7.man
+.so man7/CH_EVENT_IND.7.man

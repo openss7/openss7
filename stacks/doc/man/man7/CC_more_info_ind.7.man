@@ -1,1 +1,1 @@
-.so CC_MORE_INFO_IND.7.man
+.so man7/CC_MORE_INFO_IND.7.man

@@ -1,1 +1,1 @@
-.so backq.9.man
+.so man9/backq.9.man

@@ -1,1 +1,1 @@
-.so lapd.4.man
+.so man4/lapd.4.man

@@ -1,1 +1,1 @@
-.so t_sndvopt.3.man
+.so man3/t_sndvopt.3.man

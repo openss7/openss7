@@ -1,1 +1,1 @@
-.so N_INFO_REQ.7.man
+.so man7/N_INFO_REQ.7.man

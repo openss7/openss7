@@ -1,1 +1,1 @@
-.so N_CONN_REQ.7.man
+.so man7/N_CONN_REQ.7.man

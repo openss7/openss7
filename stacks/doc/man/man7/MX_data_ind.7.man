@@ -1,1 +1,1 @@
-.so MX_DATA_IND.7.man
+.so man7/MX_DATA_IND.7.man

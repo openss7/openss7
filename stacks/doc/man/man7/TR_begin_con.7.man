@@ -1,1 +1,1 @@
-.so TR_BEGIN_CON.7.man
+.so man7/TR_BEGIN_CON.7.man

@@ -1,1 +1,1 @@
-.so CH_DISCONNECT_CON.7.man
+.so man7/CH_DISCONNECT_CON.7.man

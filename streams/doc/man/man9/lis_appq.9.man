@@ -1,1 +1,1 @@
-.so appq.9.man
+.so man9/appq.9.man

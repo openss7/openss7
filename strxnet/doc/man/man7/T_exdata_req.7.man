@@ -1,1 +1,1 @@
-.so T_EXDATA_REQ.7.man
+.so man7/T_EXDATA_REQ.7.man

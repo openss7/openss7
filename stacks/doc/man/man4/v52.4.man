@@ -1,1 +1,1 @@
-.so v5.4.man
+.so man4/v5.4.man

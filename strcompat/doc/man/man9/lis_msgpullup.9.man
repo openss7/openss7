@@ -1,1 +1,1 @@
-.so msgpullup.9.man
+.so man9/msgpullup.9.man

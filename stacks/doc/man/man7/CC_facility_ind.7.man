@@ -1,1 +1,1 @@
-.so CC_FACILITY_IND.7.man
+.so man7/CC_FACILITY_IND.7.man

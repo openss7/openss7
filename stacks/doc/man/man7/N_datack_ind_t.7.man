@@ -1,1 +1,1 @@
-.so N_DATACK_IND.7.man
+.so man7/N_DATACK_IND.7.man

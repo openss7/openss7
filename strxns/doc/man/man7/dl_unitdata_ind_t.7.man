@@ -1,1 +1,1 @@
-.so DL_UNITDATA_IND.7.man
+.so man7/DL_UNITDATA_IND.7.man

@@ -1,1 +1,1 @@
-.so TC_end_ind_t.7.man
+.so man7/TC_end_ind_t.7.man

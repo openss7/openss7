@@ -1,1 +1,1 @@
-.so umount.9.man
+.so man9/umount.9.man

@@ -1,1 +1,1 @@
-.so T_CONN_RES.7.man
+.so man7/T_CONN_RES.7.man

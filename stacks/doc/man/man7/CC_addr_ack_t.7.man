@@ -1,1 +1,1 @@
-.so CC_ADDR_ACK.7.man
+.so man7/CC_ADDR_ACK.7.man

@@ -1,1 +1,1 @@
-.so t_rcvleafchange.3.man
+.so man3/t_rcvleafchange.3.man

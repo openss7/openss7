@@ -1,1 +1,1 @@
-.so CC_MAINT_IND.7.man
+.so man7/CC_MAINT_IND.7.man

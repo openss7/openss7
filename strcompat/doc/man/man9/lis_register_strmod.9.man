@@ -1,1 +1,1 @@
-.so register_strmod.9.man
+.so man9/register_strmod.9.man

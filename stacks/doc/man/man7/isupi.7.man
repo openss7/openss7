@@ -1,1 +1,1 @@
-.so cci_isup.7.man
+.so man7/cci_isup.7.man

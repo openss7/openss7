@@ -1,1 +1,1 @@
-.so bcanputnext.9.man
+.so man9/bcanputnext.9.man

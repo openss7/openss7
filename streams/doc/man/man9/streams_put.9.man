@@ -1,1 +1,1 @@
-.so put.9.man
+.so man9/put.9.man

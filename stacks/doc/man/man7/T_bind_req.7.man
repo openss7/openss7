@@ -1,1 +1,1 @@
-.so T_BIND_REQ.7.man
+.so man7/T_BIND_REQ.7.man

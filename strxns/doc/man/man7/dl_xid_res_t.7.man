@@ -1,1 +1,1 @@
-.so DL_XID_RES.7.man
+.so man7/DL_XID_RES.7.man

@@ -1,1 +1,1 @@
-.so MX_DETACH_REQ.7.man
+.so man7/MX_DETACH_REQ.7.man

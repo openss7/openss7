@@ -1,1 +1,1 @@
-.so CD_UNITDATA_IND.7.man
+.so man7/CD_UNITDATA_IND.7.man

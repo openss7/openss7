@@ -1,1 +1,1 @@
-.so N_CONN_IND.7.man
+.so man7/N_CONN_IND.7.man

@@ -1,1 +1,1 @@
-.so timod.4.man
+.so man4/timod.4.man

@@ -1,1 +1,1 @@
-.so cci_isdn.7.man
+.so man7/cci_isdn.7.man

@@ -1,1 +1,1 @@
-.so N_RESET_RES.7.man
+.so man7/N_RESET_RES.7.man

@@ -1,1 +1,1 @@
-.so x100p.4.man
+.so man4/x100p.4.man

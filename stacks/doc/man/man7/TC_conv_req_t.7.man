@@ -1,1 +1,1 @@
-.so TC_cont_req_t.7.man
+.so man7/TC_cont_req_t.7.man

@@ -1,1 +1,1 @@
-.so MG_CONN_CON.7.man
+.so man7/MG_CONN_CON.7.man

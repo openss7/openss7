@@ -1,1 +1,1 @@
-.so t_getinfo.3.man
+.so man3/t_getinfo.3.man

@@ -1,1 +1,1 @@
-.so SLEEP_UNLOCK.9.man
+.so man9/SLEEP_UNLOCK.9.man

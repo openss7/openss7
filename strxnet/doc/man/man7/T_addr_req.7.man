@@ -1,1 +1,1 @@
-.so T_ADDR_REQ.7.man
+.so man7/T_ADDR_REQ.7.man

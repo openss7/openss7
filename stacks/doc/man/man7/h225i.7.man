@@ -1,1 +1,1 @@
-.so cci_h225.7.man
+.so man7/cci_h225.7.man

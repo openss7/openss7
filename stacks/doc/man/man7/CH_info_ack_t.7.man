@@ -1,1 +1,1 @@
-.so CH_INFO_ACK.7.man
+.so man7/CH_INFO_ACK.7.man

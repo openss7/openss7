@@ -1,1 +1,1 @@
-.so MG_DETACH_REQ.7.man
+.so man7/MG_DETACH_REQ.7.man

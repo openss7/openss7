@@ -1,1 +1,1 @@
-.so unlinkb.9.man
+.so man9/unlinkb.9.man

@@ -1,1 +1,1 @@
-.so t_snddis.3.man
+.so man3/t_snddis.3.man

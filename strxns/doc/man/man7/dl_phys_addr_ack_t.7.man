@@ -1,1 +1,1 @@
-.so DL_PHYS_ADDR_ACK.7.man
+.so man7/DL_PHYS_ADDR_ACK.7.man

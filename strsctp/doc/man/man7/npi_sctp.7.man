@@ -1,1 +1,1 @@
-.so strsctp_soon.7.man
+.so man7/strsctp_soon.7.man
