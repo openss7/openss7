@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SLEEP_UNLOCK.9.man,v 0.9.2.4 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: SLEEP_UNLOCK.9.man,v 0.9.2.5 2004/04/18 22:29:24 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/18 22:29:24 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SLEEP_UNLOCK 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH SLEEP_UNLOCK 9 "$Date: 2004/04/18 22:29:24 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -93,7 +93,6 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .PP
 .TP \w'priority\(em'u
-.TP
 .I lockp
 A pointer to the
 .B sleep_t
