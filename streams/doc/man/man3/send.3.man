@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: send.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: send.3.man,v 0.9.2.4 2004/04/17 20:35:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:35:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH SEND 3 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.TH SEND 3 "$Date: 2004/04/17 20:35:15 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
 .SH NAME
 .B send
 \- send a message on a socket
@@ -84,24 +84,24 @@ sort-adjacent-labels
 .BI "ssize_t send(int " socket ", const void *" buffer ", size_t " length ", int " flags );
 .SH DESCRIPTION
 .PP
-.TP 12
+.TP
 .I socket
 Specifies the socket file descriptor.
-.TP 12
+.TP
 .I buffer
 Points to the buffer containing the message to send.
-.TP 12
+.TP
 .I length
 Specifies the length of the message in bytes.
-.TP 12
+.TP
 .I flags
 Specifies the type of message transmission. Values of this argument are formed
 by logically OR'ing zero or more of the following flags:
 .RS
-.TP 12
+.TP
 .B MSG_EOR
 Terminates a record (if supported by the protocol)
-.TP 12
+.TP
 .B MSG_OOB
 Sends out-of-band data on sockets that support out-of-band communications. The
 significance and semantics of out-of-band data are protocol-specific.
@@ -189,54 +189,54 @@ Otherwise, -1 is returned and errno is set to indicate the error.
 The
 .BR send ()
 function will fail if:
-.TP 12
+.TP
 .RB [ EAGAIN "] or [" EWOULDBLOCK ]
 The socket's file descriptor is marked
 .B O_NONBLOCK
 and the
 requested operation would block.
-.TP 12
+.TP
 .RB [ EBADF ]
 The
 .I socket
 argument is not a valid file descriptor.
-.TP 12
+.TP
 .RB [ ECONNRESET ]
 A connection was forcibly closed by a peer.
-.TP 12
+.TP
 .RB [ EDESTADDRREQ ]
 The socket is not connection-mode and no peer address is set.
-.TP 12
+.TP
 .RB [ EFAULT ]
 The
 .I buffer
 parameter can not be accessed.
-.TP 12
+.TP
 .RB [ EINTR ]
 A signal interrupted
 .BR send ()
 before any data was transmitted.
-.TP 12
+.TP
 .RB [ EMSGSIZE ]
 The message is too large be sent all at once, as the socket
 requires.
-.TP 12
+.TP
 .RB [ ENOTCONN ]
 The socket is not connected or otherwise has not had the peer
 prespecified.
-.TP 12
+.TP
 .RB [ ENOTSOCK ]
 The
 .I socket
 argument does not refer to a socket.
-.TP 12
+.TP
 .RB [ EOPNOTSUPP ]
 The
 .I socket
 argument is associated with a socket that does not
 support one or more of the values set in
 .IR flags .
-.TP 12
+.TP
 .RB [ EPIPE ]
 The socket is shut down for writing, or the socket is
 connection-mode and is no longer connected. In the latter case,
@@ -250,24 +250,24 @@ generated to the calling process.
 The
 .BR send ()
 function may fail if:
-.TP 12
+.TP
 .RB [ EACCES ]
 The calling process does not have the appropriate privileges.
-.TP 12
+.TP
 .RB [ EIO ]
 An I/O error occurred while reading from or writing to the file
 system.
-.TP 12
+.TP
 .RB [ ENETDOWN ]
 The local interface used to reach the destination is down.
-.TP 12
+.TP
 .RB [ ENETUNREACH ]
 No route to the network is present.
-.TP 12
+.TP
 .RB [ ENOBUFS ]
 Insufficient resources were available in the system to perform
 the operation.
-.TP 12
+.TP
 .RB [ ENOSR ]
 There were insufficient
 .IR STREAMS (4)
@@ -299,4 +299,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.TI

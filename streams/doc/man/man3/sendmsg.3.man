@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sendmsg.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: sendmsg.3.man,v 0.9.2.4 2004/04/17 20:35:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:35:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH SENDMSG 3 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.TH SENDMSG 3 "$Date: 2004/04/17 20:35:15 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
 .SH NAME
 .B sendmsg
 \- send a message on a socket using a message structure
@@ -96,10 +96,10 @@ connection-mode, the destination address in
 is ignored.
 .PP
 The function takes the following arguments:
-.TP 12
+.TP
 .I socket
 Specifies the socket file descriptor.
-.TP 12
+.TP
 .I message
 Points to a
 .B msghdr
@@ -108,15 +108,15 @@ buffers for the outgoing message.  The length and format of the address depend
 on the address family of the socket.  The
 .I msg_flags
 member is ignored.
-.TP 12
+.TP
 .I flags
 Specifies the type of message transmission.  The application may specify 0 or
 the following flag:
 .RS
-.TP 12
+.TP
 .B MSG_EOR
 Terminates a record (if supported by the protocol)
-.TP 12
+.TP
 .B MSG_OOB
 Sends out-of-band data on sockets that support out-of-bound data.  The
 significance and semantics of out-of-band data are protocol-specific.
@@ -197,23 +197,23 @@ sent.  Otherwise, -1 is returned and errno is set to indicate the error.
 The
 .BR sendmsg ()
 function will fail if:
-.TP 12
+.TP
 .RB [ EAGAIN "] or [" EWOULDBLOCK ]
 The socket's file descriptor is marked
 .B O_NONBLOCK
 and the requested operation
 would block.
-.TP 12
+.TP
 .RB [ EAFNOSUPPORT ]
 Addresses in the specified address family cannot be used with
 this socket.
-.TP 12
+.TP
 .RB [ EBADF ]
 The socket argument is not a valid file descriptor.
-.TP 12
+.TP
 .RB [ ECONNRESET ]
 A connection was forcibly closed by a peer.
-.TP 12
+.TP
 .RB [ EFAULT ]
 The message parameter, or storage pointed to by the
 .IR msg_name ,
@@ -224,18 +224,18 @@ fields of the message parameter, or
 storage pointed to by the iovec structures pointed to by the
 .I msg_iov
 field can not be accessed.
-.TP 12
+.TP
 .RB [ EINTR ]
 A signal interrupted
 .BR sendmsg ()
 before any data was transmitted.
-.TP 12
+.TP
 .RB [ EINVAL ]
 The sum of the
 .I iov_len
 values overflows an
 .BR ssize_t .
-.TP 12
+.TP
 .RB [ EMSGSIZE ]
 The message is too large to be sent all at once (as the socket
 requires), or the
@@ -245,18 +245,18 @@ member of the
 structure
 pointed to by message is less than or equal to 0 or is greater
 than {IOV_MAX}.
-.TP 12
+.TP
 .RB [ ENOTCONN ]
 The socket is connection-mode but is not connected.
-.TP 12
+.TP
 .RB [ ENOTSOCK ]
 The socket argument does not refer a socket.
-.TP 12
+.TP
 .RB [ EOPNOTSUPP ]
 The socket argument is associated with a socket that does not
 support one or more of the values set in
 .IR flags .
-.TP 12
+.TP
 .RB [ EPIPE ]
 The socket is shut down for writing, or the socket is
 connection-mode and is no longer connected.  In the latter case,
@@ -273,15 +273,15 @@ then
 .BR sendmsg ()
 will
 fail if:
-.TP 12
+.TP
 .RB [ EIO ]
 An I/O error occurred while reading from or writing to the file
 system.
-.TP 12
+.TP
 .RB [ ELOOP ]
 Too many symbolic links were encountered in translating the
 pathname in the socket address.
-.TP 12
+.TP
 .RB [ ENAMETOOLONG ]
 A component of a pathname exceeded
 .RI { NAME_MAX }
@@ -289,11 +289,11 @@ characters, or an
 entire pathname exceeded
 .RI { PATH_MAX }
 characters.
-.TP 12
+.TP
 .RB [ ENOENT ]
 A component of the pathname does not name an existing file or
 the pathname is an empty string.
-.TP 12
+.TP
 .RB [ ENOTDIR ]
 A component of the path prefix of the pathname in the socket
 address is not a directory.
@@ -301,40 +301,40 @@ address is not a directory.
 The
 .BR sendmsg ()
 function may fail if:
-.TP 12
+.TP
 .RB [ EACCES ]
 Search permission is denied for a component of the path prefix;
 or write access to the named socket is denied.
-.TP 12
+.TP
 .RB [ EDESTADDRREQ ]
 The socket is not connection-mode and does not have its peer
 address set, and no destination address was specified.
-.TP 12
+.TP
 .RB [ EHOSTUNREACH ]
 The destination host cannot be reached (probably because the
 host is down or a remote router cannot reach it).
-.TP 12
+.TP
 .RB [ EIO ]
 An I/O error occurred while reading from or writing to the file
 system.
-.TP 12
+.TP
 .RB [ EISCONN ]
 A destination address was specified and the socket is already
 connected.
-.TP 12
+.TP
 .RB [ ENETDOWN ]
 The local interface used to reach the destination is down.
-.TP 12
+.TP
 .RB [ ENETUNREACH ]
 No route to the network is present.
-.TP 12
+.TP
 .RB [ ENOBUFS ]
 Insufficient resources were available in the system to perform
 the operation.
-.TP 12
+.TP
 .RB [ ENOMEM ]
 Insufficient memory was available to fulfill the request.
-.TP 12
+.TP
 .RB [ ENOSR ]
 There were insufficient
 .IR STREAMS (4)
@@ -347,7 +347,7 @@ then
 .BR sendmsg ()
 may
 fail if:
-.TP 12
+.TP
 .RB [ ENAMETOOLONG ]
 Pathname resolution of a symbolic link produced an intermediate
 result whose length exceeds
@@ -377,4 +377,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.TI

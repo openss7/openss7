@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: xti.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,11 +73,15 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XNET 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH XNET 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .BR xti ", " xnet
-\- XNS 5.2 XTI Library
+\- XNS 5.2 XTI/TLI Library
 .BR "" ( libxnet )
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/xti.h>
@@ -145,15 +149,242 @@ sort-adjacent-labels
 .BI "int t_sync(int " fd );
 .HP 8
 .BI "int t_unbind(int " fd );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B libxnet
 is an
 .B OpenSS7
-implementation of the XNS 5.2 XTI Library for
-.B LiS
-(Linux STREAMS).
-
+implementation of the XNS 5.2 XTI/TLI Library for
+.B LfS
+(Linux Fast-STREAMS).
+.[
+lfs
+.]
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.\"
+.SS "XTI/TLI Generic Options"
+.PP
+Several options are independent of transport service provider.  These options
+are specified at the option level
+.BR XTI_GENERIC ,
+and are defined as follows:
+.\"
+.TP
+.B XTI_DEBUG
+This option enables debugging.  The values of this option are implementation
+defined.  Debugging is disabled if the option is specified with \*(lqno
+value\*(rq; that is, with an option header only.  The system supplies
+utilities to process the traces.  Note that an implementation may also provide
+other means for debugging.
+.RS
+.PP
+This option is formatted as an array of
+.BR t_uscalar_t .
+This option is an
+.IR "absolute requirement" .
+Legal values are implementation defined.
+.PP
+This option can be negotiated in any XTI/TLI transport endpoint state.
+This option can be negotiated using the
+.BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
+XTI/TLI library calls.
+.RE
+.\"
+.TP
+.B XTI_LINGER
+This option is used to linger the execution of a
+.BR t_close "(3) or " close (2)
+if send data is still queue in the send buffer.  The option value specifies
+the linger period.  If a
+.BR close "(2) or " t_close (3)
+is issued and the send buffer is not empty, the system attempts to send the
+pending data within the linger period before closing the endpoint.  Data still
+pending after the linger period has elapsed is discarded.
+.RS
+.PP
+Depending on the implementation,
+.BR t_close "(3) or " close (2)
+either blocks for, at maximum, the linger period, or immediately returns,
+whereupon the system holds the connection in existence for at most the linger
+period.
+.PP
+This option is formatted as a
+.B t_linger
+structure, with the following members:
+.sp
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;    /* option on/off */
+    t_scalar_t l_linger;   /* linger time */
+};
+\s+1\fP
+.fi
+.PP
+The value of
+.I l_onoff
+is
+.B T_YES
+(on) or
+.B T_NO
+(off).
+.I l_onoff
+is an
+.IR "absolute requirement" .
+.PP
+The value of
+.I l_linger
+determines the linger period in seconds.  The transport user can request the
+default value by setting the to
+.BR T_UNSPEC .
+The default timeout value depends on the underlying transport provider (it is
+often
+.BR T_INFINITE ).
+Legal values for this field are
+.BR T_UNSPEC ", " T_INFINITE
+and all non-negative numbers.
+.I  l_linger
+is not an
+.IR "absolute requirement" .
+The implementation may place upper and lower limits on the
+.I l_linger
+option value.  Requests that fall short of the lower limit are negotiated to
+the lower limit.  Legal values are all positive numbers.
+.PP
+This option can be negotiated in any XTI/TLI transport endpoint state; however, the
+negotiated value is not effective until
+.BR t_close (3)
+or
+.BR close (2)
+is called.
+This option can be negotiated using the
+.BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
+XTI/TLI library calls.
+.PP
+There are notes in
+.B Linux 2.4
+TCP code that say that if
+.I l_onoff
+is set to
+.B T_YES
+and
+.I l_linger
+is set to zero (0), that, per
+.IR "RFC 793" ,
+.[
+rfc 793
+.]
+an abort will be sent.  This might be a way to resolve the problem sending
+aborts.
+.RE
+.\"
+.TP
+.B XTI_RCVBUF
+This option is used to adjust the internal buffer size allocated for the
+receive buffer.  The buffer size may be increased for high-volume
+connections, or decreased to limit the possible backlog of incoming data.
+.RS
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+This request is not an
+.IR "absolute requirement" .
+The implementation may place upper and lower limits on the option value.
+Requests that fall short of the lower limit are negotiated to the lower limit.
+Legal values are all positive numbers.
+.PP
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
+will not be effective until the
+.B T_DATAXFER
+state is acheived.  This option can be negotiated using the
+.BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
+XTI/TLI library calls.
+.RE
+.\"
+.TP
+.B XTI_RCVLOWAT
+This option is used to set a low-water mark in the receive buffer.  The
+option value gives the minimal number of bytes that must have accumulated
+in the receive buffer before they become visible to the transport user.
+If and when the amount of accumulated receive data exceeds the low-water
+mark, a T_DATA event is created, an event mechansm (for example,
+.BR poll "(2) or " select (2))
+indicates the data, and the data can be read by
+.BR t_rcv "(3) or " t_rcvudata (3).
+.RS
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+This request is not an
+.IR "absolute requirement" .
+The implementation may place upper and lower limits on the option value.
+Requests that fall short of the lower limit are negotiated to the lower limit.
+Legal values are all positive numbers.
+.PP
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
+will not be effective until the
+.B T_DATAXFER
+state is acheived.  This option can be negotiated using the
+.BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
+XTI/TLI library calls.
+.RE
+.\"
+.TP
+.B XTI_SNDBUF
+This option is used to adjust the internal buffer size allocated for the
+send buffer.
+.RS
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+This request is not an
+.IR "absolute requirement" .
+The implementation may place upper and lower limits on the option value.
+Requests that fall short of the lower limit are negotiated to the lower limit.
+Legal values are all positive numbers.
+.PP
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
+will not be effective until the
+.B T_DATAXFER
+state is acheived.  This option can be negotiated using the
+.BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
+XTI/TLI library calls.
+.RE
+.\"
+.TP
+.B XTI_SNDLOWAT
+This option is used to set a low-water mark in the send buffer.  The
+option value gives the minimal number of bytes that must have accumulated
+in the send buffer before they are sent.
+.RS
+.PP
+This option is formatted as a
+.BR t_uscalar_t .
+This request is not an
+.IR "absolute requirement" .
+The implementation may place upper and lower limits on the option value.
+Requests that fall short of the lower limit are negotiated to the lower limit.
+Legal values are all positive numbers.
+.PP
+This option can be negotiated in any XTI/TLI state; however, the negotiated value
+will not be effective until the
+.B T_DATAXFER
+state is acheived.  This option can be negotiated using the
+.BR t_optmgmt "(3), " t_connect "(3) or " t_accept (3)
+XTI/TLI library calls.
+.RE
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.\"
+.\"
 .SS "Local Transport Endpoint Management"
 .HP
 .B Local Endpoint Management
@@ -180,11 +411,10 @@ parameter limits of a local transport endpoint.
 .br
 .BR t_getstate "(3) - return the current state"
 .RE
-
 .HP
 .B Local Event Management
 functions are responsible for handling asynchronous events of the underlying
-transport service provider and resynchronizing the XTI library with the
+transport service provider and resynchronizing the XTI/TLI library with the
 underlying transport service provider.
 .RS
 .sp
@@ -192,8 +422,10 @@ underlying transport service provider.
 .br
 .BR t_look "(3) - look at the current event"
 .RE
+.\"
+.\"
 .SS "Connection Oriented Endpoints"
-A set of XTI Library calls are provided for performing protocol functions on
+A set of XTI/TLI Library calls are provided for performing protocol functions on
 local transport endpoints for which the transport service provider is of a
 connection oriented service type.  Connection oriented services have three
 phases as follows:
@@ -202,7 +434,7 @@ phases as follows:
 consists of either invoking outgoing connections or listening for and
 accepting incoming connections.  Valid states for this phase are:
 .BR T_IDLE ", " T_INCON ", and " T_OUTCON .
-XTI Library calls used in the Connection Establishment Phare are as follows:
+XTI/TLI Library calls used in the Connection Establishment Phare are as follows:
 .RS
 .sp
 .BR t_listen "(3) - get a connection request"
@@ -228,7 +460,7 @@ states for this phase are:
 (for incoming data) and
 .BR T_INREL
 (for outgoing data).
-XTI Library calls used in the Data Transfer Phare are as follows:
+XTI/TLI Library calls used in the Data Transfer Phare are as follows:
 .RS
 .sp
 .BR t_snd "(3) - send data"
@@ -245,7 +477,7 @@ XTI Library calls used in the Data Transfer Phare are as follows:
 consists of either abortive or orderly release of the transport connection,
 with or without user data.  Valid states for this phase are:
 .BR T_DATAXFER ", " T_OUTREL ", and " T_INREL .
-XTI Library calls used in the Connection Release Phare are as follows:
+XTI/TLI Library calls used in the Connection Release Phare are as follows:
 .RS
 .sp
 .BR t_rcvdis "(3) - receive abortive disconnect"
@@ -260,8 +492,10 @@ XTI Library calls used in the Connection Release Phare are as follows:
 .br
 .BR t_sndreldata "(3) - send orderly release request with data"
 .RE
+.\"
+.\"
 .SS "Connectionless Endpoints"
-A set of XTI Library calls are provided for performing protocol functions on
+A set of XTI/TLI Library calls are provided for performing protocol functions on
 local transport endpoints for which the transport service provider is of a
 connectionless service type.  Connectionless service has one phase as follows:
 .HP
@@ -269,7 +503,7 @@ connectionless service type.  Connectionless service has one phase as follows:
 consists of transferring data between disconnected transport endpoints.  Valid
 states for this phase are:
 .BR T_IDLE .
-XTI Library calls used in the Data Transfer Phase are as follows:
+XTI/TLI Library calls used in the Data Transfer Phase are as follows:
 .RS
 .sp
 .BR t_rcvudata "(3) - receive unitdata"
@@ -280,14 +514,16 @@ XTI Library calls used in the Data Transfer Phase are as follows:
 .br
 .BR t_sndvudata "(3) - gather and send unitdata"
 .RE
-.SS "XTI Library functions"
-A set of XTI Library calls are provided for error handling and utility.
+.\"
+.\"
+.SS "XTI/TLI Library functions"
+A set of XTI/TLI Library calls are provided for error handling and utility.
 These functions do not operate directly on a transport endpoint.
 .HP
 .B Error Handling
 consists of the global external variable
 .I t_errno
-which holds all XTI Library call error numbers in a similar fashion to
+which holds all XTI/TLI Library call error numbers in a similar fashion to
 .BR errno (3).
 The following Error Handling functions are provided:
 .RS
@@ -296,13 +532,13 @@ The following Error Handling functions are provided:
 .br
 .BR t_error "(3) - print an error message"
 .br
-.BR t_strerror "(3) - describe an XTI library error"
+.BR t_strerror "(3) - describe an XTI/TLI library error"
 .RE
 
 .HP
 .B Utility Functions
-provide for the allocation and deallocation of XTI library datastructures, and
-equiry concerning XTI system confiruation parameters.
+provide for the allocation and deallocation of XTI/TLI library datastructures, and
+equiry concerning XTI/TLI system confiruation parameters.
 The following Utility Functions are provided:
 .RS
 .sp
@@ -310,22 +546,28 @@ The following Utility Functions are provided:
 .br
 .BR t_free "(3) - free a library structure"
 .br
-.BR t_sysconf "(3) - configure XTI system parameters"
+.BR t_sysconf "(3) - configure XTI/TLI system parameters"
 .RE
+.\"
+.\"
 .SH "RETURN VALUES"
 .PP
 Upon success,
-most XTI library functions return zero (0) or a positive integer reflecting a
+most XTI/TLI library functions return zero (0) or a positive integer reflecting a
 returned paramter value.
 Upon failure,
-XTI library functions return -1 and set
+XTI/TLI library functions return -1 and set
 .IR t_errno (3)
 to an applicable error number.
+.\"
+.\"
 .SH ERRORS
 .PP
-The errors that can be returned by XTI Library calls are detailed
+The errors that can be returned by XTI/TLI Library calls are detailed
 in
 .IR t_errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR t_accept (3),
@@ -366,6 +608,8 @@ in
 .BR t_sync (3),
 .BR t_sysconf (3),
 .BR t_unbind (3).
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 The Open Group XNS Issue 5.2.
@@ -377,4 +621,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.T4

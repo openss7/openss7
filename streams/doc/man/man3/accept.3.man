@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: accept.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: accept.3.man,v 0.9.2.4 2004/04/17 20:35:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:35:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ACCEPT 3 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.TH ACCEPT 3 "$Date: 2004/04/17 20:35:15 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
 .SH NAME
 .B accept
 \- accept a new connection on a socket
@@ -89,7 +89,7 @@ creates a new socket with the same socket type protocol and address family as
 the specified socket, and allocates a new file descriptor for that socket.
 .PP
 The function takes the following arguments:
-.TP 12
+.TP
 .I socket
 Specifies a socket that was created with
 .BR socket (3),
@@ -98,11 +98,11 @@ address with
 .BR bind (3),
 and has issued a successful call to
 .BR listen (3).
-.TP 12
+.TP
 .I address
 Either a null pointer, or a pointer to a sockaddr structure where the address
 of the connecting socket will be returned.
-.TP 12
+.TP
 .I address_len
 Points to a socklen_t which on input specifies the length of the supplied
 sockaddr structure, and on output specifies the length of the stored address.
@@ -163,52 +163,52 @@ the error.
 The
 .BR accept ()
 function will fail if:
-.TP 12
+.TP
 .RB [ EAGAIN "] or [" EWOULDBLOCK ]
 .B O_NONBLOCK
 is set for the socket file descriptor and no connections are
 present to be accepted.
-.TP 12
+.TP
 .RB [ EBADF ]
 The socket argument is not a valid file descriptor.
-.TP 12
+.TP
 .RB [ ECONNABORTED ]
 A connection has been aborted.
-.TP 12
+.TP
 .RB [ EFAULT ]
 The address or address_len parameter can not be accessed or written.
-.TP 12
+.TP
 .RB [ EINTR ]
 The
 .BR accept ()
 function was interrupted by a signal that was caught before a valid connection
 arrived.
-.TP 12
+.TP
 .RB [ EINVAL ]
 The socket is not accepting connections.
-.TP 12
+.TP
 .RB [ EMFILE ]
 {OPEN_MAX} file descriptors are currently open in the calling process.
-.TP 12
+.TP
 .RB [ ENFILE ]
 The maximum number of file descriptors in the system are already open.
-.TP 12
+.TP
 .RB [ ENOTSOCK ]
 The socket argument does not refer to a socket.
-.TP 12
+.TP
 .RB [ EOPNOTSUPP ]
 The socket type of the specified socket does not support accepting
 connections.
-.TP 12
+.TP
 .RB [ ENOBUFS ]
 No buffer space is available.
-.TP 12
+.TP
 .RB [ ENOMEM ]
 There was insufficient memory available to complete the operation.
-.TP 12
+.TP
 .RB [ ENOSR ]
 There was insufficient STREAMS resources available to complete the operation.
-.TP 12
+.TP
 .RB [ EPROTO ]
 A protocol error has occurred; for example, the STREAMS protocol stack has not
 been initialised.
@@ -230,4 +230,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.TI

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: fattach.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -48,7 +48,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 3 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH FATTACH 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B fattach
 \- attach a \fISTREAMS\fR open file to a path name in the file system
@@ -144,24 +144,24 @@ is set to indicate the error causing the failure (see below).
 .PP
 .BR fattach "() "
 may fail at least with the following error indications:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .B "[EBADF]"
 The
 .I filedes
 argument is not a valid open file descriptor.
-.TP 12
+.TP
 .B "[EINVAL]"
 The
 .I filedes
 argument does not refer to a valid
 .I STREAMS
 file.
-.TP 12
+.TP
 .B "[EISDIR]"
 The
 .I path
 argument refers to a directory.
-.TP 12
+.TP
 .B "[EBUSY]"
 The
 .I path
@@ -405,4 +405,4 @@ John Boyd, protologos LLC.
 .[
 $LIST$
 .]
-.TA
+.T3

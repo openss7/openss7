@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,10 +73,14 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-SCTP 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-SCTP 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "X/Open Transport Interface"
+.\"
+.\"
 .SH NAME
 .B xti_sctp
 \- X/Open Transport Interface \- Corrigendum for Stream Control Transmission Protocol (SCTP) Conformance
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
@@ -86,6 +90,8 @@ sort-adjacent-labels
 .B #include <xti_sctp.h>
 .HP
 .BI "int " sctp_xtistr " = t_open(" \fR\*(lq/dev/sctp_t\*(rq\fI ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 This manual section describes the protocol-specific information that is
@@ -97,9 +103,51 @@ This section also defines the data structures and constants required for SCTP
 transport providers that are exposed through the
 .B <xti_sctp.h>
 header file.
+.\"
+.\"
 .SH "ADDRESS FORMAT"
 .PP
 The SCTP address format is structured as follows:
+.PP
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Interned address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint.
+.TP
+.I sin_addr
+The IP address of the transport endpoint.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.BR sockaddr
+structure.
+.\"
+.\"
 .SH OPTIONS
 .PP
 Options are formatted according to the
@@ -111,8 +159,98 @@ or any subset of the options defined here.  An implementation may restrict the
 use of any of these options by offering them only in a privileged read-only
 mode.
 .PP
-An SCTP transport provider supports two levels of options.  These two levels
+An SCTP transport provider supports three levels of options.  These three levels
 are described below.
+.\"
+.\"
+.SS "XTI_GENERIC"
+.PP
+Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
+and are common to all transport providers.  For more information see
+.BR xti (3).
+.PP
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the stream.
+This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the stream will linger waiting for
+unsent data to be delivered.
+This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
+};
+\s+1\fP
+.fi
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.
+Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PP
+For more information, see
+.BR xti (3).
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.\"
+.\"
 .SS "T_INET_IP"
 .PP
 Options within this level are specific to the Internet Protocol (IP) and are
@@ -124,7 +262,7 @@ The options defined with the option level
 are as follows:
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_OPTIONS
 This option determines the IP options to be sent with every packet from this
 transport endpoint.  See
@@ -132,7 +270,7 @@ transport endpoint.  See
 for additional information.
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_PKTINFO
 Determines whether a
 .I T_IP_PKTINFO
@@ -178,7 +316,7 @@ operation to
 .BR t_optmgmt (3)
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_RECVTOS
 Determine whether a
 .I T_IP_TOS
@@ -226,7 +364,7 @@ See
 .IR T_IP_TOS .
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_RECVTTL
 Determine whether a
 .I T_IP_TTL
@@ -274,7 +412,7 @@ See
 .IR T_IP_TTL .
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_RECVOPTS
 Determine whether a
 .I T_IP_OPTIONS
@@ -322,7 +460,7 @@ See
 .IR T_IP_OPTIONS .
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_RETOPTS
 Determine whether a
 .I T_IP_RETOPTS
@@ -370,7 +508,7 @@ For additional information, see
 .BR xti_ip (3).
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_TOS
 This option determines the type of service to be used in IP packets associated
 with a subsequent data transmission.
@@ -392,7 +530,7 @@ See
 for additional information.
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_TTL
 This option determines the time to live to be used in IP packets associated
 with a subsequent data transmission.
@@ -414,7 +552,7 @@ See
 for additional information.
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_MTU
 This option is a read-only option that returns the value of the Path MTU for the
 SCTP association.
@@ -427,12 +565,12 @@ See
 for additional information.
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_RECVERR
 Not supported.
 .\"
 .\"
-.TP 12
+.TP
 .B T_IP_PMTU_DISCOVER
 Supported for SCTP transport service providers without modification.  See
 .BR xti_ip (3)
@@ -449,7 +587,7 @@ The options defined with the option level
 are as follows:
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_NODELAY
 This option determines whether to delay transmission of data to attempt to
 coalesce smaller packets into larger packets.
@@ -498,7 +636,7 @@ minshall-nagle-01
 also include the Minshall modification).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_MAXSEG
 This option determines the maximum segment size for outgoing packets.  Values
 greater thatn the association MTU are ignored and have no effect.  This
@@ -524,7 +662,7 @@ This option is used with
 .BR t_optmgmt (3).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_CORK
 This option determines whether to cork the transmission stream waiting for
 subsequent packets.  When set, this option permits a number of
@@ -542,7 +680,7 @@ THis option is used with
 .BR t_optmgmt (3).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_SID
 This option determines the SCTP Stream Identifier that is to be associated
 with a given data transmission.  The option value is formatted as a
@@ -562,7 +700,7 @@ See
 .IR T_SCTP_RECVSID .
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_PPI
 This option determines the SCTP Payload Protocol Identifier that is to be
 associated with a given data transmission.  The option value is formatted as a
@@ -582,7 +720,7 @@ See
 .IR T_SCTP_RECVPPI .
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_RECVSID
 Determine whether a
 .I T_SCTP_SID
@@ -631,7 +769,7 @@ See
 .IR T_SCTP_SID .
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_RECVPPI
 Determine whether a
 .I T_SCTP_PPI
@@ -680,7 +818,7 @@ See
 .IR T_SCTP_PPI .
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_HEARTBEAT_ITVL
 This option determines the time interval (in seconds) between successive
 HEARTBEAT messages used to probe destination transport addresses for RTT
@@ -703,7 +841,7 @@ Active destinations can be controlled with the option
 below.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_HB
 This option determines the heartbeat activation and interval associated with
 a specific destination address.  The option value is a
@@ -727,19 +865,21 @@ The
 .B t_sctp_hb
 structure has the following fields:
 .RS
-.TP 12
+.TP \w'hb_onoff\(em'u
 .I hb_dest
 is the
 .B sockaddr_in
 structure that contains the destination address to which the heartbeat setting
 applies.
-.TP 12
+.PD 0
+.TP
 .I hb_onoff
 is an integer boolean activation flag indicating whether heartbeat is active
 on the destination.
-.TP 12
+.TP
 .I hb_itvl
 is the integer heartbeat interval in milliseconds.
+.PD
 .PP
 This option is intended to be used with
 .BR t_optmgmt "(3).
@@ -751,7 +891,7 @@ option
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_RTO_INITIAL
 This option determines the time interval (in milliseconds) that will be used
 as an initial RTO (Retransmission Time Out) value when sending packets to a
@@ -769,7 +909,7 @@ Active destinations can be controlled with the option
 below.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_RTO_MIN
 Determine the time interval (in milliseconds) that will be used as a minimum
 RTO (Retransmission Time Out) value when sending packets.
@@ -787,7 +927,7 @@ Active destinations can be controlled with the option
 below.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_RTO_MAX
 Determine the time interval (in milliseconds) that will be used as a maximum
 RTO (Retransmission Time Out) value when sending packets.
@@ -805,7 +945,7 @@ Active destinations can be controlled with the option
 below.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_PATH_MAX_RETRANS
 This option determines the number of times that the sending endpoint will
 attempt retransmitting a packet to a given destination transport address before
@@ -828,7 +968,7 @@ Active destinations can be controlled with the option
 below.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_RTO
 This option determines the retransmission timeout parameters associated with a
 specific destination address.
@@ -852,36 +992,38 @@ The
 .B t_sctp_rto
 structure has the following fields:
 .RS
-.TP 12
+.TP \w'max_retrans\(em'u
 .I rto_dest
 is a
 .B sockaddr_in
 structure that contains the destination address to which the rto parameter
 settings apply.
-.TP 12
+.PD 0
+.TP
 .I rto_initial
 is the
 .B t_uscalar_t
 initial retransmission timeout value in milliseconds.  For valid values, see
 .IR T_SCTP_RTO_INITIAL .
-.TP 12
+.TP
 .I rto_min
 is the
 .B t_uscalar_t
 minimum retransmission timeout value in milliseconds.  For valid values, see
 .IR T_SCTP_RTO_MIN .
-.TP 12
+.TP
 .I rto_max
 is the
 .B t_uscalar_t
 maximum retransmission timeout value in milliseconds.  For valid values, see
 .IR T_SCTP_RTO_MAX .
-.TP 12
+.TP
 .I max_retrans
 is the
 .B t_uscalar_t
 maximum number of retransmissions.  For valid values, see
 .IR T_SCTP_PATH_MAX_RETRANS .
+.PD
 .PP
 For use with
 .BR t_optmgmt (3),
@@ -891,7 +1033,7 @@ connection.
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_CKSUM_TYPE
 This option determines the checksum type that will be used to checksum SCTP
 packets.
@@ -899,14 +1041,14 @@ The option value is formatted as a
 .BR t_scalar_t ,
 and can have on of the following values:
 .RS
-.TP 12
+.TP
 .I T_SCTP_CSUM_ADLER_32
 use the older RFC 2960
 .[
 RFC 2960
 .]
 Adler 32 checksum to checksum SCTP packets.
-.TP 12
+.TP
 .I T_SCTP_CSUM_CRC_32C
 use the newer RFC 3309
 .[
@@ -921,7 +1063,7 @@ or when a passive connection indication is accepted with
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_MAC_TYPE
 This option determines the MAC (Message Authentication Code) type that will be
 used with signing cookies in INIT-ACK messages.
@@ -929,16 +1071,16 @@ The option value is formatted as a
 .BR t_scalar_t ,
 and can have one of the following values:
 .RS
-.TP 12
+.TP
 .I T_SCTP_HMAC_NONE
 No message authentication code will be used.  The MAC field will be populated
 with all ones.  This completely disables the MAC features of
 .BR SCTP ,
 and should be used with caution.
-.TP 12
+.TP
 .I T_SCTP_HMAC_SHA_1
 The message authentication code will use SHA-1 message digest.
-.TP 12
+.TP
 .I T_SCTP_HMAC_MD5
 The message authentication code will use MD5 message digest.
 .PP
@@ -950,7 +1092,7 @@ The option can be read at any time and reflects the current setting.
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_COOKIE_LIFE
 Determines the cookie lifetime associated with a transport endpoint.  This is
 the amount of time that cookies sent to the peer endpoint in an INIT-ACK
@@ -991,7 +1133,7 @@ must be adjusted to accommodate the slowest peer on the slowest connection.
 The default setting is adequate for Internet applications.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_COOKIE_INC
 This option determines the time increment (in milliseconds) that will be added
 to the lifespan of the cookie in an INIT-ACK if the sender of the INIT
@@ -1006,7 +1148,7 @@ or when a passive connection indication is accepted with
 The option can be read at any time and reflects the current setting.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_THROTTLE_ITVL
 Determines the interval (in milliseconds) within which the receiver will not
 accept more than one INIT or COOKIE-ECHO.
@@ -1020,7 +1162,7 @@ or when a passive connection indication is accepted with
 The option can be read at any time and reflects the current setting.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_ISTREAMS
 Sets the maximum number of inbound streams or gets the actual number of
 inbound streams associated with the transport connection.
@@ -1035,7 +1177,7 @@ For active transport connections, setting this option has no effect on the
 current transport connection.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_OSTREAMS
 Sets the maximum number of outbound streams or gets the actual number of
 outbound streams associated with the transport connection.
@@ -1050,7 +1192,7 @@ For active transport connections, setting this option has no effect on the
 current transport connection.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_SSN
 This option determines the SCTP Stream Sequence Number that is to be associated
 with a given data transmission.  The option value is formatted as a
@@ -1066,7 +1208,7 @@ will return the value that was contained in the last packet read with
 .BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_ECN
 This option determines whether the Explicit Congestion Notification (ECN)
 capability of RFC 3168
@@ -1097,7 +1239,7 @@ For active transport connections, setting this option has no effect on the
 current transport connection.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_ALI
 This option determines the adaptation layer information
 (described in draft-ietf-tsvwg-addip-sctp-07.txt)
@@ -1133,7 +1275,7 @@ draft-ietf-tsvwg-addip-sctp-07.txt
 .]
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_PR
 This option determines whether partial reliability (described in
 draft-ietf-tsvwg-prsctp-00.txt)
@@ -1147,17 +1289,17 @@ The option value is formatted as a
 .B t_scalar_t
 and can contain one of the following values:
 .RS
-.TP 12
+.TP
 .I T_SCTP_PR_NONE
 do not place or response with a Forward TSN parameter in an INIT or INIT-ACK
 indicating to the peer that we do not support partial reliability for this
 transport connection.
-.TP 12
+.TP
 .I T_SCTP_PR_PREFERRED
 place and response with a Forward TSN parameter in an INIT or INIT-ACK
 indicating to the peer that we support partial reliability, but do no require
 the peer to support partial reliability.
-.TP 12
+.TP
 .I T_SCTP_PR_REQUIRED
 place and response with a Forward TSN parameter in an INIT or INIT-ACK
 indicating to the peer that we support partial reliability and require the
@@ -1171,7 +1313,7 @@ it indicates that the peer does not support partial reliability.
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_MAX_INIT_RETRIES
 This option determines the number of times that an INIT or COOKIE-ECHO will be
 resent before abandoning the transport connection initialization.
@@ -1183,7 +1325,7 @@ or when a passive connection indication is accepted with
 .BR t_accept (3).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_MAX_BURST
 This option determines the number of MTUs of data that will be sent in a
 single burst, as defined in
@@ -1198,7 +1340,7 @@ during the transport connection lifetime.  This option is of local
 significance only.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_ASSOC_MAX_RETRANS
 Determines the number of times that the sending endpoint will attempt
 retransmitting a packet on a given transport connection before it aborts the
@@ -1212,7 +1354,7 @@ values of each of the destinations.  This option may be changed on the stream
 at any time during the life of the transport connection.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_SACK_DELAY
 This option determines the maximum SACK delay as the interval of time (in
 milliseconds) that the sending endpoint will delay an acknowledgment of a
@@ -1230,7 +1372,7 @@ This option may be changed at any time during the life of the transport
 connection.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_DISPOSITION
 This option determines whether SCTP will retain and deliver messages that were
 not successfully acknowledged by the peer for retrieval, or will deliver
@@ -1240,23 +1382,23 @@ The option value is formatted as a
 .BR t_scalar_t ,
 and can have one of the following values:
 .RS
-.TP 12
+.TP
 .I T_SCTP_DISPOSITION_NONE
 Messages will not be retained for retrieval and acknowledgments will not be
 provided for messages.
-.TP 12
+.TP
 .I T_SCTP_DISPOSITION_UNSENT
 Messages that were unsent will be retained for retrieval.
-.TP 12
+.TP
 .I T_SCTP_DISPOSITION_SENT
 Messages that were sent and unacknowledged, or that were unsent, will be
 retained for retrieval.
-.TP 12
+.TP
 .I T_SCTP_DISPOSITION_GAP_ACKED
 Messages that were sent and gap acknowledged as well as messages that were
 sent and unacknowledged and messages that were unsent, will be retained for
 retrieval.
-.TP 12
+.TP
 .I T_SCTP_DISPOSITION_ACKED
 Messages that were sent and acknowledged (but unconfirmed), messages that were
 sent and gap acknowledged, messages that were sent and unacknowledged, and
@@ -1301,7 +1443,7 @@ and has little use for
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_LIFETIME
 This option determines the SCTP lifetime
 .[
@@ -1317,7 +1459,7 @@ The option value is formatted as a
 that contains the lifetime (in milliseconds).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_ADD
 This option determines whether the transport endpoint will support the add IP
 extension
@@ -1341,7 +1483,7 @@ This option can be set or read at any time during the transport connection
 lifetime.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_ADD_IP
 This option adds a IP address to an existing transport endpoint.
 The option value is formatted as a
@@ -1369,7 +1511,7 @@ interfaces are configured using
 or equivalent commands.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_DEL_IP
 This option deletes an IP address from an existing transport endpoint.
 The option value is formatted as a
@@ -1397,7 +1539,7 @@ interfaces are reconfigured with
 or equivalent commands.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_SET
 This option determines whether the transport endpoint will support the add IP
 extensions
@@ -1421,7 +1563,7 @@ This option can be set or read at any time during the transport connection
 lifetime.
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_STATUS
 This option conveys the association status  and the status associated with
 each of the destination transport addresses forming the transport connection.
@@ -1457,53 +1599,57 @@ typedef struct t_sctp_dest_status {
 The
 .B t_sctp_status
 structure has the following fields:
-.TP 12
+.TP \w'dest_unack\(em'u
 .I curr_rwnd
 is the current advertised receive window in bytes.
-.TP 12
+.PD 0
+.TP
 .I curr_rbuf
 is the current receive buffer size in bytes.
-.TP 12
+.TP
 .I curr_nrep
 is the number of
 .B t_sctp_dest_status
 structure that follow this structure.
+.PD
 .PP
 The
 .B t_sctp_dest_status
 structure has the following fields:
-.TP 12 12
+.TP \w'dest_unack\(em'u
 .I dest_addr
 is the address associated with this specific
 .B t_sctp_dest_status
 structure.
-.TP 12
+.PD 0
+.TP
 .I dest_cwnd
 is the congestion window for the given destination transport address in bytes.
-.TP 12
+.TP
 .I dest_unack
 is the number of unacknowledged DATA chunks outstanding to the given
 destination transport address in chunks.
-.TP 12
+.TP
 .I dest_srtt
 is the smoothed round trip time for the destination transport address in
 milliseconds.
-.TP 12
+.TP
 .I dest_rvar
 is the round trip time variance for the destination transport address in
 milliseconds.
-.TP 12
+.TP
 .I dest_rto
 is the current value of the round trip timeout for the destination transport
 address in milliseconds.
-.TP 12
+.TP
 .I dest_sst
 is the current value of the slow start threshold for the destination transport
 address in bytes.
+.PD
 .RE
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_TSN
 This option determines the SCTP Transmit Sequence Number that is to be associated
 with a given data transmission.  The option value is formatted as a
@@ -1519,25 +1665,25 @@ will return the value that was contained in the last packet read with
 .BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
 .\"
 .\"
-.TP 12
+.TP
 .B T_SCTP_DEBUG
 This option determines implementation specific debugging features.
 The option value is formatted as a
 .BR t_scalar_t ,
 that can be one of the following values:
 .RS
-.TP 12
+.TP
 .I T_SCTP_OPTION_DROPPING
 the stream will drop packets at the software level for debugging purposes.
-.TP 12
+.TP
 .I T_SCTP_OPTION_BREAK
 the stream will break the first destination address at intervals for debugging
 purposes.
-.TP 12
+.TP
 .I T_SCTP_OPTION_DBREAK
 the stream will break destination addresses in both directions at intervals
 for debugging purposes.
-.TP 12
+.TP
 .I T_SCTP_OPTION_RANDOM
 the stream will drop packets at random at the software level for debugging
 purposes.
@@ -1551,11 +1697,11 @@ purposes.
 .SS t_accept\fR(3)
 .PP
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_accept (3),
 with the additional considerations described here.
 .PP
-When the XTI user provides a transport endpoint address in
+When the XTI/TLI user provides a transport endpoint address in
 .IR call->addr ,
 the address can be an array of
 .B sockaddr_in
@@ -1564,42 +1710,131 @@ If this list of addresses does not include the destination address of the
 connection indication, the set of addresses will be expanded by the SCTP
 provider to include the destination address of the connection indication.
 .PP
+Issuing
+.BR t_accept (3)
+assigns an already established connection to
+.IR resfd .
+.PP
+Since user data cannot be exchanged during the connection establishment phase,
+.I call->udata.len
+must be set to zero.
+.PP
+When
+.RI ( "resfd != fd" ),
+the function
+.BR t_accept (3)
+is recommended to be called with
+.I resfd
+in the
+.B T_UNBND
+state, though an endpoint which is bound to any local address (in the
+.B T_IDLE
+state) can also be used.
+.PP
+After
+.BR t_accept (3)
+completes, the endpoint
+.I resfd
+will represent a connected SCTP endpoint whose complete binding essentially has
+both local and remote address components.
+.PP
+If file descriptor
+.I resfd
+was unbound before calling
+.BR t_accept (3),
+after the call completes its local address binding would be to the same
+protocol address bound to
+.IR fd .
+If the file descriptor
+.I resfd
+was bound to a local address before calling
+.BR t_accept (3),
+that local address binding is dissolved and the local address part of the
+binding after
+.BR t_accept (3)
+completes would become the same as the address bound to
+.IR fd .
+.PP
+If options with end-to-end significance
+.RB ( T_IP_OPTIONS ", " T_IP_TOS ", " T_SCTP_OSTREAMS ", " T_SCTP_ISTREAMS ", " T_SCTP_ECN " and " T_SCTP_ALI )
+are to be sent with the connection confirmation, the values of these options
+must be set with
+.BR t_optmgmt (3)
+prior to the
+.B T_LISTEN
+event occurs.  When the transport user detects a
+.B T_LISTEN
+event, SCTP has already established the connection.  Association-related
+options passed with
+.BR t_accept (3)
+become effective at once, but since the connection is already established,
+they are transmitted with subsequent IP datagrams sent out in the
+.B T_DATAXFER
+state.
+.PP
 SCTP provides a number of options, described in
 .IR \(lqOPTIONS\(rq ,
-above, that may be included in this XTI call
+above, that may be included in this XTI/TLI call
 in the
 .I call->opt
 parameter to change local and end-to-end characteristics of the transport
 endpoint accepting the connection.
-The options of end-to-end significance that can be included in this XTI
+The options of end-to-end significance that can be included in this XTI/TLI
 library call are:
-.TP 12
+.TP
+.I T_IP_OPTIONS
+.TP
+.I T_IP_TOS
+.TP
 .I T_SCTP_ISTREAMS
 sets the number of incoming streams for the transport connection.  This value
 is only significant if it is lower than the value requested by the peer in the
 options returned from the call to
 .BR t_listen (3).
-.TP 12
+.TP
 .I T_SCTP_OSTREAMS
 sets the number of outgoing streams for the transport connection.  This value
 is only significant if it is lower than the value required by the peer in the
 options returned from the call to
 .BR t_listen (3).
-.TP 12
+.TP
 .I T_SCTP_ECN
 sets whether explicit congestion notification is supported on the transport
 connection.  This value is only significant if the peer indicates that it
 supports explicit congestion notification in the options returned from the
 call to
 .BR t_listen (3).
-.TP 12
+.TP
 .I T_SCTP_ALI
 sets the adaptation layer information specifying the local endpoint
 capabilities that are available on the transport connection.
 .PP
-The options of local significance that can be included in this XTI call
+The association-related options that can be included in this XTI/TLI call include
+(other association-related options may also be included):
+.TP
+.I XTI_RCVBUF
+.TP
+.I T_IP_TTL
+.PP
+The options of local significance that can be included in this XTI/TLI call
 include (other options of local significance may also be included):
-.TP 12
+.TP
+.I XTI_DEBUG
+.TP
+.I XTI_LINGER
+.TP
+.I XTI_RCVLOWAT
+.TP
+.I XTI_SNDBUF
+.TP
+.I XTI_SNDLOWAT
+.TP
+.I T_IP_REUSEADDR
+.TP
+.I T_IP_DONTROUTE
+.TP
+.I T_IP_BROADCAST
+.TP
 .I T_SCTP_HEARTBEAT_ITVL
 sets the heartbeat interval to be used on all destination addresses during the
 connection.
@@ -1609,7 +1844,7 @@ This value may be changed during the transport connection using the
 .I T_SCTP_HB
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_RTO_INITIAL
 sets the initial retransmission timeout for all destinations.
 This value can be changed for specific connection by providing this option to the
@@ -1618,7 +1853,7 @@ This value may be changed during the transport connection using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_RTO_MIN
 sets the minimum retransmission timeout interval for all destinations.
 This value can be changed for specific connection by providing this option to the
@@ -1627,7 +1862,7 @@ This value may be changed during the transport connection using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_RTO_MAX
 sets the maximum retransmission timeout interval for all destinations.
 This value can be changed for specific connection by providing this option to the
@@ -1636,7 +1871,7 @@ This value may be changed during the transport connection using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_PATH_MAX_RETRANS
 sets the maximum number of times that a retransmission will be directed at a
 destination address until the destination address is deemed inactive.
@@ -1646,27 +1881,31 @@ This value may be changed during the transport connection using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
 .I T_SCTP_MAX_INIT_RETRIES
 sets the maximum number of COOKIE-ACK retransmissions that will be performed
 until the destination transport address is abandoned.
+This value is
+.I read-only
+in other than the
+.BR T_IDLE " or " T_OUTCON
+states.
 This value can be changed for specific connection by providing this option to the
 .BR t_accept (3).
 .PP
 If the provider indicates that connect data can be included in the response to
 .BR t_getinfo (3),
-the XTI user can provide connection data in the
+the XTI/TLI user can provide connection data in the
 .I call->udata
 parameter.
 .\"
 .\"
 .SS t_bind\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_bind (3),
 with the additional considerations described here.
 .PP
-When the XTI user provides a transport endpoint address in
+When the XTI/TLI user provides a transport endpoint address in
 .IR req->addr ,
 the address to bind can contain multiple
 .B sockaddr_in
@@ -1688,25 +1927,100 @@ transport service provider will return the same values in each
 and
 .I ret->addr[i].sin_port
 fields.
+.PP
+The
+.BR INET (4)
+implementation treats port number zero (0) as a request to bind to any
+unused port.  Other than that value, the
+.I req->addr.sin_port
+part of the binding is specific.  The
+.I req->addr.sin_addr.in_addr
+part of the binding can represent a single IP address or a wildcard binding to
+an address that could represent multiple IP addresses that are legal for the
+host
+.RB ( INADDR_ANY ).
+.PP
+Under recent versions of
+.BR INET (4),
+.BR t_bind (3)
+called with a
+.B NULL
+.I req
+argument is equivalent to binding to a wildcard port number with a wildcard IP
+address.
+.PP
+Under
+.BR INET (4),
+when bound to a wildcard port or IP address, assignment of a specific port
+number and IP address can be deferred until an incoming or outgoing connection
+is initiated.  Under these situations, any address returned in the
+.I ret
+argument to
+.BR t_bind (3)
+or the
+.I loc
+argument to
+.BR t_getprotaddr (3)
+will return the wildcard address and port number instead of an assigned
+list of addresses and port number.
+Only once a connection has been established will the local address returned by
+.BR t_getprotaddr (3)
+be assured to be an assigned address list rather than a wildcard address.
 .\"
 .\"
 .SS t_close\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_close (3)
 without modifications.
 .PP
-Note: closing a transport endpoint in a connected state will result in an
-abortive release of the transport connection.
+The
+.BR t_close (3)
+call will result in a
+.BR close (2)
+call on the descriptor of this XTI/TLI communication endpoint.  If there are no
+other descriptors in this process which reference the communications endpoint,
+the
+.BR close (2)
+call will perform an orderly connection termination according to the rules of
+a TCP CLOSE call on this transport endpoint as specified in the standards
+.I RFC 793
+.[
+rfc 793
+.]
+and
+.IR "RFC 1122" .
+.[
+rfc 1122
+.]
+If the
+.B XTI_LINGER
+option is supported and is used to enable the linger option, the linger time
+will affect the time an implementation lingers in the execution of
+.BR t_close (3)
+or
+.BR close (2).
+A linger time of zero (0) specified with the
+.B XTI_LINGER
+option may cause an abortive release of a TCP connection, resulting in lost
+data.
 .\"
 .\"
 .SS t_connect\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_connect (3),
 with the additional considerations described here.
 .PP
-When the XTI user provides a transport endpoint address to which to connect in
+The
+.I sndcall->addr
+structure specifies the remote socket.  In the present version, the returned
+address set in
+.I rcvcall->addr
+will have the same value.  Note that the peer SCTP, and not the peer transport
+user, confirms the connection.
+.PP
+When the XTI/TLI user provides a transport endpoint address to which to connect in
 .IR sndcall->addr ,
 the address can be an array of
 .B sockaddr_in
@@ -1718,28 +2032,28 @@ connection is initialized in a more secure and reliable fashion.
 .PP
 SCTP provides a number of options, described in
 .IR \(lqOPTIONS\(rq ,
-above, that may be included in this XTI call
+above, that may be included in this XTI/TLI call
 in the
 .I sndcall->opt
 parameter to change local ad end-to-end characteristics of the transport
 endpoint accepting the connection.
-The options of end-to-end significance that can be included in this XTI library
+The options of end-to-end significance that can be included in this XTI/TLI library
 call are:
-.TP 12
+.TP
 .I T_SCTP_CKSUM_TYPE
 set the type of checksum to be performed on all packets for the connection.
-This option is useful if the connecting XTI user is aware that the destination
+This option is useful if the connecting XTI/TLI user is aware that the destination
 transport endpoint only supports the older Adler 32 checksum.
-.TP 12
+.TP
 .I T_SCTP_ISTREAMS
 set the maximum number of incoming streams for the connection.  The peer must
 respect this value and negotiate the number of incoming streams to be less
 than or equal to this value or the transport connection will fail.
-.TP 12
+.TP
 .I T_SCTP_OSTREAMS
 set the requested number of outgoing streams for the connection.  The peer may
 negotiate a smaller number of outgoing streams depending on its maximum
-incoming stream requirements.  It is the XTI user's responsibility to check
+incoming stream requirements.  It is the XTI/TLI user's responsibility to check
 the number of outgoing streams in the
 .I rcvcall->opt
 response or in the
@@ -1747,16 +2061,16 @@ response or in the
 response from a call to
 .BR t_rcvconnect (3).
 If the negotiated number of outgoing streams is not acceptable, it is the
-responsibility of the XTI user to disconnect the transport connection.
-.TP 12
+responsibility of the XTI/TLI user to disconnect the transport connection.
+.TP
 .I T_SCTP_ECN
 sets whether explicit congestion notification is to be supported for the
 transport connection.
-.TP 12
+.TP
 .I T_SCTP_ALI
 sets which adaptation layer information is to be communicated and negotiated
 for the connection.  If the negotiated adaptation layer information is less
-than the capabilities sent on connection request, it is the XTI user's
+than the capabilities sent on connection request, it is the XTI/TLI user's
 responsibility to check the adaptation layer information returned in the
 .I rcvcall->opt
 response or in the
@@ -1764,11 +2078,11 @@ response or in the
 response from a call to
 .BR t_rcvconnect (3).
 If the negotiated capabilities is not acceptable, it is the responsibility of
-the XTI user to disconnect the transport connection.
+the XTI/TLI user to disconnect the transport connection.
 .PP
-The options of local significance that can be included in this XTI call
+The options of local significance that can be included in this XTI/TLI call
 include (other options of local significance may also be included):
-.TP 12
+.TP
 .I T_SCTP_HEARTBEAT_ITVL
 sets the heartbeat interval to be used on all destination addresses during the
 connection.
@@ -1777,7 +2091,7 @@ destinations using the
 .I T_SCTP_HB
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_RTO_INITIAL
 sets the initial retransmission timeout for all destinations.
 This value can be changed during the transport connection for specific
@@ -1785,7 +2099,7 @@ destinations using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_RTO_MIN
 sets the minimum retransmission timeout interval for all destinations.
 This value can be changed during the transport connection for specific
@@ -1793,7 +2107,7 @@ destinations using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_RTO_MAX
 sets the maximum retransmission timeout interval for all destinations.
 This value can be changed during the transport connection for specific
@@ -1801,7 +2115,7 @@ destinations using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_PATH_MAX_RETRANS
 sets the maximum number of times that a retransmission will be directed at a
 destination adress until the destination address is deemed inactive.
@@ -1810,7 +2124,7 @@ destinations using the
 .I T_SCTP_RTO
 option to
 .BR t_optmgmt (3).
-.TP 12
+.TP
 .I T_SCTP_MAX_INIT_RETRIES
 sets the maximum number of INIT retransmissions that will be performed until
 the destination transport address is abandoned.  When multiple transport
@@ -1821,7 +2135,7 @@ each destination transport address will be tried this many times in turn.
 If the provider indicates that connection data can be included in the response
 to
 .BR t_getinfo (3),
-the XTI user can provide connection data in the
+the XTI/TLI user can provide connection data in the
 .I sndcall->udata
 parameter.
 .PP
@@ -1833,16 +2147,16 @@ see the considerations for the
 .I call
 argument to
 .I \(lqt_rcvconnect\(rq
-XTI library call, below.
+XTI/TLI library call, below.
 .\"
 .\"
 .SS t_getinfo\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_connect (3)
 with the additional considerations described here.
 .PP
-.TP 12
+.TP \w'servtype\(em'u
 .I addr
 For compatibility with the
 .BR sockets (3)
@@ -1850,7 +2164,7 @@ library,
 .B SCTP
 uses a
 .B sockaddr_in
-structured address.  However, a number of XTI library calls support multiple
+structured address.  However, a number of XTI/TLI library calls support multiple
 .B sockaddr_in
 address to be specified in a single call.  This size will be an integer multiple of the
 size of the
@@ -1858,14 +2172,14 @@ size of the
 structure size, indicating how many
 .B sockaddr_in
 structures can be included in a single address specification.
-.TP 12
+.TP
 .I options
 The maximum size of options is provider specific.  The
 .B OpenSS7
 SCTP implementation
 .RB ( sctp (4))
 returns the maximum size of an options structure containing all SCTP options.
-.TP 12
+.TP
 .I tsdu
 The maximum size of a transport service data unit.  For SCTP this is the
 maximum size of a message, considering that it may be fragmented and sent in
@@ -1881,7 +2195,7 @@ has some limitations resulting from stream blockage due to large messages that
 need to be fragmented and sent in multiple chunks.  Some implementations may
 want to restrict the maximum size of a TSDU to something smaller for this
 purpose.
-.TP 12
+.TP
 .I etsdu
 .B SCTP
 supports the concept of expedited data as data that is sent unordered.  SCTP
@@ -1894,7 +2208,7 @@ with stream blocking due to fragmentation in SCTP.
 .[
 RFC 2960
 .]
-.TP 12
+.TP
 .I connect
 SCTP supports the concept of connection data.  Although SCTP also supports
 sending the first fragments of a TSDU or ETSDU with the COOKIE-ECHO or
@@ -1916,13 +2230,13 @@ indicated expedited data.  Therefore, it is only possible to send a TSDU with
 .BR t_connect (3)
 in
 .BR xti (3).
-.TP 12
+.TP
 .I discon
 Although SCTP supports orderly release, SCTP does not support the concept of
 disconnection data.  SCTP conforming transport providers will always return
 .B T_INVALID
 in this field.
-.TP 12
+.TP
 .I servtype
 SCTP supports only connection-oriented modes with orderly release.  SCTP
 conforming transport service providers will return
@@ -1934,7 +2248,7 @@ SCTP conforming transport service providers may return
 if the SCTP implementation does not support orderly release.
 SCTP conforming transport service providers will not return
 .BR T_CLTS .
-.TP 12
+.TP
 .I flags
 SCTP support orderly release but does not support orderly release data and
 does not support sending null data.  SCTP conforming transport providers will
@@ -1948,29 +2262,59 @@ flag.
 .\"
 .SS t_listen\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_listen (3)
 with the additional considerations described here.
+.PP
+Upon successful return
+.BR t_listen (3)
+indicates an existing connection and not a connection indication.  Since user
+data cannot be exchanged during the connection establishment phase,
+.I call->udata.maxlen
+must be set to zero (0) before the call to
+.BR t_listen (3).
+The
+.I call->addr
+structure contains the remote calling socket.
+.PP
+.B XTI-SCTP
+does not support the same semantics with regard to indication of
+connections, acceptance of indicated connections, and negotiation of options
+during connection establishment.  This is because the connection can be
+internally accepted before an indication is given to the XTI/TLI user.  To be able
+to establish proposed values of options of end-to-end significance before a
+connection is accepted, the proposed values of options must be set on the
+transport endpoint upon which the XTI/TLI user is listening with
+.BR t_listen (3)
+rather than being responded to at the time that the connection is accepted
+with
+.BR t_accept (3).
+This makes the semantics of these XTI/TLI functions somewhat different than is
+experienced for ISO/OSI conforming protocols.  This characteristic of using
+XTI/TLI for internet protocols is described in XNS 5.2.
+.[
+xns 5.2
+.]
 .PP
 Some SCTP options of end-to-end significance should be set before a call to
 .BR t_listen (3),
 using
 .BR t_optmgmt (3),
 are as follows:
-.TP 12
+.TP
 .I T_SCTP_CKSUM_TYPE
 set the type of checksum to be performed on all packets for all connections
 indicated on this transport endpoint.  This option is useful if the listening
-XTI user is aware that the connecting transport endpoints only support the
+XTI/TLI user is aware that the connecting transport endpoints only support the
 older Adler 32 checksum.
-.TP 12
+.TP
 .I T_SCTP_MAC_TYPE
 sets the message authentication digest algorithm that will be used when
 signing cookies that are returned to transport endpoints generating connection
 indications on this transport endpoint.  This option is useful if the
-listening XTI user wishes to forego or select the security/performance
+listening XTI/TLI user wishes to forego or select the security/performance
 trade-off associated with the generation of cookies on the transport endpoint.
-.TP 12
+.TP
 .I T_SCTP_COOKIE_LIFE
 sets the lifetime of cookies generated by the listening transport endpoint.
 This also sets the interval of re-keying of message authentication digests.
@@ -1978,11 +2322,11 @@ This is useful if the listening transport endpoint is aware of the transit
 delays associated with forming connections to the listening transport endpoint
 and wishes to tighten or loosen the security associated with cookie lifetimes
 and re-keying of message authentication digests.
-.TP 12
+.TP
 .I T_SCTP_COOKIE_INC
 sets the cookie increment that will be applied to connecting transport
 endpoints requesting cookie preservation.
-.TP 12
+.TP
 .I T_SCTP_THROTTLE_ITVL
 sets the throttle interval for throttling connection attempts on the listening
 transport endpoint.
@@ -2010,36 +2354,36 @@ fields.
 When an incoming connection is indicated, the options indicated in the
 .I call->opt
 argument that are of end-to-end significance are as follows:
-.TP 12
+.TP
 .I T_SCTP_CKSUM_TYPE
 indicates the checksum type that was used for the COOKIE-ECHO packet.  This
-value is auto-detected.  If this checksum type is unacceptable to the XTI user,
-the XTI user should refuse the connection indication using
+value is auto-detected.  If this checksum type is unacceptable to the XTI/TLI user,
+the XTI/TLI user should refuse the connection indication using
 .BR t_snddis (3),
 with the indicated sequence number.
-.TP 12
+.TP
 .I T_SCTP_ISTREAMS
 indicates the number of incoming streams requested by the peer.  If this value
 is too high, it may be adjusted using this option to the
 .BR t_accept (3)
 call.  This value cannot be adjusted upward.  If the value is too low, the
-XTI user should refuse the connection indication using
+XTI/TLI user should refuse the connection indication using
 .BR t_snddis (3),
 with the indicated sequence number.
-.TP 12
+.TP
 .I T_SCTP_OSTREAMS
 indicates the maximum number of outgoing streams supported by the peer.  If
 this value is too high, it may be adjusted downward using this option to the
 .BR t_accept (3)
 call.  This value cannot be adjusted upward.  If the value is too low, the
-XTI user should refuse the connection indication using
+XTI/TLI user should refuse the connection indication using
 .BR t_snddis (3),
 with the indicated sequence number.
-.TP 12
+.TP
 .I T_SCTP_ECN
 indicates whether the peer supports explicit congestion notification.  The
 peer cannot be compelled to use explicit congestion notification.  If explicit
-congestion notification is required but not indicated, it is the XTI user's
+congestion notification is required but not indicated, it is the XTI/TLI user's
 responsibility to refuse the transport connection using
 .BR t_snddis (3)
 with the indicated sequence number.  Whether this transport endpoint supports
@@ -2047,11 +2391,11 @@ explicit congestion notification or not can be specified using this option to
 the
 .BR t_accept (3)
 call accepting the connection indication.
-.TP 12
+.TP
 .I T_SCTP_ALI
 indicates whether the peer supports adaptation layer information and extension
 capabilities to the SCTP protocol.  If capabilities are required that are not
-indicated, it is the XTI user's responsibility to refuse the transport
+indicated, it is the XTI/TLI user's responsibility to refuse the transport
 connection using
 .BR t_snddis (3)
 with the indicated sequence number.  Whether this transport endpoint supports
@@ -2068,12 +2412,43 @@ parameter.
 .\"
 .SS t_open\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_open (3)
 with the additional considerations described here.
+.PP
+.BR t_open (3)
+is called as the first step in the initialization of a transport endpoint.
+This function returns various default characteristics of the underlying
+transport protocol by setting fields in the
+.B t_info
+structure.  The following should be the values returned by the call to
+.BR t_open (3)
+and
+.BR t_getinfo (3)
+with the SCTP transport provider.
+.PP
+.TS
+center tab(:);
+lcc.
+_
+Parameters:Before call:After call
+_
+name:x:/
+oflag:x:/
+info->addr:/:8 * sizeof(struct sockaddr_in)
+info->options:/:x
+info->tsdu:/:T_INFINITE
+info->etsdu:/:T_INFINITE
+info->connect:/:x
+info->discon:/:T_INVALID
+info->servtype:/:T_COTS_ORD
+info->flags:/:0
+_
+.TE
+.PP
 The information returned in the
 .I info
-parameter to this XTI call has the same considerations as the
+parameter to this XTI/TLI call has the same considerations as the
 .I info
 parameter returned in the call to
 .BR t_getinfo (3),
@@ -2082,10 +2457,10 @@ described above.
 .\"
 .SS t_optmgmt\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_optmgmt (3)
 with the additional considerations described here.
-The options that may be set, retrieved or negotiated using this XTI library
+The options that may be set, retrieved or negotiated using this XTI/TLI library
 call are described under
 .IR \(lqOPTIONS\(rq ,
 above.
@@ -2093,9 +2468,17 @@ above.
 .\"
 .SS t_rcvconnect\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_rcvconnect (3)
 with the additional considerations described here.
+.PP
+Since user data cannot be exchanged during the connection establishment phase,
+.I call->udata.maxlen
+must be set to zero (0) before the call to
+.BR t_rcvconnect (3).
+On return, the
+.I call->addr
+structure contains the address of the remote calling endpoint.
 .PP
 Multiple addresses.
 .PP
@@ -2118,9 +2501,13 @@ Multiple addresses.
 .\"
 .SS t_rcvdis\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_rcvdis (3)
 with the additional considerations described here.
+.PP
+Since data cannot be sent with a disconnect,
+.I call->udata.len
+must be set to zero (0).
 .PP
 SCTP does not support disconnection data and the
 .I dis->udata
@@ -2129,57 +2516,59 @@ parameter will always be empty.
 .I dis->reason
 will either be a negative UNIX\(rg error code, or an SCTP protocol-specific error code
 as follows:
-.TP 12
+.TP
 .I T_SCTP_CAUSE_INVALID_STR
 a DATA chunk was received that contained an invalid stream identifier.
-.TP 12
+.PD 0
+.TP
 .I T_SCTP_CAUSE_MISSING_PARM
 a control chunk was missing a mandatory parameter.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_STALE_COOKIE
 the cookie went stale before a transport connection could be formed.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_NO_RESOURCE
 there was insufficient resource to form the transport connection.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_BAD_ADDRESS
 a provided destination transport address was invalid.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_BAD_CHUNK_TYPE
 an unrecognized chunk type was received.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_INVALID_PARM
 an invalid parameter type was received.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_BAD_PARM
 a parameter containing an invalid value was received.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_NO_DATA
 a DATA chunk was received that contained no data.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_SHUTDOWN
 a cookie was received while shutting down.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_NEW_ADDR
 restart of an association with a new address.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_USER_INITIATED
 user initiated abort.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_PROTO_VIOLATION
 protocol violation.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_LAST_ADDR
 request to delete last IP address for the transport connection.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_RES_SHORTAGE
 operation was refused due to resource shortage.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_SOURCE_ADDR
 request to delete a source IP address.
-.TP 12
+.TP
 .I T_SCTP_CAUSE_ILLEGAL_ASCONF
 association aborted due to illegal ASCONF-ACK.
+.PD
 .PP
 For SCTP, a disconnect indication may be received associated with a connection
 indication before the connection indication is accepted or refused.  In this
@@ -2189,48 +2578,50 @@ will be set appropriately.
 .PP
 .I dis->reason
 can also return the following negative error numbers:
-.TP 12
+.TP \w'[ECONNABORTED]\(em'u
 .RB [ ECONNABORTED ]
 software related connection abort.
-.TP 12
+.PD 0
+.TP
 .RB [ ECONNRESET ]
 connection was reset by peer.
-.TP 12
+.TP
 .RB [ ECONNREFUSED ]
 connection was refued by the peer.
-.TP 12
+.TP
 .RB [ ETIMEDOUT ]
 connection timed out.
-.TP 12
+.TP
 .RB [ EPROTO ]
 connection aborted due to protocol error.
-.TP 12
+.TP
 .RB [ ENETDOWN ]
 network is down.
-.TP 12
+.TP
 .RB [ ENETUNREACH ]
 network is unreachable.
-.TP 12
+.TP
 .RB [ ENETRESET ]
 network dropped connection because of reset.
-.TP 12
+.TP
 .RB [ EHOSTDOWN ]
 the destination host is down.
-.TP 12
+.TP
 .RB [ EHOSTUNREACH ]
 no route to destination host.
-.TP 12
+.TP
 .RB [ ESHUTDOWN ]
 cookie received while shutting down.
+.PD
 .\"
 .\"
 .SS t_rcv\fR(3), \fBt_rcvv\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_rcv "(3) and " t_rcvv (3),
 with the additional considerations described here.
 .PP
-When data is received using these XTI library calls, the
+When data is received using these XTI/TLI library calls, the
 .I flags
 parameter will have the
 .I T_MORE
@@ -2246,7 +2637,7 @@ Because of this, reads using
 .BR read "(2) or " readv (2)
 must be complete TSDU reads of normal (ordered) data.
 .PP
-Data received with these XTI library calls, or using
+Data received with these XTI/TLI library calls, or using
 .BR read "(2) or " readv (2),
 will set the
 .IR T_SCTP_SID ", " T_SCTP_PPI ", " T_SCTP_SSN " and " T_SCTP_TSN
@@ -2262,7 +2653,7 @@ before reading more data belonging to another [E]TSDU.
 .\"
 .SS t_rcvreldata\fR(3)
 .PP
-SCTP does not support orderly release with data and this XTI library call will
+SCTP does not support orderly release with data and this XTI/TLI library call will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2271,7 +2662,7 @@ to a value of
 .\"
 .SS t_rcvrel\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_rcvrel (3)
 without modification.
 .\"
@@ -2279,7 +2670,7 @@ without modification.
 .SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
 .PP
 .B SCTP
-does not support a connection-less mode and these XTI library calls will
+does not support a connection-less mode and these XTI/TLI library calls will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2289,7 +2680,7 @@ to a value of
 .SS t_rcvuderr\fR(3)
 .PP
 .B SCTP
-does not support a connection-less mode and these XTI library calls will
+does not support a connection-less mode and these XTI/TLI library calls will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2298,9 +2689,13 @@ to a value of
 .\"
 .SS t_snddis\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_snddis (3)
 with the additional considerations described here.
+.PP
+Since data may not be sent with a disconnect,
+.I call->udata.len
+must be set to zero (0).
 .PP
 SCTP does not support disconnection from specified responding addresses.
 Therefore, the
@@ -2317,11 +2712,11 @@ parameter is populated as described in
 .\"
 .SS t_snd\fR(3), \fBt_sndv\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_snd "(3) and " t_sndv (3),
 with the additional considerations described here.
 .PP
-When data is sent using these XTI library calls, the
+When data is sent using these XTI/TLI library calls, the
 .I flags
 parameter will have the
 .I T_MORE
@@ -2336,7 +2731,7 @@ Because of this, writes using
 .BR write "(2) or " writev (2)
 must be complete TSDU writes of normal (ordered) data.
 .PP
-When data is sent using these XTI library calls, or using
+When data is sent using these XTI/TLI library calls, or using
 .BR write "(2) or " writev (2),
 the values previously set with the
 .IR T_SCTP_SID " and " T_SCTP_PPI
@@ -2350,7 +2745,7 @@ before writing more data belonging to another [E]TSDU.
 .\"
 .SS t_sndreldata\fR(3)
 .PP
-SCTP does not support orderly release with data and this XTI library call will
+SCTP does not support orderly release with data and this XTI/TLI library call will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2359,7 +2754,7 @@ to a value of
 .\"
 .SS t_sndrel\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_sndrel (3)
 without modification.
 .\"
@@ -2367,7 +2762,7 @@ without modification.
 .SS t_sndudata\fR(3), \fBt_sndvudata\fR(3)
 .PP
 .B SCTP
-does not support a connection-less mode and these XTI library calls will
+does not support a connection-less mode and these XTI/TLI library calls will
 fail, return -1 and set
 .IR t_errno (3)
 to a value of
@@ -2376,7 +2771,7 @@ to a value of
 .\"
 .SS t_unbind\fR(3)
 .PP
-SCTP supports this XTI library call as described in
+SCTP supports this XTI/TLI library call as described in
 .BR t_unbind (3)
 with the additional considerations described here.
 .PP
@@ -2384,7 +2779,7 @@ Any local addresses added with the option
 .IR T_SCTP_ADD_IP ,
 or automatically added by the system with the addition or reconfiguration of a
 network interface, will also be unbound from the local transport endpoint with
-this XTI library call.
+this XTI/TLI library call.
 .\"
 .\"
 .SH "CAVEATS"
@@ -2396,7 +2791,7 @@ library for
 transport providers, the options described here have been made compatible
 with the socket options described in
 .BR sctp (7).
-As a result, depending on the release of streams SCTP, the XTI options
+As a result, depending on the release of streams SCTP, the XTI/TLI options
 described might not be compatible with the options described here.
 .PP
 The
@@ -2477,7 +2872,7 @@ There is one SCTP device providing the Transport Provider Interface that
 provide SCTP conforming TPI devices as follows:
 .\"
 .\"
-.TP 12
+.TP
 .I /dev/sctp_t
 For more information on the TPI SCTP device, see
 .BR sctp (4).
@@ -2499,4 +2894,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.T4

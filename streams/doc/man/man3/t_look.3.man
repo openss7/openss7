@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_look.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_look.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,20 +73,28 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_LOOK 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_LOOK 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .B t_look
 \- look for a transport event
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .HP 8
 .BI "int t_look(int " fd );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint upon which to look for events.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR t_look ()
@@ -97,9 +105,11 @@ specified by
 .I fd
 specifies the local transport endpoint upon which to look for a pending
 asynchronous event.
+.\"
+.\"
 .SH CAVEATS
 .PP
-When an XTI library call is expecting a specific response from the transport
+When an XTI/TLI library call is expecting a specific response from the transport
 service provider, such as in
 .BR t_accept (3),
 .BR t_addleaf (3),
@@ -131,37 +141,81 @@ When such a failure occurs,
 .BR t_look ()
 can be used to determine which asynchronous event occured and determine the
 next course of action.
+.PP
+Also,
+.BR t_look ()
+can be used to determine which event is pending without previoulsy calling one
+of the XTI/TLI library calls listed above.  For example,
+.BR t_look ()
+can be called after a call to
+.BR poll (2)
+for a group of file descriptors to determine the event that has occured on the
+transport endpoint.  This is in fitting with the
+.BR poll (2)
+example listed in XNS 5.2.
+.[
+xns
+.]
+.PP
+The following XTI/TLI library commands return
+.RB [ TLOOK ]
+when the listed asynchronous events have occured:
+.sp
+.TS
+tab(:);
+lblssss.
+t_accept\fR(3):T_DISCONNECT, T_LISTEN
+t_connect\fR(3):T_DISCONNECT, T_LISTEN
+t_listen\fR(3):T_DISCONNECT
+t_rcv\fR(3):T_DISCONNECT, T_ORDREL
+t_rcvconnect\fR(3):T_DISCONNECT
+t_rcvrel\fR(3):T_DISCONNECT
+t_rcvreldata\fR(3):T_DISCONNECT
+t_rcvudata\fR(3):T_UDERR
+t_rcvv\fR(3):T_DISCONNECT, T_ORDREL
+t_rcvvudata\fR(3):T_UDERR
+t_snd\fR(3):T_DISCONNECT, T_ORDREL
+t_sndudata\fR(3):T_UDERR
+t_sndv\fR(3):T_DISCONNECT, T_ORDREL
+t_sndvudata\fR(3):T_UDERR
+t_unbind\fR(3):T_LISTEN, T_DATA, T_UDERR
+t_sndrel\fR(3):T_DISCONNECT
+t_sndreldata\fR(3):T_DISCONNECT
+t_snddis\fR(3):T_DISCONNECT
+.TE
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
 .BR t_look ()
 returns a positive integer reflecting the asynchronous event received and is one of the
 following values:
-.TP 12
+.TP
 .B T_LISTEN
 connection indication received.
-.TP 12
+.TP
 .B T_CONNECT
 connection confirmation received.
-.TP 12
+.TP
 .B T_DATA
 normal data received.
-.TP 12
+.TP
 .B T_EXDATA
 expedited data received.
-.TP 12
+.TP
 .B T_DISCONNECT
 disconnection received.
-.TP 12
+.TP
 .B T_UDERR
 datagram error indication received.
-.TP 12
+.TP
 .B T_ORDREL
 orderly release indication received.
-.TP 12
+.TP
 .B T_GODATA
 sending normal data is again possible.
-.TP 12
+.TP
 .B T_GOEXDATA
 sending expedited data is again possible.
 .PP
@@ -170,6 +224,8 @@ Upon failure,
 returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -177,17 +233,19 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in
 .IR errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR errno (3),
@@ -212,6 +270,18 @@ A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in
 .BR t_sndv (3),
 .BR t_sndvudata (3),
 .BR t_unbind (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_look ()
+has no known bugs.
+.BR t_look ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -236,4 +306,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sysconf.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_sysconf.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,10 +73,10 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SYSCONF 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $"" "Linux Fast-STREAMS XTI Library"
+.TH T_SYSCONF 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $"" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_sysconf
-\- configure XTI Library parameters
+\- configure XTI/TLI Library parameters
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
@@ -84,19 +84,19 @@ sort-adjacent-labels
 .BI "int t_sysconf(int " name );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I name
 the name of the configuration parameter to retrieve.
 .SH DESCRIPTION
 .PP
 .BR t_sysconf ()
-reads the value of XTI Library configuration parameters and returns them to
+reads the value of XTI/TLI Library configuration parameters and returns them to
 the caller.
 .PP
 .I name
-is the name of the XTI Library configuration parameter to return and can be
+is the name of the XTI/TLI Library configuration parameter to return and can be
 one of the following values:
-.TP 12
+.TP
 .B _SC_T_IOV_MAX
 returns the value of the T_IOV_MAX configuration parameter which specifies the
 maximum number of
@@ -112,7 +112,7 @@ array in the following commands:
 .PP
 The
 .BR OpenSS7
-XTI Library supports the return of XTI configuration parameters that are not
+XTI/TLI Library supports the return of XTI/TLI configuration parameters that are not
 documented here.
 .SH "RETURN VALUE"
 .PP
@@ -133,7 +133,7 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADFLAG ]
 The argument
 .I name
@@ -168,4 +168,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

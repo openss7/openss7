@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_strerror.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_strerror.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,10 +73,10 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_STRERROR 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_STRERROR 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_strerror
-\- describe an XTI library error.
+\- describe an XTI/TLI library error.
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
@@ -84,13 +84,13 @@ sort-adjacent-labels
 .BI "const char *t_strerror(int " errnum );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I errnum
 the error number to convert to a character string description.
 .SH DESCRIPTION
 .PP
 .BR t_strerror ()
-obtains a character string describing an XTI library error obtained from
+obtains a character string describing an XTI/TLI library error obtained from
 .IR t_errno (3).
 .PP
 .I errnum
@@ -114,7 +114,7 @@ it returns
 .BR t_strerror ()
 fails when
 .I errnum
-is not a valid XTI error number.  See
+is not a valid XTI/TLI error number.  See
 .IR t_errno .
 .SH "SEE ALSO"
 .PP
@@ -144,4 +144,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

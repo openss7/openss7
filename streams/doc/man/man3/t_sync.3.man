@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sync.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_sync.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,25 +73,33 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SYNC 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $"" "Linux Fast-STREAMS XTI Library"
+.TH T_SYNC 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $"" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .B t_sync
-\- synchronize XTI library with TLI provider
+\- synchronize XTI/TLI library with TPI provider
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .HP 8
 .BI "int t_sync(int " fd );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint to sync.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-Synchronizes the XTI library for
+Synchronizes the XTI/TLI library for
 .I fd
-with the underlying TLI transport service provider.
+with the underlying TPI transport service provider.
 .PP
 .I fd
 specifies the local transport endpoint file descriptor to synchronize.
@@ -102,7 +110,9 @@ or when
 .RB [ TPROTO ]
 was retruned as an error in
 .IR t_errno (3)
-for a previous XTI library call.
+for a previous XTI/TLI library call.
+.\"
+.\"
 .SH CAVEATS
 .PP
 .BR t_sync ()
@@ -111,7 +121,7 @@ is valid in any state other than
 .PP
 The
 .BR OpenSS7
-implementation of the XTI library minimizes the necessity for using
+implementation of the XTI/TLI library minimizes the necessity for using
 .BR t_sync ()
 due to a specialized
 .BR timod (4)
@@ -119,6 +129,8 @@ module that tracks the state of the underlying transport service provider
 independent of the accessing process or file descriptor.  See
 .BR timod (4)
 for more information.
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
@@ -129,6 +141,8 @@ Upon failure,
 returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -136,17 +150,17 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSTATECHNG ]
 The interface is in a transient state.
-.TP 12
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
@@ -154,10 +168,24 @@ system error occured and the
 .B Linux
 error number is set in
 .IR errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR t_errno (3),
 .BR timod (4).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_sync ()
+has no known bugs.
+.BR t_sync ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -182,4 +210,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

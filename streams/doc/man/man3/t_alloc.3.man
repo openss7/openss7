@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_alloc.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_alloc.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_ALLOC 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_ALLOC 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_alloc
 \- allocate a library structure
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .BI "void *t_alloc(int " fd ", int " type ", int " fields );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint against which to allocate the structure.
 .TP
@@ -98,7 +98,7 @@ fields to populate and for which to allocate buffers.
 .SH DESCRIPTION
 .PP
 .BR t_alloc ()
-allocates the specified XTI
+allocates the specified XTI/TLI
 .[
 XTI
 .]
@@ -123,7 +123,7 @@ structure from calls to
 .BR t_open "(3) or " t_getinfo (3).
 .PP
 .I type
-specifies the type of XTI
+specifies the type of XTI/TLI
 .[
 XTI
 .]
@@ -132,42 +132,43 @@ XNS
 .]
 structure to allocate, and may be one of the
 following:
-.TP 12
+.TP \w'T_UNITDATA\(em'u
 .B T_BIND
 specifies the
 .B t_bind
 structure.
-.TP 12
+.PD 0
+.TP
 .B T_OPTMGMT
 specifies the
 .B t_optmgmt
 structure.
-.TP 12
+.TP
 .B T_CALL
 specifies the
 .B t_call
 structure.
-.TP 12
+.TP
 .B T_DIS
 specifies the
 .B t_discon
 structure.
-.TP 12
+.TP
 .B T_UNITDATA
 specifies the
 .B t_unitdata
 structure.
-.TP 12
+.TP
 .B T_UDERROR
 specifies the
 .B t_uderr
 structure.
-.TP 12
+.TP
 .B T_INFO
 specifies the
 .B t_info
 structure.
-
+.PD
 .PP
 .I fields
 specifies which
@@ -179,40 +180,84 @@ from protocol sizing information associated with the local transport endpoint
 .IR fd .
 .I fields
 is a bitwise OR of zero or more of the following flags:
-.TP 12
+.TP \w'T_UNITDATA\(em'u
 .B T_ADDR
 allocate and initialize the
 .I addr
 .BR netbuf (3)
 structure and buffer.
-.TP 12
+.TP
 .B T_OPT
 allocate and initialize the
 .I opt
 .BR netbuf (3)
 structure and buffer.
-.TP 12
+.TP
 .B T_UDATA
 allocate and initialize the
 .I udata
 .BR netbuf (3)
 structure and buffer.
-.TP 12
+.TP
 .B T_ALL
-allocate and initialize all
+allocate and initialize all relevant
 .BR netbuf (3)
 structures and buffers.
 .PP
 The
 .BR netbuf (3)
+parameters in the allocated structure that have their corresponding flag set
+will have their
+.I buf
+fields set to the allocated buffer, their
+.I maxlen
+fields set to the length of the allocated buffer, and their
+.I len
+fields set to zero (0).  (The caller must sent the
+.I len
+fields appropriately after placing contents into the buffer, but not in excess
+of
+.IR maxlen .)
+.PP
+The
+.BR netbuf (3)
 parameters in the allocated structure that do not have the corresponding flag
-set will have their
+set,
+which have a length of zero (0) in the information structure returned by
+.BR t_getinfo (3),
+or which have a length of
+.B T_INVALID
+in the information structure returned by
+.BR t_getinfo (3)
+and
+.I fields
+is set to
+.BR T_ALL ,
+will have their
 .I buf
 fields set to
 .BR NULL ,
 and their
 .IR maxlen " and " len
 fields set to zero.
+.PP
+If a field with its flag set has a length of
+.B T_INVALID
+in the information structure returned by
+.BR t_getinfo (3)
+and
+.B T_ALL
+was not specified for
+.IR fields ,
+.BR t_alloc ()
+will fail with error
+.RB [ EINVAL ].
+.PP
+Any flag positions in the
+.I fields
+argument not relevant to the structure type in the
+.I type
+argument will be ignored.
 .SH "RETURN VALUE"
 .PP
 Upon success,
@@ -236,21 +281,46 @@ fails, it returns
 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TNOSTRUCTYPE ]
-The argument \fItype\fR was not a valid or supported structure type.
-.TP 12
+The argument \fItype\fR was not a valid or supported structure type, or was
+not an appropriate structure type for the service type of the transport
+endpoint.
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+This occurs in the following situations:
+.TP
+.RB [ ENOMEM ]
+Memory could not be allocated for the structure or a buffer in the structure.
+.TP
+.RB [ EINVAL ]
+.I fields
+was specified (i.e. not set to
+.BR T_ALL )
+and at least one of the specified fields was of size
+.B T_INVALID
+in the information structure (see
+.BR t_getinfo (3)).
+.SH NOTICES
+.PP
+If a field with its flag set has a length of
+.B T_INFINITE
+in the information structure returned by
+.BR t_getinfo (3),
+or if the length is greater that an internal maximum size,
+.BR t_alloc ()
+will only allocate the internal maximum size.
 .SH "SEE ALSO"
 .PP
+.BR t_getinfo (3),
 .BR t_free (3).
 .SH "CONFORMING TO"
 .PP
@@ -276,4 +346,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipe.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: pipe.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -48,7 +48,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PIPE 2 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH PIPE 2 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B pipe
 \- create a \fISTREAMS\fR \fIpipe\fR
@@ -189,9 +189,9 @@ to augment the processing of data.  Moreover, such processing may
 be
 .IR message \- oriented :
 message boundaries may be established and respected by using the
-.BR getmsg "(3)/" getpmsg "(3) "
+.BR getmsg "(2)/" getpmsg "(2) "
 and
-.BR putmsg "(3)/" putpmsg "(3) "
+.BR putmsg "(2)/" putpmsg "(2) "
 primitives instead of
 .BR read "(2) "
 and
@@ -239,8 +239,8 @@ svr4
 .]
 .SH "SEE ALSO"
 .PP
-.BR pipemod "(2), "
-.BR connld "(2), "
+.BR pipemod "(4), "
+.BR connld "(4), "
 .BR errno "(3), "
 .BR fifo "(4), "
 .BR STREAMS "(4) "
@@ -250,4 +250,4 @@ John Boyd, protologos LLC.
 .[
 $LIST$
 .]
-.TA
+.T3

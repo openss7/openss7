@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_error.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_error.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_ERROR 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_ERROR 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_error
 \- print an error message
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .BI "void t_error(char *" errmsg );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I errmsg
 the error message to print.
 .SH DESCRIPTION
@@ -93,12 +93,12 @@ the error message to print.
 produces a message on
 .B stderr
 describing
-the last error encountered during an XTI Library function call.  The argument
+the last error encountered during an XTI/TLI Library function call.  The argument
 string
 .I errmsg
 is printed first, then a colon and a blank, then the message and a new-line.
 To be of most use, the argument string should include the name of the function
-that incurred the error.  The XTI error number is taken from the external
+that incurred the error.  The XTI/TLI error number is taken from the external
 variable
 .IR t_errno (3),
 which is set to when errors occur but not cleared when non-erroneous calls are
@@ -109,16 +109,16 @@ can be used to obtain the error string associated with
 .IR t_errno (3)
 without printing the string.
 .PP
-When an XTI Library call fails, it usually returns -1 and sets the variable
+When an XTI/TLI Library call fails, it usually returns -1 and sets the variable
 .IR t_errno (3)
 to a value describing what went wrong.
 .BR t_error ()
 serves to translate this error code into a human-readible form.  Note that
 .IR t_errno (3)
-is undefined after a successful XTI library call: a call may change the valud
+is undefined after a successful XTI/TLI library call: a call may change the valud
 of
 .IR t_errno (3)
-even though it succeeds, perhaps because it is set by an internal XTI library
+even though it succeeds, perhaps because it is set by an internal XTI/TLI library
 call that failed.
 .PP
 .I errmsg
@@ -159,4 +159,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

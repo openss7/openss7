@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_rcvudata.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_rcvudata.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,18 +73,24 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_RCVUDATA 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_RCVUDATA 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .B t_rcvudata
 \- receive unitdata
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .HP 8
 .BI "int t_rcvudata(int " fd ", struct t_unitdata *" data ", int *" flags );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport enpoint upon which to receive unit data.
 .TP
@@ -97,6 +103,8 @@ structure to contain information about the received unit data.
 a pointer to an
 .B int
 to contain flags concerning the received unit data.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR t_rcvudata ()
@@ -118,7 +126,7 @@ transport address.
 provides information about the received data on return.  Flags returned by
 .BR t_rcvudata ()
 can be a bitwise OR of any of the following flags:
-.TP 12
+.TP
 .B T_MORE
 indicates that a subsequent receive operation is necessary to receive the
 remainder of the data belonging to the same transport service data unit.
@@ -140,7 +148,7 @@ struct t_unitdata {
 The
 .BR t_unitdata ()
 structure returns the following members and information:
-.TP 12
+.TP
 .I addr
 is a
 .BR netbuf (3)
@@ -158,7 +166,7 @@ If
 .I data->addr.len
 is zero on return, not originating transport address was available with the
 unitdata indication.
-.TP 12
+.TP
 .I opt
 is a
 .BR netbuf (3)
@@ -176,7 +184,7 @@ If
 .I data->opt.len
 is zero on return, no originating transport options were available with the
 unitdata indication.
-.TP 12
+.TP
 .I udata
 is a
 .BR netbuf (3)
@@ -193,6 +201,8 @@ If
 .I data->udata.len
 is zero on return, no originating data was available with the unitdata
 indication.
+.\"
+.\"
 .SH CAVEATS
 .PP
 .BR t_rcvudata ()
@@ -214,6 +224,8 @@ will fail, return -1 and set
 .IR t_errno (3)
 to
 .RB [ TNODATA ].
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
@@ -224,6 +236,8 @@ Upon failure,
 returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -231,54 +245,54 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
-.RB [ TBADDATA ]
-The amount of data specified for the call and underlying transport service
-provider was invalid (i.e. was outside the protocol limits).  See
-.BR t_getinfo (3)
-and
-.BR t_open (3)
-for more information.
-.TP 12
+.\".TP
+.\".RB [ TBADDATA ]
+.\"The amount of data specified for the call and underlying transport service
+.\"provider was invalid (i.e. was outside the protocol limits).  See
+.\".BR t_getinfo (3)
+.\"and
+.\".BR t_open (3)
+.\"for more information.
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TBUFOVFLW ]
 The
 .I maxlen
 field of a
 .BR netbuf (3)
 structure
-.IR "" ( addr ", " opt ", " data )
+.IR "" ( addr " or " opt )
 passed to the call was
 non-zero, but insufficient to hold the available information.  See,
 .BR netbuf (3)
 for more information.
-.TP 12
+.TP
 .RB [ TLOOK ]
 An asynchronous event occured before the call could complete.  See
 .BR t_look (3)
 for more information.
-.TP 12
+.TP
 .RB [ TNODATA ]
 An attempt was made to read data but no data indication was available and
 .I fd
 was in asynchronous mode
 .BR "" ( O_NONBLOCK " or " O_NDELAY " was set with " t_open "(3) or " fcntl (2)).
-.TP 12
+.TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TLI primitive not supported by the underlying transport provider.
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
 This can occur when the transport service provider was of service type
 .BR T_COTS " or " T_COTS_ORD .
-.TP 12
+.TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in a state other than
 .BR T_IDLE .
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
@@ -286,6 +300,8 @@ system error occured and the
 .B Linux
 error number is set in
 .IR errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR errno (3),
@@ -295,6 +311,18 @@ error number is set in
 .BR t_getinfo (3),
 .BR t_look (3),
 .BR t_open (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_rcvudata ()
+has no known bugs.
+.BR t_rcvudata ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -319,4 +347,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

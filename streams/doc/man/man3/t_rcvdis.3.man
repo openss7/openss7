@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_rcvdis.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_rcvdis.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,18 +73,24 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_RCVDIS 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_RCVDIS 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .B t_rcvdis
 \- receive abortive disconnect
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .HP 8
 .BI "int t_rcvdis(int " fd ", struct t_discon *" dis );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint to disconnect.
 .TP
@@ -92,6 +98,8 @@ the transport endpoint to disconnect.
 a pointer to a
 .B t_discon
 structure to contain returned disconnect information.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR t_rcvdis ()
@@ -126,7 +134,7 @@ The
 .B t_discon
 structure returns the following members and contains the following
 information:
-.TP 12
+.TP
 .I udata
 is a
 .BR netbuf (3)
@@ -143,12 +151,12 @@ will be discarded.
 If
 .I dis->udata.len
 is zero on return, no disconnect data was available.
-.TP 12
+.TP
 .I reason
 indicates the reason for the disconnection.  The values for the
 .I reason
 field are transport service provider specific.
-.TP 12
+.TP
 .I sequence
 indicates the sequence number, if any, of the connection indication which is
 now disconnected.  This field is only significant if the disconnection
@@ -164,6 +172,8 @@ and a call to
 .BR t_look (3)
 returns
 .BR T_DISCONNECT .
+.\"
+.\"
 .SH CAVEATS
 .PP
 .BR t_rcvdis ()
@@ -180,6 +190,8 @@ returns -1 and sets
 .IR t_errno (3)
 to
 .BR TNODIS .
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
@@ -190,6 +202,8 @@ Upon failure,
 returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -197,11 +211,11 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TBUFOVFLW ]
 The
 .I dis->udata.maxlen
@@ -211,27 +225,27 @@ structure passed to the call was
 non-zero, but insufficient to hold the available disconnect user data.  See,
 .BR netbuf (3)
 for more information.
-.TP 12
+.TP
 .RB [ TNODIS ]
 An attempt was made to read a disconnect and no disconnect indication was
 available, and the stream is set for asynchronous mode
 .BR "" ( O_NONBLOCK " or " O_NDELAY " to " t_open "(3) or " fcntl (2).
-.TP 12
+.TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TLI primitive not supported by the underlying transport provider.
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
 Abortive disconnect is not supported by all transport service providers.
 If the transport provider service type is connectionless
 .RB [R T_CLTS , ]
 this error is returned.
-.TP 12
+.TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in a state other than
 .BR T_DATAXFER ", " T_OUTCON ", " T_OUTREL ", " T_INREL " or " T_INCON
 with outstanding connection indications.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
@@ -239,6 +253,8 @@ system error occured and the
 .B Linux
 error number is set in
 .IR errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR errno (3),
@@ -247,6 +263,18 @@ error number is set in
 .BR t_errno (3),
 .BR t_look (3),
 .BR t_open (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_rcvdis ()
+has no known bugs.
+.BR t_rcvdis ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -271,4 +299,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_connect.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_connect.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,18 +73,24 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_CONNECT 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_CONNECT 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .B t_connect
 \- establish a transport connection
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .HP 8
 .BI "int t_connect(int " fd ", struct t_call *" sndcall ", struct t_call *" rcvcall );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint to connect.
 .TP
@@ -97,6 +103,8 @@ structure specifying the peer address, options and data.
 a pointer to a
 .B t_call
 structure returning the responding address, options and data.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .I fd
@@ -132,7 +140,7 @@ struct t_call {
 };
 \fR\s+1
 .fi
-.TP 12
+.TP
 .I addr
 is a
 .BR netbuf (3)
@@ -149,7 +157,7 @@ returns the responding address for the connection, if any.
 is significant on call and
 .I rcvcall->addr.len
 is significant on return.
-.TP 12
+.TP
 .I opt
 is a
 .BR netbuf (3)
@@ -166,7 +174,7 @@ returns the remote connection options.
 is significant on call and
 .I rcvcall->opt.len
 is significant on return.
-.TP 12
+.TP
 .I udata
 is a
 .BR netbuf (3)
@@ -183,18 +191,128 @@ returns the remote connection data.
 is significant on call and
 .I rcvcall->udata.len
 is significant on return.
-.TP 12
+.TP
 .I sequence
 is not significant in the
 .BR t_connect ()
 call.
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options in the
+.I sndcall->opt
+and
+.I rcvcall->opt
+buffers are formatted as described in
+.BR t_optmgmt (3).
+.PP
+Illegal options (where the
+.I t_opthdr.len
+exceeds the remaining size of the option buffer, or where the option value is
+illegal)
+cause
+.BR t_connect ()
+to either fail with
+.IR t_errno (3)
+set to
+.RB [ TBADOPT ],
+or the connection establishment to fail at a later stage, depending on when
+the implementation detects the illegal option.
+If multiple options are passed in
+.I sndcall->opt
+and on of them is illegal, the call fails.  It is possible, however, that some
+or all of the submitted legal options were successfully negotiated.  Use the
+.B T_CURRENT
+management flag to
+.BR t_optmgmt (3)
+to establish which options were successful.
+.PP
+Options specified in
+.I sndcall->opt
+can address multiple option levels.
+A legal option is ignored by
+.BR t_connect ()
+if it is for an option level unknown to the transport provider.  A legal
+option is ignored by
+.BR t_connect ()
+if it is for an option name unsupported by (unknown to) the transport provider.
+.PP
+If a proposed value is an absolute requirement and the negotiated value is the
+same, the returned option will have a status of
+.BR T_SUCCESS .
+If the option is supported and the negotiation is rejected, any attempt to
+establish a connection aborts; a
+.B T_DISCONNECT
+event occurs, and a synchronous call to
+.BR t_connect ()
+fails with
+.RB [ TLOOK ].
+When multiple options are provided and one of them is rejected and the
+connection establishment fails, one or all of the options successfully
+negotiated before failure may retain their negotiated values.  Use
+.BR t_optmgmt (3)
+with the
+.B T_CURRENT
+flag to determine which options retains their negotiated values.
+.PP
+If a proposed value is not an absolute requirement, and the negotiated value
+equals the proposed value, the returned option will have a status of
+.BR T_SUCCESS .
+If the negotiated value is of lesser quality than the proposed value, the
+returned option will have a status of
+.BR T_PARTSUCCESS .
+If the option is not supported, it is quietly ignored.
+.PP
+.BR t_connect ()
+initiates the negotiation of all options with end-to-end significance.
+Options not explicitly specified in
+.I sndcall->opt
+are taken from an internal option buffer used by the transport provider that
+contains the previously negotiated values or default values for the implicit
+options of end-to-end significance.
+.PP
+If a transport user requests negotiation of a read-only option, or a
+non-privileged user requests illegal access to a privileged option,
+.BR t_connect ()
+will either fail with
+.RB [ TACCES ],
+or the connection establishment aborts and a
+.B T_DISCONNECT
+event occurs.  If the connection aborts, a synchronous call to
+.BR t_connect ()
+fails with
+.RB [ TLOOK ].
+.PP
+.BR t_connect ()
+returns in
+.I rcvcall->opt
+the values of all options with end-to-end significance that were received with
+the connection response and the negotiated values of those options without
+end-to-end significance that had been specified in
+.IR sndcall->opt .
+However, options specified in
+.I sndcall->opt
+that are not supported or refer to an unknown option level are discarded and
+not returned on output.  The status field of each option returned in
+.I rcvcall->opt
+indicates if the proposed value
+.RB ( T_SUCCESS )
+or a degraded value
+.RB ( T_PARTSUCCESS )
+has been negotiated.  The status field of received ancilliary information that is not
+subject to negotiation is always set to
+.BR T_SUCCESS .
+
+.\"
+.\"
 .SH CAVEATS
 .PP
 .BR t_connect ()
 is only valid in state
 .BR T_IDLE .
 .PP
-In syncrhonous mode,
+In synchronous mode,
 .BR t_connect ()
 blocks until it successfully receives a connection confirmation.
 In asynchronous mode (i.e.
@@ -207,6 +325,8 @@ with a a return value of -1 and
 .IR t_errno (3)
 set to
 .BR T_NODATA .
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
@@ -221,6 +341,8 @@ Upon failure,
 returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -228,21 +350,21 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TACCES ]
 The caller did not have sufficient permissions to use the address or options specified in
 .IR sndcall->addr " or " sndcall->opt .
-.TP 12
+.TP
 .RB [ TADDRBUSY ]
 The
 .I sndcall->addr
 specificed was already in use by another transport endpoint.
-.TP 12
+.TP
 .RB [ TBADADDR ]
 The
 .I sndcall->addr
 specified was of an invalid format or contained invalid information.
-.TP 12
+.TP
 .RB [ TBADDATA ]
 The amount of data specified for the call
 .I sndcall->udata.len
@@ -250,17 +372,17 @@ provider was invalid for the underlying transport service (i.e. was outside
 the protocol limits).  See
 .BR t_getinfo "(3) and " t_open (3)
 for more information.
-.TP 12
+.TP
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TBADOPT ]
 The options specified were of an invalid format or contained invalid information.
 See
 .BR t_optmgmt (3)
 for more information on option formats.
-.TP 12
+.TP
 .RB [ TBUFOVFLW ]
 The
 .I maxlen
@@ -272,12 +394,12 @@ passed to the call was non-zero, but insufficient to hold the available opaque
 information.  See,
 .BR netbuf (3)
 for more information.
-.TP 12
+.TP
 .RB [ TLOOK ]
-An asynchronous event occured before the call could complete.  See
+An asynchronous event occurred before the call could complete.  See
 .BR t_look (3)
 for more information.
-.TP 12
+.TP
 .RB [ TNODATA ]
 An attempt was made to read a connection confirmation but
 .I fd
@@ -286,23 +408,25 @@ was set for non-blocking operation with
 and no connection confirmation was available.
 The connection confirmation can be retrieved later with
 .BR t_rcvconnect (3).
-.TP 12
+.TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TLI primitive not supported by the underlying transport provider.
-.TP 12
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
+.TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in an incorrect state.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occurred between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
-system error occured and the
+system error occurred and the
 .B Linux
 error number is set in
 .IR errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR fcntl (2),
@@ -313,6 +437,18 @@ error number is set in
 .BR t_open (3),
 .BR t_rcvconnect (3).
 .PP
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_connect ()
+has no known bugs.
+.BR t_connect ()
+has been tested for the described behaviour using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -337,4 +473,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

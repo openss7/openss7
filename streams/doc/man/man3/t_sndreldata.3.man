@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sndreldata.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_sndreldata.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SNDRELDATA 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_SNDRELDATA 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_sndreldata
 \- send orderly release with data
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .BI "int t_sndreldata(int " fd ", struct t_discon *" discon );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint to release in an orderly fashion with data.
 .TP
@@ -124,7 +124,7 @@ struct t_discon {
 The
 .B t_discon
 structure specifies the following members and information:
-.TP 12
+.TP
 .I udata
 is a
 .BR netbuf (3)
@@ -135,10 +135,10 @@ is significant on call.
 If
 .I discon->udata.len
 is zero, no user data will be included in the orderly release.
-.TP 12
+.TP
 .I reason
 release reason values are transport service provider specific.
-.TP 12
+.TP
 .I sequence
 not used by
 .BR t_sndreldata ()
@@ -197,7 +197,7 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADDATA ]
 The amount of data specified for the call and underlying transport service
 provider was invalid (i.e. was outside the protocol limits).
@@ -219,11 +219,11 @@ See
 and
 .BR t_open (3)
 for more information.
-.TP 12
+.TP
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TFLOW ]
 The call would block due to flow control and
 .I fd
@@ -233,24 +233,24 @@ was set using
 .BR t_open (3)
 or
 .BR fcntl (2)).
-.TP 12
+.TP
 .RB [ TLOOK ]
 An asynchronous event occured before the call could complete.  See
 .BR t_look (3)
 for more information.
-.TP 12
+.TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TLI primitive not supported by the underlying transport provider.
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
 This can occur when the transport service provider service type is
 .BR T_CLTS " or " T_COTS .
-.TP 12
+.TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in a state other than
 .BR T_DATAXFER " or " T_INREL .
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
@@ -292,4 +292,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

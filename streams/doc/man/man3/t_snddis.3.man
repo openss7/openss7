@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_snddis.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_snddis.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SNDDIS 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_SNDDIS 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_snddis
 \- send abortive disconnect
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .BI "int t_snddis(int " fd ", const struct t_call *" call );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint to disconnect.
 .TP
@@ -132,7 +132,7 @@ struct t_call {
 The
 .B t_call
 structure specifies the following members and information:
-.TP 12
+.TP
 .I addr
 is a
 .BR netbuf (3)
@@ -150,7 +150,7 @@ is zero on call, there is no responding address from which to send the data or
 reject the outstanding connection indication.  In this case, the transport
 address to which the local endpoint is bound will be used as the responding
 address, if a responding address is required by the underlying protocol.
-.TP 12
+.TP
 .I opt
 is a
 .BR netbuf (3)
@@ -164,7 +164,7 @@ is meaningless.
 If
 .I call->opt.len
 is zero on call, there are not disconnect options associated with the request.
-.TP 12
+.TP
 .I udata
 is a
 .BR netbuf (3)
@@ -178,7 +178,7 @@ is meaningless.
 If
 .I call->udata.len
 is zero on call, there is no data associated with the request.
-.TP 12
+.TP
 .I sequence
 specifies the sequence number, previously returned from a call to
 .BR t_listen (3),
@@ -219,11 +219,11 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
+.TP
 .RB [ TBADDATA ]
 The amount of data specified for the call and underlying transport service
 provider was invalid (i.e. was outside the protocol limits).  See
@@ -231,26 +231,26 @@ provider was invalid (i.e. was outside the protocol limits).  See
 and
 .BR t_open (3)
 for more information.
-.TP 12
+.TP
 .RB [ TBADSEQ ]
 The
 .I sequence
 number provided was invalid, or is not associated with an outstanding connection indication.
-.TP 12
+.TP
 .RB [ TLOOK ]
 An asynchronous event occured before the call could complete.  See
 .BR t_look (3)
 for more information.
-.TP 12
+.TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TLI primitive not supported by the underlying transport provider.
-.TP 12
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
+.TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in an incorrect state.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
@@ -291,4 +291,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_free.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_free.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,10 +73,10 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_FREE 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_FREE 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_free
-\- free an XTI library structure
+\- free an XTI/TLI library structure
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
@@ -84,7 +84,7 @@ sort-adjacent-labels
 .BI "int t_free(void *" ptr ", int " type );
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I ptr
 a pointer to the structure to free.
 .TP
@@ -93,7 +93,7 @@ the type of the structure pointed to.
 .SH DESCRIPTION
 .PP
 .BR t_free ()
-frees an XTI structure that was allocated with the
+frees an XTI/TLI structure that was allocated with the
 .BR t_alloc (3)
 call or allocated using
 .BR malloc (3).
@@ -104,37 +104,37 @@ is a pointer to a structure that was allocated with
 .PP
 .I type
 is the structure type to deallocated, and may be one of the following:
-.TP 12
+.TP
 .B T_BIND
 specifies the
 .B t_bind
 structure.
-.TP 12
+.TP
 .B T_OPTMGMT
 specifies the
 .B t_optmgmt
 structure.
-.TP 12
+.TP
 .B T_CALL
 specifies the
 .B t_call
 structure.
-.TP 12
+.TP
 .B T_DIS
 specifies the
 .B t_discon
 structure.
-.TP 12
+.TP
 .B T_UNITDATA
 specifies the
 .B t_unitdata
 structure.
-.TP 12
+.TP
 .B T_UDERROR
 specifies the
 .B t_uderr
 structure.
-.TP 12
+.TP
 .B T_INFO
 specifies the
 .B t_info
@@ -162,13 +162,13 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .RB [ TNOSTRUCTYPE ]
 The argument \fItype\fR was not a valid or supported structure type.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
 .SH "SEE ALSO"
@@ -197,4 +197,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

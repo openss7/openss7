@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_udp.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: xti_udp.3.man,v 0.9.2.3 2004/04/17 20:04:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:04:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,10 +73,14 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-UDP 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-UDP 3 "$Date: 2004/04/17 20:04:02 $" "$Name:  $" "X/Open Transport Interface"
+.\"
+.\"
 .SH "NAME"
 .B xti_udp
 \- X/Open Transport Interface \- Corrigendum for User Datagram Protocol (UDP) Conformance
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
@@ -86,6 +90,8 @@ sort-adjacent-labels
 .B #include <xti_udp.h>
 .HP
 .BI "int " udp_xtistr " = t_open(" \fR\*(lq/dev/udp\*(rq\fI ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 This manual section describes the protocol-specific information that is
@@ -97,9 +103,51 @@ This section also defines the data structures and constants required for UDP
 transport providers that are exposed through the
 .B <xti_udp.h>
 header file.
+.\"
+.\"
 .SH "ADDRESS FORMAT"
 .PP
 The UDP address format is structured as follows:
+.PP
+.nf
+\fC\s-1\
+struct sockaddr_in {
+    sa_family_t         sin_family;  /* Address family */
+    unsigned short int  sin_port;    /* Port number */
+    struct in_addr      sin_addr;    /* Interned address */
+    /* padding */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B sockaddr_in
+structure contains the following members:
+.TP \w'sin_family\(em'u
+.I sin_family
+The address family.  Always set to
+.BR AF_INET " or " AF_UNSPEC .
+.PD 0
+.TP
+.I sin_port
+The port number of the transport endpoint.
+.TP
+.I sin_addr
+The IP address of the transport endpoint.
+.TP
+.I (padding)
+Padding to pad the size of the
+.B sockaddr_in
+structure to the size of a
+.B sockaddr
+structure.
+.PD
+.PP
+The structure is padded to the size of a
+.BR sockaddr
+structure.
+.\"
+.\"
 .SH OPTIONS
 .PP
 Options are formatted according to the
@@ -111,8 +159,98 @@ or any subset of the options defined here.  An implementation may restrict the
 use of any of these options by offering them only in a priviledged read-only
 mode.
 .PP
-An UDP transport provider supports two levels of options.  These two levels
+An UDP transport provider supports three levels of options.  These three levels
 are described below.
+.\"
+.\"
+.SS "XTI_GENERIC"
+.PP
+Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
+and are common to all transport providers.  For more information see
+.BR xti (3).
+.PP
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the stream.
+This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the stream will linger waiting for
+unsent data to be delivered.
+This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
+};
+\s+1\fP
+.fi
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.
+Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PP
+For more information, see
+.BR xti (3).
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.\"
+.\"
 .SS "T_INET_IP"
 .PP
 Options within this level are specific to the Internet Protocol (IP) and are
@@ -122,6 +260,67 @@ common to all the protocol levels in IP.  For more information, see
 The options defined with the option level
 .B T_INET_IP
 are as follows:
+.TP
+.B T_IP_OPTIONS
+Provides control for the T_IP OPTIONS field.  Used for debugging.
+This option is formatted as an array of
+.BR "unsigned char" ,
+up to 40 elements.
+For more information, see
+.BR xti_ip (3).
+.TP
+.B T_IP_TOS
+Provides control of the type-of-service byte present in each transmited T_IP
+packet.
+This option is formated as an
+.BR "unsigned char" .
+Legal values can be generated with the
+.BR SET_TOS ()
+macro described in
+.BR xti_ip (3).
+For more information, see
+.BR xti_ip (3).
+.TP
+.B T_IP_TTL
+Provides control of the time-to-live byte present in each transmitted T_IP
+packet.
+This option is formatted as an
+.BR "unsigned char" .
+Legal values are from 0 to 255.
+For more information, see
+.BR xti_ip (3).
+.TP
+.B T_IP_REUSEADDR
+Allows multiple non-listening binds to the same address.
+This option is format as a
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR xti_ip (3).
+.TP
+.B T_IP_DONTROUTE
+Bypasses routing tables and routes directly to an interface.  Used for
+debugging.
+This option is format as a
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR xti_ip (3).
+.TP
+.B T_IP_BROADCAST
+Allows broadcast addresses to be used.  This option is not applicable to TCP
+and is always set to
+.BR T_NO .
+This option is format as a
+.BR "unsigned int" .
+Legal values are
+.BR T_YES " and " T_NO .
+For more information, see
+.BR xti_ip (3).
+.\"
+.\"
 .SS "T_INET_UDP"
 .PP
 Options within this level are specific to the User Datagram
@@ -130,8 +329,35 @@ Protocol (UDP) yet are used by protocol levels using UDP transport.
 The options defined with the option level
 .B T_INET_UDP
 are as follows:
-.TP 12
+.TP
 .B T_UDP_CHECKSUM
+This option allows disabling/enabling of the
+.B T_UDP
+checksum computation.  The legal values are
+.B T_YES
+(checksum enabled) and
+.B T_NO
+(checksum disabled).
+.sp
+If this option is returned with
+.BR t_rcvudata (3),
+its value indicates whether a checksum was present in the received datagram or
+not.
+.sp
+Numerous cases of undetected errors have been reported when applications
+choose to turn of checksums for efficiency.  The advisability of ever turning
+off the checksum algorithm is very controversial.
+.sp
+This option is formatted as a
+.BR t_uscalar_t .
+It can take on values
+.BR T_YES " and " T_NO .
+This option is an
+.IR "absolute requirement" .
+This option is of
+.IR "end-to-end significance" .
+.\"
+.\"
 .SH FUNCTIONS
 .PP
 .\"
@@ -139,8 +365,10 @@ are as follows:
 .SS t_accept\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_bind\fR(3)
@@ -154,8 +382,10 @@ only supports connection-less mode.  This XTI library call will return
 .SS t_connect\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_getinfo\fR(3)
@@ -165,8 +395,10 @@ only supports connection-less mode.  This XTI library call will return
 .SS t_listen\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_open\fR(3)
@@ -180,36 +412,46 @@ only supports connection-less mode.  This XTI library call will return
 .SS t_rcvconnect\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_rcvdis\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_rcv\fR(3), \fBt_rcvv\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_rcvreldata\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_rcvrel\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
@@ -223,29 +465,37 @@ only supports connection-less mode.  This XTI library call will return
 .SS t_snddis\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_snd\fR(3), \fBt_sndv\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_sndreldata\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_sndrel\fR(3)
 .PP
 .B XTI-UDP
-only supports connection-less mode.  This XTI library call will return
+only supports connection-less mode.  This XTI/TLI library call will return
 .RB [ TNOTSUPPORT ].
+For a connection mode service, see
+.BR xti_tcp "(3) or " xti_sctp (3).
 .\"
 .\"
 .SS t_sndudata\fR(3), \fBt_sndvudata\fR(3)
@@ -274,7 +524,7 @@ There is one UDP device providing the Transport Provider Interface that
 provide UDP conforming TPI devices as follows:
 .\"
 .\"
-.TP 12
+.TP
 .I /dev/udp
 For more information on the TPI UDP device, see
 .BR udp (4).
@@ -296,4 +546,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.T4

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_rcvreldata.3.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: t_rcvreldata.3.man,v 0.9.2.4 2004/04/17 20:32:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:32:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,18 +73,24 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_RCVRELDATA 3 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.TH T_RCVRELDATA 3 "$Date: 2004/04/17 20:32:58 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
 .SH NAME
 .B t_rcvreldata
 \- acknowledge orderly release request with data
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xti.h>
 .HP 8
 .BI "int t_rcvreldata(int " fd ", struct t_discon *" discon );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the transport endpoint for which to receive orderly release with data.
 .TP
@@ -92,6 +98,8 @@ the transport endpoint for which to receive orderly release with data.
 a pointer to a
 .B t_discon
 structure to contain returned information about the release.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR t_rcvreldata ()
@@ -124,7 +132,7 @@ struct t_discon {
 The
 .B t_discon
 structure returns the following members and information:
-.TP 12
+.TP
 .I udata
 is a
 .BR netbuf (3)
@@ -142,14 +150,16 @@ If the
 .I discon->udata.len
 is zero on return, no user disconnect data was provided as part of the orderly
 release indication.
-.TP 12
+.TP
 .I reason
 the disconnect reason is a transport service provider specific value.
-.TP 12
+.TP
 .I sequence
 is not used for
 .BR t_rcvreldata ()
 and is left unchanged.
+.\"
+.\"
 .SH CAVEATS
 .PP
 .BR t_rcvreldata ()
@@ -177,6 +187,8 @@ fails, returns -1 and sets
 .IR t_errno (3)
 to
 .BR TNOREL .
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon success,
@@ -190,6 +202,8 @@ Upon failure,
 returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -197,12 +211,12 @@ When
 fails, it returns -1 and sets
 .IR t_errno (3)
 to an appropriate error number as follows:
-.TP 12
-.B TBADF
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TBADF ]
 .I fd
 is invalid.
-.TP 12
-.B TBUFOVFLW
+.TP
+.RB [ TBUFOVFLW ]
 The
 .I maxlen
 field of a
@@ -211,24 +225,24 @@ structure passed to the call was
 non-zero, but insufficient to hold the available opaque information.  See,
 .BR netbuf (3)
 for more information.
-.TP 12
+.TP
 .RB [ TLOOK ]
 An asynchronous event occured before the call could complete.  See
 .BR t_look (3)
 for more information.
-.TP 12
+.TP
 .RB [ TNOREL ]
 An attempt was made to read an orderly release and no orderly release indication was available.
-.TP 12
+.TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TLI primitive not supported by the underlying transport provider.
-.TP 12
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
+.TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in an incorrect state.
-.TP 12
+.TP
 .RB [ TPROTO ]
-A protocol error occured between the XTI library and the underlying transport provider.
-.TP 12
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
 .RB [ TSYSERR ]
 A
 .B Linux
@@ -236,6 +250,8 @@ system error occured and the
 .B Linux
 error number is set in
 .IR errno (3).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR errno (3),
@@ -244,6 +260,18 @@ error number is set in
 .BR t_getinfo (3),
 .BR t_look (3),
 .BR t_open (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_rcvreldata ()
+has no known bugs.
+.BR t_rcvreldata ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -268,4 +296,4 @@ susv2
 .[
 $LIST$
 .]
-.TA
+.T4

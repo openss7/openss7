@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: shutdown.3.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: shutdown.3.man,v 0.9.2.4 2004/04/17 20:35:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 20:35:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH SHUTDOWN 3 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.TH SHUTDOWN 3 "$Date: 2004/04/17 20:35:15 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
 .SH NAME
 .B shutdown
 \- shut down socket send and receive operations
@@ -84,20 +84,20 @@ sort-adjacent-labels
 .BI "int shutdown(int " socket ", int " how );
 .SH DESCRIPTION
 .PP
-.TP 12
+.TP
 .I socket
 Specifies the file descriptor of the socket.
-.TP 12
+.TP
 .I how
 Specifies the type of shutdown.  The values are as follows:
 .RS
-.TP 12
+.TP
 .B SHUT_RD
 Disables further receive operations.
-.TP 12
+.TP
 .B SHUT_WR
 Disables further send operations.
-.TP 12
+.TP
 .B SHUT_RDWR
 Disables further send and receive operations.
 .RE
@@ -126,20 +126,20 @@ returned and errno is set to indicate the error.
 The
 .BR shutdown ()
 function will fail if:
-.TP 12
+.TP
 .RB [ EBADF ]
 The
 .I socket
 argument is not a valid file descriptor.
-.TP 12
+.TP
 .RB [ EINVAL ]
 The
 .I how
 argument is invalid.
-.TP 12
+.TP
 .RB [ ENOTCONN ]
 The socket is not connected.
-.TP 12
+.TP
 .RB [ ENOTSOCK ]
 The
 .I socket
@@ -148,11 +148,11 @@ argument does not refer to a socket.
 The
 .BR shutdown ()
 function may fail if:
-.TP 12
+.TP
 .RB [ ENOBUFS ]
 Insufficient resources were available in the system to perform
 the operation.
-.TP 12
+.TP
 .RB [ ENOSR ]
 There were insufficient
 .IR STREAMS (4)
@@ -183,4 +183,4 @@ xns
 .[
 $LIST$
 .]
-.TA
+.TI
