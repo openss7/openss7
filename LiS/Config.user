@@ -21,6 +21,7 @@ driver	putst		putst_	*
 #	name		prefix
 module	relay		relay_
 module	relay2		relay2_
+module	relay3		relay3_
 module	timod		timod_
 module	pipemod		pipemod_
 
@@ -31,7 +32,11 @@ initialize	fifo
 #
 # Node specifications
 #
-#	name		type	perm	major		minor
+# Use of the optional major-idx field is for multiple-major drivers, to
+# specify an index, 0 to nmajors-1.  It requires a driver name in the
+# major field
+#
+#	name	          type	perm	major		minor	     major-idx
 node	loop.1		c	0644	loop-around	1
 node	loop.2		c	*	loop-around	2
 node	loop.9		c	*	loop-around	9
