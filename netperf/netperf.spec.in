@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2005/02/25 10:56:40 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2005/03/09 08:00:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 10:56:40 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 08:00:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@
 %global BUILD_lis     1
 %global BUILD_lfs     0
 
-%global epoch @PACKAGE_EPOCH@
+%global epoch @PACKAGE_RPMEPOCH@
 %global base @PACKAGE_TARNAME@
 %global infofiles %{name}
 %global title @PACKAGE_TITLE@
@@ -107,22 +107,18 @@
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
-%{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RELEASE@%%{extrarelease}}}
-%{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RELEASE@}}
+%{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
+%{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
 
 # a macro to build require one package of the same version as another
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
 
 Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
-%if %{?_without_public: 0}%{!?_without_public: 1}
-Name:           @PACKAGE_TARNAME@
-%else
-Name:           @PACKAGE_TARNAME@-bin
-%endif
-Epoch:          @PACKAGE_EPOCH@
-Version:        @PACKAGE_VERSION@
-Release:        @PACKAGE_RELEASE@
+Name:           @PACKAGE@
+Epoch:          @PACKAGE_RPMEPOCH@
+Version:        @VERSION@
+Release:        @PACKAGE_RPMRELEASE@
 License:        GPL
 Group:          System Environment/Base
 %if %{?url: 1}%{!?url: 0}
@@ -136,8 +132,8 @@ Icon:           %{_gif_icon}
 %endif
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
-#Source:         %{name}-%{version}-%{release}.tar.bz2
-Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}-%{release}.tar.bz2
+#Source:         %{name}-%{version}.tar.bz2
+Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      netperf
@@ -204,8 +200,8 @@ other architectures as well.
 # ---------------------------------------------------------------------------
 
 [ -L %{name} ] && rm -f %{name}
-ln -sf %{name}-%{version}-%{release} %{name}
-%setup -q -n %{name}-%{version}-%{release}
+ln -sf %{name}-%{version} %{name}
+%setup -q -n %{name}-%{version}
 
 %build
 # ---------------------------------------------------------------------------
@@ -268,8 +264,6 @@ fi
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
-    --with-pkg-epoch=%{epoch} \
-    --with-pkg-release=%{release} \
     %{?_with_checks:             '%enable %_with_checks'} \
     %{?_without_checks:          '%disable %_without_checks'} \
     %{?_with_autotest:           '%enable %_with_autotest'} \
@@ -360,7 +354,7 @@ other architectures as well.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc ACKNWLDGMNTS AUTHORS ChangeLog COPYING COPYRIGHT INSTALL netperf_hp.ps NEWS README README.ovms Release_Notes THANKS *.pdf *.html
-%doc %{name}-%{version}-@PACKAGE_RELEASE@.lsm
+%doc %{name}-%{version}.lsm
 %{_bindir}/*
 %{_sbindir}/*
 %{_infodir}/*
@@ -372,6 +366,12 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.13  2005/03/09 08:00:23  brian
+# - Updated revision numbering.
+#
+# Revision 1.1.2.12  2005/03/09 03:40:47  brian
+# - Major revision number changes.
+#
 # Revision 1.1.2.11  2005/02/25 10:56:40  brian
 # - Don't specify build architecture.
 #

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/05 11:08:50 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/09 03:40:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/05 11:08:50 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 03:40:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,53 @@
 # _DEB_DPKG_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_OPTIONS], [dnl
+    _DEB_OPTIONS_DEB_EPOCH
+    _DEB_OPTIONS_DEB_RELEASE
 ])# _DEB_DPKG_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _DEB_OPTIONS_DEB_EPOCH
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_OPTIONS_DEB_EPOCH], [dnl
+    AC_MSG_CHECKING([for deb epoch])
+    AC_ARG_WITH([deb-epoch],
+	AS_HELP_STRING([--with-deb-epoch=EPOCH],
+	    [specify the EPOCH for the package file.  @<:@default=auto@:>@]),
+	[with_deb_epoch="$withval"],
+	[if test -r .debepoch; then d= ; else d="$srcdir/" ; fi
+	 if test -r ${d}.debepoch
+	 then with_deb_epoch="`cat ${d}.debepoch`"
+	 else with_deb_epoch=0
+	 fi])
+    AC_MSG_RESULT([${with_deb_epoch:-0}])
+    PACKAGE_DEBEPOCH="${with_deb_epoch:-0}"
+    AC_SUBST([PACKAGE_DEBEPOCH])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_DEBEPOCH], [$PACKAGE_DEBEPOCH], [The Debian
+			Epoch.  This defaults to 0.])
+])# _DEB_OPTIONS_DEB_EPOCH
+# =============================================================================
+
+# =============================================================================
+# _DEB_OPTIONS_DEB_RELEASE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
+    AC_MSG_CHECKING([for deb release])
+    AC_ARG_WITH([deb-release],
+	AS_HELP_STRING([--with-deb-release=RELEASE],
+	    [specify the RELEASE for the package files.  @<:@default=auto@:>@]),
+	[with_deb_release="$withval"],
+	[if test -r .debrelease ; then d= ; else d="$srcdir/" ; fi
+	 if test -r ${d}.debrelease
+	 then with_deb_release="`cat ${d}.debrelease`"
+	 else with_deb_release=0
+	 fi])
+    AC_MSG_RESULT([${with_deb_release:-0}])
+    PACKAGE_DEBRELEASE="${with_deb_release:-0}"
+    AC_SUBST([PACKAGE_DEBRELEASE])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_DEBRELEASE], ["$PACKAGE_DEBRELEASE"], [The
+			Debian Release. This defaults to 0.])
+])# _DEB_OPTIONS_DEB_RELEASE
 # =============================================================================
 
 # =============================================================================
