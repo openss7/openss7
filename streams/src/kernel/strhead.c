@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/28 01:30:33 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/04/28 09:24:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 09:24:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/28 01:30:33 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/04/28 09:24:29 $"
 
 static char const ident[] =
-    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/28 01:30:33 $";
+    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/04/28 09:24:29 $";
 
 #define __NO_VERSION__
 
@@ -86,7 +86,7 @@ static char const ident[] =
 #include "strsysctl.h"		/* for sysctls */
 #include "strsad.h"		/* for autopush_find */
 #include "strutil.h"		/* for q locking and puts and gets */
-#include "strattach.h"		/* for do_fattach/do_fdetach */
+#include "strattach.h"		/* for do_fattach/do_fdetach/do_spipe */
 #include "strspecfs.h"		/* for specfs_mnt */
 
 #include "sys/config.h"
@@ -151,6 +151,11 @@ struct streamtab str_info = {
  *
  *  -------------------------------------------------------------------------
  */
+/**
+ *  check_stream_io - checks if io can be performed on a stream
+ *  @file:user file pointer
+ *  @sd:stream head pointer
+ */
 static int check_stream_io(struct file *file, struct stdata *sd)
 {
 	if (unlikely(file == NULL))
@@ -167,6 +172,12 @@ static int check_stream_io(struct file *file, struct stdata *sd)
 	}
 	return (0);
 }
+
+/**
+ *  check_stream_rd - checks if read operation can be performed on a stream
+ *  @file:user file pointer
+ *  @sd:stream head pointer
+ */
 static int check_stream_rd(struct file *file, struct stdata *sd)
 {
 	if (unlikely(file == NULL || !(file->f_mode & FREAD)))
@@ -196,6 +207,12 @@ static int check_stream_rd(struct file *file, struct stdata *sd)
 	}
 	return (0);
 }
+
+/**
+ *  check_stream_wr - checks if write operation can be performed on a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int check_stream_wr(struct file *file, struct stdata *sd)
 {
 	if (unlikely(file == NULL || !(file->f_mode & FWRITE)))
@@ -235,6 +252,12 @@ static int check_stream_wr(struct file *file, struct stdata *sd)
 	}
 	return (0);
 }
+
+/**
+ *  check_stream_oc - check if open or close can be performed on a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int check_stream_oc(struct file *file, struct stdata *sd)
 {
 	if (unlikely(file == NULL))
@@ -268,6 +291,11 @@ static int check_stream_oc(struct file *file, struct stdata *sd)
 	return (0);
 }
 
+/**
+ *  check_wakeup_io - wait to perform io operations on a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
 {
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP))) {
@@ -290,6 +318,12 @@ static int check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
 		return ((file->f_flags & (O_NONBLOCK | O_NDELAY)) ? -EAGAIN : -ETIME);
 	return (0);
 }
+
+/**
+ *  check_wakeup_rd - wait to perform read operation on a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
 {
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR))) {
@@ -319,6 +353,12 @@ static int check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
 		return ((file->f_flags & (O_NONBLOCK | O_NDELAY)) ? -EAGAIN : -ETIME);
 	return (0);
 }
+
+/**
+ *  check_wakeup_wr - wait to perform write operation on a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 {
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STWRERR))) {
@@ -356,6 +396,12 @@ static int check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 		return ((file->f_flags & (O_NONBLOCK | O_NDELAY)) ? -EAGAIN : -ETIME);
 	return (0);
 }
+
+/**
+ *  check_wakeup_oc - wait to perform open or close operation on a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
 {
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR | STWRERR))) {
@@ -389,7 +435,13 @@ static int check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
 	return (0);
 }
 
-/* wait for flow control on a band */
+/**
+ *  strwaitband - timed wait to perform write on a flow controlled band
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @band:band number
+ *  @timeo:pointer to time remaining
+ */
 static int strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
 {
 	int err = 0;
@@ -412,6 +464,12 @@ static int strwaitband(struct file *file, struct stdata *sd, int band, long *tim
 	return (err);
 }
 
+/**
+ *  strgetq - get a message from a stream ala getpmsg
+ *  @sd:stream head
+ *  @flags:flags from getpmsg (MSG_HIPRI or zero)
+ *  @band:band from which to retrieve message
+ */
 static mblk_t *strgetq(struct stdata *sd, int flags, int band)
 {
 	if (flags == MSG_HIPRI) {
@@ -455,7 +513,13 @@ static mblk_t *strgetq(struct stdata *sd, int flags, int band)
 	}
 }
 
- /* wait to get a message of a given type */
+/**
+ *  strwaitgmsg - wait to get a message from a stream ala getpmsg
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @flags:flags from getpmsg (MSG_HIPRI or zero)
+ *  @band:priority band from which to get message
+ */
 static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
 {
 	mblk_t *mp;
@@ -483,7 +547,11 @@ static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int 
 	}
 }
 
-/* wait to call open on a stream head */
+/**
+ *  strwakeopen - wake waiters waiting to open a stream
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static void strwakeopen(struct file *file, struct stdata *sd)
 {
 	/* release open bit */
@@ -492,6 +560,12 @@ static void strwakeopen(struct file *file, struct stdata *sd)
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_interruptible(&sd->sd_waitq);
 }
+
+/**
+ *  strwaitopen - wait to open a stream head
+ *  @file:user file pointer
+ *  @sd:stream head
+ */
 static int strwaitopen(struct file *file, struct stdata *sd)
 {
 	int err = 0;
@@ -532,7 +606,21 @@ static int strwaitopen(struct file *file, struct stdata *sd)
 	return err;
 }
 
-/* routines for handling ioctls passed as M_IOCTL */
+/**
+ *  strsendioctl - send a M_IOCTL message downstream
+ *  @file:user file pointer
+ *  @cmd:ioctl command
+ *  @crp:user credentials
+ *  @dp:data for arg part of ioctl
+ *  @dlen:length of data
+ *  @timeo:pointer to wait time remaining
+ *  @rval:pointer to ioctl return value
+ *
+ *  DESCRIPTION:This function performs all of the actions necessary for
+ *  sending an M_IOCTL message downstream, waiting for a response, processing
+ *  the response and resulting in a return value.  Any number of COPYIN and
+ *  COPYOUT operations can be included in the process.
+ */
 static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, size_t dlen,
 			long *timeo, int *rval)
 {
@@ -665,8 +753,19 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 }
 
 /* 
- *  I_ATMARK
- *  -----------------------------------
+ *  -------------------------------------------------------------------------
+ *
+ *  IO CONTROLS
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  str_i_atmark - perform streamio(7) I_ATMARK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_ATMARK
+ *  @arg:ioctl argument
  */
 static int str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -694,9 +793,12 @@ static int str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (err);
 }
 
-/* 
- *  I_CANPUT
- *  -----------------------------------
+/**
+ *  str_i_canput - perform streamio(7) I_CANPUT ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_CANPUT
+ *  @arg:ioctl argument
  */
 static int str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -707,9 +809,12 @@ static int str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (err);
 }
 
-/* 
- *  I_CKBAND
- *  -----------------------------------
+/**
+ *  str_i_ckband - perform streamio(7) I_CKBAND ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_CKBAND
+ *  @arg:ioctl argument
  */
 static int str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -720,9 +825,12 @@ static int str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (err);
 }
 
-/* 
- *  I_FDINSERT
- *  -----------------------------------
+/**
+ *  str_i_fdinsert - perform streamio(7) I_FDINSERT ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_FDINSERT
+ *  @arg:ioctl argument
  */
 static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -801,9 +909,12 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
 	goto exit;
 }
 
-/* 
- *  I_FIND
- *  -----------------------------------
+/**
+ *  str_i_find - perform streamio(7) I_FIND ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_FIND
+ *  @arg:ioctl argument
  */
 static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -824,9 +935,12 @@ static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, un
 	return (err);
 }
 
-/* 
- *  I_FLUSHBAND
- *  -----------------------------------
+/**
+ *  str_i_flushband - perform streamio(7) I_FLUSHBAND ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_FLUSHBAND
+ *  @arg:ioctl argument
  */
 static int str_i_flushband(struct file *file, struct stdata *sd, unsigned int cmd,
 			   unsigned long arg)
@@ -850,9 +964,12 @@ static int str_i_flushband(struct file *file, struct stdata *sd, unsigned int cm
 	return (0);
 }
 
-/* 
- *  I_FLUSH
- *  -----------------------------------
+/**
+ *  str_i_flush - perform streamio(7) I_FLUSH ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_FLUSH
+ *  @arg:ioctl argument
  */
 static int str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -871,9 +988,12 @@ static int str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, u
 	return (0);
 }
 
-/* 
- *  I_GETBAND
- *  -----------------------------------
+/**
+ *  str_i_getband - perform streamio(7) I_GETBAND ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_GETBAND
+ *  @arg:ioctl argument
  */
 static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -898,9 +1018,12 @@ static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd,
 	return (0);
 }
 
-/* 
- *  I_GETCLTIME
- *  -----------------------------------
+/**
+ *  str_i_getcltime - perform streamio(7) I_GETCLTIME ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_GETCLTIME
+ *  @arg:ioctl argument
  */
 static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cmd,
 			   unsigned long arg)
@@ -916,9 +1039,12 @@ static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cm
 	return (0);
 }
 
-/* 
- *  I_SETCLTIME
- *  -----------------------------------
+/**
+ *  str_i_setcltime - perform streamio(7) I_SETCLTIME ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_SETCLTIME
+ *  @arg:ioctl argument
  */
 static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cmd,
 			   unsigned long arg)
@@ -934,9 +1060,12 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
 	return (0);
 }
 
-/* 
- *  I_GETSIG
- *  -----------------------------------
+/**
+ *  str_i_getsig - perform streamio(7) I_GETSIG ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_GETSIG
+ *  @arg:ioctl argument
  */
 static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -950,9 +1079,12 @@ static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  I_SETSIG
- *  -----------------------------------
+/**
+ *  str_i_setsig - perform streamio(7) I_SETSIG ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_SETSIG
+ *  @arg:ioctl argument
  */
 static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -963,9 +1095,12 @@ static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  I_GRDOPT
- *  -----------------------------------
+/**
+ *  str_i_grdopt - perform streamio(7) I_GRDOPT ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_GRDOPT
+ *  @arg:ioctl argument
  */
 static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -979,9 +1114,12 @@ static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  I_SRDOPT
- *  -----------------------------------
+/**
+ *  str_i_srdopt - perform streamio(7) I_SRDOPT ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_SRDOPT
+ *  @arg:ioctl argument
  */
 static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -997,9 +1135,12 @@ static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  I_GWROPT
- *  -----------------------------------
+/**
+ *  str_i_gwropt - perform streamio(7) I_GWROPT ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_GWROPT
+ *  @arg:ioctl argument
  */
 static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1013,9 +1154,12 @@ static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  I_SWROPT
- *  -----------------------------------
+/**
+ *  str_i_swropt - perform streamio(7) I_SWROPT ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_SWROPT
+ *  @arg:ioctl argument
  */
 static int str_i_swropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1032,9 +1176,14 @@ static int str_i_swropt(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  I_LINK
- *  -----------------------------------
+/**
+ *  str_send_link_ioctl - sends the M_IOCTL command for I_LINK operation
+ *  @file:user file pointer
+ *  @cmd:ioctl command to send
+ *  @crp:user credentials pointer
+ *  @qtop:upper multiplexing driver write queue pointer
+ *  @qbot:lower multiplexing driver write queue pointer
+ *  @index:multiplex index
  */
 static int str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t *qtop,
 			       queue_t *qbot, int index)
@@ -1061,6 +1210,13 @@ static int str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t 
 	return (err);
 }
 
+/**
+ *  str_i_xlink - perform streamio(7) I_LINK or I_PLINK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_LINK or I_PLINK
+ *  @arg:ioctl argument
+ */
 static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
@@ -1118,23 +1274,36 @@ static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, u
 	return (err);
 }
 
+/**
+ *  str_i_link - perform streamio(7) I_LINK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_LINK
+ *  @arg:ioctl argument
+ */
 static int str_i_link(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	return str_i_xlink(file, sd, cmd, arg);
 }
 
-/* 
- *  I_PLINK
- *  -----------------------------------
+/**
+ *  str_i_plink - perform streamio(7) I_PLINK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_PLINK
+ *  @arg:ioctl argument
  */
 static int str_i_plink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	return str_i_xlink(file, sd, cmd, arg);
 }
 
-/* 
- *  I_UNLINK
- *  -----------------------------------
+/**
+ *  str_i_xunlink - perform streamio(7) I_UNLINK or I_PUNLINK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_UNLINK or I_PUNLINK
+ *  @arg:ioctl argument
  */
 static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1185,23 +1354,37 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
       error:
 	return (err);
 }
+
+/**
+ *  str_i_unlink - perform streamio(7) I_UNLINK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_UNLINK
+ *  @arg:ioctl argument
+ */
 static int str_i_unlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	return str_i_xunlink(file, sd, cmd, arg);
 }
 
-/* 
- *  I_PUNLINK
- *  -----------------------------------
+/**
+ *  str_i_punlink - perform streamio(7) I_PUNLINK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_PUNLINK
+ *  @arg:ioctl argument
  */
 static int str_i_punlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	return str_i_xunlink(file, sd, cmd, arg);
 }
 
-/* 
- *  I_LOOK
- *  -----------------------------------
+/**
+ *  str_i_list - perform streamio(7) I_LIST ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_LIST
+ *  @arg:ioctl argument
  */
 static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1225,9 +1408,12 @@ static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, un
 	return (0);
 }
 
-/* 
- *  I_LOOK
- *  -----------------------------------
+/**
+ *  str_i_look - perform streamio(7) I_LOOK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_LOOK
+ *  @arg:ioctl argument
  */
 static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1248,9 +1434,12 @@ static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, un
 	return (err);
 }
 
-/* 
- *  I_NREAD
- *  -----------------------------------
+/**
+ *  str_i_nread - perform streamio(7) I_NREAD ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_NREAD
+ *  @arg:ioctl argument
  */
 static int str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1269,9 +1458,12 @@ static int str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, u
 	return (err);
 }
 
-/* 
- *  I_PEEK
- *  -----------------------------------
+/**
+ *  str_i_peek - perform streamio(7) I_PEEK ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_PEEK
+ *  @arg:ioctl argument
  */
 static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1354,9 +1546,12 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 	return (rtn);
 }
 
-/* 
- *  I_PUSH
- *  -----------------------------------
+/**
+ *  str_i_push - perform streamio(7) I_PUSH ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_PUSH
+ *  @arg:ioctl argument
  */
 static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1374,9 +1569,12 @@ static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, un
 	return (err);
 }
 
-/* 
- *  I_POP
- *  -----------------------------------
+/**
+ *  str_i_pop - perform streamio(7) I_POP ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_POP
+ *  @arg:ioctl argument
  */
 static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1391,9 +1589,9 @@ static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, uns
 	return (err);
 }
 
-/* 
- *  I_SENDFD
- *  -----------------------------------
+/**
+ *  freefd_func - free function for file descriptor
+ *  @arg:file pointer as caddr_t argument
  */
 static void freefd_func(caddr_t arg)
 {
@@ -1403,6 +1601,14 @@ static void freefd_func(caddr_t arg)
 	fput(file);
 	return;
 }
+
+/**
+ *  str_i_sendfd - perform streamio(7) I_SENDFD ioctl
+ *  @file:user file pointer
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_SENDFD
+ *  @arg:ioctl argument
+ */
 static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
@@ -1441,10 +1647,11 @@ static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, 
 }
 
 /**
- *  I_RECVFD - receive file descriptor
- *  @file:file pointer of current open stream
+ *  str_i_recvfd - receive file descriptor streamio(7) I_RECVFD ioctl
+ *  @file:user file pointer for the current open stream
  *  @sd:stream head of current open stream
- *  @arg:pointer to a &struct strrecvfd structure
+ *  @cmd:ioctl command, always I_RECVFD
+ *  @arg:ioctl argument, a pointer to a &struct strrecvfd structure
  */
 static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1497,9 +1704,12 @@ static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (err);
 }
 
-/* 
- *  I_STR
- *  -----------------------------------
+/**
+ *  str_i_str - perform streamio(7) I_STR ioctl
+ *  @file:user file pointer for the open stream
+ *  @sd:stream head of the open stream
+ *  @cmd:ioctl command, always I_STR
+ *  @arg:ioctl argument, pointer to a &struct strioctl structure
  */
 static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1529,9 +1739,12 @@ static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, uns
 	return (err);
 }
 
-/* 
- *  I_GERROPT
- *  -----------------------------------
+/**
+ *  str_i_gerropt - get error options streamio(7) I_GERROPT ioctl
+ *  @file:user file pointer for the open stream
+ *  @sd:stream head of the open stream
+ *  @cmd:ioctl command, always I_GERROPT
+ *  @arg:ioctl argument, pointer to an integer to contain the returned error options
  */
 static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1545,9 +1758,12 @@ static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd,
 	return (0);
 }
 
-/* 
- *  I_SERROPT
- *  -----------------------------------
+/**
+ *  str_i_serropt - set error options streamio(7) I_SERROPT ioctl
+ *  @file:user file pointer for the open stream
+ *  @sd:stream head of the open stream
+ *  @cmd:ioctl command, always I_SERROPT
+ *  @arg:ioctl argument, integer error options to set
  */
 static int str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1560,9 +1776,12 @@ static int str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd,
 	return (0);
 }
 
-/* 
- *  I_ANCHOR
- *  -----------------------------------
+/**
+ *  str_i_anchor - set a push anchor streamio(7) I_ANCHOR ioctl
+ *  @file:user file pointer for the open stream
+ *  @sd:stream head of the open stream
+ *  @cmd:ioctl command, always I_ANCHOR
+ *  @arg:ioctl argument, integer index at which point to position anchor
  */
 static int str_i_anchor(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -1573,9 +1792,12 @@ static int str_i_anchor(struct file *file, struct stdata *sd, unsigned int cmd, 
 	return (0);
 }
 
-/* 
- *  Transparent IOCTL
- *  -----------------------------------
+/**
+ *  str_i_transparent - perform transparent ioctl(2) ioctl
+ *  @file:user file pointer for the open stream
+ *  @sd:stream head of the open stream
+ *  @cmd:ioctl command
+ *  @arg:ioctl argument
  */
 static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int cmd,
 			     unsigned long arg)
@@ -1605,18 +1827,21 @@ static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int 
  *  -------------------------------------------------------------------------
  */
 
-/* 
- *  STRLSEEK
- *  -------------------------------------------------------------------------
+/**
+ *  strllseek - llseek file operation on stream
+ *  @file:user file pointer for the open stream
+ *  @off:offset to which to seek
+ *  @when:from whence to seek
  */
 loff_t strllseek(struct file *file, loff_t off, int whence)
 {
 	return (-ESPIPE);
 }
 
-/* 
- *  STRPOLL
- *  -------------------------------------------------------------------------
+/**
+ *  strpoll - poll file operation on stream
+ *  @file:user file pointer for the open stream
+ *  @poll:poll table pointer
  */
 unsigned int strpoll(struct file *file, struct poll_table_struct *poll)
 {
@@ -1646,18 +1871,23 @@ unsigned int strpoll(struct file *file, struct poll_table_struct *poll)
 	return (mask);
 }
 
-/* 
- *  STRMMAP
- *  -------------------------------------------------------------------------
+/**
+ *  strmmap - mmap file operation for a stream
+ *  @file:user file pointer for the open stream
+ *  @vma:pointer to a virtual memory area structure
  */
-int strmmap(struct file *filp, struct vm_area_struct *vma)
+int strmmap(struct file *file, struct vm_area_struct *vma)
 {
 	return (-ENODEV);
 }
 
-/* 
- *  STROPEN
- *  -------------------------------------------------------------------------
+/**
+ *  autopush - perform autopush operations on a newly opened stream
+ *  @sd:newly opened stream head
+ *  @cdev:character device switch table entry (driver) for the stream
+ *  @oflag:open flags
+ *  @sflag:stream flag (MODOPEN or CLONEOPEN or DRVOPEN)
+ *  @crp:pointer to user credentials structure
  */
 int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
@@ -1699,9 +1929,16 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
 	}
 }
 
- /* Because we are called by spec_open on the filesystem device, the inode represented here is the
-    shadow inode and the file is the shadow file pointer. We don't have to do any swapping, just
-    return the error code. Because it is a specfs inode, the dentry has our d_fsdata. */
+/**
+ *  stropen - open file operation for a stream
+ *  @inode:shadow special filesystem device inode
+ *  @file:shadow special filesystem file pointer
+ *
+ *  DESCRIPTION:Because stropen() is called by spec_open() on the filesystem
+ *  device, the inode represented here is the shadow inode and the file is the
+ *  shadow file pointer. We don't have to do any swapping, just return the
+ *  error code. Because it is a specfs inode, the dentry has our d_fsdata.
+ */
 int stropen(struct inode *inode, struct file *file)
 {
 	struct str_args *argp = file->f_dentry->d_fsdata;
@@ -1747,11 +1984,14 @@ int stropen(struct inode *inode, struct file *file)
 		}
 		if (cdev->d_flag & D_CLONE)
 			sd->sd_flag |= STRCLONE;
+		/* XXX */
 		sd->sd_strtab = cdev->d_str;	/* stream head streamtab */
 		setq(q, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
+		/* XXX */
 		sd->sd_strtab = &str_info;	/* no driver yet */
 		setq(q, str_info.st_rdinit, str_info.st_wrinit);
 		/* grafting onto inode */
+		/* TODO: need to chain here if necessary */
 		sd->sd_inode = inode;	/* shadow inode */
 		inode->i_pipe = (void *) sd;
 		stri_lookup(file) = (void *) sd;
@@ -1774,30 +2014,37 @@ int stropen(struct inode *inode, struct file *file)
 	return (err <= 0 ? err : -err);
 }
 
-/* 
- *  STRFLUSH
- *  -------------------------------------------------------------------------
- *  sys_close() calls filp_close() that calls f_op->flush().
+/**
+ *  strflush - flush file operation for a stream
+ *  @file:user file pointer for stream
+ *
+ *  DESCRIPTION:sys_close() calls filp_close() that calls f_op->flush().  We
+ *  don't actualy do any flushing because this is not necessarily the last
+ *  close.  If we ever support multiple simultaenous partial readers or
+ *  writers we could tear down partials here.
  */
 int strflush(struct file *file)
 {
 	return (0);
 }
 
-/* 
- *  STRCLOSE
- *  -------------------------------------------------------------------------
- *  This function is called by fput() on final put of a file pointer
- *  associated with the file.  After this function returns a dput() will be
- *  peformed on the dentry and a mntput() on the mount.
+/**
+ *  strclose - close file operation for a stream
+ *  @inode:shadow special filesystem inode for the stream
+ *  @file:shadow special file pointer for the stream
+ *
+ *  DESCRIPTION:This function is called by fput() on final put of a file
+ *  pointer associated with the file.  After this function returns a dput()
+ *  will be peformed on the dentry and a mntput() on the mount.
  *
  *  When the last close is about to occur we will get a d_delete() operation
  *  followed by a d_iput() operation if special dops are assigned to the
- *  dentry.  The d_iput() chains or passes to an iput() which uses a superblock
- *  put_inode() operation followed by a superblock delete_inode() operation.
+ *  dentry.  The d_iput() chains or passes to an iput() which uses a
+ *  superblock put_inode() operation followed by a superblock delete_inode()
+ *  operation.
  *
- *  The return value from this function is isgnored.
- *
+ *  The return value from this function is isgnored.  It is the return value
+ *  from the flush() above that is used in return to the close(2) call.
  */
 int strclose(struct inode *inode, struct file *file)
 {
@@ -1819,7 +2066,6 @@ int strclose(struct inode *inode, struct file *file)
 			/* 1st step: unlink any (temporary) linked streams */
 			err = str_i_unlink(file, sd, I_UNLINK, MUXID_ALL);
 			/* 2nd step: call the close routine of each module and pop the module. */
-			/* 3rd step: call the close routine of the driver and qdetach the driver */
 			wq = sd->sd_wq;
 			while ((qq = wq->q_next) && SAMESTR(wq)) {
 				if ((oflag & (O_NONBLOCK | O_NDELAY)) && qq->q_msgs) {
@@ -1840,6 +2086,7 @@ int strclose(struct inode *inode, struct file *file)
 				}
 				qdetach(qq - 1, oflag, crp);
 			}
+			/* 3rd step: call the close routine of the driver and qdetach the driver */
 			qdetach(wq - 1, oflag, crp);
 			sd->sd_rq = sd->sd_wq = NULL;
 		}
@@ -1850,8 +2097,11 @@ int strclose(struct inode *inode, struct file *file)
 	return (-ENOSTR);
 }
 
-/* 
- *  -------------------------------------------------------------------------
+/**
+ *  strfasync - fasync file operation for a stream
+ *  @fd:user file descriptor
+ *  @file:user file pointer
+ *  @on:aysnc io flag
  */
 int strfasync(int fd, struct file *file, int on)
 {
@@ -1865,9 +2115,16 @@ int strfasync(int fd, struct file *file, int on)
 	return (err);
 }
 
-/* 
- *  STRREADV
- *  -------------------------------------------------------------------------
+/**
+ *  strreadv - readv file operation for a stream
+ *  @file:shadow special filesystem file pointer
+ *  @iov:an io vector
+ *  @len:length of the io vector
+ *  @ppos:seek position
+ *
+ *  DESCRIPTION:This performs the readv file operation for a stream directly
+ *  and provides whatever optimization can be acheived by mapping mblks into
+ *  separate io vector components.
  */
 ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos)
 {
@@ -1886,6 +2143,7 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
 			return (0);	/* end of file on hangup */
 		return (err);
 	}
+	/* If the driver has registered for direct IO, then we call the driver's readv procedure. */
 	if (sd->sd_directio && sd->sd_directio->readv)
 		return sd->sd_directio->readv(file, iov, len, ppos);
 	for (;;) {
@@ -2002,16 +2260,22 @@ ssize_t strreadv(struct file *file, const struct iovec *iov, unsigned long len, 
 	return (total);
 }
 
-/* 
- *  STRREAD
- *  -------------------------------------------------------------------------
- */
 int strgetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
+/**
+ *  strread - read file operations for a stream
+ *  @file:file pointer for the stream
+ *  @buf:user buffer for read data
+ *  @len:length of the user buffer
+ *  @ppos:seek position
+ */
 ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
 	struct stdata *sd = stri_lookup(file);
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	/* read emulation of the putpmsg system call: the problem with this approach is that it
+	   almost completely destroys the ability to have a 64-bit application running against a
+	   32-bit kernel because the pointers cannot be properly converted. */
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		int err;
 		struct strpmsg *sg = (typeof(sg)) buf;
@@ -2028,6 +2292,7 @@ ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 		return (err);
 	}
 #endif
+	/* If the driver has registered for direct IO, then we call the driver's read procedure. */
 	if (sd->sd_directio && sd->sd_directio->read)
 		return sd->sd_directio->read(file, buf, len, ppos);
 	iov.iov_base = (void *) buf;
@@ -2035,9 +2300,12 @@ ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 	return strreadv(file, &iov, 1, ppos);
 }
 
-/* 
- *  STRWRITEV
- *  -------------------------------------------------------------------------
+/**
+ *  strwritev - writev file operation for a stream
+ *  @file:file pointer for the stream
+ *  @iov:io vector to write
+ *  @count:size of io vector
+ *  @ppos:seek position
  */
 ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long count, loff_t *ppos)
 {
@@ -2050,6 +2318,7 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
 	int err;
 	if ((err = check_stream_wr(file, sd)))
 		goto error;
+	/* If the driver has established direct IO then we call the driver's writev procedure */
 	if (sd->sd_directio && sd->sd_directio->writev)
 		return sd->sd_directio->writev(file, iov, count, ppos);
 	for (total = 0, i = 0; i < count; total += iov[i].iov_len, i++) ;
@@ -2103,16 +2372,22 @@ ssize_t strwritev(struct file *file, const struct iovec *iov, unsigned long coun
 	return (-ENOSR);
 }
 
-/* 
- *  STRWRITE
- *  -------------------------------------------------------------------------
- */
 int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
+/**
+ *  strwrite - write file operation for a stream
+ *  @file:file pointer for the stream
+ *  @buf:user buffer to write
+ *  @len:length of user data
+ *  @ppos:seek position
+ */
 ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
 	struct stdata *sd = stri_lookup(file);
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
+	/* write emulation of the putpmsg system call: the problem with this approach is that it
+	   almost completely destroys the ability to have a 64-bit application running against a
+	   32-bit kernel because the pointers cannot be properly converted. */
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		int err;
 		struct strpmsg *sp = (typeof(sp)) buf;
@@ -2129,6 +2404,7 @@ ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 		return (err);
 	}
 #endif
+	/* If the driver has established direct IO then we call the driver's write procedure */
 	if (sd->sd_directio && sd->sd_directio->write)
 		return sd->sd_directio->write(file, buf, len, ppos);
 	iov.iov_base = (void *) buf;
@@ -2136,9 +2412,9 @@ ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 	return strwritev(file, &iov, 1, ppos);
 }
 
-/* 
- *  STRSENDPAGE
- *  -------------------------------------------------------------------------
+/**
+ *  __strfreepage - free routine function to free a esballoc'ed page
+ *  @data:&struct page pointer passed as a caddr_t argument
  */
 static void __strfreepage(caddr_t data)
 {
@@ -2146,6 +2422,18 @@ static void __strfreepage(caddr_t data)
 	(void) page;		/* shut up compiler */
 	kunmap(page);
 }
+
+/**
+ *  strwaitpage - wait to send a page
+ *  @file:file pointer for the stream
+ *  @size:size of the data to write
+ *  @prio:priority of data
+ *  @band:priority band for data
+ *  @type:message block type
+ *  @base:base address
+ *  @frtn:free routine to free the allocated page
+ *  @timeo:the amount of time remaining to wait
+ */
 static mblk_t *strwaitpage(struct file *file, size_t size, int prio, int band, int type,
 			   caddr_t base, struct free_rtn *frtn, long *timeo)
 {
@@ -2182,6 +2470,15 @@ static mblk_t *strwaitpage(struct file *file, size_t size, int prio, int band, i
 	return ERR_PTR(-ENOSR);
 }
 
+/**
+ *  strsendpage - sendpage file operation for a stream
+ *  @file:file pointer for the stream
+ *  @page:page descriptor
+ *  @offset:offset into the page
+ *  @size:amount of data within the page
+ *  @ppos:seek position
+ *  @more:more pages to send
+ */
 ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos,
 		    int more)
 {
@@ -2214,10 +2511,18 @@ ssize_t strsendpage(struct file *file, struct page *page, int offset, size_t siz
 	return (-ESPIPE);
 }
 
-/* 
- *  STRPUTPMSG
- *  -------------------------------------------------------------------------
- *  GLIBC2 puts -1 in band when it is called as putmsg().
+/**
+ *  strputpmsg - putpmsg file operation for a stream
+ *  @file:file pointer for the stream
+ *  @ctlp:&struct strbuf pointer describing the ctrl part of the message
+ *  @datp:&struct strbuf pointer describing the data part of the message
+ *  @band:priority band to which to put
+ *  @flags:normal or high priority flag
+ *
+ *  DESCRIPTION:strputpmsg() implements the putpmsg(2) and putmsg(2) system
+ *  calls for STREAMS.
+ *
+ *  NOTE:GLIBC2 puts -1 in band when it is called as putmsg().
  */
 int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band, int flags)
 {
@@ -2300,13 +2605,21 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	return (err);
 }
 
-/* 
- *  STRGETPMSG
- *  -------------------------------------------------------------------------
- *  Note: If a hangup occurs on a stream from which messages are to be
+/**
+ *  strgetpmsg - getpmsg file operation for a stream
+ *  @file:file pointer for the stream
+ *  @ctlp:&struct strbuf pointer receiving the ctrl part of the message
+ *  @datp:&struct strbuf pointer receiving the data part of the message
+ *  @bandp:pointer to integer to return the priority band of the received message
+ *  @flagsp:pointer to integer to return the normal or high priority flag
+ *
+ *  DESCRIPTION:strgetpmsg() implements the getpmsg(2) and getmsg(2) system
+ *  calls for STREAMS.
+ *
+ *  NOTES: If a hangup occurs on a stream from which messages are to be
  *  retrieved, getpmsg() continues to operate normally, until the stream head
- *  read queue is empty.  Thereafter it returns 0 in the len fields of ctlptr
- *  and dataptr.
+ *  read queue is empty.  Thereafter it returns 0 in the len fields of @ctlp
+ *  and @datp.
  *
  *  GLIBC2 puts NULL in bandp for getmsg().
  */
@@ -2431,8 +2744,22 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 }
 
 /* 
+ *  -------------------------------------------------------------------------
+ *
+ *  ADDITIONAL PRIVATE IO CONTROLS
+ *
+ *  -------------------------------------------------------------------------
+ * 
  *  Linux Fast-STREAMS System Call Emulation
  *  ----------------------------------------
+ */
+
+/**
+ *  str_i_putpmsg - perform putpmsg(2) system call emulation as streamio(7) ioctl
+ *  @file:file pointer for the stream
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_PUTPMSG
+ *  @arg:ioctl argument, a pointer to the &struct strpmsg structure
  */
 static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -2451,6 +2778,14 @@ static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
       error:
 	return (err);
 }
+
+/**
+ *  str_i_getpmsg - perform getpmsg(2) system call emulation as streamio(7) ioctl
+ *  @file:file pointer for the stream
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_GETPMSG
+ *  @arg:ioctl argument, a pointer to the &struct strpmsg structure
+ */
 static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
@@ -2469,14 +2804,27 @@ static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
 	return (err);
 }
 
+/**
+ *  strfattach - fattach system call
+ *  @file:file pointer for stream
+ *  @path:path to which to fattach the stream
+ */
 static int strfattach(struct file *file, const char *path)
 {
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
-	return do_fattach(file, path);
+	return do_fattach(file, path); /* see strattach.c */
 #else
 	return (-ENOSYS);
 #endif
 }
+
+/**
+ *  str_i_fattach - perform fattach(2) system call emulation as streamio(7) ioctl
+ *  @file:file pointer for the stream
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_FATTACH
+ *  @arg:a pointer to a character string describing the path
+ */
 static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
@@ -2489,14 +2837,27 @@ static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd,
       error:
 	return (err);
 }
+
+/**
+ *  strfdetach - fdetach system call
+ *  @path:path from which to fdetach the stream
+ */
 static int strfdetach(const char *path)
 {
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
-	return do_fdetach(path);
+	return do_fdetach(path); /* see strattach.c */
 #else
 	return (-ENOSYS);
 #endif
 }
+
+/**
+ *  str_i_fdetach - perform fdetach(2) system call emulation as streamio(7) ioctl
+ *  @file:file pointer for the stream
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_FDETACH
+ *  @arg:a pointer to a character string describing the path
+ */
 static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
@@ -2507,10 +2868,27 @@ static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd,
       error:
 	return (err);
 }
+
+/**
+ *  strpipe - pipe system call
+ *  @fds:array to which to return two file descriptors
+ */
 static int strpipe(int fds[2])
 {
+#if defined HAVE_KERNEL_PIPE_SUPPORT
+	return do_spipe(fds); /* see strattach.c */
+#else
 	return (-ENOSYS);
+#endif
 }
+
+/**
+ *  str_i_pipe - perform pipe(2) system call emulation as streamio(7) ioctl
+ *  @file:file pointer for the stream
+ *  @sd:stream head
+ *  @cmd:ioctl command, always I_PIPE
+ *  @arg:pointer to array into which to receive two file descriptors
+ */
 static int str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, *fds = (int *) arg;
@@ -2521,9 +2899,12 @@ static int str_i_pipe(struct file *file, struct stdata *sd, unsigned int cmd, un
 	return (err);
 }
 
-/* 
- *  STRIOCTL
- *  -------------------------------------------------------------------------
+/**
+ *  strioctl - ioctl file operation for a stream
+ *  @inode:shadow special filsystem device inode
+ *  @file:shadown special filesystem file pointer
+ *  @cmd:ioctl command
+ *  @arg:ioctl arg
  */
 int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
 {
@@ -2660,12 +3041,17 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
  *
  *  -------------------------------------------------------------------------
  */
+/**
+ *  strwsrv - STREAM head write queue service procedure
+ *  @q:write queue to service
+ *
+ *  DESCRIPTION:We don't actually ever put a message on the write queue, we
+ *  just use the service procedure to wake up any synchronous or asynchronous
+ *  waiters waiting for flow control to subside.  This permit back-enabling
+ *  from the module beneath the stream head to work properly.
+ */
 static int strwsrv(queue_t *q)
 {
-	/* we don't actually ever put a message on the write queue, we just use the service
-	   procedure to wake up any synchronous or asynchronous waiters waiting for flow control to 
-	   subside.  This permit back-enabling from the module beneath the stream head to work
-	   properly. */
 	struct stdata *sd = q->q_ptr;
 	if (waitqueue_active(&sd->sd_waitq))
 		wake_up_interruptible(&sd->sd_waitq);
@@ -2678,6 +3064,11 @@ static int strwsrv(queue_t *q)
  *  PUTP Read Put Procedure
  *
  *  -------------------------------------------------------------------------
+ */
+/**
+ *  strrput - STREAM head read queue put procedure
+ *  @q:pointer to the queue to which to put the message
+ *  @mp:the message to put on the queue
  */
 static int strrput(queue_t *q, mblk_t *mp)
 {
@@ -2922,7 +3313,7 @@ static int strrput(queue_t *q, mblk_t *mp)
 	default:
 	case M_BREAK:		/* dn - request to send "break" */
 	case M_DELAY:		/* dn - request delay on output */
-	case M_IOCDATA:	/* dn - copy data response */
+	case M_IOCDATA:		/* dn - copy data response */
 	case M_READ:		/* dn - read notification */
 	case M_STOP:		/* dn - suspend output */
 	case M_START:		/* dn - resume output */
@@ -2934,7 +3325,7 @@ static int strrput(queue_t *q, mblk_t *mp)
 	case M_CTL:		/* bi - control info */
 	case M_PCCTL:		/* bi - control info */
 	case M_EVENT:		/* -- - Solaris only? */
-	case M_PCEVENT:	/* -- - Solaris only? */
+	case M_PCEVENT:		/* -- - Solaris only? */
 	case M_RSE:		/* -- - reserved */
 	case M_PCRSE:		/* -- - reserved */
 		/* Other messages are silently discarded */
@@ -2949,6 +3340,15 @@ static int strrput(queue_t *q, mblk_t *mp)
  *  OPEN and CLOSE
  *
  *  -------------------------------------------------------------------------
+ */
+/**
+ *  str_open - STREAMS qopen procedure for stream heads
+ *  @q:read queue of stream to open
+ *  @devp:pointer to a dev_t from which to read and into which to return the
+ *  device number
+ *  @oflag:open flags
+ *  @sflag:STREAMS flags (DRVOPEN or MODOPEN or CLONEOPEN)
+ *  @crp:pointer to user's credentials structure
  */
 static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
@@ -3024,6 +3424,13 @@ static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	MOD_DEC_USE_COUNT;
 	return (-EIO);		/* can't be opened as module or clone */
 }
+
+/**
+ *  str_close - STREAMS qclose procedure for stream heads
+ *  @q:read queue of stream to close
+ *  @oflag:open flags
+ *  @crp:pointer to user's credentials structure
+ */
 static int str_close(queue_t *q, int oflag, cred_t *crp)
 {
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
