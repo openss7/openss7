@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/04 03:30:39 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/07/11 08:48:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/04 03:30:39 $ by $Author: brian $
+# Last Modified $Date: 2004/07/11 08:48:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -318,7 +318,7 @@ echo 'Custom' > .rpmrelease
 
 # tar and move the sources for source release
 tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
-ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{base}
+ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 %endif
 
 %clean
@@ -814,6 +814,7 @@ to create and distribute this rpm.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_usrsrc}/%{name}-%{version}-%{release}
+%{_usrsrc}/%{name}
 %{_usrsrc}/%{name}-%{version}-%{release}/*
 %{_usrsrc}/%{name}-%{version}-%{release}/.rpm*
 %endif
@@ -827,7 +828,7 @@ Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
 Prefix:         %{_libexecdir}
-Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
+#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
 %if %{BUILD_lfs}
 Requires:       %{_streams}-lib >= 0.7a
 %endif
@@ -880,6 +881,9 @@ XNS package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.3  2004/07/11 08:48:50  brian
+# - Correct symbolic links again.
+#
 # Revision 0.9.2.2  2004/07/04 03:30:39  brian
 # - Builds rpms.
 #

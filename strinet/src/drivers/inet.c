@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/27 10:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/07/11 08:51:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -257,7 +257,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"
@@ -11751,7 +11751,8 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sk = sk;
 		p->state = sk->state;	/* capture current state */
-		putq(q, mp);
+		if (!putq(q, mp))
+			freemsg(mp);	/* FIXME */
 		return (void) (0);
 	}
 	/*
@@ -11949,7 +11950,8 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		}
 		ss->dst = *dst;
 		if (mp->b_cont) {
-			putbq(q, mp->b_cont);	/* hold back data */
+			if (!putbq(q, mp->b_cont))	/* hold back data */
+				freemsg(mp->b_cont);	/* FIXME */
 			mp->b_cont = NULL;	/* abosrbed mp->b_cont */
 		}
 		ss_set_state(ss, TS_WACK_CREQ);
@@ -13307,7 +13309,8 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked;
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
-		putq(q, mp);
+		if (!putq(q, mp))
+			freemsg(mp);	/* FIXME */
 		return (0);
 	}
 	if ((locked = ss_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
@@ -13326,7 +13329,8 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 				break;
 			case QR_STRIP:
 				if (mp->b_cont)
-					putq(q, mp->b_cont);
+					if (!putq(q, mp->b_cont))
+						freemsg(mp);	/* FIXME */
 			case QR_TRIMMED:
 				freeb(mp);
 				break;
@@ -13345,7 +13349,8 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 				freemsg(mp);
 				break;
 			case QR_DISABLE:
-				putq(q, mp);
+				if (!putq(q, mp))
+					freemsg(mp);	/* FIXME */
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
@@ -13357,7 +13362,8 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 			case -EBUSY:
 			case -EAGAIN:
 			case -ENOMEM:
-				putq(q, mp);
+				if (!putq(q, mp))
+					freemsg(mp);	/* FIXME */
 				break;
 			}
 		}
@@ -13365,7 +13371,8 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 		if (locked)
 			ss_unlockq(q);
 	} else {
-		putq(q, mp);
+		if (!putq(q, mp))
+			freemsg(mp);	/* FIXME */
 	}
 	return (rtn);
 }
@@ -13395,7 +13402,8 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 				continue;
 			case QR_STRIP:
 				if (mp->b_cont)
-					putbq(q, mp->b_cont);
+					if (!putbq(q, mp->b_cont))
+						freemsg(mp->b_cont);
 			case QR_TRIMMED:
 				freeb(mp);
 				continue;
@@ -13417,7 +13425,8 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			case QR_DISABLE:
 				ptrace(("%s: ERROR: (q disabling)\n", SS_MOD_NAME));
 				noenable(q);
-				putbq(q, mp);
+				if (!putbq(q, mp))
+					freemsg(mp);	/* FIXME */
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
@@ -13431,7 +13440,8 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			case -ENOMEM:	/* caller must re-enable queue */
 				if (mp->b_datap->db_type < QPCTL) {
 					ptrace(("%s: ERROR: (q stalled) %d\n", SS_MOD_NAME, rtn));
-					putbq(q, mp);
+					if (!putbq(q, mp))
+						freemsg(mp);	/* FIXME */
 					break;
 				}
 				/*
@@ -13454,7 +13464,8 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 					continue;
 				}
 				mp->b_band = 255;
-				putq(q, mp);
+				if (!putq(q, mp))
+					freemsg(mp);	/* FIXME */
 				break;
 			}
 			break;

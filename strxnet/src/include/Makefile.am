@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/27 08:39:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/07/11 09:06:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,16 +46,9 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 08:39:06 $ by $Author: brian $
+# Last Modified $Date: 2004/07/11 09:06:20 $ by $Author: brian $
 #
 # =============================================================================
-
-xti_headers	=
-
-xns_headers	= \
-	sys/cdi.h \
-	sys/dlpi.h \
-	sys/npi.h
 
 tli_headers	= \
 	sys/ticlts.h \
@@ -93,11 +86,8 @@ xnet_headers	= \
 sock_headers	= \
 	sys/sockmod.h
 
-nobase_pkginclude_HEADERS = $(xti_headers)
+nobase_pkginclude_HEADERS = 
 
-if WITH_XNS
-nobase_pkginclude_HEADERS += $(xns_headers)
-endif
 if WITH_TLI
 nobase_pkginclude_HEADERS += $(tli_headers)
 endif

@@ -1,1 +1,0 @@
-.so CD_MODEM_SIG_POLL.7.man

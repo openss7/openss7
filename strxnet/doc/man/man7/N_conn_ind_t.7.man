@@ -1,1 +1,0 @@
-.so N_CONN_IND.7.man

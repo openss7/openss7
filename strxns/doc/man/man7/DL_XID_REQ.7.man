@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DL_XID_REQ.7.man,v 0.9.2.1 2004/07/04 01:13:14 brian Exp $
+.\" @(#) $Id: DL_XID_REQ.7.man,v 0.9.2.2 2004/07/11 09:08:24 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/07/04 01:13:14 $ by $Author: brian $
+.\" Last Modified $Date: 2004/07/11 09:08:24 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so strxnet.macros
+.so strxns.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database strxnet.refs
+database strxns.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DL_XID_REQ 7 "$Date: 2004/07/04 01:13:14 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
+.TH DL_XID_REQ 7 "$Date: 2004/07/11 09:08:24 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_XID_REQ (dl_xid_req_t)
 \- conveys one XID DLSDU from the DLS User to the DLS Provider for

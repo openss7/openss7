@@ -1,1 +1,0 @@
-.so CD_OK_ACK.7.man
