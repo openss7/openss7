@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.5 2004/05/11 09:24:44 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.6 2004/05/14 20:40:18 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/11 09:24:44 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/14 20:40:18 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -92,15 +92,15 @@ AC_DEFUN([_LINUX_STREAMS],
 AC_DEFUN([_LINUX_STREAMS_OPTIONS],
 [
     AC_ARG_WITH([lis],
-        AS_HELP_STRING([--with-lis=HEADERS], [specify the LiS header file
-            directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
-            [with_lis=$withval],
-            [with_lis=''])
+        AS_HELP_STRING([--with-lis=HEADERS],
+            [specify the LiS header file directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
+        [with_lis=$withval],
+        [with_lis=''])
     AC_ARG_WITH([lfs],
-        AS_HELP_STRING([--with-lfs=HEADERS], [specify the LfS header file
-            directory. @<:@default=INCLUDEDIR/LfS@:>@]),
-            [with_lfs=$withval],
-            [with_lfs=''])
+        AS_HELP_STRING([--with-lfs=HEADERS],
+            [specify the LfS header file directory. @<:@default=INCLUDEDIR/LfS@:>@]),
+        [with_lfs=$withval],
+        [with_lfs=''])
 ])# _LINUX_STREAMS_OPTIONS
 # =========================================================================
 
@@ -232,24 +232,24 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS],
         # compiling for the running kernel
         eval "streams_search_path=\"
             ${with_lfs}
-            ${includedir}
-            ${oldincludedir}
-            /usr/include
-            /usr/local/include
-            /usr/src/streams/src/include
+            ${includedir}/streams
+            ${oldincludedir}/streams
+            /usr/include/streams
+            /usr/local/include/streams
+            /usr/src/streams/include
             \""
     else
         # building for another environment
         eval "streams_search_path=\"
             ${with_lfs}
-            ${linux_cv_module_prefix}/${includedir}
-            ${linux_cv_module_prefix}/${oldincludedir}
-            ${linux_cv_module_prefix}/usr/include
-            ${linux_cv_module_prefix}/usr/local/include
-            ${linux_cv_module_prefix}/usr/src/streams/src/include
-            ${includedir}
-            ${oldincludedir}
-            /usr/src/streams/src/include
+            ${linux_cv_module_prefix}/${includedir}/streams
+            ${linux_cv_module_prefix}/${oldincludedir}/streams
+            ${linux_cv_module_prefix}/usr/include/streams
+            ${linux_cv_module_prefix}/usr/local/include/streams
+            ${linux_cv_module_prefix}/usr/src/streams/include
+            ${includedir}/streams
+            ${oldincludedir}/streams
+            /usr/src/streams/include
             \""
     fi
     streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`

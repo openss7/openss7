@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/05/12 08:01:36 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.6 2004/05/14 20:40:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/12 08:01:36 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/14 20:40:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -86,50 +86,61 @@ AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION(0.14.1)
 
 # Checks for libraries.
+AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([LiS], [putpmsg])
 AC_CHECK_LIB([streams], [putpmsg])
+AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([xnet], [t_open])
 
 # Checks for header files.
+AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
 AC_C_CONST
-AC_TYPE_UID_T
 AC_C_INLINE
 AC_TYPE_MODE_T
 AC_TYPE_OFF_T
+AC_TYPE_UID_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_C_VOLATILE
+AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
 AM_GNU_GETTEXT
+AC_FUNC_ERROR_AT_LINE
 if test :"${cross_compiling:-no}" != :yes ; then : AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
+AC_FUNC_MMAP
+AC_FUNC_REALLOC
 AC_TYPE_SIGNAL
 AC_FUNC_STRNLEN
-AC_CHECK_FUNCS([bzero gethostbyname gettimeofday inet_ntoa memset socket strerror strtol])
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify bzero getcwd gethostbyname gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo setlocale socket stpcpy strcasecmp strchr strcspn strdup strerror strstr strtol strtoul])
 
 AC_SS7
 
 AC_CONFIG_FILES([Makefile
-		 src/Makefile
-		 src/include/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 intl/Makefile
+		 m4/Makefile
 		 po/Makefile.in
-		 m4/Makefile])
+		 src/Makefile
+		 src/include/Makefile])
 
 AC_OUTPUT

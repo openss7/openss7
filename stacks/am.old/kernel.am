@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/11 09:24:43 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/14 20:40:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/11 09:24:43 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 20:40:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,21 +76,27 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 install-exec-local: install-modules
 
 #
-# The post-modules target checks for a fully configured install directory by
-# checking for the existence of the /etc/modules.conf file in the target install
-# directory $(DESTDIR)$(krootdir).  If it exists, then we are doing a non-rpm
-# (autoconf) install and need to configure /etc/modules.conf in the target
-# directory.  First we check if modules.conf has already been patched by looking
-# for our include statement.  If we have already patched up the modules.conf
-# file, we just leave it.  If an adjustment needs to be made, we next check for
-# an older non-rpm LiS distribution by checking for the tell-tale 'BEGIN LiS'
-# string in modules.conf.  If there is an older non-rpm LiS, we remove any
-# reference to any of our installable modules that may have previously been
-# referenced in the modules.conf by LiS before proceeding.  We also need to
-# force remove any kernel modules left by LiS in the misc modules subdirectory.
-# Lastly, we add our prune and include lines to the modules.conf file.  If we
-# have a usable system map file and an executable depmod, we perform the depmod.
-# Finally we invoke installation of any necessary devices.
+# The post-modules target checks for a fully configured install directory by checking for the
+# existence of the /etc/modules.conf file in the target install directory $(DESTDIR)$(krootdir).
+#
+# If it exists, then we are doing a non-rpm (autoconf) install and need to configure
+# /etc/modules.conf in the target directory.  First we check if modules.conf has already been
+# patched by looking for our include statement.  If we have already patched up the modules.conf
+# file, we just leave it.
+#
+# If an adjustment needs to be made, we next check for an older non-rpm LiS distribution by checking
+# for the tell-tale 'BEGIN LiS' string in modules.conf.  If there is an older non-rpm LiS, we remove
+# any reference to any of our installable modules that may have previously been referenced in the
+# modules.conf by LiS before proceeding.  We also need to force remove any kernel modules left by
+# LiS in the misc modules subdirectory that have the same name as our installable modules.
+#
+# Lastly, we add our prune and include lines to the modules.conf file.  If we have a usable system
+# map file and an executable depmod, we perform the depmod.  Finally we invoke installation of any
+# necessary devices.
+#
+# This autoconf installation process has the side effect that upon uninstall of this package, any
+# modules replaced from LiS will be lost.  A fresh install of the older LiS may be required to
+# restore them.  Use the openss7 autoconf/rpm version of LiS instead, please.
 #
 post-modules:
 	@conf_fil='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
@@ -100,9 +106,12 @@ post-modules:
 			cp -f $$conf_fil $$conf_new ; \
 			if ( grep -q 'BEGIN LiS' $$conf_fil ) ; then \
 				conf_tmp='$(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$' ; \
-				sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' $$conf_new > $$conf_tmp ; \
-				mv -f $$conf_tmp $$conf_new ; \
-				rm -f $(DESTDIR)$(kmoduledir)/misc/streams*.o ; \
+				list='$(KERNEL_MODULES)'; for p in $$list; do \
+					m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\\.o$$||'`" ; \
+					sed -e "/$$m/d" $$conf_new > $$conf_tmp ; \
+					mv -f $$conf_tmp $$conf_new ; \
+					rm -f $(DESTDIR)$(kmoduledir)/misc/$$m.o ; \
+				done ; \
 				rmdir --ignore-fail-on-non-empty $(DESTDIR)$(kmoduledir)/misc ; \
 			fi ; \
 			echo 'prune modules.$(KMODCONF_EXT)' >> $$conf_new ; \
@@ -124,13 +133,11 @@ post-modules:
 	fi
 
 #
-# This is equivalent to the kernel modules package rpm %post scriptlet for
-# non-rpm (autoconf) installs.  It is only executed when the install directory
-# is fully configured for kernel modules.  That is, this does not run when
-# building an rpm because the binaries are installed in a temporary,
-# unconfigured directory.  Autoconf has no post-install targets, so we hook this
-# into the install target with install-exec-hook that runs after install-exec
-# has completed.
+# This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
+# installs.  It is only executed when the install directory is fully configured for kernel modules.
+# That is, this does not run when building an rpm because the binaries are installed in a temporary,
+# unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
+# target with install-exec-hook that runs after install-exec has completed.
 #
 install-exec-hook: post-modules
 
@@ -146,20 +153,22 @@ uninstall-modules:
 uninstall-local: uninstall-modules
 
 #
-# The postun-modules target checks for a fully configured uninstall directory by
-# checking for the existence of the /etc/modules.conf file in the target
-# uninstall directory $(DESTDIR)$(krootdir).  It it exists, then we are doing a
-# non-rpm (autoconf) uninstall and need to unconfigure modules.conf in the
-# target directory.  First which check if there are any remaning modules.ext
-# files that belong to other kernel releases.  If there are, we do not remove
-# the patch from modules.conf because it is still needed by the other kernels.
-# If there are not, the prune and include patch is removed from the modules.conf
-# file.  If we have a usable system map file and an executable depmod, we
-# perform the depmod.  Finally we invoke removal of any installed devices.
+# The postun-modules target checks for a fully configured uninstall directory by checking for the
+# existence of the /etc/modules.conf file in the target uninstall directory $(DESTDIR)$(krootdir).
+# It it exists, then we are doing a non-rpm (autoconf) uninstall and need to unconfigure
+# modules.conf in the target directory.
 #
-# It is not possible to restore any modules or associated modules.conf entries
-# for non-rpm or old LiS releases.  You need to reinstall those packages (if
-# desired) to restore the removed modules and entries.
+# First which check if there are any remaning modules.ext files that belong to other kernel
+# releases.  If there are, we do not remove the patch from modules.conf because it is still needed
+# by the other kernels.  If there are not, the prune and include patch is removed from the
+# modules.conf file.
+#
+# If we have a usable system map file and an executable depmod, we perform the depmod.  Finally we
+# invoke removal of any installed devices.
+#
+# It is not possible to restore any modules or associated modules.conf entries for non-rpm or old
+# LiS releases.  You need to reinstall those packages (if desired) to restore the removed modules
+# and entries.  Use the openss7 autoconf/rpm version of LiS instead, please.
 #
 postun-modules:
 	@conf_fil='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
@@ -186,12 +195,11 @@ postun-modules:
 	fi
 
 #
-# This is equivalent to the kernel modules package rpm %postun scriptlet.  It is
-# only executed when the uninstall directory is fully configured for kernel
-# modules.  That is, this does not run when building an rpm because the binaries
-# are not uninstalled (they are usually just removed wholesale).  Autoconf has
-# no post-uninstall targets, so we hook this into the uninstall-hook that runs
-# after uninstall has completed.
+# This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when
+# the uninstall directory is fully configured for kernel modules.  That is, this does not run when
+# building an rpm because the binaries are not uninstalled (they are usually just removed
+# wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
+# runs after uninstall has completed.
 #
 uninstall-hook: postun-modules
 

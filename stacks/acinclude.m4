@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.7 2004/05/12 08:01:36 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.8 2004/05/14 20:40:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,12 +53,12 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/12 08:01:36 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/14 20:40:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-m4_include([m4/streams.m4])
 m4_include([m4/kernel.m4])
+m4_include([m4/streams.m4])
 m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
@@ -104,26 +104,6 @@ AC_DEFUN([AC_SS7], [
 # _SS7_OPTIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_SS7_OPTIONS], [
-    AC_ARG_WITH([tli],
-        AS_HELP_STRING([--with-tli], [include tli modules.
-            @<:@default=no@:>@]),
-        [with_tli=$enableval],
-        [with_tli=''])
-    AC_ARG_WITH([inet],
-        AS_HELP_STRING([--with-inet], [include inet package.
-            @<:@default=no@:>@]),
-        [with_inet=$enableval],
-        [with_inet=''])
-    AC_ARG_WITH([xnet],
-        AS_HELP_STRING([--with-xnet], [include xnet library.
-            @<:@default=no@:>@]),
-        [with_xnet=$enableval],
-        [with_xnet=''])
-    AC_ARG_WITH([sctp2],
-        AS_HELP_STRING([--with-sctp2], [include sctp2 package.
-            @<:@default=no@:>@]),
-        [with_sctp2=$enableval],
-        [with_sctp2=''])
 ])# _SS7_OPTIONS
 # =========================================================================
 
@@ -131,33 +111,95 @@ AC_DEFUN([_SS7_OPTIONS], [
 # _SS7_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_SS7_SETUP], [
+    _SS7_CHECK_SCTP
+    _SS7_CHECK_XNS
     _SS7_CHECK_TLI
     _SS7_CHECK_INET
     _SS7_CHECK_XNET
-    _SS7_CHECK_SCTP2
+    _SS7_CHECK_SOCK
 ])# _SS7_SETUP
+# =========================================================================
+
+# =========================================================================
+# _SS7_CHECK_SCTP
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_SCTP], [
+    AC_ARG_WITH([sctp2],
+        AS_HELP_STRING([--with-sctp2],
+            [include sctp2 package.  @<:@default=DETECTED@:>@]),
+        [with_sctp2=$enableval],
+        [with_sctp2=''])
+    AC_MSG_CHECKING([for package sctp version 2])
+    if test :"${with_sctp2:-no}" != :no ; then
+        AC_MSG_RESULT([yes])
+        _SS7_SETUP_SCTP
+    else
+        AC_MSG_RESULT([no])
+    fi
+    AM_CONDITIONAL([WITH_SCTP2], test :"${with_sctp2:-no}" != :no )
+])# _SS7_CHECK_SCTP
+# =========================================================================
+
+# =========================================================================
+# _SS7_CHECK_XNS
+# -------------------------------------------------------------------------
+# Check if there are usable (recent OpenSS) OSI headers files.  These would be
+# from a previous OpenSS7 STREAMS installation.  If they are not usable, they
+# will be replaced with local installed copies.
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK_XNS], [
+    AC_CACHE_CHECK([for package have xns headers], [ss7_cv_have_xns], [
+        ss7_cv_have_xns=no
+    ])
+    AC_ARG_WITH([xns],
+        AS_HELP_STRING([--with-xns],
+            [include xns headers. @<:@default=DETECTED@:@>]),
+        [with_xns="$enableval"],
+        [with_xns=''])
+    AC_MSG_CHECKING([for package need xns headers])
+    case :"$with_xns" in
+        :yes)   ss7_cv_need_xns=yes ;;
+        :no)    ss7_cv_need_xns=no  ;;
+        :*) if test :"$ss7_cv_need_xns" = :yes
+            then ss7_cv_need_xns=no
+            else ss7_cv_need_xns=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$ss7_cv_need_xns])
+    if test :"$ss7_cv_need_xns" = :yes ; then
+        :
+        _SS7_SETUP_XNS
+    fi
+    AM_CONDITIONAL([WITH_XNS], test :"$ss7_cv_need_xns" = :yes )
+])# _SS7_CHECK_XNS
 # =========================================================================
 
 # =========================================================================
 # _SS7_CHECK_TLI
 # -------------------------------------------------------------------------
+# Check if there are usable (recent OpenSS7) timod or tirdwr modules.  These
+# would be from a previous OpenSS7 rpm LiS installation.  If they are not
+# usable, they will be removed in am/kernel.am.
+# -------------------------------------------------------------------------
 AC_DEFUN([_SS7_CHECK_TLI], [
-    AC_CACHE_CHECK([for package usable tli modules], [ss7_cv_tli], [
-        #
-        # Check if there are usable timod or tirdwr modules.
-        #
-        ss7_cv_tli=no
+    AC_CACHE_CHECK([for package have tli modules], [ss7_cv_have_tli], [
+        ss7_cv_have_tli=no
         if test -d $linux_cv_k_modules/misc -a -f $linux_cv_k_modules/misc/streams-timod.o ; then
             if ( grep -q 'FAST STREAMS' $linux_cv_k_modules/misc/streams-timod.o ) 2>/dev/null ; then
-                ss7_cv_tli=yes
+                ss7_cv_have_tli=yes
             fi
         fi
     ])
-    AC_MSG_CHECKING([for package tli module addon])
+    AC_ARG_WITH([tli],
+        AS_HELP_STRING([--with-tli],
+            [include tli modules.  @<:@default=DETECTED@:>@]),
+        [with_tli=$enableval],
+        [with_tli=''])
+    AC_MSG_CHECKING([for package need tli modules])
     case :"$with_tli" in
         :yes) ss7_cv_need_tli=yes ;;
         :no)  ss7_cv_need_tli=no ;;
-        :*) if test :"$ss7_cv_tli" = :yes
+        :*) if test :"$ss7_cv_have_tli" = :yes
             then ss7_cv_need_tli=no
             else ss7_cv_need_tli=yes
             fi ;;
@@ -174,20 +216,29 @@ AC_DEFUN([_SS7_CHECK_TLI], [
 # =========================================================================
 # _SS7_CHECK_INET
 # -------------------------------------------------------------------------
+# Check if there is a usable (recent OpenSS7 version) inet driver available.
+# This would be from a previous OpenSS7 rpm LiS installation.  If it is not
+# usable, it will be removed in am/kernel.am.
+# -------------------------------------------------------------------------
 AC_DEFUN([_SS7_CHECK_INET], [
-    AC_CACHE_CHECK([for package usable inet driver], [ss7_cv_inet], [
-        ss7_cv_inet=no
+    AC_CACHE_CHECK([for package have inet driver], [ss7_cv_have_inet], [
+        ss7_cv_have_inet=no
         if test -d $linux_cv_k_modules/misc -a -f $linux_cv_k_modules/misc/streams-inet.o ; then
             if ( grep -q 'FAST STREAMS' $linux_cv_k_modules/misc/streams-inet.o ) 2>/dev/null ; then
-                ss7_cv_inet=yes
+                ss7_cv_have_inet=yes
             fi
         fi
     ])
-    AC_MSG_CHECKING([for package inet driver addon])
+    AC_ARG_WITH([inet],
+        AS_HELP_STRING([--with-inet],
+            [include inet package.  @<:@default=DETECTED@:>@]),
+        [with_inet=$enableval],
+        [with_inet=''])
+    AC_MSG_CHECKING([for package need inet driver])
     case :"$with_inet" in
         :yes) ss7_cv_need_inet=yes ;;
         :no)  ss7_cv_need_inet=no ;;
-        :*) if test :"$ss7_cv_inet" = :yes
+        :*) if test :"$ss7_cv_have_inet" = :yes
             then ss7_cv_need_inet=no
             else ss7_cv_need_inet=yes
             fi ;;
@@ -205,14 +256,19 @@ AC_DEFUN([_SS7_CHECK_INET], [
 # _SS7_CHECK_XNET
 # -------------------------------------------------------------------------
 AC_DEFUN([_SS7_CHECK_XNET], [
-    AC_CACHE_CHECK([for package usable xnet library], [ss7_cv_xnet], [
-        ss7_cv_xnet="$ac_cv_lib_xnet_t_open"
+    AC_CACHE_CHECK([for package have xnet library], [ss7_cv_have_xnet], [
+        ss7_cv_have_xnet="$ac_cv_lib_xnet_t_open"
     ])
-    AC_MSG_CHECKING([for package xnet library addon])
+    AC_ARG_WITH([xnet],
+        AS_HELP_STRING([--with-xnet],
+            [include xnet library.  @<:@default=DETECTED@:>@]),
+        [with_xnet=$enableval],
+        [with_xnet=''])
+    AC_MSG_CHECKING([for package need xnet library])
     case :"$with_xnet" in
         :yes) ss7_cv_need_xnet=yes ;;
         :no)  ss7_cv_need_xnet=no ;;
-        :*) if test :"$ss7_cv_xnet" = :yes
+        :*) if test :"$ss7_cv_have_xnet" = :yes
             then ss7_cv_need_xnet=no
             else ss7_cv_need_xnet=yes
             fi ;;
@@ -227,18 +283,66 @@ AC_DEFUN([_SS7_CHECK_XNET], [
 # =========================================================================
 
 # =========================================================================
-# _SS7_CHECK_SCTP2
+# _SS7_CHECK_SOCK
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_CHECK_SCTP2], [
-    AC_MSG_CHECKING([for package sctp version 2])
-    if test :"${with_sctp2:-no}" != :no ; then
-        AC_MSG_RESULT([yes])
-        _SS7_SETUP_SCTP2
-    else
-        AC_MSG_RESULT([no])
+AC_DEFUN([_SS7_CHECK_SOCK], [
+    AC_CACHE_CHECK([for package have socket library], [ss7_cv_have_sock], [
+        ss7_cv_have_sock=no
+    ])
+    AC_ARG_WITH([sock],
+        AS_HELP_STRING([--with-sock],
+            [include socket library.  @<:@default=DETECTED@:>@]),
+        [with_sock=$enableval],
+        [with_sock=''])
+    AC_MSG_CHECKING([for package need socket library])
+    case :"$with_sock" in
+        :yes) ss7_cv_need_sock=yes ;;
+        :no)  ss7_cv_need_sock=no ;;
+        :*) if test :"$ss7_cv_have_sock" = :yes
+            then ss7_cv_need_sock=no
+            else ss7_cv_need_sock=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$ss7_cv_need_sock])
+    if test :"$ss7_cv_need_sock" = :yes ; then
+        :
+        _SS7_SETUP_SOCK
     fi
-    AM_CONDITIONAL([WITH_SCTP2], test :"${with_sctp2:-no}" != :no )
-])# _SS7_CHECK_SCTP2
+    AM_CONDITIONAL([WITH_SOCK], test :"$ss7_cv_need_sock" = :yes )
+])# _SS7_CHECK_SOCK
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_SCTP
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_SCTP], [
+    AC_CACHE_CHECK([for package OpenSS7 Kernel SCTP], [ss7_cv_openss7_sctp], [
+        _LINUX_KERNEL_ENV([
+            AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/sctp.h>
+#ifdef SCTPCB_FLAG_CONF
+    yes_we_have_openss7_kernel_sctp
+#endif
+            ], [ss7_cv_openss7_sctp=yes], [ss7_cv_openss7_sctp=no])
+        ])
+    ])
+    if test :"${ss7_cv_openss7_sctp:-no}" = :yes ; then
+        AC_DEFINE([HAVE_OPENSS7_SCTP], [1],
+            [Define if your kernel supports the OpenSS7 Linux Kernel Sockets SCTP patches.  This
+            enables support in the INET driver for STREAMS on top of the OpenSS7 Linux Kernel
+            Sockets SCTP implementation.])
+    fi
+])# _SS7_SETUP_SCTP
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_XNS
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_SETUP_XNS], [
+])# _SS7_SETUP_XNS
 # =========================================================================
 
 # =========================================================================
@@ -461,10 +565,10 @@ AC_DEFUN([_SS7_SETUP_XNET], [
 # =========================================================================
 
 # =========================================================================
-# _SS7_SETUP_SCTP2
+# _SS7_SETUP_SOCK
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_SETUP_SCTP2], [
-])# _SS7_SETUP_SCTP2
+AC_DEFUN([_SS7_SETUP_SOCK], [
+])# _SS7_SETUP_SOCK
 # =========================================================================
 
 # =========================================================================

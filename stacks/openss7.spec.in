@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/12 10:14:50 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/14 20:40:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/12 10:14:50 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 20:40:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -112,7 +112,11 @@ Obsoletes:      SS7 SIGTRAN H323 ISDN
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
-Requires:       LiS >= 2.16.16
+%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+Requires:       streams >= 0.7a
+%else
+Requires:       LiS >= 2.16.18-15
+%endif
 Provides:       SS7 SIGTRAN H323 ISDN
 BuildRequires:  kernel-source >= 2.4
 %ifarch s390 s390x
@@ -125,7 +129,11 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-BuildRequires:  LiS-devel >= 2.16.16
+%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+BuildRequires:  streams-devel >= 0.7a
+%else
+BuildRequires:  LiS-devel >= 2.16.18-15
+%endif
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
@@ -223,15 +231,7 @@ preferred_cflags="-freorder-blocks"
     %{?_with_k_inline:            --enable-k-inline} \
     %{?_without_k_inline:         --disable-k-inline} \
     %{?_with_lis:                 %{_with_lis}} \
-    %{?_without_lis:              %{_without_lis}} \
-    %{?_with_lfs:                 %{_with_lfs}} \
-    %{?_without_lfs:              %{_without_lfs}} \
-    %{?_with_tli:                 %{_with_tli}} \
-    %{?_without_tli:              %{_without_tli}} \
-    %{?_with_inet:                %{_with_inet}} \
-    %{?_without_inet:             %{_without_inet}} \
-    %{?_with_xnet:                %{_with_xnet}} \
-    %{?_without_xnet:             %{_without_xnet}}
+    %{?_with_lfs:                 %{_with_lfs}}
 
 make
 
@@ -245,9 +245,12 @@ make
 
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
-# take our configured source and move it for the source package
 mkdir -p $RPM_BUILD_ROOT
+
+%if %{?_without_public: 0}%{?!_without_public: 1}
+# take our configured source and move it for the source package
 mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
+%endif
 
 # add a directory for our devices
 mkdir -p $RPM_BUILD_ROOT/dev/ss7
@@ -268,9 +271,11 @@ mkdir -p $RPM_BUILD_ROOT/dev/ss7
 
 rm -rf build-%{_target_cpu}
 
+%if %{?_without_public: 0}%{?!_without_public: 1}
 # tar and move the sources for source release
 tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
 ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
+%endif
 
 %clean
 # ---------------------------------------------------------------------------
@@ -284,7 +289,11 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 Summary:        OpenSS7 core kernel modules.
 Group:          System Environment/Kernel
 Requires:       kernel = %{kernel_version}
-Requires:       LiS-core-%{kernel_version} >= 2.16.16
+%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+Requires:       streams-core-%{kernel_version} >= 0.7a
+%else
+Requires:       LiS-core-%{kernel_version} >= 2.16.18-15
+%endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -295,10 +304,10 @@ Icon:           %{_icon}
 The %{name}-%{core_name} package contains the kernel modules the provide the
 Linux kernel SS7 STREAMS drivers and modules.  This also includes assorted
 drivers and modules for additiona protocol stacks such as SIGTRAN, ISDN and
-VoIP.  This package is heavily tied to the kernel for which it and the LiS
+VoIP.  This package is heavily tied to the kernel for which it and the
 STREAMS facility was compiled.  This package applies to kernel version
-%{kernel_version} and requires an LiS 2.16.16 (or better) STREAMS package
-%compiled for the same kernel.
+%{kernel_version} and requires a suitable STREAMS package compiled for the
+same kernel.
 
 %pre %{core_name}
 # ---------------------------------------------------------------------------
@@ -335,12 +344,7 @@ if [ $1 = 1 ] ; then
     if ( grep -q 'include.*modules.ss7' /etc/modules.conf ) ; then
         :
     else
-#       if not, check for an old non-rpm OpenSS7
-        if ( grep -q 'BEGIN LiS' /etc/modules.conf ) ; then
-            sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
-        else
-            cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
-        fi
+        cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
         echo 'prune modules.ss7' >> /etc/modules.conf.tmp.$$
         echo 'if -f /lib/modules/`uname -r`/modules.ss7' >> /etc/modules.conf.tmp.$$
         echo 'include /lib/modules/`uname -r`/modules.ss7' >> /etc/modules.conf.tmp.$$
@@ -569,6 +573,11 @@ if [ -x /sbin/install-info ] ; then
         /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
     fi
 fi
+@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
+@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info %{_infodir}/dir
+@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
+@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info.gz %{_infodir}/dir
+@WITH_XNET_TRUE@    fi
 
 %preun doc
 # ---------------------------------------------------------------------------
@@ -579,6 +588,11 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     elif test -f %{_infodir}/%{name}.info.gz ; then
         /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
     fi
+@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
+@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info %{_infodir}/dir
+@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
+@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info.gz %{_infodir}/dir
+@WITH_XNET_TRUE@    fi
 fi
 
 %postun doc
@@ -589,6 +603,9 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%if %{?_with_xnet: 1}%{?_with_xnet: 0}
+%doc ABOUT-NLS
+%endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual
 %doc doc/drafts
@@ -601,7 +618,11 @@ Summary:        OpenSS7 headers, lib and doc.
 Group:          Development/System
 Requires:       %{name}-lib = %{version}-%{base_release}
 Requires:       %{name}-doc = %{version}-%{base_release}
-Requires:       LiS-devel >= 2.16.16
+%if %{?_with_lfs: 1}%{!?_with_lfs: 0}
+Requires:       streams-devel >= 0.7a
+%else
+Requires:       LiS-devel >= 2.16.18-15
+%endif
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
@@ -651,6 +672,7 @@ developing OpenSS7 application programs.
 %endif
 
 
+%if %{?_without_public: 0}%{?!_without_public: 1}
 # ===========================================================================
 %package source
 
@@ -690,6 +712,7 @@ necessary to create and distribute this rpm.
 %defattr(-,root,root)
 %dir %{_usrsrc}/%{name}-%{version}-%{release}
 %{_usrsrc}/*
+%endif
 %endif
 
 # ===========================================================================
@@ -744,15 +767,21 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.11  2004/05/12 10:14:50  brian
-# - Added documentation for XTI.  (Need new refs.)
+# Revision 0.9.2.12  2004/05/14 20:40:17  brian
+# - Updated for latest LiS and LfS build processes.
 #
-# Revision 0.9.2.10  2004/05/12 08:01:36  brian
-# - Added in xti library and STREAMS modules.
-#
-# Revision 0.9.2.9  2004/05/11 09:24:18  brian
-# - Added new configure options.
-#
+
+* Wed May 12 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.11  2004/05/12 10:14:50  brian
+- Added documentation for XTI.  (Need new refs.)
+
+* Wed May 12 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.10  2004/05/12 08:01:36  brian
+- Added in xti library and STREAMS modules.
+
+* Tue May 11 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.9  2004/05/11 09:24:18  brian
+- Added new configure options.
 
 * Sun Apr 25 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.8  2004/04/25 07:34:24  brian

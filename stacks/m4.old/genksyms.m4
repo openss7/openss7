@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/11 09:24:43 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/14 20:40:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/11 09:24:43 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 20:40:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,7 +74,6 @@ dnl     AS_HELP_STRING([--enable-k-versions],
 dnl         [version all symbols @<:@default=automatic@:>@]),
 dnl     [enable_k_versions=$enableval],
 dnl     [enable_k_versions=''])
-    AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
 ])# _KSYMS_OPTIONS
 # =============================================================================
 
@@ -96,6 +95,7 @@ AC_DEFUN([_KSYMS_SETUP], [
     else
         GENKSYMS_SMP_PREFIX=''
     fi
+    AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
     AC_PATH_TOOL([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GENKSYMS:-no}" = :no ; then
         AC_MSG_WARN([Could not find genksyms program in PATH.])

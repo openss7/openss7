@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/12 10:14:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/14 20:40:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/12 10:14:50 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 20:40:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2318,8 +2318,8 @@ else
 $(man_MANS): %: %.man
 	@p=`echo $@ | sed -e 's|/[^/]*$$||'` ; \
 	$(mkdir_p) $$p ; \
-	echo "converting (strip) manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
+	echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
 install-manpages: $(man_MANS) $(man_MACROS)
 	@$(NORMAL_INSTALL)

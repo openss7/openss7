@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: public.m4,v 0.9.2.2 2004/05/11 09:24:44 brian Exp $
+dnl @(#) $Id: public.m4,v 0.9.2.3 2004/05/14 20:40:18 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/11 09:24:44 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/14 20:40:18 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -79,11 +79,6 @@ AC_DEFUN([_PUBLIC_RELEASE],
 # -------------------------------------------------------------------------
 AC_DEFUN([_PUBLIC_RELEASE_OPTIONS],
 [
-    AC_ARG_ENABLE([public],
-                  AS_HELP_STRING([--disable-public],
-                                 [disable public release.  @<:@default=no@:>@]),
-                  [enable_public=$enableval],
-                  [enable_public='yes'])
 ])# _PUBLIC_RELEASE_OPTIONS
 # =========================================================================
 
@@ -100,6 +95,11 @@ AC_DEFUN([_PUBLIC_RELEASE_SETUP],
 # -------------------------------------------------------------------------
 AC_DEFUN([_PUBLIC_RELEASE_OUTPUT],
 [
+    AC_ARG_ENABLE([public],
+        AS_HELP_STRING([--disable-public],
+            [disable public release.  @<:@default=no@:>@]),
+        [enable_public=$enableval],
+        [enable_public='yes'])
     AC_MSG_CHECKING([for public release])
     if test :"${enable_public:-yes}" != :yes ; then
         AC_MSG_RESULT([no])

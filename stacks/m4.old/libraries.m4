@@ -71,7 +71,6 @@ AC_DEFUN([_LDCONFIG], [
 # _LDCONFIG_SPEC_OPTIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [
-    AC_ARG_VAR([LDCONFIG], [Configure loader command])
 ])# _LDCONFIG_SPEC_OPTIONS
 # =========================================================================
 
@@ -79,6 +78,7 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [
 # _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [
+    AC_ARG_VAR([LDCONFIG], [Configure loader command])
     AC_PATH_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${LDCONFIG:-no}" = :no ; then
         AC_MSG_WARN([Could not find ldconfig program in PATH.])

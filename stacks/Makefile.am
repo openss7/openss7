@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/12 08:01:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/14 20:40:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/12 08:01:35 $ by $Author: brian $
+# Last Modified $Date: 2004/05/14 20:40:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -238,7 +238,6 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= libSS7sctp.a
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
-				  src/modules/inet/inet.c \
 				  src/modules/m2pa/m2pa_sl.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
@@ -580,7 +579,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/dl/dl_v52.c \
 				  src/modules/dl/dl_v5ua.c \
 				  src/modules/hdlc/hdlc.c \
-				  src/modules/inet/inet.c \
 				  src/modules/isdn/isdn.c \
 				  src/modules/isup/isup.c \
 				  src/modules/lm/lm.c \
@@ -852,7 +850,7 @@ if WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-timod \
 				  test-tirdwr
-nodist_EXTRA_libSS7mods_a_SOURCES	+= \
+nodist_libSS7mods_a_SOURCES	+= \
 				  src/modules/ti/timod.c \
 				  src/include/timod.h \
 				  src/modules/ti/tirdwr.c \
@@ -963,7 +961,34 @@ libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= -lLiS
 endif
 
+STRMAKENODES			= ./ss7makenodes
+INET_MKDEV			= $(auxdir)/inet_mkdev
+INET_RMDEV			= $(auxdir)/inet_rmdev
+
 include am/strconf.am
+
+if WITH_INET
+
+install-devices: $(STRMAKENODES)
+	$(STRMAKENODES)
+	DESTDIR=$(DESTDIR) $(INET_MKDEV)
+
+uninstall-devices:
+	$(STRMAKENODES) --remove
+	DESTDIR=$(DESTDIR) $(INET_RMDEV)
+
+else
+
+install-devices: $(STRMAKENODES)
+	$(STRMAKENODES)
+
+uninstall-devices:
+	$(STRMAKENODES) --remove
+
+endif
+
+dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+EXTRA_SCRIPTS += scripts/inet_mkdev scripts/inet_rmdev
 
 SUBDIRS = doc src intl m4 po
 

@@ -74,30 +74,6 @@ AC_DEFUN([_RPM_SPEC], [
 # _RPM_SPEC_OPTIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OPTIONS], [
-    AC_ARG_WITH([rpm-epoch],
-        AS_HELP_STRING([--with-rpm-epoch=EPOCH],
-            [specify the EPOCH for the RPM spec file.
-            @<:@default=1@:>@]),
-        [with_rpm_epoch=$withval],
-        [with_rpm_epoch=1])
-    AC_ARG_WITH([rpm-release],
-        AS_HELP_STRING([--with-rpm-release=RELEASE],
-            [specify the RELEASE for the RPM spec file.
-            @<:@default=Custom@:>@]),
-        [with_rpm_release=$withval],
-        [with_rpm_release='Custom'])
-    AC_ARG_WITH([gpg-user],
-        AS_HELP_STRING([--with-gpg-user=USERNAME],
-            [specify the USER for signing RPMs and tarballs.
-            @<:@default=${USER}@:>@]),
-        [with_gpg_user=$withval],
-        [with_gpg_user=${USER}])
-    AC_ARG_VAR([RPMBUILD], [Build rpms command])
-    AC_ARG_VAR([RPM], [Rpm command])
-    AC_ARG_VAR([GPG], [PGP signature command])
-    AC_ARG_VAR([GPGUSER], [GPG user name])
-    AC_ARG_VAR([HOME], [User's home directory])
-    AC_ARG_VAR([GPGHOME], [GPG home directory])
 ])# _RPM_SPEC_OPTIONS
 # =========================================================================
 
@@ -106,12 +82,23 @@ AC_DEFUN([_RPM_SPEC_OPTIONS], [
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP], [
     # two extra subsitutions for the RPM spec file
+    AC_ARG_WITH([rpm-epoch],
+        AS_HELP_STRING([--with-rpm-epoch=EPOCH],
+            [specify the EPOCH for the RPM spec file.  @<:@default=1@:>@]),
+        [with_rpm_epoch=$withval],
+        [with_rpm_epoch=1])
     AC_MSG_CHECKING([for rpm epoch])
     AC_MSG_RESULT([${with_rpm_epoch:-1}])
     PACKAGE_EPOCH="${with_rpm_epoch:-1}"
     AC_SUBST(PACKAGE_EPOCH)
     AC_DEFINE_UNQUOTED([PACKAGE_EPOCH], [$PACKAGE_EPOCH], [The RPM Epoch. This
         defaults to 1.])
+    AC_ARG_WITH([rpm-release],
+        AS_HELP_STRING([--with-rpm-release=RELEASE],
+            [specify the RELEASE for the RPM spec file.
+            @<:@default=Custom@:>@]),
+        [with_rpm_release=$withval],
+        [with_rpm_release='Custom'])
     AC_MSG_CHECKING([for rpm release])
     AC_MSG_RESULT([${with_rpm_release:-Custom}])
     PACKAGE_RELEASE="${with_rpm_release:-Custom}"
@@ -129,22 +116,34 @@ AC_DEFUN([_RPM_SPEC_SETUP], [
         fi
     done
     AC_SUBST(PACKAGE_OPTIONS)
+    AC_ARG_VAR([RPMBUILD], [Build rpms command])
     AC_PATH_TOOL([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPMBUILD:-no}" = :no ; then
         AC_MSG_WARN([Could not find rpmbuild program in PATH.])
     fi
+    AC_ARG_VAR([RPM], [Rpm command])
     AC_PATH_TOOL([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPM:-no}" = :no ; then
         AC_MSG_WARN([Could not find rpm program in PATH.])
     fi
+    AC_ARG_WITH([gpg-user],
+        AS_HELP_STRING([--with-gpg-user=USERNAME],
+            [specify the USER for signing RPMs and tarballs.
+            @<:@default=${USER}@:>@]),
+        [with_gpg_user=$withval],
+        [with_gpg_user=${USER}])
+    AC_ARG_VAR([GPGUSER], [GPG user name])
     AC_MSG_CHECKING([for gpg user])
     GPGUSER="${with_gpg_user:-$USER}"
     AC_MSG_RESULT([$GPGUSER])
+    AC_ARG_VAR([GPG], [PGP signature command])
     AC_PATH_TOOL([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GPG:-no}" = :no ; then
         AC_MSG_WARN([Could not find gpg program in PATH.])
     fi
     AC_MSG_CHECKING([for gpg home])
+    AC_ARG_VAR([HOME], [User's home directory])
+    AC_ARG_VAR([GPGHOME], [GPG home directory])
     if test -z "$GPGHOME" ; then
         GPGHOME="${HOME}${HOME:+/}.gnupg"
     fi
