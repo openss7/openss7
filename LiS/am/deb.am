@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/09 11:26:40 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:26:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/09 11:26:40 $ by $Author: brian $
+## Last Modified $Date: 2005/03/17 14:26:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -81,15 +81,27 @@ if BUILD_DPKG
 # number onto the upstream version, but with a period instead of a dash to suppress warnings from
 # dpkg-source.
 ##
-debianpkg		= $(PACKAGE_TARNAME)-$(VERSION)_$(PACKAGE_DEBRELEASE)
-debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION)-$(PACKAGE_DEBRELEASE)
-debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE)-$(VERSION)-$(PACKAGE_DEBRELEASE)
+debianpkg		= $(PACKAGE_LCNAME)-$(VERSION)_$(PACKAGE_DEBRELEASE)
+debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)-$(PACKAGE_DEBRELEASE)
+debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE_LCNAME)-$(VERSION)-$(PACKAGE_DEBRELEASE)
 debian_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
 debian_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
+debian_chg_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes
+debian_asc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes.asc
 debian_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
 debian_source_files	= $(debian_dsc_file) $(debian_tar_file) $(debian_sig_file)
+debian_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*-$(VERSION)_$(PACKAGE_DEBRELEASE)_*.deb
+debian_change_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)_*.changes \
+			  $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)_*.changes.asc
 
 RELEASE_DIRECTORIES	+= $(PACKAGE_DEBTOPDIR)
+
+##
+# For the master build package it is sometime necessary to pass extra options down to configured
+# subdirectories for a master build.  These options will contain the passed down options from the
+# environment in that case.  See the recursive build targets below.
+##
+DEBXOPTS	= -D
 
 $(debian_dir):: $(debian_dir_stamp)
 $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(PACKAGE_DEBTOPDIR)
@@ -112,31 +124,56 @@ $(debian_dsc_file) $(debian_tar_file): $(debian_dir_stamp) $(PACKAGE_DEBTOPDIR)
 
 $(debian_sig_file): $(debian_dsc_file)
 	@\
-	user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
-	home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+	user="$(GNUPGUSER)" ; user="$${user:+ -u $$user}" ; \
+	home="$(GNUPGHOME)" ; home="$${home:+ --homedir $$home}" ; \
 	pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch }" ; \
 	pipe="$(GNUPGPASS)" ; pipe="$${pipe:+ $(ECHO) "$$pipe" |}" ; \
-	$(ECHO) "rm -f $(debian_sig_file)" ; \
-	rm -f $(debian_sig_file) ; \
+	$(ECHO) "rm -f $@" ; \
+	rm -f $@ ; \
 	$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" ; \
 	eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" || { rm -f $< $@ ; exit 1 ; }
-	cp -fp $(debian_sig_file) $(debian_dsc_file)
-	touch $(debian_sig_file)
+	cp -fp $@ $<
+	touch $@
 
 dsc: $(debian_dsc_file) $(debian_tar_file)
 
-# still have to do this yet
-debs:
+debs: $(debian_dir)
+	( cd $(debian_dir) ; $(DPKG_BUILDPACKAGE) -b -rfakeroot -uc $(DEBXOPTS) -nc )
+
+# Another sneaky trick
+all-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)'
+
+$(debian_asc_file): $(debian_chg_file)
+	@\
+	user="$(GNUPGUSER)" ; user="$${user:+ -u $$user}" ; \
+	home="$(GNUPGHOME)" ; home="$${home:+ --homedir $$home}" ; \
+	pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch }" ; \
+	pipe="$(GNUPGPASS)" ; pipe="$${pipe:+ $(ECHO) "$$pipe" |}" ; \
+	$(ECHO) "rm -f $@" ; \
+	rm -f $@ ; \
+	$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" ; \
+	eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" || { rm -f $< $@ ; exit 1 ; }
+	cp -fp $@ $<
+	touch $@
 
 sigs: $(debian_sig_file)
 
+csig:
+	@for file in $(debian_change_files) ; do \
+		if test -f "$$file" ; then \
+			f=`echo "$$file" | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'` ; \
+			$(MAKE) $(AM_MAKEFLAGS) $$f ; \
+		fi ; \
+	done
+
 release-deb: dsc debs
 
-release-sign-deb: sigs
+release-sign-dsc: sigs
+release-sign-chg: csig
 
 RELEASE			+= release-deb
-RELEASE_SIGN		+= release-sign-deb
-RELEASECLEANFILES	+= $(debian_source_files) $(debian_dir_stamp)
+RELEASE_SIGN		+= release-sign-dsc release-sign-chg
+RELEASECLEANFILES	+= $(debian_source_files) $(debian_dir_stamp) $(debian_binary_files) $(debian_change_files)
 RELEASE_DIRECTORIES	+= $(debian_dir)
 
 distclean-deb:
@@ -153,7 +190,7 @@ EXTRA_DIST		+= \
 			.pkgrelease \
 			.pkgepoch
 
-MY_PHONY		+= dsc debs sigs
+MY_PHONY		+= dsc debs sigs csig
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-sigs
 
 endif

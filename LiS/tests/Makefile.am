@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.1 $) $Date: 2005/03/09 23:14:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.2 $) $Date: 2005/03/17 11:18:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:14:19 $ by $Author: brian $
+# Last Modified $Date: 2005/03/17 11:18:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,8 +73,12 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
-	cp -pf package.m4 $(srcdir)/package.m4
-	rm -f package.m4
+	@if test ':$(srcdir)' != ':.' ; then \
+		$(ECHO) "cp -pf package.m4 $(srcdir)/package.m4" ; \
+		cp -pf package.m4 $(srcdir)/package.m4 ; \
+		$(ECHO) "rm -f package.m4" ; \
+		rm -f package.m4 ; \
+	fi
 
 # my rule
 TESTSUITE_DEPS		= \

@@ -1,28 +1,34 @@
-Source: @PACKAGE@-@VERSION@
+Source: @PACKAGE_LCNAME@-@VERSION@
 Section: devel
 Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE@-LiS-@VERSION@
+Package: @PACKAGE_LCNAME@-LiS-@VERSION@
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE@-LiS, @PACKAGE@-LiS-@VERSION@
-Description: This package includes @PACKAGE@ test programs optioned and compiled for use with
- OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 LiS STREAMS DLPI, XTI INET driver,
- and XTI SCTP driver.  The purpose of this package is to be able to perform comparison tests against
- TCP and SCTP.  This distribution is currently only applicable to Linux release and was targetted at
- ix86 and ppc architectures, but should build and install for other architectures as well.
+Provides: @PACKAGE_LCNAME@-LiS, @PACKAGE_LCNAME@-LiS-@VERSION@
+Description: @PACKAGE_TITLE@ for Linux STREAMS (LiS)
+ This package includes @PACKAGE_TITLE@ test programs optioned and compiled for
+ use with OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 LiS
+ STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The purpose of this
+ package is to be able to perform comparison tests against TCP and SCTP.  This
+ distribution is currently only applicable to Linux release and was targetted at
+ ix86 and ppc architectures, but should build and install for other
+ architectures as well.
 
-Package: @PACKAGE@-streams-@VERSION@
+Package: @PACKAGE_LCNAME@-streams-@VERSION@
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE@-streams, @PACKAGE@-streams-@VERSION@
-Description: This package includes @PACKAGE@ test programs optioned and compiled for use with
- OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 LfS STREAMS DLPI, XTI INET driver,
- and XTI SCTP driver.  The purpose of this package is to be able to perform comparison tests against
- TCP and SCTP.  This distribution is currently only applicable to Linux release and was targetted at
- ix86 and ppc architectures, but should build and install for other architectures as well.
+Provides: @PACKAGE_LCNAME@-streams, @PACKAGE_LCNAME@-streams-@VERSION@
+Description: @PACKAGE_TITLE@ for Linux Fast-STREAMS (LfS)
+ This package includes @PACKAGE_TITLE@ test programs optioned and compiled for
+ use with OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 LfS
+ STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The purpose of this
+ package is to be able to perform comparison tests against TCP and SCTP.  This
+ distribution is currently only applicable to Linux release and was targetted at
+ ix86 and ppc architectures, but should build and install for other
+ architectures as well.
 

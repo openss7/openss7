@@ -1,12 +1,109 @@
-Source: @PACKAGE@-@PACKAGE_VERSION@.@PACKAGE_RELEASE@
+Source: @PACKAGE_LCNAME@-@VERSION@
 Section: devel
 Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE@-@VERSION@
+Package: @PACKAGE_LCNAME@-LiS-core-@kversion@-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-LiS-core @PACKAGE_LCNAME@-LiS-core-@kversion@ @PACKAGE_LCNAME@-LiS-core-@kversion@-@VERSION@
+Conflicts: streams-core @PACKAGE_LCNAME@-streams-core
+Description: Core LiS kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for LiS.
+ Includes assorted LiS drivers and modules for @PACKAGE_TITLE@.
+ These binaries are heavily tied to the kernel for which they were compiled:
+ applies to kernel version @kversion@ and requires an LiS package
+ compiled for the same kernel.
+
+Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-streams-core @PACKAGE_LCNAME@-streams-core-@kversion@ @PACKAGE_LCNAME@-streams-core-@kversion@-@VERSION@
+Conflicts: LiS-core @PACKAGE_LCNAME@-LiS-core
+Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
+ Includes assorted STREAMS drivers and modules for @PACKAGE_TITLE@.
+ These binaries are heavily tied to the kernel for which they were compiled:
+ applies to kernel version @kversion@ and requires an STREAMS package
+ compiled for the same kernel.
+
+Package: @PACKAGE_LCNAME@-LiS-lib-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-lib @PACKAGE_LCNAME@-LiS-lib
+Description: Shared libraries for @PACKAGE_TITLE@ for LiS
+ Run-time shared libraries necessary to run applications programs and utilities
+ developed for @PACKAGE_SHORTTITLE@ for LiS.
+
+Package: @PACKAGE_LCNAME@-streams-lib-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-lib @PACKAGE_LCNAME@-streams-lib
+Description: Shared libraries for @PACKAGE_TITLE@ for STREAMS
+ Run-time shared libraries necessary to run applications programs and utilities
+ developed for @PACKAGE_SHORTTITLE@ for STREAMS.
+
+Package: @PACKAGE_LCNAME@-LiS-util-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-util @PACKAGE_LCNAME@-LiS-util
+Conflicts: @PACKAGE_LCNAME@-streams-util
+Description: Utitlity and test programs for @PACKAGE_TITLE@ and LiS
+ Adminstration and configuration test utilities and commands for
+ @PACKAGE_TITLE@ for LiS; also init scripts and configuration files.
+
+Package: @PACKAGE_LCNAME@-streams-util-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-util @PACKAGE_LCNAME@-streams-util
+Conflicts: @PACKAGE_LCNAME@-LiS-util
+Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
+ Adminstration and configuration test utilities and commands for
+ @PACKAGE_TITLE@ for STREAMS; also init scripts and configuration files.
+
+Package: @PACKAGE_LCNAME@-devel-@VERSION@
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE@, @PACKAGE@-@VERSION@
-Description: This package is a master package that includes all OpenSS7 release packages.
+Provides: @PACKAGE_LCNAME@-devel
+Description: C headers and static libraries for @PACKAGE_TITLE@
+ Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
+ drivers; user-space headers and static libraries required to compile
+ @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
+ info files for both kernel and user-space functions.
+
+Package: @PACKAGE_LCNAME@-dev-@VERSION@
+Architecture: all
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-dev
+Description: Character devices for @PACKAGE_TITLE@
+ Character special device definitions necessary to run applications programs and
+ utilities developed for @PACKAGE_TITLE@.
+
+Package: @PACKAGE_LCNAME@-doc-@VERSION@
+Architecture: all
+Section: doc
+Priority: optional
+Provides: @PACKAGE_LCNAME@-doc
+Description: Documentation and man pages for @PACKAGE_TITLE@
+ Pdf and html documentation for installation and the development of
+ @PACKAGE_TITLE@ applications, modules and drivers.
+
+Package: @PACKAGE_LCNAME@-source-@VERSION@
+Architecture: all
+Section: devel
+Priority: optional
+Provides: @PACKAGE_LCNAME@-source
+Description: Source code for @PACKAGE_TITLE@
+ Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
+ utilities necessary to create and distribute this dpkg -- required for
+ recompiling against recompiled kernel.
+
