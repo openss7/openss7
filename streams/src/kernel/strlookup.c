@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/06 23:10:11 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/10 01:10:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 23:10:11 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/06 23:10:11 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/10 01:10:21 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/06 23:10:11 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/10 01:10:21 $";
 
 #define __NO_VERSION__
 
@@ -411,8 +411,11 @@ STATIC struct cdevsw *cdev_lookup(major_t major, int load)
 #endif				/* CONFIG_DEVFS */
 		} while (0);
 		/* try to acquire the module */
-		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
-			break;
+		if (cdev && cdev->d_str)
+			if (try_inc_mod_count(cdev->d_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__, cdev->d_name));
+				break;
+			}
 		cdev = NULL;
 	}
 	read_unlock(&cdevsw_lock);
@@ -450,8 +453,12 @@ STATIC struct cdevsw *cdrv_lookup(modID_t modid, int load)
 				break;
 		} while (0);
 		/* try to acquire the module */
-		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
-			break;
+		if (cdev && cdev->d_str)
+			if (try_inc_mod_count(cdev->d_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					cdev->d_name));
+				break;
+			}
 		cdev = NULL;
 	}
 	read_unlock(&fmodsw_lock);
@@ -489,8 +496,12 @@ STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
 				break;
 		} while (0);
 		/* try to acquire the module */
-		if (fmod && fmod->f_str && try_inc_mod_count(fmod->f_kmod))
-			break;
+		if (fmod && fmod->f_str)
+			if (try_inc_mod_count(fmod->f_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					fmod->f_name));
+				break;
+			}
 		fmod = NULL;
 	}
 	read_unlock(&fmodsw_lock);
@@ -586,8 +597,12 @@ STATIC struct cdevsw *cdev_search(const char *name, int load)
 #endif				/* CONFIG_DEVFS */
 		} while (0);
 		/* try to acquire the module */
-		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
-			break;
+		if (cdev && cdev->d_str)
+			if (try_inc_mod_count(cdev->d_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					cdev->d_name));
+				break;
+			}
 		cdev = NULL;
 	}
 #else				/* CONFIG_KMOD */
@@ -627,8 +642,12 @@ STATIC struct fmodsw *fmod_search(const char *name, int load)
 			read_lock(&fmodsw_lock);
 		} while (0);
 		/* try to acquire the module */
-		if (fmod && fmod->f_str && try_inc_mod_count(fmod->f_kmod))
-			break;
+		if (fmod && fmod->f_str)
+			if (try_inc_mod_count(fmod->f_kmod)) {
+				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
+					fmod->f_name));
+				break;
+			}
 		fmod = NULL;
 	}
 #else				/* CONFIG_KMOD */
@@ -737,8 +756,10 @@ struct cdevsw *cdev_get(major_t major)
  */
 void cdev_put(struct cdevsw *cdev)
 {
-	if (cdev && cdev->d_kmod)
+	if (cdev && cdev->d_kmod) {
+		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		__MOD_DEC_USE_COUNT(cdev->d_kmod);
+	}
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || \
@@ -798,8 +819,10 @@ EXPORT_SYMBOL_GPL(fmod_get);
  */
 void fmod_put(struct fmodsw *fmod)
 {
-	if (fmod && fmod->f_kmod)
+	if (fmod && fmod->f_kmod) {
+		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		__MOD_DEC_USE_COUNT(fmod->f_kmod);
+	}
 }
 
 #if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
@@ -915,7 +938,7 @@ EXPORT_SYMBOL_GPL(cmin_find);
 minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 {
 	struct list_head *pos;
-	ensure(!cdev->d_majors.next || list_empty(&cdev->d_majors), return (minor));
+	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 	list_for_each(pos, &cdev->d_majors) {
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
 		if (major == cmaj->n_major)

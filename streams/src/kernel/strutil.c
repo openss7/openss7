@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/09 08:32:52 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:52 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/09 08:32:52 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/09 08:32:52 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $";
 
 #define __NO_VERSION__
 
@@ -1150,8 +1150,10 @@ qi_qadmin_t getadmin(modID_t modid)
 	if ((fmod = fmod_get(modid))) {
 		struct streamtab *st;
 		struct qinit *qi;
+		printd(("%s: %s: got module\n", __FUNCTION__, fmod->f_name));
 		if ((st = fmod->f_str) && (qi = st->st_rdinit))
 			qadmin = qi->qi_qadmin;
+		printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 		fmod_put(fmod);
 	}
 	return (qadmin);
@@ -1178,11 +1180,15 @@ modID_t getmid(const char *name)
 	struct cdevsw *cdev;
 	if ((fmod = fmod_find(name))) {
 		modID_t modid = fmod->f_modid;
+		printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
+		printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 		fmod_put(fmod);
 		return (modid);
 	}
 	if ((cdev = cdev_find(name))) {
 		modID_t modid = cdev->d_modid;
+		printd(("%s: %s: found device\n", __FUNCTION__, cdev->d_name));
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 		cdev_put(cdev);
 		return (modid);
 	}
@@ -1783,6 +1789,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 					getmajor(*devp)));
 				goto enoent;
 			}
+			printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 			err = -ENOENT;
 			if (!(st = cdev->d_str)) {
 				pswerr(("%s: device has no streamtab, should not happen\n",
@@ -1794,6 +1801,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 					__FUNCTION__));
 				goto put_noent;
 			}
+			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 			cdrv_put(cdev);
 		}
 	} else if (odev != *devp) {
@@ -1804,6 +1812,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 	qprocson(q);		/* in case qopen() forgot */
 	return (0);
       put_noent:
+	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 	cdrv_put(cdev);
       enoent:
 	qdetach(q, oflag, crp);	/* need to call close */
@@ -1858,9 +1867,9 @@ void qdelete(queue_t *q)
 	unsigned long flags;
 	struct queinfo *qu = (typeof(qu)) q;
 	struct stdata *sd = qu->qu_str;
-	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	wq = rq + 1;
 	swlock(sd, &flags);
 	qput(&rq->q_next);
@@ -2087,10 +2096,12 @@ int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *c
 		goto enosr;
 	if (!(fmod = fmod_find(name)))
 		goto einval;
+	printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
 	if ((err = qattach(sd, fmod, devp, oflag, MODOPEN, crp)) != 0)
 		goto error;
 	sd->sd_pushcnt++;
       error:
+	printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 	fmod_put(fmod);
 	return (err);
       einval:

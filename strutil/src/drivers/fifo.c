@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:13 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -84,7 +84,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -323,6 +323,8 @@ STATIC int fifo_open(struct inode *inode, struct file *file)
 	args.sflag = DRVOPEN;
 	args.crp = current_creds;
 	file->private_data = &args;
+	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
+	printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
 	fops_put(xchg(&file->f_op, fops_get(fifo_cdev.d_fop)));
 	err = file->f_op->open(inode, file);
 	up(&inode->i_sem);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:49 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,10 +75,11 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
+#include "strdebug.h"
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -186,22 +187,33 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct nuls *p, **pp = &nuls_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
-	if (q->q_ptr != NULL)
+	ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor, sflag));
+	if (q->q_ptr != NULL) {
+		printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
-	if (sflag == MODOPEN || WR(q)->q_next)
+	}
+	if (sflag == MODOPEN || WR(q)->q_next) {
+		printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
-	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
+	}
+	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) { /* we could sleep */
+		printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
+	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
+		printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
-		if (cminor < 1)
+		printd(("%s: driver open\n", __FUNCTION__));
+		if (cminor < 1) {
+			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
+		}
 		spin_lock(&nuls_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
@@ -212,12 +224,14 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			if (cminor == dminor && sflag != CLONEOPEN) {
 				spin_unlock(&nuls_lock);
 				kmem_free(p, sizeof(*p));
+				pswerr(("%s: stream already open!\n", __FUNCTION__));
 				return (EIO);	/* bad error */
 			}
 		}
 		if (getminor(makedevice(cmajor, cminor)) == 0) {
 			spin_unlock(&nuls_lock);
 			kmem_free(p, sizeof(*p));
+			printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -227,9 +241,11 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&nuls_lock);
+		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
+	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
 

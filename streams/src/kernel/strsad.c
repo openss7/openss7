@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/10 01:10:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:39 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/10 01:10:21 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:39 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/10 01:10:21 $";
 
 #define __NO_VERSION__
 
@@ -139,10 +139,12 @@ struct strapush *autopush_find(dev_t dev)
 	struct apinfo *api = NULL;
 	if ((cdev = cdrv_get(getmajor(dev))) == NULL)
 		goto notfound;
+	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
 		ap_get(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
+	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 	cdrv_put(cdev);
       notfound:
 	return ((struct strapush *) api);
@@ -183,9 +185,11 @@ int autopush_add(struct strapush *sap)
 	err = -ENOSTR;
 	if ((cdev = cdev_get(sap->sap_major)) == NULL)
 		goto error;
+	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
+	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
       error:
 	return (err);
@@ -205,9 +209,11 @@ int autopush_del(struct strapush *sap)
 	err = -ENODEV;
 	if ((cdev = cdev_get(sap->sap_major)) == NULL)
 		goto error;
+	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
+	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
       error:
 	return (err);
@@ -225,9 +231,11 @@ int autopush_vml(struct str_mlist *smp, int nmods)
 		len = strnlen(smp->l_name, FMNAMESZ + 1);
 		if (len == 0 || len == FMNAMESZ + 1)
 			goto einval;
-		if ((fmod = fmod_find(smp->l_name)) != NULL)
+		if ((fmod = fmod_find(smp->l_name)) != NULL) {
+			printd(("%s: %s: got module\n", __FUNCTION__, fmod->f_name));
+			printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 			fmod_put(fmod);
-		else
+		} else
 			rtn = 1;
 	}
 	return (rtn);
@@ -319,13 +327,16 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
 				err = -EIO;
 				goto abort_autopush;
 			}
+			printd(("%s: %s: found module\n", __FUNCTION__, fmod->f_name));
 			dev = *devp;	/* don't change dev nr */
 			if (fmod->f_str == NULL) {
+				printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 				fmod_put(fmod);
 				err = -EIO;
 				goto abort_autopush;
 			}
 			if ((err = qattach(sd, fmod, &dev, oflag, sflag, crp))) {
+				printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
 				fmod_put(fmod);
 				goto abort_autopush;
 			}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:55 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:55 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:55 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:55 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $";
 
 //#define __NO_VERSION__
 
@@ -99,7 +99,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:55 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1934,15 +1934,18 @@ int stropen(struct inode *inode, struct file *file)
 		printd(("%s: need new stream head\n", __FUNCTION__));
 		if (!(cdev = cdrv_get(getmajor(argp->dev))))
 			return (-ENXIO);
+		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: allocating queues for %s\n", __FUNCTION__, cdev->d_name));
 		/* we don't have a stream yet (or want a new one), so allocate one */
 		if (!(q = allocq())) {
+			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 			cdrv_put(cdev);
 			return (-ENOSR);
 		}
 		printd(("%s: creating stream head for %s\n", __FUNCTION__, cdev->d_name));
 		/* FIXME: need to find/create and attach syncq. */
 		if (!(sd = allocsd())) {
+			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 			cdrv_put(cdev);
 			freeq(q);
 			return (-ENOSR);
@@ -1984,6 +1987,8 @@ int stropen(struct inode *inode, struct file *file)
 		sd->sd_file = file;
 		stri_lookup(file) = (void *) sd;
 		/* done setup, do the open */
+		printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+		cdrv_put(cdev);
 	} else
 		err = strwaitopen(file, sd);
 	if (!err) {
@@ -2018,6 +2023,7 @@ int stropen(struct inode *inode, struct file *file)
  */
 int strflush(struct file *file)
 {
+	ptrace(("%s: stream close\n", __FUNCTION__));
 	return (0);
 }
 
@@ -2040,8 +2046,10 @@ int strflush(struct file *file)
 int strclose(struct inode *inode, struct file *file)
 {
 	struct stdata *sd;
+	ptrace(("%s: closing stream\n", __FUNCTION__));
 	if ((sd = sd_get(stri_lookup(file)))) {
 		int err = 0;
+		printd(("%s: exiting stream head\n", __FUNCTION__));
 		stri_lookup(file) = NULL;
 		sd->sd_readers -= (file->f_mode & FREAD) ? 1 : 0;
 		sd->sd_writers -= (file->f_mode & FWRITE) ? 1 : 0;
@@ -2049,14 +2057,21 @@ int strclose(struct inode *inode, struct file *file)
 			queue_t *wq, *qq;
 			int oflag = make_oflag(file);
 			cred_t *crp = current_creds;
+			printd(("%s: last close\n", __FUNCTION__));
 			/* last close */
-			if (!test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag))
+			if (!test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag)) {
+				printd(("%s: already closing\n", __FUNCTION__));
 				goto put_exit;
-			if (test_bit(STPLEX_BIT, &sd->sd_flag))
+			}
+			if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
+				printd(("%s: linked under multiplexing driver\n", __FUNCTION__));
 				goto put_exit;
+			}
 			/* 1st step: unlink any (temporary) linked streams */
+			printd(("%s: unlink temporary linked streams\n", __FUNCTION__));
 			err = str_i_unlink(file, sd, I_UNLINK, MUXID_ALL);
 			/* 2nd step: call the close routine of each module and pop the module. */
+			printd(("%s: closing queues\n", __FUNCTION__));
 			wq = sd->sd_wq;
 			while ((qq = wq->q_next) && SAMESTR(wq)) {
 				if ((oflag & (O_NONBLOCK | O_NDELAY)) && qq->q_msgs) {
@@ -2075,16 +2090,20 @@ int strclose(struct inode *inode, struct file *file)
 					set_current_state(TASK_RUNNING);
 					remove_wait_queue(&qu->qu_qwait, &wait);
 				}
+				printd(("%s: detaching module queue %p\n", __FUNCTION__, (qq - 1)));
 				qdetach(qq - 1, oflag, crp);
 			}
 			/* 3rd step: call the close routine of the driver and qdetach the driver */
+			printd(("%s: detaching driver queue %p\n", __FUNCTION__, (wq - 1)));
 			qdetach(wq - 1, oflag, crp);
 			sd->sd_rq = sd->sd_wq = NULL;
 		}
 	      put_exit:
+		printd(("%s: putting stream head%p\n", __FUNCTION__, sd));
 		sd_put(sd);	/* could be final put */
 		return (err);
 	}
+	pswerr(("%s: no stream head\n", __FUNCTION__));
 	return (-ENOSTR);
 }
 
@@ -3444,6 +3463,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	err = -ENXIO;
 	if (!(cdev = cdev_get(major)))
 		goto up_exit;
+	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	printd(("%s: major maps to streams driver %s\n", __FUNCTION__, cdev->d_name));
 	minor = cdev_minor(cdev, major, minor);
 	printd(("%s: minor maps to internal minor %hu\n", __FUNCTION__, minor));
@@ -3459,6 +3479,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	args.crp = current_creds;
 	file->private_data = &args;
 	err = spec_open(inode, file);
+	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
       up_exit:
 	up(&inode->i_sem);

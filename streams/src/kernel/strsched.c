@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/01 12:04:39 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/01 12:04:39 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $";
 
 #define __NO_VERSION__
 
@@ -2170,7 +2170,8 @@ struct stdata *sd_get(struct stdata *sd)
 		if (atomic_read(&sh->sh_refs) <= 0)
 			swerr();
 		atomic_inc(&sh->sh_refs);
-	}
+	} else
+		swerr();
 	return (sd);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
@@ -2188,8 +2189,8 @@ void sd_put(struct stdata *sd)
 				freemsg(sd->sd_iocblk);
 			__freesd(sd);
 		}
-	}
-	swerr();
+	} else
+		swerr();
 	return;
 }
 #ifdef CONFIG_STREAMS_STH_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/06/09 08:32:52 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/06/10 01:10:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:52 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/06/09 08:32:52 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/06/10 01:10:21 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/06/09 08:32:52 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/06/10 01:10:21 $";
 
 #define __NO_VERSION__
 
@@ -707,6 +707,7 @@ STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct file *ext_
 	file->f_flags &= ~(O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC);
 	return (file);
       error:
+	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
 	fops_put(file->f_op);
 	_file_move(file, &kill_list);	/* out of the way.. */
 	file->f_dentry = NULL;
@@ -738,6 +739,7 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 	err = ENXIO;
 	if (!(cdev = cdrv_get(getmajor(argp->dev))))
 		goto exit;
+	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	printd(("%s: open of driver %s\n", __FUNCTION__, cdev->d_name));
 	err = ENOENT;
 	if (!(parent = dget(cdev->d_dentry)))
@@ -817,7 +819,7 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 	printd(("%s: putting parent dentry\n", __FUNCTION__));
 	dput(parent);
       cput_exit:
-	printd(("%s: putting driver\n", __FUNCTION__));
+	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 	cdrv_put(cdev);
       exit:
 	return (err);

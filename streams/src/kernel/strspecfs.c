@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/09 08:32:52 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:52 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/09 08:32:52 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/09 08:32:52 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/09 08:32:52 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -280,6 +280,8 @@ STATIC int spec_dev_open(struct inode *inode, struct file *file)
 	args.oflag = make_oflag(file);
 	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
 	args.crp = current_creds;
+	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
+	printd(("%s: %s: getting file operations\n", __FUNCTION__, cdev->d_name));
 	fops_put(xchg(&file->f_op, fops_get(cdev->d_fop)));
 	err = -EIO;
 	if (!file->f_op || !file->f_op->open)
@@ -510,6 +512,8 @@ STATIC int spec_dir_open(struct inode *inode, struct file *file)
 	args.oflag = make_oflag(file);
 	args.sflag = CLONEOPEN;
 	args.crp = current_creds;
+	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
+	printd(("%s: %s: getting file operations\n", __FUNCTION__, cdev->d_name));
 	fops_put(xchg(&file->f_op, fops_get(cdev->d_fop)));
 	if (!file->f_op || !file->f_op->open)
 		return (-EIO);
@@ -712,6 +716,7 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 	}
 	/* this will also attempt to demand load the "streams-%s" module if required */
 	if ((cdev = cdev_find(name))) {
+		printd(("%s: %s: found device\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: name is a device or module\n", __FUNCTION__));
 		if ((dentry = dget(cdev->d_dentry)))
 			goto exit;
@@ -740,8 +745,10 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 	dentry = ERR_PTR(-ENOMEM);
 	goto exit;
       exit:
-	if (cdev)
+	if (cdev) {
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 		cdev_put(cdev);
+	}
 	return (dentry);
 }
 
@@ -1130,6 +1137,7 @@ STATIC void spec_read_inode(struct inode *inode)
 			struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
 			__kernel_dev_t dev =
 			    MKDEV(cdev->d_major, getminor(inode->i_ino) & MAX_CHRDEV);
+			printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 			printd(("%s: reading device node %p (%ld)\n", __FUNCTION__, inode,
 				inode->i_ino));
 			inode->i_mode = (sbi->sbi_mode & ~S_IFMT) | (cdev->d_mode & S_IFMT);
@@ -1145,6 +1153,8 @@ STATIC void spec_read_inode(struct inode *inode)
 			inode->i_fop = &spec_dev_f_ops;
 			inode->i_rdev = to_kdev_t(dev);
 			inode->i_cdev = cdget(dev);
+			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+			cdrv_put(cdev);
 			return;
 		}
 	} else {
@@ -1153,6 +1163,7 @@ STATIC void spec_read_inode(struct inode *inode)
 		if ((cdev = cdrv_get(getminor(inode->i_ino)))) {
 			struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
 			__kernel_dev_t dev = NODEV;
+			printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 			printd(("%s: reading driver node %p (%ld)\n", __FUNCTION__, inode,
 				inode->i_ino));
 			inode->i_mode = (sbi->sbi_mode & ~S_IFMT) | S_IFDIR;
@@ -1166,6 +1177,8 @@ STATIC void spec_read_inode(struct inode *inode)
 			inode->i_fop = &spec_dir_f_ops;
 			inode->i_rdev = to_kdev_t(dev);
 			inode->i_cdev = NULL;
+			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+			cdrv_put(cdev);
 			return;
 		}
 	}
@@ -1282,6 +1295,7 @@ STATIC void spec_delete_inode(struct inode *inode)
 			swerr();
 			inode->u.generic_ip = NULL;
 			// cdev->d_dentry = NULL;
+			printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 			cdev_put(cdev);
 		}
 		break;
@@ -1374,7 +1388,6 @@ STATIC int spec_remount_fs(struct super_block *sb, int *flags, char *data)
 {
 	struct spec_sb_info *sbi = sb->u.generic_sbp;
 	ptrace(("%s: remouting superblock %p\n", __FUNCTION__, sb));
-	printd(("%s: would like to MOD_INC_USE_COUNT\n", __FUNCTION__));
 	return spec_parse_options(data, sbi);
 }
 

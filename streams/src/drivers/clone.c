@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 23:08:27 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -161,14 +161,25 @@ static int cloneopen(struct inode *inode, struct file *file)
 	struct str_args *argp;
 	struct cdevsw *cdev;
 	int err;
-	if (!(argp = file->private_data))
-		return (-EIO);
-	if (!(cdev = cdrv_get(getminor(argp->dev))))
-		return (-ENOENT);
+	ptrace(("%s: opening clone device\n", __FUNCTION__));
+	err = -EIO;
+	if (!(argp = file->private_data)) {
+		pswerr(("%s: no arguments passed\n", __FUNCTION__));
+		goto exit;
+	}
+	err = -ENOENT;
+	if (!(cdev = cdrv_get(getminor(argp->dev)))) {
+		printd(("%s: no driver for minor %hu\n", __FUNCTION__, getminor(argp->dev)));
+		goto exit;
+	}
+	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	argp->dev = makedevice(cdev->d_modid, 0);
 	argp->sflag = CLONEOPEN;
+	printd(("%s: opening cloned device internal major %hu, minor %hu\n", __FUNCTION__, cdev->d_modid, 0));
 	err = spec_open(inode, file);
+	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
+exit:
 	return (err);
 }
 
@@ -223,24 +234,34 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	major_t major;
 	minor_t minor;
 	modID_t modid, instance;
+	ptrace(("%s: opening clone device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+	printd(("%s: external major %hu, minor %hu\n", __FUNCTION__, major, minor));
 	minor = cdev_minor(&clone_cdev, major, minor);
 	major = clone_cdev.d_major;
+	printd(("%s: base major %hu, extended minor %hu\n", __FUNCTION__, major, minor));
 	modid = clone_cdev.d_modid;
+	printd(("%s: internal major %hu\n", __FUNCTION__, modid));
 	err = -ENXIO;
-	if (!(cdev = cdev_get(minor)))
+	printd(("%s: device maps to internal major %hu, minor %hu\n", __FUNCTION__, modid, 0));
+	if (!(cdev = cdev_get(minor))) {
+		printd(("%s: could not find driver for minor %hu\n", __FUNCTION__, minor));
 		goto up_exit;
+	}
+	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	instance = cdev->d_modid;
-	cdev_put(cdev);
 	args.dev = makedevice(modid, instance);
 	args.oflag = make_oflag(file);
 	args.sflag = CLONEOPEN;
 	args.crp = current_creds;
 	file->private_data = &args;
+	printd(("%s: opening driver %s\n", __FUNCTION__, cdev->d_name));
 	err = spec_open(inode, file);
+	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+	cdev_put(cdev);
       up_exit:
 	up(&inode->i_sem);
       exit:
@@ -264,7 +285,7 @@ int register_clone(struct cdevsw *cdev)
 {
 	int err;
 	struct devnode *cmin;
-	ptrace(("registering clone minor for %s\n", cdev->d_name));
+	ptrace(("%s: registering clone minor for %s\n", __FUNCTION__, cdev->d_name));
 	err = -ENOMEM;
 	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC))) {
 		printd(("could not allocate minor devnode structure\n"));
@@ -282,11 +303,12 @@ int register_clone(struct cdevsw *cdev)
 	cmin->n_minor = cdev->d_major;
 	cmin->n_dev = &clone_cdev;
 	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0) {
-		printd(("could not register minor node for %s, err = %d\n", cdev->d_name, -err));
+		printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
+			cdev->d_name, -err));
 		kfree(cmin);
 		goto error;
 	}
-	printd(("STREAMS: registered clone minor for %s\n", cdev->d_name));
+	printd(("%s: registered clone minor for %s\n", __FUNCTION__, cdev->d_name));
       error:
 	return (err);
 }
@@ -297,11 +319,13 @@ int unregister_clone(struct cdevsw *cdev)
 {
 	int err;
 	struct devnode *cmin;
+	err = -ENXIO;
 	if (!(cmin = cmin_get(&clone_cdev, cdev->d_modid)))
-		return (-ENXIO);
+		goto error;
 	if ((err = unregister_strnod(&clone_cdev, cdev->d_modid)))
-		return (err);
+		goto error;
 	kfree(cmin);
+      error:
 	return (err);
 }
 
