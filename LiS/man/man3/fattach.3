@@ -144,24 +144,24 @@ is set to indicate the error causing the failure (see below).
 .PP
 .BR fattach "() "
 may fail at least with the following error indications:
-.TP 12
+.TP \w'[TNOTSUPPORT]\(em'u
 .B "[EBADF]"
 The
 .I filedes
 argument is not a valid open file descriptor.
-.TP 12
+.TP
 .B "[EINVAL]"
 The
 .I filedes
 argument does not refer to a valid
 .I STREAMS
 file.
-.TP 12
+.TP
 .B "[EISDIR]"
 The
 .I path
 argument refers to a directory.
-.TP 12
+.TP
 .B "[EBUSY]"
 The
 .I path
