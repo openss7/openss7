@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: specfs.5.man,v 0.9.2.5 2004/08/22 06:17:42 brian Exp $
+.\" @(#) $Id: specfs.5.man,v 0.9.2.6 2004/08/24 08:42:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:42 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SPECFS 5 "$Date: 2004/08/22 06:17:42 $" "$Name:  $" "Linux Fast-STREAMS System File Formats"
+.TH SPECFS 5 "$Date: 2004/08/24 08:42:36 $" "$Name:  $" "Linux Fast-STREAMS System File Formats"
 .\"
 .\"
 .SH NAME
 .B specfs
-\- \fISTREAMS\fR special device shadow filesystem
+\- \fISTREAMS\fR special device shadow file system
 .\"
 .\"
 .SH SYNOPSIS
@@ -99,7 +99,7 @@ filesystem
 .BR fs (5))
 that provides a
 .I STREAMS
-shadow special filesystem that supports
+shadow special file system that supports
 .I STREAMS
 special character devices.
 The
@@ -115,7 +115,7 @@ is performed on a character special device corresponding to a
 driver, the inode attached to the filepointer associated with the opening file
 descriptor is replaced with an inode from the
 .B specfs
-filesystem that represents a minor node of the
+file system that represents a minor node of the
 .I STREAMS
 character special device.  The original inode (as a device in the
 .B /dev
@@ -140,7 +140,7 @@ and
 .BR fdetach (8))
 directory entries (devices) in the
 .B specfs
-filesystem can be mounted on files in other filesystems.
+file system can be mounted on files in other file systems.
 The
 .B Linux
 kernel supports file on file mounting, and the
@@ -151,18 +151,18 @@ user functions are provided by
 .B Linux Fast-STREAMS
 to permit mounting and unmounting of device nodes from the
 .I specfs
-filesystem on regular files in other filesystems.
+file system on regular files in other file systems.
 .\"
 .\"
 .PP
 As an additional feature, the entire
 .B specfs
-filesystem is mountable.  Recommended practice is to create a mount point in
+file system is mountable.  Recommended practise is to create a mount point in
 the device directory
 .B /dev/streams
 and mount the
 .B specfs
-filesystem there with a command similar to the following in a boot script:
+file system there with a command similar to the following in a boot script:
 .PP
 .RS
 .nf
@@ -174,12 +174,12 @@ mount -t specfs none /dev/streams
 .PP
 It is also possible to mount the
 .B specfs
-filesystem at more than one mount point in more than one filesystem.  The
+file system at more than one mount point in more than one file system.  The
 directory hierarchy that is rooted at the mount point is identical to all
 mount points.
 This permits the
 .B specfs
-filesystem to be mounted on the
+file system to be mounted on the
 .B /device
 mount point in a fashion similar to
 .IR Solaris \(rg.
@@ -192,14 +192,14 @@ for additional information.
 .PP
 The
 .B specfs
-filesystem accepts the following options to the
+file system accepts the following options to the
 .BR mount (8)
 command:
 .TP
 .BI uid= value
 Set the user for all directory and device nodes created within the
 .B specfs
-filesystem.
+file system.
 The value must be numeric, but can be decimal, hexadecimal or octal in shell
 notation.  See
 .BR strtoul (3).
@@ -208,7 +208,7 @@ The default is to use the user id of the user creating the directory or node.
 .BI gid= value
 Set the group for all directory and device nodes created within the
 .B specfs
-filesystem.
+file system.
 The value must be numeric, but can be decimal, hexadecimal or octal in shell
 notation.  See
 .BR strtoul (3).
@@ -217,7 +217,7 @@ The default is to use the group id of the user creating the directory or node.
 .BI mode= value
 Set the mode for all directories and device nodes created within the
 .B specfs
-filesystem.
+file system.
 The value must be numeric, but can be decimal, hexadecimal or octal in shell
 notation.  See
 .BR strtoul (3).
@@ -231,7 +231,7 @@ When mounted at
 .BR /dev/streams  " or " /device ,
 the
 .B specfs
-filesystem exhibits a number of special properties:
+file system exhibits a number of special properties:
 .IP 1. \w'1.\(em'u
 Attempting to read the
 .BI /dev/streams/ devname /
@@ -284,12 +284,12 @@ registers using the
 .BR register_strdev (9)
 utility, or any of the other compatibility
 .I STREAMS
-driver registraion functions.
+driver registration functions.
 .PP
 The behaviour is similar in some respects to the
 .IR Solaris \(rg
 .B /device
-filesystem, the
+file system, the
 .B Linux
 .BR devfs ,
 and the
@@ -299,7 +299,7 @@ and the
 These characteristics greatly simply device naming and numbering.  A simple
 symbolic link within the
 .B /dev
-filesystem is sufficient to demand load the necessary kernel module and open
+file system is sufficient to demand load the necessary kernel module and open
 the appropriate instances of the
 .I STREAMS
 device without need to reference device major or device minor numbers.  For a
@@ -327,7 +327,7 @@ field of the
 .B stat
 structure.
 (The truncated internal device number is the internal device number of the
-device compoposed of module ID as major device component and instance number
+device composed of module ID as major device component and instance number
 as minor device component truncated to OS limits.  Under Linux 2.4 kernels,
 this is the 16-bit module ID truncated to an 8-bit major device number and the
 16-bit instance number truncated to an 8-bit minor device number.)
@@ -343,7 +343,7 @@ The node types for pipes, fifos or sockets are appropriately returned as
 .PP
 Permission set on directories and device nodes within the
 .B specfs
-filesystem do not affect the permissions on normal
+file system do not affect the permissions on normal
 .B /dev
 character special device nodes corresponding to
 .I STREAMS
@@ -351,8 +351,8 @@ devices.
 .PP
 Mounting the
 .B specfs
-filesystem presents some unique secuirty concerns listed below.  The most
-secure approach is to not mount the filesystem.
+file system presents some unique security concerns listed below.  The most
+secure approach is to not mount the file system.
 .IP a) \w'm)\(em'u
 Any user with create permission to the
 .B /dev/streams
@@ -373,18 +373,18 @@ subdirectory can create a new stream or open an existing stream.
 .PP
 The
 .B specfs
-filesystem is implemented with the
+file system is implemented with the
 .I SPECFS
 kernel module,
 .BR specfs ,
-as a normal pseudo-filesystem under
+as a normal pseudo-file system under
 .B Linux .
 .PP
 When the
 .B specfs
 is compiled as a loadable kernel module and the kernel is configured for
 .BR kmod ,
-mounting the special filesystem will demand-load the kernel module.
+mounting the special file system will demand-load the kernel module.
 .\"
 .\"
 .SH EXAMPLES
@@ -462,7 +462,7 @@ magic
 .]
 however, there are many differences and access to the
 .B specfs
-filesystem should be left internal to the
+file system should be left internal to the
 .I STREAMS
 executive and its structures should not be accessed directly by
 portable
@@ -471,11 +471,11 @@ drivers.
 .IP \(em
 Neither source nor binary compatibility of the
 .B specfs
-filesystem is guaranteed.
+file system is guaranteed.
 .IP \(em
 The
 .B specfs
-filesystem is provide for compatibilty with
+file system is provide for compatabilty with
 .I SVR 4
 for the purpose of porting
 .I STREAMS
@@ -485,26 +485,26 @@ Because internal structures and definitions differ, binaries are incompatible.
 .IP \(em
 The
 .B specfs
-filesystem only provides functionality comparable to
+file system only provides functionality comparable to
 .I SVR 4
 for use by
 .I STREAMS
 drivers and modules.  Any and all functionality provided by the
 .B specfs
-filesystem in support of
+file system in support of
 .RI non- STREAMS
 devices is not supported.
 .PP
 See
 .BR STREAMS (9)
-for more compatiblity information.
+for more compatablity information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 Descriptions of the
 .B specfs
-filesystem in
+file system in
 .RI \(lq "The Magic Garden" \(rq.
 .[
 magic
@@ -515,7 +515,7 @@ magic
 .PP
 The
 .B specfs
-filesystem first appeared in
+file system first appeared in
 .IR "SVR 4" .
 .[
 svr4

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: RW_ALLOC.9.man,v 0.9.2.6 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: RW_ALLOC.9.man,v 0.9.2.7 2004/08/24 08:42:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH RW_ALLOC 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH RW_ALLOC 9 "$Date: 2004/08/24 08:42:39 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -198,7 +198,7 @@ and sufficient resources for the allocation are not immediately available.
 .SH CONTEXT
 .PP
 .BR RW_ALLOC ()
-can only be called from user or blockable context only when
+can only be called from user or blocking context only when
 .B KM_SLEEP
 is set in
 .IR flag .
@@ -237,7 +237,7 @@ usldk
 .]
 documentation.  The
 .IR lkinfop ", " hierarchy " and " lkinfop
-arguements are ignored.
+arguments are ignored.
 Only the
 .I flag
 argument is honoured.
@@ -250,7 +250,7 @@ is implemented by allocating a
 .B rwlock_t
 structure using
 .BR kmem_alloc (9)
-and initialised with
+and initialized with
 .BR rwlock_init (9).
 .\"
 .\"
@@ -294,7 +294,7 @@ ignores the
 argument.
 The underlying
 .B Linux
-read/write locks are incapable of tracking lock heirarchies.
+read/write locks are incapable of tracking lock hierarchies.
 .IP \(em
 .BR RW_ALLOC ()
 ignores the
@@ -318,7 +318,7 @@ ignores the
 .I lkinfop
 argument.
 .B Linux Fast-STREAMS
-does not support basic, sleep, sychronization or read/write lock statistics or
+does not support basic, sleep, synchronization or read/write lock statistics or
 debugging in the manner of
 .IR "SVR 4.2 MP" .
 .IP \(em
@@ -352,7 +352,7 @@ devices are not supported.
 .PP
 See
 .BR STREAMS (9)
-for more compatbility information.
+for more compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

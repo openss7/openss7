@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: weldq.9.man,v 0.9.2.8 2004/08/22 06:17:46 brian Exp $
+.\" @(#) $Id: weldq.9.man,v 0.9.2.9 2004/08/24 08:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WELDQ 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WELDQ 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -201,7 +201,7 @@ If a callback function is not required,
 should be set to
 .BR NULL .
 .PP
-If syncrhonization of the callback function with a queue is necessary (and is
+If synchronization of the callback function with a queue is necessary (and is
 recommended), the argument
 .I protect_q
 specifies a queue to be used for synchronization.  If synchronization of the
@@ -222,7 +222,7 @@ and
 .BR spx (4)
 drivers to connect two streams together to form a
 .BR pipe (2)
-or loopback connection.
+or loop-back connection.
 .BR
 .PP
 For example, to weld two streams,
@@ -287,7 +287,7 @@ error number.
 .PP
 .BR weldq ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+call-outs, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -339,7 +339,7 @@ from the callback function.
 .PP
 If a protection queue,
 .I protect_q
-is specified, the normal sychronization as is appropriate for a callback
+is specified, the normal synchronization as is appropriate for a callback
 procedure on the specified queue will be taken before the action is performed
 and the callback is invoked.
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: enableok.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: enableok.9.man,v 0.9.2.9 2004/08/24 08:42:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ENABLEOK 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH ENABLEOK 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -124,7 +124,7 @@ Queues that have their
 flag clear will enable the service procedure under all normal queue enabling
 situations, as follows:
 .IP \- 3
-the queue has been backenabled.
+the queue has been back-enabled.
 .PD 0
 .IP \- 3
 a normal message arrives at an empty queue.

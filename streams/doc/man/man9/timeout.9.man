@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timeout.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: timeout.9.man,v 0.9.2.9 2004/08/24 08:42:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIMEOUT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH TIMEOUT 9 "$Date: 2004/08/24 08:42:47 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -394,11 +394,11 @@ allocates a
 .B strevent
 structure that includes an embedded Linux kernel timer.
 .BR timeout ()
-assigns a packed outdating pointer into the integer
+assigns a packed out-dating pointer into the integer
 .B toid_t
 returned.  This pointer is a sequenced pointer to a
 .B strevent
-object that expires when the timeout's sequence number is incremented.  This
+object that expires when the timeout sequence number is incremented.  This
 permits unpacking and dereferencing of the pointer instead of searches for id
 numbers in
 .B strevent

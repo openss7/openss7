@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_register_strdev.9.man,v 0.9.2.5 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: lis_register_strdev.9.man,v 0.9.2.6 2004/08/24 08:42:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LIS_REGISTER_STRDEV 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH LIS_REGISTER_STRDEV 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -135,7 +135,7 @@ LiS
 .I STREAMS
 devices registered with
 .BR lis_register_strdev ()
-can be deregistered with
+can be unregistered with
 .BR lis_unregsiter_strdev (9).
 .PP
 .BR lis_register_strdev ()

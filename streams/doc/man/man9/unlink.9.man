@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlink.9.man,v 0.9.2.8 2004/08/22 06:17:46 brian Exp $
+.\" @(#) $Id: unlink.9.man,v 0.9.2.9 2004/08/24 08:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNLINK 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNLINK 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -121,7 +121,7 @@ Normally,
 would be called within the kernel module
 .BR cleanup_module (9)
 function to remove the character special devices that were created during
-module intialization.
+module initialization.
 .PP
 The arguments to
 .BR unlink ()
@@ -215,7 +215,7 @@ lis
 synthesizes system calls from inside the kernel that is incompatible with
 architectures that do not support in-kernel system calls.
 .BR unlink ()
-peforms a direct function call to
+performs a direct function call to
 .BR sys_unlink (9)
 within the kernel and does not suffer from this deficiency.
 .IP \(em

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qtimeout.9.man,v 0.9.2.9 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: qtimeout.9.man,v 0.9.2.10 2004/08/24 08:42:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QTIMEOUT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QTIMEOUT 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .SH NAME
 .B qtimeout
 \- start a timer associated with a queue
@@ -176,7 +176,7 @@ the return value should always be checked.
 .PP
 .BR qtimeout ()
 can be called from any context including user context, queue procedures,
-callouts, callbacks and interrupt service routiners.
+call-outs, callbacks and interrupt service routines.
 .\"
 .\"
 .SH "MP-STREAMS"
@@ -186,7 +186,7 @@ is MP-safe.
 .PP
 The
 .BR qtimeout ()
-callback function will not be executed while any synchronous procedure, callout
+callback function will not be executed while any synchronous procedure, call-out
 or callback functions are executing.
 In addition, the
 .BR qtimeout ()
@@ -216,7 +216,7 @@ variables accessed by the callback function.
 It is also safe to hold private locks taken by the callback function across a
 call to
 .BR qtimeout ().
-This is the same situationas as that of the other callback functions.
+This is the same situations as that of the other callback functions.
 See
 .BR mt-streams (9).
 .\"
@@ -258,7 +258,7 @@ calling
 has the same effect as calling
 .BR timeout (9).
 .PP
-For architectural independency, the driver function
+For architectural independence, the driver function
 should not specify the
 .I ticks
 argument directly, but should use the
@@ -276,7 +276,7 @@ microseconds or some other absolute unit of time.
 should be treated as an opaque type that can be tested for equality to zero.
 The value should not otherwise be manipulated.
 .B Linux Fast-STREAMS
-implements timeout id values internally as abbreviated outdating pointers to a
+implements timeout id values internally as abbreviated out-dating pointers to a
 .B strevent
 structure containing a
 .I Linux

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: module_stat.9.man,v 0.9.2.3 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: module_stat.9.man,v 0.9.2.4 2004/08/24 08:42:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MODULE_STAT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MODULE_STAT 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -145,7 +145,7 @@ Flags for boolean statistics (events).
 .\"
 .SH CONTEXT
 .PP
-Functions that operat on a module information structure can be called from any
+Functions that operate on a module information structure can be called from any
 context.
 .\"
 .\"
@@ -169,7 +169,7 @@ for implementation and architecture independence.
 .PP
 The
 .B module_stat
-structu is only a subset of the implementation structure used by the
+structure is only a subset of the implementation structure used by the
 .I STREAMS
 scheduler.  Additional hidden fields are present in the implementation
 structure.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dtimeout.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: dtimeout.9.man,v 0.9.2.2 2004/08/24 08:42:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DTIMEOUT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DTIMEOUT 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -104,10 +104,10 @@ the argument to pass to the callback function.
 the number of ticks to wait before expiry.
 .TP
 .I pl
-the priority level at which to run the callout function.
+the priority level at which to run the call-out function.
 .TP
 .I cpu
-the cpu on which to execute the callout function.
+the cpu on which to execute the call-out function.
 .\"
 .\"
 .SH DESCRIPTION
@@ -128,7 +128,7 @@ at the specified priority level
 .IR pl ,
 and on the specified processor
 .IR cpu .
-The timeout callout function
+The timeout call-out function
 .I timo_fcn
 is a function returning
 .B void
@@ -140,7 +140,7 @@ argument as follows:
 .BI "typedef void timo_fcn_t(caddr_t " arg );
 .fi
 .PP
-The callout function
+The call-out function
 .I timo_fcn
 will be executed at some time greater than or equal to the interval specified
 in the
@@ -156,7 +156,7 @@ timeout identifier returned by
 .BR dtimeout ()
 is suitable to be used by 
 .BR untimeout (9)
-to cancel the timeout function callout.
+to cancel the timeout function call-out.
 .\"
 .\"
 .SH RETURN
@@ -185,7 +185,7 @@ When
 .BR dtimeout ()
 fails, it returns a zero (0) timeout id.
 .BR dtimeout ()
-failes when it cannot allocate the internal structures for the timeout, when
+fails when it cannot allocate the internal structures for the timeout, when
 the arguments are invalid, or the timeout cannot otherwise be scheduled on the
 specified processor.  If it is important that a timeout be scheduled with
 assurance, the return value should always be checked.
@@ -205,14 +205,14 @@ is MP-safe.
 .PP
 Considerations should be given when writing the callback function that a
 .BR dtimeout ()
-callout function is asynchronous and can execute at the same time as any user
-context, module procedure, callout, callback, soft interrupt or interrupt
+call-out function is asynchronous and can execute at the same time as any user
+context, module procedure, call-out, callback, soft interrupt or interrupt
 service routine not masked by the
 .I pl
 argument.
 In addition, for sufficiently small
 .I tick
-values, the callout function may execute before the call to
+values, the call-out function may execute before the call to
 .BR dtimeout ()
 returns.
 However, the callback function will be serviced on the CPU specified.
@@ -230,7 +230,7 @@ and
 .BR drv_hztousec (9)
 DKI functions.  The Linux
 .B HZ
-define or som other quantoum independent conversion function to conver to and
+define or some other quantum independent conversion function to convert to and
 from microseconds or some other absolute unit of time.
 .PP
 .B toid_t
@@ -288,7 +288,7 @@ uw7doc
 .]
 allows a
 .B TO_PERIODIC
-flag to be logically OR'ed with the
+flag to be logically ORed with the
 .I ticks
 argument to indicate a periodic timer.
 .IP \(em

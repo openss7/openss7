@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmsg.2.man,v 0.9.2.7 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: getmsg.2.man,v 0.9.2.8 2004/08/24 08:42:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMSG 2 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH GETMSG 2 "$Date: 2004/08/24 08:42:33 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -259,7 +259,7 @@ indicates that the entire message was received successfully.
 .PP
 .B getmsg()
 with the appropriate arguments will retrieve a higher priority message before
-the remainder of a partially retreived lower priority message is retrieved.
+the remainder of a partially retrieved lower priority message is retrieved.
 .PP
 Upon success,
 .B getmsg()
@@ -602,7 +602,7 @@ recognizes the \*(lqinvalid\*(rq buffer length to
 .BR read (2)
 used by LiS to emulate the
 .I __NR_getpmsg
-system call, permitting LiS libaries to be used with
+system call, permitting LiS libraries to be used with
 .BR "Linux Fast-STREAMS" .
 .\"
 .\"

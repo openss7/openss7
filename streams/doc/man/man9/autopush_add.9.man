@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush_add.9.man,v 0.9.2.6 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: autopush_add.9.man,v 0.9.2.7 2004/08/24 08:42:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH_ADD 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH AUTOPUSH_ADD 9 "$Date: 2004/08/24 08:42:41 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -97,7 +97,7 @@ performs the same function within the kernel as is provided to user space via
 the
 .B SAD_SAP
 IO control to the
-.IR "STREAMS Adminstrative Driver" ,
+.IR "STREAMS Administrative Driver" ,
 .BR sad (4).
 This function adds an autopush list to a \fISTREAMS\fP character device.  The
 character device and autopush list is specified by
@@ -278,7 +278,7 @@ or a subset of the specified range of minor device numbers
 already exists.
 .TP
 .RB [ ENOSR ]
-insufficient \fISTREAMS\fP resources were available to succesfully complete
+insufficient \fISTREAMS\fP resources were available to successfully complete
 the call.  This is caused by the inability to allocate cache storage to hold
 the autopush description.
 .\"

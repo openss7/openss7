@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: appq.9.man,v 0.9.2.9 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: appq.9.man,v 0.9.2.10 2004/08/24 08:42:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH APPQ 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH APPQ 9 "$Date: 2004/08/24 08:42:41 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -213,7 +213,7 @@ However, it is also possible to ensure exclusive access with
 or with appropriate synchronization boundaries
 .RB ( STR_PERQUEUE " or " D_MTPERQ ).
 .PP
-This is similar to the syncrhonization necessary for use of
+This is similar to the synchronization necessary for use of
 .BR insq (9)
 and
 .BR rmvq (9).
@@ -291,7 +291,7 @@ drivers and modules should not call this function.
 called with a
 .B NULL
 .IR q " or " nmp
-argument will panic or destablize the kernel.
+argument will panic or destabilize the kernel.
 .BR appq ()
 called with a
 .B NULL
@@ -353,7 +353,7 @@ with
 Under
 .IR LiS ,
 .BR appq ()
-does not protect dereferncing of the
+does not protect dereferencing of the
 .I emp->b_next
 pointer with the queue spin lock making it unsafe to be called concurrent
 with

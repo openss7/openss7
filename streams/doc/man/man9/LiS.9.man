@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 0.9.2.5 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 0.9.2.6 2004/08/24 08:42:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LiS 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH LiS 9 "$Date: 2004/08/24 08:42:39 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .SH NAME
 .I LiS
 \- introduction to \fISTREAMS\fR kernel functions
@@ -134,7 +134,7 @@ a STREAMS XTI/TLI compatibility interface
 .HP
 .BR tirdwr (4)
 \-
-a STREAMS XTI/TLI read write comptibility interface
+a STREAMS XTI/TLI read write compatibility interface
 .SS "System Calls"
 .PP
 .HP
@@ -205,7 +205,7 @@ register a STREAMS module
 .HP
 .BR lis_unregister_strmod (9)
 \-
-deregister a STREAMS module
+unregister a STREAMS module
 .HP
 .BR lis_register_strdev (9)
 \-
@@ -547,7 +547,7 @@ start a timer
 .HP
 .BR umount (9)
 \-
-unmount a filesystem
+unmount a file system
 .HP
 .BR unlink (9)
 \-

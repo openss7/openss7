@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cmn_err.9.man,v 0.9.2.9 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: cmn_err.9.man,v 0.9.2.10 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CMN_ERR 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH CMN_ERR 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -128,7 +128,7 @@ level in
 .BR Linux .
 .TP
 .B CE_WARN
-This error level is for warinings.  These are critical conditions, however,
+This error level is for warnings.  These are critical conditions, however,
 these errors do not halt the kernel.
 This equates to a
 .B KERN_WARNING

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.2 2004/08/24 08:42:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STR_INSTALL 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STR_INSTALL 9 "$Date: 2004/08/24 08:42:47 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -222,7 +222,7 @@ This flag is automatically set by
 if the module is not multiprocesor-safe.
 .TP
 .B STR_PERSTREAM
-Specifies that the module accesspt to run at perstream synchronization level.
+Specifies that the module accepts to run at per-stream synchronization level.
 .TP
 .B STR_Q_NOTTOSPEC
 Specifies that the module is designed to run it's service procedure
@@ -305,7 +305,7 @@ Specifies the default level, set to
 .I sc_sqinfo
 Specifies an optional group name.  This field is only used when the
 .BR SQLVL_ELSEWHERE
-abitrary sychronization level is set; all modules having the same name belong
+arbitrary synchronization level is set; all modules having the same name belong
 to one group.  The name size is limited to eight
 .RB ( FMNAMESZ )
 characters.
@@ -342,7 +342,7 @@ The module could not be loaded.
 The module is not present and cannot be unloaded.
 .TP
 .RB [ ENOMEM ]
-Insufficent memory was availale to complete the request.
+Insufficient memory was available to complete the request.
 .TP
 .RB [ ENXIO ]
 .I STREAMS
@@ -478,7 +478,7 @@ synchronization flags are not supported.  On
 .[
 lfs
 .]
-sychronization flags are fully supported.
+synchronization flags are fully supported.
 .IP \(em
 .BR str_install ()
 is provided for source level compatibility with

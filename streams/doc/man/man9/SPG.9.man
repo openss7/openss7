@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.7 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.8 2004/08/24 08:42:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SPG 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
+.TH SPG 9 "$Date: 2004/08/24 08:42:40 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
 .\"
 .\"
 .SH NAME
@@ -410,7 +410,7 @@ will return the real external major or minor device number.  The real external
 major or minor device number is the major or minor device number that is seen
 by user applications.
 .PP
-A number of adminstrative utilities are provided that assist with the
+A number of administrative utilities are provided that assist with the
 assignment of device names and numbers and are useful in boot scripts:
 .\".TS
 .\"expand tab(:);
@@ -489,8 +489,8 @@ supports the
 character device module demand loading; however, the
 .B Linux
 mechanism requires prior knowledge of the character major device number.
-Some of the adminstrative utilities above can load kernel modules and
-establishe what major device number was assigned.  See the individual manual
+Some of the administrative utilities above can load kernel modules and
+established what major device number was assigned.  See the individual manual
 pages for more information.
 .\"
 .PP
@@ -554,7 +554,7 @@ and
 .BR getminor (9)
 still function as as normal on the resulting
 .I devp
-argument passed to the utlimate driver's
+argument passed to the ultimate driver's
 .BR qopen (9)
 procedure.  This is true both for base and extended major device numbers.
 The following table illustrates the situation
@@ -633,7 +633,7 @@ The
 driver operates similar to the
 .BR clone (4)
 driver, however, the major number is derived from the prefix name of the device
-and the minor number is taken directy from the minor number of the
+and the minor number is taken directly from the minor number of the
 .BR nsdev (4)
 device.
 .PP
@@ -685,24 +685,24 @@ would request the
 .B streams-inet
 kernel module be loaded.
 This approach simplifies kernel module loading as well as device numbering and
-makes it easier for boot scripts to intialize devices.
+makes it easier for boot scripts to initialize devices.
 .\"
 .PP
 .B Mountable specfs Filesystem
 .PP
 Another approach to creation and assignment of device numbers is the mountable
 .BR specfs (5)
-filesystem.  The
+file system.  The
 .BR specfs (5)
-filesystem can be mounted to provide an in-kernel
+file system can be mounted to provide an in-kernel
 device directory similar to the
 .B Linux
-devfs filesystem and the
+devfs file system and the
 .IR Solaris \(rg
-devices filesystem.
+devices file system.
 The
 .BR specfs (5)
-filesystem should normally be mounted on the
+file system should normally be mounted on the
 .B /dev/streams
 subdirectory by system initialization scripts using a command such as:
 .BR "mount -t specfs none /dev/streams" .
@@ -727,7 +727,7 @@ external (real) minor device number.
 .PP
 The mounted
 .BR specfs (5)
-filesystem also has the characteristic that if a device
+file system also has the characteristic that if a device
 subdirectory
 .BI /dev/streams/ devname /
 does not exist, but an attempt is made to read such a directory,
@@ -774,8 +774,8 @@ _
 In fact, it does not matter what the character device major or minor device
 number is of node in the
 .BR specfs (5)
-filesystem.  This is because the inode in the
-filesystem is directy associated with the
+file system.  This is because the inode in the
+file system is directly associated with the
 .B streamtab (9)
 structure and instance number without using the normal
 .B Linux
@@ -783,7 +783,7 @@ character device mechanisms.
 When a device instance exceeds the extended minor device numbering space
 assigned to a device driver in the
 .BR specfs (5)
-filesystem, device number displayed by
+file system, device number displayed by
 .BR stat (2),
 .BR lstat (2)
 or

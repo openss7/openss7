@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: unweldq.9.man,v 0.9.2.7 2004/08/22 06:17:46 brian Exp $
+.\" @(#) $Id: unweldq.9.man,v 0.9.2.8 2004/08/24 08:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNWELDQ 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNWELDQ 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -228,7 +228,7 @@ drivers to disconnect two streams previously connected with
 .BR weldq (9)
 to tear down a
 .BR pipe (2)
-or loopback connection.
+or loop-back connection.
 .PP
 For example, to unweld two streams,
 .IR rq1 " and " rq2
@@ -294,7 +294,7 @@ error number.
 .PP
 .BR unweldq ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+call-outs, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -346,7 +346,7 @@ from the callback function.
 .PP
 If a protection queue,
 .I protect_q
-is specified, the normal sychronization as is appropriate for a callback
+is specified, the normal synchronization as is appropriate for a callback
 procedure on the specified queue will be taken before the action is performed
 and the callback is invoked.
 .\"

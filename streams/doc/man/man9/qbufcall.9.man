@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbufcall.9.man,v 0.9.2.9 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: qbufcall.9.man,v 0.9.2.10 2004/08/24 08:42:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QBUFCALL 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QBUFCALL 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -181,7 +181,7 @@ sufficient memory to allocate the necessary buffer and message block.
 .PP
 Buffer calls initiated with
 .BR qbufcall ()
-can be canceled by calling
+can be cancelled by calling
 .BR qunbufcall (9)
 with the returned bufcall id.
 .\"
@@ -273,7 +273,7 @@ callback will not be invoked until after the function that called
 returns.
 This means that it is safe to store the returned bufcall id in global
 variables accessed by the callback function.
-It is also safe to hold private locks taken by the callback function accross a
+It is also safe to hold private locks taken by the callback function across a
 call to
 .BR qbufcall (9).
 This is the same situation as that of the
@@ -327,7 +327,7 @@ Although
 .B bufcall_id_t
 has traditionally been implemented as an integer index,
 .BR qbufcall ()
-implements bufcall id values internally as outdating pointer into a
+implements bufcall id values internally as out-dating pointer into a
 .B strevent
 structure.
 .\"

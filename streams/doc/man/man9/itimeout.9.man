@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: itimeout.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: itimeout.9.man,v 0.9.2.8 2004/08/24 08:42:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DTIMEOUT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DTIMEOUT 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -198,14 +198,14 @@ is MP-safe.
 .PP
 Considerations should be given when writing the callback function that a
 .BR itimeout ()
-callout function is asynchronous and can execute at the same time as any user
-context, module procedure, callout, callback, soft interrupt or interrupt
+call-out function is asynchronous and can execute at the same time as any user
+context, module procedure, call-out, callback, soft interrupt or interrupt
 service routine not masked by the
 .I pl
 argument.
 In addition, for sufficiently small
 .I tick
-values, the callout function may execute before the call to
+values, the call-out function may execute before the call to
 .BR itimeout ()
 returns.
 .PP
@@ -247,13 +247,13 @@ and
 .BR drv_hztousec (9)
 DKI functions.  The Linux
 .B HZ
-define or som other quantoum independent conversion function to conver to and
+define or some other quantum independent conversion function to convert to and
 from microseconds or some other absolute unit of time.
 .PP
 .B toid_t
 and
 .B timout_id_t
-should eb treated as an opaque type that can be tested for equality to zero.
+should be treated as an opaque type that can be tested for equality to zero.
 The value should not otherwise be manipulated.
 .B Linux Fast-STREAMS
 implements timeout id values internally as a pointer to a

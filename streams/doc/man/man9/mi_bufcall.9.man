@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.11 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.12 2004/08/24 08:42:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_BUFCALL 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
+.TH MI_BUFCALL 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -163,10 +163,10 @@ return
 was not a particularly good idea.
 .BR mi_bufcall ()
 fails when there is insufficient memory available to allocate the necessary
-internal datastructures to represent the buffer call.  Because
+internal data structures to represent the buffer call.  Because
 .BR mi_bufcall ()
 returns void, it is not possible to determine whether the call was successful
-or whether it failed, rendering the function rather useles.
+or whether it failed, rendering the function rather useless.
 .\"
 .\"
 .SH CONTEXT

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putmsg.2.man,v 0.9.2.7 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: putmsg.2.man,v 0.9.2.8 2004/08/24 08:42:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTMSG 2 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PUTMSG 2 "$Date: 2004/08/24 08:42:34 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -185,7 +185,7 @@ member indicates the length of the information for the control part.
 .I datptr
 points to a
 .B strbuf
-structure decribing the data part to be included in the message, or
+structure describing the data part to be included in the message, or
 .B NULL
 is there is no data part.
 The
@@ -237,7 +237,7 @@ Upon failure,
 .B putmsg()
 returns 1 and sets
 .I errno
-to an appropritate error number.
+to an appropriate error number.
 .\"
 .\"
 .SH ERRORS
@@ -506,7 +506,7 @@ recognizes the \*(lqinvalid\*(rq buffer length to
 .BR write (2)
 used by LiS to emulate the
 .I __NR_getpmsg
-system call, permitting LiS libaries to be used with
+system call, permitting LiS libraries to be used with
 .BR "Linux Fast-STREAMS" .
 .\"
 .\"

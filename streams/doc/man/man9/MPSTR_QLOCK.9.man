@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: MPSTR_QLOCK.9.man,v 0.9.2.7 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: MPSTR_QLOCK.9.man,v 0.9.2.8 2004/08/24 08:42:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MPSTR_QLOCK 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH MPSTR_QLOCK 9 "$Date: 2004/08/24 08:42:39 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -141,7 +141,7 @@ lock is held, interrupts are disabled.
 .BR MPSTR_QLOCK ()
 is always successful.  Calling
 .BR MPSTR_QLOCK ()
-with invalid or uninitialized arguments will yeild indeterminate results.
+with invalid or uninitialized arguments will yield indeterminate results.
 .\"
 .\"
 .SH CONTEXT
@@ -221,7 +221,7 @@ the
 members.
 In addtion,
 .BR MPSTR_QLOCK ()
-returns the current interrupt mask and suppreses interrupts.
+returns the current interrupt mask and suppresses interrupts.
 .\"
 .\"
 .SH EXAMPLES

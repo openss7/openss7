@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.5 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.6 2004/08/24 08:42:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PULLUPMSG 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PULLUPMSG 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -145,7 +145,7 @@ in the message blocks of all absorbed data blocks.
 .BR pullupmsg ()
 is typically used where it is necessary for the first number of bytes in a
 .I STREAMS
-message be continguous to meet the needs of the routines processing
+message be contiguous to meet the needs of the routines processing
 the bytes contained in the message.  In this case,
 .BR pullupmsg ()
 is called before processing the bytes.
@@ -167,7 +167,7 @@ returns false (0), and the passed in message is unaltered.
 .SH ERRORS
 .PP
 .BR pullupmsg ()
-failes and returns false (0) when
+fails and returns false (0) when
 the number bytes in the initial data blocks of the same type in the passed in
 message pointed to by
 .I mp

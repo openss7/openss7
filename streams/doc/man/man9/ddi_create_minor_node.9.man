@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.8 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -198,12 +198,12 @@ structures for this device node.
 .PP
 .BR ddi_create_minor_node ()
 can only be called from User Context and the user requires appropriate
-privileve to create the necessary filesystem entries.  This normally means for
+privilege to create the necessary file system entries.  This normally means for
 .B Linux Fast-STREAMS
 drivers and modules that the call will succeed when called from within n
 module's
 .BR _init (9)
-procedure, but will normally fail when calle from within a module's
+procedure, but will normally fail when called from within a module's
 .BR qopen (9)
 or
 .BR qclose (9)
@@ -213,7 +213,7 @@ procedures.
 .SH MP-STREAMS
 .PP
 .BR ddi_create_minor_node ()
-is MP-safe when call from an apporpriate context.
+is MP-safe when call from an appropriate context.
 .\"
 .\"
 .SH NOTICES

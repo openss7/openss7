@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strmod_add.9.man,v 0.9.2.9 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: strmod_add.9.man,v 0.9.2.10 2004/08/24 08:42:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRMOD_ADD 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRMOD_ADD 9 "$Date: 2004/08/24 08:42:47 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -136,7 +136,7 @@ the entry points.  A
 .I STREAMS
 driver can supply
 .B NODEV
-insead of a device number.  In this case,
+instead of a device number.  In this case,
 .BR strmod_add ()
 finds the first available device switch slot and returns the number actually
 used.  If a device switch lot is already in use or if there are not slots
@@ -291,9 +291,9 @@ This field is ignored by
 .TP
 .B sa_sync_level
 This field specifies the synchronization level to be used with the module or
-drivers.  The syncrhonization level specifies the number of concurrent thread
+drivers.  The synchronization level specifies the number of concurrent thread
 of execution that can be within a scope.
-For additional information concerning the synchornization of
+For additional information concerning the synchronization of
 .I STREAMS
 modules and drivers, see
 .BR mt-streams (9).
@@ -314,10 +314,10 @@ that the default level is the same as
 below.
 .TP
 .B SQLVL_GLOBAL
-Global level syncrhonization.
+Global level synchronization.
 .TP
 .B SQLVL_ELSEWHERE
-Arbitrary level sychronization.
+Arbitrary level synchronization.
 .TP
 .B SQLVL_MODULE
 Module level synchronization.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_strdev.9.man,v 0.9.2.1 2004/08/22 06:17:46 brian Exp $
+.\" @(#) $Id: unregister_strdev.9.man,v 0.9.2.2 2004/08/24 08:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNREGISTER_STRDEV 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNREGISTER_STRDEV 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -108,9 +108,9 @@ structure previously registered with
 .BR register_strdev (9).
 .TP
 .I major
-the (external) character major device number to deregister, or zero (0),
-inidicating that all registered character major device numbers for this driver
-are to be deregistered.
+the (external) character major device number to unregister, or zero (0),
+indicating that all registered character major device numbers for this driver
+are to be unregistered.
 .\"
 .\"
 .SH DESCRIPTION
@@ -129,7 +129,7 @@ from the character major device number specified by
 can also be set to zero (0)
 to indicate that the
 .I STREAMS
-executive should deregister all character major device numbers currently
+executive should unregister all character major device numbers currently
 associated with the
 .I STREAMS
 device,
@@ -152,21 +152,21 @@ device.
 .PP
 Upon success,
 .BR unregister_strdev ()
-deregisters the
+unregisters the
 .I STREAMS
 driver described by
 .I cdev
 and returns zero (0).
 Upon failure,
 .BR unregister_strdev ()
-does not effect deregistration and returns a negative error number.
+does not effect unregistration and returns a negative error number.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .BR unregister_strdev ()
-fails to deregister the specified
+fails to unregister the specified
 .I STREAMS
 driver, it returns an appropriate negative error number as follows:
 .TP \w'[ENOMEM]\(em'u
@@ -202,7 +202,7 @@ is registered to a driver other than that referenced by
 .SH CONTEXT
 .PP
 .BR unregister_strdev ()
-can be called from any blockable context.  Consideration for import on
+can be called from any blocking context.  Consideration for import on
 performance and latency should be given before calling
 .BR unregister_strdev ()
 from soft or hard interrupt context.  Typically,
@@ -239,7 +239,7 @@ Drivers unregistered with
 will no longer appear in
 .BR /proc/streams/devices .
 .PP
-Drivers unregsitered with
+Drivers unregistered with
 .BR unregister_strdev ()
 will also disappear as a device directory in
 .BR /dev/streams ,
@@ -286,7 +286,7 @@ and additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-Registration and deregistration of
+Registration and unregistration of
 .I STREAMS
 drivers is implementation specific and not subject to standardization.
 .BR unregister_strdev ()

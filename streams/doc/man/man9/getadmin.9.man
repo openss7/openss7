@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getadmin.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: getadmin.9.man,v 0.9.2.8 2004/08/24 08:42:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETADMIN 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETADMIN 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
 .B getadmin
-\- get the adminstration function pointer for a \fISTREAMS\fR module
+\- get the administration function pointer for a \fISTREAMS\fR module
 .\"
 .\"
 .SH SYNOPSIS
@@ -98,7 +98,7 @@ Module ID.
 .SH DESCRIPTION
 .PP
 .BR getadmin ()
-returns a pointer to the adminstration function as indicated by the
+returns a pointer to the administration function as indicated by the
 .I qi_qadmin
 member of the
 .BR qinit (9)
@@ -107,7 +107,7 @@ structure for the module.
 .\"
 .SH RETURN
 .PP
-Returns a pointer to the adminstration function for that module, or
+Returns a pointer to the administration function for that module, or
 .B NULL
 if no driver or module has the given identifier.
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 0.9.2.9 2004/08/24 08:42:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ESBALLOC 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH ESBALLOC 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -109,7 +109,7 @@ is used where the
 driver needs control over the location, allocation and deallocation of data
 buffers.  This may be because the data buffers are subject to some physical
 contraints (e.g. must be allocated in DMA-able memory, or must exist in
-dual-ported RAM or in a decriptor ring).  This may also be because some other
+dual-ported RAM or in a descriptor ring).  This may also be because some other
 mechanism outside of
 .IR STREAMS (4)
 has already allocated and passed the data buffer to a
@@ -233,7 +233,7 @@ message size.
 can be called from any context.
 The priority
 .B BPRI_WAITOK
-must only be used from a blockable context.
+must only be used from a blocking context.
 .\"
 .\"
 .SH MP-STREAMS
@@ -263,7 +263,7 @@ svr3
 concept which was found not to be useful, primarily due to priority inversion.
 For a history of the
 .I priority
-mechanism and a discussion as to why the mechanism was abandonned in SVR 4.2,
+mechanism and a discussion as to why the mechanism was abandoned in SVR 4.2,
 .[
 svr42
 .]
@@ -298,7 +298,7 @@ memory cache.
 will not be permitted to grow the
 .B mdbblock
 memory cache to meet the request.
-When speed is not criticial and a lower degree of immediate success is acceptable, use
+When speed is not critical and a lower degree of immediate success is acceptable, use
 .BR BPRI_LO .
 .TP
 .B BPRI_MED
@@ -508,7 +508,7 @@ osfspg
 and non-portable.
 .BR BPRI_WAITOK
 will block the calling thread if a message block is not immediately available,
-and is only intended to be called from a blockable context (e.g. from the
+and is only intended to be called from a blocking context (e.g. from the
 .BR qopen (9)
 and
 .BR qclose (9)

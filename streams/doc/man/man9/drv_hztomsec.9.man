@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.8 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DRV_HZTOUSEC 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DRV_HZTOUSEC 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -116,9 +116,9 @@ the time value in milliseconds to convert to ticks.
 .BR drv_usectohz ()
 and
 .BR drv_msectohz ()
-provide a mechansim for converting between kernel tick time and an absolute
+provide a mechanism for converting between kernel tick time and an absolute
 time unit (microseconds or milliseconds).  Use of these functions permit
-driver code to be architecturally independent from the quatum of the kernel
+driver code to be architecturally independent from the quantum of the kernel
 tick clock.
 .PP
 .BR drv_hztousec ()
@@ -200,7 +200,7 @@ and
 .BR HZ (9).
 There are defined as
 .B extern inline
-functions and with optimization these calculations will be inlined.
+functions and with optimization these calculations will be inline.
 .PP
 .BR drv_usectohz ()
 and

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_priv.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: drv_priv.9.man,v 0.9.2.2 2004/08/24 08:42:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DRV_PRIV 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DRV_PRIV 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .TP
 .I crp
-a pointer to the credentials to test for priveledge.
+a pointer to the credentials to test for privilege.
 .\"
 .\"
 .SH DESCRIPTION
@@ -98,7 +98,7 @@ a pointer to the credentials to test for priveledge.
 when given a references to a process'
 .BR cred_t (9)
 credentials structure, returns a value indicating whether the specified
-credentials are priviledged or not.
+credentials are privileged or not.
 .BR drv_priv ()
 is an
 SVR 4.2
@@ -115,8 +115,8 @@ credentials structure.
 .SH RETURN
 .PP
 .BR drv_priv ()
-returns true (1) if the process is priviledged; it returns false (0) if the
-process is not priviledged.
+returns true (1) if the process is privileged; it returns false (0) if the
+process is not privileged.
 .\"
 .\"
 .SH ERRORS
@@ -134,7 +134,7 @@ can be executed from any context.
 .SH MP-STREAMS
 .PP
 .BR drv_priv ()
-is MP-safe, however, the caller is resposible for ensuring exclusive access to
+is MP-safe, however, the caller is responsible for ensuring exclusive access to
 the passed in credentials.
 .\"
 .\"

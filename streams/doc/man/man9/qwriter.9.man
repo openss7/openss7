@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qwriter.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: qwriter.9.man,v 0.9.2.9 2004/08/24 08:42:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QWRITER 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QWRITER 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -102,7 +102,7 @@ a pointer to the queue for which to upgrade to writer.
 a STREAMS message to pass to the callback function.
 .TP
 .I func
-a function that will be called when write access has been acheived.
+a function that will be called when write access has been achieved.
 .TP
 .I perim
 a description of the perimeter.
@@ -114,7 +114,7 @@ can be either
 .SH DESCRIPTION
 .PP
 .BR qwriter ()
-schedules the callout function,
+schedules the call-out function,
 .IR func ,
 to be executed with the specified queue pair,
 .IR q ,
@@ -136,7 +136,7 @@ perimeter can exist at the queue, the queue pair or the module.
 See
 .BR mp-streams (9)
 for more information.
-If an inner perimeter does not exist, the callout function is still executed,
+If an inner perimeter does not exist, the call-out function is still executed,
 but synchronization does not occur.
 (This has a similar effect to
 .BR qprocsoff (9),
@@ -154,7 +154,7 @@ perimeter can exist at the module.
 See
 .BR mp-streams (9)
 for more information.
-If an outer perimeter does not exist, the callout function is still executed,
+If an outer perimeter does not exist, the call-out function is still executed,
 but synchronization does not occur.
 (This has a similar effect to
 .BR freezestr (9),
@@ -193,17 +193,17 @@ or
 .BR qwriter ()
 is MP-safe.
 .PP
-Considerations should be given when writing the callout function that the
-function may execute in parallel with aysnchronous entry points, callbacks,
-callouts and interrupt service procedures.
+Considerations should be given when writing the call-out function that the
+function may execute in parallel with asynchronous entry points, callbacks,
+call-outs and interrupt service procedures.
 .PP
 However, in
 .BR "Linux Fast-STREAMS" ,
-the callout function is scheduled on the same CPU and the CPU which called
+the call-out function is scheduled on the same CPU and the CPU which called
 .BR qwriter ().
 This means that
 .BR qwriter ()
-will return before the callout function executes.  In addition, the callout
+will return before the call-out function executes.  In addition, the call-out
 function will not execute before the calling function returns or the next
 preemption point is encountered.
 .\"
@@ -218,9 +218,9 @@ or
 procedure.
 .PP
 .BR qwriter ()
-may return before the callout function,
+may return before the call-out function,
 .IR func ,
-executes, or the callout function,
+executes, or the call-out function,
 .IR func ,
 may be executed on the calling thread before
 .BR qwriter ()

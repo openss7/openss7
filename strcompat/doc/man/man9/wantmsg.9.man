@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: wantmsg.9.man,v 0.9.2.1 2004/08/22 06:17:46 brian Exp $
+.\" @(#) $Id: wantmsg.9.man,v 0.9.2.2 2004/08/24 08:42:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WANTMSG 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WANTMSG 9 "$Date: 2004/08/24 08:42:48 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -131,10 +131,10 @@ rocedure; if it returns false (0), then the message is passed to the next module
 bypassing the current queue.
 .PP
 In a multiprocessing kernel,
-the filter program is called before attempting to sychronize the queue,
+the filter program is called before attempting to synchronize the queue,
 .IR q .
 This permits concurrent processing of the filter function and high performance bypass of the queue
-processing and queue sychronization for messages that do not need to be processed by the queue.
+processing and queue synchronization for messages that do not need to be processed by the queue.
 .\"
 .\"
 .SH USAGE
@@ -142,7 +142,7 @@ processing and queue sychronization for messages that do not need to be processe
 .BR wantmsg ()
 is particularly useful for optimizing
 .I STREAMS
-modules with no service proceedure that are solely intended to intercept IO controls such as
+modules with no service procedure that are solely intended to intercept IO controls such as
 .BR pipemod (4),
 .BR sockmod (4),
 and
@@ -182,7 +182,7 @@ can be called from any context.
 is MP-safe.
 .BR wantmsg ()
 provides increased performance for MP-STREAMS modules and drivers by determining whether a message
-should be processed by a module outside of the sycnrhonization queues for the module.
+should be processed by a module outside of the synchronization queues for the module.
 .\"
 .\"
 .SH NOTICES
@@ -212,7 +212,7 @@ structure.  This pointer is examined by the
 .BR put (9)
 function in the
 .I STREAMS
-executive and called when it exists outside before the sycnhronization queue for the queue.
+executive and called when it exists outside before the synchronization queue for the queue.
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.9 2004/08/22 06:17:43 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.10 2004/08/24 08:42:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:43 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMIO 7 "$Date: 2004/08/22 06:17:43 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH STREAMIO 7 "$Date: 2004/08/24 08:42:36 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
@@ -555,8 +555,8 @@ to be sent a
 .B SIGPOLL
 signal.
 .I arg
-points to an integer into which will be returned the bitmask.
-The bitmask returned in the integer pointed to by
+points to an integer into which will be returned the bit mask.
+The bit mask returned in the integer pointed to by
 .I arg
 will contain a bitwise OR of one or more of the following flags:
 .TP
@@ -604,7 +604,7 @@ all flags.
 .PP
 Upon success,
 .B I_GETSIG
-returns (0) and the event bitmask in the integer pointed to by
+returns (0) and the event bit mask in the integer pointed to by
 .IR arg .
 Upon failure,
 .B I_GETSIG
@@ -627,7 +627,7 @@ signal.
 Sets the
 .BR read (2)
 options flags for the stream head.
-These flags alter the behavior of the
+These flags alter the behaviour of the
 .BR read (2)
 call when called for
 .IR fd .
@@ -719,7 +719,7 @@ Although all modes terminate the read on a zero-length message, POSIX requires
 that zero only be returned from read when the requested length is zero or an
 end of file
 .RB ( M_HANGUP )
-has occured.  Therefore,
+has occurred.  Therefore,
 .B LfS
 .[
 LfS
@@ -781,7 +781,7 @@ points outside the caller's valid address space.
 Sets the
 .BR write (2)
 options flags for the stream head.
-These flags alter the behavior of the
+These flags alter the behaviour of the
 .BR write "(2) and " putmsg (2)
 calls when called for
 .IR fd .
@@ -804,7 +804,7 @@ if the stream head has received a write error
 message.
 .TP
 .B SNDHOLD
-hold messages briefly in an attempt to coallese smaller transmissions into
+hold messages briefly in an attempt to coalesce smaller transmissions into
 larger ones.
 .\"
 .\"
@@ -835,7 +835,7 @@ if the stream head has received a write error
 message.
 .TP
 .B SNDHOLD
-hold messages briefly in an attempt to coallese smaller transmissions into
+hold messages briefly in an attempt to coalesce smaller transmissions into
 larger ones.
 .PP
 Upon success,
@@ -862,7 +862,7 @@ message at the stream head when called for
 .IR fd .
 .I arg
 is an integer value containing the error option flags which may be one flag
-controlling the read error beahvior
+controlling the read error behaviour
 from the following:
 .TP
 .B RERRNORM
@@ -874,9 +874,9 @@ This is the default.
 .TP
 .B RERRNONPERSIST
 specifies that read errors are treated as non-persistent.  Once the read
-errror is delivered to a system call, it is cleared automatically.
+error is delivered to a system call, it is cleared automatically.
 .PP
-and one flag controlling the write error behavior from the following:
+and one flag controlling the write error behaviour from the following:
 .TP
 .B WERRNORM
 specifies that write errors are treated as normal and persist until they are
@@ -887,7 +887,7 @@ This is the default.
 .TP
 .B WERRNONPERSIST
 specifies that write errors are treated as non-persistent.  Once the write
-errror is delivered to a system call, it is cleared automatically.
+error is delivered to a system call, it is cleared automatically.
 .PP
 Upon success,
 .B I_SERROPT
@@ -912,7 +912,7 @@ Gets ther error options flags for the stream head.
 is a pointer to an integer to receive the stream head error options.  The
 integer pointed to by
 .I arg
-will return one flag fromt he following flags:
+will return one flag from the following flags:
 (These flags alter the operations of read errors in return to system calls.)
 .TP
 .B RERRNORM
@@ -924,7 +924,7 @@ This is the default.
 .TP
 .B RERRNONPERSIST
 indicates that read errors are treated as non-persistent.  Once the read
-errror is delivered to a system call, it is cleared automatically.
+error is delivered to a system call, it is cleared automatically.
 .PP
 and one flag from the following flags:
 (These flags alter the operations of the write errors in return to system
@@ -939,7 +939,7 @@ This is the default.
 .TP
 .B WERRNONPERSIST
 indicates that write errors are treated as non-persistent.  Once the write
-errror is delivered to a system call, it is cleared automatically.
+error is delivered to a system call, it is cleared automatically.
 .PP
 Upon success,
 .B I_GERROPT
@@ -971,7 +971,7 @@ ioctl using an
 down the stream head write queue to be processed by the multiplexing driver on
 .IR fd .
 .B I_LINK
-will block until an acknowledgment is received from the driver, the call
+will block until an acknowledgement is received from the driver, the call
 times out waiting for an acknowledgement, the call is interrupted while
 blocked by a signal, or the receipt of hangup or error message.
 .PP
@@ -993,7 +993,7 @@ to an appropriate error number as follows:
 is not a valid open file descriptor.
 .TP
 .RB [ ETIME ]
-the command timed out before receiving an acknowledgment.
+the command timed out before receiving an acknowledgement.
 .TP
 .RB [ ENOSR ]
 a buffer for the ioctl message could not be allocated.
@@ -1018,7 +1018,7 @@ has no lower multiplexing driver definition.
 .TP
 .RB [ EINVAL ]
 .I arg
-is already linked under a multiplexor or is not a STREAMS character special
+is already linked under a multiplexer or is not a STREAMS character special
 file.
 .PP
 In addition, any error received in an error message will be returned in
@@ -1082,7 +1082,7 @@ structure.
 only lists
 .I sl_nmods
 number of modules and drivers starting with the module below the stream head.
-If there is an insuffient number of members in the
+If there is an insufficient number of members in the
 .I sl_modlist
 array to hold all of the names,
 .B I_LIST
@@ -1128,7 +1128,7 @@ in length.
 .PP
 Upon success,
 .B I_LOOK
-copies the name of the module beneath the stream head to tbe buffer pointed to
+copies the name of the module beneath the stream head to the buffer pointed to
 by
 .IR arg .
 Upon failure,
@@ -1149,7 +1149,7 @@ there is no module beneath the stream head.
 .PP
 Gets the number of unread data bytes contained in
 .B M_DATA
-message blocks in the first messsage on the stream head read queue.
+message blocks in the first message on the stream head read queue.
 .I arg
 points to an integer to contain the number of unread bytes.
 .PP
@@ -1263,7 +1263,7 @@ ioctl using an
 down the stream head write queue to be processed by the multiplexing driver on
 .IR fd .
 .B I_PLINK
-will block until an acknowledgment is received from the driver, the call
+will block until an acknowledgement is received from the driver, the call
 times out waiting for an acknowledgement, the call is interrupted while
 blocked by a signal, or the receipt of hangup or error message.
 .PP
@@ -1285,7 +1285,7 @@ to an appropriate error number as follows:
 is not a valid open file descriptor.
 .TP
 .RB [ ETIME ]
-the command timed out before receiving an acknowledgment.
+the command timed out before receiving an acknowledgement.
 .TP
 .RB [ ENOSR ]
 a buffer for the ioctl message could not be allocated.
@@ -1310,7 +1310,7 @@ has no lower multiplexing driver definition.
 .TP
 .RB [ EINVAL ]
 .I arg
-is already linked under a multiplexor or is not a STREAMS character special
+is already linked under a multiplexer or is not a STREAMS character special
 file.
 .PP
 In addition, any error received in an error message will be returned in
@@ -1356,7 +1356,7 @@ there was no module beneath the stream head.
 .RB [ EPERM ]
 an anchor was placed with
 .B I_ANCHOR
-and an attempt is being made by a non-privideged process to pop beneath the
+and an attempt is being made by a non-privileged process to pop beneath the
 anchor position.
 .PP
 See
@@ -1370,7 +1370,7 @@ Unlink a stream from under a multiplexing driver that was previously linked
 with
 .BR I_PLINK .
 .I arg
-is the multiplexor identifier of the linked stream, or,
+is the multiplexer identifier of the linked stream, or,
 .B MUXID_ALL
 indicating that all linked streams are requested to be unlinked.
 .PP
@@ -1539,7 +1539,7 @@ In the
 .B strrecfd
 structure,
 .I fd
-is the filedescriptor received, and
+is the file descriptor received, and
 .IR uid " and " gid
 are the credentials associated with the file descriptor.
 .PP
@@ -1664,7 +1664,7 @@ or
 .B SIGURG
 signal.
 .I arg
-is an integer value containins one or more of the following event flags:
+is an integer value contains one or more of the following event flags:
 .TP
 .B S_INPUT
 any message but high priority on read queue.
@@ -1759,7 +1759,7 @@ received.
 .PP
 Upon success,
 .B I_STR
-returns the return value sepcified in the positive or negative acknowledgement
+returns the return value specified in the positive or negative acknowledgement
 message.
 Upon failure,
 .B I_STR
@@ -1820,7 +1820,7 @@ Unlink a stream from under a multiplexing driver that was previously linked
 with
 .BR I_LINK .
 .I arg
-is the multiplexor identifier of the linked stream, or,
+is the multiplexer identifier of the linked stream, or,
 .B MUXID_ALL
 indicating that all linked streams are requested to be unlinked.
 .PP
@@ -1979,7 +1979,7 @@ will return
 a signal was received before the operation could begin.
 .TP
 .RB [ EINTR ]
-a signal was recevied before the operation could complete.
+a signal was recievied before the operation could complete.
 .TP
 .RB [ EAGAIN "], [" EWOULDBLOCK ]
 the file is set for asynchronous I/O and the operation would block.
@@ -2003,7 +2003,7 @@ procedures, the error number returned by the module or driver can be returned
 in
 .IR errno (3).
 .PP
-Any error retuend in an
+Any error returned in an
 .B M_IOCNAK
 message from the driver in response to a
 .I I_STR
@@ -2016,7 +2016,7 @@ ioctl can be returned in
 STREAMS
 .B ioctl()
 calls are complex and there is much conflicting documentation in specific
-areas of behavior.  Not all bugs are bugs and not all features are features.
+areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -2047,7 +2047,7 @@ has no known bugs.
 STREAMS
 .B ioctl()
 calls are complex and there is much conflicting documentation in specific
-areas of behavior.  Not all bugs are bugs and not all features are features.
+areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -2081,7 +2081,7 @@ specific.
 .B Linux Fast-STREAMS
 provides ioctls that are used to implement this system call.  In addition,
 .B Linux Fast-STREAMS
-regcognizes some
+recognizes some
 .IR Solaris \(rg-specific
 and
 .BR LiS -specific

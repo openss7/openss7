@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canputnext.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: canputnext.9.man,v 0.9.2.9 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CANPUTNEXT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH CANPUTNEXT 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -112,7 +112,7 @@ Starting at the queue next from the
 .I q
 specified
 .BR canputnext ()
-looks for the next foward queue which has a service routine or which has no
+looks for the next forward queue which has a service routine or which has no
 further forward queue.
 .PP
 If this forward queue has the
@@ -133,7 +133,7 @@ returns false (0), it also sets the
 .B QWANTW
 flag for the queue indicating that the
 .I STREAMS
-scheduler should backenable the
+scheduler should back-enable the
 service procedures feeding the flow controlled queue once the flow controlled
 queue is no longer full (i.e. message have been read from the queue to reduce
 the queue size below the low water mark for the queue).
@@ -242,7 +242,7 @@ svr42
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR canputnext ()
-explicitly protects dereferncing of the
+explicitly protects dereferencing of the
 .I q->q_next
 pointer with the stream head read lock that prevents reconfiguration of the
 stream during the call.
@@ -255,8 +255,8 @@ pointer or a
 .I q
 pointer that has an invalid
 .I q->q_next
-pointer, will have undefined results and may crash or destablize the kernel.
-LiS will return false (0) under the samd conditions.
+pointer, will have undefined results and may crash or destabilize the kernel.
+LiS will return false (0) under the same conditions.
 .IR STREAMS (4)
 modules and drivers that always obtain
 .I q

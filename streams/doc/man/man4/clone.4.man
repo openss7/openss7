@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: clone.4.man,v 0.9.2.7 2004/08/22 06:17:41 brian Exp $
+.\" @(#) $Id: clone.4.man,v 0.9.2.8 2004/08/24 08:42:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:41 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CLONE 4 "$Date: 2004/08/22 06:17:41 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH CLONE 4 "$Date: 2004/08/24 08:42:35 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -183,7 +183,8 @@ procedure should check to ensure that there is no
 assignment already made to the passed in read queue before attempting to
 assign a minor device number.
 .IP ""
-This condition can be relaxed if the minor device node is marked as clonable
+This condition can be relaxed if the minor device node is marked as clone
+device
 (either with the
 .B DF_CLONE
 flag on minor node registration or creation, or with the
@@ -224,7 +225,7 @@ to
 .BR qopen (9).
 This means that a
 .I STREAMS
-driver can always treat minor device number zero (0) as a clonable minor
+driver can always treat minor device number zero (0) as a clone minor
 device and assign a new, unique, non-zero minor device number.  This removes
 the need to create special
 .B clone
@@ -233,7 +234,7 @@ device nodes in the file system using
 as described below under
 .IR "\*(lqUSAGE\*(rq" .
 Rather, a minor device node with minor device number zero can be used to
-represent the cloneable device instead.
+represent the clone device instead.
 .SS
 Super Cloning
 .PP
@@ -317,7 +318,7 @@ This has two ramification on the explicit opening of minor devices:
 If a minor device number is explicitly opened and the device number is
 marked with device flags
 .BR DF_CLONE ,
-or the device has been marked as a clonable minor with the
+or the device has been marked as a clone minor with the
 .BR SAP_CLONE
 flag to the STREAMS Administrative Driver
 .BR sad (4),
@@ -329,7 +330,7 @@ will always be set to
 .BR CLONEOPEN .
 .IP (2)
 If a minor device number is explicitly opened and the device number is not
-marked as a clonable minor (i.e.
+marked as a clone minor (i.e.
 .BR DF_CLONE
 is not used and
 .BR SAP_CLONE
@@ -439,7 +440,7 @@ device node, the results of
 .BR stat (2)
 on the
 .B clone
-device will yeild a different device number than the results of
+device will yield a different device number than the results of
 .BR fstat (2)
 on the file descriptor resulting from an open of the
 .B clone
@@ -554,7 +555,7 @@ including
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg,
 .IR UXP/V \(rg,
-with the following portiablity considerations:
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .I LiS
 .[
@@ -562,7 +563,7 @@ lis
 .]
 (and to my knowledge
 .IR Solaris \(rg)
-does not support the concept of clonable minors.
+does not support the concept of clone minors.
 .IP \(em
 .IR AIX \(rg
 supports the
@@ -576,7 +577,7 @@ to indicate that a driver is capable of the new cloning method.  See
 for more information.
 .IP \(em
 .IR UnixWare \(rg
-supports both the concept of clonable minors as well as providing for clone
+supports both the concept of clone minors as well as providing for clone
 channels which is more in line with the behaviour of
 .BR "Linux Fast-STREAMS" .
 This should not, however, cause incompatibility problems with

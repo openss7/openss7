@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_usecwait.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: drv_usecwait.9.man,v 0.9.2.2 2004/08/24 08:42:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DRV_USECWAIT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DRV_USECWAIT 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -99,7 +99,7 @@ is an SVR 4.2
 .[
 svr42
 .]
-DDI/DKI D3DK function intented to insulate the
+DDI/DKI D3DK function intended to insulate the
 .I STREAMS
 driver or module from the internals of the underlying operating system
 implementation.

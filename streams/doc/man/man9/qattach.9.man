@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qattach.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: qattach.9.man,v 0.9.2.8 2004/08/24 08:42:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QATTACH 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS Internal"
+.TH QATTACH 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS Internal"
 .\"
 .\"
 .SH NAME
@@ -122,7 +122,7 @@ command is issued to a
 .IR STREAMS (4)
 character special file.  See
 .BR streamio (7)
-for more informaiton on
+for more information on
 .BR I_PUSH .
 .PP
 .BR qattach ()
@@ -217,7 +217,7 @@ module or driver writer.
 .BR qattach ()
 is not part of the DDI/DKI and should not be called by portable programs.
 .BR qattach ()
-is highly implemetnation dependent in function an prototype.  Use of this
+is highly implementation dependent in function an prototype.  Use of this
 function by a driver or module will guarantee that it is not portable even between
 releases of
 .BR "Linux Fast-STREAMS" .

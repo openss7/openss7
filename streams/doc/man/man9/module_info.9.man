@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: module_info.9.man,v 0.9.2.6 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: module_info.9.man,v 0.9.2.7 2004/08/24 08:42:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MODULE_INFO 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MODULE_INFO 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -133,8 +133,8 @@ this is the number of octets of queued messages beyond which the queue will be
 considered flow controlled.
 .TP
 .I mi_lowat
-The low water mark for flow control.  For modules with a service procedrue,
-this is the number of octents of queue messages beneath which the queue will
+The low water mark for flow control.  For modules with a service procedure,
+this is the number of octets of queue messages beneath which the queue will
 be considered no longer flow controlled and back-enabling will occur.
 .\"
 .\"
@@ -144,7 +144,7 @@ be considered no longer flow controlled and back-enabling will occur.
 .\"
 .SH CONTEXT
 .PP
-Functions that operat on a module information structure can be called from any
+Functions that operate on a module information structure can be called from any
 context.
 .\"
 .\"
@@ -168,7 +168,7 @@ for implementation and architecture independence.
 .PP
 The
 .B module_info
-structu is only a subset of the implementation structure used by the
+structure is only a subset of the implementation structure used by the
 .I STREAMS
 scheduler.  Additional hidden fields are present in the implementation
 structure.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.6 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.7 2004/08/24 08:42:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QBAND 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QBAND 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -195,7 +195,7 @@ The priority of this band.
 .I __pad
 Padding to pad the structure to the size of the
 .I "SVR 4.2"
-Extended Funadmental Type.
+Extended fundamental Type.
 .\"
 .\"
 .SH DESCRIPTION
@@ -288,7 +288,7 @@ modules and drivers should use the facilities provided by
 .BR strqget (9)
 and
 .BR strqset (9)
-for implementation and architecture independency.
+for implementation and architecture independence.
 .PP
 The
 .B qband

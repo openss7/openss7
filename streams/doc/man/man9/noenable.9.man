@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: noenable.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: noenable.9.man,v 0.9.2.8 2004/08/24 08:42:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NOENABLE 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH NOENABLE 9 "$Date: 2004/08/24 08:42:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -155,7 +155,7 @@ without invoking the queue's service procedure.
 .PP
 This facility can be used to provide Nagle-like algorithms for flow control on
 read or write queues.  For example, multiple messages can be enqueued
-permitting the queue's service procedure, when later invoked, to coallesce
+permitting the queue's service procedure, when later invoked, to coalesce
 smaller messages into larger ones.  Such a queue can be pushed by scheduling
 the service procedure explicitly with the
 .BR qenable (9)
@@ -212,7 +212,7 @@ If one thread disables a queue with
 .BR noenable ()
 and another enables the queue with
 .BR enableok (9),
-there will be a race ondition on the
+there will be a race condition on the
 .B QNOENB
 flag.
 .\"
@@ -324,7 +324,7 @@ Only
 .I LiS
 provides the
 .BR appq (9)
-function so the behavior of
+function so the behaviour of
 .BR noenable ()
 with regard to
 .BR appq (9)
@@ -378,7 +378,7 @@ and that it disables scheduling of queues resulting from any message being
 placed on the queue with
 .BR insq (9).
 .I LiS
-also follows this behavior.
+also follows this behaviour.
 .IP \(em
 .IR OSF/1 \(rg,
 .[
@@ -399,7 +399,7 @@ uw7spg
 .]
 state that
 .BR noenable ()
-disables the scheduling of queeus resulting from a normal priority message
+disables the scheduling of queues resulting from a normal priority message
 being placed on the queue with
 .BR putq (9),
 .BR putbq (9)
@@ -419,7 +419,7 @@ behaviour.
 .IP \(em
 Portable
 .I STREAMS
-drivers and modules should not rely upon the behavior of
+drivers and modules should not rely upon the behaviour of
 .BR insq (9)
 with regard to high-priority messages when
 .BR noenable ()

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SV_ALLOC.9.man,v 0.9.2.7 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: SV_ALLOC.9.man,v 0.9.2.8 2004/08/24 08:42:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SV_ALLOC 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH SV_ALLOC 9 "$Date: 2004/08/24 08:42:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -115,13 +115,13 @@ The caller cannot sleep awaiting allocation of the synchronization variable.
 .SS SV_DEALLOC
 .TP
 .I svp
-A pointer to the synchronization varilable to deallocate.
+A pointer to the synchronization variable to deallocate.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR SV_ALLOC ()
-allocates and initializes a syncrhonization variable.  A synchronization
+allocates and initializes a synchronization variable.  A synchronization
 variable is a kernel condition variable.  Allocation can sleep awaiting
 availability of sufficient memory with the
 .B KM_SLEEP
@@ -155,7 +155,7 @@ are used in relation to
 .I STREAMS
 to allocate a synchronization variable to be used from within a user context,
 or deallocate an allocated synchronization variable.  The synchronization
-variable could be used within the kernle module's
+variable could be used within the kernel module's
 .BR init_module (9)
 or
 .BR term_module (9)
@@ -165,7 +165,7 @@ or
 .BR qclose (9)
 procedures.
 .PP
-An alternative to using a syncrhonization variable within the
+An alternative to using a synchronization variable within the
 .BR qopen (9)
 and
 .BR qclose (9)
@@ -199,7 +199,7 @@ fails when
 .I flags
 is set to
 .BR KM_NOSLEEP
-and suffient memory for the sycnrhonization variable cannot be allocated.
+and sufficient memory for the synchronization variable cannot be allocated.
 When
 .BR SV_ALLOC ()
 fails, it returns

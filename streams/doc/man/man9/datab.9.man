@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datab.9.man,v 0.9.2.5 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: datab.9.man,v 0.9.2.6 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DATAB 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DATAB 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -254,16 +254,16 @@ priority reserved message
 stop input message
 .TP
 .B M_STARTI
-start intput message
+start input message
 .TP
 .B M_PCCTL
 priority control message
 .TP
 .B M_PCSETOPTS
-prioirty stream head set options message
+prioirity stream head set options message
 .TP
 .B M_PCEVENT
-prioirty event
+prioirity event
 .TP
 .B M_UNHANGUP
 undo hangup message
@@ -362,15 +362,15 @@ data block.
 To ensure that this condition does not exist, the
 .I db_refs
 member can be examined to determine whether the reference count is one (1)
-indicating that no duplication has occured, or greater, indicating that
-duplication has occured.
+indicating that no duplication has occurred, or greater, indicating that
+duplication has occurred.
 .\"
 .\"
 .SH NOTICES
 .PP
 Members of the
 .B datab
-structure should not be accessed directy by
+structure should not be accessed directly by
 .I STREAMS
 modules or drivers.  Portable
 .I STREAMS

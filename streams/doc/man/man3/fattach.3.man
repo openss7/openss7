@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.3.man,v 0.9.2.5 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: fattach.3.man,v 0.9.2.6 2004/08/24 08:42:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 3 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH FATTACH 3 "$Date: 2004/08/24 08:42:34 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B fattach
 \- attach a \fISTREAMS\fR open file to a path name in the file system
@@ -164,7 +164,7 @@ is similar to the more typical
 of a file system on a path name representing a directory (see
 .BR mount "(8)).  "
 Both cause the process of searching for the path name to
-use an altenative file system node when the point of mounting or
+use an alternative file system node when the point of mounting or
 attachment is reached; i.e., the attached file or mounted file system
 covers and hides the underlying path name.
 They differ in that mounting applies to directory names and attaches
@@ -314,7 +314,7 @@ in order to receive these messages via the
 .B I_RECVFD
 .IR ioctl ". "
 .sp
-The behavior of automatically detaching a
+The behaviour of automatically detaching a
 .I STREAMS
 file which has received a
 .I hangup
@@ -329,7 +329,7 @@ and
 .BR fchmod "(2)) "
 of the attached
 .I STREAMS
-file.  If such behavior is desired, the path's mode should be determined
+file.  If such behaviour is desired, the path's mode should be determined
 .I before
 attaching, and applied to the
 .I STREAMS

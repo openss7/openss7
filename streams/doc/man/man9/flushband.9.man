@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 0.9.2.9 2004/08/24 08:42:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FLUSHBAND 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH FLUSHBAND 9 "$Date: 2004/08/24 08:42:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -104,7 +104,7 @@ how to flush the band within the queue.
 is used to flush messages from a message queue band.  It is typically called
 in a
 .B M_FLUSH
-handling routine to flush the requested messsages from a queue band.
+handling routine to flush the requested messages from a queue band.
 .PP
 If
 .I band
@@ -322,7 +322,7 @@ that were on the queue) with concurrent calls to
 or
 .BR putbq (9)
 functions.
-Also, queue enabling and backenabling will not necessary be performed
+Also, queue enabling and back-enabling will not necessary be performed
 correctly.
 There doesn't seem to be any excuse for the LiS approach, removing messages
 from the queue,
@@ -382,12 +382,12 @@ does not clear the
 flag when flushing an empty queue.  This is an indication to the STREAMS
 scheduler that
 .BR getq (9)
-read an empty queue and backenabling has already been performed for the queue.
+read an empty queue and back-enabling has already been performed for the queue.
 LiS clears the
 .B QWANTR
 flag when flushing an empty queue.  This means that the next call to
 .BR getq (9)
-for the empty queue will perform an extra backenable.
+for the empty queue will perform an extra back-enable.
 .IP \(em
 .BR flushband ()
 may be called on a stream frozen with

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strdev.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: register_strdev.9.man,v 0.9.2.2 2004/08/24 08:42:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH REGISTER_STRDEV 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH REGISTER_STRDEV 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -128,7 +128,7 @@ subsystem resource allocations are made,
 and decremented when the driver is
 closed or
 .I STREAMS
-susbsystem resources are freed.
+subsystem resources are freed.
 .RE
 .TP
 .I major
@@ -237,7 +237,7 @@ the necessary device structures could not be allocated due to memory shortage.
 .SH CONTEXT
 .PP
 .BR register_strdev ()
-can be called from any blockable context.  Consideration for impact on
+can be called from any blocking context.  Consideration for impact on
 performance and latency should be given before calling
 .BR register_strdev ()
 from soft or hard interrupt context.
@@ -289,7 +289,7 @@ filesystem has been mounted on
 .\"
 .SH EXAMPLES
 .PP
-Following is an example of registration and deregistration from the
+Following is an example of registration and unregistration from the
 .I STREAMS
 Administrative Driver (see
 .BR sad (4)):
@@ -390,7 +390,7 @@ and additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-Registration and deregistration of \fISTREAMS\fR drivers is implementation
+Registration and unregistration of \fISTREAMS\fR drivers is implementation
 specific and not subject to standardization.
 .BR register_strdev ()
 is a

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: RW_TRYWRLOCK.9.man,v 0.9.2.1 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: RW_TRYWRLOCK.9.man,v 0.9.2.2 2004/08/24 08:42:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH RW_TRYWRLOCK 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH RW_TRYWRLOCK 9 "$Date: 2004/08/24 08:42:39 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -133,7 +133,7 @@ restores the previous priority level and returns a value of
 .BR invpl .
 If the lock can be acquired immediately,
 .BR RW_TRYWRLOCK ()
-returns the prevailining priority level at the time that
+returns the prevailing priority level at the time that
 .BR RW_TRYWRLOCK ()
 was called.
 .\"
@@ -231,7 +231,7 @@ is returned.
 .BR RW_TRYWRLOCK ()
 has a race due to a missing
 .BR write_trylock ()
-primitve in
+primitive in
 .BR Linux .
 It is possible that the function will spon on
 .I lockp
@@ -280,7 +280,7 @@ devices are not supported.
 .PP
 See
 .BR STREAMS (9)
-for more compatbility information.
+for more compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

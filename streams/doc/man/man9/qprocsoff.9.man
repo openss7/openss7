@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.9 2004/08/24 08:42:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QPROCSOFF 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QPROCSOFF 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -143,7 +143,7 @@ is always successful.
 .BR qprocsoff ()
 can be called from any
 .BR !in_irq ()
-context including user context, queue procedures, callouts, callbacks, but
+context including user context, queue procedures, call-outs, callbacks, but
 must not be called from an interrupt service routine.
 .BR qprocsoff ()
 must be called by the
@@ -185,14 +185,14 @@ returns.
 Pending
 .BR srv (9)
 events will be cancelled.
-All pending syncrhonous callout and callback events for the queue pair will be
+All pending synchronous call-out and callback events for the queue pair will be
 blocked.
-All pending asynchronous callouts and callbacks for the
+All pending asynchronous call-outs and callbacks for the
 queue pair (e.g.,
 .BR timeout (9),
 .BR bufcall (9))
 will not be blocked.
-It is still the caller's responsibilty to cancel all pending callouts and
+It is still the caller's responsibility to cancel all pending call-outs and
 callbacks for which a call id was returned.
 .PP
 .BR qprocsoff ()
@@ -310,7 +310,7 @@ procedure and the
 .I STREAMS
 scheduler will perform an implicit
 .BR qprocsoff ().
-This is consitent with
+This is consistent with
 .I LiS
 behavior but different from
 .IR "SVR 4.2 MP DDI/DKI" ,

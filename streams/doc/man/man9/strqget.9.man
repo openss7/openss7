@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqget.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: strqget.9.man,v 0.9.2.8 2004/08/24 08:42:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRQGET 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRQGET 9 "$Date: 2004/08/24 08:42:47 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -90,13 +90,13 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
-the queue for which to retreive parameters.
+the queue for which to retrieve parameters.
 .TP
 .I what
 which parameter to retrieve.
 .TP
 .I band
-the queue band for which to retreive parameters.
+the queue band for which to retrieve parameters.
 .TP
 .I val
 the pointer to where the retrieved value is to be placed.

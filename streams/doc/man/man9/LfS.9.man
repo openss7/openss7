@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LfS.9.man,v 0.9.2.6 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: LfS.9.man,v 0.9.2.7 2004/08/24 08:42:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LfS 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH LfS 9 "$Date: 2004/08/24 08:42:38 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -163,7 +163,7 @@ an existing pipe end
 \-\ a STREAMS XTI/TLI compatibility interface
 .HP
 .BR tirdwr (4)
-\-\ a STREAMS XTI/TLI read write comptibility interface
+\-\ a STREAMS XTI/TLI read write compatibility interface
 .HP
 .BR sockmod (4)
 \-\ a STREAMS TPI to sockets compatibility module
@@ -224,7 +224,7 @@ an existing pipe end
 .PD 0
 .HP
 .BR register_inode (9),
-\-\ register a STREAMS special filesystem node
+\-\ register a STREAMS special file system node
 .HP
 .BR register_strdev (9),
 \-\ register a STREAMS device
@@ -239,7 +239,7 @@ an existing pipe end
 \-\ register a STREAMS module to a module id
 .HP
 .BR unregister_inode (9),
-\-\ unregister a STREAMS special filesystem node
+\-\ unregister a STREAMS special file system node
 .HP
 .BR unregister_strdev (9),
 \-\ unregister a STREAMS device
@@ -522,7 +522,7 @@ an existing pipe end
 \-\ convert milliseconds to clock ticks
 .HP
 .BR drv_priv (9)
-\-\ determin if user is priviledged
+\-\ determine if user is privileged
 .HP
 .BR drv_usectohz (9)
 \-\ convert microseconds to clock ticks
@@ -558,7 +558,7 @@ an existing pipe end
 \-\ start a timer
 .HP
 .BR umount (9)
-\-\ unmount a filesystem
+\-\ unmount a file system
 .HP
 .BR unlink (9)
 \-\ remove a file
@@ -772,7 +772,7 @@ an existing pipe end
 \-\ enables a STREAMS message queue for multi-processing
 .HP
 .BR lis_qreply (9)
-\-\ replys to a message from a STREAMS message queue
+\-\ replies to a message from a STREAMS message queue
 .HP
 .BR lis_qsize (9)
 \-\ return the number of messages on a queue
@@ -808,7 +808,7 @@ an existing pipe end
 \-\ puts a message on the downstream STREAMS message queue
 .HP
 .BR lis_safe_qreply (9)
-\-\ replys to a message from a STREAMS message queue
+\-\ replies to a message from a STREAMS message queue
 .HP
 .BR lis_safe_RD (9)
 \-\ return the read queue of a STREAMS queue pair
@@ -838,10 +838,10 @@ an existing pipe end
 \-\ start a timer
 .HP
 .BR lis_umount2 (9)
-\-\ unmount a filesystem
+\-\ unmount a file system
 .HP
 .BR lis_umount (9)
-\-\ unmount a filesystem
+\-\ unmount a file system
 .HP
 .BR lis_unbufcall (9)
 \-\ removes a STREAMS buffer callback
@@ -856,7 +856,7 @@ an existing pipe end
 \-\ unregister a STREAMS device
 .HP
 .BR lis_unregister_strmod (9)
-\-\ deregister a STREAMS module
+\-\ unregister a STREAMS module
 .HP
 .BR lis_untimeout (9)
 \-\ stop a timer

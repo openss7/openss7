@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strlog.4.man,v 0.9.2.5 2004/08/22 06:17:41 brian Exp $
+.\" @(#) $Id: strlog.4.man,v 0.9.2.6 2004/08/24 08:42:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:41 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRLOG 4 "$Date: 2004/08/22 06:17:41 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH STRLOG 4 "$Date: 2004/08/24 08:42:35 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -104,7 +104,7 @@ This device is accessible to all users.
 .PP
 The
 .B strlog
-device is characterized by the following behavior:
+device is characterized by the following behaviour:
 .PP
 The
 .B strlog
@@ -146,7 +146,7 @@ utility.
 .PP
 The
 .B strlog
-driver si opened using the clone interface,
+driver is opened using the clone interface,
 .BR /dev/strlog .
 Each open of the
 .B /dev/strlog
@@ -197,61 +197,9 @@ in any of the fields of the
 .B trace_ids
 structure indicates that any value is accepted for that field.
 .PP
-At most, one trace logger and one error logger can be active at a time.  After
-the logger process has identified itself by using the ioctl
-.RB ( streamio (7))
-operation, the
-.B strlog
-driver will begin sendinggn messages, subject to the restrictions previously
-noted.  These messages are obtained by using the
-.BR getmsg (2)
-system call.  The control part of the message contains a
-.B log_ctl
-structure, which specifies the
-.IR mid ", " sid ", " level " and " flags
-fields, as well as the time in ticks since boot that the message was
-submitted, the corresponding time in seconds since Jan. 1, 1970, and a
-sequence number.  The time in seconds since 1970 is p rovided so that the date
-and time of the message can be easily computed; the time in ticks since boot
-is provided so that the relative timing of log messages can be determined.
-.PP
-Different sequence number are maintained for the error logging and trace
-logging streams so that gaps in the sequence of messages can be determined.
-(During times of high message traffic, some message may not be delivered by
-the logger to aviod tying up system resources).  The data part of the message
-contains the unexpanded text of the format string (null-terminated), followed
-by the arguments to the format string (up to the number specified by the
-.B NLOGARGS
-value), aligned on the first word boundary following the format string.
-.PP
-A process may also send a message of the same structure to the log driver,
-even if it is not an error or trace logger.  The only fields of the
-.B log_ctl
-structure in the control part of the message that are accepted are the
-.I level " and " flags
-fields.  All other fields are filled in by the log driver before being
-forwarded to the appropriate logger.  The data portion must conatin a
-null-terminated format string, and any arguments (up to NLOGARGS) must be
-packed one word each, on the next word boundary following the end of the
-format string.
-.PP
-Attempting to issue an
-.I I_TRCLOG
-or
-.I I_ERRLOG
-operation when a logging process of the given type already exists result in
-the
-.RB [ ENXIO ]
-error being returned.  Similarly,
-.RB [ ENXIO ]
-is returned for
-.I I_TRCLOG
-operations without any
+Following is the format of the
 .B trace_ids
-structures, or for any unrecognized
-.I I_STR
-operations.  Incorrectly formatted log messages sent to the driver by a user
-process are silently ignored (no error results).
+structure:
 .PP
 .RS
 .nf
@@ -264,15 +212,33 @@ struct trace_ids {
 };
 \s+1\fP
 .fi
-.RE
 .TP
 .I ti_mid
+specifies the
+.I STREAMS
+module ID number for this trace id entry.  A value of minus one
+.RB ( -1 )
+indicates that this trace id entry applies to any module ID.
 .TP
 .I ti_sid
+specifies the sub-ID number of a minor device (unit) associated with the
+.I STREAMS
+module or driver specified by
+.IR t_mid .
+A value of minus one
+.RB ( -1 )
+indicates that this trace id entry applies to any sub-ID.
 .TP
 .I ti_level
+specifies that maximum
+.B strlog
+log level that will be accepted by this trace id entry.
+A value of minus one
+.RB ( -1 )
+indicates that this trace id entry applies to any log level.
 .TP
 .I ti_flags
+.RE
 .PP
 If any of the fields of the
 .B trace_ids
@@ -293,6 +259,24 @@ value in the
 .B trace_ids
 structure.
 .PP
+At most, one trace logger and one error logger can be active at a time.  After
+the logger process has identified itself by using the ioctl
+.RB ( streamio (7))
+operation, the
+.B strlog
+driver will begin sending messages, subject to the restrictions previously
+noted.  These messages are obtained by using the
+.BR getmsg (2)
+system call.  The control part of the message contains a
+.B log_ctl
+structure, which specifies the
+.IR mid ", " sid ", " level " and " flags
+fields, as well as the time in ticks since boot that the message was
+submitted, the corresponding time in seconds since Jan. 1, 1970, and a
+sequence number.  The time in seconds since 1970 is provided so that the date
+and time of the message can be easily computed; the time in ticks since boot
+is provided so that the relative timing of log messages can be determined.
+.PP
 .RS
 .nf
 \fC\s-1
@@ -308,7 +292,6 @@ struct log_ctl {
 };
 \s+1\fP
 .fi
-.RE
 .TP
 .I mid
 specifies the
@@ -327,29 +310,35 @@ specifies the level for screening lower-level event messages from a tracer.
 .I flags
 contains several flags that can be set in various combinations.  The flags are
 as follows:
+.DS
 .RS
-.TP
-.B SL_ERROR
+.TS
+tab(:);
+lblsss.
+SL_ERROR:T{
 message is for the error logger.
-.TP
-.B SL_TRACE
+T}
+SL_TRACE:T{
 message is for the tracer.
-.TP
-.B SL_CONSOLE
+T}
+SL_CONSOLE:T{
 message will be printed to the console.
-.TP
-.B SL_FATAL
+T}
+SL_FATAL:T{
 notification of a fatal error.
-.TP
-.B SL_NOTIFY
+T}
+SL_NOTIFY:T{
 requests to mail a copy of a message to the system administrator.
-.TP
-.B SL_WARN
+T}
+SL_WARN:T{
 message is a warning.
-.TP
-.B SL_NOTE
+T}
+SL_NOTE:T{
 message is a note.
+T}
+.TE
 .RE
+.DE
 .TP
 .I ltime
 tim in seconds since January 1, 1970.
@@ -385,6 +374,45 @@ Messages originating from the kernel have facility code set to
 Most message originating from user processes will have the facility code set
 to
 .BR LOG_USER .
+.RE
+.PP
+Different sequence number are maintained for the error logging and trace
+logging streams so that gaps in the sequence of messages can be determined.
+(During times of high message traffic, some message may not be delivered by
+the logger to avoid tying up system resources).  The data part of the message
+contains the unexpanded text of the format string (null-terminated), followed
+by the arguments to the format string (up to the number specified by the
+.B NLOGARGS
+value), aligned on the first word boundary following the format string.
+.PP
+A process may also send a message of the same structure to the log driver,
+even if it is not an error or trace logger.  The only fields of the
+.B log_ctl
+structure in the control part of the message that are accepted are the
+.IR level " and " flags
+fields.  All other fields are filled in by the log driver before being
+forwarded to the appropriate logger.  The data portion must contain a
+null-terminated format string, and any arguments (up to NLOGARGS) must be
+packed one word each, on the next word boundary following the end of the
+format string.
+.PP
+Attempting to issue an
+.I I_TRCLOG
+or
+.I I_ERRLOG
+operation when a logging process of the given type already exists result in
+the
+.RB [ ENXIO ]
+error being returned.  Similarly,
+.RB [ ENXIO ]
+is returned for
+.I I_TRCLOG
+operations without any
+.B trace_ids
+structures, or for any unrecognized
+.I I_STR
+operations.  Incorrectly formatted log messages sent to the driver by a user
+process are silently ignored (no error results).
 .\"
 .\"
 .SH USAGE
@@ -399,6 +427,12 @@ device.
 .\"
 .SH IOCTLS
 .PP
+The
+.B strlog
+drivers supports the following
+.BR streamio (7)
+.B I_STR
+input ouput controls:
 .SS I_ERRLOG
 .PP
 Indicates an error logger.  No
@@ -497,7 +531,13 @@ putmsg(log, &ctl, &dat, 0);
 .\"
 .SH "SEE ALSO"
 .PP
-.BR nuls (4),
+.BR open (2),
+.BR strerr (8),
+.BR strace (8),
+.BR strlog (9),
+.BR streamio (7),
+.BR strlog (1),
+.BR getmsg (2).
 .\"
 .\"
 .SH BUGS
@@ -547,7 +587,7 @@ field of the
 structure.
 .IP \(em
 .IR Solaris \(rg
-declards
+declares
 .I ltime
 to be
 .BR clock32_t " or " clock_t ,

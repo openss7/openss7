@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.8 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.9 2004/08/24 08:42:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH KMEM_ZALLOC 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH KMEM_ZALLOC 9 "$Date: 2004/08/24 08:42:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -120,7 +120,7 @@ cannot wait or reschedule, may fail and return
 .SH RETURN
 .PP
 .BR kmem_zalloc ()
-returns a pointer to the alocated initialized memory on success.  On failure,
+returns a pointer to the allocated initialized memory on success.  On failure,
 .BR kmem_zalloc ()
 returns a
 .B NULL

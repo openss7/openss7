@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_umem_alloc.9.man,v 0.9.2.9 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: ddi_umem_alloc.9.man,v 0.9.2.10 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_UMEM_ALLOC 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_UMEM_ALLOC 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -97,7 +97,7 @@ void \fBddi_umem_alloc\fR(size_t \fIsize\fR, int \fIflag\fR, ddi_umem_cookie_t *
 Number of bytes to allocate.
 .TP
 .I flag
-Determines type of memory requiest.  A combination of:
+Determines type of memory requested.  A combination of:
 .RS
 .TP
 .B DDI_UMEM_SLEEP

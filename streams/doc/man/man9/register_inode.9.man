@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_inode.9.man,v 0.9.2.4 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: register_inode.9.man,v 0.9.2.5 2004/08/24 08:42:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH REGISTER_INODE 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Under Construction"
+.TH REGISTER_INODE 9 "$Date: 2004/08/24 08:42:46 $" "$Name:  $" "Under Construction"
 .\"
 .\"
 .SH NAME
 .B register_inode, register_inode_major, register_inode_minor, unregister_inode, unregister_inode_major, unregister_inode_minor
-\- register a new or deregister an existing \fISTREAMS\fP stream head type against a device
+\- register a new or unregister an existing \fISTREAMS\fP stream head type against a device
 .\"
 .\"
 .SH SYNOPSIS
@@ -163,22 +163,22 @@ are called.
 .BR register_inode_major ()
 and
 .BR unregister_inode_major ()
-register or deregister a stream head from a given (or automatically assigned)
+register or unregister a stream head from a given (or automatically assigned)
 major device number.
 .PP
 .BR register_inode_minor ()
 and
 .BR unregister_inode_minor ()
-register or deregister the stream head from a specific major-minor device
+register or unregister the stream head from a specific major-minor device
 number combination.
 .PP
-Both registration and deregistration functions take a
+Both registration and unregistration functions take a
 .BR cdevsw (9)
 structure in the
 .I cdev
 argument.  The same
 .I cdev
-argument must be passed to the deregistration function as was passed to the
+argument must be passed to the unregistration function as was passed to the
 registration function.
 .\"
 .\"

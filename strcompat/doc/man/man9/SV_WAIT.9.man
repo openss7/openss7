@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SV_WAIT.9.man,v 0.9.2.1 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: SV_WAIT.9.man,v 0.9.2.2 2004/08/24 08:42:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SV_WAIT 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH SV_WAIT 9 "$Date: 2004/08/24 08:42:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -98,7 +98,7 @@ int \fBSV_WAIT_SIG\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
 .PP
 .TP
 .I svp
-A pointer to the sychrnonization variable upon which to wait.
+A pointer to the synchronization variable upon which to wait.
 .TP
 .I priority
 A hint to scheduler concerning the priority with which the caller will run
@@ -139,7 +139,7 @@ A locked basic lock that will be released before blocking.
 .BR SV_WAIT ()
 and
 .BR SV_WAIT_SIG ()
-wait on the sycnhronization variable referenced by the
+wait on the synchronization variable referenced by the
 .I svp
 argument.
 The calling process will sleep inside
@@ -150,7 +150,7 @@ until signalled by
 .BR SV_BROADCAST (9)
 or
 .BR SV_SIGNAL (9)
-for the synchronization varilable referenced by
+for the synchronization variable referenced by
 .I svp
 by another thread of execution.
 .BR SV_WAIT_SIG ()
@@ -176,7 +176,7 @@ argument must be held by the caller when calling
 .BR SV_WAIT ()
 or
 .BR SV_WAIT_SIG ().
-This lock will be released internally and interrupt prioirty set to
+This lock will be released internally and interrupt priority set to
 .B plbase
 after the process is placed on the wait queue, but before the context
 switching to another process.  Upon return from
@@ -185,7 +185,7 @@ or
 .BR SV_WAIT_SIG (),
 the lock is not held and the interrupt priority is set to
 .BR plbase .
-This procedure ensures that signals and wakeups on the sychronization variable
+This procedure ensures that signals and wake-ups on the synchronization variable
 are not lost.
 .PP
 The process will not be interrupted by signals while sleeping inside
@@ -205,7 +205,7 @@ is typically used within a
 .BR qopen (9)
 procedure to wait on some condition before continuing
 .I STREAMS
-module initialization actions.  One typicall usage is to call
+module initialization actions.  One typical usage is to call
 .BR qprocson (9)
 to enable
 .BR put (9)
@@ -315,8 +315,8 @@ Calls to
 .BR SV_WAIT ()
 and
 .BR SV_WAIT_SIG ()
-should be written so as to be able to tolerate false wakeups.  The condition
-that initiated the sleep on the synchronization varilable should be rechecked
+should be written so as to be able to tolerate false wake-ups.  The condition
+that initiated the sleep on the synchronization variable should be rechecked
 on exit to ensure that the condition has been cleared.
 .PP
 .BR SV_WAIT ()

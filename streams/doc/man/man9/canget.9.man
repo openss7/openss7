@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canget.9.man,v 0.9.2.5 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: canget.9.man,v 0.9.2.6 2004/08/24 08:42:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/24 08:42:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CANGET 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH CANGET 9 "$Date: 2004/08/24 08:42:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -149,7 +149,7 @@ Although this function is documented as an internal function of
 lfs
 .]
 .BR canget ()
-is not normally called direclty by
+is not normally called directly by
 .I STREAMS
 modules or drivers.  It is not part of any DDI.  This function is normally
 internal to the
@@ -162,7 +162,7 @@ lfs
 provides an exported version of this function for use by modules and drivers
 in support of direct IO.
 .PP
-This function should not bs used by portable
+This function should not be used by portable
 .I STREAMS
 modules or drivers.
 .\"
