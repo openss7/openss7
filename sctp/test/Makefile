@@ -8,7 +8,7 @@ PERF = test-tcps test-tcpc test-udps test-udpc test-sctps test-sctpc
 DELY = test-tcp-ds test-tcp-dc test-sctp-ds test-sctp-dc
 THPT = test-tcp-ts test-tcp-tc test-sctp-ts test-sctp-tc
 
-OBJS = ${ETSI} ${TEST} ${PERF} ${DELY} ${THPT}
+OBJS = ${PERF} ${DELY} ${THPT}
 
 all: ${OBJS}
 

@@ -2,7 +2,7 @@
 .\" Don't change the line above, it tells man that tbl is needed.
 .\" -*- nroff -*-
 .\"
-.\" @(#) $Id: sctp.7,v 0.9.2.15 2003/04/09 12:16:57 brian Exp $
+.\" @(#) $Id: sctp.7,v 0.9.2.16 2003/05/07 20:25:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -32,7 +32,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2003/04/09 12:16:57 $ by $Author: brian $
+.\" Modified $Date: 2003/05/07 20:25:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .TH SCTP 7 "9 April 2003" "Linux Man Page" "Linux Programmer's Manual"
@@ -1551,13 +1551,12 @@ flag to \fBnetstat\fR(8).  For additional information see \fBproc\fR(5) and \fBn
 ICMP Protocol statistics that are applicable to \fBSCTP\fR are as follows:
 .TP 18
 .B InErrors
-The number of ICMP messages received in error.  This represents the value for
-all protocols including \fBSCTP\fR.
+The number of ICMP messages received in error.  This represents the value for all protocols
+including \fBSCTP\fR.
 .PP
-\fBSCTP\fR provides the following information in the Linux MIB.  Linux MIB
-statistics are available in \fI\fC/proc/net/netstat\fR.  For additional
-information see \fBproc\fR(5).  Linux protocol statistics that are applicable
-also to \fBSCTP\fR are as follows:
+\fBSCTP\fR provides the following information in the Linux MIB.  Linux MIB statistics are
+available in \fI\fC/proc/net/netstat\fR.  For additional information see \fBproc\fR(5).  Linux
+protocol statistics that are applicable also to \fBSCTP\fR are as follows:
 .TP 18
 .B LockDroppedIcmps
 The number of ICMP errors that were dropped because the socket was locked.
@@ -1571,26 +1570,38 @@ The number of COOKIE-ECHO chunks dropped due to listen queue overflows.
 SCTP Protocol Statistics that are applicable to \fBSCTP\fR are as follows:
 .TP 18
 .B RtoAlgorithm
+The algorithm used to determine the timeout value (T3-rtx) used for retransmitting
+unacknowledged chunks.
 .TP 18
 .B RtoMin
-This value can be obtained by reading the system control \fBsctp_rto_min\fR.
+The minimum value for the transmission timeout value.  This value can be obtained by reading
+the system control \fBsctp_rto_min\fR.  A retransmission time value of zero means immediate
+retransmission.  The value of this object has to be less than or equal to RtoMax's value.
 .TP 18
 .B RtoMax
-This value can be obtained by reading the system control \fBsctp_rto_max\fR.
+The maximum value for the retransmission timeout value.  This value can be obtained by reading
+the system control \fBsctp_rto_max\fR.  A retransmission timeout value of zero means immediate
+retransmission.  The value of this object has to be greater than or equal to RtoMin's value.
 .TP 18
 .B RtoInitial
-This value can be obtained by reading the system control \fBsctp_rto_initial\fR.
+The initial value for the retransmission timer.  This value can be obtained by reading the
+system control \fBsctp_rto_initial\fR.  A retransmission time value of zero means immediate
+retransmission.
 .TP 18
 .B MaxAssoc
-There is no controllable upper limit on the maximum number of associations.  The maximum number
-of associations is constrained by the system maximum number of file descriptors, the process
-maximum number of file descriptors, and the amount of memory in the system.
+The maximum number of associations.  For \fBSCTP\fR there is no controllable upper limit on the
+maximum number of associations.  The maximum number of associations is constrained by the
+system maximum number of file descriptors, the process maximum number of file descriptors, and
+the amount of memory in the system.  Therefore, this value will always be -1.
 .TP 18
 .B ValCookieLife
-This value can be obtained by reading the system control \fBsctp_valid_cookie_life\fR.
+The valid cookie life for COOKIEs in the initialization procedure.  This value can be obtained
+by reading the system control \fBsctp_valid_cookie_life\fR.
 .TP 18
 .B MaxInitRetr
-This value can be obtained by reading the system control \fBsctp_max_init_retries\fR.
+The maximum number of times that an INIT or COOKIE-ECHO chunk will be retransmitted during the
+startup of an association.  This value can be obtained by reading the system control
+\fBsctp_max_init_retries\fR.
 .TP 18
 .B CurrEstab
 The number of \fBSCTP\fR sockets in the established state.
@@ -1615,22 +1626,26 @@ no corresponding \fBSCTP\fR socket could be found.
 The number of received packets that discovered a checksum error and were discarded.
 .TP 18
 .B OutCtrlChunks
-The number of out SCTP Control Chunks that were processed for transmission.
+The number of SCTP Control Chunks that were sent, excluding retransmissions.
 .TP 18
 .B OutOrderChunks
-The number of out SCTP Data Chunks were sent with the Unordered Bit clear.
+The number of SCTP Data Chunks that were sent with the Unordered Bit clear, excluding
+retransmissions.
 .TP 18
 .B OutUnorderChunks
-The number of out SCTP Data Chunks were sent with the Unordered Bit set.
+The number of SCTP Data Chunks that were sent with the Unordered Bit set, excluding
+retransmissions.
 .TP 18
 .B InCtrlChunks
-The number of out SCTP Control Chunks that were received and processed.
+The number of SCTP Control Chunks that were received and processed, excluding duplicates.
 .TP 18
 .B InOrderChunks
-The number of out SCTP Data Chunks were received with the Unordered Bit clear.
+The number of SCTP Data Chunks that were received with the Unordered Bit clear, excluding
+duplicates.
 .TP 18
 .B InUnorderChunks
-The number of out SCTP Data Chunks were received with the Unordered Bit set.
+The number of SCTP Data Chunks that were received with the Unordered Bit set, excluding
+duplicates.
 .TP 18
 .B FragUsrMsgs
 The number of times that \fBSCTP\fR further fragmented a user message.
@@ -1643,6 +1658,9 @@ The number of packets delivered for transmission to the IP layer.
 .TP 18
 .B InSCTPPacks
 The number of packets received for processing from the IP layer.
+.TP 18
+.B DiscontinuityTime
+The last time at which SCTP statistics suffered a discontinuity.
 .SS "Connection Information"
 .PP
 \fBSCTP\fR provides for SNMP Connection Information following the SCTP MIB
