@@ -1,0 +1,1279 @@
+<html>
+
+
+
+<head>
+
+<title>LiS User Commands</title>
+<meta name="title" content="LiS User Commands">
+<meta name="keywords" content="Linux, streams, user, commands, LiS">
+<meta name="description" content="LiS User Commands">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>LiS User Commands</h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+    <td width="600" height="100%" align="left" valign="top"> 
+      <p><a name="Contents"></a>Contents </p>
+      <p><a href="#Introduction">Introduction</a> 
+      <p><a href="#Global Commands">Global Commands</a> 
+      <blockquote> 
+        <p><a href="#fattach">fattach</a> <br>
+          <a href="#fdetach">fdetach</a> <br>
+          <a href="#ldlconfig">ldlconfig<br>
+          </a><a href="#ldltest">ldltest</a><br>
+          <a href="#polltst">polltst</a> <br>
+          <a href="#streams">streams</a> <br>
+          <a href="#strmakenodes">strmakenodes</a> <br>
+          <a href="#strtst">strtst</a> <br>
+          <a href="#timetst">timetst</a></p>
+      </blockquote>
+      <hr width="100%">
+      <h3> <a name="Introduction"></a>Introduction</h3>
+      <p>The Linux STREAMS (LiS) package contains some user level commands that 
+        are used to manage the package and assist the user with STREAMS functions. 
+      </p>
+      <p>These commands are installed in <font face="Courier New, Courier, mono">/usr/bin</font> 
+        or <font face="Courier New, Courier, mono">/usr/sbin</font>.&nbsp; They 
+        are referred to a "global commands." </p>
+      <p>A second group is built in the LiS installation directory and left there.&nbsp; 
+        This second group is oriented more towards testing of LiS than towards 
+        its operation.&nbsp; These commands remain undocumented since they are 
+        primarily intended for the use of the authors of the modules that they 
+        test. <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="100%">
+      <h3> <a name="Global Commands"></a>Global Commands</h3>
+      <p>These are the commands that are installed in <font face="Courier New, Courier, mono">/usr/bin</font> 
+        or <font face="Courier New, Courier, mono">/usr/sbin</font>, and are thus 
+        globally accessible to any user with those directories in his/her path. 
+      </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <p><br>
+        &nbsp; </p>
+      <h3> <a name="fattach"></a><b>fattach</b></h3>
+      <blockquote> 
+        <p><tt>/usr/sbin/fattach [-v] [-m|-u|-M </tt><i>mode</i><tt>] [-p|</tt><i>STREAMS-path</i><tt>] 
+          </tt><i>path</i><tt> ...</tt> <br>
+          <tt>/usr/sbin/fattach -?</tt></p>
+      </blockquote>
+      <p> Description</p>
+      <p>The&nbsp; fattach&nbsp; program provides a command-line interface to 
+        the underlying fattach(3) function.&nbsp; If the <font face="Courier New, Courier, mono">-p</font> 
+        and/or the <font face="Courier New, Courier, mono">-c</font>&nbsp; option&nbsp; 
+        is&nbsp; specified, a STREAMS-based pipe is created and its two ends are&nbsp; 
+        alternately&nbsp; attached&nbsp; to&nbsp; the&nbsp; path names&nbsp; given.&nbsp;&nbsp; 
+        In&nbsp; this&nbsp; mode of usage, at least two path names are required, 
+        but there need not be an&nbsp; even&nbsp; number of path names (i.e., 
+        the pipe ends need not be attached to the same number of paths). </p>
+      <p>If the <font face="Courier New, Courier, mono">-p</font> and <font face="Courier New, Courier, mono">-c</font> 
+        options are not specified, the first path name&nbsp; given must identify 
+        a STREAMS-based file.&nbsp; That file will be opened, and it will be attached&nbsp; 
+        to&nbsp; each&nbsp; of&nbsp; the path&nbsp; names subsequently specified 
+        (of which there must be at least one). </p>
+      <p> <b>Options</b></p>
+      <table cols=3 width="70%" NOSAVE >
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-p</font></p>
+          </td>
+          <td width="60%" NOSAVE> 
+            <p>Create a STREAMS-based pipe, to which to attach the subsequently&nbsp; 
+              specified path names.&nbsp; The first path will be attached to the 
+              first pipe end, the&nbsp; second to the second pipe end, the third 
+              to the first pipe end,&nbsp; etc.,&nbsp; until the list of path&nbsp; 
+              names is exhausted. </p>
+            <p>By&nbsp; default,&nbsp; the&nbsp; umask&nbsp; (see&nbsp; umask(2))&nbsp; 
+              is&nbsp; also applied to each end of the&nbsp; pipe&nbsp; after&nbsp; 
+              attaching. (See fattach(3)).</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-c</font></p>
+          </td>
+          <td> 
+            <p>Like <font face="Courier New, Courier, mono">-p</font> (both&nbsp; 
+              may&nbsp; be&nbsp; given),&nbsp; but additionally pushes the <i>connld</i> 
+              module onto the first end of the pipe.&nbsp;&nbsp; This&nbsp; conveniently&nbsp; 
+              creates a free-standing pipe-serving pipe (see connld(9), and below).</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-m</font></p>
+          </td>
+          <td> 
+            <p>Apply the mode of the last-specified path(s) to the attached STREAMS-based&nbsp; 
+              file(s) after&nbsp; attaching.&nbsp; (See fattach(3).</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-u</font></p>
+          </td>
+          <td> 
+            <p>Apply the umask (see&nbsp; umask(2)) of the&nbsp; STREAMS-based 
+              file&nbsp; after&nbsp; attaching.&nbsp; (See fattach(3)).&nbsp; 
+              This is done by default when a pipe is created via -p.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-M</font> <i>mode</i></p>
+          </td>
+          <td> 
+            <p>Apply the given mode to the STREAMS-based&nbsp; file(s) after attaching.&nbsp; 
+              (See fattach(3)).</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-v</font></p>
+          </td>
+          <td> 
+            <p>Operate in a "verbose" manner.&nbsp; This causes fattach to report 
+              its progress via message output to stdout or stderr.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-?</font></p>
+          </td>
+          <td> 
+            <p>Provide a usage summary.</p>
+          </td>
+        </tr>
+      </table>
+      <p> <b>Return Value</b></p>
+      <p>Upon&nbsp; successful completion, i.e., if all given path names are attached 
+        to, fattach returns 0.&nbsp; Upon failure, fattach returns&nbsp; 1.&nbsp;&nbsp; 
+        However, the failure of one more attachments does not otherwise affect 
+        those that succeed, and the user is&nbsp; responsible&nbsp; for detaching 
+        any that may have succeeded if that is the desired behavior in the event 
+        of any&nbsp; failures. </p>
+      <p> <b>Application Usage</b></p>
+      <p>The <font face="Courier New, Courier, mono">-p</font> and <font face="Courier New, Courier, mono">-c</font> 
+        options provide a convenient means for creating free-standing mounted 
+        pipes.&nbsp;&nbsp; The&nbsp; openers of the paths attached via <font face="Courier New, Courier, mono">-p</font> 
+        will share a single pipe, while the openers of the paths attached via 
+        <font face="Courier New, Courier, mono">-c</font> will have access to 
+        a pipe-serving&nbsp; pipe.&nbsp;&nbsp; I.e.,&nbsp; each&nbsp; open&nbsp; 
+        of&nbsp; the first end (e.g., the client end) will generate a new pipe,&nbsp; 
+        one&nbsp; end of which will be given to the opener, and the other end 
+        of which will be passed as if by the I_SENDFD ioctl to the path attached&nbsp; 
+        to&nbsp; the other end (e.g., the server end).&nbsp; Each opener of the 
+        server path could&nbsp; poll(2) for input, receive a new pipe end using 
+        the I_RECVFD ioctl, and then close the server path, therefter using the 
+        new pipe end to communicate with&nbsp; the corresponding opener of the 
+        client path (note that the sense of client and&nbsp; server will in fact 
+        depend on the application - users of the two paths need only be aware 
+        of whether or not an I_RECVFD ioctl must be performed). </p>
+      <p> <b>See Also</b></p>
+      <p>connld(9), fattach(3), fdetach(3), fdetach(8), STREAMS(4), umask(2) </p>
+      <p> <b>History</b></p>
+      <p>An fattach function has been provided for various STREAMS implementations 
+        based on SVR4 STREAMS.&nbsp; Not all of these have provided a corresponding 
+        utility program of this sort. </p>
+      <p> <b>Author</b></p>
+      <p>John Boyd, protologos LLC &lt;jaboydjr@netwalk.com> </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3> <a name="fdetach"></a>fdetach</h3>
+      <blockquote> 
+        <p><tt>/usr/sbin/fdetach [-v] </tt><i>path</i><tt> ...</tt> <br>
+          <tt>/usr/sbin/fdetach -a</tt> <br>
+          <tt>/usr/sbin/fattach -?</tt></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p>The fdetach program provides a command-line interface to the underlying 
+        fdetach(3) function. </p>
+      <p>It is thus intended to provide a convenient means to dismantle so-called 
+        mounted STREAMS. </p>
+      <p>If the <font face="Courier New, Courier, mono">-a</font> option is specified,&nbsp; 
+        all currently attached STREAMS-based files are detached.&nbsp; If the 
+        <font face="Courier New, Courier, mono">-a</font> option is not specified, 
+        the path names given are taken to&nbsp; identify paths to which STREAMS-based 
+        files are currently attached. Those files will be detached from these 
+        paths. </p>
+      <p> <b>Options</b></p>
+      <table cols=3 width="70%" NOSAVE >
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-a</font></p>
+          </td>
+          <td width="60%" NOSAVE> 
+            <p>Undo all attachments currently in effect.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-v</font></p>
+          </td>
+          <td> 
+            <p>Operate in a "verbose" manner.&nbsp; This causes fdetach to report 
+              its progress via message output to stdout or stderr.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-?</font></p>
+          </td>
+          <td> 
+            <p>Provide a usage summary.</p>
+          </td>
+        </tr>
+      </table>
+      <p> <b>Return Value</b></p>
+      <p>Upon successful completion, i.e., if all given path names identify mounted 
+        STREAMS&nbsp; and these are all successfully detached,&nbsp; fdetach returns 
+        0.&nbsp;&nbsp; Upon failure, fdetach returns 1. </p>
+      <p>Note,&nbsp; however, that a failure indication does not mean that no 
+        action is taken; i.e., those detachments that succeed are not affected 
+        by those that fail. </p>
+      <p> <b>Warnings</b></p>
+      <p>It should be noted that although the fdetach program implements the -a 
+        option, by passing "*" to the fdetach function,&nbsp; this is not at all 
+        equivalent to specifying "*" on the command line when executing the program.&nbsp; 
+        Normally, "*"&nbsp; specified&nbsp; on the command line will be converted 
+        by a shell into a list of all files in the current&nbsp; working directory.&nbsp;&nbsp; 
+        By contrast, the -a option causes the fdetach operation to operate not 
+        with respect to path names at all, but with respect to STREAMS devices 
+        currently active within the STREAMS subsystem.&nbsp; I.e., each active 
+        stream head is examined for&nbsp; attachments, and any attachments found 
+        are dismantled. </p>
+      <p>The intended use for the -a option is thus to undo all attachments, e.g., 
+        in&nbsp; preparation for unloading the STREAMS subsystem. </p>
+      <p> <b>See Also</b></p>
+      <p>fdetach(3), fattach(8), STREAMS(4) </p>
+      <p> <b>History</b></p>
+      <p>An fdetach function has been provided for various STREAMS implementations 
+        based on SVR4 STREAMS.&nbsp; Not all of these have provided a corresponding 
+        utility program of this sort. </p>
+      <p> <b>Author</b></p>
+      <p>John Boyd, protologos LLC &lt;jaboydjr@netwalk.com> </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3> <a name="ldlconfig"></a>ldlconfig</h3>
+      <blockquote> 
+        <p><tt>/usr/sbin/ldlconfig </tt><i>Options</i> <br>
+          <tt>/usr/sbin/ldlconfig -h</tt></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p>ldlconfig is used to configure the ldl STREAMS driver as a client of 
+        a standard Linux network driver.&nbsp; Once configured other STREAMS drivers 
+        can be pushed or I_LINKed on top of the ldl driver, thus giving STREAMS 
+        drivers access to Linux network drivers. </p>
+      <p> <b>Options</b></p>
+      <table cols=3 width="70%" NOSAVE >
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-a</font><i>name</i></p>
+          </td>
+          <td width="60%" NOSAVE> 
+            <p>The name of the network driver interface to attach.&nbsp; For example, 
+              "<font face="Courier New, Courier, mono">-aeth0</font>" attaches 
+              to the <font face="Courier New, Courier, mono">eth0</font> network 
+              driver.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-b</font><i>sap</i></p>
+          </td>
+          <td> 
+            <p>The SAP to bind.&nbsp; The interpretation of the SAP depends upon 
+              the mode (<font face="Courier New, Courier, mono">-p</font>) and 
+              framing <font face="Courier New, Courier, mono">(-F</font>) being 
+              used.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-d</font><i>filed</i></p>
+          </td>
+          <td> 
+            <p>Instead of opening <font face="Courier New, Courier, mono">/dev/ldl</font>, 
+              use the given file descriptor number.&nbsp; This allows an external 
+              program to open <font face="Courier New, Courier, mono">/dev/ldl</font>, 
+              use ldlconfig to configure the STREAM, and then continue to use 
+              the open file descriptor for further operations.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-f</font><i>flag</i></p>
+          </td>
+          <td> 
+            <p>Flag to set with ioctl.&nbsp; Mnemonic values for <i>flag</i> are 
+              <tt>PEDANTIC_STANDARD</tt> and <tt>RAW</tt>.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-F</font><i>framing</i></p>
+          </td>
+          <td> 
+            <p>The type of framing to use in interactions with the network driver.&nbsp; 
+              Mnemonic values for <i>framing</i> are <tt>EII</tt>, <tt>802.2</tt>, 
+              <tt>SNAP</tt>, <tt>802.3</tt> and <tt>RAWLLC</tt>.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-h</font></p>
+          </td>
+          <td> 
+            <p>Print a command usage synopsis.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-p</font><i>mode</i></p>
+          </td>
+          <td> 
+            <p>Set promiscuous mode.&nbsp; Mnemonic values for <i>mode</i> are 
+              <tt>PHYS</tt>, <tt>SAP</tt> or <tt>MULTI</tt>.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td></td>
+          <td> 
+            <p><font face="Courier New, Courier, mono">-v</font><i>mask</i></p>
+          </td>
+          <td> 
+            <p>Set verbose mask.</p>
+          </td>
+        </tr>
+      </table>
+      <p> <b>Operation</b></p>
+      <p>ldlconfig opens the clone device <font face="Courier New, Courier, mono">/dev/ldl</font>, 
+        or accepts a file descriptor to a file already opened to that device.&nbsp; 
+        It performs a DLPI Attach Request based upon the <font face="Courier New, Courier, mono">-a</font> 
+        parameter.&nbsp; This attaches the file to a Linux network device. </p>
+      <p>It then sets operational options based upon the <font face="Courier New, Courier, mono">-f</font> 
+        and <font face="Courier New, Courier, mono">-p</font> options, if any 
+        were specified. </p>
+      <p>If the <font face="Courier New, Courier, mono">-b</font> option is specified 
+        it also performs a DLPI Bind Request on the stream. </p>
+      <p>The resulting stream connects to the ldl driver which acts as a DLPI 
+        Provider and translates between the DLPI STREAMS protocol from above to 
+        the Linux network driver interface below.&nbsp; The effect is to present 
+        a DLPI interface to a Linux network driver. </p>
+      <p>The type of network driver (Ethernet, Token Ring, FDDI, HDLC) is compared 
+        with the requested framing type (is option) and <font face="Courier New, Courier, mono">RAW</font> 
+        flag (is option).&nbsp; If the given driver does not support the requested 
+        framing type then the ldlconfig command will fail.&nbsp; All drivers support 
+        the <font face="Courier New, Courier, mono">RAW</font> frame interface. 
+      </p>
+      <p>Depending upon the driver type and framing type, the ldl driver will 
+        set up to decode incoming "frames" according to the framing type.&nbsp; 
+        This has an effect on where the driver looks in the incoming "frame" to 
+        find the SAP to match against the requested SAP in the DLPI Bind Request 
+        to ldl (<font face="Courier New, Courier, mono">-b</font> option).&nbsp; 
+        The framing type of <font face="Courier New, Courier, mono">RAWLLC</font> 
+        generally means that the entire frame is passed upstream.&nbsp; This allows 
+        the upstream client driver to interpret the LLC information within the 
+        frame. </p>
+      <p>Frame types other than <font face="Courier New, Courier, mono">RAWLLC</font> 
+        generally mean that the LLC header will be stripped from received frames 
+        passing just the payload portion to the upstream client.&nbsp; The received 
+        frame is passed upstream in a <font face="Courier New, Courier, mono">DL_UNITDATA_IND</font> 
+        <font face="Courier New, Courier, mono">M_PROTO</font> message and the 
+        address carried by this frame will be set to the source MAC address from 
+        the frame header. </p>
+      <p>In the transmit direction, a frame type of <font face="Courier New, Courier, mono">RAWLLC</font> 
+        means that the formatting of the frame to be sent to the medium is under 
+        the control of the upstream client. </p>
+      <p>For other types of framing, the ldl driver will build the LLC header 
+        according to the framing type.&nbsp; The address in the <font face="Courier New, Courier, mono">DL_UNITDATA_REQ</font> 
+        is used to develop the destination MAC address. </p>
+      <p>For any given frame type and driver type, it is often necessary to consult 
+        the driver source code in order to understand the fine details of the 
+        frame processing involved. <br>
+        &nbsp; </p>
+      <p> <b>Return Value</b></p>
+      <p>ldlconfig returns 0 upon success and 1 if any indicated operation failed. 
+        <br>
+        &nbsp; </p>
+      <p> <b>Author</b></p>
+      <p>Ole Husgaard &lt;sparre@login.dknet.dk> <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3><a name="ldltest"></a>ldltest</h3>
+      <blockquote> 
+        <p><tt>/usr/sbin/ldltest </tt><i>Options</i> <i>Driver</i> <i>Local-IP</i></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p>ldltest is used to test the ldl STREAMS driver by using one of the existing 
+        standard Linux network drivers to send a &quot;ping&quot; to another host 
+        on the network. The command line parameters specify the <i>local-IP</i> 
+        and <i>remote-IP</i> addresses and the name of the <i>Driver</i> to use 
+        when sending the ping.</p>
+      <p>ldltest is also used to obtain statistics from the ldl STREAMS driver 
+        and to set debugging masks.</p>
+      <p> <b>Options</b></p>
+      <table cols=3 width="70%" NOSAVE >
+        <tr NOSAVE> 
+          <td width="9%" NOSAVE></td>
+          <td valign=TOP width="34%" NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-a</font></p>
+          </td>
+          <td width="57%" NOSAVE valign="top"> 
+            <p>Respond to received ARP queries.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-s</font></p>
+          </td>
+          <td valign="top" width="57%"> 
+            <p>Respond to received pings. Also enables LLC TEST/XID echo mode.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-S </font><i>dsap</i>:<i>ssap</i></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>Set the DSAP and SSAP to use when sending an LLC TEST or XID.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-r </font><i>remote-IP</i></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>The remote IP address to which the ping is to be directed.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-R </font><i>remote-MAC</i></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>The remote MAC address for sending LLC TEST/XID frames.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-c </font><i>packet-cnt</i></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>The number of ping packets to send. Default is 1.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-v </font><i>number</i></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>Set verbosity level.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-f </font><i>framing</i></p>
+          </td>
+          <td width="57%"> 
+            <p>Set framing style to <font face="Courier New, Courier, mono">EII</font> 
+              (default), <font face="Courier New, Courier, mono">RAW</font> or 
+              <font face="Courier New, Courier, mono">SNAP</font>.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="9%"></td>
+          <td valign=TOP NOSAVE width="34%"> 
+            <p><font face="Courier New, Courier, mono">-d </font><i>mask</i></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>Set debug mask for the ldl driver to <i>mask</i>.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="9%"></td>
+          <td width="34%" valign="top">
+            <p><font face="Courier New, Courier, mono">-H</font></p>
+          </td>
+          <td width="57%" valign="top"> 
+            <p>Print out the values for the debug mask bits.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="9%"></td>
+          <td width="34%" valign="top">
+            <p><font face="Courier New, Courier, mono">-g</font></p>
+          </td>
+          <td width="57%"> 
+            <p>Print out global statistics obtained from the ldl driver.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="9%"></td>
+          <td width="34%">
+            <p><font face="Courier New, Courier, mono">-T</font></p>
+          </td>
+          <td width="57%"> 
+            <p>Send LLC TEST command.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="9%"></td>
+          <td width="34%"> 
+            <p><font face="Courier New, Courier, mono">-X</font></p>
+          </td>
+          <td width="57%"> 
+            <p>Send LLC XID command</p>
+          </td>
+        </tr>
+      </table>
+      <p> <b>Operation</b></p>
+      <p>In test mode, ldltest constructs a ping packet from the parameters given 
+        and sends it to the remote host. It awaits the response and prints out 
+        the round trip time when it receives the response. If the <font face="Courier New, Courier, mono">-c</font> 
+        option is used it sends the ping repeatedly and prints out the round-trip 
+        time every 1,000 packets.</p>
+      <p>With the <font face="Courier New, Courier, mono">-s</font> (lower case) 
+        option, ldltest listens for received frames from the indicated interface 
+        driver. If the framing is specified as <font face="Courier New, Courier, mono">RAW</font> 
+        then it will receive LLC frames from the driver. Other types of framing 
+        result in non-LLC Ethernet types of frames such as IP packets and ARP 
+        messages. Thus, the setting of the <font face="Courier New, Courier, mono">-f</font> 
+        option conditions the type of messages that can be received from the interface. 
+        When an ICMP ping is received, it is responded to. When an LLC TEST or 
+        XID command is received it is responded to with the corresponding response 
+        frame.</p>
+      <p>With the <font face="Courier New, Courier, mono">-g</font> option, ldltest 
+        obtains statistics maintained by the ldl driver and prints them out. This 
+        is useful for troubleshooting protocol stack configuration since you can 
+        see whether packets entering ldl from either above or below was forwarded 
+        to the neighboring module.</p>
+      <p>By setting debug bits via the <font face="Courier New, Courier, mono">-d</font> 
+        option, you can cause the ldl driver to print the contents of packets 
+        flowing into it and out of it.</p>
+      <p><b>Examples</b></p>
+      <blockquote> 
+        <p><font face="Courier New, Courier, mono">ldltest -r 192.168.1.1 eth0 
+          192.168.1.117</font></p>
+        <blockquote> 
+          <p>Sends a ping to 192.168.1.1. The local host address is 192.168.1.117 
+            (obtainable from the <font face="Courier New, Courier, mono">ifconfig</font> 
+            command).</p>
+        </blockquote>
+        <p><font face="Courier New, Courier, mono">ldltest -S 0x00:0x0C -T -R 
+          00:00:C0:D7:54:F8 eth0</font></p>
+        <blockquote> 
+          <p>Sends an LLC TEST command to the remote system with Ethernet address 
+            <font face="Courier New, Courier, mono">00:00:C0:D7:54:F8</font>, 
+            DSAP <font face="Courier New, Courier, mono">0x00</font> and SSAP 
+            <font face="Courier New, Courier, mono">0x0C</font>. Await the response.</p>
+        </blockquote>
+        <p><font face="Courier New, Courier, mono">ldltest -s -f RAW eth0 192.168.1.47</font></p>
+        <blockquote> 
+          <p>Listens for RAW LLC frames addressed to the local machine whose IP 
+            address is <font face="Courier New, Courier, mono">192.168.1.47</font>. 
+            Send responses to TEST and XID commands.</p>
+        </blockquote>
+        <p><font face="Courier New, Courier, mono">ldltest -d 0x0f</font></p>
+        <blockquote> 
+          <p>Sets the debug mask in the ldl driver.</p>
+        </blockquote>
+        <p><font face="Courier New, Courier, mono">ldltest -H</font></p>
+        <blockquote> 
+          <p>Prints the values assigned to the debug mask bits as follows:</p>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000001 
+            dump raw frame from net driver</font></code></div>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000002 
+            dump UNITDATA_IND upstream</font></code></div>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000004 
+            dump UNITDATA_REQ downstream</font></code></div>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000008 
+            dump Tx to net driver</font></code> </div>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000010 
+            dump full buffer, not just header</font></code> </div>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000020 
+            debug info for DL_ATTACH</font></code> </div>
+          <div align="left"><code><font face="Courier New, Courier, mono">0x00000040 
+            debug info for DL_BIND</font></code> </div>
+          
+        </blockquote>
+      </blockquote>
+      <p><b>Author</b></p>
+      <p>Ole Husgaard &lt;sparre@login.dknet.dk> </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr width="50%">
+      <h3> <a name="polltst"></a>polltst</h3>
+      <blockquote> 
+        <p><tt>/usr/bin/polltst</tt></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p><font face="Courier New, Courier, mono">polltst</font> is a simple test 
+        program for the poll system call.&nbsp; Using poll, it reads keystrokes 
+        from stdin, writes them to one end of the LiS loopback driver, reads them 
+        from the other end and then writes them back to stdout. </p>
+      <p>While performing this operation it configures <font face="Courier New, Courier, mono">stdin</font> 
+        for "no echo" mode, so the appearance of "echoed" characters is evidence 
+        of the operation of poll involving both a STREAMS and a non-STREAMS file. 
+        <br>
+        &nbsp; </p>
+      <p> <b>Author</b></p>
+      <p>David Grothe &lt;dave@gcom.com> <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3> <a name="streams"></a>streams</h3>
+      <blockquote> 
+        <p><tt>/usr/sbin/streams </tt><i>Options</i></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p><br>
+        The <font face="Courier New, Courier, mono">streams</font> program is 
+        used to perform several different management functions for the LiS package, 
+        including starting and stopping the LiS subsystem. <br>
+        &nbsp; </p>
+      <p> <b>Options</b></p>
+      <table cols=3 width="70%" NOSAVE >
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">start</font></tt></p>
+          </td>
+          <td width="60%" NOSAVE> 
+            <p>Start the LiS subsystem.&nbsp; This amounts to performing the command 
+              "modprobe streams".</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">stop</font></tt></p>
+          </td>
+          <td> 
+            <p>Stop the LiS subsystem.&nbsp; This amounts to performing the command 
+              "modprobe -r streams".</p>
+          </td>
+        </tr>
+        <tr> 
+          <td></td>
+          <td> 
+            <p><tt><font face="Courier New, Courier, mono">status</font></tt></p>
+          </td>
+          <td> 
+            <p>Reports on the status of the LiS subsystem.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">-c</font></tt><i>Kbytes</i></p>
+          </td>
+          <td> 
+            <p>Print or set the maximum message memory usage for LiS.&nbsp; The 
+              value 0 (default) means unlimited.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">-C</font></tt><i>Kbytes</i></p>
+          </td>
+          <td> 
+            <p>Print or set the maximum total memory usage for LiS.&nbsp; The 
+              value 0 (default) means unlimited.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">-d</font></tt><i>mask</i></p>
+          </td>
+          <td> 
+            <p>Set the debug mask for LiS.&nbsp; See below for details.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE>
+            <p><tt><font face="Courier New, Courier, mono">-D</font></tt><i>mask</i></p>
+          </td>
+          <td>
+            <p>Set an additional debug mask for LiS.&nbsp; See below for details.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">-s</font></tt></p>
+          </td>
+          <td> 
+            <p>Print STREAMS memory usage statistics.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><tt><font face="Courier New, Courier, mono">-m</font></tt></p>
+          </td>
+          <td> 
+            <p>Print STREAMS memory allocation to the system messages file (from 
+              kernel).&nbsp; This option should be used only for debugging and 
+              only when LiS is in a quiescent state.&nbsp; Unpredictable results 
+              can occur if this option is used while LiS memory allocations are 
+              changing dynamically.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-p</font></p>
+          </td>
+          <td> 
+            <p>Print the LiS lock trace buffer to the system messages file (from 
+              kernel).&nbsp; Used in conjunction with the <font face="Courier New, Courier, mono">DEBUG_SPL_TRACE</font> 
+              debug option.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-q</font></p>
+          </td>
+          <td> 
+            <p>Print all STREAMS queues to the system messages file (from kernel).&nbsp; 
+              This option should be used only for debugging and only when LiS 
+              is in a quiescent state.&nbsp; Unpredictable results can occur if 
+              this option is used while LiS queue allocations are changing dynamically.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-t</font></p>
+          </td>
+          <td> 
+            <p>Print STREAMS timing statistics.&nbsp; Used inconjunction with 
+              the DEBUG_MEAS_TIME debug option.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td></td>
+          <td> 
+            <p><font face="Courier New, Courier, mono">-h</font></p>
+          </td>
+          <td> 
+            <p>Print a command synopsis.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td></td>
+          <td> 
+            <p><font face="Courier New, Courier, mono">-H</font></p>
+          </td>
+          <td> 
+            <p>Print a command synopsis including the debug mask mnemonics.</p>
+          </td>
+        </tr>
+      </table>
+      <p> <b>Debug Options</b></p>
+      <p>The value that is used with the -d option consists of the logical "or" 
+        of the following single bit options. <br>
+        &nbsp; </p>
+      <table cols=3 width="70%" NOSAVE >
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE height="19"></td>
+          <td valign=TOP width="10%" NOSAVE height="19"> 
+            <p><font face="Courier New, Courier, mono"><b>-d</b></font><b> Options</b></p>
+          </td>
+          <td width="60%" NOSAVE height="19">&nbsp;</td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_OPEN</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000001</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_CLOSE</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000002</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_READ</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000004</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_WRITE</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000008</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_IOCTL</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000010</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_PUTNEXT</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000020</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_STRRPUT</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000040</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_SIG</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000080</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_PUTMSG</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000100</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_GETMSG</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000200</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_POLL</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000400</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_LINK</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000800</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_MEAS_TIME</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00001000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_MEM_LEAK</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00002000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE height="18"></td>
+          <td valign=TOP width="10%" NOSAVE height="18"><font face="Courier New, Courier, mono">DEBUG_FLUSH</font></td>
+          <td width="60%" NOSAVE height="18"><font face="Courier New, Courier, mono">0x00004000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_FATTACH</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00008000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE height="19"></td>
+          <td valign=TOP width="10%" NOSAVE height="19"><font face="Courier New, Courier, mono">DEBUG_SAFE</font></td>
+          <td width="60%" NOSAVE height="19"><font face="Courier New, Courier, mono">0x00010000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE height="19"></td>
+          <td valign=TOP width="10%" NOSAVE height="19"><font face="Courier New, Courier, mono">DEBUG_TRCE_MSG</font></td>
+          <td width="60%" NOSAVE height="19"><font face="Courier New, Courier, mono">0x00020000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_CLEAN_MSG</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00040000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_SPL_TRACE</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00080000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_MP_ALLOC</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00100000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_MP_FREEMSG</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00200000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_MALLOC</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00400000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_MONITOR_MEM</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00800000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_DMP_QUEUE</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x01000000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_DMP_MBLK</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x02000000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_DMP_DBLK</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x04000000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_DMP_STRHD</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x08000000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_ADDRS</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x80000000</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE> 
+            <p><font face="Courier New, Courier, mono"><b>-D</b></font><b> Options</b></p>
+          </td>
+          <td width="60%" NOSAVE>&nbsp;</td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE> <font face="Courier New, Courier, mono">DEBUG_SNDFD</font></td>
+          <td width="60%" NOSAVE> <font face="Courier New, Courier, mono">0x00000001</font></td>
+        </tr>
+      </table>
+      <p>Most of these options are intuitive as to their operation from the mnemonics. 
+      </p>
+      <p>The <font face="Courier New, Courier, mono">DEBUG_MEAS_TIME</font> option 
+        causes LiS to use a high precision timer to calculate the execution time 
+        of several operations within itself.&nbsp; These timings include the time 
+        spent in STREAMS drivers.&nbsp; Thus, under controlled circumstances this 
+        option can be used to time STREAMS driver code.&nbsp; It is used in conjunction 
+        with the <font face="Courier New, Courier, mono">-t</font> option to print 
+        out the timing statistics. </p>
+      <p>The <font face="Courier New, Courier, mono">DEBUG_SAFE</font> option 
+        causes LiS to carefully check for NULL pointers when performing message 
+        passing and queueing operations such as putq and putnext. </p>
+      <p>The <font face="Courier New, Courier, mono">DEBUG_CLEAN_MSG</font> option 
+        causes LiS to clear message data buffers to zero when they are allocated.&nbsp; 
+        It is useful for tracking down driver problems relating to using uninitialized 
+        areas of messages. </p>
+      <p>The <font face="Courier New, Courier, mono">DEBUG_SPL_TRACE</font> option 
+        causes LiS to maintain a trace table of all LiS locking operations.&nbsp; 
+        It is used in conjunction with the <font face="Courier New, Courier, mono">-p</font> 
+        option to print out the lock trace table.&nbsp; The locking operations 
+        that are traced include calls on the LiS locking primitives from STREAMS 
+        drivers. </p>
+      <p>The options <font face="Courier New, Courier, mono">DEBUG_DMP_QUEUE</font>, 
+        <font face="Courier New, Courier, mono">DEBUG_DMP_MBLK</font> and <font face="Courier New, Courier, mono">DEBUG_DMP_DBLK</font> 
+        control the verbosity of the printing out of LiS memory areas via the 
+        <font face="Courier New, Courier, mono">-m</font> option.&nbsp; With these 
+        debug mask bits set, LiS will print out the contents of these structures 
+        as well as the headers indicating that such a structure was allocated. 
+      </p>
+      <p>The <font face="Courier New, Courier, mono">DEBUG_ADDRS</font> option 
+        causes the <font face="Courier New, Courier, mono">-m</font> option to 
+        print out the addresses of structures as well as their memory tags and/or 
+        contents. </p>
+      <p>The <font face="Courier New, Courier, mono">DEBUG_MONITOR_MEM</font> 
+        option causes LiS to monitor the guard words surrounding allocated memory 
+        areas in an attempt to catch overwriting of these words in a timely fashion.&nbsp; 
+        This option comes at a fairly substantial CPU time penalty. <br>
+        &nbsp; </p>
+      <p> <b>Author</b></p>
+      <p>David Grothe &lt;dave@gcom.com> </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3> <a name="strmakenodes"></a>strmakenodes</h3>
+      <blockquote> 
+        <p><tt>/usr/sbin/strmakenodes</tt></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p><font face="Courier New, Courier, mono">strmakenodes</font> makes all 
+        of the <font face="Courier New, Courier, mono">/dev</font> entries that 
+        are associated with LiS as a result of the LiS build process.&nbsp; All 
+        of the Config files that contributed to the LiS build are scanned for 
+        their "node" declarations.&nbsp; strmakenodes performs a mknod system 
+        call for each specified "node". </p>
+      <p>This command must be run before LiS can operate correctly after it is 
+        installed.&nbsp; This command is run automatically as a result of the 
+        "<font face="Courier New, Courier, mono">make install</font>" operation 
+        of LiS. </p>
+      <p>This command accepts the option &quot;<font face="Courier New, Courier, mono">-r</font>&quot; 
+        to mean remove nodes instead of making them. The command is run with this 
+        option as a result of the &quot;<font face="Courier New, Courier, mono">make 
+        uninstall</font>&quot; operation.</p>
+      <p>The source code for this command is generated automatically as a side-effect 
+        of running the strconf utility. <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3> <a name="strtst"></a>strtst</h3>
+      <blockquote> 
+        <p><tt>/usr/bin/strtst</tt></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p><font face="Courier New, Courier, mono">strtst</font> is a test program 
+        which tests the core functionality of LiS.&nbsp; It is a user level program 
+        which uses the built-in drivers that are installed by default with LiS.&nbsp; 
+        It performs numerous STREAMS operations and checks the results for correctness.&nbsp; 
+        It prints out a voluminous log file whose output is routed to the "messages" 
+        file (kernel informational messages). </p>
+      <p>The output of <font face="Courier New, Courier, mono">strtst</font> can 
+        be compared to earlier "reference" outputs to see if the behavior of LiS 
+        has changed as a result of modifications to the code. <br>
+        &nbsp; </p>
+      <p> <b>Author</b></p>
+      <p>David Grothe &lt;dave@gcom.com> <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="50%">
+      <h3> <a name="timetst"></a>timetst</h3>
+      <blockquote> 
+        <p><tt>/usr/bin/timetst [</tt><i>Iterations</i><tt>]</tt></p>
+      </blockquote>
+      <p> <b>Description</b></p>
+      <p><br>
+        <font face="Courier New, Courier, mono">timetst</font> peforms a timing 
+        test using the LiS loopback driver.&nbsp; It writes short messages downstream 
+        under several different LiS options and measures the round trip time for 
+        the messages.&nbsp; The <i>Iterations</i> parameter specified the number 
+        of iterations that timetst uses in its timing loop, the default being 
+        100,000. <br>
+        &nbsp; </p>
+      <p> <b>Author</b></p>
+      <p>David Grothe &lt;dave@gcom.com> <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> </p>
+      <hr width="100%">
+      <p>&nbsp; </p>
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
