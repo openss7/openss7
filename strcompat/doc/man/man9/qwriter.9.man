@@ -1,0 +1,296 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qwriter.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QWRITER 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qwriter
+\- \fISTREAMS\fP mutex upgrade
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+.BI "void qwriter(queue_t *" q ", mblk_t *" mp ", void (*" func ")(queue_t *, mblk_t *), int " perim );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+a pointer to the queue for which to upgrade to writer.
+.TP
+.I mp
+a STREAMS message to pass to the callback function.
+.TP
+.I func
+a function that will be called when write access has been acheived.
+.TP
+.I perim
+a description of the perimeter.
+.I perim
+can be either
+.BR PERIM_INNER " or " PERIM_OUTER .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qwriter ()
+schedules the callout function,
+.IR func ,
+to be executed with the specified queue pair,
+.IR q ,
+and the passed in message,
+.IR mp ,
+once the perimeter,
+.IR perim ,
+can be entered exclusively.
+.PP
+.I perim
+can be one of the following values:
+.TP
+.B PERIM_INNER
+establishes exclusive access to the inner perimeter
+for the queue,
+.IR q ,
+when present.  An inner
+perimeter can exist at the queue, the queue pair or the module.
+See
+.BR mp-streams (9)
+for more information.
+If an inner perimeter does not exist, the callout function is still executed,
+but synchronization does not occur.
+(This has a similar effect to
+.BR qprocsoff (9),
+although
+.BR qprocsoff (9)
+is a different mechanism.)
+.TP
+.B PERIM_OUTER
+establishes exclusive access to the outer perimeter
+for the module to which
+.I q
+belongs,
+when present.  An outer
+perimeter can exist at the module.
+See
+.BR mp-streams (9)
+for more information.
+If an outer perimeter does not exist, the callout function is still executed,
+but synchronization does not occur.
+(This has a similar effect to
+.BR freezestr (9),
+although
+.BR freezestr (9)
+is a different mechanism.)
+.\"
+.\"
+.SH RETURN
+.PP
+.BR qwriter ()
+returns void.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR qwriter ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qwriter ()
+can only be called by a 
+.BR put (9)
+or 
+.BR srv (9)
+procedure or from a queue callback function (see
+.BR qtimeout (9)
+or
+.BR qbufcall (9)).
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qwriter ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callout function that the
+function may execute in parallel with aysnchronous entry points, callbacks,
+callouts and interrupt service procedures.
+.PP
+However, in
+.BR "Linux Fast-STREAMS" ,
+the callout function is scheduled on the same CPU and the CPU which called
+.BR qwriter ().
+This means that
+.BR qwriter ()
+will return before the callout function executes.  In addition, the callout
+function will not execute before the calling function returns or the next
+preemption point is encountered.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qwriter ()
+must only be called from a queue
+.BR put (9)
+or
+.BR srv (9)
+procedure.
+.PP
+.BR qwriter ()
+may return before the callout function,
+.IR func ,
+executes, or the callout function,
+.IR func ,
+may be executed on the calling thread before
+.BR qwriter ()
+returns.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR freezestr (9),
+.BR unfreezestr (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qwriter ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR qwriter ()
+is source level compatible with
+.IR Solaris \(rg
+.[
+soldoc
+.]
+with the following considerations:
+.IP \(bu
+.BR qwriter ()
+is a
+.IR Solaris \(rg-specific
+function:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this
+symbol.
+.IP \(bu
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR UnixWare \(rg,
+.IR OSF \(rg,
+.IR HP-UP \(rg,
+and
+.BR LiS ,
+do not provide this function.
+.IP \(bu
+Binary compatiblity is not guaranteed.
+.\"
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qwriter ()
+is a
+.IR Solaris \(rg
+specific function that first appeared in
+.IR Solaris "\(rg 2."
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

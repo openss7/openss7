@@ -1,0 +1,128 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: rtp.4.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH RTP 4 "$Date: 2004/03/01 02:44:06 $" "$Name:  $" "OpenSS7 INET Drivers"
+.SH NAME
+.B RTP/RTCP
+\- Real Time (Control) Protocol
+.SH DESCRIPTION
+.B RTP
+is an implementation of the Real-Time Transport Protocol defined in RFC 1889.
+.B RTP
+provides the encapsulation and control of media in
+.BR udp (4)
+packets.
+.PP
+.B RTP
+is implemented as a
+.IR STREAMS (4)
+module that is pushed over a connectionless transport stream conforming to the
+.BR tpi (7)
+interface, such as
+.BR udp (4).
+The
+.BR RTP
+module provides a Channel Interface (CHI),
+.BR chi (7),
+to the stream head.
+.B RTP
+streams can be linked under the
+.BR mx "(4), or " mg (4)
+drivers to provide media streams into the Media Gateway,
+.BR MG (4).
+.SH IOCTLS
+.SH NOTICES
+.SH BUGS
+.SH "SEE ALSO"
+.SH VERSIONS
+.\"
+.\"
+.XX
+.[
+RFC 1889
+.]
+.[
+RFC 2959
+.]
+.[
+RFC 3158
+.]
+.[
+RFC 3267
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

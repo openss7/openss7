@@ -1,0 +1,438 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QPROCSOFF 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qprocsoff
+\- disables \fISTREAMS\fR message queue processing for multi-processing
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "void qprocsoff(queue_t *" rq );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I rq
+the read queue pointer of the queue pair for which to turn queue procedures
+off.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qprocsoff ()
+disables invocation of
+.BR put (9)
+and
+.BR srv (9)
+procedures for the queue pair whose read queue pointer is pointed to by
+.IR rq .
+.PP
+If there are existing threads other than the calling thread executing
+.BR put (9)
+or
+.BR srv (9)
+procedures for the queue,
+.IR q ,
+then
+.BR qprocsoff ()
+will block until these threads exit before returning.
+Once
+.BR qprocsoff ()
+returns, it is guaranteed that a
+.I STREAMS
+module or driver queue pair is single threaded after
+.BR qprocsoff ()
+returns and before
+.BR qprocson (9)
+is called.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR qprocsoff ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR qprocsoff ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qprocsoff ()
+can be called from any
+.BR !in_irq ()
+context including user context, queue procedures, callouts, callbacks, but
+must not be called from an interrupt service routine.
+.BR qprocsoff ()
+must be called by the
+.BR qclose ()
+procedure (i.e. in user context) before returning.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qprocsoff ()
+is MP-safe.
+Upon return from
+.BR qprocsoff ()
+the the queue pair is guaranteed to be single threaded.
+.BR qprocsoff ()
+should not be called twice for the same queue pair from the same thread.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qprocsoff ()
+must be called with a valid read queue pointer for a queue pair.
+.BR qprocsoff ()
+must not be called on a stream that is frozen with
+.BR freezestr (9).
+.PP
+Before a call to
+.BR qprocsoff ()
+a driver or module is fully attached on a stream.
+.BR qprocsoff ()
+bypasses the module so that any upstream or downstream module calling
+.BR putnext (9)
+will bypass the module.
+Pending
+.BR put (9)
+events on the queue pair will be run before
+.BR qprocsoff ()
+returns.
+Pending
+.BR srv (9)
+events will be cancelled.
+All pending syncrhonous callout and callback events for the queue pair will be
+blocked.
+All pending asynchronous callouts and callbacks for the
+queue pair (e.g.,
+.BR timeout (9),
+.BR bufcall (9))
+will not be blocked.
+It is still the caller's responsibilty to cancel all pending callouts and
+callbacks for which a call id was returned.
+.PP
+.BR qprocsoff ()
+can be called twice on the same queue pair without consequence.
+.PP
+After a call to
+.BR qprocsoff ()
+the caller must not directly or indirectly invoke any queue entry points.  This includes
+all queue utility functions and other
+.I STREAMS
+utility functions that take
+.I q
+or
+.BI WR( q )
+as an argument.
+.PP
+See also
+.IR \*(lqCOMPATIBILITY\*(rq ,
+below.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qprocson (9),
+.BR qunbufcall (9),
+.BR quntimeout (9),
+.BR lisbcm (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qprocsoff ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.PP
+.BR qprocsoff ()
+is compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4" ,
+with the following portability considerations:
+.IP \(bu
+.BR qprocson ()
+can be called with private queue pairs allocated with
+.BR allocq (9).
+This is a non-portable
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+extension.
+.IP \(bu
+.BR qprocsoff ()
+clears the
+.I QHLIST
+flag in the
+.BR queue (9)
+structure for both queues in the queue pair.
+.BR qprocsoff ()
+can be called repeatedly for the same queue pair and only the first call will
+have an effect.  This can crash or lock processors on other systems (with the
+exception of
+.BR HP-UX \(rg
+.[
+hpuxspg
+.]
+as noted below.)
+.IP \(bu
+.BR qprocsoff ()
+waits for all other threads to exit
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+and
+.BR srv (9)
+procedures before returning.  This is consistent with
+.B SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and documentation for
+.BR Solaris \(rg
+.[
+soldoc
+.]
+but inconsistent with
+.BR LiS .
+.[
+lis
+.]
+Under
+.BR LiS ,
+.BR qprocsoff ()
+does not wait for
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+or
+.BR srv (9)
+procedures on other threads to exit before returning, but simply
+sets a flag.
+.IP \(bu
+The module or driver can neglect to call
+.BR qprocsoff ()
+before returning from the module's
+.BR qclose (9)
+procedure and the
+.I STREAMS
+scheduler will perform an implicit
+.BR qprocsoff ().
+This is consitent with
+.B LiS
+behavior but different from
+.BR "SVR 4.2 MP DDI/DKI" ,
+.BR UnixWare \(rg,
+.BR OSF1 \(rg,
+and
+.BR Solaris \(rg.
+Because
+.BR "SVR 4.2 MP DDI/DKI" ,
+.BR UnixWare \(rg,
+.BR OSF1 \(rg,
+and 
+.BR Solaris \(rg
+should never return from
+.BR qclose (9)
+without calling
+.BR qprocsoff (),
+there should be no compatibility issues.
+.IP \(bu
+.BR AIX \(rg
+and
+.BR HP-UX \(rg
+do not support a
+.BR qprocson (9)
+or
+.BR qprocsoff (9)
+function.   On
+.BR HP-UX \(rg
+they are
+a null operation.
+.IP \(bu
+.BR qprocsoff ()
+can be called twice without danger.
+This is not true for
+.BR "SVR 4.2 MP DDI/DKI"
+or
+.BR Solaris \(rg
+but is consistent with
+.BR HP-UX \(rg
+and
+.BR LiS .
+.IP \(bu
+.BR qprocsoff ()
+blocks other threads attempting to enter the
+.BR put (9)
+procedure until it returns.
+Under
+.BR LiS ,
+attempts to enter the
+.BR put (9)
+procedure will result in the message being dropped or freed.
+See
+.BR put (9)
+for more information.
+.IP \(bu
+Symbol
+.BR lis_qprocsoff ()
+is provided for compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_qprocsoff ()
+simply calls
+.BR qprocsoff ().
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR qprocsoff ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+.BR UnixWare \(rg,
+.[
+uw7doc
+.]
+.BR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.BR OSF \(rg,
+.[
+osfdoc
+.]
+.BR Solaris \(rg,
+.[
+soldoc
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qprocsoff ()
+first appeared in SVR 4 MP.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

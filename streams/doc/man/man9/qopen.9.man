@@ -1,0 +1,464 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qopen.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QOPEN 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qopen
+\- call a \fISTREAMS\fR module or driver open routine
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int qopen(queue_t *" q ", dev_t *" devp ", int " oflag ", int " sflag ", cred_t *" crp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+pointer to the module or driver's read queue.
+.TP
+.I devp
+pointer to the device number.
+.TP
+.I oflag
+open flags.
+.TP
+.I sflag
+stream flags.
+.TP
+.I crp
+pointer to the credentials of the opening user.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qopen ()
+is an internal
+.I STREAMS
+function which invokes the
+.I STREAMS
+module or driver open routine associated with
+.IR q .
+.TP
+.I q
+is a pointer to the read queue of a newly allocated queue pair for the module
+or driver,  allocated with
+.BR allocq (9)
+and for which a
+.B qinit
+structure was associated with
+.BR setq (9).
+.TP
+.I devp
+is a pointer to a
+.B dev_t
+device number.
+For a driver,
+.B devp
+points to the device number of the
+.I STREAMS
+character special file that was
+opened that invoked the driver's open routine.
+A driver open routine returns the resulting device
+number to the area pointed to by
+.IR devp .
+See
+.BR makedevice (9).
+For a module,
+.B devp
+points to the device number of the
+.I STREAMS
+character special file under whose
+stream file the module is being pushed.  A module open routine does not alter
+the device number but may use the passed in device number to determine which
+device the module is ultimately being pushed over.
+.TP
+.I oflag
+contains the open flags for use by the driver's open routine and will contain
+a bitwise or of one or more of the following flags:
+.RS
+.TP
+.B FREAD
+the \fISTREAMS\fR special file is opened for read.
+.TP
+.B FWRITE
+the \fISTREAMS\fR special file is opened for write.
+.TP
+.B FEXCL
+the \fISTREAMS\fR special file is opened with exclusive access.
+.TP
+.B FNDELAY
+the \fISTREAMS\fR special file is opened for non-blocking operation.
+.RE
+.TP
+.I sflag
+contains \fISTREAMS\fP flags for use by the module or driver's open routine.
+Modules are always opened with
+.I sflag
+set to
+.BR MODOPEN .
+Drivers are opened with
+.B DRVOPEN
+or
+.B CLONEOPEN
+depending upon whether they were opened via a clone driver or not.  For opens
+subsequent to the first open and before close, will always be opened with
+.BR DRVOPEN .
+.I sflag
+and will contain one of:
+.RS
+.TP
+.B DRVOPEN
+the module was opened as a
+.I STREAMS
+driver.  Drivers opened subsequent to the first open, but before close, will
+always be opened with this flag.
+.TP
+.B MODOPEN
+the module was opened as a
+.I STREAMS
+module.  Modules will always be opened with this flag.
+.TP
+.B CLONEOPEN
+the module was opened via the
+.BR clone (4)
+driver.  This flag will only be set on the initial open of a driver that was
+made via a clone driver.  This setting of
+.I sflag
+requests that the driver assign a unique minor device number to the newly
+created stream.
+.PP
+.RE
+.TP
+.I crp
+points to a
+.BR cred_t (9)
+structure which provides the credentials of the process invoking the open,
+structured as follows:
+.RS
+.nf
+\fC\s-2
+typedef struct cred {
+        uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
+        gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
+        int cr_ngroups;
+        gid_t cr_groups[NGROUPS];
+} cred_t;
+\fR\s+2
+.fi
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR qopen ()
+returns zero (0) and the device number associated with a driver in the area
+pointed to by
+.IR devp .
+Upon failure,
+.BR qopen ()
+returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+When
+.BR qopen ()
+fails, it returns a negative error number as follows:
+.TP
+.RB [ ENOPKG ]
+the module has no qopen routine.
+.PP
+.BR qopen ()
+can also return any error returned by the modules qopen routine.  In general,
+the following errors are provided by module qopen routines:
+.TP
+.RB [ EXNIO ]
+the qopen routine for the module or driver failed.
+.TP
+.RB [ EIO ]
+a module was opened as a driver, or visa versa.
+.TP
+.RB [ EPERM ]
+the opening process did not have sufficient credentials to open the specified
+device or push the specified module.
+.TP
+.RB [ ENOMEM ]
+memory could not be allocated to hold the module or driver's private
+structures.
+.TP
+.RB [ ENOSR "], [" ENOBUFS ]
+a buffer could not be allocated as part of the open.
+.TP
+.RB [ ENOSR ]
+a
+.I STREAMS
+resource could not be allocated as part of the open.
+.\"
+.\"
+.SH CONTEXT
+.BR qopen ()
+should only be called from user context with the open semaphore held and a
+write lock on the stream head.
+.B Linux Fast-STREAMS
+uses the inode semaphore for the inode associated with the streams special
+file for open/close locking.
+.\"
+.\"
+.SH MP-STREAMS
+.BR qopen ()
+must be called single-threaded with the open semaphore and the stream write
+lock held.
+.PP
+Driver and module
+.I q->q_info->qi_open
+procedures are always invoked single-threaded and exclusive in accordance with
+descriptions for SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+This is also consistent with exclusive open/close access under
+.IR Solaris \(rg.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qopen ()
+is an internal
+.I STREAMS
+function that is not intended to be called
+directly by the module or driver writer.  See
+.BR open (2)
+and
+.B I_PUSH
+under
+.BR streamio (7)
+for indirect methods of invoking this function.  This function is exported for
+use by clone drivers and stream heads.  See
+.BR register_inode (9).
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of a module open routine:
+.sp
+.nf
+\fC\s-2\
+static priv_t *xxx_opens = NULL;
+
+int xxx_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
+{
+    int err;
+    if (q->q_ptr != NULL)
+        return (0);             /* already open */
+    if (sflag == MODOPEN || WR(q)->q_next != NULL) {
+        int cmajor = getmajor(*devp);
+        int cminor = getminor(*devp);
+        priv_t *x;
+        /* test for multiple push */
+        for (x = xxx_opens; x; x = x->next)
+            if (x->u.dev.cmajor == cmajor && x->u.dev.cminor == cminor)
+                return (ENXIO);
+        if (!(xxx_alloc_priv(q, &xxx_opens, devp, crp)))
+            return (ENOMEM);
+        return (0);
+    }
+    return (EIO);
+}
+\fR\s+2
+.fi
+.PP
+Following is an example of a driver open routine:
+.sp
+.nf
+\fC\s-2\
+int ss_majors[SS_NMAJOR] = { SS_CMAJOR, };
+int ss_open(queue_t * q, dev_t * devp, int flag, int sflag,
+            cred_t * crp)
+{
+    int flags, mindex = 0;
+    int cmajor = getmajor(*devp);
+    int cminor = getminor(*devp);
+    ss_t *ss, **ipp = &ss_opens;
+    const ss_profile_t *prof;
+    if (q->q_ptr != NULL)
+        return (0);             /* already open */
+    if (sflag == MODOPEN || WR(q)->q_next) {
+        ptrace(("%s: ERROR: can't push as module\n", SS_MOD_NAME));
+        return (EIO);
+    }
+    if (cmajor != SS_CMAJOR || cminor < ICMP_CMINOR ||
+        cminor > RAWIP_CMINOR) {
+        return (ENXIO);
+    }
+    prof = &ss_profiles[cminor - ICMP_CMINOR];
+    cminor = FREE_CMINOR;
+    lis_spin_lock_irqsave(&ss_lock, &flags);
+    for (; *ipp; ipp = &(*ipp)->next) {
+        if (cmajor != (*ipp)->cmajor)
+            break;
+        if (cmajor == (*ipp)->cmajor) {
+            if (cminor < (*ipp)->cminor)
+                break;
+            if (cminor == (*ipp)->cminor) {
+                if (++cminor >= SS_NMINOR) {
+                    if (++mindex >= SS_NMAJOR ||
+                        !(cmajor = ss_majors[mindex]))
+                        break;
+                    cminor = 0;
+                }
+                continue;
+            }
+        }
+    }
+    if (mindex >= SS_NMAJOR || !cmajor) {
+        ptrace(("%s: ERROR: no device numbers available\n",
+                SS_MOD_NAME));
+        lis_spin_unlock_irqrestore(&ss_lock, &flags);
+        return (ENXIO);
+    }
+    printd(("%s: opened character device %d:%d\n", SS_MOD_NAME, cmajor,
+            cminor));
+    *devp = makedevice(cmajor, cminor);
+    if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
+        ptrace(("%s: ERROR: No memory\n", SS_MOD_NAME));
+        lis_spin_unlock_irqrestore(&ss_lock, &flags);
+        return (ENOMEM);
+    }
+    lis_spin_unlock_irqrestore(&ss_lock, &flags);
+    return (0);
+}
+\fR\s+2
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.BR allocq (9),
+.BR setq (9),
+.BR makedevice (9),
+.BR clone (4),
+.BR cred_t (9),
+.BR open (2s),
+.BR streamio (7),
+.BR register_inode (9).
+.\"
+.\"
+.SH BUGS
+.BR qopen ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.BR qopen ()
+is not an exported function in SVR 4.2,
+.IR Solaris \(rg
+or LiS.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I \*(lqMagic Garden\*(rq
+.[
+magic
+.]
+description of internal
+SVR 4
+.[
+svr4
+.]
+function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qopen ()
+first appeared as an internal function with \fISTREAMS\fP in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,690 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: sad.4.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SAD 4 "$Date: 2004/03/01 02:44:06 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.\"
+.\"
+.SH NAME
+.B sad
+\- STREAMS Administrative Driver
+.\"
+.\"
+.SH SYNOPSIS
+.B #include <sys/types.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/sad.h>
+.HP 12
+.BI "int ioctl(int " fd ", int " cmd ", int" arg );
+.\"
+.\"
+.SH DESCRIPTION
+This manpage is under construction.
+.PP
+.I fd
+is a file descriptor returned from an
+.BR open (2)
+system call on one of the following devices:
+.TP
+.RI \*(lq /dev/sad/admin \*(rq
+This device is only accessible by priviledged users.
+.TP
+.RI \*(lq /dev/sad/user \*(rq
+This device is accessible by all users.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B sad
+driver implements the IO controls that can be performed on an open device
+using the
+.BR ioctl (2)
+system call as follows:
+.HP 12
+.BI "int ioctl(int " fd ", int " cmd ", int" arg );
+.TP 12
+.I fd
+is an open file descriptor for the
+.RI \*(lq /dev/sad/admin \*(rq
+or
+.RI \*(lq /dev/sad/user \*(rq
+device.
+.TP
+.I cmd
+is the ioctl command and can be one of the following:
+.sp
+.TS
+tab(;);
+lbw(12)lsss.
+SAD_GAP;get autopush list.
+SAD_SAP;set autopush list or clonable minor.
+SAD_VML;verify module list.
+.TE
+.TP
+.I arg
+is a pointer to a
+.B strapush
+or
+.B str_list
+structure, depending on
+.IR cmd .
+.PP
+Each
+.I cmd
+is described in the subsections which follow:
+.\"
+.\"
+.SS "SAD_SAP"
+.PP
+Set the autopush list for a
+.IR STREAMS (4)
+driver.
+.PP
+.I arg
+points to a
+.B strapush
+structure formatted as follows:
+.RS 12
+.nf
+\fC\s-1
+struct strapush {
+        unsigned int sap_cmd;
+        long sap_major;
+        long sap_minor;
+        long sap_lastminor;
+        long sap_npush;
+        char sap_list[MAXAPUSH][FMNAMSZ + 1];
+	char sap_module[FMNAMSZ + 1];
+};
+\s+1\fP
+.fi
+.RE
+.TP 12
+.I sap_cmd
+Specifies the command to execute when setting the autopush list for a
+.IR STREAMS (4)
+driver.
+.I sap_cmd
+can be one of the following values:
+.RS 12
+.TP 12
+.B SAP_CLEAR
+Requests that the autopush list for the
+.IR STREAMS (4)
+driver specified by the
+.I sap_major
+major device number be cleared.
+.TP
+.B SAP_ONE
+Requests that the autopush list for the
+.IR STREAMS (4)
+driver specified by the
+.I sap_major
+and
+.I sap_minor
+device number be set to the modules named in the
+.I sap_npush
+and
+.I sap_list
+members.
+.TP
+.B SAP_RANGE
+Requests that the autopush list for the
+.IR STREAMS (4)
+driver specified by the
+.I sap_major
+and range of minor devices from
+.I sap_minor
+to
+.I sap_lastminor
+(inclusive) be set to the modules named in the
+.I sap_npush
+and
+.I sap_list
+members.
+.TP
+.B SAP_ALL
+Requests that the autopush list for all minor devices of the
+.IR STREAMS (4)
+driver specified by the
+.I sap_major
+major device number be set to the modules named in the
+.I sap_npush
+and
+.I sap_list
+members.
+.TP
+.B SAP_CLONE
+Requests that the minor device of the
+.I STREAMS
+driver specified by the
+.I sap_major
+and
+.I sap_minor
+device number to set to be a clonable minor device.
+.RE
+.TP 12
+.I sap_major
+Specifies the major device number of the
+.IR STREAMS (4)
+driver upon which to perform
+the command specified in
+.IR sap_cmd .
+.I sap_major
+is significant for all autopush commands.
+.TP 12
+.I sap_minor
+Specifies the minor device number, or initial minor device number in a range,
+of the
+.IR STREAMS (4)
+driver for which to exexcute the autopush command.
+.I sap_minor
+is only significant for autopush commands
+.BR SAP_CLEAR ", " SAP_ONE " and " SAP_RANGE ,
+and is ignored otherwise.
+.TP 12
+.I sap_lastminor
+Specifies the minor device number of the last minor device in a range for the
+.IR STREAMS (4)
+driver for which to execute the autopush command.
+.I sap_lastminor
+is only significant for autopush commands
+.BR SAP_RANGE ,
+and is ignored otherwise.
+.TP 12
+.I sap_npush
+Specifies the number of module names in the
+.I sap_list
+member array.
+.I sap_npush
+is only significant for autopush commands
+.I SAP_ONE ", " SAP_RANGE " and " SAP_ALL ,
+and is ignored otherwise.
+.TP 12
+.I sap_list
+Specifies an array containing
+.I sap_npush
+names of modules.
+.PP
+When calling
+.BR SAD_SAP ,
+the user must provide sufficient room for the entire 
+.B strapush
+structure, regardless of the number of module names in the
+.I sap_list
+member.
+.\"
+.\"
+.PP
+Upon success,
+.B SAD_SAP
+returns zero (0) and sets or clears the autopush list for the specified
+.IR STREAMS (4)
+device.
+Upon failure,
+.B SAD_SAP
+returns -1, does not alter autopush list for any
+.IR STREAMS (4)
+device, and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ EFAULT ]
+.I arg
+is
+.B NULL
+or points outside the caller's valid address space.
+.TP 12
+.RB [ EINVAL ]
+.IR sap_major ", " sap_minor " or " sap_lastminor
+was invalid.
+.TP 12
+.RB [ EINVAL ]
+.I sap_nlist
+is less than one or greater than
+.BR MAXAPUSH .
+.TP 12
+.RB [ EINVAL ]
+.I sap_list
+contained invalid information (e.g. the names are not null terminated).
+.TP 12
+.RB [ EHOSTR ]
+.IR sap_major ", " sap_minor " and " sap_lastminor
+specify a character device that is not a
+.IR STREAMS (4)
+device.
+.TP 12
+.RB [ EEXIST ]
+.IR sap_major ", " sap_minor " and " sap_lastminor
+specify a
+.IR STREAMS (4)
+device that is already configured for autopush and the
+.I sap_cmd
+was
+.BR SAP_ONE ", " SAP_RANGE " or " SAP_ALL .
+.TP 12
+.RB [ ERANGE ]
+.I sap_minor
+was not the first minor an a range previously set with
+.B SAP_RANGE
+and the
+.I sap_cmd
+was
+.BR SAP_CLEAR .
+.TP 12
+.RB [ ERANGE ]
+.I sap_lastminor
+is less than or equal to
+.I sap_minor
+and the
+.I sap_cmd
+was
+.BR SAP_RANGE .
+.TP 12
+.RB [ ENODEV ]
+the device specified by
+.IR sap_major " and " sap_minor
+is not configured with an autopush list and the
+.I sap_cmd
+was
+.BR SAP_CLEAR .
+.TP 12
+.RB [ ENSOR ]
+.IR STREAMS (4)
+resources could not be allocated to complete the command.
+.PP
+In addition, any of the errors returned by the
+.BR ioctl (2)
+command may be returned.
+.\"
+.\"
+.SS "SAD_GAP"
+.PP
+Get the autopush list for a
+.IR STREAMS (4)
+driver.
+.PP
+.I arg
+points to a
+.B strapush
+structure formatted as follows:
+.RS 12
+.nf
+\fC\s-1
+struct strapush {
+        unsigned int sap_cmd;
+        major_t sap_major;
+        minor_t sap_minor;
+        minor_t sap_lastminor;
+        unsigned int sap_npush;
+        char sap_list[MAXAPUSH][FMNAMSZ + 1];
+};
+\s+1\fP
+.fi
+.RE
+.TP 12
+.I sap_cmd
+This member is ignored on call an is unchanged on return.
+.TP 12
+.I sap_major
+This member specifies the major device number of the
+.IR STREAMS (4)
+driver for which
+to retrieve the current autopush list.
+.TP 12
+.I sap_minor
+This member specifies the minor device number of the
+.IR STREAMS (4)
+driver for which
+to retreive the current autopush list.
+.TP 12
+.I sap_lastminor
+This member is ignored on call an is unchanged on return.
+.TP 12
+.I sap_npush
+Indicates on successful return the number of modules in the autopush list for
+the
+.IR STREAMS (4)
+device specified in the
+.IR sap_major " and " sap_minor
+members.
+Upon failure, this member remains unchanged.
+.TP 12
+.I sap_list
+Indicates on successful return the null terminated names of the
+.I sap_npush
+modules in the autopush list for the
+.IR STREAMS (4)
+device specified in 
+.IR sap_major " and " sap_minor .
+Unused elements in the list are filled with character nulls.
+Upon failure, this member remains unchanged.
+.\"
+.\"
+.PP
+For
+.B SAD_GAP
+to be successful,
+.IR sap_major " and " sap_minor
+must specify a
+.IR STREAMS (4)
+device that was previously configured for autopush with
+.BR SAP_SAP ,
+above,
+or using
+.BR register_strdev (9).
+.\"
+.\"
+.PP
+Upon success,
+.B SAD_GAP
+returns zero (0) and sets the
+.IR sap_nlist " and " sap_list
+members to indicate the current autopush settings for the
+.IR STREAMS (4)
+device
+specified in
+.IR sap_major " and " sap_minor .
+Upon failure,
+.B SAD_GAP
+returns -1, does not alter any members, and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ EFAULT ]
+.I arg
+is
+.B NULL
+or points outside the caller's valid address space.
+.TP 12
+.RB [ EINVAL ]
+The device specified by
+.IR sap_major " and " sap_minor
+is invalid.
+.TP 12
+.RB [ ENOSTR ]
+The device specified by
+.IR sap_major " and " sap_minor
+is not a
+.IR STREAMS (4)
+device.
+.TP 12
+.RB [ ENODEV ]
+The device specified by
+.IR sap_major " and " sap_minor
+is not configured for autopush.
+.PP
+In addition, any of the errors returned by the
+.BR ioctl (2)
+command may be returned.
+.\"
+.\"
+.SS "SAD_VML"
+Verify that a module list is valid.
+.PP
+.I arg
+points to a
+.B str_list
+structure formatted as follows:
+.RS 12
+.nf
+\fC\s-1
+struct str_list {
+        int sl_nmods;
+        struct str_mlist *sl_modlist;
+};
+\s+1\fP
+.fi
+.RE
+.TP 12
+.I sl_nmods
+.TP 12
+.I sl_modlist
+.RS 12
+.nf
+\fC\s-1
+struct str_mlist {
+        char l_name[FMNAMESZ + 1];
+};
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.PP
+.B SAD_VML
+has the side-effect that if a
+.IR STREAMS (4)
+module corresponds to a kernel-module, the call will load the kernel module:
+meaning, this control has the side-effect as calling
+.BR request_module (9)
+for some of the module names in the module list, whether the control is
+successful or not.
+.\"
+.\"
+.PP
+Upon success,
+.B SAD_VML
+return zero (0) to indicate that all of the modules in the specified module
+list are load on the system.
+Upon failure,
+.B SAD_VML
+returns one (1) if an invalid module name is present in the list, or returns
+minus one (-1) and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ EFAULT ]
+.I arg
+is
+.B NULL
+or points outside the caller's valid address space.
+.TP 12
+.RB [ EFAULT ]
+.I sl_modlist
+is
+.B NULL
+or points outside the caller's valid address space.
+.TP 12
+.RB [ EINVAL ]
+.I sl_nmods
+is less than one (1).
+.PP
+In addition, any of the errors returned by the
+.BR ioctl (2)
+command may be returned.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.B sad
+IO controls return
+zero (0) and perform the requested control.
+.\"
+.\"
+.SH ERRORS
+.PP
+Upon failure,
+.B sad
+IO controls return
+minus one (-1) and sets
+.IR errno (3)
+to an appropriate error code as describe for the specific IO control above.
+.PP
+In addition,
+.IR errno (3)
+may be set to any of the errors returned by the
+.BR ioctl (2)
+system call.
+.\"
+.\"
+.SH NOTICES
+.PP
+Historically, the
+.B sad
+driver has not used user credentials on a IO control by IO control basis, but
+permits access to the priviledged
+.B SAD_SAP
+command on the basis of file access controls.  This means that a user program
+can open the
+.RI \*(lq /dev/sad/admin \*(rq
+device while suid root and then downgrade its credentials for security, but
+still have the ability to modify the autopush list for
+.IR STREAMS (4)
+devices.
+.\"
+.\"
+.SH DEVICES
+.PP
+.BR /dev/sad/admin ,
+.BR /dev/sad/user .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR STREAMS (4),
+.IR errno (3),
+.BR ioctl (2),
+.BR register_strdev (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B sad
+has no know bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+SVR 4.2,
+.[
+svr42
+.]
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.I LiS
+.[
+LiS
+.]
+with the following considerations:
+.IP \(em 4
+.B sad
+implements the
+.IR UnixWare \(rg
+.B SAP_CLONE
+command for specifying clonable minor devices.
+This command is not implemented by
+SVR 4.2,
+.IR Solaris \(rg
+or
+.IR LiS .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH "HISTORY"
+.PP
+.B sad
+first appeared in
+SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

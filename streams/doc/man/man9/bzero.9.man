@@ -1,0 +1,228 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: bzero.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BZERO 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH "NAME"
+.B bzero
+\- zero a byte string
+.\"
+.\"
+.SH "SYNOPSIS"
+.PP
+.B #include <string.h>
+.HP
+.BI "void bzero(void *" str ", size_t " len );
+.\"
+.\"
+.SH "ARGUMENTS"
+.PP
+.TP
+.I str
+a pointer to the address to zero.
+.TP
+.I len
+the number of bytes to zero starting at
+.IR str .
+.\"
+.\"
+.SH "DESCRIPTION"
+.PP
+.BR bzero ()
+zeros
+.I len
+bytes of byte string starting at address
+.IR str .
+If
+.I len
+is zero, this function has no effect.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR bzero ()
+returns
+.BR void .
+.\"
+.\"
+.SH "ERRORS"
+.PP
+.BR bzero ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bzero ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bzero ()
+is MP-safe.
+.\"
+.\"
+.SH "NOTICES"
+.PP
+Linux preserves this deprecated function.
+.BR memset (9)
+should be used instead.
+For older
+.I STREAMS
+modules and drivers, it is sufficient to define the macro:
+.sp
+.nf
+\fC\s-2
+#define bzero(str, len) (void)memset(src, 0, len)
+\s+2\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR bzero (9),
+.BR memset (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR bzero ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bzero ()
+is source-level compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR LiS .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg
+and
+.BR UnixWare \(rg
+documentation;
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+and
+.BR LiS 
+.[
+LiS
+.]
+source code.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR bzero ()
+first appeared in SVR 2.
+.[
+svr2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

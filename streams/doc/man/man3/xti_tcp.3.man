@@ -1,0 +1,285 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH XTI-TCP 3 "$Date: 2004/03/01 02:44:05 $" "$Name:  $" "X/Open Transport Interface"
+.SH "NAME"
+.B xti_tcp
+\- X/Open Transport Interface \- Corrigendum for Transmission Control Protocol (TCP) Conformance
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ip.h>
+.br
+.B #include <xti_tcp.h>
+.HP
+.BI "int " tcp_xtistr " = t_open(" \fR\*(lq/dev/tcp\*(rq\fI ", " flags );
+.SH DESCRIPTION
+.PP
+This manual section describes the protocol-specific information that is
+relevant for TCP transport providers.  This section also describes the
+protocol-specific information that is relevant when TCP services are provided
+over an IP network using TCP.
+.PP
+This section also defines the data structures and constants required for TCP
+transport providers that are exposed through the
+.B <xti_tcp.h>
+header file.
+.SH "ADDRESS FORMAT"
+.PP
+The TCP address format is structured as follows:
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An TCP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a priviledged read-only
+mode.
+.PP
+An TCP transport provider supports two levels of options.  These two levels
+are described below.
+.SS "T_INET_IP"
+.PP
+Options within this level are specific to the Internet Protocol (IP) and are
+common to all the protocol levels in IP.  For more information, see
+.BR xti_ip (3).
+.PP
+The options defined with the option level
+.B T_INET_IP
+are as follows:
+.SS "T_INET_TCP"
+.PP
+Options within this level are specific to the Transmission Control
+Protocol (TCP) yet are used by protocol levels using TCP transport.
+.PP
+The options defined with the option level
+.B T_INET_TCP
+are as follows:
+.TP 12
+.B T_TCP_NODELAY
+.TP 12
+.B T_TCP_MAXSEG
+.TP 12
+.B T_TCP_KEEPALIVE
+.SH FUNCTIONS
+.PP
+.\"
+.\"
+.SS t_accept\fR(3)
+.PP
+.\"
+.\"
+.SS t_bind\fR(3)
+.PP
+.\"
+.\"
+.SS t_close\fR(3)
+.PP
+.\"
+.\"
+.SS t_connect\fR(3)
+.PP
+.\"
+.\"
+.SS t_getinfo\fR(3)
+.PP
+.\"
+.\"
+.SS t_listen\fR(3)
+.PP
+.\"
+.\"
+.SS t_open\fR(3)
+.PP
+.\"
+.\"
+.SS t_optmgmt\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvconnect\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvdis\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcv\fR(3), \fBt_rcvv\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvreldata\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvrel\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
+.PP
+.B XTI-TCP
+does not support a connection-less mode and these XTI library calls will
+return a
+.I t_errno
+value of
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_rcvuderr\fR(3)
+.PP
+.B XTI-TCP
+does not support a connection-less mode and these XTI library calls will
+return a
+.I t_errno
+value of
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_snddis\fR(3)
+.PP
+.\"
+.\"
+.SS t_snd\fR(3), \fBt_sndv\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndreldata\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndrel\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndudata\fR(3), \fBt_sndvudata\fR(3)
+.PP
+.B XTI-TCP
+does not support a connection-less mode and these XTI library calls will
+return a
+.I t_errno
+value of
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_unbind\fR(3)
+.PP
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.BR xti (3),
+.BR xnet (3).
+.\"
+.\"
+.SH "DEVICES"
+.PP
+There is one TCP device providing the Transport Provider Interface that
+provide TCP conforming TPI devices as follows:
+.\"
+.\"
+.TP 12
+.I /dev/tcp
+For more information on the TPI TCP device, see
+.BR tcp (4).
+.\"
+.\"
+.SH "VERSIONS"
+.PP
+The
+.B TCP-TPI
+driver is specific to the
+.B OpenSS7
+stack.
+This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

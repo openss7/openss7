@@ -1,0 +1,185 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: t_sync.3.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_SYNC 3 "$Date: 2004/03/01 02:44:05 $" "$Name:  $"" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_sync
+\- synchronize XTI library with TLI provider
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_sync(int " fd );
+.SH ARGUMENTS
+.PP
+.TP 12
+.I fd
+the transport endpoint to sync.
+.SH DESCRIPTION
+.PP
+Synchronizes the XTI library for
+.I fd
+with the underlying TLI transport service provider.
+.PP
+.I fd
+specifies the local transport endpoint file descriptor to synchronize.
+.PP
+.BR t_sync ()
+should be called whenever a new file descriptor is generated from an old one
+or when
+.RB [ TPROTO ]
+was retruned as an error in
+.IR t_errno (3)
+for a previous XTI library call.
+.SH CAVEATS
+.PP
+.BR t_sync ()
+is valid in any state other than
+.BR T_UNINIT .
+.PP
+The
+.BR OpenSS7
+implementation of the XTI library minimizes the necessity for using
+.BR t_sync ()
+due to a specialized
+.BR timod (4)
+module that tracks the state of the underlying transport service provider
+independent of the accessing process or file descriptor.  See
+.BR timod (4)
+for more information.
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_sync ()
+returns a positive integer reflecting the state of the transport interface.
+Upon failure,
+.BR t_sync ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_sync ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP 12
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP 12
+.RB [ TSTATECHNG ]
+The interface is in a transient state.
+.TP 12
+.RB [ TSYSERR ]
+A
+.B Linux
+system error occured and the
+.B Linux
+error number is set in
+.IR errno (3).
+.SH "SEE ALSO"
+.PP
+.BR t_errno (3),
+.BR timod (4).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,253 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: N_CONN_REQ.7.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH N_CONN_REQ 7 "$Data$" "$Name:  $" "Linxu STREAMS"
+.SH NAME
+.BR N_CONN_REQ " (" N_conn_req_t )
+\- network connection request
+.SH SYNOPSIS
+.PP
+The format of the message is one
+.B M_PROTO
+message block followed by one or more
+.B M_DATA
+blocks for the NS user data transfer.
+The structure of the
+.B M_PROTO
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    ulong PRIM_type;		/* always N_CONN_REQ */
+    ulong DEST_length;		/* destination address length */
+    ulong DEST_offset;		/* destination address offset */
+    ulong CONN_flags;		/* bit masking for options flags */
+    ulong QOS_length;		/* QOS parameters' length */
+    ulong QOS_offset;		/* QOS parameters' offset */
+} N_conn_req_t;
+
+/* Flags to indicate if options are requested */
+#define REC_CONF_OPT	0x00000001L
+#define EX_DATA_OPT	0x00000002L
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive requests that the NS provider make a network connection to the
+specified destination.
+.PP
+The specification of the NS user data is optional.  The NS user can send any
+integral number of octets of data within the range supported by the NS provider
+(see
+.BR N_INFO_ACK (7)).
+If the user does not specify QOS parameter values, the default values
+(specified via
+.BR N_OPTMGMT_REQ (7))
+are used by the NS provider.
+.SH PARAMETERS
+.PP
+.TP
+.I PRIM_type
+Indicates the primitive type.
+
+.TP
+.I DEST_length
+Indicates the length of the destination address parameter that conveys an
+address identifying the NS user to which the NC is to be established.  This
+field will accommodate variable length addresses within a range supported
+by the NS provider.
+
+.TP
+.I DEST_offset
+Is the offset of the destination address from the beginning of the
+.B M_PROTO
+message block.
+
+.TP
+.I CONN_flags
+Specifies the connection flags that are a bitwise OR of any of the following
+flags:
+.RS
+.TP
+.B REC_CONF_OPT
+The receipt confirmation selection parameter indicates the use/availability of
+the receipt confirmation service on the NC.  The receipt confirmation service
+must be supported by the NS provider to be used on the NC.
+
+.TP
+.B EX_DATA_OPT
+Indicates the use of the expedited data transfer service on the NC.  The
+expedited data transfer service must be provided by the NS provider for it to
+be used on the NC.
+.RE
+
+.TP
+.I QOS_length
+Indicates the length of the QOS parameters values that apply to the NC being
+requested.  If the NS user cannot determine the value of a QOS parameter, its
+value should be set to
+.BR QOS_UNKNOWN .
+If the NS user does not specify any QOS parameter values, the length of this
+field should be set to zero.
+
+.TP
+.I QOS_offset
+Indicates the offset of the QOS parameters from the beginning of the
+.B M_PROTO
+message block.
+.SH STATE 
+.PP
+This primitive is valid in state
+.BR NS_IDLE .
+.SH "NEW STATE"
+.PP
+The new state is
+.BR NS_WCON_CREQ .
+.SH RESPONSE
+.PP
+The following acknowledgments are valid for this primitive:
+.HP
+.B Successful NC Establishment:
+This is indicated via the
+.BR N_CONN_CON (7)
+primitive.  This results in the data transfer state.
+.HP
+.B Unsuccessful NC Establishment:
+This is indicated via the
+.BR N_DISCON_IND (7)
+primitive.  For example, a connection may be rejected because either the called
+NS user cannot be reached, or the NS provider and/or the called NS user did
+not agree with the specified QOS.  This results in the idle state.
+.HP
+.B Non-fatal errors:
+These are indicated via the
+.BR N_ERROR_ACK (7)
+primitive.
+.SH ERRORS
+.PP
+The applicable non-fatal errors are defined as follows:
+.TP
+.RB [ NACCESS ]
+The user did not have proper permissions for the use of the requested address
+or options.
+.TP
+.RB [ NBADQOSPARAM ]
+The QOS parameter values specified are outside the range supported by
+the NS provider.
+.TP
+.RB [ NBADQOSTYPE ]
+The QOS structure type is not supported by the NS provider.
+.TP
+.RB [ NBADADDR ]
+The network address was in an incorrect format or contained illegal
+information.  It is not intended to indicate NC errors, such as an unreachable
+destination.  These errors types are indicated via the
+.BR N_DISCON_IND (7)
+primitive.
+.TP
+.RB [ NBADOPT ]
+The options were in an incorrect format, or they contained illegal information.
+.TP
+.RB [ NOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ NBADDATA ]
+The amount of user data specified was outside the range supported by the NS
+provider.
+.TP
+.RB [ NSYSERR ]
+A system error has occurred and the Linux system error is indicated in the primitive.
+.SH "CONFORMING TO"
+.PP
+This interface conforms to NPI Revision 2.
+.[
+npi
+.]
+.SH "HISTORY"
+.PP
+The Network Provider Interface first appeared in SVR4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

@@ -1,0 +1,323 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: dtimeout.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DTIMEOUT 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B dtimeout
+\- start a timer for a specified processor
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.B #define _UW7_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "toid_t dtimeout(timo_fcn_t *" timo_fcn ", caddr_t " arg ", long " ticks ", pl_t " pl ", processorid_t " cpu );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I timo_fcn
+the function to call on expiry.
+.TP
+.I arg
+the argument to pass to the callback function.
+.TP
+.I ticks
+the number of ticks to wait before expiry.
+.TP
+.I pl
+the priority level at which to run the callout function.
+.TP
+.I cpu
+the cpu on which to execute the callout function.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR dtimeout ()
+starts a timer with duration
+.I ticks
+number of system clock ticks, that,  upon expiry will invoke the supplied
+timeout function callback
+.I timo_fcn
+(if the
+.I timo_fcn
+function pointer is
+.RB non- NULL )
+with the supplied argument
+.IR arg ,
+at the specified priority level
+.IR pl ,
+and on the specified processor
+.IR cpu .
+The timeout callout function
+.I timo_fcn
+is a function returning
+.B void
+and taking a single
+.B caddr_t
+argument as follows:
+.sp
+.nf
+.BI "typedef void timo_fcn_t(caddr_t " arg );
+.fi
+.PP
+The callout function
+.I timo_fcn
+will be executed at some time greater than or equal to the interval specified
+in the
+.I ticks
+argument on the specified
+.I cpu
+and at the specified priority level
+.IR pl .
+.PP
+The
+.B toid_t
+timeout identifier returned by
+.BR dtimeout ()
+is suitable to be used by 
+.BR untimeout (9)
+to cancel the timeout function callout.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR dtimeout ()
+returns a
+.B toid_t
+defined as follows:
+.sp
+.nf
+.B typedef int toid_t;
+.B typedef int timout_id_t;
+.fi
+.PP
+Upon success,
+.BR dtimeout ()
+returns a non-zero timeout id and the timeout is scheduled.
+Upon failure,
+.BR dtimeout ()
+returns a zero timeout id and no timeout is scheduled.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR dtimeout ()
+fails, it returns a zero (0) timeout id.
+.BR dtimeout ()
+failes when it cannot allocate the internal structures for the timeout, when
+the arguments are invalid, or the timeout cannot otherwise be scheduled on the
+specified processor.  If it is important that a timeout be scheduled with
+assurance, the return value should always be checked.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR dtimeout ()
+can be called from any context including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR dtimeout ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR dtimeout ()
+callout function is asynchronous and can execute at the same time as any user
+context, module procedure, callout, callback, soft interrupt or interrupt
+service routine not masked by the
+.I pl
+argument.
+In addition, for sufficiently small
+.I tick
+values, the callout function may execute before the call to
+.BR dtimeout ()
+returns.
+However, the callback function will be serviced on the CPU specified.
+.\"
+.\"
+.SH NOTICES
+.PP
+For architectural independence,
+.I STREAMS
+drivers and modules should not specify the
+.I ticks
+argument directly, but should use the
+.BR drv_usectohz (9)
+and
+.BR drv_hztousec (9)
+DKI functions.  The Linux
+.B HZ
+define or som other quantoum independent conversion function to conver to and
+from microseconds or some other absolute unit of time.
+.PP
+.B toid_t
+and
+.B timout_id_t
+should eb treated as an opaque type that can be tested for equality to zero.
+The value should not otherwise be manipulated.
+.B Linux Fast-STREAMS
+implements timeout id values internally as a pointer to a
+.B strevent
+structure containing a Linux timer.  on 64-bit architectures,
+.B strevent
+structures are allocated in low or high memory only so that pointers can be
+converted to integers and visa versa.
+.B Linux Fast-STREAMS
+also includes a version field in the least significant bits of the pointer to
+handle late calls to
+.BR untimeout (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR untimeout (9),
+.BR timeout (9),
+.BR qtimeout (9),
+.BR quntimeout (9),
+.BR drv_usectohz (9),
+.BR drv_hztousec (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR dtimeout ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR dtimeout ()
+is compatible with
+.B "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.B "SVR 4"
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7doc
+.]
+allows a
+.B TO_PERIODIC
+flag to be logically OR'ed with the
+.I ticks
+argument to indicate a periodic timer.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR dtimeout ()
+first appeared in
+.BR "SVR 4 MP" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

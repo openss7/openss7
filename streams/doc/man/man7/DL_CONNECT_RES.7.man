@@ -1,0 +1,248 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: DL_CONNECT_RES.7.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DL_CONNECT_REQ 7 "$Date: 2004/03/01 02:44:06 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B DL_CONNECT_RES (dl_connect_res_t)
+\- directs the DLS provider to accept a connect request from a remote
+(calling) DLS user on adesignated stream.
+.SH DESCRIPTION
+.B DL_CONNECT_RES
+directs the DLS provider to accept a connect request from a remote (calling)
+DLS user on adesignated stream.  The DLS user may accept the connection on the
+same stream where the connect indication arrived, or on a different stream
+that has been previously bound.  The response contains the correlation number
+from the corresponding
+.BR DL_CONNECT_IND ,
+selected quality of service parameters, and an indication of the stream on
+which to accept the connection.
+.PP
+After issuing this primitive, the DLS user may immediately begin
+transferring data using the
+.BR DL_DATA_REQ (7)
+primitive.  If the DLS provider receives one or more
+.BR DL_DATA_REQ (7)
+primitives from the local DLS user before it has completed connection
+establishment, however, it must queue the data transfer requests internally
+until the connection is successfully established.
+.SH SYNOPSIS
+The message consists of one
+.B M_PROTO
+message block containing the structure shown below.
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_correlation;
+    t_uscalar_t  dl_resp_token;
+    t_uscalar_t  dl_qos_length;
+    t_uscalar_t  dl_qos_offset;
+    t_uscalar_t  dl_growth;
+} dl_connect_res_t;
+\fC\s+1
+.fi
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_CONNECT_RES .
+.TP
+.I dl_correlation
+conveys the correlation number that was received with the
+.BR DL_CONNECT_IND (7)
+associated with the connection request.  The DLS provider will use the
+correlation number to identify the connect indication to which the DLS user
+is responding.
+.TP
+.I dl_resp_token
+if non-zero, conveys the token associated with the responding stream on
+which the DLS provider is to establish the connection; this stream must
+be in the state
+.BR DL_IDLE .
+The token value for a stream can be obtained by issuing a
+.BR DL_TOKEN_REQ (7)
+on that stream.  If the DLS user is accepting the connection on the stream
+where the connect indication arrived, this value must be zero.  See
+.I \*(lqConnection Establishment,\*(rq
+.BR dlpi (7),
+for a description of the connection response
+model.
+.TP
+.I dl_qos_length
+conveys the length of the quality of service parameter values selected by
+the called DLS user.  The selected QOS values are conveyed in the appropriate
+structure as defined in
+.I \*(lqQOS Data Structures,\*(rq
+.BR dlpi (7).
+A full specification of these QOS parameters and rules for negotiating their
+values is presented in
+.I \*(lqQuality of Data Link Service,\*(rq
+.BR dlpi (7).
+If the DLS user does not care which value is selected for a particular QOS
+parameter, the value
+.B DL_QOS_DONT_CARE
+may be specified.  If the DLS user does not care which values are selected for
+all QOS parameters, this field may be set to zero.
+.TP
+.I dl_qos_offset
+conveys the offset from the beginning of the
+.B M_PROTO
+message block where the quality of service parameters begin.
+.TP
+.I dl_growth
+defines a growth field for future enhancements to this primitive.  Its
+value must be set to zero.
+.SH STATE
+The primitive is valid in state
+.BR DL_INCON_PENDING .
+.SH "NEW STATE"
+The resulting state is
+.BR DL_CONN_RES_PENDING .
+.SH RESPONSE
+If the connect response is successful,
+.BR DL_OK_ACK (7)
+is sent to the DLS user.  If no outstanding connect indications remain, the
+resulting state for the current stream is
+.BR DL_IDLE ;
+otherwise it remains
+.BR DL_INCON_PENDING .
+For the responding stream (designated by the parameter
+.IR dl_resp_token ),
+the resulting state is
+.BR DL_DATAXFER .
+If the current stream and responding stream are the same, the resulting state
+of that stream is
+.BR DL_DATAXFER .
+These streams may only be the same when the response corresponds to the only
+outstanding connect indication.  If the request fails,
+.BR DL_ERROR_ACK (7)
+is returned on the stream where the
+.B DL_CONNECT_RES
+primitive was received, and the resulting state of that stream and the
+responding stream is unchanged.
+.SH ERRORS
+.TP
+.B DL_ACCESS
+The DLS user did not have proper permission to use the responding
+stream.
+.TP
+.B DL_BADCORR
+The correlation number specified in this primitive did not correspond to
+apending connect indication.
+.TP
+.B DL_BADTOKEN
+The token for the responding stream was not associated with a currently open
+stream.
+.TP
+.B DL_BADQOSPARAM
+The quality of service parameters contained invalid values.
+.TP
+.B DL_BADQOSTYPE
+The quality of service structure type was not supported by the DLS provider.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state, or the responding
+stream was not in a valid state for establishing aconnection.
+.TP
+.B DL_PENDING
+Current stream and responding stream is the same and there is more than one
+outstanding connect indication.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in
+the
+.BR DL_ERROR_ACK (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi
+.]
+.SH "HISTORY"
+.PP
+The Data Link Provider Interface first appeared in SVR4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

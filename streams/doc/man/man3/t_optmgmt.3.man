@@ -1,0 +1,366 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: t_optmgmt.3.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_OPTMGMT 3 "$Date: 2004/03/01 02:44:05 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_optmgmt
+\- manage transport options
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_optmgmt(int " fd ", const struct t_optmgmt *" req ", struct t_optmgmt *" ret );
+.SH ARGUMENTS
+.PP
+.TP 12
+.I fd
+the transport endpoint for which to manage options.
+.TP
+.I req
+a pointer to a
+.B t_optmgmt
+structure containing the requested options.
+.TP
+.I ret
+a pointer to a
+.BR t_optmgmt
+structure to contain the returned options.
+.SH DESCRIPTION
+.PP
+.BR t_optmgmt ()
+manages options associated with the underlying transport provider for the
+endpoint
+.IR fd .
+.PP
+.I fd
+specifies the local transport endpoint upon which to manage options.
+.PP
+.I req
+is a pointer to a
+.B t_optmgmt
+structure that provides the passed in option names and values.
+.PP
+.I ret
+is a pointer to a
+.B t_optmgmt
+structure that provides the returned option names and values.
+.PP
+The
+.B t_optmgmt
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_optmgmt {
+        struct netbuf opt;
+        t_scalar_t flags;
+};
+\fR\s+1
+.fi
+.PP
+The
+.B t_optmgmt
+structure passes and returns the following members and information.
+.TP 12
+.I opt
+is a
+.BR netbuf (3)
+structure that contains passed in
+.IR "" ( req )
+or returned
+.IR "" ( ret )
+options names and values.  Options are structured as described below under
+.IR "\(lqOPTIONS\(rq" .
+The
+.IR req->opt.len and ret->opt.maxlen
+is significant on call and the
+.I ret->opt.len
+is significant on return.
+If
+.I req->opt.len
+is zero on call, no option names and values are passed.
+If
+.I ret->opt.maxlen
+is zero on call or
+.I ret->opt.len
+is zero on return, no option names and values are returned.
+.TP 12
+.I flags
+specifies and returns management flags which can be one of the following
+values:
+.RS
+.TP 12
+.B T_DEFAULT
+requests that the default options for the specified option names, or if
+.I req->opt.len
+is zero, all default options, be returned.
+.TP 12
+.B T_CURRENT
+requests that the current options for the specified option names, or if
+.I req->opt.len
+is zero, all current options, be returned.
+.TP 12
+.B T_CHECK
+requests that the options specified in
+.I req
+be checked for validity and validity reported in
+.IR ret .
+.TP 12
+.B T_NEGOTIATE
+requests that the options specified in
+.I req
+be negoitated and the negotiated values returned in
+.IR ret .
+.RE
+.SH OPTIONS
+Options with the
+.I opt
+field of the
+.B t_optmgmt
+structure (and other structures including XTI options)
+are a formatted as a contiguous list of options.  Each option in the list
+begins with a
+.B t_opthdr
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_opthdr {
+    t_uscalar_t len;            /* Option length, incl. header */
+    t_uscalar_t level;          /* Option level */
+    t_uscalar_t name;           /* Option name */
+    t_uscalar_t status;         /* Negotiation result */
+    char value[0];              /* and onwards...  */
+};
+\fR\s+1
+.fi
+.PP
+The
+.B t_opthdr
+strucuture contains the following members:
+.TP 12
+.I len
+the length of the option including the length of this header and the length of
+the option value that follows.
+.TP 12
+.I level
+the level of the option.
+.I level
+values are transport service provider specific.
+.TP 12
+.I name
+the name of the option within the
+.IR level .
+.I name
+values are transport service provider specific.
+.TP 12
+.I value
+the value of the option.  This is a variable lenght field, the length of which
+is specific to the option specified by
+.I level
+and
+.IR name.
+The format of option values is transport service provider specific.
+.PP
+Option headers in the options list are always aligned in memory to permit
+direct access to the header.  This means that the next option in the
+list will begin on the next alignment boundary for a
+.B t_opthdr
+structure.  A macro is provided to assist the XTI application writer in
+locating the next option in the option list.
+.PP
+A number of macros are provided to assist with handling options in option
+lists.  These macros are decribed as follows:
+.HP 12
+.B T_OPT_FIRSTHDR(b)
+takes a an argument
+.I b
+a pointer to the
+.BR netbuf (3)
+structure describing the options list and returns a pointer to the first
+.B t_opthdr
+structure in the list.
+.HP 12
+.B T_OPT_NEXTHDR(b, p)
+takes as arguments
+.I b
+a pointer to the
+.BR netbuf (3)
+structure describing the options list and
+.I p
+a pointer to the
+.B t_opthdr
+for the current option, and returns a pointer to the
+.B t_opthdr
+of the next option in the list, or
+.B NULL
+if there is no next option in the list.
+.HP 12
+.B T_OPT_DATA(p)
+takes as an argument
+.I p
+a pointer to the
+.B t_opthdr
+for the options and returns a unsigned character pointer to the
+.I value
+for the option.
+.SH CAVEATS
+.PP
+.BR t_optmgmt ()
+is valid in any state other than
+.BR T_UNINIT .
+.PP
+.BR t_optmgmt ()
+is valid for all transport service providers regardless of service type.
+Not all transport service providers necessarily support this function.
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_optmgmt ()
+returns zero (0).
+Upon failure,
+.BR t_optmgmt ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_optmgmt ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP 12
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP 12
+.RB [ TBADFLAG ]
+The argument
+.I req->flags
+contains invalid flags.
+.TP 12
+.RB [ TBADOPT ]
+The options specified were of an invalid format or contained invalid information.
+See
+.IR "\(lqOPTIONS\(rq" ,
+above, for more information on option formats.
+.TP 12
+.RB [ TBUFOVFLW ]
+The \fImaxlen\fR field of a \fBnetbuf\fR(3) structure passed to the call was
+non-zero, but insufficient to hold the available opaque information.  See,
+\fBnetbuf\fR(3) for more information.
+.TP 12
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+.TP 12
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP 12
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP 12
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR netbuf (3),
+.BR t_errno (3).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

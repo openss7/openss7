@@ -1,0 +1,337 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qreply.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QREPLY 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qreply
+\- replys to a message from a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void qreply(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue from which to reply.
+.TP
+.I mp
+the message to reply with.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qreply ()
+replies, with the message pointed to by
+.IR mp ,
+to the read queue that is upstream from the specified write queue
+pointed to by
+.IR q ,
+or the write queue downstream from the specified read queue pointed to by
+.IR q .
+.PP
+.BR qreply ()
+is normally used within
+.IR q 's
+.BR put (9)
+or
+.BR srv (9)
+procedure to reply to messages that have arrived on its write queue from
+upstream, or its read queue from downstream.
+.PP
+It is the responsibility of the procedure calling
+.BR qreply ()
+with a normal message pointer to by
+.I mp
+to first call
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+for the queue to check for flow control.  If
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+fails for queue
+.IR q ,
+the procedure should not normally invoke
+.BR qreply ()
+with a low priority message for the flow controlled queue
+.BI OTHERQ( q ) ->q_next .
+.PP
+.BR qreply ()
+will wake up any processes waiting with
+.BR qwait (9)
+or
+.BR qwait_sig (9)
+on the previous queue
+.BI OTHERQ( q ) ->q_next .
+.\"
+.\"
+.SH RETURN
+.PP
+.BR qreply ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR qreply ()
+fails silently when a queue band structure cannot be allocated for the band
+specified in
+.IR mp->b_band .
+The caller can ensure that a queue band structure exists for the band in
+question by calling
+.BR strqset (9)
+for the band.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BI qreply( q ", " mp )
+has the same effect as
+.BI putnext(OTHERQ( q "), " mp )).
+Because
+.BR qreply ()
+invokes the put procedure of the upstream or downstream queue, the same care
+should be taken with
+.BR qreply ()
+as is taken with
+.BR putnext (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qreply ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qreply ()
+is MP-safe.  The caller is responsible for ensuring exclusive access to the
+passed in message block.  The caller should remove all global references to
+the passed in message block before calling
+.BR qreply ().
+.PP
+.BR qreply ()
+whould always be used in the MP environment in preference to
+.BI put(OTHERQ( q ) ->q_next ", " mp )
+because the later does not protect dereference of the
+.I q_next
+pointer.
+.BI putnext(OTHERQ( q "), " mp )
+would be an acceptable alternative.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR OTHERQ (9),
+.BR putnext (9),
+.BR putq (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qreply ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR qreply ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+and
+LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.BR qreply ()
+fails silently and frees
+.I mp
+if a queue band structure cannot be allocated on demand for
+.IR mp->b_band .
+Under LiS,
+.BR qreply ()
+fails silently and frees
+.I mp
+if
+the message pointer
+.I mp
+is
+.BR NULL ;
+the queue pointer
+.I q
+is
+.BR NULL ,
+or
+.BI OTHERQ( q )
+is
+.BR NULL ;
+.BI OTHERQ( q )
+does not refer to a queue structure;
+.BI OTHERQ( q ) ->q_next
+is
+.BR NULL ;
+.BI OTHERQ( q ) ->q_next
+does not refer to a queue structure;
+.BI OTHERQ( q ) ->q_next->q_info
+is
+.BR NULL ,
+or
+.BI OTHERQ( q ) ->q_next
+does not have a put procedure;
+.BI OTHERQ( q ) ->q_next
+has put and service procedures turned off (e.g. with
+.BR qprocsoff (9)).
+.IP \(bu
+.BR qreply ()
+protects dereference of the
+.I q_next
+pointer with the stream head read lock.
+SVR 4.2 MP and
+.IR Solaris \(rg
+offer the same protection.
+Under LiS,
+.BR qreply ()
+does not protect dereference of the
+.I q_next
+pointer against module pushes and pops.
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR qreply ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IP \(bu
+See
+.BR putnext (9)
+for additional information.
+.PP
+Symbol
+.BR lis_safe_qreply ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_safe_qreply ()
+simply calls
+.BR qreply ().
+.PP
+Binary compatibility with SVR 4.2 MP DDI/DKI and
+.IR Solaris \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qreply ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

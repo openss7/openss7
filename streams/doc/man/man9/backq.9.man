@@ -1,0 +1,358 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: backq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BACKQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B backq
+\- find the upstream or downstream queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "queue_t *backq(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue for which to find the previous queue.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR backq ()
+returns a pointer to the queue
+which feeds messages to
+.IR q .
+.PP
+If
+.I q
+references a normal read queue, then the returned queue pointer references the
+downstream queue.  If
+.I q
+references a normal write queue, then the returned queue pointer references
+the upstream queue.
+.PP
+If
+.I q
+references a FIFO read queue, then the returned queue pointer references the
+FIFO write queue.  If
+.I q
+references a FIFO write queue, then the returned queue pointer references the
+FIFO read queue.
+.PP
+If
+.I q
+references a PIPE read queue, then the returned queue pointer references the
+write queue at the other end of the PIPE.  If
+.I q
+references a PIPE write queue, then the returned queue pointer references the
+read queue at the other end of the PIPE.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR backq ()
+returns a pointer to the feeding queue, or
+.B NULL
+when there is no feeding queue.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR backq ()
+always succeeds.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR backq ()
+is problematic in MP systems.
+MP-safe drivers and modules should avoid using this function.
+When
+.BR backq ()
+is absolutely necessary, it should only be called from a module procedure and
+should only be passed a
+.I q
+belonging to the queue pair for which a module procedure is sycncrhonized.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR backq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR backq ()
+is MP-safe; however, the returned queue reference might no longer be valid if
+a push or pop of a module has been made by the queue, or the queue has been
+linked under a multiplexing driver, after return from
+.BR backq ().
+.PP
+If the stream and queue is frozen with
+.BR freezestr (9),
+then the returned queue reference will be valid until the stream is thawed
+with
+.BR unfreezestr (9),
+or the queue pointers are manipulated by the caller.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR backq (),
+is obsolete.
+There are no utility functions that protect dereference of the
+.BI OTHERQ( q ) ->q_next
+across the return from the call (such as
+.I q->q_next
+is protected by, for example,
+.BR putnext (9)).
+.BR backq (),
+should not be used by portable MP-safe modules.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freezestr (9),
+.BR unfreezestr (9),
+.BR strqget (9),
+.BR strqset (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR backq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR backq ()
+is compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4"
+with the following portablity considerations:
+.IP \(bu
+.BR SUPER-UX \(rg
+.[
+suxdoc
+.]
+does not document this function.
+.IP \(bu
+.BR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR backq ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.  See
+.IR \*(lqNOTICES\*(rq ,
+above.
+.IP \(bu
+.BR backq ()
+returns
+.B NULL
+if
+.I q
+points to a stream end read queue, regardless of whether a FIFO or PIPE
+midpoint exists beyond
+.IR q .
+.BR AIX \(rg
+.[
+aixdoc
+.]
+and
+.BR Solaris \(rg
+.[
+soldoc
+.]
+indicate that the returned pointer is
+.B NULL
+if
+.I q
+is a stream head write queue or a stream end read queue.
+.IP \(bu
+.BR backq ()
+returns
+.B NULL
+if
+.I q
+points to a stream end read queue, regardless of whether a FIFO or PIPE
+midpoint exists beyond
+.IR q .
+.BR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.BR UXP/V \(rg
+.[
+uxpdoc
+.]
+do not explicitly document what happens in the case of FIFOs and PIPEs, but
+indicate that the queue pointer returned with that whose
+.I q_next
+pointer points to
+.IR q .
+.IP \(bu
+.BR backq ()
+will kernel oops if
+.I q
+is
+.BR NULL .
+Under
+.BR LiS ,
+.BR backq ()
+will return
+.B NULL
+if
+.I q
+is
+.BR NULL .
+.IP \(bu
+.BR backq ()
+will destabilize the kernel if
+.I q
+is a
+.RB non- NULL
+pointer to a structure other than a valid
+.B queue_t
+structure.
+Under
+.BR LiS ,
+.BR backq ()
+will return
+.B NULL
+in the same situation.
+.IP \(bu
+.BR backq ()
+always succeeds.
+Under
+.BR LiS ,
+.BR backq ()
+will fail silently and return
+.B NULL
+in the two situations above, and when an internal error occurs.
+.IP \(bu
+Symbol
+.BR lis_backq ()
+is provide for compatibility with
+.BR LiS .
+See
+.BR lisbcm (9).
+.BR lis_backq ()
+simply calls
+.BR backq ()
+directly.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR backq ()
+first appeared in
+.BR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

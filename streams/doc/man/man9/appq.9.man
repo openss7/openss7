@@ -1,0 +1,368 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: appq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH APPQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B appq
+\- append one \fISTREAMS\fP message after another
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void appq(queue_t *" q ", mblk_t *" emp ", mblk_t *" nmp );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+a pointer to a
+.I STREAMS
+message queue.
+.TP
+.I emp
+a pointer to an existing message block on queue \fIq\fP.
+.TP
+.I nmp
+a pointer to a new message block to append after \fIemp\fP on \fIq\fP.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR appq ()
+appends the
+.I STREAMS
+message
+.I nmp
+just after the message
+.I emp
+already on queue
+.IR q .
+If there is no message after
+.I emp
+in the queue
+.IR q ,
+or
+.I emp
+is
+.BR NULL ,
+this has the same effect as
+calling
+.BR putq (9)
+with
+.IR q " and " nmp .
+.PP
+.BR appq ()
+performs all of the normal
+.I STREAMS
+scheduler functions associated with
+.BR putq (9)
+including enabling of the queue,
+.IR q ,
+when the first message or a priority message is placed on the queue.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR appq ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR appq ()
+fails silently if
+.I nmp
+is associated with a non-existent queue band and a queue band structure could not be
+allocated.  This error can be avoided by assuring that a queue band structure
+exists with
+.BR strqset (9)
+before the call to
+.BR appq ()
+is made with a banded
+.IR nmp .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR appq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR appq ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+messages.
+On uniprocessor systems it may be sufficient to block interrupts to ensure
+exclusive access to
+.IR q .
+.PP
+Ensuring exclusive access to the passed in message,
+.IR emp ,
+is difficult on SMP systems, because 
+.BR putq "(9), " putbq (9) " and " insq (9)
+can change
+.I emp->b_next
+and
+.BR getq "(9), " flushq "(9), " flushband "(9) and " rmvq (9)
+can change
+.IR emp ,
+(e.g. remove it from the queue).
+.PP
+Exclusive access to the passed in queue on both UP and SMP systems can be
+ensured most easily by freezing the stream associated with
+.I q
+using
+.BR freezestr (9).
+However, it is also possible to ensure exclusive access with
+.BR qwriter (9),
+.BR streams_put (9),
+or with appropriate synchronization boundaries
+.RB ( STR_PERQUEUE " or " D_MTPERQ ).
+.PP
+This is similar to the syncrhonization necessary for use of
+.BR insq (9)
+and
+.BR rmvq (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR appq ()
+is an
+.BR LIS -specific
+function that should not be called by portable
+.I STREAMS
+modules and drivers.
+Instead, the module or drivers should use the DDI/DKI defined
+.BR insq (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR appq ()
+called with an existing message pointer,
+.IR emp ,
+argument that is not on the queue,
+.IR q ,
+will panic or destabilize the kernel.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putq (9),
+.BR strqset (9),
+.BR putbq (9)
+.BR insq (9),
+.BR getq (9),
+.BR flushq (9),
+.BR flushband (9),
+.BR rmvq (9),
+.BR freezestr (9),
+.BR qwriter (9),
+.BR streams_put (9),
+.BR mp-streams (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR appq ()
+is compatible with
+.B LiS
+with the following exceptions:
+.IP \(bu
+.BR appq ()
+is an
+.BR LiS -specific
+function that is also provided by
+.BR "Linux Fast-STREAMS" .
+.IP \(bu
+.BR appq ()
+called with a
+.B NULL
+.IR q " or " nmp
+argument will panic or destablize the kernel.
+.BR appq ()
+called with a
+.B NULL
+.I emp
+argument will have the same effect as
+.BI putq( q ", " nmp )\fR.
+Under
+.BR LiS ,
+.BR appq ()
+called with a
+.B NULL
+.IR q ", " emp " or " nmp
+argument, will fail silently (losing a reference to
+.IR nmp ).
+.IP \(bu
+.BR appq ()
+called with a
+.RB non- NULL
+.I q
+pointer that does not point to a valid queue structure will result in
+destabilization of the kernel.
+Under
+.BR LiS ,
+.BR appq ()
+called with a
+.RB non- NULL
+.I q
+pointer that does not point to a valid queue structure will result in the
+silent freeing of the
+.I emp
+message block.
+.IP \(bu
+.BR appq ()
+protects dereferencing of the
+.I emp->b_next
+pointer with the queue write lock, making it safe to be called concurrent
+with
+.BR putq (9).
+Under
+.BR LiS ,
+.BR appq ()
+does not protect dereferncing of the
+.I emp->b_next
+pointer with the queue spin lock making it unsafe to be called concurrent
+with
+.BR putq (9).
+.IP \(bu
+Symbol
+.BR lis_appq ()
+is provided for binary compatibility with
+.BR LiS .
+.BR lis_appq ()
+simply calls
+.BR appq ()
+directly.
+.IP \(bu
+This function is not provided by
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+requires that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR insq (9).
+As
+.BR appq ()
+is functionally similar to
+.BR insq (9),
+the same should be true for this function as well.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR LfS
+.[
+LfS
+.]
+and
+.BR LiS
+.[
+LiS
+.]
+source code.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR appq ()
+first appeared in
+.BR LiS .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

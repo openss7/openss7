@@ -1,0 +1,395 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qenable.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QENABLE 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qenable, enableq
+\- schedules a \fISTREAMS\fR message queue service routine
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void qenable(queue_t *" q );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qenable ()
+schedules the service procedure of the queue pointed to by
+.I q
+to be run by
+.BR runqueues (9).
+If the queue pointed to by
+.I q
+has been disabled with a call to
+.BR noenable (9),
+then
+.BR qenable ()
+will silently fail.
+Whether the queue can be scheduled with
+.BR qenable ()
+can be determined to some degree with a call to
+.BR canenable (9).
+.PP
+.BR qenable ()
+is normally called to indirectly invoke the execution of
+.IR q 's
+service procedure.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR qenable ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR qenable ()
+fails silently if the
+.B QNOENB
+flag was set by
+.BR noenable
+for the queue,
+.IR q .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qenable ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qenable ()
+is MP-safe.
+.PP
+If the queue was not already enabled
+.RB ( srv (9)
+procedure already scheduled to run) on a different CPU,
+.BR qenable ()
+schedules the service procedure of
+.I q
+on the current CPU.  In this case, the queue service procedure for
+.I q
+will not execute until after
+.BR qenable ()
+returns and the function that called
+.BR qenable ()
+returns or encounters a preemption point.
+However, if the queue is already scheduled by another processor  and
+.BR qenable ()
+was not called from a context synchronous with the service procedure, another
+processor may run the service procedure before
+.BR qenable ()
+returns.
+.PP
+Therefore,
+.BR qenable ()
+should be called with
+.I STREAMS
+synchronization in effect, or hold the necessary private locks across the
+call to
+.BR qenable (),
+if it is ncessary to synchronize the call to
+.BR qenable ()
+with execution of the service procedure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qenable ()
+has no effect if
+.B QNOENB
+is set,
+the queue has already been enabled due to internal
+.I STREAMS
+scheduler actions, or a previous call to
+.BR qenable ()
+that has not yet completed service.
+.PP
+Enabling a queue from within its own
+.BR srv (9)
+procedure will not reschedule the service procedure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR canenable (9),
+.BR qdisable (9),
+.BR noenable (9),
+.BR enableok (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qenable ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR qenable ()
+is source-level compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR LiS ,
+with the following considerations:
+.IP \(bu
+.BR qenable ()
+only schedules the queue for later service.
+.IP \(bu
+.BR qenable ()
+schedules a queue regardless of whether the
+.B QNOENB
+flag is set, or whether
+.BR noenable (9)
+has been called for the queue,
+.IR q .
+.IP \(bu
+Under
+.BR LiS,
+.[
+LiS
+.]
+.BR qenable ()
+will not enable a queue previously disabled with
+.BR enableok ()
+or
+.BR qprocsoff ().
+This is an
+.B LiS
+bug.
+.IP \(bu
+.BR qenable ()
+functions properly on a stream frozen with
+.BR freezestr (9).
+.BR freezestr (9)
+does not block the setting of flags unless some other
+.I STREAMS
+sychronization mechanism is in place (such as perimeters).
+Under
+.BR UnixWare \(rg,
+.BR qenable ()
+called on a frozen stream will have indeterminate results.
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR qenable ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IP \(bu
+.BR qenable ()
+enables the queue regardless of the settings of other flags.
+.BR UnixWare \(rg
+documentation
+.[
+uw7doc
+.]
+explicitly states that
+.BR qenable ()
+schedules the queue regardless of whether
+.BR noenable (9)
+was invoked on the queue previously.
+.BR AIX
+.BR HP-UX \(rg,
+.BR OSF \(rg
+and
+.BR Solaris \(rg
+documentation
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+do not say that
+.BR noenable (9)
+defeats
+.BR qenable ()
+either.
+.BR LiS
+source code,
+.[
+LiS
+.]
+on the other hand shows that no queue will be enabled while the
+.BR QNOENB ", "  QPROCSOFF " or " QCLOSING
+flags are set.
+This is an
+.B LiS
+bug.
+.IP \(bu
+.BR qenable ()
+is not bug-for-bug compatible with
+.BR LiS .
+.B LiS
+has a nasty bug in
+.BR qenable ()
+requiring the non-standard
+.BR canenable (9)
+function.
+.IP \(bu
+Symbol
+.BR lis_qenable ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_qenable ()
+simply calls
+.BR qenable ().
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCES
+.PP
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.BR AIX \(rg,
+.BR HP-UX \(rg,
+.BR OSF \(rg,
+.BR Solaris \(rg
+and
+.BR UnixWare \(rg
+documentation;
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+and
+.BR LiS 
+source code
+.[
+LiS
+.]
+(but see
+.IR \*(lqCOMPATIBILITY\*(rq ,
+above).
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qenable ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+The original versions of
+.BR qenable ()
+returned
+.B int
+instead of
+.BR void .
+.\"
+.\"
+.TI

@@ -1,0 +1,284 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: qclose.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QCLOSE 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B qclose
+\- closes a \fISTREAMS\fR module or driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int qclose(queue_t *" q ", int " flag ", cred_t *" credp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+is a pointer to the module or driver's read queue.
+.TP
+.I flag
+is a close flag that contains a bitwise or of one or more of the following
+flags:
+.RS
+.TP
+.B FREAD
+the \fISTREAMS\fP special file was opened for read.
+.TP
+.B FWRITE
+the \fISTREAMS\fP special file was opened for write.
+.TP
+.B FEXCL
+the \fISTREAMS\fP special file was opened for exclusive access.
+.TP
+.B FNDELAY
+the \fISTREAMS\fP special file was opened for non-blocking operation.
+.PP
+The close flags are the same as the flags used to open the module or driver by
+the closing user.
+.RE
+.TP
+.I credp
+is a pointer to a credentials structure indicating the credentials of the
+process invoking the close, structured as follows:
+.sp
+.nf
+\fC\s-2\
+typedef struct cred {
+        uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
+        gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
+        int cr_ngroups;
+        gid_t cr_groups[NGROUPS];
+} cred_t;
+\fR\s+2
+.fi
+.sp
+For more information on the
+.B cred
+structure, see
+.BR cred_t (9).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR qclose ()
+closes a
+.I STREAMS
+module or driver by calling the queue's
+.I q->q_info->qi_close
+procedure (if it exists).
+.BR qclose ()
+is invoked on the last close of a
+.I STREAMS
+character special file.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qclose ()
+is an internal
+.I STREAMS
+function that is not intended to be called directly by
+the module writer.  See
+.BR close (2s)
+and
+.B I_POP
+under
+.BR streamio (7).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR qclose ()
+returns zero (0).
+Upon failure,
+.BR qclose ()
+returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR qclose ()
+fails, it returns a negative error number as follows:
+.PP
+In addition, any error returned by the module's
+.I q->q_info->qi_close
+function can be returned by
+.BR qclose ().
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qclose ()
+should only be called from user context or from within a
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qclose ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qclose ()
+is an internal
+.I STREAMS
+function which was not intended to be called directly by
+.I STREAMS
+modules or drivers.
+.BR qclose ()
+is not part of the DDI/DKI and should no be called by portable programs.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of a module close procedure.
+.sp
+.nf
+\fC\s-2\
+int xxx_close(queue_t* q, int flag, cred_t* crp)
+{
+    (void) flag;
+    (void) crp;
+    xxx_free_priv(q);
+    MOD_DEC_USE_COUNT;
+    return (0);
+}
+\fR\s+2
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.BR close (2s),
+.BR streamio (7),
+.BR qopen (9),
+.BR qattach (9),
+.BR qdetach (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qclose ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR qclose ()
+is not exported by SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+or LiS.
+.\"
+.\"
+.SH COMPLIANCE
+.PP
+.BR qclose ()
+is compliant with the description of the internal
+.BR qclose ()
+function of
+SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qclose ()
+first appeared in as a module entry point in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,311 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: testb.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TESTB 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B testb
+\- test is a \fISTREAMS\fR message can be allocated
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int testb(int " size ", unsigned int " priority );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I size
+the size of the requested data buffer.
+.TP
+.I priority
+the priority of the request for a message block.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR testb ()
+tests whether an allocation made with
+.BR allocb (9)
+of the size specified by
+.I size
+and priority specified by
+.IR priority ,
+will succeed or fail.
+To test whether a subsequent allocation with
+.BR esballoc (9)
+will succeed or fail, set
+.I size
+to zero (0).
+.PP
+.I priority
+can be one of the following values:
+.sp
+.TS
+tab(:);
+lblsss.
+BPRI_LO:T{
+requests a low priority buffer.
+T}
+BPRI_MED:T{
+requests a medium priority buffer.
+T}
+BPRI_HI:T{
+requests a high priority buffer.
+T}
+BPRI_WAITOK:T{
+requests a low priority buffer and can block.
+T}
+.TE
+.PP
+If
+.I priority
+is other than
+.BR BPRI_LO ", " BPRI_MED ", " BPRI_HI " or " BPRI_WAITOK ,
+the request will be treated as
+.BR BPRI_LOW .
+.\"
+.\"
+.SH RETURN
+.PP
+.BR testb ()
+returns true (1) if the allocate would succeed, and returns false (0) if the
+allocation would fail.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR testb ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR testb ()
+can be executed from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR testb ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+As with other post SVR 3 STREAMS
+.[
+svr3
+.]
+implementations,
+.B LiS
+.[
+LiS
+.]
+ignores the
+.I priority
+argument to
+.BR testb () .
+The message block
+.I priority
+was an SVR 3
+.[
+svr3
+.]
+concept which was found not to be useful, primarily due to
+priority inversion.  For a history of the
+.I priority
+mechanism and a discussion as to why the mechanism was abandonned in SVR 4.2,
+.[
+svr42
+.]
+see
+.I \*(lqThe Magic Garden Explained\*(rq
+section 7.7.2.
+.[
+magic
+.]
+.PP
+.BR testb ()
+can only test whether the allocation would succeed at a given moment in time.
+It cannot indicate what would happen immediately following return from
+.BR testb ().
+Therefore, the return from
+.BR allocb "(9) and " esballoc (9)
+must always be tested for
+.BR NULL .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR allocb (9),
+.BR esballoc (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR testb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR testb ()
+is compatible with
+.B "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.B SVR 4
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(bu
+.BR AIX \(rg
+.[
+aixdoc
+.]
+defines the first argument as
+.BR "register int" .
+.IP \(bu
+.BR AIX \(rg
+and
+.BR Solaris \(rg
+.[
+soldoc
+.]
+ignore the
+.I priority
+argument.
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7doc
+.]
+.BR HP-UX \(rg
+.[
+hpuxdoc
+.]
+.BR SUPER-UX \(rg
+.[
+suxdoc
+.]
+.BR OSF \(rg
+.[
+osfdoc
+.]
+do not.
+.BR OSF \(rg
+adds the
+.B BPRI_WAITOK
+priority.
+.BR UXP/V \(rg
+.[
+uxpdoc
+.]
+does not document this function.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR testb ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

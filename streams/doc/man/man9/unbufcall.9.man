@@ -1,0 +1,329 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: unbufcall.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNBUFCALL 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B unbufcall
+\- removes a \fISTREAMS\fR buffer callback
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.PP
+.PD 0
+.HP
+.BI "void unbufcall(int " bcid );
+.HP
+.BI "void unbufcall(bcid_t " bcid );
+.HP
+.BI "void unbufcall(bufcall_id_t " bcid );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I bcid
+the buffer call identifier returned by
+.BR bufcall (9)
+or
+.BR esbbcall (9).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR unbufcall ()
+cancels the buffer callback that was installed using
+.BR bufcall "(9) or " esbbcall (9).
+.I bcid
+is the buffer callback identifier that was returned from a previous call to
+.BR bufcall "(9) or " esbbcall (9).
+.PP
+.BR unbufcall ()
+is typically used to remove outstanding buffer calls when a stream is closing.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR unbufcall ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR bufcall ()
+silently fails if the buffer callback identified by
+.I bcid
+no longer exists;
+or, 
+.I bcid
+is invalid.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unbufcall ()
+can be called from any context, including user context, module procedures,
+call outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR unbufcall ()
+is MP-safe.
+.PP
+Because the module is permitted to unload after calling
+.BR unbufcall ()
+for all oustanding buffer callbacks the call to
+.BR unbufcall ()
+will not return until either the callback function has completed, or the
+callback function has been cancelled.  Therefore the callback function will be
+guaranteed not to run once 
+.BR unbufcall ()
+has returned for all outstanding callbacks.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR unbufcall ()
+can be called with a
+.I bcid
+returned by
+.BR bufcall (9),
+.BR esbbcall (9),
+or
+.BR qbufcall (9).
+(For
+.BR qbufcall (9),
+it is more appropriate to use the
+.BR qunbufcall (9)
+function.)
+.PP
+.BR unbfucall ()
+must be called for all oustanding buffer calls from the
+.BR qclose (9)
+procedure of the module before exiting or unloading.
+.PP
+Because
+.B "Linux Fast-STREAMS"
+.[
+lfs
+.]
+uses an outdaing pointer for the returned
+.BR bcid_t ,
+.BR unbufcall ()
+must be called promptly for outstanding buffer calls.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR bufcall (9),
+.BR esbbcall (9),
+.BR qbufcall (9),
+.BR mi_bufcall (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR unbufcall ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unbufcall ()
+is compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.B SVR 4
+.[
+svr4spg
+.]
+with the folllowing portability considerations:
+.IP \(bu
+.BR unbufcall ()
+uses an efficient packed outdating pointer for
+.BR bcid_t .
+.B LiS
+.[
+lis
+.]
+uses rather inefficient linear lookups with interrupts disabled while
+looking for the
+.I bcid
+in the list of buffer callbacks.  As buffer callbacks should be rare in most
+.I STREAMS
+module and driver designs, this is of little moment.
+.IP \(bu
+In
+.B SVR 4
+.[
+svr4spg
+.]
+.BR unbufcall ()
+was redefined to accept a
+.B bcid_t
+.I bcid
+instead of an
+.B int
+.I bcid
+as was the case for
+.BR "SVR 3" .
+.[
+svr3spg
+.]
+.BR Solaris \(rg
+.[
+soldoc
+.]
+ues a
+.B bufcall_id_t
+instead.
+.BR AIX \(rg
+.[
+aixdoc
+.]
+and
+.BR UXP/V \(rg
+.[
+uxpdoc
+.]
+use
+.B register int
+for
+.IR bcid .
+.BR OSF \(rg
+.[
+osfdoc
+.]
+uses a plain
+.BR int .
+.BR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxdoc
+.]
+use a
+.BR toid_t .
+.IP \(bu
+Symbol
+.BR lis_unbufcall ()
+is provided for compatibility with
+.BR LiS .
+See
+.BR lisbcm (9).
+.BR lis_unbufcall ()
+calls
+.BR unbufcall ()
+directly.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unbufcall ()
+first appeared in
+.BR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

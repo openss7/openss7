@@ -1,0 +1,354 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: allocb_physreq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ALLOCB_PHYSREQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B allocb_physreq
+\- allocate a \fISTREAMS\fR message and data block
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "mblk_t *allocb_physreq(size_t " size ", unsigned int " bpri ", physreq_t *" physrp );
+.\"
+.\"
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I size
+the size of the message buffer to allocate
+.TP
+.I bpri
+the priority of the request.
+.TP
+.I physrp
+a pointer to a
+.BR physreq (9)
+structure specifying the physical requirements of the data buffer.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR allocb_physreq ()
+allocates a message block and a data block of the requested
+.IR size " and " bpri
+subject to the memory constraints specified by the structure indicated by
+.IR physrp .
+.I physrp
+points to a
+.BR physreq (9)
+structure.
+.PP
+If the requested
+.I size
+is less than the
+.I STREAMS
+constant
+.B FASTBUF
+then a data block of size
+.B FASTBUF
+will be created.
+If the requested
+.I size
+is larger than the
+.I STREAMS
+constant
+.B FASTBUF
+then a data block of size
+.I size
+will be created.
+.PP
+The
+.I bpri
+can be one of the following values:
+.sp
+.TS
+expand tab(:);
+lb0ls.
+BPRI_LO\ \ :requests a low priority message buffer.
+BPRI_MED\ \ :requests a medium priority message buffer.
+BPRI_HI\ \ :requests a high priority message buffer.
+.TE
+.PP
+If
+.BR allocb_physreq ()
+is called with a
+.I bpri
+other than
+.BR BPRI_HI ", " BPR_MED " or " BPRI_LO ,
+the request will be serviced as
+.BR BPRI_LO .
+.PP
+.BR allocb_physreq ()
+accepts a pointer
+.I phsyreq_ptr
+to a
+.BR physreq (9)
+structure providing the memory constraints on the resulting data block is
+provided as an argument.  If
+.I physrp
+is
+.BR NULL ,
+calling
+.BR allocb_physreq ()
+returns the identical result as would a call to
+.BR allocb (9).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR allocb_physreq ()
+will
+return an
+.BR mblk_t (9)
+pointer to the allocated message block.
+The allocated mesage block will have a data block type of
+.BR M_DATA .
+All bands and flags will be cleared.
+.I b_rptr
+and
+.I b_wptr
+will be set to the beginning of the datablock buffer area.
+.PP
+Upon failure,
+.BR allocb_physreq ()
+will
+return a
+.B NULL
+message pointer.
+.\"
+.\"
+.SH ERRORS
+.PP
+When an error occurs,
+.BR allocb_physreq ()
+will return a
+.B NULL
+message pointer.
+.PP
+.BR allocb_physreq ()
+will only fail if there is insufficient memory to allocate the necessary
+datastructures for the message block, data block or data buffer, given the
+value of
+.I size
+and
+.IR bpri ,
+subject to the specified memory constraints specified by
+.IR  physrp .
+.PP
+Failure to allocate a message block is typically followed by a call to
+.BR bufcall (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR allocb_physreq ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR allocb_physreq ()
+is MP-safe.  The caller has exclusive acces to the returned message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR allocb_physreq ()
+is provided for source level compatibility with
+.BR UnixWare \(rg
+and, despite the description above, ignores the
+.I physrp
+argument.
+.PP
+Portable
+.I STREAMS
+drivers and modules should not use
+.BR allocb_physreq ().
+To control the physical requirement of the memory allocated, allocate the
+memory using a suitable kernel memory allocator (such as
+.BR kmalloc (9)
+or
+.BR get_freepages (9)
+with suitable
+.I gpf_flags
+such as
+.BR GFP_DMA )
+and then use
+.BR esballoc (9)
+to allocate the message block.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mblk_t (9),
+.BR physreq (9),
+.BR allocb (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR bufcall (9),
+.BR esballoc (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR allocb_physreq ()
+is source level compatible with
+.BR UnixWare \(rg
+and
+.BR LiS ,
+with the following considerations:
+.IP \(bu
+Despite the description above,
+.BR allocb_physreq ()
+is not specially implemented and results in a simple call to
+.BR allocb (9)
+with the argument
+.I physrp
+being largely ignored.
+.BR LiS
+has the same behavior.
+.IP \(bu
+.I STREAMS
+modules relying on
+.BR allocb_physreq ()
+should consider the following aspects of
+.BR Linux \(rg
+memory allocation: (1) allocations are always aligned to the next largest
+power of 2 boundary greater than the requested size; (2) allocations of
+greater than a page size result in continguous memory allocations; (3)
+allocations of greater than a page size are alligned to a page boundary.
+.IP \(bu
+Symbol
+.BR lis_allocb_physreq ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (8).
+.BR lis_allocb_physreq ()
+simply calls
+.BR allocb_physreq ()
+directly.
+.BR \(bu
+This function is not provided by
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+nor any other
+.B SVR 4
+based implementation with the exception of
+.BR UnixWare \(rg
+and
+.BR LiS ,
+.RB ( LiS
+largely for compatibility with
+.BR UnixWare \(rg).
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR UnixWare \(rg
+documentation;
+.[
+uw7doc
+.]
+and
+.B LiS
+source code.
+.[
+LiS
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR allocb_physreq ()
+first appeared in
+.BR UnixWare \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

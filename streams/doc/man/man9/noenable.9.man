@@ -1,0 +1,276 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: noenable.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH NOENABLE 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B noenable
+\- disables a \fISTREAMS\fR message queue from being scheduled
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void noenable(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue for which to suppress scheduling.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR noenable ()
+sets the
+.B QNOENB
+flag on the specified queue,
+.IR q .
+This tells the
+.I STREAMS
+scheduler that the queue cannot be scheduled for
+.BR runqueues (9).
+.PP
+.BR noenable ()
+can be cancelled with
+.BR enableok (9).
+.PP
+If
+.BR noenable ()
+has been called for a queue and
+.BR enableok (9)
+has not subsequently been called for the same queue, a second call to
+.BR noenable ()
+for the queue will have no effect.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR noenable ()
+sets the
+.B QNOENB
+flag and returns void.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR noenable ()
+always succeeds.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR noenable ()
+does not remove the queue from the current
+.BR runqueues (9)
+schedule list.  It only sets the
+.B QNOENB
+flag to indicate whether the queue should be subsequently scheduled.  To
+remove a queue from the current run list, use
+.BR qdisable (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR noenable ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR noenable ()
+is MP-safe.
+.BR noenable ()
+uses atomic bit operations and does not write lock the queue.  Therefore,
+.BR noenable ()
+can be called for a queue that has been frozen with
+.BR freezestr (9).
+No global locks need to be held across ac all to
+.BR noenable ()
+and
+.BR noenable ()
+takes no locks.
+.PP
+If one thread disables a queue with
+.BR noenable ()
+and another enables the queue with
+.BR enableok (9),
+there will be a race ondition on the
+.B QNOENB
+flag.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR enableok (9),
+.BR canenable (9),
+.BR qenable (9),
+.BR qdisable (9),
+.BR runqueues (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR noenable ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR noenable ()
+is source-level compatible with SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+and
+LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.BR noenable ()
+uses atomic bit operations and does not require taking the queue write lock.
+This makes
+.BR noenable ()
+safe for use on a write locked stream that has been frozen with
+.BR freezestr (9).
+LiS takes the queue spin lock and uses normal bit operations to set the flag.
+.IP \(bu
+.BR noenable ()
+called with an invalid
+.I q
+argument will have an undefined result.
+In referenced versions of LiS
+.[
+LiS
+.]
+the result is undefined in the same situations due to an LiS coding error.
+Repaired versions of LiS will make
+.BR noenable ()
+fail silently in these situations.
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR noenable ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.PP
+Symbol
+.BR lis_safe_noenable ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_safe_noenable ()
+simply calls
+.BR noenable ().
+.PP
+Binary compatibility with SVR 4.2 DDI/DKI and
+.IR Solaris \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR noenable ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,165 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: sockets.3.man,v 0.9.2.1 2004/03/01 02:44:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH SOCKETS 3 "$Date: 2004/03/01 02:44:05 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.SH NAME
+.B libsocket, sockets
+\- Linux STREAMS Sockets Library
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.HP
+.BI "int accept(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int bind(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.HP
+.BI "int connect(int " socket ", const struct sockaddr *" address ", socklen_t " address_len );
+.HP
+.BI "int getpeername(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int getsockname(int " socket ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "int getsockopt(int " socket ", int " level ", int " option_name ", void *" option_value ", socklen_t *" option_len );
+.HP
+.BI "int listen(int " socket ", int " backlog );
+.HP
+.BI "ssize_t recv(int " socket ", void *" buffer ", size_t " length ", int " flags );
+.HP
+.BI "ssize_t recvfrom(int " socket ", void *" buffer ", size_t " length ", int " flags ", struct sockaddr *" address ", socklen_t *" address_len );
+.HP
+.BI "ssize_t recvmsg(int " socket ", struct msghdr *" message ", int " flags );
+.HP
+.BI "ssize_t send(int " socket ", const void *" buffer ", size_t " length ", int " flags );
+.HP
+.BI "ssize_t sendmsg(int " socket ", const struct msghdr *" message ", int " flags );
+.HP
+.BI "ssize_t sendto(int " socket ", const void *" message ", size_t " length ", int " flags ", const struct sockaddr *" dest_addr ", socklen_t " dest_len );
+.HP
+.BI "int setsockopt(int " socket ", int " level ", int " option_name ", const void *" option_value ", socklen_t " option_len );
+.HP
+.BI "int shutdown(int " socket ", int " how );
+.HP
+.BI "int socket(int " domain ", int " type ", int " protocol );
+.HP
+.BI "int socketpair(int " domain ", int " type ", int " protocol ", int " socket_vector[2] );
+.SH DESCRIPTION
+.PP
+.B libsocket
+is a Linux
+.IR STREAMS (4)
+socket library that uses the
+.BR socksys (4)
+driver.
+.SH NOTES
+.PP
+.SH CAVEATS
+.PP
+.SH "RETURN VALUE"
+.PP
+.SH "ERROR HANDLING"
+.PP
+.SH ERRORS
+.PP
+.SH "SEE ALSO"
+.PP
+.BR accept (3),
+.BR bind (3),
+.BR connect (3),
+.BR getpeername (3),
+.BR getsockname (3),
+.BR getsockopt (3),
+.BR listen (3),
+.BR recv (3),
+.BR recvfrom (3),
+.BR recvmsg (3),
+.BR send (3),
+.BR sendmsg (3),
+.BR sendto (3),
+.BR setsockopt (3),
+.BR shutdown (3),
+.BR socket (3),
+.BR socketpair (3).
+.SH "CONFORMING TO"
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

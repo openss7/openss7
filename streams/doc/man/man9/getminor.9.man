@@ -1,0 +1,215 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: getminor.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH GETMINOR 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH "NAME"
+.B getminor, minor
+\- get the minor device number for a device.
+.\"
+.\"
+.SH "SYNOPSIS"
+.PP
+.B #include <sys/streams.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "minor_t getminor(dev_t " dev );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I dev
+the device number from which to extract the minor device number.
+.\"
+.\"
+.SH "DESCRIPTION"
+.PP
+.BR getminor ()
+returns the minor device number associated with the
+.B dev_t
+.IR dev .
+.BR minor ()
+was the SVR 3
+.[
+svr3
+.]
+name for this function.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR getminor ()
+always returns the minor device number.
+.\"
+.\"
+.SH "ERRORS"
+.PP
+.BR getminor ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR getminor ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR getminor ()
+is MP-safe.
+.\"
+.\"
+.SH "NOTICES"
+.PP
+.BR getminor ()
+simply invokes the kernel macro
+.BR MINOR (9).
+For Linux 2.4,
+.B minor_t
+is
+.BR "unsigned char" .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR getminor (9),
+.BR makedevice (9),
+.BR geteminor (9),
+.BR ddi_getiminor (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR getminor ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR getminor ()
+is source level compatible with
+.BR "SVR 4.2" ,
+.[
+svr42
+.]
+.BR Solaris \(rg,
+.BR UnixWare \(rg
+and
+.BR LiS .
+.[
+LiS
+.]
+.PP
+.BR getminor ()
+is binary compatible with LiS.  Binary compatibility with
+.BR "SVR 4.2" ,
+.BR Solaris \(rg
+and
+.BR UnixWare \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.BR Solaris \(rg
+and
+.BR UnixWare \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR getminor ()
+first appeared in SVR 4.
+.[
+svr4
+.]
+.BR minor ()
+first appeared as
+in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

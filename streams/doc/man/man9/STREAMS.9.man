@@ -1,0 +1,1815 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STREAMS 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B STREAMS
+\- introduction to \fISTREAMS\fR kernel functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _AIX_SOURCE
+.br
+.B #define _HPUX_SOURCE
+.br
+.B #define _OSF_SOURCE
+.br
+.B #define _SUN_SOURCE
+.br
+.B #define _UW7_SOURCE
+.br
+.B #define _LIS_SOURCE
+.PP
+.B #include <sys/dki.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.br
+.B #include <sys/kmem.h>
+.br
+.B #include <sys/cmn_err.h>
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.SS "Header Files"
+.PP
+.PD 0
+.HP
+.BR <sys/dki.h> " \-\ kernel definitions
+.HP
+.BR <sys/stropts.h> " \-\ user STREAMS ioctl include file
+.HP
+.BR <sys/stream.h> " \-\ STREAMS structures and utilities
+.HP
+.BR <sys/strconf.h> " \-\ STREAMS module configuration
+.HP
+.BR <sys/kmem.h> " \-\ STREAMS aware memory allocators
+.HP
+.BR <sys/cmn_err.h> " \-\ SVR4 style
+.BR printk (9).
+.HP
+.BR <sys/ddi.h> " \-\ DDI functions.  See
+.BR DDI (9)
+for more information.
+.PD
+.PP
+.SS "Common Drivers"
+.PP
+.PD 0
+.HP
+.BR pipe "(4)\ \-\ STREAMS-based software pipes
+.HP
+.BR fifo "(4)\ \-\ STREAMS-based first-in first-out special file, named pipe
+.HP
+.BR clone "(4)\ \-\ the STREAMS clone driver
+.HP
+.BR sad "(4)\ \-\ the STREAMS administrative driver
+.HP
+.BR socksys "(4)\ \-\ STREAMS XTI/TLI access to sockets.
+.HP
+.BR ticlts "(4)\ \-\ STREAMS XTI/TLI connectionless local transport provider
+.HP
+.BR ticots "(4)\ \-\ STREAMS XTI/TLI connection-oriented local transport provider
+.HP
+.BR ticotsord "(4)\ \-\ STREAMS XTI/TLI connection-oriented orderly release local transport provider
+.HP
+.BR spx "(4)\ \-\ STREAMS bi-directional pipe device
+.PD
+.PP
+.SS "Common Modules"
+.PP
+.PP
+.PD 0
+.HP
+.BR pipemod "(4)\ \-\ STREAMS module supporting flush handling in STREAMS fifos and pipes
+.HP
+.BR ldl "(4)\ \-\ a STREAMS DLPI interface to Linux network devices
+.HP
+.BR connld "(4)\ \-\ STREAMS module supporting the generation of unique new STREAMS pipes from
+an existing pipe end
+.HP
+.BR timod "(4)\ \-\ a STREAMS XTI/TLI compatibility interface
+.HP
+.BR tirdwr "(4)\ \-\ a STREAMS XTI/TLI read write comptibility interface
+.HP
+.BR sockmod "(4)\ \-\ a STREAMS TPI to sockets compatibility module
+.PD
+.PP
+.SS "System Calls"
+.PP
+.PP
+.PD 0
+.HP
+.BR getmsg "(2)\ \-\ get next message from a STREAMS character device
+.HP
+.BR getpmsg "(2)\ \-\ get next message from a STREAMS character device
+.HP
+.BR putmsg "(2)\ \-\ put a message to a STREAMS character device
+.HP
+.BR putpmsg "(2)\ \-\ put a message to a STREAMS character device
+.HP
+.BR poll "(2)\ \-\ wait for some event on a STREAMS character device
+.HP
+.BR fattach "(3)\ \-\ attach a STREAMS open file to a path name in the file system
+.HP
+.BR fdetach "(3)\ \-\ detach a STREAMS file from a path name in the file system
+.HP
+.BR isastream "(2)\ \-\ determine whether an open file is a STREAMS character device
+.HP
+.BR open "(2)\ \-\ open and possibly create a file or device
+.HP
+.BR close "(2)\ \-\ close a file descriptor
+.HP
+.BR read "(2)\ \-\ read from a file descriptor
+.HP
+.BR readv "(2)\ \-\ read from a file descriptor
+.HP
+.BR write "(2)\ \-\ write to a file descriptor
+.HP
+.BR writev "(2)\ \-\ write to a file descriptor
+.HP
+.BR pipe "(2)\ \-\ create a STREAMS pipe
+.HP
+.BR ioctl "(2)\ \-\ control device
+.HP
+.BR streamio "(7)\ \-\ STREAMS ioctl commands
+.PD
+.PP
+.SS "STREAMS Module Entry Points"
+.PP
+.PD 0
+.HP
+.BR qopen "(9)\ \-\ call a STREAMS module or driver open routine
+.HP
+.BR qclose "(9)\ \-\ closes a STREAMS module or driver
+.HP
+.BR put "(9)\ \-\ invokes a STREAMS message queue put procedure
+.HP
+.BR srv "(9)\ \-\ invokes a STREAMS message queue service procedure
+.PD
+.PP
+.SS "STREAMS Structures"
+.PP
+.PD 0
+.HP
+.BR cdevsw "(9)\ \-\ character device switch table entry
+.HP
+.BR cred_t "(9)\ \-\ SVR4-style credentials
+.HP
+.BR datab "(9)\ \-\ STREAMS data block
+.HP
+.BR fmodsw "(9)\ \-\ module switch table entry
+.HP
+.BR module_info "(9)\ \-\ STREAMS module information
+.HP
+.BR msgb "(9)\ \-\ STREAMS message block
+.HP
+.BR qband "(9)\ \-\ STREAMS queue band structure
+.HP
+.BR qinit "(9)\ \-\ STREAMS queue initilization structures
+.HP
+.BR queinfo "(9)\ \-\ STREAMS queue info structure
+.HP
+.BR queue "(9)\ \-\ STREAMS queue structure
+.HP
+.BR streamtab "(9)\ \-\ STREAMS stream table structure
+.PP
+.PD
+.PP
+.SS "Module and Driver Registration Functions"
+.PP
+.PD 0
+.HP
+.BR autopush_add "(9)\ \-\ add STREAMS autopush configuration"
+.HP
+.BR autopush_del "(9)\ \-\ delete STREAMS autopush configuration"
+.HP
+.BR autopush_find "(9)\ \-\ find STREAMS autopush configuration"
+.HP
+.BR autopush_vml "(9)\ \-\ verify a STREAMS module list"
+.HP
+.BR getadmin "(9)\ \-\ get the adminstration function pointer for a STREAMS module
+.HP
+.BR getmid "(9)\ \-\ get the STREAMS module id for a name
+.HP
+.BR register_inode "(9)\ \-\ register a STREAMS special filesystem node
+.HP
+.BR register_inode_major "(9)\ \-\ register a STREAM head to a major device number
+.HP
+.BR register_inode_minor "(9)\ \-\ register a STREAM head to a minor device number
+.HP
+.BR register_strdev "(9)\ \-\ register a STREAMS device
+.HP
+.BR register_strdev_major "(9)\ \-\ register a STREAMS device to a major device number
+.HP
+.BR register_strdev_minor "(9)\ \-\ register a STREAMS device to a minor device number
+.HP
+.BR register_strmod "(9)\ \-\ register a STREAMS module to a module id
+.HP
+.BR unregister_inode "(9)\ \-\ unregister a STREAMS special filesystem node
+.HP
+.BR unregister_inode_major "(9)\ \-\ unregister a STREAM head from a major device number
+.HP
+.BR unregister_inode_minor "(9)\ \-\ unregister a STREAM head from a minor device number
+.HP
+.BR unregister_strdev "(9)\ \-\ unregister a STREAMS device
+.HP
+.BR unregister_strdev_major "(9)\ \-\ unregister a STREAMS device from a major device number
+.HP
+.BR unregister_strdev_minor "(9)\ \-\ unregister a STREAMS device from a minor device number
+.HP
+.BR unregister_strmod "(9)\ \-\ unregister a STREAMS module from a module id
+.PD
+.PP
+.SS "Message Handling Functions"
+.PP
+.PP
+.PD 0
+.HP
+.BR adjmsg "(9)\ \-\ trim bytes from the front or back of a STREAMS message
+.HP
+.BR allocb "(9)\ \-\ allocate a STREAMS message and data block
+.HP
+.BR bufcall "(9)\ \-\ install a STREAMS buffer callback
+.HP
+.BR copyb "(9)\ \-\ copy a STREAMS message block
+.HP
+.BR copymsg "(9)\ \-\ copy a STREAMS message
+.HP
+.BR datamsg "(9)\ \-\ tests a STREAMS message type for data
+.HP
+.BR dupb "(9)\ \-\ duplicate a STREAMS message block
+.HP
+.BR dupmsg "(9)\ \-\ duplicate a STREAMS message
+.HP
+.BR esballoc "(9)\ \-\ allocate a STREAMS message and data block with a caller supplied data buffer
+.HP
+.BR freeb "(9)\ \-\ frees a STREAMS message block
+.HP
+.BR freemsg "(9)\ \-\ frees a STREAMS message
+.HP
+.BR linkb "(9)\ \-\ link a message block to a STREAMS message
+.HP
+.BR msgdsize "(9)\ \-\ calculate the size of the data in a STREAMS message
+.HP
+.BR msgpullup "(9)\ \-\ pull up bytes in a STREAMS message
+.HP
+.BR pcmsg "(9)\ \-\ determine priority of a STREAMS message
+.HP
+.BR pullupmsg "(9)\ \-\ pull up the bytes in a STREAMS message
+.HP
+.BR rmvb "(9)\ \-\ remove a message block from a STREAMS message
+.HP
+.BR testb "(9)\ \-\ test is a STREAMS message can be allocated
+.HP
+.BR unbufcall "(9)\ \-\ removes a STREAMS buffer callback
+.HP
+.BR unlinkb "(9)\ \-\ unlink a message block from a STREAMS message
+.PD
+.PP
+.SS "Queue Handling Functions"
+.PP
+.B UP Queue Handling Functions
+.PP
+.PD 0
+.HP
+.BR backq "(9)\ \-\ find the upstream or downstream STREAMS queue
+.HP
+.BR bcanput "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR canenable "(9)\ \-\ test whether a STREAMS message queue can be scheduled
+.HP
+.BR canput "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR enableok "(9)\ \-\ allows a STREAMS message queue to be scheduled
+.HP
+.BR flushband "(9)\ \-\ flushes band STREAMS messages from a message queue
+.HP
+.BR flushq "(9)\ \-\ flushes messages from a STREAMS message queue
+.HP
+.BR getq "(9)\ \-\ gets a message from a STREAMS message queue
+.HP
+.BR insq "(9)\ \-\ inserts a message into a STREAMS message queue
+.HP
+.BR noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
+.HP
+.BR OTHERQ "(9)\ \-\ return the other queue of a STREAMS queue pair
+.HP
+.BR putbq "(9)\ \-\ puts a message back on a STREAMS message queue
+.HP
+.BR putctl "(9)\ \-\ puts a control message on a STREAMS message queue
+.HP
+.BR putctl1 "(9)\ \-\ puts a 1 byte control message on a STREAMS message queue
+.HP
+.BR putq "(9)\ \-\ puts a message on a STREAMS message queue
+.HP
+.BR qenable "(9)\ \-\ schedules a STREAMS message queue service routine
+.HP
+.BR qreply "(9)\ \-\ replys to a message from a STREAMS message queue
+.HP
+.BR qsize "(9)\ \-\ return the number of messages on a queue
+.HP
+.BR RD "(9)\ \-\ return the read queue of a STREAMS queue pair
+.HP
+.BR rmvq "(9)\ \-\ remove a message from a STREAMS message queue
+.HP
+.BR SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
+.HP
+.BR WR "(9)\ \-\ return the write queue of a STREAMS queue pair
+.PD
+.PP
+.B MP Queue Handling Functions
+.PP
+.PD 0
+.HP
+.BR bcanputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR canputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR freezestr "(9)\ \-\ freeze a STREAMS stream
+.HP
+.BR put "(9)\ \-\ invokes a STREAMS message queue put procedure
+.HP
+.BR putnext "(9)\ \-\ puts a message on the downstream STREAMS message queue
+.HP
+.BR putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream STREAMS message queue
+.HP
+.BR putnextctl "(9)\ \-\ puts a control message on the downstream STREAMS message queue
+.HP
+.BR qprocsoff "(9)\ \-\ disables STREAMS message queue processing for multi-processing
+.HP
+.BR qprocson "(9)\ \-\ enables a STREAMS message queue for multi-processing
+.HP
+.BR strqget "(9)\ \-\ gets information about a STREAMS message queue
+.HP
+.BR strqset "(9)\ \-\ sets attributes of a STREAMS message queue
+.HP
+.BR unfreezestr "(9)\ \-\ thaw a STREAMS stream
+.PP
+.PD
+.PP
+.SS "Miscellaneous Functions"
+.PP
+.PP
+.PD 0
+.HP
+.BR kmem_alloc "(9)\ \-\ allocate kernel memory
+.HP
+.BR kmem_free "(9)\ \-\ deallocates kernel memory
+.HP
+.BR kmem_zalloc "(9)\ \-\ allocate kernel memory
+.HP
+.BR cmn_err "(9)\ \-\ print a kernel command error
+.HP
+.BR bcopy "(9)\ \-\ copy byte strings
+.HP
+.BR bzero "(9)\ \-\ zero a byte string
+.HP
+.BR copyin "(9)\ \-\ copy bytes from user to kernel
+.HP
+.BR copyout "(9)\ \-\ copy bytes from kernel to user
+.HP
+.BR delay "(9)\ \-\ delay for an interval
+.HP
+.BR drv_getparm "(9)\ \-\ get kernel parameters
+.HP
+.BR drv_hztomsec "(9)\-\ convert clock ticks to milliseconds
+.HP
+.BR drv_hztousec "(9)\-\ convert clock ticks to microseconds
+.HP
+.BR drv_msectohz "(9)\-\ convert milliseconds to clock ticks
+.HP
+.BR drv_priv "(9)\-\ determine if user is priviledged
+.HP
+.BR drv_usectohz "(9)\ \-\ convert microseconds to clock ticks
+.HP
+.BR drv_usecwait "(9)\ \-\ wait for a specified number of microseconds
+.HP
+.BR max "(9)\ \-\ determine the maximum of two variables
+.HP
+.BR min "(9)\ \-\ determine the minimum of two variables
+.HP
+.BR getmajor "(9)\ \-\ get the major device number for a device
+.HP
+.BR getminor "(9)\ \-\ get the minor device number for a device
+.HP
+.BR makedevice "(9)\ \-\ create a device from major and minor device numbers
+.HP
+.BR mknod "(9)\ \-\ create a special or ordinary file
+.HP
+.BR mount "(9)\ \-\ mount a file system
+.HP
+.BR strlog "(9)\ \-\ pass a message to the STREAMS logger
+.HP
+.BR timeout "(9)\ \-\ start a timer
+.HP
+.BR umount "(9)\ \-\ unmount a filesystem
+.HP
+.BR unlink "(9)\ \-\ remove a file
+.HP
+.BR untimeout "(9)\ \-\ stop a timer
+.PD
+.PP
+.SH EXTENSIONS
+.PP
+.SS "Common Extensions"
+.PP
+.B Linux Fast-STREAMS
+provides the following more common extensions to
+.BR "SVR 4.2 MP DDI/DKI" :
+.[
+usldk
+.]
+.PP
+.PD 0
+.HP
+.BR linkmsg "(9)\ \-\ link a message block to a STREAMS message
+.HP
+.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a STREAMS message queue
+.HP
+.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream STREAMS message queue
+.HP
+.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.HP
+.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.PD
+.PP
+.SS "Linux Fast-STREAMS Extensions"
+.PP
+.B Linux Fast-STREAMS
+provides access to the
+.BR "SVR 4"
+.[
+svr4
+.]
+internal functions listed below:
+.PP
+.PD 0
+.HP
+.BR allocq "(9)\ \-\ allocate a STREAMS queue pair
+.HP
+.BR bcanget "(9)\ \-\ test retrieval on a STREAMS message queue
+.HP
+.BR canget "(9)\ \-\ test retreival on a STREAMS message queue
+.HP
+.BR freeq "(9)\ \-\ deallocate a STREAMS queue pair
+.HP
+.BR qattach "(9)\ \-\ attach a module onto a STREAMS file
+.HP
+.BR qclose "(9)\ \-\ closes a STREAMS module or driver
+.HP
+.BR qdetach "(9)\ \-\ detach a module from a STREAMS file
+.HP
+.BR qopen "(9)\ \-\ call a STREAMS module or driver open routine
+.HP
+.BR setq "(9)\ \-\ asign a queue pair to a STREAMS module
+.PD
+.PP
+.SH "Linux Fast-STREAMS Extensions from LiS"
+.PP
+.PP
+.PD 0
+.HP
+.BR appq "(9)\ \-\ append a STREAMS message after another
+.HP
+.BR esbbcall "(9)\ \-\ installs a buffer callback for an extended STREAMS message block
+.HP
+.BR isdatablk "(9)\ \-\ tests a STREAMS data block for data type
+.HP
+.BR isdatamsg "(9)\ \-\ tests a STREAMS data block for data type
+.HP
+.BR kmem_zalloc_node "(9)\ \-\ allocate kernel memory
+.HP
+.BR msgsize "(9)\ \-\ calculate the size of the message blocks in a STREAMS message
+.HP
+.BR qcountstrm "(9)\ \-\ return the downstream message count on a stream
+.HP
+.BR xmsgsize "(9)\ \-\ calculate the size of message blocks in a STREAMS message
+.PD
+.PP
+.SH COMPATIBILITY
+.PP
+.SS "SVR 4.2 MP DDI/DKI Compatibility Functions"
+.PP
+.PD 0
+.BR itimeout "(9)\ \-\ perform a timeout at an interrupt level;"
+.HP
+.BR LOCK "(9)\ \-\ lock a basic lock;"
+.HP
+.BR LOCK_ALLOC "(9)\ \-\ allocate a basic lock;"
+.HP
+.BR LOCK_DEALLOC "(9)\ \-\ deallocate a basic lock;"
+.HP
+.BR major "(9)\ \-\ get the internal major number of a device;"
+.HP
+.BR makedev "(9)\ \-\ make a device number from internal major and minor device numbers;"
+.HP
+.BR minor "(9)\ \-\  get the internal minor number of a device;"
+.HP
+.BR sleep "(9)\ \-\ put a process to sleep;"
+.HP
+.BR spl0 "(9)\ \-\ set priority level 0;"
+.HP
+.BR spl1 "(9)\ \-\ set priority level 1;"
+.HP
+.BR spl2 "(9)\ \-\ set priority level 2;"
+.HP
+.BR spl3 "(9)\ \-\ set priority level 3;"
+.HP
+.BR spl4 "(9)\ \-\ set priority level 4;"
+.HP
+.BR spl5 "(9)\ \-\ set priority level 5;"
+.HP
+.BR spl6 "(9)\ \-\ set priority level 6;"
+.HP
+.BR spl7 "(9)\ \-\ set priority level 7;"
+.HP
+.BR spl "(9)\ \-\ set priority level;"
+.HP
+.BR splx "(9)\ \-\ set priority level x;"
+.HP
+.BR SV_ALLOC "(9)\ \-\ allocate a basic condition variable;"
+.HP
+.BR SV_BROADCAST "(9)\ \-\ broadcast a basic condition variable;"
+.HP
+.BR SV_DEALLOC "(9)\ \-\ deallocate a basic condition variable;"
+.HP
+.BR SV_SIGNAL "(9)\ \-\ signal a basic condition variable;"
+.HP
+.BR SV_WAIT "(9)\ \-\ wait on a basic condition variable;"
+.HP
+.BR SV_WAIT_SIG "(9)\ \-\ interruptible wait on a basic condition variable;"
+.HP
+.BR TRYLOCK "(9)\ \-\ try to lock a basic lock;"
+.HP
+.BR UNLOCK "(9)\ \-\ unlock a basic lock;"
+.HP
+.BR vtop "(9)\ \-\ convert virtual to physical address;"
+.HP
+.BR wakeup "(9)\ \-\ wake a process;"
+.PD
+.PP
+.SS "AIX\(rg 5L Version 5.1 Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR mi_bufcall "(9)\ \-\ reliable alternative to \fBbufcall\fP(9)
+.HP
+.BR mi_close_comm "(9)\ \-\ \fISTREAMS\fP common minor device close utility
+.HP
+.BR mi_next_ptr "(9)\ \-\ \fISTREAMS\fP minor device list traversal
+.HP
+.BR mi_open_comm "(9)\ \-\ \fISTREAMS\fP common minor device open utility
+.HP
+.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a STREAMS message queue
+.HP
+.BR splstr "(9)\ \-\ 
+.HP
+.BR splx "(9)\ \-\ 
+.HP
+.BR str_install "(9)\ \-\ 
+.HP
+.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.HP
+.BR wantio "(9)\ \-\ perform direct I/O from a \fISTREAMS\fR driver
+.HP
+.BR wantmsg "(9)\ \-\ provide a filter of wanted messages for a \fISTREAMS\fP module
+.HP
+.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.PD
+.PP
+.SS "HP-UX\(rg 11.0i v2 Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a STREAMS message queue
+.HP
+.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream STREAMS message queue
+.HP
+.BR str_install "(9)\ \-\ 
+.HP
+.BR str_uninstall "(9)\ \-\ 
+.HP
+.BR streams_get_sleep_lock "(9)\ \-\ 
+.HP
+.BR streams_put "(9)\ \-\ 
+.HP
+.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.HP
+.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.PD
+.PP
+.SS "OSF1.2/Digial UNIX\(rg Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR lbolt "(9)\ \-\ 
+.HP
+.BR puthere "(9)\ \-\ 
+.HP
+.BR streams_open_comm "(9)\ \-\ 
+.HP
+.BR streams_open_ocomm "(9)\ \-\ 
+.HP
+.BR streams_close_comm "(9)\ \-\ 
+.HP
+.BR strmod_add "(9)\ \-\ 
+.HP
+.BR strmod_del "(9)\ \-\ 
+.HP
+.BR time "(9)\ \-\ 
+.HP
+.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.HP
+.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.PD
+.PP
+.SS "UnixWare\(rg 7.1.3 (OpenUnix 8) Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR allocb_physreq "(9)\ \-\ allocate a STREAMS message and data block
+.HP
+.BR ATOMIC_INT_ADD "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_ALLOC "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_DEALLOC "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_DECR "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_INCR "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_INIT "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_READ "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_SUB "(9)\ \-\ 
+.HP
+.BR ATOMIC_INT_WRITE "(9)\ \-\ 
+.HP
+.BR emajor "(9)\ \-\ 
+.HP
+.BR eminor "(9)\ \-\ 
+.HP
+.BR etoimajor "(9)\ \-\ 
+.HP
+.BR getemajor "(9)\ \-\ get external major device number
+.HP
+.BR geteminor "(9)\ \-\ get external minor device number
+.HP
+.BR itoemajor "(9)\ \-\ 
+.HP
+.BR LOCK_OWNED "(9)\ \-\ 
+.HP
+.BR MPSTR_QLOCK "(9)\ \-\ 
+.HP
+.BR MPSTR_QRELE "(9)\ \-\ 
+.HP
+.BR MPSTR_STPLOCK "(9)\ \-\ 
+.HP
+.BR MPSTR_STPRELE "(9)\ \-\ 
+.HP
+.BR msgphysreq "(9)\ \-\ 
+.HP
+.BR msgpullup_physreq "(9)\ \-\ 
+.HP
+.BR msgscgth "(9)\ \-\ 
+.HP
+.BR printf "(9)\ \-\ 
+.HP
+.BR RW_ALLOC "(9)\ \-\ 
+.HP
+.BR RW_DEALLOC "(9)\ \-\ 
+.HP
+.BR RW_RDLOCK "(9)\ \-\ 
+.HP
+.BR RW_TRYRDLOCK "(9)\ \-\ 
+.HP
+.BR RW_TRYWRLOCK "(9)\ \-\ 
+.HP
+.BR RW_UNLOCK "(9)\ \-\ 
+.HP
+.BR RW_WRLOCK "(9)\ \-\ 
+.HP
+.BR SLEEP_ALLOC "(9)\ \-\ 
+.HP
+.BR SLEEP_DEALLOC "(9)\ \-\ 
+.HP
+.BR SLEEP_LOCK "(9)\ \-\ 
+.HP
+.BR SLEEP_LOCKAVAIL "(9)\ \-\ 
+.HP
+.BR SLEEP_LOCKOWNED "(9)\ \-\ 
+.HP
+.BR SLEEP_LOCK_SIG "(9)\ \-\ 
+.HP
+.BR SLEEP_TRYLOCK "(9)\ \-\ 
+.HP
+.BR SLEEP_UNLOCK "(9)\ \-\ 
+.HP
+.BR strioccall "(9)\ \-\ 
+.PD
+.PP
+.SS "Solaris\(rg 9/SunOS 5.9 Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR ddi_get_cred "(9)\ \-\ 
+.HP
+.BR ddi_getiminor "(9)\ \-\ 
+.HP
+.BR ddi_get_lbolt "(9)\ \-\ 
+.HP
+.BR ddi_get_pid "(9)\ \-\ 
+.HP
+.BR ddi_get_time "(9)\ \-\ 
+.HP
+.BR ddi_umem_alloc "(9)\ \-\ 
+.HP
+.BR ddi_umem_free "(9)\ \-\ 
+.HP
+.BR mod_info "(9)\ \-\ 
+.HP
+.BR mod_install "(9)\ \-\ 
+.HP
+.BR mod_remove "(9)\ \-\ 
+.HP
+.BR qbufcall "(9)\ \-\ 
+.HP
+.BR queclass "(9)\ \-\ return the class of a message
+.HP
+.BR qtimeout "(9)\ \-\ 
+.HP
+.BR qunbufcall "(9)\ \-\ 
+.HP
+.BR quntimeout "(9)\ \-\ 
+.HP
+.BR qwait "(9)\ \-\ wait for a queue procedure to execute
+.HP
+.BR qwait_sig "(9)\ \-\ wait for a queue procedure to execute or signal
+.HP
+.BR qwriter "(9)\ \-\ 
+.PD
+.PP
+.SS "LiS 2.16 Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR lis_register_strdev "(9lis)\ \-\ 
+.HP
+.BR lis_register_strmod "(9lis)\ \-\ 
+.HP
+.BR lis_unregister_strdev "(9lis)\ \-\ 
+.HP
+.BR lis_unregister_strmod "(9lis)\ \-\ 
+.PD
+.PP
+.SS "LiS 2.16 Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR lis_adjmsg "(9)\ \-\ trim bytes from the front or back of a STREAMS message
+.HP
+.BR lis_allocb "(9)\ \-\ allocate a STREAMS message and data block
+.HP
+.BR lis_allocb_physreq "(9)\ \-\ allocate a STREAMS message and data block
+.HP
+.BR lis_allocq "(9)\ \-\ allocate a STREAMS queue pair
+.HP
+.BR lis_appq "(9)\ \-\ append a STREAMS message after another
+.HP
+.BR lis_backq "(9)\ \-\ find the upstream or downstream STREAMS queue
+.HP
+.BR lis_bcanput "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR lis_bcanputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR lis_bcopy "(9)\ \-\ copy byte strings
+.HP
+.BR lis_bufcall "(9)\ \-\ install a STREAMS buffer callback
+.HP
+.BR lis_bzero "(9)\ \-\ zero a byte string
+.HP
+.BR lis_canenable "(9)\ \-\ test whether a STREAMS message queue can be scheduled
+.HP
+.BR lis_canput "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR lis_canputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.HP
+.BR lis_cmn_err "(9)\ \-\ print a kernel command error
+.HP
+.BR lis_copyb "(9)\ \-\ copy a STREAMS message block
+.HP
+.BR lis_copymsg "(9)\ \-\ copy a STREAMS message
+.HP
+.BR lis_datamsg "(9)\ \-\ tests a STREAMS message type for data
+.HP
+.BR lis_date "(9)\ \-\ the version and release date of STREAMS
+.HP
+.BR lis_dupb "(9)\ \-\ duplicate a STREAMS message block
+.HP
+.BR lis_dupmsg "(9)\ \-\ duplicate a STREAMS message
+.HP
+.BR lis_enableok "(9)\ \-\ allows a STREAMS message queue to be scheduled
+.HP
+.BR lis_esballoc "(9)\ \-\ allocate a STREAMS message and data block with a caller supplied data buffer
+.HP
+.BR lis_esbbcall "(9)\ \-\ installs a buffer callback for an extended STREAMS message block
+.HP
+.BR lis_find_strdev "(9)\ \-\ finds a streamtab entry for a device
+.HP
+.BR lis_flushband "(9)\ \-\ flushes band STREAMS messages from a message queue
+.HP
+.BR lis_flushq "(9)\ \-\ flushes messages from a STREAMS message queue
+.HP
+.BR lis_freeb "(9)\ \-\ frees a STREAMS message block
+.HP
+.BR lis_freemsg "(9)\ \-\ frees a STREAMS message
+.HP
+.BR lis_freeq "(9)\ \-\ deallocate a STREAMS queue pair
+.HP
+.BR lis_getq "(9)\ \-\ gets a message from a STREAMS message queue
+.HP
+.BR lis_insq "(9)\ \-\ inserts a message into a STREAMS message queue
+.HP
+.BR lis_isdatablk "(9)\ \-\ tests a STREAMS data block for data type
+.HP
+.BR lis_isdatamsg "(9)\ \-\ tests a STREAMS data block for data type
+.HP
+.BR lis_linkb "(9)\ \-\ link a message block to a STREAMS message
+.HP
+.BR lis_mknod "(9)\ \-\ create a special or ordinary file
+.HP
+.BR lis_mount "(9)\ \-\ mount a file system
+.HP
+.BR lis_msgdsize "(9)\ \-\ calculate the size of the data in a STREAMS message
+.HP
+.BR lis_msgpullup "(9)\ \-\ pull up bytes in a STREAMS message
+.HP
+.BR lis_msgsize "(9)\ \-\ calculate the size of message blocks in a STREAMS message
+.\".HP
+.\".BR lis_msgutil "(9)\ .\"\-\ 
+.HP
+.BR lis_noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
+.HP
+.BR lis_OTHER "(9)\ \-\ return the other queue of a STREAMS queue pair
+.HP
+.BR lis_OTHERQ "(9)\ \-\ return the other queue of a STREAMS queue pair
+.HP
+.BR lis_pullupmsg "(9)\ \-\ pull up the bytes in a STREAMS message
+.HP
+.BR lis_putbq "(9)\ \-\ puts a message back on a STREAMS message queue
+.HP
+.BR lis_putctl1 "(9)\ \-\ puts a 1 byte control message on a STREAMS message queue
+.HP
+.BR lis_putctl "(9)\ \-\ puts a control message on a STREAMS message queue
+.HP
+.BR lis_putnext "(9)\ \-\ puts a message on the downstream STREAMS message queue
+.HP
+.BR lis_putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream STREAMS message queue
+.HP
+.BR lis_putnextctl "(9)\ \-\ puts a control message on the downstream STREAMS message queue
+.HP
+.BR lis_putq "(9)\ \-\ puts a message on a STREAMS message queue
+.HP
+.BR lis_qattach "(9)\ \-\ attach a module onto a STREAMS file
+.HP
+.BR lis_qclose "(9)\ \-\ closes a STREAMS module or driver
+.HP
+.BR lis_qdetach "(9)\ \-\ detach a module from a STREAMS file
+.HP
+.BR lis_qenable "(9)\ \-\ schedules a STREAMS message queue service routine
+.HP
+.BR lis_qopen "(9)\ \-\ call a STREAMS module or driver open routine
+.HP
+.BR lis_qprocsoff "(9)\ \-\ disables STREAMS message queue processing for multi-processing
+.HP
+.BR lis_qprocson "(9)\ \-\ enables a STREAMS message queue for multi-processing
+.HP
+.BR lis_qreply "(9)\ \-\ replys to a message from a STREAMS message queue
+.HP
+.BR lis_qsize "(9)\ \-\ return the number of messages on a queue
+.HP
+.BR lis_RD "(9)\ \-\ return the read queue of a STREAMS queue pair
+.HP
+.BR lis_register_strdev "(9)\ \-\ register a STREAMS device
+.HP
+.BR lis_register_strmod "(9)\ \-\ register a STREAMS module
+.HP
+.BR lis_rmvb "(9)\ \-\ remove a message block from a STREAMS message
+.HP
+.BR lis_rmvq "(9)\ \-\ remove a message from a STREAMS message queue
+.HP
+.BR lis_safe_canenable "(9)\ \-\ test whether a STREAMS message queue can be scheduled
+.HP
+.BR lis_safe_enableok "(9)\ \-\ allows a STREAMS message queue to be scheduled
+.HP
+.BR lis_safe_noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
+.HP
+.BR lis_safe_OTHERQ "(9)\ \-\ return the other queue of a STREAMS queue pair
+.HP
+.BR lis_safe_putnext "(9)\ \-\ puts a message on the downstream STREAMS message queue
+.HP
+.BR lis_safe_qreply "(9)\ \-\ replys to a message from a STREAMS message queue
+.HP
+.BR lis_safe_RD "(9)\ \-\ return the read queue of a STREAMS queue pair
+.HP
+.BR lis_safe_SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
+.HP
+.BR lis_safe_WR "(9)\ \-\ return the write queue of a STREAMS queue pair
+.HP
+.BR lis_SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
+.HP
+.BR lis_stream_utils "(9)\ \-\ 
+.HP
+.BR lis_strqget "(9)\ \-\ gets information about a STREAMS message queue
+.HP
+.BR lis_strqset "(9)\ \-\ sets attributes of a STREAMS message queue
+.HP
+.BR lis_testb "(9)\ \-\ test is a STREAMS message can be allocated
+.HP
+.BR lis_timeout "(9)\ \-\ start a timer
+.HP
+.BR lis_umount2 "(9)\ \-\ unmount a filesystem
+.HP
+.BR lis_umount "(9)\ \-\ unmount a filesystem
+.HP
+.BR lis_unbufcall "(9)\ \-\ removes a STREAMS buffer callback
+.HP
+.BR lis_unlink "(9)\ \-\ remove a file
+.HP
+.BR lis_unlinkb "(9)\ \-\ unlink a message block from a STREAMS message
+.HP
+.BR lis_unregister_strdev "(9)\ \-\ unregister a STREAMS device
+.HP
+.BR lis_unregister_strmod "(9)\ \-\ deregister a STREAMS module
+.HP
+.BR lis_untimeout "(9)\ \-\ stop a timer
+.HP
+.BR lis_version "(9)\ \-\ the version and release date of STREAMS
+.HP
+.BR lis_WR "(9)\ \-\ return the write queue of a STREAMS queue pair
+.HP
+.BR lis_xmsgsize "(9)\ \-\ calculate the size of the message blocks in a STREAMS message
+.PD
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+See
+.BR streamio (7).
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.B Linux Fast-STREAMS
+provides and supports a number of system controls that can be accessed using
+the
+.B /proc/sys/streams/*
+files, with the
+.BR sysctl (2)
+interface, or using
+.BR sysctl (8).
+.PP
+The following
+.B STREAMS
+specific system controls are provided by
+.BR "Linux Fast-STREAMS" :
+.TP
+.B sys.streams.cltime
+Defines the default time interval (in milliseconds) that closing stream will
+linger for messages to clear its queues before finally closing.
+Valid values are zero (0) or greater (MAXINT).
+The default value is the traditional UNIX value of 15,000 milliseconds (15 seconds).
+This system control defines the default for all new streams.
+The value for a given stream can be changed with the
+.BR streamio (7)
+IO control
+.BR I_CLTIME ,
+after the stream is opened and before the stream is closed.
+.TP
+.B sys.streams.max_apush
+Defines the maximum number of modules that can be configured for autopush onto
+a STREAMS driver.
+Valid values are zero (0) or greater (MAXINT).
+The default value is the traditional UNIX value of 8 modules.
+This system control defines the maximum for all new autopush configurations.
+Existing autopush configurations are unchanged.
+.TP
+.B sys.streams.max_mblk
+Defines the maximum number of combined message data blocks that will be held
+on the per-CPU free list between runs of
+.BR runqueues (9).
+Valid values are zero (0) or greater (MAXINT).
+The default value is the traditional UNIX value of 10 blocks.
+This system control defines the maximum for the next run of
+.BR runqueues (9)
+for all CPUs.
+Increasing or decreasing this number may have a positive or negative performance impact.
+.TP
+.B sys.streams.max_stramod
+Defines the maximum number of autopush structures that can be defined for the
+entire system.
+Valid values are zero (0) or greater (MAXINT).
+The default value is eight (8) ???????
+This system control defines the system-wide maximum.
+.TP
+.B sys.streams.max_strdev
+Defines the maximum number of streams devices.  This is normally the maximum
+number of character devices (MAX_CHRDEV).
+Valid values are zero (0) or greater (MAXINT).
+The default value is MAX_CHRDEV (256).
+This is a read-only system control.
+.TP
+.B sys.streams.max_strmod
+Defines the maximum number of streams modules.  This is normally the maximum
+number of character devices (MAX_CHRDEV).
+Valid values are zero (0) or greater (MAXINT).
+The default value is MAX_CHRDEV (256).
+This is a read-only system control.
+.TP
+.B sys.streams.msg_priority
+Defines whether allocation priority will honored or whether all allocations
+will be treated the same.  See
+.BR allocb (9).
+When true (non-zero), allocation priority will be honored when allocating
+message blocks.  When false (zero), allocation priority will be ignored.
+Valid values are zero (0) or non-zero.
+The default value is zero (0).
+Changing this value may have a positive or negative impact on system
+performance.
+.TP
+.B sys.streams.nband
+Defines the number of queue bands available.
+Valid values are zero (0) or greater (MAXINT).
+The default value is the traditional UNIX value of 256.
+This system control defines the system wide value.
+This system control is read-only.
+.TP
+.B sys.streams.nstrmsgs
+Defines the maximum number of combined message data blocks that will be
+allocated.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 2^12.
+Changing this value may have a positive or negative impact on system
+performance.  Setting this value to a small number may be useful for debugging
+STREAMS drivers and modules.
+.TP
+.B sys.streams.nstrpush
+Deinfes the maximum number of modules that can be pushed on a stream.  This
+includes both autopushed modules and modules pushed using the
+.B I_PUSH
+IO control of
+.BR streamio (7).
+Valid values are zero (0) or greater (MAXINT).
+The default value is the tranditional UNIX value of 64.
+This is the default values for all new streams.  Existing streams are
+unaffected.
+.TP
+.B sys.streams.hiwat
+Defines the default high water mark (in message bytes) for 
+the stream head.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 5120.
+This is the default value for all new stream heads.  Existing stream heads are
+unaffected.  The value on existing stream heads can be changed by a driver or
+module by sending an
+.B M_SETOPTS
+message to the stream head.
+.TP
+.B sys.streams.lowat
+Defines the default low water mark (in mesasge bytes) for
+the stream head.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 1024.
+This is the default value for all new stream heads.  Existing stream heads are
+unaffected.  The value on existing stream heads can be changed by a driver or
+module by sending an
+.B M_SETOPTS
+message to the stream head.
+.TP
+.B sys.streams.maxpsz
+Defines the maximum packet size accepted (in message bytes) for the
+stream head.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 2^12.
+This is the default value for all new stream heads.  Existing stream heads are
+unaffected.  The value on existing stream heads can be changed by a driver or
+module by sending an
+.B M_SETOPTS
+message to the stream head.
+.TP
+.B sys.streams.minpsz
+Defines the minimum packet size accepted (in message bytes) for the
+stream head.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 0.
+This is the default value for all new stream heads.  Existing stream heads are
+unaffected.  The value on existing stream heads can be changed by a driver or
+module by sending an
+.B M_SETOPTS
+message to the stream head.
+.TP
+.B sys.streams.reuse_fmodsw
+Defines whether fmodsw table entries will be reused.
+When false (zero), fmodsw table entries will not be reused.  When true
+(non-zero), fmodsw table entries will be reused.
+Valid values are zero (0) and non-zero.
+The default value is false (zero).
+.TP
+.B sys.streams.rtime
+Defines the time interval (in milliseconds) that the stream head will wait to
+forward held messages when SNDHOLD is set for the stream head.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 10 milliseconds (one clock tick).
+This is the system wide value for all streams.
+Changing this value may have a positive or negative impact on system
+performance.
+.TP
+.B sys.streams.strhold
+Defines whether the SNDHOLD feature is active or not.  When false (0), the
+SNDHOLD feature is deactivated.  When true (non-zero), the SNDHOLD feature is
+activated.
+Valid values are zero (0) or non-zero.
+The default value is false (0).
+This is the default value for all new streams.  Existing streams are
+unaffected.
+This setting can be examined and altered on an open stream using the
+.B I_GWROPT
+and
+.B I_SWROPT
+IO controls of
+.BR streamio (7).
+.TP
+.B sys.streams.strctlsz
+Defines the maximum STREAMS control part size.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 2^12.
+This is the system wide maximum.  Existing allocations are unaffected by
+lowering this value.
+Changing this value can have an impact on users of
+.BR putpmsg (2).
+.TP
+.B sys.streams.strmsgsz
+Defines the maximum STREAMS message size.
+Valid values are zero (0) or greater (MAXINT).
+The default value is 2^18.
+This is the system wide maximum.  Existing allocations are unaffected by
+lowering this value.
+Changing this value can have an impact on users of
+.BR write (2),
+.BR writev (2),
+and
+.BR putpmsg (2).
+.TP
+.B sys.streams.strthresh
+Defines the maximum amount of memory that will be allocated for use by the
+STREAMS subsystem via
+.BR kmem_alloc (9)
+or
+.BR kmem_zalloc (9),
+or indirectly using
+.BR allocb (9)
+or allocating other STREAMS datastructures.
+Valid values are zero (0) or greater (MAXINT).
+This is the system wide maximum.  Existing allocations are unaffected by
+lowering this value.
+Changing this value to a low value may have some use in debugging STREAMS
+drivers and modules.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+
+      1	.BR lis_add_timer (9),
+      1	.BR lis_alloc_atomic_fcn (9),
+      1	.BR lis_alloc_dma_fcn (9),
+      1	.BR lis_alloc_kernel_fcn (9),
+      1	.BR lis_apush_get (9),
+      1	.BR lis_apushm (9),
+      1	.BR lis_apush_set (9),
+      1	.BR lis_assert_fail (9),
+      1	.BR lis_atomic_add (9),
+      1	.BR lis_atomic_dec (9),
+      1	.BR lis_atomic_dec_and_test (9),
+      1	.BR lis_atomic_inc (9),
+      1	.BR lis_atomic_read (9),
+      1	.BR lis_atomic_set (9),
+      1	.BR lis_atomic_sub (9),
+      1	.BR lis_backq_fcn (9),
+      1	.BR lis_bcanputnext_anyband (9),
+      1	.BR lis_bprintf (9),
+      1	.BR lis_can_unload (9),
+      1	.BR lis_check_guard (9),
+      1	.BR lis_check_mem (9),
+      1	.BR lis_check_q_magic (9),
+      1	.BR lis_check_region (9),
+      1	.BR lis_check_umem (9),
+      1	.BR lis_clone_major (9),
+      1	.BR lis_copyin (9),
+      1	.BR lis_copyout (9),
+      1	.BR lis_debug_mask (9),
+      1	.BR lis_debug_mask2 (9),
+      1	.BR lis_dec_mod_cnt_fcn (9),
+      1	.BR lis_del_timer (9),
+      1	.BR lis_disable_irq (9),
+      1	.BR lis_dobufcall (9),
+      1	.BR lis_doclose (9),
+      1	.BR lis_down_fcn (9),
+      1	.BR lis_dsecs (9),
+      1	.BR lis_enable_intr (9),
+      1	.BR lis_enable_irq (9),
+      1	.BR lis_fattach (9),
+      1	.BR lis_fdetach (9),
+      1	.BR lis_fdetach_all (9),
+      1	.BR lis_fdetach_stream (9),
+      1	.BR lis_fifo_close_sync (9),
+      1	.BR lis_fifo_open_sync (9),
+      1	.BR lis_fifo_write_sync (9),
+      1	.BR lis_file_inode (9),
+      1	.BR lis_file_str (9),
+      1	.BR lis_flush_print_buffer (9),
+      1	.BR lis_fmod_sw (9),
+      1	.BR lis_free (9),
+      1	.BR lis_freedb (9),
+      1	.BR lis_free_dma (9),
+      1	.BR lis_free_irq (9),
+      1	.BR lis_free_mem_fcn (9),
+      1	.BR lis_free_pages_fcn (9),
+      1	.BR lis_free_passfp (9),
+      1	.BR lis_fstr_sw (9),
+      1	.BR lis_get_fifo (9),
+      1	.BR lis_get_free_pages_atomic_fcn (9),
+      1	.BR lis_get_free_pages_fcn (9),
+      1	.BR lis_get_free_pages_kernel_fcn (9),
+      1	.BR lis_getint (9),
+      1	.BR lis_get_passfp (9),
+      1	.BR lis_get_pipe (9),
+      1	.BR lis_gettimeofday (9),
+      1	.BR lis_hitime (9),
+      1	.BR lis_inc_mod_cnt_fcn (9),
+      1	.BR lis_init_bufcall (9),
+      1	.BR lis_in_syscall (9),
+      1	.BR lis_interruptible_sleep_on (9),
+      1	.BR lis_ioc_fattach (9),
+      1	.BR lis_ioc_fdetach (9),
+      1	.BR lis_ioc_pipe (9),
+      1	.BR lis_ioremap (9),
+      1	.BR lis_ioremap_nocache (9),
+      1	.BR lis_iounmap (9),
+      1	.BR lis_jiffies (9),
+      1	.BR lis_kernel_down (9),
+      1	.BR lis_kernel_up (9),
+      1	.BR lis_kernel_version (9),
+      1	.BR lis_kfree (9),
+      1	.BR lis__kfree (9),
+      1	.BR lis_kill_pg (9),
+      1	.BR lis_kill_proc (9),
+      1	.BR lis_kmalloc (9),
+      1	.BR lis__kmalloc (9),
+      1	.BR lis_loadable_load (9),
+      1	.BR lis_maj_min_name (9),
+      1	.BR lis_major (9),
+      1	.BR lis_malloc (9),
+      1	.BR lis_mark_mem (9),
+      1	.BR lis_max_mem (9),
+      1	.BR lis_milli_to_ticks (9),
+      1	.BR lis_msecs (9),
+      1	.BR lis_msg_type_name (9),
+      1	.BR lis_num_cpus (9),
+      1	.BR lis_old_inode (9),
+      1	.BR lis_open_cnt (9),
+      1	.BR lis_osif_cli (9),
+      1	.BR lis_osif_do_gettimeofday (9),
+      1	.BR lis_osif_do_settimeofday (9),
+      1	.BR lis_osif_pci_alloc_consistent (9),
+      1	.BR lis_osif_pci_dac_dma_supported (9),
+      1	.BR lis_osif_pci_dac_dma_sync_single (9),
+      1	.BR lis_osif_pci_dac_dma_to_offset (9),
+      1	.BR lis_osif_pci_dac_dma_to_page (9),
+      1	.BR lis_osif_pci_dac_page_to_dma (9),
+      1	.BR lis_osif_pci_dac_set_dma_mask (9),
+      1	.BR lis_osif_pci_disable_device (9),
+      1	.BR lis_osif_pci_dma_supported (9),
+      1	.BR lis_osif_pci_dma_sync_sg (9),
+      1	.BR lis_osif_pci_dma_sync_single (9),
+      1	.BR lis_osif_pci_enable_device (9),
+      1	.BR lis_osif_pci_find_class (9),
+      1	.BR lis_osif_pci_find_device (9),
+      1	.BR lis_osif_pci_find_slot (9),
+      1	.BR lis_osif_pci_free_consistent (9),
+      1	.BR lis_osif_pci_map_page (9),
+      1	.BR lis_osif_pci_map_sg (9),
+      1	.BR lis_osif_pci_map_single (9),
+      1	.BR lis_osif_pci_module_init (9),
+      1	.BR lis_osif_pci_read_config_byte (9),
+      1	.BR lis_osif_pci_read_config_dword (9),
+      1	.BR lis_osif_pci_read_config_word (9),
+      1	.BR lis_osif_pci_set_dma_mask (9),
+      1	.BR lis_osif_pci_set_master (9),
+      1	.BR lis_osif_pci_unmap_page (9),
+      1	.BR lis_osif_pci_unmap_sg (9),
+      1	.BR lis_osif_pci_unmap_single (9),
+      1	.BR lis_osif_pci_unregister_driver (9),
+      1	.BR lis_osif_pci_write_config_byte (9),
+      1	.BR lis_osif_pci_write_config_dword (9),
+      1	.BR lis_osif_pci_write_config_word (9),
+      1	.BR lis_osif_sg_dma_address (9),
+      1	.BR lis_osif_sg_dma_len (9),
+      1	.BR lis_osif_sti (9),
+      1	.BR lis_own_spl (9),
+      1	.BR lis_pcibios_find_class (9),
+      1	.BR lis_pcibios_find_device (9),
+      1	.BR lis_pcibios_init (9),
+      1	.BR lis_pcibios_present (9),
+      1	.BR lis_pcibios_read_config_byte (9),
+      1	.BR lis_pcibios_read_config_dword (9),
+      1	.BR lis_pcibios_read_config_word (9),
+      1	.BR lis_pcibios_strerror (9),
+      1	.BR lis_pcibios_write_config_byte (9),
+      1	.BR lis_pcibios_write_config_dword (9),
+      1	.BR lis_pcibios_write_config_word (9),
+      1	.BR lis_pci_cleanup (9),
+      1	.BR lis_pci_disable_device (9),
+      1	.BR lis_pci_enable_device (9),
+      1	.BR lis_pci_find_class (9),
+      1	.BR lis_pci_find_device (9),
+      1	.BR lis_pci_find_slot (9),
+      1	.BR lis_pci_read_config_byte (9),
+      1	.BR lis_pci_read_config_dword (9),
+      1	.BR lis_pci_read_config_word (9),
+      1	.BR lis_pci_set_master (9),
+      1	.BR lis_pci_write_config_byte (9),
+      1	.BR lis_pci_write_config_dword (9),
+      1	.BR lis_pci_write_config_word (9),
+      1	.BR lis_phys_to_virt (9),
+      1	.BR lis_pipe (9),
+      1	.BR lis_poll_2_1 (9),
+      1	.BR lis_poll_bits (9),
+      1	.BR lis_poll_events (9),
+      1	.BR lis_poll_file (9),
+      1	.BR lis_print_block (9),
+      1	.BR lis_print_data (9),
+      1	.BR lis_printk (9),
+      1	.BR lis_print_mem (9),
+      1	.BR lis_print_msg (9),
+      1	.BR lis_print_queue (9),
+      1	.BR lis_print_queues (9),
+      1	.BR lis_print_spl_track (9),
+      1	.BR lis_print_stream (9),
+      1	.BR lis_putbyte (9),
+      1	.BR lis_qcountstrm (9),
+      1	.BR lis_qopen (9),
+      1	.BR lis_queue_name (9),
+      1	.BR lis_queuerun_cnts (9),
+      1	.BR lis_queues_running (9),
+      1	.BR lis_recvfd (9),
+      1	.BR lis_release_region (9),
+      1	.BR lis_request_dma (9),
+      1	.BR lis_request_irq (9),
+      1	.BR lis_request_region (9),
+      1	.BR lis_runq_cnts (9),
+      1	.BR lis_runq_req_cnt (9),
+      1	.BR lis_rw_lock_alloc_fcn (9),
+      1	.BR lis_rw_lock_free_fcn (9),
+      1	.BR lis_rw_lock_init_fcn (9),
+      1	.BR lis_rw_read_lock_fcn (9),
+      1	.BR lis_rw_read_lock_irq_fcn (9),
+      1	.BR lis_rw_read_lock_irqsave_fcn (9),
+      1	.BR lis_rw_read_unlock_fcn (9),
+      1	.BR lis_rw_read_unlock_irq_fcn (9),
+      1	.BR lis_rw_read_unlock_irqrestore_fcn (9),
+      1	.BR lis_rw_write_lock_fcn (9),
+      1	.BR lis_rw_write_lock_irq_fcn (9),
+      1	.BR lis_rw_write_lock_irqsave_fcn (9),
+      1	.BR lis_rw_write_unlock_fcn (9),
+      1	.BR lis_rw_write_unlock_irq_fcn (9),
+      1	.BR lis_rw_write_unlock_irqrestore_fcn (9),
+      1	.BR lis_safe_putmsg (9),
+      1	.BR lis_secs (9),
+      1	.BR lis_sem_alloc (9),
+      1	.BR lis_sem_destroy (9),
+      1	.BR lis_sem_init (9),
+      1	.BR lis_sendfd (9),
+      1	.BR lis_set_file_str (9),
+      1	.BR lis_setq (9),
+      1	.BR lis_setqsched (9),
+      1	.BR lis_setqsched_cnts (9),
+      1	.BR lis_setqsched_isr_cnts (9),
+      1	.BR lis_sleep_on (9),
+      1	.BR lis_spin_is_locked_fcn (9),
+      1	.BR lis_spin_lock_alloc_fcn (9),
+      1	.BR lis_spin_lock_fcn (9),
+      1	.BR lis_spin_lock_free_fcn (9),
+      1	.BR lis_spin_lock_init_fcn (9),
+      1	.BR lis_spin_lock_irq_fcn (9),
+      1	.BR lis_spin_lock_irqsave_fcn (9),
+      1	.BR lis_spin_trylock_fcn (9),
+      1	.BR lis_spin_unlock_fcn (9),
+      1	.BR lis_spin_unlock_irq_fcn (9),
+      1	.BR lis_spin_unlock_irqrestore_fcn (9),
+      1	.BR lis_spl0_fcn (9),
+      1	.BR lis_splstr_fcn (9),
+      1	.BR lis_splx_fcn (9),
+      1	.BR lis_sprintf (9),
+      1	.BR lis_stdata_cnt (9),
+      1	.BR lis_strclose (9),
+      1	.BR lis_strcount (9),
+      1	.BR lis_strgetpmsg (9),
+      1	.BR lis_strioctl (9),
+      1	.BR lis_strm_name (9),
+      1	.BR lis_strm_name_from_queue (9),
+      1	.BR lis_stropen (9),
+      1	.BR lis_stropts_file (9),
+      1	.BR lis_strputpmsg (9),
+      1	.BR lis_strread (9),
+      1	.BR lis_strstats (9),
+      1	.BR lis_strwrite (9),
+      1	.BR lis_thread_start (9),
+      1	.BR lis_thread_stop (9),
+      1	.BR lis_timeout_fcn (9),
+      1	.BR lis_udelay (9),
+      1	.BR lis_up_fcn (9),
+      1	.BR lis_usecs (9),
+      1	.BR lis_usectohz (9),
+      1	.BR lis_valid_mod_list (9),
+      1	.BR lis_vfree (9),
+      1	.BR lis_virt_to_phys (9),
+      1	.BR lis_vmalloc (9),
+      1	.BR lis_vremap (9),
+      1	.BR lis_vsprintf (9),
+      1	.BR lis_wake_up (9),
+      1	.BR lis_wake_up_interruptible (9),
+      1	.BR lis_zmalloc (9),
+
+.BR adjmsg (9),
+.BR allocb (9),
+.BR allocb_physreq (9),
+.BR allocq (9),
+.BR appq (9),
+.BR autopush_add (9),
+.BR autopush_del (9),
+.BR autopush_find (9),
+.BR autopush_vml (9),
+.BR backq (9),
+.BR bcanget (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bcopy (9),
+.BR bufcall (9),
+.BR bzero (9),
+.BR canenable (9),
+.BR canget (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR cdevsw (9),
+.BR cmn_err (9),
+.BR copyb (9),
+.BR copyin (9),
+.BR copymsg (9),
+.BR copyout (9),
+.BR cred_t (9),
+.BR datab (9),
+.BR datamsg (9),
+.BR ddi_get_cred (9),
+.BR ddi_getiminor (9),
+.BR ddi_get_lbolt (9),
+.BR ddi_get_pid (9),
+.BR ddi_get_time (9),
+.BR ddi_umem_alloc (9),
+.BR ddi_umem_free (9),
+.BR delay (9),
+.BR drv_getparm (9),
+.BR drv_hztomsec (9),
+.BR drv_hztousec (9),
+.BR drv_msectohz (9),
+.BR drv_priv (9),
+.BR drv_usectohz (9),
+.BR drv_usecwait (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR enableok (9),
+.BR esballoc (9),
+.BR esbbcall (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR fmodsw (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR freeq (9),
+.BR freezestr (9),
+.BR getemajor (9),
+.BR geteminor (9),
+.BR getmajor (9),
+.BR getminor (9),
+.BR getq (9),
+.BR insq (9),
+.BR isdatablk (9),
+.BR isdatamsg (9),
+.BR kmem_alloc (9),
+.BR kmem_free (9),
+.BR kmem_zalloc (9),
+.BR kmem_zalloc_node (9),
+.BR linkb (9),
+.BR linkmsg (9),
+.BR lis_adjmsg (9),
+.BR lis_allocb (9),
+.BR lis_allocb_physreq (9),
+.BR lis_allocq (9),
+.BR lis_appq (9),
+.BR lis_backq (9),
+.BR lis_bcanput (9),
+.BR lis_bcanputnext (9),
+.BR lis_bcopy (9),
+.BR lis_bufcall (9),
+.BR lis_bzero (9),
+.BR lis_canenable (9),
+.BR lis_canput (9),
+.BR lis_canputnext (9),
+.BR lis_cmn_err (9),
+.BR lis_copyb (9),
+.BR lis_copymsg (9),
+.BR lis_datamsg (9),
+.BR lis_date (9),
+.BR lis_dupb (9),
+.BR lis_dupmsg (9),
+.BR lis_enableok (9),
+.BR lis_esballoc (9),
+.BR lis_esbbcall (9),
+.BR lis_find_strdev (9),
+.BR lis_flushband (9),
+.BR lis_flushq (9),
+.BR lis_freeb (9),
+.BR lis_freemsg (9),
+.BR lis_freeq (9),
+.BR lis_getq (9),
+.BR lis_insq (9),
+.BR lis_isdatablk (9),
+.BR lis_isdatamsg (9),
+.BR lis_linkb (9),
+.BR lis_mknod (9),
+.BR lis_mount (9),
+.BR lis_msgdsize (9),
+.BR lis_msgpullup (9),
+.BR lis_msgsize (9),
+.BR lis_msgutil (9),
+.BR lis_noenable (9),
+.BR lis_OTHER (9),
+.BR lis_OTHERQ (9),
+.BR lis_pullupmsg (9),
+.BR lis_putbq (9),
+.BR lis_putctl1 (9),
+.BR lis_putctl (9),
+.BR lis_putnext (9),
+.BR lis_putnextctl1 (9),
+.BR lis_putnextctl (9),
+.BR lis_putq (9),
+.BR lis_qattach (9),
+.BR lis_qclose (9),
+.BR lis_qdetach (9),
+.BR lis_qenable (9),
+.BR lis_qprocsoff (9),
+.BR lis_qprocson (9),
+.BR lis_qreply (9),
+.BR lis_qsize (9),
+.BR lis_RD (9),
+.BR lis_register_strdev (9),
+.BR lis_register_strmod (9),
+.BR lis_rmvb (9),
+.BR lis_rmvq (9),
+.BR lis_safe_canenable (9),
+.BR lis_safe_enableok (9),
+.BR lis_safe_noenable (9),
+.BR lis_safe_OTHERQ (9),
+.BR lis_safe_putnext (9),
+.BR lis_safe_qreply (9),
+.BR lis_safe_RD (9),
+.BR lis_safe_SAMESTR (9),
+.BR lis_safe_WR (9),
+.BR lis_SAMESTR (9),
+.BR lis_stream_utils (9),
+.BR lis_strqget (9),
+.BR lis_strqset (9),
+.BR lis_testb (9),
+.BR lis_timeout (9),
+.BR lis_umount2 (9),
+.BR lis_umount (9),
+.BR lis_unbufcall (9),
+.BR lis_unlink (9),
+.BR lis_unlinkb (9),
+.BR lis_unregister_strdev (9),
+.BR lis_unregister_strmod (9),
+.BR lis_untimeout (9),
+.BR lis_version (9),
+.BR lis_WR (9),
+.BR lis_xmsgsize (9),
+.BR makedevice (9),
+.BR max (9),
+.BR mblk_t (9),
+.BR mi_bufcall (9),
+.BR mi_close_comm (9),
+.BR mi_next_ptr (9),
+.BR mi_open_comm (9),
+.BR mknod (9),
+.BR module_info (9),
+.BR mount (9),
+.BR msgb (9),
+.BR msgdsize (9),
+.BR msgpullup (9),
+.BR msgsize (9),
+.BR msgutil (9),
+.BR noenable (9),
+.BR OTHERQ (9),
+.BR pullupmsg (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR putctl (9),
+.BR putnext (9),
+.BR putnextctl1 (9),
+.BR putnextctl2 (9),
+.BR putnextctl (9),
+.BR putq (9),
+.BR qattach (9),
+.BR qband (9),
+.BR qbufcall (9),
+.BR qclose (9),
+.BR qcountstrm (9),
+.BR qdetach (9),
+.BR qenable (9),
+.BR qinit (9),
+.BR qopen (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR qtimeout (9),
+.BR queclass (9),
+.BR queinfo (9),
+.BR queue (9),
+.BR queue_t (9),
+.BR qunbufcall (9),
+.BR quntimeout (9),
+.BR qwait (9),
+.BR qwait_sig (9),
+.BR qwriter (9),
+.BR RD (9),
+.BR register_inode (9),
+.BR register_inode_major (9),
+.BR register_inode_minor (9),
+.BR register_strdev (9),
+.BR register_strdev_major (9),
+.BR register_strdev_minor (9),
+.BR register_strmod (9),
+.BR rmvb (9),
+.BR rmvq (9),
+.BR SAMESTR (9),
+.BR setq (9),
+.BR streamtab (9),
+.BR stream_utils (9),
+.BR strlog (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR testb (9),
+.BR timeout (9),
+.BR umount (9),
+.BR unbufcall (9),
+.BR unfreezestr (9),
+.BR unlink (9),
+.BR unlinkb (9),
+.BR unregister_inode (9),
+.BR unregister_inode_major (9),
+.BR unregister_inode_minor (9),
+.BR unregister_strdev (9),
+.BR unregister_strdev_major (9),
+.BR unregister_strdev_minor (9),
+.BR unregister_strmod (9),
+.BR untimeout (9),
+.BR unweldq (9),
+.BR wantio (9),
+.BR wantmsg (9),
+.BR weldq (9),
+.BR WR (9),
+.BR xmsgsize (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

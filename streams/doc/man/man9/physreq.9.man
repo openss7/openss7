@@ -1,0 +1,258 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: physreq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH PHSYREQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B physreq, physreq_t
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _UW7_SOURCE
+.br
+.B #define _LIS_SOURCE
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.PP
+.nf
+\fC\s-1
+typedef struct physreq {
+        paddr_t phys_align;
+        paddr_t phys_boundary;
+        uchar_t phys_dmasize;
+        uchar_t phys_max_scgth;
+        uchar_t phys_flags;
+} physreq_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+.TP
+.I phys_align
+When non-zero, specifies a (power of 2) alignment for the beginning of the
+block.
+.TP
+.I phys_boundary
+When non-zero, specifies a (power of 2) boundary which the memory is not
+permitted to span.
+.TP
+.I phys_dmasize
+The size of the allowable DMA address.
+.I phys_dmasize
+can be one of the following values:
+.sp
+.TS
+tab(:);
+nb2l.
+0:DMA not used.
+24:ISA device.
+32:PCI, EISA, MCA device.
+64:64bit device.
+.TE
+.TP
+.I phys_max_sgth
+Specifies the maximum number of scatter gather buffers.
+.TP
+.I phys_flags
+Additional request flags.
+.I phys_flags
+can be a bitwise OR of zero or more of the following flags:
+.sp
+.TS
+tab(:);
+lb2l.
+PREQ_PHYSCONTIG:request physically contiguous memory.
+.TE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR physreq _t
+structure describes the phsyical memory requirements for an allocation of for
+testing and adjusting the suitability of message blocks.
+.PP
+The following allocators use the
+.BR physreq _t
+structure:
+.PP
+.PD 0
+.HP
+.BR allocb_physreq "(9) \- allocate a STREAMS message block with physical requirements
+.HP
+.BR msgphysreq "(9) \- adjust a STREAMS message to conform to physical requirements
+.HP
+.BR msgpullup_physreq "(9) \- pull up a STREAMS message with physical requirements
+.HP
+.BR lis_allocb_physreq "(9) \- allocate a STREAMS message block with physical requirements
+.PD
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+Functions that operate on a physical request structure can be calle from any
+context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Read-only MP-safe structure without locks.  The caller must guarantee the
+integrity of the data structure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR Linux Fast-STREAMS
+.[
+LfS
+.]
+allocator functions that accept a
+.BR physreq _t
+structure largely ignore the members of the structure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR allocb_physreq (9),
+.BR msgphysreq (9),
+.BR msgpullup_physreq (9),
+.BR lis_allocb_physreq (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.BR physreq _t
+structure is compatible with
+.BR UnixWare \(rg
+and
+.BR LiS ,
+with the following considerations:
+.IP \(bu
+The
+.BR physreq _t
+structure is specific to
+.BR UnixWare \(rg
+and is only provided
+when
+.B _UW7_SOURCE
+is defined before DDI include files are included and the kernel was compiled
+with compatibility flag:
+.B CONFIG_STREAMS_COMPAT_UW7
+or
+.BR CONFIG_STREAMS_COMPAT_LIS .
+.IP \(bu
+.B LiS
+ignores this argument and provides a
+.B void 
+pointer in the
+.BR lis_allocb_physreq (9)
+function prototype.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR UnixWare \(rg
+documentation;
+.[
+uw7doc
+.]
+.B LiS
+source code.
+.[
+LiS
+.]
+
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B phsyreq
+structure first appeared in
+.BR UnixWare \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,332 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: apush_get.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH APUSH_GET 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B apush_get
+\- get the autopush list associated with a \fISTREAMS\fP driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _LIS_SOURCE
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/sad.h>
+.HP
+.BI "int apush_get(struct strapush *" sap );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I sap
+a pointer to a
+.B strapush
+structure describing the \fISTREAMS\fP driver from which to retrieve the
+autopush list.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR apush_get ()
+gets the autopush list associated with the \fISTREAMS\fP character device
+specified in
+.IR sap->sap_major " and " sap->sap_minor
+from the module list in the passed in
+.B strapush
+structure,
+.IR sap .
+.PP
+.I sap
+is a pointer to a
+.B strapush
+structure as follows:
+.nf
+\fC\s-2
+struct strapush {
+        unsigned long sap_cmd;
+        major_t sap_major;
+        minor_t sap_minor;
+        minor_t sap_lastminor;
+        size_t sap_npush;
+        char sap_list[MAXAPUSH][FMNAMESZ + 1];
+};
+\s+2\fP
+.fi
+.TP
+.I sap_cmd
+ignored on call and unchanged on return.
+.TP
+.I sap_major
+on call specifies the major device number of the \fISTREAMS\fP character
+special device for which to get the list of autopush modules; unchanged on
+return.
+.TP
+.I sap_minor
+on call specifies the minor device number of the \fISTREAMS\fP character
+special device for which to get the list of autopush modules.  On successful
+return, this value indicates the first minor device number in the range of
+minor device numbers for which the passed in
+.I sap_minor
+belongs.
+.TP
+.I sap_lastminor
+ignored on call and on return indicates the last minor device number in the
+range of minor device number for which the passed in
+.I sap_minor
+belongs.
+.TP
+.I sap_npush
+ignored on call and set on return to equal the number of autopush module names
+returned in
+.IR sap_list .
+.TP
+.I sap_list
+the list of the returned names of autopush modules.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR apush_get ()
+returns zero (0) and the completed
+.B strapush
+structure pointed to by
+.IR sap .
+Upon failure,
+.BR apush_get ()
+leaves the
+.B strapush
+pointed to by
+.I sap
+structure unchanged and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+Upon failure,
+.BR apush_get ()
+returns one of the following negative error numbers:
+.TP
+.RB [ EINVAL ]
+.I sap->sap_major " or " sap->sap_minor
+were invalid.
+.TP
+.RB [ ENODEV ]
+a \fISTREAMS\fP character special device did not exist for the specified
+.I sap->sap_major " and " sap->sap_minor
+combination and a kernel module associated with the device was not
+successfully loaded.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR apush_get ()
+is an
+.BR LiS -specific
+function.
+The macro definition
+.B _LIS_SOURCE
+must be defined before including
+.I STREAMS
+header files to expose the prototype for this function.
+Also,
+.B Linux Fast-STREAMS
+must have been compiled with
+kernel configuration parameter
+.BR CONFIG_STREAMS_LIS_COMPAT
+defined.
+.PP
+.BR apush_get ()
+should not be used by portable
+.I STREAMS
+modules and drivers.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR apush_get ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR apush_get ()
+is MP-safe.
+The caller must ensure exclusive access to the passed in
+.B strapush
+structure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR apush_get ()
+is functionally equivalent to the
+.BR SAD_GAP
+ioctl to the
+.BR sad (4)
+driver.
+The
+.BR apush_get ()
+function is a useful way for a driver or module to manipulate the autopush
+list associated with a \fISTREAMS\fP driver.
+.PP
+Calling
+.BR apush_get ()
+has the kernel module side-effect that if a \fISTREAMS\fP device associated
+with
+.I sap->sap_major
+does not currently exist in the system, an attempt will be made to load the
+character driver associated with
+.I sap->sap_major
+before the module list or an error will be returned.  No attempt, however, is
+made to load any kernel modules associated with the autopush modules in the
+list.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR apush_set (9),
+.BR sad (4),
+.BR autopush_add (9),
+.BR autopush_del (9),
+.BR autopush_find (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR apush_get ()
+is compatible with
+.BR LiS ,
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(bu
+Symbol
+.BR lis_apush_get ()
+is provided for compatibility with LiS.  See
+.BR lisbcm (8).
+.BR lis_apush_get ()
+simply calls
+.BR apush_get ()
+directly.
+.IP \(bu
+.B SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and
+systems based on
+.B SVR 4
+do not export this function.
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2
+.[
+svr42
+.]
+SAD (STREAMS Administrative Driver).  See
+.BR sad (4).
+.BR apush_get ()
+is provided only for compatibility with
+.BR LiS .
+For the
+.B Linux Fast-STREAMS
+specific function, see
+.BR autopush_find (9).
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR lis_apush_get ()
+is an LiS-specific function.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,397 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: register_strdev.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH REGISTER_STRDEV 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS"
+.\"
+.\"
+.SH NAME
+.B register_strdev
+\- register a \fISTREAMS\fR device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <linxu/stream.h>
+.br
+.B #include <sys/strconfig.h>
+.HP
+.BI "int register_strdev(dev_t " dev ", struct cdevsw *" cdev );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I dev
+a device number containing the major device number to register and a zero
+minor device number.
+.TP
+.I cdev
+a pointer to a
+.BR cdevsw (9)
+structure indicating the characteristics of the driver.
+The following members of the
+.BR cdevsw (9)
+structure, pointed to by
+.IR cdev ,
+are significant:
+.RS
+.TP
+.I d_name
+the name of the driver.  This name is used to register the character major
+device number.
+.TP
+.I d_str
+a pointer to the
+.BR streamtab (9)
+structure describing the
+.I STREAMS
+device.
+.TP
+.I d_flag
+flags indicating options associated with the device.  See
+.BR cdevsw (9)
+for more information.
+.TP
+.I d_kmod
+a pointer to the kernel module
+.RB "(typically " THIS_MODULE )
+to be incremented when the driver is opened
+or
+.I STREAMS
+subsystem resource allocations are made,
+and decremented when the driver is
+closed or
+.I STREAMS
+susbsystem resources are freed.
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_strdev ()
+registers the
+.I STREAMS
+device described by the
+.BR cdevsw (9)
+structure,
+.IR cdev ,
+against the major or major-minor device number specified by
+.IR dev .
+.PP
+When the
+.BR getminor (9)
+component of the device number,
+.IR dev ,
+is non-zero, this call has the same effect as a call to
+.BR register_strdev_major (9);
+when zero (0),
+the same effect as a call to
+.BR register_strdev_minor (9).
+.PP
+The
+.BR getmajor (9)
+component of
+.I dev
+can also be set to zero (0)
+to indicate that
+.I STREAMS
+executive should assign an available major device number.
+This is only valid if the
+.BR getminor (9)
+component of
+.I dev
+is also zero (0).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_strdev ()
+registers the
+.I STREAMS
+driver described by
+.I cdev
+and returns a positive number returning the specified or assigned major device
+number.  Upon failure,
+.BR register_strdev ()
+performs does not effect registration and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_strdev ()
+fails to register the specified
+.I STREAMS
+driver, it returns an appropriate negative
+error number as follows:
+.TP
+.RB [ EINVAL ]
+.I cdev
+is
+.BR NULL .
+.TP
+.RB [ EINVAL ]
+.I dev
+contains an invalid
+.BR getmajor (9)
+component
+.RB ( ">= MAX_CHRDEV" ).
+.TP
+.RB [ EBUSY ]
+the requested device number
+.I dev
+already has a
+.BR cdevsw (9)
+structure other than
+.I cdev
+registered against it.
+.TP
+.RB [ EBUSY ]
+the requested device number is in use by a
+.RI non- STREAMS
+character special device.
+.TP
+.RB [ EBUSY ]
+the
+.BR getmajor (9)
+component of
+.I dev
+was zero (0) requesting dynamic allocation of a major device number and no
+major device numbers are available for allocation.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_strdev ()
+can be called from any context.  Consideration for impact on performance and
+latency should be given before calling
+.BR register_strdev ()
+from soft or hard interrupt context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strdev ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_strdev ()
+when loading
+must call
+.BR unregister_strdev (9)
+before unloading.
+.BR unregister_strdev (9)
+must be called with the same value of
+.I cdev
+with which
+.BR register_strdev ()
+was called.
+.PP
+Drivers registered with
+.BR register_strdev ()
+will appear in
+.BR /proc/streams/devices .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of registration and deregistration from the
+.I STREAMS
+Administrative Driver (see
+.BR sad (4)):
+.PP
+.nf
+\fC\s-2
+static struct module_info sad_minfo = {
+    mi_idnum:0,
+    mi_idname:CONFIG_STREAMS_SAD_NAME,
+    mi_minpsz:0,
+    mi_maxpsz:INFPSZ,
+    mi_hiwat:STRHIGH,
+    mi_lowat:STRLOW,
+};
+
+static struct qinit sad_qinit = {
+    qi_putp:sad_put,
+    qi_open:sad_open,
+    qi_close:sad_close,
+    qi_minfo:&sad_minfo,
+};
+
+static struct streamtab sad_info = {
+    st_rdinit:&sad_qinit,
+    st_wrinit:&sad_qinit,
+};
+
+static struct cdevsw sad_cdev = {
+    d_name:CONFIG_STREAMS_SAD_NAME,
+    d_str:&sad_info,
+    d_flag:0,
+    d_kmod:THIS_MODULE,
+};
+
+static int __init sad_init(void)
+{
+    int err;
+    cmn_err(CE_NOTE, SAD_BANNER);
+    err = register_strdev(makedevice(major, 0), &sad_cdev);
+    if (err < 0)
+        return (err);
+    if (err > 0)
+        major = err;
+    bzero(&sads, sizeof(sads));
+    return (0);
+};
+static void __exit sad_exit(void)
+{
+    unregister_strdev(makedevice(major, 0), &sad_cdev);
+};
+
+module_init(sad_init);
+module_exit(sad_exit);
+\s+2\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR unregister_strdev (9),
+.BR register_strdev_major (9),
+.BR unregister_strdev_major (9),
+.BR register_strdev_minor (9),
+.BR unregister_strdev_minor (9),
+.BR register_inode (9),
+.BR unregister_inode (9),
+.BR register_inode_major (9),
+.BR unregister_inode_major (9),
+.BR register_inode_minor (9),
+.BR unregister_inode_minor (9),
+.BR lis_register_strdev (9),
+.BR lis_unregister_strdev (9),
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_strdev ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_strdev ()
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+implementation specific function.
+For source and binary compatibility with
+.BR LiS ,
+.[
+LiS
+.]
+see
+.BR lis_register_strdev (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and deregistration of \fISTREAMS\fR drivers is implementation
+specific and not subject to standardization.
+.BR register_strdev ()
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strdev ()
+first appeared in
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

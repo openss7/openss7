@@ -1,0 +1,349 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: put.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH PUT 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B put
+\- invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void put(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue to which to put the message.
+.TP
+.I mp
+the message to put to the queue.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR put ()
+calls the
+.I q->q_info->qi_putp
+procedure associated with the passed in queue, with the arguments
+.IR q " and " mp .
+.PP
+As a side-effect,
+.BR put ()
+will wake up any processes waiting with
+.BR qwait (9)
+or
+.BR qwait_sig (9)
+on the specified queue.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR put ()
+returns void.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR put ()
+fails silently when a queue band structure cannot be allocated for the band
+specified in
+.IR mp->b_band .
+The caller can ensure that a queue band structure exists for the band in
+question by calling
+.BR strqset (9)
+for the band.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR put ()
+can be called from any context; however, careful consideration should be given
+on Linux before calling
+.BR put ()
+from an interrupt service routine to ensure that control not be transferred to
+another unaware
+.I STREAMS
+module within the context of the interrupt service routine.
+See
+.BR putnext (9).
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR put ()
+is MP-safe.  The driver or module put procedures invoked must also be MP-safe.
+Under
+.B Linux Fast-STREAMS
+any
+.BR put ()
+procedure could be executed concurrently with any queue
+.BR qopen (9),
+.BR qclose (9),
+.BR put (),
+.BR srv (9)
+procedure,
+.BR esbbcall (9),
+.BR bufcall (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9)
+callback function,
+or interrupt service routine.
+The
+.BR put ()
+procedure itself must perform its own mutual exclusion.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.RB qopen (9),
+.BR qclose (9),
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR freezestr (9),
+.BR unfreezestr (9),
+.BR srv (9),
+.BR esbbcall (9),
+.BR bufcall (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR put ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR put ()
+is source-level compatible with SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+and
+LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(bu
+.BR put ()
+called with invalid arguments will have undefined results.
+LiS fails silently when
+.IR mp " or " q
+is
+.BR NULL ,
+or
+.I q
+does not reference a valid queue structure,
+or
+.I q->q_info
+is
+.BR NULL ,
+or
+.I q->q_info->qi_putp
+is
+.BR NULL .
+When LiS
+fails silently, it frees
+.I mp
+using
+.BR freemsg (9).
+.IP \(bu
+.BR put ()
+cannot be invoked while
+.BR qprocsoff (9)
+is in effect for
+.IR q
+because no other queue has a references to the queue for which
+.BR qprocsoff (9)
+has been executed, or for which
+.BR qprocson (9)
+has not yet been executed.
+LiS discards messages passed to
+.BR lis_safe_putmsg ()
+when 
+.BR qprocsoff (9)
+has been executed for
+.IR q .
+It is invalid to call
+.BR put ()
+for a queue that has not had
+.BR qprocson (9)
+called, or which has called
+.BR qprocsoff (9),
+so this difference should not present a problem.
+.IP \(bu
+.BR put (),
+.BR putnext (9),
+.BR qreply (9)
+will invoke a queue's put procedure shared and multi-threaded.
+.IP ""
+This is equivalent to
+.IR Solaris \(rg
+drivers with the
+.B D_MP
+flag set or with the
+.B D_MTPUTSHARED
+flag set.
+.IP ""
+LiS holds an exclusive nesting queue procedures lock while calling
+.BR put ().
+Unfortunately, these locks disable interrupts, meaning that interrupts are
+disabled while
+.BR put ()
+executes.
+LiS
+.BR lis_safe_putnext (9)
+and
+.BR lis_safe_qreply (9)
+also call this function, meaning that all message passing functions in LiS
+lock out interrupts until the entire thread of execution completes.  LiS
+drivers and modules calling
+.BR put ()
+should notice superior interrupt service routine latency and performance.  It
+is normally the case that put procedures are MP-safe as then normally use only
+MP-safe queue and message utility functions.  Also, most put procedures are
+inherently invoked single threaded (from a single-threaded serviec procedure).
+Lack of locking should not present a problem.
+.IP ""
+Because LiS also uses this lock for service procedures, this means that while
+the LiS scheduler is running (at kernel thread priority 50), interrupts,
+timeouts, bottom halves, hi tasklets and soft interrupts are indefinitely
+postponed.  This is not acceptable for soft-real-time performance.  Rewrite
+LiS put procedures to be MP-safe.
+.IP \(bu
+.BR UnixWare \(rg,
+.[
+uw7spg
+.]
+.BR Solaris \(rg
+.[
+solspg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR put ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.PP
+Symbol
+.BR lis_safe_putmsg ()
+is provided for binary compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_safe_putmsg ()
+simply calls
+.BR put ().
+.PP
+Binary compatibility with SVR 4.2 DDI/DKI and
+.IR Solaris \(rg
+is not guaranteed.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR put ()
+first appeared in SVR 4 DDI/DKI.
+.[
+svr4dk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

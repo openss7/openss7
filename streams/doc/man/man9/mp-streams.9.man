@@ -1,0 +1,530 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MP-STREAMS 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mp-streams
+\- multi-processor \fISTREAMS\fR executive
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+when run on symmetrical multi-processor systems, and when compiled with kernel
+configuration symbol
+.B CONFIG_SMP
+defined on symmetrical multi-processor (MP) or uniprocessor (UP), will execute
+in
+.B MP-STREAMS
+mode.
+.PP
+This manpage provides additional information with regards to synchronization
+and serialization of events within the
+.I STREAMS
+executive, for compatibility with
+.BR "SVR 4.2 MP" ,
+.[
+svr42
+.]
+and systems based on
+.BR "SVR 4 MP" .
+.[
+svr4
+.]
+.B Linux Fast-STREAMS
+also provide a sycnrhonization framework based on perimeters for compatibility
+with the
+.BR Solaris \(rg
+implementation of
+.IR STREAMS .
+.[
+solspg
+.]
+.SS "Configuration"
+.PP
+Syncrhonization is specified by the module writer during configuration of a
+.I STREAMS
+module.
+This is accomplished using flags and sychronization level definitions to the
+module installation or registration function.  For compatibility with other
+registration mechanisms based on
+.B SVR 4 MP
+.IR STREAMS ,
+.B Linux Fast-STREAMS
+provides the following flags and sychronization levels:
+.\"
+.\"
+.PP
+.B Synchronization Flags
+.TP
+.B D_MP
+Specifies that the module is MP-safe and observes a syncrhonization model
+specified by the following flags.  Modules that do not specify
+.B D_MP
+are not MP-safe and will be run with synchronization at the module level
+(single threaded).
+.TP
+.B D_MTPERQ
+Specifies that the module has an inner perimeter and that syncrhonization at
+the inner perimeter is per queue.  This is the same as the sychronization
+level
+.BR SQLVL_QUEUE ,
+below.
+Only one
+.I STREAMS
+executive thread per queue will be permitted.  Other threads will wait until
+a thread currently within the perimeter exits.
+.TP
+.B D_MTQPAIR
+Specifies that the module has an inner perimeter and that synchronization at
+the inner perimeter is per queue pair.  This is the same as the
+synchronization level
+.BR SQLVL_QUEUEPAIR ,
+below.
+Only one
+.I STREAMS
+executive thread per queue pair will be perimitted.  Other threads will wait
+until a thread currently within the perimeter exits.
+.TP
+.B D_MTPERMOD
+Specifies that the module has an inner perimeter and that syncrhonization at
+the inner perimeter is per module.  This is the same as the synchronization
+level
+.BR SQLVL_MODULE ,
+below.
+Only one
+.I STREAMS
+executive thread per module will be permitted.  Other threads will wait until
+a thread currently within the perimeter exits.
+.TP
+.B D_MTPUTSHARED
+Specifies that the
+.BR put (9)
+procedure will be permitted to enter the inner perimeter shared.  This means
+that module
+.BR put (9)
+procedures must run fully re-entrant and multi-threaded.  Also, that
+calling sequence of
+.BR put (9)
+procesures is not guaranteed by the
+.I STREAMS
+executive.
+.TP
+.B D_MTOUTPERIM
+Specifies that an outer perimeter exists enclosing the module.  Threads at the
+outer perimeter will be allowed to enter the module shared.
+.TP
+.B D_MTOCEXCL
+Specifies that the
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures will be run exclusive at the outer perimeter.  That is,
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures will run single-threaded.
+This flag is useful where the
+.BR qopen (9)
+or
+.BR qclose (9)
+procedures of a module use data structures that are global to the module.
+This is a
+.BR Solaris \(rg
+specific concept.
+.[
+solspg
+.]
+Other multi-processor
+.I STREAMS
+executives provide some utility functions that ensure that common data
+structures are protected.  For example:
+.BR mi_comm_open (9),
+.BR mi_comm_close (9),
+.BR streams_open (9),
+.BR streams_close (9),
+or even
+.BR Solaris \(rg's
+own
+.BR ddi_get_soft_state (9)
+mechanism.
+.\"
+.\"
+.PP
+.B Configuration Flags
+.TP
+.B STR_MPSAFE
+Same as the
+.B D_MP
+flag, above.
+.TP
+.B STR_QSAFETY
+Specifies that interrupt-safe callbacks are required.
+.TP
+.B STR_PERSTREAM
+Specifies that the module agrees to per-stream synchronization for non MP-safe
+modules.
+.TP
+.B STR_Q_NOTTOSPEC
+Specifies that the module is not to specification and runs under a process
+context.  The module might sleep in its procedures.
+.\"
+.\"
+.PP
+.B Synchronization Levels
+.TP
+.B SQLVL_DEFAULT
+Specifies that the module uses the default syncrhonization scheme.  This is
+the same a specifying
+.BR SQLVL_MODULE .
+.TP
+.B SQLVL_GLOBAL
+Specifies that the module is run with global syncrhonization.  This means that
+only one
+.I STREAMS
+executive thread will be permitted to enter any module.  This makes the entire
+.I STREAMS
+executive single threaded and is useful primarily for debugging.  This is the
+same as
+.I "\*(lqUniprocessor Emulation\*(rq"
+on some systems, and reduces the
+.I STREAMS
+executive to running on a single processor at a time.
+.TP
+.B SQLVL_ELSEWHERE
+Specifies that the module is run with synchronization within a group of
+modules.  Only one thread of execution will be within the group of modules at
+a time.  The group is separately specified as a character string name.  This
+permits a group of modules to run single threaded as though they are running
+on a single processor, without interfering with the concurrency of other
+module outside the group.  This can be important for testing and for modules
+that implicitly share unprotected data structures.
+.TP
+.B SQLVL_MODULE
+Specifies that the module is run with synchronization at the module.  Only one
+thread of execution will be permitted within the module.  Where the module
+does not share data structures between modules, this has a similar effect to
+running on a UP system.
+This is the default and works best for non-MP-safe modules written in
+accordances with
+.I STREAMS
+guidelines.
+This level is equivalent to the
+.B D_MTPERMOD
+flag, above.
+.TP
+.B SQLVL_QUEUEPAIR
+Specifies that the module is run with syncrhonization at the queue pair.
+Only one thread will be permitted to enter a given queue's procedures within a
+given queue pair.  Where the read and write side of the queue pair shared the
+same private structure (q->q_ptr), this provides MP protection of the common
+data structure to all synchronous entry points.
+This level is equivalent to the
+.B D_MTQPAIR
+flag, above.
+.TP
+.B SQLVL_QUEUE
+Specifies that the module is run with synchronization at the queue.  Only one
+thread will be permitted to enter a given queue's procedures, however, another
+thread will be permitted to enter the procedures of the other queue in the
+queue pair.
+This is useful when the read and write side of a module are largely
+independent and do not require synchronization between sides of the queue
+pair.
+This level is equivalent to the
+.B D_MTPERQ
+flag, above.
+.TP
+.B SQLVL_NOP
+Specifies that the module is run without synchronization.  All synchronous
+module entry points, callouts and callbacks become asynchronous.  It is the
+module's responsibility to provide synchronization or serialization as
+required.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.SS "Asynchronous Callbacks"
+.PP
+The following D3DK utilities use asynchronous callback functions:
+.PP
+.TS
+tab(:);
+lbw(14n)0c0lssss.
+timeout\fR(9):\ \(en\ :T{
+the caller-supplied timeout callback function.
+T}
+dtimeout\fR(9):\ \(en\ :T{
+the caller-supplied timeout callback function.
+T}
+itimeout\fR(9):\ \(en\ :T{
+the caller-supplied timeout callback function.
+T}
+bufcall\fR(9):\ \(en\ :T{
+the caller-supplied buffer callback function.
+T}
+esbbcall\fR(9):\ \(en\ :T{
+the caller-supplied buffer callback function.
+T}
+esballoc\fR(9):\ \(en\ :T{
+the caller-supplied free function.
+T}
+.TE
+.PP
+Asynchronous callback functions are not normally synchronized.
+.PP
+.B Linux Fast-STREAMS
+provides the following assurances with regard to asynchronous callbacks:
+.IP \(bu
+The callback function will be invoked on the processor that initiated the
+callback.  This ensures that the callback function will not execute until
+after the function that invoked the callback returns or encounters a
+pre-emption point.
+.IP \(bu
+If the
+.B STR_QSAFETY
+flag is set during configuration, asynchronous callback function invoked from
+within the
+.I STREAMS
+executive (within a
+.I STREAMS
+queue procedure, callout or callback function),
+will be synchronized with the queue for which the callback is associated.  In
+addition, local interrupts will be supressed on the servicing processor.
+.IP \(bu
+Asynchronous callbacks invoked from outside the
+.I STREAMS
+executive (at user context outside the
+.BR qopen (9)
+and
+.BR qclose (9)
+procesures, at soft interrupt other than STREAMS_SOFTIRQ and from within
+interrupt service routines)
+will never be synchronized with the
+.I STREAMS
+framework.
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.PP
+.SS "Asynchronous Callback Cancellation"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0lssss.
+untimeout\fR(9):\ \(en\ :T{
+cancels a timeout callback function.
+T}
+unbufcall\fR(9):\ \(en\ :T{
+cancels a buffer callback function.
+T}
+freemsg\fR(9):\ \(en\ :T{
+calls a free routine callback function.
+T}
+.TE
+.PP
+Normally, the caller-supplied timeout callback function can execute at any time; however,
+.BR timeout (9),
+.BR itimeout (9),
+.BR dtimeout (9)
+uses CPU binding to ensure that the timeout callback will be executed on the
+same processor that raised the timeout.  The callback function will not
+execute until after
+.BR timeout (9)
+.BR itimeout (9),
+.BR dtimeout (9),
+returns and the calling thread encounters a preemption point.  Private locks
+do not need to be held across the call to
+.PP
+The callback functions passed to
+.BR timeout (9),
+.BR dtimeout (9),
+.BR itimeout (9),
+.BR bufcall (9),
+.BR esbbcall (9),
+and
+.BR esballoc (9)
+are asynchronous callbacks.
+The callback function can execute at any time, asychronous with other
+.I STREAMS
+procedures.
+When the callback function is executed, no sychronization is performed on any
+module, stream, queue pair or queue before calling the function.
+.\"
+.\"
+.SS "Synchronous Entry Points"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+qopen\fR(9):\ \(en\ :
+qclose\fR(9):\ \(en\ :
+put\fR(9):\ \(en\ :
+srv\fR(9):\ \(en\ :
+.TE
+.\"
+.\"
+.SS "Synchronous Callbacks"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+qtimeout\fR(9):\ \-\ :the timeout function
+qbufcall\fR(9):\ \-\ :the buffer callback function
+qwriter\fR(9):\ \-\ :the exclusive callback function
+weldq\fR(9):\ \-\ :the weld complete callback function
+unweldq\fR(9):\ \-\ :the unweld complete callback function
+streams_put\fR(9):\ \-\ :the put function
+.TE
+.\"
+.\"
+.SS "Asynchronous Callback Cancellation"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+untimeout\fR(9):\ \-\ :the \fBtoid_t\fP
+unbufcall\fR(9):\ \-\ :the \fBbcid_t\fP
+freeb\fR(9):\ \-\ :the message block
+.TE
+.\"
+.\"
+.SS "Syncrhonous Callback Cancellation"
+.PP
+.TS
+tab(:);
+lbw(14n)0c0ls.
+quntimeout\fR(9):\ \-\ :the \fBtimeout_id_t\fR
+qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
+.TE
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.TI

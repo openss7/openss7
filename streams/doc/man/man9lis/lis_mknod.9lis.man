@@ -1,0 +1,210 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: lis_mknod.9lis.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MKNOD 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.SH NAME
+.B mknod
+\- create a special or ordinary file
+.SH SYNOPSIS
+.PP
+.B #include <linux/stream.h>
+.br
+.B #include <linux/dki.h>
+.HP 8
+.BI "int lis_mknod(const char *" pathname ", mode_t " mode ", dev_t " dev );
+.SH DESCRIPTION
+.BR mknod ()
+is an
+.B LiS
+.[
+LiS
+.]
+wrapper function to the system call
+.BR mknod (2)
+that can be called from the kernel.
+.PP
+The purpose of this kernel function call is to permit
+.IR STREAMS (4)
+kernel modules to create their own character special devices.  This allows the
+.IR STREAMS (4)
+device driver to allocate a character device major number at kernel module
+initialization, see
+.BR lis_register_strdev (9),
+and create the necessary character special file entires in
+.B /dev
+after the major number has been allocated.  This avoids fixed allocation of
+character device major numbers within the
+.B Linux
+kernel.
+.PP
+.BR mknod ()
+takes the same arguments as
+.BR mknod (2).
+.PP
+.I pathname
+is a string which describes the path to the file.
+.PP
+.I mode
+is the bitwise OR combination of the file type and permissions.  The file type
+is one of the following:
+.TP 10
+.B S_IFREG
+Normal file to be created empty.
+.TP 10
+.B S_IFCHR
+Character special file.
+.TP 10
+.B S_IFBLK
+Block special file.
+.TP 10
+.B S_IFIFO
+FIFO named pipe.
+.TP 10
+.B S_IFSOCK
+Socket.
+.PP
+The permissions is the normal combination of the file permissions and the
+caller's
+permissions:
+.BR "" ( "mode & ~umask" ).
+.PP
+.I dev
+is used only if the file type in
+.I mode
+is either
+.BR S_IFCHR " or " S_IFBLK ;
+where it specifies the combination of device major and device minor numbers.
+For other file types
+.I dev
+is ignored.
+.PP
+For additional information, see
+.BR mknod (2).
+.SH RETURN
+.PP
+Upon success, the requested file is created and
+.BR mknod ()
+returns zero (0).
+Upon failure, no file is created and
+.BR mknod ()
+returns a negative error number.
+.SH ERRORS
+.PP
+When
+.BR mknod ()
+fails, it returns a negative error number that can contain any of the errors
+listed under
+.BR mknod (2).
+.SH NOTICES
+.BR mknod ()
+is implemented by changing the data segment to the kernel data segment and
+calling
+.BR mount (2).
+This means that the
+.BR uid " and " euid
+of the caller is not changed.
+This makes this function rather useless if the process invoking it is not the
+kernel module loading daemon, or other process running with real root
+permission.
+.SH "SEE ALSO"
+.PP
+.BR mknod (2),
+.BR lis_mount (9),
+.BR lis_umount2 (9),
+.BR lis_unlink (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR mknod ()
+appeared in SVR 2.
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.TI

@@ -1,0 +1,212 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: unregister_strdev_minor.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNREGISTER_STRDEV_MINOR 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.SH NAME
+.B unregister_strdev_minor
+\- unregister a \fISTREAMS\fR device from a minor device node
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int unregister_strdev_minor(dev_t " dev ", struct cdevsw *" cdev );
+.SH DESCRIPTION
+.PP
+.BR unregister_strdev_minor ()
+deallocates a device node
+.IR dev ,
+within the
+.IR STREAMS (4)
+character special device filesystem
+and deregisters the
+.IR STREAMS (4)
+device
+.IR cdev ,
+from that device node.
+Once a
+.IR STREAMS (4)
+minor device is deregistered, opening a character device special node in any
+filesystem will no longer result in a call to the
+.BR qopen (9)
+routine for the device.
+.\"
+.\"
+.BR unregister_strdev_minor ()
+does not affect open streams for the character device special node and only
+serves to unlink the special node in the special device filesystem.  The
+special device node will be removed once all streams are closed for the
+device.
+.\"
+.\"
+.SS ARGUMENTS
+.PP
+.TP
+.I dev
+the character device number (major and minor) for which to unregister the
+STREAMS device.
+.TP
+.I cdev
+the character device switch table entry that describes the STREAMS device.
+This must be the same
+.B struct cdevsw
+pointer that was passed to
+.BR unregister_strdev_minor (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR unregister_strdev_minor ()
+does not deallocate a device major number from the
+.B Linux
+kernel.  Either the driver must also deallocate the major device number
+associated with the node using
+.BR unregister_strdev_major (9)
+or the minor device will remain accessible outside the STREAMS environment.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success, the character device minor STREAMS device is unregistered and
+.BR unregister_strdev_minor ()
+return zero (0).
+Upon failure,
+.BR unregister_strdev_minor ()
+returns non-zero.
+.\"
+.\"
+.SH "ERRORS"
+Upon failure,
+.BR unregister_strdev_minor ()
+returns one of the negative error numbers listed below:
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.I cdev
+does not point to a valid character device switch table entry.
+.\"
+.\"
+.TP
+.RB [ ENOMEM ]
+insufficient memory was avaialable to complete the request.
+.\"
+.\"
+.TP
+.RB [ EBUSY ]
+a device is already registered against the character minor device, or the
+character minor device is open under the specified major device number.
+.\"
+.\"
+.TP
+.RB [ ENODEV ]
+the kernel loadable module associated with the STREAMS driver was unloaded by
+the system.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR unregister_strdev_minor (9),
+.BR unregister_strdev (9),
+.BR unregister_snode (9),
+.BR qopen (9),
+.BR nsdev (4),
+.BR STREAMS (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR unregister_strdev_minor ()
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+specific function.  Because all STREAMS modules and drviers require some form of
+registration, the use of this function cannot be avoided and remains a
+non-portable element of STREAMS device drivers.
+.SH "HISTORY"
+.PP
+A STREAMS device registration function appeared in
+.B LiS\c
+.
+.[
+LiS
+.]
+.XX
+.[
+magic
+.]
+.TI
+

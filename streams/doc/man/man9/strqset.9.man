@@ -1,0 +1,358 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: strqset.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRQSET 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strqset
+\- sets attributes of a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int strqset(queue_t *" q ", qfields_t " what ", unsigned char " band ", long " val );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue for which to set values.
+.TP
+.I what
+what values of the associated queue to set.
+.TP
+.I band
+the band for the specified settings.
+.TP
+.I val
+the value to set.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strqset ()
+sets the attribute requested by
+.I what
+for the queue pointed to by
+.I q
+and band specified by
+.I band
+to the value specified by
+.IR val .
+The value set can be either a scalar or a pointer.
+.PP
+When
+.I band
+is zero,
+.BR strqset ()
+will set the attribute specified by
+.I what
+for the queue.
+When
+.I band
+is non-zero (between 1 and 255),
+.BR strqset ()
+will set the attribute specified by
+.I what
+for the queue band specified by
+.IR band .
+.PP
+The argument
+.I what
+specifies the queue (or queue band if
+.I band
+is non-zero) attribute to be set.
+.I what
+can be one of the following values.
+.TP
+.B QHIWAT
+Sets the high water mark associated with the
+.I q
+or queue
+.IR band .
+.TP
+.B QLOWAT
+Sets the low water mark associated with the
+.I q
+or queue
+.IR band .
+.TP
+.B QMAXPSZ
+Sets the maximum packet size associated with the
+.IR q .
+For this operation
+.I band
+must be zero (0).
+.TP
+.B QMINPSZ
+Sets the minimum packet size associated with the
+.IR q .
+For this operation
+.I band
+must be zero (0).
+.PP
+.BR strqset ()
+provides a mechanims whereby a
+.IR STREAMS (4)
+module or driver can change information
+about a queue or queue band without directly accessing the
+.B queue
+or
+.B qband
+structures.
+Values set by
+.BR strqset ()
+are equivalent to directly accessing the
+.B queue
+or
+.B qband
+structure members described below.
+.PP
+The
+.B queue
+structure contains at least the following members:
+.HP
+.BI "ulong " q_hiwat
+\- the high water mark for the queue.
+.HP
+.BI "ulong " q_lowat
+\- the low water mark for the queue.
+.HP
+.BI "long " q_maxpsz
+\- the maximum message size accepted by the queue.
+.HP
+.BI "long " q_minpsz
+\- the minimum message size accepted by the queue.
+.PP
+The
+.B qband
+structure contains at least the following members:
+.HP
+.BI "ulong " qb_hiwat
+\- the high water mark for the band.
+.HP
+.BI "ulong " qb_lowat
+\- the low water mark for the band.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR strqset ()
+returns zero (0) and sets the appropriate attribute to the appropriate value.
+.PP
+Upon failure,
+.BR strqset ()
+returns a non-zero error number.
+The requested attribute is remains unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR strqset ()
+fails,
+it returns one of the following errors:
+.TP
+.RB [ EINVAL ]
+The queue pointer
+.I q
+is
+.BR NULL;
+.I q
+does not point to a valid queue structure;
+the queue band specified in
+.I band
+does not exist;
+.BR QMAXPSZ " or " QMINPSZ
+was specified for
+.I what
+and
+.I band
+was non-zero;
+.I what
+is not a valid queue or queue band attribute.
+.TP
+.RB [ EPERM ]
+.I what
+specified an attribute that is appropriate for
+.BR strqget (9),
+but which is invalid for
+.BR strqset ():
+.BR QCOUNT ", " QFIRST ", " QLAST " or " QFLAG .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR strqset ()
+can be called from any context including user context, queue procedures,
+callouts, callbacks and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strqset ()
+is MP-safe.
+.PP
+Calling
+.BR strqset ()
+on a queue and stream previously frozen with
+.BR freezestr (9)
+could result in single-party deadlock.
+.\"
+.\"
+.SH NOTICES
+.PP
+None.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR strqget (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strqset (9)
+has not known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strqset (9)
+is source-level compatible with
+.BR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(bu
+.BR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.BR SUPER-UX \(rg
+.[
+suxspg
+.]
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR strqset ().
+.IP \(bu
+Symbol
+.BR lis_strqset ()
+is provided for compatibility with LiS.  See
+.BR lisbcm (9).
+.BR lis_strqset ()
+simply calls
+.BR strqset ().
+.IP \(bu
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strqset ()
+first appeared in SVR 4 MP.
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
