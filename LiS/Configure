@@ -967,14 +967,14 @@ Please enter y or n "
     PROMPT="Enter location of your kernel module directory\n"
     PROMPT="$PROMPT              "
     if [ "$MOD_INST_DIR..." = "..." ]; then
-	DEFAULT=/lib/modules/$PKVER/misc
+	DEFAULT=/lib/modules/$KVER/misc
 	if [ ! -d $DEFAULT ]; then
 	    DEFAULT=/lib/modules/$KVER/misc
 	    if [ ! -d $DEFAULT ]; then
 		DEFAULT=/lib/modules/preferred/misc
 		if [ ! -d $DEFAULT ]; then
 		    if [ `id -u` -eq 0 ]; then
-			DEFAULT=/lib/modules/$PKVER/misc
+			DEFAULT=/lib/modules/$KVER/misc
 			if ! mkdir $DEFAULT 2>/dev/null; then
 			    DEFAULT=/lib/modules/preferred/misc
 			    if ! mkdir $DEFAULT 2>/dev/null; then
@@ -1187,18 +1187,43 @@ fi
 #
 # The default is plain old gcc with -O2.
 #
-if [ "$TARGET" = "l"  -a -x /usr/bin/kgcc ]; then
-    CC_NAME=kgcc
-    CC_OPTIMIZE=-O3
-elif [ -x /usr/bin/gcc3 ]; then
-    CC_NAME=gcc3
-    CC_OPTIMIZE=-O3
-elif [ -x /usr/bin/egcs ]; then
-    CC_NAME=egcs
-    CC_OPTIMIZE=-O3
+get_cc_from_makefile()
+{
+    make --no-print-directory -C $KSRC script 'SCRIPT=@echo $(CC)' | \
+        sed -e 's/ .*//'
+}
+
+CC_OPTIMIZE=-O3
+if   [ "$TARGET" = "l"  ]; then
+#    if [ -f $KSRC/Makefile ]; then
+#	echo
+#	echo "Choosing C compiler from kernel source Makefile."
+#	echo
+#	CC_NAME=`get_cc_from_makefile`
+#    else
+#	echo
+#	echo "File $KSRC/Makefile is not present.  The choice of which"
+#	echo "C compiler to use will be based upon the presence of"
+#	echo "kgcc, gcc3 or egcs rather than on the compiler used"
+#	echo "to build the kernel from source."
+#	echo
+	if [ -x /usr/bin/kgcc ]; then
+	    CC_NAME=kgcc
+	elif [ -x /usr/bin/gcc3 ]; then
+	    CC_NAME=gcc3
+	elif [ -x /usr/bin/egcs ]; then
+	    CC_NAME=egcs
+	else
+	    CC_NAME=gcc
+	    CC_OPTIMIZE=-O2
+	fi
+#    fi
 else
-    CC_NAME=gcc
-    CC_OPTIMIZE=-O2
+    echo
+    echo "Non-Linux install.  Using cc as default C compiler."
+    echo
+    CC_NAME=cc
+    CC_OPTIMIZE=-O
 fi
 
 GCC_VERS=`$CC_NAME -v 2>&1 |tail -1`
@@ -1212,6 +1237,8 @@ if [ "$CC_VERS..." = "3.0.2..." ]; then
     echo
     do_confirm
 fi
+
+echo "Using \"$CC_NAME $CC_OPTIMIZE\" $GCC_VERS as the C compiler"
 
 #
 # Figure out which routine name to use for "get_empty_inode".
@@ -1253,7 +1280,6 @@ if [ "$TARGET" = "l" ]; then
     cfg_out KSRC $KSRC
     cfg_out NOKSRC $NOKSRC
     cfg_out USE_RUNNING_KERNEL $USE_RUNNING_KERNEL
-    cfg_out PKVER $PKVER
     cfg_out NKVER $NKVER
     cfg_out KVER $KVER
     cfg_out KVER_MAJOR $KVER_MAJOR
