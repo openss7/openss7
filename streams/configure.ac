@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.31 2005/01/22 06:39:38 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.32 2005/01/23 08:13:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 06:39:38 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 08:13:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.31 2005/01/22 06:39:38 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.32 2005/01/23 08:13:47 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
@@ -69,9 +69,7 @@ if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; 
 if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
 
 AC_CONFIG_SRCDIR([src/modules/sth.c])
-AC_CONFIG_HEADER([config.h])
-
-ac_config_headers="$ac_config_headers include/sys/streams/config.h"
+AC_CONFIG_HEADER([config.h include/sys/streams/config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2004/11/06 10:18:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2005/01/23 08:12:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/06 10:18:30 $ by $Author: brian $
+# Last Modified $Date: 2005/01/23 08:12:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -112,12 +112,12 @@ libnetperf_la_DEPENDENCIES	= $(libnetperf_la_SOURCES)
 $(libnetperf_la_OBJECTS):	./config.h
 
 netperf_SOURCES			= netperf.c
-netperf_LDFLAGS			= libnetperf.la $(NETPERF_LDADD)
+netperf_LDADD			= libnetperf.la $(NETPERF_LDADD)
 netperf_DEPENDENCIES		= libnetperf.la ./config.h
 
 
 netserver_SOURCES		= netserver.c
-netserver_LDFLAGS		= libnetperf.la $(NETPERF_LDADD)
+netserver_LDADD			= libnetperf.la $(NETPERF_LDADD)
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
 dist_noinst_SCRIPTS		= configure.nexusware

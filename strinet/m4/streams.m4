@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.28 2005/01/23 00:24:47 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.30 2005/01/23 08:26:00 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/23 00:24:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 08:26:00 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -232,7 +232,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                 if test -d $streams_dir -a -r $streams_dir/$streams_what 
                 then
                     streams_cv_lis_includes="$streams_dir $streams_bld"
-                    STREAMS_LIS_LDADD="../LiS/libLiS.la"
+                    streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
@@ -258,7 +258,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                 if test -d "$streams_dir" -a -r "$streams_dir/$streams_what"
                 then
                     streams_cv_lis_includes="$streams_dir"
-                    STREAMS_LIS_LDADD="-lLiS"
+                    streams_cv_lis_ldadd="-lLiS"
                     break
                 fi
             done
@@ -342,7 +342,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                 if test -d $streams_dir -a -r $streams_dir/$streams_what 
                 then
                     streams_cv_lfs_includes="$streams_dir $streams_bld"
-                    STREAMS_LFS_LDADD="../streams/libstreams.la"
+                    streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
@@ -368,7 +368,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                 if test -d "$streams_dir" -a -r "$streams_dir/$streams_what"
                 then
                     streams_cv_lfs_includes="$streams_dir"
-                    STREAMS_LFS_LDADD="-lstreams"
+                    streams_cv_lfs_ldadd="-lstreams"
                     break
                 fi
             done
@@ -515,7 +515,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
 	*)			: ;;
     esac
     STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    STREAMS_LDADD="$STREAMS_LIS_LDADD"
+    STREAMS_LDADD="$streams_cv_lis_ldadd"
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =========================================================================
 
@@ -530,7 +530,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
             the OpenSS7 autoconf releases.])
     fi
     STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    STREAMS_LDADD="$STREAMS_LFS_LDADD"
+    STREAMS_LDADD="$streams_cv_lfs_ldadd"
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [], [Linux Fast-STREAMS has this type.])
     AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [], [Linux Fast-STREAMS has this type.])
 ])# _LINUX_STREAMS_LFS_DEFINES

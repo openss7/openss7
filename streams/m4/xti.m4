@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.11 2005/01/23 00:24:47 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.13 2005/01/23 08:26:00 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/23 00:24:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 08:26:00 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -100,26 +100,31 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
     # files (or both) to compile.
     AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [dnl
-        if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
+        if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes 
+        then
             xti_cv_includes="$with_xti"
         fi
         xti_what="xti.h"
-        if test ":${xti_cv_includes:-no}" = :no ; then
+        if test ":${xti_cv_includes:-no}" = :no 
+        then
             # The next place to look now is for a peer package being built under
             # the same top directory, and then the higher level directory.
             xti_here=`pwd`
             xti_where="strxnet/src/include"
-            for xti_d in . .. ; do
+            for xti_d in . .. 
+            do
                 xti_dir=`echo "$srcdir/$xti_d/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 xti_bld=`echo "$xti_here/$xti_d/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
+                if test -d $xti_dir -a -r $xti_dir/$xti_what 
+                then
                     xti_cv_includes="$xti_dir $xti_bld"
-                    XTI_LDADD="../strxnet/libxnet.la"
+                    xti_cv_ldadd=`echo "$xti_here/$xti_d/strxnet/libxnet.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
         fi
-        if test ":${xti_cv_includes:-no}" = :no ; then
+        if test ":${xti_cv_includes:-no}" = :no 
+        then
             case "$streams_cv_package" in
                 LiS)
                     # Some of our oldest RPM releases of LiS put the xti header files into their own
@@ -170,16 +175,19 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
                     ;;
             esac
             xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-            for xti_dir in $xti_search_path ; do
-                if test -d "$xti_dir" -a -r "$xti_dir/$xti_what" ; then
+            for xti_dir in $xti_search_path 
+            do
+                if test -d "$xti_dir" -a -r "$xti_dir/$xti_what" 
+                then
                     xti_cv_includes="$xti_dir"
-                    XTI_LDADD="-lxnet"
+                    xti_cv_ldadd="-lxnet"
                     break
                 fi
             done
         fi
     ])
-    if test :"${xti_cv_includes:-no}" = :no ; then
+    if test :"${xti_cv_includes:-no}" = :no 
+    then
         AC_MSG_WARN([
 *** 
 *** Could not find XTI include directories.  This package requires the
@@ -187,7 +195,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 *** XTI include directories with option --with-xti to configure and try again.
 *** ])
     else
-        if test -z "$with_xti" ; then
+        if test -z "$with_xti" 
+        then
             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with xti"
         fi
     fi
@@ -198,13 +207,15 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 # _XTI_DEFINES
 # -------------------------------------------------------------------------
 AC_DEFUN([_XTI_DEFINES], [dnl
-    for xti_include in $xti_cv_includes ; do
+    for xti_include in $xti_cv_includes 
+    do
         XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-I${xti_include}"
     done
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
         Define for SuSv3.  This is necessary for LiS and LfS and strxnet for
         that matter.
     ])
+    XTI_LDADD="$xti_cv_ldadd"
 ])# _XTI_DEFINES
 # =========================================================================
 
