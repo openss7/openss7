@@ -57,7 +57,8 @@
 #endif				/* __KERNEL__ */
 
 #include <linux/fs.h>		/* for file_operations */
-#include <linux/sad.h>		/* for strapush */
+
+#include <sys/sad.h>		/* for strapush */
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__

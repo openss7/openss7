@@ -60,7 +60,7 @@
 #define __UW7_EXTERN_INLINE extern __inline__
 #endif				/* __UW7_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _UW7_SOURCE
 #warning "_UW7_SOURCE not defined but uw7ddi.h,v included"
@@ -71,7 +71,7 @@
 #ifndef _SVR4_SOURCE
 #define _SVR4_SOURCE
 #endif
-#include <linux/svr4ddi.h>
+#include <sys/svr4ddi.h>
 
 /* don't use these functions, they are way too dangerous */
 struct stdata;

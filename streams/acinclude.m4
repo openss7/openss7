@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.3 2004/03/01 06:26:59 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/03/01 11:32:21 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/01 06:26:59 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/01 11:32:21 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -63,15 +63,14 @@ m4_include([m4/rpm.m4])
 # =========================================================================
 # AC_LFS
 # -------------------------------------------------------------------------
-AC_DEFUN(AC_LFS,
-[
+AC_DEFUN([AC_LFS], [
     _LFS_OPTIONS
     _LFS_SETUP_COMPAT
     _LFS_SETUP_PUBLIC
     _LFS_SETUP_DEBUG
-    LFS_INCLUDES="-I- -imacros ./config.h -I./include -I${srcdir}/include"
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
+    LFS_INCLUDES="-D_LFS_SOURCE=1 -I- -imacros ./config.h -I./include -I${srcdir}/include"
+    USER_CPPFLAGS="$CPPFLAGS"
+    USER_CFLAGS="$CFLAGS"
     AC_SUBST([USER_CPPFLAGS])
     AC_SUBST([USER_CFLAGS])
     AC_SUBST([LFS_INCLUDES])
@@ -99,8 +98,7 @@ dnl
 # =========================================================================
 # _LFS_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_OPTIONS,
-[
+AC_DEFUN([_LFS_OPTIONS], [
     AC_ARG_ENABLE([public],
                   AC_HELP_STRING([--enable-public],
                                  [enable public release. @<:@default=yes@:>@]),
@@ -172,8 +170,7 @@ AC_DEFUN(_LFS_OPTIONS,
 # =========================================================================
 # _LFS_SETUP_PUBLIC
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_SETUP_PUBLIC,
-[
+AC_DEFUN([_LFS_SETUP_PUBLIC], [
     AC_CACHE_CHECK([for public release], [lfs_cv_public], [dnl
         if test :"$enable_public" = :no ; then
             lfs_cv_public=no
@@ -188,8 +185,7 @@ AC_DEFUN(_LFS_SETUP_PUBLIC,
 # =========================================================================
 # _LFS_SETUP_DEBUG
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_SETUP_DEBUG,
-[
+AC_DEFUN([_LFS_SETUP_DEBUG], [
     AC_CACHE_CHECK([for debugging], [lfs_cv_debug], [dnl
         if test :"$enable_k_debug" = :yes ; then
             lfs_cv_debug=_DEBUG
@@ -232,8 +228,7 @@ AC_DEFUN(_LFS_SETUP_DEBUG,
 # =========================================================================
 # _LFS_SETUP_COMPAT
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_SETUP_COMPAT,
-[
+AC_DEFUN([_LFS_SETUP_COMPAT], [
     AC_CACHE_CHECK([for UNIX(R) SVR 4.2 compatibility], [lfs_cv_svr4], [dnl
         if test :"$enable_compat_svr4" != :no ; then lfs_cv_svr4=yes ; else lfs_cv_svr4=no ; fi
         if test :"$enable_compat_sol8" != :no ; then lfs_cv_svr4=yes ; fi
@@ -330,8 +325,7 @@ AC_DEFUN(_LFS_SETUP_COMPAT,
 # =========================================================================
 # _LFS_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_SETUP,
-[
+AC_DEFUN([_LFS_SETUP], [
     AC_LINUX_KERNEL
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
@@ -358,8 +352,7 @@ AC_DEFUN(_LFS_SETUP,
 # =========================================================================
 # _LFS_GET_STRCONF
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_GET_STRCONF,
-[
+AC_DEFUN([_LFS_GET_STRCONF], [
     AC_REQUIRE([_LFS_SETUP])
     lfs_configs=
     for lfs_config in `find $srcdir -type f -name "Config"`
@@ -410,18 +403,17 @@ AC_DEFUN([_LFS_OUTPUT_CONFIG], [
               AC_MSG_NOTICE([creating $LFS_SC_CONFMOD from $lfs_configs])
               eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --confmodules=$LFS_SC_CONFMOD $lfs_configs"
           fi
-dnl       if test :"${LFS_SC_MAKEDEV:+set}" = :set; then
-dnl           AC_MSG_NOTICE([creating $LFS_SC_MAKEDEV from $lfs_configs])
-dnl           eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strmknods=$LFS_SC_MAKEDEV $lfs_configs"
-dnl       fi
+          if test :"${LFS_SC_MAKEDEV:+set}" = :set; then
+              AC_MSG_NOTICE([creating $LFS_SC_MAKEDEV from $lfs_configs])
+              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strmknods=$LFS_SC_MAKEDEV $lfs_configs"
+          fi
 ])# _LFS_OUTPUT_CONFIG
 # =============================================================================
 
 # =========================================================================
 # _LFS_CHECK_KERNEL
 # -------------------------------------------------------------------------
-AC_DEFUN(_LFS_CHECK_KERNEL,
-[
+AC_DEFUN([_LFS_CHECK_KERNEL], [
     # ---------------
     # symbols to check:
     # -----------------

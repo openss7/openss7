@@ -60,7 +60,7 @@
 #define __OSF_EXTERN_INLINE extern __inline__
 #endif				/* __OSF_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _OSF_SOURCE
 #warning "_OSF_SOURCE not defined but osfddi.h,v included"

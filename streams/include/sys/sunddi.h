@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9.2.1 2004/02/29 19:10:45 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.2 2004/03/01 06:26:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/29 19:10:45 $ by $Author: brian $
+ Last Modified $Date: 2004/03/01 06:26:59 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -60,7 +60,7 @@
 #define __SUN_EXTERN_INLINE extern __inline__
 #endif				/* __SUN_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _SUN_SOURCE
 #warning "_SUN_SOURCE not defined but $RCSfile: sunddi.h,v $ included"

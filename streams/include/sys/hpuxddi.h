@@ -60,7 +60,7 @@
 #define __HPUX_EXTERN_INLINE extern __inline__
 #endif				/* __HPUX_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _HPUX_SOURCE
 #warning "_HPUX_SOURCE not defined but hpuxddi.h,v included"

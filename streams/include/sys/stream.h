@@ -68,9 +68,9 @@ typedef unsigned char uchar;		/* idiots! */
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
 
-#include <linux/dki.h>		/* for cred_t */
+#include <sys/dki.h>		/* for cred_t */
 /* caller should have already included this, but make sure */
-#include <linux/stropts.h>	/* for some defines */
+#include <sys/stropts.h>	/* for some defines */
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/01 06:26:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/01 11:32:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,19 +46,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/01 06:26:59 $ by $Author: brian $
+# Last Modified $Date: 2004/03/01 11:32:21 $ by $Author: brian $
 #
 # =============================================================================
 
 #bin_PROGRAMS			= 
-#sbin_PROGRAMS			= 
 
-#LFS_EXTRA_TESTS			= 
-#LFS_EXTRA_TOOLS			= 
+sbin_PROGRAMS			= strmakenodes
 
-LDADD				= 
+LFS_EXTRA_TESTS			= 
+LFS_EXTRA_TOOLS			= strmakenodes
 
-lib_LTLIBRARIES			= 
+LDADD				= libstreams.la
+
+lib_LTLIBRARIES			= libstreams.la libxnet.la
 
 noinst_LIBRARIES		= \
 				libLfSkernel.a \
@@ -146,19 +147,12 @@ libLfSmodules_a_CFLAGS		= @KERNEL_CFLAGS@
 
 libLfScompat_a_SOURCES		= \
 				src/compat/aix/aixcompat.c \
-				src/compat/aix/aixksyms.c \
 				src/compat/hpux/hpuxcompat.c \
-				src/compat/hpux/hpuxksyms.c \
 				src/compat/lis/liscompat.c \
-				src/compat/lis/lisksyms.c \
 				src/compat/osf/osfcompat.c \
-				src/compat/osf/osfksyms.c \
 				src/compat/sun/suncompat.c \
-				src/compat/sun/sunksyms.c \
 				src/compat/svr4/svr4compat.c \
-				src/compat/svr4/svr4ksyms.c \
 				src/compat/uw7/uw7compat.c \
-				src/compat/uw7/uw7ksyms.c \
 				$(top_builddir)/$(LFS_SC_CONFIG)
 
 libLfScompat_a_DEPENDENCIES	= $(LFS_SC_CONFIG) $(LFS_SC_MODCONF)
@@ -178,14 +172,40 @@ KERNEL_MODCONF			= $(LFS_SC_CONFMOD)
 KERNEL_SUBDIR			= streams
 KMODCONF_EXT			= streams
 
-MANMACRO_PFX			= openss7
+MANMACRO_PFX			= streams
 mansrcdir			= $(srcdir)/doc/man
 
 include kernel.am
 
-#EXTRA_PROGRAMS			= 
+libstreams_la_SOURCES		= \
+				lib/libc/fattach.c \
+				lib/libc/fdetach.c \
+				lib/libc/getmsg.c \
+				lib/libc/getpmsg.c \
+				lib/libc/isastream.c \
+				lib/libc/pipe.c \
+				lib/libc/putmsg.c \
+				lib/libc/putpmsg.c
+libstreams_la_LDFLAGS		= -no-undefined -version-info 0:0:0
+libstreams_la_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+libstreams_la_CFLAGS		= @USER_CFLAGS@
+
+libxnet_la_SOURCES		= lib/libxnet/xnet.c gettext.h
+libxnet_la_LDFLAGS		= -version-info 0:0:0
+libxnet_la_CPPFLAGS		= -I$(top_srcdir)/lib/libxnet -I$(top_builddir)/lib/libxnet @LFS_INCLUDES@ @USER_CPPFLAGS@ -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnet_la_CFLAGS		= @USER_CFLAGS@
+libxnet_la_LIBADD		= libstreams.la
+
+EXTRA_PROGRAMS			= strmakenodes
+
 #bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
+
+strmakenodes_SOURCES		= src/util/strmakenodes.c $(top_builddir)/include/sys/config.h
+strmakenodes_DEPENDENCIES	= $(top_builddir)/include/sys/config.h
+strmakenodes_LDADD		=
+strmakenodes_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+strmakenodes_CFLAGS		= @USER_CFLAGS@
 
 INET_MKDEV			= @auxdir@/inet_mkdev
 INET_RMDEV			= @auxdir@/inet_rmdev
@@ -1010,11 +1030,11 @@ uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
 	$(STRMAKENODES) --remove
 	DESTDIR=$(DESTDIR) $(INET_RMDEV)
 
-EXTRA_DIST = streams.spec.in streams.spec doc/man/openss7.refs doc/man/openss7.macros \
+EXTRA_DIST = streams.spec.in streams.spec doc/man/streams.refs doc/man/streams.macros \
 	$(STRCONF_SCRIPT) $(lfs_configs) openss7-logo-small.gif openss7-logo-small.xpm \
 	$(INET_MKDEV) $(INET_RMDEV) m4/kernel.m4 m4/rpm.m4 $(EXTRA_MAN_SOURCES)
 
-#SUBDIRS = intl m4 po manual
+SUBDIRS = intl m4 po
 
 #
 # Rules for making rpms

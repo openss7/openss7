@@ -58,9 +58,10 @@
 
 #include <linux/compiler.h>	/* for likely */
 #include <linux/slab.h>		/* for kmem_cache_t */
-#include <linux/stream.h>
-#include <linux/stropts.h>
-#include <linux/sad.h>
+
+#include <sys/stream.h>
+#include <sys/stropts.h>
+#include <sys/sad.h>
 
 #if 0
 struct linesw {

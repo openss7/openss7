@@ -60,7 +60,7 @@
 #define __AIX_EXTERN_INLINE extern __inline__
 #endif				/* __AIX_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _AIX_SOURCE
 #warning "_AIX_SOURCE not defined but aixddi.h,v included"

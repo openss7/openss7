@@ -60,7 +60,7 @@
 #define __SVR4_EXTERN_INLINE extern __inline__
 #endif				/* __SVR4_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _SVR4_SOURCE
 #warning "_SVR4_SOURCE not defined but svr4ddi.h,v included"
@@ -68,7 +68,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 
-#include <linux/kmem.h>		/* for kmem_alloc/free */
+#include <sys/kmem.h>		/* for kmem_alloc/free */
 
 typedef spinlock_t lock_t;
 

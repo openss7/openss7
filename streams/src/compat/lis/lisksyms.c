@@ -68,12 +68,12 @@ static char const ident[] = "lisksyms.c,v (0.9.2.6) 2003/10/21 21:50:19";
 #include <linux/poll.h>
 
 #define _LIS_SOURCE
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
-#include <linux/sad.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+#include <sys/sad.h>
 
 #include "strdebug.h"
 
