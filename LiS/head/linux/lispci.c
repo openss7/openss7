@@ -25,10 +25,11 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lispci.c 1.11 4/28/03"
+#ident "@(#) LiS lispci.c 1.12 6/4/03"
 
 #include <sys/stream.h>		/* gets all the right LiS stuff included */
 #include <sys/lispci.h>		/* LiS PCI header file */
+#include <sys/lismem.h>		/* mainly needed for 2.2 kernels */
 
 # ifdef RH_71_KLUDGE			/* boogered up incls in 2.4.2 */
 #  undef CONFIG_HIGHMEM			/* b_page has semi-circular reference */
@@ -424,10 +425,10 @@ void    *lis_pci_alloc_consistent(lis_pci_dev_t  *dev,
     dma_handle->dev  = dev ;
     vaddr = lis_get_free_pages_atomic(size) ;
     dma_handle->vaddr = vaddr ;
-    p[0] = NULL ;
-    p[1] = NULL ;
+    p[0] = 0 ;
+    p[1] = 0 ;
     if (vaddr != NULL)
-	*p = virt_to_bus(vaddr) ;
+	*p = virt_to_phys(vaddr) ;
 
     return(vaddr) ;
 #endif
@@ -449,8 +450,8 @@ void    *lis_pci_free_consistent(lis_dma_addr_t *dma_handle)
     if (dma_handle->vaddr != NULL)
 	lis_free_pages(dma_handle->vaddr) ;
 
-    p[0] = NULL ;
-    p[1] = NULL ;
+    p[0] = 0 ;
+    p[1] = 0 ;
     dma_handle->vaddr = NULL ;
     return(NULL) ;
 #endif
@@ -491,10 +492,10 @@ void    lis_pci_map_single(lis_pci_dev_t *dev,
     dma_handle->dev       = dev ;
     dma_handle->vaddr     = ptr ;
     dma_handle->direction = direction ;
-    p[0] = NULL ;
-    p[1] = NULL ;
+    p[0] = 0 ;
+    p[1] = 0 ;
     if (ptr != NULL)
-	*p = virt_to_bus(ptr) ;
+	*p = virt_to_phys(ptr) ;
 #endif
 }
 
@@ -512,9 +513,10 @@ void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
 #else						/* 2.2 kernel */
     u32		*p = (u32 *) dma_handle->opaque ;
 
-    p[0] = NULL ;
-    p[1] = NULL ;
+    p[0] = 0 ;
+    p[1] = 0 ;
     dma_handle->vaddr = NULL ;
+    return(NULL) ;
 #endif
 }
 
