@@ -1,0 +1,472 @@
+/*
+ *  sad: STREAMS Administrative Driver
+ *
+ *  Version: 0.1
+ *
+ *  Copyright (C) 1999 Ole Husgaard (sparre@login.dknet.dk)
+ *
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+ * MA 02139, USA.
+ *
+ * 
+ */
+
+#ifdef MODVERSIONS
+# ifdef LISMODVERS
+#  include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
+# else
+#  include <linux/modversions.h>
+# endif
+#endif
+#ifdef MODULE
+#include <linux/module.h>
+#include <linux/version.h>
+#endif
+
+#include <sys/stream.h>
+#include <sys/LiS/mod.h>
+
+#include <sys/sad.h>
+
+#include <sys/LiS/config.h>
+#include <sys/osif.h>
+
+/*
+ *  Some configuration sanity checks
+ */
+#ifndef SAD_
+#error Not configured
+#endif
+
+#if !defined(SAD__CMAJORS) || SAD__CMAJORS != 1
+#error There should be exactly one major number
+#endif
+
+#if !defined(SAD__CMAJOR_0)
+#error The major number should be defined
+#endif
+
+#if !defined(SAD_N_MINOR)
+#define SAD_N_MINOR 4
+#endif
+
+
+#ifndef STATIC
+#define STATIC static
+#endif
+#ifndef INLINE
+#define INLINE inline
+#endif
+
+
+STATIC int sad_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sad_close(queue_t *, int, cred_t *);
+STATIC int sad_wput(queue_t *, mblk_t *);
+
+
+STATIC struct module_info sad_minfo = 
+{
+	0,		/* Module ID number		*/
+	"sad",		/* Module name			*/
+	0,		/* Min packet size accepted	*/
+	INFPSZ,		/* Max packet size accepted	*/
+	0,		/* Hi water mark ignored	*/
+	0		/* Low water mark ignored	*/
+};
+
+STATIC struct qinit sad_rinit = 
+{
+	NULL,		/* No read put		*/
+	NULL,		/* No read service	*/
+	sad_open,	/* Each open		*/
+	sad_close,	/* Last close		*/
+	NULL,		/* Reserved		*/
+	&sad_minfo,	/* Information		*/
+	NULL		/* No statistics	*/
+};
+
+STATIC struct qinit sad_winit = 
+{
+	sad_wput,	/* Write put		*/
+	NULL,		/* No write service	*/
+	NULL,		/* Ignored		*/
+	NULL,		/* Ignored		*/
+	NULL,		/* Reserved		*/
+	&sad_minfo,	/* Information		*/
+	NULL		/* No statistics	*/
+};
+
+#ifdef MODULE
+STATIC
+#endif
+struct streamtab sad_info = 
+{
+	&sad_rinit,	/* Read queue		*/
+	&sad_winit,	/* Write queue		*/
+	NULL,		/* Unused		*/
+	NULL		/* Unused		*/
+};
+
+
+/*
+ *  Private per-stream data
+ */
+struct priv
+{
+	queue_t *rq;
+	caddr_t uaddr;
+	int ioc_state;
+	str_list_t vml;
+};
+
+/*
+ *  Values of priv->ioc_state
+ */
+#define ST_NONE		0
+#define ST_SAP_IN	1
+#define ST_GAP_IN	2
+#define ST_GAP_OUT	3
+#define ST_VML_IN1	4
+#define ST_VML_IN2	5
+
+
+/*
+ *  Per stream storage
+ */
+STATIC struct priv sad_sad[SAD_N_MINOR];
+
+
+/****************************************************************************/
+/*                                                                          */
+/*  copyin/copyout handling.                                                */
+/*                                                                          */
+/****************************************************************************/
+
+STATIC void sad_copyio(struct priv *p, mblk_t *mp, int type,
+		       caddr_t uaddr, size_t size)
+{
+	struct copyreq *req;
+
+	mp->b_datap->db_type = type;
+	mp->b_wptr = mp->b_rptr + sizeof(*req);
+	ASSERT(mp->b_wptr <= mp->b_datap->db_lim);
+
+	req = (struct copyreq *)mp->b_rptr;
+	req->cq_addr = uaddr;
+	req->cq_size = size;
+	req->cq_flag = 0;
+
+	putnext(p->rq, mp);
+}
+
+STATIC void sad_iocdata(struct priv *p, mblk_t *mp)
+{
+	struct copyresp *res = (struct copyresp *)mp->b_rptr;
+	mblk_t *bp = mp->b_cont;
+	str_list_t *sl;
+	struct iocblk *iocp;
+	int err = 0, ret = 0;
+
+	if (res->cp_rval != 0) {
+		err = -(int)res->cp_rval;
+		ret = -1;
+		goto ioctl_done;
+	}
+
+	ASSERT(bp != NULL);
+	ASSERT(bp->b_datap->db_type == M_DATA);
+
+	switch (p->ioc_state) {
+	   case ST_SAP_IN:
+		p->ioc_state = ST_NONE;
+		ASSERT(res->cp_cmd == SAD_SAP);
+		if (res->cp_rval != 0) {
+			err = -EFAULT;
+			ret = -1;
+		} else if (bp->b_wptr - bp->b_rptr == sizeof(struct strapush))
+			err = lis_apush_set((struct strapush *)bp->b_rptr);
+		else {
+			err = -EINVAL;
+			ret = -1;
+		}
+
+ioctl_done:	iocp = (struct iocblk *)mp->b_rptr;
+		mp->b_datap->db_type = (err < 0) ? M_IOCNAK : M_IOCACK;
+		iocp->ioc_count = 0;
+		iocp->ioc_error = -err;
+		iocp->ioc_rval = ret;
+		putnext(p->rq, mp);
+		return;
+
+	   case ST_GAP_IN:
+		p->ioc_state = ST_GAP_OUT;
+		ASSERT(res->cp_cmd == SAD_GAP);
+		if (res->cp_rval != 0) {
+			err = -EFAULT;
+			ret = -1;
+		} else if (bp->b_wptr - bp->b_rptr == sizeof(struct strapush))
+			err = lis_apush_get((struct strapush *)bp->b_rptr);
+		else {
+			err = -EINVAL;
+			ret = -1;
+		}
+		if (err < 0) {
+			p->ioc_state = ST_NONE;
+			goto ioctl_done;
+		}
+		sad_copyio(p, mp, M_COPYOUT, p->uaddr, sizeof(struct strapush));
+		return;
+
+	   case ST_GAP_OUT:
+		p->ioc_state = ST_NONE;
+		ASSERT(res->cp_cmd == SAD_GAP);
+		if (res->cp_rval != 0) {
+			err = -EFAULT;
+			ret = -1;
+		}
+		goto ioctl_done;
+
+	   case ST_VML_IN1:
+		ASSERT(res->cp_cmd == SAD_VML);
+		sl = (str_list_t *)bp->b_rptr;
+		if (bp->b_wptr - bp->b_rptr != sizeof(str_list_t) ||
+		    (p->vml.sl_nmods = sl->sl_nmods) <= 0) {
+			p->ioc_state = ST_NONE;
+			err = -EINVAL;
+			ret = -1;
+			goto ioctl_done;
+		}
+		p->ioc_state = ST_VML_IN2;
+		sad_copyio(p, mp, M_COPYIN, (caddr_t)sl->sl_modlist,
+			   sl->sl_nmods * sizeof(str_mlist_t));
+		return;
+	   case ST_VML_IN2:
+		p->ioc_state = ST_NONE;
+		ASSERT(res->cp_cmd == SAD_VML);
+		if (res->cp_rval != 0) {
+			err = -EFAULT;
+			ret = -1;
+		} else if (bp->b_wptr - bp->b_rptr
+				!= p->vml.sl_nmods * sizeof(str_mlist_t)) {
+			err = -EINVAL;
+			ret = -1;
+		}
+		p->vml.sl_modlist = (struct str_mlist *)bp->b_rptr;
+		ret = lis_valid_mod_list(p->vml);
+		err = 0;
+		goto ioctl_done;
+
+	   default:
+		err = -EINVAL;
+		ret = -1;
+		goto ioctl_done;
+	}
+}
+
+
+/****************************************************************************/
+/*                                                                          */
+/*  ioctl handling.                                                         */
+/*                                                                          */
+/****************************************************************************/
+
+STATIC INLINE void sad_do_ioctl(struct priv *p, mblk_t *mp)
+{
+	struct iocblk *iocp;
+	mblk_t *dp;
+	int err;
+
+	ASSERT(p != NULL);
+
+	ASSERT(mp != NULL);
+	ASSERT(mp->b_datap->db_type == M_IOCTL);
+	ASSERT(mp->b_wptr - mp->b_rptr >= sizeof(struct iocblk));
+
+	dp = mp->b_cont;
+	ASSERT(dp != NULL);
+	ASSERT(dp->b_datap->db_type == M_DATA);
+	ASSERT(mp->b_wptr - mp->b_rptr >= sizeof(void *));
+
+	iocp = (struct iocblk *)mp->b_rptr;
+	if (iocp->ioc_count != TRANSPARENT) {
+		err = -EINVAL;
+nak_it:		mp->b_datap->db_type = M_IOCNAK;
+		iocp->ioc_error = -err;
+		putnext(p->rq, mp);
+		return;
+	}
+
+	if (p->ioc_state != ST_NONE) {
+		err = -EINVAL;
+		goto nak_it;
+	}
+
+	p->uaddr = *(caddr_t *)dp->b_rptr;
+	
+	switch (iocp->ioc_cmd) {
+	    case SAD_SAP:
+		if (iocp->ioc_uid != 0) {
+			err = -EACCES;
+			goto nak_it;
+		}
+		p->ioc_state = ST_SAP_IN;
+		sad_copyio(p, mp, M_COPYIN, p->uaddr, sizeof(struct strapush));
+		return;
+	    case SAD_GAP:
+		p->ioc_state = ST_GAP_IN;
+		sad_copyio(p, mp, M_COPYIN, p->uaddr, sizeof(struct strapush));
+		return;
+	    case SAD_VML:
+		p->ioc_state = ST_VML_IN1;
+		sad_copyio(p, mp, M_COPYIN, p->uaddr, sizeof(str_list_t));
+		return;
+	    default:
+		err = -EINVAL;
+		goto nak_it;
+	}
+}
+
+
+/****************************************************************************/
+/*                                                                          */
+/*  The usual STREAMS driver stuff.                                         */
+/*                                                                          */
+/****************************************************************************/
+
+STATIC int sad_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+{
+	dev_t i;
+
+	if (sflag == CLONEOPEN) {
+		for (i = 1; i < SAD_N_MINOR; i++)
+			if (sad_sad[i].rq == NULL)
+				break;
+		if (i == SAD_N_MINOR)
+			return ENXIO;
+	} else {
+		if ((i = getminor(*devp)) >= SAD_N_MINOR)
+			return EBUSY;
+	}
+	*devp = MKDEV(MAJOR(*devp), i);
+
+	q->q_ptr = WR(q)->q_ptr = &sad_sad[i];
+	sad_sad[i].rq = q;
+	sad_sad[i].ioc_state = ST_NONE;
+
+#ifdef MODULE
+        MOD_INC_USE_COUNT;
+#endif
+	return 0;
+}
+
+STATIC int sad_close(queue_t *q, int flag, cred_t *crp)
+{
+	struct priv *p = q->q_ptr;
+
+	ASSERT(p != NULL);
+
+	p->rq = q->q_ptr = WR(q)->q_ptr = NULL;
+
+#ifdef MODULE
+        MOD_DEC_USE_COUNT;
+#endif
+	return 0;
+}
+
+STATIC int sad_wput(queue_t *q, mblk_t *mp)
+{
+	struct priv *p;
+
+	ASSERT(q != NULL);
+	ASSERT(mp != NULL);
+
+	p = q->q_ptr;
+	ASSERT(p != NULL);
+
+	switch (mp->b_datap->db_type)
+	{
+		case M_FLUSH:
+			if (*mp->b_rptr & FLUSHW) {
+				flushq(q, FLUSHALL);
+				*mp->b_rptr &= ~FLUSHW;
+			}
+			if (*mp->b_rptr & FLUSHR) {
+				flushq(RD(q), FLUSHALL);
+				qreply(q, mp);
+			} else
+				freemsg(mp);
+			break;
+		case M_IOCTL:
+			sad_do_ioctl(p, mp);
+			break;
+		case M_IOCDATA:
+			sad_iocdata(p, mp);
+			break;
+		default:
+			freemsg(mp);
+			break;
+	}
+	return(0) ;
+}
+
+
+/****************************************************************************/
+/*                                                                          */
+/*  Loadable module initialization and shutdown.                            */
+/*                                                                          */
+/****************************************************************************/
+
+#ifdef MODULE
+
+int init_module(void)
+{
+        int ret = lis_register_strdev(SAD__CMAJOR_0, &sad_info,
+				      SAD_N_MINOR, LIS_OBJNAME_STR);
+	if (ret < 0) {
+                printk("%s: Unable to register module, error %d.\n",
+		       LIS_OBJNAME_STR, -ret);
+                return ret;
+        }
+	memset(sad_sad, 0, sizeof(sad_sad));
+        return 0;
+}
+
+void cleanup_module(void)
+{
+	int err = lis_unregister_strdev(SAD__CMAJOR_0);
+        if (err < 0)
+                printk("%s: Unable to unregister module, error %d.\n",
+		       LIS_OBJNAME_STR, -err);
+        else
+                printk("%s: Unregistered, ready to be unloaded.\n",
+		       LIS_OBJNAME_STR);
+        return;
+}
+
+#endif
+
+#if defined(LINUX)			/* linux kernel */
+#if defined(MODULE_LICENSE)
+MODULE_LICENSE("GPL and additional rights");
+#endif
+#if defined(MODULE_AUTHOR)
+MODULE_AUTHOR("Ole Husgaard (sparre@login.dknet.dk");
+#endif
+#if defined(MODULE_DESCRIPTION)
+MODULE_DESCRIPTION("STREAMS Administrative Driver");
+#endif
+#endif
+
