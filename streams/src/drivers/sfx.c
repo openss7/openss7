@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -84,7 +84,7 @@ static char const ident[] =
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 08:28:14 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -234,7 +234,7 @@ static int __init sfx_init(void)
 };
 static void __exit sfx_exit(void)
 {
-	unregister_strdev(&sfx_cdev, 0);
+	unregister_strdev(&sfx_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_SFX_MODULE

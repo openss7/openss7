@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:36 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:13 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:13 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -289,7 +289,7 @@ static int __init echo_init(void)
 	echo_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&echo_cdev, major)) < 0)
 		return (err);
-	if (err > 0)
+	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };

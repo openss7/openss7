@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:14 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -410,7 +410,7 @@ static int __init sad_init(void)
 	sad_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&sad_cdev, major)) < 0)
 		return (err);
-	if (err > 0)
+	if (major == 0 && err > 0)
 		major = err;
 	bzero(&sads, sizeof(sads));
 	return (0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/29 08:28:13 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -342,7 +342,7 @@ static int __init log_init(void)
 	log_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&log_cdev, major)) < 0)
 		return (err);
-	if (err > 0)
+	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:44 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -955,7 +955,7 @@ static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, un
 		srlock(sd);
 		for (wq = sd->sd_wq; wq; wq = SAMESTR(wq) ? wq->q_next : NULL) {
 			const char *idname = wq->q_qinfo->qi_minfo->mi_idname;
-			if (!strncmp(idname, name, FMNAMESZ + 1))
+			if (!strncmp(idname, name, FMNAMESZ))
 				err = 1;
 		}
 		srunlock(sd);

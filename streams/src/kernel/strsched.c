@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/27 08:55:40 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/29 08:28:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/27 08:55:40 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/29 08:28:17 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/27 08:55:40 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/29 08:28:17 $";
 
 #define __NO_VERSION__
 
@@ -2219,7 +2219,7 @@ static struct cacheinfo {
 	"DYN_STRAPUSH", sizeof(struct apinfo), 0, SLAB_HWCACHE_ALIGN, &apinfo_ctor, NULL}, {
 	"DYN_DEVINFO", sizeof(struct devinfo), 0, SLAB_HWCACHE_ALIGN, &devinfo_ctor, NULL}, {
 	"DYN_MODINFO", sizeof(struct modinfo), 0, SLAB_HWCACHE_ALIGN, &modinfo_ctor, NULL}, {
-	"DYN_SYNQ", sizeof(struct syncq), 0, SLAB_HWCACHE_ALIGN, &syncq_ctor, NULL}
+	"DYN_SYNCQ", sizeof(struct syncq), 0, SLAB_HWCACHE_ALIGN, &syncq_ctor, NULL}
 };
 
 /* Note: that we only have one cache for both MSGBLOCKs and MDBBLOCKs */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/27 08:55:24 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:24 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/27 08:55:24 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/27 08:55:24 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -123,7 +123,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/27 08:55:24 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 08:28:08 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2137,7 +2137,10 @@ int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, con
 	cdev->d_flag = D_MP | D_MTPERQ;	/* mark LiS compatibility for qopen and qclose */
 	cdev->d_kmod = NULL;
 	atomic_set(&cdev->d_count, 0);
+	INIT_LIST_HEAD(&cdev->d_majors);
+	INIT_LIST_HEAD(&cdev->d_nodes);
 	INIT_LIST_HEAD(&cdev->d_apush);
+	INIT_LIST_HEAD(&cdev->d_stlist);
 	if ((err = WARN(register_strdev(cdev, major))) < 0)
 		kmem_free(cdev, sizeof(*cdev));
 	return (err);

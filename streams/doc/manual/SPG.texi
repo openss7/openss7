@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.3 2004/04/18 21:37:40 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.4 2004/05/29 08:28:01 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/04/18 21:37:40 $ by $Author: brian $
+% Last Modified $Date: 2004/05/29 08:28:01 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -64,7 +64,7 @@
 
 @dircategory STREAMS
 @direntry
-* SPG: (spg).                   STREAMS Programmer's Guide
+* SPG: (SPG).                   STREAMS Programmer's Guide
 @end direntry
 
 @set xref-automatic-section-title

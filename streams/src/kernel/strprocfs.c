@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $";
 
 #define __NO_VERSION__
 
@@ -109,6 +109,15 @@ static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
 }
 
 #if 0
+static int get_streams_driver(char *page, ssize_t maxlen, struct cdevsw *d)
+{
+	int len = 0;
+	if (!d)
+		goto done;
+      done:
+	return (len);
+}
+
 /* called by proc file system to list the registered STREAMS devices */
 static int get_streams_drivers_list(char *page, char **start, off_t offset, int length)
 {
@@ -142,6 +151,15 @@ static int get_streams_drivers_list(char *page, char **start, off_t offset, int 
 		len = length;
 	if (len < 0)
 		len = 0;
+	return (len);
+}
+
+static int get_streams_module(char *page, ssize_t maxlen, struct cdevsw *d)
+{
+	int len = 0;
+	if (!d)
+		goto done;
+      done:
 	return (len);
 }
 
@@ -318,6 +336,8 @@ static int get_streams_strapush_list(char *page, ssize_t maxlen, struct list_hea
 {
 	int len = 0;
 	struct list_head *cur, *tmp;
+	if (!list->next)
+		INIT_LIST_HEAD(list);
 	list_for_each_safe(cur, tmp, list) {
 		struct strapush *sap = (struct strapush *) list_entry(cur, struct apinfo, api_list);
 		len += snprintf(page + len, maxlen - len, ", %p", sap);
@@ -328,15 +348,18 @@ static int get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
 	len += snprintf(page + len, maxlen - len, "dp");
-	len += snprintf(page + len, maxlen - len, ", d_names");
+	len += snprintf(page + len, maxlen - len, ", d_name");
 	len += snprintf(page + len, maxlen - len, ", d_str { ");
 	len += get_streams_streamtab_drv_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, d_flag");
-	len += snprintf(page + len, maxlen - len, ", d_kmod");
 	len += snprintf(page + len, maxlen - len, ", d_count");
-//      len += snprintf(page + len, maxlen - len, ", d_regs");
-	len += snprintf(page + len, maxlen - len, ", d_fopp");
+	len += snprintf(page + len, maxlen - len, ", d_inode");
+	len += snprintf(page + len, maxlen - len, ", d_sqlvl");
+	len += snprintf(page + len, maxlen - len, ", d_syncq");
+	len += snprintf(page + len, maxlen - len, ", d_kmod");
+	len += snprintf(page + len, maxlen - len, ", d_major");
 	len += snprintf(page + len, maxlen - len, ", d_mode");
+	len += snprintf(page + len, maxlen - len, ", d_fop");
 	len += snprintf(page + len, maxlen - len, ", d_apush { ");
 	len += get_streams_strapush_list_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
@@ -352,11 +375,14 @@ static int get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 	len += snprintf(page + len, maxlen - len, ", %p { ", d->d_str);
 	len += get_streams_streamtab_drv(page + len, maxlen - len, d->d_str);
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", d->d_flag);
-	len += snprintf(page + len, maxlen - len, ", %p", d->d_kmod);
 	len += snprintf(page + len, maxlen - len, ", %hu", atomic_read(&d->d_count));
-//      len += snprintf(page + len, maxlen - len, ", %hu", d->d_regs);
+	len += snprintf(page + len, maxlen - len, ", %p", d->d_inode);
+	len += snprintf(page + len, maxlen - len, ", %d", d->d_sqlvl);
+	len += snprintf(page + len, maxlen - len, ", %p", d->d_syncq);
+	len += snprintf(page + len, maxlen - len, ", %p", d->d_kmod);
+	len += snprintf(page + len, maxlen - len, ", %d", d->d_major);
+	len += snprintf(page + len, maxlen - len, ", %d", d->d_mode);
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_fop);
-	len += snprintf(page + len, maxlen - len, ", %hu", d->d_mode);
 	len += snprintf(page + len, maxlen - len, ", { ");
 	len += get_streams_strapush_list(page + len, maxlen - len, &d->d_apush);
 	len += snprintf(page + len, maxlen - len, " }");
@@ -433,8 +459,10 @@ static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", f_str { ");
 	len += get_streams_streamtab_mod_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, f_flag");
-	len += snprintf(page + len, maxlen - len, ", f_regs");
 	len += snprintf(page + len, maxlen - len, ", f_count");
+	len += snprintf(page + len, maxlen - len, ", f_inode");
+	len += snprintf(page + len, maxlen - len, ", f_sqlvl");
+	len += snprintf(page + len, maxlen - len, ", f_syncq");
 	len += snprintf(page + len, maxlen - len, ", f_kmod");
 	return (len);
 }
@@ -448,8 +476,10 @@ static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 	len += snprintf(page + len, maxlen - len, ", %p { ", f->f_str);
 	len += get_streams_streamtab_mod(page + len, maxlen - len, f->f_str);
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", f->f_flag);
-	len += snprintf(page + len, maxlen - len, ", %d", f->f_regs);
 	len += snprintf(page + len, maxlen - len, ", %d", atomic_read(&f->f_count));
+	len += snprintf(page + len, maxlen - len, ", %p", f->f_inode);
+	len += snprintf(page + len, maxlen - len, ", %d", f->f_sqlvl);
+	len += snprintf(page + len, maxlen - len, ", %p", f->f_syncq);
 	len += snprintf(page + len, maxlen - len, ", %p", f->f_kmod);
       done:
 	return (len);

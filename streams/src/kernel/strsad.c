@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $";
 
 #define __NO_VERSION__
 
@@ -88,8 +88,8 @@ static struct apinfo *__autopush_find(struct cdevsw *cdev, unsigned char minor)
 {
 	struct list_head *pos;
 	struct apinfo *api = NULL;
-	if (cdev->d_apush.next == NULL)
-		goto init;
+	if (!cdev->d_apush.next)
+		INIT_LIST_HEAD(&cdev->d_apush);
 	list_for_each(pos, &cdev->d_apush) {
 		api = list_entry(pos, struct apinfo, api_list);
 		if (minor >= api->api_sap.sap_minor && minor <= api->api_sap.sap_lastminor)
@@ -97,9 +97,6 @@ static struct apinfo *__autopush_find(struct cdevsw *cdev, unsigned char minor)
 		api = NULL;
 	}
 	return (api);
-      init:
-	INIT_LIST_HEAD(&cdev->d_apush);
-	return (NULL);
 }
 
 static int __autopush_add(struct cdevsw *cdev, struct strapush *sap)
@@ -112,6 +109,8 @@ static int __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 	err = -ENOSR;
 	if ((api = ap_alloc(sap)) == NULL)
 		goto error;
+	if (!cdev->d_apush.next)
+		INIT_LIST_HEAD(&cdev->d_apush);
 	list_add_tail(&api->api_list, &cdev->d_apush);
 	return (0);
       error:

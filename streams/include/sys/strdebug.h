@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.4 2004/05/29 08:28:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 08:28:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/29 08:28:06 $"
 
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -77,6 +77,9 @@ do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FIL
 
 #define __ensure(__exp,__sta) \
 do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
+
+#define __unless(__exp,__sta) \
+__ensure(!(__exp),__sta)
 
 #define __trace() \
 do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -117,7 +120,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  assert(__exp)		__assert(__exp)
 #define  assure(__exp)		__assure(__exp)
 #define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define  unless(__exp,__sta)	__unless(__exp,__sta)
 #define   trace()		__trace()
 #define  ptrace(__pks)		__ptrace(__pks)
 #define  ctrace(__fnc)		__ctrace(__fnc)
@@ -142,7 +145,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  assert(__exp)		__assert(__exp)
 #define  assure(__exp)		__assure(__exp)
 #define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define  unless(__exp,__sta)	__unless(__exp,__sta)
 #define   trace()		do { } while(0)
 #define  ptrace(__pks)		do { } while(0)
 #define  ctrace(__fnc)		(__fnc)
