@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/04 18:50:22 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/04/05 05:30:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/04 18:50:22 $ by $Author: brian $
+## Last Modified $Date: 2005/04/05 05:30:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -54,6 +54,23 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
+
+##
+# Before installing libraries we need to go looking for conflicting libraries in other locations.
+# These would be libraries of the same name in directories other than the directory to which we are
+# installing.
+##
+pre-libraries:
+	@for dir in /lib /usr/lib /usr/local/lib ; do \
+		test "$$dir" != "$(libdir)" || continue ; \
+		libs='$(lib_LTLIBRARIES)' ; for lib in $$libs ; do \
+			lib=`echo $$lib | sed -e 's|^.*/||;s|\.la$$||'` ; \
+			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.*" ; \
+			rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.* ; \
+		done ; \
+	done
+
+PRE_INSTALL_AM		+= pre-libraries
 
 ##
 # Although we use libtool for building shared libraries, libtool "finish" commands are not smart
