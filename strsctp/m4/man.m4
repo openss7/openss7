@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 0.9.2.3 2004/06/28 08:59:34 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.4 2004/08/20 21:12:23 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/28 08:59:34 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/20 21:12:23 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -82,11 +82,11 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_ARG_WITH([cooked-manpages],
         AS_HELP_STRING([--with-cooked-manpages],
             [convert manual pages to remove macro dependencies and grefer
-            references.  @<:@default=no@:>@]),
+            references.  @<:@default=yes@:>@]),
         [with_cooked_manpages="$withval"],
-        [with_cooked_manpages='no'])
+        [with_cooked_manpages='yes'])
     AC_MSG_CHECKING([for manpage conversion])
-    if test :"${with_cooked_manpages:-no}" != :no ; then
+    if test :"${with_cooked_manpages:-yes}" != :no ; then
         AC_MSG_RESULT([yes])
         AC_ARG_VAR([SOELIM], [Roff source elminiation command])
         AC_ARG_VAR([REFER], [Roff references command])
@@ -120,7 +120,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 # _MAN_CONVERSION_OUTPUT
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
-    AM_CONDITIONAL([COOKED_MANPAGES], [test :"${with_cooked_manpages:-no}" != :no])dnl
+    AM_CONDITIONAL([COOKED_MANPAGES], [test :"${with_cooked_manpages:-yes}" != :no])dnl
     AM_CONDITIONAL([COMPRESS_MANPAGES], [test :"${enable_compress_manpages:-yes}" = :yes])dnl
 ])# _MAN_CONVERSION_OUTPUT
 # =========================================================================

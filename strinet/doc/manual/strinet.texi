@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.1 2004/08/16 11:40:41 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.2 2004/08/20 21:14:13 brian Exp $
 %
 % =========================================================================
 %
@@ -54,17 +54,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/16 11:40:41 $ by $Author: brian $
+% Last Modified $Date: 2004/08/20 21:14:13 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
-@setfilename strinet.info
+@setfilename @value{PACKAGE}.info
 @settitle @value{PACKAGE_TITLE}
 @setchapternewpage odd
 @footnotestyle separate
 
-@dircategory STREAMS
+@dircategory Kernel
 @direntry
 * INET: (strinet).   		An Internet Protocol driver for STREAMS.
 @end direntry
@@ -82,10 +82,10 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
 @cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@@openss7.org>
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
-All Rights Reserved.
+All Rights Reserved. @*
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -107,16 +107,20 @@ Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
 
-@iftex
+@ignore
 @shorttitlepage @value{PACKAGE_TITLE} Installation and Reference Manual
-@end iftex
+@end ignore
 @titlepage
-@title @value{PACKAGE_TITLE}
-@subtitle Installation and Reference Manual
-@subtitle Edition @value{PACKAGE_VERSION} for @value{PACKAGE_TITLE}
-@subtitle Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
+@titlefont{@value{PACKAGE_TITLE}}
+@sp 0.2
+@title Installation and Reference Manual
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
-@author Brian Bidulock @cite{<@email{bidulock@@openss7.org}>}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
@@ -147,7 +151,36 @@ another language, under the same conditions as for modified versions.
 @end titlepage
 @page
 
-@ifnottex
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@c @defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@itnottex
 @node Top, , (dir), (dir)
 @top @value{PACKAGE_TITLE}
 @end ifnottex
@@ -182,6 +215,7 @@ Acknowledgments
 				the package.
 Introduction
 
+* Notice::			Notice
 * Overview::			Overview
 * Organization::		Organization
 * Conventions::			Conventions
@@ -250,6 +284,8 @@ part by:
 @item Performance Technologies
 @item Motorola
 @item HOB International
+@item Comverse
+@item Sonus Networks
 @end itemize
 
 @node Contributors, , Sponsors, Acknowledgments
@@ -474,9 +510,13 @@ This document is organized (loosely) into several sections as follows:
 @appendixsec Index of Files and Programs
 @printindex pg
 
-@node Option Index, , File Index, Indices
+@node Option Index, Author Index, File Index, Indices
 @appendixsec Index of Configuration Options
 @printindex op
+
+@node Author Index, , Option Index, Indices
+@unnumbered Author Index
+@printindex au
 
 @c ----------------------------------------------------------------------------
 

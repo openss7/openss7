@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.6 2004/08/17 11:51:07 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.7 2004/08/20 21:14:13 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/17 11:51:07 $ by $Author: brian $
+% Last Modified $Date: 2004/08/20 21:14:13 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -64,7 +64,7 @@
 @setchapternewpage odd
 @footnotestyle separate
 
-@dircategory STREAMS
+@dircategory Kernel
 @direntry
 * OpenSS7 XNS: (@value{PACKAGE}).      An Open STREAMS XNS Networking Package.
 @end direntry
@@ -82,10 +82,10 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
 @cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@@openss7.org>
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
-All Rights Reserved.
+All Rights Reserved. @*
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -151,7 +151,36 @@ another language, under the same conditions as for modified versions.
 @end titlepage
 @page
 
-@ifnottex
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@c @defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@itnottex
 @node Top, , (dir), (dir)
 @top @value{PACKAGE_TITLE}
 @end ifnottex
@@ -564,6 +593,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 * Variable Index::		Index of Variables and Constants
 * File Index::			Index of Files and Programs
 * Option Index::		Index of Configuration Options
+* Author Index::		Index of Authors
 @end menu
 
 @node Concept Index, Type Index, , Indices
@@ -586,9 +616,13 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @appendixsec Index of Files and Programs
 @printindex pg
 
-@node Option Index, , File Index, Indices
+@node Option Index, Author Index, File Index, Indices
 @appendixsec Index of Configuration Options
 @printindex op
+
+@node Author Index, , Option Index, Indices
+@unnumbered Author Index
+@printindex au
 
 @c ----------------------------------------------------------------------------
 
