@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/14 09:37:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/20 07:33:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 09:37:53 $ by $Author: brian $
+# Last Modified $Date: 2005/03/20 07:33:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -439,8 +439,6 @@ if RPM_BUILD_USER
 
 SUBDIRS = src doc tests
 
-endif
-
 if INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
@@ -463,6 +461,8 @@ endif
 ## Rules for init scripts
 ##
 include am/init.am
+
+endif
 
 ##
 ## Rules for lsms

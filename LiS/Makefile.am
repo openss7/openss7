@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2005/03/16 05:47:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2005/03/20 07:33:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 05:47:53 $ by $Author: brian $
+# Last Modified $Date: 2005/03/20 07:33:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -372,8 +372,6 @@ if RPM_BUILD_USER
 
 SUBDIRS = include man manual tests . testsuite
 
-endif
-
 if INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
@@ -400,6 +398,8 @@ endif
 ## Rules for init scripts
 ##
 include am/init.am
+
+endif
 
 ##
 ## Rules for lsms

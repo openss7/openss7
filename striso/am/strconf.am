@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/20 07:33:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+## Last Modified $Date: 2005/03/20 07:33:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -99,21 +99,21 @@ maintainer-clean-strconf:
 dist_noinst_SCRIPTS	+= $(STRCONF_SCRIPT)
 EXTRA_SCRIPTS		+= scripts/strconf-sh
 
-# Invoke creation of any installed devices if the installation directory is configured.
-
-install-devices: $(STRMAKENODES)
-	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
-		$(ECHO) './$(STRMAKENODES)' ; \
-		./$(STRMAKENODES) ; \
-	fi
-
-# Invoke removal of any installed devices if the installation directory is configured.
-
-uninstall-devices: $(STRMAKENODES)
-	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
-		$(ECHO) './$(STRMAKENODES) --remove' ; \
-		./$(STRMAKENODES) --remove ; \
-	fi
+## Invoke creation of any installed devices if the installation directory is configured.
+#
+#install-devices: $(STRMAKENODES)
+#	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+#		$(ECHO) './$(STRMAKENODES)' ; \
+#		./$(STRMAKENODES) ; \
+#	fi
+#
+## Invoke removal of any installed devices if the installation directory is configured.
+#
+#uninstall-devices: $(STRMAKENODES)
+#	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+#		$(ECHO) './$(STRMAKENODES) --remove' ; \
+#		./$(STRMAKENODES) --remove ; \
+#	fi
 
 else
 
@@ -123,10 +123,10 @@ distclean-strconf:
 
 maintainer-clean-strconf:
 
-install-devices:
-
-uninstall-devices:
-
+#install-devices:
+#
+#uninstall-devices:
+#
 endif
 
 CLEAN_LOCAL += clean-strconf
@@ -135,10 +135,10 @@ DISTCLEAN_LOCAL += distclean-strconf
 
 MAINTAINER_CLEAN_LOCAL += maintainer-clean-strconf
 
-INSTALL_EXEC_HOOK += install-devices
-
-UNINSTALL_HOOK += uninstall-devices
-
+#INSTALL_EXEC_HOOK += install-devices
+#
+#UNINSTALL_HOOK += uninstall-devices
+#
 .PHONY: clean-strconf distclean-strconf maintainer-clean-strconf install-devices uninstall-devices
 
 ## vim: ft=automake
