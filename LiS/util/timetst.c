@@ -18,16 +18,19 @@
  * 
  */
 
-#ident "@(#) LiS timetst.c 2.3 12/15/02 18:00:05 "
+#ident "@(#) LiS timetst.c 2.5 09/02/04 14:46:08 "
 
 #define	inline				/* make disappear */
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #include <string.h>			/* for strerror */
 #ifdef LINUX
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/ioctl.h>
 #endif
 #ifdef SYS_QNX
@@ -64,11 +67,19 @@
 #define LOOP_CLONE	"loop_clone"
 #endif
 
+#define	ALL_DEBUG_BITS	( ~ ((unsigned long long) 0) )
+
+#ifdef DIRECT_USER		/* tie-in to cmn_err */
+#define	ENO(neg_e)	(-(neg_e))
+#else
+#define	ENO(dmy)	(errno)
+#endif
 
 /************************************************************************
 *                           Storage                                     *
 ************************************************************************/
 
+unsigned long long	debug_mask ;
 char		buf[1000] ;		/* general purpose */
 char		rdbuf[1000] ;		/* for reading */
 long		iter_cnt = 100000 ;	/* default iteration count */
@@ -81,6 +92,136 @@ struct strbuf	rd_ctl = {0, 0, rdctlbuf} ;
 struct strbuf	rd_dta = {0, 0, rdbuf} ;
 
 extern void make_nodes(void) ;
+
+/************************************************************************
+*                        Histogram Maintenance                          *
+************************************************************************/
+
+int	latency_opt = 0;		/* option to measure latency */
+
+typedef struct
+{
+    int		micro_secs ;
+    unsigned	counter ;
+
+} histogram_bucket_t ;
+
+#define	HISTOGRAM_INIT	{ \
+			    {1, 0}, \
+			    {2, 0}, \
+			    {3, 0}, \
+			    {4, 0}, \
+			    {5, 0}, \
+			    {6, 0}, \
+			    {7, 0}, \
+			    {8, 0}, \
+			    {9, 0}, \
+			    {10, 0}, \
+			    {20, 0}, \
+			    {30, 0}, \
+			    {40, 0}, \
+			    {50, 0}, \
+			    {60, 0}, \
+			    {70, 0}, \
+			    {80, 0}, \
+			    {90, 0}, \
+			    {100, 0}, \
+			    {200, 0}, \
+			    {300, 0}, \
+			    {400, 0}, \
+			    {500, 0}, \
+			    {600, 0}, \
+			    {700, 0}, \
+			    {800, 0}, \
+			    {900, 0}, \
+			    {1000, 0}, \
+			    {2000, 0}, \
+			    {3000, 0}, \
+			    {4000, 0}, \
+			    {5000, 0}, \
+			    {6000, 0}, \
+			    {7000, 0}, \
+			    {8000, 0}, \
+			    {9000, 0}, \
+			    {10000, 0}, \
+			    {20000, 0}, \
+			    {30000, 0}, \
+			    {40000, 0}, \
+			    {50000, 0}, \
+			    {60000, 0}, \
+			    {70000, 0}, \
+			    {80000, 0}, \
+			    {90000, 0}, \
+			    {100000, 0}, \
+			    {200000, 0}, \
+			    {300000, 0}, \
+			    {400000, 0}, \
+			    {500000, 0}, \
+			    {600000, 0}, \
+			    {700000, 0}, \
+			    {800000, 0}, \
+			    {900000, 0}, \
+			    {1000000, 0}, \
+			    {2000000, 0}, \
+			    {3000000, 0}, \
+			    {4000000, 0}, \
+			    {5000000, 0}, \
+			    {6000000, 0}, \
+			    {7000000, 0}, \
+			    {8000000, 0}, \
+			    {9000000, 0}, \
+			    {0, 0} \
+			}
+
+histogram_bucket_t	hist_init[] = HISTOGRAM_INIT ;
+histogram_bucket_t	hist[] = HISTOGRAM_INIT ;
+
+/*
+ * Initialize the 'hist' buffer.
+ */
+void init_hist(histogram_bucket_t *h)
+{
+    memcpy(h, hist_init, sizeof(hist_init)) ;
+}
+
+/*
+ * Enter a time interval into a histogram bucket
+ */
+void enter_hist(histogram_bucket_t *h, int interval)
+{
+    for ( ; h->micro_secs != 0; h++)
+    {
+	if (interval <= h->micro_secs)
+	    break ;
+    }
+
+    h->counter++ ;
+}
+
+/*
+ * Print out the histogram
+ */
+void print_hist(histogram_bucket_t *h, int minimum)
+{
+    histogram_bucket_t	*p = h ;
+    int			 max_counter = 0 ;
+
+    for (; p->micro_secs != 0; p++)
+    {
+	if (p->counter > max_counter)
+	    max_counter = p->counter ;
+    }
+
+    for (p = h; p->micro_secs != 0; p++)
+    {
+	if (p->counter >= minimum)
+	    printf("%8d %12u\n", p->micro_secs, p->counter) ;
+    }
+
+    if (p->counter != 0)
+	printf("%8s %12u\n", "Larger", p->counter) ;
+
+}
 
 /************************************************************************
 *                           register_drivers                            *
@@ -119,6 +260,12 @@ void	timing_test(void)
     int			flags = MSG_ANY;
     int			rband = 0 ;
     struct strioctl	ioc ;
+    struct timeval	*tp = NULL ;
+    struct timeval	*rtp = NULL ;
+    int			xmit_time ;
+    int			rcv_time ;
+    int			interval ;
+    struct timeval	x ;
 
     printf("\nBegin timing test\n") ;
 
@@ -148,8 +295,19 @@ void	timing_test(void)
 	printf("loop.1: ioctl LOOP_SET: %s\n", strerror(-rslt)) ;
     }
 
-    strcpy(buf, "Data to send down the file") ;
-    lgth = strlen(buf) ;
+    if (latency_opt)
+    {
+	tp = (struct timeval *) buf ;
+	strcpy(&buf[sizeof(*tp)], "Data to send down the file") ;
+	lgth = sizeof(*tp) + strlen(&buf[sizeof(*tp)]) ;
+	rtp = (struct timeval *) rdbuf ;
+    }
+    else
+    {
+	strcpy(buf, "Data to send down the file") ;
+	lgth = strlen(buf) ;
+    }
+
 
     printf("Time test:  write %d bytes, read/write and service queue: ",
     		lgth) ;
@@ -158,10 +316,14 @@ void	timing_test(void)
     sync() ;				/* do file sync now rather than
     					 * in the middle of the test.
     					 */
+    init_hist(hist) ;
     time_on = time(NULL) ;
 #if 1
     for (i = 0; i < iter_cnt; i++)
     {
+	if (latency_opt)
+	    gettimeofday(tp, NULL) ;
+
 	rslt = user_write(fd1, buf, lgth) ;
 
 	if (rslt != lgth)
@@ -184,11 +346,23 @@ void	timing_test(void)
 		printf("loop.2:  read returned %d, expected %d\n", rslt, lgth) ;
 	    break ;
 	}
+
+	if (latency_opt)
+	{
+	    gettimeofday(&x, NULL) ;		/* current time */
+	    xmit_time = rtp->tv_sec * 1000000 + rtp->tv_usec ;
+	    rcv_time  = x.tv_sec * 1000000 + x.tv_usec ;
+	    interval  = rcv_time - xmit_time ;
+	    enter_hist(hist, interval) ;
+	}
     }
 #endif
     et = (time(NULL) - time_on) * 1000000 ;	/* time in usecs */
 
     printf("%ld micro-secs\n", et/iter_cnt) ;
+    if (latency_opt)
+	print_hist(hist, 1000) ;
+    printf("\n") ;
 
 
 
@@ -203,11 +377,15 @@ void	timing_test(void)
     printf("Time test:  write %d bytes, read/write w/o service queue: ",
     		lgth) ;
     fflush(stdout) ;
+    init_hist(hist) ;
     sync() ;
     time_on = time(NULL) ;
 
     for (i = 0; i < iter_cnt; i++)
     {
+	if (latency_opt)
+	    gettimeofday(tp, NULL) ;
+
 	rslt = user_write(fd1, buf, lgth) ;
 
 	if (rslt != lgth)
@@ -230,11 +408,23 @@ void	timing_test(void)
 		printf("loop.2:  read returned %d, expected %d\n", rslt, lgth) ;
 	    break ;
 	}
+
+	if (latency_opt)
+	{
+	    gettimeofday(&x, NULL) ;		/* current time */
+	    xmit_time = rtp->tv_sec * 1000000 + rtp->tv_usec ;
+	    rcv_time  = x.tv_sec * 1000000 + x.tv_usec ;
+	    interval  = rcv_time - xmit_time ;
+	    enter_hist(hist, interval) ;
+	}
     }
 
     et = (time(NULL) - time_on) * 1000000 ;	/* time in usecs */
 
     printf("%ld micro-secs\n", et/iter_cnt) ;
+    if (latency_opt)
+	print_hist(hist, 1000) ;
+    printf("\n") ;
 
 
 
@@ -249,6 +439,7 @@ void	timing_test(void)
     printf("Time test:  write %d bytes, getmsg/putmsg w/o service queue: ",
     		lgth) ;
     fflush(stdout) ;
+    init_hist(hist) ;
     sync() ;
     time_on = time(NULL) ;
 
@@ -258,6 +449,9 @@ void	timing_test(void)
     wr_dta.len	= lgth ;
     for (i = 0; i < iter_cnt; i++)
     {
+	if (latency_opt)
+	    gettimeofday(tp, NULL) ;
+
 	rslt = user_putpmsg(fd1, &wr_ctl, &wr_dta, 0, MSG_BAND) ;
 
 	if (rslt < 0)
@@ -283,11 +477,23 @@ void	timing_test(void)
 	    printf("expected rd_ctl.len = %d, got %d\n", -1, rd_ctl.len) ;
 	    printf("expected rd_dta.len = %d, got %d\n", lgth, rd_dta.len) ;
 	}
+
+	if (latency_opt)
+	{
+	    gettimeofday(&x, NULL) ;		/* current time */
+	    xmit_time = rtp->tv_sec * 1000000 + rtp->tv_usec ;
+	    rcv_time  = x.tv_sec * 1000000 + x.tv_usec ;
+	    interval  = rcv_time - xmit_time ;
+	    enter_hist(hist, interval) ;
+	}
     }
 
     et = (time(NULL) - time_on) * 1000000 ;	/* time in usecs */
 
     printf("%ld micro-secs\n", et/iter_cnt) ;
+    if (latency_opt)
+	print_hist(hist, 1000) ;
+    printf("\n") ;
 
 
     user_close(fd1) ;
@@ -302,52 +508,96 @@ void	timing_test(void)
 * Use stream ioctl to set the debug mask for streams.			*
 *									*
 ************************************************************************/
-void	set_debug_mask(long msk)
+void	set_debug_mask(unsigned long long msk)
 {
-    int		fd ;
-    int		rslt ;
+    int			fd ;
+    int			rslt ;
+    unsigned long	mask1 = (unsigned long)(msk & 0xFFFFFFFF) ;
+    unsigned long	mask2 = (msk >> 32) ;
 
-    fd = user_open(LOOP_1, 0, 0) ;
+    fd = user_open(LOOP_1, O_RDWR, 0) ;
     if (fd < 0)
     {
-	printf("loop.1: %s\n", strerror(-fd)) ;
-	return ;
+	printf("loop.1: %s\n", strerror(ENO(fd))) ;
+	exit(1) ;
     }
 
-    rslt = user_ioctl(fd, I_LIS_SDBGMSK, msk) ;
+    rslt = user_ioctl(fd, I_LIS_SDBGMSK, mask1) ;
     if (rslt < 0)
     {
-	printf("loop.1: I_LIS_SDBGMSK: %s\n", strerror(-rslt)) ;
-	return ;
+	printf("loop.1: I_LIS_SDBGMSK: %s\n", strerror(ENO(rslt))) ;
+	exit(1) ;
     }
 
-    printf("\nSTREAMS debug mask set to 0x%08lx\n", msk) ;
+    rslt = user_ioctl(fd, I_LIS_SDBGMSK2, mask2) ;
+    printf("\nSTREAMS debug mask set to 0x%08lx%08lx\n", mask2, mask1) ;
 
     user_close(fd) ;
 
 } /* set_debug_mask */
 
 /************************************************************************
+*                             print_options                             *
+************************************************************************/
+void print_options(void)
+{
+    printf("strtst [<options>]\n");
+    printf("  -d<mask>     Set debug mask (long long argument)\n");
+    printf("  -i<cnt>      Set iteration count, %ld default\n", iter_cnt);
+    printf("  -l           Compute round trip message latency histogram\n");
+    printf("  -h           Print this message\n");
+}
+
+/************************************************************************
+*                            get_options                                *
+************************************************************************/
+void get_options(int argc, char **argv)
+{
+    int		opt ;
+
+    while ((opt = getopt(argc, argv, "d:i:hl")) > 0)
+    {
+	switch (opt)
+	{
+	case 'd':
+	    debug_mask = strtoull(optarg, NULL, 0);
+	    break ;
+	case 'i':
+	    iter_cnt = strtol(optarg, NULL, 0) ;
+	    break ;
+	case 'l':
+	    latency_opt = 1 ;
+	    break ;
+	case 'h':
+	    print_options() ;
+	    exit(0) ;
+	default:
+	    print_options() ;
+	    exit(1) ;
+	}
+    }
+}
+
+
+/************************************************************************
 *                              main                                     *
 ************************************************************************/
 int main(int argc, char **argv)
 {
-    if (argc > 1)
-	sscanf(argv[1], "%ld", &iter_cnt) ;
+    get_options(argc, argv) ;
 
 #if	!defined(LINUX) && !defined(QNX)
     register_drivers() ;
     make_nodes() ;
 #endif
 
-    printf("Timing test version %s\n\n", "2.3 12/15/02");
+    printf("Timing test version %s\n\n", "2.5 09/02/04");
     printf("Using safe constructs and message tracing\n") ;
-    set_debug_mask(0x30000L) ;
-    /* set_debug_mask(0x0FFFFFFF) ; */
+    set_debug_mask(debug_mask | 0x30000L) ;
     timing_test() ;
 
     printf("\n\nNot using safe constructs or message tracing\n") ;
-    set_debug_mask(0L) ;
+    set_debug_mask(debug_mask & ~0x30000L) ;
     timing_test() ;
 
     return 0;
