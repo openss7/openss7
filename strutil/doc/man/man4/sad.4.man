@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sad.4.man,v 0.9.2.7 2004/08/24 08:42:35 brian Exp $
+.\" @(#) $Id: sad.4.man,v 0.9.2.8 2005/01/20 23:41:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/20 23:41:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SAD 4 "$Date: 2004/08/24 08:42:35 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH SAD 4 "$Date: 2005/01/20 23:41:59 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -98,7 +98,7 @@ is a file descriptor returned from an
 system call on one of the following devices:
 .TP
 .RI \*(lq /dev/sad/admin \*(rq
-This device is only accessible by priveleged users.
+This device is only accessible by privileged users.
 .TP
 .RI \*(lq /dev/sad/user \*(rq
 This device is accessible by all users.
@@ -249,7 +249,7 @@ is significant for all autopush commands.
 Specifies the minor device number, or initial minor device number in a range,
 of the
 .IR STREAMS (4)
-driver for which to exexcute the autopush command.
+driver for which to execute the autopush command.
 .I sap_minor
 is only significant for autopush commands
 .BR SAP_CLEAR ", " SAP_ONE " and " SAP_RANGE ,
@@ -609,8 +609,28 @@ devices.
 .\"
 .SH DEVICES
 .PP
-.BR /dev/sad/admin ,
-.BR /dev/sad/user .
+.TP
+.B /dev/sad
+Systems other than
+.IR Solaris \(rg
+use this external filesystem device.  This may be a symbolic link to the
+.BR specfs (5)
+device.
+.TP
+.BR /dev/sad/admin ", " /dev/sad/user
+.IR Solaris \(rg
+uses these two external filesystem devices.  This (or
+.BR /dev/sad )
+may be a symbolic link to a
+.BR specfs (5)
+device.
+.TP
+.BR /dev/streams/sad ", " /dev/streams/sad/admin ", " /dev/streams/sad/user ", " /devices/sad ", " /devices/sad/admin ", " /devices/sad/user
+These are the
+.BR specfs (5)
+special shadow filesystem nodes for the
+.I STREAMS
+administrative device.
 .\"
 .\"
 .SH "SEE ALSO"
