@@ -2,21 +2,22 @@
  *
  *  Copyright (C)  1998-2003 The Software Group Limited.
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Library General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
-/*************************************************************************
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Library General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Library General Public
+ *  License along with this library; if not, write to the
+ *  Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+ *  MA 02139, USA.
+ * 
+ *************************************************************************/
 
 /*
  * This driver provides a mapping between Linux IP and an underlying
@@ -69,6 +70,7 @@
 #include <linux/tcp.h>         /* struct tcphdr */
 #include <linux/skbuff.h>
 #include <linux/if_arp.h>
+#include <net/arp.h>
 
 #include <sys/stream.h>
 #include <sys/dlpi.h>
@@ -76,9 +78,24 @@
 #include <sys/lislocks.h>
 
 
-MODULE_LICENSE("GPL");
+/************************************************************************
+*                         Module Information                            *
+************************************************************************/
+
+/*
+ * Note:  We are labeling the module license as "GPL and additional rights".
+ * This is said to be equivalent to GPL for symbol exporting purposes and
+ * is also supposed to span LGPL.
+ */
+#if defined(MODULE_LICENSE)
+MODULE_LICENSE("GPL and additional rights");
+#endif
+#if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("The Software Group Ltd.");
+#endif
+#if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("Linux IP to Streams driver");
+#endif
 
 
 /* version dependencies have been confined to a separate file */
@@ -246,7 +263,7 @@ int ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	ip2xinet_numopen = 1;
 
     if (q->q_count != 0)
-	printk("ip2x level:q_count is %d",q->q_count);
+	printk("ip2x level:q_count is %lu",q->q_count);
 
     /*
      * Set up the flow control parameters and send them up to the stream head.
@@ -952,14 +969,14 @@ int init_module(void)
 
     if( !(ip2_m_number = ip2xinetinit()) )
     { 
-	ip2xinet_lock = lis_free_mem(ip2xinet_lock);
+	ip2xinet_lock = lis_free_mem((void *)ip2xinet_lock);
         return ip2_m_number;
     }
     if (( ip2_m_number = lis_register_strdev(0, &ip2xinetinfo, 
 		    NUMIP2XINET, ip2xinetminfo.mi_idname)) < 0 )
     {
 	printk("ip2xinet.init_module: Unable to register driver.\n");
-	ip2xinet_lock = lis_free_mem(ip2xinet_lock);
+	ip2xinet_lock = lis_free_mem((void *)ip2xinet_lock);
 	return ip2_m_number;
     }
     clonemajor = lis_clone_major();
@@ -975,7 +992,7 @@ int init_module(void)
 		0666 | S_IFCHR,
 		MKDEV(clonemajor, ip2_m_number))) < 0)
     {
-	ip2xinet_lock = lis_free_mem(ip2xinet_lock);
+	ip2xinet_lock = lis_free_mem((void *)ip2xinet_lock);
 	return ip2_m_number;
     }
     return 0;
@@ -1003,7 +1020,7 @@ void cleanup_module(void)
     {
 	cleanup_linuxip();
 	lis_unlink("/dev/ip2xinet");
-        ip2xinet_lock = lis_free_mem(ip2xinet_lock);
+        ip2xinet_lock = lis_free_mem((void *)ip2xinet_lock);
         printk("ip2xinet: Unregistered, ready to be unloaded.\n");
     }
     return;
@@ -1019,7 +1036,6 @@ void cleanup_module(void)
 #define IP_SAP          0x800   /* SAP for IP protocol - currently enet type */
 #define ARP_SAP         0x806   /* SAP for ARP */
 
-extern int arp_find();
 
 /* This is a load-time options */
 static int eth = 0; /* Call yourself "ethX". Default is "ip2x0"/"ip2x1" */
@@ -1396,7 +1412,8 @@ struct net_device_stats *ip2xinet_stats(struct net_device *dev)
 int ip2xinet_rebuild_header(struct sk_buff *skb)
 {
     struct ethhdr *eth = (struct ethhdr *)(skb->data);
-    return arp_find(&(eth->h_dest),skb);
+    // return arp_find(&(eth->h_dest),skb);
+    return arp_find(eth->h_dest, skb);
 }
 
 /*
@@ -1521,7 +1538,7 @@ int ip2xinet_init(struct net_device *dev)
     return 0;
 }
 
-struct net_device ip2xinet_devs[NUMIP2XINET] = {0};
+struct net_device ip2xinet_devs[NUMIP2XINET];
 
 /*
  * Finally, the module stuff
