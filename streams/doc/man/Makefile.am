@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/01 09:54:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/02 03:46:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 09:54:46 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:46:35 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
 MANMACRO_PFX			= streams
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 man_MANS = \
 	man1/strchg.1 \
@@ -1585,6 +1588,9 @@ dist_noinst_MANS = \
 	man9/WR.9.man \
 	man9/xmsgsize.9.man \
 	man9/undoc.9.man
+
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/man.am
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2005/03/24 02:11:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/04/02 03:46:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:03 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:46:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,8 @@
 include am/openss7.am
 
 dist_sysconf_DATA =
+
+if PKG_BUILD_ARCH
 
 if RPM_BUILD_USER
 
@@ -108,6 +110,7 @@ LDADD				= libstreams.la
 
 lib_LTLIBRARIES			= libstreams.la
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
@@ -335,6 +338,9 @@ streams.o: stamp-verobjs
 	$(LD) -r -o $@ $$list
 
 endif
+## RPM_BUILD_KERNEL
+endif
+## PKG_BUILD_ARCH
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
@@ -372,6 +378,8 @@ dist_modutil_DATA		= \
 include am/libraries.am
 
 if RPM_BUILD_USER
+
+if PKG_BUILD_ARCH
 
 libstreams_la_SOURCES		= \
 				lib/libc/fattach.c \
@@ -565,6 +573,9 @@ test_streams_LDFLAGS		= libstreams.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
 
+## PKG_BUILD_ARCH
+endif
+## RPM_BUILD_USER
 endif
 
 PKGINCL				= include/sys/$(PACKAGE_NAME)
@@ -636,9 +647,14 @@ if RPM_BUILD_USER
 
 SUBDIRS = include doc tests
 
+## RPM_BUILD_USER
+endif
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				src/util/init/specfs.sh \
@@ -646,7 +662,9 @@ dist_initrd_SCRIPTS		= \
 				src/util/init/streams.sh \
 				src/util/init/strerr.sh
 
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				src/util/init/specfs \
@@ -654,6 +672,7 @@ dist_initrd_SCRIPTS		= \
 				src/util/init/streams \
 				src/util/init/strerr
 
+## ! WITH_RCSD_DIRECTORY
 endif
 
 dist_config_DATA		= \
@@ -665,14 +684,13 @@ dist_config_DATA		= \
 dist_sysconf_DATA		+= \
 				src/util/sysconfig/streams.conf
 
+## INSTALL_INITSCRIPTS
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms

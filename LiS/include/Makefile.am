@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/04/02 03:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 01:39:41 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
 	stropts.h \
@@ -109,9 +112,12 @@ nobase_pkginclude_HEADERS = \
 	sys/stropts.h \
 	sys/strport.h
 
-EXTRA_DIST += $(nobase_pkginclude_HEADERS)
-
 nobase_nodist_pkginclude_HEADERS = \
 	sys/LiS/genconf.h
+
+## PKG_BUILD_ARCH
+endif
+
+EXTRA_DIST += $(nobase_pkginclude_HEADERS)
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.1 $) $Date: 2005/03/09 23:14:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.2 $) $Date: 2005/04/02 03:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,12 +47,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:14:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
 #
 # =============================================================================
 #
 
 include ../../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 $(top_builddir)/$(STRCONF_CONFIG):
 	$(MAKE) -C $(top_builddir) $(AM_MAKEFLAGS) $(STRCONF_CONFIG)
@@ -68,5 +71,8 @@ wrapper_DEPENDENCIES	= $(top_builddir)/$(STRCONF_CONFIG) \
 wrapper_LDFLAGS		= $(top_builddir)/libLiS.la
 wrapper_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 wrapper_CFLAGS		= $(USER_CFLAGS)
+
+## PKG_BUILD_ARCH
+endif
 
 # vim: ft=automake

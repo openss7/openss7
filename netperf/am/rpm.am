@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/03/27 14:14:18 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/04/02 04:39:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/27 14:14:18 $ by $Author: brian $
+## Last Modified $Date: 2005/04/02 04:39:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -239,20 +239,24 @@ each-rpm: $(redhat_spec_file) $(redhat_source_files) $(redhat_directories)
 # instead.
 ##
 one-rpm:
-@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='' each-rpm
+@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_indep --without-indep"' each-rpm
 
 lis-rpm:
-@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lis --with-lis"' each-rpm
+@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lis --with-lis" --define "_without_indep --without-indep"' each-rpm
 
 lfs-rpm:
-@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs"' each-rpm
+@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs" --define "_without_indep --without-indep"' each-rpm
 
-rpms: lis-rpm lfs-rpm one-rpm
+noa-rpm:
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm
+
+rpms: noa-rpm lis-rpm lfs-rpm one-rpm
 
 # Another sneaky trick
 all-one-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-lis-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-lfs-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+all-noa-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 
 sign srpm-sign: $(redhat_src_file)
@@ -281,7 +285,9 @@ rebuild:
 		done ; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
-	done
+	done ; \
+	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"noarch\" $$rpmtarg" ; \
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="noarch" $$rpmtarg || :
 
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
@@ -307,7 +313,7 @@ resign: sign
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
 
-RELEASE			+= all-srpm all-one-rpm all-lis-rpm all-lfs-rpm
+RELEASE			+= all-srpm all-noa-rpm all-lis-rpm all-lfs-rpm all-one-rpm
 RELEASE_SIGN		+= all-sign all-resign
 RELEASE_DIRECTORIES	+= $(redhat_directories)
 
@@ -350,8 +356,8 @@ RELEASECLEANFILES	+= $(redhat_cache_files) \
 			   $(redhat_binary_files) \
 			   $(redhat_hdist_files)
 
-MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign
-ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-sign all-rebuild all-resign
+MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm noa-rpm sign srpm-sign rebuild resign
+ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-noa-rpm all-sign all-rebuild all-resign
 
 endif
 ## BUILD_RPMS

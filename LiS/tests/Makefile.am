@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.2 $) $Date: 2005/03/17 11:18:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.3 $) $Date: 2005/04/02 03:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 11:18:44 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 #
 # This automake file is used to specify the autotest definitions and targets
@@ -103,14 +106,10 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
-# my rule
-dist_noinst_SCRIPTS	+= $(TESTSUITE)
-
-# my rule
 all-testsuite: $(TESTSUITE)
 
 if PERFORM_TESTING
+## PERFORM_TESTING
 
 # my rule
 installcheck-specfs:
@@ -139,11 +138,14 @@ installcheck-testsuite: $(TESTSUITE) atconfig atlocal \
 	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod \
 	installcheck-tirdwr installcheck-inet installcheck-test
 
+## PERFORM_TESTING
 else
+## ! PERFORM_TESTING
 
 # my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal
 
+## ! PERFORM_TESTING
 endif
 
 # my rule
@@ -170,6 +172,14 @@ ALL_LOCAL += all-testsuite
 INSTALLCHECK_LOCAL += installcheck-testsuite
 
 CLEAN_LOCAL += clean-testsuite
+
+## PKG_BUILD_ARCH
+endif
+
+# my rule
+EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
+# my rule
+dist_noinst_SCRIPTS	+= $(TESTSUITE)
 
 .PHONY: all-testsuite installcheck-testsuite clean-testsuite \
 	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod

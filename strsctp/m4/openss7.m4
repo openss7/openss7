@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/21 08:29:37 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/02 03:22:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/21 08:29:37 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:22:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -168,6 +168,8 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_PKG_EPOCH
     _OPENSS7_OPTIONS_PKG_RELEASE
     _OPENSS7_OPTIONS_PKG_DISTDIR
+    _OPENSS7_OPTIONS_PKG_ARCH
+    _OPENSS7_OPTIONS_PKG_INDEP
 ])# _OPENSS7_OPTIONS
 # =============================================================================
 
@@ -316,6 +318,45 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
     PACKAGE_DISTDIR="$pkg_cv_distdir"
     AC_SUBST([PACKAGE_DISTDIR])dnl
 ])# _OPENSS7_OPTIONS_PKG_DISTDIR
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_ARCH
+# -----------------------------------------------------------------------------
+# Debian (and rpm for that matter) can build architecture dependent or
+# architecture independent packages.  This option specifies whether architecture
+# dependent packages are to be built and installed.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_ARCH], [dnl
+    AC_MSG_CHECKING([for deb build/install of arch packages])
+    AC_ARG_ENABLE([arch],
+	AS_HELP_STRING([--enable-arch],
+	    [build and install arch packages.  @<:@default=yes@:>@]),
+	[enable_arch="$enableval"],
+	[enable_arch='yes'])
+    AC_MSG_RESULT([${enable_arch:-yes}])
+    AM_CONDITIONAL([PKG_BUILD_ARCH], [test :"${enable_arch:-yes}" = :yes])dnl
+	
+])# _OPENSS7_OPTIONS_PKG_ARCH
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_INDEP
+# -----------------------------------------------------------------------------
+# Debian (and rpm for that matter) can build architecture dependent or
+# architecture independent packages.  This option specifies whether architecture
+# independent packages are to be built and installed.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_INDEP], [dnl
+    AC_MSG_CHECKING([for deb build/install of indep packages])
+    AC_ARG_ENABLE([indep],
+	AS_HELP_STRING([--enable-indep],
+	    [build and install indep packages.  @<:@default=yes@:>@]),
+	[enable_indep="$enableval"],
+	[enable_indep='yes'])
+    AC_MSG_RESULT([${enable_indep:-yes}])
+    AM_CONDITIONAL([PKG_BUILD_INDEP], [test :"${enable_indep:-yes}" = :yes])dnl
+])# _OPENSS7_OPTIONS_PKG_INDEP
 # =============================================================================
 
 # =============================================================================

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.1 $) $Date: 2005/03/09 23:14:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.2 $) $Date: 2005/04/02 03:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:14:19 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,12 @@ RUNTESTFLAGS	=
 
 EXTRA_DIST	+= config/default.exp netperf/netperf.exp strtst/strtst.exp
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 SUBDIRS		= wrapper
+
+## PKG_BUILD_ARCH
+endif
 
 # vim: ft=automake

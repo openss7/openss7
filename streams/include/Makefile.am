@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/26 22:12:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/02 03:46:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:26 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:46:38 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
 	log.h \
@@ -81,5 +84,8 @@ nobase_pkginclude_HEADERS = \
 	sys/uw7ddi.h
 
 nobase_nodist_pkginclude_HEADERS =
+
+## PKG_BUILD_ARCH
+endif
 
 # vim: ft=automake

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/04/01 18:35:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.9 $) $Date: 2005/04/02 03:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 18:35:27 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,8 @@ include am/openss7.am
 dist_sysconf_DATA =
 
 if LIS_USER_TARGET
+
+if PKG_BUILD_ARCH
 
 if RPM_BUILD_USER
 
@@ -80,9 +82,16 @@ LIS_EXTRA_TOOLS			=
 
 LDADD				= libLiSuser.la
 
+## RPM_BUILD_USER
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 else
+## ! LIS_USER_TARGET
+
+if PKG_BUILD_ARCH
 
 if RPM_BUILD_USER
 
@@ -111,8 +120,10 @@ LDADD				= libLiS.la
 
 lib_LTLIBRARIES			= libLiS.la libpLiS.la
 
+## RPM_BUILD_USER
 endif
 
+if PKG_BUILD_ARCH
 if RPM_BUILD_KERNEL
 
 noinst_LIBRARIES		= libLiShead.a libLiSdrvr.a libLiSload.a
@@ -181,6 +192,9 @@ streams.o: stamp-verobjs
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
+## RPM_BUILD_KERNEL
+endif
+## PKG_BUILD_ARCH
 endif
 
 if RPM_BUILD_USER
@@ -210,8 +224,11 @@ libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:1:0
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
-
+## PKG_BUILD_ARCH
+endif
+## ! LIS_USER_TARGET
 endif
 
 EXTRA_TEX			+= \
@@ -250,6 +267,8 @@ dist_modutil_DATA		= \
 include am/libraries.am
 
 if RPM_BUILD_USER
+
+if PKG_BUILD_ARCH
 
 EXTRA_PROGRAMS			+= \
 				  polltst \
@@ -353,6 +372,9 @@ strmakenodes_LDADD		=
 strmakenodes_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strmakenodes_CFLAGS		= $(USER_CFLAGS)
 
+## PKG_BUILD_ARCH
+endif
+## RPM_BUILD_USER
 endif
 
 PKGINCL				= include/sys/$(PACKAGE_NAME)
@@ -380,18 +402,25 @@ if RPM_BUILD_USER
 
 SUBDIRS = include man manual tests . testsuite
 
+## RPM_BUILD_USER
+endif
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				util/init/streams.sh
 
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				util/init/streams
-
+## ! WITH_RCSD_DIRECTORY
 endif
 
 dist_config_DATA		= \
@@ -400,14 +429,13 @@ dist_config_DATA		= \
 dist_sysconf_DATA		+= \
 				util/sysconfig/streams.conf
 
+## INSTALL_INITSCRIPTS
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms

@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/02 03:22:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+## Last Modified $Date: 2005/04/02 03:22:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 ##
 # Although we use libtool for building shared libraries, libtool "finish"
@@ -104,12 +107,17 @@ postun-libraries:
 UNINSTALL_HOOK += postun-libraries
 
 if PERFORM_CHECKS
+## PERFORM_CHECKS
 dist_check_SCRIPTS 	+= $(top_srcdir)/scripts/check_libs
 TESTS_ENVIRONMENT 	+= lib_LTLIBRARIES='$(lib_LTLIBRARIES)'
 CLEANFILES		+= check_libs.log
 DISTCLEANFILES		+= *.err *.out
+## PERFORM_CHECKS
 endif
 
+## RPM_BUILD_USER
+endif
+## PKG_BUILD_ARCH
 endif
 
 .PHONY: post-libraries postun-libraries

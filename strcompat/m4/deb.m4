@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/27 10:57:57 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/02 03:22:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/27 10:57:57 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 03:22:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,8 +109,8 @@ AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
 # _DEB_DPKG_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP], [dnl
-    _DEB_DPKG_SETUP_ARCH
-    _DEB_DPKG_SETUP_INDEP
+dnl _DEB_DPKG_SETUP_ARCH
+dnl _DEB_DPKG_SETUP_INDEP
     _DEB_DPKG_SETUP_TOPDIR
     _DEB_DPKG_SETUP_OPTIONS
     _DEB_DPKG_SETUP_BUILD
