@@ -1,0 +1,307 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: t_sndv.3.man,v 0.9 2004/04/04 00:12:51 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/04 00:12:51 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_SNDV 3 "$Date: 2004/04/04 00:12:51 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.\"
+.\"
+.SH NAME
+.B t_sndv
+\- gather and send data
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_sndv(int " fd ", struct t_iovec *" iov ", unsigned int " iovcnt ", int " flags );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+specifies the local transport endpoint from which the data is to be sent.
+.TP
+.I iov
+is a pointer to an array of
+.B t_iovec
+structures that specify the scatter-gather buffer from which to gather the
+data.
+.TP
+.I iovcnt
+is the number of
+.B t_iovec
+structures in the array pointed to by
+.IR iov .
+.TP
+.I flags
+describe additional information about the data being sent.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR t_sndv ()
+sends connection oriented data, gathering the data from a vector of
+user specified scatter-gather buffers.
+.PP
+The
+.I flags
+are a bitwise OR of any of the following flags:
+.TP
+.B T_MORE
+specifies that the next send operation will include data belonging to the same
+transport service data unit or expedited transport service data unit.
+.TP
+.B T_EXPEDITED
+specifies that the data is part of an expedited transport service data unit.
+When not set, specifies that the data is part of a normal transport service
+data unit.
+.TP
+.B T_PUSH
+specifies that any accumulated data should be sent without delay.
+.PP
+The
+.B t_iovec
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_iovec {
+        void *iov_base;
+        size_t iov_len;
+};
+\fR\s+1
+.fi
+.PP
+The
+.B t_iovec
+structure specifies the following members:
+.TP
+.I iov_base
+The base of the scatter-gather buffer.
+.TP
+.I iov_len
+The length of the scatter-gather buffer pointed to by
+.IR iov_base .
+.PP
+When data is sent, each buffer in the array of scatter-gather buffers,
+.IR iov ,
+are used in order until they are exhausted and then data is sent from the next
+sequential buffer in the array.
+.\"
+.\"
+.SH CAVEATS
+.PP
+.BR t_sndv ()
+is only valid in the
+.BR T_DATAXFER " and " T_INREL
+states.
+.PP
+.BR t_sndv ()
+is only valid for transport service providers of service type
+.BR T_COTS " and " T_COTS_ORD .
+.PP
+In synchronous mode,
+.BR t_sndv ()
+blocks until there is sufficient room to buffer the data for transmission
+considering flow control.  In asynchronous mode where there is insufficient
+room to buffer the data for transmission considering flow control,
+.BR t_sndv ()
+fails, returns -1 and sets
+.IR t_errno (3)
+to
+.RB [ TFLOW ].
+.PP
+.BR t_sndv ()
+is functionaly equivalent to
+.BR writev (2),
+and the two functions can be used interchangeably; however,
+.BR writev (2)
+does not maintain
+.IR t_errno (3).
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_sndv ()
+returns zero (0) or a positive integer reflecting the number of bytes sent.
+Upon failure,
+.BR t_sndv ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR t_sndv ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP
+.RB [ TBADFLAG ]
+The argument
+.I flags
+contains invalid flags (other than
+.BR T_MORE ", " T_EXPEDITED " or " T_PUSH ).
+.TP
+.RB [ TFLOW ]
+The call would block due to flow control but
+.I fd
+is in asynchronous mode
+.BR "" ( O_NONBLOCK " or " O_NDELAY
+was set using
+.BR t_open (3)
+or
+.BR fcntl (2).
+.TP
+.RB [ TLOOK ]
+An asynchronous event occured before the call could complete.  See
+.BR t_look (3)
+for more information.
+.TP
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+The can occur when the transport service provider is of service type
+.BR T_CLTS .
+.TP
+.RB [ TOUTSTATE ]
+The call was issued with the interface in a state other than
+.BR T_DATAXFER " or " T_INREL .
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A
+.B Linux
+system error occured and the
+.B Linux
+error number is set in
+.IR errno (3).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR fcntl (2),
+.BR t_errno (3),
+.BR t_look (3),
+.BR t_open (3),
+.BR t_snd (3),
+.BR writev (2).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_sndv ()
+has no known bugs.
+.BR t_sndv ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

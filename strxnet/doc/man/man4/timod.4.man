@@ -1,0 +1,916 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: timod.4.man,v 0.9 2004/04/04 00:12:51 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/04 00:12:51 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TIMOD 4 "$Date: 2004/04/04 00:12:51 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.\"
+.\"
+.SH NAME
+.B timod
+\- a STREAMS XTI/TLI compatability interface
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/tihdr.h>
+.br
+.B #include <sys/timod.h>
+.HP 8
+.BI "" t " = open(" /dev/tcp , 0 );
+.HP 8
+.BI ioctl( t , " I_PUSH" , " \*(lqtimod\*(rq" );
+.HP 8
+.BI ioctl( t , " I_STR" , " &ic" );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.PP
+.B timod
+is a XTI/TLI library compatability module for the STREAMS Transport Provider
+Interface
+.BR tpi (7).
+It translates a set of
+.B timod
+.BR ioctl (2)
+commands into TLI primitives.  These
+.B timod
+.BR ioctl (2)
+commands are intended to be used by the XTI/TLI library.
+.PP
+The purpose of the
+.B timod
+module is provide thread-safe atomic operations in support fot he XTI/TLI
+library.
+.B timod
+does not alter any messages passed with
+.BR putmsg "(2) or " putpmsg (2),
+or received with
+.BR getmsg "(2) or " getpmsg (2).
+.B timod
+simply intercepts responses to its own primitives sent downstream as a result
+of an
+.BR ioctl (2)
+command.
+.PP
+Unlike the
+.BR sockmod (4)
+module,
+.B timod
+makes no adjustments to the stream head for
+.BR read (2)
+options (see
+.B I_SETRDOPT
+under
+.BR streamio (7)).
+.\"
+.\"
+.SH IOCTLS
+.PP
+.PP
+The following subsections detail the
+.BR ioctl (2)
+commands that are made available by pushing the
+.B timod
+module.
+For additional information on the
+.B T_primitive
+structures, see
+.BR tpi (7).
+.PP
+.B timod
+only supports the
+.I I_STR
+version of the IO controls and does not support transparent IO controls.  For
+more information, see the
+.I I_STR
+subsection of
+.BR streamio (7).
+.\"
+.\"
+.SS TI_GETINFO (('T' << 8) + 140)
+.PP
+.I arg
+is a pointer to a
+.B strioctl
+structure passing in a
+.B T_info_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_info_req {
+    t_scalar_t PRIM_type;       /* always T_INFO_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_info_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_info_ack {
+    t_scalar_t PRIM_type;       /* always T_INFO_ACK */
+    t_scalar_t TSDU_size;       /* max TSDU size */
+    t_scalar_t ETSDU_size;      /* max ETSDU size */
+    t_scalar_t CDATA_size;      /* Connect data size */
+    t_scalar_t DDATA_size;      /* Discon data size */
+    t_scalar_t ADDR_size;       /* TSAP size */
+    t_scalar_t OPT_size;        /* options size */
+    t_scalar_t TIDU_size;       /* TIDU size */
+    t_scalar_t SERV_type;       /* service type */
+    t_scalar_t CURRENT_state;   /* current state */
+    t_scalar_t PROVIDER_flag;   /* provider flags */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_info_ack
+structure.
+.\"
+.\"
+.SS TI_OPTMGMT (('T' << 8) + 141)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_optmgmt_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_optmgmt_req {
+    t_scalar_t PRIM_type;       /* always T_OPTMGMT_REQ */
+    t_scalar_t OPT_length;      /* options length */
+    t_scalar_t OPT_offset;      /* options offset */
+    t_scalar_t MGMT_flags;      /* flags */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_optmgmt_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_optmgmt_ack {
+    t_scalar_t PRIM_type;       /* always T_OPTMGMT_ACK */
+    t_scalar_t OPT_length;      /* options length */
+    t_scalar_t OPT_offset;      /* options offset */
+    t_scalar_t MGMT_flags;      /* flags */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_optmgmt_ack
+structure.
+.\"
+.\"
+.SS TI_BIND (('T' << 8) + 142)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_bind_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_bind_req {
+    t_scalar_t PRIM_type;       /* always T_BIND_REQ */
+    t_scalar_t ADDR_length;     /* length of address */
+    t_scalar_t ADDR_offset;     /* offset of address */
+    t_uscalar_t CONIND_number;  /* requested number of connect
+                                   indications to be queued */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_bind_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_bind_ack {
+    t_scalar_t PRIM_type;       /* always T_BIND_ACK */
+    t_scalar_t ADDR_length;     /* length of address */
+    t_scalar_t ADDR_offset;     /* offset of address */
+    t_uscalar_t CONIND_number;  /* connect indications to be queued */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_bind_ack
+structure.
+.\"
+.\"
+.SS TI_UNBIND (('T' << 8) + 143)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_unbind_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_unbind_req {
+    t_scalar_t PRIM_type;       /* always T_UNBIND_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_ok_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_ok_ack {
+    t_scalar_t PRIM_type;       /* always T_OK_ACK */
+    t_scalar_t CORRECT_prim;    /* primitive */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_ok_ack
+structure.
+.\"
+.\"
+.SS TI_GETMYNAME (('T' << 8) + 144)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_addr_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_req {
+    t_scalar_t PRIM_type;       /* always T_ADDR_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_addr_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_ack {
+    t_scalar_t PRIM_type;       /* always T_ADDR_ACK */
+    t_scalar_t LOCADDR_length;  /* length of local address */
+    t_scalar_t LOCADDR_offset;  /* offset of local address */
+    t_scalar_t REMADDR_length;  /* length of remote address */
+    t_scalar_t REMADDR_offset;  /* offset of remote address */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_addr_ack
+structure.
+.\"
+.\"
+.SS TI_GETPEERNAME (('T' << 8) + 145)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_addr_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_req {
+    t_scalar_t PRIM_type;       /* always T_ADDR_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_addr_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_ack {
+    t_scalar_t PRIM_type;       /* always T_ADDR_ACK */
+    t_scalar_t LOCADDR_length;  /* length of local address */
+    t_scalar_t LOCADDR_offset;  /* offset of local address */
+    t_scalar_t REMADDR_length;  /* length of remote address */
+    t_scalar_t REMADDR_offset;  /* offset of remote address */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_addr_ack
+structure.
+.\"
+.\"
+.SS TI_SETMYNAME (('T' << 8) + 146)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_conn_res
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_conn_res {
+    t_scalar_t PRIM_type;       /* always T_CONN_RES */
+    t_scalar_t ACCEPTOR_id;     /* reponse queue ptr */
+    t_scalar_t OPT_length;      /* options length */
+    t_scalar_t OPT_offset;      /* options offset */
+    t_scalar_t SEQ_number;      /* sequence number */
+};
+\fR\s+1
+.fi
+following by any connection response data.
+.PP
+and returning a
+.B T_ok_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_ok_ack {
+    t_scalar_t PRIM_type;       /* always T_OK_ACK */
+    t_scalar_t CORRECT_prim;    /* primitive */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_ok_ack
+structure.
+.\"
+.\"
+.SS TI_SETPEERNAME (('T' << 8) + 147)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_conn_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_conn_req {
+    t_scalar_t PRIM_type;       /* always T_CONN_REQ */
+    t_scalar_t DEST_length;     /* dest addr length */
+    t_scalar_t DEST_offset;     /* dest addr offset */
+    t_scalar_t OPT_length;      /* options length */
+    t_scalar_t OPT_offset;      /* options offset */
+};
+\fR\s+1
+followed by any connection request data.
+.fi
+.PP
+and returning a
+.B T_ok_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_ok_ack {
+    t_scalar_t PRIM_type;       /* always T_OK_ACK */
+    t_scalar_t CORRECT_prim;    /* primitive */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_ok_ack
+structure.
+.\"
+.\"
+.SS TI_SYNC (('T' << 8) + 148)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B ti_sync_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct ti_sync_req {
+    u_int32_t tsr_flags;
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B ti_sync_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct ti_sync_ack {
+    t_scalar_t PRIM_type;
+    t_scalar_t TSDU_size;
+    t_scalar_t ETSDU_size;
+    t_scalar_t CDATA_size;
+    t_scalar_t DDATA_size;
+    t_scalar_t ADDR_size;
+    t_scalar_t OPT_size;
+    t_scalar_t TIDU_size;
+    t_scalar_t SERV_type;
+    t_scalar_t CURRENT_state;
+    t_scalar_t PROVIDER_flag;
+    t_uscalar_t tsa_qlen;
+    u_int32_t tsa_flags;
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+Field
+.I tsr_flags
+can contain zero or more of the following flags bitwise OR'ed together:
+.TP
+.B TSRF_INFO_REQ
+Requests that the response contain a completed information request.
+.TP
+.B TSRF_IS_EXP_IN_RCVBUF
+Requests that the response contain a flag indicating whether there is
+expedited data in the receive buffer.
+.TP
+.B TSRF_QLEN_REQ
+Requests that the response contain the queue length of the transport service
+provider.  Note that this information is not contained in a
+.B T_capability_ack
+but is necessary when a file descriptor is being synced on an open transport
+endpoint.
+.PP
+Field
+.I tsa_flags
+can contain zero or more of the following flags bitwise OR'ed together:
+.TP
+.B TSAF_EXP_QUEUED
+Indicates that there is expedited data queued in the transport endpoint
+receive buffer.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B ti_sync_ack
+structure.
+.\"
+.\"
+.SS TI_GETADDRS (('T' << 8) + 149)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_addr_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_req {
+    t_scalar_t PRIM_type;       /* always T_ADDR_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_addr_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_ack {
+    t_scalar_t PRIM_type;       /* always T_ADDR_ACK */
+    t_scalar_t LOCADDR_length;  /* length of local address */
+    t_scalar_t LOCADDR_offset;  /* offset of local address */
+    t_scalar_t REMADDR_length;  /* length of remote address */
+    t_scalar_t REMADDR_offset;  /* offset of remote address */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value, See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_addr_ack
+structure.
+.\"
+.\"
+.SS TI_CAPABILITY (('T' << 8) + 150)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.BR T_capability_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_capability_req {
+    t_scalar_t PRIM_type;       /* T_CAPABILITY_REQ */
+    t_uscalar_t CAP_bits1;      /* capability bits 1 */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_capability_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_capability_ack {
+    t_scalar_t PRIM_type;       /* T_CAPABILITY_ACK */
+    t_uscalar_t CAP_bits1;      /* capability bits #1 */
+    struct T_info_ack INFO_ack; /* info acknowledgement */
+    t_uscalar_t ACCEPTOR_id;    /* accepting endpoint id */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value, See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.PP
+The buffer passed in the
+.B strioctl
+structure
+.RI ( ic_dp )
+must be of sufficient size
+.RI ( ic_len )
+to hold the returned
+.B T_capability_ack
+structure.
+.\"
+.\"
+.SH "RETURN VALUES"
+.PP
+.PP
+When
+.B timod
+ioctls succeed, they return zero and the returned TLI message in the area
+pointed to by the
+.I ic_dp
+member of the
+.B strioctl
+structure pointed to by
+.IR arg .
+When
+.B timod
+ioctls fail due to a
+.B T_ERROR_ACK
+being returned from the underlying TLI driver,
+.B timod
+returns a concatentation of the UNIX_error and the TLI_error as follows:
+.BR "((p->UNIX_error << 8) + p->TLI_error)" .
+When the ioctl fails, 
+.B timod
+returns -1 and sets
+.BI errno (3)
+to an appropriate error number.
+See
+.BR streamio (7)
+for a list of error numbers returned by the
+.B I_STR
+command.
+.\"
+.\"
+.SH ERRORS
+.PP
+.PP
+When
+.B timod
+ioctl calls fail,
+.B timod
+returns -1 and sets the
+.BI errno (3)
+to an appropriate error number.
+See
+.BR streamio (7)
+for a list of error numbers returned by the
+.B I_STR
+command.
+.\"
+.\"
+.SH MODULES
+.PP
+.RB \*(lq timod \*(rq
+.I STREAMS
+module.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2),
+.BR streamio (7),
+.BR tpi (7),
+.BR sockmod (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B timod
+has been tested with the
+.I /usr/bin/test-timod
+conformance test suite.
+.PP
+.B timod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.PP
+This
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation of
+.B timod
+was backported to
+.B LiS
+.[
+LiS
+.]
+to repair deficiencies in the previous
+.B LiS
+implementation.
+.PP
+.B timod
+is compatible with
+.BR "XNS 5.2"
+.[
+xns
+.]
+and
+.BR "SVR 4.2" ,
+.[
+svr42spg
+.]
+and descriptions for
+.BR UnixWare7 \(rg,
+.[
+uw7doc
+.]
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+.BR DigitalUNIX \(rg,
+.[
+osfdoc
+.]
+.BR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.BR Solaris \(rg,
+.[
+soldoc
+.]
+.BR SUPER-UX \(rg,
+.[
+suxdoc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\ \ 'u
+Most other implementations only document the
+.BR TI_GETINFO ,
+.BR TI_OPTMGMT ,
+.BR TI_BIND " and " T_UNBIND
+IO controls.
+.B timod
+is consistent with this documentation.
+.IP \(em
+Most other implementations do not document
+.BR TI_GETMYNAME ,
+.BR TI_GETPEERNAME ,
+.BR TI_SETMYNAME " and " TI_SETPEERNAME
+IO controls.  Some of these are archaic and deprecated.
+.B timod
+provides the non-portable mechanisms described here.  Portable application
+programs should not use these IO controls directly.
+.B timod
+uses special versions of these IO controls to ease work involved in the
+XTI/TLI library and to increase efficiency of that library.
+.IP \(em
+.BR TI_SYNC ,
+.BR TI_GETADDR " and " TI_CAPABILITY
+IO controls are consistent with internal documentation of other implementations.
+.B timod
+uses these IO controls to ease work involved in the XTI/TLI library and to
+increase efficiency of that library.
+.B timod
+provides the non-portable mechanisms described here.  Portable application
+programs should not use these IO controls directly.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR "XNS 5.2" ,
+.[
+xns
+.]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 / POSIX ,
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B timod
+first appeared in
+.B SVR 3
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

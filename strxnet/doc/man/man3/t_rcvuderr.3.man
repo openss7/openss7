@@ -1,0 +1,310 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: t_rcvuderr.3.man,v 0.9 2004/04/04 00:12:51 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/04 00:12:51 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_RCVUDERR 3 "$Date: 2004/04/04 00:12:51 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.\"
+.\"
+.SH NAME
+.B t_rcvuderr
+\- receive unitdata error
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_rcvuderr(int " fd ", struct t_uderr *" err );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the transport endpoint upon which to receive a unit data error.
+.TP
+.I err
+a pointer to a
+.B t_uderr
+structure to contain returned information about the received error.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR t_rcvuderr ()
+receives a unitdata error indication that arrived on the local transport
+endpoint specified by
+.IR fd .
+.PP
+.I fd
+specifies the local transport endpoint upon which the unitdata error
+indication arrives.
+.PP
+.I err
+points to a
+.B t_uderr
+structure that returns the destination address and options associated with the
+original message and the error code.
+The
+.B t_uderr
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_uderr {
+        struct netbuf addr;             /* address */
+        struct netbuf opt;              /* options */
+        t_scalar_t error;               /* error code */
+};
+\fR\s+1
+.fi
+.PP
+The
+.B t_uderr
+structure returns the following members and information:
+.TP
+.I addr
+is a
+.BR netbuf (3)
+structure that returns the destination address of the original unitdata that
+resulted in the unitdata error indication.
+The
+.I err->addr.maxlen
+is significant on call and the
+.I err->addr.len
+is significant on return.
+If
+.I err->addr.maxlen
+is zero on call, no destination address is returned.
+If
+.I err->addr.len
+is zero on return, no destination address was associated with the unitdata
+error indication.
+.TP
+.I opt
+is a
+.BR netbuf (3)
+structure that returns the options associated with the original unitdata that
+resulted in the unitdata error indication.
+The
+.I err->opt.maxlen
+is significant on call and the
+.I err->opt.len
+is significant on return.
+If
+.I err->opt.maxlen
+is zero on call, no options are returned.
+If
+.I err->opt.len
+is zero on return, no options were associated with the original unitdata that
+resulted in the unitdata error indication.
+.TP
+.I error
+the error code value is transport service provider specific.
+.\"
+.\"
+.SH CAVEATS
+.PP
+.BR t_rcvuderr ()
+is only valid in state
+.BR T_IDLE .
+.PP
+.BR t_rcvuderr ()
+is valid only for transport service providers for service type
+.BR T_CLTS .
+.PP
+In synchronous mode,
+.BR t_rcvuderr ()
+will block until a unitdata error indication is received.
+In asyncronous mode when no unitdata error indication is immediately
+available,
+.BR t_rcvuderr ()
+fails, returns -1 and sets
+.IR t_errno (3)
+to
+.BR TNOUDERR .
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_rcvuderr ()
+returns zero (0) and the destination address, options and error code in the
+.B t_uderr
+structure.
+Upon failure,
+.BR t_rcvuderr ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR t_rcvuderr ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP
+.RB [ TBUFOVFLW ]
+The
+.I maxlen
+field of a
+.BR netbuf (3)
+structure passed to the call
+.IR "" ( addr ", " opt )
+was non-zero, but insufficient to hold the available information.  See,
+.BR netbuf (3)
+for more information.
+.TP
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+This can happen when the transport service provider is of type
+.BR T_COTS " or " T_COTS_ORD .
+.TP
+.RB [ TNOUDERR ]
+An attempt was made to read a unitdata error and no unitdata error indication was available and
+.I fd
+is in asynchronous mode
+.BR "" ( O_NONBLOCK " or " O_NDELAY
+was set using
+.BR t_open (3)
+or
+.BR fcntl (2)).
+.TP
+.RB [ TOUTSTATE ]
+The call was issued with the interface in a state other than
+.RB [R T_IDLE .
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A
+.B Linux
+system error occured and the
+.B Linux
+error number is set in
+.BR errno (3).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR fcntl (2),
+.BR netbuf (3),
+.BR t_errno (3),
+.BR t_open (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_rcvuderr ()
+has no known bugs.
+.BR t_rcvuderr ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,476 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: t_connect.3.man,v 0.9 2004/04/04 00:12:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/04 00:12:50 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_CONNECT 3 "$Date: 2004/04/04 00:12:50 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.\"
+.\"
+.SH NAME
+.B t_connect
+\- establish a transport connection
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_connect(int " fd ", struct t_call *" sndcall ", struct t_call *" rcvcall );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the transport endpoint to connect.
+.TP
+.I sndcall
+a pointer to a
+.B t_call
+structure specifying the peer address, options and data.
+.TP
+.I rcvcall
+a pointer to a
+.B t_call
+structure returning the responding address, options and data.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I fd
+is the file descriptor of the local transport endpoint.
+.PP
+.I sndcall
+is a
+.B t_call
+structure that specifies the address of the peer and the options and
+connection data to send to the peer.
+.PP
+.I rcvcall
+is a
+.B t_call
+structure that specifies the responding address, response options and
+connection data received from the peer.
+.PP
+The
+.IR sndcall " and " rcvcall
+are
+.B t_call
+structures that specify the called and responding addresses.  The
+.B t_call
+structure is formated as follows:
+.sp
+.nf
+\fC\s-1\
+struct t_call {
+        struct netbuf addr;             /* address */
+        struct netbuf opt;              /* options */
+        struct netbuf udata;            /* user data */
+        int sequence;                   /* sequence number */
+};
+\fR\s+1
+.fi
+.TP
+.I addr
+is a
+.BR netbuf (3)
+structure specifying the area and length of the protocol address.
+.I sndcall->addr
+passes in on call the called address for the connection, if any.
+.I sndcall->addr.len
+is significant and
+.I sndcall->addr.maxlen
+is not.
+.I rcvcall->addr
+returns the responding address for the connection, if any.
+.I rcvcall->addr.maxlen
+is significant on call and
+.I rcvcall->addr.len
+is significant on return.
+.TP
+.I opt
+is a
+.BR netbuf (3)
+structure specifying the area and length of the connection options.
+.I sndcall->opt
+passes in on call the local connection options.
+.I sndcall->opt.len
+is significant and
+.I sndcall->opt.maxlen
+is not.
+.I rcvcall->opt
+returns the remote connection options.
+.I rcvcall->opt.maxlen
+is significant on call and
+.I rcvcall->opt.len
+is significant on return.
+.TP
+.I udata
+is a
+.BR netbuf (3)
+structure specifying the area and length of the connection data.
+.I sndcall->udata
+passes in on call the local connection data.
+.I sndcall->udata.len
+is significant and
+.I sndcall->udata.maxlen
+is not.
+.I rcvcall->udata
+returns the remote connection data.
+.I rcvcall->udata.maxlen
+is significant on call and
+.I rcvcall->udata.len
+is significant on return.
+.TP
+.I sequence
+is not significant in the
+.BR t_connect ()
+call.
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options in the
+.I sndcall->opt
+and
+.I rcvcall->opt
+buffers are formatted as described in
+.BR t_optmgmt (3).
+.PP
+Illegal options (where the
+.I t_opthdr.len
+exceeds the remaining size of the option buffer, or where the option value is
+illegal)
+cause
+.BR t_connect ()
+to either fail with
+.IR t_errno (3)
+set to
+.RB [ TBADOPT ],
+or the connection establishment to fail at a later stage, depending on when
+the implementation detects the illegal option.
+If multiple options are passed in
+.I sndcall->opt
+and on of them is illegal, the call fails.  It is possible, however, that some
+or all of the submitted legal options were successfully negotiated.  Use the
+.B T_CURRENT
+management flag to
+.BR t_optmgmt (3)
+to establish which options were successful.
+.PP
+Options specified in
+.I sndcall->opt
+can address multiple option levels.
+A legal option is ignored by
+.BR t_connect ()
+if it is for an option level unknown to the transport provider.  A legal
+option is ignored by
+.BR t_connect ()
+if it is for an option name unsupported by (unknown to) the transport provider.
+.PP
+If a proposed value is an absolute requirement and the negotiated value is the
+same, the returned option will have a status of
+.BR T_SUCCESS .
+If the option is supported and the negotiation is rejected, any attempt to
+establish a connection aborts; a
+.B T_DISCONNECT
+event occurs, and a synchronous call to
+.BR t_connect ()
+fails with
+.RB [ TLOOK ].
+When multiple options are provided and one of them is rejected and the
+connection establishment fails, one or all of the options successfully
+negotiated before failure may retain their negotiated values.  Use
+.BR t_optmgmt (3)
+with the
+.B T_CURRENT
+flag to determine which options retains their negotiated values.
+.PP
+If a proposed value is not an absolute requirement, and the negotiated value
+equals the proposed value, the returned option will have a status of
+.BR T_SUCCESS .
+If the negotiated value is of lesser quality than the proposed value, the
+returned option will have a status of
+.BR T_PARTSUCCESS .
+If the option is not supported, it is quietly ignored.
+.PP
+.BR t_connect ()
+initiates the negotiation of all options with end-to-end significance.
+Options not explicitly specified in
+.I sndcall->opt
+are taken from an internal option buffer used by the transport provider that
+contains the previously negotiated values or default values for the implicit
+options of end-to-end significance.
+.PP
+If a transport user requests negotiation of a read-only option, or a
+non-privileged user requests illegal access to a privileged option,
+.BR t_connect ()
+will either fail with
+.RB [ TACCES ],
+or the connection establishment aborts and a
+.B T_DISCONNECT
+event occurs.  If the connection aborts, a synchronous call to
+.BR t_connect ()
+fails with
+.RB [ TLOOK ].
+.PP
+.BR t_connect ()
+returns in
+.I rcvcall->opt
+the values of all options with end-to-end significance that were received with
+the connection response and the negotiated values of those options without
+end-to-end significance that had been specified in
+.IR sndcall->opt .
+However, options specified in
+.I sndcall->opt
+that are not supported or refer to an unknown option level are discarded and
+not returned on output.  The status field of each option returned in
+.I rcvcall->opt
+indicates if the proposed value
+.RB ( T_SUCCESS )
+or a degraded value
+.RB ( T_PARTSUCCESS )
+has been negotiated.  The status field of received ancilliary information that is not
+subject to negotiation is always set to
+.BR T_SUCCESS .
+
+.\"
+.\"
+.SH CAVEATS
+.PP
+.BR t_connect ()
+is only valid in state
+.BR T_IDLE .
+.PP
+In synchronous mode,
+.BR t_connect ()
+blocks until it successfully receives a connection confirmation.
+In asynchronous mode (i.e.
+.BR O_NONBLOCK " or " O_NDELAY
+is set with
+.BR t_open "(3) or " fcntl (2)),
+.BR t_connect ()
+will return immediately after failing to read a connection confirmation
+with a a return value of -1 and
+.IR t_errno (3)
+set to
+.BR T_NODATA .
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_connect ()
+returns zero (0), confirms the connection request and provides the responding
+address, options and connection data in the
+.I rcvcall
+.B t_call
+structure.
+Upon failure,
+.BR t_connect ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR t_connect ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TACCES ]
+The caller did not have sufficient permissions to use the address or options specified in
+.IR sndcall->addr " or " sndcall->opt .
+.TP
+.RB [ TADDRBUSY ]
+The
+.I sndcall->addr
+specificed was already in use by another transport endpoint.
+.TP
+.RB [ TBADADDR ]
+The
+.I sndcall->addr
+specified was of an invalid format or contained invalid information.
+.TP
+.RB [ TBADDATA ]
+The amount of data specified for the call
+.I sndcall->udata.len
+provider was invalid for the underlying transport service (i.e. was outside
+the protocol limits).  See
+.BR t_getinfo "(3) and " t_open (3)
+for more information.
+.TP
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP
+.RB [ TBADOPT ]
+The options specified were of an invalid format or contained invalid information.
+See
+.BR t_optmgmt (3)
+for more information on option formats.
+.TP
+.RB [ TBUFOVFLW ]
+The
+.I maxlen
+field of a
+.BR netbuf (3)
+structure,
+.IR rcvcall->addr.maxlen ", " rcvcall->opt.maxlen " or " rcvcall->udata.maxlen ,
+passed to the call was non-zero, but insufficient to hold the available opaque
+information.  See,
+.BR netbuf (3)
+for more information.
+.TP
+.RB [ TLOOK ]
+An asynchronous event occurred before the call could complete.  See
+.BR t_look (3)
+for more information.
+.TP
+.RB [ TNODATA ]
+An attempt was made to read a connection confirmation but
+.I fd
+was set for non-blocking operation with
+.BR O_NONBLOCK " or " O_NDELAY
+and no connection confirmation was available.
+The connection confirmation can be retrieved later with
+.BR t_rcvconnect (3).
+.TP
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+.TP
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP
+.RB [ TPROTO ]
+A protocol error occurred between the XTI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A
+.B Linux
+system error occurred and the
+.B Linux
+error number is set in
+.IR errno (3).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR fcntl (2),
+.BR netbuf (3),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR t_look (3),
+.BR t_open (3),
+.BR t_rcvconnect (3).
+.PP
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_connect ()
+has no known bugs.
+.BR t_connect ()
+has been tested for the described behaviour using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

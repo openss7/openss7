@@ -1,0 +1,225 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: t_addleaf.3.man,v 0.9 2004/04/04 00:12:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/04 00:12:50 $ by $Author: brian $
+.\"
+.\" =========================================================================
+
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_ADDLEAF 3 "$Date: 2004/04/04 00:12:50 $" "$Name:  $" "Linux Fast-STREAMS XTI Library"
+.SH NAME
+.B t_addleaf
+\- add a point to a point to multipoint connection
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_addleaf(int " fd ", int " leafid ", struct netbuf *" addr );
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the transport endpoint to which to add a leaf.
+.TP
+.I leafid
+the identifier for the leaf.
+.TP
+.I addr
+a pointer to a
+.BR netbuf (3)
+structure containing the address of the leaf.
+.SH DESCRIPTION
+.PP
+Requests that an endpoint be added to a point to multipoint connection.
+.PP
+.I fd
+is the file descriptor of the local transport endpoint.
+.PP
+.I leafid
+is a transport user assigned integer value which will be used to identify the
+point added to the point to multipoint connection in subsequent interactions
+with the transport user.
+.PP
+.I addr
+is a
+.BR netbuf (3)
+structure specifying on call the address of the local point being added to the
+point to multipoint connection.
+No information is returned in
+.IR addr .
+.I addr->maxlen
+is ignored by the call.
+.I add->len
+is the length of the address.  If
+.I add->len
+is zero, it indicates that no address is provided.
+.I add->buf
+is a pointer to the user buffer containing the address.
+.SH CAVEATS
+.PP
+.BR t_addleaf ()
+is only valid in the
+.B T_DATAXFER
+state.
+.PP
+.BR t_addleaf ()
+is only valid for transport service providers of service type
+.BR T_COTS " or " T_COTS_ORD
+that support point to multipoint connection management.
+.PP
+In synchronous mode,
+.BR t_addleaf ()
+blocks until a leaf change confirmation is received.
+In asynchronous mode where no leaf change confirmation is immediately
+avaialble,
+.BR t_addleaf ()
+fails, returns -1 and sets
+.IR t_errno (3)
+to
+.RB [ TNODATA ].
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_addleaf ()
+returns zero (0) and confirms the addition of the requested leaf.
+Upon failure,
+.BR t_addleaf ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_addleaf ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP
+.RB [ TADDRBUSY ]
+The address specificed was already in use by another transport endpoint.
+.TP
+.RB [ TBADADDR ]
+The address specified was of an invalid format or contained invalid information.
+.TP
+.RB [ TLOOK ]
+An asynchronous event occured before the call could complete.  See \fBt_look\fR(3) for more information.
+.TP
+.RB [ TNOADDR ]
+An address was not specified and the transport provider could not assign one.
+.TP
+.RB [ TNODATA ]
+An attempt was made to read the add leaf confirmation but no add leaf confirmation was available.
+.TP
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
+.TP
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.SH "SEE ALSO"
+.PP
+.BR netbuf (3),
+.BR t_rcvleafchange (3),
+.BR t_removeleaf (3).
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
