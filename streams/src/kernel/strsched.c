@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/02 17:41:28 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/05 13:07:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/05 13:07:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/02 17:41:28 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/05 13:07:50 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/02 17:41:28 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/05 13:07:50 $";
 
 #define __NO_VERSION__
 
@@ -118,8 +118,8 @@ static void mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		bzero(md, sizeof(*md));
 		atomic_set(&md->datablk.d_dblock.db_users, 0);
 #if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &md->msgblk.m_next);
-		INIT_LIST_HEAD((struct list_head *) &md->datablk.db_next);
+		INIT_LIST_HEAD(&md->msgblk.m_list);
+		INIT_LIST_HEAD(&md->datablk.db_list);
 #endif
 	}
 }
@@ -196,8 +196,8 @@ mblk_t *mdbblock_alloc(uint priority, void *func)
 		md->msgblk.m_func = func;
 		md->msgblk.m_queue = queue_guess(NULL);
 		write_lock_irqsave(&smi->si_rwlock, flags);
-		list_add_tail((struct list_head *) &md->msgblk.m_next, &smi->si_head);
-		list_add_tail((struct list_head *) &md->datablk.db_next, &sdi->si_head);
+		list_add_tail(&md->msgblk.m_list, &smi->si_head);
+		list_add_tail(&md->datablk.db_list, &sdi->si_head);
 		write_unlock_irqrestore(&smi->si_rwlock, flags);
 		atomic_inc(&smi->si_cnt);
 		if (atomic_read(&smi->si_cnt) > smi->si_hwl)
@@ -272,8 +272,8 @@ static void freeblocks(struct strthread *t)
 			unsigned long flags;
 			struct mdbblock *md = (struct mdbblock *) mp;
 			write_lock_irqsave(&smi->si_rwlock, flags);
-			list_del_init((struct list_head *) &md->msgblk.m_next);
-			list_del_init((struct list_head *) &md->datablk.db_next);
+			list_del_init(&md->msgblk.m_list);
+			list_del_init(&md->datablk.db_list);
 			write_unlock_irqrestore(&smi->si_rwlock, flags);
 			atomic_dec(&smi->si_cnt);
 #endif
@@ -300,7 +300,7 @@ static void qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct qbinfo *qbi = obj;
 		bzero(qbi, sizeof(*qbi));
 #if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &qbi->qbi_next);
+		INIT_LIST_HEAD(&qbi->qbi_list);
 #endif
 	}
 }
@@ -315,7 +315,7 @@ struct qband *allocqb(void)
 		{
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
-			list_add_tail((struct list_head *) &qbi->qbi_next, &si->si_head);
+			list_add_tail(&qbi->qbi_list, &si->si_head);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
 		}
 #endif
@@ -332,7 +332,7 @@ void freeqb(struct qband *qb)
 	unsigned long flags;
 	struct qbinfo *qbi = (struct qbinfo *) qb;
 	write_lock_irqsave(&si->si_rwlock, flags);
-	list_del_init((struct list_head *) &qbi->qbi_next);
+	list_del_init(&qbi->qbi_list);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
 #endif
 	atomic_dec(&si->si_cnt);
@@ -364,9 +364,9 @@ static void apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct apinfo *api = obj;
 		bzero(api, sizeof(*api));
-		INIT_LIST_HEAD(&api->api_list);
+		INIT_LIST_HEAD(&api->api_more);
 #if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &api->api_next);
+		INIT_LIST_HEAD(&api->api_list);
 #endif
 	}
 }
@@ -378,7 +378,7 @@ struct apinfo *ap_alloc(struct strapush *sap)
 #if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
-		list_add_tail((struct list_head *) &api->api_next, &si->si_head);
+		list_add_tail(&api->api_list, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
 #endif
 		atomic_inc(&si->si_cnt);
@@ -406,16 +406,16 @@ void ap_put(struct apinfo *api)
 #if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
-			list_del_init((struct list_head *) &api->api_next);
+			list_del_init(&api->api_list);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
 #endif
 			atomic_dec(&si->si_cnt);
-			list_del_init(&api->api_list);
+			list_del_init(&api->api_more);
 			/* clean it up before putting it back in the cache */
 			bzero(api, sizeof(*api));
-			INIT_LIST_HEAD(&api->api_list);
+			INIT_LIST_HEAD(&api->api_more);
 #if defined CONFIG_STREAMS_DEBUG
-			INIT_LIST_HEAD((struct list_head *) &api->api_next);
+			INIT_LIST_HEAD(&api->api_list);
 #endif
 			kmem_cache_free(si->si_cache, api);
 		}
@@ -731,7 +731,7 @@ static void queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		qu->rq.q_flag = QREADR;
 		qu->wq.q_flag = 0;
 #if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &qu->qu_next);
+		INIT_LIST_HEAD(&qu->qu_list);
 #endif
 	}
 }
@@ -755,7 +755,7 @@ queue_t *allocq(void)
 		{
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
-			list_add_tail((struct list_head *) &qu->qu_next, &si->si_head);
+			list_add_tail(&qu->qu_list, &si->si_head);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
 		}
 #endif
@@ -783,7 +783,7 @@ static void __freeq(queue_t *rq)
 	unsigned long flags;
 	struct queinfo *qu = (struct queinfo *) rq;
 	write_lock_irqsave(&si->si_rwlock, flags);
-	list_del_init((struct list_head *) &qu->qu_next);
+	list_del_init(&qu->qu_list);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
 #endif
 	atomic_dec(&si->si_cnt);
@@ -838,7 +838,7 @@ static void linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct linkblk *l = &li->li_linkblk;
 		bzero(li, sizeof(*li));
 #if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &li->li_next);
+		INIT_LIST_HEAD(&li->li_list);
 #endif
 		spin_lock_irqsave(&link_index_lock, flags);
 		l->l_index = ++link_index;
@@ -856,7 +856,7 @@ struct linkblk *alloclk(void)
 		unsigned long flags;
 		struct linkinfo *li = (struct linkinfo *) l;
 		write_lock_irqsave(&si->si_rwlock, flags);
-		list_add_tail((struct list_head *) &li->li_next, &si->si_head);
+		list_add_tail(&li->li_list, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
 #endif
 		atomic_inc(&si->si_cnt);
@@ -876,7 +876,7 @@ void freelk(struct linkblk *l)
 	{
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
-		list_del_init((struct list_head *) &li->li_next);
+		list_del_init(&li->li_list);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
 	}
 #endif
@@ -992,7 +992,7 @@ static void seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		unsigned long flags;
 		bzero(s, sizeof(*s));
 #if defined CONFIG_STREAMS_DEBUG
-		INIT_LIST_HEAD((struct list_head *) &s->s_next);
+		INIT_LIST_HEAD(&s->s_list);
 #endif
 		write_lock_irqsave(&event_hash_lock, flags);
 		se->se_id = event_id;
@@ -1014,7 +1014,7 @@ static inline struct strevent *event_alloc(int type, queue_t *q)
 				unsigned long flags;
 				s->s_queue = queue_guess(q);
 				write_lock_irqsave(&si->si_rwlock, flags);
-				list_add_tail((struct list_head *) &s->s_next, &si->si_head);
+				list_add_tail(&s->s_list, &si->si_head);
 				write_unlock_irqrestore(&si->si_rwlock, flags);
 			}
 #endif
@@ -1033,7 +1033,7 @@ static inline void event_free(struct strevent *se)
 	struct seinfo *s = (struct seinfo *) se;
 	ctrace(qput(&s->s_queue));
 	write_lock_irqsave(&si->si_rwlock, flags);
-	list_del_init((struct list_head *) &s->s_next);
+	list_del_init(&s->s_list);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
 #endif
 	atomic_dec(&si->si_cnt);
@@ -2101,7 +2101,7 @@ static void clear_shinfo(struct shinfo *sh)
 	bzero(sh, sizeof(*sh));
 	atomic_set(&sh->sh_refs, 0);
 #if defined CONFIG_STREAMS_DEBUG
-	INIT_LIST_HEAD((struct list_head *) &sh->sh_next);
+	INIT_LIST_HEAD(&sh->sh_list);
 #endif
 	sd->sd_rdopt = RNORM | RPROTNORM;
 	sd->sd_wropt = 0;
@@ -2126,7 +2126,7 @@ struct stdata *allocsd(void)
 		{
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
-			list_add_tail((struct list_head *) &sh->sh_next, &si->si_head);
+			list_add_tail(&sh->sh_list, &si->si_head);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
 		}
 #endif
@@ -2147,7 +2147,7 @@ static void __freesd(struct stdata *sd)
 	{
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
-		list_del_init((struct list_head *) &sh->sh_next);
+		list_del_init(&sh->sh_list);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
 	}
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/28 13:46:47 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/05 13:07:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/05 13:07:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/28 13:46:47 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/05 13:07:50 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/28 13:46:47 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/05 13:07:50 $";
 
 #define __NO_VERSION__
 
@@ -81,7 +81,7 @@ static struct apinfo *__autopush_find(struct cdevsw *cdev, unsigned char minor)
 	if (!cdev->d_apush.next)
 		INIT_LIST_HEAD(&cdev->d_apush);
 	list_for_each(pos, &cdev->d_apush) {
-		api = list_entry(pos, struct apinfo, api_list);
+		api = list_entry(pos, struct apinfo, api_more);
 		if (minor >= api->api_sap.sap_minor && minor <= api->api_sap.sap_lastminor)
 			break;
 		api = NULL;
@@ -101,7 +101,7 @@ static int __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 		goto error;
 	if (!cdev->d_apush.next)
 		INIT_LIST_HEAD(&cdev->d_apush);
-	list_add_tail(&api->api_list, &cdev->d_apush);
+	list_add_tail(&api->api_more, &cdev->d_apush);
 	return (0);
       error:
 	return (err);

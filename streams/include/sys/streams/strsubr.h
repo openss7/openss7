@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.18 2005/02/28 13:49:24 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.19 2005/03/05 13:07:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
+ Last Modified $Date: 2005/03/05 13:07:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:49:24 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/05 13:07:49 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -375,8 +375,7 @@ enum {
 struct shinfo {
 	struct stdata sh_stdata;
 	atomic_t sh_refs;		/* references to this structure */
-	struct shinfo *sh_next;
-	struct shinfo *sh_prev;
+	struct list_head sh_list;
 };
 
 struct queinfo {
@@ -395,8 +394,7 @@ struct queinfo {
 	rwlock_t qu_lock;		/* procs lock */
 	struct task_struct *qu_owner;	/* exclusive locker */
 	uint qu_nest;			/* exclusive lock nest */
-	struct queinfo *qu_next;
-	struct queinfo *qu_prev;
+	struct list_head qu_list;
 };
 
 #if 0
@@ -420,20 +418,17 @@ struct mbinfo {
 	mblk_t m_mblock;
 	void (*m_func) (void);		/* allocating function SVR4 compatible */
 	queue_t *m_queue;		/* last queue for this block */
-	struct mbinfo *m_next;
-	struct mbinfo *m_prev;
+	struct list_head m_list;
 };
 struct dbinfo {
 	dblk_t d_dblock;
-	struct dbinfo *db_next;
-	struct dbinfo *db_prev;
+	struct list_head db_list;
 };
 
 /* I don't know why, we never allocate these, we place them in message blocks */
 struct linkinfo {
 	struct linkblk li_linkblk;
-	struct linkinfo *li_next;
-	struct linkinfo *li_prev;
+	struct list_head li_list;
 };
 
 #define SE_STREAM	0
@@ -449,23 +444,20 @@ struct seinfo {
 	struct strevent s_strevent;
 	unsigned int s_type;
 	queue_t *s_queue;		/* queue guess for this strevent */
-	struct seinfo *s_next;
-	struct seinfo *s_prev;
+	struct list_head s_list;
 };
 
 struct qbinfo {
 	struct qband qbi_qband;
 	atomic_t qbi_refs;		/* references to this structure */
-	struct qbinfo *qbi_next;
-	struct qbinfo *qbi_prev;
+	struct list_head qbi_list;
 };
 
 struct apinfo {
 	struct strapush api_sap;
-	struct list_head api_list;
+	struct list_head api_more;
 	atomic_t api_refs;
-	struct apinfo *api_next;
-	struct apinfo *api_prev;
+	struct list_head api_list;
 };
 
 struct devinfo {

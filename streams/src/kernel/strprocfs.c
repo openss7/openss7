@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 14:13:57 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/05 13:07:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/05 13:07:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 14:13:57 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/05 13:07:50 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 14:13:57 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/05 13:07:50 $";
 
 #define __NO_VERSION__
 
@@ -330,7 +330,7 @@ static int get_streams_strapush_list(char *page, ssize_t maxlen, struct list_hea
 	if (!list->next)
 		INIT_LIST_HEAD(list);
 	list_for_each_safe(cur, tmp, list) {
-		struct strapush *sap = (struct strapush *) list_entry(cur, struct apinfo, api_list);
+		struct strapush *sap = (struct strapush *) list_entry(cur, struct apinfo, api_more);
 		len += snprintf(page + len, maxlen - len, ", %p", sap);
 	}
 	return (len);
@@ -684,7 +684,7 @@ static int get_streams_shinfo_list(char *page, char **start, off_t offset, int l
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct shinfo *sh = list_entry(cur, struct shinfo, sh_next);
+		struct shinfo *sh = list_entry(cur, struct shinfo, sh_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_shinfo_data(buffer, maxlen - 1, sh);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -804,7 +804,7 @@ static int get_streams_queinfo_list(char *page, char **start, off_t offset, int 
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct queinfo *qu = list_entry(cur, struct queinfo, qu_next);
+		struct queinfo *qu = list_entry(cur, struct queinfo, qu_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_queinfo_data(buffer, maxlen - 1, qu);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -900,7 +900,7 @@ static int get_streams_mbinfo_list(char *page, char **start, off_t offset, int l
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct mbinfo *m = list_entry(cur, struct mbinfo, m_next);
+		struct mbinfo *m = list_entry(cur, struct mbinfo, m_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_mbinfo_data(buffer, maxlen - 1, m);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -984,7 +984,7 @@ static int get_streams_dbinfo_list(char *page, char **start, off_t offset, int l
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct dbinfo *db = list_entry(cur, struct dbinfo, db_next);
+		struct dbinfo *db = list_entry(cur, struct dbinfo, db_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_dbinfo_data(buffer, maxlen - 1, db);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1062,7 +1062,7 @@ static int get_streams_linkinfo_list(char *page, char **start, off_t offset, int
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct linkinfo *li = list_entry(cur, struct linkinfo, li_next);
+		struct linkinfo *li = list_entry(cur, struct linkinfo, li_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_linkinfo_data(buffer, maxlen - 1, li);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1167,7 +1167,7 @@ static int get_streams_seinfo_list(char *page, char **start, off_t offset, int l
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct seinfo *s = list_entry(cur, struct seinfo, s_next);
+		struct seinfo *s = list_entry(cur, struct seinfo, s_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_seinfo_data(buffer, maxlen - 1, s);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1257,7 +1257,7 @@ static int get_streams_qbinfo_list(char *page, char **start, off_t offset, int l
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct qbinfo *qbi = list_entry(cur, struct qbinfo, qbi_next);
+		struct qbinfo *qbi = list_entry(cur, struct qbinfo, qbi_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_qbinfo_data(buffer, maxlen - 1, qbi);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
@@ -1345,7 +1345,7 @@ static int get_streams_apinfo_list(char *page, char **start, off_t offset, int l
 	}
 	pos = maxlen;
 	list_for_each_safe(cur, tmp, &si->si_head) {
-		struct apinfo *api = list_entry(cur, struct apinfo, api_next);
+		struct apinfo *api = list_entry(cur, struct apinfo, api_list);
 		if ((pos += maxlen) > offset) {
 			get_streams_apinfo_data(buffer, maxlen - 1, api);
 			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
