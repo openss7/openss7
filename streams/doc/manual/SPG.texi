@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.2 2004/03/18 11:17:49 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.3 2004/04/18 21:37:40 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/03/18 11:17:49 $ by $Author: brian $
+% Last Modified $Date: 2004/04/18 21:37:40 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -1521,9 +1521,46 @@ have some use in debugging @i{STREAMS} drivers and modules.
 Linux Fast-STREAMS supports the concept of internal and external device
 numbering with base majors and extended minors.
 
+Linux Fast-STREAMS uses several device numbering schemes intended to be
+compatible with SVR 4.2 MP DDI/DKI and implementations based on SVR 4.2
+including AIX, HP-UX, LiS, OSF/1, Solaris, SUPER-UX, UnixWare, and UXP/V.
+
 @node External Device Numbers, Internal Device Numbers, , Device Numbers
 @section External Device Numbers
 @cpindex external device numbers
+
+Linux Fast-STREAMS provides real external device numbering using the functions
+@iftex
+@b{getemajor}(9), @b{geteminor}(9) and @b{makedevice}(9).
+@end iftex
+@ifnottex
+@inforef{getemajor(9), , *manpages*},
+@inforef{geteminor(9), , *manpages*}
+and
+@inforef{makedevice(9), ,  *manpages*}.
+@end ifnottex
+When used on a devp argument passed to the
+@iftex
+@b{qopen}(9)
+@end iftex
+@ifnottex
+@inforef{qopen(9), , *manpages*}
+@end ifnottex
+procedures of a STREAMS driver or module,
+@iftex
+@b{getemajor}(9) and @b{geteminor}(9)
+@end iftex
+@ifnottex
+@inforef{getemajor(9), , *manpages*}
+and
+@inforef{geteminor(9), , *manpages*}
+@end ifnottex
+will return the real external major or minor device number.  The real external
+major or minor device number is the major or minor device number that is seen
+by user applications.
+
+A number of administrative utilities are provided that assist with the
+assignment of device names and number and are useful in boot scripts:
 
 @node Internal Device Numbers, spec Filesystem, External Device Numbers, Device Numbers
 @section Internal Device Numbers

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.1 2004/03/15 07:59:39 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.2 2004/04/18 21:37:40 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/03/15 07:59:39 $ by $Author: brian $
+% Last Modified $Date: 2004/04/18 21:37:40 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -173,8 +173,8 @@ Porting
 * Porting from OSF/1 1.2/Digital UNIX::
 * Porting from UnixWare 7.1.3 (OpenUnix 8)::
 * Porting from Solaris 9/SunOS 5.9::
-* Porting from Super/UX::
-* Porting from UX/P::
+* Porting from SUPER-UX::
+* Porting from UXP/V::
 * Porting from Linux STREAMS (LiS) 2.16.18::
 
 Appendices
@@ -280,8 +280,8 @@ Porting information is organized into sections as follows:
 * Porting from OSF/1 1.2/Digital UNIX::
 * Porting from UnixWare 7.1.3 (OpenUnix 8)::
 * Porting from Solaris 9/SunOS 5.9::
-* Porting from Super/UX::
-* Porting from UX/P::
+* Porting from SUPER-UX::
+* Porting from UXP/V::
 * Porting from Linux STREAMS (LiS) 2.16.18::
 @end menu
 
@@ -833,7 +833,7 @@ compatibility functions.
 
 @subsection Configuration ala UnixWare 7.1.3 (OpenUnix 8)
 
-@node Porting from Solaris 9/SunOS 5.9, Porting from Super/UX, Porting from UnixWare 7.1.3 (OpenUnix 8), Porting
+@node Porting from Solaris 9/SunOS 5.9, Porting from SUPER-UX, Porting from UnixWare 7.1.3 (OpenUnix 8), Porting
 @section Porting from Solaris 9/SunOS 5.9
 @cindex Porting from Solaris 9/SunOS 5.9
 
@@ -907,23 +907,23 @@ compatibility functions.
 
 @subsection Configuration ala Solaris 9/SunOS 5.9
 
-@node Porting from Super/UX, Porting from UX/P, Porting from Solaris 9/SunOS 5.9, Porting
-@section Porting from Super/UX
-@cindex Porting from Super/UX
+@node Porting from SUPER-UX, Porting from UXP/V, Porting from Solaris 9/SunOS 5.9, Porting
+@section Porting from SUPER-UX
+@cindex Porting from SUPER-UX
 
-@subsection Differences from Super/UX
-@subsection Commonalities with Super/UX
-@subsection Configuration ala Super/UX
+@subsection Differences from SUPER-UX
+@subsection Commonalities with SUPER-UX
+@subsection Configuration ala SUPER-UX
 
-@node Porting from UX/P, Porting from Linux STREAMS (LiS) 2.16.18, Porting from Super/UX, Porting
-@section Porting from UX/P
-@cindex Porting from UX/P
+@node Porting from UXP/V, Porting from Linux STREAMS (LiS) 2.16.18, Porting from SUPER-UX, Porting
+@section Porting from UXP/V
+@cindex Porting from UXP/V
 
-@subsection Differences from UX/P
-@subsection Commonalities with UX/P
-@subsection Configuration ala UX/P
+@subsection Differences from UXP/V
+@subsection Commonalities with UXP/V
+@subsection Configuration ala UXP/V
 
-@node Porting from Linux STREAMS (LiS) 2.16.18, , Porting from UX/P, Porting
+@node Porting from Linux STREAMS (LiS) 2.16.18, , Porting from UXP/V, Porting
 @section Porting from Linux STREAMS (LiS) 2.16.18
 @cindex Porting from Linux STREAMS (LiS) 2.16.18
 
