@@ -1,4 +1,4 @@
-Makefile_ident="@(#) LiS Makefile 2.28 5/30/03"
+Makefile_ident="@(#) LiS Makefile 2.29 6/2/03"
 #
 # Makefile for the kernel STREAMS device drivers.
 #
@@ -112,7 +112,7 @@ SC_MKNODES  := $(UTILOBJ)/makenodes.c
 endif
 SC_GEN := $(SC_CONFIG) $(SC_MODCONF) $(SC_MKNODES) $(SC_DRVRCONF) $(SC_CONFMOD)
 
-$(SC_GEN): Config.master $(UTILOBJ)/strconf
+$(SC_GEN): Config.master $(UTILOBJ)/strconf $(GENCONF)
 	$(UTILOBJ)/strconf			\
 		-h$(SC_CONFIG)			\
 		-o$(SC_MODCONF)			\
@@ -139,7 +139,7 @@ config: $(CONFIG_TARGETS)
 ##   End of: Configuration                                             ##
 #########################################################################
 
-TODO = config $(GENCONF)
+TODO = $(GENCONF) config
 
 ifneq ($(LIS_TARG),user)
 TODO += libc util
@@ -253,7 +253,7 @@ endif
 very-clean: uninstall clean realclean 
 
 
-dep:    
+dep:    $(GENCONF)
 	$(MAKE) -C $(LIBOBJ)  dep
 	$(MAKE) -C $(HEADOBJ) dep
 	$(MAKE) -C $(DRVROBJ) dep
