@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 00:53:13 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $";
 
 #include "compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 #include <ss7/chi_ioctl.h>
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
-#define CH_SDL_REVISION		"LfS $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/27 00:53:13 $"
+#define CH_SDL_REVISION		"LfS $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -84,12 +84,12 @@ MODULE_DESCRIPTION(CH_SDL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CH_SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(CH_SDL_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define CH_SDL_MOD_ID	CONFIG_STREAMS_CH_SDL_MODID
-#define CH_SDL_MOD_NAME	CONFIG_STREAMS_CH_SDL_NAME
+#define CH_SDL_MOD_ID		CONFIG_STREAMS_CH_SDL_MODID
+#define CH_SDL_MOD_NAME		CONFIG_STREAMS_CH_SDL_NAME
 #endif
 /*
  *  =========================================================================
@@ -99,31 +99,39 @@ MODULE_LICENSE(CH_SDL_LICENSE);
  *  =========================================================================
  */
 
-static struct module_info ch_minfo = {
-	mi_idnum:CH_SDL_MOD_ID,		/* Module ID number */
-	mi_idname:CH_SDL_MOD_NAME,	/* Module ID name */
+#define MOD_ID		CH_SDL_MOD_ID
+#define MOD_NAME	CH_SDL_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	CH_SDL_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	CH_SDL_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info ch_minfo = {
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
 	mi_lowat:0,			/* Lo water mark */
 };
 
-static int ch_open(queue_t *, dev_t *, int, int, cred_t *);
-static int ch_close(queue_t *, int, cred_t *);
+STATIC int ch_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int ch_close(queue_t *, int, cred_t *);
 
-static struct qinit ch_rinit = {
+STATIC struct qinit ch_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
 	qi_qopen:ch_open,		/* Each open */
 	qi_qclose:ch_close,		/* Last close */
 	qi_minfo:&ch_minfo,		/* Information */
 };
 
-static struct qinit ch_winit = {
+STATIC struct qinit ch_winit = {
 	qi_putp:ss7_iput,		/* Write put (message from above) */
 	qi_minfo:&ch_minfo,		/* Information */
 };
 
-static struct streamtab ch_info = {
+STATIC struct streamtab ch_sdlinfo = {
 	st_rdinit:&ch_rinit,		/* Upper read queue */
 	st_wrinit:&ch_winit,		/* Upper write queue */
 };
@@ -160,12 +168,12 @@ struct ch_config ch_default = {
 	opt_flags:CH_PARM_OPT_CLRCH,	/* option flags */
 };
 
-static struct ch *ch_opens = NULL;
+STATIC struct ch *ch_opens = NULL;
 
-static struct ch *ch_alloc_priv(queue_t *, struct ch **, dev_t *, cred_t *);
-static struct ch *ch_get(struct ch *);
-static void ch_put(struct ch *);
-static void ch_free_priv(queue_t *);
+STATIC struct ch *ch_alloc_priv(queue_t *, struct ch **, dev_t *, cred_t *);
+STATIC struct ch *ch_get(struct ch *);
+STATIC void ch_put(struct ch *);
+STATIC void ch_free_priv(queue_t *);
 
 /*
  *  =========================================================================
@@ -186,7 +194,8 @@ static void ch_free_priv(queue_t *);
  *  M_ERROR
  *  -----------------------------------
  */
-static int m_error(queue_t *q, struct ch *ch, int error)
+STATIC int
+m_error(queue_t *q, struct ch *ch, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
@@ -207,7 +216,7 @@ static int m_error(queue_t *q, struct ch *ch, int error)
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
 			ch->i_state = CHS_UNUSABLE;
-			printd(("%s: %p: <- M_HANGUP\n", CH_SDL_MOD_NAME, ch));
+			printd(("%s: %p: <- M_HANGUP\n", MOD_NAME, ch));
 			putnext(ch->oq, mp);
 			return (-error);
 		} else {
@@ -215,7 +224,7 @@ static int m_error(queue_t *q, struct ch *ch, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			ch->i_state = CHS_UNUSABLE;
-			printd(("%s: %p: <- M_ERROR\n", CH_SDL_MOD_NAME, ch));
+			printd(("%s: %p: <- M_ERROR\n", MOD_NAME, ch));
 			putnext(ch->oq, mp);
 			return (QR_DONE);
 		}
@@ -230,7 +239,8 @@ static int m_error(queue_t *q, struct ch *ch, int error)
  *  Indicates to the channel user information concerning the channel provider and the
  *  attached channel (if any).
  */
-static inline int ch_info_ack(queue_t *q, struct ch *ch)
+STATIC INLINE int
+ch_info_ack(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_info_ack *p;
@@ -260,7 +270,7 @@ static inline int ch_info_ack(queue_t *q, struct ch *ch)
 		o->cp_tx_channels = ch->config.tx_channels;
 		o->cp_rx_channels = ch->config.rx_channels;
 		o->cp_opt_flags = ch->config.opt_flags;
-		printd(("%s: %p: <- CH_INFO_ACK\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_INFO_ACK\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -272,8 +282,8 @@ static inline int ch_info_ack(queue_t *q, struct ch *ch)
  *  CH_OPTMGMT_ACK
  *  -----------------------------------
  */
-static inline int ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len,
-				 ulong flags)
+STATIC INLINE int
+ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_optmgmt_ack *p;
@@ -288,7 +298,7 @@ static inline int ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- CH_OPTMGMT_ACK\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_OPTMGMT_ACK\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -303,7 +313,8 @@ static inline int ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size
  *  acknowledgement was completed successfully.  (There are only two
  *  operations requiring acknowledgement: CH_ATTACH_REQ and CH_DETACH_REQ.)
  */
-static inline int ch_ok_ack(queue_t *q, struct ch *ch)
+STATIC INLINE int
+ch_ok_ack(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_ok_ack *p;
@@ -329,7 +340,7 @@ static inline int ch_ok_ack(queue_t *q, struct ch *ch)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_OK_ACK\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_OK_ACK\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -346,7 +357,8 @@ static inline int ch_ok_ack(queue_t *q, struct ch *ch)
  *  acknowledgement or confirmation.  In addition, this error is returned when
  *  unrecognized primitives are sent.
  */
-static inline int ch_error_ack(queue_t *q, struct ch *ch, ulong prim, long error)
+STATIC INLINE int
+ch_error_ack(queue_t *q, struct ch *ch, ulong prim, long error)
 {
 	mblk_t *mp;
 	struct CH_error_ack *p;
@@ -395,7 +407,7 @@ static inline int ch_error_ack(queue_t *q, struct ch *ch, ulong prim, long error
 			p->ch_state = ch->i_state;
 			break;
 		}
-		printd(("%s: %p: <- CH_ERROR_ACK\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_ERROR_ACK\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -409,7 +421,8 @@ static inline int ch_error_ack(queue_t *q, struct ch *ch, ulong prim, long error
  *  Confirms to the channel user that the attached channel was enabled as
  *  requested.
  */
-static inline int ch_enable_con(queue_t *q, struct ch *ch)
+STATIC INLINE int
+ch_enable_con(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_enable_con *p;
@@ -427,7 +440,7 @@ static inline int ch_enable_con(queue_t *q, struct ch *ch)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_ENABLE_CON\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_ENABLE_CON\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -441,7 +454,8 @@ static inline int ch_enable_con(queue_t *q, struct ch *ch)
  *  Confirms to the channel user that the enabled or connected channel was
  *  connected in the requested direction.
  */
-static inline int ch_connect_con(queue_t *q, struct ch *ch, ulong flags)
+STATIC INLINE int
+ch_connect_con(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_connect_con *p;
@@ -460,7 +474,7 @@ static inline int ch_connect_con(queue_t *q, struct ch *ch, ulong flags)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_CONNECT_CON\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_CONNECT_CON\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -475,7 +489,8 @@ static inline int ch_connect_con(queue_t *q, struct ch *ch, ulong flags)
  *  This is the non-preferred way of sending data to the channel user.  We
  *  should normally just send M_DATA blocks.
  */
-static inline int ch_data_ind(queue_t *q, struct ch *ch)
+STATIC INLINE int
+ch_data_ind(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_data_ind *p;
@@ -483,7 +498,7 @@ static inline int ch_data_ind(queue_t *q, struct ch *ch)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->ch_primitive = CH_DATA_IND;
-		printd(("%s: %p: <- CH_DATA_IND\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DATA_IND\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -501,7 +516,8 @@ static inline int ch_data_ind(queue_t *q, struct ch *ch)
  *  alarms).  This indication is rather optional, as carrier alarms are also
  *  indicated to management streams for the underlying devices.
  */
-static inline int ch_disconnect_ind(queue_t *q, struct ch *ch, ulong flags)
+STATIC INLINE int
+ch_disconnect_ind(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_disconnect_ind *p;
@@ -523,7 +539,7 @@ static inline int ch_disconnect_ind(queue_t *q, struct ch *ch, ulong flags)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_DISCONNECT_IND\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISCONNECT_IND\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -537,7 +553,8 @@ static inline int ch_disconnect_ind(queue_t *q, struct ch *ch, ulong flags)
  *  Confirms to the channel user that the requested directions were
  *  disconnected as requested.
  */
-static inline int ch_disconnect_con(queue_t *q, struct ch *ch, ulong flags)
+STATIC INLINE int
+ch_disconnect_con(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_disconnect_con *p;
@@ -562,7 +579,7 @@ static inline int ch_disconnect_con(queue_t *q, struct ch *ch, ulong flags)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_DISCONNECT_CON\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISCONNECT_CON\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -578,7 +595,8 @@ static inline int ch_disconnect_con(queue_t *q, struct ch *ch, ulong flags)
  *  underlying stream, but is optional.  The channel user should detach and
  *  reattach the stream.
  */
-static inline int ch_disable_ind(queue_t *q, struct ch *ch, long cause)
+STATIC INLINE int
+ch_disable_ind(queue_t *q, struct ch *ch, long cause)
 {
 	mblk_t *mp;
 	struct CH_disable_ind *p;
@@ -588,7 +606,7 @@ static inline int ch_disable_ind(queue_t *q, struct ch *ch, long cause)
 		p->ch_primitive = CH_DISABLE_IND;
 		p->ch_cause = cause;
 		ch->i_state = CHS_UNUSABLE;
-		printd(("%s: %p: <- CH_DISABLE_IND\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISABLE_IND\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -600,7 +618,8 @@ static inline int ch_disable_ind(queue_t *q, struct ch *ch, long cause)
  *  CH_DISABLE_CON
  *  -----------------------------------
  */
-static inline int ch_disable_con(queue_t *q, struct ch *ch)
+STATIC INLINE int
+ch_disable_con(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_disable_con *p;
@@ -623,7 +642,7 @@ static inline int ch_disable_con(queue_t *q, struct ch *ch)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- CH_DISABLE_CON\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: <- CH_DISABLE_CON\n", MOD_NAME, ch));
 		putnext(ch->oq, mp);
 		return (QR_DONE);
 	}
@@ -642,7 +661,8 @@ static inline int ch_disable_con(queue_t *q, struct ch *ch)
  *  LMI_INFO_REQ
  *  -----------------------------------
  */
-static inline int lmi_info_req(queue_t *q, struct ch *ch)
+STATIC INLINE int
+lmi_info_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_info_req_t *p;
@@ -650,7 +670,7 @@ static inline int lmi_info_req(queue_t *q, struct ch *ch)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -664,7 +684,8 @@ static inline int lmi_info_req(queue_t *q, struct ch *ch)
  *  Requests that the provider attach the requesting stream to the specified
  *  PPA.  This is only valid for STYLE 2 devices.
  */
-static inline int lmi_attach_req(queue_t *q, struct ch *ch, uchar *ppa_ptr, size_t ppa_len)
+STATIC INLINE int
+lmi_attach_req(queue_t *q, struct ch *ch, uchar *ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_attach_req_t *p;
@@ -677,7 +698,7 @@ static inline int lmi_attach_req(queue_t *q, struct ch *ch, uchar *ppa_ptr, size
 			mp->b_wptr += ppa_len;
 		}
 		ch->i_state = CHS_WACK_AREQ;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -691,7 +712,8 @@ static inline int lmi_attach_req(queue_t *q, struct ch *ch, uchar *ppa_ptr, size
  *  Requests that the provider detach the requesting stream from the attached
  *  PPA.  This is only valid for STYLE 2 devices.
  */
-static inline int lmi_detach_req(queue_t *q, struct ch *ch)
+STATIC INLINE int
+lmi_detach_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_detach_req_t *p;
@@ -700,7 +722,7 @@ static inline int lmi_detach_req(queue_t *q, struct ch *ch)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
 		ch->i_state = CHS_WACK_UREQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -715,7 +737,8 @@ static inline int lmi_detach_req(queue_t *q, struct ch *ch)
  *  remote address (if required).  Typically we do not have remote addresses
  *  for channels.
  */
-static inline int lmi_enable_req(queue_t *q, struct ch *ch)
+STATIC INLINE int
+lmi_enable_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_enable_req_t *p;
@@ -728,7 +751,7 @@ static inline int lmi_enable_req(queue_t *q, struct ch *ch)
 			mp->b_wptr += ch->rem_len;
 		}
 		ch->i_state = CHS_WCON_EREQ;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -742,7 +765,8 @@ static inline int lmi_enable_req(queue_t *q, struct ch *ch)
  *  Requests that the provider disable the attached stream for the enabled
  *  remote address.
  */
-static inline int lmi_disable_req(queue_t *q, struct ch *ch)
+STATIC INLINE int
+lmi_disable_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_disable_req_t *p;
@@ -751,7 +775,7 @@ static inline int lmi_disable_req(queue_t *q, struct ch *ch)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		ch->i_state = CHS_WCON_RREQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -764,8 +788,8 @@ static inline int lmi_disable_req(queue_t *q, struct ch *ch)
  *  -----------------------------------
  *  Requests that the provider get, set or negotiate the specified options.
  */
-static inline int lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len,
-				  ulong flags)
+STATIC INLINE int
+lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len, ulong flags)
 {
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
@@ -780,7 +804,7 @@ static inline int lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, siz
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -795,7 +819,8 @@ static inline int lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, siz
  *  non-preferred method for sending data to the lower level and is not used
  *  by this module.
  */
-static inline int sdl_bits_for_transmission_req(queue_t *q, struct ch *ch, mblk_t *dp)
+STATIC INLINE int
+sdl_bits_for_transmission_req(queue_t *q, struct ch *ch, mblk_t *dp)
 {
 	mblk_t *mp;
 	sdl_bits_for_transmission_req_t *p;
@@ -804,7 +829,7 @@ static inline int sdl_bits_for_transmission_req(queue_t *q, struct ch *ch, mblk_
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_BITS_FOR_TRANSMISSION_REQ;
 		mp->b_cont = dp;
-		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -817,7 +842,8 @@ static inline int sdl_bits_for_transmission_req(queue_t *q, struct ch *ch, mblk_
  *  -----------------------------------
  *  Requests that the provider connect the stream in the specified directions.
  */
-static inline int sdl_connect_req(queue_t *q, struct ch *ch, ulong flags)
+STATIC INLINE int
+sdl_connect_req(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	sdl_connect_req_t *p;
@@ -827,7 +853,7 @@ static inline int sdl_connect_req(queue_t *q, struct ch *ch, ulong flags)
 		p->sdl_primitive = SDL_CONNECT_REQ;
 		p->sdl_flags = flags;
 		ch->i_state = CHS_WCON_CREQ;
-		printd(("%s: %p: SDL_CONNECT_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -839,7 +865,8 @@ static inline int sdl_connect_req(queue_t *q, struct ch *ch, ulong flags)
  *  SDL_DISCONNECT_REQ
  *  -----------------------------------
  */
-static inline int sdl_disconnect_req(queue_t *q, struct ch *ch, ulong flags)
+STATIC INLINE int
+sdl_disconnect_req(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	sdl_disconnect_req_t *p;
@@ -849,7 +876,7 @@ static inline int sdl_disconnect_req(queue_t *q, struct ch *ch, ulong flags)
 		p->sdl_primitive = SDL_DISCONNECT_REQ;
 		p->sdl_flags = flags;
 		ch->i_state = CHS_WCON_DREQ;
-		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MOD_NAME, ch));
 		putnext(ch->iq, mp);
 		return (QR_DONE);
 	}
@@ -868,7 +895,8 @@ static inline int sdl_disconnect_req(queue_t *q, struct ch *ch, ulong flags)
  *  LMI_INFO_ACK
  *  -----------------------------------
  */
-static int lmi_info_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_info_ack(queue_t *q, mblk_t *mp)
 {
 	/* discard */
 	return (QR_DONE);
@@ -878,7 +906,8 @@ static int lmi_info_ack(queue_t *q, mblk_t *mp)
  *  LMI_OK_ACK
  *  -----------------------------------
  */
-static int lmi_ok_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	return ch_ok_ack(q, ch);
@@ -888,7 +917,8 @@ static int lmi_ok_ack(queue_t *q, mblk_t *mp)
  *  LMI_ERROR_ACK
  *  -----------------------------------
  */
-static int lmi_error_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	long prim, error = -EFAULT;
@@ -952,7 +982,8 @@ static int lmi_error_ack(queue_t *q, mblk_t *mp)
  *  LMI_ENABLE_CON
  *  -----------------------------------
  */
-static int lmi_enable_con(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_enable_con(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	return ch_enable_con(q, ch);
@@ -962,7 +993,8 @@ static int lmi_enable_con(queue_t *q, mblk_t *mp)
  *  LMI_DISABLE_CON
  *  -----------------------------------
  */
-static int lmi_disable_con(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_disable_con(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	return ch_disable_con(q, ch);
@@ -972,7 +1004,8 @@ static int lmi_disable_con(queue_t *q, mblk_t *mp)
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
  */
-static int lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -986,7 +1019,8 @@ static int lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
  *  indicates when a Red Alarm condition occurs so that we can notify of
  *  hardware failure.
  */
-static int lmi_error_ind(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_error_ind(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -997,7 +1031,8 @@ static int lmi_error_ind(queue_t *q, mblk_t *mp)
  *  LMI_STATS_IND
  *  -----------------------------------
  */
-static int lmi_stats_ind(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_stats_ind(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -1011,7 +1046,8 @@ static int lmi_stats_ind(queue_t *q, mblk_t *mp)
  *  indicates when a Red Alarm condition occurs so that we can notify of
  *  hardware failure.
  */
-static int lmi_event_ind(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_event_ind(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -1022,7 +1058,8 @@ static int lmi_event_ind(queue_t *q, mblk_t *mp)
  *  M_DATA
  *  -----------------------------------
  */
-static int ch_read(queue_t *q, mblk_t *mp)
+STATIC int
+ch_read(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	if (!mp || !msgdsize(mp))
@@ -1054,7 +1091,8 @@ static int ch_read(queue_t *q, mblk_t *mp)
  *  SDL_RECEIVED_BITS_IND
  *  -----------------------------------
  */
-static int sdl_received_bits_ind(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_received_bits_ind(queue_t *q, mblk_t *mp)
 {
 	sdl_received_bits_ind_t *p = (typeof(p)) mp->b_rptr;
 	int err;
@@ -1072,7 +1110,8 @@ static int sdl_received_bits_ind(queue_t *q, mblk_t *mp)
  *  SDL_DISCONNECT_IND
  *  -----------------------------------
  */
-static int sdl_disconnect_ind(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	sdl_disconnect_ind_t *p = (typeof(p)) mp->b_rptr;
@@ -1104,7 +1143,8 @@ static int sdl_disconnect_ind(queue_t *q, mblk_t *mp)
  *  block onto the transmit stream of the channel.  This is the preferred
  *  method of sending data to the channel.
  */
-static int ch_write(queue_t *q, mblk_t *mp)
+STATIC int
+ch_write(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	if (!mp || !msgdsize(mp))
@@ -1137,7 +1177,8 @@ static int ch_write(queue_t *q, mblk_t *mp)
  *  Requests that the channel provider return information about the provider
  *  and the attached channel (if any).
  */
-static int ch_info_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_info_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_info_req *p = (typeof(p)) mp->b_rptr;
@@ -1158,7 +1199,8 @@ static int ch_info_req(queue_t *q, mblk_t *mp)
  *  Requests that the channel provider set, get or negotiate provider or
  *  attached channel options.
  */
-static int ch_optmgmt_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_optmgmt_req *p = (typeof(p)) mp->b_rptr;
@@ -1266,7 +1308,8 @@ static int ch_optmgmt_req(queue_t *q, mblk_t *mp)
  *  Requests that the channel provider attached the requesting stream to the
  *  specified channel (specified in the channel address).
  */
-static int ch_attach_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_attach_req *p = (typeof(p)) mp->b_rptr;
@@ -1288,7 +1331,8 @@ static int ch_attach_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the channel provider enable the attached channel.
  */
-static int ch_enable_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_enable_req *p = (typeof(p)) mp->b_rptr;
@@ -1309,7 +1353,8 @@ static int ch_enable_req(queue_t *q, mblk_t *mp)
  *  Requests that the channel provider connect the specified direction on the
  *  attached and enabled channel.
  */
-static int ch_connect_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_connect_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_connect_req *p = (typeof(p)) mp->b_rptr;
@@ -1344,7 +1389,8 @@ static int ch_connect_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the provider send data on the connected channel.
  */
-static int ch_data_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_data_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_data_req *p = (typeof(p)) mp->b_rptr;
@@ -1364,7 +1410,8 @@ static int ch_data_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider disconnect the specified direction for the
  *  attached, enabled and connected channel.
  */
-static int ch_disconnect_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_disconnect_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_disconnect_req *p = (typeof(p)) mp->b_rptr;
@@ -1397,7 +1444,8 @@ static int ch_disconnect_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the provider disable the attached and enabled channel.
  */
-static int ch_disable_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_disable_req *p = (typeof(p)) mp->b_rptr;
@@ -1421,7 +1469,8 @@ static int ch_disable_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the provider detach the attached channel.
  */
-static int ch_detach_req(queue_t *q, mblk_t *mp)
+STATIC int
+ch_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_detach_req *p = (typeof(p)) mp->b_rptr;
@@ -1451,7 +1500,8 @@ static int ch_detach_req(queue_t *q, mblk_t *mp)
  *  CH_IOCGCONFIG
  *  -----------------------------------
  */
-static int ch_iocgconfig(struct ch *ch, struct ch_config *p)
+STATIC int
+ch_iocgconfig(struct ch *ch, struct ch_config *p)
 {
 	*p = ch->config;
 	return (0);
@@ -1461,8 +1511,9 @@ static int ch_iocgconfig(struct ch *ch, struct ch_config *p)
  *  CH_IOCSCONFIG
  *  -----------------------------------
  */
-static int ch_ioctconfig(struct ch *, struct ch_config *);
-static int ch_iocsconfig(struct ch *ch, struct ch_config *p)
+STATIC int ch_ioctconfig(struct ch *, struct ch_config *);
+STATIC int
+ch_iocsconfig(struct ch *ch, struct ch_config *p)
 {
 	int err;
 	if ((err = ch_ioctconfig(ch, p)))
@@ -1475,7 +1526,8 @@ static int ch_iocsconfig(struct ch *ch, struct ch_config *p)
  *  CH_IOCTCONFIG
  *  -----------------------------------
  */
-static int ch_ioctconfig(struct ch *ch, struct ch_config *p)
+STATIC int
+ch_ioctconfig(struct ch *ch, struct ch_config *p)
 {
 	if (p->block_size <= 0 || p->block_size & 0x7)
 		goto einval;
@@ -1506,7 +1558,8 @@ static int ch_ioctconfig(struct ch *ch, struct ch_config *p)
  *  CH_IOCCCONFIG
  *  -----------------------------------
  */
-static int ch_ioccconfig(struct ch *ch, struct ch_config *p)
+STATIC int
+ch_ioccconfig(struct ch *ch, struct ch_config *p)
 {
 	*p = ch->config = ch_default;
 	return (0);
@@ -1516,7 +1569,8 @@ static int ch_ioccconfig(struct ch *ch, struct ch_config *p)
  *  CH_IOCGSTATEM
  *  -----------------------------------
  */
-static int ch_iocgstatem(struct ch *ch, struct ch_statem *p)
+STATIC int
+ch_iocgstatem(struct ch *ch, struct ch_statem *p)
 {
 	p->state = ch->i_state;
 	p->flags = ch->flags;
@@ -1527,7 +1581,8 @@ static int ch_iocgstatem(struct ch *ch, struct ch_statem *p)
  *  CH_IOCCMRESET
  *  -----------------------------------
  */
-static int ch_ioccmreset(struct ch *ch, struct ch_statem *p)
+STATIC int
+ch_ioccmreset(struct ch *ch, struct ch_statem *p)
 {
 	ch->i_state = p->state;
 	ch->flags = p->flags;
@@ -1538,7 +1593,8 @@ static int ch_ioccmreset(struct ch *ch, struct ch_statem *p)
  *  CH_IOCGSTATSP
  *  -----------------------------------
  */
-static int ch_iocgstatsp(struct ch *ch, struct ch_stats *p)
+STATIC int
+ch_iocgstatsp(struct ch *ch, struct ch_stats *p)
 {
 	*p = ch->statsp;
 	return (0);
@@ -1548,7 +1604,8 @@ static int ch_iocgstatsp(struct ch *ch, struct ch_stats *p)
  *  CH_IOCSSTATSP
  *  -----------------------------------
  */
-static int ch_iocsstatsp(struct ch *ch, struct ch_stats *p)
+STATIC int
+ch_iocsstatsp(struct ch *ch, struct ch_stats *p)
 {
 	ch->statsp = *p;
 	return (0);
@@ -1558,7 +1615,8 @@ static int ch_iocsstatsp(struct ch *ch, struct ch_stats *p)
  *  CH_IOCGSTATS
  *  -----------------------------------
  */
-static int ch_iocgstats(struct ch *ch, struct ch_stats *p)
+STATIC int
+ch_iocgstats(struct ch *ch, struct ch_stats *p)
 {
 	*p = ch->stats;
 	return (0);
@@ -1568,7 +1626,8 @@ static int ch_iocgstats(struct ch *ch, struct ch_stats *p)
  *  CH_IOCCSTATS
  *  -----------------------------------
  */
-static int ch_ioccstats(struct ch *ch, struct ch_stats *p)
+STATIC int
+ch_ioccstats(struct ch *ch, struct ch_stats *p)
 {
 	bzero(&ch->stats, sizeof(ch->stats));
 	return (0);
@@ -1578,7 +1637,8 @@ static int ch_ioccstats(struct ch *ch, struct ch_stats *p)
  *  CH_IOCGNOTIFY
  *  -----------------------------------
  */
-static int ch_iocgnotify(struct ch *ch, struct ch_notify *p)
+STATIC int
+ch_iocgnotify(struct ch *ch, struct ch_notify *p)
 {
 	*p = ch->notify;
 	return (0);
@@ -1588,7 +1648,8 @@ static int ch_iocgnotify(struct ch *ch, struct ch_notify *p)
  *  CH_IOCSNOTIFY
  *  -----------------------------------
  */
-static int ch_iocsnotify(struct ch *ch, struct ch_notify *p)
+STATIC int
+ch_iocsnotify(struct ch *ch, struct ch_notify *p)
 {
 	ch->notify.events |= p->events;
 	return (0);
@@ -1598,7 +1659,8 @@ static int ch_iocsnotify(struct ch *ch, struct ch_notify *p)
  *  CH_IOCCNOTIFY
  *  -----------------------------------
  */
-static int ch_ioccnotify(struct ch *ch, struct ch_notify *p)
+STATIC int
+ch_ioccnotify(struct ch *ch, struct ch_notify *p)
 {
 	ch->notify.events &= ~p->events;
 	return (0);
@@ -1608,7 +1670,8 @@ static int ch_ioccnotify(struct ch *ch, struct ch_notify *p)
  *  SDL_IOCGCONFIG
  *  -----------------------------------
  */
-static int sdl_iocgconfig_req(queue_t *q)
+STATIC int
+sdl_iocgconfig_req(queue_t *q)
 {
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1635,7 +1698,8 @@ static int sdl_iocgconfig_req(queue_t *q)
 	rare();
 	return (-ENOBUFS);
 }
-static int sdl_iocgconfig_ack(struct ch *ch, sdl_config_t * p)
+STATIC int
+sdl_iocgconfig_ack(struct ch *ch, sdl_config_t * p)
 {
 	/* ignore */
 	switch (ch->i_state) {
@@ -1705,7 +1769,8 @@ static int sdl_iocgconfig_ack(struct ch *ch, sdl_config_t * p)
 	ch->i_state = CHS_UNUSABLE;
 	return m_error(ch->oq, ch, -EFAULT);
 }
-static int sdl_iocgconfig_nak(struct ch *ch, sdl_config_t * p)
+STATIC int
+sdl_iocgconfig_nak(struct ch *ch, sdl_config_t * p)
 {
 	swerr();
 	return m_error(ch->oq, ch, -EFAULT);
@@ -1716,7 +1781,8 @@ static int sdl_iocgconfig_nak(struct ch *ch, sdl_config_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
+STATIC int
+sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
 {
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1744,12 +1810,14 @@ static int sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_iocsstatsp_ack(struct ch *ch, sdl_stats_t * p)
+STATIC int
+sdl_iocsstatsp_ack(struct ch *ch, sdl_stats_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_iocsstatsp_nak(struct ch *ch, sdl_stats_t * p)
+STATIC int
+sdl_iocsstatsp_nak(struct ch *ch, sdl_stats_t * p)
 {
 	swerr();
 	return m_error(ch->oq, ch, -EFAULT);
@@ -1760,7 +1828,8 @@ static int sdl_iocsstatsp_nak(struct ch *ch, sdl_stats_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_iocgstats_req(queue_t *q)
+STATIC int
+sdl_iocgstats_req(queue_t *q)
 {
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1788,12 +1857,14 @@ static int sdl_iocgstats_req(queue_t *q)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_iocgstats_ack(struct ch *ch, sdl_stats_t * p)
+STATIC int
+sdl_iocgstats_ack(struct ch *ch, sdl_stats_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_iocgstats_nak(struct ch *ch, sdl_stats_t * p)
+STATIC int
+sdl_iocgstats_nak(struct ch *ch, sdl_stats_t * p)
 {
 	swerr();
 	return m_error(ch->oq, ch, -EFAULT);
@@ -1804,7 +1875,8 @@ static int sdl_iocgstats_nak(struct ch *ch, sdl_stats_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_ioccstats_req(queue_t *q)
+STATIC int
+sdl_ioccstats_req(queue_t *q)
 {
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1832,12 +1904,14 @@ static int sdl_ioccstats_req(queue_t *q)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_ioccstats_ack(struct ch *ch, sdl_stats_t * p)
+STATIC int
+sdl_ioccstats_ack(struct ch *ch, sdl_stats_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_ioccstats_nak(struct ch *ch, sdl_stats_t * p)
+STATIC int
+sdl_ioccstats_nak(struct ch *ch, sdl_stats_t * p)
 {
 	swerr();
 	return m_error(ch->oq, ch, -EFAULT);
@@ -1848,7 +1922,8 @@ static int sdl_ioccstats_nak(struct ch *ch, sdl_stats_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
+STATIC int
+sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
 {
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1876,12 +1951,14 @@ static int sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_iocsnotify_ack(struct ch *ch, sdl_notify_t * p)
+STATIC int
+sdl_iocsnotify_ack(struct ch *ch, sdl_notify_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_iocsnotify_nak(struct ch *ch, sdl_notify_t * p)
+STATIC int
+sdl_iocsnotify_nak(struct ch *ch, sdl_notify_t * p)
 {
 	swerr();
 	return m_error(ch->oq, ch, -EFAULT);
@@ -1892,7 +1969,8 @@ static int sdl_iocsnotify_nak(struct ch *ch, sdl_notify_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
+STATIC int
+sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
 {
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1920,12 +1998,14 @@ static int sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_ioccnotify_ack(struct ch *ch, sdl_notify_t * p)
+STATIC int
+sdl_ioccnotify_ack(struct ch *ch, sdl_notify_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_ioccnotify_nak(struct ch *ch, sdl_notify_t * p)
+STATIC int
+sdl_ioccnotify_nak(struct ch *ch, sdl_notify_t * p)
 {
 	swerr();
 	return m_error(ch->oq, ch, -EFAULT);
@@ -1942,7 +2022,8 @@ static int sdl_ioccnotify_nak(struct ch *ch, sdl_notify_t * p)
  *
  *  -------------------------------------------------------------------------
  */
-static int ch_w_ioctl(queue_t *q, mblk_t *mp)
+STATIC int
+ch_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -1999,7 +2080,7 @@ static int ch_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = ch_ioccnotify(ch, arg);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported CH ioctl %d\n", CH_SDL_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported CH ioctl %d\n", MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -2031,7 +2112,8 @@ static int ch_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int ch_r_iocack(queue_t *q, mblk_t *mp)
+STATIC int
+ch_r_iocack(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2073,7 +2155,8 @@ static int ch_r_iocack(queue_t *q, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
 }
-static int ch_r_iocnak(queue_t *q, mblk_t *mp)
+STATIC int
+ch_r_iocnak(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2127,7 +2210,8 @@ static int ch_r_iocnak(queue_t *q, mblk_t *mp)
  *  Primitives from MG to CH.
  *  -----------------------------------
  */
-static int ch_w_proto(queue_t *q, mblk_t *mp)
+STATIC int
+ch_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct ch *ch = CH_PRIV(q);
@@ -2135,43 +2219,43 @@ static int ch_w_proto(queue_t *q, mblk_t *mp)
 	(void) ch;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case CH_INFO_REQ:
-		printd(("%s: %p: -> CH_INFO_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_INFO_REQ\n", MOD_NAME, ch));
 		rtn = ch_info_req(q, mp);
 		break;
 	case CH_OPTMGMT_REQ:
-		printd(("%s: %p: -> CH_OPTMGMT_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_OPTMGMT_REQ\n", MOD_NAME, ch));
 		rtn = ch_optmgmt_req(q, mp);
 		break;
 	case CH_ATTACH_REQ:
-		printd(("%s: %p: -> CH_ATTACH_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_ATTACH_REQ\n", MOD_NAME, ch));
 		rtn = ch_attach_req(q, mp);
 		break;
 	case CH_ENABLE_REQ:
-		printd(("%s: %p: -> CH_ENABLE_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_ENABLE_REQ\n", MOD_NAME, ch));
 		rtn = ch_enable_req(q, mp);
 		break;
 	case CH_CONNECT_REQ:
-		printd(("%s: %p: -> CH_CONNECT_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_CONNECT_REQ\n", MOD_NAME, ch));
 		rtn = ch_connect_req(q, mp);
 		break;
 	case CH_DATA_REQ:
-		printd(("%s: %p: -> CH_DATA_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DATA_REQ\n", MOD_NAME, ch));
 		rtn = ch_data_req(q, mp);
 		break;
 	case CH_DISCONNECT_REQ:
-		printd(("%s: %p: -> CH_DISCONNECT_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DISCONNECT_REQ\n", MOD_NAME, ch));
 		rtn = ch_disconnect_req(q, mp);
 		break;
 	case CH_DISABLE_REQ:
-		printd(("%s: %p: -> CH_DISABLE_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DISABLE_REQ\n", MOD_NAME, ch));
 		rtn = ch_disable_req(q, mp);
 		break;
 	case CH_DETACH_REQ:
-		printd(("%s: %p: -> CH_DETACH_REQ\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_DETACH_REQ\n", MOD_NAME, ch));
 		rtn = ch_detach_req(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> CH_????\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: -> CH_????\n", MOD_NAME, ch));
 		rtn = ch_error_ack(q, ch, prim, CHNOTSUPP);
 		break;
 	}
@@ -2182,58 +2266,59 @@ static int ch_w_proto(queue_t *q, mblk_t *mp)
  *  Primitives from SDL to CH.
  *  -----------------------------------
  */
-static int ch_r_proto(queue_t *q, mblk_t *mp)
+STATIC int
+ch_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct ch *ch = CH_PRIV(q);
 	(void) ch;
 	switch (*((ulong *) mp->b_rptr)) {
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", MOD_NAME, ch));
 		rtn = lmi_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_OK_ACK <-\n", MOD_NAME, ch));
 		rtn = lmi_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", MOD_NAME, ch));
 		rtn = lmi_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", MOD_NAME, ch));
 		rtn = lmi_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", MOD_NAME, ch));
 		rtn = lmi_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MOD_NAME, ch));
 		rtn = lmi_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", MOD_NAME, ch));
 		rtn = lmi_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_STATS_IND <-\n", MOD_NAME, ch));
 		rtn = lmi_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", MOD_NAME, ch));
 		rtn = lmi_event_ind(q, mp);
 		break;
 	case SDL_RECEIVED_BITS_IND:
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", MOD_NAME, ch));
 		rtn = sdl_received_bits_ind(q, mp);
 		break;
 	case SDL_DISCONNECT_IND:
-		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", MOD_NAME, ch));
 		rtn = sdl_disconnect_ind(q, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? %lu <-\n", CH_SDL_MOD_NAME, ch, *(ulong *) mp->b_rptr));
+		printd(("%s: %p: ???? %lu <-\n", MOD_NAME, ch, *(ulong *) mp->b_rptr));
 		rtn = -EFAULT;
 		break;
 	}
@@ -2247,16 +2332,18 @@ static int ch_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int ch_w_data(queue_t *q, mblk_t *mp)
+STATIC int
+ch_w_data(queue_t *q, mblk_t *mp)
 {
 	/* data from above */
-	printd(("%s: %p: -> M_DATA\n", CH_SDL_MOD_NAME, CH_PRIV(q)));
+	printd(("%s: %p: -> M_DATA\n", MOD_NAME, CH_PRIV(q)));
 	return ch_write(q, mp);
 }
-static int ch_r_data(queue_t *q, mblk_t *mp)
+STATIC int
+ch_r_data(queue_t *q, mblk_t *mp)
 {
 	/* data from below */
-	printd(("%s: %p: M_DATA <-\n", CH_SDL_MOD_NAME, CH_PRIV(q)));
+	printd(("%s: %p: M_DATA <-\n", MOD_NAME, CH_PRIV(q)));
 	return ch_read(q, mp);
 }
 
@@ -2267,7 +2354,8 @@ static int ch_r_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int ch_r_error(queue_t *q, mblk_t *mp)
+STATIC int
+ch_r_error(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	int err;
@@ -2281,7 +2369,8 @@ static int ch_r_error(queue_t *q, mblk_t *mp)
 		return (QR_PASSALONG);
 	}
 }
-static int ch_r_hangup(queue_t *q, mblk_t *mp)
+STATIC int
+ch_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	int err;
@@ -2303,7 +2392,8 @@ static int ch_r_hangup(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-static inline int ch_w_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+ch_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -2321,7 +2411,8 @@ static inline int ch_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-static inline int ch_r_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+ch_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -2357,7 +2448,8 @@ static inline int ch_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-static int ch_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int
+ch_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -2390,7 +2482,8 @@ static int ch_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-static int ch_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+ch_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
 	(void) crp;
@@ -2406,39 +2499,43 @@ static int ch_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-static kmem_cache_t *ch_priv_cachep = NULL;
-static int ch_init_caches(void)
+STATIC kmem_cache_t *ch_priv_cachep = NULL;
+STATIC int
+ch_init_caches(void)
 {
 	if (!ch_priv_cachep &&
 	    !(ch_priv_cachep =
 	      kmem_cache_create("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
 				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", CH_SDL_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", MOD_NAME);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized ch private structure cache\n", CH_SDL_MOD_NAME));
+		printd(("%s: initialized ch private structure cache\n", MOD_NAME));
 	return (0);
 }
-static void ch_term_caches(void)
+STATIC int
+ch_term_caches(void)
 {
 	if (ch_priv_cachep) {
-		if (kmem_cache_destroy(ch_priv_cachep))
+		if (kmem_cache_destroy(ch_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ch_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed ch_priv_cachep\n", CH_SDL_MOD_NAME));
+			return (-EBUSY);
+		} else
+			printd(("%s: destroyed ch_priv_cachep\n", MOD_NAME));
 	}
-	return;
+	return (0);
 }
 
 /*
  *  CH allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct ch *ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t *crp)
+STATIC struct ch *
+ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t *crp)
 {
 	struct ch *ch;
 	if ((ch = kmem_cache_alloc(ch_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated ch private structure\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: allocated ch private structure\n", MOD_NAME, ch));
 		bzero(ch, sizeof(*ch));
 		ch_get(ch);	/* first get */
 		ch->u.dev.cmajor = getmajor(*devp);
@@ -2459,13 +2556,14 @@ static struct ch *ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t
 			ch->next->prev = &ch->next;
 		ch->prev = chp;
 		*chp = ch_get(ch);
-		printd(("%s: %p: linked ch private structure\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: linked ch private structure\n", MOD_NAME, ch));
 		ch->config = ch_default;
 	} else
-		ptrace(("%s: ERROR: Could not allocate ch private structure\n", CH_SDL_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate ch private structure\n", MOD_NAME));
 	return (ch);
 }
-static void ch_free_priv(queue_t *q)
+STATIC void
+ch_free_priv(queue_t *q)
 {
 	struct ch *ch = CH_PRIV(q);
 	psw_t flags = 0;
@@ -2491,66 +2589,132 @@ static void ch_free_priv(queue_t *q)
 	ch_put(ch);		/* final put */
 	return;
 }
-static struct ch *ch_get(struct ch *ch)
+STATIC struct ch *
+ch_get(struct ch *ch)
 {
 	atomic_inc(&ch->refcnt);
 	return (ch);
 }
-static void ch_put(struct ch *ch)
+STATIC void
+ch_put(struct ch *ch)
 {
 	if (atomic_dec_and_test(&ch->refcnt)) {
 		kmem_cache_free(ch_priv_cachep, ch);
-		printd(("%s: %p: freed ch private structure\n", CH_SDL_MOD_NAME, ch));
+		printd(("%s: %p: freed ch private structure\n", MOD_NAME, ch));
 	}
 }
 
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-static int ch_initialized = 0;
-static void ch_init(void)
-{
-	unless(ch_initialized > 0, return);
-	cmn_err(CE_NOTE, CH_SDL_BANNER);	/* console splash */
-	if ((ch_initialized = ch_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", CH_SDL_MOD_NAME);
-	} else if ((ch_initialized = lis_register_strmod(&ch_info, CH_SDL_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: could not register module", CH_SDL_MOD_NAME);
-		ch_term_caches();
-	}
-	return;
-}
-static void ch_terminate(void)
-{
-	ensure(ch_initialized > 0, return);
-	if ((ch_initialized = lis_unregister_strmod(&ch_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: could not unregister module", CH_SDL_MOD_NAME);
-	} else {
-		ch_term_caches();
-	}
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the CH-SDL module. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int init_module(void)
+#ifdef LFS
+
+STATIC struct fmodsw ch_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &ch_sdlinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+ch_register_strmod(void)
 {
-	ch_init();
-	if (ch_initialized < 0)
-		return ch_initialized;
+	int err;
+	if ((err = register_strmod(&ch_fmod)) < 0)
+		return (err);
 	return (0);
 }
-void cleanup_module(void)
+
+STATIC int
+ch_unregister_strmod(void)
 {
-	ch_terminate();
+	int err;
+	if ((err = unregister_strmod(&ch_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+ch_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&ch_sdlinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+ch_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&ch_sdlinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+ch_sdlinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = ch_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = ch_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		ch_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+ch_sdlterminate(void)
+{
+	int err;
+	if ((err = ch_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = ch_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(ch_sdlinit);
+module_exit(ch_sdlterminate);
+
+#endif				/* LINUX */

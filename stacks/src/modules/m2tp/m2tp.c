@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:36 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:36 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:36 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:18 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:36 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:18 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -75,7 +75,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2029,22 +2029,37 @@ m2tp_init_priv(void)
 static int
 m2tp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	(void) crp;
-
-	if (q->q_ptr != NULL)
+	(void) crp;		/* for now */
+	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
+	if (q->q_ptr != NULL) {
+		MOD_DEC_USE_COUNT;
 		return (0);
-
+	}
 	if (sflag == MODOPEN || WR(q)->q_next != NULL) {
-		/*
+		major_t cmajor = getmajor(*devp);
+		minor_t cminor = getminor(*devp);
+		struct m2tp *m2tp;
+		/* test for multiple push */
+		for (m2tp = m2tp_list; m2tp; m2tp = m2tp->next) {
+			if (m2tp->u.dev.cmajor == cmajor && m2tp->u.dev.cminor == cminor) {
+				MOD_DEC_USE_COUNT;
+				return (ENXIO);
+			}
+		}
+		/* 
 		 *  FIXME: check to make sure that the module we are being
 		 *  pushed over is compatible (i.e. it is the right kind of
 		 *  transport module.
 		 */
-		if (!(m2tp_alloc_priv(q)))
-			return ENOMEM;
+		if (!(m2tp_alloc_priv(q))) {
+			MOD_DEC_USE_COUNT;
+			return (ENOMEM);
+		}
+		qprocson(q);
 		return (0);
 	}
-	return EIO;
+	MOD_DEC_USE_COUNT;
+	return (EIO);
 }
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:09 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -97,7 +97,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -124,69 +124,72 @@ MODULE_LICENSE(SLM_LICENSE);
 #define SLM_DRV_NAME		CONFIG_STREAMS_SLM_NAME
 #define SLM_CMAJORS		CONFIG_STREAMS_SLM_NMAJORS
 #define SLM_CMAJOR_0		CONFIG_STREAMS_SLM_MAJOR
+#define SLM_UNITS		CONFIG_STREAMS_SLM_NMINORS
 #endif
 
-#define SLM_CMINORS 256
+/*
+ *  =========================================================================
+ *
+ *  STREAMS Definitions
+ *
+ *  =========================================================================
+ */
 
-STATIC struct module_info slm_winfo = {
-	mi_idnum:SLM_DRV_ID,		/* Module ID number */
-	mi_idname:SLM_DRV_NAME "-wr",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1024,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
-};
+#define DRV_ID		SLM_DRV_ID
+#define DRV_NAME	SLM_DRV_NAME
+#define CMAJORS		SLM_CMAJORS
+#define CMAJOR_0	SLM_CMAJOR_0
+#define UNITS		SLM_UNITS
+#ifdef MODULE
+#define DRV_BANNER	SLM_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SLM_SPLASH
+#endif				/* MODULE */
 
-STATIC struct module_info slm_rinfo = {
-	mi_idnum:SLM_DRV_ID,		/* Module ID number */
-	mi_idname:SLM_DRV_NAME "-rd",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1024,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+STATIC struct module_info slm_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1024,		/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC int slm_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int slm_close(queue_t *, mblk_t *);
 
-STATIC int slm_rput(queue_t *, mblk_t *);
-STATIC int slm_rsrv(queue_t *, mblk_t *);
-
-STATIC struct qinit slm_rinit = {
-	qi_putp:slm_rput,		/* Read put (message from below) */
-	qi_srvp:slm_rsrv,		/* Read queue service */
-	qi_qopen:slm_open,		/* Each open */
-	qi_qclose:slm_close,		/* Last close */
-	qi_minfo:&slm_rinfo,		/* Information */
+STATIC struct qinit sl_rinit = {
+	.qi_putp = ss7_oput,		/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = slm_open,		/* Each open */
+	.qi_qclose = slm_close,		/* Last close */
+	.qi_minfo = &slm_minfo,		/* Information */
 };
 
-STATIC int slm_wput(queue_t *, mblk_t *);
-STATIC int slm_wsrv(queue_t *, mblk_t *);
+STATIC struct qinit sl_winit = {
+	.qi_putp = ss7_iput,		/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_minfo = &slm_minfo,		/* Information */
+};
 
-STATIC struct qinit slm_winit = {
-	qi_putp:slm_wput,		/* Write put (message from above) */
-	qi_srvp:slm_wsrv,		/* Write queue service */
-	qi_minfo:&slm_winfo,		/* Information */
+STATIC struct qinit ls_rinit = {
+	.qi_putp = ss7_iput,		/* Read put (message from below) */
+	.qi_srvp = ss7_isrv,		/* Read queue service */
+	.qi_minfo = &slm_minfo,		/* Information */
+};
+
+STATIC struct qinit ls_winit = {
+	.qi_putp = ss7_oput,		/* Write put (message from above) */
+	.qi_putp = ss7_osrv,		/* Write queue service */
+	.qi_minfo = &slm_minfo,		/* Information */
 };
 
 STATIC struct streamtab slm_info = {
-	st_rdinit:&slm_rinit,		/* Upper read queue */
-	st_wrinit:&slm_winit,		/* Upper write queue */
-	st_muxrinit:&slm_rinit,		/* Lower read queue */
-	st_muxwinit:&slm_winit,		/* Lower write queue */
+	.st_rdinit = &sl_rinit,		/* Upper read queue */
+	.st_wrinit = &sl_winit,		/* Upper write queue */
+	.st_muxrinit = &ls_rinit,	/* Lower read queue */
+	.st_muxwinit = &ls_winit,	/* Lower write queue */
 };
-
-/*
- *  Queue Return constants
- */
-#define QR_DONE		0
-#define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
-#define QR_STRIP	7
 
 /*
  *  =========================================================================
@@ -3780,188 +3783,6 @@ slm_w_prim(queue_t *q, mblk_t *mp)
 	}
 }
 
-/*
- *  PUTQ Put Routine
- *  -------------------------------------------------------------------------
- */
-STATIC INLINE int
-slm_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
-{
-	int rtn = 0;
-	if (mp->b_datap->db_type < QPCTL || q->q_count) {
-		// printd(("%s: putting %s on queue\n", q->q_qinfo->qi_minfo->mi_idname,
-		// mname(mp)));
-		putq(q, mp);
-		return (0);
-	}
-	if (slm_trylockq(q)) {
-		do {
-			// printd(("%s: processing priority %s\n", q->q_qinfo->qi_minfo->mi_idname,
-			// mname(mp)));
-			/*
-			   Fast Path 
-			 */
-			if ((rtn = proc(q, mp)) == QR_DONE) {
-				freemsg(mp);
-				break;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				break;
-			case QR_STRIP:
-				if (mp->b_cont)
-					putq(q, mp->b_cont);
-			case QR_TRIMMED:
-				freeb(mp);
-				break;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					break;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					break;
-				}
-				// ptrace(("%s: ERROR: couldn't pass message\n",
-				// q->q_qinfo->qi_minfo->mi_idname));
-				rtn = -EOPNOTSUPP;
-			default:
-				// ptrace(("%s: ERROR: (q dropping) %d\n",
-				// q->q_qinfo->qi_minfo->mi_idname,
-				// rtn));
-				freemsg(mp);
-				break;
-			case QR_DISABLE:
-				putq(q, mp);
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-					putnext(q, mp);
-					break;
-				}
-			case -ENOBUFS:
-			case -EBUSY:
-			case -ENOMEM:
-			case -EAGAIN:
-				putq(q, mp);
-				break;
-			}
-		} while (0);
-		slm_unlockq(q);
-	} else {
-		rare();
-		// printd(("%s: putting %s on queue\n", q->q_qinfo->qi_minfo->mi_idname,
-		// mname(mp)));
-		putq(q, mp);
-	}
-	return (rtn);
-}
-
-/*
- *  SRVQ Service Routine
- *  -------------------------------------------------------------------------
- */
-STATIC INLINE int
-slm_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
-{
-	int rtn = 0;
-	ensure(q, return (-EFAULT));
-	if (slm_trylockq(q)) {
-		mblk_t *mp;
-		while ((mp = getq(q))) {
-			// printd(("%s: processing queued %s\n", q->q_qinfo->qi_minfo->mi_idname,
-			// mname(mp)));
-			/*
-			   Fast Path 
-			 */
-			if ((rtn = proc(q, mp)) == QR_DONE) {
-				freemsg(mp);
-				continue;
-			}
-			switch (rtn) {
-			case QR_DONE:
-				freemsg(mp);
-			case QR_ABSORBED:
-				continue;
-			case QR_STRIP:
-				if (mp->b_cont)
-					putbq(q, mp->b_cont);
-			case QR_TRIMMED:
-				freeb(mp);
-				continue;
-			case QR_LOOP:
-				if (!q->q_next) {
-					qreply(q, mp);
-					continue;
-				}
-			case QR_PASSALONG:
-				if (q->q_next) {
-					putnext(q, mp);
-					continue;
-				}
-				// ptrace(("%s: ERROR: couldn't pass message\n",
-				// q->q_qinfo->qi_minfo->mi_idname));
-				rtn = -EOPNOTSUPP;
-			default:
-				// ptrace(("%s: ERROR: (q dropping) %d\n",
-				// q->q_qinfo->qi_minfo->mi_idname,
-				// rtn));
-				freemsg(mp);
-				continue;
-			case QR_DISABLE:
-				// ptrace(("%s: ERROR: (q disabling) %d\n",
-				// q->q_qinfo->qi_minfo->mi_idname,
-				// rtn));
-				noenable(q);
-				putbq(q, mp);
-				rtn = 0;
-				break;
-			case QR_PASSFLOW:
-				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-					putnext(q, mp);
-					continue;
-				}
-			case -ENOBUFS:	/* proc must have scheduled bufcall */
-			case -EBUSY:	/* proc must have failed canput */
-			case -ENOMEM:	/* proc must have scheduled bufcall */
-			case -EAGAIN:	/* proc must re-enable on some event */
-				if (mp->b_datap->db_type < QPCTL) {
-					// ptrace(("%s: ERROR: (q stalled) %d\n",
-					// q->q_qinfo->qi_minfo->mi_idname, rtn));
-					putbq(q, mp);
-					break;
-				}
-				/*
-				 *  Be careful not to put a priority
-				 *  message back on the queue.
-				 */
-				if (mp->b_datap->db_type == M_PCPROTO) {
-					mp->b_datap->db_type = M_PROTO;
-					mp->b_band = 255;
-					putq(q, mp);
-					break;
-				}
-				// ptrace(("%s: ERROR: (q dropping) %d\n",
-				// q->q_qinfo->qi_minfo->mi_idname,
-				// rtn));
-				freemsg(mp);
-				continue;
-			}
-			break;
-		}
-		slm_unlockq(q);
-	} else {
-		rare();
-		qenable(q);
-	}
-	return (rtn);
-}
-
 STATIC int
 slm_rput(queue_t *q, mblk_t *mp)
 {
@@ -4021,7 +3842,7 @@ slm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 1;
 	}
 	for (; *ppp && (*ppp)->id.dev.cmajor < cmajor; ppp = &(*ppp)->next) ;
-	for (; *ppp && cminor < SLM_CMINORS; ppp = &(*ppp)->next) {
+	for (; *ppp && cminor < NMINORS; ppp = &(*ppp)->next) {
 		ushort dminor = (*ppp)->id.dev.cminor;
 		if (cminor < dminor)
 			break;
@@ -4034,7 +3855,7 @@ slm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			cminor++;
 		}
 	}
-	if (cminor >= SLM_CMINORS) {
+	if (cminor >= NMINORS) {
 		ptrace(("SLM: ERROR: No device minors left\n"));
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
@@ -4083,8 +3904,8 @@ slm_init(void)
 	}
 	for (major = 0; major < SLM_CMAJORS; major++) {
 		if ((err =
-		     lis_register_strdev(SLM_CMAJOR_0 + major, &slm_info, SLM_CMINORS,
-					 SLM_DRV_NAME)) <= 0) {
+		     lis_register_strdev(SLM_CMAJOR_0 + major, &slm_info, UNITS,
+					 DRV_NAME)) <= 0) {
 			cmn_err(CE_WARN, "SLM: ERROR: couldn't register driver for major %d",
 				major + SLM_CMAJOR_0);
 			slm_initialized = err;

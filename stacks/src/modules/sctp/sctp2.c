@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:04 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $";
 
 #include "compat.h"
 
@@ -110,17 +110,19 @@ static char const ident[] =
 #endif				/* LINUX */
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
-			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:04 $"
+			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:28 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
-#define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
+#define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
 #define SCTP_BANNER	SCTP_DESCRIP	"\n" \
 			SCTP_REVISION	"\n" \
 			SCTP_COPYRIGHT	"\n" \
 			SCTP_DEVICE	"\n" \
-			SCTP_CONTACT	"\n"
+			SCTP_CONTACT
+#define SCTP_SPLASH	SCTP_DESCRIP	"\n" \
+			SCTP_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(SCTP_CONTACT);
@@ -128,12 +130,8 @@ MODULE_DESCRIPTION(SCTP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SCTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCTP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
-
-#ifndef tid_t
-typedef int tid_t;
-#endif
 
 /* 
  *  =========================================================================
@@ -1416,8 +1414,8 @@ struct sctp_ifops {
  *              the stream regardless of what s_state the stream is in.
  *
  */
-static int sctp_bind_req(sctp_t * sp, uint16_t sport, uint32_t * sptr, size_t snum, ulong cons);
-static int sctp_conn_req(sctp_t * sp, uint16_t dport, uint32_t * dptr, size_t dnum, mblk_t *dp);
+static int sctp_bind_req(sctp_t * sp, uint16_t sport, uint32_t *sptr, size_t snum, ulong cons);
+static int sctp_conn_req(sctp_t * sp, uint16_t dport, uint32_t *dptr, size_t dnum, mblk_t *dp);
 static int sctp_conn_res(sctp_t * sp, mblk_t *cp, sctp_t * ap, mblk_t *dp);
 static int sctp_data_req(sctp_t * sp, uint32_t ppi, uint16_t sid, uint ord, uint more, uint rctp,
 			 mblk_t *dp);
@@ -1664,7 +1662,7 @@ __sctp_free_daddrs(sctp_t * sp)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 static int
-sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t * daddrs, size_t dnum)
+sctp_alloc_daddrs(sctp_t * sp, uint16_t dport, uint32_t *daddrs, size_t dnum)
 {
 	int err = 0;
 	ensure(sp, return (-EFAULT));
@@ -3168,7 +3166,7 @@ SHAInit(SHA_CTX * sha1)
  *  Note that this corrupts the sha1->data area
  */
 STATIC void
-SHSTransform(uint32_t * dig, uint32_t * dat)
+SHSTransform(uint32_t *dig, uint32_t *dat)
 {
 	uint32_t A, B, C, D, E;		/* Local vars */
 	uint32_t xd[16];		/* Expanded data */
@@ -3274,7 +3272,7 @@ SHSTransform(uint32_t * dig, uint32_t * dat)
  */
 #ifdef __LITTLE_ENDIAN
 STATIC void
-longReverse(uint32_t * buf, int cnt)
+longReverse(uint32_t *buf, int cnt)
 {
 	uint32_t val;
 	cnt /= sizeof(uint32_t);
@@ -3291,7 +3289,7 @@ longReverse(uint32_t * buf, int cnt)
  *  Update SHS for a block of data
  */
 STATIC void
-SHAUpdate(SHA_CTX * sha1, uint8_t * buf, int len)
+SHAUpdate(SHA_CTX * sha1, uint8_t *buf, int len)
 {
 	uint32_t tmp;
 	int cnt;
@@ -3333,7 +3331,7 @@ SHAUpdate(SHA_CTX * sha1, uint8_t * buf, int len)
  *  (64-bit count of bits processed, MSB-first)
  */
 STATIC void
-SHAFinal(uint8_t * out, SHA_CTX * sha1)
+SHAFinal(uint8_t *out, SHA_CTX * sha1)
 {
 	int len;
 	unsigned int i, j;
@@ -3384,7 +3382,7 @@ SHAFinal(uint8_t * out, SHA_CTX * sha1)
  *  Code adapted directly from RFC 2401.
  */
 STATIC void
-hmac_sha1(uint8_t * text, int tlen, uint8_t * key, int klen, uint8_t * digest)
+hmac_sha1(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
 {
 	SHA_CTX context;
 	uint8_t k_ipad[64];
@@ -3529,7 +3527,7 @@ MD5Transform(uint32_t dig[4], uint32_t const dat[16])
 
 #ifdef __BIG_ENDIAN
 static void
-byteSwap(uint32_t * buf, unsigned cnt)
+byteSwap(uint32_t *buf, unsigned cnt)
 {
 	uint8_t *p = (uint8_t *) buf;
 	do {
@@ -3632,7 +3630,7 @@ MD5Final(uint8_t dig[16], MD5_CTX * md5)
  *  Code adapted directly from RFC 2401.
  */
 STATIC void
-hmac_md5(uint8_t * text, int tlen, uint8_t * key, int klen, uint8_t * digest)
+hmac_md5(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest)
 {
 	MD5_CTX context;
 	uint8_t k_ipad[65];
@@ -3921,13 +3919,13 @@ sctp_update_routes(sp, force_reselect)
 			continue;
 #endif
 		printd(("INFO: Checking stream %p route for %d.%d.%d.%d\n", sp,
-			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
-			(sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff));
+			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
+			(sd->daddr >> 24) & 0xff));
 		if (rt && (rt->u.dst.obsolete || rt->u.dst.ops->check(&rt->u.dst, 0))) {
 			rare();
-			__printd(("INFO: Obsolete route for %d.%d.%d.%d\n",
-				  (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
-				  (sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff));
+			__printd(("INFO: Obsolete route for %d.%d.%d.%d\n", (sd->daddr >> 0) & 0xff,
+				  (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
+				  (sd->daddr >> 24) & 0xff));
 			sd->dst_cache = NULL;
 			ip_rt_put(rt);
 			sd->saddr = 0;
@@ -3954,8 +3952,8 @@ sctp_update_routes(sp, force_reselect)
 				rare();
 #ifdef SCTP_CONFIG_ADD_IP
 				/* Candidate for ADD-IP but we can't use it yet */
-				if (sp->p_caps & SCTP_CAPS_ADD_IP &&
-				    !(sp->userlocks & SCTP_BINDADDR_LOCK)) {
+				if (sp->p_caps & SCTP_CAPS_ADD_IP
+				    && !(sp->userlocks & SCTP_BINDADDR_LOCK)) {
 					int err = 0;
 					struct sctp_saddr *ss;
 					if ((ss = __sctp_saddr_alloc(sp, rt->rt_src, &err))) {
@@ -4030,8 +4028,8 @@ sctp_update_routes(sp, force_reselect)
 		return (err);
 	}
 	/* if we have made or need changes then we want to reanalyze routes */
-	if (force_reselect || route_changed || mtu_changed ||
-	    sp->pmtu != old_pmtu || !sp->taddr || !sp->raddr) {
+	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr
+	    || !sp->raddr) {
 #if defined SCTP_CONFIG_DEBUG && defined SCTP_CONFIG_ERROR_GENERATOR
 		int bad_choice = 0;
 #endif				/* defined SCTP_CONFIG_DEBUG && defined SCTP_CONFIG_ERROR_GENERATOR 
@@ -4693,8 +4691,8 @@ sctp_bundle_fsn(sp, sd, ckp)
 			continue;
 		if (!after(tcb->tsn, sp->t_ack))
 			break;
-		if (tcb->st && !(tcb->flags & SCTPCB_FLAG_URG) &&
-		    (tcb - st->n.more & SCTP_STRMF_DROP)) {
+		if (tcb->st && !(tcb->flags & SCTPCB_FLAG_URG)
+		    && (tcb - st->n.more & SCTP_STRMF_DROP)) {
 			*((uint16_t *) mp->b_wptr)++ = tcb->st->sid;
 			*((uint16_t *) mp->b_wptr)++ = tcb->ssn;
 			tcb->st->n.more &= ~SCTP_STRMF_DROP;
@@ -5772,8 +5770,8 @@ sctp_assoc_timedout(sp, sd, rmax, stroke)
 			   are cruel on destinations that drop a single packet due to noise.  This
 			   forces an immediate heartbeat on the destination so that it can be made
 			   available again quickly it if passes the heartbeat. */
-			if (sd->rto_max < 2 && sd->max_retries == 0 &&
-			    (1 << sp->s_state) & (SCTPF_CONNECTED | SCTPF_CLOSING)) {
+			if (sd->rto_max < 2 && sd->max_retries == 0
+			    && (1 << sp->s_state) & (SCTPF_CONNECTED | SCTPF_CLOSING)) {
 				if (sd->timer_idle)
 					untimeout(xchg(&sd->timer_idle, 0));
 				sctp_send_heartbeat(sp, sd);
@@ -5932,8 +5930,9 @@ sctp_retrans_timeout(data)
 		struct sctp_tcb *cb = SCTP_TCB(mp);
 		size_t dlen = cb->dlen;
 		if (cb->daddr == sd && (cb->flags & SCTPCB_FLAG_SENT)
-		    && !(cb->flags &
-			 (SCTPCB_FLAG_RETRANS | SCTPCB_FLAG_SACKED | SCTPCB_FLAG_DROPPED))) {
+		    && !(cb->
+			 flags & (SCTPCB_FLAG_RETRANS | SCTPCB_FLAG_SACKED | SCTPCB_FLAG_DROPPED)))
+		{
 			cb->flags |= SCTPCB_FLAG_RETRANS;
 			sp->nrtxs++;
 			cb->sacks = 4;	/* not eligible for FR now */
@@ -6812,8 +6811,8 @@ sctp_send_init_ack(sp, daddr, sh, ck)
 		mp->b_wptr += ck->opt_len;
 	}
 #endif
-	for (ap = (typeof(ap)) (init + sizeof(struct sctp_init)),
-	     arem = PADC(htons(((struct sctpchdr *) init)->len)) - sizeof(struct sctp_init);
+	for (ap = (typeof(ap)) (init + sizeof(struct sctp_init)), arem =
+	     PADC(htons(((struct sctpchdr *) init)->len)) - sizeof(struct sctp_init);
 	     anum && arem >= sizeof(struct sctpphdr);
 	     arem -= PADC(alen), ap = (typeof(ap)) (((uint8_t *) ap) + PADC(alen))) {
 		if ((alen = ntohs(ap->ph.len)) > arem) {
@@ -8677,7 +8676,7 @@ sctp_recv_data(sp, mp)
 		sp->sackf |= SCTP_SACKF_DUP;
 		if (sd && !(sp->sackf & SCTP_SACKF_NEW)) {
 			sd->dups += sp->ndups;
-			if (!sd->in_flight && !sd->timer_heartbeat)
+			if (!sd->in_flight && !sd->timer_heartbeat) {
 				if (sd->timer_idle)
 					untimeout(xchg(&sd->timer_idle, 0));
 				sctp_send_heartbeat(sp, sd);
@@ -11162,7 +11161,14 @@ sctp_term_proto(void)
 	inet_del_protocol(&sctp_protocol);
 }
 
-#define SCTP_N_CMINORS 255
+#ifdef LFS
+#define SCTP_N_DRV_ID	    CONFIG_STREAMS_SCTP_N_MODID
+#define SCTP_N_DRV_NAME	    CONFIG_STREAMS_SCCP_N_NAME
+#define SCTP_N_CMAJORS	    CONFIG_STREAMS_SCCP_N_NMAJORS
+#define SCTP_N_CMAJOR_0	    CONFIG_STREAMS_SCCP_N_MAJOR
+#define SCTP_N_UNITS	    CONFIG_STREAMS_SCCP_N_NMINORS
+#endif				/* LFS */
+
 /* 
  *  =========================================================================
  *
@@ -11171,18 +11177,34 @@ sctp_term_proto(void)
  *  =========================================================================
  *  This driver defines two user interfaces: one NPI, the other TPI.
  */
+
+#undef DRV_ID
+#undef DRV_NAME
+#undef CMAJORS
+#undef CMAJOR_0
+#undef UNITS
+
+#define DRV_ID		SCTP_N_DRV_ID
+#define DRV_NAME	SCTP_N_DRV_NAME
+#define CMAJORS		SCTP_N_CMAJORS
+#define CMAJOR_0	SCTP_N_CMAJOR_0
+#define UNITS		SCTP_N_UNITS
+
 STATIC struct module_info sctp_n_minfo = {
-	mi_idnum:0,			/* Module ID number */
-	mi_idname:"sctp",		/* Module name */
+	mi_idnum:SCTP_N_DRV_ID,		/* Module ID number */
+	mi_idname:SCTP_N_DRV_NAME,	/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10		/* Lo water mark */
 };
+
 STATIC int sctp_n_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sctp_n_close(queue_t *, int, cred_t *);
+
 STATIC int sctp_n_rput(queue_t *, mblk_t *);
 STATIC int sctp_n_rsrv(queue_t *);
+
 STATIC struct qinit sctp_n_rinit = {
 	qi_putp:sctp_n_rput,		/* Read put (msg from below) */
 	qi_srvp:sctp_n_rsrv,		/* Read queue service */
@@ -11190,17 +11212,21 @@ STATIC struct qinit sctp_n_rinit = {
 	qi_qclose:sctp_n_close,		/* Last close */
 	qi_minfo:&sctp_n_minfo,		/* Information */
 };
+
 STATIC int sctp_n_wput(queue_t *, mblk_t *);
 STATIC int sctp_n_wsrv(queue_t *);
+
 STATIC struct qinit sctp_n_winit = {
 	qi_putp:sctp_n_wput,		/* Write put (msg from above) */
 	qi_srvp:sctp_n_wsrv,		/* Write queue service */
 	qi_minfo:&sctp_n_minfo,		/* Information */
 };
+
 STATIC struct streamtab sctp_n_info = {
 	st_rdinit:&sctp_n_rinit,	/* Upper read queue */
 	st_wrinit:&sctp_n_winit,	/* Upper write queue */
 };
+
 #define QR_DONE		0
 #define QR_ABSORBED	1
 #define QR_TRIMMED	2
@@ -13010,7 +13036,7 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 		cminor = 1;
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
-	for (; *spp && cminor <= SCTP_N_CMINORS; spp = &(*spp)->next) {
+	for (; *spp && cminor <= NMINORS; spp = &(*spp)->next) {
 		ushort dminor = (*spp)->cminor;
 		if (cminor < dminor)
 			break;
@@ -13022,7 +13048,7 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			cminor++;
 		}
 	}
-	if (cminor > SCTP_N_CMINORS) {
+	if (cminor > NMINORS) {
 		rare();
 		return (ENXIO);
 	}
@@ -13054,8 +13080,7 @@ sctp_n_init(void)
 {
 	int cmajor;
 	if ((cmajor =
-	     lis_register_strdev(SCTP_N_CMAJOR_0, &sctp_n_info, SCTP_N_CMINORS,
-				 sctp_n_minfo.mi_idname)) < 0) {
+	     lis_register_strdev(CMAJOR_0, &sctp_n_info, UNITS, DRV_NAME)) < 0) {
 		sctp_n_minfo.mi_idnum = 0;
 		rare();
 		cmn_err(CE_NOTE, "sctp: couldn't register driver\n");
@@ -13075,7 +13100,14 @@ sctp_n_term(void)
 	}
 }
 
-#define SCTP_T_CMINORS 255
+#ifdef LFS
+#define SCTP_T_DRV_ID	    CONFIG_STREAMS_SCTP_T_MODID
+#define SCTP_T_DRV_NAME	    CONFIG_STREAMS_SCTP_T_NAME
+#define SCTP_T_CMAJORS	    CONFIG_STREAMS_SCTP_T_NMAJORS
+#define SCTP_T_CMAJOR_0	    CONFIG_STREAMS_SCTP_T_MAJOR
+#define SCTP_T_UNITS	    CONFIG_STREAMS_SCTP_T_NMINORS
+#endif				/* LFS */
+
 /* 
  *  =========================================================================
  *
@@ -13084,18 +13116,34 @@ sctp_n_term(void)
  *  =========================================================================
  *  This driver defines two user interfaces: one NPI, the other TPI.
  */
+
+#undef DRV_ID
+#undef DRV_NAME
+#undef CMAJORS
+#undef CMAJOR_0
+#undef UNITS
+
+#define DRV_ID		SCTP_T_DRV_ID
+#define DRV_NAME	SCTP_T_DRV_NAME
+#define CMAJORS		SCTP_T_CMAJORS
+#define CMAJOR_0	SCTP_T_CMAJOR_0
+#define UNITS		SCTP_T_UNITS
+
 STATIC struct module_info sctp_t_minfo = {
-	mi_idnum:0,			/* Module ID number */
-	mi_idname:"sctp",		/* Module name */
+	mi_idnum:SCTP_T_DRV_ID,		/* Module ID number */
+	mi_idname:SCTP_T_DRV_NAME,	/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
+
 STATIC int sctp_t_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sctp_t_close(queue_t *, int, cred_t *);
+
 STATIC int sctp_t_rput(queue_t *, mblk_t *);
 STATIC int sctp_t_rsrv(queue_t *);
+
 STATIC struct qinit sctp_t_rinit = {
 	qi_putp:sctp_t_rput,		/* Read put (msg from below) */
 	qi_srvp:sctp_t_rsrv,		/* Read queue service */
@@ -13103,17 +13151,21 @@ STATIC struct qinit sctp_t_rinit = {
 	qi_qclose:sctp_t_close,		/* Last close */
 	qi_minfo:&sctp_t_minfo,		/* Information */
 };
+
 STATIC int sctp_t_wput(queue_t *, mblk_t *);
 STATIC int sctp_t_wsrv(queue_t *);
+
 STATIC struct qinit sctp_t_winit = {
 	qi_putp:sctp_t_wput,		/* Write put (msg from above) */
 	qi_srvp:sctp_t_wsrv,		/* Write queue service */
 	qi_minfo:&sctp_t_minfo,		/* Information */
 };
+
 STATIC struct streamtab sctp_t_info = {
 	st_rdinit:&sctp_t_rinit,	/* Upper read queue */
 	st_wrinit:&sctp_t_winit,	/* Upper write queue */
 };
+
 #define QR_DONE		0
 #define QR_ABSORBED	1
 #define QR_TRIMMED	2
@@ -13121,6 +13173,7 @@ STATIC struct streamtab sctp_t_info = {
 #define QR_PASSALONG	4
 #define QR_PASSFLOW	5
 #define QR_DISABLE	6
+
 /* 
  *  =========================================================================
  *
@@ -16823,7 +16876,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 		cminor = 1;
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
-	for (; *spp && cminor <= SCTP_T_CMINORS; spp = &(*spp)->next) {
+	for (; *spp && cminor <= NMINORS; spp = &(*spp)->next) {
 		ushort dminor = (*spp)->cminor;
 		if (cminor < dminor)
 			break;
@@ -16835,7 +16888,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			cminor++;
 		}
 	}
-	if (cminor > SCTP_T_CMINORS) {
+	if (cminor > NMINORS) {
 		rare();
 		return (ENXIO);
 	}
@@ -16867,8 +16920,7 @@ sctp_t_init(void)
 {
 	int cmajor;
 	if ((cmajor =
-	     lis_register_strdev(SCTP_T_CMAJOR_0, &sctp_t_info, SCTP_T_CMINORS,
-				 sctp_t_minfo.mi_idname)) < 0) {
+	     lis_register_strdev(CMAJOR_0, &sctp_t_info, UNITS, DRV_NAME)) < 0) {
 		sctp_t_minfo.mi_idnum = 0;
 		rare();
 		cmn_err(CE_NOTE, "sctp: couldn't register driver\n");

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.3 2004/08/29 20:25:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:05 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -131,25 +131,16 @@ ss7_r_flush(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *))
 {
-	int rtn = 0;
+	int rtn = 0, locked = 0;
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
-#if 0
-	if (q->q_count || mp->b_datap->db_type < QPCTL) {
+	if (q->q_count && mp->b_datap->db_type < QPCTL) {
 		putq(q, mp);
 		return (0);
 	}
-#else
-	if (q->q_count) {
-		putq(q, mp);
-		return (0);
-	}
-#endif
-	if (ss7_trylockq(q)) {
+	if ((locked = ss7_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
 		do {
-			/*
-			   Fast Path 
-			 */
+			/* Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				freemsg(mp);
 				break;
@@ -203,7 +194,8 @@ ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeu
 		} while (0);
 		if (wakeup)
 			wakeup(q);
-		ss7_unlockq(q);
+		if (locked)
+			ss7_unlockq(q);
 	} else {
 		rare();
 		putq(q, mp);
@@ -223,9 +215,7 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 	if (ss7_trylockq(q)) {
 		mblk_t *mp;
 		while ((mp = getq(q))) {
-			/*
-			   Fast Path 
-			 */
+			/* Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				freemsg(mp);
 				continue;
@@ -279,7 +269,7 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 					putbq(q, mp);
 					break;
 				}
-				/*
+				/* 
 				 *  Be careful not to put a priority
 				 *  message back on the queue.
 				 */
@@ -299,9 +289,8 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 			}
 			break;
 		}
-		/*
-		   perform wakeups 
-		 */
+		/* 
+		   perform wakeups */
 		if (wakeup)
 			wakeup(q);
 		ss7_unlockq(q);

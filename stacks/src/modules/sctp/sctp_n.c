@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:06 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:06 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:06 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
 
-static char const ident[] = "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:06 $";
+static char const ident[] =
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
 
 #define __NO_VERSION__
 
@@ -69,7 +70,13 @@ static char const ident[] = "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2
 
 #include "sctp_n.h"
 
-#define SCTP_N_CMINORS 255
+#ifdef LFS
+#define SCTP_N_DRV_ID		CONFIG_STREAMS_SCTP_N_MODID
+#define SCTP_N_DRV_NAME		CONFIG_STREAMS_SCTP_N_NAME
+#define SCTP_N_CMAJORS		CONFIG_STREAMS_SCTP_N_NMAJORS
+#define SCTP_N_CMAJOR_0		CONFIG_STREAMS_SCTP_N_MAJOR
+#define SCTP_N_UNITS		CONFIG_STREAMS_SCTP_N_NMINORS
+#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -80,13 +87,19 @@ static char const ident[] = "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2
  *  This driver defines two user interfaces: one NPI, the other TPI.
  */
 
+#define DRV_ID		SCTP_N_DRV_ID
+#define DRV_NAME	SCTP_N_DRV_NAME
+#define CMAJORS		SCTP_N_CMAJORS
+#define CMAJOR_0	SCTP_N_CMAJOR_0
+#define UNITS		SCTP_N_UNITS
+
 STATIC struct module_info sctp_n_minfo = {
-	mi_idnum:0,			/* Module ID number */
-	mi_idname:"sctp",		/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10		/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10		/* Lo water mark */
 };
 
 STATIC int sctp_n_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -96,25 +109,25 @@ STATIC int sctp_n_rput(queue_t *, mblk_t *);
 STATIC int sctp_n_rsrv(queue_t *);
 
 STATIC struct qinit sctp_n_rinit = {
-	qi_putp:sctp_n_rput,		/* Read put (msg from below) */
-	qi_srvp:sctp_n_rsrv,		/* Read queue service */
-	qi_qopen:sctp_n_open,		/* Each open */
-	qi_qclose:sctp_n_close,		/* Last close */
-	qi_minfo:&sctp_n_minfo,		/* Information */
+	.qi_putp = sctp_n_rput,		/* Read put (msg from below) */
+	.qi_srvp = sctp_n_rsrv,		/* Read queue service */
+	.qi_qopen = sctp_n_open,	/* Each open */
+	.qi_qclose = sctp_n_close,	/* Last close */
+	.qi_minfo = &sctp_n_minfo,	/* Information */
 };
 
 STATIC int sctp_n_wput(queue_t *, mblk_t *);
 STATIC int sctp_n_wsrv(queue_t *);
 
 STATIC struct qinit sctp_n_winit = {
-	qi_putp:sctp_n_wput,		/* Write put (msg from above) */
-	qi_srvp:sctp_n_wsrv,		/* Write queue service */
-	qi_minfo:&sctp_n_minfo,		/* Information */
+	.qi_putp = sctp_n_wput,		/* Write put (msg from above) */
+	.qi_srvp = sctp_n_wsrv,		/* Write queue service */
+	.qi_minfo = &sctp_n_minfo,	/* Information */
 };
 
-STATIC struct streamtab sctp_n_info = {
-	st_rdinit:&sctp_n_rinit,	/* Upper read queue */
-	st_wrinit:&sctp_n_winit,	/* Upper write queue */
+MODULE_STATIC struct streamtab sctp_ninfo = {
+	.st_rdinit = &sctp_n_rinit,	/* Upper read queue */
+	.st_wrinit = &sctp_n_winit,	/* Upper write queue */
 };
 
 #define QR_DONE		0
@@ -150,52 +163,49 @@ n_conn_ind(sctp_t * sp, mblk_t *cp)
 	size_t dst_len = sizeof(uint16_t) + sizeof(uint32_t);
 	size_t src_len = danum ? sizeof(uint16_t) + danum * sizeof(uint32_t) : 0;
 	size_t qos_len = sizeof(*q);
-
 	ensure(((1 << sp->i_state) & (NSF_IDLE | NSF_WRES_CIND)), return (-EFAULT));
-	if (bufq_length(&sp->conq) < sp->conind) {
-		if (canputnext(sp->rq)) {
-			if ((mp = allocb(sizeof(*p) + dst_len + src_len + qos_len, BPRI_MED))) {
-				mp->b_datap->db_type = M_PROTO;
-				p = (N_conn_ind_t *) mp->b_wptr;
-				p->PRIM_type = N_CONN_IND;
-				p->DEST_length = dst_len;
-				p->DEST_offset = dst_len ? sizeof(*p) : 0;
-				p->SRC_length = src_len;
-				p->SRC_offset = src_len ? sizeof(*p) + dst_len : 0;
-				p->SEQ_number = (ulong) cp;
-				p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
-				p->QOS_length = qos_len;
-				p->QOS_offset = qos_len ? sizeof(*p) + dst_len + src_len : 0;
-				mp->b_wptr += sizeof(*p);
-
-				*((uint16_t *) mp->b_wptr)++ = ck->sport;
-				*((uint32_t *) mp->b_wptr)++ = ck->saddr;
-
-				if (danum)
-					*((uint16_t *) mp->b_wptr)++ = ck->dport;
-				if (danum--)
-					*((uint32_t *) mp->b_wptr)++ = ck->daddr;
-				while (danum--)
-					*((uint32_t *) mp->b_wptr)++ = *daptr++;
-
-				q = (N_qos_sel_conn_sctp_t *) mp->b_wptr;
-				q->n_qos_type = N_QOS_SEL_CONN_SCTP;
-				q->i_streams = ck->n_istr;
-				q->o_streams = ck->n_ostr;
-				mp->b_wptr += sizeof(*q);
-
-				bufq_queue(&sp->conq, cp);
-
-				sp->i_state = NS_WRES_CIND;
-				putnext(sp->rq, mp);
-				return (0);
-			}
-			seldom();
-			return (-ENOBUFS);
-		}
-		seldom();
-		return (-EBUSY);
-	}
+	if (bufq_length(&sp->conq) >= sp->conind)
+		goto erestart;
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p) + dst_len + src_len + qos_len, BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_conn_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_CONN_IND;
+	p->DEST_length = dst_len;
+	p->DEST_offset = dst_len ? sizeof(*p) : 0;
+	p->SRC_length = src_len;
+	p->SRC_offset = src_len ? sizeof(*p) + dst_len : 0;
+	p->SEQ_number = (ulong) cp;
+	p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+	p->QOS_length = qos_len;
+	p->QOS_offset = qos_len ? sizeof(*p) + dst_len + src_len : 0;
+	mp->b_wptr += sizeof(*p);
+	*((uint16_t *) mp->b_wptr)++ = ck->sport;
+	*((uint32_t *) mp->b_wptr)++ = ck->saddr;
+	if (danum)
+		*((uint16_t *) mp->b_wptr)++ = ck->dport;
+	if (danum--)
+		*((uint32_t *) mp->b_wptr)++ = ck->daddr;
+	while (danum--)
+		*((uint32_t *) mp->b_wptr)++ = *daptr++;
+	q = (N_qos_sel_conn_sctp_t *) mp->b_wptr;
+	q->n_qos_type = N_QOS_SEL_CONN_SCTP;
+	q->i_streams = ck->n_istr;
+	q->o_streams = ck->n_ostr;
+	mp->b_wptr += sizeof(*q);
+	bufq_queue(&sp->conq, cp);
+	sp->i_state = NS_WRES_CIND;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
+	seldom();
+	return (-EBUSY);
+      erestart:
 	seldom();
 	return (-ERESTART);
 }
@@ -213,39 +223,37 @@ n_conn_con(sctp_t * sp)
 	struct sctp_daddr *sd = sp->daddr;
 	size_t res_len = sp->danum ? sizeof(uint16_t) + sp->danum * sizeof(sd->daddr) : 0;
 	size_t qos_len = sizeof(*q);
-
 	ensure((sp->i_state == NS_WCON_CREQ), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p) + res_len + qos_len, BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			mp->b_band = 1;	/* expedite */
-			p = (N_conn_con_t *) mp->b_wptr;
-			p->PRIM_type = N_CONN_CON;
-			p->RES_length = res_len;
-			p->RES_offset = res_len ? sizeof(*p) : 0;
-			p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
-			p->QOS_length = qos_len;
-			p->QOS_offset = qos_len ? sizeof(*p) + res_len : 0;
-			mp->b_wptr += sizeof(*p);
-
-			if (sd)
-				*((uint16_t *) mp->b_wptr)++ = sp->dport;
-			for (; sd; sd = sd->next)
-				*((uint32_t *) mp->b_wptr)++ = sd->daddr;
-
-			q = (N_qos_sel_conn_sctp_t *) mp->b_wptr;
-			q->n_qos_type = N_QOS_SEL_CONN_SCTP;
-			q->i_streams = sp->n_istr;
-			q->o_streams = sp->n_ostr;
-			mp->b_wptr += sizeof(*q);
-
-			sp->i_state = NS_DATA_XFER;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p) + res_len + qos_len, BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	mp->b_band = 1;		/* expedite */
+	p = (N_conn_con_t *) mp->b_wptr;
+	p->PRIM_type = N_CONN_CON;
+	p->RES_length = res_len;
+	p->RES_offset = res_len ? sizeof(*p) : 0;
+	p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+	p->QOS_length = qos_len;
+	p->QOS_offset = qos_len ? sizeof(*p) + res_len : 0;
+	mp->b_wptr += sizeof(*p);
+	if (sd)
+		*((uint16_t *) mp->b_wptr)++ = sp->dport;
+	for (; sd; sd = sd->next)
+		*((uint32_t *) mp->b_wptr)++ = sd->daddr;
+	q = (N_qos_sel_conn_sctp_t *) mp->b_wptr;
+	q->n_qos_type = N_QOS_SEL_CONN_SCTP;
+	q->i_streams = sp->n_istr;
+	q->o_streams = sp->n_ostr;
+	mp->b_wptr += sizeof(*q);
+	sp->i_state = NS_DATA_XFER;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -261,35 +269,36 @@ n_discon_ind(sctp_t * sp, ulong orig, long reason, mblk_t *seq)
 {
 	mblk_t *mp;
 	N_discon_ind_t *p;
-
 	ensure(((1 << sp->
 		 i_state) & (NSF_WCON_CREQ | NSF_WRES_CIND | NSF_DATA_XFER | NSF_WCON_RREQ |
 			     NSF_WRES_RIND)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_discon_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_DISCON_IND;
-			p->DISCON_orig = orig;
-			p->DISCON_reason = reason;
-			p->RES_length = 0;
-			p->RES_offset = 0;
-			p->SEQ_number = (ulong) seq;
-			mp->b_wptr += sizeof(*p);
-			if (seq) {
-				bufq_unlink(&sp->conq, seq);
-				freemsg(seq);
-			}
-			if (!bufq_length(&sp->conq))
-				sp->i_state = NS_IDLE;
-			else
-				sp->i_state = NS_WRES_CIND;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_discon_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_DISCON_IND;
+	p->DISCON_orig = orig;
+	p->DISCON_reason = reason;
+	p->RES_length = 0;
+	p->RES_offset = 0;
+	p->SEQ_number = (ulong) seq;
+	mp->b_wptr += sizeof(*p);
+	if (seq) {
+		bufq_unlink(&sp->conq, seq);
+		freemsg(seq);
 	}
+	if (!bufq_length(&sp->conq))
+		sp->i_state = NS_IDLE;
+	else
+		sp->i_state = NS_WRES_CIND;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -305,34 +314,35 @@ n_data_ind(sctp_t * sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t tsn, 
 	mblk_t *mp;
 	N_data_ind_t *p;
 	N_qos_sel_data_sctp_t *q;
-
 	if (!((1 << sp->i_state) & (NSF_DATA_XFER))) {
 		printd(("Interace in state %u\n", sp->i_state));
 		printd(("mblk size is %d\n", msgdsize(dp)));
 	}
 	ensure(((1 << sp->i_state) & (NSF_DATA_XFER)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_data_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_DATA_IND;
-			p->DATA_xfer_flags = (more ? N_MORE_DATA_FLAG : 0);
-			mp->b_wptr += sizeof(*p);
-			q = (N_qos_sel_data_sctp_t *) mp->b_wptr;
-			q->n_qos_type = N_QOS_SEL_DATA_SCTP;
-			q->ppi = ppi;
-			q->sid = sid;
-			q->ssn = ssn;
-			q->tsn = tsn;
-			q->more = more ? 1 : 0;
-			mp->b_wptr += sizeof(*q);
-			mp->b_cont = dp;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_data_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_DATA_IND;
+	p->DATA_xfer_flags = (more ? N_MORE_DATA_FLAG : 0);
+	mp->b_wptr += sizeof(*p);
+	q = (N_qos_sel_data_sctp_t *) mp->b_wptr;
+	q->n_qos_type = N_QOS_SEL_DATA_SCTP;
+	q->ppi = ppi;
+	q->sid = sid;
+	q->ssn = ssn;
+	q->tsn = tsn;
+	q->more = more ? 1 : 0;
+	mp->b_wptr += sizeof(*q);
+	mp->b_cont = dp;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -350,30 +360,31 @@ n_exdata_ind(sctp_t * sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t tsn
 	mblk_t *mp;
 	N_exdata_ind_t *p;
 	N_qos_sel_data_sctp_t *q;
-
 	ensure(((1 << sp->i_state) & (NSF_DATA_XFER)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			mp->b_band = 1;	/* expedite */
-			p = (N_exdata_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_EXDATA_IND;
-			mp->b_wptr += sizeof(*p);
-			q = (N_qos_sel_data_sctp_t *) mp->b_wptr;
-			q->n_qos_type = N_QOS_SEL_DATA_SCTP;
-			q->ppi = ppi;
-			q->sid = sid;
-			q->ssn = ssn;
-			q->tsn = tsn;
-			q->more = more ? 1 : 0;
-			mp->b_wptr += sizeof(*q);
-			mp->b_cont = dp;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	mp->b_band = 1;		/* expedite */
+	p = (N_exdata_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_EXDATA_IND;
+	mp->b_wptr += sizeof(*p);
+	q = (N_qos_sel_data_sctp_t *) mp->b_wptr;
+	q->n_qos_type = N_QOS_SEL_DATA_SCTP;
+	q->ppi = ppi;
+	q->sid = sid;
+	q->ssn = ssn;
+	q->tsn = tsn;
+	q->more = more ? 1 : 0;
+	mp->b_wptr += sizeof(*q);
+	mp->b_cont = dp;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -394,73 +405,69 @@ n_info_ack(sctp_t * sp)
 	size_t qor_len = sizeof(*r);
 	size_t pro_len = sizeof(uint32_t);
 	sctp_saddr_t *ss = sp->saddr;
-
-	if ((mp = allocb(sizeof(*p) + add_len + qos_len + qor_len + pro_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (N_info_ack_t *) mp->b_wptr;
-		p->PRIM_type = N_INFO_ACK;
-		p->NSDU_size = -1;	/* no limit on NSDU size */
-		p->ENSDU_size = -1;	/* no limit on ENSDU size */
-		p->CDATA_size = -1;	/* no limit on CDATA size */
-		p->DDATA_size = -1;	/* no limit on DDATA size */
-		p->ADDR_size = -1;	/* no limit on ADDR size */
-		p->ADDR_length = add_len;
-		p->ADDR_offset = add_len ? sizeof(*p) : 0;
-		p->QOS_length = qos_len;
-		p->QOS_offset = qos_len ? sizeof(*p) + add_len : 0;
-		p->QOS_range_length = qor_len;
-		p->QOS_range_offset = qor_len ? sizeof(*p) + add_len + qos_len : 0;
-		p->OPTIONS_flags =
-		    REC_CONF_OPT | EX_DATA_OPT | ((sp->flags & SCTP_FLAG_DEFAULT_RC_SEL) ?
-						  DEFAULT_RC_SEL : 0);
-		p->NIDU_size = -1;	/* no limit on NIDU size */
-		p->SERV_type = N_CONS;
-		p->CURRENT_state = sp->i_state;
-		p->PROVIDER_type = N_SUBNET;
-		p->NODU_size = sp->pmtu >> 1;
-		p->PROTOID_length = pro_len;
-		p->PROTOID_offset = pro_len ? sizeof(*p) + add_len + qos_len + qor_len : 0;
-		p->NPI_version = N_VERSION_2;
-		mp->b_wptr += sizeof(*p);
-
-		if (ss)
-			*((uint16_t *) mp->b_wptr)++ = sp->sport;
-		for (; ss; ss = ss->next)
-			*((uint32_t *) mp->b_wptr)++ = ss->saddr;
-
-		q = (N_qos_sel_info_sctp_t *) mp->b_wptr;
-		q->n_qos_type = N_QOS_SEL_INFO_SCTP;
-		if ((1 << sp->i_state) & (NSF_UNBND | NSF_IDLE | NSF_WCON_CREQ)) {
-			q->i_streams = sp->max_istr;
-			q->o_streams = sp->req_ostr;
-		} else {
-			q->i_streams = sp->n_istr;
-			q->o_streams = sp->n_ostr;
-		}
-		q->ppi = sp->ppi;
-		q->sid = sp->sid;
-		q->max_inits = sp->max_inits;
-		q->max_retrans = sp->max_retrans;
-		q->ck_life = sp->ck_life;
-		q->ck_inc = sp->ck_inc;
-		q->hmac = sp->hmac;
-		q->throttle = sp->throttle;
-		q->max_sack = sp->max_sack;
-		q->rto_ini = sp->rto_ini;
-		q->rto_min = sp->rto_min;
-		q->rto_max = sp->rto_max;
-		q->rtx_path = sp->rtx_path;
-		q->hb_itvl = sp->hb_itvl;
-		mp->b_wptr += sizeof(*q);
-
-		r = (N_qos_range_info_sctp_t *) mp->b_wptr;
-		r->n_qos_type = N_QOS_RANGE_INFO_SCTP;
-		mp->b_wptr += sizeof(*r);
-
-		*((uint32_t *) mp->b_wptr)++ = sp->ppi;
-		putnext(sp->rq, mp);
-		return (0);
+	if (!(mp = allocb(sizeof(*p) + add_len + qos_len + qor_len + pro_len, BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (N_info_ack_t *) mp->b_wptr;
+	p->PRIM_type = N_INFO_ACK;
+	p->NSDU_size = -1;	/* no limit on NSDU size */
+	p->ENSDU_size = -1;	/* no limit on ENSDU size */
+	p->CDATA_size = -1;	/* no limit on CDATA size */
+	p->DDATA_size = -1;	/* no limit on DDATA size */
+	p->ADDR_size = -1;	/* no limit on ADDR size */
+	p->ADDR_length = add_len;
+	p->ADDR_offset = add_len ? sizeof(*p) : 0;
+	p->QOS_length = qos_len;
+	p->QOS_offset = qos_len ? sizeof(*p) + add_len : 0;
+	p->QOS_range_length = qor_len;
+	p->QOS_range_offset = qor_len ? sizeof(*p) + add_len + qos_len : 0;
+	p->OPTIONS_flags =
+	    REC_CONF_OPT | EX_DATA_OPT | ((sp->flags & SCTP_FLAG_DEFAULT_RC_SEL) ?
+					  DEFAULT_RC_SEL : 0);
+	p->NIDU_size = -1;	/* no limit on NIDU size */
+	p->SERV_type = N_CONS;
+	p->CURRENT_state = sp->i_state;
+	p->PROVIDER_type = N_SUBNET;
+	p->NODU_size = sp->pmtu >> 1;
+	p->PROTOID_length = pro_len;
+	p->PROTOID_offset = pro_len ? sizeof(*p) + add_len + qos_len + qor_len : 0;
+	p->NPI_version = N_VERSION_2;
+	mp->b_wptr += sizeof(*p);
+	if (ss)
+		*((uint16_t *) mp->b_wptr)++ = sp->sport;
+	for (; ss; ss = ss->next)
+		*((uint32_t *) mp->b_wptr)++ = ss->saddr;
+	q = (N_qos_sel_info_sctp_t *) mp->b_wptr;
+	q->n_qos_type = N_QOS_SEL_INFO_SCTP;
+	if ((1 << sp->i_state) & (NSF_UNBND | NSF_IDLE | NSF_WCON_CREQ)) {
+		q->i_streams = sp->max_istr;
+		q->o_streams = sp->req_ostr;
+	} else {
+		q->i_streams = sp->n_istr;
+		q->o_streams = sp->n_ostr;
 	}
+	q->ppi = sp->ppi;
+	q->sid = sp->sid;
+	q->max_inits = sp->max_inits;
+	q->max_retrans = sp->max_retrans;
+	q->ck_life = sp->ck_life;
+	q->ck_inc = sp->ck_inc;
+	q->hmac = sp->hmac;
+	q->throttle = sp->throttle;
+	q->max_sack = sp->max_sack;
+	q->rto_ini = sp->rto_ini;
+	q->rto_min = sp->rto_min;
+	q->rto_max = sp->rto_max;
+	q->rtx_path = sp->rtx_path;
+	q->hb_itvl = sp->hb_itvl;
+	mp->b_wptr += sizeof(*q);
+	r = (N_qos_range_info_sctp_t *) mp->b_wptr;
+	r->n_qos_type = N_QOS_RANGE_INFO_SCTP;
+	mp->b_wptr += sizeof(*r);
+	*((uint32_t *) mp->b_wptr)++ = sp->ppi;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
 	seldom();
 	return (-ENOBUFS);
 }
@@ -477,30 +484,27 @@ n_bind_ack(sctp_t * sp)
 	sctp_saddr_t *ss = sp->saddr;
 	size_t add_len = sp->sanum ? sizeof(sp->sport) + sp->sanum * sizeof(ss->saddr) : 0;
 	size_t pro_len = sizeof(sp->ppi);
-
-	if ((mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (N_bind_ack_t *) mp->b_wptr;
-		p->PRIM_type = N_BIND_ACK;
-		p->ADDR_length = add_len;
-		p->ADDR_offset = add_len ? sizeof(*p) : 0;
-		p->CONIND_number = sp->conind;
-		p->TOKEN_value = (ulong) sp->rq;
-		p->PROTOID_length = pro_len;
-		p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
-		mp->b_wptr += sizeof(*p);
-
-		if (ss)
-			*((typeof(sp->sport) *) mp->b_wptr)++ = sp->sport;
-		for (; ss; ss = ss->next)
-			*((typeof(ss->saddr) *) mp->b_wptr)++ = ss->saddr;
-
-		*((typeof(sp->ppi) *) mp->b_wptr)++ = sp->ppi;
-
-		sp->i_state = NS_IDLE;
-		putnext(sp->rq, mp);
-		return (0);
-	}
+	if (!(mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (N_bind_ack_t *) mp->b_wptr;
+	p->PRIM_type = N_BIND_ACK;
+	p->ADDR_length = add_len;
+	p->ADDR_offset = add_len ? sizeof(*p) : 0;
+	p->CONIND_number = sp->conind;
+	p->TOKEN_value = (ulong) sp->rq;
+	p->PROTOID_length = pro_len;
+	p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
+	mp->b_wptr += sizeof(*p);
+	if (ss)
+		*((typeof(sp->sport) *) mp->b_wptr)++ = sp->sport;
+	for (; ss; ss = ss->next)
+		*((typeof(ss->saddr) *) mp->b_wptr)++ = ss->saddr;
+	*((typeof(sp->ppi) *) mp->b_wptr)++ = sp->ppi;
+	sp->i_state = NS_IDLE;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
 	seldom();
 	return (-ENOBUFS);
 }
@@ -514,7 +518,6 @@ n_error_ack(sctp_t * sp, int prim, int err)
 {
 	mblk_t *mp;
 	N_error_ack_t *p;
-
 	switch (err) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -526,55 +529,56 @@ n_error_ack(sctp_t * sp, int prim, int err)
 		never();
 		return (err);
 	}
-	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (N_error_ack_t *) mp->b_wptr;
-		p->PRIM_type = N_ERROR_ACK;
-		p->ERROR_prim = prim;
-		p->NPI_error = err < 0 ? NSYSERR : err;
-		p->UNIX_error = err < 0 ? -err : 0;
-		mp->b_wptr += sizeof(*p);
-		switch (sp->i_state) {
-		case NS_WACK_OPTREQ:
-		case NS_WACK_UREQ:
-		case NS_WCON_CREQ:
-			sp->i_state = NS_IDLE;
-			break;
-		case NS_WCON_RREQ:
-			sp->i_state = NS_DATA_XFER;
-			break;
-		case NS_WACK_BREQ:
-			sp->i_state = NS_UNBND;
-			break;
-		case NS_WACK_CRES:
-			sp->i_state = NS_WRES_CIND;
-			break;
-		case NS_WACK_DREQ6:
-			sp->i_state = NS_WCON_CREQ;
-			break;
-		case NS_WACK_DREQ7:
-			sp->i_state = NS_WRES_CIND;
-			break;
-		case NS_WACK_DREQ9:
-			sp->i_state = NS_DATA_XFER;
-			break;
-		case NS_WACK_DREQ10:
-			sp->i_state = NS_WCON_RREQ;
-			break;
-		case NS_WACK_DREQ11:
-			sp->i_state = NS_WRES_RIND;
-			break;
-			/*
-			 *  Note: if we are not in a WACK state we simply do
-			 *  not change state.  This occurs normally when we
-			 *  send NOUTSTATE or NNOTSUPPORT or are responding
-			 *  to an N_OPTMGMT_REQ in other than the NS_IDLE
-			 *  state.
-			 */
-		}
-		putnext(sp->rq, mp);
-		return (0);
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (N_error_ack_t *) mp->b_wptr;
+	p->PRIM_type = N_ERROR_ACK;
+	p->ERROR_prim = prim;
+	p->NPI_error = err < 0 ? NSYSERR : err;
+	p->UNIX_error = err < 0 ? -err : 0;
+	mp->b_wptr += sizeof(*p);
+	switch (sp->i_state) {
+	case NS_WACK_OPTREQ:
+	case NS_WACK_UREQ:
+	case NS_WCON_CREQ:
+		sp->i_state = NS_IDLE;
+		break;
+	case NS_WCON_RREQ:
+		sp->i_state = NS_DATA_XFER;
+		break;
+	case NS_WACK_BREQ:
+		sp->i_state = NS_UNBND;
+		break;
+	case NS_WACK_CRES:
+		sp->i_state = NS_WRES_CIND;
+		break;
+	case NS_WACK_DREQ6:
+		sp->i_state = NS_WCON_CREQ;
+		break;
+	case NS_WACK_DREQ7:
+		sp->i_state = NS_WRES_CIND;
+		break;
+	case NS_WACK_DREQ9:
+		sp->i_state = NS_DATA_XFER;
+		break;
+	case NS_WACK_DREQ10:
+		sp->i_state = NS_WCON_RREQ;
+		break;
+	case NS_WACK_DREQ11:
+		sp->i_state = NS_WRES_RIND;
+		break;
+		/* 
+		 *  Note: if we are not in a WACK state we simply do
+		 *  not change state.  This occurs normally when we
+		 *  send NOUTSTATE or NNOTSUPPORT or are responding
+		 *  to an N_OPTMGMT_REQ in other than the NS_IDLE
+		 *  state.
+		 */
 	}
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
 	seldom();
 	return (-ENOBUFS);
 }
@@ -588,69 +592,68 @@ n_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 {
 	mblk_t *mp;
 	N_ok_ack_t *p;
-
-	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
-		p = (N_ok_ack_t *) mp->b_wptr;
-		p->PRIM_type = N_OK_ACK;
-		p->CORRECT_prim = prim;
-		mp->b_wptr += sizeof(*p);
-		switch (sp->i_state) {
-		case NS_WACK_OPTREQ:
-			sp->i_state = NS_IDLE;
-			break;
-		case NS_WACK_RRES:
-			sp->i_state = NS_DATA_XFER;
-			break;
-		case NS_WACK_UREQ:
-			sp->i_state = NS_UNBND;
-			break;
-		case NS_WACK_CRES:
-		{
-			queue_t *aq = (queue_t *) tok;
-			sctp_t *ap = (sctp_t *) aq->q_ptr;
-
-			if (ap) {
-				ap->i_state = NS_DATA_XFER;
-				sctp_cleanup_read(sp);	/* deliver to user what is possible */
-				sctp_transmit_wakeup(ap);	/* reply to peer what is necessary */
-			}
-			if (seq) {
-				bufq_unlink(&sp->conq, (mblk_t *) seq);
-				freemsg((mblk_t *) seq);
-			}
-			if (aq != sp->rq) {
-				if (bufq_length(&sp->conq))
-					sp->i_state = NS_WRES_CIND;
-				else
-					sp->i_state = NS_IDLE;
-			}
-			break;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PCPROTO;
+	p = (N_ok_ack_t *) mp->b_wptr;
+	p->PRIM_type = N_OK_ACK;
+	p->CORRECT_prim = prim;
+	mp->b_wptr += sizeof(*p);
+	switch (sp->i_state) {
+	case NS_WACK_OPTREQ:
+		sp->i_state = NS_IDLE;
+		break;
+	case NS_WACK_RRES:
+		sp->i_state = NS_DATA_XFER;
+		break;
+	case NS_WACK_UREQ:
+		sp->i_state = NS_UNBND;
+		break;
+	case NS_WACK_CRES:
+	{
+		queue_t *aq = (queue_t *) tok;
+		sctp_t *ap = (sctp_t *) aq->q_ptr;
+		if (ap) {
+			ap->i_state = NS_DATA_XFER;
+			sctp_cleanup_read(sp);	/* deliver to user what is possible */
+			sctp_transmit_wakeup(ap);	/* reply to peer what is necessary */
 		}
-		case NS_WACK_DREQ7:
-			if (seq) {
-				bufq_unlink(&sp->conq, (mblk_t *) seq);
-				freemsg((mblk_t *) seq);
-			}
-		case NS_WACK_DREQ6:
-		case NS_WACK_DREQ9:
-		case NS_WACK_DREQ10:
-		case NS_WACK_DREQ11:
+		if (seq) {
+			bufq_unlink(&sp->conq, (mblk_t *) seq);
+			freemsg((mblk_t *) seq);
+		}
+		if (aq != sp->rq) {
 			if (bufq_length(&sp->conq))
 				sp->i_state = NS_WRES_CIND;
 			else
 				sp->i_state = NS_IDLE;
-			break;
-			/*
-			 *  Note: if we are not in a WACK state we simply do
-			 *  not change state.  This occurs normally when we
-			 *  are responding to an N_OPTMGMT_REQ in other than
-			 *  the NS_IDLE state.
-			 */
 		}
-		putnext(sp->rq, mp);
-		return (0);
+		break;
 	}
+	case NS_WACK_DREQ7:
+		if (seq) {
+			bufq_unlink(&sp->conq, (mblk_t *) seq);
+			freemsg((mblk_t *) seq);
+		}
+	case NS_WACK_DREQ6:
+	case NS_WACK_DREQ9:
+	case NS_WACK_DREQ10:
+	case NS_WACK_DREQ11:
+		if (bufq_length(&sp->conq))
+			sp->i_state = NS_WRES_CIND;
+		else
+			sp->i_state = NS_IDLE;
+		break;
+		/* 
+		 *  Note: if we are not in a WACK state we simply do
+		 *  not change state.  This occurs normally when we
+		 *  are responding to an N_OPTMGMT_REQ in other than
+		 *  the NS_IDLE state.
+		 */
+	}
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
 	seldom();
 	return (-ENOBUFS);
 }
@@ -665,28 +668,29 @@ n_datack_ind(sctp_t * sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t tsn
 	mblk_t *mp;
 	N_datack_ind_t *p;
 	N_qos_sel_data_sctp_t *q;
-
 	ensure(((1 << sp->i_state) & (NSF_DATA_XFER)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_datack_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_DATACK_IND;
-			mp->b_wptr += sizeof(*p);
-			q = (N_qos_sel_data_sctp_t *) mp->b_wptr;
-			q->n_qos_type = N_QOS_SEL_DATA_SCTP;
-			q->ppi = ppi;
-			q->sid = sid;
-			q->ssn = ssn;
-			q->tsn = tsn;
-			q->more = 0;
-			mp->b_wptr += sizeof(*q);
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p) + sizeof(*q), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_datack_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_DATACK_IND;
+	mp->b_wptr += sizeof(*p);
+	q = (N_qos_sel_data_sctp_t *) mp->b_wptr;
+	q->n_qos_type = N_QOS_SEL_DATA_SCTP;
+	q->ppi = ppi;
+	q->sid = sid;
+	q->ssn = ssn;
+	q->tsn = tsn;
+	q->more = 0;
+	mp->b_wptr += sizeof(*q);
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -700,26 +704,25 @@ n_reset_ind(sctp_t * sp, ulong orig, ulong reason, mblk_t *cp)
 {
 	mblk_t *mp;
 	N_reset_ind_t *p;
-
 	ensure(((1 << sp->i_state) & (NSF_DATA_XFER)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_reset_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_RESET_IND;
-			p->RESET_orig = orig;
-			p->RESET_reason = reason;
-			mp->b_wptr += sizeof(*p);
-
-			bufq_queue(&sp->conq, cp);
-
-			sp->i_state = NS_WRES_RIND;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_reset_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_RESET_IND;
+	p->RESET_orig = orig;
+	p->RESET_reason = reason;
+	mp->b_wptr += sizeof(*p);
+	bufq_queue(&sp->conq, cp);
+	sp->i_state = NS_WRES_RIND;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -733,21 +736,22 @@ n_reset_con(sctp_t * sp)
 {
 	mblk_t *mp;
 	N_reset_con_t *p;
-
 	ensure(((1 << sp->i_state) & (NSF_WCON_RREQ)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_reset_con_t *) mp->b_wptr;
-			p->PRIM_type = N_RESET_CON;
-			mp->b_wptr += sizeof(*p);
-			sp->i_state = NS_DATA_XFER;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_reset_con_t *) mp->b_wptr;
+	p->PRIM_type = N_RESET_CON;
+	mp->b_wptr += sizeof(*p);
+	sp->i_state = NS_DATA_XFER;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -762,20 +766,21 @@ n_recover_ind(void)
 {
 	mblk_t *mp;
 	N_recover_ind_t *p;
-
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_recover_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_RECOVER_IND;
-			mp->b_wptr += sizeof(*p);
-			sp->i_state = NS_DATA_XFER;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_recover_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_RECOVER_IND;
+	mp->b_wptr += sizeof(*p);
+	sp->i_state = NS_DATA_XFER;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -789,22 +794,23 @@ n_retrieve_ind(mblk_t *dp)
 {
 	mblk_t *mp;
 	N_retrieve_ind_t *p;
-
 	ensure(((1 << sp->i_state) & (NSF_IDLE)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_retrieve_ind_t *) mp->b_wptr;
-			p->PRIM_type = N_RETRIEVE_IND;
-			mp->b_wptr += sizeof(*p);
-			mp->b_cont = dp;
-			sp->i_state = NS_IDLE;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_retrieve_ind_t *) mp->b_wptr;
+	p->PRIM_type = N_RETRIEVE_IND;
+	mp->b_wptr += sizeof(*p);
+	mp->b_cont = dp;
+	sp->i_state = NS_IDLE;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -818,21 +824,22 @@ n_retrieve_con(void)
 {
 	mblk_t *mp;
 	N_retrieve_con_t *p;
-
 	ensure(((1 << sp->i_state) & (NSF_IDLE)), return (-EFAULT));
-	if (canputnext(sp->rq)) {
-		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
-			mp->b_datap->db_type = M_PROTO;
-			p = (N_retrieve_con_t *) mp->b_wptr;
-			p->PRIM_type = N_RETREIVE_CON;
-			mp->b_wptr += sizeof(*p);
-			sp->i_state = NS_IDLE;
-			putnext(sp->rq, mp);
-			return (0);
-		}
-		seldom();
-		return (-ENOBUFS);
-	}
+	if (!canputnext(sp->rq))
+		goto ebusy;
+	if (!(mp = allocb(sizeof(*p), BPRI_MED)))
+		goto enobufs;
+	mp->b_datap->db_type = M_PROTO;
+	p = (N_retrieve_con_t *) mp->b_wptr;
+	p->PRIM_type = N_RETREIVE_CON;
+	mp->b_wptr += sizeof(*p);
+	sp->i_state = NS_IDLE;
+	putnext(sp->rq, mp);
+	return (0);
+      enobufs:
+	seldom();
+	return (-ENOBUFS);
+      ebusy:
 	seldom();
 	return (-EBUSY);
 }
@@ -1060,9 +1067,8 @@ n_conn_res(sctp_t * sp, mblk_t *mp)
 		goto badtoken1;
 	if (ap->i_state == NS_IDLE && ap->conind)
 		goto badtoken2;
-	/*
-	   protect at least r00t streams from users 
-	 */
+	/* 
+	   protect at least r00t streams from users */
 	if (sp->cred.cr_uid != 0 && (ap->cred.cr_uid != sp->cred.cr_uid))
 		goto access;
 	{
@@ -1165,7 +1171,7 @@ n_discon_req(sctp_t * sp, mblk_t *mp)
 		goto badaddr;
 	if (sp->i_state == NS_WACK_DREQ7 && !(cp = n_seq_check(sp, p->SEQ_number)))
 		goto badseq;
-	/*
+	/* 
 	 *  XXX: What do we do with the disconnect reason?  Nothing?
 	 */
 	if ((err = sctp_discon_req(sp, cp)))
@@ -1385,9 +1391,8 @@ n_bind_req(sctp_t * sp, mblk_t *mp)
 		goto badaddr;
 	if (p->ADDR_length != sizeof(a->port) + anum * sizeof(a->addr[0]))
 		goto badaddr;
-	/*
-	   we don't allow wildcards just yet 
-	 */
+	/* 
+	   we don't allow wildcards just yet */
 	if (!anum || (!a->port && !(a->port = sctp_get_port())))
 		goto noaddr;
 	if (sp->cred.cr_uid != 0 && a->port < 1024)
@@ -1987,91 +1992,240 @@ sctp_n_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-sctp_t *sctp_n_list = NULL;
+spinlock_t sctp_n_lock = SPINLOCK_LOCKED;
+struct sctp *sctp_n_list = NULL;
 
 STATIC int
 sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int cmajor = getmajor(*devp);
-	int cminor = getminor(*devp);
-	sctp_t *sp, **spp = &sctp_n_list;
-
+	psw_t flags;
+	int mindex = 0;
+	ushort cmajor = getmajor(*devp);
+	ushort cminor = getminor(*devp);
+	ushort bminor = cminor;
+	struct sctp *sp, **spp = &sctp_n_list;
 	(void) crp;
-	if (q->q_ptr != NULL)
+	MOD_INC_USE_COUNT;	/* keep module from unloading */
+	if (q->q_ptr != NULL) {
+		MOD_DEC_USE_COUNT;
 		return (0);	/* already open */
+	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		rare();
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
+		MOD_DEC_USE_COUNT;
 		return (EIO);	/* can't open as module */
 	}
-	if (!cminor)
-		sflag = CLONEOPEN;
-	if (sflag == CLONEOPEN)
-		cminor = 1;
-	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
-	for (; *spp && cminor <= SCTP_N_CMINORS; spp = &(*spp)->next) {
-		ushort dminor = (*spp)->cminor;
-
-		if (cminor < dminor)
-			break;
-		if (cminor == dminor) {
-			if (sflag != CLONEOPEN) {
-				rare();
-				return (ENXIO);	/* requested device in use */
-			}
-			cminor++;
-		}
-	}
-	if (cminor > SCTP_N_CMINORS) {
-		rare();
+	if (cmajor != CMAJOR_0 || cminor >= 1) {
+		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
+	/* allocate a new device */
+	cminor = 1;
+	spin_lock_irqsave(&sctp_n_lock, flags);
+	for (; *spp; spp = &(*spp) - next) {
+		ushort dmajor = (*spp)->cmajor;
+		if (cmajor != dmajor)
+			break;
+		if (cmajor == dmajor) {
+			ushort dminor = (*spp)->cminor;
+			if (cminor < dminor)
+				break;
+			if (cminor > dminor)
+				continue;
+			if (cminor == dminor) {
+				if (++cminor >= NMINORS) {
+					if (++mindex >= SCTP_CMAJORS
+					    || !(cmajor = sctp_majors[mindex]))
+						break;
+					cminor = 0;
+				}
+				continue;
+			}
+		}
+	}
+	if (mindex >= SCTP_CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
+		spin_unlock_irqrestore(&sctp_n_lock, flags);
+		MOD_DEC_USE_COUNT;
+		return (ENXIO);
+	}
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(sp = sctp_alloc_priv(q, spp, cmajor, cminor, &n_ops))) {
-		rare();
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
+		spin_unlock_irqrestore(&sctp_n_lock, flags);
+		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
+	spin_unlock_irqrestore(&sctp_n_lock, flags);
 	return (0);
 }
 STATIC int
 sctp_n_close(queue_t *q, int flag, cred_t *crp)
 {
+	struct sctp *sp = SCTP_PRIV(q);
+	psw_t flags;
 	(void) flag;
 	(void) crp;
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, sp->cmajor, sp->cminor));
+	spin_lock_irqsave(&sctp_n_lock, flags);
 	sctp_free_priv(q);
+	spin_unlock_irqrestore(&sctp_n_lock, flags);
+	MOD_DEC_USE_COUNT;
 	return (0);
 }
 
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short n_modid = DRV_ID;
+MODULE_PARM(n_modid, "h");
+MODULE_PARM_DESC(n_modid, "Module ID for the SCTP-NPI driver. (0 for allocation.)");
+
+unsigned short n_major = CMAJOR_0;
+MODULE_PARM(n_major, "h");
+MODULE_PARM_DESC(n_major, "Device number for the SCTP-NPI driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw sctp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &sctp_ninfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+sctp_register_strdev(major_t n_major)
+{
+	int err;
+	if ((err = register_strdev(&sctp_cdev, n_major)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+sctp_unregister_strdev(major_t n_major)
+{
+	int err;
+	if ((err = unregister_strdev(&sctp_cdev, n_major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sctp_register_strdev(major_t n_major)
+{
+	int err;
+	if ((err = lis_register_strdev(n_major, &sctp_ninfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+sctp_unregister_strdev(major_t n_major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(n_major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+sctp_nterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (sctp_majors[mindex]) {
+			if ((err = sctp_unregister_strdev(sctp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister n_major %d", DRV_NAME,
+					sctp_majors[mindex]);
+			if (mindex)
+				sctp_majors[mindex] = 0;
+		}
+	}
+	if ((err = sctp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+sctp_ninit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = sctp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		sctp_nterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = sctp_register_strdev(sctp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register n_major %d", DRV_NAME,
+					sctp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				sctp_nterminate();
+				return (err);
+			}
+		}
+		if (sctp_majors[mindex] == 0)
+			sctp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(sctp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (n_major == 0)
+			n_major = sctp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sctp_ninit);
+module_exit(sctp_nterminate);
+
+#endif				/* LINUX */
+
 void
 sctp_n_init(void)
 {
-	int cmajor;
-
-	if ((cmajor =
-	     lis_register_strdev(SCTP_N_CMAJOR_0, &sctp_n_info, SCTP_N_CMINORS,
-				 sctp_n_minfo.mi_idname)) < 0) {
-		sctp_n_minfo.mi_idnum = 0;
-		rare();
-		cmn_err(CE_NOTE, "sctp: couldn't register driver\n");
-		return;
-	}
-	sctp_n_minfo.mi_idnum = cmajor;
+	sctp_ninit();
 }
 
 void
 sctp_n_term(void)
 {
-	if (sctp_n_minfo.mi_idnum) {
-		if ((sctp_n_minfo.mi_idnum = lis_unregister_strdev(sctp_n_minfo.mi_idnum))) {
-			sctp_n_minfo.mi_idnum = 0;
-			rare();
-			cmn_err(CE_WARN, "sctp: couldn't unregister driver!\n");
-		}
-	}
+	sctp_ntermnate();
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:47 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:47 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:47 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:47 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -115,7 +115,8 @@ static kmem_cache_t **const _tcp_openreq_cachep_location =
 
 #ifndef tcp_set_keepalive
 #ifdef HAVE_TCP_SET_KEEPALIVE_ADDR
-void tcp_set_keepalive(struct sock *sk, int val)
+void
+tcp_set_keepalive(struct sock *sk, int val)
 {
 	static void (*func) (struct sock *, int) = (typeof(func)) HAVE_TCP_SET_KEEPALIVE_ADDR;
 	return func(sk, val);
@@ -125,7 +126,8 @@ void tcp_set_keepalive(struct sock *sk, int val)
 
 #ifndef tcp_sync_mss
 #ifdef HAVE_TCP_SYNC_MSS_ADDR
-int tcp_sync_mss(struct sock *sk, u32 pmtu)
+int
+tcp_sync_mss(struct sock *sk, u32 pmtu)
 {
 	static int (*func) (struct sock *, u32) = (typeof(func)) HAVE_TCP_SYNC_MSS_ADDR;
 	return func(sk, pmtu);
@@ -135,7 +137,8 @@ int tcp_sync_mss(struct sock *sk, u32 pmtu)
 
 #ifndef tcp_write_xmit
 #ifdef HAVE_TCP_WRITE_XMIT_ADDR
-int tcp_write_xmit(struct sock *sk, int nonagle)
+int
+tcp_write_xmit(struct sock *sk, int nonagle)
 {
 	static int (*func) (struct sock *, int) = (typeof(func)) HAVE_TCP_WRITE_XMIT_ADDR;
 	return func(sk, nonagle);
@@ -145,7 +148,8 @@ int tcp_write_xmit(struct sock *sk, int nonagle)
 
 #ifndef tcp_cwnd_application_limited
 #ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
-void tcp_cwnd_application_limited(struct sock *sk)
+void
+tcp_cwnd_application_limited(struct sock *sk)
 {
 	static void (*func) (struct sock *) = (typeof(func)) HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR;
 	return func(sk);
@@ -207,48 +211,48 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define LINUX_2_4 1
 
-#define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:47 $"
-#define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
-#define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SS_LICENSE	"GPL"
-#define SS_BANNER	SS_DESCRIP	"\n" \
-			SS_COPYRIGHT	"\n" \
-			SS_REVISION	"\n" \
-			SS_DEVICE	"\n" \
-			SS_CONTACT	"\n"
-#define SS_SPLASH	SS_DEVICE	" - " \
-			SS_REVISION	"\n"
+#define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SS__REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:11 $"
+#define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
+#define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SS__LICENSE	"GPL"
+#define SS__BANNER	SS__DESCRIP	"\n" \
+			SS__COPYRIGHT	"\n" \
+			SS__REVISION	"\n" \
+			SS__DEVICE	"\n" \
+			SS__CONTACT	"\n"
+#define SS__SPLASH	SS__DEVICE	" - " \
+			SS__REVISION	"\n"
 
-MODULE_AUTHOR(SS_CONTACT);
-MODULE_DESCRIPTION(SS_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SS_DEVICE);
-MODULE_LICENSE(SS_LICENSE);
+#ifdef LINUX
+MODULE_AUTHOR(SS__CONTACT);
+MODULE_DESCRIPTION(SS__DESCRIP);
+MODULE_SUPPORTED_DEVICE(SS__DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(SS__LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
-#ifndef SS_MOD_NAME
-#   ifdef CONFIG_STREAMS_INET_NAME
-#	define SS_MOD_NAME CONFIG_STREAMS_INET_NAME
-#   else
-#	define SS_MOD_NAME "inet"
-#   endif
-#endif
+#ifdef LFS
+#define SS__DRV_ID	CONFIG_STREAMS_SS__MODID
+#define SS__DRV_NAME	CONFIG_STREAMS_SS__NAME
+#define SS__CMAJORS	CONFIG_STREAMS_SS__NMAJORS
+#define SS__CMAJOR_0	CONFIG_STREAMS_SS__MAJOR
+#define SS__UNITS	CONFIG_STREAMS_SS__NMINORS
+#endif				/* LFS */
 
-#ifndef SS_CMAJOR
-#   ifdef CONFIG_STREAMS_INET_MAJOR
-#	define SS_CMAJOR CONFIG_STREAMS_INET_MAJOR
-#   else
-#	define SS_CMAJOR 30
-#   endif
-#endif
+#ifndef SS__DRV_NAME
+#define SS__DRV_NAME		"inet"
+#endif				/* SS__DRV_NAME */
 
-unsigned short major = SS_CMAJOR;
-MODULE_PARM(major, "h");
-MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allocation).");
+#ifndef SS__CMAJORS
+#define SS__CMAJORS		4
+#endif				/* SS__CMAJORS */
 
-#ifndef SS_CMAJOR
-#define SS_CMAJOR	30
-#endif
+#ifndef SS__CMAJOR_0
+#define SS__CMAJOR_0		30
+#endif				/* SS__CMAJOR_0 */
 
 #define IP_CMINOR	32
 
@@ -277,10 +281,9 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allo
 
 #define FREE_CMINOR	50
 
-#ifndef SS_NMAJOR
-#define SS_NMAJOR 4
-#define SS_NMINOR 256
-#endif
+#ifndef SS__UNITS
+#define SS__UNITS	(FREE_CMINOR-1)
+#endif				/* SS__UNITS */
 
 /*
  *  =========================================================================
@@ -290,9 +293,20 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allo
  *  =========================================================================
  */
 
+#define DRV_ID		SS__DRV_ID
+#define DRV_NAME	SS__DRV_NAME
+#define CMAJORS		SS__CMAJORS
+#define CMAJOR_0	SS__CMAJOR_0
+#define UNITS		SS__UNITS
+#ifdef MODULE
+#define DRV_BANNER	SS__BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SS__SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info ss_minfo = {
-	mi_idnum:SS_CMAJOR,		/* Module ID number */
-	mi_idname:SS_MOD_NAME,		/* Module name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -322,7 +336,7 @@ STATIC struct qinit ss_winit = {
 	qi_minfo:&ss_minfo,		/* Information */
 };
 
-STATIC struct streamtab ss_info = {
+MODULE_STATIC struct streamtab ss_info = {
 	st_rdinit:&ss_rinit,		/* Upper read queue */
 	st_wrinit:&ss_winit,		/* Lower read queue */
 };
@@ -742,7 +756,8 @@ STATIC void ss_state_change(struct sock *sk);
 STATIC void ss_write_space(struct sock *sk);
 STATIC void ss_error_report(struct sock *sk);
 STATIC void ss_data_ready(struct sock *sk, int len);
-STATIC void ss_socket_put(struct socket *sock)
+STATIC void
+ss_socket_put(struct socket *sock)
 {
 	struct sock *sk;
 	ensure(sock, return);
@@ -775,7 +790,8 @@ STATIC void ss_socket_put(struct socket *sock)
 		assure(sk);
 	sock_release(sock);
 }
-STATIC void ss_socket_get(struct socket *sock, ss_t * ss)
+STATIC void
+ss_socket_get(struct socket *sock, ss_t * ss)
 {
 	struct sock *sk;
 	ensure(sock, return);
@@ -814,7 +830,8 @@ STATIC void ss_socket_get(struct socket *sock, ss_t * ss)
  *
  *  =========================================================================
  */
-STATIC int ss_trylockq(queue_t *q)
+STATIC int
+ss_trylockq(queue_t *q)
 {
 	int res;
 	ss_t *ss = PRIV(q);
@@ -828,7 +845,8 @@ STATIC int ss_trylockq(queue_t *q)
 	spin_unlock_bh(&ss->qlock);
 	return (res);
 }
-STATIC void ss_unlockq(queue_t *q)
+STATIC void
+ss_unlockq(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	spin_lock_bh(&ss->qlock);
@@ -851,7 +869,8 @@ STATIC void ss_unlockq(queue_t *q)
  *  BUFSRV calls service routine
  *  -------------------------------------------------------------------------
  */
-STATIC void ss_bufsrv(long data)
+STATIC void
+ss_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
 	if (q) {
@@ -878,7 +897,8 @@ STATIC void ss_bufsrv(long data)
  *  UNBUFCALL
  *  -------------------------------------------------------------------------
  */
-STATIC void __ss_unbufcall(queue_t *q)
+STATIC void
+__ss_unbufcall(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	if (ss->rbid) {
@@ -895,7 +915,8 @@ STATIC void __ss_unbufcall(queue_t *q)
  *  ALLOCB
  *  -------------------------------------------------------------------------
  */
-STATIC mblk_t *ss_allocb(queue_t *q, size_t size, int prior)
+STATIC mblk_t *
+ss_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
 	if ((mp = allocb(size, prior)))
@@ -925,7 +946,8 @@ STATIC mblk_t *ss_allocb(queue_t *q, size_t size, int prior)
  *  ESBALLOC
  *  -------------------------------------------------------------------------
  */
-STATIC mblk_t *ss_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
+STATIC mblk_t *
+ss_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
 	if ((mp = esballoc(base, size, prior, frtn)))
@@ -1065,7 +1087,8 @@ STATIC ss_options_t ss_defaults = {
  *  both indicated and confirmed.  For this to work for connection
  *  indications, all request options flags must be cleared to zero.
  */
-STATIC int ss_size_conn_opts(ss_t * ss)
+STATIC int
+ss_size_conn_opts(ss_t * ss)
 {
 	int size = 0;
 	if (ss_tst_bit(_T_BIT_XTI_DEBUG, ss->options.flags))
@@ -1222,7 +1245,8 @@ STATIC int ss_size_conn_opts(ss_t * ss)
  *  ancillary information (for example, T_IP options) that is not subject to
  *  negotiation is always set to T_SUCCESS.
  */
-STATIC int ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
+STATIC int
+ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 {
 	struct t_opthdr *oh;
 	struct sock *sk;
@@ -1985,7 +2009,8 @@ STATIC int ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
  *  newly accepted socket.  All options of interest have their flags set and
  *  the appropriate option values set.
  */
-STATIC int ss_set_options(ss_t * ss)
+STATIC int
+ss_set_options(ss_t * ss)
 {
 	struct sock *sk;
 	if (!ss || !ss->sock || !(sk = ss->sock->sk))
@@ -2484,7 +2509,8 @@ STATIC int ss_set_options(ss_t * ss)
  *  successfully negotiated before the erroneous option was processed retain
  *  their negotiated values.  There is no roll-back mechanmism.
  */
-STATIC int ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
+STATIC int
+ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 {
 	struct t_opthdr *ih;
 	struct sock *sk;
@@ -3635,7 +3661,8 @@ STATIC int ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int req
  *  Calculate how large a cmsg buffer needs to be to contain all of the
  *  options provided to T_OPTDATA_REQ or T_UNITDATA_REQ.
  */
-STATIC int ss_cmsg_size(ss_t * ss, unsigned char *ip, size_t ilen)
+STATIC int
+ss_cmsg_size(ss_t * ss, unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	struct t_opthdr *ih;
@@ -3716,7 +3743,8 @@ STATIC int ss_cmsg_size(ss_t * ss, unsigned char *ip, size_t ilen)
  *  Build a cmsg buffer from options provided to T_OPTDATA_REQ or
  *  T_UNITDATA_REQ.
  */
-STATIC int ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
+STATIC int
+ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 {
 	struct cmsghdr *ch = CMSG_FIRSTHDR(msg);
 	struct t_opthdr *ih;
@@ -3882,11 +3910,13 @@ STATIC int ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghd
 	return (-EPROTO);
 }
 
-STATIC int ss_errs_size(ss_t * ss, struct msghdr *msg)
+STATIC int
+ss_errs_size(ss_t * ss, struct msghdr *msg)
 {
 	return (0);
 }
-STATIC int ss_errs_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
+STATIC int
+ss_errs_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
 {
 	return (-EFAULT);
 }
@@ -3897,7 +3927,8 @@ STATIC int ss_errs_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
  *  Calculate the size of the options buffer necessary to hold elements in a
  *  cmsg.  Only options with end to end significance are important.
  */
-STATIC int ss_opts_size(ss_t * ss, struct msghdr *msg)
+STATIC int
+ss_opts_size(ss_t * ss, struct msghdr *msg)
 {
 	int size = 0;
 	struct cmsghdr *cmsg;
@@ -3959,7 +3990,8 @@ STATIC int ss_opts_size(ss_t * ss, struct msghdr *msg)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Data indications only indicate options with end-to-end significance.
  */
-STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
+STATIC int
+ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 {
 	struct cmsghdr *cmsg;
 	struct t_opthdr *oh;
@@ -3977,9 +4009,9 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
 				{
 					size_t len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
 					printd(("%s: %p: processing option IP_RECVOPTS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					printd(("%s: %p: building option T_IP_OPTIONS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
 					oh->len = T_LENGTH(len);
@@ -3989,9 +4021,9 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
 					continue;
 				}
 				case IP_TOS:
-					printd(("%s: %p: processing option IP_TOS\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option IP_TOS\n", DRV_NAME,
 						ss));
-					printd(("%s: %p: building option T_IP_TOS\n", SS_MOD_NAME,
+					printd(("%s: %p: building option T_IP_TOS\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -4002,9 +4034,9 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_TTL:
-					printd(("%s: %p: processing option IP_TTL\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option IP_TTL\n", DRV_NAME,
 						ss));
-					printd(("%s: %p: building option T_IP_TTL\n", SS_MOD_NAME,
+					printd(("%s: %p: building option T_IP_TTL\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -4016,8 +4048,8 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
 					continue;
 				case IP_PKTINFO:
 					printd(("%s: %p: processing option IP_PKTINFO\n",
-						SS_MOD_NAME, ss));
-					printd(("%s: %p: building option T_IP_ADDR\n", SS_MOD_NAME,
+						DRV_NAME, ss));
+					printd(("%s: %p: building option T_IP_ADDR\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
@@ -4044,8 +4076,8 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
 		case SOL_SCTP:
 			switch (cmsg->cmsg_type) {
 			case SCTP_PPI:
-				printd(("%s: %p: processing option SCTP_PPI\n", SS_MOD_NAME, ss));
-				printd(("%s: %p: building option T_SCTP_PPI\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option SCTP_PPI\n", DRV_NAME, ss));
+				printd(("%s: %p: building option T_SCTP_PPI\n", DRV_NAME, ss));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PPI;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
@@ -4055,9 +4087,9 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 				continue;
 			case SCTP_DISPOSITION:
-				printd(("%s: %p: processing option SCTP_DISPOSITION\n", SS_MOD_NAME,
+				printd(("%s: %p: processing option SCTP_DISPOSITION\n", DRV_NAME,
 					ss));
-				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", SS_MOD_NAME,
+				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", DRV_NAME,
 					ss));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DISPOSITION;
@@ -4082,7 +4114,8 @@ STATIC int ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_
  *  each supplied option given the option management flag, and return the size
  *  required of the acknowledgement options field.
  */
-STATIC int ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
+STATIC int
+ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
@@ -4451,14 +4484,15 @@ STATIC int ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	ptrace(("%s: %p: Calculated option output size = %u\n", SS_MOD_NAME, ss, olen));
+	ptrace(("%s: %p: Calculated option output size = %u\n", DRV_NAME, ss, olen));
 	return (olen);
       einval:
-	ptrace(("%s: %p: ERROR: Invalid input options\n", SS_MOD_NAME, ss));
+	ptrace(("%s: %p: ERROR: Invalid input options\n", DRV_NAME, ss));
 	return (-EINVAL);
 }
 
-STATIC int ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
+STATIC int
+ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
@@ -4825,14 +4859,15 @@ STATIC int ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	ptrace(("%s: %p: Calculated option output size = %u\n", SS_MOD_NAME, ss, olen));
+	ptrace(("%s: %p: Calculated option output size = %u\n", DRV_NAME, ss, olen));
 	return (olen);
       einval:
-	ptrace(("%s: %p: ERROR: Invalid input options\n", SS_MOD_NAME, ss));
+	ptrace(("%s: %p: ERROR: Invalid input options\n", DRV_NAME, ss));
 	return (-EINVAL);
 }
 
-STATIC int ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
+STATIC int
+ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
@@ -5338,14 +5373,15 @@ STATIC int ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	ptrace(("%s: %p: Calculated option output size = %u\n", SS_MOD_NAME, ss, olen));
+	ptrace(("%s: %p: Calculated option output size = %u\n", DRV_NAME, ss, olen));
 	return (olen);
       einval:
-	ptrace(("%s: %p: ERROR: Invalid input options\n", SS_MOD_NAME, ss));
+	ptrace(("%s: %p: ERROR: Invalid input options\n", DRV_NAME, ss));
 	return (-EINVAL);
 }
 
-STATIC int ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
+STATIC int
+ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
@@ -5905,10 +5941,10 @@ STATIC int ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	ptrace(("%s: %p: Calculated option output size = %u\n", SS_MOD_NAME, ss, olen));
+	ptrace(("%s: %p: Calculated option output size = %u\n", DRV_NAME, ss, olen));
 	return (olen);
       einval:
-	ptrace(("%s: %p: ERROR: Invalid input options\n", SS_MOD_NAME, ss));
+	ptrace(("%s: %p: ERROR: Invalid input options\n", DRV_NAME, ss));
 	return (-EINVAL);
 }
 
@@ -5917,7 +5953,8 @@ STATIC int ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
-STATIC ulong ss_overall_result(ulong *overall, ulong result)
+STATIC ulong
+ss_overall_result(ulong *overall, ulong result)
 {
 	switch (result) {
 	case T_NOTSUPPORT:
@@ -5983,22 +6020,22 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		default:
 		case T_ALLLEVELS:
 			ih->name = T_ALLOPT;
-			printd(("%s: %p: processing all options at all levels\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: processing all options at all levels\n", DRV_NAME, ss));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
 				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					SS_MOD_NAME, ss));
+					DRV_NAME, ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 				oh->len = T_LENGTH(0);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", SS_MOD_NAME,
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
 					ss));
 			case XTI_DEBUG:
-				printd(("%s: %p: processing option XTI_DEBUG\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.debug);
@@ -6010,7 +6047,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_LINGER:
-				printd(("%s: %p: processing option XTI_LINGER\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_LINGER\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.linger);
@@ -6021,8 +6058,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVBUF:
-				printd(("%s: %p: processing option XTI_RECVBUF\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RECVBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.rcvbuf);
@@ -6033,8 +6069,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVLOWAT:
-				printd(("%s: %p: processing option XTI_RCVLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RCVLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.rcvlowat);
@@ -6045,7 +6080,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDBUF:
-				printd(("%s: %p: processing option XTI_SNDBUF\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_SNDBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.sndbuf);
@@ -6056,8 +6091,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDLOWAT:
-				printd(("%s: %p: processing option XTI_SNDLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_SNDLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.sndlowat);
@@ -6077,7 +6111,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -6085,11 +6119,11 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_IP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_IP_OPTIONS:
 				{
 					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.options);
@@ -6103,7 +6137,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				}
 				case T_IP_TOS:
-					printd(("%s: %p: processing option T_IP_TOS\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -6115,7 +6149,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					printd(("%s: %p: processing option T_IP_TTL\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -6128,7 +6162,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_REUSEADDR:
 					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.reuseaddr);
@@ -6141,7 +6175,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_DONTROUTE:
 					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.dontroute);
@@ -6154,7 +6188,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_BROADCAST:
 					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.broadcast);
@@ -6167,7 +6201,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_ADDR:
 					printd(("%s: %p: processing option T_IP_ADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.addr);
@@ -6189,7 +6223,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -6197,10 +6231,10 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_UDP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
 					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.udp.checksum);
@@ -6233,7 +6267,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				}
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_TCP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_TCP_NODELAY:
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_NODELAY;
@@ -6385,7 +6419,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -6393,10 +6427,10 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_SCTP_NODELAY:
 					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.nodelay);
@@ -6409,7 +6443,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_MAXSEG:
 					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.maxseg);
@@ -6421,7 +6455,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_CORK:
 					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cork);
@@ -6433,7 +6467,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_PPI:
 					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.ppi);
@@ -6445,7 +6479,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_SID:
 					printd(("%s: %p: processing option T_SCTP_SID\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.sid);
@@ -6457,7 +6491,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_SSN:
 					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = sizeof(*oh);
@@ -6468,7 +6502,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_TSN:
 					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = sizeof(*oh);
@@ -6479,7 +6513,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RECVOPT:
 					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.recvopt);
@@ -6492,7 +6526,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_COOKIE_LIFE:
 					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cookie_life);
@@ -6505,7 +6539,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_SACK_DELAY:
 					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.sack_delay);
@@ -6517,7 +6551,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PATH_MAX_RETRANS:
-					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->len =
@@ -6530,7 +6564,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_ASSOC_MAX_RETRANS:
-					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->len =
@@ -6543,7 +6577,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAX_INIT_RETRIES:
-					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->len =
@@ -6557,7 +6591,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_HEARTBEAT_ITVL:
 					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.heartbeat_itvl);
@@ -6570,7 +6604,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO_INITIAL:
 					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto_initial);
@@ -6583,7 +6617,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO_MIN:
 					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto_min);
@@ -6596,7 +6630,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO_MAX:
 					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto_max);
@@ -6609,7 +6643,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_OSTREAMS:
 					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.ostreams);
@@ -6622,7 +6656,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_ISTREAMS:
 					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.istreams);
@@ -6635,7 +6669,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_COOKIE_INC:
 					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cookie_inc);
@@ -6648,7 +6682,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_THROTTLE_ITVL:
 					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.throttle_itvl);
@@ -6661,7 +6695,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_MAC_TYPE:
 					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.mac_type);
@@ -6674,7 +6708,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_HB:
 					printd(("%s: %p: processing option T_SCTP_HB\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.hb);
@@ -6687,7 +6721,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO:
 					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto);
@@ -6700,7 +6734,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_STATUS:
 					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
 					oh->len = sizeof(*oh);
@@ -6711,7 +6745,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_DEBUG:
 					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.debug);
@@ -6776,22 +6810,22 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		default:
 		case T_ALLLEVELS:
 			ih->name = T_ALLOPT;
-			printd(("%s: %p: processing all options at all levels\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: processing all options at all levels\n", DRV_NAME, ss));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
 				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					SS_MOD_NAME, ss));
+					DRV_NAME, ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 				oh->len = sizeof(*oh);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", SS_MOD_NAME,
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
 					ss));
 			case XTI_DEBUG:
-				printd(("%s: %p: processing option XTI_DEBUG\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.debug);
@@ -6803,7 +6837,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_LINGER:
-				printd(("%s: %p: processing option XTI_LINGER\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_LINGER\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.linger);
@@ -6815,8 +6849,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVBUF:
-				printd(("%s: %p: processing option XTI_RECVBUF\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RECVBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvbuf);
@@ -6828,8 +6861,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVLOWAT:
-				printd(("%s: %p: processing option XTI_RCVLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RCVLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvlowat);
@@ -6841,7 +6873,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDBUF:
-				printd(("%s: %p: processing option XTI_SNDBUF\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_SNDBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndbuf);
@@ -6853,8 +6885,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDLOWAT:
-				printd(("%s: %p: processing option XTI_SNDLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_SNDLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndlowat);
@@ -6875,7 +6906,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -6883,11 +6914,11 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_IP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_IP_OPTIONS:
 				{
 					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.options);
@@ -6900,7 +6931,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				}
 				case T_IP_TOS:
-					printd(("%s: %p: processing option T_IP_TOS\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -6913,7 +6944,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					printd(("%s: %p: processing option T_IP_TTL\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -6927,7 +6958,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_REUSEADDR:
 					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.reuseaddr);
@@ -6941,7 +6972,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_DONTROUTE:
 					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.dontroute);
@@ -6955,7 +6986,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_BROADCAST:
 					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.broadcast);
@@ -6969,7 +7000,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_IP_ADDR:
 					printd(("%s: %p: processing option T_IP_ADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.addr);
@@ -6992,7 +7023,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -7000,10 +7031,10 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_UDP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
 					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.udp.checksum);
@@ -7181,7 +7212,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -7189,10 +7220,10 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_SCTP_NODELAY:
 					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.nodelay);
@@ -7206,7 +7237,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_MAXSEG:
 					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.maxseg);
@@ -7219,7 +7250,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_CORK:
 					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cork);
@@ -7232,7 +7263,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_PPI:
 					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ppi);
@@ -7245,7 +7276,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_SID:
 					printd(("%s: %p: processing option T_SCTP_SID\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sid);
@@ -7258,7 +7289,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_SSN:
 					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ssn);
@@ -7271,7 +7302,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_TSN:
 					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.tsn);
@@ -7284,7 +7315,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RECVOPT:
 					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.recvopt);
@@ -7298,7 +7329,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_COOKIE_LIFE:
 					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cookie_life);
@@ -7312,7 +7343,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_SACK_DELAY:
 					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sack_delay);
@@ -7325,7 +7356,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PATH_MAX_RETRANS:
-					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->len =
@@ -7339,7 +7370,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_ASSOC_MAX_RETRANS:
-					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->len =
@@ -7353,7 +7384,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAX_INIT_RETRIES:
-					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->len =
@@ -7368,7 +7399,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_HEARTBEAT_ITVL:
 					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.heartbeat_itvl);
@@ -7382,7 +7413,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO_INITIAL:
 					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_initial);
@@ -7396,7 +7427,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO_MIN:
 					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_min);
@@ -7410,7 +7441,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO_MAX:
 					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_max);
@@ -7424,7 +7455,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_OSTREAMS:
 					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ostreams);
@@ -7438,7 +7469,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_ISTREAMS:
 					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.istreams);
@@ -7452,7 +7483,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_COOKIE_INC:
 					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cookie_inc);
@@ -7466,7 +7497,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_THROTTLE_ITVL:
 					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.throttle_itvl);
@@ -7480,7 +7511,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_MAC_TYPE:
 					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.mac_type);
@@ -7494,7 +7525,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_HB:
 					printd(("%s: %p: processing option T_SCTP_HB\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.hb);
@@ -7508,7 +7539,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_RTO:
 					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto);
@@ -7522,7 +7553,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_STATUS:
 					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.status);
@@ -7537,7 +7568,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				case T_SCTP_DEBUG:
 					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.debug);
@@ -7603,12 +7634,12 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 		default:
 		case T_ALLLEVELS:
 			ih->name = T_ALLOPT;
-			printd(("%s: %p: processing all options at all levels\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: processing all options at all levels\n", DRV_NAME, ss));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
 				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					SS_MOD_NAME, ss));
+					DRV_NAME, ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->len = ih->len;
@@ -7616,10 +7647,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", SS_MOD_NAME,
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
 					ss));
 			case XTI_DEBUG:
-				printd(("%s: %p: processing option XTI_DEBUG\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->len = ih->len;
@@ -7635,7 +7666,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_LINGER:
-				printd(("%s: %p: processing option XTI_LINGER\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_LINGER\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
 				oh->len = ih->len;
@@ -7668,8 +7699,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVBUF:
-				printd(("%s: %p: processing option XTI_RECVBUF\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RECVBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->len = ih->len;
@@ -7692,8 +7722,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVLOWAT:
-				printd(("%s: %p: processing option XTI_RCVLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RCVLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
 				oh->len = ih->len;
@@ -7716,7 +7745,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDBUF:
-				printd(("%s: %p: processing option XTI_SNDBUF\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_SNDBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->len = ih->len;
@@ -7740,8 +7769,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDLOWAT:
-				printd(("%s: %p: processing option XTI_SNDLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_SNDLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->len = ih->len;
@@ -7774,7 +7802,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -7783,10 +7811,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_IP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_IP_OPTIONS:
 					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
 					oh->len = ih->len;
@@ -7797,7 +7825,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TOS:
-					printd(("%s: %p: processing option T_IP_TOS\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -7822,7 +7850,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					printd(("%s: %p: processing option T_IP_TTL\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -7856,7 +7884,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_IP_REUSEADDR:
 					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->len = ih->len;
@@ -7873,7 +7901,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_IP_DONTROUTE:
 					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->len = ih->len;
@@ -7890,7 +7918,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_IP_BROADCAST:
 					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->len = ih->len;
@@ -7907,7 +7935,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_IP_ADDR:
 					printd(("%s: %p: processing option T_IP_ADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = ih->len;
@@ -7929,7 +7957,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -7938,10 +7966,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_UDP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
 					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->len = ih->len;
@@ -7979,7 +8007,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_TCP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_TCP_NODELAY:
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_NODELAY;
@@ -8188,8 +8216,8 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						} else if (*valp != 0) {
 							int count;
 							for (count = 0;
-							     count < 32 &&
-							     *valp >
+							     count < 32
+							     && *valp >
 							     ((TCP_TIMEOUT_INIT / HZ) << count);
 							     count++) ;
 							count++;
@@ -8263,7 +8291,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				default:
 				{
 					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -8273,10 +8301,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				}
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_SCTP_NODELAY:
 					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
 					oh->len = ih->len;
@@ -8293,7 +8321,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_MAXSEG:
 					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
 					oh->len = ih->len;
@@ -8320,7 +8348,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_CORK:
 					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = ih->len;
@@ -8337,7 +8365,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_PPI:
 					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = ih->len;
@@ -8353,7 +8381,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_SID:
 					printd(("%s: %p: processing option T_SCTP_SID\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = ih->len;
@@ -8370,7 +8398,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_SSN:
 					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = ih->len;
@@ -8382,7 +8410,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_TSN:
 					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = ih->len;
@@ -8394,7 +8422,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_RECVOPT:
 					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->len = ih->len;
@@ -8411,7 +8439,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_COOKIE_LIFE:
 					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->len = ih->len;
@@ -8444,7 +8472,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_SACK_DELAY:
 					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->len = ih->len;
@@ -8476,7 +8504,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PATH_MAX_RETRANS:
-					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->len = ih->len;
@@ -8491,7 +8519,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_ASSOC_MAX_RETRANS:
-					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->len = ih->len;
@@ -8506,7 +8534,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAX_INIT_RETRIES:
-					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->len = ih->len;
@@ -8522,7 +8550,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_HEARTBEAT_ITVL:
 					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->len = ih->len;
@@ -8538,7 +8566,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_RTO_INITIAL:
 					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->len = ih->len;
@@ -8571,7 +8599,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_RTO_MIN:
 					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->len = ih->len;
@@ -8604,7 +8632,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_RTO_MAX:
 					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->len = ih->len;
@@ -8637,7 +8665,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_OSTREAMS:
 					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->len = ih->len;
@@ -8664,7 +8692,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_ISTREAMS:
 					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->len = ih->len;
@@ -8691,7 +8719,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_COOKIE_INC:
 					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->len = ih->len;
@@ -8724,7 +8752,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_THROTTLE_ITVL:
 					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->len = ih->len;
@@ -8757,7 +8785,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_MAC_TYPE:
 					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->len = ih->len;
@@ -8772,7 +8800,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_HB:
 					printd(("%s: %p: processing option T_SCTP_HB\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = ih->len;
@@ -8809,7 +8837,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_RTO:
 					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = ih->len;
@@ -8870,7 +8898,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_STATUS:
 					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
 					oh->len = ih->len;
@@ -8882,7 +8910,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto efault;
 				case T_SCTP_DEBUG:
 					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
 					oh->len = ih->len;
@@ -8952,12 +8980,12 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 		default:
 		case T_ALLLEVELS:
 			ih->name = T_ALLOPT;
-			printd(("%s: %p: processing all options at all levels\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: processing all options at all levels\n", DRV_NAME, ss));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
 				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n",
-					SS_MOD_NAME, ss));
+					DRV_NAME, ss));
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -8967,12 +8995,12 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					      ih->len - sizeof(*ih));
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", SS_MOD_NAME,
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
 					ss));
 			case XTI_DEBUG:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-				printd(("%s: %p: processing option XTI_DEBUG\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->len = ih->len;
@@ -9004,7 +9032,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			case XTI_LINGER:
 			{
 				struct t_linger *valp = (typeof(valp)) T_OPT_DATA(oh);
-				printd(("%s: %p: processing option XTI_LINGER\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_LINGER\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9052,8 +9080,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			case XTI_RCVBUF:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-				printd(("%s: %p: processing option XTI_RECVBUF\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RECVBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9086,8 +9113,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			case XTI_RCVLOWAT:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-				printd(("%s: %p: processing option XTI_RCVLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_RCVLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9120,7 +9146,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			case XTI_SNDBUF:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-				printd(("%s: %p: processing option XTI_SNDBUF\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: processing option XTI_SNDBUF\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9153,8 +9179,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			case XTI_SNDLOWAT:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-				printd(("%s: %p: processing option XTI_SNDLOWAT\n", SS_MOD_NAME,
-					ss));
+				printd(("%s: %p: processing option XTI_SNDLOWAT\n", DRV_NAME, ss));
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9192,7 +9217,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -9203,11 +9228,11 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_IP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_IP_OPTIONS:
 				{
 					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
 					oh->len = sizeof(*oh) + 40;
@@ -9223,7 +9248,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_TOS:
 				{
 					unsigned char *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_TOS\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -9267,7 +9292,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_TTL:
 				{
 					unsigned char *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_TTL\n", SS_MOD_NAME,
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
 						ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -9311,7 +9336,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9338,7 +9363,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9365,7 +9390,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9392,7 +9417,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					uint32_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_IP_ADDR\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9425,7 +9450,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				switch (ih->name) {
 				default:
 					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					if (!sk) {
@@ -9440,12 +9465,12 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_UDP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9861,7 +9886,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				default:
 				{
 					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
@@ -9873,12 +9898,12 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					continue;
 				case T_ALLOPT:
 					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 				case T_SCTP_NODELAY:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9905,7 +9930,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9931,7 +9956,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_CORK\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9957,7 +9982,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_PPI\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9983,7 +10008,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_SID\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10009,7 +10034,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_SSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10035,7 +10060,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_TSN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10061,7 +10086,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10087,7 +10112,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10113,7 +10138,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10138,7 +10163,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_PATH_MAX_RETRANS:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10163,7 +10188,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_ASSOC_MAX_RETRANS:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10188,7 +10213,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_MAX_INIT_RETRIES:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10214,7 +10239,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10240,7 +10265,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10266,7 +10291,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10292,7 +10317,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10318,7 +10343,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10344,7 +10369,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10370,7 +10395,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10396,7 +10421,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10422,7 +10447,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10448,7 +10473,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_HB\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10474,7 +10499,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_RTO\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10500,7 +10525,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10526,7 +10551,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						SS_MOD_NAME, ss));
+						DRV_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10598,7 +10623,8 @@ ss_build_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char *op, s
  *
  *  =========================================================================
  */
-STATIC int ss_addr_size(ss_t * ss, struct sockaddr *add)
+STATIC int
+ss_addr_size(ss_t * ss, struct sockaddr *add)
 {
 	if (add) {
 		switch (add->sa_family) {
@@ -10623,7 +10649,8 @@ STATIC int ss_addr_size(ss_t * ss, struct sockaddr *add)
  *  =========================================================================
  */
 #ifdef _DEBUG
-STATIC const char *state_name(long state)
+STATIC const char *
+state_name(long state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -10667,19 +10694,22 @@ STATIC const char *state_name(long state)
 	}
 }
 #endif
-STATIC void ss_set_state(ss_t * ss, long state)
+STATIC void
+ss_set_state(ss_t * ss, long state)
 {
-	printd(("%s: %p: %s <- %s\n", SS_MOD_NAME, ss, state_name(state),
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, ss, state_name(state),
 		state_name(ss->p.info.CURRENT_state)));
 	ss->p.info.CURRENT_state = state;
 }
-STATIC long ss_get_state(ss_t * ss)
+STATIC long
+ss_get_state(ss_t * ss)
 {
 	return (ss->p.info.CURRENT_state);
 }
 
 #ifdef _DEBUG
-STATIC const char *tcp_state_name(int state)
+STATIC const char *
+tcp_state_name(int state)
 {
 	switch (state) {
 	case TCP_ESTABLISHED:
@@ -10724,7 +10754,8 @@ STATIC const char *tcp_state_name(int state)
  *  SOCKET CREATE
  *  ------------------------------------------------------------------------
  */
-STATIC int ss_socket(ss_t * ss)
+STATIC int
+ss_socket(ss_t * ss)
 {
 	int err;
 	int family, type, protocol;
@@ -10733,7 +10764,7 @@ STATIC int ss_socket(ss_t * ss)
 	family = ss->p.prot.family;
 	type = ss->p.prot.type;
 	protocol = (ss->p.prot.protocol == IPPROTO_RAW) ? ss->port : ss->p.prot.protocol;
-	printd(("%s: %p: SS_CREATE %d:%d:%d\n", SS_MOD_NAME, ss, family, type, protocol));
+	printd(("%s: %p: SS_CREATE %d:%d:%d\n", DRV_NAME, ss, family, type, protocol));
 	if (!(err = sock_create(family, type, protocol, &ss->sock))) {
 		ensure(ss->sock, return (-EFAULT));
 		ensure(ss->sock->sk, return (-EFAULT));
@@ -10743,7 +10774,7 @@ STATIC int ss_socket(ss_t * ss)
 			ss->sock->sk->protinfo.af_inet.cmsg_flags |= 0x0f;
 		return (0);
 	}
-	printd(("%s: %p: ERROR: from sock_create %d\n", SS_MOD_NAME, ss, err));
+	printd(("%s: %p: ERROR: from sock_create %d\n", DRV_NAME, ss, err));
 	return (err);
 }
 
@@ -10754,7 +10785,8 @@ STATIC int ss_socket(ss_t * ss)
  *  initialization time.  For IPPROTO_RAW sockets, we cannot create the socket
  *  until they have been bound to a protocol.  Those are deferred until bind.
  */
-STATIC int ss_sock_init(ss_t * ss)
+STATIC int
+ss_sock_init(ss_t * ss)
 {
 	if (ss->p.prot.protocol == IPPROTO_RAW)
 		return (0);
@@ -10768,7 +10800,8 @@ STATIC int ss_sock_init(ss_t * ss)
  *  normally created at initialization (open/unbind) time, but we will create
  *  them here now if an earlier reinitialization failed.
  */
-STATIC int ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
+STATIC int
+ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
 {
 	int err;
 	ensure(ss, return (-EFAULT));
@@ -10777,12 +10810,12 @@ STATIC int ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
 		ensure(ss->sock->sk, return (-EFAULT));
 		ensure(ss->sock->ops, return (-EFAULT));
 		ensure(ss->sock->ops->bind, return (-EFAULT));
-		printd(("%s: %p: SS_BIND\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: SS_BIND\n", DRV_NAME, ss));
 		if (!(err = ss->sock->ops->bind(ss->sock, add, add_len))) {
 			ss->src = *add;
 			return (0);
 		} else
-			printd(("%s: %p: ERROR: from sock->ops->bind %d\n", SS_MOD_NAME, ss, err));
+			printd(("%s: %p: ERROR: from sock->ops->bind %d\n", DRV_NAME, ss, err));
 		switch (-err) {
 		case EADDRINUSE:
 			err = TADDRBUSY;
@@ -10819,7 +10852,8 @@ STATIC int ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
  *  SOCKET LISTEN
  *  ------------------------------------------------------------------------
  */
-STATIC int ss_listen(ss_t * ss, uint cons)
+STATIC int
+ss_listen(ss_t * ss, uint cons)
 {
 	int err;
 	int type;
@@ -10830,13 +10864,13 @@ STATIC int ss_listen(ss_t * ss, uint cons)
 	ensure(ss->sock->ops->listen, return (-EFAULT));
 	type = ss->p.prot.type;
 	ensure(type == SOCK_STREAM || type == SOCK_SEQPACKET, return (-EFAULT));
-	printd(("%s: %p: SS_LISTEN %d\n", SS_MOD_NAME, ss, cons));
+	printd(("%s: %p: SS_LISTEN %d\n", DRV_NAME, ss, cons));
 	if (!(err = ss->sock->ops->listen(ss->sock, cons))) {
 		ss->conind = cons;
 		ss->tcp_state = ss->sock->sk->state;
 		return (0);
 	}
-	printd(("%s: %p: ERROR: from sock->ops->listen %d\n", SS_MOD_NAME, ss, err));
+	printd(("%s: %p: ERROR: from sock->ops->listen %d\n", DRV_NAME, ss, err));
 	switch (-err) {
 	case EDESTADDRREQ:
 	case ESOCKTNOSUPPORT:
@@ -10865,7 +10899,8 @@ STATIC int ss_listen(ss_t * ss, uint cons)
  *  the next in the queue.  To do this we mimic some of the tcp_accept
  *  behavior.
  */
-STATIC int ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
+STATIC int
+ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 {
 	struct socket *sock;
 	ensure(newsock, return (-EFAULT));
@@ -10875,7 +10910,7 @@ STATIC int ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->accept, return (-EFAULT));
-	printd(("%s: %p: SS_ACCEPT\n", SS_MOD_NAME, ss));
+	printd(("%s: %p: SS_ACCEPT\n", DRV_NAME, ss));
 	if ((sock = sock_alloc())) {
 		struct sock *sk = ss->sock->sk;
 		struct tcp_opt *tp = &sk->tp_pinfo.af_tcp;
@@ -10907,10 +10942,10 @@ STATIC int ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 		}
 		release_sock(sk);
 		ss_socket_put(sock);
-		printd(("%s: %p: invalid accept\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: invalid accept\n", DRV_NAME, ss));
 		return (-EAGAIN);
 	}
-	printd(("%s: %p: ERROR: couldn't allocate accepting socket\n", SS_MOD_NAME, ss));
+	printd(("%s: %p: ERROR: couldn't allocate accepting socket\n", DRV_NAME, ss));
 	return (-EFAULT);
 }
 
@@ -10924,12 +10959,13 @@ STATIC int ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
  *  Actually, socket code is supposed to allow a bind to AF_UNSPEC to unbind a
  *  socket.  This is X/Open POSIX behavior.
  */
-STATIC int ss_unbind(ss_t * ss)
+STATIC int
+ss_unbind(ss_t * ss)
 {
 	ensure(ss, return (-EFAULT));
 	if (ss->sock) {
 		ensure(ss->sock->sk, return (-EFAULT));
-		printd(("%s: %p: SS_UNBIND\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: SS_UNBIND\n", DRV_NAME, ss));
 		ss_socket_put(xchg(&ss->sock, NULL));
 	}
 	/* 
@@ -10945,7 +10981,8 @@ STATIC int ss_unbind(ss_t * ss)
  *  SOCKET CONNECT
  *  ------------------------------------------------------------------------
  */
-STATIC int ss_connect(ss_t * ss, struct sockaddr *dst)
+STATIC int
+ss_connect(ss_t * ss, struct sockaddr *dst)
 {
 	int err;
 	ensure(ss, return (-EFAULT));
@@ -10957,7 +10994,7 @@ STATIC int ss_connect(ss_t * ss, struct sockaddr *dst)
 	    || err == -EINPROGRESS) {
 		return (0);
 	}
-	printd(("%s: %p: ERROR: from sock->ops->connect %d\n", SS_MOD_NAME, ss, err));
+	printd(("%s: %p: ERROR: from sock->ops->connect %d\n", DRV_NAME, ss, err));
 	return (err);
 }
 
@@ -10965,7 +11002,8 @@ STATIC int ss_connect(ss_t * ss, struct sockaddr *dst)
  *  SOCKET SENDMSG
  *  ------------------------------------------------------------------------
  */
-STATIC int ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
+STATIC int
+ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 {
 	int res;
 	ensure(ss, return (-EFAULT));
@@ -10982,7 +11020,7 @@ STATIC int ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
 		set_fs(fs);
 	}
 	if (res <= 0)
-		printd(("%s: %p: ERROR: from sock->sk->prot->sendmsg %d\n", SS_MOD_NAME, ss, res));
+		printd(("%s: %p: ERROR: from sock->sk->prot->sendmsg %d\n", DRV_NAME, ss, res));
 	return (res);
 }
 
@@ -10990,7 +11028,8 @@ STATIC int ss_sendmsg(ss_t * ss, struct msghdr *msg, int len)
  *  SOCKET RECVMSG
  *  ------------------------------------------------------------------------
  */
-STATIC int ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
+STATIC int
+ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
 {
 	int res;
 	int sflags = MSG_DONTWAIT | MSG_NOSIGNAL;
@@ -11008,7 +11047,7 @@ STATIC int ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
 		set_fs(fs);
 	}
 	if (res < 0)
-		printd(("%s: %p: ERROR: from sock->ops->recvmsg %d\n", SS_MOD_NAME, ss, res));
+		printd(("%s: %p: ERROR: from sock->ops->recvmsg %d\n", DRV_NAME, ss, res));
 	return (res);
 }
 
@@ -11020,7 +11059,8 @@ STATIC int ss_recvmsg(ss_t * ss, struct msghdr *msg, int size)
  *  shutdown rather than an abortive release.  We can try performing a
  *  protocol disconnect and see if that works better.
  */
-STATIC int ss_disconnect(ss_t * ss)
+STATIC int
+ss_disconnect(ss_t * ss)
 {
 	int err;
 	ensure(ss, return (-EFAULT));
@@ -11035,7 +11075,7 @@ STATIC int ss_disconnect(ss_t * ss)
 		return (0);
 	}
 	ss->sock->state = SS_DISCONNECTING;
-	printd(("%s: %p: ERROR: from sock->sk->prot->disconnect %d\n", SS_MOD_NAME, ss, err));
+	printd(("%s: %p: ERROR: from sock->sk->prot->disconnect %d\n", DRV_NAME, ss, err));
 	return (err);
 }
 
@@ -11044,7 +11084,8 @@ STATIC int ss_disconnect(ss_t * ss)
  *  ------------------------------------------------------------------------
  *  Get the names from a socket.
  */
-STATIC int ss_getsockname(ss_t * ss)
+STATIC int
+ss_getsockname(ss_t * ss)
 {
 	int err, len = sizeof(ss->src);
 	ensure(ss, return (-EFAULT));
@@ -11055,7 +11096,8 @@ STATIC int ss_getsockname(ss_t * ss)
 		return (err);
 	return (len);
 }
-STATIC int ss_getpeername(ss_t * ss)
+STATIC int
+ss_getpeername(ss_t * ss)
 {
 	int err, len = sizeof(ss->dst);
 	ensure(ss, return (-EFAULT));
@@ -11066,7 +11108,8 @@ STATIC int ss_getpeername(ss_t * ss)
 		return (err);
 	return (len);
 }
-STATIC int ss_getnames(ss_t * ss)
+STATIC int
+ss_getnames(ss_t * ss)
 {
 	int err_src, err_dst;
 	err_src = ss_getsockname(ss);
@@ -11085,7 +11128,8 @@ STATIC int ss_getnames(ss_t * ss)
  *  M_FLUSH
  *  ---------------------------------------------------------------
  */
-STATIC int m_flush(queue_t *q, int how, int band)
+STATIC int
+m_flush(queue_t *q, int how, int band)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11103,7 +11147,8 @@ STATIC int m_flush(queue_t *q, int how, int band)
  *  M_ERROR
  *  ---------------------------------------------------------------
  */
-STATIC int m_error(queue_t *q, int error)
+STATIC int
+m_error(queue_t *q, int error)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11125,12 +11170,12 @@ STATIC int m_error(queue_t *q, int error)
 		if (ss->sock)
 			ss_socket_put(xchg(&ss->sock, NULL));
 		if (hangup) {
-			printd(("%s: %p: <- M_HANGUP\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, ss));
 			mp->b_datap->db_type = M_HANGUP;
 			putnext(ss->rq, mp);
 			error = EPIPE;
 		} else {
-			printd(("%s: %p: <- M_ERROR %d\n", SS_MOD_NAME, ss, error));
+			printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, ss, error));
 			mp->b_datap->db_type = M_ERROR;
 			*(mp->b_wptr)++ = error;
 			*(mp->b_wptr)++ = error;
@@ -11146,7 +11191,8 @@ STATIC int m_error(queue_t *q, int error)
  *  T_CONN_IND          11 - Connection Indication
  *  ---------------------------------------------------------------
  */
-STATIC int t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
+STATIC int
+t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11176,23 +11222,23 @@ STATIC int t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
 					else {
 						freemsg(mp);
 						ptrace(("%s: ERROR: option build fault\n",
-							SS_MOD_NAME));
+							DRV_NAME));
 						return (-EFAULT);
 					}
 				}
 				bufq_queue(&ss->conq, cp);
 				ss_set_state(ss, TS_WRES_CIND);
-				printd(("%s: %p: <- T_CONN_IND\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: <- T_CONN_IND\n", DRV_NAME, ss));
 				putnext(ss->rq, mp);
 				return (QR_ABSORBED);	/* absorbed cp */
 			}
-			ptrace(("%s: ERROR: no buffers\n", SS_MOD_NAME));
+			ptrace(("%s: ERROR: no buffers\n", DRV_NAME));
 			return (-ENOBUFS);
 		}
-		ptrace(("%s: ERROR: flow controlled\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: flow controlled\n", DRV_NAME));
 		return (-EBUSY);
 	}
-	ptrace(("%s: ERROR: too many conn inds\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: too many conn inds\n", DRV_NAME));
 	return (-EAGAIN);
 }
 
@@ -11200,7 +11246,8 @@ STATIC int t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
  *  T_CONN_CON          12 - Connection Confirmation
  *  ---------------------------------------------------------------
  */
-STATIC int t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
+STATIC int
+t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11229,19 +11276,19 @@ STATIC int t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
 					mp->b_wptr += opt_len;
 				else {
 					freemsg(mp);
-					ptrace(("%s: ERROR: option build fault\n", SS_MOD_NAME));
+					ptrace(("%s: ERROR: option build fault\n", DRV_NAME));
 					return (-EFAULT);
 				}
 			}
 			ss_set_state(ss, TS_DATA_XFER);
-			printd(("%s: %p: <- T_CONN_CON\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: <- T_CONN_CON\n", DRV_NAME, ss));
 			putnext(ss->rq, mp);
 			return (0);
 		}
-		ptrace(("%s: ERROR: no buffers\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: no buffers\n", DRV_NAME));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: ERROR: flow controlled\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: flow controlled\n", DRV_NAME));
 	return (-EBUSY);
 }
 
@@ -11249,7 +11296,8 @@ STATIC int t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
  *  T_DISCON_IND        13 - Disconnect Indication
  *  ---------------------------------------------------------------
  */
-STATIC mblk_t *t_seq_find(ss_t * ss, mblk_t *rp)
+STATIC mblk_t *
+t_seq_find(ss_t * ss, mblk_t *rp)
 {
 	mblk_t *mp;
 	if ((mp = rp)) {
@@ -11263,7 +11311,8 @@ STATIC mblk_t *t_seq_find(ss_t * ss, mblk_t *rp)
 	}
 	return (mp);
 }
-STATIC ulong t_seq_delete(ss_t * ss, mblk_t *rp)
+STATIC ulong
+t_seq_delete(ss_t * ss, mblk_t *rp)
 {
 	mblk_t *mp;
 	if ((mp = t_seq_find(ss, rp))) {
@@ -11306,19 +11355,19 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
 				else
 					ss_set_state(ss, TS_WRES_CIND);
 				mp->b_cont = dp;
-				printd(("%s: %p: <- T_DISCON_IND\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: <- T_DISCON_IND\n", DRV_NAME, ss));
 				putnext(ss->rq, mp);
 				return (0);
 			}
 			freemsg(mp);
-			ptrace(("%s: ERROR: bad sequence number\n", SS_MOD_NAME));
+			ptrace(("%s: ERROR: bad sequence number\n", DRV_NAME));
 			return (-EFAULT);
 		}
 	      enobufs:
-		ptrace(("%s: ERROR: no buffers\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: no buffers\n", DRV_NAME));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: ERROR: flow controlled\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: flow controlled\n", DRV_NAME));
 	return (-EBUSY);
 }
 
@@ -11326,7 +11375,8 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
  *  T_DATA_IND          14 - Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC int t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
+STATIC int
+t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11337,11 +11387,11 @@ STATIC int t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		p->PRIM_type = T_DATA_IND;
 		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_DATA_IND\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_DATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: ERROR: no buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11349,7 +11399,8 @@ STATIC int t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_EXDATA_IND        15 - Expedited Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC int t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
+STATIC int
+t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11361,11 +11412,11 @@ STATIC int t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		p->PRIM_type = T_EXDATA_IND;
 		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_EXDATA_IND\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_EXDATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: ERROR: no buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11373,7 +11424,8 @@ STATIC int t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_INFO_ACK          16 - Information acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC int t_info_ack(queue_t *q)
+STATIC int
+t_info_ack(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11382,11 +11434,11 @@ STATIC int t_info_ack(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		*p = ss->p.info;
-		printd(("%s: %p: <- T_INFO_ACK\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (0);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11394,7 +11446,8 @@ STATIC int t_info_ack(queue_t *q)
  *  T_BIND_ACK          17 - Bind Acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC int t_bind_ack(queue_t *q, struct sockaddr *add, ulong conind)
+STATIC int
+t_bind_ack(queue_t *q, struct sockaddr *add, ulong conind)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11412,11 +11465,11 @@ STATIC int t_bind_ack(queue_t *q, struct sockaddr *add, ulong conind)
 			mp->b_wptr += add_len;
 		}
 		ss_set_state(ss, TS_IDLE);
-		printd(("%s: %p: <- T_BIND_ACK\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (0);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11424,7 +11477,8 @@ STATIC int t_bind_ack(queue_t *q, struct sockaddr *add, ulong conind)
  *  T_ERROR_ACK         18 - Error Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int t_error_ack(queue_t *q, ulong prim, long error)
+STATIC int
+t_error_ack(queue_t *q, ulong prim, long error)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11490,7 +11544,7 @@ STATIC int t_error_ack(queue_t *q, ulong prim, long error)
 			   TS_IDLE state. */
 		}
 	}
-	printd(("%s: %p: <- T_ERROR_ACK\n", SS_MOD_NAME, ss));
+	printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, ss));
 	putnext(ss->rq, mp);
 	/* 
 	   Returning -EPROTO here will make sure that the old state is restored correctly.  If we
@@ -11499,7 +11553,7 @@ STATIC int t_error_ack(queue_t *q, ulong prim, long error)
 		return (error);
 	return (-EPROTO);
       enobufs:
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11507,7 +11561,8 @@ STATIC int t_error_ack(queue_t *q, ulong prim, long error)
  *  T_OK_ACK            19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
+STATIC int
+t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 {
 	int err = -EFAULT;
 	ss_t *ss = PRIV(q);
@@ -11599,12 +11654,12 @@ STATIC int t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
 			   the TS_IDLE state. */
 		}
-		printd(("%s: %p: <- T_OK_ACK\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (QR_DONE);
 	}
       enobufs:
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
       free_error:
 	freemsg(mp);
@@ -11615,7 +11670,8 @@ STATIC int t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
  *  T_UNIDATA_IND       20 - Unitdata indication
  *  -------------------------------------------------------------------------
  */
-STATIC int t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
+STATIC int
+t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11642,11 +11698,11 @@ STATIC int t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_UNITDATA_IND\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11659,7 +11715,8 @@ STATIC int t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  This is not called, but should be when T_UNITDATA_REQ fails due to options
  *  errors or permission.
  */
-STATIC INLINE int t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
+STATIC INLINE int
+t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11686,14 +11743,14 @@ STATIC INLINE int t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 			}
 			p->ERROR_type = etype;
 			mp->b_cont = dp;
-			printd(("%s: %p: <- T_UDERROR_IND\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, ss));
 			putnext(ss->rq, mp);
 			return (0);
 		}
-		ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: ERROR: Flow controlled\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: Flow controlled\n", DRV_NAME));
 	return (-EBUSY);
 }
 
@@ -11703,7 +11760,8 @@ STATIC INLINE int t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  Note: opt_len is conservative but might not be actual size of the output
  *  options.  This will be adjusted when the option buffer is built.
  */
-STATIC int t_optmgmt_ack(queue_t *q, long flags, unsigned char *req, size_t req_len, size_t opt_len)
+STATIC int
+t_optmgmt_ack(queue_t *q, long flags, unsigned char *req, size_t req_len, size_t opt_len)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11726,11 +11784,11 @@ STATIC int t_optmgmt_ack(queue_t *q, long flags, unsigned char *req, size_t req_
 		if (ss_get_state(ss) == TS_WACK_OPTREQ)
 			ss_set_state(ss, TS_IDLE);
 #endif
-		printd(("%s: %p: <- T_OPTMGMT_ACK\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (0);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11738,7 +11796,8 @@ STATIC int t_optmgmt_ack(queue_t *q, long flags, unsigned char *req, size_t req_
  *  T_ORDREL_IND        23 - Orderly Release Indication
  *  -------------------------------------------------------------------------
  */
-STATIC int t_ordrel_ind(queue_t *q)
+STATIC int
+t_ordrel_ind(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11756,14 +11815,14 @@ STATIC int t_ordrel_ind(queue_t *q)
 				ss_set_state(ss, TS_IDLE);
 				break;
 			}
-			printd(("%s: %p: <- T_ORDREL_IND\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: <- T_ORDREL_IND\n", DRV_NAME, ss));
 			putnext(ss->rq, mp);
 			return (0);
 		}
-		ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: ERROR: Flow controlled\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: Flow controlled\n", DRV_NAME));
 	return (-EBUSY);
 }
 
@@ -11771,7 +11830,8 @@ STATIC int t_ordrel_ind(queue_t *q)
  *  T_OPTDATA_IND       26 - Data with Options Indication
  *  -------------------------------------------------------------------------
  */
-STATIC int t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
+STATIC int
+t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11797,11 +11857,11 @@ STATIC int t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_OPTDATA_IND\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_OPTDATA_IND\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 
@@ -11810,7 +11870,8 @@ STATIC int t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_ADDR_ACK          27 - Address Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
+STATIC int
+t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11833,11 +11894,11 @@ STATIC int t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
 			bcopy(rem, mp->b_wptr, rem_len);
 			mp->b_wptr += rem_len;
 		}
-		printd(("%s: %p: <- T_ADDR_ACK\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (0);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 #endif
@@ -11847,7 +11908,8 @@ STATIC int t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
  *  T_CAPABILITY_ACK    ?? - Protocol Capability Ack
  *  -------------------------------------------------------------------------
  */
-STATIC int t_capability_ack(queue_t *q, ulong caps)
+STATIC int
+t_capability_ack(queue_t *q, ulong caps)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -11862,11 +11924,11 @@ STATIC int t_capability_ack(queue_t *q, ulong caps)
 			p->INFO_ack = ss->p.info;
 		else
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-		printd(("%s: %p: <- T_CAPABILITY_ACK\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, ss));
 		putnext(ss->rq, mp);
 		return (0);
 	}
-	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
 }
 #endif
@@ -11888,7 +11950,8 @@ STATIC int t_capability_ack(queue_t *q, ulong caps)
  *  address.  This means that connection must be accepted and then released,
  *  rather than refused.
  */
-STATIC int ss_conn_ind(queue_t *q, mblk_t *cp)
+STATIC int
+ss_conn_ind(queue_t *q, mblk_t *cp)
 {
 	ss_t *ss = PRIV(q);
 	struct sock *sk;
@@ -11927,17 +11990,16 @@ STATIC int ss_conn_ind(queue_t *q, mblk_t *cp)
 	return t_conn_ind(q, &dst, cp);
       einval:
 	swerr();
-	ptrace(("%s: SWERR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: SWERR: invalid primitive format\n", DRV_NAME));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: ERROR: connect indication in wrong state %ld\n", SS_MOD_NAME,
-		ss_get_state(ss)));
+	ptrace(("%s: ERROR: connect indication in wrong state %ld\n", DRV_NAME, ss_get_state(ss)));
 	return (-EPROTO);
       nolisten:
-	ptrace(("%s: ERROR: connect indication received while not listening\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: connect indication received while not listening\n", DRV_NAME));
 	return (-EPROTO);
       duplicate:
-	ptrace(("%s: %p: INFO: discarding duplicate connection indication\n", SS_MOD_NAME, ss));
+	ptrace(("%s: %p: INFO: discarding duplicate connection indication\n", DRV_NAME, ss));
 	return (QR_DONE);
 }
 
@@ -11955,7 +12017,8 @@ STATIC int ss_conn_ind(queue_t *q, mblk_t *cp)
  *  message and then call sendmsg on the socket with the kernel data segment.
  *  The socket will handle moving data from the mblks.
  */
-STATIC int ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
+STATIC int
+ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
 {
 	int err = 0;
 	int len, sdu, n;
@@ -11992,7 +12055,7 @@ STATIC int ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
 				i++;
 			}
 		}
-		ptrace(("%s: %p: sendmsg with len = %d\n", SS_MOD_NAME, ss, len));
+		ptrace(("%s: %p: sendmsg with len = %d\n", DRV_NAME, ss, len));
 		err = ss_sendmsg(ss, msg, len);
 	}
 	if (err < 0)
@@ -12038,7 +12101,8 @@ STATIC int ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
  *  RECVMSG
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_sock_recvmsg(queue_t *q, int flags)
+STATIC int
+ss_sock_recvmsg(queue_t *q, int flags)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -12091,27 +12155,27 @@ STATIC int ss_sock_recvmsg(queue_t *q, int flags)
 				return (QR_DONE);
 			}
 			mp->b_wptr = mp->b_rptr + res;
-			ptrace(("%s: %p: recvmsg with len = %d\n", SS_MOD_NAME, ss, res));
+			ptrace(("%s: %p: recvmsg with len = %d\n", DRV_NAME, ss, res));
 		}
 		if (msg.msg_flags & MSG_CTRUNC) {
-			printd(("%s: %p: control message truncated\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: control message truncated\n", DRV_NAME, ss));
 			msg.msg_control = NULL;
 			msg.msg_controllen = 0;
 		}
 		if (msg.msg_control != (void *) cbuf) {
-			printd(("%s: %p: control message pointer moved!\n", SS_MOD_NAME, ss));
-			printd(("%s: %p: initial control buffer %p\n", SS_MOD_NAME, ss,
+			printd(("%s: %p: control message pointer moved!\n", DRV_NAME, ss));
+			printd(("%s: %p: initial control buffer %p\n", DRV_NAME, ss,
 				msg.msg_control));
-			printd(("%s: %p: initial control length %d\n", SS_MOD_NAME, ss,
+			printd(("%s: %p: initial control length %d\n", DRV_NAME, ss,
 				msg.msg_controllen));
 			msg.msg_control = cbuf;
 			msg.msg_controllen = sizeof(cbuf) - msg.msg_controllen;
-			printd(("%s: %p: final control buffer %p\n", SS_MOD_NAME, ss,
+			printd(("%s: %p: final control buffer %p\n", DRV_NAME, ss,
 				msg.msg_control));
-			printd(("%s: %p: final control length %d\n", SS_MOD_NAME, ss,
+			printd(("%s: %p: final control length %d\n", DRV_NAME, ss,
 				msg.msg_controllen));
 		} else if (msg.msg_controllen == sizeof(cbuf) && cbuf[0] == 0xdeadbeef) {
-			printd(("%s: %p: control message unchanged!\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: control message unchanged!\n", DRV_NAME, ss));
 			msg.msg_control = NULL;
 			msg.msg_controllen = 0;
 		}
@@ -12157,7 +12221,8 @@ STATIC int ss_sock_recvmsg(queue_t *q, int flags)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC void ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
+STATIC void
+ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 {
 	mblk_t *mp;
 	ss_event_t *p;
@@ -12195,7 +12260,8 @@ STATIC void ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), stru
  *  We get state changes on sockets that we hold.  We also get state changes
  *  on accepting sockets.
  */
-STATIC void _ss_sock_state_change(long data)
+STATIC void
+_ss_sock_state_change(long data)
 {
 	struct sock *sk;
 	ss_t *ss;
@@ -12212,7 +12278,8 @@ STATIC void _ss_sock_state_change(long data)
 	} else
 		assure(sk);
 }
-STATIC void ss_state_change(struct sock *sk)
+STATIC void
+ss_state_change(struct sock *sk)
 {
 	_ss_sock_state_change((long) sk);
 }
@@ -12221,7 +12288,8 @@ STATIC void ss_state_change(struct sock *sk)
  *  WRITE Available
  *  -------------------------------------------------------------------------
  */
-STATIC void _ss_sock_write_space(long data)
+STATIC void
+_ss_sock_write_space(long data)
 {
 	struct sock *sk;
 	ss_t *ss;
@@ -12238,7 +12306,8 @@ STATIC void _ss_sock_write_space(long data)
 	} else
 		assure(sk);
 }
-STATIC void ss_write_space(struct sock *sk)
+STATIC void
+ss_write_space(struct sock *sk)
 {
 	_ss_sock_write_space((long) sk);
 }
@@ -12247,7 +12316,8 @@ STATIC void ss_write_space(struct sock *sk)
  *  ERROR Available
  *  -------------------------------------------------------------------------
  */
-STATIC void _ss_sock_error_report(long data)
+STATIC void
+_ss_sock_error_report(long data)
 {
 	struct sock *sk;
 	ss_t *ss;
@@ -12267,7 +12337,8 @@ STATIC void _ss_sock_error_report(long data)
 	} else
 		assure(sk);
 }
-STATIC void ss_error_report(struct sock *sk)
+STATIC void
+ss_error_report(struct sock *sk)
 {
 	_ss_sock_error_report((long) sk);
 }
@@ -12276,7 +12347,8 @@ STATIC void ss_error_report(struct sock *sk)
  *  READ Available
  *  -------------------------------------------------------------------------
  */
-STATIC void _ss_sock_data_ready(long data)
+STATIC void
+_ss_sock_data_ready(long data)
 {
 	struct sock *sk;
 	ss_t *ss;
@@ -12293,7 +12365,8 @@ STATIC void _ss_sock_data_ready(long data)
 	} else
 		assure(sk);
 }
-STATIC void ss_data_ready(struct sock *sk, int len)
+STATIC void
+ss_data_ready(struct sock *sk, int len)
 {
 	(void) len;
 	_ss_sock_data_ready((long) sk);
@@ -12309,7 +12382,8 @@ STATIC void ss_data_ready(struct sock *sk, int len)
  *  T_CONN_REQ           0 - TC Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_conn_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_conn_req(queue_t *q, mblk_t *mp)
 {
 	int err = -EFAULT;
 	ss_t *ss = PRIV(q);
@@ -12365,27 +12439,27 @@ STATIC int t_conn_req(queue_t *q, mblk_t *mp)
 	}
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: ERROR: bad options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: ERROR: no permission for address or option\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no permission for address or option\n", DRV_NAME));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: ERROR: address is unusable\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: address is unusable\n", DRV_NAME));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid message format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid message format\n", DRV_NAME));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return t_error_ack(q, T_CONN_REQ, err);
@@ -12395,7 +12469,8 @@ STATIC int t_conn_req(queue_t *q, mblk_t *mp)
  *  T_CONN_RES           1 - Accept previous connection indication
  *  -------------------------------------------------------------------
  */
-STATIC mblk_t *t_seq_check(ss_t * ss, ulong seq)
+STATIC mblk_t *
+t_seq_check(ss_t * ss, ulong seq)
 {
 	mblk_t *mp;
 	spin_lock_bh(&ss->conq.q_lock); {
@@ -12405,7 +12480,8 @@ STATIC mblk_t *t_seq_check(ss_t * ss, ulong seq)
 	usual(mp);
 	return (mp);
 }
-STATIC ss_t *t_tok_check(ulong acceptor)
+STATIC ss_t *
+t_tok_check(ulong acceptor)
 {
 	ss_t *as;
 	queue_t *aq = (queue_t *) acceptor;
@@ -12413,7 +12489,8 @@ STATIC ss_t *t_tok_check(ulong acceptor)
 	usual(as);
 	return (as);
 }
-STATIC int t_conn_res(queue_t *q, mblk_t *mp)
+STATIC int
+t_conn_res(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	int err = 0;
@@ -12466,43 +12543,43 @@ STATIC int t_conn_res(queue_t *q, mblk_t *mp)
 	return t_ok_ack(q, T_CONN_RES, cp, as);
       baddata:
 	err = TBADDATA;
-	ptrace(("%s: ERROR: bad connection data\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad connection data\n", DRV_NAME));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: ERROR: bad options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: ERROR: no access to accepting queue\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no access to accepting queue\n", DRV_NAME));
 	goto error;
       resqlen:
 	err = TRESQLEN;
-	ptrace(("%s: ERROR: accepting queue is listening\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: accepting queue is listening\n", DRV_NAME));
 	goto error;
       provmismatch:
 	err = TPROVMISMATCH;
-	ptrace(("%s: ERROR: not same transport provider\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: not same transport provider\n", DRV_NAME));
 	goto error;
       badf:
 	err = TBADF;
-	ptrace(("%s: ERROR: accepting queue id is invalid\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: accepting queue id is invalid\n", DRV_NAME));
 	goto error;
       badseq:
 	err = TBADSEQ;
-	ptrace(("%s: ERROR: sequence number is invalid\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: sequence number is invalid\n", DRV_NAME));
 	goto error;
       inval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return t_error_ack(q, T_CONN_RES, err);
@@ -12512,7 +12589,8 @@ STATIC int t_conn_res(queue_t *q, mblk_t *mp)
  *  T_DISCON_REQ         2 - TC disconnection request
  *  -------------------------------------------------------------------
  */
-STATIC int t_discon_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_discon_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	int err;
@@ -12547,19 +12625,19 @@ STATIC int t_discon_req(queue_t *q, mblk_t *mp)
 	return t_ok_ack(q, T_DISCON_REQ, cp, NULL);
       badseq:
 	err = TBADSEQ;
-	ptrace(("%s: ERROR: sequence number is invalid\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: sequence number is invalid\n", DRV_NAME));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return t_error_ack(q, T_DISCON_REQ, err);
@@ -12569,7 +12647,8 @@ STATIC int t_discon_req(queue_t *q, mblk_t *mp)
  *  M_DATA
  *  -------------------------------------------------------------------
  */
-STATIC int ss_w_data(queue_t *q, mblk_t *mp)
+STATIC int
+ss_w_data(queue_t *q, mblk_t *mp)
 {
 	int mlen, mmax;
 	struct msghdr msg;
@@ -12593,16 +12672,16 @@ STATIC int ss_w_data(queue_t *q, mblk_t *mp)
 	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET) ? MSG_EOR : 0;
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
-	ptrace(("%s: ERROR: message too large %d > %d\n", SS_MOD_NAME, mlen, mmax));
+	ptrace(("%s: ERROR: message too large %d > %d\n", DRV_NAME, mlen, mmax));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -12612,7 +12691,8 @@ STATIC int ss_w_data(queue_t *q, mblk_t *mp)
  *  T_DATA_REQ           3 - Connection-Mode data transfer request
  *  -------------------------------------------------------------------
  */
-STATIC int t_data_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_data_req(queue_t *q, mblk_t *mp)
 {
 	int mlen, mmax;
 	ss_t *ss = PRIV(q);
@@ -12639,19 +12719,19 @@ STATIC int t_data_req(queue_t *q, mblk_t *mp)
 	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0;
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
-	ptrace(("%s: ERROR: message too large %d > %d\n", SS_MOD_NAME, mlen, mmax));
+	ptrace(("%s: ERROR: message too large %d > %d\n", DRV_NAME, mlen, mmax));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -12661,7 +12741,8 @@ STATIC int t_data_req(queue_t *q, mblk_t *mp)
  *  T_EXDATA_REQ         4 - Expedited data request
  *  -------------------------------------------------------------------
  */
-STATIC int t_exdata_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_exdata_req(queue_t *q, mblk_t *mp)
 {
 	int mlen, mmax;
 	ss_t *ss = PRIV(q);
@@ -12689,19 +12770,19 @@ STATIC int t_exdata_req(queue_t *q, mblk_t *mp)
 	    MSG_OOB | ((ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0);
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
-	ptrace(("%s: ERROR: message too large %d > %d\n", SS_MOD_NAME, mlen, mmax));
+	ptrace(("%s: ERROR: message too large %d > %d\n", DRV_NAME, mlen, mmax));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -12711,7 +12792,8 @@ STATIC int t_exdata_req(queue_t *q, mblk_t *mp)
  *  T_INFO_REQ           5 - Information Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_info_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_info_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	(void) mp;
@@ -12723,7 +12805,8 @@ STATIC int t_info_req(queue_t *q, mblk_t *mp)
  *  T_BIND_REQ           6 - Bind a TS user to a transport address
  *  -------------------------------------------------------------------
  */
-STATIC int t_bind_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_bind_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	int err, add_len;
@@ -12737,8 +12820,8 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
 	if (ss->p.info.SERV_type == T_CLTS && p->CONIND_number)
 		goto notsupport;
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
-		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n",
-			SS_MOD_NAME, ss, p->ADDR_offset, p->ADDR_length));
+		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME,
+			ss, p->ADDR_offset, p->ADDR_length));
 		goto badaddr;
 	}
 	switch (ss->p.prot.family) {
@@ -12754,11 +12837,11 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
 		} else {
 			if (add_len < sizeof(struct sockaddr_in)) {
 				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_in)(%u)\n",
-					SS_MOD_NAME, ss, add_len, sizeof(struct sockaddr_in)));
+					DRV_NAME, ss, add_len, sizeof(struct sockaddr_in)));
 				goto badaddr;
 			}
 			if (add->sa_family != AF_INET && add->sa_family != 0) {
-				ptrace(("%s: %p: sa_family incorrect (%u)\n", SS_MOD_NAME, ss,
+				ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, ss,
 					add->sa_family));
 				goto badaddr;
 			}
@@ -12780,11 +12863,11 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
 		} else {
 			if (add_len < sizeof(struct sockaddr_un)) {
 				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_un)(%u)\n",
-					SS_MOD_NAME, ss, add_len, sizeof(struct sockaddr_un)));
+					DRV_NAME, ss, add_len, sizeof(struct sockaddr_un)));
 				goto badaddr;
 			}
 			if (add->sa_family != AF_UNIX && add->sa_family != 0) {
-				ptrace(("%s: %p: sa_family incorrect (%u)\n", SS_MOD_NAME, ss,
+				ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, ss,
 					add->sa_family));
 				goto badaddr;
 			}
@@ -12795,8 +12878,7 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
 		break;
 	}
 	default:
-		ptrace(("%s: %p: protocol family incorrect %u\n", SS_MOD_NAME, ss,
-			ss->p.prot.family));
+		ptrace(("%s: %p: protocol family incorrect %u\n", DRV_NAME, ss, ss->p.prot.family));
 		goto badaddr;
 	}
 	if ((err = ss_bind(ss, add, add_len)))
@@ -12811,27 +12893,27 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
 	return t_bind_ack(q, &ss->src, p->CONIND_number);
       acces:
 	err = TACCES;
-	ptrace(("%s: ERROR: no permission for address\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no permission for address\n", DRV_NAME));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: ERROR: address could not be assigned\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: address could not be assigned\n", DRV_NAME));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: ERROR: address is invalid\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: address is invalid\n", DRV_NAME));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error_close:
 	ss_socket_put(xchg(&ss->sock, NULL));
@@ -12843,7 +12925,8 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
  *  T_UNBIND_REQ         7 - Unbind TS user from transport address
  *  -------------------------------------------------------------------
  */
-STATIC int t_unbind_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_unbind_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	if (ss_get_state(ss) != TS_IDLE)
@@ -12851,7 +12934,7 @@ STATIC int t_unbind_req(queue_t *q, mblk_t *mp)
 	ss_set_state(ss, TS_WACK_UREQ);
 	return t_ok_ack(q, T_UNBIND_REQ, NULL, NULL);
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	return t_error_ack(q, T_UNBIND_REQ, TOUTSTATE);
 }
 
@@ -12859,7 +12942,8 @@ STATIC int t_unbind_req(queue_t *q, mblk_t *mp)
  *  T_UNITDATA_REQ       8 -Unitdata Request 
  *  -------------------------------------------------------------------
  */
-STATIC int t_unitdata_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
@@ -12911,25 +12995,25 @@ STATIC int t_unitdata_req(queue_t *q, mblk_t *mp)
 	/* 
 	   FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
       badopt:
-	ptrace(("%s: ERROR: bad options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
 	goto error;
       acces:
-	ptrace(("%s: ERROR: no permission to address or options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no permission to address or options\n", DRV_NAME));
 	goto error;
       badadd:
-	ptrace(("%s: ERROR: bad destination address\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad destination address\n", DRV_NAME));
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive\n", DRV_NAME));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       baddata:
-	ptrace(("%s: ERROR: bad data size\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad data size\n", DRV_NAME));
 	goto error;
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_COTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_COTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -12939,7 +13023,8 @@ STATIC int t_unitdata_req(queue_t *q, mblk_t *mp)
  *  T_OPTMGMT_REQ        9 - Options management request
  *  -------------------------------------------------------------------
  */
-STATIC int t_optmgmt_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	int err, opt_len;
@@ -12996,23 +13081,23 @@ STATIC int t_optmgmt_req(queue_t *q, mblk_t *mp)
 	return (err);
       provspec:
 	err = err;
-	ptrace(("%s: ERROR: provider specific\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: provider specific\n", DRV_NAME));
 	goto error;
       badflag:
 	err = TBADFLAG;
-	ptrace(("%s: ERROR: bad options flags\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad options flags\n", DRV_NAME));
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: ERROR: no permission for option\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no permission for option\n", DRV_NAME));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: ERROR: bad options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       error:
 	return t_error_ack(q, T_OPTMGMT_REQ, err);
@@ -13022,7 +13107,8 @@ STATIC int t_optmgmt_req(queue_t *q, mblk_t *mp)
  *  T_ORDREL_REQ        10 - TS user is finished sending
  *  -------------------------------------------------------------------
  */
-STATIC int t_ordrel_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_ordrel_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
@@ -13041,10 +13127,10 @@ STATIC int t_ordrel_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS or T_COTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS or T_COTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -13054,7 +13140,8 @@ STATIC int t_ordrel_req(queue_t *q, mblk_t *mp)
  *  T_OPTDATA_REQ       24 - Data with options request
  *  -------------------------------------------------------------------
  */
-STATIC int t_optdata_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_optdata_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
@@ -13096,22 +13183,22 @@ STATIC int t_optdata_req(queue_t *q, mblk_t *mp)
 		goto badopt;
 	}
       badopt:
-	ptrace(("%s: ERROR: bad options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
 	goto error;
       acces:
-	ptrace(("%s: ERROR: no permission to options\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: no permission to options\n", DRV_NAME));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -13122,7 +13209,8 @@ STATIC int t_optdata_req(queue_t *q, mblk_t *mp)
  *  T_ADDR_REQ          25 - Address Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_addr_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_addr_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	(void) mp;
@@ -13150,7 +13238,8 @@ STATIC int t_addr_req(queue_t *q, mblk_t *mp)
  *  T_CAPABILITY_REQ    ?? - Capability Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_capability_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_capability_req(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	struct T_capability_req *p = (typeof(p)) mp->b_rptr;
@@ -13162,7 +13251,8 @@ STATIC int t_capability_req(queue_t *q, mblk_t *mp)
  *  Other primitives    XX - other invalid primitives
  *  -------------------------------------------------------------------------
  */
-STATIC int t_other_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_other_req(queue_t *q, mblk_t *mp)
 {
 	ulong prim = *((ulong *) mp->b_rptr);
 	return t_error_ack(q, prim, TNOTSUPPORT);
@@ -13183,7 +13273,8 @@ STATIC int t_other_req(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_w_proto(queue_t *q, mblk_t *mp)
+STATIC int
+ss_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	ulong prim;
@@ -13191,62 +13282,62 @@ STATIC int ss_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = ss_get_state(ss);
 	switch ((prim = *((ulong *) mp->b_rptr))) {
 	case T_CONN_REQ:
-		printd(("%s: %p: -> T_CONN_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, ss));
 		rtn = t_conn_req(q, mp);
 		break;
 	case T_CONN_RES:
-		printd(("%s: %p: -> T_CONN_RES\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, ss));
 		rtn = t_conn_res(q, mp);
 		break;
 	case T_DISCON_REQ:
-		printd(("%s: %p: -> T_DISCON_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, ss));
 		rtn = t_discon_req(q, mp);
 		break;
 	case T_DATA_REQ:
-		printd(("%s: %p: -> T_DATA_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, ss));
 		rtn = t_data_req(q, mp);
 		break;
 	case T_EXDATA_REQ:
-		printd(("%s: %p: -> T_EXDATA_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, ss));
 		rtn = t_exdata_req(q, mp);
 		break;
 	case T_INFO_REQ:
-		printd(("%s: %p: -> T_INFO_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, ss));
 		rtn = t_info_req(q, mp);
 		break;
 	case T_BIND_REQ:
-		printd(("%s: %p: -> T_BIND_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, ss));
 		rtn = t_bind_req(q, mp);
 		break;
 	case T_UNBIND_REQ:
-		printd(("%s: %p: -> T_UNBIND_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, ss));
 		rtn = t_unbind_req(q, mp);
 		break;
 	case T_OPTMGMT_REQ:
-		printd(("%s: %p: -> T_OPTMGMT_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, ss));
 		rtn = t_optmgmt_req(q, mp);
 		break;
 	case T_UNITDATA_REQ:
-		printd(("%s: %p: -> T_UNITDATA_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, ss));
 		rtn = t_unitdata_req(q, mp);
 		break;
 	case T_ORDREL_REQ:
-		printd(("%s: %p: -> T_ORDREL_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, ss));
 		rtn = t_ordrel_req(q, mp);
 		break;
 	case T_OPTDATA_REQ:
-		printd(("%s: %p: -> T_OPTDATA_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, ss));
 		rtn = t_optdata_req(q, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
-		printd(("%s: %p: -> T_ADDR_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, ss));
 		rtn = t_addr_req(q, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_REQ
 	case T_CAPABILITY_REQ:
-		printd(("%s: %p: -> T_CAPABILITY_REQ\n", SS_MOD_NAME, ss));
+		printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, ss));
 		rtn = t_capability_req(q, mp);
 		break;
 #endif
@@ -13281,7 +13372,8 @@ STATIC int ss_w_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_w_flush(queue_t *q, mblk_t *mp)
+STATIC int
+ss_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
@@ -13320,7 +13412,8 @@ STATIC int ss_w_flush(queue_t *q, mblk_t *mp)
  *  ss->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int ss_r_pcrse(queue_t *q, mblk_t *mp)
+STATIC int
+ss_r_pcrse(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
@@ -13328,7 +13421,7 @@ STATIC int ss_r_pcrse(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	// assure(p->state != oldstate);
-	printd(("%s: %p: state_change [%s <- %s] %p\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: state_change [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(oldstate), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
@@ -13424,21 +13517,21 @@ STATIC int ss_r_pcrse(queue_t *q, mblk_t *mp)
 			}
 			break;
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	default:
-		printd(("%s: SWERR: unsupported socket type\n", SS_MOD_NAME));
+		printd(("%s: SWERR: unsupported socket type\n", DRV_NAME));
 		return (-EFAULT);
 	}
       discard:
-	printd(("%s: ERROR: lingering event, ignoring\n", SS_MOD_NAME));
+	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	return (QR_DONE);
 }
 
@@ -13466,14 +13559,15 @@ STATIC int ss_r_pcrse(queue_t *q, mblk_t *mp)
  *  ss->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int ss_r_read(queue_t *q, mblk_t *mp)
+STATIC int
+ss_r_read(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 	if (!ss->sock)
 		goto discard;
 	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
-	printd(("%s: %p: data_ready [%s <- %s] %p\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: data_ready [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:	/* TCP */
@@ -13488,7 +13582,7 @@ STATIC int ss_r_read(queue_t *q, mblk_t *mp)
 		case TS_WREQ_ORDREL:	/* TCP bug I believe */
 			return ss_sock_recvmsg(q, 0);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
@@ -13498,14 +13592,14 @@ STATIC int ss_r_read(queue_t *q, mblk_t *mp)
 		case TS_IDLE:
 			return ss_sock_recvmsg(q, 0);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	}
-	printd(("%s: SWERR: unsupported socket type %d\n", SS_MOD_NAME, ss->p.prot.type));
+	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
 	return (-EFAULT);
       discard:
-	printd(("%s: ERROR: lingering event, ignoring\n", SS_MOD_NAME));
+	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	return (QR_DONE);
 }
 
@@ -13528,14 +13622,15 @@ STATIC int ss_r_read(queue_t *q, mblk_t *mp)
  *  socket.
  *
  */
-STATIC int ss_w_read(queue_t *q, mblk_t *mp)
+STATIC int
+ss_w_read(queue_t *q, mblk_t *mp)
 {
 	ss_t *ss = PRIV(q);
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 	if (!ss->sock)
 		goto discard;
 	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
-	printd(("%s: %p: write_space [%s <- %s] %p\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: write_space [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
@@ -13546,7 +13641,7 @@ STATIC int ss_w_read(queue_t *q, mblk_t *mp)
 			qenable(ss->wq);
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
@@ -13557,14 +13652,14 @@ STATIC int ss_w_read(queue_t *q, mblk_t *mp)
 			qenable(ss->wq);
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	}
-	printd(("%s: SWERR: unsupported socket type %d\n", SS_MOD_NAME, ss->p.prot.type));
+	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
 	return (-EFAULT);
       discard:
-	printd(("%s: ERROR: lingering event, ignoring\n", SS_MOD_NAME));
+	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	return (QR_DONE);
 }
 
@@ -13586,7 +13681,8 @@ STATIC int ss_w_read(queue_t *q, mblk_t *mp)
  *  ss->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int ss_r_error(queue_t *q, mblk_t *mp)
+STATIC int
+ss_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
 	ss_t *ss = PRIV(q);
@@ -13595,20 +13691,20 @@ STATIC int ss_r_error(queue_t *q, mblk_t *mp)
 	if (!ss->sock)
 		goto discard;
 	// assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
-	printd(("%s: %p: error_report [%s <- %s] %p\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
+	printd(("%s: %p: error_report [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
 	case SOCK_SEQPACKET:
 		switch (ss_get_state(ss)) {
 		default:
-			// fixme(("%s: %p: FIXME: save errors for later\n", SS_MOD_NAME, ss));
+			// fixme(("%s: %p: FIXME: save errors for later\n", DRV_NAME, ss));
 			return (QR_DONE);
 		case TS_IDLE:
-			printd(("%s: %p: INFO: ignoring error event %d\n", SS_MOD_NAME, ss, err));
+			printd(("%s: %p: INFO: ignoring error event %d\n", DRV_NAME, ss, err));
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
@@ -13616,18 +13712,18 @@ STATIC int ss_r_error(queue_t *q, mblk_t *mp)
 	case SOCK_RDM:
 		switch (ss_get_state(ss)) {
 		case TS_IDLE:
-			fixme(("%s: %p: FIXME: generate uderror\n", SS_MOD_NAME, ss));
-			printd(("%s: %p: INFO: ignoring error event %d\n", SS_MOD_NAME, ss, err));
+			fixme(("%s: %p: FIXME: generate uderror\n", DRV_NAME, ss));
+			printd(("%s: %p: INFO: ignoring error event %d\n", DRV_NAME, ss, err));
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss,
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
 			tcp_state_name(p->state), state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	}
-	printd(("%s: SWERR: unsupported socket type %d\n", SS_MOD_NAME, ss->p.prot.type));
+	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
 	return (-EFAULT);
       discard:
-	printd(("%s: ERROR: lingering event, ignoring\n", SS_MOD_NAME));
+	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	return (QR_DONE);
 }
 
@@ -13641,7 +13737,8 @@ STATIC int ss_r_error(queue_t *q, mblk_t *mp)
  *  WRITE PUT ad SERVICE (Message from above IP-User --> IP-Provider
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_w_prim(queue_t *q, mblk_t *mp)
+STATIC int
+ss_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -13662,7 +13759,8 @@ STATIC int ss_w_prim(queue_t *q, mblk_t *mp)
  *  READ PUT ad SERVICE (Message from below IP-Provider --> IP-User
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_r_prim(queue_t *q, mblk_t *mp)
+STATIC int
+ss_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_RSE:
@@ -13687,7 +13785,8 @@ STATIC int ss_r_prim(queue_t *q, mblk_t *mp)
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-STATIC int ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
+STATIC int
+ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked;
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
@@ -13763,7 +13862,8 @@ STATIC int ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
  *  SRVQ Service Routine
  *  -----------------------------------
  */
-STATIC int ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+STATIC int
+ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
 	if (ss_trylockq(q)) {
@@ -13800,11 +13900,11 @@ STATIC int ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 				}
 				rtn = -EOPNOTSUPP;
 			default:
-				ptrace(("%s: ERROR: (q dropping) %d\n", SS_MOD_NAME, rtn));
+				ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
 				freemsg(mp);
 				continue;
 			case QR_DISABLE:
-				ptrace(("%s: ERROR: (q disabling)\n", SS_MOD_NAME));
+				ptrace(("%s: ERROR: (q disabling)\n", DRV_NAME));
 				noenable(q);
 				if (!putbq(q, mp))
 					freemsg(mp);	/* FIXME */
@@ -13820,7 +13920,7 @@ STATIC int ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			case -EAGAIN:	/* caller must re-enable queue */
 			case -ENOMEM:	/* caller must re-enable queue */
 				if (mp->b_datap->db_type < QPCTL) {
-					ptrace(("%s: ERROR: (q stalled) %d\n", SS_MOD_NAME, rtn));
+					ptrace(("%s: ERROR: (q stalled) %d\n", DRV_NAME, rtn));
 					if (!putbq(q, mp))
 						freemsg(mp);	/* FIXME */
 					break;
@@ -13840,7 +13940,7 @@ STATIC int ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 					mp->b_datap->db_type = M_CTL;
 					break;
 				default:
-					ptrace(("%s: ERROR: (q dropping) %d\n", SS_MOD_NAME, rtn));
+					ptrace(("%s: ERROR: (q dropping) %d\n", DRV_NAME, rtn));
 					freemsg(mp);
 					continue;
 				}
@@ -13856,22 +13956,26 @@ STATIC int ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (rtn);
 }
 
-STATIC int ss_rput(queue_t *q, mblk_t *mp)
+STATIC int
+ss_rput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_r_prim);
 }
 
-STATIC int ss_rsrv(queue_t *q)
+STATIC int
+ss_rsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_r_prim);
 }
 
-STATIC int ss_wput(queue_t *q, mblk_t *mp)
+STATIC int
+ss_wput(queue_t *q, mblk_t *mp)
 {
 	return ss_putq(q, mp, &ss_w_prim);
 }
 
-STATIC int ss_wsrv(queue_t *q)
+STATIC int
+ss_wsrv(queue_t *q)
 {
 	return ss_srvq(q, &ss_w_prim);
 }
@@ -13884,7 +13988,8 @@ STATIC int ss_wsrv(queue_t *q)
  *  =========================================================================
  */
 STATIC kmem_cache_t *ss_priv_cachep = NULL;
-STATIC int ss_init_caches(void)
+STATIC int
+ss_init_caches(void)
 {
 	if (!ss_priv_cachep
 	    && !(ss_priv_cachep =
@@ -13893,25 +13998,28 @@ STATIC int ss_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate ss_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized driver private structure cache\n", SS_MOD_NAME));
+		printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	return (0);
 }
-STATIC void ss_term_caches(void)
+STATIC int
+ss_term_caches(void)
 {
 	if (ss_priv_cachep) {
-		if (kmem_cache_destroy(ss_priv_cachep))
+		if (kmem_cache_destroy(ss_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ss_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed ss_priv_cachep\n", SS_MOD_NAME));
+			return (-EBUSY);
+		} else
+			printd(("%s: destroyed ss_priv_cachep\n", DRV_NAME));
 	}
-	return;
+	return (0);
 }
-STATIC ss_t *ss_alloc_priv(queue_t *q, ss_t ** slp, ushort cmajor, ushort cminor, cred_t *crp,
-			   const ss_profile_t * prof)
+STATIC ss_t *
+ss_alloc_priv(queue_t *q, ss_t ** slp, ushort cmajor, ushort cminor, cred_t *crp,
+	      const ss_profile_t * prof)
 {
 	ss_t *ss;
 	if ((ss = kmem_cache_alloc(ss_priv_cachep, SLAB_ATOMIC))) {
-		// printd(("%s: allocated module private structure\n", SS_MOD_NAME));
+		// printd(("%s: allocated module private structure\n", DRV_NAME));
 		bzero(ss, sizeof(*ss));
 		ss->cmajor = cmajor;
 		ss->cminor = cminor;
@@ -13935,30 +14043,30 @@ STATIC ss_t *ss_alloc_priv(queue_t *q, ss_t ** slp, ushort cmajor, ushort cminor
 		ss->prev = slp;
 		*slp = ss;
 		ss->refcnt++;
-		// printd(("%s: linked private structure, reference count %d\n", SS_MOD_NAME,
+		// printd(("%s: linked private structure, reference count %d\n", DRV_NAME,
 		// ss->refcnt));
 	} else
-		ptrace(("%s: ERROR: Could not allocate module private structure\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", DRV_NAME));
 	return (ss);
 }
-STATIC void ss_free_priv(queue_t *q)
+STATIC void
+ss_free_priv(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
-	printd(("%s: unlinking private structure, reference count = %d\n", SS_MOD_NAME,
-		ss->refcnt));
+	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME, ss->refcnt));
 	spin_lock_bh(&ss->lock); {
 		bufq_purge(&ss->conq);
 		if (ss->sock)
 			ss_socket_put(xchg(&ss->sock, NULL));
-		printd(("%s: removed socket, reference count = %d\n", SS_MOD_NAME, ss->refcnt));
+		printd(("%s: removed socket, reference count = %d\n", DRV_NAME, ss->refcnt));
 		__ss_unbufcall(q);
-		printd(("%s: removed bufcalls, reference count = %d\n", SS_MOD_NAME, ss->refcnt));
+		printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME, ss->refcnt));
 		if ((*ss->prev = ss->next))
 			ss->next->prev = ss->prev;
 		ss->next = NULL;
 		ss->prev = NULL;
 		ss->refcnt--;
-		printd(("%s: unlinked, reference count = %d\n", SS_MOD_NAME, ss->refcnt));
+		printd(("%s: unlinked, reference count = %d\n", DRV_NAME, ss->refcnt));
 		ss->rq->q_ptr = NULL;
 		ss->refcnt--;
 		ss->wq->q_ptr = NULL;
@@ -13967,10 +14075,10 @@ STATIC void ss_free_priv(queue_t *q)
 	spin_unlock_bh(&ss->lock);
 	if (ss->refcnt) {
 		assure(ss->refcnt);
-		printd(("%s: WARNING: ss->refcnt = %d\n", SS_MOD_NAME, ss->refcnt));
+		printd(("%s: WARNING: ss->refcnt = %d\n", DRV_NAME, ss->refcnt));
 	}
 	kmem_cache_free(ss_priv_cachep, ss);
-	// printd(("%s: freed module private structure\n", SS_MOD_NAME));
+	// printd(("%s: freed module private structure\n", DRV_NAME));
 	return;
 }
 
@@ -14052,8 +14160,9 @@ STATIC const ss_profile_t ss_profiles[] = {
 	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
-STATIC int ss_majors[SS_NMAJOR] = { SS_CMAJOR, };
-STATIC int ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int ss_majors[SS__CMAJORS] = { SS__CMAJOR_0, };
+STATIC int
+ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0, err;
 	int cmajor = getmajor(*devp);
@@ -14066,11 +14175,11 @@ STATIC int ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: can't push as module\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: can't push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
-	if (cmajor != SS_CMAJOR || cminor < FIRST_CMINOR || cminor > LAST_CMINOR) {
+	if (cmajor != SS__CMAJOR_0 || cminor < FIRST_CMINOR || cminor > LAST_CMINOR) {
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -14084,8 +14193,9 @@ STATIC int ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor < (*ipp)->cminor)
 				break;
 			if (cminor == (*ipp)->cminor) {
-				if (++cminor >= SS_NMINOR) {
-					if (++mindex >= SS_NMAJOR || !(cmajor = ss_majors[mindex]))
+				if (++cminor >= NMINORS) {
+					if (++mindex >= SS__CMAJORS
+					    || !(cmajor = ss_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -14093,16 +14203,16 @@ STATIC int ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (mindex >= SS_NMAJOR || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", SS_MOD_NAME));
+	if (mindex >= SS__CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", SS_MOD_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
-		ptrace(("%s: ERROR: No memory\n", SS_MOD_NAME));
+		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -14114,7 +14224,7 @@ STATIC int ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	   sockets. */
 	spin_unlock_bh(&ss_lock);
 	if ((err = ss_sock_init(ss)) < 0) {
-		ptrace(("%s: ERROR: from ss_sock_init %d\n", SS_MOD_NAME, -err));
+		ptrace(("%s: ERROR: from ss_sock_init %d\n", DRV_NAME, -err));
 		spin_lock_bh(&ss_lock);
 		ss_free_priv(q);
 		spin_unlock_bh(&ss_lock);
@@ -14129,24 +14239,24 @@ STATIC int ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int ss_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+ss_close(queue_t *q, int flag, cred_t *crp)
 {
 	ss_t *ss = PRIV(q);
 	(void) flag;
 	(void) crp;
 	(void) ss;
-	printd(("%s: closing character device %d:%d\n", SS_MOD_NAME, ss->cmajor, ss->cminor));
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, ss->cmajor, ss->cminor));
 #if defined LIS
 	/* 
 	   protect against LiS bugs */
 	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", SS_MOD_NAME,
-			__FUNCTION__);
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
 		goto quit;
 	}
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			SS_MOD_NAME, __FUNCTION__);
+			DRV_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
 #endif				/* defined LIS */
@@ -14162,124 +14272,145 @@ STATIC int ss_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
-#if defined LFS
 /*
  *  =========================================================================
  *
- *  LfS Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-static struct cdevsw ss_cdev = {
-	d_name:SS_MOD_NAME,
-	d_str:&ss_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR,
-	d_kmod:THIS_MODULE,
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw ss_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &ss_info,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
 };
-int __init ss_init(void)
+
+STATIC int
+ss_register_strdev(major_t major)
 {
 	int err;
-#ifdef CONFIG_STREAMS_INET_MODULE
-	printk(KERN_INFO SS_BANNER);
-#else
-	printk(KERN_INFO SS_SPLASH);
-#endif
-	if ((err = ss_init_caches()))
+	if ((err = register_strdev(&ss_cdev, major)) < 0)
 		return (err);
-	if ((err = register_strdev(&ss_cdev, major)) < 0) {
-		ss_term_caches();
-		return (err);
-	}
-	if (err > 0)
-		major = err;
 	return (0);
 }
 
-void __exit ss_exit(void)
+STATIC int
+ss_unregister_strdev(major_t major)
 {
-	unregister_strdev(&ss_cdev, major);
-	ss_term_caches();
+	int err;
+	if ((err = unregister_strdev(&ss_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
 
-#ifdef CONFIG_STREAMS_INET_MODULE
-module_init(ss_init);
-module_exit(ss_exit);
-#endif
+#endif				/* LFS */
 
-#elif defined LIS
 /*
- *  =========================================================================
- *
- *  LiS Module Initialization
- *
- *  =========================================================================
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC int ss_initialized = 0;
-STATIC void ss_init(void)
+#ifdef LIS
+
+STATIC int
+ss_register_strdev(major_t major)
 {
-	int err, mindex;
-	cmn_err(CE_NOTE, SS_BANNER);	/* console splash */
-	if ((err = ss_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Counld not allocated caches", SS_MOD_NAME);
-		ss_initialized = err;
-		return;
-	}
-	for (mindex = 0; mindex < SS_NMAJOR; mindex++) {
-		if ((err =
-		     lis_register_strdev(ss_majors[mindex], &ss_info, SS_NMINOR,
-					 SS_MOD_NAME)) < 0) {
-			if (!mindex) {
-				cmn_err(CE_PANIC, "%s: Can't register 1'st major %d", SS_MOD_NAME,
-					ss_majors[0]);
-				ss_term_caches();
-				ss_initialized = err;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: Can't register %d'th major", SS_MOD_NAME, mindex + 1);
-			ss_majors[mindex] = 0;
-		} else if (mindex)
-			ss_majors[mindex] = err;
-	}
-	spin_lock_init(&ss_lock);
-	ss_initialized = 1;
-	return;
+	int err;
+	if ((err = lis_register_strdev(major, &ss_info, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
 }
-STATIC void ss_terminate(void)
+
+STATIC int
+ss_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+ss_terminate(void)
 {
 	int err, mindex;
-	for (mindex = 0; mindex < SS_NMAJOR; mindex++) {
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (ss_majors[mindex]) {
-			if ((err = lis_unregister_strdev(ss_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: Can't unregister major %d\n", SS_MOD_NAME,
+			if ((err = ss_unregister_strdev(ss_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
 					ss_majors[mindex]);
 			if (mindex)
 				ss_majors[mindex] = 0;
 		}
 	}
-	ss_term_caches();
+	if ((err = ss_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
 
-/*
- *  =========================================================================
- *
- *  LINUX MODULE INITIALIZATION
- *
- *  =========================================================================
- */
-int init_module(void)
+MODULE_STATIC int __init
+ss_init(void)
 {
-	(void) major;
-	ss_init();
-	if (ss_initialized < 0)
-		return ss_initialized;
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = ss_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		ss_terminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = ss_register_strdev(ss_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					ss_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				ss_terminate();
+				return (err);
+			}
+		}
+		if (ss_majors[mindex] == 0)
+			ss_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(ss_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = ss_majors[0];
+	}
 	return (0);
 }
 
-void cleanup_module(void)
-{
-	ss_terminate();
-}
-#endif
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(ss_init);
+module_exit(ss_terminate);
+
+#endif				/* LINUX */

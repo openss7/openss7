@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
 
-static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
+static char const ident[] =
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $";
 
 #include "compat.h"
 
@@ -65,23 +66,28 @@ static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/lapd_ioctl.h>
 #include <ss7/hdlc_ioctl.h>
 
-#define LAPD_DESCRIP	"LAPD Data Link (DL-LAPD) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.2 $)"
-#define LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
-#define LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPD_DEVICE	"OpenSS7 CDI Devices."
-#define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LAPD_LICENSE	"GPL"
-#define LAPD_BANNER	LAPD_DESCRIP	"\n" \
-			LAPD_REVISION	"\n" \
-			LAPD_COPYRIGHT	"\n" \
-			LAPD_DEVICE	"\n" \
-			LAPD_CONTACT
+#define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
+				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
+#define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
+#define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
+#define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define DL_LAPD_LICENSE		"GPL"
+#define DL_LAPD_BANNER		DL_LAPD_DESCRIP		"\n" \
+				DL_LAPD_REVISION	"\n" \
+				DL_LAPD_COPYRIGHT	"\n" \
+				DL_LAPD_DEVICE		"\n" \
+				DL_LAPD_CONTACT
+#define DL_LAPD_SPLASH		DL_LAPD_DESCRIP		"\n" \
+				DL_LAPD_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(LAPD_CONTACT);
-MODULE_DESCRIPTION(LAPD_DESCRIP);
-MODULE_SUPPORTED_DEVICE(LAPD_DEVICE);
-MODULE_LICENSE(LAPD_LICENSE);
+MODULE_AUTHOR(DL_LAPD_CONTACT);
+MODULE_DESCRIPTION(DL_LAPD_DESCRIP);
+MODULE_SUPPORTED_DEVICE(DL_LAPD_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(DL_LAPD_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -89,9 +95,8 @@ MODULE_LICENSE(LAPD_LICENSE);
 #define DL_LAPD_DRV_NAME	CONFIG_STREAMS_DL_LAPD_NAME
 #define DL_LAPD_CMAJORS		CONFIG_STREAMS_DL_LAPD_NMAJORS
 #define DL_LAPD_CMAJOR_0	CONFIG_STREAMS_DL_LAPD_MAJOR
-#endif
-
-#define DL_LAPD_CMINORS 255
+#define DL_LAPD_UNITS		CONFIG_STREAMS_DL_LAPD_NMINORS
+#endif				/* LIS */
 
 /*
  *  =========================================================================
@@ -101,9 +106,20 @@ MODULE_LICENSE(LAPD_LICENSE);
  *  =========================================================================
  */
 
+#define DRV_ID		DL_LAPD_DRV_ID
+#define DRV_NAME	DL_LAPD_DRV_NAME
+#define CMAJORS		DL_LAPD_CMAJORS
+#define CMAJOR_0	DL_LAPD_CMAJOR_0
+#define UNITS		DL_LAPD_UNITS
+#ifdef MODULE
+#define DRV_BANNER	DL_LAPD_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	DL_LAPD_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info dl_winfo = {
-	mi_idnum:DL_LAPD_DRV_ID,	/* Module ID number */
-	mi_idname:DL_LAPD_DRV_NAME,	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1 << 15),		/* Hi water mark */
@@ -111,8 +127,8 @@ STATIC struct module_info dl_winfo = {
 };
 
 STATIC struct module_info dl_rinfo = {
-	mi_idnum:DL_LAPD_DRV_ID,	/* Module ID number */
-	mi_idname:DL_LAPD_DRV_NAME,	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1 << 15),		/* Hi water mark */
@@ -120,8 +136,8 @@ STATIC struct module_info dl_rinfo = {
 };
 
 STATIC struct module_info cd_winfo = {
-	mi_idnum:DL_LAPD_DRV_ID,	/* Module ID number */
-	mi_idname:DL_LAPD_DRV_NAME,	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1 << 15),		/* Hi water mark */
@@ -129,8 +145,8 @@ STATIC struct module_info cd_winfo = {
 };
 
 STATIC struct module_info cd_rinfo = {
-	mi_idnum:DL_LAPD_DRV_ID,	/* Module ID number */
-	mi_idname:DL_LAPD_DRV_NAME,	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1 << 15),		/* Hi water mark */
@@ -166,7 +182,7 @@ STATIC struct qinit cd_winit = {
 	qi_minfo:&cd_winfo,		/* Information */
 };
 
-MODULE_STATIC struct streamtab lapd_info = {
+MODULE_STATIC struct streamtab dl_lapdinfo = {
 	st_rdinit:&dl_rinit,		/* Upper read queue */
 	st_wrinit:&dl_winit,		/* Upper write queue */
 	st_muxrinit:&cd_rinit,		/* Lower read queue */
@@ -438,7 +454,7 @@ dl_set_state(struct dl *dl, ulong newstate)
 	ulong oldstate = dl_get_state(dl);
 	(void) oldstate;
 	dl->info.dl_current_state = dl->i_state = newstate;
-	printd(("%s: %p: %s <- %s\n", DL_LAPD_DRV_NAME, dl, dl_state_name(newstate),
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, dl, dl_state_name(newstate),
 		dl_state_name(oldstate)));
 	return (newstate);
 }
@@ -485,7 +501,7 @@ cd_set_state(struct cd *cd, ulong newstate)
 	ulong oldstate = cd_get_state(cd);
 	(void) oldstate;
 	cd->info.cd_state = cd->i_state = newstate;
-	printd(("%s: %p: %s <- %s\n", DL_LAPD_DRV_NAME, cd, cd_state_name(newstate),
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, cd, cd_state_name(newstate),
 		cd_state_name(oldstate)));
 	return (newstate);
 }
@@ -725,10 +741,10 @@ enum { tall, t200, t201, t202, t203 };
  *  DL timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DL_LAPD_DRV_NAME, dl, t200, config.timers);
-SS7_DECLARE_TIMER(DL_LAPD_DRV_NAME, dl, t201, config.timers);
-SS7_DECLARE_TIMER(DL_LAPD_DRV_NAME, dl, t202, config.timers);
-SS7_DECLARE_TIMER(DL_LAPD_DRV_NAME, dl, t203, config.timers);
+SS7_DECLARE_TIMER(DRV_NAME, dl, t200, config.timers);
+SS7_DECLARE_TIMER(DRV_NAME, dl, t201, config.timers);
+SS7_DECLARE_TIMER(DRV_NAME, dl, t202, config.timers);
+SS7_DECLARE_TIMER(DRV_NAME, dl, t203, config.timers);
 STATIC INLINE void
 __dl_timer_stop(struct dl *dl, const uint t)
 {
@@ -736,37 +752,32 @@ __dl_timer_stop(struct dl *dl, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t200:
 		dl_stop_timer_t200(dl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t201:
 		dl_stop_timer_t201(dl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t202:
 		dl_stop_timer_t202(dl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t203:
 		dl_stop_timer_t203(dl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -815,8 +826,8 @@ dl_timer_start(struct dl *dl, const uint t)
  *  CD timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DL_LAPD_DRV_NAME, cd, t201, config.timers);
-SS7_DECLARE_TIMER(DL_LAPD_DRV_NAME, cd, t202, config.timers);
+SS7_DECLARE_TIMER(DRV_NAME, cd, t201, config.timers);
+SS7_DECLARE_TIMER(DRV_NAME, cd, t202, config.timers);
 STATIC INLINE void
 __cd_timer_stop(struct cd *cd, const uint t)
 {
@@ -824,23 +835,20 @@ __cd_timer_stop(struct cd *cd, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t201:
 		cd_stop_timer_t201(cd);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t202:
 		cd_stop_timer_t202(cd);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -903,7 +911,7 @@ m_hangup(queue_t *q, struct dl *dl)
 	mblk_t *mp;
 	if ((mp = ss7_allocb(q, 0, BPRI_MED))) {
 		mp->b_datap->db_type = M_HANGUP;
-		printd(("%s: %p: <- M_HANGUP\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -923,7 +931,7 @@ m_error(queue_t *q, struct dl *dl, uint8_t rerr, uint8_t werr)
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = rerr;
 		*mp->b_wptr++ = werr;
-		printd(("%s: %p: <- M_ERROR\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- M_ERROR\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -941,9 +949,8 @@ m_hangup_all(queue_t *q, struct cd *cd)
 	struct dl *dl;
 	int err;
 	fixme(("re-write this function\n"));
-	/*
-	   this function should also detach the dl 
-	 */
+	/* 
+	   this function should also detach the dl */
 	for (dl = cd->dl.list; dl; dl = dl->cd.next)
 		if ((err = m_hangup(q, dl)))
 			return (err);
@@ -960,9 +967,8 @@ m_error_all(queue_t *q, struct cd *cd, uint8_t rerr, uint8_t werr)
 	struct dl *dl;
 	int err;
 	fixme(("re-write this function\n"));
-	/*
-	   this function should also detach the dl 
-	 */
+	/* 
+	   this function should also detach the dl */
 	for (dl = cd->dl.list; dl; dl = dl->cd.next)
 		if ((err = m_error(q, dl, rerr, werr)))
 			return (err);
@@ -1005,7 +1011,7 @@ dl_info_ack(queue_t *q, struct dl *dl)
 			bcopy(bptr, mp->b_wptr, blen);
 			mp->b_wptr += blen;
 		}
-		printd(("%s: %p: <- DL_INFO_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_INFO_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1048,7 +1054,7 @@ dl_bind_ack(queue_t *q, struct dl *dl, struct cd *cd)
 			dl_wait_unlink(dl);
 		dl->state = LAPD_TEI_UNASSIGNED;
 		dl_set_state(dl, DL_IDLE);
-		printd(("%s: %p: <- DL_BIND_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_BIND_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1084,7 +1090,7 @@ dl_subs_bind_ack(queue_t *q, struct dl *dl, uchar tei)
 		dl_bind_link(dl, dl->cd.cd);
 		if (dl->conind)
 			dl_list_link(dl, dl->cd.cd);
-		printd(("%s: %p: <- DL_SUBS_BIND_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_SUBS_BIND_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1148,16 +1154,14 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 				freemsg(cp);
 			}
 			if (ap != dl) {
-				/*
-				   auto attach 
-				 */
+				/* 
+				   auto attach */
 				if (dl->cd.cd != ap->cd.cd) {
 					dl_atta_unlink(ap);
 					dl_atta_link(ap, dl->cd.cd);
 				}
-				/*
-				   auto bind 
-				 */
+				/* 
+				   auto bind */
 				if (dl->dlc.dl_sap != ap->dlc.dl_sap
 				    || dl->dlc.dl_tei != ap->dlc.dl_tei) {
 					dl_bind_unlink(ap);
@@ -1169,14 +1173,12 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 				else
 					dl_set_state(dl, DL_IDLE);
 			}
-			/*
-			   move to data transfer state 
-			 */
+			/* 
+			   move to data transfer state */
 			dl->state = LAPD_ESTABLISHED;
 			dl_set_state(ap, DL_DATAXFER);
-			/*
-			   place in connection hashes 
-			 */
+			/* 
+			   place in connection hashes */
 			dl_conn_link(ap, ap->cd.cd);
 			ap->vs = ap->vr = ap->va = 0;
 			break;
@@ -1206,9 +1208,8 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 			if ((1 << cd_get_state(cd)) &
 			    (CDF_ENABLED | CDF_READ_ACTIVE | CDF_INPUT_ALLOWED | CDF_OUTPUT_ACTIVE))
 			{
-				/*
-				   layer 1 active 
-				 */
+				/* 
+				   layer 1 active */
 				uchar sapi = dl->dlc.dl_sap;
 				uchar tei = dl->dlc.dl_tei;
 				uchar pf = 1;
@@ -1221,9 +1222,8 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 			dl_set_state(dl, DL_IDLE);
 			break;
 		case DL_SUBS_UNBIND_REQ:
-			/*
-			   just jam tei 
-			 */
+			/* 
+			   just jam tei */
 			dl_bind_unlink(dl);
 			if (dl->conind)
 				dl_list_unlink(dl);
@@ -1235,15 +1235,13 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 			dl_set_state(dl, DL_IDLE);
 			break;
 		default:
-			/*
-			   happens for promicon, promiscoff, enabmulti, disabmulti 
-			 */
-			/*
-			   remain in the same state 
-			 */
+			/* 
+			   happens for promicon, promiscoff, enabmulti, disabmulti */
+			/* 
+			   remain in the same state */
 			break;
 		}
-		printd(("%s: %p: <- DL_OK_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_OK_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1269,11 +1267,10 @@ dl_error_ack(queue_t *q, struct dl *dl, ulong prim, ulong error, ulong reason)
 		p->dl_unix_errno = reason;
 		if (dl->wait.cd)
 			dl_wait_unlink(dl);	/* remove from wait list */
-		/*
-		   restore previous state 
-		 */
+		/* 
+		   restore previous state */
 		dl_set_state(dl, dl->i_oldstate);
-		printd(("%s: %p: <- DL_ERROR_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_ERROR_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1313,7 +1310,7 @@ dl_connect_ind(queue_t *q, struct dl *dl, mblk_t *cp, size_t cda_len, caddr_t cd
 		}
 		bufq_queue(&dl->conq, cp);
 		dl_set_state(dl, DL_INCON_PENDING);
-		printd(("%s: %p: <- DL_CONNECT_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_CONNECT_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -1348,7 +1345,7 @@ dl_connect_con(queue_t *q, struct dl *dl, size_t res_len, caddr_t res_ptr)
 		dl_timer_start(dl, t200);
 		dl_timer_start(dl, t203);
 		dl->vs = dl->vr = dl->va = 0;
-		printd(("%s: %p: <- DL_CONNECT_CON\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_CONNECT_CON\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1370,7 +1367,7 @@ dl_token_ack(queue_t *q, struct dl *dl)
 		p = (typeof(p)) mp->b_wptr++;
 		p->dl_primitive = DL_TOKEN_ACK;
 		p->dl_token = dl->id;
-		printd(("%s: %p: <- DL_TOKEN_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_TOKEN_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1404,7 +1401,7 @@ dl_disconnect_ind(queue_t *q, struct dl *dl, ulong orig, ulong reason, mblk_t *c
 			dl->state = LAPD_TEI_ASSIGNED;
 			dl_set_state(dl, DL_IDLE);
 		}
-		printd(("%s: %p: <- DL_DISCONNECT_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_DISCONNECT_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1428,7 +1425,7 @@ dl_reset_ind(queue_t *q, struct dl *dl, ulong orig, ulong reason)
 		p->dl_originator = orig;
 		p->dl_reason = reason;
 		dl_set_state(dl, DL_PROV_RESET_PENDING);
-		printd(("%s: %p: <- DL_RESET_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_RESET_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1451,7 +1448,7 @@ dl_reset_con(queue_t *q, struct dl *dl)
 		p->dl_primitive = DL_RESET_CON;
 		dl->state = LAPD_ESTABLISHED;
 		dl_set_state(dl, DL_DATAXFER);
-		printd(("%s: %p: <- DL_RESET_CON\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_RESET_CON\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1487,7 +1484,7 @@ dl_unitdata_ind(queue_t *q, struct dl *dl, mblk_t *dp, size_t dst_len, caddr_t d
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_UNITDATA_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_UNITDATA_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1518,7 +1515,7 @@ dl_uderror_ind(queue_t *q, struct dl *dl, ulong errno, ulong reason, size_t dst_
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_UDERROR_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_UDERROR_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1554,7 +1551,7 @@ dl_test_ind(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_p
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_TEST_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_TEST_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1590,7 +1587,7 @@ dl_test_con(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_p
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_TEST_CON\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_TEST_CON\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1626,7 +1623,7 @@ dl_xid_ind(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_pt
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_XID_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_XID_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1662,7 +1659,7 @@ dl_xid_con(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_pt
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_XID_CON\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_XID_CON\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1699,7 +1696,7 @@ dl_data_ack_ind(queue_t *q, struct dl *dl, size_t dst_len, caddr_t dst_ptr, size
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_DATA_ACK_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_DATA_ACK_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1722,7 +1719,7 @@ dl_data_ack_status_ind(queue_t *q, struct dl *dl, ulong corr, ulong status)
 		p->dl_primitive = DL_DATA_ACK_STATUS_IND;
 		p->dl_correlation = corr;
 		p->dl_status = status;
-		printd(("%s: %p: <- DL_DATA_ACK_STATUS_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_DATA_ACK_STATUS_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1759,7 +1756,7 @@ dl_reply_ind(queue_t *q, struct dl *dl, size_t dst_len, caddr_t dst_ptr, size_t 
 			mp->b_wptr += src_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- DL_REPLY_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_REPLY_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1782,7 +1779,7 @@ dl_reply_status_ind(queue_t *q, struct dl *dl, ulong corr, ulong status)
 		p->dl_primitive = DL_REPLY_STATUS_IND;
 		p->dl_correlation = corr;
 		p->dl_status = status;
-		printd(("%s: %p: <- DL_REPLY_STATUS_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_REPLY_STATUS_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1805,7 +1802,7 @@ dl_reply_update_status_ind(queue_t *q, struct dl *dl, ulong corr, ulong status)
 		p->dl_primitive = DL_REPLY_UPDATE_STATUS_IND;
 		p->dl_correlation = corr;
 		p->dl_status = status;
-		printd(("%s: %p: <- DL_REPLY_UPDATE_STATUS_IND\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_REPLY_UPDATE_STATUS_IND\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1832,7 +1829,7 @@ dl_phys_addr_ack(queue_t *q, struct dl *dl, size_t add_len, caddr_t add_ptr)
 			bcopy(add_ptr, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: <- DL_PHYS_ADDR_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_PHYS_ADDR_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1859,7 +1856,7 @@ dl_get_statistics_ack(queue_t *q, struct dl *dl, size_t sta_len, caddr_t sta_ptr
 			bcopy(sta_ptr, mp->b_wptr, sta_len);
 			mp->b_wptr += sta_len;
 		}
-		printd(("%s: %p: <- DL_GET_STATISTICS_ACK\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- DL_GET_STATISTICS_ACK\n", DRV_NAME, dl));
 		putnext(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1888,7 +1885,7 @@ cd_info_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_INFO_REQ;
-		printd(("%s: %p: <- CD_INFO_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_INFO_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1911,7 +1908,7 @@ cd_attach_req(queue_t *q, struct cd *cd, struct dl *dl)
 		p->cd_primitive = CD_ATTACH_REQ;
 		p->cd_ppa = cd->ppa;
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_ATTACH_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_ATTACH_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1933,7 +1930,7 @@ cd_detach_req(queue_t *q, struct cd *cd, struct dl *dl)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_DETACH_REQ;
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_DETACH_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_DETACH_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1959,7 +1956,7 @@ cd_enable_req(queue_t *q, struct cd *cd, struct dl *dl)
 		p->cd_dial_offset = 0;
 		cd_set_state(cd, CD_ENABLE_PENDING);
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_ENABLE_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_ENABLE_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1983,7 +1980,7 @@ cd_disable_req(queue_t *q, struct cd *cd, struct dl *dl, ulong disposal)
 		p->cd_disposal = disposal;
 		cd_set_state(cd, CD_DISABLE_PENDING);
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_DISABLE_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_DISABLE_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2005,7 +2002,7 @@ cd_allow_input_req(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_ALLOW_INPUT_REQ;
 		cd_set_state(cd, CD_INPUT_ALLOWED);
-		printd(("%s: %p: <- CD_ALLOW_INPUT_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_ALLOW_INPUT_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2028,7 +2025,7 @@ cd_read_req(queue_t *q, struct cd *cd, ulong msec)
 		p->cd_primitive = CD_READ_REQ;
 		p->cd_msec = msec;
 		cd_set_state(cd, CD_READ_ACTIVE);
-		printd(("%s: %p: <- CD_READ_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_READ_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2059,7 +2056,7 @@ cd_unitdata_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst_l
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_UNITDATA_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_UNITDATA_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2093,7 +2090,7 @@ cd_write_read_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_WRITE_READ_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_WRITE_READ_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2116,7 +2113,7 @@ cd_halt_input_req(queue_t *q, struct cd *cd, ulong disposal)
 		p->cd_primitive = CD_HALT_INPUT_REQ;
 		p->cd_disposal = disposal;
 		cd_set_state(cd, CD_ENABLED);
-		printd(("%s: %p: <- CD_HALT_INPUT_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_HALT_INPUT_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2137,7 +2134,7 @@ cd_abort_output_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_ABORT_OUTPUT_REQ;
-		printd(("%s: %p: <- CD_ABORT_OUTPUT_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_ABORT_OUTPUT_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2159,7 +2156,7 @@ cd_mux_name_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MUX_NAME_REQ;
-		printd(("%s: %p: <- CD_MUX_NAME_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_MUX_NAME_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2182,7 +2179,7 @@ cd_modem_sig_req(queue_t *q, struct cd *cd, ulong sigs)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MODEM_SIG_REQ;
 		p->cd_sigs = sigs;
-		printd(("%s: %p: <- CD_MODEM_SIG_REQ\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_MODEM_SIG_REQ\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2203,7 +2200,7 @@ cd_modem_sig_poll(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MODEM_SIG_POLL;
-		printd(("%s: %p: <- CD_MODEM_SIG_POLL\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: <- CD_MODEM_SIG_POLL\n", DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2289,10 +2286,9 @@ build_msg(queue_t *q, ulong prio, size_t len)
 STATIC INLINE int
 send_I_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr, uint ns, mblk_t *dp)
 {
-	/*
+	/* 
 	   a dl entity receiving a I with the P bit set to 1 shall set the F bit to 1 in the next
-	   RR, RNR, REJ (or FRMR or DM in LAPB) frame it transmits 
-	 */
+	   RR, RNR, REJ (or FRMR or DM in LAPB) frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 4))) {
@@ -2314,10 +2310,9 @@ send_I_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr, uin
 STATIC INLINE int
 send_RR_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
-	/*
+	/* 
 	   a dl entity receiving a RR with the P bit set to 1 shall set the F bit to 1 in the next
-	   RR, RNR, REJ frame it transmits 
-	 */
+	   RR, RNR, REJ frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 4))) {
@@ -2358,10 +2353,9 @@ send_RR_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 STATIC INLINE int
 send_RNR_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
-	/*
+	/* 
 	   a dl entity receiving a RNR with the P bit set to 1 shall set the F bit to 1 in the next 
-	   RR, RNR, REJ frame it transmits 
-	 */
+	   RR, RNR, REJ frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 4))) {
@@ -2402,10 +2396,9 @@ send_RNR_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 STATIC INLINE int
 send_REJ_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
-	/*
+	/* 
 	   a dl entity receiving a REJ with the P bit set to 1 shall set the F bit to 1 in the next 
-	   RR, RNR, REJ frame it transmits 
-	 */
+	   RR, RNR, REJ frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 4))) {
@@ -2450,9 +2443,8 @@ send_UI_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, mblk_t *dp)
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
-			/*
-			   the P bit shall be set to zero 
-			 */
+			/* 
+			   the P bit shall be set to zero */
 			assure(pf == 0);
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x00);
 			linkb(mp, dp);
@@ -2491,10 +2483,9 @@ send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 STATIC INLINE int
 send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
-	/*
+	/* 
 	   a dl entity receiving a DISC with the P bit set to 1 shall set the F bit to 1 in the
-	   next UA or DM frame it transmits 
-	 */
+	   next UA or DM frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 3))) {
@@ -2535,13 +2526,11 @@ send_UA_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 STATIC INLINE int
 send_SABME_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
-	/*
+	/* 
 	   a dl entity receiving a SABME with the P bit set to 1 shall set the F bit to 1 in the
-	   next UA or DM frame it transmits 
-	 */
-	/*
-	   no information field is permitted with a SAMBE 
-	 */
+	   next UA or DM frame it transmits */
+	/* 
+	   no information field is permitted with a SAMBE */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
 		if ((mp = build_msg(q, 0, 3))) {
@@ -2793,10 +2782,9 @@ send_TEI_i_ver(queue_t *q, struct cd *cd, uchar ai)
 STATIC int
 recv_I_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf, uint nr, uint ns)
 {
-	/*
+	/* 
 	   a dl entity receiving a I with the P bit set to 1 shall set the F bit to 1 in the next
-	   RR, RNR, REJ (or FRMR or DM in LAPB) frame it transmits 
-	 */
+	   RR, RNR, REJ (or FRMR or DM in LAPB) frame it transmits */
 	fixme(("Write this function!\n"));
 	return (-EIO);
 }
@@ -2808,10 +2796,9 @@ recv_I_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf, 
 STATIC int
 recv_RR_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
-	/*
+	/* 
 	   a dl entity receiving a RR with the P bit set to 1 shall set the F bit to 1 in the next
-	   RR, RNR, REJ frame it transmits 
-	 */
+	   RR, RNR, REJ frame it transmits */
 	if (pf) {
 	} else {
 	}
@@ -2840,10 +2827,9 @@ recv_RR_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf,
 STATIC int
 recv_RNR_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
-	/*
+	/* 
 	   a dl entity receiving a RNR with the P bit set to 1 shall set the F bit to 1 in the next 
-	   RR, RNR, REJ frame it transmits 
-	 */
+	   RR, RNR, REJ frame it transmits */
 	if (pf) {
 	} else {
 	}
@@ -2872,10 +2858,9 @@ recv_RNR_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf
 STATIC int
 recv_REJ_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
-	/*
+	/* 
 	   a dl entity receiving a REJ with the P bit set to 1 shall set the F bit to 1 in the next 
-	   RR, RNR, REJ frame it transmits 
-	 */
+	   RR, RNR, REJ frame it transmits */
 	if (pf) {
 	} else {
 	}
@@ -2904,9 +2889,8 @@ recv_REJ_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf
 STATIC int
 recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
-	/*
-	   the P bit shall be set to zero 
-	 */
+	/* 
+	   the P bit shall be set to zero */
 	assure(pf == 0);
 	if (sapi == 63 && tei == 127 && mp->b_rptr[3] == 0x0f) {
 		struct dl *dl;
@@ -2922,13 +2906,11 @@ recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 			if (cd->mode == CD_MODE_USER)
 				goto discard;
 			if (ai == 127) {
-				/*
-				   pick any TEI 
-				 */
+				/* 
+				   pick any TEI */
 			} else {
-				/*
-				   requested TEI 
-				 */
+				/* 
+				   requested TEI */
 			}
 			break;
 		case LAPD_TEI_MT_I_ACK:	/* Identity assigned (network to user) */
@@ -2936,15 +2918,13 @@ recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 				goto discard;
 			if (ai < 64 || ai > 126)
 				goto discard;
-			/*
-			   find requesting data link 
-			 */
+			/* 
+			   find requesting data link */
 			for (dl = cd->teim.list; dl && dl->ref != ref; dl = dl->teim.next) ;
 			if (!dl)
 				goto discard;
-			/*
-			   accept assigned value 
-			 */
+			/* 
+			   accept assigned value */
 			switch (dl->state) {
 			case LAPD_WAIT_TEI_ASSIGN:	/* was connectionless */
 				dl_timer_stop(dl, t202);
@@ -2952,9 +2932,8 @@ recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 				case DL_SUBS_BIND_PND:
 					if ((err = dl_subs_bind_ack(q, dl, ai)))
 						return (err);
-					/*
-					   fall through 
-					 */
+					/* 
+					   fall through */
 				case DL_IDLE:
 					dl->dlc.dl_tei = ai;
 					if (dl->bind.cd) {
@@ -2998,19 +2977,16 @@ recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 		case LAPD_TEI_MT_I_REJ:	/* Identity denied (network to user) */
 			if (cd->mode == CD_MODE_NTWK)
 				goto discard;
-			/*
-			   find requesting data link 
-			 */
-			/*
-			   ai doesn't matter really 
-			 */
+			/* 
+			   find requesting data link */
+			/* 
+			   ai doesn't matter really */
 			break;
 		case LAPD_TEI_MT_C_REQ:	/* Identity check request (network to user) */
 			if (cd->mode == CD_MODE_NTWK)
 				goto discard;
-			/*
-			   no reference 
-			 */
+			/* 
+			   no reference */
 			break;
 		case LAPD_TEI_MT_C_RES:	/* Identity check response (user to network) */
 			if (cd->mode == CD_MODE_USER)
@@ -3019,16 +2995,14 @@ recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 		case LAPD_TEI_MT_I_RMV:	/* Identity remove (network to user) */
 			if (cd->mode == CD_MODE_NTWK)
 				goto discard;
-			/*
-			   no reference 
-			 */
+			/* 
+			   no reference */
 			break;
 		case LAPD_TEI_MT_I_VER:	/* Identity verify (user to network) */
 			if (cd->mode == CD_MODE_USER)
 				goto discard;
-			/*
-			   no reference 
-			 */
+			/* 
+			   no reference */
 			break;
 		default:
 			goto discard;
@@ -3049,12 +3023,11 @@ STATIC int
 recv_DM_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	struct dl *dl;
-	/*
+	/* 
 	   Upon reception of a DM response with the F bit set to 1, the originator of the SABME
 	   command shall indicate this to layer 3 by means of a DL-RELEASE indication primitive,
 	   and reset timer T200. It shall the enter the TEI-assigned state.  DM responses with the
-	   F bit set to zero shall be ignored in this case. 
-	 */
+	   F bit set to zero shall be ignored in this case. */
 	if (!pf)
 		goto ignore;
 	for (dl = cd->conn.hash[((sapi + tei) & DL_CONN_HASHMASK)];
@@ -3069,12 +3042,11 @@ recv_DM_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 		fixme(("Write this procedure\n"));
 		break;
 	case LAPD_TEI_ASSIGNED:
-		/*
+		/* 
 		   5.5.4 While in the TEI-assigned state, on receipt of an unsolicited DM response
 		   with the F bit set to 0, the data link layer entity shall, if it is able to,
 		   initiate the esnablishment procedures by the transmission of a SABME (see
-		   5.5.1.2).  Otherwise, the DM shall be ignored 
-		 */
+		   5.5.1.2).  Otherwise, the DM shall be ignored */
 		if (!pf)
 			goto ignore;
 		goto unexpected;
@@ -3109,10 +3081,9 @@ STATIC int
 recv_DISC_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	struct dl *dl;
-	/*
+	/* 
 	   a dl entity receiving a DISC with the P bit set to 1 shall set the F bit to 1 in the
-	   next UA or DM frame it transmits 
-	 */
+	   next UA or DM frame it transmits */
 	for (dl = cd->conn.hash[((sapi + tei) & DL_CONN_HASHMASK)];
 	     dl && (dl->dlc.dl_sap != sapi || dl->dlc.dl_tei != tei); dl = dl->conn.next) ;
 	if (!dl)
@@ -3125,11 +3096,10 @@ recv_DISC_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint p
 		fixme(("Write this procedure\n"));
 		break;
 	case LAPD_TEI_ASSIGNED:
-		/*
+		/* 
 		   5.5.4 While in the TEI-assigned state, the receipt of a DISC command shall
 		   result in the transmission of a DM response with the F bit set to the value of
-		   the received P bit 
-		 */
+		   the received P bit */
 		return send_DM_res(q, cd, sapi, tei, pf);
 	case LAPD_WAIT_ESTABLISH:
 		fixme(("Write this procedure\n"));
@@ -3160,12 +3130,11 @@ STATIC int
 recv_UA_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	struct dl *dl;
-	/*
+	/* 
 	   upon reception of a UA response with the F-bit set to 1, the originator of the SABME
 	   command shall: reset timer T200; start timer T203, if implemented; set V(S), V(R) and
 	   V(A) to 0; and enter the multiple-frame-established state and inform layer 3 using the
-	   DL-ESTABLISH confirm primitive. 
-	 */
+	   DL-ESTABLISH confirm primitive. */
 	for (dl = cd->conn.hash[((sapi + tei) & DL_CONN_HASHMASK)];
 	     dl && (dl->dlc.dl_sap != sapi || dl->dlc.dl_tei != tei); dl = dl->conn.next) ;
 	if (!dl)
@@ -3189,13 +3158,11 @@ STATIC int
 recv_SABME_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uchar sapi, uchar tei, uint pf)
 {
 	struct dl *dl;
-	/*
+	/* 
 	   a dl entity receiving a SABME with the P bit set to 1 shall set the F bit to 1 in the
-	   next UA or DM frame it transmits 
-	 */
-	/*
-	   no information field is permitted with a SAMBE 
-	 */
+	   next UA or DM frame it transmits */
+	/* 
+	   no information field is permitted with a SAMBE */
 	if (msgdsize(mp) > 3)
 		return (-EINVAL);
 	for (dl = cd->conn.hash[((sapi + tei) & DL_CONN_HASHMASK)];
@@ -3208,9 +3175,8 @@ recv_SABME_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uchar sapi, uchar tei, uin
 	if (!dl)
 		dl = cd->mgmt;
 	if (dl && ((1 << dl_get_state(dl)) & (DLF_IDLE | DLF_INCON_PENDING))) {
-		/*
-		   dl in listening state 
-		 */
+		/* 
+		   dl in listening state */
 		mblk_t *cp;
 		for (cp = dl->conq.q_head;
 		     cp && (((cp->b_rptr[0] >> 2) & 0x3f) != sapi
@@ -3225,11 +3191,10 @@ recv_SABME_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uchar sapi, uchar tei, uin
 			return dl_connect_ind(q, dl, mp, alen, aptr, alen, aptr);
 		}
 	}
-	/*
+	/* 
 	   If the data link layer entity is unable to enter the multiple-frame-established state,
 	   it shall respond to the SABME command with a DM response with the F bit set to the same
-	   binary value as the P bit in the received SABME command. 
-	 */
+	   binary value as the P bit in the received SABME command. */
 	return send_DM_res(q, cd, sapi, tei, pf);
       discard:
 	return (QR_DONE);
@@ -3414,26 +3379,29 @@ recv_msg(queue_t *q, mblk_t *mp)
 STATIC kmem_cache_t *dl_priv_cachep = NULL;
 STATIC kmem_cache_t *dl_link_cachep = NULL;
 
-STATIC void
+STATIC int
 lapd_term_caches(void)
 {
+	int err = 0;
 	if (dl_priv_cachep) {
-		if (kmem_cache_destroy(dl_priv_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy dl_priv_cachep", DL_LAPD_DRV_NAME);
-		else {
-			printd(("%s: destroyed dl_priv_cachep\n", DL_LAPD_DRV_NAME));
+		if (kmem_cache_destroy(dl_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy dl_priv_cachep", DRV_NAME);
+			err = -EBUSY;
+		} else {
+			printd(("%s: destroyed dl_priv_cachep\n", DRV_NAME));
 			dl_priv_cachep = NULL;
 		}
 	}
 	if (dl_link_cachep) {
-		if (kmem_cache_destroy(dl_link_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy dl_link_cachep", DL_LAPD_DRV_NAME);
-		else {
-			printd(("%s: destroyed dl_link_cachep\n", DL_LAPD_DRV_NAME));
+		if (kmem_cache_destroy(dl_link_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy dl_link_cachep", DRV_NAME);
+			err = -EBUSY;
+		} else {
+			printd(("%s: destroyed dl_link_cachep\n", DRV_NAME));
 			dl_link_cachep = NULL;
 		}
 	}
-	return;
+	return (err);
 }
 STATIC int
 lapd_init_caches(void)
@@ -3442,20 +3410,20 @@ lapd_init_caches(void)
 	    && !(dl_priv_cachep =
 		 kmem_cache_create("dl_priv_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate dl_priv_cachep", DL_LAPD_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate dl_priv_cachep", DRV_NAME);
 		lapd_term_caches();
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized dl priv structure cache\n", DL_LAPD_DRV_NAME));
+		printd(("%s: initialized dl priv structure cache\n", DRV_NAME));
 	if (!dl_link_cachep
 	    && !(dl_link_cachep =
 		 kmem_cache_create("dl_link_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate dl_link_cachep", DL_LAPD_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate dl_link_cachep", DRV_NAME);
 		lapd_term_caches();
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized dl link structure cache\n", DL_LAPD_DRV_NAME));
+		printd(("%s: initialized dl link structure cache\n", DRV_NAME));
 	return (0);
 }
 
@@ -3494,7 +3462,7 @@ dl_put(struct dl *dl)
 	assure(dl);
 	if (dl && atomic_dec_and_test(&dl->refcnt)) {
 		kmem_cache_free(dl_priv_cachep, dl);
-		printd(("%s: %p: deallocated dl priv structure\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: deallocated dl priv structure\n", DRV_NAME, dl));
 	}
 }
 STATIC INLINE ulong
@@ -3516,14 +3484,14 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 	struct dl *dl;
 	ushort cmajor = getmajor(*devp);
 	ushort cminor = getminor(*devp);
-	printd(("%s: create dl dev = %d:%d\n", DL_LAPD_DRV_NAME, cmajor, cminor));
+	printd(("%s: create dl dev = %d:%d\n", DRV_NAME, cmajor, cminor));
 	if ((dl = kmem_cache_alloc(dl_priv_cachep, SLAB_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		dl_get(dl);	/* first get */
 		dl->u.dev.cmajor = cmajor;
 		dl->u.dev.cminor = cminor;
 		dl->cred = *crp;
-		spin_lock_init(&dl->qlock); /* "dl-queue-lock" */
+		spin_lock_init(&dl->qlock);	/* "dl-queue-lock" */
 		(dl->oq = RD(q))->q_ptr = dl_get(dl);
 		(dl->iq = WR(q))->q_ptr = dl_get(dl);
 		dl->o_prim = &dl_r_prim;
@@ -3533,16 +3501,14 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 		dl->i_state = DL_UNATTACHED;
 		dl->i_style = DL_STYLE2;
 		dl->i_version = DL_CURRENT_VERSION;
-		spin_lock_init(&dl->lock); /* "dl-lock" */
-		/*
-		   place in master list - open holds the master list lock 
-		 */
+		spin_lock_init(&dl->lock);	/* "dl-lock" */
+		/* 
+		   place in master list - open holds the master list lock */
 		dl_mast_link(dl, dlp);
 		bufq_init(&dl->conq);
 		dl->id = dl_get_id(0);
-		/*
-		   fill out info ack defaults 
-		 */
+		/* 
+		   fill out info ack defaults */
 		dl->info.dl_primitive = DL_INFO_ACK;
 		dl->info.dl_max_sdu = 256;
 		dl->info.dl_min_sdu = 3;
@@ -3564,7 +3530,7 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 		dl->info.dl_growth = 0;
 		fixme(("allocate option defaults"));
 	} else
-		ptrace(("%s: ERROR: failed to allocated dl priv structure\n", DL_LAPD_DRV_NAME));
+		ptrace(("%s: ERROR: failed to allocated dl priv structure\n", DRV_NAME));
 	return (dl);
 }
 STATIC void
@@ -3572,56 +3538,46 @@ dl_free_priv(struct dl *dl)
 {
 	psw_t flags;
 	ensure(dl, return);
-	printd(("%s: %p: free dl dev = %d:%d\n", DL_LAPD_DRV_NAME, dl, dl->u.dev.cmajor,
-		dl->u.dev.cminor));
+	printd(("%s: %p: free dl dev = %d:%d\n", DRV_NAME, dl, dl->u.dev.cmajor, dl->u.dev.cminor));
 	spin_lock_irqsave(&dl->lock, flags);
 	{
 		ss7_unbufcall((struct str *) dl);
 		flushq(dl->oq, FLUSHALL);
 		flushq(dl->iq, FLUSHALL);
 		bufq_purge(&dl->conq);
-		/*
-		   remove from wait list 
-		 */
+		/* 
+		   remove from wait list */
 		if (dl->wait.cd)
 			dl_wait_unlink(dl);
-		/*
-		   remove from teim list 
-		 */
+		/* 
+		   remove from teim list */
 		if (dl->teim.cd)
 			dl_teim_unlink(dl);
-		/*
-		   remove from bind hashes 
-		 */
+		/* 
+		   remove from bind hashes */
 		if (dl->bind.cd)
 			dl_bind_unlink(dl);
-		/*
-		   remove from conn hashes 
-		 */
+		/* 
+		   remove from conn hashes */
 		if (dl->conn.cd)
 			dl_conn_unlink(dl);
-		/*
-		   remove from list hashes 
-		 */
+		/* 
+		   remove from list hashes */
 		if (dl->list.cd)
 			dl_list_unlink(dl);
-		/*
-		   remove form mgmt hashes 
-		 */
+		/* 
+		   remove form mgmt hashes */
 		if (dl->mgmt.cd)
 			dl_mgmt_unlink(dl);
-		/*
-		   remove from attachment list 
-		 */
+		/* 
+		   remove from attachment list */
 		if (dl->cd.cd)
 			dl_atta_unlink(dl);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		dl_mast_unlink(dl);
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		dl_put(xchg(&dl->oq->q_ptr, NULL));
 		dl_put(xchg(&dl->iq->q_ptr, NULL));
 		dl->oq = NULL;
@@ -3669,7 +3625,7 @@ cd_put(struct cd *cd)
 	assure(cd);
 	if (cd && atomic_dec_and_test(&cd->refcnt)) {
 		kmem_cache_free(dl_link_cachep, cd);
-		printd(("%s: %p: deallocated dl link structure\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: deallocated dl link structure\n", DRV_NAME, cd));
 	}
 }
 STATIC INLINE ulong
@@ -3689,13 +3645,13 @@ STATIC struct cd *
 dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 {
 	struct cd *cd;
-	printd(("%s: create cd mux = %lu\n", DL_LAPD_DRV_NAME, index));
+	printd(("%s: create cd mux = %lu\n", DRV_NAME, index));
 	if ((cd = kmem_cache_alloc(dl_link_cachep, SLAB_ATOMIC))) {
 		bzero(cd, sizeof(*cd));
 		cd_get(cd);	/* first get */
 		cd->u.mux.index = index;
 		cd->cred = *crp;
-		spin_lock_init(&cd->qlock); /* "cd-queue-lock" */
+		spin_lock_init(&cd->qlock);	/* "cd-queue-lock" */
 		(cd->iq = RD(q))->q_ptr = cd_get(cd);
 		(cd->oq = WR(q))->q_ptr = cd_get(cd);
 		cd->o_prim = cd_w_prim;
@@ -3705,14 +3661,12 @@ dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 		cd->i_state = CD_UNATTACHED;
 		cd->i_style = CD_STYLE2;
 		cd->i_version = 1;
-		spin_lock_init(&cd->lock); /* "cd-lock" */
-		/*
-		   place in master list - link holds the master list lock 
-		 */
+		spin_lock_init(&cd->lock);	/* "cd-lock" */
+		/* 
+		   place in master list - link holds the master list lock */
 		cd_mast_link(cd, cdp);
-		/*
-		   fill out info ack defaults 
-		 */
+		/* 
+		   fill out info ack defaults */
 		cd->info.cd_primitive = CD_INFO_ACK;
 		cd->info.cd_state = CD_UNATTACHED;
 		cd->info.cd_max_sdu = 256;
@@ -3725,7 +3679,7 @@ dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 		cd->info.cd_ppa_style = CD_STYLE2;
 		fixme(("allocate option defaults"));
 	} else
-		ptrace(("%s: ERROR: failed to allocate dl link structure\n", DL_LAPD_DRV_NAME));
+		ptrace(("%s: ERROR: failed to allocate dl link structure\n", DRV_NAME));
 	return (cd);
 }
 STATIC void
@@ -3733,7 +3687,7 @@ dl_free_link(struct cd *cd)
 {
 	psw_t flags;
 	ensure(cd, return);
-	printd(("%s: %p: free cd mux = %lu\n", DL_LAPD_DRV_NAME, cd, cd->u.mux.index));
+	printd(("%s: %p: free cd mux = %lu\n", DRV_NAME, cd, cd->u.mux.index));
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		int i;
@@ -3741,54 +3695,45 @@ dl_free_link(struct cd *cd)
 		ss7_unbufcall((struct str *) cd);
 		flushq(cd->oq, FLUSHALL);
 		flushq(cd->iq, FLUSHALL);
-		/*
-		   empty wait list 
-		 */
+		/* 
+		   empty wait list */
 		while ((dl = cd->wait.list))
 			dl_wait_unlink(dl);
-		/*
-		   empty teim list 
-		 */
+		/* 
+		   empty teim list */
 		while ((dl = cd->teim.list))
 			dl_teim_unlink(dl);
-		/*
-		   empty conn hash 
-		 */
+		/* 
+		   empty conn hash */
 		for (i = 0; i < DL_CONN_SIZE; i++)
 			while ((dl = cd->conn.hash[i]))
 				dl_conn_unlink(dl);
-		/*
-		   empty list hash 
-		 */
+		/* 
+		   empty list hash */
 		for (i = 0; i < DL_LIST_SIZE; i++)
 			while ((dl = cd->list.hash[i]))
 				dl_list_unlink(dl);
-		/*
-		   empty bind hash 
-		 */
+		/* 
+		   empty bind hash */
 		for (i = 0; i < DL_BIND_SIZE; i++)
 			while ((dl = cd->bind.hash[i]))
 				dl_bind_unlink(dl);
-		/*
-		   empty connection management list 
-		 */
+		/* 
+		   empty connection management list */
 		if ((dl = cd->mgmt)) {
 			dl->state = LAPD_TEI_UNASSIGNED;
 			dl_set_state(dl, -1);
 			dl_mgmt_unlink(dl);
 		}
-		/*
-		   empty attach list 
-		 */
+		/* 
+		   empty attach list */
 		while ((dl = cd->dl.list))
 			dl_atta_unlink(dl);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		cd_mast_unlink(cd);
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		cd_put(xchg(&cd->oq->q_ptr, NULL));
 		cd_put(xchg(&cd->iq->q_ptr, NULL));
 		cd->oq = NULL;
@@ -4002,14 +3947,12 @@ dl_attach_req(queue_t *q, mblk_t *mp)
 	dl_set_state(dl, DL_ATTACH_PENDING);
 	if (cd_get_state(cd) != CD_UNATTACHED)
 		return dl_ok_ack(q, dl, p->dl_primitive, cd, NULL, NULL);
-	/*
+	/* 
 	   when the first DL attaches we will attach the comm device if it is in the unattached
-	   state (implicitly a style 2 comm device) 
-	 */
+	   state (implicitly a style 2 comm device) */
 	if (!cd->wait.list)
-		/*
-		   nobody attaching yet 
-		 */
+		/* 
+		   nobody attaching yet */
 		return cd_attach_req(q, cd, dl);
 	dl_wait_link(dl, cd);	/* add to wait list */
 	return (QR_DONE);
@@ -4041,9 +3984,8 @@ dl_detach_req(queue_t *q, mblk_t *mp)
 		goto eio;
 	dl_set_state(dl, DL_DETACH_PENDING);
 	if (cd->dl.numb > 1 || cd->info.cd_ppa_style == CD_STYLE1)
-		/*
-		   we are not the last 
-		 */
+		/* 
+		   we are not the last */
 		return dl_ok_ack(q, dl, p->dl_primitive, cd, NULL, NULL);
 	return cd_detach_req(q, cd, dl);
       eio:
@@ -4148,9 +4090,8 @@ dl_bind_req(queue_t *q, mblk_t *mp)
 		return dl_bind_ack(q, dl, cd);
 	}
 	if (!cd->wait.list)
-		/*
-		   nobody binding yet 
-		 */
+		/* 
+		   nobody binding yet */
 		return cd_enable_req(q, cd, dl);
 	dl_wait_link(dl, cd);	/* add to wait list */
 	return (QR_DONE);
@@ -4190,9 +4131,8 @@ dl_unbind_req(queue_t *q, mblk_t *mp)
 		goto eio;
 	dl_set_state(dl, DL_UNBIND_PENDING);
 	if (cd->bind.numb > 1)
-		/*
-		   we are not the last bound stream 
-		 */
+		/* 
+		   we are not the last bound stream */
 		return dl_ok_ack(q, dl, p->dl_primitive, cd, NULL, NULL);
 	return cd_disable_req(q, cd, dl, CD_WAIT);
       eio:
@@ -4403,9 +4343,8 @@ dl_connect_req(queue_t *q, mblk_t *mp)
 		dl->ref = (jiffies ^ (ulong) &q);
 		dl->ref ^= dl->ref >> 16;
 		dl->ref &= 0x0000ffff;
-		/*
-		   initiate TEI assignment 
-		 */
+		/* 
+		   initiate TEI assignment */
 		if ((err = send_TEI_i_req(q, cd, dl->ref, TEI_ANY)))
 			return (err);
 		dl_teim_link(dl, cd);
@@ -4414,9 +4353,8 @@ dl_connect_req(queue_t *q, mblk_t *mp)
 		dl_set_state(dl, DL_OUTCON_PENDING);
 		break;
 	case LAPD_WAIT_TEI_ASSIGN:
-		/*
-		   wait for assignment to complete 
-		 */
+		/* 
+		   wait for assignment to complete */
 		dl->state = LAPD_WAIT_TEI_ESTABLISH;
 		dl_set_state(dl, DL_OUTCON_PENDING);
 		break;
@@ -4430,9 +4368,8 @@ dl_connect_req(queue_t *q, mblk_t *mp)
 		dl_set_state(dl, DL_OUTCON_PENDING);
 		break;
 	case LAPD_WAIT_REESTABLISH:
-		/*
-		   DISC, I QUEUE 
-		 */
+		/* 
+		   DISC, I QUEUE */
 		dl->state = LAPD_WAIT_ESTABLISH;
 		dl_set_state(dl, DL_OUTCON_PENDING);
 		break;
@@ -4558,9 +4495,8 @@ dl_disconnect_req(queue_t *q, mblk_t *mp)
 	case DL_IDLE:
 		if (dl->state == LAPD_TEI_ASSIGNED)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 		goto outstate;
 	}
@@ -4620,15 +4556,13 @@ dl_unitdata_req(queue_t *q, mblk_t *mp)
 	case DL_IDLE:
 		switch (dl->state) {
 		case LAPD_TEI_UNASSIGNED:
-			/*
-			   initiate assignment procedures 
-			 */
+			/* 
+			   initiate assignment procedures */
 			dl->state = LAPD_WAIT_TEI_ASSIGN;
 			return (-EAGAIN);
 		case LAPD_WAIT_TEI_ASSIGN:
-			/*
-			   wait more for assignment 
-			 */
+			/* 
+			   wait more for assignment */
 			return (-EAGAIN);
 		case LAPD_WAIT_TEI_ESTABLISH:
 		case LAPD_TEI_ASSIGNED:
@@ -4848,15 +4782,13 @@ cd_info_ack(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd->info = *p;		/* just adopt the state */
-	/*
-	   this is just a educated guess really, but here it goes 
-	 */
+	/* 
+	   this is just a educated guess really, but here it goes */
 	switch (cd_set_state(cd, p->cd_state)) {
 	case CD_UNATTACHED:
 	case CD_DISABLED:
-		/*
-		   initial info request on link 
-		 */
+		/* 
+		   initial info request on link */
 		break;
 	case CD_ENABLED:
 	case CD_INPUT_ALLOWED:
@@ -4969,9 +4901,8 @@ cd_enable_con(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd_set_state(cd, p->cd_state);
-	/*
-	   turn around immediate info request 
-	 */
+	/* 
+	   turn around immediate info request */
 	mp->b_datap->db_type = M_PCPROTO;
 	mp->b_wptr = mp->b_rptr;
 	*(ulong *) mp->b_wptr++ = CD_INFO_REQ;
@@ -5030,9 +4961,8 @@ cd_error_ind(queue_t *q, mblk_t *mp)
 		assure(p->cd_errno == CD_FATALERR);
 		goto eio;	/* fatal error */
 	}
-	/*
-	   can't switch to pending, unattached or xray state 
-	 */
+	/* 
+	   can't switch to pending, unattached or xray state */
 	switch (p->cd_state) {
 	case CD_ENABLE_PENDING:
 	case CD_DISABLE_PENDING:
@@ -5040,9 +4970,8 @@ cd_error_ind(queue_t *q, mblk_t *mp)
 	case CD_XRAY:
 		goto eio;
 	}
-	/*
-	   these required error ack not error ind 
-	 */
+	/* 
+	   these required error ack not error ind */
 	switch (cd->i_oldstate) {
 	case CD_UNATTACHED:
 	case CD_DISABLED:
@@ -5055,9 +4984,8 @@ cd_error_ind(queue_t *q, mblk_t *mp)
 		if (p->cd_state != CD_DISABLED)
 			goto eio;
 		assure(p->cd_errno == CD_EVENT);
-		/*
-		   handle autonomous recovery 
-		 */
+		/* 
+		   handle autonomous recovery */
 		return m_error_all(q, cd, 0, 0);
 	case CD_ENABLED:
 	case CD_READ_ACTIVE:
@@ -5066,9 +4994,8 @@ cd_error_ind(queue_t *q, mblk_t *mp)
 		if (p->cd_state != CD_DISABLED)
 			break;
 		assure(p->cd_errno == CD_DISC);
-		/*
-		   handle autonomous disable 
-		 */
+		/* 
+		   handle autonomous disable */
 		return m_hangup_all(q, cd);
 	default:
 		goto eio;
@@ -5248,9 +5175,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 			if (size < sizeof(*hdr))
 				return (-EFAULT);
 			if (hdr->id) {
-				/*
-				   get specific object 
-				 */
+				/* 
+				   get specific object */
 				if (!dl)
 					return (-ENXIO);
 				hdr->type = LAPD_OBJ_TYPE_DL;
@@ -5261,9 +5187,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 				cnf->ppa = dl->cd.cd ? dl->cd.cd->id : 0;
 				hdr = (typeof(hdr)) (cnf + 1);
 			} else {
-				/*
-				   get list of all objects 
-				 */
+				/* 
+				   get list of all objects */
 				for (dl = master.dl.list;
 				     dl && size >= sizeof(*hdr) + sizeof(*cnf) + sizeof(*hdr);
 				     dl = dl->next, size -= sizeof(*hdr) + sizeof(*cnf), hdr =
@@ -5275,9 +5200,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 					cnf->ppa = dl->cd.cd ? dl->cd.cd->id : 0;
 				}
 			}
-			/*
-			   terminate list with zero object type 
-			 */
+			/* 
+			   terminate list with zero object type */
 			hdr->type = 0;
 			hdr->id = 0;
 			hdr->cmd = 0;
@@ -5287,30 +5211,27 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 		{
 			if (dl)
 				return (-EEXIST);
-			/*
+			/* 
 			   DL objects normally add with open(2), but we might support permanent
-			   data links 
-			 */
+			   data links */
 			return (-EOPNOTSUPP);
 		}
 		case LAPD_CHA:
 		{
 			if (!dl)
 				return (-ENXIO);
-			/*
+			/* 
 			   DL objects normally cha with bind, but we might support permanent data
-			   links 
-			 */
+			   links */
 			return (-EOPNOTSUPP);
 		}
 		case LAPD_DEL:
 		{
 			if (!dl)
 				return (-ENXIO);
-			/*
+			/* 
 			   DL objects normally del with close(2), but we might support permanent
-			   data links 
-			 */
+			   data links */
 			return (-EOPNOTSUPP);
 		}
 		}
@@ -5330,9 +5251,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 			if (hdr->id) {
 				struct dl *dl;
 				struct lapd_config_dl *cdl;
-				/*
-				   get specific object 
-				 */
+				/* 
+				   get specific object */
 				if (!cd)
 					return (-ENXIO);
 				hdr->type = LAPD_OBJ_TYPE_CD;
@@ -5342,9 +5262,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 				cnf->ppa = cd->ppa;
 				hdr = (typeof(hdr)) (cnf + 1);
 				cdl = (typeof(cdl)) (hdr + 1);
-				/*
-				   list all attached data links 
-				 */
+				/* 
+				   list all attached data links */
 				for (dl = cd->dl.list;
 				     dl && size >= sizeof(*hdr) + sizeof(*cdl) + sizeof(*hdr);
 				     dl = dl->next, size -= sizeof(*hdr) + sizeof(*cdl), hdr =
@@ -5357,9 +5276,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 					cdl->ppa = dl->cd.cd ? dl->cd.cd->id : 0;
 				}
 			} else {
-				/*
-				   get list of all objects 
-				 */
+				/* 
+				   get list of all objects */
 				for (cd = master.cd.list;
 				     cd && size >= sizeof(*hdr) + sizeof(*cnf) + sizeof(*hdr);
 				     cd = cd->next, size -= sizeof(*hdr) + sizeof(*cnf), hdr =
@@ -5370,9 +5288,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 					cnf->ppa = cd->ppa;
 				}
 			}
-			/*
-			   terminate list with zero object type 
-			 */
+			/* 
+			   terminate list with zero object type */
 			hdr->type = 0;
 			hdr->id = 0;
 			hdr->cmd = 0;
@@ -5390,9 +5307,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 				}
 			}
 			if (!force) {
-				/*
-				   nothing to skip 
-				 */
+				/* 
+				   nothing to skip */
 			}
 			if (!test) {
 				hdr->id = cd->id = cd_get_id(hdr->id);
@@ -5407,9 +5323,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 			if (!cd)
 				return (-ENXIO);
 			if (!force) {
-				/*
-				   we have attached data links 
-				 */
+				/* 
+				   we have attached data links */
 				if (cd->dl.list)
 					return (-EBUSY);
 			}
@@ -5455,9 +5370,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 		{
 			if (df)
 				return (-EEXIST);
-			/*
-			   The default object always exists. 
-			 */
+			/* 
+			   The default object always exists. */
 			return (-EEXIST);
 		}
 		case LAPD_CHA:
@@ -5465,9 +5379,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 			if (!df)
 				return (-ENXIO);
 			if (!force) {
-				/*
-				   nothing to skip 
-				 */
+				/* 
+				   nothing to skip */
 			}
 			if (!test) {
 				df->proto = cnf->proto;
@@ -5479,9 +5392,8 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 		{
 			if (!df)
 				return (-ENXIO);
-			/*
-			   Can't delete the default object. 
-			 */
+			/* 
+			   Can't delete the default object. */
 			return (-EOPNOTSUPP);
 		}
 		}
@@ -5964,21 +5876,20 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
-			ptrace(("%s: %p: -> I_PLINK\n", DL_LAPD_DRV_NAME, dl));
+			ptrace(("%s: %p: -> I_PLINK\n", DRV_NAME, dl));
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					DL_LAPD_DRV_NAME, dl));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
+					dl));
 				ret = (-EPERM);
 				break;
 			}
 		case _IOC_NR(I_LINK):
-			ptrace(("%s: %p: -> I_LINK\n", DL_LAPD_DRV_NAME, dl));
+			ptrace(("%s: %p: -> I_LINK\n", DRV_NAME, dl));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
 			spin_lock_irqsave(&master.lock, flags);
 			{
-				/*
-				   place in list in ascending index order 
-				 */
+				/* 
+				   place in list in ascending index order */
 				for (cdp = &master.cd.list;
 				     *cdp && (*cdp)->u.mux.index < lb->l_index;
 				     cdp = &(*cdp)->next) ;
@@ -5993,15 +5904,15 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
-			ptrace(("%s: %p: -> I_PUNLINK\n", DL_LAPD_DRV_NAME, dl));
+			ptrace(("%s: %p: -> I_PUNLINK\n", DRV_NAME, dl));
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					DL_LAPD_DRV_NAME, dl));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					dl));
 				ret = (-EPERM);
 				break;
 			}
 		case _IOC_NR(I_UNLINK):
-			ptrace(("%s: %p: -> I_UNLINK\n", DL_LAPD_DRV_NAME, dl));
+			ptrace(("%s: %p: -> I_UNLINK\n", DRV_NAME, dl));
 			spin_lock_irqsave(&master.lock, flags);
 			{
 				for (cd = master.cd.list; cd; cd = cd->next)
@@ -6018,8 +5929,8 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n",
-				DL_LAPD_DRV_NAME, dl, (char) type, nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", DRV_NAME, dl,
+				(char) type, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -6034,76 +5945,76 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(LAPD_IOCGOPTIONS):
-			printd(("%s: %p: -> LAPD_IOCGOPTIONS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGOPTIONS\n", DRV_NAME, dl));
 			ret = lapd_iocgoptions(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSOPTIONS):
-			printd(("%s: %p: -> LAPD_IOCSOPTIONS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSOPTIONS\n", DRV_NAME, dl));
 			ret = lapd_iocsoptions(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGCONFIG):
-			printd(("%s: %p: -> LAPD_IOCGCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGCONFIG\n", DRV_NAME, dl));
 			ret = lapd_iocgconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSCONFIG):
-			printd(("%s: %p: -> LAPD_IOCSCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSCONFIG\n", DRV_NAME, dl));
 			ret = lapd_iocsconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCTCONFIG):
-			printd(("%s: %p: -> LAPD_IOCTCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCTCONFIG\n", DRV_NAME, dl));
 			ret = lapd_ioctconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCCONFIG):
-			printd(("%s: %p: -> LAPD_IOCCCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCCONFIG\n", DRV_NAME, dl));
 			ret = lapd_ioccconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGSTATEM):
-			printd(("%s: %p: -> LAPD_IOCGSTATEM\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGSTATEM\n", DRV_NAME, dl));
 			ret = lapd_iocgstatem(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCMRESET):
-			printd(("%s: %p: -> LAPD_IOCCMRESET\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCMRESET\n", DRV_NAME, dl));
 			ret = lapd_ioccmreset(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGSTATSP):
-			printd(("%s: %p: -> LAPD_IOCGSTATSP\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGSTATSP\n", DRV_NAME, dl));
 			ret = lapd_iocgstatsp(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSSTATSP):
-			printd(("%s: %p: -> LAPD_IOCSSTATSP\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSSTATSP\n", DRV_NAME, dl));
 			ret = lapd_iocsstatsp(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGSTATS):
-			printd(("%s: %p: -> LAPD_IOCGSTATS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGSTATS\n", DRV_NAME, dl));
 			ret = lapd_iocgstats(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCSTATS):
-			printd(("%s: %p: -> LAPD_IOCCSTATS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCSTATS\n", DRV_NAME, dl));
 			ret = lapd_ioccstats(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGNOTIFY):
-			printd(("%s: %p: -> LAPD_IOCGNOTIFY\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGNOTIFY\n", DRV_NAME, dl));
 			ret = lapd_iocgnotify(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSNOTIFY):
-			printd(("%s: %p: -> LAPD_IOCSNOTIFY\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSNOTIFY\n", DRV_NAME, dl));
 			ret = lapd_iocsnotify(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCNOTIFY):
-			printd(("%s: %p: -> LAPD_IOCCNOTIFY\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCNOTIFY\n", DRV_NAME, dl));
 			ret = lapd_ioccnotify(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCMGMT):
-			printd(("%s: %p: -> LAPD_IOCCMGMT\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCMGMT\n", DRV_NAME, dl));
 			ret = lapd_ioccmgmt(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCPASS):
-			printd(("%s: %p: -> LAPD_IOCCPASS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCPASS\n", DRV_NAME, dl));
 			ret = lapd_ioccpass(q, dl, hdr, count);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported DL ioctl %c, %d\n", DL_LAPD_DRV_NAME,
-				dl, (char) type, nr));
+			ptrace(("%s: %p: ERROR: Unsupported DL ioctl %c, %d\n", DRV_NAME, dl,
+				(char) type, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -6113,9 +6024,8 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		struct cd *cd;
 		if (!(cd = dl->cd.cd)) {
-			/*
-			   not attached to ppa 
-			 */
+			/* 
+			   not attached to ppa */
 			ret = (-ENXIO);
 			break;
 		}
@@ -6127,8 +6037,8 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 		return (QR_ABSORBED);
 	}
 	default:
-		ptrace(("%s: %p: ERROR: Unsuported DL ioctl %c, %d\n", DL_LAPD_DRV_NAME, dl,
-			(char) type, nr));
+		ptrace(("%s: %p: ERROR: Unsuported DL ioctl %c, %d\n", DRV_NAME, dl, (char) type,
+			nr));
 		ret = (-EOPNOTSUPP);
 		break;
 	}
@@ -6194,123 +6104,123 @@ dl_w_proto(queue_t *q, mblk_t *mp)
 		return (-EMSGSIZE);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case DL_INFO_REQ:
-		printd(("%s: %p: -> DL_INFO_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_INFO_REQ\n", DRV_NAME, dl));
 		rtn = dl_info_req(q, mp);
 		break;
 	case DL_ATTACH_REQ:
-		printd(("%s: %p: -> DL_ATTACH_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_ATTACH_REQ\n", DRV_NAME, dl));
 		rtn = dl_attach_req(q, mp);
 		break;
 	case DL_DETACH_REQ:
-		printd(("%s: %p: -> DL_DETACH_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_DETACH_REQ\n", DRV_NAME, dl));
 		rtn = dl_detach_req(q, mp);
 		break;
 	case DL_BIND_REQ:
-		printd(("%s: %p: -> DL_BIND_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_BIND_REQ\n", DRV_NAME, dl));
 		rtn = dl_bind_req(q, mp);
 		break;
 	case DL_UNBIND_REQ:
-		printd(("%s: %p: -> DL_UNBIND_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_UNBIND_REQ\n", DRV_NAME, dl));
 		rtn = dl_unbind_req(q, mp);
 		break;
 	case DL_SUBS_BIND_REQ:
-		printd(("%s: %p: -> DL_SUBS_BIND_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_SUBS_BIND_REQ\n", DRV_NAME, dl));
 		rtn = dl_subs_bind_req(q, mp);
 		break;
 	case DL_SUBS_UNBIND_REQ:
-		printd(("%s: %p: -> DL_SUBS_UNBIND_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_SUBS_UNBIND_REQ\n", DRV_NAME, dl));
 		rtn = dl_subs_unbind_req(q, mp);
 		break;
 	case DL_ENABMULTI_REQ:
-		printd(("%s: %p: -> DL_ENABMULTI_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_ENABMULTI_REQ\n", DRV_NAME, dl));
 		rtn = dl_enabmulti_req(q, mp);
 		break;
 	case DL_DISABMULTI_REQ:
-		printd(("%s: %p: -> DL_DISABMULTI_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_DISABMULTI_REQ\n", DRV_NAME, dl));
 		rtn = dl_disabmulti_req(q, mp);
 		break;
 	case DL_PROMISCON_REQ:
-		printd(("%s: %p: -> DL_PROMISCON_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_PROMISCON_REQ\n", DRV_NAME, dl));
 		rtn = dl_promiscon_req(q, mp);
 		break;
 	case DL_PROMISCOFF_REQ:
-		printd(("%s: %p: -> DL_PROMISCOFF_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_PROMISCOFF_REQ\n", DRV_NAME, dl));
 		rtn = dl_promiscoff_req(q, mp);
 		break;
 	case DL_CONNECT_REQ:
-		printd(("%s: %p: -> DL_CONNECT_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_CONNECT_REQ\n", DRV_NAME, dl));
 		rtn = dl_connect_req(q, mp);
 		break;
 	case DL_CONNECT_RES:
-		printd(("%s: %p: -> DL_CONNECT_RES\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_CONNECT_RES\n", DRV_NAME, dl));
 		rtn = dl_connect_res(q, mp);
 		break;
 	case DL_TOKEN_REQ:
-		printd(("%s: %p: -> DL_TOKEN_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_TOKEN_REQ\n", DRV_NAME, dl));
 		rtn = dl_token_req(q, mp);
 		break;
 	case DL_DISCONNECT_REQ:
-		printd(("%s: %p: -> DL_DISCONNECT_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_DISCONNECT_REQ\n", DRV_NAME, dl));
 		rtn = dl_disconnect_req(q, mp);
 		break;
 	case DL_RESET_REQ:
-		printd(("%s: %p: -> DL_RESET_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_RESET_REQ\n", DRV_NAME, dl));
 		rtn = dl_reset_req(q, mp);
 		break;
 	case DL_RESET_RES:
-		printd(("%s: %p: -> DL_RESET_RES\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_RESET_RES\n", DRV_NAME, dl));
 		rtn = dl_reset_res(q, mp);
 		break;
 	case DL_UNITDATA_REQ:
-		printd(("%s: %p: -> DL_UNITDATA_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_UNITDATA_REQ\n", DRV_NAME, dl));
 		rtn = dl_unitdata_req(q, mp);
 		break;
 	case DL_UDQOS_REQ:
-		printd(("%s: %p: -> DL_UDQOS_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_UDQOS_REQ\n", DRV_NAME, dl));
 		rtn = dl_udqos_req(q, mp);
 		break;
 	case DL_TEST_REQ:
-		printd(("%s: %p: -> DL_TEST_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_TEST_REQ\n", DRV_NAME, dl));
 		rtn = dl_test_req(q, mp);
 		break;
 	case DL_TEST_RES:
-		printd(("%s: %p: -> DL_TEST_RES\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_TEST_RES\n", DRV_NAME, dl));
 		rtn = dl_test_res(q, mp);
 		break;
 	case DL_XID_REQ:
-		printd(("%s: %p: -> DL_XID_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_XID_REQ\n", DRV_NAME, dl));
 		rtn = dl_xid_req(q, mp);
 		break;
 	case DL_XID_RES:
-		printd(("%s: %p: -> DL_XID_RES\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_XID_RES\n", DRV_NAME, dl));
 		rtn = dl_xid_res(q, mp);
 		break;
 	case DL_DATA_ACK_REQ:
-		printd(("%s: %p: -> DL_DATA_ACK_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_DATA_ACK_REQ\n", DRV_NAME, dl));
 		rtn = dl_data_ack_req(q, mp);
 		break;
 	case DL_REPLY_REQ:
-		printd(("%s: %p: -> DL_REPLY_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_REPLY_REQ\n", DRV_NAME, dl));
 		rtn = dl_reply_req(q, mp);
 		break;
 	case DL_REPLY_UPDATE_REQ:
-		printd(("%s: %p: -> DL_REPLY_UPDATE_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_REPLY_UPDATE_REQ\n", DRV_NAME, dl));
 		rtn = dl_reply_update_req(q, mp);
 		break;
 	case DL_PHYS_ADDR_REQ:
-		printd(("%s: %p: -> DL_PHYS_ADD_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_PHYS_ADD_REQ\n", DRV_NAME, dl));
 		rtn = dl_phys_addr_req(q, mp);
 		break;
 	case DL_SET_PHYS_ADDR_REQ:
-		printd(("%s: %p: -> DL_SET_PHYS_ADDR_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_SET_PHYS_ADDR_REQ\n", DRV_NAME, dl));
 		rtn = dl_set_phys_addr_req(q, mp);
 		break;
 	case DL_GET_STATISTICS_REQ:
-		printd(("%s: %p: -> DL_GET_STATISTICS_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: -> DL_GET_STATISTICS_REQ\n", DRV_NAME, dl));
 		rtn = dl_get_statistics_req(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> DL_?? %lu ??\n", DL_LAPD_DRV_NAME, dl, prim));
+		printd(("%s: %p: -> DL_?? %lu ??\n", DRV_NAME, dl, prim));
 		rtn = dl_error_ack(q, dl, prim, DL_BADPRIM, EOPNOTSUPP);
 		break;
 	}
@@ -6329,47 +6239,47 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 		return (-EMSGSIZE);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case CD_INFO_ACK:
-		printd(("%s: %p: CD_INFO_ACK <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_INFO_ACK <-\n", DRV_NAME, cd));
 		rtn = cd_info_ack(q, mp);
 		break;
 	case CD_OK_ACK:
-		printd(("%s: %p: CD_OK_ACK <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_OK_ACK <-\n", DRV_NAME, cd));
 		rtn = cd_ok_ack(q, mp);
 		break;
 	case CD_ERROR_ACK:
-		printd(("%s: %p: CD_ERROR_ACK <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_ERROR_ACK <-\n", DRV_NAME, cd));
 		rtn = cd_error_ack(q, mp);
 		break;
 	case CD_ENABLE_CON:
-		printd(("%s: %p: CD_ENABLE_CON <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_ENABLE_CON <-\n", DRV_NAME, cd));
 		rtn = cd_enable_con(q, mp);
 		break;
 	case CD_DISABLE_CON:
-		printd(("%s: %p: CD_DISABLE_CON <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_DISABLE_CON <-\n", DRV_NAME, cd));
 		rtn = cd_disable_con(q, mp);
 		break;
 	case CD_ERROR_IND:
-		printd(("%s: %p: CD_ERROR_IND <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_ERROR_IND <-\n", DRV_NAME, cd));
 		rtn = cd_error_ind(q, mp);
 		break;
 	case CD_UNITDATA_ACK:
-		printd(("%s: %p: CD_UNITDATA_ACK <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_UNITDATA_ACK <-\n", DRV_NAME, cd));
 		rtn = cd_unitdata_ack(q, mp);
 		break;
 	case CD_UNITDATA_IND:
-		printd(("%s: %p: CD_UNITDATA_IND <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_UNITDATA_IND <-\n", DRV_NAME, cd));
 		rtn = cd_unitdata_ind(q, mp);
 		break;
 	case CD_BAD_FRAME_IND:
-		printd(("%s: %p: CD_BAD_FRAME_IND <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_BAD_FRAME_IND <-\n", DRV_NAME, cd));
 		rtn = cd_bad_frame_ind(q, mp);
 		break;
 	case CD_MODEM_SIG_IND:
-		printd(("%s: %p: CD_MODEM_SIG_IND <-\n", DL_LAPD_DRV_NAME, cd));
+		printd(("%s: %p: CD_MODEM_SIG_IND <-\n", DRV_NAME, cd));
 		rtn = cd_modem_sig_ind(q, mp);
 		break;
 	default:
-		pswerr(("%s: %p: CD_?? %lu ?? <-\n", DL_LAPD_DRV_NAME, cd, prim));
+		pswerr(("%s: %p: CD_?? %lu ?? <-\n", DRV_NAME, cd, prim));
 		rtn = m_hangup_all(q, cd);
 		break;
 	}
@@ -6390,7 +6300,7 @@ dl_w_data(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	(void) dl;
-	printd(("%s: %p: -> M_DATA [%d]\n", DL_LAPD_DRV_NAME, dl, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%d]\n", DRV_NAME, dl, msgdsize(mp)));
 	return dl_data_req(q, mp);
 }
 STATIC INLINE int
@@ -6398,7 +6308,7 @@ cd_r_data(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	(void) cd;
-	printd(("%s: %p: M_DATA [%d] <-\n", DL_LAPD_DRV_NAME, cd, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%d] <-\n", DRV_NAME, cd, msgdsize(mp)));
 	return cd_data_ind(q, mp);
 }
 
@@ -6413,14 +6323,14 @@ STATIC INLINE int
 cd_r_error(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
-	printd(("%s: %p: M_ERROR <-\n", DL_LAPD_DRV_NAME, cd));
+	printd(("%s: %p: M_ERROR <-\n", DRV_NAME, cd));
 	return m_error_all(q, cd, ((uchar *) mp->b_rptr)[0], ((uchar *) mp->b_rptr++)[1]);
 }
 STATIC INLINE int
 cd_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
-	printd(("%s: %p: M_HANGUP <-\n", DL_LAPD_DRV_NAME, cd));
+	printd(("%s: %p: M_HANGUP <-\n", DRV_NAME, cd));
 	return m_hangup_all(q, cd);
 }
 
@@ -6443,9 +6353,8 @@ dl_r_prim(queue_t *q, mblk_t *mp)
 STATIC int
 dl_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return dl_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6467,9 +6376,8 @@ dl_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 cd_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return cd_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6517,6 +6425,8 @@ STATIC int lapd_majors[DL_LAPD_CMAJORS] = {
 	DL_LAPD_CMAJOR_0,
 };
 
+STATIC int dl_register_strdev(major_t major);
+
 /*
  *  Open
  *  -------------------------------------------------------------------------
@@ -6540,7 +6450,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", DL_LAPD_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -6548,9 +6458,8 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	/*
-	   allocate a new device 
-	 */
+	/* 
+	   allocate a new device */
 	cminor = 1;
 	spin_lock_irqsave(&master.lock, flags);
 	for (dlp = &master.dl.list; *dlp; dlp = &(*dlp)->next) {
@@ -6560,14 +6469,12 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			continue;	/* skip headless opens */
 		if (!cmajor || cmajor != dmajor || cminor < dminor)
 			break;
-		if (cminor > dminor || ++cminor < DL_LAPD_CMINORS)
+		if (cminor > dminor || ++cminor < NMINORS)
 			continue;
 		if (++mindex >= DL_LAPD_CMAJORS)
 			break;
 		if (!(cmajor = lapd_majors[mindex])) {
-			if ((cmajor =
-			     lis_register_strdev(lapd_majors[mindex], &lapd_info, DL_LAPD_CMINORS,
-						 DL_LAPD_DRV_NAME)) <= 0)
+			if ((cmajor = dl_register_strdev(lapd_majors[mindex])) <= 0)
 				break;
 			lapd_majors[mindex] = cmajor;
 #ifdef LIS
@@ -6577,15 +6484,15 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		cminor = 0;
 	}
 	if (mindex >= DL_LAPD_CMAJORS || !lapd_majors[mindex]) {
-		ptrace(("%s: ERROR: no device numbers available\n", DL_LAPD_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened chanracter device %d:%d\n", DL_LAPD_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened chanracter device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(dl = dl_alloc_priv(q, dlp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: no memory\n", DL_LAPD_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -6605,7 +6512,7 @@ dl_close(queue_t *q, int flag, cred_t *crp)
 	psw_t flags;
 	(void) flag;
 	(void) crp;
-	printd(("%s: closing character device %d:%d\n", DL_LAPD_DRV_NAME, dl->u.dev.cmajor,
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, dl->u.dev.cmajor,
 		dl->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	dl_free_priv(dl);
@@ -6617,95 +6524,142 @@ dl_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LIS MODULE INITIALIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int lapd_initialized = 0;
-MODULE_STATIC void
-lapd_terminate(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the DL driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the DL driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw dl_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &dl_lapdinfo,
+	.d_flag = 0,
+	.d_mode = S_IFCHR,
+	.d_fop = NULL,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+dl_register_strdev(major_t major)
 {
-	int rtn, mindex;
-	for (mindex = 0; mindex < DL_LAPD_CMAJORS; mindex++) {
+	int err;
+	if ((err = register_strdev(&dl_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+dl_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = unregister_strdev(&dl_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+dl_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &dl_lapdinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+dl_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+dlterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (lapd_majors[mindex]) {
-			if ((rtn = lis_unregister_strdev(lapd_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n",
-					DL_LAPD_DRV_NAME, lapd_majors[mindex]);
+			if ((err = dl_unregister_strdev(lapd_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					lapd_majors[mindex]);
 			if (mindex)
 				lapd_majors[mindex] = 0;
 		}
 	}
-	lapd_term_caches();
-	lapd_initialized = 0;
-	return;
-}
-MODULE_STATIC void
-lapd_init(void)
-{
-	int rtn, mindex = 0;
-	unless(lapd_initialized, return);
-	cmn_err(CE_NOTE, LAPD_BANNER);	/* console splash */
-	if ((rtn = lapd_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR; Could no allocate caches", DL_LAPD_DRV_NAME);
-		goto error;
-	}
-	if ((rtn =
-	     lis_register_strdev(lapd_majors[mindex], &lapd_info, DL_LAPD_CMINORS,
-				 DL_LAPD_DRV_NAME)) <= 0) {
-		cmn_err(CE_PANIC, "%s: ERROR: Cannot register 1'st major %d", DL_LAPD_DRV_NAME,
-			lapd_majors[mindex]);
-		goto error;
-	}
-#if 0
-	if (!lapd_majors[mindex]) {
-		dev_t dev = makedevice(LIS_CLONE, rtn);
-		/*
-		   we have auto allocated a major, so we have to create a clone device to access
-		   the major 
-		 */
-		if ((rtn = lis_unlink("/dev/dl-lapd") < 0)) {
-			cmn_err(CE_PANIC, "%s: ERROR: Cannot unlink /dev/dl-lapd\n",
-				DL_LAPD_DRV_NAME);
-			goto error;
-		}
-		if ((rtn = lis_mknod("/dev/dl-lapd", S_IFCHR | 0666, dev) < 0)) {
-			cmn_err(CE_PANIC, "%s: ERROR: Cannot create /dev/dl-lapd\n ",
-				DL_LAPD_DRV_NAME);
-			goto error;
-		}
-	}
-#endif
-	lapd_majors[mindex] = rtn;
-#ifdef LIS
-	LIS_DEVFLAGS(rtn) |= LIS_MODFLG_CLONE;
-#endif
-	spin_lock_init(&master.lock); /* "dl-open-list-lock" */
-	lapd_initialized = 1;
-	return;
-      error:
-	lapd_terminate();
-	lapd_initialized = rtn;
+	if ((err = lapd_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
 
-/*
- *  =========================================================================
- *
- *  LINUX MODULE INITIALIZATION
- *
- *  =========================================================================
- */
-int
-init_module(void)
+MODULE_STATIC int __init
+dlinit(void)
 {
-	lapd_init();
-	if (lapd_initialized < 0)
-		return lapd_initialized;
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = lapd_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		dlterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = dl_register_strdev(lapd_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					lapd_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				dlterminate();
+				return (err);
+			}
+		}
+		if (lapd_majors[mindex] == 0)
+			lapd_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(lapd_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = lapd_majors[0];
+	}
 	return (0);
 }
 
-void
-cleanup_module(void)
-{
-	lapd_terminate();
-}
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(dlinit);
+module_exit(dlterminate);
+
+#endif				/* LINUX */

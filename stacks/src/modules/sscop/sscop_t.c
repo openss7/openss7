@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $
+ @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,42 +46,44 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
+#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
+    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $";
 
 #include "compat.h"
 
-#define SSCOP_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SSCOP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSCOP_LICENSE	"GPL"
-#define SSCOP_BANNER	SSCOP_DESCRIP	"\n" \
-			SSCOP_COPYRIGHT	"\n" \
-			SSCOP_DEVICE	"\n" \
-			SSCOP_CONTACT	"\n"
-#define SSCOP_BANNER	SSCOP_DEVICE	" - " \
-			SSCOP_REVISION	"\n"
+#define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
+#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $"
+#define SSCOP_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SSCOP_TPI_LICENSE	"GPL"
+#define SSCOP_TPI_BANNER	SSCOP_TPI_DESCRIP	"\n" \
+				SSCOP_TPI_REVISION	"\n" \
+				SSCOP_TPI_COPYRIGHT	"\n" \
+				SSCOP_TPI_DEVICE	"\n" \
+				SSCOP_TPI_CONTACT
+#define SSCOP_TPI_BANNER	SSCOP_TPI_DESCRIP	"\n" \
+				SSCOP_TPI_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(SSCOP_CONTACT);
-MODULE_DESCRIPTION(SSCOP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SSCOP_DEVICE);
+MODULE_AUTHOR(SSCOP_TPI_CONTACT);
+MODULE_DESCRIPTION(SSCOP_TPI_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SSCOP_TPI_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(SSCOP_LICENSE);
-#endif
+MODULE_LICENSE(SSCOP_TPI_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
-#ifdef SSCOP_DEBUG
-static int sscop_debug = SSCOP_DEBUG;
+#ifdef SSCOP_TPI_DEBUG
+STATIC int sscop_debug = SSCOP_TPI_DEBUG;
 #else
-static int sscop_debug = 2;
+STATIC int sscop_debug = 2;
 #endif
 
 #ifdef LFS
@@ -89,12 +91,19 @@ static int sscop_debug = 2;
 #define SSCOP_TPI_DRV_NAME	CONFIG_STREAMS_SSCOP_TPI_NAME
 #define SSCOP_TPI_CMAJORS	CONFIG_STREAMS_SSCOP_TPI_NMAJORS
 #define SSCOP_TPI_CMAJOR_0	CONFIG_STREAMS_SSCOP_TPI_MAJOR
-#endif
+#endif				/* LFS */
 
-#ifndef SSCOP_CMAJOR_0
-#define SSCOP_CMAJOR_0 240
-#endif
-#define SSCOP_NMINOR 255
+#ifndef SSCOP_TPI_DRV_NAME
+#define SSCOP_TPI_DRV_NAME	"sscop"
+#endif				/* SSCOP_TPI_DRV_NAME */
+
+#ifndef SSCOP_TPI_CMAJOR_0
+#define SSCOP_TPI_CMAJOR_0	240
+#endif				/* SSCOP_TPI_CMAJOR_0 */
+
+#ifndef SSCOP_TPI_NMINOR
+#define SSCOP_TPI_NMINOR	255
+#endif				/* SSCOP_TPI_NMINOR */
 
 /*
  *  =========================================================================
@@ -104,21 +113,30 @@ static int sscop_debug = 2;
  *  =========================================================================
  */
 
-static struct module_info sscop_info = {
-	0,				/* Module ID number *//* FIXME */
-	"sscop",			/* Module name */
+#define DRV_ID		SSCOP_TPI_DRV_ID
+#define DRV_NAME	SSCOP_TPI_DRV_NAME
+#ifdef MODULE
+#define DRV_BANNER	SSCOP_TPI_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SSCOP_TPI_SPLASH
+#endif				/* MODULE */
+
+MODULE_STATIC struct module_info sscop_tpiinfo = {
+	DRV_ID,				/* Module ID number *//* FIXME */
+	DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted */
 	512,				/* Max packet size accepted */
 	8 * 512,			/* Hi water mark */
 	1 * 512				/* Lo water mark */
 };
 
-static INT sscop_rput(queue_t *, mblk_t *);
-static INT sscop_rsrv(queue_t *);
-static int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
-static int sscop_close(queue_t *, int, cred_t *);
+STATIC INT sscop_rput(queue_t *, mblk_t *);
+STATIC INT sscop_rsrv(queue_t *);
 
-static struct qinit sscop_rinit = {
+STATIC int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sscop_close(queue_t *, int, cred_t *);
+
+STATIC struct qinit sscop_rinit = {
 	sscop_rput,			/* Read put (msg from below) */
 	sscop_rsrv,			/* Read queue service */
 	sscop_open,			/* Each open */
@@ -128,10 +146,10 @@ static struct qinit sscop_rinit = {
 	NULL				/* Statistics */
 };
 
-static INT sscop_wput(queue_t *, mblk_t *);
-static INT sscop_wsrv(queue_t *);
+STATIC INT sscop_wput(queue_t *, mblk_t *);
+STATIC INT sscop_wsrv(queue_t *);
 
-static struct qinit sscop_winit = {
+STATIC struct qinit sscop_winit = {
 	sscop_wput,			/* Write put (msg from above) */
 	sscop_wsrv,			/* Write queue service */
 	NULL,				/* Each open */
@@ -227,7 +245,8 @@ struct sscop {
  *  N_UNITDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_unitdata_req(caddr_t dst_ptr, size_t dst_len)
+STATIC inline mblk_t *
+n_unitdata_req(caddr_t dst_ptr, size_t dst_len)
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p;
@@ -288,7 +307,8 @@ extern int sscop_recv_msg(const queue_t *, const mblk_t *);
  *  N_UNITDATA_IND
  *  -------------------------------------------------------------------------
  */
-static int n_unitdata_ind(queue_t * q, mblk_t * pdu)
+STATIC int
+n_unitdata_ind(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -303,7 +323,8 @@ static int n_unitdata_ind(queue_t * q, mblk_t * pdu)
  *  N_UDERROR_IND
  *  -------------------------------------------------------------------------
  */
-static int n_uderror_ind(queue_t * q, mblk_t * pdu)
+STATIC int
+n_uderror_ind(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -313,7 +334,7 @@ static int n_uderror_ind(queue_t * q, mblk_t * pdu)
 	const uint error = p->ERROR_type;
 }
 
-static int (*n_prim[]) (queue_t *, mblk_t *) = {
+STATIC int (*n_prim[]) (queue_t *, mblk_t *) = {
 	NULL,			/* N_CONN_REQ 0 */
 	    NULL,		/* N_CONN_RES 1 */
 	    NULL,		/* N_DISCON_REQ 2 */
@@ -364,7 +385,7 @@ extern int sscop_w_pcproto(queue_t *, mblk_t *);
  *  =========================================================================
  */
 
-static int (*sscop_ioctl[]) (queue_t *, uint, void *) = {
+STATIC int (*sscop_ioctl[]) (queue_t *, uint, void *) = {
 };
 
 /*
@@ -378,11 +399,13 @@ static int (*sscop_ioctl[]) (queue_t *, uint, void *) = {
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_data(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_data(queue_t *q, mblk_t *mp)
 {
 	return sscop_write_data(q, mp);
 }
-static inline int sscop_r_data(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_data(queue_t *q, mblk_t *mp)
 {
 	return sscop_recv_sdu(q, mp);
 }
@@ -395,7 +418,8 @@ static inline int sscop_r_data(queue_t * q, mblk_t * mp)
  *  -------------------------------------------------------------------------
  */
 
-static inline int sscop_r_proto(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_proto(queue_t *q, mblk_t *mp)
 {
 	int prim = ((union N_primitives *) (mp->b_rptr))->type;
 	if (0 <= prim && prim < sizeof(n_prim) / sizeof(void *))
@@ -403,7 +427,8 @@ static inline int sscop_r_proto(queue_t * q, mblk_t * mp)
 			return (*n_prim[prim]) (q, mp);
 	return (-EOPNOTSUPP);
 }
-static inline int sscop_r_pcproto(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_pcproto(queue_t *q, mblk_t *mp)
 {
 	return sscop_r_proto(q, mp);
 }
@@ -415,13 +440,15 @@ static inline int sscop_r_pcproto(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_ctl(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_ctl(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
 	return (-EOPNOTSUPP);
 }
-static inline int sscop_r_ctl(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_ctl(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -435,7 +462,8 @@ static inline int sscop_r_ctl(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_ioctl(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	int ret;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -495,7 +523,8 @@ static inline int sscop_w_ioctl(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline void sscop_w_flush(queue_t * q, mblk_t * mp)
+STATIC inline void
+sscop_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & M_FLUSHW) {
 		flushq(q, FLUSHALL);
@@ -523,7 +552,8 @@ static inline void sscop_w_flush(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline void sscop_r_error(queue_t * q, mblk_t * mp)
+STATIC inline void
+sscop_r_error(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = SSCOP_PRIV(q);
 	sp->zapped = 1;
@@ -552,7 +582,8 @@ static inline void sscop_r_error(queue_t * q, mblk_t * mp)
  *  supported, we pass it up-queue if possible.  If the message cannot be
  *  processed immediately we place it on the queue.
  */
-static INT sscop_rput(queue_t * q, mblk_t * mp)
+STATIC INT
+sscop_rput(queue_t *q, mblk_t *mp)
 {
 	int err = -EOPNOTSUPP;
 
@@ -614,7 +645,8 @@ static INT sscop_rput(queue_t * q, mblk_t * mp)
  *  messages which cannot be processed immediately.  Unrecognized messages are
  *  passed down-queue.
  */
-static INT sscop_rsrv(queue_t * q)
+STATIC INT
+sscop_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 	int err = -EOPNOTSUPP;
@@ -684,7 +716,8 @@ static INT sscop_rsrv(queue_t * q)
  *  supported, we pass it down-queue if possible.  If the message cannot be
  *  processed immediately, we place it on the queue.
  */
-static INT sscop_wput(queue_t * q, mblk_t * mp)
+STATIC INT
+sscop_wput(queue_t *q, mblk_t *mp)
 {
 	mblk_t *mp;
 	int err = -EOPNOTSUPP;
@@ -751,7 +784,8 @@ static INT sscop_wput(queue_t * q, mblk_t * mp)
  *  messages which cannot be processed immediately.  Unrecognized messages are
  *  passed down-queue.
  */
-static INT sscop_wsrv(queue_t * q)
+STATIC INT
+sscop_wsrv(queue_t *q)
 {
 	int err = -EOPNOTSUPP;
 	mblk_t *mp;
@@ -817,11 +851,12 @@ static INT sscop_wsrv(queue_t * q)
  *  We use Linux hardware aligned cache here for speedy access to information
  *  contained in the private data structure.
  */
-static sscop_t *sscop_priv_list = NULL;
+STATIC sscop_t *sscop_priv_list = NULL;
 
 kmem_cache_t *sscop_cachep = NULL;
 
-static sscop_t *sscop_alloc_priv(queue_t * q)
+STATIC sscop_t *
+sscop_alloc_priv(queue_t *q)
 {
 	sscop_t *sp;
 
@@ -859,19 +894,33 @@ static sscop_t *sscop_alloc_priv(queue_t * q)
 	return (sp);
 }
 
-static void sscop_free_priv(queue_t * q)
+STATIC void
+sscop_free_priv(queue_t *q)
 {
 	sscop_t *sp = SSCOP_PRIV(q);
 	kmem_cache_free(sscop_cachep, sp);
 	return;
 }
 
-static void sscop_init_priv(void)
+STATIC void
+sscop_init_priv(void)
 {
 	if (!(sscop_cachep = kmem_find_general_cachep(sizeof(sscop_t)))) {
 		/* allocate a new cachep */
 	}
 	return;
+}
+
+STATIC int
+sscop_init_caches(void)
+{
+	return (0);
+}
+
+STATIC int
+sscop_term_caches(void)
+{
+	return (0);
 }
 
 /*
@@ -881,7 +930,8 @@ static void sscop_init_priv(void)
  *
  *  -------------------------------------------------------------------------
  */
-static int sscop_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
+STATIC int
+sscop_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;
 
@@ -917,7 +967,8 @@ static int sscop_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * c
  *
  *  -------------------------------------------------------------------------
  */
-static int sscop_close(queue_t * q, int flag, cred_t * crp)
+STATIC int
+sscop_close(queue_t *q, int flag, cred_t *crp)
 {
 	sscop_t *sp = SSCOP_PRIV(q);
 
@@ -934,65 +985,114 @@ static int sscop_close(queue_t * q, int flag, cred_t * crp)
 /*
  *  =========================================================================
  *
- *  LiS MODULE INITIALIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
-static int sscop_initialized = 0;
-
-#ifndef LIS_REGISTERED
-static inline void sscop_init(void)
-#else
-__initfunc(void sscop_init(void))
-#endif
-{
-	if (sscop_initialized)
-		return;
-	sscop_initialized = 1;
-	printk(KERN_INFO SSCOP_BANNER);	/* console splash */
-#ifndef LIS_REGISTERED
-	if (!(sscop_minfo.mi_idnum = lis_register_strmod(&sscop_info, sscop_minfo.mi_idname))) {
-		cmn_err(CE_NOTE, "sscop: couldn't register as module\n");
-		sscop_minfo.mi_idnum = 0;
-	}
-#endif
-}
-
-#ifndef LIS_REGISTERED
-static inline void sscop_terminate(void)
-#else
-__initfunc(void sscop_terminate(void))
-#endif
-{
-	if (!sscop_initialized)
-		return;
-	sscop_initialized = 0;
-#ifndef LIS_REGISTERED
-	if (sscop_minfo.mi_idnum)
-		if ((sdt_minfo.mi_idnum = lis_unregister_strmod(&sscop_info))) {
-			cmn_err(CE_WARN, "sdt: couldn't unregister as module!\n");
-		}
-#endif
-};
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  LINUX KERNEL MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
+#ifdef LFS
 
-#ifdef MODULE
-int init_module(void)
+STATIC struct fmodsw sscop_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sscop_tpiinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sscop_register_strmod(void)
 {
-	sscop_init();
+	int err;
+	if ((err = register_strmod(&sscop_fmod)) < 0)
+		return (err);
 	return (0);
 }
-void cleanup_module(void)
+
+STATIC int
+sscop_unregister_strmod(void)
 {
-	sscop_terminate();
+	int err;
+	if ((err = unregister_strmod(&sscop_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sscop_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sscop_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sscop_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sscop_tpiinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sscop_tpiinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sscop_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sscop_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sscop_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sscop_tpiterminate(void)
+{
+	int err;
+	if ((err = sscop_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sscop_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
-#endif
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sscop_tpiinit);
+module_exit(sscop_tpiterminate);
+
+#endif				/* LINUX */

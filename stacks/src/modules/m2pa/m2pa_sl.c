@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:33 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:33 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:33 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:18 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:33 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:18 $";
 
 #include "compat.h"
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:33 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:18 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -6309,10 +6309,21 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next != NULL) {
+		major_t cmajor = getmajor(*devp);
+		minor_t cminor = getminor(*devp);
+		struct sl *sl;
+		/* test for multiple push */
+		for (sl = sl_list; sl; sl = sl->next) {
+			if (sl->u.dev.cmajor == cmajor && sl->u.dev.cminor == cminor) {
+				MOD_DEC_USE_COUNT;
+				return (ENXIO);
+			}
+		}
 		if (!(sl_alloc_priv(q, &sl_list, devp, crp))) {
 			MOD_DEC_USE_COUNT;
 			return ENOMEM;
 		}
+		qprocson(q);
 		return (0);
 	}
 	MOD_DEC_USE_COUNT;

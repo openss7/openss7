@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:15 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $";
 
 #include "compat.h"
 
@@ -70,23 +70,35 @@ static char const ident[] =
 // #define TIRDWR_TPI_PEDANTIC
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:32 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
-				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_REVISION		"\n" \
+				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_DEVICE		"\n" \
-				TIRDWR_CONTACT		"\n"
-#define TIRDWR_SPLASH		TIRDWR_DEVICE		" - " \
+				TIRDWR_CONTACT
+#define TIRDWR_SPLASH		TIRDWR_DEVICE		"\n" \
 				TIRDWR_REVSISION
 
+#ifdef LINUX
 MODULE_AUTHOR(TIRDWR_CONTACT);
 MODULE_DESCRIPTION(TIRDWR_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TIRDWR_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(TIRDWR_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
+
+#ifndef TIRDWR_MOD_NAME
+#define TIRDWR_MOD_NAME		"tirdwr"
+#endif				/* TIRDWR_MOD_NAME */
+
+#ifndef TIRDWR_MOD_ID
+#define TIRDWR_MOD_ID		0
+#endif				/* TIRDWR_MOD_ID */
 
 /*
  *  =========================================================================
@@ -96,29 +108,17 @@ MODULE_LICENSE(TIRDWR_LICENSE);
  *  =========================================================================
  */
 
-#ifndef TIRDWR_MOD_NAME
-#   ifdef CONFIG_STREAMS_TIRDWR_NAME
-#	define TIRDWR_MOD_NAME CONFIG_STREAMS_TIRDWR_NAME
-#   else
-#	define TIRDWR_MOD_NAME "tirdwr"
-#   endif
-#endif
-
-#ifndef TIRDWR_MOD_ID
-#   ifdef CONFIG_STREAMS_TIRDWR_MODID
-#	define TIRDWR_MOD_ID CONFIG_STREAMS_TIRDWR_MODID
-#   else
-#	define TIRDWR_MOD_ID 0
-#   endif
-#endif
-
-modID_t modid = TIRDWR_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for TIRDWR.");
+#define MOD_ID		TIRDWR_MOD_ID
+#define MOD_NAME	TIRDWR_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	TIRDWR_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	TIRDWR_SPLASH
+#endif				/* MODULE */
 
 static struct module_info tirdwr_minfo = {
-	mi_idnum:TIRDWR_MOD_ID,		/* Module ID number */
-	mi_idname:TIRDWR_MOD_NAME,	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
@@ -143,7 +143,7 @@ static struct qinit tirdwr_winit = {
 	qi_minfo:&tirdwr_minfo,		/* Information */
 };
 
-static struct streamtab tirdwr_info = {
+static struct streamtab tirdwrinfo = {
 	st_rdinit:&tirdwr_rinit,	/* Upper read queue */
 	st_wrinit:&tirdwr_winit,	/* Upper write queue */
 };
@@ -181,26 +181,28 @@ static kmem_cache_t *tirdwr_priv_cachep = NULL;
 static int
 tirdwr_init_caches(void)
 {
-	if (!tirdwr_priv_cachep &&
-	    !(tirdwr_priv_cachep =
-	      kmem_cache_create(TIRDWR_MOD_NAME, sizeof(tirdwr_t), 0, SLAB_HWCACHE_ALIGN,
-				NULL, NULL))) {
-		cmn_err(CE_WARN, "%s: %s: Cannot allocate tirdwr_priv_cachep",
-			TIRDWR_MOD_NAME, __FUNCTION__);
+	if (!tirdwr_priv_cachep
+	    && !(tirdwr_priv_cachep =
+		 kmem_cache_create(MOD_NAME, sizeof(tirdwr_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_WARN, "%s: %s: Cannot allocate tirdwr_priv_cachep", MOD_NAME,
+			__FUNCTION__);
 		return (-ENOMEM);
 	}
 	return (0);
 }
 
-static void
+static int
 tirdwr_term_caches(void)
 {
 	if (tirdwr_priv_cachep) {
-		if (kmem_cache_destroy(tirdwr_priv_cachep))
-			cmn_err(CE_WARN, "%s: %s: did not destroy tirdwr_priv_cachep",
-				TIRDWR_MOD_NAME, __FUNCTION__);
+		if (kmem_cache_destroy(tirdwr_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: %s: did not destroy tirdwr_priv_cachep", MOD_NAME,
+				__FUNCTION__);
+			return (-EBUSY);
+		}
 	}
-	return;
+	return (0);
 }
 
 static tirdwr_t *
@@ -216,13 +218,12 @@ tirdwr_alloc_priv(queue_t *q)
 		priv->rdzero_bcid = 0;
 		priv->hangup_bcid = 0;
 		priv->eproto_bcid = 0;
-		/*
+		/* 
 		   we are a module with no service routine so our hiwat, lowat shouldn't matter;
 		   however, our minpsz, maxpsz do because we are the first queue under the stream
 		   head.  We do not want to alter the characteristics of the transport packet sizes
 		   so we copy them here. This will allow the stream head to exhibit the same
-		   behaviour as before we were pushed. 
-		 */
+		   behaviour as before we were pushed. */
 		priv->wq->q_minpsz = priv->wq->q_next->q_minpsz;
 		priv->wq->q_maxpsz = priv->wq->q_next->q_maxpsz;
 		q->q_ptr = WR(q)->q_ptr = priv;
@@ -282,7 +283,7 @@ tirdwr_rdzero(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->rdzero_bcid = bufcall(0, BPRI_HI, &tirdwr_rdzero_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call", TIRDWR_MOD_NAME);
+			cmn_err(CE_WARN, "%s: could not allocate rdzero buffer call", MOD_NAME);
 	}
 }
 static void
@@ -295,20 +296,18 @@ tirdwr_hangup(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 	if (!(priv->flags & (TIRDWR_HANGUP | TIRDWR_EPROTO))) {
 		if (priv->hangup_bcid != 0)
 			unbufcall(xchg(&priv->hangup_bcid, 0));
-		/*
-		   LiS does not have a reliable putnextctl() 
-		 */
+		/* 
+		   LiS does not have a reliable putnextctl() */
 		if ((mp = allocb(0, BPRI_HI))) {
 			mp->b_datap->db_type = M_HANGUP;
-			/*
-			   LiS doesn't have a reliable putnext() either :/ 
-			 */
+			/* 
+			   LiS doesn't have a reliable putnext() either :/ */
 			putnext(priv->rq, mp);
 			priv->flags |= TIRDWR_HANGUP;
 			return;
 		}
 		if (!(priv->hangup_bcid = bufcall(0, BPRI_HI, &tirdwr_hangup_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call", TIRDWR_MOD_NAME);
+			cmn_err(CE_WARN, "%s: could not allocate hangup buffer call", MOD_NAME);
 	}
 }
 static void
@@ -330,7 +329,7 @@ tirdwr_eproto(tirdwr_t * priv, mblk_t *mp, mblk_t *bp)
 			return;
 		}
 		if (!(priv->eproto_bcid = bufcall(2, BPRI_HI, &tirdwr_eproto_bc, (long) priv)))
-			cmn_err(CE_WARN, "%s: could not allocate eproto buffer call", TIRDWR_MOD_NAME);
+			cmn_err(CE_WARN, "%s: could not allocate eproto buffer call", MOD_NAME);
 	}
 }
 
@@ -368,11 +367,10 @@ static inline void
 tirdwr_restore_delim(t_uscalar_t flag, mblk_t *mp)
 {
 #if !defined TIRDWR_PEDANTIC
-	/*
+	/* 
 	   Although SVR 4 documentation says that we ignore message delimitors, we restore message
 	   delimitors in case the RMSGN or RMSGD read options are set at the stream head. Otherwise
-	   they are ignored anyway. 
-	 */
+	   they are ignored anyway. */
 	if (flag)
 		mp->b_flag &= ~MSGDELIM;
 	else
@@ -389,28 +387,26 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			TIRDWR_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
 #endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		/*
+		/* 
 		   There is a problem here right off the bat.  Although a TPI compliant provider
 		   must accept M_DATA written (instead of T_DATA_REQ), it should not generate
 		   M_DATA on read.  These should only be T_DATA_IND.  tirdwr can be pushed over
 		   other modules, however, and an underlying module (e.g. timod) might be stripping 
-		   T_DATA_IND blocks, so we process them anyway. 
-		 */
+		   T_DATA_IND blocks, so we process them anyway. */
 #	    if !defined TIRDWR_TPI_PEDANTIC
 		if (mp->b_band == 0) {
 			if (msgdsize(mp) > 0) {
 				putnext(q, mp);
 			} else {
-				/*
-				   Silently discard zero length normal data. 
-				 */
+				/* 
+				   Silently discard zero length normal data. */
 				freemsg(mp);
 			}
 		} else
@@ -419,11 +415,10 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 		break;
 	case M_PCPROTO:
 #	    if defined TIRDWR_TPI_PEDANTIC
-		/*
+		/* 
 		   We could be forgiving and accept M_PCPROTO mesages that should actually be sent
 		   as M_PROTO messages; however, a transport service provider that sends M_PCPROTO
-		   for data or disconnect messages is in violation of the TPI specifications. 
-		 */
+		   for data or disconnect messages is in violation of the TPI specifications. */
 		tirdwr_eproto(priv, mp, bp);
 		break;
 #	    endif		/* defined TIRDWR_TPI_PEDANTIC */
@@ -442,9 +437,8 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 					freeb(mp);
 					putnext(q, bp);
 				} else {
-					/*
-					   Silently discard zero length normal data. 
-					 */
+					/* 
+					   Silently discard zero length normal data. */
 					freeb(mp);
 					freemsg(bp);
 				}
@@ -453,12 +447,11 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 			break;
 #	    if defined T_OPTDATA_IND
 		case T_OPTDATA_IND:
-			/*
+			/* 
 			   T_OPTDATA is not always provided by the tihdr and is a more recent TPI
 			   (Version 5 Release 2) addition.  The purpose of T_OPTDATA is to support
 			   sockmod rather than timod or bare TI streams.  If we are pedantic about
-			   the TPI spec, we should not accept them even if we have them. 
-			 */
+			   the TPI spec, we should not accept them even if we have them. */
 #		    if !defined TIRDWR_TPI_PEDANTIC
 			if ((bp = unlinkb(mp)) && bp->b_datap->db_type == M_DATA && bp->b_band == 0
 			    && !(p->optdata_ind.DATA_flag & T_ODF_EX)) {
@@ -468,9 +461,8 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 					freeb(mp);
 					putnext(q, bp);
 				} else {
-					/*
-					   Silently discard zero length normal data. 
-					 */
+					/* 
+					   Silently discard zero length normal data. */
 					freeb(mp);
 					freemsg(bp);
 				}
@@ -516,11 +508,10 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 		break;
 	default:
-		/*
+		/* 
 		   If we are pedantic about the TPI spec and TIRDWR operation, we should not permit 
 		   any other STREAMS messages from being transported upstream.  To be a little more 
-		   forgiving we could just pass what we don't recognize. 
-		 */
+		   forgiving we could just pass what we don't recognize. */
 #	    if defined TIRDWR_TPI_PEDANTIC || defined TIRDWR_PEDANTIC
 		tirdwr_eproto(priv, mp, bp);
 #	    else		/* defined TIRDWR_TPI_PEDANTIC || defined TIRDWR_PEDANTIC */
@@ -539,7 +530,7 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			TIRDWR_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
@@ -551,15 +542,13 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 				if (msgdsize(mp) > 0) {
 					putnext(q, mp);
 				} else {
-					/*
-					   Silently discard zero-length data 
-					 */
+					/* 
+					   Silently discard zero-length data */
 					freemsg(mp);
 				}
 			} else {
-				/*
-				   error on banded (expedited) data 
-				 */
+				/* 
+				   error on banded (expedited) data */
 				tirdwr_eproto(priv, mp, NULL);
 			}
 		} else
@@ -567,13 +556,12 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 		break;
 	case M_PROTO:
 	case M_PCPROTO:
-		/*
+		/* 
 		   The major reason for denying these messages is that the normal use of tirdwr is
 		   to dup2 standard in or standard out or both with a connected XTI device with
 		   tirdwr pushed. Because the parent can still access the stream with XTI commands, 
 		   these need to generate EPROTO to signal both parent and child that something is
-		   wrong. 
-		 */
+		   wrong. */
 		tirdwr_eproto(priv, mp, NULL);
 		break;
 #   if !defined TIRDWR_PEDANTIC
@@ -607,11 +595,10 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 			break;
 		}
 #	    endif		/* !defined TIRDWR_PEDANTIC */
-		/*
+		/* 
 		   Documentation states that XTI/TLI library commands should fail with EPROTO.
 		   Also, there is never any reason why the user should be accessing lower layer
-		   IOCTLs with tirdwr installed.  This acheives that effect. 
-		 */
+		   IOCTLs with tirdwr installed.  This acheives that effect. */
 		tirdwr_eproto(priv, NULL, NULL);
 		mp->b_datap->db_type = M_IOCNAK;
 		iocp->ioc_error = EPROTO;
@@ -639,19 +626,18 @@ tirdwr_push(queue_t *q)
 {
 	queue_t *hq;
 	int err = 0;
-	/*
+	/* 
 	   Need to check for bad messages on stream head read queue. LiS does not have a freezestr
 	   or much of a qprocsoff, but the stream should be effectively frozen, so we can
 	   dereference the q->q_next pointer.  If anything, the q->q_next pointer should remain
-	   valid until we return from the open procedure. 
-	 */
+	   valid until we return from the open procedure. */
 	if ((hq = q->q_next) == NULL)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
 #ifdef LIS
 		lis_flags_t psw;
-		/*
+		/* 
 		   Under LiS we can't freeze the stream but we can lock the queue.  This is not a
 		   completely satisfactory solution for SMP because another processor could be in
 		   the middle of performing putq to the queue from before the push while we lock
@@ -660,8 +646,7 @@ tirdwr_push(queue_t *q)
 		   head, this will never work. Missing an M_PROTO or M_PCPROTO message on the
 		   stream head read queue will result in read(2) returning EBADMSG for default
 		   stream head read ops. tirdwr should return EPROTO and refuse to push the module
-		   instead. 
-		 */
+		   instead. */
 		LIS_QISRLOCK(hq, &psw);
 #else
 		unsigned long psw = freezestr(q);
@@ -708,9 +693,8 @@ tirdwr_pop(queue_t *q)
 			}
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
@@ -777,17 +761,15 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 #if defined LIS
-	/*
-	   protect against some LiS bugs 
-	 */
+	/* 
+	   protect against some LiS bugs */
 	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", TIRDWR_MOD_NAME,
-			__FUNCTION__);
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;
 	}
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			TIRDWR_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
 #endif				/* defined LIS */
@@ -805,91 +787,114 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  Registration and intialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
-#if defined LFS
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 
-static struct fmodsw tirdwr_fmod = {
-	f_name:TIRDWR_MOD_NAME,
-	f_str:&tirdwr_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw tirdwr_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &tirdwrinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
 };
 
-static int
-tirdwr_register_module(void)
+STATIC int
+tirdwr_register_strmod(void)
 {
 	int err;
 	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
-	if (modid == 0 && err > 0)
+	return (0);
+}
+
+STATIC int
+tirdwr_unregister_strmod(void)
+{
+	int err;
+	if ((err = unregister_strmod(&tirdwr_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+tirdwr_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&tirdwrinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+tirdwr_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&tirdwrinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+tirdwrinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = tirdwr_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = tirdwr_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		tirdwr_term_caches();
+		return (err);
+	}
+	if (modid == 0)
 		modid = err;
 	return (0);
 }
-static void
-tirdwr_unregister_module(void)
-{
-	return (void) unregister_strmod(&tirdwr_fmod);
-}
 
-#elif defined LIS
-
-static int
-tirdwr_register_module(void)
-{
-	int ret;
-	if ((ret = lis_register_strmod(&tirdwr_info, TIRDWR_MOD_NAME)) != LIS_NULL_MID) {
-		if (modid == 0)
-			modid = ret;
-		return (0);
-	}
-	/*
-	   LiS is not too good on giving informative errors here 
-	 */
-	return (EIO);
-}
-static void
-tirdwr_unregister_module(void)
-{
-	/*
-	   LiS provides detailed errors here when they are discarded. 
-	 */
-	return (void) lis_unregister_strmod(&tirdwr_info);
-}
-
-#endif
-
-static int __init
-tirdwr_init(void)
+MODULE_STATIC void __exit
+tirdwrterminate(void)
 {
 	int err;
-#ifdef MODULE
-	cmn_err(CE_NOTE, TIRDWR_BANNER);	/* banner message */
-#else
-	cmn_err(CE_NOTE, TIRDWR_SLPASH);	/* console splash */
-#endif
-	if ((err = tirdwr_init_caches())) {
-		cmn_err(CE_WARN, "%s: could not init caches, err = %d", TIRDWR_MOD_NAME, -err);
-		return (err);
-	}
-	if ((err = tirdwr_register_module())) {
-		tirdwr_term_caches();
-		cmn_err(CE_WARN, "%s: could not register module, err = %d", TIRDWR_MOD_NAME, -err);
-		return (err);
-	}
-	return (0);
-}
-
-static void __exit
-tirdwr_exit(void)
-{
-	tirdwr_unregister_module();
-	tirdwr_term_caches();
+	if ((err = tirdwr_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = tirdwr_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
-module_init(tirdwr_init);
-module_exit(tirdwr_exit);
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(tirdwrinit);
+module_exit(tirdwrterminate);
+
+#endif				/* LINUX */

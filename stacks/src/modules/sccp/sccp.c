@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $";
+static char const ident[] =
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -82,11 +83,8 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <sys/xti_mtp.h>
 #include <sys/xti_sccp.h>
 
-#undef INLINE
-#define INLINE
-
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:02 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -103,7 +101,7 @@ MODULE_DESCRIPTION(SCCP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SCCP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCCP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -111,6 +109,7 @@ MODULE_LICENSE(SCCP_LICENSE);
 #define SCCP_DRV_NAME	CONFIG_STREAMS_SCCP_NAME
 #define SCCP_CMAJORS	CONFIG_STREAMS_SCCP_NMAJORS
 #define SCCP_CMAJOR_0	CONFIG_STREAMS_SCCP_MAJOR
+#define SCCP_UNITS	CONFIG_STREAMS_SCCP_NMINORS
 #endif
 
 #define SCCP_CMINOR_SCCPI   0
@@ -119,8 +118,6 @@ MODULE_LICENSE(SCCP_LICENSE);
 #define SCCP_CMINOR_GTT	    3
 #define SCCP_CMINOR_MGMT    4
 #define SCCP_CMINOR_FREE    5
-
-#define SCCP_CMINORS 255
 
 #define SCCP_STYLE_SCCPI    SCCP_CMINOR_SCCPI
 #define SCCP_STYLE_TPI	    SCCP_CMINOR_TPI
@@ -135,33 +132,45 @@ MODULE_LICENSE(SCCP_LICENSE);
  *
  *  =========================================================================
  */
+
+#define DRV_ID		SCCP_DRV_ID
+#define DRV_NAME	SCCP_DRV_NAME
+#define CMAJORS		SCCP_CMAJORS
+#define CMAJOR_0	SCCP_CMAJOR_0
+#define UNITS		SCCP_UNITS
+#ifdef MODULE
+#define DRV_BANNER	SCCP_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SCCP_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info sccp_winfo = {
-	mi_idnum:SCCP_DRV_ID,		/* Module ID number */
-	mi_idname:SCCP_DRV_NAME "-wr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 STATIC struct module_info sccp_rinfo = {
-	mi_idnum:SCCP_DRV_ID,		/* Module ID number */
-	mi_idname:SCCP_DRV_NAME "-rd",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 STATIC struct module_info mtp_winfo = {
-	mi_idnum:SCCP_DRV_ID,		/* Module ID number */
-	mi_idname:SCCP_DRV_NAME "-muxw",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 STATIC struct module_info mtp_rinfo = {
-	mi_idnum:SCCP_DRV_ID,		/* Module ID number */
-	mi_idname:SCCP_DRV_NAME "-muxr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -194,7 +203,7 @@ STATIC struct qinit mtp_winit = {
 	qi_minfo:&mtp_winfo,		/* Information */
 };
 
-STATIC struct streamtab sccp_info = {
+STATIC struct streamtab sccpinfo = {
 	st_rdinit:&sccp_rinit,		/* Upper read queue */
 	st_wrinit:&sccp_winit,		/* Upper write queue */
 	st_muxrinit:&mtp_rinit,		/* Lower read queue */
@@ -1168,7 +1177,7 @@ sccp_set_state(struct sc *sc, ulong newstate)
 {
 	ulong oldstate = sc->state;
 	if (newstate != oldstate) {
-		printd(("%s: %p: %s <- %s\n", SCCP_DRV_NAME, sc, sccp_state(newstate),
+		printd(("%s: %p: %s <- %s\n", DRV_NAME, sc, sccp_state(newstate),
 			sccp_state(oldstate)));
 		sc->state = newstate;
 	}
@@ -1183,7 +1192,7 @@ sccp_set_n_state(struct sc *sc, ulong newstate)
 {
 	ulong oldstate = sc->i_state;
 	if (newstate != oldstate) {
-		printd(("%s: %p: %s <- %s\n", SCCP_DRV_NAME, sc, sccp_n_state(newstate),
+		printd(("%s: %p: %s <- %s\n", DRV_NAME, sc, sccp_n_state(newstate),
 			sccp_n_state(oldstate)));
 		sc->i_state = newstate;
 	}
@@ -1198,7 +1207,7 @@ sccp_set_t_state(struct sc *sc, ulong newstate)
 {
 	ulong oldstate = sc->i_state;
 	if (newstate != oldstate) {
-		printd(("%s: %p: %s <- %s\n", SCCP_DRV_NAME, sc, sccp_t_state(newstate),
+		printd(("%s: %p: %s <- %s\n", DRV_NAME, sc, sccp_t_state(newstate),
 			sccp_t_state(oldstate)));
 		sc->i_state = newstate;
 	}
@@ -1220,7 +1229,7 @@ mtp_set_state(struct mt *mt, ulong newstate)
 {
 	ulong oldstate = mt->state;
 	if (newstate != oldstate) {
-		printd(("%s: %p: %s <- %s\n", SCCP_DRV_NAME, mt, mtp_state(newstate),
+		printd(("%s: %p: %s <- %s\n", DRV_NAME, mt, mtp_state(newstate),
 			mtp_state(oldstate)));
 		mt->state = newstate;
 	}
@@ -1236,7 +1245,7 @@ mtp_set_i_state(struct mt *mt, ulong newstate)
 {
 	ulong oldstate = mt->i_state;
 	if (newstate != oldstate) {
-		printd(("%s: %p: %s <- %s\n", SCCP_DRV_NAME, mt, mtp_i_state(newstate),
+		printd(("%s: %p: %s <- %s\n", DRV_NAME, mt, mtp_i_state(newstate),
 			mtp_i_state(oldstate)));
 		mt->i_state = newstate;
 	}
@@ -1661,7 +1670,7 @@ m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 	mp->b_datap->db_type = M_FLUSH;
 	*(mp->b_wptr)++ = flags | (band ? FLUSHBAND : 0);
 	*(mp->b_wptr)++ = band;
-	printd(("%s: %p: <- M_FLUSH\n", SCCP_DRV_NAME, pq));
+	printd(("%s: %p: <- M_FLUSH\n", DRV_NAME, pq));
 	putq(pq, mp);
 	return (QR_DONE);
       enobufs:
@@ -1698,7 +1707,7 @@ m_error(queue_t *q, struct sc *sc, int error)
 	if (hangup) {
 		mp->b_datap->db_type = M_HANGUP;
 		sccp_set_state(sc, NS_NOSTATES);
-		printd(("%s: %p: <- M_HANGUP\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, sc));
 		ss7_oput(sc->oq, mp);
 		return (-error);
 	} else {
@@ -1706,7 +1715,7 @@ m_error(queue_t *q, struct sc *sc, int error)
 		*(mp->b_wptr)++ = error < 0 ? -error : error;
 		*(mp->b_rptr)++ = error < 0 ? -error : error;
 		sccp_set_state(sc, NS_NOSTATES);
-		printd(("%s: %p: <- M_ERROR\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: <- M_ERROR\n", DRV_NAME, sc));
 		ss7_oput(sc->oq, mp);
 		return (QR_DONE);
 	}
@@ -1773,15 +1782,15 @@ n_conn_ind(queue_t *q, struct sc *sc, mblk_t *cp)
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -1831,15 +1840,15 @@ n_conn_con(queue_t *q, struct sc *sc, ulong pcl, ulong flags, struct sccp_addr *
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -1851,8 +1860,8 @@ n_conn_con(queue_t *q, struct sc *sc, ulong pcl, ulong flags, struct sccp_addr *
  *  -----------------------------------
  */
 STATIC INLINE int
-n_discon_ind(queue_t *q, struct sc *sc, ulong orig, long reason, struct sccp_addr *res,
-	     mblk_t *seq, mblk_t *dp)
+n_discon_ind(queue_t *q, struct sc *sc, ulong orig, long reason, struct sccp_addr *res, mblk_t *seq,
+	     mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -1890,15 +1899,15 @@ n_discon_ind(queue_t *q, struct sc *sc, ulong orig, long reason, struct sccp_add
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -1939,15 +1948,15 @@ n_data_ind(queue_t *q, struct sc *sc, ulong more, mblk_t *dp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -1988,15 +1997,15 @@ n_exdata_ind(queue_t *q, struct sc *sc, ulong more, mblk_t *dp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2072,7 +2081,7 @@ n_info_ack(queue_t *q, struct sc *sc)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
 	goto error;
       error:
@@ -2121,11 +2130,11 @@ n_bind_ack(queue_t *q, struct sc *sc)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2188,18 +2197,17 @@ n_error_ack(queue_t *q, struct sc *sc, const long prim, int err)
 		sccp_set_n_state(sc, NS_WRES_RIND);
 		break;
 	default:
-		/*
+		/* 
 		   Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we send NOUTSTATE or NNOTSUPPORT or are responding to an
-		   N_OPTMGMT_REQ in other than the NS_IDLE state. 
-		 */
+		   N_OPTMGMT_REQ in other than the NS_IDLE state. */
 		break;
 	}
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2265,18 +2273,17 @@ n_ok_ack(queue_t *q, struct sc *sc, long prim, ulong seq, ulong tok)
 			sccp_set_n_state(sc, NS_IDLE);
 		break;
 	default:
-		/*
+		/* 
 		   Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we are responding to a N_OPTMGMT_REQ in other than the NS_IDLE
-		   state. 
-		 */
+		   state. */
 		break;
 	}
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2321,15 +2328,15 @@ n_unitdata_ind(queue_t *q, struct sc *sc, struct sccp_addr *src, struct sccp_add
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2374,15 +2381,15 @@ n_uderror_ind(queue_t *q, struct sc *sc, struct sccp_addr *dst, mblk_t *dp, ulon
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2421,15 +2428,15 @@ n_datack_ind(queue_t *q, struct sc *sc)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2463,15 +2470,15 @@ n_reset_ind(queue_t *q, struct sc *sc, ulong orig, ulong reason, mblk_t *cp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2502,15 +2509,15 @@ n_reset_con(queue_t *q, struct sc *sc)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2540,15 +2547,15 @@ n_recover_ind(queue_t *q, struct sc *sc)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2580,15 +2587,15 @@ n_retrieve_ind(queue_t *q, struct sc *sc, mblk_t *dp)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2619,15 +2626,15 @@ n_retrieve_con(queue_t *q, struct sc *sc)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_n_state(sc)));
 	goto error;
       error:
@@ -2655,8 +2662,8 @@ n_ordrel_ind(queue_t *q, struct sc *sc)
  *  -----------------------------------------------------------------
  */
 STATIC INLINE int
-n_notice_ind(queue_t *q, struct sc *sc, ulong cause, struct sccp_addr *dst,
-	     struct sccp_addr *src, ulong pri, ulong seq, ulong pcl, ulong imp, mblk_t *dp)
+n_notice_ind(queue_t *q, struct sc *sc, ulong cause, struct sccp_addr *dst, struct sccp_addr *src,
+	     ulong pri, ulong seq, ulong pcl, ulong imp, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -2695,16 +2702,16 @@ n_notice_ind(queue_t *q, struct sc *sc, ulong cause, struct sccp_addr *dst,
 	qos->importance = imp;
 	qos->sequence_selection = seq;
 	qos->message_priority = pri;
-	printd(("%s: %p: <- N_NOTICE_IND\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_NOTICE_IND\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2736,16 +2743,16 @@ n_inform_ind(queue_t *q, struct sc *sc, N_qos_sel_infr_sccp_t * qos, ulong reaso
 		bcopy(qos, mp->b_wptr, qos_len);
 		mp->b_wptr += qos_len;
 	}
-	printd(("%s: %p: <- N_INFORM_IND\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_INFORM_IND\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2776,16 +2783,16 @@ n_coord_ind(queue_t *q, struct sc *sc, struct sccp_addr *add)
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- N_COORD_IND\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_COORD_IND\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2817,16 +2824,16 @@ n_coord_con(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong smi)
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- N_COORD_CON\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_COORD_CON\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2859,16 +2866,16 @@ n_state_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status, ulon
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- N_STATE_IND\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_STATE_IND\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2901,16 +2908,16 @@ n_pcstate_ind(queue_t *q, struct sc *sc, struct mtp_addr *add, ulong status)
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- N_PCSTATE_IND\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_PCSTATE_IND\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -2946,16 +2953,16 @@ n_traffic_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong tmix)
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- N_TRAFFIC_IND\n", SCCP_DRV_NAME, sc));
+	printd(("%s: %p: <- N_TRAFFIC_IND\n", DRV_NAME, sc));
 	putnext(sc->oq, mp);
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3020,10 +3027,10 @@ t_conn_ind(queue_t *q, struct sc *sc, mblk_t *cp)
 	rare();
 	return (-EBUSY);
       erestart:
-	ptrace(("%s: %p: PROTO: too many connection indications\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: PROTO: too many connection indications\n", DRV_NAME, sc));
 	return (-ERESTART);
       efault:
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	return (-EFAULT);
 }
@@ -3072,15 +3079,15 @@ t_conn_con(queue_t *q, struct sc *sc, ulong pcl, ulong flgas, struct sccp_addr *
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	goto error;
       error:
@@ -3127,15 +3134,15 @@ t_discon_ind(queue_t *q, struct sc *sc, long reason, mblk_t *seq, mblk_t *dp)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	goto error;
       error:
@@ -3168,15 +3175,15 @@ t_data_ind(queue_t *q, struct sc *sc, ulong more, mblk_t *dp)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	goto error;
       error:
@@ -3210,15 +3217,15 @@ t_exdata_ind(queue_t *q, struct sc *sc, ulong more, mblk_t *dp)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	goto error;
       error:
@@ -3260,7 +3267,7 @@ t_info_ack(queue_t *q, struct sc *sc)
 	}
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3297,12 +3304,12 @@ t_bind_ack(queue_t *q, struct sc *sc, struct sccp_addr *add)
 	return (0);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3367,17 +3374,16 @@ t_error_ack(queue_t *q, struct sc *sc, const ulong prim, long error)
 	case TS_WACK_DREQ11:
 		sccp_set_t_state(sc, TS_WREQ_ORDREL);
 		break;
-		/*
+		/* 
 		   Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we send TOUTSTATE or TNOTSUPPORT or are responding to a
-		   T_OPTMGMT_REQ in other then TS_IDLE state. 
-		 */
+		   T_OPTMGMT_REQ in other then TS_IDLE state. */
 	}
 	putnext(sc->oq, mp);
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3440,17 +3446,16 @@ t_ok_ack(queue_t *q, struct sc *sc, ulong prim, ulong seq, ulong tok)
 		else
 			sccp_set_t_state(sc, TS_IDLE);
 		break;
-		/*
+		/* 
 		   Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE
-		   state. 
-		 */
+		   state. */
 	}
 	putnext(sc->oq, mp);
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3486,7 +3491,7 @@ t_optmgmt_ack(queue_t *q, struct sc *sc, ulong flags, struct sccp_opts *ops)
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3525,16 +3530,16 @@ t_ordrel_ind(queue_t *q, struct sc *sc)
 	return (0);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", SCCP_DRV_NAME, sc,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, sc,
 		sccp_get_t_state(sc)));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3575,7 +3580,7 @@ t_addr_ack(queue_t *q, struct sc *sc, struct sccp_addr *loc, struct sccp_addr *r
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3618,7 +3623,7 @@ t_capability_ack(queue_t *q, struct sc *sc, ulong caps)
 		return (0);
 	} else {
 		err = -ENOBUFS;
-		ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	}
 	return (err);
 }
@@ -3706,11 +3711,11 @@ t_unitdata_ind(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong *seq, ulo
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3723,8 +3728,8 @@ t_unitdata_ind(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong *seq, ulo
  *  options produced an error.
  */
 STATIC INLINE int
-t_uderror_ind(queue_t *q, struct sc *sc, ulong etype, struct sccp_addr *dst, ulong *seq,
-	      ulong *pri, ulong *pcl, ulong *imp, ulong *ret, mblk_t *dp)
+t_uderror_ind(queue_t *q, struct sc *sc, ulong etype, struct sccp_addr *dst, ulong *seq, ulong *pri,
+	      ulong *pcl, ulong *imp, ulong *ret, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -3799,11 +3804,11 @@ t_uderror_ind(queue_t *q, struct sc *sc, ulong etype, struct sccp_addr *dst, ulo
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -3838,7 +3843,7 @@ mtp_bind_req(queue_t *q, struct mt *mt, ulong flags, struct mtp_addr *add)
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: MTP_BIND_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_BIND_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -3861,7 +3866,7 @@ mtp_unbind_req(queue_t *q, struct mt *mt)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_UNBIND_REQ;
-		printd(("%s: %p: MTP_UNBIND_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_UNBIND_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -3892,7 +3897,7 @@ mtp_conn_req(queue_t *q, struct mt *mt, ulong flags, struct mtp_addr *add)
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: MTP_CONN_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_CONN_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -3916,7 +3921,7 @@ mtp_discon_req(queue_t *q, struct mt *mt)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mtp_primitive = MTP_DISCON_REQ;
-			printd(("%s: %p: MTP_DISCON_REQ ->\n", SCCP_DRV_NAME, mt));
+			printd(("%s: %p: MTP_DISCON_REQ ->\n", DRV_NAME, mt));
 			ss7_oput(mt->oq, mp);
 			return (QR_DONE);
 		}
@@ -3942,7 +3947,7 @@ mtp_addr_req(queue_t *q, struct mt *mt)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_ADDR_REQ;
-		printd(("%s: %p: MTP_ADDR_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_ADDR_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -3965,7 +3970,7 @@ mtp_info_req(queue_t *q, struct mt *mt)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_INFO_REQ;
-		printd(("%s: %p: MTP_INFO_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_INFO_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -3995,7 +4000,7 @@ mtp_optmgmt_req(queue_t *q, struct mt *mt, ulong flags, uchar *opt_ptr, size_t o
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: MTP_OPTMGMT_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_OPTMGMT_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -4029,7 +4034,7 @@ mtp_transfer_req(queue_t *q, struct mt *mt, struct mtp_addr *add, ulong prior, u
 				mp->b_wptr += add_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: MTP_TRANSFER_REQ ->\n", SCCP_DRV_NAME, mt));
+			printd(("%s: %p: MTP_TRANSFER_REQ ->\n", DRV_NAME, mt));
 			ss7_oput(mt->oq, mp);
 			return (QR_ABSORBED);
 		}
@@ -4389,9 +4394,8 @@ unpack_cpa(ulong pvar, uchar *p, uchar *e, struct sccp_addr *a)
 				default:
 					return (-EPROTO);
 				}
-				/*
-				   followed by address bytes 
-				 */
+				/* 
+				   followed by address bytes */
 				if ((a->alen = e - p) > SCCP_MAX_ADDR_LENGTH)
 					return (-EMSGSIZE);
 				bcopy(p, a->addr, a->alen);
@@ -4458,9 +4462,8 @@ unpack_cpa(ulong pvar, uchar *p, uchar *e, struct sccp_addr *a)
 			default:
 				return (-EPROTO);
 			}
-			/*
-			   followed by address bytes 
-			 */
+			/* 
+			   followed by address bytes */
 			if ((a->alen = e - p) > SCCP_MAX_ADDR_LENGTH)
 				return (-EMSGSIZE);
 			bcopy(p, a->addr, a->alen);
@@ -4843,21 +4846,19 @@ size_data(struct sccp_msg *m)
 STATIC inline void
 link_data(mblk_t *mp, mblk_t *data)
 {
-	/*
+	/* 
 	   IMPLEMENTATION NOTE:- Because sizeable mandatory variable part data exists, MVP DATA and 
 	   MVP LDATA are linked at the end of the SCCP message rather than copying it into the SCCP 
-	   M_DATA message block. 
-	 */
+	   M_DATA message block. */
 	linkb(mp, data);
 }
 STATIC inline int
 pack_data(struct sccp_msg *m, uchar **p)
 {
-	/*
+	/* 
 	   IMPLEMENTATION NOTE:- For optional data (in connection and disconnect) the farthest
 	   towards the end of the message that DATA can be placed is just before the EOP byte.
-	   Because optional data is not normally large, we byte-copy the data. 
-	 */
+	   Because optional data is not normally large, we byte-copy the data. */
 	int len = 0;
 	mblk_t *dp = m->bp->b_cont;
 	while ((dp = dp->b_cont)) {
@@ -6318,9 +6319,8 @@ sccp_pack_ludts(queue_t *q, mblk_t *msg)
 			pack_ins(m, &mp->b_wptr);
 		}
 		*(mp->b_wptr)++ = SCCP_PT_EOP;	/* EOP O */
-		/*
-		   always link data at end of message 
-		 */
+		/* 
+		   always link data at end of message */
 		*pd = mp->b_wptr - pd;	/* LDATA V */
 		*(mp->b_wptr)++ = size_ldata(m);
 		link_data(mp, msg->b_cont);
@@ -6481,7 +6481,7 @@ sccp_send_msg(queue_t *q, mblk_t *msg)
 	}
 	if (dp) {
 		mp->b_cont = dp;
-		printd(("%s: %p: MTP_TRANSFER_REQ ->\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_TRANSFER_REQ ->\n", DRV_NAME, mt));
 		ss7_oput(mt->oq, mp);
 		return (QR_DONE);
 	}
@@ -6558,8 +6558,8 @@ STATIC int sccp_orte_msg(queue_t *q, mblk_t *mp);
  */
 STATIC INLINE int
 sccp_send_cr(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong slr, ulong pcl,
-	     struct sccp_addr *cdpa, ulong *cred, struct sccp_addr *cgpa, mblk_t *data,
-	     ulong *hopc, ulong *imp)
+	     struct sccp_addr *cdpa, ulong *cred, struct sccp_addr *cgpa, mblk_t *data, ulong *hopc,
+	     ulong *imp)
 {
 	struct sccp_msg *m;
 	if ((m = sccp_enc_msg(q, sp, dpc, pri, sls))) {
@@ -6683,8 +6683,8 @@ sccp_send_cref(queue_t *q, struct sp *sp, ulong dpc, ulong sls, ulong dlr, ulong
  *  ANSI: F(DLR, SLR, RELC), O(DATA, EOP)
  */
 STATIC INLINE int
-sccp_send_rlsd(queue_t *q, struct sp *sp, ulong dpc, ulong sls, ulong dlr, ulong slr,
-	       ulong relc, mblk_t *data, ulong *imp)
+sccp_send_rlsd(queue_t *q, struct sp *sp, ulong dpc, ulong sls, ulong dlr, ulong slr, ulong relc,
+	       mblk_t *data, ulong *imp)
 {
 	struct sccp_msg *m;
 	if ((m = sccp_enc_msg(q, sp, dpc, SCCP_MP_RLSD, sls))) {
@@ -7038,9 +7038,9 @@ sccp_send_xudt(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong
  *  ANSI: F(RETC, HOPC), V(CDPA, CGPA, DATA[2-251]), O(SGMT, INS, MTI, ISNI, EOP)
  */
 STATIC INLINE int
-sccp_send_xudts(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong retc,
-		ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data,
-		sccp_sgmt_t * sgmt, ulong *imp, sccp_ins_t * ins, ulong *mti, sccp_isni_t * isni)
+sccp_send_xudts(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong retc, ulong hopc,
+		struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data, sccp_sgmt_t * sgmt,
+		ulong *imp, sccp_ins_t * ins, ulong *mti, sccp_isni_t * isni)
 {
 	struct sccp_msg *m;
 	if ((m = sccp_enc_msg(q, sp, dpc, pri, sls))) {
@@ -7136,9 +7136,9 @@ sccp_send_ludt(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong
  *  ANSI: F(RETC, HOPC), V(CDPA, CGPA, LDATA[3-3904]), O(SGMT, ISNI, INS, EOP)
  */
 STATIC INLINE int
-sccp_send_ludts(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong retc,
-		ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data,
-		sccp_sgmt_t * sgmt, ulong *imp, sccp_isni_t * isni, sccp_ins_t * ins)
+sccp_send_ludts(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, ulong retc, ulong hopc,
+		struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data, sccp_sgmt_t * sgmt,
+		ulong *imp, sccp_isni_t * isni, sccp_ins_t * ins)
 {
 	struct sccp_msg *m;
 	if ((m = sccp_enc_msg(q, sp, dpc, pri, sls))) {
@@ -7205,8 +7205,8 @@ sccp_send_scmg(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls, struc
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_ssa(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_ssa(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SSA, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SSA, assn, apc, smi, 0);
@@ -7242,8 +7242,8 @@ sccp_bcast_ssa(queue_t *q, struct sp *sp, ulong dpc, ulong assn, ulong apc, ulon
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_ssp(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_ssp(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SSP, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SSP, assn, apc, smi, 0);
@@ -7254,8 +7254,8 @@ sccp_send_ssp(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_sst(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_sst(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SST, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SST, assn, apc, smi, 0);
@@ -7266,8 +7266,8 @@ sccp_send_sst(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_sor(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_sor(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SOR, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SOR, assn, apc, smi, 0);
@@ -7278,8 +7278,8 @@ sccp_send_sor(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_sog(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_sog(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SOG, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SOG, assn, apc, smi, 0);
@@ -7290,8 +7290,8 @@ sccp_send_sog(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_ssc(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi, ulong cong)
+sccp_send_ssc(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi, ulong cong)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SSC, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SSC, assn, apc, smi, cong);
@@ -7302,8 +7302,8 @@ sccp_send_ssc(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_sbr(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_sbr(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SBR, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SBR, assn, apc, smi, 0);
@@ -7314,8 +7314,8 @@ sccp_send_sbr(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_snr(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_snr(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SNR, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SNR, assn, apc, smi, 0);
@@ -7326,8 +7326,8 @@ sccp_send_snr(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
-sccp_send_srt(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_srt(queue_t *q, struct sp *sp, ulong dpc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      ulong assn, ulong apc, ulong smi)
 {
 	return sccp_send_scmg(q, sp, dpc, SCMG_MP_SRT, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SRT, assn, apc, smi, 0);
@@ -7386,16 +7386,16 @@ enum { tall, tcon, tias, tiar, trel, trel2, tint, tguard, tres, trea, tack, tgtt
  *  SCCP timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tcon, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tias, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tiar, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, trel, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, trel2, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tint, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tguard, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tres, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, trea, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sc, tack, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tcon, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tias, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tiar, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, trel, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, trel2, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tint, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tguard, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tres, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, trea, config);
+SS7_DECLARE_TIMER(DRV_NAME, sc, tack, config);
 
 STATIC INLINE void
 __sccp_timer_stop(struct sc *sc, const ulong t)
@@ -7404,79 +7404,68 @@ __sccp_timer_stop(struct sc *sc, const ulong t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tcon:
 		sc_stop_timer_tcon(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tias:
 		sc_stop_timer_tias(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tiar:
 		sc_stop_timer_tiar(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case trel:
 		sc_stop_timer_trel(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case trel2:
 		sc_stop_timer_trel2(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tint:
 		sc_stop_timer_tint(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tguard:
 		sc_stop_timer_tguard(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tres:
 		sc_stop_timer_tres(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case trea:
 		sc_stop_timer_trea(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tack:
 		sc_stop_timer_tack(sc);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -7543,8 +7532,8 @@ sccp_timer_start(struct sc *sc, const ulong t)
  *  SS timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, ss, tisst, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, ss, twsog, config);
+SS7_DECLARE_TIMER(DRV_NAME, ss, tisst, config);
+SS7_DECLARE_TIMER(DRV_NAME, ss, twsog, config);
 
 STATIC INLINE void
 __ss_timer_stop(struct ss *ss, const ulong t)
@@ -7553,23 +7542,20 @@ __ss_timer_stop(struct ss *ss, const ulong t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tisst:
 		ss_stop_timer_tisst(ss);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case twsog:
 		ss_stop_timer_twsog(ss);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -7612,7 +7598,7 @@ ss_timer_start(struct ss *ss, const ulong t)
  *  RS timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, rs, tsst, config);
+SS7_DECLARE_TIMER(DRV_NAME, rs, tsst, config);
 
 STATIC INLINE void
 __rs_timer_stop(struct rs *rs, const ulong t)
@@ -7621,16 +7607,14 @@ __rs_timer_stop(struct rs *rs, const ulong t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tsst:
 		rs_stop_timer_tsst(rs);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -7670,7 +7654,7 @@ rs_timer_start(struct rs *rs, const ulong t)
  *  SP timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sp, tgtt, config);
+SS7_DECLARE_TIMER(DRV_NAME, sp, tgtt, config);
 
 STATIC INLINE void
 __sp_timer_stop(struct sp *sp, const ulong t)
@@ -7679,16 +7663,14 @@ __sp_timer_stop(struct sp *sp, const ulong t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tgtt:
 		sp_stop_timer_tgtt(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -7728,10 +7710,10 @@ sp_timer_start(struct sp *sp, const ulong t)
  *  SR timers
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sr, tattack, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sr, tdecay, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sr, tstatinfo, config);
-SS7_DECLARE_TIMER(SCCP_DRV_NAME, sr, tsst, config);
+SS7_DECLARE_TIMER(DRV_NAME, sr, tattack, config);
+SS7_DECLARE_TIMER(DRV_NAME, sr, tdecay, config);
+SS7_DECLARE_TIMER(DRV_NAME, sr, tstatinfo, config);
+SS7_DECLARE_TIMER(DRV_NAME, sr, tsst, config);
 
 STATIC INLINE void
 __sr_timer_stop(struct sr *sr, const ulong t)
@@ -7740,37 +7722,32 @@ __sr_timer_stop(struct sr *sr, const ulong t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tattack:
 		sr_stop_timer_tattack(sr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tdecay:
 		sr_stop_timer_tdecay(sr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tstatinfo:
 		sr_stop_timer_tstatinfo(sr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tsst:
 		sr_stop_timer_tsst(sr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -7900,9 +7877,8 @@ sccp_datack_ind(queue_t *q, struct sc *sc)
 	case SCCP_STYLE_NPI:
 		return n_datack_ind(q, sc);
 	case SCCP_STYLE_TPI:
-		/*
-		   could possibly use t_opdata_ind here 
-		 */
+		/* 
+		   could possibly use t_opdata_ind here */
 		return (-EOPNOTSUPP);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
@@ -7920,9 +7896,8 @@ sccp_reset_ind(queue_t *q, struct sc *sc, ulong orig, ulong reason, mblk_t *cp)
 	case SCCP_STYLE_NPI:
 		return n_reset_ind(q, sc, orig, reason, cp);
 	case SCCP_STYLE_TPI:
-		/*
-		   could possibly use t_opdata_ind here 
-		 */
+		/* 
+		   could possibly use t_opdata_ind here */
 		return (-EOPNOTSUPP);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
@@ -7938,9 +7913,8 @@ sccp_reset_con(queue_t *q, struct sc *sc)
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		/*
-		   could possibly use t_opdata_ind here 
-		 */
+		/* 
+		   could possibly use t_opdata_ind here */
 		return n_reset_con(q, sc);
 	case SCCP_STYLE_TPI:
 		return (-EOPNOTSUPP);
@@ -8034,13 +8008,11 @@ sccp_inform_ind(queue_t *q, struct sc *sc, N_qos_sel_infr_sccp_t * qos, ulong re
 	case SCCP_STYLE_SCCPI:
 		return n_inform_ind(q, sc, qos, reason);
 	case SCCP_STYLE_NPI:
-		/*
-		   XXX: could possibly use n_reset_ind 
-		 */
+		/* 
+		   XXX: could possibly use n_reset_ind */
 	case SCCP_STYLE_TPI:
-		/*
-		   XXX: could possible use t_optdata_ind with no data 
-		 */
+		/* 
+		   XXX: could possible use t_optdata_ind with no data */
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
@@ -8094,13 +8066,11 @@ sccp_state_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status, u
 	case SCCP_STYLE_MGMT:
 		return n_state_ind(q, sc, add, status, smi);
 	case SCCP_STYLE_NPI:
-		/*
-		   could possibly use n_uderror_ind or n_reset_ind 
-		 */
+		/* 
+		   could possibly use n_uderror_ind or n_reset_ind */
 	case SCCP_STYLE_TPI:
-		/*
-		   could possibly use t_uderror_ind or t_optdata_ind 
-		 */
+		/* 
+		   could possibly use t_uderror_ind or t_optdata_ind */
 		swerr();
 		return (-EOPNOTSUPP);
 	default:
@@ -8157,13 +8127,11 @@ sccp_pcstate_ind(queue_t *q, struct sc *sc, struct mtp_addr *add, ulong status)
 	case SCCP_STYLE_MGMT:
 		return n_pcstate_ind(q, sc, add, status);
 	case SCCP_STYLE_NPI:
-		/*
-		   could possibly use n_uderror_ind or n_reset_ind 
-		 */
+		/* 
+		   could possibly use n_uderror_ind or n_reset_ind */
 	case SCCP_STYLE_TPI:
-		/*
-		   could possibly use t_uderror_ind or t_optdata_ind 
-		 */
+		/* 
+		   could possibly use t_uderror_ind or t_optdata_ind */
 		swerr();
 		return (-EOPNOTSUPP);
 	default:
@@ -8220,13 +8188,11 @@ sccp_traffic_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong tmix)
 	case SCCP_STYLE_MGMT:
 		return n_traffic_ind(q, sc, add, tmix);
 	case SCCP_STYLE_NPI:
-		/*
-		   could possibly use n_uderror_ind or n_reset_ind 
-		 */
+		/* 
+		   could possibly use n_uderror_ind or n_reset_ind */
 	case SCCP_STYLE_TPI:
-		/*
-		   could possibly use t_uderror_ind or t_optdata_ind 
-		 */
+		/* 
+		   could possibly use t_uderror_ind or t_optdata_ind */
 		swerr();
 		return (-EOPNOTSUPP);
 	default:
@@ -8266,11 +8232,10 @@ STATIC INLINE int
 sccp_release_error(queue_t *q, struct sc *sc)
 {
 	int err;
-	/*
+	/* 
 	   Figure C.2/Q.714 Sheet 2 of 7: Figure 2A/T1.112.4-2000 Sheet 2 of 4: stop connection
 	   timer, release resources and local reference, freeze local reference, send N_DISCON_IND
-	   to user, and move to the idle state. 
-	 */
+	   to user, and move to the idle state. */
 	sccp_release(sc);
 	if ((err =
 	     sccp_discon_ind(q, sc, N_PROVIDER, SCCP_RELC_REMOTE_PROCEDURE_ERROR, NULL, NULL,
@@ -8299,63 +8264,57 @@ sccp_release_error(queue_t *q, struct sc *sc)
 STATIC int
 sccp_recv_cr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   CRED is only used with protocol class 3, DATA is optional, HOPC is only used at a relay
 	   node, CGPA is optional, the OPC of the message is used if the CGPA is absent, IMP is
-	   used for congestion control 
-	 */
+	   used for congestion control */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_IDLE:
 	case SS_WRES_CIND:
-		/*
+		/* 
 		   Notes: we defer all of this stuff until we get an N_CONN_RES from the listening
 		   stream.  Then we associate all of this stuff with the connection section.  This
 		   might not be completely correct.  SCCP only sends one CR and then assigns a new
 		   reference to the next connection.  We could actually use the local reference as
-		   the SEQUENCE_number in the N_CONN_IND. 
-		 */
-		/*
+		   the SEQUENCE_number in the N_CONN_IND. */
+		/* 
 		   Figure 2B/T1.112.4-2000 1of2: if resources are not available, send a CREF;
 		   otherwise, assign a local reference and SLS to incoming connection section and
 		   determine protocol class and credit, associate originating node of CR with the
 		   incoming connection section, send an N_CONN_IND to the user and move to the
-		   connection pending state. 
-		 */
-		/*
+		   connection pending state. */
+		/* 
 		   Figure C.3/Q.714 Sheet 1 of 6: if resources are not available, send a CREF;
 		   otherwise, associate the remote reference to the connection, determine protocol
 		   class and credit, send user an N_CONN_IND, move to the connection pending state. 
 		 */
-		/*
-		   FIXME: should send pcl and src address in options 
-		 */
+		/* 
+		   FIXME: should send pcl and src address in options */
 		if ((err = sccp_conn_ind(q, sc, msg)))
 			return (err);
 		sccp_set_state(sc, SS_WRES_CIND);
 		return (QR_ABSORBED);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Note that ITUT96 does not use SLR in the CR to send a RLSD message as does ANSI. 
 		 */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ITUT:
 		case SS7_PVAR_ETSI:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 3 of 7: stop connection timer, release resources
-			   and local reference, freeze local reference, move to the idle state. 
-			 */
+			   and local reference, freeze local reference, move to the idle state. */
 			return sccp_release_error(q, sc);
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: same action as for CC in this
 			   state: stop connection timer, associate destination reference to
 			   connection section, release resources, stop inactivity timers, send
 			   RLSD, start released (ANSI: and interval timers), move to the disconnect 
-			   pending state. 
-			 */
+			   pending state. */
 			sccp_release(sc);
 			sc->dlr = m->slr;
 			if ((err =
@@ -8382,11 +8341,11 @@ sccp_recv_cr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   CRED is only used with protocol class 3, DATA is optional, CDPA is optional, the OPC of
 	   the message is used in subseqent messages if CDPA is absent, IMP is used for congestion
-	   control.  DLR is used to look up the stream in the NS_WCON_REQ state.  SLR is saved. PCLS 
-	   is passed to user.  This should result in an N_CONN_CON primitive to the SCCP-User. 
+	   control.  DLR is used to look up the stream in the NS_WCON_REQ state.  SLR is saved.
+	   PCLS is passed to user.  This should result in an N_CONN_CON primitive to the SCCP-User. 
 	 */
 	int err;
 	// mblk_t *mp;
@@ -8394,13 +8353,12 @@ sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	ulong flags = m->pcl == 3 ? REC_CONF_OPT | EX_DATA_OPT : 0;
 	switch (sccp_get_state(sc)) {
 	case SS_WCON_CREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 2 of 7: Figure 2A/T1.112.4-2000 Sheet 2 of 4: stop
 		   connection timer, start inactivity timers, assign protocol class and credit,
 		   associate remote reference to connection section, (ANSI: associate originating
 		   node of CC with connection section), send N_CONN_CON to user, and enter the data 
-		   transfer state. 
-		 */
+		   transfer state. */
 		sccp_timer_stop(sc, tcon);
 		if ((err = sccp_conn_con(q, sc, m->pcl, flags, res, msg->b_cont->b_cont)))
 			return (err);
@@ -8413,12 +8371,11 @@ sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 3 of 7: Figure 2A/T1.112.4-2000 Sheet 3 of 4: Stop
 		   connection timer, associate destination reference to connection section, release 
 		   resources, stop inactivity timers, send RLSD, start released (ANSI: and interval 
-		   timers), move to the disconnect pending state. 
-		 */
+		   timers), move to the disconnect pending state. */
 		sccp_release(sc);
 		sc->dlr = m->slr;
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
@@ -8442,25 +8399,22 @@ sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_IDLE:
-		/*
-		   Figure 2A/T1.112.4-2000 1of4: Figure 2B/T1.112.4-2000 1of2: send ERR. 
-		 */
+		/* 
+		   Figure 2A/T1.112.4-2000 1of4: Figure 2B/T1.112.4-2000 1of2: send ERR. */
 		if ((err =
 		     sccp_send_err(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 				   SCCP_ERRC_UNQUALIFIED)))
@@ -8470,12 +8424,11 @@ sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_DATA_XFER:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000 2of2: send an
 			   N_DISCON_IND to the user, release resources for the connection, stop
 			   inactivity timers, send RLSD, start released and interval timers, move
-			   to the disconnect pending state. 
-			 */
+			   to the disconnect pending state. */
 			sccp_release(sc);
 			if ((err =
 			     sccp_send_rlsd(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
@@ -8493,9 +8446,8 @@ sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			sccp_set_state(sc, SS_WCON_DREQ);
 			return (QR_DONE);
 		default:
-			/*
-			   Figure C.3/Q.714 Sheet 3 of 6: discard 
-			 */
+			/* 
+			   Figure C.3/Q.714 Sheet 3 of 6: discard */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
@@ -8516,60 +8468,54 @@ sccp_recv_cc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_cref(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   CDPA is completely optional and only identifies the ultimate refuser, the OPC of the
 	   message is used if the CDPA is absent, IMP is used for congestion control.  DLR is used
 	   to look up the stream in the NS_WCON_CREQ state.  This should result in a N_DISCON_IND
-	   primitive to the SCCP-User. 
-	 */
+	   primitive to the SCCP-User. */
 	int err;
 	ulong cause = 0x5000 | m->cause;
 	struct sccp_addr *res = m->parms & SCCP_PTF_CDPA ? &m->cdpa : NULL;
 	switch (sccp_get_state(sc)) {
 	case SS_WCON_CREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 2 of 7: Figure 2A/T1.112.4-2000 Sheet 2 of 4: stop the
 		   connection timer, release resources and local reference, freeze local reference, 
-		   and send N_DISCON_IND to the user.  Move to the idle state. 
-		 */
+		   and send N_DISCON_IND to the user.  Move to the idle state. */
 		sccp_release(sc);
 		if ((err = sccp_discon_ind(q, sc, N_USER, cause, res, NULL, msg->b_cont)))
 			return (err);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 3 of 7: Figure 2A/T1.112.4-2000 Sheet 3 of 4: Stop
-		   connection timer, release resources and references, move to the idle state. 
-		 */
+		   connection timer, release resources and references, move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_DATA_XFER:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000: send an N_DISCON_IND
 			   to the user, release resources for the connection, stop inactivity
 			   timers, send RLSD, start released and interval timers, move to the
-			   disconnect pending state. 
-			 */
+			   disconnect pending state. */
 			sccp_release(sc);
 			if ((err =
 			     sccp_send_rlsd(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
@@ -8587,9 +8533,8 @@ sccp_recv_cref(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			sccp_set_state(sc, SS_WCON_DREQ);
 			return (QR_DONE);
 		default:
-			/*
-			   Figure C.3/Q.714 Sheet 3 of 6: discard 
-			 */
+			/* 
+			   Figure C.3/Q.714 Sheet 3 of 6: discard */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
@@ -8611,43 +8556,38 @@ sccp_recv_cref(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_rlsd(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   DATA is optional, IMP is used for congestion control.  DLR is used to look up the stream 
 	   in the NS_DATA_XFER state.  This should result in a N_DISCON_IND primitive to the
-	   SCCP-User and a SCCP_MT_RLC message issued back to the peer. 
-	 */
+	   SCCP-User and a SCCP_MT_RLC message issued back to the peer. */
 	int err;
 	mblk_t *cp = NULL;
 	struct sccp_addr *res = m->parms & SCCP_PTF_CDPA ? &m->cdpa : NULL;
 	fixme(("Have to look up any connection indications and set cp\n"));
 	switch (sccp_get_state(sc)) {
 	case SS_IDLE:
-		/*
+		/* 
 		   Figure 2A/T1.112.4-2000 1of4: Figure 2B/T1.112.4-2000 1of2: return a release
-		   complete. 
-		 */
+		   complete. */
 		if ((err =
 		     sccp_send_rlc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
 			return (err);
-		/*
+		/* 
 		   Note: this case cannot happen.  We handle this case in the bottom end routing,
-		   so this should not happen. 
-		 */
+		   so this should not happen. */
 		swerr();
 		return (QR_DONE);
 	case SS_WRES_CIND:
-		/*
+		/* 
 		   Note: the ANSI procedures permit the side initiating the connection to release
 		   the connection before receiving the Connection Confirm, which is weird as it
-		   waits for the connection confirm before releasing under user control. 
-		 */
+		   waits for the connection confirm before releasing under user control. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2B/T1.112.4-2000 1of2: send N_DISCON_IND to user, release
 			   resources and reference for the connection section, stop inactivity
-			   timers, send RLC, move to the idle state. 
-			 */
+			   timers, send RLC, move to the idle state. */
 			fixme(("Look up cc cp in connection list\n"));
 			sccp_release(sc);
 			if ((err =
@@ -8662,18 +8602,16 @@ sccp_recv_rlsd(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
-			   Figure C.2/Q.714 2of6: discard received message. 
-			 */
+			/* 
+			   Figure C.2/Q.714 2of6: discard received message. */
 			return (QR_DONE);
 		}
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 5 of 7: Figure C.3/Q.714 Sheet 4 of 6: Figure
 		   2A/T1.112.4-2000 Sheet 4 of 4: Figure 2B/T1.112.4-2000 2of2: send N_DISCON_IND
 		   to user, release resources and local reference, freeze local reference, stop
-		   inactivity timers, send RLC, and move to the IDLE state. 
-		 */
+		   inactivity timers, send RLC, and move to the IDLE state. */
 		sccp_release(sc);
 		if ((err =
 		     sccp_send_rlc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
@@ -8683,27 +8621,24 @@ sccp_recv_rlsd(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WCON_DREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 6 of 7: release resources and local reference, freeze
 		   local reference, stop release and interval timers, move to the idle state.
 		   Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000: Release references for the
-		   connection section, stop release and interval timers, move to the idle state. 
-		 */
+		   connection section, stop release and interval timers, move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WRES_RIND:
-		/*
-		   Figure C.2/Q.714 Sheet 4 of 4: FIXME this is confusing. 
-		 */
+		/* 
+		   Figure C.2/Q.714 Sheet 4 of 4: FIXME this is confusing. */
 		fixme(("Figure this out\n"));
 		return (-EFAULT);
 	case SS_WCON_CREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 2 of 7: Figure 2A/T1.112.4-2000 Sheet 2 of 4: reply with
 		   RLC, stop the connection timer, release resources and local reference, freeze
-		   local reference, and send N_DISCON_IND to the user. 
-		 */
+		   local reference, and send N_DISCON_IND to the user. */
 		sccp_release(sc);
 		if ((err =
 		     sccp_send_rlc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
@@ -8713,12 +8648,11 @@ sccp_recv_rlsd(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 3 of 7: In this case we have already received an
 		   N_DISCON_REQ from the user.  Send an RLC, stop the connection timer, release
 		   resources and local reference, freeze local reference, and move to the idle
-		   state. 
-		 */
+		   state. */
 		sccp_release(sc);
 		if ((err =
 		     sccp_send_rlc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
@@ -8726,21 +8660,18 @@ sccp_recv_rlsd(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_BOTH_RESET:
-		/*
-		   Figure C.6/Q.714 Sheet 3 of 4: same as below. 
-		 */
+		/* 
+		   Figure C.6/Q.714 Sheet 3 of 4: same as below. */
 	case SS_WCON_RREQ:
-		/*
+		/* 
 		   Figure 2E/T1.112.4-2000 2of2: stop reset timer and go to Figure 2A/T1.112.4-2000 
 		   4of4: send N_DISCON_IND to user, release resources and reference for the
 		   connection section, stop inactivity timers, send RLC and move to the idle state. 
-		   Same as below for ITU. 
-		 */
-		/*
+		   Same as below for ITU. */
+		/* 
 		   Figure C.6/Q.714 Sheet 2 of 4: Figure C.2/Q.714 Sheet 5 of 7: Send an
 		   N_DISCON_IND to the user, release resource and local reference, freeze local
-		   reference, stop inactivity timers, send a RLC, and move to the Idle state. 
-		 */
+		   reference, stop inactivity timers, send a RLC, and move to the Idle state. */
 		sccp_release(sc);
 		if ((err =
 		     sccp_send_rlc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
@@ -8765,66 +8696,59 @@ sccp_recv_rlsd(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_rlc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored.  DLR is used to look up
 	   the stream in the NS_WACK_DREQ or NS_IDLE state.  This should result in a N_OK_ACK
-	   primitive to the SCCP-User if not already sent. 
-	 */
+	   primitive to the SCCP-User if not already sent. */
 	int err;
 	// struct sccp_addr *res = m->parms & SCCP_PTF_CDPA ? &m->cdpa : NULL;
 	switch (sccp_get_state(sc)) {
 	case SS_WCON_DREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 6 of 7: release resources and local reference for
 		   connection section, freeze local reference, stop release and interval timers,
 		   move to idle state. Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000 2of2:
 		   Release references for the connection section, stop release and interval timers, 
-		   move to the idle state. 
-		 */
+		   move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
 		return sccp_release_error(q, sc);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Note that ITUT96 does not use the SLR in the RLC to send a RLSD message as does
-		   ANSI. 
-		 */
+		   ANSI. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ITUT:
 		case SS7_PVAR_ETSI:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 3 of 7: stop connection timer, release resources
-			   and local reference, freeze local reference, move to the idle state. 
-			 */
+			   and local reference, freeze local reference, move to the idle state. */
 			return sccp_release_error(q, sc);
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: same action as for CC in this
 			   state: stop connection timer, associate destination reference to
 			   connection section, release resources, stop inactivity timers, send
 			   RLSD, start released (ANSI: and interval timers), move to the disconnect 
-			   pending state. 
-			 */
+			   pending state. */
 			sccp_release(sc);
 			sc->dlr = m->slr;
 			if ((err =
@@ -8839,12 +8763,11 @@ sccp_recv_rlc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_DATA_XFER:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000 2of2: send an
 			   N_DISCON_IND to the user, release resources for the connection, stop
 			   inactivity timers, send RLSD, start released and interval timers, move
-			   to the disconnect pending state. 
-			 */
+			   to the disconnect pending state. */
 			sccp_release(sc);
 			if ((err =
 			     sccp_send_rlsd(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
@@ -8862,9 +8785,8 @@ sccp_recv_rlc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			sccp_set_state(sc, SS_WCON_DREQ);
 			return (QR_DONE);
 		default:
-			/*
-			   Figure C.3/Q.714 Sheet 3 of 6: discard 
-			 */
+			/* 
+			   Figure C.3/Q.714 Sheet 3 of 6: discard */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
@@ -8885,32 +8807,29 @@ sccp_recv_rlc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_dt1(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   for protocol class 2.  DLR is used to look up the stream in the NS_DATA_XFER state.  SEG 
 	   is passed as the more bit to the user.  This should result in an N_DATA_IND primitive to 
-	   the SCCP-User. 
-	 */
+	   the SCCP-User. */
 	int err;
 	fixme(("Handle sequence numbers and credit\n"));
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2C/T1.112.4-2000 1of2: reset receive inactivity timer.  For protocol
 		   class 3 if P(R) is in the rage from the last P(R) received up to including the
 		   send sequence number of the next message to be transmitted, if P(R) is lower
 		   than the window edge, update the lower window edge and perform the transmission
 		   wakeup function.  Otherwise, if P(S) is the next in sequence, mark ack
 		   outstanding and deliver to the user.  If P(S) is not next in sequence do an
-		   internal reset. For protocol class 2 deliver data to the user. 
-		 */
-		/*
+		   internal reset. For protocol class 2 deliver data to the user. */
+		/* 
 		   Figure C.4/Q.714 Sheet 2 of 4: When we receive a DT1 we restart the receive
 		   inactivity timer. If the M-bit is set, we can either reassemble before
 		   delivering to the user, or we can deliver immediately using the more flag in the 
 		   N_DATA_IND.  In either case, once we have a deliverable message we generate an
-		   N_DATA_IND to the user. 
-		 */
+		   N_DATA_IND to the user. */
 		sccp_timer_start(sc, tiar);
 		if ((err = sccp_data_ind(q, sc, 0, m->seg, msg->b_cont)))
 			return (err);
@@ -8918,17 +8837,15 @@ sccp_recv_dt1(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: queue received message. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: queue received message. */
 			bufq_queue(&sc->rcvq, msg);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate
-			   internal reset request, move to the active state. 
-			 */
+			   internal reset request, move to the active state. */
 			fixme(("Internal reset request\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
@@ -8936,9 +8853,8 @@ sccp_recv_dt1(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
@@ -8951,20 +8867,17 @@ sccp_recv_dt1(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 */
 	case SS_WCON_RREQ:	/* Figure C.6/Q.714 Sheet 2 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 2of2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 2of2 */
 	case SS_WCON_DREQ:	/* Figure C.2/Q.714 Sheet 6 of 7 */
 		return (QR_DONE);
 	}
@@ -8981,26 +8894,24 @@ sccp_recv_dt1(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_dt2(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   for protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  SEQ 
 	   is used for sequencing and the more bit is passed to the user.  This should result in a
-	   N_DATA_IND primitive to the SCCP-User. 
-	 */
+	   N_DATA_IND primitive to the SCCP-User. */
 	int err;
 	fixme(("Handle sequence numbers and credit\n"));
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2C/T1.112.4-2000 1of2: reset receive inactivity timer.  For protocol
 		   class 3 if P(R) is in the rage from the last P(R) received up to including the
 		   send sequence number of the next message to be transmitted, if P(R) is lower
 		   than the window edge, update the lower window edge and perform the transmission
 		   wakeup function.  Otherwise, if P(S) is the next in sequence, mark ack
 		   outstanding and deliver to the user.  If P(S) is not next in sequence do an
-		   internal reset. For protocol class 2 deliver data to the user. 
-		 */
-		/*
+		   internal reset. For protocol class 2 deliver data to the user. */
+		/* 
 		   Figure C.4/Q.714 Sheet 2 of 4: If the received P(S) is not the next in sequence, 
 		   or P(R) is outside the range from the last received P(R) to the last P(S) sent
 		   plus 1, the an internal reset (see figure) is peformed.  Otherwise, perform a
@@ -9018,25 +8929,22 @@ sccp_recv_dt2(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		   NOTE:- We allow the user to explicitly acknowledge receipt of data messages in
 		   protocol class 3.  To do this, we queue the message to an ack queue rather than
 		   performing the P(S) P(R) processing on it yet.  We postpone this processing until
-		   a data ack request is received from the user. 
-		 */
+		   a data ack request is received from the user. */
 		if ((err = sccp_data_ind(q, sc, 0, m->seg, msg->b_cont)))
 			return (err);
 		return (QR_DONE);
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: queue received message. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: queue received message. */
 			bufq_queue(&sc->rcvq, msg);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate
-			   internal reset request, move to the active state. 
-			 */
+			   internal reset request, move to the active state. */
 			fixme(("Internal reset request\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
@@ -9044,9 +8952,8 @@ sccp_recv_dt2(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
@@ -9059,20 +8966,17 @@ sccp_recv_dt2(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 */
 	case SS_WCON_RREQ:	/* Figure C.6/Q.714 Sheet 2 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 2of2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 2of2 */
 	case SS_WCON_DREQ:	/* Figure C.2/Q.714 Sheet 6 of 7 */
 		return (QR_DONE);
 	}
@@ -9089,26 +8993,24 @@ sccp_recv_dt2(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_ak(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   for protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  RSN 
 	   is used to acknowledge a specific data segment and CRED is used to update the flow
 	   control window.  If RC_OPT_SEL has been set for the stream, this should result in a
-	   N_DATACK_IND to the SCCP-User. 
-	 */
+	   N_DATACK_IND to the SCCP-User. */
 	int err;
 	fixme(("Handle sequence numbers\n"));
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2C/T1.112.4-2000 1of2: reset receive inactivity timer, update sequence
 		   number for next message to be sent and update credit.  While P(R)>lower window
 		   edge and message in transmit queue: update window edge, construct message, send
 		   data, mark no ack outstanding, reset send inactivity timer.  If P(S) is next in
 		   sequence mark ack oustanding and deliver data to user, otherwise do an internal
-		   reset. 
-		 */
-		/*
+		   reset. */
+		/* 
 		   Figure C.4/Q.714 Sheet 3 of 4: Restart the receive inactivity timer.  If the
 		   received P(R) is not in the correct range, we perform an internal reset.
 		   Otherwise, we set the sending cred to the value received in the data ack.
@@ -9120,8 +9022,7 @@ sccp_recv_ak(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		   receive inactivity timer. IMPLEMENTATION NOTES:- Q.714 does not specify an
 		   N-DATACK Indication; however, the ISO NSD as provided by NPI does support this
 		   (TPI doesn't directly).  Therefore, we deliver a data acknowledgement indication
-		   to the user if the interface supports this. 
-		 */
+		   to the user if the interface supports this. */
 		sccp_timer_start(sc, tiar);
 		if ((err = sccp_datack_ind(q, sc)))
 			return (err);
@@ -9129,17 +9030,15 @@ sccp_recv_ak(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: queue received message. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: queue received message. */
 			bufq_queue(&sc->rcvq, msg);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate
-			   internal reset request, move to the active state. 
-			 */
+			   internal reset request, move to the active state. */
 			fixme(("Internal reset request\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
@@ -9147,9 +9046,8 @@ sccp_recv_ak(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
@@ -9162,20 +9060,17 @@ sccp_recv_ak(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 */
 	case SS_WCON_RREQ:	/* Figure C.6/Q.714 Sheet 2 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 2of2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 2of2 */
 	case SS_WCON_DREQ:	/* Figure C.2/Q.714 Sheet 6 of 7 */
 		return (QR_DONE);
 	}
@@ -9192,26 +9087,23 @@ sccp_recv_ak(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_ed(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  This 
-	   should result in an N_EXDATA_IND to the SCCP-User. 
-	 */
+	   should result in an N_EXDATA_IND to the SCCP-User. */
 	int err;
 	fixme(("Handle sequence numbers\n"));
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2D/T1.112.4-2000: this is shown a little differently (no internal reset
 		   procedure), but we wait for ack from user if necessary.  Figure C.5/Q.714 Sheet
 		   1 of 2: Restart the receive inactivity timer.  Deliever an N_DATA_IND for
-		   expedited data to the user.  Wait for an acknowledgement from the user. 
-		 */
+		   expedited data to the user.  Wait for an acknowledgement from the user. */
 		if (sc->flags & SCCPF_REM_ED) {
-			/*
+			/* 
 			   Figure C.5/Q.714 Sheet 1 of 2: Perform an internal reset and move to the 
-			   active state. 
-			 */
+			   active state. */
 			fixme(("Perform internal reset\n"));
 			sc->flags &= ~SCCPF_REM_ED;
 			return (-EPROTO);
@@ -9223,17 +9115,15 @@ sccp_recv_ed(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: queue received message. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: queue received message. */
 			bufq_queue(&sc->rcvq, msg);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate
-			   internal reset request, move to the active state. 
-			 */
+			   internal reset request, move to the active state. */
 			fixme(("Internal reset request\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
@@ -9241,9 +9131,8 @@ sccp_recv_ed(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
@@ -9256,20 +9145,17 @@ sccp_recv_ed(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 */
 	case SS_WCON_RREQ:	/* Figure C.6/Q.714 Sheet 2 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 2of2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 2of2 */
 	case SS_WCON_DREQ:	/* Figure C.2/Q.714 Sheet 6 of 7 */
 		return (QR_DONE);
 	}
@@ -9286,22 +9172,20 @@ sccp_recv_ed(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_ea(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  No
 	   indication is given to the user.  It will be used internally in protocol class 3 to
-	   unlock the normal data flow. 
-	 */
+	   unlock the normal data flow. */
 	int err;
 	fixme(("Handle sequence numbers\n"));
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2D/T1.112.4-2000: same.  Figure C.5/Q.714 Sheet 1 of 2: Restart the
 		   receive inactivity timer.  If there is expedited data in queue, send another
 		   expedited data now. IMPLEMENTATION NOTE:- We deliver expedited data
-		   acknolwedgements to the User as well. 
-		 */
+		   acknolwedgements to the User as well. */
 		if (!(sc->flags & SCCPF_LOC_ED))
 			return (QR_DONE);
 		if ((err = sccp_datack_ind(q, sc)))
@@ -9311,17 +9195,15 @@ sccp_recv_ea(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: queue received message. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: queue received message. */
 			bufq_queue(&sc->rcvq, msg);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate
-			   internal reset request, move to the active state. 
-			 */
+			   internal reset request, move to the active state. */
 			fixme(("Internal reset request\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
@@ -9329,9 +9211,8 @@ sccp_recv_ea(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
@@ -9344,20 +9225,17 @@ sccp_recv_ea(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 Sheet 1 of 2 */
 	case SS_WCON_RREQ:	/* Figure C.6/Q.714 Sheet 2 of 4 */
-		/*
-		   Figure 2E/T1.112.4-2000 2of2 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000 2of2 */
 	case SS_WCON_DREQ:	/* Figure C.2/Q.714 Sheet 6 of 7 */
 		return (QR_DONE);
 	}
@@ -9374,25 +9252,22 @@ sccp_recv_ea(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  This 
-	   normally results in a N_RESET_IND primtiive to the SCCP-User.  The stream is reset. 
-	 */
+	   normally results in a N_RESET_IND primtiive to the SCCP-User.  The stream is reset. */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   ANSI is peculiar in that it does not wait for a reset response from the user
-		   before sending an RSC. 
-		 */
+		   before sending an RSC. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000: send an RSC, send an N_RESET_IND to the user,
 			   reset variables and discard all queued and unacknowledged messages, move 
-			   to the reset incoming state. 
-			 */
+			   to the reset incoming state. */
 			if ((err =
 			     sccp_send_rsc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					   sc->slr)))
@@ -9404,11 +9279,10 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			sccp_set_state(sc, SS_WRES_RIND);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 1 of 4: Restart the receive inactivity timer.
 			   Deliver an N_RESET_IND to the user, reset variables and discard all
-			   queued and unacked messages. Mover the reset incoming state. 
-			 */
+			   queued and unacked messages. Mover the reset incoming state. */
 			sccp_timer_start(sc, tiar);
 			fixme(("Reset variables and discard queued unacked messages\n"));
 			if ((err = sccp_reset_ind(q, sc, N_USER, 0x3000 | m->cause, msg->b_cont)))
@@ -9419,20 +9293,18 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_BOTH_RESET:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000: stop reset timer and move to the reset incoming 
-			   state. 
-			 */
+			   state. */
 			sccp_timer_stop(sc, tres);
 			sccp_set_state(sc, SS_WRES_RIND);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 3 of 4: send a N_RESET_CON to the user, stop the
 			   reset timer, restart the receive inactivity timer, move to the reset
-			   incoming state. 
-			 */
+			   incoming state. */
 			sccp_timer_stop(sc, tres);
 			sccp_timer_start(sc, tiar);
 			if ((err = sccp_reset_con(q, sc)))
@@ -9443,20 +9315,18 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WCON_RREQ:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000: stop reset timer, transfer all queued
-			   information, move to the active state. 
-			 */
+			   information, move to the active state. */
 			sccp_timer_stop(sc, tres);
 			fixme(("Transfer all queued information\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 2 of 4: send N_RESET_CON, stop reset timer,
-			   restart receive inactivity timer, move to the active state. 
-			 */
+			   restart receive inactivity timer, move to the active state. */
 			sccp_timer_stop(sc, tres);
 			sccp_timer_start(sc, tiar);
 			if ((err = sccp_reset_con(q, sc)))
@@ -9467,36 +9337,32 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
 		return sccp_release_error(q, sc);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Note that ITUT96 does not use the SLR in the RLC to send a RLSD message as does
-		   ANSI. 
-		 */
+		   ANSI. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ITUT:
 		case SS7_PVAR_ETSI:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 3 of 7: stop connection timer, release resources
-			   and local reference, freeze local reference, move to the idle state. 
-			 */
+			   and local reference, freeze local reference, move to the idle state. */
 			return sccp_release_error(q, sc);
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: same action as for CC in this
 			   state: stop connection timer, associate destination reference to
 			   connection section, release resources, stop inactivity timers, send
 			   RLSD, start released (ANSI: and interval timers), move to the disconnect 
-			   pending state. 
-			 */
+			   pending state. */
 			sccp_release(sc);
 			sc->dlr = m->slr;
 			if ((err =
@@ -9511,10 +9377,9 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000 2of2: send RSC, discard all queue and
-			   unacknolwedged messages, 
-			 */
+			   unacknolwedged messages, */
 			if ((err =
 			     sccp_send_rsc(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					   sc->slr)))
@@ -9523,10 +9388,9 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate
-			   internal reset request, move to the active state. 
-			 */
+			   internal reset request, move to the active state. */
 			fixme(("Internal reset request\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
@@ -9547,31 +9411,28 @@ sccp_recv_rsr(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_rsc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  This 
 	   normally results in a N_RESET_CON primitive to the SCCP-User.  The stream is confirmed
-	   reset. 
-	 */
+	   reset. */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_BOTH_RESET:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000: stop reset timer and move to the reset incoming 
-			   state. 
-			 */
+			   state. */
 			sccp_timer_stop(sc, tres);
 			sccp_set_state(sc, SS_WRES_RIND);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 3 of 4: Send a N_RESET_CON to the user, stop the
 			   reset timer, restart the inactivity timer and move to the reset incoming 
-			   state. 
-			 */
+			   state. */
 			sccp_timer_stop(sc, tres);
 			sccp_timer_start(sc, tiar);
 			if ((err = sccp_reset_con(q, sc)))
@@ -9580,11 +9441,10 @@ sccp_recv_rsc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			return (QR_DONE);
 		}
 	case SS_WCON_RREQ:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 2 of 4: Send an N_RESET_CON to the user, stop the reset
 		   timer, restart the receive inactivity timer, resume data transfer, move to the
-		   active state. 
-		 */
+		   active state. */
 		sccp_timer_stop(sc, tres);
 		sccp_timer_start(sc, tiar);
 		if ((err = sccp_reset_con(q, sc)))
@@ -9592,51 +9452,45 @@ sccp_recv_rsc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
 	case SS_DATA_XFER:
-		/*
-		   Figure C.6/Q.714 Sheet 1 of 4: Discard received message. 
-		 */
+		/* 
+		   Figure C.6/Q.714 Sheet 1 of 4: Discard received message. */
 		return (QR_DONE);
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
 	case SS_WRES_DIND:
 		goto error1;
 	      error1:
-		/*
-		   send RLSD 
-		 */
+		/* 
+		   send RLSD */
 		sccp_set_state(sc, SS_WCON_DREQ);
 		return (QR_DONE);
 	case SS_WCON_CREQ:
 		return sccp_release_error(q, sc);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Note that ITUT96 does not use the SLR in the RLC to send a RLSD message as does
-		   ANSI. 
-		 */
+		   ANSI. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ITUT:
 		case SS7_PVAR_ETSI:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 3 of 7: stop connection timer, release resources
-			   and local reference, freeze local reference, move to the idle state. 
-			 */
+			   and local reference, freeze local reference, move to the idle state. */
 			return sccp_release_error(q, sc);
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: same action as for CC in this
 			   state: stop connection timer, associate destination reference to
 			   connection section, release resources, stop inactivity timers, send
 			   RLSD, start released (ANSI: and interval timers), move to the disconnect 
-			   pending state. 
-			 */
+			   pending state. */
 			sccp_release(sc);
 			sc->dlr = m->slr;
 			if ((err =
@@ -9664,35 +9518,31 @@ sccp_recv_rsc(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream.  This does not result in a
 	   primitive to the SCCP-User directly, any one of a number of primitives may be sent
 	   depending on the disposition of the error. Management is informed of the error
-	   condition. 
-	 */
+	   condition. */
 	int err;
 	switch (sccp_get_state(sc)) {
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 5 of 7: Figure C.3/Q.714 Sheet 4 of 6: if the error is
 		   not service class mismatch: release resourcesa and local reference, freeze local 
 		   reference, send N_DISCON_IND to user, stop inactivity timers, move to the idle
-		   state. 
-		 */
+		   state. */
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Notes: this is somewhat different between variants here. ANSI always sends RLSD
 		   and goes through the released procedure.  ITUT only sends RLSD in the case of
-		   service class mismatch, otherwise it simply aborts. 
-		 */
+		   service class mismatch, otherwise it simply aborts. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000 2of2: send an
 			   N_DISCON_IND to the user, release resources for the connection, stop
 			   inactivity timers, send RLSD, start released and interval timers, move
-			   to the disconnect pending state. 
-			 */
+			   to the disconnect pending state. */
 			sccp_release(sc);
 			if ((err =
 			     sccp_send_rlsd(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
@@ -9712,11 +9562,10 @@ sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_ITUT:
 			if (m->cause == (SCCP_ERRC_SERVICE_CLASS_MISMATCH & 0xff)) {
-				/*
+				/* 
 				   Figure C.2/Q.714 Sheet 4 of 7: send N_DISCON_IND to user, stop
 				   inactivity timers, send RLSD, start released timer, move to
-				   disconnect pending state. 
-				 */
+				   disconnect pending state. */
 				sccp_timer_stop(sc, tias);
 				sccp_timer_stop(sc, tiar);
 				if ((err =
@@ -9733,11 +9582,10 @@ sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 				sccp_set_state(sc, SS_WCON_DREQ);
 				return (QR_DONE);
 			} else {
-				/*
+				/* 
 				   Figure C.2/Q.714 Sheet 5 of 7: release resources and local
 				   reference, deliver N_DISCON_IND to user, stop inactivity timers, 
-				   move to idle state. 
-				 */
+				   move to idle state. */
 				sccp_release(sc);
 				if ((err =
 				     sccp_discon_ind(q, sc, N_PROVIDER, m->cause | 0x4000, NULL,
@@ -9748,11 +9596,10 @@ sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			}
 		}
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: Figure C.3/Q.714 Sheet 4 of 6: release resources
 		   and local reference, freeze local reference, send N_DISCON_IND to the user, stop 
-		   inactivity timers, move to the idle state. 
-		 */
+		   inactivity timers, move to the idle state. */
 		return sccp_release_error(q, sc);
 	case SS_WCON_CREQ:
 		return sccp_release_error(q, sc);
@@ -9764,19 +9611,17 @@ sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_WCON_DREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 6 of 7: release resources and local reference, freeze
 		   local reference, stop release and interval timers, move to the idle state.
 		   Figure 2A/T1.112.4-2000: Figure 2B/T1.112.4-2000: Release references for the
-		   connection section, stop release and interval timers, move to the idle state. 
-		 */
+		   connection section, stop release and interval timers, move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
@@ -9785,15 +9630,13 @@ sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_BOTH_RESET:
-		/*
-		   Figure C.6/Q.714 Sheet 3 of 4: same as below. 
-		 */
+		/* 
+		   Figure C.6/Q.714 Sheet 3 of 4: same as below. */
 	case SS_WCON_RREQ:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 2 of 4: Figure C.2/Q.714 Sheet 5 of 7: Release resources
 		   and local reference, freeze local reference, send an N_DISCON_IND to the user,
-		   stop inactivity timers and move to the idle state. 
-		 */
+		   stop inactivity timers and move to the idle state. */
 		return sccp_release_error(q, sc);
 		return (QR_DONE);
 	default:
@@ -9811,48 +9654,43 @@ sccp_recv_err(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_it(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored.  DLR is used to look up
 	   the stream. This does not result in a primitive to the SCCP-User.  This is a heartbeat
-	   between SCCP peers.  It is responded to by the state machine. 
-	 */
+	   between SCCP peers.  It is responded to by the state machine. */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2D/T1.112.4-2000: just reset the receive inactivity timer.  No audit or
 		   internal reset specified for ANSI. Figure C.4/Q.714 Sheet 4 of 4: If we are
 		   protocol class 3 we audit the received P(S), P(R), M and W.  If these are ok, or 
 		   we are protocol class 2, we reset the receive inactivity timer.  If these are
-		   not ok, we perform an internal reset. 
-		 */
+		   not ok, we perform an internal reset. */
 		fixme(("Write this function\n"));
 		return (-EFAULT);
 	case SS_BOTH_RESET:	/* Figure C.6/Q.714 Sheet 3 of 4 */
 		return (QR_DONE);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Note that ITUT96 does not use the SLR in the RLC to send a RLSD message as does
-		   ANSI. 
-		 */
+		   ANSI. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ITUT:
 		case SS7_PVAR_ETSI:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 3 of 7: stop connection timer, release resources
-			   and local reference, freeze local reference, move to the idle state. 
-			 */
+			   and local reference, freeze local reference, move to the idle state. */
 			return sccp_release_error(q, sc);
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: same action as for CC in this
 			   state: stop connection timer, associate destination reference to
 			   connection section, release resources, stop inactivity timers, send
 			   RLSD, start released (ANSI: and interval timers), move to the disconnect 
-			   pending state. 
-			 */
+			   pending state. */
 			sccp_release(sc);
 			sc->dlr = m->slr;
 			if ((err =
@@ -9879,12 +9717,11 @@ sccp_recv_it(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_udt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol classes 0 and 1.  CDPA and the DPC in the message is used to look up a
 	   connection-less stream in the NS_IDLE state.  This should result in a N_UNITDATA_IND to
-	   the SCCP-User. 
-	 */
+	   the SCCP-User. */
 	int err;
 	fixme(("Perform segmentation\n"));
 	switch (sccp_get_state(sc)) {
@@ -9904,17 +9741,15 @@ sccp_recv_udt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
@@ -9938,12 +9773,11 @@ sccp_recv_udt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_udts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol classes 0 and 1.  CGPA and DPC in the message are used to look up a
 	   connection-less stream in the NS_IDLE state.  This should result in a N_UDERROR_IND to
-	   the SCCP-User. 
-	 */
+	   the SCCP-User. */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_IDLE:
@@ -9953,10 +9787,9 @@ sccp_recv_udts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 			return (err);
 		return (QR_DONE);
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
@@ -9970,10 +9803,9 @@ sccp_recv_udts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_DATA_XFER:
@@ -9996,7 +9828,7 @@ sccp_recv_udts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_xudt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
+	/* 
 	   PCLS is passed to the user.  HOPC is only used by a relay node. CDPA and CGPA and DATA
 	   are passed to the user.  SGMT is only used when segmentation of the XUDT message has
 	   occured.  Segmented XUDT messages will be reassembled before passing to the user.  ISNI, 
@@ -10005,8 +9837,7 @@ sccp_recv_xudt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 	   If SGMT is present, the message must be protocol class 1 (with the original protocol
 	   class from the SGMT parameter passed to the user).  CDPA was already used to look up
 	   this CLNS stream in the NS_IDLE state.  After reassembly addresses and data are sent to
-	   the user. This normally results in a N_UNITDATA_IND primitive to the SCCP-User. 
-	 */
+	   the user. This normally results in a N_UNITDATA_IND primitive to the SCCP-User. */
 	int err;
 	fixme(("Perform segmentation\n"));
 	switch (sccp_get_state(sc)) {
@@ -10026,17 +9857,15 @@ sccp_recv_xudt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
@@ -10060,9 +9889,8 @@ sccp_recv_xudt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_xudts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
-	   Same as XUDT but this is passed as a N_UDERROR_IND. 
-	 */
+	/* 
+	   Same as XUDT but this is passed as a N_UDERROR_IND. */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_IDLE:
@@ -10081,17 +9909,15 @@ sccp_recv_xudts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
@@ -10115,9 +9941,8 @@ sccp_recv_xudts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_ludt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
-	   Same as XUDT but longer data and no MTI. 
-	 */
+	/* 
+	   Same as XUDT but longer data and no MTI. */
 	int err;
 	fixme(("Perform segmentation\n"));
 	switch (sccp_get_state(sc)) {
@@ -10139,18 +9964,16 @@ sccp_recv_ludt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_WRES_RIND:
 		swerr();
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
@@ -10175,9 +9998,8 @@ sccp_recv_ludt(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 STATIC int
 sccp_recv_ludts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 {
-	/*
-	   Same as XUDTS but longer data and no MTI. 
-	 */
+	/* 
+	   Same as XUDTS but longer data and no MTI. */
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_IDLE:
@@ -10196,17 +10018,15 @@ sccp_recv_ludts(queue_t *q, struct sc *sc, mblk_t *msg, struct sccp_msg *m)
 		default:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 3 of 4: discard, continue to wait for
-			   connection confirm. 
-			 */
+			   connection confirm. */
 			return (QR_DONE);
 		}
 	case SS_WRES_RIND:
-		/*
+		/* 
 		   Figure C.6/Q.714 Sheet 4 of 4: discard received message and generate internal
-		   reset request, move to the active state. 
-		 */
+		   reset request, move to the active state. */
 		fixme(("Internal reset request\n"));
 		sccp_set_state(sc, SS_DATA_XFER);
 		return (QR_DONE);
@@ -11063,9 +10883,8 @@ sccp_recv_msg(queue_t *q, mblk_t *mp)
 		err = sccp_recv_ludts(q, sc, mp, m);
 		break;
 	default:
-		/*
-		   any message with an unknown message type is discarded 
-		 */
+		/* 
+		   any message with an unknown message type is discarded */
 		err = -ENOPROTOOPT;
 		break;
 	}
@@ -11121,9 +10940,8 @@ sccp_recv_scmg(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 		err = scmg_recv_srt(q, sp, sr, rs, mp, m);
 		break;
 	}
-	/*
-	   any message with an unknown message type is discarded 
-	 */
+	/* 
+	   any message with an unknown message type is discarded */
 	err = -ENOPROTOOPT;
 	goto error;
       eproto:
@@ -11148,9 +10966,8 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 	int err, refc;
 	struct sp *dst;
 	ulong smi, cong;
-	/*
-	   translate and handle hop counter 
-	 */
+	/* 
+	   translate and handle hop counter */
 	if (m->flags & SCCPF_HOPC_VIOLATION)
 		goto sccp_hopc_violation;
 	if (m->flags & SCCPF_XLAT_FAILURE)
@@ -11189,9 +11006,8 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 			return (QR_DONE);
 		case SCCP_RI_GT:
 			if (src == dst)
-				/*
-				   inform maintenance of GTT loop 
-				 */
+				/* 
+				   inform maintenance of GTT loop */
 				goto unqualified;
 			if (!(sc = dst->gt.list))
 				goto access_failure;
@@ -11235,12 +11051,10 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 		if (canput(mt->oq))
 			goto unqualified;
 		if (m->flags & SCCPF_ASSOC_REQUIRED) {
-			/*
-			   create coupling 
-			 */
-			/*
-			   process cr on coupling 
-			 */
+			/* 
+			   create coupling */
+			/* 
+			   process cr on coupling */
 			fixme(("Write this function\n"));
 			return (-EFAULT);
 		} else {
@@ -11250,52 +11064,51 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 	}
       sccp_failure:
 	refc = SCCP_REFC_SCCP_FAILURE;
-	ptrace(("%s: ERROR: SCCP failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: SCCP failure\n", DRV_NAME));
 	goto do_refc;
       sccp_hopc_violation:
 	refc = SCCP_REFC_SCCP_HOP_COUNTER_VIOLATION;
-	ptrace(("%s: ERROR: hop counter violation\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: hop counter violation\n", DRV_NAME));
 	goto do_refc;
       no_address_type_translation:
 	refc = SCCP_REFC_NO_ADDRESS_TYPE_TRANSLATION;
-	ptrace(("%s: ERROR: no address type translation\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: no address type translation\n", DRV_NAME));
 	goto do_refc;
       unqualified:
-	/*
-	   inform maintenance of GTT loop 
-	 */
+	/* 
+	   inform maintenance of GTT loop */
 	refc = SCCP_REFC_UNQUALIFIED;
-	ptrace(("%s: ERROR: GT translation loop\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: GT translation loop\n", DRV_NAME));
 	goto do_refc;
       access_failure:
 	refc = SCCP_REFC_ACCESS_FAILURE;
-	ptrace(("%s: ERROR: access failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: access failure\n", DRV_NAME));
 	goto do_refc;
       access_congestion:
 	refc = SCCP_REFC_ACCESS_CONGESTION;
-	ptrace(("%s: ERROR: access congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: access congestion\n", DRV_NAME));
 	goto do_refc;
       unequipped_user:
 	refc = SCCP_REFC_UNEQUIPPED_USER;
-	ptrace(("%s: ERROR: subsystem unequipped\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem unequipped\n", DRV_NAME));
 	goto do_ssp;
       subsystem_failure:
 	refc = SCCP_REFC_SUBSYSTEM_FAILURE;
-	ptrace(("%s: ERROR: subsystem failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem failure\n", DRV_NAME));
 	goto do_ssp;
       subsystem_congestion:
 	refc = SCCP_REFC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: flow controlled\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: flow controlled\n", DRV_NAME));
 	if (!(src->proto.popt & SS7_POPT_MPLEV))
 		goto do_ssc;
 	goto do_refc;
       destination_address_unknown:
 	refc = SCCP_REFC_DESTINATION_ADDRESS_UNKNOWN;
-	ptrace(("%s: ERROR: destination unknown\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: destination unknown\n", DRV_NAME));
 	goto do_refc;
       destination_inaccessible:
 	refc = SCCP_REFC_DESTINATION_INACCESSIBLE;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       do_ssc:
 	if ((err =
@@ -11312,9 +11125,8 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 		return (err);
 	goto do_refc;
       do_refc:
-	/*
-	   invoke CREF procedures with REFC 
-	 */
+	/* 
+	   invoke CREF procedures with REFC */
 	if ((err =
 	     sccp_send_cref(q, src, m->rl.opc, m->rl.sls, m->slr, refc,
 			    (m->parms & SCCP_PTF_CGPA ? &m->cgpa : NULL), mp->b_cont,
@@ -11329,9 +11141,8 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 	int err, retc;
 	struct sp *dst;
 	ulong smi, cong;
-	/*
-	   translate and handle hop counter 
-	 */
+	/* 
+	   translate and handle hop counter */
 	if (m->flags & SCCPF_HOPC_VIOLATION)
 		goto sccp_hopc_violation;
 	if (m->flags & SCCPF_XLAT_FAILURE)
@@ -11368,9 +11179,8 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 			return (QR_DONE);
 		case SCCP_RI_GT:
 			if (src == dst)
-				/*
-				   inform maintenance of GTT loop 
-				 */
+				/* 
+				   inform maintenance of GTT loop */
 				goto unqualified;
 			if (!(sc = dst->gt.list))
 				goto no_address_translation;
@@ -11414,9 +11224,8 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 		if (!canput(mt->oq))
 			goto network_congestion;
 		if (m->flags & SCCPF_CHANGE_REQUIRED) {
-			/*
-			   change message 
-			 */
+			/* 
+			   change message */
 			goto message_change_failure;
 			goto segmentation_not_supported;
 			goto segmentation_failure;
@@ -11426,66 +11235,66 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 	}
       sccp_hopc_violation:
 	retc = SCCP_RETC_SCCP_HOP_COUNTER_VIOLATION;
-	ptrace(("%s: ERROR: SCCP hop counter violation\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: SCCP hop counter violation\n", DRV_NAME));
 	goto do_retc;
       no_address_type_translation:
 	retc = SCCP_RETC_NO_ADDRESS_TYPE_TRANSLATION;
-	ptrace(("%s: ERROR: no address type translation\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: no address type translation\n", DRV_NAME));
 	goto do_retc;
       unqualified:
 	retc = SCCP_RETC_UNQUALIFIED;
-	ptrace(("%s: ERROR: unqualified\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: unqualified\n", DRV_NAME));
 	goto do_retc;
       no_address_translation:
 	retc = SCCP_RETC_NO_ADDRESS_TRANSLATION;
-	ptrace(("%s: ERROR: no address translation\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: no address translation\n", DRV_NAME));
 	goto do_retc;
       unequipped_user:
 	retc = SCCP_RETC_UNEQUIPPED_USER;
-	ptrace(("%s: ERROR: unequipped user\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: unequipped user\n", DRV_NAME));
 	goto do_ssp;
       subsystem_congestion:
 	retc = SCCP_RETC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: subsystem congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem congestion\n", DRV_NAME));
 	if (!(src->proto.popt & SS7_POPT_MPLEV))
 		goto do_ssc;
 	goto do_retc;
       mtp_failure:
 	retc = SCCP_RETC_MTP_FAILURE;
-	ptrace(("%s: ERROR: MTP failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: MTP failure\n", DRV_NAME));
 	goto do_retc;
       sccp_failure:
 	retc = SCCP_RETC_SCCP_FAILURE;
-	ptrace(("%s: ERROR: SCCP failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: SCCP failure\n", DRV_NAME));
 	goto do_retc;
       subsystem_failure:
 	retc = SCCP_RETC_SUBSYSTEM_FAILURE;
-	ptrace(("%s: ERROR: subsystem failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem failure\n", DRV_NAME));
 	goto do_ssp;
       local_processing_error:
 	retc = SCCP_RETC_LOCAL_PROCESSING_ERROR;
-	ptrace(("%s: ERROR: local processing error\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: local processing error\n", DRV_NAME));
 	goto do_retc;
       network_congestion:
 	retc = SCCP_RETC_NETWORK_CONGESTION;
-	ptrace(("%s: ERROR: network congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: network congestion\n", DRV_NAME));
 	goto do_retc;
       message_change_failure:
 	retc = SCCP_RETC_MESSAGE_CHANGE_FAILURE;
-	ptrace(("%s: ERROR: message change failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: message change failure\n", DRV_NAME));
 	goto do_retc;
       segmentation_not_supported:
 	retc = SCCP_RETC_SEGMENTATION_NOT_SUPPORTED;
-	ptrace(("%s: ERROR: segmentation not supported\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: segmentation not supported\n", DRV_NAME));
 	goto do_retc;
       segmentation_failure:
 	retc = SCCP_RETC_SEGMENTATION_FAILURE;
-	ptrace(("%s: ERROR: segmentation failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: segmentation failure\n", DRV_NAME));
 	goto do_retc;
 #if 0
       no_resassembly_at_destination:
 	retc = SCCP_RETC_NO_REASSEMBLY_AT_DESTINATION;
-	ptrace(("%s: ERROR: no reassembly at destination\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: no reassembly at destination\n", DRV_NAME));
 	goto do_retc;
 #endif
       do_ssc:
@@ -11504,11 +11313,11 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 	goto do_retc;
       do_retc:
 	if ((1 << m->type) & (SCCP_MTF_UDTS | SCCP_MTF_XUDTS | SCCP_MTF_LUDTS)) {
-		ptrace(("%s: INFO: Discarding service message\n", SCCP_DRV_NAME));
+		ptrace(("%s: INFO: Discarding service message\n", DRV_NAME));
 		return (QR_DONE);
 	}
 	if (!m->ret) {
-		ptrace(("%s: INFO: Discarding message with no return on error\n", SCCP_DRV_NAME));
+		ptrace(("%s: INFO: Discarding message with no return on error\n", DRV_NAME));
 		return (QR_DONE);
 	}
 	switch (m->type) {
@@ -11544,7 +11353,7 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 			return (err);
 		return (QR_ABSORBED);
 	}
-	pswerr(("%s: SWERR: RoE procedure no UDTS\n", SCCP_DRV_NAME));
+	pswerr(("%s: SWERR: RoE procedure no UDTS\n", DRV_NAME));
 	return (-EFAULT);
 }
 
@@ -11564,7 +11373,7 @@ sccp_grte_msg(queue_t *q, mblk_t *mp)
 			return sccp_grte_cl(q, sp, mp, m);
 		if ((1 << m->type) & (SCCP_MTF_CR))
 			return sccp_grte_cr(q, sp, mp, m);
-		pswerr(("%s: ERROR: routing failure\n", SCCP_DRV_NAME));
+		pswerr(("%s: ERROR: routing failure\n", DRV_NAME));
 		return (-EPROTO);
 	}
 	swerr();
@@ -11661,41 +11470,41 @@ sccp_orte_cr(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 	}
       unequipped_user:
 	refc = SCCP_REFC_UNEQUIPPED_USER;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_ssp;
       subsystem_failure:
 	refc = SCCP_REFC_SUBSYSTEM_FAILURE;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_ssp;
       subsystem_congestion:
 	refc = SCCP_REFC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	if (!(src->proto.popt & SS7_POPT_MPLEV))
 		goto do_ssc;
 	goto do_refc;
       destination_address_unknown:
 	refc = SCCP_REFC_DESTINATION_ADDRESS_UNKNOWN;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       destination_inaccessible:
 	refc = SCCP_REFC_DESTINATION_INACCESSIBLE;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       sccp_failure:
 	refc = SCCP_REFC_SCCP_FAILURE;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       local_processing_error:
 	refc = SCCP_REFC_UNQUALIFIED;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       access_failure:
 	refc = SCCP_REFC_ACCESS_FAILURE;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       access_congestion:
 	refc = SCCP_REFC_ACCESS_CONGESTION;
-	ptrace(("%s: ERROR: \n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: \n", DRV_NAME));
 	goto do_refc;
       do_ssc:
 	if ((err =
@@ -11712,9 +11521,8 @@ sccp_orte_cr(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 		return (err);
 	goto do_refc;
       do_refc:
-	/*
-	   invoke CREF procedures with REFC 
-	 */
+	/* 
+	   invoke CREF procedures with REFC */
 	if ((err =
 	     sccp_send_cref(q, src, m->rl.opc, m->rl.sls, m->slr, refc,
 			    (m->parms & SCCP_PTF_CGPA ? &m->cgpa : NULL), mp->b_cont,
@@ -11752,38 +11560,38 @@ sccp_orte_co(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 #if 0
       access_failure:
 	relc = SCCP_RELC_ACCESS_FAILURE;
-	ptrace(("%s: ERROR: access failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: access failure\n", DRV_NAME));
 	goto do_relc;
       access_congestion:
 	relc = SCCP_RELC_ACCESS_CONGESTION;
-	ptrace(("%s: ERROR: access congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: access congestion\n", DRV_NAME));
 	goto do_relc;
       subsystem_failure:
 	relc = SCCP_RELC_SUBSYSTEM_FAILURE;
-	ptrace(("%s: ERROR: subsystem failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem failure\n", DRV_NAME));
 	goto do_relc;
       subsystem_congestion:
 	relc = SCCP_RELC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: subsystem congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem congestion\n", DRV_NAME));
 	goto do_relc;
 #endif
       mtp_failure:
 	relc = SCCP_RELC_MTP_FAILURE;
-	ptrace(("%s: ERROR: MTP failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: MTP failure\n", DRV_NAME));
 	goto do_relc;
       network_congestion:
 	relc = SCCP_RELC_NETWORK_CONGESTION;
-	ptrace(("%s: ERROR: network congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: network congestion\n", DRV_NAME));
 	goto do_relc;
 #if 0
       unqualified:
 	relc = SCCP_RELC_UNQUALIFIED;
-	ptrace(("%s: ERROR: unqualified\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: unqualified\n", DRV_NAME));
 	goto do_relc;
 #endif
       sccp_failure:
 	relc = SCCP_RELC_SCCP_FAILURE;
-	ptrace(("%s: ERROR: SCCP failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: SCCP failure\n", DRV_NAME));
 	goto do_relc;
       do_relc:
 	if ((err =
@@ -11865,9 +11673,8 @@ sccp_orte_cl(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 			if (!canput(mt->oq))
 				goto network_congestion;
 			if (m->flags & SCCPF_CHANGE_REQUIRED) {
-				/*
-				   change message 
-				 */
+				/* 
+				   change message */
 			}
 			ss7_oput(mt->oq, mp);
 			return (QR_DONE);
@@ -11888,37 +11695,37 @@ sccp_orte_cl(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 	return sccp_recv_scmg(q, src, mp, m);
       unequipped_user:
 	retc = SCCP_RETC_UNEQUIPPED_USER;
-	printd(("%s: ERROR: unequipped user\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: unequipped user\n", DRV_NAME));
 	goto do_ssp;
       subsystem_failure:
 	retc = SCCP_RETC_SUBSYSTEM_FAILURE;
-	printd(("%s: ERROR: subsystem failure\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: subsystem failure\n", DRV_NAME));
 	goto do_ssp;
       subsystem_congestion:
 	retc = SCCP_RETC_SUBSYSTEM_CONGESTION;
-	printd(("%s: ERROR: subsystem congestion\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: subsystem congestion\n", DRV_NAME));
 	if (!(src->proto.popt & SS7_POPT_MPLEV))
 		goto do_ssc;
 	goto do_retc;
       mtp_failure:
 	retc = SCCP_RETC_MTP_FAILURE;
-	printd(("%s: ERROR: MTP failure\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: MTP failure\n", DRV_NAME));
 	goto do_retc;
       sccp_failure:
 	retc = SCCP_RETC_SCCP_FAILURE;
-	printd(("%s: ERROR: SCCP failure\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: SCCP failure\n", DRV_NAME));
 	goto do_retc;
       network_congestion:
 	retc = SCCP_RETC_NETWORK_CONGESTION;
-	printd(("%s: ERROR: network congestion\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: network congestion\n", DRV_NAME));
 	goto do_retc;
       no_address_translation:
 	retc = SCCP_RETC_NO_ADDRESS_TRANSLATION;
-	printd(("%s: ERROR: no address translation\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: no address translation\n", DRV_NAME));
 	goto do_retc;
       unqualified:
 	retc = SCCP_RETC_UNQUALIFIED;
-	printd(("%s: ERROR: unqualified\n", SCCP_DRV_NAME));
+	printd(("%s: ERROR: unqualified\n", DRV_NAME));
 	goto do_retc;
       do_ssc:
 	if ((err =
@@ -11936,11 +11743,11 @@ sccp_orte_cl(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 	goto do_retc;
       do_retc:
 	if ((1 << m->type) & (SCCP_MTF_UDTS | SCCP_MTF_XUDTS | SCCP_MTF_LUDTS)) {
-		ptrace(("%s: INFO: Discarding service message\n", SCCP_DRV_NAME));
+		ptrace(("%s: INFO: Discarding service message\n", DRV_NAME));
 		return (QR_DONE);
 	}
 	if (!m->ret) {
-		ptrace(("%s: INFO: Discarding message with no return on error\n", SCCP_DRV_NAME));
+		ptrace(("%s: INFO: Discarding message with no return on error\n", DRV_NAME));
 		return (QR_DONE);
 	}
 	switch (m->type) {
@@ -11976,7 +11783,7 @@ sccp_orte_cl(queue_t *q, struct sc *sc, mblk_t *mp, struct sccp_msg *m)
 			return (err);
 		return (QR_ABSORBED);
 	}
-	pswerr(("%s: SWERR: RoE procedure no UDTS\n", SCCP_DRV_NAME));
+	pswerr(("%s: SWERR: RoE procedure no UDTS\n", DRV_NAME));
 	return (-EFAULT);
 }
 
@@ -11999,7 +11806,7 @@ sccp_orte_msg(queue_t *q, mblk_t *mp)
 			return sccp_orte_cr(q, sc, mp, m);
 		if ((1 << m->type) & (SCCP_MTM_CO))
 			return sccp_orte_co(q, sc, mp, m);
-		ptrace(("%s: ERROR: routing failure\n", SCCP_DRV_NAME));
+		ptrace(("%s: ERROR: routing failure\n", DRV_NAME));
 		return (-EPROTO);
 	}
 	swerr();
@@ -12051,25 +11858,25 @@ sccp_irte_cr(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 	return (-EFAULT);
       unequipped_user:
 	refc = SCCP_REFC_UNEQUIPPED_USER;
-	ptrace(("%s: ERROR: subsystem unequipped\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem unequipped\n", DRV_NAME));
 	goto do_ssp;
       subsystem_failure:
 	refc = SCCP_REFC_SUBSYSTEM_FAILURE;
-	ptrace(("%s: ERROR: subsystem failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem failure\n", DRV_NAME));
 	goto do_ssp;
       subsystem_congestion:
 	refc = SCCP_REFC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: flow controlled\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: flow controlled\n", DRV_NAME));
 	if (!(sp->proto.popt & SS7_POPT_MPLEV))
 		goto do_ssc;
 	goto do_refc;
       access_failure:
 	refc = SCCP_REFC_ACCESS_FAILURE;
-	ptrace(("%s: ERROR: GT Translation failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: GT Translation failure\n", DRV_NAME));
 	goto do_refc;
       access_congestion:
 	refc = SCCP_REFC_ACCESS_CONGESTION;
-	ptrace(("%s: ERROR: GT Translation congested\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: GT Translation congested\n", DRV_NAME));
 	goto do_refc;
       do_ssc:
 	if ((err =
@@ -12084,9 +11891,8 @@ sccp_irte_cr(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 		return (err);
 	goto do_refc;
       do_refc:
-	/*
-	   invoke CREF procedures with REFC 
-	 */
+	/* 
+	   invoke CREF procedures with REFC */
 	if ((err =
 	     sccp_send_cref(q, sp, m->rl.opc, m->rl.sls, m->slr, refc,
 			    (m->parms & SCCP_PTF_CGPA ? &m->cgpa : NULL), mp->b_cont,
@@ -12150,29 +11956,29 @@ sccp_irte_cl(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 	return sccp_recv_scmg(q, sp, mp, m);
       unequipped_user:
 	retc = SCCP_RETC_UNEQUIPPED_USER;
-	ptrace(("%s: ERROR: subsystem unequipped\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem unequipped\n", DRV_NAME));
 	goto do_ssp;
       subsystem_congestion:
 	retc = SCCP_RETC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: subsystem congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem congestion\n", DRV_NAME));
 	if (!(sp->proto.popt & SS7_POPT_MPLEV))
 		goto do_ssc;
 	goto do_retc;
       subsystem_failure:
 	retc = SCCP_RETC_SUBSYSTEM_FAILURE;
-	ptrace(("%s: ERROR: subsystem failure\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: subsystem failure\n", DRV_NAME));
 	goto do_ssp;
       network_congestion:
 	retc = SCCP_RETC_NETWORK_CONGESTION;
-	ptrace(("%s: ERROR: network congestion\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: network congestion\n", DRV_NAME));
 	goto do_retc;
       subsystem_congestion2:
 	retc = SCCP_RETC_SUBSYSTEM_CONGESTION;
-	ptrace(("%s: ERROR: GT Translation congested\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: GT Translation congested\n", DRV_NAME));
 	goto do_retc;
       no_address_translation:
 	retc = SCCP_RETC_NO_ADDRESS_TRANSLATION;
-	ptrace(("%s: ERROR: GT Translation unavailable\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: GT Translation unavailable\n", DRV_NAME));
 	goto do_retc;
       do_ssc:
 	if ((err =
@@ -12188,11 +11994,11 @@ sccp_irte_cl(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 	goto do_retc;
       do_retc:
 	if ((1 << m->type) & (SCCP_MTF_UDTS | SCCP_MTF_XUDTS | SCCP_MTF_LUDTS)) {
-		ptrace(("%s: INFO: Discarding service message\n", SCCP_DRV_NAME));
+		ptrace(("%s: INFO: Discarding service message\n", DRV_NAME));
 		return (QR_DONE);
 	}
 	if (!m->ret) {
-		ptrace(("%s: INFO: Discarding message with no return on error\n", SCCP_DRV_NAME));
+		ptrace(("%s: INFO: Discarding message with no return on error\n", DRV_NAME));
 		return (QR_DONE);
 	}
 	switch (m->type) {
@@ -12228,7 +12034,7 @@ sccp_irte_cl(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 			return (err);
 		return (QR_ABSORBED);
 	}
-	pswerr(("%s: SWERR: RoE procedure no UDTS\n", SCCP_DRV_NAME));
+	pswerr(("%s: SWERR: RoE procedure no UDTS\n", DRV_NAME));
 	return (-EFAULT);
 }
 
@@ -12245,9 +12051,8 @@ sccp_co_lookup(struct sp *sp, ulong slr)
 STATIC int
 sccp_irte_co(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 {
-	/*
-	   pass message to SCCP user 
-	 */
+	/* 
+	   pass message to SCCP user */
 	return (QR_DONE);
 }
 
@@ -12259,64 +12064,54 @@ sccp_irte_co(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 	ulong relc;
 	struct sr *sr;
 	struct sc *sc, **scp;
-	/*
-	   these are always route on DLR 
-	 */
+	/* 
+	   these are always route on DLR */
 	if (!(scp = sccp_co_lookup(sp, m->dlr)) || !(sc = *scp))
 		goto unassigned_dlr;
-	/*
-	   we have a connected segment 
-	 */
-	if (((sc->pcl != 2) || (1 << m->type) & ~(SCCP_MTM_PCLS2)) &&
-	    ((sc->pcl != 3) || (1 << m->type) & ~(SCCP_MTM_PCLS3)))
+	/* 
+	   we have a connected segment */
+	if (((sc->pcl != 2) || (1 << m->type) & ~(SCCP_MTM_PCLS2))
+	    && ((sc->pcl != 3) || (1 << m->type) & ~(SCCP_MTM_PCLS3)))
 		goto unqualified_discard;
 	if ((m->parms & SCCP_PTF_SLR) && m->slr != sc->slr)
 		goto slr_mismatch;
 	if (m->rl.opc != sc->opc.pc)
 		goto pc_mismatch;
-	/*
+	/* 
 	   Figure C.4/Q.714 Sheet 4 of 4: Construct an AK message with credit = 0 and send it,
 	   restarting the send inactivity timer.  We need to mark that the connection is congested
 	   as well so that when congestion ceases (i.e, when the service procedure runs and we are
 	   ready to backenable, we will construct an AK message with credit = W and sent it,
-	   restarting the inactivity timer). 
-	 */
-	/*
-	   Figure 2C/T1.112.4-2000 2of2: same. 
-	 */
+	   restarting the inactivity timer). */
+	/* 
+	   Figure 2C/T1.112.4-2000 2of2: same. */
 	if (!canput(sc->oq))
 		goto ebusy;
-	/*
-	   pass on for user 
-	 */
+	/* 
+	   pass on for user */
 	ss7_oput(sc->oq, mp);
 	return (QR_ABSORBED);
       unassigned_dlr:
-	/*
-	   Figure C.2/Q.714 Sheet 1 of 7 
-	 */
-	/*
-	   Table B-1/T1.112.4-2000 case (a) 
-	 */
+	/* 
+	   Figure C.2/Q.714 Sheet 1 of 7 */
+	/* 
+	   Table B-1/T1.112.4-2000 case (a) */
 	if ((1 << m->type) & (SCCP_MTF_CC | SCCP_MTF_RSR | SCCP_MTF_RSC))
 		goto unassigned_dlrn;
 	if ((1 << m->type) & ~(SCCP_MTF_RLSD))
 		goto unqualified_discard2;
 	goto unqualified_rlc;
       pc_mismatch:
-	/*
-	   Table B-1/T1.112.4-2000 case (b) 
-	 */
+	/* 
+	   Table B-1/T1.112.4-2000 case (b) */
 	if ((1 << m->type) & (SCCP_MTF_RSR | SCCP_MTF_RSC | SCCP_MTF_RLSD))
 		goto point_code_mismatch_err;
 	goto point_code_mismatch_discard;
       slr_mismatch:
-	/*
-	   Figure C.2/Q.714 Sheet 1 of 7 
-	 */
-	/*
-	   Table B-1/T1.112.4-2000 case (c) 
-	 */
+	/* 
+	   Figure C.2/Q.714 Sheet 1 of 7 */
+	/* 
+	   Table B-1/T1.112.4-2000 case (c) */
 	if ((1 << m->type) & (SCCP_MTF_RSR | SCCP_MTF_RSC | SCCP_MTF_RLSD))
 		goto inconsistent_slrn_err;
 	if ((1 << m->type) & (SCCP_MTF_IT))
@@ -12324,61 +12119,55 @@ sccp_irte_co(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
 	goto inconsistent_slrn_discard;
       point_code_mismatch_err:
 	relc = SCCP_ERRC_POINT_CODE_MISMATCH;
-	ptrace(("%s: ERROR: OPC mismatch (send ERR)\n", SCCP_DRV_NAME));
-	/*
-	   send ERR 
-	 */
+	ptrace(("%s: ERROR: OPC mismatch (send ERR)\n", DRV_NAME));
+	/* 
+	   send ERR */
 	goto do_err;
       point_code_mismatch_discard:
 	relc = SCCP_ERRC_POINT_CODE_MISMATCH;
-	ptrace(("%s: ERROR: OPC mismatch (discard)\n", SCCP_DRV_NAME));
-	/*
-	   discard 
-	 */
+	ptrace(("%s: ERROR: OPC mismatch (discard)\n", DRV_NAME));
+	/* 
+	   discard */
 	goto discard;
       inconsistent_slrn_err:
 	relc = SCCP_ERRC_LRN_MISMATCH_INCONSISTENT_SOURCE_LRN;
-	ptrace(("%s: ERROR: SLR mismatch (send ERR)\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: SLR mismatch (send ERR)\n", DRV_NAME));
 	goto do_err;
       inconsistent_slrn_discard:
 	relc = SCCP_ERRC_LRN_MISMATCH_INCONSISTENT_SOURCE_LRN;
-	ptrace(("%s: ERROR: SLR mismatch (discard)\n", SCCP_DRV_NAME));
-	/*
-	   discard 
-	 */
+	ptrace(("%s: ERROR: SLR mismatch (discard)\n", DRV_NAME));
+	/* 
+	   discard */
 	goto discard;
       inconsistent_connection_data:
 	relc = SCCP_RELC_INCONSISTENT_CONNECTION_DATA;
-	ptrace(("%s: ERROR: SLR mismatch (send RLSD)\n", SCCP_DRV_NAME));
-	/*
-	   Send RLSD(2) 
-	 */
+	ptrace(("%s: ERROR: SLR mismatch (send RLSD)\n", DRV_NAME));
+	/* 
+	   Send RLSD(2) */
 	goto do_rlsd;
       unassigned_dlrn:
 	relc = SCCP_ERRC_LRN_MISMATCH_UNASSIGNED_DEST_LRN;
-	ptrace(("%s: ERROR: DLR unassigned (send ERR)\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: DLR unassigned (send ERR)\n", DRV_NAME));
 	goto do_err;
       unqualified_rlc:
 	relc = SCCP_RELC_UNQUALIFIED;
-	ptrace(("%s: ERROR: DLR unassigned (send RLC)\n", SCCP_DRV_NAME));
-	/*
-	   Send RLC 
-	 */
+	ptrace(("%s: ERROR: DLR unassigned (send RLC)\n", DRV_NAME));
+	/* 
+	   Send RLC */
 	goto do_rlc;
       unqualified_discard:
 	relc = SCCP_ERRC_UNQUALIFIED;
-	ptrace(("%s: ERROR: inconsistent CO msg type (discard)\n", SCCP_DRV_NAME));
-	/*
-	   discard 
-	 */
+	ptrace(("%s: ERROR: inconsistent CO msg type (discard)\n", DRV_NAME));
+	/* 
+	   discard */
 	goto discard;
       unqualified_discard2:
 	relc = SCCP_RELC_UNQUALIFIED;
-	ptrace(("%s: ERROR: DLR unassigned (discard)\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: DLR unassigned (discard)\n", DRV_NAME));
 	goto discard;
       ebusy:
 	relc = -ENOSR;
-	ptrace(("%s: ERROR: flow controlled (dropping)\n", SCCP_DRV_NAME));
+	ptrace(("%s: ERROR: flow controlled (dropping)\n", DRV_NAME));
 	goto discard;
       discard:
 	return (QR_DONE);
@@ -12424,7 +12213,7 @@ sccp_irte_msg(queue_t *q, mblk_t *mp)
 			return sccp_irte_cr(q, sp, mp, m);
 		if ((1 << m->type) & (SCCP_MTM_CO))
 			return sccp_irte_co(q, sp, mp, m);
-		ptrace(("%s: ERROR: routing failure\n", SCCP_DRV_NAME));
+		ptrace(("%s: ERROR: routing failure\n", DRV_NAME));
 		return (-EPROTO);
 	}
 	swerr();
@@ -12455,9 +12244,8 @@ sccp_bind_req(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong cons)
 	struct sp *sp;
 	struct ss *ss;
 	struct sc **scp;
-	/*
-	   look for bound MTP provider 
-	 */
+	/* 
+	   look for bound MTP provider */
 	if (!(sp = sccp_lookup_sp(src->ni, src->pc, 1)))
 		goto eaddrnotavail;
 	if (!(ss = sccp_lookup_ss(sp, src->ssn, 1)))
@@ -12465,22 +12253,19 @@ sccp_bind_req(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong cons)
 	switch (sc->pcl) {
 	case 0:		/* protocol class 0 */
 	case 1:		/* protocol class 1 */
-		/*
-		   look for bind slot on provider 
-		 */
+		/* 
+		   look for bind slot on provider */
 		if (!(scp = sccp_cl_lookup(sp, src->ssn)) || (*scp))
 			goto eaddrinuse;
-		/*
-		   we have a CL slot, use it 
-		 */
+		/* 
+		   we have a CL slot, use it */
 		if ((sc->sp.next = *scp))
 			sc->sp.next->sp.prev = &sc->sp.next;
 		sc->sp.prev = scp;
 		*scp = sccp_get(sc);
 		sc->sp.sp = sp_get(sp);
-		/*
-		   bind to subsystem 
-		 */
+		/* 
+		   bind to subsystem */
 		if ((sc->ss.next = ss->cl.list))
 			sc->ss.next->ss.prev = &sc->ss.next;
 		sc->ss.prev = &ss->cl.list;
@@ -12492,32 +12277,28 @@ sccp_bind_req(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong cons)
 		if (cons) {	/* listening */
 			if (!(scp = sccp_cr_lookup(sp, src->ssn)) || (*scp))
 				goto eaddrinuse;
-			/*
-			   we have a CR slot, use it 
-			 */
+			/* 
+			   we have a CR slot, use it */
 			if ((sc->sp.next = *scp))
 				sc->sp.next->sp.prev = &sc->sp.next;
 			sc->sp.prev = scp;
 			*scp = sccp_get(sc);
 			sc->sp.sp = sp_get(sp);
-			/*
-			   bind to subsystem 
-			 */
+			/* 
+			   bind to subsystem */
 			if ((sc->ss.next = ss->cr.list))
 				sc->ss.next->ss.prev = &sc->ss.next;
 			sc->ss.prev = &ss->cr.list;
 			ss->cr.list = sccp_get(sc);
 			sc->ss.ss = ss_get(ss);
 		} else {	/* not listening */
-			/*
+			/* 
 			   We don't bind non-listening streams because until they are assigned an
 			   SLR, they are not in the hashes.  SLRs are only assigned when we enter
 			   the SS_WCON_CREQ state from SS_IDLE or the SS_DATA_XFER state from
-			   SS_WRES_CIND. 
-			 */
-			/*
-			   bind to subsystem 
-			 */
+			   SS_WRES_CIND. */
+			/* 
+			   bind to subsystem */
 			if ((sc->ss.next = ss->co.list))
 				sc->ss.next->ss.prev = &sc->ss.next;
 			sc->ss.prev = &ss->co.list;
@@ -12529,11 +12310,11 @@ sccp_bind_req(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong cons)
 	return (0);
       eaddrinuse:
 	err = -EADDRINUSE;
-	ptrace(("%s: %p: ERROR: address already bound\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: address already bound\n", DRV_NAME, sc));
 	goto error;
       eaddrnotavail:
 	err = -EADDRNOTAVAIL;
-	ptrace(("%s: %p: ERROR: no such NI/PC pair available\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no such NI/PC pair available\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -12548,9 +12329,8 @@ sccp_bind_req(queue_t *q, struct sc *sc, struct sccp_addr *src, ulong cons)
 STATIC int
 sccp_unbind_req(queue_t *q, struct sc *sc)
 {
-	/*
-	   remove from bind/listen hash 
-	 */
+	/* 
+	   remove from bind/listen hash */
 	if (sc->ss.ss) {
 		if ((*sc->ss.prev = sc->ss.next))
 			sc->ss.next->ss.prev = &sc->ss.next;
@@ -12559,9 +12339,8 @@ sccp_unbind_req(queue_t *q, struct sc *sc)
 		ss_put(xchg(&sc->ss.ss, NULL));
 		sccp_put(sc);
 	}
-	/*
-	   remove from established hash 
-	 */
+	/* 
+	   remove from established hash */
 	if (sc->sp.sp) {
 		if ((*sc->sp.prev = sc->sp.next))
 			sc->sp.next->sp.prev = &sc->sp.next;
@@ -12586,8 +12365,8 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 {
 	int err = 0;
 	int tries;
-	unsigned short slr = 0; /* just to shut up compiler */
-	struct sc **scp = NULL; /* just to shut up compiler */
+	unsigned short slr = 0;		/* just to shut up compiler */
+	struct sc **scp = NULL;		/* just to shut up compiler */
 	struct sp *sp;
 	if (sccp_get_state(sc) != SS_IDLE)
 		goto efault;
@@ -12595,45 +12374,39 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 		goto efault;
 	if (sc->sp.sp)
 		goto eisconn;
-	/*
+	/* 
 	   Figure C.2/Q.714: Figure 2A/T1.112.4-2000: If not sufficient resources, return an
-	   N_DISCON_IND indication or simply return an N_ERROR_ACK. 
-	 */
+	   N_DISCON_IND indication or simply return an N_ERROR_ACK. */
 	if (!sc->slr) {
 		struct sr *sr;
-		/*
-		   normal N_CONN_REQ 
-		 */
+		/* 
+		   normal N_CONN_REQ */
 		if (!(sr = sccp_lookup_sr(sp, sc->sp.sp->add.pc, 1)))
 			goto enomem;
-		/*
+		/* 
 		   Figure C.2/Q.714: Figure 2A/T1.112.4-2000 1of4: Assign a local reference and an
-		   SLS to the connection section. Determine proposed protocol class and credit. 
-		 */
+		   SLS to the connection section. Determine proposed protocol class and credit. */
 		for (tries = SCCP_SLR_MAX_TRIES; tries; tries--) {
-			/*
+			/* 
 			   IMPLEMENTAION NOTE: This is where we would do labelling and offset for
 			   SUA.  There would need to be a fixed SLR portion mask and value.  We
 			   would then only select SLRs which are within the variable portion.  For
-			   now, this uses the entire SLR numbering space. 
-			 */
+			   now, this uses the entire SLR numbering space. */
 			slr = (sp->sccp_next_slr++) & 0xffff;
 			if ((scp = sccp_co_lookup(sp, slr)) && !(*scp))
 				break;
 		}
 		if (*scp)
 			goto eagain2;
-		/*
-		   we have CO slot, use it 
-		 */
+		/* 
+		   we have CO slot, use it */
 		if ((sc->sp.next = *scp))
 			sc->sp.next->sp.prev = &sc->sp.next;
 		sc->sp.prev = scp;
 		*scp = sccp_get(sc);
 		sc->sp.sp = sp_get(sp);
-		/*
-		   connect to remote signalling point 
-		 */
+		/* 
+		   connect to remote signalling point */
 		if ((sc->sr.next = sr->sc.list))
 			sc->sr.next->sr.prev = &sc->sr.next;
 		sc->sr.prev = &sr->sc.list;
@@ -12650,7 +12423,7 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 			sc->mp = *pri;
 			if (sc->mp > 1) {
 				ptrace(("%s: %p: ERROR: user selected message priority > 1\n",
-					SCCP_DRV_NAME, sc));
+					DRV_NAME, sc));
 				sc->mp = 1;
 			}
 		}
@@ -12658,12 +12431,12 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 			sc->pcl = *pcl;
 			if (sc->pcl < 2) {
 				ptrace(("%s: %p: ERROR: user selected protocol class < 2\n",
-					SCCP_DRV_NAME, sc));
+					DRV_NAME, sc));
 				sc->pcl = 2;
 			}
 			if (sc->pcl > 3) {
 				ptrace(("%s: %p: ERROR: user selected protocol class > 3\n",
-					SCCP_DRV_NAME, sc));
+					DRV_NAME, sc));
 				sc->pcl = 3;
 			}
 		}
@@ -12676,17 +12449,14 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 				  &sc->credit, &sc->src, dp, NULL, imp)))
 			return (err);
 	} else {
-		/*
-		   Request Type 1 or Request Type 2 
-		 */
-		/*
+		/* 
+		   Request Type 1 or Request Type 2 */
+		/* 
 		   Figure 2A/T1.112.4-2000 1of4: Request Type 1 has SLR, DLR, DPC, PCLASS and
-		   credit already assigned (for permanent or semi-permanent connection). 
-		 */
-		/*
+		   credit already assigned (for permanent or semi-permanent connection). */
+		/* 
 		   Figure 2A/T1.112.4-2000 1of2: Request Type 2 has SLR, DLR, DPC, PCLASS and
-		   credit already assigned (for permanent or semi-permanent connection). 
-		 */
+		   credit already assigned (for permanent or semi-permanent connection). */
 		slr = sc->slr;
 		scp = sccp_co_lookup(sp, slr);
 		if (scp && (*scp))
@@ -12694,9 +12464,8 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 	}
 	sccp_timer_start(sc, tcon);
 	sccp_set_state(sc, SS_WCON_CREQ);
-	/*
-	   we have a blind slot, use it 
-	 */
+	/* 
+	   we have a blind slot, use it */
 	sc->slr = slr;
 	if ((sc->sp.next = *scp))
 		sc->sp.next->sp.prev = &sc->sp.next;
@@ -12706,19 +12475,19 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 	return (0);
       enomem:
 	err = -ENOMEM;
-	ptrace(("%s: %p: ERROR: insufficient memory\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: insufficient memory\n", DRV_NAME, sc));
 	goto error;
       eagain2:
 	err = -EAGAIN;
-	ptrace(("%s: %p: ERROR: couldn't assign SLR\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: couldn't assign SLR\n", DRV_NAME, sc));
 	goto error;
       eisconn:
 	err = -EISCONN;
-	ptrace(("%s: %p: ERROR: user already connected\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: user already connected\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	ptrace(("%s: %p: SWERR: connection request in wrong state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: SWERR: connection request in wrong state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -12734,7 +12503,7 @@ sccp_conn_res(queue_t *q, struct sc *sc, mblk_t *cp, struct sc *ap, mblk_t *dp)
 	int err;
 	int tries;
 	unsigned short slr;
-	struct sc **scp = NULL; /* just to shut up compiler */
+	struct sc **scp = NULL;		/* just to shut up compiler */
 	struct sccp_msg *m = (struct sccp_msg *) cp->b_rptr;
 	struct sp *sp;
 	struct sr *sr;
@@ -12744,15 +12513,14 @@ sccp_conn_res(queue_t *q, struct sc *sc, mblk_t *cp, struct sc *ap, mblk_t *dp)
 		goto efault;
 	if (ap->sp.sp)
 		goto eisconn;
-	/*
+	/* 
 	   Figure 2B/T1.112.4-2000 1of2: update protocol class and credit, assign local
 	   referenceand SLS for incoming connection section, send CC, start activity timers and
 	   move tot he active state.
 
 	   Figure C.3/Q.714 Sheet 2 of 6: assign local reference, sls, protocol class and credit
 	   for the incoming connection section, send a CC, start inactivity timers, move to the
-	   active state. 
-	 */
+	   active state. */
 	fixme(("We should really get the user's protocol class and\n"
 	       "credit preferences from the N_CONN_RES options\n"));
 	for (tries = 0; tries < SCCP_SLR_MAX_TRIES; tries++) {
@@ -12766,17 +12534,15 @@ sccp_conn_res(queue_t *q, struct sc *sc, mblk_t *cp, struct sc *ap, mblk_t *dp)
 		goto eisconn2;
 	if (!(sr = sccp_lookup_sr(sp, sc->sp.sp->add.pc, 1)))
 		goto enomem;
-	/*
-	   we have CO slot, use it 
-	 */
+	/* 
+	   we have CO slot, use it */
 	if ((ap->sp.next = *scp))
 		ap->sp.next->sp.prev = &ap->sp.next;
 	ap->sp.prev = scp;
 	*scp = sccp_get(ap);
 	ap->sp.sp = sp_get(sp);
-	/*
-	   connect to remote signalling point 
-	 */
+	/* 
+	   connect to remote signalling point */
 	if ((ap->sr.next = sr->sc.list))
 		ap->sr.next->sr.prev = &ap->sr.next;
 	ap->sr.prev = &sr->sc.list;
@@ -12807,23 +12573,23 @@ sccp_conn_res(queue_t *q, struct sc *sc, mblk_t *cp, struct sc *ap, mblk_t *dp)
 	return (QR_DONE);
       enomem:
 	err = -ENOMEM;
-	ptrace(("%s: %p: ERROR: insufficient memory\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: insufficient memory\n", DRV_NAME, sc));
 	goto error;
       eisconn2:
 	err = -EISCONN;
-	ptrace(("%s: %p: ERROR: user already connected\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: user already connected\n", DRV_NAME, sc));
 	goto error;
       eagain2:
-	ptrace(("%s: %p: ERROR: slr assignment timed out\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: slr assignment timed out\n", DRV_NAME, sc));
 	return (-EAGAIN);
 	goto error;
       eisconn:
 	err = -EISCONN;
-	ptrace(("%s: %p: ERROR: accepting stream already connected\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: accepting stream already connected\n", DRV_NAME, sc));
 	goto error;
       efault:
 	err = -EFAULT;
-	ptrace(("%s: %p: SWERR: connection response in wrong state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: SWERR: connection response in wrong state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -12854,7 +12620,7 @@ sccp_data_req(queue_t *q, struct sc *sc, ulong exp, ulong more, ulong rctp, mblk
 		m->data.len = dp->b_wptr - dp->b_rptr;
 		fixme(("Fill out message structure\n"));
 		mp->b_cont = dp;
-		/*
+		/* 
 		   Figure 2C/T1.112.4-2002 1of2: segment message, reset receive inactivity timer,
 		   For class 3 peform sequence number function: if P(S) outside window, queue
 		   segment, otherwise construct message and send it out.  For class 2 construct
@@ -12867,34 +12633,28 @@ sccp_data_req(queue_t *q, struct sc *sc, ulong exp, ulong more, ulong rctp, mblk
 		   queue.  Otherwise we can send the message immediately. For protocol class 2 and
 		   when we send a protocol class 3 message immediately, we send a DT1(class 2) or
 		   DT2(class 3) and restart the send inactivity timer. This operation is performed
-		   for each message in the M-bit sequence. 
-		 */
+		   for each message in the M-bit sequence. */
 		bufq_queue(&sc->sndq, mp);
 		return (QR_TRIMMED);
 	case SS_BOTH_RESET:
-		/*
-		   Figure 2E/T1.112.4-2000: dicard 
-		 */
-		/*
-		   Figure C.6/Q.714 Shee 2 of 4: discard 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000: dicard */
+		/* 
+		   Figure C.6/Q.714 Shee 2 of 4: discard */
 		return (QR_DONE);
 	case SS_WCON_RREQ:
-		/*
-		   Figure 2E/T1.112.4-2002 2of2: queue received information. 
-		 */
-		/*
+		/* 
+		   Figure 2E/T1.112.4-2002 2of2: queue received information. */
+		/* 
 		   Figure C.6/Q.714 Sheet 2 of 4: Received information (whatever that means: see
-		   figure). 
-		 */
+		   figure). */
 		fixme(("Write this procedure\n"));
 		return (-EFAULT);
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: discard received information. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: discard received information. */
 			return (QR_DONE);
 		default:
 			swerr();
@@ -12906,7 +12666,7 @@ sccp_data_req(queue_t *q, struct sc *sc, ulong exp, ulong more, ulong rctp, mblk
 	}
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sc));
 	goto error;
       error:
 	return (err);
@@ -12918,13 +12678,11 @@ sccp_exdata_req(queue_t *q, struct sc *sc, ulong more, ulong rctp, mblk_t *dp)
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
-		   Figure 2D/T1.112.4-2000: same. 
-		 */
-		/*
+		/* 
+		   Figure 2D/T1.112.4-2000: same. */
+		/* 
 		   Figure C.5/Q.714 Sheet 1 of 2: If there is an unacknowledged ED, queue the
-		   message, otherwise send the ED and restart send inactivity timer. 
-		 */
+		   message, otherwise send the ED and restart send inactivity timer. */
 		if (sc->flags & SCCPF_LOC_ED) {
 			bufq_queue(&sc->urgq, dp);
 			return (QR_TRIMMED);
@@ -12934,29 +12692,24 @@ sccp_exdata_req(queue_t *q, struct sc *sc, ulong more, ulong rctp, mblk_t *dp)
 		sccp_timer_start(sc, tias);
 		return (QR_TRIMMED);
 	case SS_BOTH_RESET:
-		/*
-		   Figure 2E/T1.112.4-2000: dicard 
-		 */
-		/*
-		   Figure C.6/Q.714 Shee 2 of 4: discard 
-		 */
+		/* 
+		   Figure 2E/T1.112.4-2000: dicard */
+		/* 
+		   Figure C.6/Q.714 Shee 2 of 4: discard */
 		return (QR_DONE);
 	case SS_WCON_RREQ:
-		/*
-		   Figure 2E/T1.112.4-2002 2of2: queue received information. 
-		 */
-		/*
+		/* 
+		   Figure 2E/T1.112.4-2002 2of2: queue received information. */
+		/* 
 		   Figure C.6/Q.714 Sheet 2 of 4: Received information (whatever that means: see
-		   figure). 
-		 */
+		   figure). */
 		fixme(("Write this procedure\n"));
 		return (-EFAULT);
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
-			   Figure 2E/T1.112.4-2000 2of2: discard received information. 
-			 */
+			/* 
+			   Figure 2E/T1.112.4-2000 2of2: discard received information. */
 			return (QR_DONE);
 		default:
 			err = -EFAULT;
@@ -12977,27 +12730,23 @@ sccp_datack_req(queue_t *q, struct sc *sc)
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
 		if (sc->flags & SCCPF_REM_ED) {
-			/*
-			   we are acking expedited data 
-			 */
-			/*
-			   Figure 2D/T1.112.4-2000: same. 
-			 */
-			/*
+			/* 
+			   we are acking expedited data */
+			/* 
+			   Figure 2D/T1.112.4-2000: same. */
+			/* 
 			   Figure C.5/Q.714 Sheet 1 of 2: Send and EA and restart the send
-			   inactivity timer. 
-			 */
+			   inactivity timer. */
 			if ((err = sccp_send_ea(q, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr)))
 				return (err);
 			sccp_timer_start(sc, tias);
 			sc->flags &= ~SCCPF_REM_ED;
 			return (QR_DONE);
 		} else {
-			/*
-			   we are acking normal data 
-			 */
+			/* 
+			   we are acking normal data */
 			if (bufq_size(&sc->ackq)) {	/* we must have data to ack */
-				/*
+				/* 
 				   Perform the processing deferred from when we received the data
 				   message and queued it on the ack queue
 
@@ -13028,8 +12777,7 @@ sccp_datack_req(queue_t *q, struct sc *sc)
 				   acknowledge receipt of data messages in protocol class 3.  To do 
 				   this, we queue the message to an ack queue rather than
 				   performing the P(S) P(R) processing on it yet. We postpone this
-				   processing until a data ack request is received from the user. 
-				 */
+				   processing until a data ack request is received from the user. */
 				fixme(("Write this procedure\n"));
 				return (-EFAULT);
 			}
@@ -13046,73 +12794,64 @@ sccp_reset_req(queue_t *q, struct sc *sc)
 {
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
-		   Note: ANSI returns an N_RESET_CON immediately here.  That is strange. 
-		 */
+		/* 
+		   Note: ANSI returns an N_RESET_CON immediately here.  That is strange. */
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000 1of2: return N_RESET_CON, send RSR, start reset
 			   timer, reset variables and discard all queued messages and
-			   unacknowledged messages, move to the reset outgoing state. 
-			 */
+			   unacknowledged messages, move to the reset outgoing state. */
 			fixme(("SWERR: write this function\n"));
 			sccp_set_state(sc, SS_WCON_RREQ);
 			return (-EFAULT);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 1 of 4: Send a reset request message to the perr, 
 			   start the reset timer, restart the send inactivity timer, reset
 			   variables and discard all queued and unacknowledged messages. Move to
-			   the reset ongoing state. 
-			 */
+			   the reset ongoing state. */
 			fixme(("SWERR: write this function\n"));
 			sccp_set_state(sc, SS_WCON_RREQ);
 			return (-EFAULT);
 		}
 	case SS_BOTH_RESET:
-		/*
-		   Figure 2E/T1.112.4-2000: same but no "received information" function. 
-		 */
-		/*
+		/* 
+		   Figure 2E/T1.112.4-2000: same but no "received information" function. */
+		/* 
 		   Figure C.6/Q.714 Sheet 3 of 4: Received information (whatever that means), and
-		   move to the reset outgoing state. 
-		 */
+		   move to the reset outgoing state. */
 		fixme(("Do received information function\n"));
-		/*
+		/* 
 		   FIXME: We don't want to lose track of the fact that the reset was a both way
 		   reset and not to send an N_RESET_CON to the user when the reset completes (for
-		   ITU).  This state transition alone doesn't cut it. 
-		 */
+		   ITU).  This state transition alone doesn't cut it. */
 		sccp_set_state(sc, SS_WCON_RREQ);
 		return (QR_DONE);
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000 2of2: transfer all queued information, move to
-			   the active state. 
-			 */
+			   the active state. */
 			fixme(("Transfer all queued information\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: received information (whatever that
-			   means). 
-			 */
+			   means). */
 			fixme(("Received information\n"));
 			return (QR_DONE);
 		}
 	case SS_WCON_RREQ:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2002 2of2: send N_RESET_CON to the user, discard all
-			   queue and unacknowledged messages. 
-			 */
+			   queue and unacknowledged messages. */
 			fixme(("Write this function\n"));
 			return (-EFAULT);
 		default:
@@ -13130,37 +12869,32 @@ sccp_reset_res(queue_t *q, struct sc *sc)
 {
 	switch (sccp_get_state(sc)) {
 	case SS_BOTH_RESET:
-		/*
-		   Figure 2E/T1.112.4-2000: same but no "received information" function. 
-		 */
-		/*
+		/* 
+		   Figure 2E/T1.112.4-2000: same but no "received information" function. */
+		/* 
 		   Figure C.6/Q.714 Sheet 3 of 4: Received information (whatever that means), and
-		   move to the reset outgoing state. 
-		 */
+		   move to the reset outgoing state. */
 		fixme(("Do received information function\n"));
-		/*
+		/* 
 		   FIXME: We don't want to lose track of the fact that the reset was a both way
 		   reset and not to send an N_RESET_CON to the user when the reset completes (for
-		   ITU).  This state transition alone doesn't cut it. 
-		 */
+		   ITU).  This state transition alone doesn't cut it. */
 		sccp_set_state(sc, SS_WCON_RREQ);
 		return (QR_DONE);
 	case SS_WRES_RIND:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000 2of2: transfer all queued information, move to
-			   the active state. 
-			 */
+			   the active state. */
 			fixme(("Transfer all queued information\n"));
 			sccp_set_state(sc, SS_DATA_XFER);
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.6/Q.714 Sheet 4 of 4: received information (whatever that
-			   means). 
-			 */
+			   means). */
 			fixme(("Received information\n"));
 			return (QR_DONE);
 		}
@@ -13182,14 +12916,12 @@ sccp_discon_req(queue_t *q, struct sc *sc, mblk_t *cp, mblk_t *dp)
 	case SS_IDLE:
 	case SS_WRES_CIND:
 	{
-		/*
+		/* 
 		   Figure 2B/T1.112.4-2000 1of2: release allocated resources, send CREF, move to
-		   the idle state. 
-		 */
-		/*
+		   the idle state. */
+		/* 
 		   Figure C.3/Q.714 Sheet 2 of 6: release resources, send CREF, move to the idle
-		   state. 
-		 */
+		   state. */
 		struct sccp_msg *m = (struct sccp_msg *) cp->b_rptr;
 		fixme(("Select sr, but don't set sc->sr.sr\n"));
 		sccp_send_cref(q, sc->sp.sp, sc->sp.sp->add.pc, m->rl.sls, m->slr,
@@ -13199,29 +12931,25 @@ sccp_discon_req(queue_t *q, struct sc *sc, mblk_t *cp, mblk_t *dp)
 		return (QR_DONE);
 	}
 	case SS_WCON_CREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 2 of 7: Figure 2A/T1.112.4-2000 Sheet 2 of 4: We need to
 		   remember the fact that we got a disconnect request while an outgoing connection
 		   was pending and wait for a connection confirmation anyway. When we receive the
-		   connection confirmation we will disconnect. 
-		 */
+		   connection confirmation we will disconnect. */
 		sccp_set_state(sc, SS_WCON_CREQ2);
 		return (QR_DONE);
 	case SS_DATA_XFER:
 	{
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 4 of 7: Figure C.3/Q.714 Sheet 3 of 6: Stop inactivity
-		   timers, send RLSD, start release timer, move to disconnect pending state. 
-		 */
-		/*
+		   timers, send RLSD, start release timer, move to disconnect pending state. */
+		/* 
 		   Figure 2A/T1.112.4-2000 Sheet 4 of 4: release resources for the connection
-		   section, stop inactivity timers, send RLSD, start released and interval timers. 
-		 */
-		/*
+		   section, stop inactivity timers, send RLSD, start released and interval timers. */
+		/* 
 		   Notes: Although ANSI says to release resources for the connection section, it
 		   does not talk about releasing the local reference (which is needed to receive
-		   the RLC). 
-		 */
+		   the RLC). */
 		sccp_timer_stop(sc, tias);
 		sccp_timer_stop(sc, tiar);
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
@@ -13261,20 +12989,18 @@ STATIC int
 sccp_unitdata_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong pcl, ulong opt, ulong imp,
 		  ulong seq, ulong pri, mblk_t *dp)
 {
-	/*
+	/* 
 	   Figure 3/T1.112.4-2000 1of2: assign an sls based on the sequence parameter in the
 	   N-UNITDATA Request, construct an [X/L]UDT message, deciding which message to use based
 	   on local information, decide whether segmentation is necessary and if necessary segment
-	   the message, send the resulting messages to routing control for routing 
-	 */
-	/*
+	   the message, send the resulting messages to routing control for routing */
+	/* 
 	   IMPLEMENTATION NOTE:- Actually we don't care at this point whether the message needs to
 	   be segmented or not: we will decide that after routing and perform segmentation during
 	   routing if necessary.  Also, we build just a UDT here.  If global title is performed and 
 	   a hop counter is required, the message will be converted into an XUDT.  If segmentation
 	   is required the message will be converted into an XUDT/LUDT when the need for
-	   segementation is determined after routing. 
-	 */
+	   segementation is determined after routing. */
 	fixme(("SWERR: write this function\n"));
 	return (-EFAULT);
 }
@@ -13320,13 +13046,11 @@ sccp_state_req(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status)
 	case N_SCCP_STATUS_USER_IN_SERVICE:
 		if (ss->state != SSN_ALLOWED) {
 			struct sr *sr;
-			/*
-			   broadcast SSA 
-			 */
+			/* 
+			   broadcast SSA */
 			for (sr = sp->sr.list; sr; sr = sr->sp.next) {
-				/*
-				   send SSA 
-				 */
+				/* 
+				   send SSA */
 				struct sccp_addr cdpa, cgpa;
 				cdpa.ni = add->ni;
 				cdpa.ri = SCCP_RI_DPC_SSN;
@@ -13345,18 +13069,16 @@ sccp_state_req(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status)
 						   add->ssn, sp->add.pc, smi)) < 0)
 					goto error;
 			}
-			/*
-			   local broadcast UIS (including GTT function) 
-			 */
+			/* 
+			   local broadcast UIS (including GTT function) */
 			if ((err = sccp_state_lbr(q, add, status, smi)) < 0)
 				goto error;
 			ss->state = SSN_ALLOWED;
 		}
 		break;
 	case N_SCCP_STATUS_USER_OUT_OF_SERVICE:
-		/*
-		   See ANSI Figure 8/T1.112.4-2000 sheet 1of1 
-		 */
+		/* 
+		   See ANSI Figure 8/T1.112.4-2000 sheet 1of1 */
 		if (ss->state != SSN_PROHIBITED) {
 			struct sr *sr;
 			if (ss->flags & SSNF_IGNORE_SST_IN_PROGRESS) {
@@ -13366,13 +13088,11 @@ sccp_state_req(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status)
 				ss_timer_stop(ss, twsog);
 				ss->flags &= ~SSNF_WAIT_FOR_GRANT;
 			}
-			/*
-			   broadcast SSP 
-			 */
+			/* 
+			   broadcast SSP */
 			for (sr = sp->sr.list; sr; sr = sr->sp.next) {
-				/*
-				   send SSP 
-				 */
+				/* 
+				   send SSP */
 				struct sccp_addr cdpa, cgpa;
 				cdpa.ni = add->ni;
 				cdpa.ri = SCCP_RI_DPC_SSN;
@@ -13391,9 +13111,8 @@ sccp_state_req(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status)
 						   add->ssn, sp->add.pc, smi)) < 0)
 					goto error;
 			}
-			/*
-			   local broadcast UOS (including GTT function) 
-			 */
+			/* 
+			   local broadcast UOS (including GTT function) */
 			if ((err = sccp_state_lbr(q, add, status, smi)) < 0)
 				goto error;
 			ss->state = SSN_PROHIBITED;
@@ -13463,9 +13182,8 @@ mtp_hangup(struct mt *mt)
 			}
 		}
 	} else {
-		/*
-		   mt lower stream is not attached to a signalling point 
-		 */
+		/* 
+		   mt lower stream is not attached to a signalling point */
 		rare();
 	}
 	fixme(("Notify management of failed lower stream\n"));
@@ -13575,15 +13293,13 @@ mtp_read(queue_t *q, mblk_t *pdu, struct sr *sr, ulong pri, ulong sls)
 		err = sccp_dec_ludts(p, e, m);
 		break;
 	default:
-		/*
-		   any message with an unknown message type is discarded 
-		 */
+		/* 
+		   any message with an unknown message type is discarded */
 		err = -ENOPROTOOPT;
 		break;
 	}
-	/*
-	   handle return value 
-	 */
+	/* 
+	   handle return value */
 	if (err < 0 || (err = sccp_irte_msg(q, mp)) < 0) {
 		switch (err) {
 		case -EOPNOTSUPP:	/* unexpected message */
@@ -13591,10 +13307,9 @@ mtp_read(queue_t *q, mblk_t *pdu, struct sr *sr, ulong pri, ulong sls)
 		case -EPROTONOSUPPORT:	/* parameter type error */
 			break;
 		case -ENOPROTOOPT:	/* message type error */
-			/*
+			/* 
 			   ANSI T1.112.4-2000 Table B-1/T1.112.4: any message with an unknown
-			   message type is discarded 
-			 */
+			   message type is discarded */
 			break;
 		}
 		goto error;
@@ -13737,7 +13452,7 @@ mtp_addr_ack(queue_t *q, struct mt *mt, mblk_t *mp)
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EINVAL;
 #if defined(_SAFE)||defined(_DEBUG)
@@ -13745,7 +13460,7 @@ mtp_addr_ack(queue_t *q, struct mt *mt, mblk_t *mp)
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EBUSY;
 #endif
@@ -13753,14 +13468,14 @@ mtp_addr_ack(queue_t *q, struct mt *mt, mblk_t *mp)
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EFAULT;
       emsgsize:
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: Bad message size\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: Bad message size\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EMSGSIZE;
 }
@@ -13836,7 +13551,7 @@ mtp_info_ack(queue_t *q, struct mt *mt, mblk_t *mp)
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EINVAL;
 #if defined(_SAFE)||defined(_DEBUG)
@@ -13844,7 +13559,7 @@ mtp_info_ack(queue_t *q, struct mt *mt, mblk_t *mp)
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EBUSY;
 #endif
@@ -13852,14 +13567,14 @@ mtp_info_ack(queue_t *q, struct mt *mt, mblk_t *mp)
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EFAULT;
       emsgsize:
 	noenable(mt->iq);
 	noenable(mt->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", SCCP_DRV_NAME, mt));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mt));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EMSGSIZE;
 }
@@ -13918,15 +13633,15 @@ mtp_transfer_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 	return (err);
       baddata:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: no data\n", SCCP_DRV_NAME, mt));
+	pswerr(("%s: %p: SWERR: no data\n", DRV_NAME, mt));
 	goto error;
       badaddr:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: bad address\n", SCCP_DRV_NAME, mt));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, mt));
 	goto error;
       emsgsize:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: bad message size\n", SCCP_DRV_NAME, mt));
+	pswerr(("%s: %p: SWERR: bad message size\n", DRV_NAME, mt));
 	goto error;
       eproto:
 	err = -EPROTO;
@@ -13990,19 +13705,17 @@ mtp_pause_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 	else
 		for (sr = sp->sr.list; sr && sr->add.pc != a->pc; sr = sr->sp.next) ;
 	if (sr) {
-		/*
+		/* 
 		   ANSI Figure 5/T1.112.4-2000 1of3: mark sp prohibited; local broadcast of "SP
 		   inactive", mark sc prohibited, local broadcast of SCCP Inactive, update PC
 		   translation; for each subsystem stop SST; mark subsystem prohibited; update
-		   subsystem translation information; local broadcast of "UOS" 
-		 */
+		   subsystem translation information; local broadcast of "UOS" */
 		if (!sp)
 			sp = sr->sp.sp;
 		if (!(sr->flags & SCCPF_PROHIBITED)) {
 			ulong smi = 0;	/* FIXME */
-			/*
-			   local broadcast SP inactive (N-PCSTATE) 
-			 */
+			/* 
+			   local broadcast SP inactive (N-PCSTATE) */
 			if ((err =
 			     sccp_pcstate_lbr(q, a, N_SCCP_STATUS_SIGNALLING_POINT_INACCESSIBLE)))
 				return (err);
@@ -14014,9 +13727,8 @@ mtp_pause_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 				add.pc = a->pc;
 				add.gtt = 0;
 				add.alen = 0;
-				/*
-				   local broadcast of SCCP Inactive 
-				 */
+				/* 
+				   local broadcast of SCCP Inactive */
 				for (sc = sp->gt.list; sc; sc = sc->sp.next) {
 				}
 				for (ss = sp->ss.list; ss; ss = ss->sp.next) {
@@ -14030,9 +13742,8 @@ mtp_pause_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 				for (rs = sr->rs.list; rs; rs = rs->sr.next) {
 					add.ssn = rs->ssn;
 					if (!(rs->flags & SCCPF_PROHIBITED)) {
-						/*
-						   local broadcast of "UOS" N-STATE 
-						 */
+						/* 
+						   local broadcast of "UOS" N-STATE */
 						if ((err =
 						     sccp_state_lbr(q, &add,
 								    N_SCCP_STATUS_USER_OUT_OF_SERVICE,
@@ -14220,9 +13931,8 @@ mtp_status_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 	case MTP_STATUS_TYPE_CONG:
 		if (sr->proto.popt & SS7_POPT_MPLEV) {
 			int level;
-			/*
-			   multiple congestion levels ala ANSI 
-			 */
+			/* 
+			   multiple congestion levels ala ANSI */
 			switch (p->mtp_status) {
 			case MTP_STATUS_CONGESTION_LEVEL0:
 				level = 0;
@@ -14241,9 +13951,8 @@ mtp_status_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 			}
 			if (sr->level < level) {
 				if (!sr->level) {
-					/*
-					   congestion begins 
-					 */
+					/* 
+					   congestion begins */
 #if 0
 					if ((err =
 					     sccp_sr_maint_ind(q, sc->sr.sr,
@@ -14255,14 +13964,12 @@ mtp_status_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 				sr_timer_start(sr, tdecay);
 			}
 		} else {
-			/*
-			   single congestion level ala ITU 
-			 */
+			/* 
+			   single congestion level ala ITU */
 			if (!sr->timers.tattack) {
 				if (!sr->level) {
-					/*
-					   congestion begins 
-					 */
+					/* 
+					   congestion begins */
 #if 0
 					if ((err =
 					     sccp_sr_maint_ind(q, sc->sr.sr,
@@ -14279,9 +13986,8 @@ mtp_status_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 	case MTP_STATUS_TYPE_UPU:
 		switch (p->mtp_status) {
 		case MTP_STATUS_UPU_UNEQUIPPED:
-			/*
-			   inform management 
-			 */
+			/* 
+			   inform management */
 #if 0
 			if ((err =
 			     sccp_sr_maint_ind(q, sc->sr.sr, SCCP_MAINT_USER_PART_UNEQUIPPED)))
@@ -14297,18 +14003,16 @@ mtp_status_ind(queue_t *q, struct mt *mt, mblk_t *mp)
 #endif
 #define SCCPF_UPT_PENDING 2	/* FIXME */
 #define SS7_POPT_UPT (1<<5)	/* FIXME */
-			/*
-			   start UPU procedures 
-			 */
+			/* 
+			   start UPU procedures */
 			if (!(sr->flags & SCCPF_UPT_PENDING)) {
 				if ((sr->proto.popt & SS7_POPT_UPT) && sr->sp.sp
 				    && sr->sp.sp->ss.list) {
 					fixme(("Send SST message\n"));
 					sr_timer_start(sr, tstatinfo);
 				} else {
-					/*
-					   send some other message 
-					 */
+					/* 
+					   send some other message */
 				}
 				sr->flags |= SCCPF_UPT_PENDING;
 			}
@@ -14501,43 +14205,43 @@ n_conn_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_TRIMMED);
       naccess:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no permission for requested address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no permission for requested address\n", DRV_NAME, sc));
 	goto error;
       nbadaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: address is unusable\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, sc));
 	goto error;
       nnoaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: no destination address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no destination address\n", DRV_NAME, sc));
 	goto error;
       nbadopt:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: options are unusable\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: options are unusable\n", DRV_NAME, sc));
 	goto error;
       nnotsupport:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: protocol class not supported\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: protocol class not supported\n", DRV_NAME, sc));
 	goto error;
       nbadopt2:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: invalid protocol class\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid protocol class\n", DRV_NAME, sc));
 	goto error;
       nbadqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: QOS structure type not supported\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: QOS structure type not supported\n", DRV_NAME, sc));
 	goto error;
       nbadopt3:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: options are unusable\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: options are unusable\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid message format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, sc));
 	goto error;
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_CONN_REQ, err);
@@ -14606,9 +14310,8 @@ n_conn_res(queue_t *q, struct sc *sc, mblk_t *mp)
 		goto nbadtoken2;
 	if (ap->i_state == NS_IDLE && ap->conind)
 		goto nbadtoken;
-	/*
-	   protect at least r00t streams from users 
-	 */
+	/* 
+	   protect at least r00t streams from users */
 	if (sc->cred.cr_uid != 0 && ap->cred.cr_uid == 0)
 		goto naccess;
 	{
@@ -14632,39 +14335,39 @@ n_conn_res(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       naccess:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no access to accepting queue\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no access to accepting queue\n", DRV_NAME, sc));
 	goto error;
       nbadtoken:
 	err = NBADTOKEN;
-	ptrace(("%s: %p: ERROR: accepting queue is listening\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: accepting queue is listening\n", DRV_NAME, sc));
 	goto error;
       nbadtoken2:
 	err = NBADTOKEN;
-	ptrace(("%s: %p: ERROR: accepting queue id is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: accepting queue id is invalid\n", DRV_NAME, sc));
 	goto error;
       nbadseq:
 	err = NBADSEQ;
-	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", DRV_NAME, sc));
 	goto error;
       nbadopt:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: quality of service options are bad\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: quality of service options are bad\n", DRV_NAME, sc));
 	goto error;
       nbadqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: quality of service options are bad\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: quality of service options are bad\n", DRV_NAME, sc));
 	goto error;
       nbadopt2:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: quality of service options are bad\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: quality of service options are bad\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_CONN_RES, err);
@@ -14706,9 +14409,8 @@ n_discon_req(queue_t *q, struct sc *sc, mblk_t *mp)
 		goto nbadaddr;
 	if (sccp_get_n_state(sc) == NS_WACK_DREQ7 && !(cp = n_seq_check(sc, p->SEQ_number)))
 		goto nbadseq;
-	/*
-	   XXX: What to do with the disconnect reason? Nothing? 
-	 */
+	/* 
+	   XXX: What to do with the disconnect reason? Nothing? */
 	if ((err = sccp_discon_req(q, sc, cp, mp->b_cont)))
 		goto error;
 	if ((err = n_ok_ack(q, sc, p->PRIM_type, p->SEQ_number, 0)))
@@ -14716,19 +14418,19 @@ n_discon_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_TRIMMED);
       nbadseq:
 	err = NBADSEQ;
-	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", DRV_NAME, sc));
 	goto error;
       nbadaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: responding addres invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: responding addres invalid\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_DISCON_REQ, err);
@@ -14750,7 +14452,7 @@ n_error_reply(queue_t *q, struct sc *sc, int err)
 	case QR_DONE:
 	case QR_ABSORBED:
 	case QR_TRIMMED:
-		ptrace(("%s: %p: ERROR: No error condition\n", SCCP_DRV_NAME, sc));
+		ptrace(("%s: %p: ERROR: No error condition\n", DRV_NAME, sc));
 		return (err);
 	}
 	if ((mp = ss7_allocb(q, 2, BPRI_HI))) {
@@ -14775,11 +14477,11 @@ n_write(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_ABSORBED);	/* absorbed mp */
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = 0;
-	ptrace(("%s: %p: ERROR: ignoring in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignoring in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_reply(q, sc, err);
@@ -14811,15 +14513,15 @@ n_data_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = QR_DONE;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_reply(q, sc, err);
@@ -14857,15 +14559,15 @@ n_exdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = QR_DONE;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_reply(q, sc, err);
@@ -14913,23 +14615,23 @@ n_bind_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_bind_ack(q, sc);
       naccess:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no permission for requested address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no permission for requested address\n", DRV_NAME, sc));
 	goto error;
       nnoaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", DRV_NAME, sc));
 	goto error;
       nbadaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: address is invalid\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_BIND_REQ, err);
@@ -14953,7 +14655,7 @@ n_unbind_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, p->PRIM_type, 0, 0);
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_UNBIND_REQ, err);
@@ -14975,7 +14677,7 @@ n_uderror_reply(queue_t *q, struct sc *sc, mblk_t *mp, int etype)
 	case QR_DONE:
 	case QR_ABSORBED:
 	case QR_TRIMMED:
-		ptrace(("%s: %p: ERROR: No error condition\n", SCCP_DRV_NAME, sc));
+		ptrace(("%s: %p: ERROR: No error condition\n", DRV_NAME, sc));
 		return (etype);
 	}
 	if (etype > 0) {
@@ -15031,23 +14733,23 @@ n_unitdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: no permission to send to address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no permission to send to address\n", DRV_NAME, sc));
 	goto error;
       eproto2:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad destnation address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad destnation address\n", DRV_NAME, sc));
 	goto error;
       eproto3:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: invalid primitive\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive\n", DRV_NAME, sc));
 	goto error;
       eproto4:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sc));
 	goto error;
       eproto5:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad data size\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad data size\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_uderror_reply(q, sc, mp, err);
@@ -15088,23 +14790,23 @@ n_optmgmt_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, p->PRIM_type, 0, 0);
       nbadopt:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: bad protocol class\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad protocol class\n", DRV_NAME, sc));
 	goto error;
       nbadopt2:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: invalid qos options\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid qos options\n", DRV_NAME, sc));
 	goto error;
       nbadqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: bad qos structure type\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad qos structure type\n", DRV_NAME, sc));
 	goto error;
       nbadopt3:
 	err = NBADOPT;
-	ptrace(("%s: %p: ERROR: bad qos structure format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad qos structure format\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_OPTMGMT_REQ, err);
@@ -15142,11 +14844,11 @@ n_reset_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (0);
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = 0;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_RESET_REQ, err);
@@ -15171,11 +14873,11 @@ n_reset_res(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, p->PRIM_type, 0, 0);
       noutstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = 0;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_RESET_RES, err);
@@ -15207,11 +14909,11 @@ n_inform_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, N_INFORM_REQ, 0, 0);
       badqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: QOS structure type not supported\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: QOS structure type not supported\n", DRV_NAME, sc));
 	goto error;
       emsgsize:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_INFORM_REQ, err);
@@ -15243,15 +14945,15 @@ n_coord_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, N_COORD_REQ, 0, 0);
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, sc));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not assign address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: could not assign address\n", DRV_NAME, sc));
 	goto error;
       emsgsize:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_COORD_REQ, err);
@@ -15283,15 +14985,15 @@ n_coord_res(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, N_COORD_RES, 0, 0);
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, sc));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not assign address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: could not assign address\n", DRV_NAME, sc));
 	goto error;
       emsgsize:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_COORD_RES, err);
@@ -15323,15 +15025,15 @@ n_state_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return n_ok_ack(q, sc, N_STATE_REQ, 0, 0);
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, sc));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not assign address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: could not assign address\n", DRV_NAME, sc));
 	goto error;
       emsgsize:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, sc));
 	goto error;
       error:
 	return n_error_ack(q, sc, N_STATE_REQ, err);
@@ -15365,9 +15067,8 @@ t_conn_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	if (p->OPT_length) {
 		if (mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 			goto einval;
-		/*
-		   check options ranges and format 
-		 */
+		/* 
+		   check options ranges and format */
 		for (op = mp->b_rptr + p->OPT_offset, oe = op + p->OPT_length, oh = (typeof(oh)) op;
 		     op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh)
 		     && op + oh->len <= oe; op += oh->len, oh = (typeof(oh)) op) {
@@ -15421,9 +15122,8 @@ t_conn_req(queue_t *q, struct sc *sc, mblk_t *mp)
 				case T_SCCP_DEBUG:
 				case T_SCCP_CLUSTER:
 				case T_SCCP_RET_ERROR:
-					/*
-					   ignore 
-					 */
+					/* 
+					   ignore */
 					continue;
 				}
 			}
@@ -15436,35 +15136,35 @@ t_conn_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_TRIMMED);
       access:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for requested address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no permission for requested address\n", DRV_NAME, sc));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is unusable\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, sc));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: no destination address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no destination address\n", DRV_NAME, sc));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: options are unusable\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: options are unusable\n", DRV_NAME, sc));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for protocol class\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: primitive not supported for protocol class\n", DRV_NAME, sc));
 	goto error;
       badopt3:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: invalid protocol class\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid protocol class\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid message format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, sc));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_CONN_REQ, err);
@@ -15477,14 +15177,13 @@ t_conn_req(queue_t *q, struct sc *sc, mblk_t *mp)
 STATIC INLINE mblk_t *
 t_seq_check(struct sc *sc, ulong seq)
 {
-	/*
+	/* 
 	   IMPLEMENTATION NOTE:- Sequence numbers are actually the address of the mblk which
 	   contains the CR message and contains the contents of this message as a connection
 	   indication.  To find if a particular sequence number is valid, we walk the connection
 	   indication queue looking for an mblk with the same address as the sequence number.
 	   Sequence numbers are only valid on the stream for which the connection indication is
-	   queued. 
-	 */
+	   queued. */
 	psw_t flags;
 	mblk_t *mp;
 	bufq_lock(&sc->conq, &flags);
@@ -15496,13 +15195,12 @@ t_seq_check(struct sc *sc, ulong seq)
 STATIC INLINE struct sc *
 t_tok_check(struct sc *sc, ulong tok)
 {
-	/*
+	/* 
 	   IMPLEMENTATION NOTE:- Tokens are actually the address of the read queue.  To find if a
 	   particular token is valid, we walk the open list looking for an open device with a read
 	   queue with the same address as the token.  Tokens are only valid for SCCP streams of the 
 	   same provider type.  (That is, a TPI connection indication cannot be accepted on an NPI
-	   stream. 
-	 */
+	   stream. */
 	struct sc *ap;
 	queue_t *aq = (queue_t *) tok;
 	for (ap = master.sc.list; ap && ap->oq != aq; ap = ap->next) ;
@@ -15526,9 +15224,8 @@ t_conn_res(queue_t *q, struct sc *sc, mblk_t *mp)
 	if (p->OPT_length) {
 		if (mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 			goto einval;
-		/*
-		   check options ranges and format 
-		 */
+		/* 
+		   check options ranges and format */
 		for (op = mp->b_rptr + p->OPT_offset, oe = op + p->OPT_length, oh = (typeof(oh)) op;
 		     op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh)
 		     && op + oh->len <= oe; op += oh->len, oh = (typeof(oh)) op) {
@@ -15555,9 +15252,8 @@ t_conn_res(queue_t *q, struct sc *sc, mblk_t *mp)
 		goto badf;
 	if ((ap_oldstate = sccp_get_t_state(ap)) == TS_IDLE && ap->conind)
 		goto resqlen;
-	/*
-	   protect at least r00t streams from users 
-	 */
+	/* 
+	   protect at least r00t streams from users */
 	if (sc->cred.cr_uid != 0 && ap->cred.cr_uid == 0)
 		goto access;
 	if (p->OPT_length) {
@@ -15586,9 +15282,8 @@ t_conn_res(queue_t *q, struct sc *sc, mblk_t *mp)
 				case T_SCCP_DEBUG:
 				case T_SCCP_CLUSTER:
 				case T_SCCP_RET_ERROR:
-					/*
-					   ignore 
-					 */
+					/* 
+					   ignore */
 					continue;
 				}
 			}
@@ -15606,35 +15301,35 @@ t_conn_res(queue_t *q, struct sc *sc, mblk_t *mp)
       access:
       resqlen:
 	err = TRESQLEN;
-	ptrace(("%s: %p: ERROR: accepting queue is listening\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: accepting queue is listening\n", DRV_NAME, sc));
 	goto error;
       badf:
 	err = TBADF;
-	ptrace(("%s: %p: ERROR: accepting queue id is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: accepting queue id is invalid\n", DRV_NAME, sc));
 	goto error;
       badseq:
 	err = TBADSEQ;
-	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", DRV_NAME, sc));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: options are bad\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: options are bad\n", DRV_NAME, sc));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for protocol class\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: primitive not supported for protocol class\n", DRV_NAME, sc));
 	goto error;
       badopt3:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: invalid protocol class\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid protocol class\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_CONN_RES, err);
@@ -15683,15 +15378,15 @@ t_discon_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_TRIMMED);
       badseq:
 	err = TBADSEQ;
-	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: connection ind reference is invalid\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_DISCON_REQ, err);
@@ -15713,7 +15408,7 @@ t_error_reply(queue_t *q, struct sc *sc, int err)
 	case QR_DONE:
 	case QR_ABSORBED:
 	case QR_TRIMMED:
-		ptrace(("%s: %p: ERROR: No error condition\n", SCCP_DRV_NAME, sc));
+		ptrace(("%s: %p: ERROR: No error condition\n", DRV_NAME, sc));
 		return (err);
 	}
 	if ((mp = ss7_allocb(q, 2, BPRI_HI))) {
@@ -15738,11 +15433,11 @@ t_write(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_ABSORBED);
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = 0;
-	ptrace(("%s: %p: ERROR: ignoring in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignoring in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_reply(q, sc, err);
@@ -15768,15 +15463,15 @@ t_data_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = QR_DONE;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_reply(q, sc, err);
@@ -15807,15 +15502,15 @@ t_exdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       eproto:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = QR_DONE;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_reply(q, sc, err);
@@ -15852,9 +15547,8 @@ t_bind_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	if ((mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)
 	    || (p->ADDR_length != add_len))
 		goto tbadaddr;
-	/*
-	   we don't allow wildcards just yet 
-	 */
+	/* 
+	   we don't allow wildcards just yet */
 	if (!add->ssn)
 		goto tnoaddr;
 	if (sc->cred.cr_uid != 0 && !add->ssn)
@@ -15864,23 +15558,23 @@ t_bind_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return t_bind_ack(q, sc, &sc->src);
       tacces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, sc));
 	goto error;
       tnoaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: couldn't allocate address\n", DRV_NAME, sc));
 	goto error;
       tbadaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: address is invalid\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       toutstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_BIND_REQ, err);
@@ -15904,7 +15598,7 @@ t_unbind_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return t_ok_ack(q, sc, T_UNBIND_REQ, 0, 0);
       toutstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_UNBIND_REQ, err);
@@ -15926,16 +15620,15 @@ t_uderror_reply(queue_t *q, struct sc *sc, mblk_t *mp, int etype)
 	case QR_DONE:
 	case QR_ABSORBED:
 	case QR_TRIMMED:
-		ptrace(("%s: %p: ERROR: No error condition\n", SCCP_DRV_NAME, sc));
+		ptrace(("%s: %p: ERROR: No error condition\n", DRV_NAME, sc));
 		return (etype);
 	}
 	if (etype > 0) {
 		static const int offset =
 		    sizeof(struct T_uderror_ind) - sizeof(struct T_unitdata_req);
 		if (offset > 0) {
-			/*
-			   shift addresses, if necessary 
-			 */
+			/* 
+			   shift addresses, if necessary */
 			bcopy(mp->b_rptr + sizeof(*p), mp->b_rptr + sizeof(*p) + offset,
 			      mp->b_wptr - mp->b_rptr - sizeof(*p));
 			if (p->DEST_offset)
@@ -16012,23 +15705,23 @@ t_unitdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_TRIMMED);
       eperm:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: no permission to send to address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: no permission to send to address\n", DRV_NAME, sc));
 	goto error;
       tbadaddr:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad destination address\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad destination address\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: invalid primitive\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive\n", DRV_NAME, sc));
 	goto error;
       toutstate:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sc));
 	goto error;
       tbaddata:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad data size\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad data size\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_uderror_reply(q, sc, mp, err);
@@ -16101,23 +15794,23 @@ t_optmgmt_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	}
       tbadflag:
 	err = TBADFLAG;
-	ptrace(("%s: %p: ERROR: bad options flags\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: bad options flags\n", DRV_NAME, sc));
 	goto error;
       tbadopt3:
 	err = err;
-	ptrace(("%s: %p: ERROR: option parsing error\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: option parsing error\n", DRV_NAME, sc));
 	goto error;
       tbadopt2:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: invalid options\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid options\n", DRV_NAME, sc));
 	goto error;
       tbadopt1:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: invalid options\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid options\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_OPTMGMT_REQ, err);
@@ -16146,7 +15839,7 @@ t_ordrel_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_DONE);
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_ack(q, sc, T_ORDREL_REQ, err);
@@ -16171,9 +15864,8 @@ t_optdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	if (p->OPT_length) {
 		if (mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 			goto einval;
-		/*
-		   check options ranges and format 
-		 */
+		/* 
+		   check options ranges and format */
 		for (op = mp->b_rptr + p->OPT_offset, oe = op + p->OPT_length, oh = (typeof(oh)) op;
 		     op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh)
 		     && op + oh->len <= oe; op += oh->len, oh = (typeof(oh)) op) ;
@@ -16204,9 +15896,8 @@ t_optdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 				case T_SCCP_CLUSTER:
 				case T_SCCP_SEQ_CTRL:
 				case T_SCCP_RET_ERROR:
-					/*
-					   ignore 
-					 */
+					/* 
+					   ignore */
 					continue;
 				}
 			}
@@ -16221,19 +15912,19 @@ t_optdata_req(queue_t *q, struct sc *sc, mblk_t *mp)
 	return (QR_ABSORBED);
       outstate:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place interface out of state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: would place interface out of state\n", DRV_NAME, sc));
 	goto error;
       badopt:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: invalid options format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid options format\n", DRV_NAME, sc));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, sc));
 	goto error;
       discard:
 	err = QR_DONE;
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", SCCP_DRV_NAME, sc));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, sc));
 	goto error;
       error:
 	return t_error_reply(q, sc, err);
@@ -16292,11 +15983,10 @@ sc_tcon_timeout(struct sc *sc)
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_WCON_CREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 2 of 7: Figure 2A/T1.112.4-2000 Sheet 2 of 4: release
 		   resources and local reference. Freeze local reference.  Send an N_DISCON_IND to
-		   the user. Move to the idle state. 
-		 */
+		   the user. Move to the idle state. */
 		sccp_release(sc);
 		if ((err =
 		     sccp_discon_ind(NULL, sc, N_PROVIDER, SCCP_REFC_EXPIRATION_OF_NC_ESTAB_TIMER,
@@ -16305,13 +15995,12 @@ sc_tcon_timeout(struct sc *sc)
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
 	case SS_WCON_CREQ2:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 3 of 7: Figure 2A/T1.112.4-2000 Sheet 3 of 4: In this
 		   case, we have received a disconnect from the user before receiving the CC from
 		   the peer.  We have not received a CC from the peer within the timeout so we will 
 		   now disconnect.  Release resource and local reference.  Freeze the local
-		   reference.  Move to the idle state. 
-		 */
+		   reference.  Move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
@@ -16333,10 +16022,9 @@ sc_tias_timeout(struct sc *sc)
 	ulong more = 0;
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure C.4/Q.714 Sheet 4 of 4: Send an inactivity test and restart the send
-		   inactivity timer. Figure 2C/T1.112.4-2002 2of2: same. 
-		 */
+		   inactivity timer. Figure 2C/T1.112.4-2002 2of2: same. */
 		if ((err =
 		     sccp_send_it(NULL, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr,
 				  sc->pcl, sc->ps, sc->pr, more, sc->credit)))
@@ -16366,11 +16054,10 @@ sc_tiar_timeout(struct sc *sc)
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
 		{
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 4of4: Figure 2B/T1.112.4-2000 2of2: send
 			   N_DISCON_IND to user, release resource for connection section, stop
-			   inactivity timers, send RLSD, start released and interval timers. 
-			 */
+			   inactivity timers, send RLSD, start released and interval timers. */
 			sccp_timer_stop(sc, tiar);
 			sccp_timer_stop(sc, tias);
 			if ((err =
@@ -16395,11 +16082,10 @@ sc_tiar_timeout(struct sc *sc)
 		default:
 		case SS7_PVAR_ITUT:
 		{
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 5 of 7: Figure C.3/Q.714 Sheet 4 of 6: send
 			   N_DISCON_IND to user, stop inactivity timers, start release timer, move
-			   to disconnect pending state. 
-			 */
+			   to disconnect pending state. */
 			sccp_release(sc);
 			if ((err =
 			     sccp_discon_ind(NULL, sc, N_PROVIDER,
@@ -16437,10 +16123,9 @@ sc_trel_timeout(struct sc *sc)
 	case SS_WCON_DREQ:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure 2A/T1.112.4-2000 Sheet 4 of 4: Figure 2B/T1.112.4-2000 Sheet 2 of 
-			   2: send RLSD, restart released timer. 
-			 */
+			   2: send RLSD, restart released timer. */
 			if ((err =
 			     sccp_send_rlsd(NULL, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_UNQUALIFIED, NULL, NULL)))
@@ -16449,10 +16134,9 @@ sc_trel_timeout(struct sc *sc)
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 6 of 7: Send RLSD again, start the interval
-			   timer, start the repeat release timer. 
-			 */
+			   timer, start the repeat release timer. */
 			if ((err =
 			     sccp_send_rlsd(NULL, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_UNQUALIFIED, NULL, &sc->imp)))
@@ -16481,10 +16165,9 @@ sc_trel2_timeout(struct sc *sc)
 	case SS_WCON_DREQ:
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 7 of 7: send another RLSD, restart the repeat
-			   release timer. 
-			 */
+			   release timer. */
 			if ((err =
 			     sccp_send_rlsd(NULL, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_UNQUALIFIED, NULL, NULL)))
@@ -16493,10 +16176,9 @@ sc_trel2_timeout(struct sc *sc)
 			return (QR_DONE);
 		default:
 		case SS7_PVAR_ITUT:
-			/*
+			/* 
 			   Figure C.2/Q.714 Sheet 7 of 7: send another RLSD, restart the repeat
-			   release timer. 
-			 */
+			   release timer. */
 			if ((err =
 			     sccp_send_rlsd(NULL, sc->sp.sp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_UNQUALIFIED, NULL, &sc->imp)))
@@ -16521,17 +16203,15 @@ sc_tint_timeout(struct sc *sc)
 {
 	switch (sccp_get_state(sc)) {
 	case SS_WCON_DREQ:
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 6 of 7: inform maintenance, release resources and local
 		   reference number, freeze local reference, stop release and interval timers, move 
-		   to the idle state. 
-		 */
+		   to the idle state. */
 		fixme(("Inform maintenance\n"));
-		/*
+		/* 
 		   Figure 2A/T1.112.4-2000 Sheet 4 of 4: Figure 2B/T1.112.4-2000 Sheet 2 of 2: ASNI 
 		   says to inform maintenance and then place the connection section into the
-		   Maintenance Blocking state. 
-		 */
+		   Maintenance Blocking state. */
 		fixme(("Handle ANSI\n"));
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
@@ -16570,19 +16250,17 @@ sc_tres_timeout(struct sc *sc)
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_BOTH_RESET:
-		/*
-		   Figure C.6/Q.174 Sheet 3 of 4: same as Figure C.6/Q.714 Sheet 2 of 4: below. 
-		 */
+		/* 
+		   Figure C.6/Q.174 Sheet 3 of 4: same as Figure C.6/Q.714 Sheet 2 of 4: below. */
 	case SS_WCON_RREQ:
 		if (1) {	/* temporary connection */
 			switch (sc->proto.pvar & SS7_PVAR_MASK) {
 			case SS7_PVAR_ANSI:
-				/*
+				/* 
 				   Figure 2E/T1.112.4-2000: if this is a temporary connection,
 				   release resources for the connection section, stop inactivity
 				   timers, send a RLSD, start release and interval timers, move to
-				   the disconnect pending state. 
-				 */
+				   the disconnect pending state. */
 				sccp_timer_stop(sc, tiar);
 				sccp_timer_stop(sc, tias);
 				if ((err =
@@ -16597,12 +16275,11 @@ sc_tres_timeout(struct sc *sc)
 				return (QR_DONE);
 			default:
 			case SS7_PVAR_ITUT:
-				/*
+				/* 
 				   Figure C.6/Q.714 Sheet 2 of 4: If this is a temporary connection 
 				   section then (Figure C.2/Q.714 Sheet 5 of 7) release resources
 				   an local reference, freeze local reference, send an N_DISCON_IND 
-				   to the user, stop inactivity timers and move the idle state. 
-				 */
+				   to the user, stop inactivity timers and move the idle state. */
 				sccp_release(sc);
 				if ((err =
 				     sccp_discon_ind(NULL, sc, N_PROVIDER,
@@ -16613,11 +16290,10 @@ sc_tres_timeout(struct sc *sc)
 				return (QR_DONE);
 			}
 		} else {
-			/*
+			/* 
 			   Figure 2E/T1.112.4-2000: same.  Figure C.6/Q.714 Sheet 2 of 4: If this
 			   is a permanent connection, inform maintenance and place the connection
-			   section in management blocking state. 
-			 */
+			   section in management blocking state. */
 			fixme(("Handle permanent connection\n"));
 			sccp_set_state(sc, SS_IDLE);
 			return (-EFAULT);
@@ -16655,10 +16331,9 @@ sc_tack_timeout(struct sc *sc)
 	int err;
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
-		/*
+		/* 
 		   Figure 2C/T1.112.4-2000 2of2: if an ack is outstanding, send an AK, clear ack
-		   outstanding, reset the send inactivity timer and reset the ack timer. 
-		 */
+		   outstanding, reset the send inactivity timer and reset the ack timer. */
 		if (sc->flags & SCCPF_ACK_OUT) {
 			if ((err =
 			     sccp_send_ak(NULL, sc->sp.sp, sc->sp.sp->add.pc, sc->mp, sc->sls,
@@ -16800,9 +16475,8 @@ sccp_get_na(struct sccp_config *arg, struct na *na, int size)
 	if (!na || (size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	cnf->proto = na->proto;
-	/*
-	   write out list of signalling point configurations following na configuration 
-	 */
+	/* 
+	   write out list of signalling point configurations following na configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (sp = na->sp.list; sp && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
@@ -16814,9 +16488,8 @@ sccp_get_na(struct sccp_config *arg, struct na *na, int size)
 		chd->proto = sp->proto;
 		chd->add = sp->add;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -16838,14 +16511,12 @@ sccp_get_ss(struct sccp_config *arg, struct ss *ss, int size)
 		return (-EINVAL);
 	cnf->spid = ss->sp.sp ? ss->sp.sp->id : 0;
 	cnf->ssn = ss->ssn;
-	/*
-	   write out list of SCCP users following subsystem configuration 
-	 */
+	/* 
+	   write out list of SCCP users following subsystem configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
-	/*
-	   bound CL users 
-	 */
+	/* 
+	   bound CL users */
 	for (sc = ss->cl.list; sc && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sc = sc->ss.next, size -= sizeof(*arg) + sizeof(*chd), arg =
 	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
@@ -16853,9 +16524,8 @@ sccp_get_ss(struct sccp_config *arg, struct ss *ss, int size)
 		arg->id = ss->id;
 		todo(("Write out child info\n"));
 	}
-	/*
-	   bound CO users 
-	 */
+	/* 
+	   bound CO users */
 	for (sc = ss->co.list; sc && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sc = sc->ss.next, size -= sizeof(*arg) + sizeof(*chd), arg =
 	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
@@ -16863,9 +16533,8 @@ sccp_get_ss(struct sccp_config *arg, struct ss *ss, int size)
 		arg->id = ss->id;
 		todo(("Write out child info\n"));
 	}
-	/*
-	   listening users 
-	 */
+	/* 
+	   listening users */
 	for (sc = ss->cr.list; sc && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sc = sc->ss.next, size -= sizeof(*arg) + sizeof(*chd), arg =
 	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
@@ -16873,9 +16542,8 @@ sccp_get_ss(struct sccp_config *arg, struct ss *ss, int size)
 		arg->id = ss->id;
 		todo(("Write out child info\n"));
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -16889,9 +16557,8 @@ sccp_get_rs(struct sccp_config *arg, struct rs *rs, int size)
 	cnf->srid = rs->sr.sr ? rs->sr.sr->id : 0;
 	cnf->ssn = rs->ssn;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -16907,9 +16574,8 @@ sccp_get_sr(struct sccp_config *arg, struct sr *sr, int size)
 	cnf->spid = sr->sp.sp ? sr->sp.sp->id : 0;
 	cnf->proto = sr->proto;
 	cnf->add = sr->add;
-	/*
-	   write out list of remote subsystems 
-	 */
+	/* 
+	   write out list of remote subsystems */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (rs = sr->rs.list; rs && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
@@ -16920,9 +16586,8 @@ sccp_get_sr(struct sccp_config *arg, struct sr *sr, int size)
 		chd->srid = rs->sr.sr ? rs->sr.sr->id : 0;
 		chd->ssn = rs->ssn;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -16940,9 +16605,8 @@ sccp_get_sp(struct sccp_config *arg, struct sp *sp, int size)
 	cnf->naid = sp->na.na ? sp->na.na->id : 0;
 	cnf->proto = sp->proto;
 	cnf->add = sp->add;
-	/*
-	   write out list of signalling relations 
-	 */
+	/* 
+	   write out list of signalling relations */
 	arg = (typeof(arg)) (cnf + 1);
 	chr = (typeof(chr)) (arg + 1);
 	for (sr = sp->sr.list; sr && size >= sizeof(*arg) + sizeof(*chr) + sizeof(*arg);
@@ -16954,9 +16618,8 @@ sccp_get_sp(struct sccp_config *arg, struct sp *sp, int size)
 		chr->proto = sr->proto;
 		chr->add = sr->add;
 	}
-	/*
-	   write out list of local subsystems 
-	 */
+	/* 
+	   write out list of local subsystems */
 	chs = (typeof(chs)) chr;
 	for (ss = sp->ss.list; ss && size >= sizeof(*arg) + sizeof(*chs) + sizeof(*arg);
 	     ss = ss->sp.next, size -= sizeof(*arg) + sizeof(*chs), arg =
@@ -16966,9 +16629,8 @@ sccp_get_sp(struct sccp_config *arg, struct sp *sp, int size)
 		chs->spid = ss->sp.sp ? ss->sp.sp->id : 0;
 		chs->ssn = ss->ssn;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -16984,15 +16646,13 @@ sccp_get_mt(struct sccp_config *arg, struct mt *mt, int size)
 	if (!mt || (size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	cnf->proto = mt->proto;
-	/*
+	/* 
 	   write out remote signalling point or local signalling point configuration following
-	   message transfer part configuration 
-	 */
+	   message transfer part configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chr = (typeof(chr)) (arg + 1);
-	/*
-	   remote signalling point 
-	 */
+	/* 
+	   remote signalling point */
 	for (sr = mt->sr; sr && size >= sizeof(*arg) + sizeof(*chr) + sizeof(*arg);
 	     sr = NULL, size -= sizeof(*arg) + sizeof(*chr), arg = (typeof(arg)) (chr + 1), chr =
 	     (typeof(chr)) (arg + 1)) {
@@ -17003,9 +16663,8 @@ sccp_get_mt(struct sccp_config *arg, struct mt *mt, int size)
 		chr->add = sr->add;
 	}
 	chp = (typeof(chp)) chr;
-	/*
-	   local signalling point 
-	 */
+	/* 
+	   local signalling point */
 	for (sp = mt->sp; sp && size >= sizeof(*arg) + sizeof(*chp) + sizeof(*arg);
 	     sp = NULL, size -= sizeof(*arg) + sizeof(*chp), arg = (typeof(arg)) (chp + 1), chp =
 	     (typeof(chp)) (arg + 1)) {
@@ -17015,9 +16674,8 @@ sccp_get_mt(struct sccp_config *arg, struct mt *mt, int size)
 		chp->proto = sp->proto;
 		chp->add = sp->add;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -17031,9 +16689,8 @@ sccp_get_df(struct sccp_config *arg, struct df *df, int size)
 	if (!df || (size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	cnf->proto = df->proto;
-	/*
-	   write out list of network appearances following default configuration 
-	 */
+	/* 
+	   write out list of network appearances following default configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	cha = (typeof(cha)) (arg + 1);
 	for (na = df->na.list; na && size >= sizeof(*arg) + sizeof(*cha) + sizeof(*arg);
@@ -17043,9 +16700,8 @@ sccp_get_df(struct sccp_config *arg, struct df *df, int size)
 		arg->id = na->id;
 		cha->proto = na->proto;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -17124,9 +16780,8 @@ sccp_add_ss(struct sccp_config *arg, struct ss *ss, int size, int force, int tes
 		sp = sp_lookup(cnf->spid);
 	if (!sp)
 		return (-EINVAL);
-	/*
-	   local subsystem number must be unique for local signalling point 
-	 */
+	/* 
+	   local subsystem number must be unique for local signalling point */
 	for (ss = sp->ss.list; ss; ss = ss->sp.next)
 		if (ss->ssn == cnf->ssn)
 			return (-EBUSY);
@@ -17150,9 +16805,8 @@ sccp_add_rs(struct sccp_config *arg, struct rs *rs, int size, int force, int tes
 		sr = sr_lookup(cnf->srid);
 	if (!sr)
 		return (-EINVAL);
-	/*
-	   remote subsystem number must be unique for remote signalling point 
-	 */
+	/* 
+	   remote subsystem number must be unique for remote signalling point */
 	for (rs = sr->rs.list; rs; rs = rs->sr.next)
 		if (rs->ssn == cnf->ssn)
 			return (-EBUSY);
@@ -17176,26 +16830,22 @@ sccp_add_sr(struct sccp_config *arg, struct sr *sr, int size, int force, int tes
 		sp = sp_lookup(cnf->spid);
 	if (!sp)
 		return (-EINVAL);
-	/*
-	   network appearance of remote must match network appearance of local 
-	 */
+	/* 
+	   network appearance of remote must match network appearance of local */
 	if (cnf->add.ni)
 		if (sp->add.ni != cnf->add.ni)
 			return (-EINVAL);
-	/*
-	   service indicator of remote must match service indicator of local 
-	 */
+	/* 
+	   service indicator of remote must match service indicator of local */
 	if (cnf->add.si)
 		if (sp->add.si != cnf->add.si)
 			return (-EINVAL);
-	/*
-	   remote address must not be local address 
-	 */
+	/* 
+	   remote address must not be local address */
 	if (sp->add.pc == cnf->add.pc)
 		return (-EINVAL);
-	/*
-	   remote address must be unique for local signalling point 
-	 */
+	/* 
+	   remote address must be unique for local signalling point */
 	for (sr = sp->sr.list; sr; sr = sr->sp.next)
 		if (sr->add.pc == cnf->add.pc)
 			return (-EBUSY);
@@ -17225,9 +16875,8 @@ sccp_add_sp(struct sccp_config *arg, struct sp *sp, int size, int force, int tes
 			return (-EINVAL);
 	} else
 		cnf->add.ni = na->id;
-	/*
-	   local address must be unique for network appearance 
-	 */
+	/* 
+	   local address must be unique for network appearance */
 	for (sp = na->sp.list; sp; sp = sp->na.next)
 		if (sp->add.ni == cnf->add.ni && sp->add.pc == cnf->add.pc
 		    && sp->add.si == cnf->add.si)
@@ -17414,9 +17063,8 @@ sccp_del_sc(struct sccp_config *arg, struct sc *sc, int size, int force, int tes
 	if (!sc)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to subsystem 
-		 */
+		/* 
+		   bound to subsystem */
 		if (sc->ss.ss)
 			return (-EBUSY);
 	}
@@ -17431,9 +17079,8 @@ sccp_del_na(struct sccp_config *arg, struct na *na, int size, int force, int tes
 	if (!na)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   attached signalling points 
-		 */
+		/* 
+		   attached signalling points */
 		if (na->sp.list)
 			return (-EBUSY);
 	}
@@ -17460,19 +17107,16 @@ sccp_del_ss(struct sccp_config *arg, struct ss *ss, int size, int force, int tes
 	if (!ss)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound CL SCCP users 
-		 */
+		/* 
+		   bound CL SCCP users */
 		if (ss->cl.list)
 			return (-EBUSY);
-		/*
-		   bound CO SCCP users 
-		 */
+		/* 
+		   bound CO SCCP users */
 		if (ss->co.list)
 			return (-EBUSY);
-		/*
-		   listening SCCP users 
-		 */
+		/* 
+		   listening SCCP users */
 		if (ss->cr.list)
 			return (-EBUSY);
 	}
@@ -17499,19 +17143,16 @@ sccp_del_sr(struct sccp_config *arg, struct sr *sr, int size, int force, int tes
 	if (!sr)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   attached to a live MTP interface 
-		 */
+		/* 
+		   attached to a live MTP interface */
 		if (sr->mt)
 			return (-EBUSY);
-		/*
-		   we have remote subsystems 
-		 */
+		/* 
+		   we have remote subsystems */
 		if (sr->rs.list)
 			return (-EBUSY);
-		/*
-		   we have connected SCCP users 
-		 */
+		/* 
+		   we have connected SCCP users */
 		if (sr->sc.list)
 			return (-EBUSY);
 	}
@@ -17526,29 +17167,24 @@ sccp_del_sp(struct sccp_config *arg, struct sp *sp, int size, int force, int tes
 	if (!sp)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to SCCP user 
-		 */
+		/* 
+		   bound to SCCP user */
 		if (sp->sc.list)
 			return (-EBUSY);
-		/*
-		   attached to a live MTP interface 
-		 */
+		/* 
+		   attached to a live MTP interface */
 		if (sp->mt)
 			return (-EBUSY);
-		/*
-		   we have remote signalling points associated 
-		 */
+		/* 
+		   we have remote signalling points associated */
 		if (sp->sr.list)
 			return (-EBUSY);
-		/*
-		   we have local subsystems 
-		 */
+		/* 
+		   we have local subsystems */
 		if (sp->ss.list)
 			return (-EBUSY);
-		/*
-		   we have couplings 
-		 */
+		/* 
+		   we have couplings */
 		if (sp->cp.list)
 			return (-EBUSY);
 	}
@@ -17563,9 +17199,8 @@ sccp_del_mt(struct sccp_config *arg, struct mt *mt, int size, int force, int tes
 	if (!mt)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (mt->sp || mt->sr)
 			return (-EBUSY);
 	}
@@ -19339,8 +18974,8 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					SCCP_DRV_NAME, sc));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
+					sc));
 				ret = -EPERM;
 				break;
 			}
@@ -19353,8 +18988,8 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					SCCP_DRV_NAME, sc));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					sc));
 				ret = -EPERM;
 				break;
 			}
@@ -19364,16 +18999,15 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 					break;
 			if (!mt) {
 				ret = -EINVAL;
-				ptrace(("%s: %p: ERROR: could not find I_UNLINK muxid\n",
-					SCCP_DRV_NAME, sc));
+				ptrace(("%s: %p: ERROR: could not find I_UNLINK muxid\n", DRV_NAME,
+					sc));
 				break;
 			}
 			sccp_free_link(mt);
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SCCP_DRV_NAME, sc,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, sc, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -19387,83 +19021,82 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(SCCP_IOCGOPTION):
-			printd(("%s: %p: -> SCCP_IOCGOPTION\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCGOPTION\n", DRV_NAME, sc));
 			ret = sccp_iocgoptions(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCSOPTION):
-			printd(("%s: %p: -> SCCP_IOCSOPTION\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCSOPTION\n", DRV_NAME, sc));
 			ret = sccp_iocsoption(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCGCONFIG):
-			printd(("%s: %p: -> SCCP_IOCGCONFIG\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCGCONFIG\n", DRV_NAME, sc));
 			ret = sccp_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCSCONFIG):
-			printd(("%s: %p: -> SCCP_IOCSCONFIG\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCSCONFIG\n", DRV_NAME, sc));
 			ret = sccp_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCTCONFIG):
-			printd(("%s: %p: -> SCCP_IOCTCONFIG\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCTCONFIG\n", DRV_NAME, sc));
 			ret = sccp_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCCCONFIG):
-			printd(("%s: %p: -> SCCP_IOCCCONFIG\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCCCONFIG\n", DRV_NAME, sc));
 			ret = sccp_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCGSTATEM):
-			printd(("%s: %p: -> SCCP_IOCGSTATEM\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCGSTATEM\n", DRV_NAME, sc));
 			ret = sccp_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCCMRESET):
-			printd(("%s: %p: -> SCCP_IOCCMRESET\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCCMRESET\n", DRV_NAME, sc));
 			ret = sccp_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCGSTATSP):
-			printd(("%s: %p: -> SCCP_IOCGSTATSP\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCGSTATSP\n", DRV_NAME, sc));
 			ret = sccp_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCSSTATSP):
-			printd(("%s: %p: -> SCCP_IOCSSTATSP\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCSSTATSP\n", DRV_NAME, sc));
 			ret = sccp_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCGSTATS):
-			printd(("%s: %p: -> SCCP_IOCGSTATS\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCGSTATS\n", DRV_NAME, sc));
 			ret = sccp_iocgstats(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCSSTATS):
-			printd(("%s: %p: -> SCCP_IOCSSTATS\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCSSTATS\n", DRV_NAME, sc));
 			ret = sccp_iocsstats(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCGNOTIFY):
-			printd(("%s: %p: -> SCCP_IOCGNOTIFY\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCGNOTIFY\n", DRV_NAME, sc));
 			ret = sccp_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCSNOTIFY):
-			printd(("%s: %p: -> SCCP_IOCSNOTIFY\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCSNOTIFY\n", DRV_NAME, sc));
 			ret = sccp_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCCNOTIFY):
-			printd(("%s: %p: -> SCCP_IOCCNOTIFY\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCCNOTIFY\n", DRV_NAME, sc));
 			ret = sccp_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCCMGMT):
-			printd(("%s: %p: -> SCCP_IOCCMGMT\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCCMGMT\n", DRV_NAME, sc));
 			ret = sccp_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCCPASS):
-			printd(("%s: %p: -> SCCP_IOCCPASS\n", SCCP_DRV_NAME, sc));
+			printd(("%s: %p: -> SCCP_IOCCPASS\n", DRV_NAME, sc));
 			ret = sccp_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported SCCP ioctl %d\n", SCCP_DRV_NAME, sc, nr));
+			ptrace(("%s: %p: ERROR: Unsupported SCCP ioctl %d\n", DRV_NAME, sc, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
 		break;
 	}
-		/*
-		   TODO: Need to add standard TPI/NPI ioctls 
-		 */
+		/* 
+		   TODO: Need to add standard TPI/NPI ioctls */
 	default:
 		ret = (-EOPNOTSUPP);
 		break;
@@ -19525,11 +19158,10 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct mt *mt = MTP_PRIV(q);
 	// ulong oldstate = mtp_get_state(mt);
-	/*
-	   fast path 
-	 */
+	/* 
+	   fast path */
 	if ((prim = *(ulong *) mp->b_rptr) == MTP_TRANSFER_IND) {
-		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", SCCP_DRV_NAME, mt, msgdsize(mp->b_cont)));
+		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", DRV_NAME, mt, msgdsize(mp->b_cont)));
 		rtn = mtp_transfer_ind(q, mt, mp);
 		// if (rtn < 0)
 		// mtp_set_state(mt, oldstate);
@@ -19537,55 +19169,55 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	}
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MTP_OK_ACK:
-		printd(("%s: %p: MTP_OK_ACK <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_OK_ACK <-\n", DRV_NAME, mt));
 		rtn = mtp_ok_ack(q, mt, mp);
 		break;
 	case MTP_ERROR_ACK:
-		printd(("%s: %p: MTP_ERROR_ACK <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_ERROR_ACK <-\n", DRV_NAME, mt));
 		rtn = mtp_error_ack(q, mt, mp);
 		break;
 	case MTP_BIND_ACK:
-		printd(("%s: %p: MTP_BIND_ACK <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_BIND_ACK <-\n", DRV_NAME, mt));
 		rtn = mtp_bind_ack(q, mt, mp);
 		break;
 	case MTP_ADDR_ACK:
-		printd(("%s: %p: MTP_ADDR_ACK <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_ADDR_ACK <-\n", DRV_NAME, mt));
 		rtn = mtp_addr_ack(q, mt, mp);
 		break;
 	case MTP_INFO_ACK:
-		printd(("%s: %p: MTP_INFO_ACK <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_INFO_ACK <-\n", DRV_NAME, mt));
 		rtn = mtp_info_ack(q, mt, mp);
 		break;
 	case MTP_OPTMGMT_ACK:
-		printd(("%s: %p: MTP_OPGMGMT_ACK <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_OPGMGMT_ACK <-\n", DRV_NAME, mt));
 		rtn = mtp_optmgmt_ack(q, mt, mp);
 		break;
 	case MTP_TRANSFER_IND:
-		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", SCCP_DRV_NAME, mt, msgdsize(mp->b_cont)));
+		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", DRV_NAME, mt, msgdsize(mp->b_cont)));
 		rtn = mtp_transfer_ind(q, mt, mp);
 		break;
 	case MTP_PAUSE_IND:
-		printd(("%s: %p: MTP_PAUSE_IND <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_PAUSE_IND <-\n", DRV_NAME, mt));
 		rtn = mtp_pause_ind(q, mt, mp);
 		break;
 	case MTP_RESUME_IND:
-		printd(("%s: %p: MTP_RESUME_IND <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_RESUME_IND <-\n", DRV_NAME, mt));
 		rtn = mtp_resume_ind(q, mt, mp);
 		break;
 	case MTP_STATUS_IND:
-		printd(("%s: %p: MTP_STATUS_IND <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_STATUS_IND <-\n", DRV_NAME, mt));
 		rtn = mtp_status_ind(q, mt, mp);
 		break;
 	case MTP_RESTART_BEGINS_IND:
-		printd(("%s: %p: MTP_RESTART_BEGINS_IND <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_RESTART_BEGINS_IND <-\n", DRV_NAME, mt));
 		rtn = mtp_restart_begins_ind(q, mt, mp);
 		break;
 	case MTP_RESTART_COMPLETE_IND:
-		printd(("%s: %p: MTP_RESTART_COMPLETE_IND <-\n", SCCP_DRV_NAME, mt));
+		printd(("%s: %p: MTP_RESTART_COMPLETE_IND <-\n", DRV_NAME, mt));
 		rtn = mtp_restart_complete_ind(q, mt, mp);
 		break;
 	default:
-		printd(("%s: %p: ??? %lu <-\n", SCCP_DRV_NAME, mt, prim));
+		printd(("%s: %p: ??? %lu <-\n", DRV_NAME, mt, prim));
 		rtn = mtp_unrecognized_prim(q, mt, mp);
 		break;
 	}
@@ -19603,71 +19235,71 @@ sccp_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = sccp_get_state(sc);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case N_CONN_REQ:
-		printd(("%s: %p: -> N_CONN_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_CONN_REQ\n", DRV_NAME, sc));
 		rtn = n_conn_req(q, sc, mp);
 		break;
 	case N_CONN_RES:
-		printd(("%s: %p: -> N_CONN_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_CONN_RES\n", DRV_NAME, sc));
 		rtn = n_conn_res(q, sc, mp);
 		break;
 	case N_DISCON_REQ:
-		printd(("%s: %p: -> N_DISCON_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_DISCON_REQ\n", DRV_NAME, sc));
 		rtn = n_discon_req(q, sc, mp);
 		break;
 	case N_DATA_REQ:
-		printd(("%s: %p: -> N_DATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_DATA_REQ\n", DRV_NAME, sc));
 		rtn = n_data_req(q, sc, mp);
 		break;
 	case N_EXDATA_REQ:
-		printd(("%s: %p: -> N_EXDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_EXDATA_REQ\n", DRV_NAME, sc));
 		rtn = n_exdata_req(q, sc, mp);
 		break;
 	case N_INFO_REQ:
-		printd(("%s: %p: -> N_INFO_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_INFO_REQ\n", DRV_NAME, sc));
 		rtn = n_info_req(q, sc, mp);
 		break;
 	case N_BIND_REQ:
-		printd(("%s: %p: -> N_BIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_BIND_REQ\n", DRV_NAME, sc));
 		rtn = n_bind_req(q, sc, mp);
 		break;
 	case N_UNBIND_REQ:
-		printd(("%s: %p: -> N_UNBIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_UNBIND_REQ\n", DRV_NAME, sc));
 		rtn = n_unbind_req(q, sc, mp);
 		break;
 	case N_UNITDATA_REQ:
-		printd(("%s: %p: -> N_UNITDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_UNITDATA_REQ\n", DRV_NAME, sc));
 		rtn = n_unitdata_req(q, sc, mp);
 		break;
 	case N_OPTMGMT_REQ:
-		printd(("%s: %p: -> N_OPTMGMT_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_OPTMGMT_REQ\n", DRV_NAME, sc));
 		rtn = n_optmgmt_req(q, sc, mp);
 		break;
 	case N_DATACK_REQ:
-		printd(("%s: %p: -> N_DATACK_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_DATACK_REQ\n", DRV_NAME, sc));
 		rtn = n_datack_req(q, sc, mp);
 		break;
 	case N_RESET_REQ:
-		printd(("%s: %p: -> N_RESET_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_RESET_REQ\n", DRV_NAME, sc));
 		rtn = n_reset_req(q, sc, mp);
 		break;
 	case N_RESET_RES:
-		printd(("%s: %p: -> N_RESET_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_RESET_RES\n", DRV_NAME, sc));
 		rtn = n_reset_res(q, sc, mp);
 		break;
 	case N_INFORM_REQ:
-		printd(("%s: %p: -> N_INFORM_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_INFORM_REQ\n", DRV_NAME, sc));
 		rtn = n_inform_req(q, sc, mp);
 		break;
 	case N_COORD_REQ:
-		printd(("%s: %p: -> N_COORD_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_COORD_REQ\n", DRV_NAME, sc));
 		rtn = n_coord_req(q, sc, mp);
 		break;
 	case N_COORD_RES:
-		printd(("%s: %p: -> N_COORD_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_COORD_RES\n", DRV_NAME, sc));
 		rtn = n_coord_res(q, sc, mp);
 		break;
 	case N_STATE_REQ:
-		printd(("%s: %p: -> N_STATE_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_STATE_REQ\n", DRV_NAME, sc));
 		rtn = n_state_req(q, sc, mp);
 		break;
 	default:
@@ -19688,62 +19320,62 @@ tpi_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = sccp_get_state(sc);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case T_CONN_REQ:
-		printd(("%s: %p: -> T_CONN_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, sc));
 		rtn = t_conn_req(q, sc, mp);
 		break;
 	case T_CONN_RES:
-		printd(("%s: %p: -> T_CONN_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, sc));
 		rtn = t_conn_res(q, sc, mp);
 		break;
 	case T_DISCON_REQ:
-		printd(("%s: %p: -> T_DISCON_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, sc));
 		rtn = t_discon_req(q, sc, mp);
 		break;
 	case T_DATA_REQ:
-		printd(("%s: %p: -> T_DATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, sc));
 		rtn = t_data_req(q, sc, mp);
 		break;
 	case T_EXDATA_REQ:
-		printd(("%s: %p: -> T_EXDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, sc));
 		rtn = t_exdata_req(q, sc, mp);
 		break;
 	case T_INFO_REQ:
-		printd(("%s: %p: -> T_INFO_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, sc));
 		rtn = t_info_req(q, sc, mp);
 		break;
 	case T_BIND_REQ:
-		printd(("%s: %p: -> T_BIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, sc));
 		rtn = t_bind_req(q, sc, mp);
 		break;
 	case T_UNBIND_REQ:
-		printd(("%s: %p: -> T_UNBIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, sc));
 		rtn = t_unbind_req(q, sc, mp);
 		break;
 	case T_UNITDATA_REQ:
-		printd(("%s: %p: -> T_UNITDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, sc));
 		rtn = t_unitdata_req(q, sc, mp);
 		break;
 	case T_OPTMGMT_REQ:
-		printd(("%s: %p: -> T_OPTMGMT_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, sc));
 		rtn = t_optmgmt_req(q, sc, mp);
 		break;
 	case T_ORDREL_REQ:
-		printd(("%s: %p: -> T_ORDREL_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, sc));
 		rtn = t_ordrel_req(q, sc, mp);
 		break;
 	case T_OPTDATA_REQ:
-		printd(("%s: %p: -> T_OPTDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, sc));
 		rtn = t_optdata_req(q, sc, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
-		printd(("%s: %p: -> T_ADDR_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, sc));
 		rtn = t_addr_req(q, sc, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_REQ
 	case T_CAPABILITY_REQ:
-		printd(("%s: %p: -> T_CAPABILITY_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, sc));
 		rtn = t_capability_req(q, sc, mp);
 		break;
 #endif
@@ -19765,55 +19397,55 @@ npi_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = sccp_get_state(sc);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case N_CONN_REQ:
-		printd(("%s: %p: -> N_CONN_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_CONN_REQ\n", DRV_NAME, sc));
 		rtn = n_conn_req(q, sc, mp);
 		break;
 	case N_CONN_RES:
-		printd(("%s: %p: -> N_CONN_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_CONN_RES\n", DRV_NAME, sc));
 		rtn = n_conn_res(q, sc, mp);
 		break;
 	case N_DISCON_REQ:
-		printd(("%s: %p: -> N_DISCON_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_DISCON_REQ\n", DRV_NAME, sc));
 		rtn = n_discon_req(q, sc, mp);
 		break;
 	case N_DATA_REQ:
-		printd(("%s: %p: -> N_DATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_DATA_REQ\n", DRV_NAME, sc));
 		rtn = n_data_req(q, sc, mp);
 		break;
 	case N_EXDATA_REQ:
-		printd(("%s: %p: -> N_EXDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_EXDATA_REQ\n", DRV_NAME, sc));
 		rtn = n_exdata_req(q, sc, mp);
 		break;
 	case N_INFO_REQ:
-		printd(("%s: %p: -> N_INFO_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_INFO_REQ\n", DRV_NAME, sc));
 		rtn = n_info_req(q, sc, mp);
 		break;
 	case N_BIND_REQ:
-		printd(("%s: %p: -> N_BIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_BIND_REQ\n", DRV_NAME, sc));
 		rtn = n_bind_req(q, sc, mp);
 		break;
 	case N_UNBIND_REQ:
-		printd(("%s: %p: -> N_UNBIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_UNBIND_REQ\n", DRV_NAME, sc));
 		rtn = n_unbind_req(q, sc, mp);
 		break;
 	case N_UNITDATA_REQ:
-		printd(("%s: %p: -> N_UNITDATA_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_UNITDATA_REQ\n", DRV_NAME, sc));
 		rtn = n_unitdata_req(q, sc, mp);
 		break;
 	case N_OPTMGMT_REQ:
-		printd(("%s: %p: -> N_OPTMGMT_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_OPTMGMT_REQ\n", DRV_NAME, sc));
 		rtn = n_optmgmt_req(q, sc, mp);
 		break;
 	case N_DATACK_REQ:
-		printd(("%s: %p: -> N_DATACK_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_DATACK_REQ\n", DRV_NAME, sc));
 		rtn = n_datack_req(q, sc, mp);
 		break;
 	case N_RESET_REQ:
-		printd(("%s: %p: -> N_RESET_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_RESET_REQ\n", DRV_NAME, sc));
 		rtn = n_reset_req(q, sc, mp);
 		break;
 	case N_RESET_RES:
-		printd(("%s: %p: -> N_RESET_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_RESET_RES\n", DRV_NAME, sc));
 		rtn = n_reset_res(q, sc, mp);
 		break;
 	default:
@@ -19834,24 +19466,24 @@ gtt_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = sccp_get_state(sc);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case N_BIND_REQ:
-		printd(("%s: %p: -> N_BIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_BIND_REQ\n", DRV_NAME, sc));
 		rtn = n_bind_req(q, sc, mp);
 		break;
 	case N_UNBIND_REQ:
-		printd(("%s: %p: -> N_UNBIND_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_UNBIND_REQ\n", DRV_NAME, sc));
 		rtn = n_unbind_req(q, sc, mp);
 		break;
 	case N_INFORM_REQ:
-		printd(("%s: %p: -> N_INFORM_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_INFORM_REQ\n", DRV_NAME, sc));
 		rtn = n_inform_req(q, sc, mp);
 		break;
 	case N_STATE_REQ:
-		printd(("%s: %p: -> N_STATE_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_STATE_REQ\n", DRV_NAME, sc));
 		rtn = n_state_req(q, sc, mp);
 		break;
 #ifdef N_TRANSLATE_RES
 	case N_TRANSLATE_RES:
-		printd(("%s: %p: -> N_TRANSLATE_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_TRANSLATE_RES\n", DRV_NAME, sc));
 		rtn = n_translate_res(q, sc, mp);
 		break;
 #endif
@@ -19873,19 +19505,19 @@ mgm_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = sccp_get_state(sc);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case N_INFORM_REQ:
-		printd(("%s: %p: -> N_INFORM_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_INFORM_REQ\n", DRV_NAME, sc));
 		rtn = n_inform_req(q, sc, mp);
 		break;
 	case N_COORD_REQ:
-		printd(("%s: %p: -> N_COORD_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_COORD_REQ\n", DRV_NAME, sc));
 		rtn = n_coord_req(q, sc, mp);
 		break;
 	case N_COORD_RES:
-		printd(("%s: %p: -> N_COORD_RES\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_COORD_RES\n", DRV_NAME, sc));
 		rtn = n_coord_res(q, sc, mp);
 		break;
 	case N_STATE_REQ:
-		printd(("%s: %p: -> N_STATE_REQ\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: -> N_STATE_REQ\n", DRV_NAME, sc));
 		rtn = n_state_req(q, sc, mp);
 		break;
 	default:
@@ -19971,13 +19603,12 @@ sccp_r_error(queue_t *q, mblk_t *mp)
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
 	{
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 4 of 7: Figure 2A/T1.112.4-2000 Sheet 4 of 4: Figure
 		   2B/T1.112.4-2000 2of2: This is an internal disconnect.  Provide an N_DISCON_IND
 		   to the user, release resources for the connection section, stop inactivity
 		   timers, send a RLSD (if possible), start the release and interval timers, move
-		   to the disconnect pending state. 
-		 */
+		   to the disconnect pending state. */
 		sccp_release(sc);
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
@@ -20009,10 +19640,9 @@ sccp_r_error(queue_t *q, mblk_t *mp)
 		return (QR_DONE);
 	}
 	case SS_WCON_DREQ:
-		/*
+		/* 
 		   Figure 2B/T1.112.4-2000 2of2: release reference for the connection section, stop 
-		   release and interval timer, move to the idle state. 
-		 */
+		   release and interval timer, move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
@@ -20047,13 +19677,12 @@ sccp_r_hangup(queue_t *q, mblk_t *mp)
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
 	{
-		/*
+		/* 
 		   Figure C.2/Q.714 Sheet 4 of 7: Figure 2A/T1.112.4-2000 Sheet 4 of 4: Figure
 		   2B/T1.112.4-2000 2of2: This is an internal disconnect.  Provide an N_DISCON_IND
 		   to the user, release resources for the connection section, stop inactivity
 		   timers, send a RLSD (if possible), start the release and interval timers, move
-		   to the disconnect pending state. 
-		 */
+		   to the disconnect pending state. */
 		sccp_release(sc);
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
@@ -20085,10 +19714,9 @@ sccp_r_hangup(queue_t *q, mblk_t *mp)
 		return (QR_DONE);
 	}
 	case SS_WCON_DREQ:
-		/*
+		/* 
 		   Figure 2B/T1.112.4-2000 2of2: release reference for the connection section, stop 
-		   release and interval timer, move to the idle state. 
-		 */
+		   release and interval timer, move to the idle state. */
 		sccp_release(sc);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
@@ -20123,9 +19751,8 @@ sccp_r_prim(queue_t *q, mblk_t *mp)
 STATIC int
 sccp_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sccp_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -20148,9 +19775,8 @@ sccp_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 tpi_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return tpi_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -20173,9 +19799,8 @@ tpi_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 npi_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return npi_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -20198,9 +19823,8 @@ npi_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 gtt_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return gtt_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -20223,9 +19847,8 @@ gtt_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 mgm_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mgm_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -20245,9 +19868,8 @@ mgm_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 mtp_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -20309,7 +19931,7 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", SCCP_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -20317,9 +19939,8 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	/*
-	   allocate a new device 
-	 */
+	/* 
+	   allocate a new device */
 	cminor = SCCP_CMINOR_FREE;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *scp; scp = &(*scp)->next) {
@@ -20333,7 +19954,7 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= SCCP_CMINORS) {
+				if (++cminor >= NMINORS) {
 					if (++mindex >= SCCP_CMAJORS
 					    || !(cmajor = sccp_majors[mindex]))
 						break;
@@ -20344,15 +19965,15 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (mindex >= SCCP_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", SCCP_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", SCCP_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(sc = sccp_alloc_priv(q, scp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: no memory\n", SCCP_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -20373,7 +19994,7 @@ sccp_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) sc;
-	printd(("%s: closing character device %d:%d\n", SCCP_DRV_NAME, sc->u.dev.cmajor,
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, sc->u.dev.cmajor,
 		sc->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	sccp_free_priv(sc);
@@ -20400,70 +20021,70 @@ STATIC kmem_cache_t *sccp_mt_cachep = NULL;	/* Route cache */
 STATIC int
 sccp_init_caches(void)
 {
-	if (!sccp_sc_cachep &&
-	    !(sccp_sc_cachep =
-	      kmem_cache_create("sccp_sc_cachep", sizeof(struct sc), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_sc_cachep", SCCP_DRV_NAME);
+	if (!sccp_sc_cachep
+	    && !(sccp_sc_cachep =
+		 kmem_cache_create("sccp_sc_cachep", sizeof(struct sc), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_sc_cachep", DRV_NAME);
 		goto failed_mt;
 	} else
-		printd(("%s: initialized sc structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_na_cachep &&
-	    !(sccp_na_cachep =
-	      kmem_cache_create("sccp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_na_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized sc structure cache\n", DRV_NAME));
+	if (!sccp_na_cachep
+	    && !(sccp_na_cachep =
+		 kmem_cache_create("sccp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_na_cachep", DRV_NAME);
 		goto failed_na;
 	} else
-		printd(("%s: initialized na structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_cp_cachep &&
-	    !(sccp_cp_cachep =
-	      kmem_cache_create("sccp_cp_cachep", sizeof(struct cp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_cp_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized na structure cache\n", DRV_NAME));
+	if (!sccp_cp_cachep
+	    && !(sccp_cp_cachep =
+		 kmem_cache_create("sccp_cp_cachep", sizeof(struct cp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_cp_cachep", DRV_NAME);
 		goto failed_cp;
 	} else
-		printd(("%s: initialized cp structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_sp_cachep &&
-	    !(sccp_sp_cachep =
-	      kmem_cache_create("sccp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_sp_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized cp structure cache\n", DRV_NAME));
+	if (!sccp_sp_cachep
+	    && !(sccp_sp_cachep =
+		 kmem_cache_create("sccp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_sp_cachep", DRV_NAME);
 		goto failed_sp;
 	} else
-		printd(("%s: initialized sp structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_sr_cachep &&
-	    !(sccp_sr_cachep =
-	      kmem_cache_create("sccp_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_sr_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized sp structure cache\n", DRV_NAME));
+	if (!sccp_sr_cachep
+	    && !(sccp_sr_cachep =
+		 kmem_cache_create("sccp_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_sr_cachep", DRV_NAME);
 		goto failed_rs;
 	} else
-		printd(("%s: initialized rs structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_ss_cachep &&
-	    !(sccp_ss_cachep =
-	      kmem_cache_create("sccp_ss_cachep", sizeof(struct ss), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_ss_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized rs structure cache\n", DRV_NAME));
+	if (!sccp_ss_cachep
+	    && !(sccp_ss_cachep =
+		 kmem_cache_create("sccp_ss_cachep", sizeof(struct ss), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_ss_cachep", DRV_NAME);
 		goto failed_cr;
 	} else
-		printd(("%s: initialized cr structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_rs_cachep &&
-	    !(sccp_rs_cachep =
-	      kmem_cache_create("sccp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_rs_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized cr structure cache\n", DRV_NAME));
+	if (!sccp_rs_cachep
+	    && !(sccp_rs_cachep =
+		 kmem_cache_create("sccp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_rs_cachep", DRV_NAME);
 		goto failed_rl;
 	} else
-		printd(("%s: initialized rl structure cache\n", SCCP_DRV_NAME));
-	if (!sccp_mt_cachep &&
-	    !(sccp_mt_cachep =
-	      kmem_cache_create("sccp_mt_cachep", sizeof(struct mt), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate sccp_mt_cachep", SCCP_DRV_NAME);
+		printd(("%s: initialized rl structure cache\n", DRV_NAME));
+	if (!sccp_mt_cachep
+	    && !(sccp_mt_cachep =
+		 kmem_cache_create("sccp_mt_cachep", sizeof(struct mt), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sccp_mt_cachep", DRV_NAME);
 		goto failed_rt;
 	} else
-		printd(("%s: initialized rt structure cache\n", SCCP_DRV_NAME));
+		printd(("%s: initialized rt structure cache\n", DRV_NAME));
 	return (0);
 	// failed_sl:
 	// kmem_cache_destroy(sccp_mt_cachep);
@@ -20484,57 +20105,67 @@ sccp_init_caches(void)
       failed_mt:
 	return (-ENOMEM);
 }
-STATIC void
+STATIC int
 sccp_term_caches(void)
 {
+	int err = 0;
 	if (sccp_sc_cachep) {
-		if (kmem_cache_destroy(sccp_sc_cachep))
+		if (kmem_cache_destroy(sccp_sc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_sc_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_sc_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_sc_cachep\n", DRV_NAME));
 	}
 	if (sccp_na_cachep) {
-		if (kmem_cache_destroy(sccp_na_cachep))
+		if (kmem_cache_destroy(sccp_na_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_na_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_na_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_na_cachep\n", DRV_NAME));
 	}
 	if (sccp_sp_cachep) {
-		if (kmem_cache_destroy(sccp_sp_cachep))
+		if (kmem_cache_destroy(sccp_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_sp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_sp_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_sp_cachep\n", DRV_NAME));
 	}
 	if (sccp_cp_cachep) {
-		if (kmem_cache_destroy(sccp_cp_cachep))
+		if (kmem_cache_destroy(sccp_cp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_cp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_cp_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_cp_cachep\n", DRV_NAME));
 	}
 	if (sccp_sr_cachep) {
-		if (kmem_cache_destroy(sccp_sr_cachep))
+		if (kmem_cache_destroy(sccp_sr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_sr_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_sr_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_sr_cachep\n", DRV_NAME));
 	}
 	if (sccp_ss_cachep) {
-		if (kmem_cache_destroy(sccp_ss_cachep))
+		if (kmem_cache_destroy(sccp_ss_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_ss_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_ss_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_ss_cachep\n", DRV_NAME));
 	}
 	if (sccp_rs_cachep) {
-		if (kmem_cache_destroy(sccp_rs_cachep))
+		if (kmem_cache_destroy(sccp_rs_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_rs_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_rs_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_rs_cachep\n", DRV_NAME));
 	}
 	if (sccp_mt_cachep) {
-		if (kmem_cache_destroy(sccp_mt_cachep))
+		if (kmem_cache_destroy(sccp_mt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_mt_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed sccp_mt_cachep\n", SCCP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sccp_mt_cachep\n", DRV_NAME));
 	}
+	return (err);
 }
 
 /*
@@ -20546,7 +20177,7 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, ushort bm
 {
 	struct sc *sc;
 	if ((sc = kmem_cache_alloc(sccp_sc_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated sc private structure\n", SCCP_DRV_NAME, sc));
+		printd(("%s: %p: allocated sc private structure\n", DRV_NAME, sc));
 		bzero(sc, sizeof(*sc));
 		sc->priv_put = &sccp_put;
 		sc->u.dev.cmajor = getmajor(*devp);
@@ -20554,11 +20185,10 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, ushort bm
 		sc->cred = *crp;
 		(sc->oq = RD(q))->q_ptr = sccp_get(sc);
 		(sc->iq = WR(q))->q_ptr = sccp_get(sc);
-		spin_lock_init(&sc->qlock); /* "sc-queue-lock" */
+		spin_lock_init(&sc->qlock);	/* "sc-queue-lock" */
 		sc->o_prim = &sccp_r_prim;
-		/*
-		   style of interface depends on bminor 
-		 */
+		/* 
+		   style of interface depends on bminor */
 		switch (bminor) {
 		case SCCP_STYLE_SCCPI:
 			sc->i_prim = &sccp_w_prim;
@@ -20591,17 +20221,16 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, ushort bm
 			sc->i_version = N_CURRENT_VERSION;
 			break;
 		}
-		spin_lock_init(&sc->lock); /* "sc-queue-lock" */
+		spin_lock_init(&sc->lock);	/* "sc-queue-lock" */
 		if ((sc->next = *scp))
 			sc->next->prev = &sc->next;
 		sc->prev = scp;
 		*scp = sccp_get(sc);
-		/*
-		   set defaults 
-		 */
-		printd(("%s: %p: linked sc private structure\n", SCCP_DRV_NAME, sc));
+		/* 
+		   set defaults */
+		printd(("%s: %p: linked sc private structure\n", DRV_NAME, sc));
 	} else
-		ptrace(("%s: ERROR: Could not allocate sc private structure\n", SCCP_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate sc private structure\n", DRV_NAME));
 	return (sc);
 }
 STATIC void
@@ -20613,9 +20242,8 @@ sccp_free_priv(struct sc *sc)
 	{
 		ss7_unbufcall((str_t *) sc);
 		if (sc->ss.next || sc->ss.prev != &sc->ss.next) {
-			/*
-			   disconnect from local subsystem 
-			 */
+			/* 
+			   disconnect from local subsystem */
 			if ((*sc->ss.prev = sc->ss.next))
 				sc->ss.next->ss.prev = sc->ss.prev;
 			sc->ss.next = NULL;
@@ -20624,9 +20252,8 @@ sccp_free_priv(struct sc *sc)
 			sccp_put(sc);
 		}
 		if (sc->sr.next || sc->sr.prev != &sc->sr.next) {
-			/*
-			   disconnect from remote signalling point 
-			 */
+			/* 
+			   disconnect from remote signalling point */
 			if ((*sc->sr.prev = sc->sr.next))
 				sc->sr.next->sr.prev = sc->sr.prev;
 			sc->sr.next = NULL;
@@ -20635,9 +20262,8 @@ sccp_free_priv(struct sc *sc)
 			sccp_put(sc);
 		}
 		if (sc->next || sc->prev != &sc->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*sc->prev = sc->next))
 				sc->next->prev = sc->prev;
 			sc->next = NULL;
@@ -20682,7 +20308,7 @@ sccp_put(struct sc *sc)
 {
 	if (atomic_dec_and_test(&sc->refcnt)) {
 		kmem_cache_free(sccp_sc_cachep, sc);
-		printd(("%s: %s: %p: deallocated sc private structure", SCCP_DRV_NAME, __FUNCTION__,
+		printd(("%s: %s: %p: deallocated sc private structure", DRV_NAME, __FUNCTION__,
 			sc));
 	}
 }
@@ -20698,25 +20324,22 @@ sccp_alloc_na(ulong id, struct lmi_option *proto)
 	if ((na = kmem_cache_alloc(sccp_na_cachep, SLAB_ATOMIC))) {
 		bzero(na, sizeof(*na));
 		na->priv_put = &na_put;
-		spin_lock_init(&na->lock); /* "na-lock" */
+		spin_lock_init(&na->lock);	/* "na-lock" */
 		na_get(na);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((na->next = master.na.list))
 			na->next->prev = &na->next;
 		na->prev = &master.na.list;
 		master.na.list = na_get(na);
 		master.na.numb++;
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		na->id = na_get_id(id);
 		na->type = MTP_OBJ_TYPE_NA;
 		na->proto = *proto;
-		/*
-		   populate defaults based on protoocl variant 
-		 */
+		/* 
+		   populate defaults based on protoocl variant */
 		switch ((na->proto.pvar & SS7_PVAR_MASK)) {
 		default:
 		case SS7_PVAR_ITUT:
@@ -20743,15 +20366,13 @@ sccp_free_na(struct na *na)
 	spin_lock_irqsave(&na->lock, flags);
 	{
 		struct sp *sp;
-		/*
-		   remove all attached signalling points 
-		 */
+		/* 
+		   remove all attached signalling points */
 		while ((sp = na->sp.list))
 			sccp_free_sp(sp);
 		if (na->next || na->prev != &na->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*na->prev = na->next))
 				na->next->prev = na->prev;
 			na->next = NULL;
@@ -20791,7 +20412,7 @@ na_put(struct na *na)
 {
 	if (atomic_dec_and_test(&na->refcnt)) {
 		kmem_cache_free(sccp_na_cachep, na);
-		printd(("%s: %p: freed na structure\n", SCCP_DRV_NAME, na));
+		printd(("%s: %p: freed na structure\n", DRV_NAME, na));
 	}
 }
 
@@ -20806,34 +20427,30 @@ sccp_alloc_cp(ulong id, struct sp *sp, ulong slr0, ulong slr1)
 	if ((cp = kmem_cache_alloc(sccp_cp_cachep, SLAB_ATOMIC))) {
 		bzero(cp, sizeof(*cp));
 		cp->priv_put = &cp_put;
-		spin_lock_init(&cp->lock); /* "cp-lock" */
+		spin_lock_init(&cp->lock);	/* "cp-lock" */
 		cp_get(cp);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((cp->next = master.cp.list))
 			cp->next->prev = &cp->next;
 		cp->prev = &master.cp.list;
 		master.cp.list = cp_get(cp);
 		master.cp.numb++;
-		/*
-		   link to signalling point 
-		 */
+		/* 
+		   link to signalling point */
 		if ((cp->sp.next = sp->cp.list))
 			cp->sp.next->sp.prev = &cp->sp.next;
 		cp->sp.prev = &sp->cp.list;
 		cp->sp.sp = sp_get(sp);
 		sp->cp.list = cp_get(cp);
 		sp->cp.numb++;
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		cp->csec[0].slr = slr0;
 		cp->csec[1].slr = slr1;
 		fixme(("fill out structure\n"));
-		/*
-		   populate defaults 
-		 */
+		/* 
+		   populate defaults */
 		fixme(("populate defaults\n"));
 	}
 	return (cp);
@@ -20846,9 +20463,8 @@ sccp_free_cp(struct cp *cp)
 	spin_lock_irqsave(&cp->lock, flags);
 	{
 		if (cp->sp.next || cp->sp.prev != &cp->sp.next) {
-			/*
-			   remove from sp list 
-			 */
+			/* 
+			   remove from sp list */
 			if ((*cp->sp.prev = cp->sp.next))
 				cp->sp.next->sp.prev = cp->sp.prev;
 			cp->sp.next = NULL;
@@ -20858,9 +20474,8 @@ sccp_free_cp(struct cp *cp)
 			cp_put(cp);
 		}
 		if (cp->next || cp->prev != &cp->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*cp->prev = cp->next))
 				cp->next->prev = cp->prev;
 			cp->next = NULL;
@@ -20884,7 +20499,7 @@ cp_put(struct cp *cp)
 {
 	if (atomic_dec_and_test(&cp->refcnt)) {
 		kmem_cache_free(sccp_cp_cachep, cp);
-		printd(("%s: %p: freed cp structure\n", SCCP_DRV_NAME, cp));
+		printd(("%s: %p: freed cp structure\n", DRV_NAME, cp));
 	}
 }
 STATIC struct cp *
@@ -20924,33 +20539,29 @@ sccp_alloc_ss(ulong id, struct sp *sp, ulong ssn)
 	if ((ss = kmem_cache_alloc(sccp_ss_cachep, SLAB_ATOMIC))) {
 		bzero(ss, sizeof(*ss));
 		ss->priv_put = &ss_put;
-		spin_lock_init(&ss->lock); /* "ss-lock" */
+		spin_lock_init(&ss->lock);	/* "ss-lock" */
 		ss_get(ss);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((ss->next = master.ss.list))
 			ss->next->prev = &ss->next;
 		ss->prev = &master.ss.list;
 		master.ss.list = ss_get(ss);
 		master.ss.numb++;
-		/*
-		   link to signalling point 
-		 */
+		/* 
+		   link to signalling point */
 		if ((ss->sp.next = sp->ss.list))
 			ss->sp.next->sp.prev = &ss->sp.next;
 		ss->sp.prev = &sp->ss.list;
 		ss->sp.sp = sp_get(sp);
 		sp->ss.list = ss_get(ss);
 		sp->ss.numb++;
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		ss->ssn = ssn;
 		fixme(("fill out structure\n"));
-		/*
-		   populate defaults 
-		 */
+		/* 
+		   populate defaults */
 		fixme(("populate defaults\n"));
 	}
 	return (ss);
@@ -20966,9 +20577,8 @@ sccp_free_ss(struct ss *ss)
 		while ((rs = ss->rs.list))
 			sccp_free_rs(rs);
 		if (ss->sp.next || ss->sp.prev != &ss->sp.next) {
-			/*
-			   remove from sp list 
-			 */
+			/* 
+			   remove from sp list */
 			if ((*ss->sp.prev = ss->sp.next))
 				ss->sp.next->sp.prev = ss->sp.prev;
 			ss->sp.next = NULL;
@@ -20978,9 +20588,8 @@ sccp_free_ss(struct ss *ss)
 			ss_put(ss);
 		}
 		if (ss->next || ss->prev != &ss->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*ss->prev = ss->next))
 				ss->next->prev = ss->prev;
 			ss->next = NULL;
@@ -21004,7 +20613,7 @@ ss_put(struct ss *ss)
 {
 	if (atomic_dec_and_test(&ss->refcnt)) {
 		kmem_cache_free(sccp_ss_cachep, ss);
-		printd(("%s: %p: freed ss structure\n", SCCP_DRV_NAME, ss));
+		printd(("%s: %p: freed ss structure\n", DRV_NAME, ss));
 	}
 }
 STATIC struct ss *
@@ -21044,19 +20653,17 @@ sccp_alloc_rs(ulong id, struct sr *sr, ulong ssn)
 	if ((rs = kmem_cache_alloc(sccp_rs_cachep, SLAB_ATOMIC))) {
 		bzero(rs, sizeof(*rs));
 		rs->priv_put = &rs_put;
-		spin_lock_init(&rs->lock); /* "rs-lock" */
+		spin_lock_init(&rs->lock);	/* "rs-lock" */
 		rs_get(rs);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((rs->next = master.rs.list))
 			rs->next->prev = &rs->next;
 		rs->prev = &master.rs.list;
 		master.rs.list = rs_get(rs);
 		master.rs.numb++;
-		/*
-		   link to sr 
-		 */
+		/* 
+		   link to sr */
 		if ((rs->sr.next = sr->rs.list))
 			rs->sr.next->sr.prev = &rs->sr.next;
 		rs->sr.prev = &sr->rs.list;
@@ -21064,9 +20671,8 @@ sccp_alloc_rs(ulong id, struct sr *sr, ulong ssn)
 		sr->rs.list = rs_get(rs);
 		sr->rs.numb++;
 #if 0
-		/*
-		   link to ss 
-		 */
+		/* 
+		   link to ss */
 		if ((rs->ss.next = ss->rs.list))
 			rs->ss.next->ss.prev = &rs->ss.next;
 		rs->ss.prev = &ss->rs.list;
@@ -21074,14 +20680,12 @@ sccp_alloc_rs(ulong id, struct sr *sr, ulong ssn)
 		ss->rs.list = rs_get(rs);
 		ss->rs.numb++;
 #endif
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		fixme(("fill out structure\n"));
 		rs->ssn = ssn;
-		/*
-		   populate defaults 
-		 */
+		/* 
+		   populate defaults */
 		fixme(("populate defaults\n"));
 	}
 	return (rs);
@@ -21094,9 +20698,8 @@ sccp_free_rs(struct rs *rs)
 	spin_lock_irqsave(&rs->lock, flags);
 	{
 		if (rs->sr.next || rs->sr.prev != &rs->sr.next) {
-			/*
-			   remove from sr list 
-			 */
+			/* 
+			   remove from sr list */
 			if ((*rs->sr.prev = rs->sr.next))
 				rs->sr.next->sr.prev = rs->sr.prev;
 			rs->sr.next = NULL;
@@ -21106,9 +20709,8 @@ sccp_free_rs(struct rs *rs)
 			rs_put(rs);
 		}
 		if (rs->ss.next || rs->ss.prev != &rs->ss.next) {
-			/*
-			   remove from ss list 
-			 */
+			/* 
+			   remove from ss list */
 			if ((*rs->ss.prev = rs->ss.next))
 				rs->ss.next->ss.prev = rs->ss.prev;
 			rs->ss.next = NULL;
@@ -21118,9 +20720,8 @@ sccp_free_rs(struct rs *rs)
 			rs_put(rs);
 		}
 		if (rs->next || rs->prev != &rs->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*rs->prev = rs->next))
 				rs->next->prev = rs->prev;
 			rs->next = NULL;
@@ -21144,7 +20745,7 @@ rs_put(struct rs *rs)
 {
 	if (atomic_dec_and_test(&rs->refcnt)) {
 		kmem_cache_free(sccp_rs_cachep, rs);
-		printd(("%s: %p: freed rs structure\n", SCCP_DRV_NAME, rs));
+		printd(("%s: %p: freed rs structure\n", DRV_NAME, rs));
 	}
 }
 STATIC struct rs *
@@ -21181,24 +20782,22 @@ STATIC struct sr *
 sccp_alloc_sr(ulong id, struct sp *sp, ulong pc)
 {
 	struct sr *sr, **srp;
-	printd(("%s: %s: create sr->id = %ld\n", SCCP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sr = kmem_cache_alloc(sccp_sr_cachep, SLAB_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
 		sr_get(sr);	/* first get */
-		spin_lock_init(&sr->lock); /* "sr-lock" */
+		spin_lock_init(&sr->lock);	/* "sr-lock" */
 		sr->id = id;
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		for (srp = &master.sr.list; *srp && (*srp)->id < id; srp = &(*srp)->next) ;
 		if ((sr->next = *srp))
 			sr->next->prev = &sr->next;
 		sr->prev = srp;
 		*srp = sr_get(sr);
 		master.sr.numb++;
-		/*
-		   add to signalling point list of signalling relations 
-		 */
+		/* 
+		   add to signalling point list of signalling relations */
 		sr->sp.sp = sp_get(sp);
 		if ((sr->sp.next = sp->sr.list))
 			sr->sp.next->sp.prev = &sr->sp.next;
@@ -21208,7 +20807,7 @@ sccp_alloc_sr(ulong id, struct sp *sp, ulong pc)
 		sr->add = sp->add;
 		sr->add.pc = pc;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sr structure %lu\n", SCCP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sr structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sr);
 }
@@ -21217,35 +20816,30 @@ sccp_free_sr(struct sr *sr)
 {
 	psw_t flags;
 	ensure(sr, return);
-	printd(("%s: %s: %p free sr->id = %ld\n", SCCP_DRV_NAME, __FUNCTION__, sr, sr->id));
+	printd(("%s: %s: %p free sr->id = %ld\n", DRV_NAME, __FUNCTION__, sr, sr->id));
 	spin_lock_irqsave(&sr->lock, flags);
 	{
 		struct rs *rs;
 		struct sc *sc;
-		/*
-		   stop all timers 
-		 */
+		/* 
+		   stop all timers */
 		__sr_timer_stop(sr, tall);
-		/*
-		   remove all remote subsystems 
-		 */
+		/* 
+		   remove all remote subsystems */
 		while ((rs = sr->rs.list))
 			sccp_free_rs(rs);
-		/*
-		   release all connected SCCP users 
-		 */
+		/* 
+		   release all connected SCCP users */
 		while ((sc = sr->sc.list))
 			sccp_release(sc);
-		/*
-		   unlink from message transfer part 
-		 */
+		/* 
+		   unlink from message transfer part */
 		if (sr->mt) {
 			sr_put(xchg(&sr->mt->sr, NULL));
 			mtp_put(xchg(&sr->mt, NULL));
 		}
-		/*
-		   remove from signalling point list 
-		 */
+		/* 
+		   remove from signalling point list */
 		if (sr->sp.sp) {
 			if ((*sr->sp.prev = sr->sp.next))
 				sr->sp.next->sp.prev = sr->sp.prev;
@@ -21255,9 +20849,8 @@ sccp_free_sr(struct sr *sr)
 			ensure(atomic_read(&sr->refcnt) > 1, sr_get(sr));
 			sr_put(sr);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*sr->prev = sr->next))
 			sr->next->prev = sr->prev;
 		sr->next = NULL;
@@ -21266,12 +20859,11 @@ sccp_free_sr(struct sr *sr)
 		sr_put(sr);
 		assure(master.sr.numb > 0);
 		master.sr.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sr->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: sr lingering reference count = %d\n",
-				  SCCP_DRV_NAME, __FUNCTION__, sr, atomic_read(&sr->refcnt)));
+				  DRV_NAME, __FUNCTION__, sr, atomic_read(&sr->refcnt)));
 			atomic_set(&sr->refcnt, 1);
 		}
 	}
@@ -21294,8 +20886,8 @@ sr_put(struct sr *sr)
 		assure(atomic_read(&sr->refcnt) > 1);
 		if (atomic_dec_and_test(&sr->refcnt)) {
 			kmem_cache_free(sccp_sr_cachep, sr);
-			printd(("%s: %s: %p: deallocated sr structure\n", SCCP_DRV_NAME,
-				__FUNCTION__, sr));
+			printd(("%s: %s: %p: deallocated sr structure\n", DRV_NAME, __FUNCTION__,
+				sr));
 		}
 	}
 }
@@ -21338,11 +20930,11 @@ STATIC struct sp *
 sccp_alloc_sp(ulong id, struct na *na, mtp_addr_t * add)
 {
 	struct sp *sp, **spp;
-	printd(("%s: %s: create sp->id = %ld\n", SCCP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sp = kmem_cache_alloc(sccp_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
-		spin_lock_init(&sp->lock); /* "sp-lock" */
+		spin_lock_init(&sp->lock);	/* "sp-lock" */
 		sp->id = id;
 		for (spp = &master.sp.list; *spp && (*spp)->id < id; spp = &(*spp)->next) ;
 		if ((sp->next = *spp))
@@ -21350,9 +20942,8 @@ sccp_alloc_sp(ulong id, struct na *na, mtp_addr_t * add)
 		sp->prev = spp;
 		*spp = sp_get(sp);
 		master.sp.numb++;
-		/*
-		   add to network appearance list of signalling points 
-		 */
+		/* 
+		   add to network appearance list of signalling points */
 		sp->na.na = na_get(na);
 		if ((sp->na.next = na->sp.list))
 			sp->na.next->na.prev = &sp->na.next;
@@ -21361,7 +20952,7 @@ sccp_alloc_sp(ulong id, struct na *na, mtp_addr_t * add)
 		na->sp.numb++;
 		sp->add = *add;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", SCCP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sp);
 }
@@ -21370,25 +20961,22 @@ sccp_free_sp(struct sp *sp)
 {
 	psw_t flags;
 	ensure(sp, return);
-	printd(("%s: %s: %p free sp->id = %ld\n", SCCP_DRV_NAME, __FUNCTION__, sp, sp->id));
+	printd(("%s: %s: %p free sp->id = %ld\n", DRV_NAME, __FUNCTION__, sp, sp->id));
 	spin_lock_irqsave(&sp->lock, flags);
 	{
 		__sp_timer_stop(sp, tall);
-		/*
-		   freeing all signalling relations 
-		 */
+		/* 
+		   freeing all signalling relations */
 		while (sp->sr.list)
 			sccp_free_sr(sp->sr.list);
-		/*
-		   unlink from message transfer part 
-		 */
+		/* 
+		   unlink from message transfer part */
 		if (sp->mt) {
 			sp_put(xchg(&sp->mt->sp, NULL));
 			mtp_put(xchg(&sp->mt, NULL));
 		}
-		/*
-		   remote from network appearance list 
-		 */
+		/* 
+		   remote from network appearance list */
 		if (sp->na.na) {
 			if ((*sp->na.prev = sp->na.next))
 				sp->na.next->na.prev = sp->na.prev;
@@ -21398,9 +20986,8 @@ sccp_free_sp(struct sp *sp)
 			ensure(atomic_read(&sp->refcnt) < 1, sp_get(sp));
 			sp_put(sp);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*sp->prev = sp->next))
 			sp->next->prev = sp->prev;
 		sp->next = NULL;
@@ -21409,12 +20996,11 @@ sccp_free_sp(struct sp *sp)
 		sp_put(sp);
 		assure(master.sp.numb > 0);
 		master.sp.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sp->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: sp lingering reference count = %d\n",
-				  SCCP_DRV_NAME, __FUNCTION__, sp, atomic_read(&sp->refcnt)));
+				  DRV_NAME, __FUNCTION__, sp, atomic_read(&sp->refcnt)));
 			atomic_set(&sp->refcnt, 1);
 		}
 	}
@@ -21437,8 +21023,8 @@ sp_put(struct sp *sp)
 		assure(atomic_read(&sp->refcnt) > 1);
 		if (atomic_dec_and_test(&sp->refcnt)) {
 			kmem_cache_free(sccp_sp_cachep, sp);
-			printd(("%s: %s: %p: deallocated sp structure\n", SCCP_DRV_NAME,
-				__FUNCTION__, sp));
+			printd(("%s: %s: %p: deallocated sp structure\n", DRV_NAME, __FUNCTION__,
+				sp));
 		}
 	}
 }
@@ -21491,13 +21077,13 @@ STATIC struct mt *
 sccp_alloc_link(queue_t *q, struct mt **mpp, ulong index, cred_t *crp)
 {
 	struct mt *mt;
-	printd(("%s: %s: create mt index = %lu\n", SCCP_DRV_NAME, __FUNCTION__, index));
+	printd(("%s: %s: create mt index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((mt = kmem_cache_alloc(sccp_mt_cachep, SLAB_ATOMIC))) {
 		bzero(mt, sizeof(*mt));
 		mtp_get(mt);	/* first get */
 		mt->u.mux.index = index;
 		mt->cred = *crp;
-		spin_lock_init(&mt->qlock); /* "mt-queue-lock" */
+		spin_lock_init(&mt->qlock);	/* "mt-queue-lock" */
 		(mt->iq = RD(q))->q_ptr = mtp_get(mt);
 		(mt->oq = WR(q))->q_ptr = mtp_get(mt);
 		mt->o_prim = mtp_w_prim;
@@ -21507,17 +21093,16 @@ sccp_alloc_link(queue_t *q, struct mt **mpp, ulong index, cred_t *crp)
 		mt->i_state = LMI_UNUSABLE;
 		mt->i_style = LMI_STYLE1;
 		mt->i_version = 1;
-		spin_lock_init(&mt->lock); /* "mt-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&mt->lock);	/* "mt-lock" */
+		/* 
+		   place in master list */
 		if ((mt->next = *mpp))
 			mt->next->prev = &mt->next;
 		mt->prev = mpp;
 		*mpp = mtp_get(mt);
 		master.mt.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate mt structure %lu\n", SCCP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate mt structure %lu\n", DRV_NAME,
 			__FUNCTION__, index));
 	return (mt);
 }
@@ -21526,26 +21111,23 @@ sccp_free_link(struct mt *mt)
 {
 	psw_t flags;
 	ensure(mt, return);
-	printd(("%s: %s: %p free mt index = %lu\n", SCCP_DRV_NAME, __FUNCTION__, mt, mt->u.mux.index));
+	printd(("%s: %s: %p free mt index = %lu\n", DRV_NAME, __FUNCTION__, mt, mt->u.mux.index));
 	spin_lock_irqsave(&mt->lock, flags);
 	{
-		/*
-		   flushing buffers 
-		 */
+		/* 
+		   flushing buffers */
 		ss7_unbufcall((str_t *) mt);
 		flushq(mt->iq, FLUSHALL);
 		flushq(mt->oq, FLUSHALL);
-		/*
-		   unlink from signalling relation 
-		 */
+		/* 
+		   unlink from signalling relation */
 		if (mt->sr) {
 			struct sr *sr = mt->sr;
 			(void) sr;
 #if 0
 			if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
-				/*
-				   software block all circuits 
-				 */
+				/* 
+				   software block all circuits */
 				struct ct *ct;
 				for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 					ct_set(ct, CCTF_LOC_S_BLOCKED);
@@ -21556,17 +21138,15 @@ sccp_free_link(struct mt *mt)
 			mtp_put(xchg(&mt->sr->mt, NULL));
 			sr_put(xchg(&mt->sr, NULL));
 		}
-		/*
-		   unlink from signalling point 
-		 */
+		/* 
+		   unlink from signalling point */
 		if (mt->sp) {
 			struct sr *sr;
 			for (sr = mt->sp->sr.list; sr; sr = sr->sp.next) {
 #if 0
 				if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
-					/*
-					   software block all circuits 
-					 */
+					/* 
+					   software block all circuits */
 					struct ct *ct;
 					for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 						ct_set(ct, CCTF_LOC_S_BLOCKED);
@@ -21578,9 +21158,8 @@ sccp_free_link(struct mt *mt)
 			mtp_put(xchg(&mt->sp->mt, NULL));
 			sp_put(xchg(&mt->sp, NULL));
 		}
-		/*
-		   remote from master list 
-		 */
+		/* 
+		   remote from master list */
 		if ((*mt->prev = mt->next))
 			mt->next->prev = mt->prev;
 		mt->next = NULL;
@@ -21589,19 +21168,17 @@ sccp_free_link(struct mt *mt)
 		mtp_put(mt);
 		assure(master.mt.numb > 0);
 		master.mt.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&mt->refcnt) > 1, mtp_get(mt));
 		mtp_put(xchg(&mt->iq->q_ptr, NULL));
 		ensure(atomic_read(&mt->refcnt) > 1, mtp_get(mt));
 		mtp_put(xchg(&mt->oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&mt->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: mt lingering reference count = %d\n",
-				  SCCP_DRV_NAME, __FUNCTION__, mt, atomic_read(&mt->refcnt)));
+				  DRV_NAME, __FUNCTION__, mt, atomic_read(&mt->refcnt)));
 			atomic_set(&mt->refcnt, 1);
 		}
 	}
@@ -21624,8 +21201,8 @@ mtp_put(struct mt *mt)
 		assure(atomic_read(&mt->refcnt) > 1);
 		if (atomic_dec_and_test(&mt->refcnt)) {
 			kmem_cache_free(sccp_mt_cachep, mt);
-			printd(("%s: %s: %p: deallocated mt structure\n", SCCP_DRV_NAME,
-				__FUNCTION__, mt));
+			printd(("%s: %s: %p: deallocated mt structure\n", DRV_NAME, __FUNCTION__,
+				mt));
 		}
 	}
 }
@@ -21649,104 +21226,142 @@ mtp_get_id(ulong id)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int sccp_initialized = 0;
-STATIC void
-sccp_init(void)
-{
-	int rtn, major;
-	unless(sccp_initialized, return);
-	cmn_err(CE_NOTE, SCCP_BANNER);	/* console splash */
-	if ((rtn = sccp_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Could not allocate caches", SCCP_DRV_NAME);
-		sccp_initialized = rtn;
-		return;
-	}
-	for (major = 0; major < SCCP_CMAJORS; major++) {
-		if ((rtn =
-		     lis_register_strdev(sccp_majors[major], &sccp_info, SCCP_CMINORS,
-					 SCCP_DRV_NAME)) <= 0) {
-			if (!major) {
-				cmn_err(CE_PANIC, "%s: Cannot register 1'st major %d",
-					SCCP_DRV_NAME, sccp_majors[0]);
-				sccp_term_caches();
-				sccp_initialized = rtn;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: Cannot register %d'th major", SCCP_DRV_NAME, major + 1);
-			sccp_majors[major] = 0;
-		} else if (major)
-			sccp_majors[major] = rtn;
-	}
-	spin_lock_init(&master.lock); /* "sc-open-list-lock" */
-	sccp_initialized = 1;
-	return;
-}
-STATIC void
-sccp_terminate(void)
-{
-	int rtn, major;
-	for (major = 0; major < SCCP_CMAJORS; major++) {
-		if (sccp_majors[major]) {
-			if ((rtn = lis_unregister_strdev(sccp_majors[major])))
-				cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", SCCP_DRV_NAME,
-					sccp_majors[major]);
-			if (major)
-				sccp_majors[major] = 0;
-		}
-	}
-	sccp_term_caches();
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SCCP driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the SCCP driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  LINUX MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw sccp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &sccpinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+sccp_register_strdev(major_t major)
 {
-	sccp_init();
-	if (sccp_initialized < 0)
-		return sccp_initialized;
+	int err;
+	if ((err = register_strdev(&sccp_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+sccp_unregister_strdev(major_t major)
 {
-	(void) sccp_get_id;
-	(void) sccp_send_dt1;
-	(void) sccp_send_dt2;
-	(void) sccp_send_udt;
-	(void) sccp_send_rsr;
-	(void) sccp_send_xudt;
-	(void) sccp_send_ludt;
-	(void) sp_timer_stop;
-	(void) sp_timer_start;
-	(void) ss_timer_start;
-	(void) rs_timer_start;
-	(void) sccp_inform_ind;
-	(void) sccp_coord_ind;
-	(void) sccp_coord_con;
-	(void) sccp_traffic_ind;
-	(void) sccp_bcast_ssa;
-	(void) sccp_send;
-	(void) sccp_send_sst;
-	(void) sccp_send_sor;
-	(void) sccp_send_sog;
-	(void) sccp_send_sbr;
-	(void) sccp_send_snr;
-	(void) sccp_send_srt;
-	(void) sccp_grte_msg;
-	(void) sccp_alloc_cp;
-	(void) cp_get_id;
-	(void) sccp_lookup_cp;
-	sccp_terminate();
+	int err;
+	if ((err = unregister_strdev(&sccp_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sccp_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &sccpinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+sccp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+sccpterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (sccp_majors[mindex]) {
+			if ((err = sccp_unregister_strdev(sccp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					sccp_majors[mindex]);
+			if (mindex)
+				sccp_majors[mindex] = 0;
+		}
+	}
+	if ((err = sccp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+sccpinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = sccp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		sccpterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = sccp_register_strdev(sccp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					sccp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				sccpterminate();
+				return (err);
+			}
+		}
+		if (sccp_majors[mindex] == 0)
+			sccp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(sccp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = sccp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sccpinit);
+module_exit(sccpterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:49 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $"
 
-static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $";
+static char const ident[] =
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -72,7 +73,7 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:37:49 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/29 20:25:12 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -82,6 +83,8 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $
 			ISDN_COPYRIGHT	"\n" \
 			ISDN_DEVICE	"\n" \
 			ISDN_CONTACT
+#define ISDN_SPLASH	ISDN_DESCRIP	"\n" \
+			ISDN_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(ISDN_CONTACT);
@@ -89,7 +92,7 @@ MODULE_DESCRIPTION(ISDN_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ISDN_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ISDN_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -97,9 +100,8 @@ MODULE_LICENSE(ISDN_LICENSE);
 #define ISDN_DRV_NAME		CONFIG_STREAMS_ISDN_NAME
 #define ISDN_CMAJORS		CONFIG_STREAMS_ISDN_NMAJORS
 #define ISDN_CMAJOR_0		CONFIG_STREAMS_ISDN_MAJOR
+#define ISDN_UNITS		CONFIG_STREAMS_ISDN_NMINORS
 #endif
-
-#define ISDN_CMINORS 255
 
 /*
  *  =========================================================================
@@ -109,9 +111,20 @@ MODULE_LICENSE(ISDN_LICENSE);
  *  =========================================================================
  */
 
+#define DRV_ID		ISDN_DRV_ID
+#define DRV_NAME	ISDN_DRV_NAME
+#define CMAJORS		ISDN_CMAJORS
+#define CMAJOR_0	ISDN_CMAJOR_0
+#define UNITS		ISDN_UNITS
+#ifdef MODULE
+#define DRV_BANNER	ISDN_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	ISDN_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info isdn_winfo = {
-	mi_idnum:ISDN_DRV_ID,		/* Module ID number */
-	mi_idname:ISDN_DRV_NAME "-wr",	/* Module name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -119,8 +132,8 @@ STATIC struct module_info isdn_winfo = {
 };
 
 STATIC struct module_info isdn_rinfo = {
-	mi_idnum:ISDN_DRV_ID,		/* Module ID number */
-	mi_idname:ISDN_DRV_NAME "-rd",	/* Module name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -128,8 +141,8 @@ STATIC struct module_info isdn_rinfo = {
 };
 
 STATIC struct module_info dl_winfo = {
-	mi_idnum:ISDN_DRV_ID,		/* Module ID number */
-	mi_idname:ISDN_DRV_NAME "-mxw",	/* Module name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -137,8 +150,8 @@ STATIC struct module_info dl_winfo = {
 };
 
 STATIC struct module_info dl_rinfo = {
-	mi_idnum:ISDN_DRV_ID,		/* Module ID number */
-	mi_idname:ISDN_DRV_NAME "-mxr",	/* Module name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -862,7 +875,7 @@ cc_set_state(struct cc *cc, const long newstate)
 {
 	long oldstate = cc_get_state(cc);
 	(void) oldstate;
-	printd(("%s: %p: %d:%d cc-state %s <- %s\n", ISDN_DRV_NAME, cc, cc->u.dev.cmajor,
+	printd(("%s: %p: %d:%d cc-state %s <- %s\n", DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor, cc_state_name(newstate), cc_state_name(oldstate)));
 	cc->state = newstate;
 }
@@ -871,7 +884,7 @@ tg_set_state(struct tg *tg, const long newstate)
 {
 	long oldstate = tg_get_state(tg);
 	(void) oldstate;
-	printd(("%s: %p: tg %2ld tg-state %s <- %s\n", ISDN_DRV_NAME, tg, tg->id,
+	printd(("%s: %p: tg %2ld tg-state %s <- %s\n", DRV_NAME, tg, tg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	tg->state = newstate;
 }
@@ -880,7 +893,7 @@ fg_set_state(struct fg *fg, const long newstate)
 {
 	long oldstate = fg_get_state(fg);
 	(void) oldstate;
-	printd(("%s: %p: fg %2ld fg-state %s <- %s\n", ISDN_DRV_NAME, fg, fg->id,
+	printd(("%s: %p: fg %2ld fg-state %s <- %s\n", DRV_NAME, fg, fg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	fg->state = newstate;
 }
@@ -889,7 +902,7 @@ eg_set_state(struct eg *eg, const long newstate)
 {
 	long oldstate = eg_get_state(eg);
 	(void) oldstate;
-	printd(("%s: %p: eg %2ld eg-state %s <- %s\n", ISDN_DRV_NAME, eg, eg->id,
+	printd(("%s: %p: eg %2ld eg-state %s <- %s\n", DRV_NAME, eg, eg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	eg->state = newstate;
 }
@@ -898,7 +911,7 @@ xg_set_state(struct xg *xg, const long newstate)
 {
 	long oldstate = xg_get_state(xg);
 	(void) oldstate;
-	printd(("%s: %p: xg %2ld xg-state %s <- %s\n", ISDN_DRV_NAME, xg, xg->id,
+	printd(("%s: %p: xg %2ld xg-state %s <- %s\n", DRV_NAME, xg, xg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	xg->state = newstate;
 }
@@ -1011,22 +1024,20 @@ cr_set_m_state(struct cr *cr, struct cc *cc, const long newstate)
 {
 	if (cr && cc) {
 		long oldstate = cr_get_m_state(cr);
-		printd(("%s: %p: cr %2ld cc %d:%d m-state %s <- %s\n", ISDN_DRV_NAME, cr, cr->id,
+		printd(("%s: %p: cr %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, cr, cr->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			cr->mgm.cc = cc_get(cc);
 			if ((cr->mgm.next = cc->conn.mgm.cr))
 				cr->mgm.next->mgm.prev = &cr->mgm.next;
 			cr->mgm.prev = &cc->conn.mgm.cr;
 			cc->conn.mgm.cr = cr_get(cr);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			cr_put(xchg(&cc->conn.mgm.cr, NULL));
 			if ((*cr->mgm.prev = cr->mgm.next))
 				cr->mgm.next->mgm.prev = cr->mgm.prev;
@@ -1044,22 +1055,20 @@ tg_set_m_state(struct tg *tg, struct cc *cc, const long newstate)
 {
 	if (tg && cc) {
 		long oldstate = tg_get_m_state(tg);
-		printd(("%s: %p: tg %2ld cc %d:%d m-state %s <- %s\n", ISDN_DRV_NAME, tg, tg->id,
+		printd(("%s: %p: tg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, tg, tg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			tg->mgm.cc = cc_get(cc);
 			if ((tg->mgm.next = cc->conn.mgm.tg))
 				tg->mgm.next->mgm.prev = &tg->mgm.next;
 			tg->mgm.prev = &cc->conn.mgm.tg;
 			cc->conn.mgm.tg = tg_get(tg);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			tg_put(xchg(&cc->conn.mgm.tg, NULL));
 			if ((*tg->mgm.prev = tg->mgm.next))
 				tg->mgm.next->mgm.prev = tg->mgm.prev;
@@ -1077,22 +1086,20 @@ fg_set_m_state(struct fg *fg, struct cc *cc, const long newstate)
 {
 	if (fg && cc) {
 		long oldstate = fg_get_m_state(fg);
-		printd(("%s: %p: fg %2ld cc %d:%d m-state %s <- %s\n", ISDN_DRV_NAME, fg, fg->id,
+		printd(("%s: %p: fg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, fg, fg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			fg->mgm.cc = cc_get(cc);
 			if ((fg->mgm.next = cc->conn.mgm.fg))
 				fg->mgm.next->mgm.prev = &fg->mgm.next;
 			fg->mgm.prev = &cc->conn.mgm.fg;
 			cc->conn.mgm.fg = fg_get(fg);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detafg from current 
-			 */
+			/* 
+			   detafg from current */
 			fg_put(xchg(&cc->conn.mgm.fg, NULL));
 			if ((*fg->mgm.prev = fg->mgm.next))
 				fg->mgm.next->mgm.prev = fg->mgm.prev;
@@ -1110,22 +1117,20 @@ eg_set_m_state(struct eg *eg, struct cc *cc, const long newstate)
 {
 	if (eg && cc) {
 		long oldstate = eg_get_m_state(eg);
-		printd(("%s: %p: eg %2ld cc %d:%d m-state %s <- %s\n", ISDN_DRV_NAME, eg, eg->id,
+		printd(("%s: %p: eg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, eg, eg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			eg->mgm.cc = cc_get(cc);
 			if ((eg->mgm.next = cc->conn.mgm.eg))
 				eg->mgm.next->mgm.prev = &eg->mgm.next;
 			eg->mgm.prev = &cc->conn.mgm.eg;
 			cc->conn.mgm.eg = eg_get(eg);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detaeg from current 
-			 */
+			/* 
+			   detaeg from current */
 			eg_put(xchg(&cc->conn.mgm.eg, NULL));
 			if ((*eg->mgm.prev = eg->mgm.next))
 				eg->mgm.next->mgm.prev = eg->mgm.prev;
@@ -1143,22 +1148,20 @@ xg_set_m_state(struct xg *xg, struct cc *cc, const long newstate)
 {
 	if (xg && cc) {
 		long oldstate = xg_get_m_state(xg);
-		printd(("%s: %p: xg %2ld cc %d:%d m-state %s <- %s\n", ISDN_DRV_NAME, xg, xg->id,
+		printd(("%s: %p: xg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, xg, xg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			xg->mgm.cc = cc_get(cc);
 			if ((xg->mgm.next = cc->conn.mgm.xg))
 				xg->mgm.next->mgm.prev = &xg->mgm.next;
 			xg->mgm.prev = &cc->conn.mgm.xg;
 			cc->conn.mgm.xg = xg_get(xg);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			xg_put(xchg(&cc->conn.mgm.xg, NULL));
 			if ((*xg->mgm.prev = xg->mgm.next))
 				xg->mgm.next->mgm.prev = xg->mgm.prev;
@@ -1177,13 +1180,12 @@ cr_set_i_state(struct cr *cr, struct cc *cc, const long newstate)
 {
 	if (cr && cc) {
 		long oldstate = cr_get_i_state(cr);
-		printd(("%s: %p: cr %2ld cc %d:%d i-state %s <- %s\n", ISDN_DRV_NAME, cr, cr->id,
+		printd(("%s: %p: cr %2ld cc %d:%d i-state %s <- %s\n", DRV_NAME, cr, cr->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cp_state_name(newstate),
 			cp_state_name(oldstate)));
 		if (oldstate == CCS_IDLE && newstate != CCS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			cc_get_cref(cr, cc);
 			cr->cpc.cc = cc_get(cc);
 			if ((cr->cpc.next = cc->conn.cpc))
@@ -1191,9 +1193,8 @@ cr_set_i_state(struct cr *cr, struct cc *cc, const long newstate)
 			cr->cpc.prev = &cc->conn.cpc;
 			cc->conn.cpc = cr_get(cr);
 		} else if (oldstate != CCS_IDLE && newstate == CCS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			cr_put(xchg(&cc->conn.cpc, NULL));
 			if ((*cr->cpc.prev = cr->cpc.next))
 				cr->cpc.next->cpc.prev = cr->cpc.prev;
@@ -1215,17 +1216,15 @@ STATIC INLINE void
 cr_swap_cref(struct cr *cr, struct cc *cc)
 {
 	if (cr && cc) {
-		/*
-		   remove from old stream 
-		 */
+		/* 
+		   remove from old stream */
 		if ((*cr->cpc.prev = cr->cpc.next))
 			cr->cpc.next->cpc.prev = cr->cpc.prev;
 		cr->cpc.next = NULL;
 		cr->cpc.prev = &cr->cpc.next;
 		cc_put(xchg(&cr->cpc.cc, NULL));
-		/*
-		   add to new stream 
-		 */
+		/* 
+		   add to new stream */
 		cr->cpc.cc = cc_get(cc);
 		if ((cr->cpc.next = cc->conn.cpc))
 			cr->cpc.next->cpc.prev = &cr->cpc.next;
@@ -1240,20 +1239,17 @@ STATIC INLINE void
 cr_set_c_state(struct cr *cr, const long newstate)
 {
 	long oldstate = cr_get_c_state(cr);
-	printd(("%s: %p: cr %2ld c-state %s <- %s\n", ISDN_DRV_NAME, cr, cr->id,
-		cp_state_name(newstate), cp_state_name(oldstate)));
+	printd(("%s: %p: cr %2ld c-state %s <- %s\n", DRV_NAME, cr, cr->id, cp_state_name(newstate),
+		cp_state_name(oldstate)));
 	if (oldstate == U0_NULL || oldstate == N0_NULL) {
-		/*
-		   possiblu remove circuit(s) from idle list 
-		 */
-		/*
-		   has no effect if not on list because prev points to next 
-		 */
+		/* 
+		   possiblu remove circuit(s) from idle list */
+		/* 
+		   has no effect if not on list because prev points to next */
 		struct ch *ch;
 		for (ch = cr->ch.list; ch; ch = ch->cr.next) {
-			/*
-			   remove from idle list 
-			 */
+			/* 
+			   remove from idle list */
 			if ((*ch->idle.prev = ch->idle.next))
 				ch->idle.next->idle.prev = ch->idle.prev;
 			ch->idle.next = NULL;
@@ -1262,17 +1258,14 @@ cr_set_c_state(struct cr *cr, const long newstate)
 	}
 	if (newstate == U0_NULL || newstate == N0_NULL) {
 		struct ch *ch = NULL, **chp;	/* FIXME */
-		/*
-		   add circuit(s) to idle list 
-		 */
-		/*
-		   just insert at head of facility group for now 
-		 */
+		/* 
+		   add circuit(s) to idle list */
+		/* 
+		   just insert at head of facility group for now */
 		chp = &ch->fg.fg->idle.list;
 		for (ch = cr->ch.list; ch; ch = ch->cr.next) {
-			/*
-			   insert into idle list 
-			 */
+			/* 
+			   insert into idle list */
 			if ((ch->idle.next = *chp))
 				ch->idle.next->idle.prev = ch->idle.prev;
 			ch->idle.prev = chp;
@@ -1296,7 +1289,7 @@ cr_set(struct cr *cr, const ulong flags)
 	cr->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: cr %2ld SET %s\n", ISDN_DRV_NAME, cr, cr->id,
+			printd(("%s: %p: cr %2ld SET %s\n", DRV_NAME, cr, cr->id,
 				cr_flag_name(newflags & (0x1UL << i))));
 	cr_set_c_state(cr, cr_get_c_state(cr));
 	return (cr->flags);
@@ -1309,7 +1302,7 @@ cr_clr(struct cr *cr, const ulong flags)
 	cr->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: cr %2ld CLR %s\n", ISDN_DRV_NAME, cr, cr->id,
+			printd(("%s: %p: cr %2ld CLR %s\n", DRV_NAME, cr, cr->id,
 				cr_flag_name(newflags & (0x1UL << i))));
 	cr_set_c_state(cr, cr_get_c_state(cr));
 	return (cr->flags);
@@ -1328,7 +1321,7 @@ tg_set(struct tg *tg, const ulong flags)
 	tg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: tg %2ld SET %s\n", ISDN_DRV_NAME, tg, tg->id,
+			printd(("%s: %p: tg %2ld SET %s\n", DRV_NAME, tg, tg->id,
 				tg_flag_name(newflags & (0x1UL << i))));
 	return (tg->flags);
 }
@@ -1340,7 +1333,7 @@ tg_clr(struct tg *tg, const ulong flags)
 	tg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: tg %2ld CLR %s\n", ISDN_DRV_NAME, tg, tg->id,
+			printd(("%s: %p: tg %2ld CLR %s\n", DRV_NAME, tg, tg->id,
 				tg_flag_name(newflags & (0x1UL << i))));
 	return (tg->flags);
 }
@@ -1358,7 +1351,7 @@ fg_set(struct fg *fg, const ulong flags)
 	fg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: fg %2ld SET %s\n", ISDN_DRV_NAME, fg, fg->id,
+			printd(("%s: %p: fg %2ld SET %s\n", DRV_NAME, fg, fg->id,
 				fg_flag_name(newflags & (0x1UL << i))));
 	return (fg->flags);
 }
@@ -1370,7 +1363,7 @@ fg_clr(struct fg *fg, const ulong flags)
 	fg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: fg %2ld CLR %s\n", ISDN_DRV_NAME, fg, fg->id,
+			printd(("%s: %p: fg %2ld CLR %s\n", DRV_NAME, fg, fg->id,
 				fg_flag_name(newflags & (0x1UL << i))));
 	return (fg->flags);
 }
@@ -1388,7 +1381,7 @@ eg_set(struct eg *eg, const ulong flags)
 	eg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: eg %2ld SET %s\n", ISDN_DRV_NAME, eg, eg->id,
+			printd(("%s: %p: eg %2ld SET %s\n", DRV_NAME, eg, eg->id,
 				eg_flag_name(newflags & (0x1UL << i))));
 	return (eg->flags);
 }
@@ -1400,7 +1393,7 @@ eg_clr(struct eg *eg, const ulong flags)
 	eg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: eg %2ld CLR %s\n", ISDN_DRV_NAME, eg, eg->id,
+			printd(("%s: %p: eg %2ld CLR %s\n", DRV_NAME, eg, eg->id,
 				eg_flag_name(newflags & (0x1UL << i))));
 	return (eg->flags);
 }
@@ -1418,7 +1411,7 @@ xg_set(struct xg *xg, const ulong flags)
 	xg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: xg %2ld SET %s\n", ISDN_DRV_NAME, xg, xg->id,
+			printd(("%s: %p: xg %2ld SET %s\n", DRV_NAME, xg, xg->id,
 				xg_flag_name(newflags & (0x1UL << i))));
 	return (xg->flags);
 }
@@ -1430,7 +1423,7 @@ xg_clr(struct xg *xg, const ulong flags)
 	xg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: xg %2ld CLR %s\n", ISDN_DRV_NAME, xg, xg->id,
+			printd(("%s: %p: xg %2ld CLR %s\n", DRV_NAME, xg, xg->id,
 				xg_flag_name(newflags & (0x1UL << i))));
 	return (xg->flags);
 }
@@ -1453,9 +1446,8 @@ isdn_find_ch(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 	if (add_len) {
 		struct isdn_addr add = { 0, };
 		if (add_len >= sizeof(add)) {
-			/*
-			   can't trust alignment or size 
-			 */
+			/* 
+			   can't trust alignment or size */
 			bcopy(add_ptr, &add, sizeof(add));
 			switch (add.scope) {
 			case ISDN_SCOPE_CH:
@@ -1504,9 +1496,8 @@ isdn_find_tg(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 	if (add_len) {
 		struct isdn_addr add = { 0, };
 		if (add_len >= sizeof(add)) {
-			/*
-			   can't trust alignment or size 
-			 */
+			/* 
+			   can't trust alignment or size */
 			bcopy(add_ptr, &add, sizeof(add));
 			switch (add.scope) {
 			case ISDN_SCOPE_CH:
@@ -1550,9 +1541,8 @@ isdn_find_fg(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 	if (add_len) {
 		struct isdn_addr add = { 0, };
 		if (add_len >= sizeof(add)) {
-			/*
-			   can't trust alignment or size 
-			 */
+			/* 
+			   can't trust alignment or size */
 			bcopy(add_ptr, &add, sizeof(add));
 			switch (add.scope) {
 			case ISDN_SCOPE_CH:
@@ -1904,7 +1894,7 @@ m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | band ? FLUSHBAND : 0;
 		*(mp->b_wptr)++ = band;
-		printd(("%s: %p: <- M_FLUSH\n", ISDN_DRV_NAME, pq));
+		printd(("%s: %p: <- M_FLUSH\n", DRV_NAME, pq));
 		putq(pq, mp);
 		return (QR_DONE);
 	}
@@ -1937,7 +1927,7 @@ m_error(queue_t *q, struct cc *cc, int error)
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
 			cc_set_state(cc, CCS_UNUSABLE);
-			printd(("%s: %p: <- M_HANGUP\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (-error);
 		} else {
@@ -1945,7 +1935,7 @@ m_error(queue_t *q, struct cc *cc, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			cc_set_state(cc, CCS_UNUSABLE);
-			printd(("%s: %p: <- M_ERROR\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- M_ERROR\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -1970,7 +1960,7 @@ cc_info_ack(queue_t *q, struct cc *cc)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->cc_primitive = CC_INFO_ACK;
 		fixme(("Fill out more of the message\n"));
-		printd(("%s: %p: <- CC_INFO_ACK\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_INFO_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2002,7 +1992,7 @@ cc_bind_ack(queue_t *q, struct cc *cc, unsigned char *add_ptr, size_t add_len, u
 			bcopy(add_ptr, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: <- CC_BIND_ACK\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_BIND_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2024,7 +2014,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, unsigned char *opt_ptr, size_t opt_len
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p))mp->b_wptr)++;
+		p = ((typeof(p)) mp->b_wptr)++;
 		p->cc_call_ref = cref;
 		p->cc_opt_length = opt_len;
 		p->cc_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -2033,7 +2023,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, unsigned char *opt_ptr, size_t opt_len
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- CC_OPTMGMT_ACK\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_OPTMGMT_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2070,7 +2060,7 @@ cc_addr_ack(queue_t *q, struct cc *cc, unsigned char *bind_ptr, size_t bind_len,
 			bcopy(conn_ptr, mp->b_wptr, conn_len);
 			mp->b_wptr += conn_len;
 		}
-		printd(("%s: %p: <- CC_ADDR_ACK\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_ADDR_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2095,7 +2085,7 @@ cc_ok_ack(queue_t *q, struct cc *cc, long prim)
 		p->cc_primitive = CC_OK_ACK;
 		p->cc_correct_prim = prim;
 		p->cc_state = cc->state;
-		printd(("%s: %p: <- CC_OK_ACK\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_OK_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2121,7 +2111,7 @@ cc_error_ack(queue_t *q, struct cc *cc, ulong prim, long error)
 		p->cc_error_primitive = prim;
 		p->cc_error_type = error < 0 ? CCSYSERR : error;
 		p->cc_unix_error = error < 0 ? -error : 0;
-		printd(("%s: %p: <- CC_ERROR_ACK\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_ERROR_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2175,7 +2165,7 @@ cc_setup_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(add_ptr, mp->b_wptr, add_len);
 				mp->b_wptr += add_len;
 			}
-			printd(("%s: %p: <- CC_SETUP_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SETUP_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2213,7 +2203,7 @@ cc_setup_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			a->scope = ISDN_SCOPE_CH;
 			a->id = cr->ch.list->id;
 			a->ci = cr->ch.list->ci;
-			printd(("%s: %p: <- CC_SETUP_CON\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SETUP_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			cc_put_uref(cr, cc);
 			return (QR_DONE);
@@ -2252,7 +2242,7 @@ cc_more_info_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_MORE_INFO_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_MORE_INFO_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2308,7 +2298,7 @@ cc_information_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_INFORMATION_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_INFORMATION_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2338,7 +2328,7 @@ cc_info_timeout_ind(queue_t *q, struct cr *cr)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_INFO_TIMEOUT_IND;
 			p->cc_call_ref = cr->cref;
-			printd(("%s: %p: <- CC_INFO_TIMEOUT_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_INFO_TIMEOUT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2368,7 +2358,7 @@ cc_error_ind(queue_t *q, struct cr *cr)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_ERROR_IND;
 			p->cc_call_ref = cr->cref;
-			printd(("%s: %p: <- CC_ERROR_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_ERROR_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2408,7 +2398,7 @@ cc_proceeding_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_PROCEEDING_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_PROCEEDING_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2448,7 +2438,7 @@ cc_alerting_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_ALERTING_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_ALERTING_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2490,7 +2480,7 @@ cc_progress_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_PROGRESS_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_PROGRESS_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2530,7 +2520,7 @@ cc_disconnect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_DISCONNECT_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_DISCONNECT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2570,7 +2560,7 @@ cc_connect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_CONNECT_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CONNECT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2607,7 +2597,7 @@ cc_setup_complete_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_SETUP_COMPLETE_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SETUP_COMPLETE_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2636,7 +2626,7 @@ cc_notify_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_NOTIFY_IND;
-			printd(("%s: %p: <- CC_NOTIFY_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_NOTIFY_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2675,7 +2665,7 @@ cc_suspend_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_SUSPEND_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SUSPEND_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2713,7 +2703,7 @@ cc_suspend_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_SUSPEND_CON\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SUSPEND_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2752,7 +2742,7 @@ cc_suspend_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_SUSPEND_REJECT_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SUSPEND_REJECT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2792,7 +2782,7 @@ cc_resume_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RESUME_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESUME_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2830,7 +2820,7 @@ cc_resume_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RESUME_CON\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESUME_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2869,7 +2859,7 @@ cc_resume_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RESUME_REJECT_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESUME_REJECT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2909,7 +2899,7 @@ cc_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_REJECT_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_REJECT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2951,7 +2941,7 @@ cc_release_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RELEASE_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RELEASE_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2990,7 +2980,7 @@ cc_release_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RELEASE_CON\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RELEASE_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3018,7 +3008,7 @@ cc_restart_con(queue_t *q, struct cr *cr)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_RESTART_CON;
-			printd(("%s: %p: <- CC_RESTART_CON\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESTART_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3047,7 +3037,7 @@ cc_status_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_STATUS_IND;
-			printd(("%s: %p: <- CC_STATUS_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_STATUS_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3077,7 +3067,7 @@ cc_datalink_failure_ind(queue_t *q, struct cr *cr)
 			p->cc_primitive = CC_DATALINK_FAILURE_IND;
 			p->cc_user_ref = cr->uref;
 			p->cc_call_ref = cr->cref;
-			printd(("%s: %p: <- CC_DATALINK_FAILURE_IND\n", ISDN_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_DATALINK_FAILURE_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3129,7 +3119,7 @@ dl_info_req(queue_t *q, struct dl *dl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->dl_primitive = DL_INFO_REQ;
-		printd(("%s: %p: DL_INFO_REQ ->\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_INFO_REQ ->\n", DRV_NAME, dl));
 		ss7_oput(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -3154,7 +3144,7 @@ dl_attach_req(queue_t *q, struct dl *dl, ulong ppa)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_ATTACH_REQ;
 			p->dl_ppa = ppa;
-			printd(("%s: %p: DL_ATTACH_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_ATTACH_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_ATTACH_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3182,7 +3172,7 @@ dl_detach_req(queue_t *q, struct dl *dl)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_DETACH_REQ;
-			printd(("%s: %p: DL_DETACH_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_DETACH_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_DETACH_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3215,7 +3205,7 @@ dl_bind_req(queue_t *q, struct dl *dl, ulong sap)
 			p->dl_service_mode = DL_CLDLS;
 			p->dl_conn_mgmt = 0;
 			p->dl_xidtest_flg = 0;
-			printd(("%s: %p: DL_BIND_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_BIND_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_BIND_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3243,7 +3233,7 @@ dl_unbind_req(queue_t *q, struct dl *dl)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_UNBIND_REQ;
-			printd(("%s: %p: DL_UNBIND_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_UNBIND_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_UNBIND_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3278,7 +3268,7 @@ dl_subs_bind_req(queue_t *q, struct dl *dl, caddr_t sap_ptr, size_t sap_len)
 				bcopy(sap_ptr, mp->b_wptr, sap_len);
 				mp->b_wptr += sap_len;
 			}
-			printd(("%s: %p: DL_SUBS_BIND_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_SUBS_BIND_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_SUBS_BIND_PND);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3312,7 +3302,7 @@ dl_subs_unbind_req(queue_t *q, struct dl *dl, caddr_t sap_ptr, size_t sap_len)
 				bcopy(sap_ptr, mp->b_wptr, sap_len);
 				mp->b_wptr += sap_len;
 			}
-			printd(("%s: %p: DL_SUBS_UNBIND_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_SUBS_UNBIND_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_SUBS_UNBIND_PND);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3346,7 +3336,7 @@ dl_enabmulti_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 				bcopy(add_ptr, mp->b_wptr, add_len);
 				mp->b_wptr += add_len;
 			}
-			printd(("%s: %p: DL_ENABMULTI_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_ENABMULTI_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3379,7 +3369,7 @@ dl_disabmulti_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 				bcopy(add_ptr, mp->b_wptr, add_len);
 				mp->b_wptr += add_len;
 			}
-			printd(("%s: %p: DL_DISABMULTI_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_DISABMULTI_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3407,7 +3397,7 @@ dl_promiscon_req(queue_t *q, struct dl *dl, ulong level)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_PROMISCON_REQ;
 			p->dl_level = level;
-			printd(("%s: %p: DL_PROMISCON_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_PROMISCON_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3435,7 +3425,7 @@ dl_promiscoff_req(queue_t *q, struct dl *dl, ulong level)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_PROMISCOFF_REQ;
 			p->dl_level = level;
-			printd(("%s: %p: DL_PROMISCOFF_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_PROMISCOFF_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3479,7 +3469,7 @@ dl_connect_req(queue_t *q, struct dl *dl)
 				bcopy(qos_ptr, mp->b_wptr, qos_len);
 				mp->b_wptr += qos_len;
 			}
-			printd(("%s: %p: DL_CONNECT_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_CONNECT_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_OUTCON_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3516,7 +3506,7 @@ dl_connect_res(queue_t *q, struct dl *dl, ulong cor, ulong tok, caddr_t qos_ptr,
 				bcopy(qos_ptr, mp->b_wptr, qos_len);
 				mp->b_wptr += qos_len;
 			}
-			printd(("%s: %p: DL_CONNECT_RES ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_CONNECT_RES ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_CONN_RES_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3543,7 +3533,7 @@ dl_token_req(queue_t *q, struct dl *dl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->dl_primitive = DL_TOKEN_REQ;
-		printd(("%s: %p: DL_TOKEN_REQ ->\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_TOKEN_REQ ->\n", DRV_NAME, dl));
 		ss7_oput(dl->oq, mp);
 		return (QR_DONE);
 	}
@@ -3569,7 +3559,7 @@ dl_disconnect_req(queue_t *q, struct dl *dl, ulong reason, ulong cor)
 			p->dl_primitive = DL_DISCONNECT_REQ;
 			p->dl_reason = reason;
 			p->dl_correlation = cor;
-			printd(("%s: %p: DL_DISCONNECT_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_DISCONNECT_REQ ->\n", DRV_NAME, dl));
 			switch (dl_get_state(dl)) {
 			case DL_OUTCON_PENDING:
 				dl_set_state(dl, DL_DISCON8_PENDING);
@@ -3613,7 +3603,7 @@ dl_reset_req(queue_t *q, struct dl *dl)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_RESET_REQ;
-			printd(("%s: %p: DL_RESET_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_RESET_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_USER_RESET_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3641,7 +3631,7 @@ dl_reset_res(queue_t *q, struct dl *dl)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_RESET_RES;
-			printd(("%s: %p: DL_RESET_RES ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_RESET_RES ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_RESET_RES_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3679,7 +3669,7 @@ dl_unitdata_req(queue_t *q, struct dl *dl, caddr_t dst_ptr, size_t dst_len, ulon
 				mp->b_wptr += dst_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_UNITDATA_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_UNITDATA_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3712,7 +3702,7 @@ dl_udqos_req(queue_t *q, struct dl *dl, caddr_t qos_ptr, size_t qos_len)
 				bcopy(qos_ptr, mp->b_wptr, qos_len);
 				mp->b_wptr += qos_len;
 			}
-			printd(("%s: %p: DL_UDQOS_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_UDQOS_REQ ->\n", DRV_NAME, dl));
 			dl_set_state(dl, DL_UDQOS_PENDING);
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
@@ -3748,7 +3738,7 @@ dl_test_req(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_l
 				mp->b_wptr += dst_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_TEST_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_TEST_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3783,7 +3773,7 @@ dl_test_res(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_l
 				mp->b_wptr += dst_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_TEST_RES ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_TEST_RES ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3818,7 +3808,7 @@ dl_xid_req(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_le
 				mp->b_wptr += dst_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_XID_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_XID_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3853,7 +3843,7 @@ dl_xid_res(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_le
 				mp->b_wptr += dst_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_XID_RES ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_XID_RES ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3897,7 +3887,7 @@ dl_data_ack_req(queue_t *q, struct dl *dl, ulong cor, caddr_t dst_ptr, size_t ds
 				mp->b_wptr += src_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_DATA_ACK_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_DATA_ACK_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3941,7 +3931,7 @@ dl_reply_req(queue_t *q, struct dl *dl, ulong cor, caddr_t dst_ptr, size_t dst_l
 				mp->b_wptr += src_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_REPLY_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_REPLY_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -3977,7 +3967,7 @@ dl_reply_update_req(queue_t *q, struct dl *dl, ulong cor, caddr_t src_ptr, size_
 				mp->b_wptr += src_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: DL_REPLY_UPDATE_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_REPLY_UPDATE_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -4005,7 +3995,7 @@ dl_phys_addr_req(queue_t *q, struct dl *dl, ulong type)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_PHYS_ADDR_REQ;
 			p->dl_addr_type = type;
-			printd(("%s: %p: DL_PHYS_ADDR_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_PHYS_ADDR_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -4034,7 +4024,7 @@ dl_set_phys_addr_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 			p->dl_primitive = DL_SET_PHYS_ADDR_REQ;
 			p->dl_addr_length = add_len;
 			p->dl_addr_offset = add_len ? sizeof(*p) : 0;
-			printd(("%s: %p: DL_SET_PHYS_ADDR_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_SET_PHYS_ADDR_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -4061,7 +4051,7 @@ dl_get_statistics_req(queue_t *q, struct dl *dl)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->dl_primitive = DL_GET_STATISTICS_REQ;
-			printd(("%s: %p: DL_GET_STATISTICS_REQ ->\n", ISDN_DRV_NAME, dl));
+			printd(("%s: %p: DL_GET_STATISTICS_REQ ->\n", DRV_NAME, dl));
 			ss7_oput(dl->oq, mp);
 			return (QR_DONE);
 		}
@@ -4571,9 +4561,8 @@ isdn_send_msg(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				    || dl->i_state != DL_DATAXFER); dl = dl->dc.next) ;
 	}
 	if (!dl) {
-		/*
-		   no viable data link 
-		 */
+		/* 
+		   no viable data link */
 		rare();
 		return (-EFAULT);
 	}
@@ -4585,9 +4574,8 @@ isdn_send_msg(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			unsigned char *e;
 			ulong pvar = cr->fg.fg->proto.pvar;
 			mp->b_datap->db_type = M_DATA;
-			/*
-			   fill out message 
-			 */
+			/* 
+			   fill out message */
 			p = mp->b_rptr;
 			mp->b_wptr += size;
 			e = mp->b_wptr;
@@ -5047,7 +5035,7 @@ cr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 	struct cr *cr = (struct cr *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&cr->lock)) {
-			printd(("%s: %p: %s timeout at %lu\n", ISDN_DRV_NAME, cr, timer, jiffies));
+			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, cr, timer, jiffies));
 			switch (to_fnc(cr)) {
 			default:
 			case QR_DONE:
@@ -5062,11 +5050,10 @@ cr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			}
 			spin_unlock(&cr->lock);
 		} else
-			printd(("%s: %p: %s timeout collision at %lu\n", ISDN_DRV_NAME, cr, timer,
+			printd(("%s: %p: %s timeout collision at %lu\n", DRV_NAME, cr, timer,
 				jiffies));
-		/*
-		   back off timer one tick 
-		 */
+		/* 
+		   back off timer one tick */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -5076,7 +5063,7 @@ cr_stop_timer(struct cr *cr, const char *timer, ulong *timeo)
 	ulong to;
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
-		printd(("%s: %p: stopping %s at %lu\n", ISDN_DRV_NAME, cr, timer, jiffies));
+		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, cr, timer, jiffies));
 		cr_put(cr);
 	}
 	return;
@@ -5084,7 +5071,7 @@ cr_stop_timer(struct cr *cr, const char *timer, ulong *timeo)
 STATIC INLINE void
 cr_start_timer(struct cr *cr, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
 {
-	printd(("%s: %p: starting %s %lu ms at %lu\n", ISDN_DRV_NAME, cr, timer, val * 1000 / HZ,
+	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, cr, timer, val * 1000 / HZ,
 		jiffies));
 	*timeo = timeout(exp_fnc, (caddr_t) cr, val);
 }
@@ -5117,149 +5104,128 @@ __cr_timer_stop(struct cr *cr, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t301:
 		cr_stop_timer_t301(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t302:
 		cr_stop_timer_t302(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t303:
 		cr_stop_timer_t303(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t304:
 		cr_stop_timer_t304(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t305:
 		cr_stop_timer_t305(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t306:
 		cr_stop_timer_t306(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t307:
 		cr_stop_timer_t307(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t308:
 		cr_stop_timer_t308(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t309:
 		cr_stop_timer_t309(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t310:
 		cr_stop_timer_t310(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t312:
 		cr_stop_timer_t312(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t313:
 		cr_stop_timer_t313(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t314:
 		cr_stop_timer_t314(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t316:
 		cr_stop_timer_t316(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t317:
 		cr_stop_timer_t317(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t318:
 		cr_stop_timer_t318(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t319:
 		cr_stop_timer_t319(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t320:
 		cr_stop_timer_t320(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t321:
 		cr_stop_timer_t321(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t322:
 		cr_stop_timer_t322(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 }
 
@@ -5520,9 +5486,8 @@ isdn_recv_connect(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		if ((err = cc_setup_con(q, cr, m)))
 			goto error;
 		cr_set_i_state(cr, cr->cpc.cc, CCS_WIND_CONNECT);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_MORE:
 	case CCS_WREQ_INFO:
 	case CCS_WIND_PROCEED:
@@ -5532,9 +5497,8 @@ isdn_recv_connect(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		if ((err = cc_connect_ind(q, cr, m)) < 0)
 			goto error;
 		cr_set_i_state(cr, cr->cpc.cc, CCS_CONNECTED);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_CONNECTED:
 		break;
 	case CCS_IDLE:
@@ -5617,9 +5581,8 @@ isdn_recv_disconnect(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	case U9_INCOMING_CALL_PROCEEDING:
 	case U10_ACTIVE:
 	case U25_OVERLAP_RECEIVING:
-		/*
-		   any state except 0, 1, 6, 11, 12, 15, 17, 19 
-		 */
+		/* 
+		   any state except 0, 1, 6, 11, 12, 15, 17, 19 */
 		cr_timer_stop(cr, tall);
 		break;
 	}
@@ -5671,9 +5634,8 @@ isdn_recv_disconnect(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	swerr();
 	return (-EFAULT);
       confused:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	if (cr->fg.fg->proto.popt & ISDN_POPT_ENQ) {
 		if ((err = isdn_send_status_enquiry(q, cr)) < 0)
 			goto error;
@@ -5686,9 +5648,8 @@ isdn_recv_disconnect(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				goto error;
 		}
 	}
-	/*
-	   remain in current state 
-	 */
+	/* 
+	   remain in current state */
 	return (-ENOPROTOOPT);
       error:
 	return (err);
@@ -5741,12 +5702,10 @@ isdn_recv_information(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	case U25_OVERLAP_RECEIVING:
 		cr_timer_start(cr, t302);
 	default:
-		/*
-		   any state except 0, 1, 6, 17, 19, 25 
-		 */
-		/*
-		   remain in current state 
-		 */
+		/* 
+		   any state except 0, 1, 6, 17, 19, 25 */
+		/* 
+		   remain in current state */
 		rare();
 		return (QR_DONE);	/* ignore */
 	case U0_NULL:
@@ -5759,9 +5718,8 @@ isdn_recv_information(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	swerr();
 	return (-EFAULT);
       confused:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	if (cr->fg.fg->proto.popt & ISDN_POPT_ENQ) {
 		if ((err = isdn_send_status_enquiry(q, cr)) < 0)
 			goto error;
@@ -5774,9 +5732,8 @@ isdn_recv_information(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				goto error;
 		}
 	}
-	/*
-	   remain in current state 
-	 */
+	/* 
+	   remain in current state */
 	return (-ENOPROTOOPT);
       error:
 	return (err);
@@ -5804,9 +5761,8 @@ isdn_recv_notify(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		cr_set_c_state(cr, U10_ACTIVE);
 		break;
 	case U11_DISCONNECT_REQUEST:
-		/*
-		   for further study 
-		 */
+		/* 
+		   for further study */
 		break;
 	}
 	return (QR_DONE);
@@ -5929,9 +5885,8 @@ isdn_recv_release(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	case U19_RELEASE_REQUEST:
 		goto outstate;
 	default:
-		/*
-		   any state except 0, 1, 6, 11, 12, 15, 17, 19 
-		 */
+		/* 
+		   any state except 0, 1, 6, 11, 12, 15, 17, 19 */
 		cr_timer_stop(cr, tall);
 		if ((err = cc_release_ind(q, cr, m)) < 0)
 			goto error;
@@ -5944,9 +5899,8 @@ isdn_recv_release(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	swerr();
 	return (-EFAULT);
       enxio:
-	/*
-	   release without cause 
-	 */
+	/* 
+	   release without cause */
 	if ((err = isdn_send_release_complete(q, cr, CC_CAUS_MISSING_MANDATORY_PARAMETER)) < 0)	/* cause 
 												   No. 
 												   96 
@@ -5958,9 +5912,8 @@ isdn_recv_release(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	isdn_free_cr(cr);
 	return (QR_DONE);
       einval:
-	/*
-	   release without cause in error 
-	 */
+	/* 
+	   release without cause in error */
 	if ((err = isdn_send_release_complete(q, cr, CC_CAUS_INVALID_MANDATORY_PARAMETER)) < 0)	/* cause 
 												   No. 
 												   100 
@@ -6007,9 +5960,8 @@ isdn_recv_release_complete(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		isdn_free_cr(cr);
 		break;
 	default:
-		/*
-		   any state except 0, 1, 19 
-		 */
+		/* 
+		   any state except 0, 1, 19 */
 		cr_timer_stop(cr, tall);
 		if ((err = cc_release_ind(q, cr, m)) < 0)
 			goto error;
@@ -6133,9 +6085,8 @@ isdn_recv_setup(queue_t *q, struct cr *cr, isdn_msg_t * m)
 					goto error;
 				cr_set_c_state(cr, U6_CALL_PRESENT);
 			} else {
-				/*
-				   mandtory ie error 
-				 */
+				/* 
+				   mandtory ie error */
 				if ((err = isdn_send_release_complete(q, cr, CC_CAUS_INVALID_MANDATORY_PARAMETER)) < 0)	/* cause 
 															   No. 
 															   100 
@@ -6144,9 +6095,8 @@ isdn_recv_setup(queue_t *q, struct cr *cr, isdn_msg_t * m)
 				cr_set_c_state(cr, U0_NULL);
 			}
 		} else {
-			/*
-			   missing mandatory ie 
-			 */
+			/* 
+			   missing mandatory ie */
 			if ((err = isdn_send_release_complete(q, cr, CC_CAUS_MISSING_MANDATORY_PARAMETER)) < 0)	/* cause 
 														   No. 
 														   96 
@@ -6156,12 +6106,10 @@ isdn_recv_setup(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		}
 		break;
 	default:
-		/*
-		   discard 
-		 */
-		/*
-		   remain in current state 
-		 */
+		/* 
+		   discard */
+		/* 
+		   remain in current state */
 		break;
 	}
 	swerr();
@@ -6241,9 +6189,8 @@ isdn_recv_status(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	default:
 		if (m->cs.call_state != 0) {
 			if (0) {
-				/*
-				   compatible state: TODO: need to fix up timers and call state 
-				 */
+				/* 
+				   compatible state: TODO: need to fix up timers and call state */
 			} else {
 				if ((err = cc_status_ind(q, cr, m)) < 0)
 					goto error;
@@ -6286,9 +6233,8 @@ isdn_recv_status_enquiry(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	default:
 		if ((err = isdn_send_status(q, cr, cause)) < 0)
 			goto error;
-		/*
-		   remain in current state 
-		 */
+		/* 
+		   remain in current state */
 		break;
 	}
 	return (QR_DONE);
@@ -6434,9 +6380,8 @@ isdn_recv_unrecognized_message(queue_t *q, struct cr *cr, isdn_msg_t * m)
 		case U0_NULL:
 			return (-EPROTO);	/* unexpected message */
 		default:
-			/*
-			   any state except 0 
-			 */
+			/* 
+			   any state except 0 */
 			if (cr->fg.fg->proto.popt & ISDN_POPT_ENQ) {
 				if ((err = isdn_send_status_enquiry(q, cr)) < 0)
 					goto error;
@@ -6453,24 +6398,20 @@ isdn_recv_unrecognized_message(queue_t *q, struct cr *cr, isdn_msg_t * m)
 						goto error;
 				}
 			}
-			/*
-			   remain in current state 
-			 */
+			/* 
+			   remain in current state */
 			break;
 		}
 	} else {
 		if (m->crf != 0x02) {
-			/*
-			   global call reference 
-			 */
+			/* 
+			   global call reference */
 		} else {
-			/*
-			   dummy call reference 
-			 */
+			/* 
+			   dummy call reference */
 		}
-		/*
-		   ignore for now 
-		 */
+		/* 
+		   ignore for now */
 	}
 	return (QR_DONE);
       error:
@@ -6546,9 +6487,8 @@ unpack_cr(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 			if (len > 4)
 				m->cr |= *p++ << 31;
 		} else {
-			/*
-			   dummy call reference 
-			 */
+			/* 
+			   dummy call reference */
 			m->crf = 0x2;
 			m->cr = 0;
 		}
@@ -6971,9 +6911,8 @@ unpack_md(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 STATIC int
 unpack_nsf(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
-	/*
-	   there can be 4 of these in a message 
-	 */
+	/* 
+	   there can be 4 of these in a message */
 	uint len, i = m->nsf_numb;
 	if (i > 3)
 		goto eproto;
@@ -7181,10 +7120,9 @@ unpack_eetd(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7199,10 +7137,9 @@ unpack_ir(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7217,10 +7154,9 @@ unpack_plbp(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7235,10 +7171,9 @@ unpack_plws(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7253,10 +7188,9 @@ unpack_ps(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7271,10 +7205,9 @@ unpack_rdn(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7317,10 +7250,9 @@ unpack_rci(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7335,10 +7267,9 @@ unpack_tdsi(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 {
 	uint len;
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7355,10 +7286,9 @@ unpack_res(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 	if (p[-1] & 0x80)
 		return (0);
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Reserved IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Reserved IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7375,10 +7305,9 @@ unpack_unknown(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 	if (p[-1] & 0x80)
 		return (0);
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Unknown IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Unknown IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7395,10 +7324,9 @@ unpack_esc(uint pvar, unsigned char *p, unsigned char *e, isdn_msg_t * m)
 	if (p[-1] & 0x80)
 		return (0);
 	if ((p < e) && (p <= e + (len = *p++))) {
-		ptrace(("%s: PROTO: Escape IE encountered\n", ISDN_DRV_NAME));
-		/*
-		   ignore 
-		 */
+		ptrace(("%s: PROTO: Escape IE encountered\n", DRV_NAME));
+		/* 
+		   ignore */
 		return (len + 1);
 	}
 	return (-EMSGSIZE);
@@ -7655,17 +7583,15 @@ cr_t302_timeout(struct cr *cr)
 	if (cr_get_c_state(cr) == U25_OVERLAP_RECEIVING) {
 		if ((err = cc_info_timeout_ind(NULL, cr)) < 0)
 			goto error;
-		/*
+		/* 
 		   it is assumed that the decision whether complete information has been received
-		   or not, at the expiry of T302, will be made by the call control. 
-		 */
+		   or not, at the expiry of T302, will be made by the call control. */
 		cr_set_c_state(cr, U25_OVERLAP_RECEIVING);
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -7681,17 +7607,15 @@ cr_t303_timeout(struct cr *cr)
 	int err;
 	if (cr_get_c_state(cr) == U1_CALL_INITIATED) {
 		if ((cr->statem.t303_count ^= 1)) {
-			/*
-			   first timeout 
-			 */
+			/* 
+			   first timeout */
 			if ((err = isdn_send_setup(NULL, cr)) < 0)	/* use user B chan */
 				goto error;
 			cr_timer_start(cr, t303);
 			cr_set_c_state(cr, U1_CALL_INITIATED);
 		} else {
-			/*
-			   subsequent timeout 
-			 */
+			/* 
+			   subsequent timeout */
 			if ((err = cc_connect_ind(NULL, cr, NULL)))
 				goto error;
 			cr_set_c_state(cr, U0_NULL);
@@ -7700,9 +7624,8 @@ cr_t303_timeout(struct cr *cr)
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -7727,9 +7650,8 @@ cr_t304_timeout(struct cr *cr)
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -7752,9 +7674,8 @@ cr_t305_timeout(struct cr *cr)
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -7787,9 +7708,8 @@ cr_t307_timeout(struct cr *cr)
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -7806,20 +7726,17 @@ cr_t308_timeout(struct cr *cr)
 	ulong cause = 0;		/* FIXME */
 	if (cr_get_c_state(cr) == U19_RELEASE_REQUEST) {
 		if ((cr->statem.t308_count ^= 1)) {
-			/*
-			   first timeout 
-			 */
+			/* 
+			   first timeout */
 			if ((err = isdn_send_release(NULL, cr, cause)) < 0)
 				goto error;
 			cr_timer_start(cr, t308);
 			cr_set_c_state(cr, U19_RELEASE_REQUEST);
 		} else {
-			/*
-			   subsequent timeout 
-			 */
-			/*
-			   TODO: place B channel in maintenance 
-			 */
+			/* 
+			   subsequent timeout */
+			/* 
+			   TODO: place B channel in maintenance */
 			if ((err = cc_release_con(NULL, cr, NULL)))
 				goto error;
 			cr_set_c_state(cr, U0_NULL);
@@ -7828,9 +7745,8 @@ cr_t308_timeout(struct cr *cr)
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -7852,9 +7768,8 @@ cr_t309_timeout(struct cr *cr)
 	      error:
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	err = -ETIMEDOUT;
 	goto error;
@@ -8054,14 +7969,12 @@ dl_data_ind(queue_t *q, mblk_t *dp)
 		return (err);
 	if (msg.cr == 0) {
 		if (msg.crf != 0x2)
-			/*
-			   no call reference (global call reference) 
-			 */
+			/* 
+			   no call reference (global call reference) */
 			goto global_cr;
 		else
-			/*
-			   dummy call reference 
-			 */
+			/* 
+			   dummy call reference */
 			goto dummy_cr;
 	}
 	for (cr = fg->cr.list; cr && cr->cref != msg.cr; cr = cr->fg.next) ;
@@ -8072,127 +7985,116 @@ dl_data_ind(queue_t *q, mblk_t *dp)
       have_cr:
 	switch (msg.mt) {
 	case ISDN_MT_ALERTING:
-		printd(("%s: :%s :%p <- [%#08lx] ALERTING\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] ALERTING\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_alerting(q, cr, &msg);
 		break;
 	case ISDN_MT_CALL_PROCEEDING:
-		printd(("%s: :%s :%p <- [%#08lx] PROCEEDING\n", ISDN_DRV_NAME, __FUNCTION__, cr,
+		printd(("%s: :%s :%p <- [%#08lx] PROCEEDING\n", DRV_NAME, __FUNCTION__, cr,
 			cr->id));
 		err = isdn_recv_call_proceeding(q, cr, &msg);
 		break;
 	case ISDN_MT_CONNECT:
-		printd(("%s: :%s :%p <- [%#08lx] CONNECT\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] CONNECT\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_connect(q, cr, &msg);
 		break;
 	case ISDN_MT_CONNECT_ACKNOWLEDGE:
-		printd(("%s: :%s :%p <- [%#08lx] CONNECT-ACKNOWLEDGE\n", ISDN_DRV_NAME,
-			__FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] CONNECT-ACKNOWLEDGE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_connect_acknowledge(q, cr, &msg);
 		break;
 	case ISDN_MT_DISCONNECT:
-		printd(("%s: :%s :%p <- [%#08lx] DISCONNECT\n", ISDN_DRV_NAME, __FUNCTION__, cr,
+		printd(("%s: :%s :%p <- [%#08lx] DISCONNECT\n", DRV_NAME, __FUNCTION__, cr,
 			cr->id));
 		err = isdn_recv_disconnect(q, cr, &msg);
 		break;
 	case ISDN_MT_INFORMATION:
-		printd(("%s: :%s :%p <- [%#08lx] INFORMATION\n", ISDN_DRV_NAME, __FUNCTION__, cr,
+		printd(("%s: :%s :%p <- [%#08lx] INFORMATION\n", DRV_NAME, __FUNCTION__, cr,
 			cr->id));
 		err = isdn_recv_information(q, cr, &msg);
 		break;
 	case ISDN_MT_NOTIFY:
-		printd(("%s: :%s :%p <- [%#08lx] NOTIFY\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] NOTIFY\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_notify(q, cr, &msg);
 		break;
 	case ISDN_MT_PROGRESS:
-		printd(("%s: :%s :%p <- [%#08lx] PROGRESS\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] PROGRESS\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_progress(q, cr, &msg);
 		break;
 	case ISDN_MT_RELEASE:
-		printd(("%s: :%s :%p <- [%#08lx] RELEASE\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RELEASE\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_release(q, cr, &msg);
 		break;
 	case ISDN_MT_RELEASE_COMPLETE:
-		printd(("%s: :%s :%p <- [%#08lx] RELEASE-COMPLETE\n", ISDN_DRV_NAME, __FUNCTION__,
-			cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RELEASE-COMPLETE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_release_complete(q, cr, &msg);
 		break;
 	case ISDN_MT_RESUME:
-		printd(("%s: :%s :%p <- [%#08lx] RESUME\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RESUME\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_resume(q, cr, &msg);
 		break;
 	case ISDN_MT_RESUME_ACKNOWLEDGE:
-		printd(("%s: :%s :%p <- [%#08lx] RESUME-ACKNOWLEDGE\n", ISDN_DRV_NAME, __FUNCTION__,
-			cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RESUME-ACKNOWLEDGE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_resume_acknowledge(q, cr, &msg);
 		break;
 	case ISDN_MT_RESUME_REJECT:
-		printd(("%s: :%s :%p <- [%#08lx] RESUME-REJECT\n", ISDN_DRV_NAME, __FUNCTION__, cr,
+		printd(("%s: :%s :%p <- [%#08lx] RESUME-REJECT\n", DRV_NAME, __FUNCTION__, cr,
 			cr->id));
 		err = isdn_recv_resume_reject(q, cr, &msg);
 		break;
 	case ISDN_MT_SETUP:
-		printd(("%s: :%s :%p <- [%#08lx] SETUP\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] SETUP\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_setup(q, cr, &msg);
 		break;
 	case ISDN_MT_SETUP_ACKNOWLEDGE:
-		printd(("%s: :%s :%p <- [%#08lx] SETUP-ACKNOWLEDGE\n", ISDN_DRV_NAME, __FUNCTION__,
-			cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] SETUP-ACKNOWLEDGE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_setup_acknowledge(q, cr, &msg);
 		break;
 	case ISDN_MT_STATUS:
-		printd(("%s: :%s :%p <- [%#08lx] STATUS\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] STATUS\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_status(q, cr, &msg);
 		break;
 	case ISDN_MT_STATUS_ENQUIRY:
-		printd(("%s: :%s :%p <- [%#08lx] ENQUIRY\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] ENQUIRY\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_status_enquiry(q, cr, &msg);
 		break;
 	case ISDN_MT_SUSPEND:
-		printd(("%s: :%s :%p <- [%#08lx] SUSPEND\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] SUSPEND\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_suspend(q, cr, &msg);
 		break;
 	case ISDN_MT_SUSPEND_ACKNOWLEDGE:
-		printd(("%s: :%s :%p <- [%#08lx] SUSPEND-ACKNOWLEDGE\n", ISDN_DRV_NAME,
-			__FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] SUSPEND-ACKNOWLEDGE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_suspend_acknowledge(q, cr, &msg);
 		break;
 	case ISDN_MT_SUSPEND_REJECT:
-		printd(("%s: :%s :%p <- [%#08lx] SUSPEND-REJECT\n", ISDN_DRV_NAME, __FUNCTION__, cr,
+		printd(("%s: :%s :%p <- [%#08lx] SUSPEND-REJECT\n", DRV_NAME, __FUNCTION__, cr,
 			cr->id));
 		err = isdn_recv_suspend_reject(q, cr, &msg);
 		break;
 	case ISDN_MT_CONGESTION_CONTROL:
-		printd(("%s: :%s :%p <- [%#08lx] CONGESTION-CONTROL\n", ISDN_DRV_NAME, __FUNCTION__,
-			cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] CONGESTION-CONTROL\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_congestion_control(q, cr, &msg);
 		break;
 	case ISDN_MT_USER_INFORMATION:
-		printd(("%s: :%s :%p <- [%#08lx] USER-INFORMATION\n", ISDN_DRV_NAME, __FUNCTION__,
-			cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] USER-INFORMATION\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_user_information(q, cr, &msg);
 		break;
 	case ISDN_MT_RESTART:
-		printd(("%s: :%s :%p <- [%#08lx] RESTART\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RESTART\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_restart(q, cr, &msg);
 		break;
 	case ISDN_MT_RESTART_ACKNOWLEDGE:
-		printd(("%s: :%s :%p <- [%#08lx] RESTART-ACKNOWLEDGE\n", ISDN_DRV_NAME,
-			__FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RESTART-ACKNOWLEDGE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_restart_acknowledge(q, cr, &msg);
 		break;
 	default:
-		printd(("%s: :%s :%p <- [%#08lx] ????\n", ISDN_DRV_NAME, __FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] ????\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_unrecognized_message(q, cr, &msg);
 		break;
 	}
@@ -8213,9 +8115,8 @@ dl_data_ind(queue_t *q, mblk_t *dp)
 				err = isdn_recv_unrecognized_message(q, cr, &msg);
 				break;
 			}
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case -EPROTO:	/* unexpected message */
 			err = isdn_recv_unexpected_message(q, cr, &msg);
 			break;
@@ -8227,12 +8128,11 @@ dl_data_ind(queue_t *q, mblk_t *dp)
       no_cr:
 	switch (msg.mt) {
 	case ISDN_MT_SETUP:
-		printd(("%s: :%s :%p <- [%#08lx] SETUP\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] SETUP\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_setup(q, cr, &msg);
 		break;
 	default:
-		printd(("%s: :%s :%p <- [%#08lx] ????\n", ISDN_DRV_NAME, __FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] ????\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_unexpected_message(q, cr, &msg);
 		break;
 	}
@@ -8240,27 +8140,24 @@ dl_data_ind(queue_t *q, mblk_t *dp)
       global_cr:
 	switch (msg.mt) {
 	case ISDN_MT_STATUS:
-		printd(("%s: :%s :%p <- [%#08lx] STATUS\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] STATUS\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_status(q, cr, &msg);
 		break;
 	case ISDN_MT_STATUS_ENQUIRY:
-		printd(("%s: :%s :%p <- [%#08lx] ENQUIRY\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] ENQUIRY\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_status_enquiry(q, cr, &msg);
 		break;
 	case ISDN_MT_RESTART:
-		printd(("%s: :%s :%p <- [%#08lx] RESTART\n", ISDN_DRV_NAME, __FUNCTION__, cr,
-			cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RESTART\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_restart(q, cr, &msg);
 		break;
 	case ISDN_MT_RESTART_ACKNOWLEDGE:
-		printd(("%s: :%s :%p <- [%#08lx] RESTART-ACKNOWLEDGE\n", ISDN_DRV_NAME,
-			__FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] RESTART-ACKNOWLEDGE\n", DRV_NAME, __FUNCTION__, cr,
+			cr->id));
 		err = isdn_recv_restart_acknowledge(q, cr, &msg);
 		break;
 	default:
-		printd(("%s: :%s :%p <- [%#08lx] ????\n", ISDN_DRV_NAME, __FUNCTION__, cr, cr->id));
+		printd(("%s: :%s :%p <- [%#08lx] ????\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 		err = isdn_recv_unexpected_message(q, cr, &msg);
 		break;
 	}
@@ -8268,9 +8165,8 @@ dl_data_ind(queue_t *q, mblk_t *dp)
       dummy_cr:
 	goto discard;
       discard:
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (QR_DONE);
       disable:
 	rare();
@@ -8322,9 +8218,8 @@ dl_bind_ack(queue_t *q, mblk_t *mp)
 		goto eproto;
 	dl->dlc.dl_sap = p->dl_sap;
 	dl->conind = p->dl_max_conind;
-	/*
-	   ignore XID and test? 
-	 */
+	/* 
+	   ignore XID and test? */
 	dl_set_state(dl, DL_IDLE);
       emsgsize:
 	swerr();
@@ -8547,9 +8442,8 @@ dl_connect_con(queue_t *q, mblk_t *mp)
 			if ((err = isdn_send_status(q, cr, cause)) < 0)
 				goto error;
 		}
-		/*
-		   remain in same state 
-		 */
+		/* 
+		   remain in same state */
 	}
 	dl_set_state(dl, DL_DATAXFER);
 	return (QR_DONE);
@@ -8600,9 +8494,8 @@ dl_disconnect_ind(queue_t *q, mblk_t *mp)
 	for (cr = dl->dc.dc->fg.fg->cr.list; cr; cr = cr->fg.next) {
 		switch (cr_get_c_state(cr)) {
 		case U0_NULL:
-			/*
-			   do nothing 
-			 */
+			/* 
+			   do nothing */
 			break;
 		case U2_OVERLAP_SENDING:
 			if ((err = cc_connect_ind(q, cr, NULL)) < 0)
@@ -8620,9 +8513,8 @@ dl_disconnect_ind(queue_t *q, mblk_t *mp)
 			break;
 		default:
 			if (0) {
-				/*
-				   calls in inactive state 
-				 */
+				/* 
+				   calls in inactive state */
 				cr_timer_stop(cr, tall);
 				cr_set_c_state(cr, U0_NULL);
 				isdn_free_cr(cr);
@@ -8633,9 +8525,8 @@ dl_disconnect_ind(queue_t *q, mblk_t *mp)
 							goto error;
 					cr_timer_start(cr, t309);
 				}
-				/*
-				   remain in current state 
-				 */
+				/* 
+				   remain in current state */
 			}
 			break;
 		}
@@ -9044,9 +8935,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	{
 		struct df *df;
 		df = &master;
-		/*
-		   bind to default 
-		 */
+		/* 
+		   bind to default */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_MANAGEMENT)
 				ccp = &df->bind.mgm;
@@ -9081,9 +8971,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = xg->id;
 		}
-		/*
-		   bind to exchange group 
-		 */
+		/* 
+		   bind to exchange group */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_MANAGEMENT)
 				ccp = &xg->bind.mgm;
@@ -9118,9 +9007,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = eg->id;
 		}
-		/*
-		   bind to equipment group 
-		 */
+		/* 
+		   bind to equipment group */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_MANAGEMENT)
 				ccp = &eg->bind.mgm;
@@ -9155,9 +9043,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = fg->id;
 		}
-		/*
-		   bind to facility group 
-		 */
+		/* 
+		   bind to facility group */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_MANAGEMENT)
 				ccp = &fg->bind.mgm;
@@ -9192,9 +9079,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = tg->id;
 		}
-		/*
-		   bind to transmission group 
-		 */
+		/* 
+		   bind to transmission group */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_MANAGEMENT)
 				ccp = &tg->bind.mgm;
@@ -9229,9 +9115,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = ch->id;
 		}
-		/*
-		   bind to channel 
-		 */
+		/* 
+		   bind to channel */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_MANAGEMENT)
 				ccp = &ch->bind.mgm;
@@ -9473,9 +9358,8 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 		goto badopt;
 	if (isdn_check_addr(add_ptr, add_len))
 		goto badaddr;
-	/*
-	   cannot trust alignment of address 
-	 */
+	/* 
+	   cannot trust alignment of address */
 	bcopy(add_ptr, &add, add_len);
 	switch (cc_get_state(cc)) {
 	case CCS_IDLE:
@@ -9488,9 +9372,8 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	if (!add_len) {
 		switch (cc->bind.type) {
 		case ISDN_BIND_XG:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!cc->bind.u.xg || !cc->bind.u.xg->eg.list
 			    || !cc->bind.u.xg->eg.list->fg.list
 			    || !cc->bind.u.xg->eg.list->fg.list->ch.list)
@@ -9498,34 +9381,30 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			ch = cc->bind.u.xg->eg.list->fg.list->ch.list;
 			break;
 		case ISDN_BIND_EG:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!cc->bind.u.eg || !cc->bind.u.eg->fg.list
 			    || !cc->bind.u.eg->fg.list->ch.list)
 				goto addrbusy;
 			ch = cc->bind.u.eg->fg.list->ch.list;
 			break;
 		case ISDN_BIND_FG:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!cc->bind.u.fg || !cc->bind.u.fg->ch.list)
 				goto addrbusy;
 			ch = cc->bind.u.fg->ch.list;
 			break;
 		case ISDN_BIND_TG:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!cc->bind.u.tg || !cc->bind.u.tg->ch.list)
 				goto addrbusy;
 			ch = cc->bind.u.tg->ch.list;
 			break;
 		case ISDN_BIND_CH:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!cc->bind.u.ch)
 				goto addrbusy;
 			ch = cc->bind.u.ch;
@@ -9539,7 +9418,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	} else {
 		switch (add.scope) {
 		case ISDN_SCOPE_FG:
-			/*
+			/* 
 			   Note: if we are bound to a facility group we can specify an address with 
 			   scope facility group and a ci within the bound facility group to specify 
 			   a channel.  If the ci == 0, the next idle channel within the facility
@@ -9549,8 +9428,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			   is specified, no channel selection wil be provided in user setup
 			   messages and any channel will be permitted.  When facility scope is
 			   specified and a channel is specified, the channel will be preferred and
-			   any channel will be permitted. 
-			 */
+			   any channel will be permitted. */
 			if (cc->bind.type != ISDN_BIND_FG)
 				goto noaddr;
 			if (add.id && add.id != cc->bind.u.fg->id)
@@ -9567,7 +9445,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			}
 			break;
 		case ISDN_SCOPE_TG:
-			/*
+			/* 
 			   Note: if we are bound to a transmission group we can specify an address
 			   with scope transmission group and a ci witin the bound transmission
 			   group to specify a channel. If the ci == 0, the first channel in the
@@ -9576,8 +9454,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			   transmission group will be specifie das preferred, and any channel
 			   within the transmission group will be accepted.  When transmission group 
 			   scope is specified and a channel is specified, the channel will be
-			   selected and no other channel will be permitted. 
-			 */
+			   selected and no other channel will be permitted. */
 			if (cc->bind.type != ISDN_BIND_TG)
 				goto noaddr;
 			if (add.id && add.id != cc->bind.u.tg->id)
@@ -9593,12 +9470,11 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 				break;
 			}
 		case ISDN_SCOPE_CH:
-			/*
+			/* 
 			   Note: we can always specify a channel no matter how we are bound by
 			   specifying an address with scope channel and a channel identifier and
 			   optional ci. When we specify addresses this way, the setup will not
-			   permit negotiation of another channel. 
-			 */
+			   permit negotiation of another channel. */
 			if (!add.id)
 				goto noaddr;
 			switch (cc->bind.type) {
@@ -9836,9 +9712,8 @@ cc_information_req(queue_t *q, mblk_t *mp)
 	}
 	switch (cr_get_c_state(cr)) {
 	case U1_CALL_INITIATED:
-		/*
-		   save 
-		 */
+		/* 
+		   save */
 		break;
 	case U2_OVERLAP_SENDING:
 		if ((err = isdn_send_information(q, cr)) < 0)
@@ -9847,14 +9722,12 @@ cc_information_req(queue_t *q, mblk_t *mp)
 		cr_set_c_state(cr, U2_OVERLAP_SENDING);
 		break;
 	default:
-		/*
-		   any state except 0, 1, 6, 17, 19 
-		 */
+		/* 
+		   any state except 0, 1, 6, 17, 19 */
 		if ((err = isdn_send_information(q, cr)) < 0)
 			goto error;
-		/*
-		   remain in same state 
-		 */
+		/* 
+		   remain in same state */
 		break;
 	case U0_NULL:
 	case U6_CALL_PRESENT:
@@ -9970,18 +9843,16 @@ cc_proceeding_req(queue_t *q, mblk_t *mp)
 		cr_set_i_state(cr, cc, CCS_WACK_PROCEED);
 		break;
 	case CCS_WACK_PROCEED:
-		/*
-		   second time through after error 
-		 */
+		/* 
+		   second time through after error */
 		break;
 	default:
 		goto outstate;
 	}
 	switch (cr_get_c_state(cr)) {
 	case U6_CALL_PRESENT:
-		/*
-		   neg B channel 
-		 */
+		/* 
+		   neg B channel */
 		if ((err = isdn_send_call_proceeding(q, cr)) < 0)
 			goto error;
 		cr_set_c_state(cr, U9_INCOMING_CALL_PROCEEDING);
@@ -10060,9 +9931,8 @@ cc_alerting_req(queue_t *q, mblk_t *mp)
 		cr_set_i_state(cr, cc, CCS_WACK_ALERTING);
 		break;
 	case CCS_WACK_ALERTING:
-		/*
-		   second time through after error 
-		 */
+		/* 
+		   second time through after error */
 		break;
 	case CCS_WRES_RELIND:
 		goto ignore;
@@ -10261,14 +10131,12 @@ cc_disconnect_req(queue_t *q, mblk_t *mp)
 		cr_set_c_state(cr, U11_DISCONNECT_REQUEST);
 		break;
 	case U17_RESUME_REQUEST:
-		/*
-		   open issue: handling of disconnect request primitive 
-		 */
+		/* 
+		   open issue: handling of disconnect request primitive */
 		break;
 	default:
-		/*
-		   any state except 0, 1, 6, 11, 12, 15, 17, 19 
-		 */
+		/* 
+		   any state except 0, 1, 6, 11, 12, 15, 17, 19 */
 		if ((err = isdn_send_disconnect(q, cr, p->cc_cause)) < 0)
 			goto error;
 		cr_timer_start(cr, t305);
@@ -10354,18 +10222,16 @@ cc_connect_req(queue_t *q, mblk_t *mp)
 	}
 	switch (cr_get_c_state(cr)) {
 	case U6_CALL_PRESENT:
-		/*
-		   with neg B chan 
-		 */
+		/* 
+		   with neg B chan */
 		if ((err = isdn_send_connect(q, cr)) < 0)
 			goto error;
 		cr_timer_start(cr, t313);
 		cr_set_c_state(cr, U8_CONNECT_REQUEST);
 		break;
 	case U7_CALL_RECEIVED:
-		/*
-		   with neg B chan 
-		 */
+		/* 
+		   with neg B chan */
 		if ((err = isdn_send_connect(q, cr)) < 0)
 			goto error;
 		cr_timer_start(cr, t313);
@@ -10730,9 +10596,8 @@ cc_resume_req(queue_t *q, mblk_t *mp)
 		goto badclr;
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
-		/*
-		   select call reference 
-		 */
+		/* 
+		   select call reference */
 		isdn_send_resume(q, cr);
 		cr_timer_start(cr, t318);
 		cr_set_c_state(cr, U17_RESUME_REQUEST);
@@ -10932,12 +10797,10 @@ cc_restart_req(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	if (!(cr = cc_find_cpc_cref(cc, 0)))	/* global call ref */
 		goto badclr;
-	/*
-	   any state 
-	 */
-	/*
-	   from global call reference 
-	 */
+	/* 
+	   any state */
+	/* 
+	   from global call reference */
 	cr_timer_stop(cr, tall);
 	if ((err = cc_release_ind(q, cr, NULL)) < 0)
 		goto error;
@@ -11231,9 +11094,8 @@ isdn_get_ch(isdn_config_t * arg, struct ch *ch, int size)
 	cnf->fgid = ch->fg.fg ? ch->fg.fg->id : 0;
 	cnf->ts = ch->ts;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11253,9 +11115,8 @@ isdn_get_tg(isdn_config_t * arg, struct tg *tg, int size)
 	cnf->egid = tg->eg.eg ? tg->eg.eg->id : 0;
 	cnf->proto = tg->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of data link configurations 
-	 */
+	/* 
+	   write out list of data link configurations */
 	dcc = (typeof(dcc)) (arg + 1);
 	for (dc = tg->dc.list; dc && size >= sizeof(*arg) + sizeof(*dcc) + sizeof(*arg);
 	     dc = dc->tg.next, size -= sizeof(*arg) + sizeof(*dcc), arg =
@@ -11268,9 +11129,8 @@ isdn_get_tg(isdn_config_t * arg, struct tg *tg, int size)
 		dcc->sap = dc->sap;	/* address */
 		dcc->proto = dc->proto;	/* protocol options */
 	}
-	/*
-	   write out list of channel configurations 
-	 */
+	/* 
+	   write out list of channel configurations */
 	chc = (typeof(chc)) (arg + 1);
 	for (ch = tg->ch.list; ch && size >= sizeof(*arg) + sizeof(*chc) + sizeof(*arg);
 	     ch = ch->tg.next, size -= sizeof(*arg) + sizeof(*chc), arg =
@@ -11280,9 +11140,8 @@ isdn_get_tg(isdn_config_t * arg, struct tg *tg, int size)
 		chc->tgid = tg->id;	/* transmission group id */
 		chc->ts = ch->ts;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11302,9 +11161,8 @@ isdn_get_fg(isdn_config_t * arg, struct fg *fg, int size)
 	cnf->egid = fg->eg.eg ? fg->eg.eg->id : 0;
 	cnf->proto = fg->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of d-channel configurations 
-	 */
+	/* 
+	   write out list of d-channel configurations */
 	dcc = (typeof(dcc)) (arg + 1);
 	for (dc = fg->dc.list; dc && size >= sizeof(*arg) + sizeof(*dcc) + sizeof(*arg);
 	     dc = dc->fg.next, size -= sizeof(*arg) + sizeof(*dcc), arg =
@@ -11317,9 +11175,8 @@ isdn_get_fg(isdn_config_t * arg, struct fg *fg, int size)
 		dcc->sap = dc->sap;	/* data link address */
 		dcc->proto = dc->proto;	/* data link protocol options */
 	}
-	/*
-	   write out list of b-channel configurations 
-	 */
+	/* 
+	   write out list of b-channel configurations */
 	chc = (typeof(chc)) (arg + 1);
 	for (ch = fg->ch.list; ch && size >= sizeof(*arg) + sizeof(*chc) + sizeof(*arg);
 	     ch = ch->fg.next, size -= sizeof(*arg) + sizeof(*chc), arg =
@@ -11330,9 +11187,8 @@ isdn_get_fg(isdn_config_t * arg, struct fg *fg, int size)
 		chc->tgid = ch->tg.tg ? ch->tg.tg->id : 0;	/* transmission group */
 		chc->ts = ch->ts;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11352,9 +11208,8 @@ isdn_get_eg(isdn_config_t * arg, struct eg *eg, int size)
 	cnf->xgid = eg->xg.xg ? eg->xg.xg->id : 0;
 	cnf->proto = eg->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of facility groups 
-	 */
+	/* 
+	   write out list of facility groups */
 	fgc = (typeof(fgc)) (arg + 1);
 	for (fg = eg->fg.list; fg && size >= sizeof(*arg) + sizeof(*fgc) + sizeof(*arg);
 	     fg = fg->eg.next, size -= sizeof(*arg) + sizeof(*fgc), arg =
@@ -11364,9 +11219,8 @@ isdn_get_eg(isdn_config_t * arg, struct eg *eg, int size)
 		fgc->egid = eg->id;	/* equipment group id */
 		fgc->proto = fg->proto;
 	}
-	/*
-	   write out list of transmission groups 
-	 */
+	/* 
+	   write out list of transmission groups */
 	tgc = (typeof(tgc)) (arg + 1);
 	for (tg = eg->tg.list; tg && size >= sizeof(*arg) + sizeof(*tgc) + sizeof(*arg);
 	     tg = tg->eg.next, size -= sizeof(*arg) + sizeof(*tgc), arg =
@@ -11376,9 +11230,8 @@ isdn_get_eg(isdn_config_t * arg, struct eg *eg, int size)
 		tgc->egid = eg->id;	/* equipment group id */
 		tgc->proto = tg->proto;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11395,9 +11248,8 @@ isdn_get_xg(isdn_config_t * arg, struct xg *xg, int size)
 		return (-EINVAL);
 	cnf->proto = xg->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out the list of equipment group configurations 
-	 */
+	/* 
+	   write out the list of equipment group configurations */
 	egc = (typeof(egc)) (arg + 1);
 	for (eg = xg->eg.list; eg && size >= sizeof(*arg) + sizeof(*egc) + sizeof(*arg);
 	     eg = eg->xg.next, size -= sizeof(*arg) + sizeof(*egc), arg =
@@ -11407,9 +11259,8 @@ isdn_get_xg(isdn_config_t * arg, struct xg *xg, int size)
 		egc->xgid = xg->id;	/* exchange group id */
 		egc->proto = eg->proto;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11430,9 +11281,8 @@ isdn_get_dc(isdn_config_t * arg, struct dc *dc, int size)
 	cnf->sap = dc->sap;
 	cnf->proto = dc->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of data link configurations 
-	 */
+	/* 
+	   write out list of data link configurations */
 	dlc = (typeof(dlc)) (arg + 1);
 	for (dl = dc->dl.list; dl && size >= sizeof(*arg) + sizeof(*dlc) + sizeof(*arg);
 	     dl = dl->dc.next, size -= sizeof(*arg) + sizeof(*dlc), arg =
@@ -11445,9 +11295,8 @@ isdn_get_dc(isdn_config_t * arg, struct dc *dc, int size)
 		dlc->proto = dl->proto;
 	}
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11465,9 +11314,8 @@ isdn_get_dl(isdn_config_t * arg, struct dl *dl, int size)
 	cnf->dlc = dl->dlc;
 	cnf->proto = dl->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11484,9 +11332,8 @@ isdn_get_df(isdn_config_t * arg, df_t * df, int size)
 		return (-EINVAL);
 	cnf->proto = df->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of exchange groups 
-	 */
+	/* 
+	   write out list of exchange groups */
 	xgc = (typeof(xgc)) (arg + 1);
 	for (xg = df->xg.list; xg && size >= sizeof(*arg) + sizeof(*xgc) + sizeof(*arg);
 	     xg = xg->next, size -= sizeof(*arg) + sizeof(*xgc), arg =
@@ -11495,9 +11342,8 @@ isdn_get_df(isdn_config_t * arg, df_t * df, int size)
 		arg->id = xg->id;
 		xgc->proto = xg->proto;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11522,9 +11368,8 @@ isdn_add_ch(isdn_config_t * arg, struct ch *ch, int size, int force, int test)
 		fg = fg_lookup(cnf->fgid);
 	if (!tg || !fg)
 		return (-EINVAL);
-	/*
-	   timeslot must be unique within the transmission group 
-	 */
+	/* 
+	   timeslot must be unique within the transmission group */
 	for (ch = tg->ch.list; ch; ch = ch->tg.next)
 		if (cnf->ts == ch->ts)
 			return (-EINVAL);
@@ -11662,9 +11507,8 @@ isdn_add_dl(isdn_config_t * arg, struct dl *dl, int size, int force, int test)
 	if (!dl)
 		return (-EINVAL);
 	if (!test) {
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		dl->id = dl_get_id(arg->id);
 		dl->dlc = cnf->dlc;
 		dl->proto = cnf->proto;
@@ -11695,26 +11539,22 @@ isdn_cha_ch(isdn_config_t * arg, struct ch *ch, int size, int force, int test)
 		return (-EINVAL);
 	if (cnf->tgid && cnf->tgid != ch->tg.tg->id)
 		return (-EINVAL);
-	/*
-	   can't change to existing ts 
-	 */
+	/* 
+	   can't change to existing ts */
 	for (c = ch->tg.tg->ch.list; c; c = c->tg.next)
 		if (c->ts == cnf->ts)
 			return (-EINVAL);
 	if (!force) {
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (ch->bind.mgm || ch->bind.icc || ch->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (ch->bind.mnt || ch->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in call 
-		 */
+		/* 
+		   engaged in call */
 		if (ch->cr.next)
 			return (-EBUSY);
 	}
@@ -11732,29 +11572,24 @@ isdn_cha_tg(isdn_config_t * arg, struct tg *tg, int size, int force, int test)
 	if (cnf->egid && cnf->egid != tg->eg.eg->id)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have channels 
-		 */
+		/* 
+		   we have channels */
 		if (tg->ch.list)
 			return (-EBUSY);
-		/*
-		   we have data links 
-		 */
+		/* 
+		   we have data links */
 		if (tg->dc.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (tg->bind.mgm || tg->bind.icc || tg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (tg->bind.mnt || tg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management 
-		 */
+		/* 
+		   engaged in management */
 		if (tg->mgm.next)
 			return (-EBUSY);
 	}
@@ -11771,29 +11606,24 @@ isdn_cha_fg(isdn_config_t * arg, struct fg *fg, int size, int force, int test)
 	if (cnf->egid && cnf->egid != fg->eg.eg->id)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have channels 
-		 */
+		/* 
+		   we have channels */
 		if (fg->ch.list)
 			return (-EBUSY);
-		/*
-		   we have data links 
-		 */
+		/* 
+		   we have data links */
 		if (fg->dc.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (fg->bind.mgm || fg->bind.icc || fg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (fg->bind.mnt || fg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management or monitoring 
-		 */
+		/* 
+		   engaged in management or monitoring */
 		if (fg->mgm.next || fg->xry.next)
 			return (-EBUSY);
 	}
@@ -11811,29 +11641,24 @@ isdn_cha_eg(isdn_config_t * arg, struct eg *eg, int size, int force, int test)
 	if (cnf->xgid && cnf->xgid != eg->xg.xg->id)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have transmission groups 
-		 */
+		/* 
+		   we have transmission groups */
 		if (eg->tg.list)
 			return (-EBUSY);
-		/*
-		   we have facility groups 
-		 */
+		/* 
+		   we have facility groups */
 		if (eg->fg.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (eg->bind.mgm || eg->bind.icc || eg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (eg->bind.mnt || eg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management 
-		 */
+		/* 
+		   engaged in management */
 		if (eg->mgm.next)
 			return (-EBUSY);
 	}
@@ -11849,24 +11674,20 @@ isdn_cha_xg(isdn_config_t * arg, struct xg *xg, int size, int force, int test)
 	if (!xg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have equipment groups 
-		 */
+		/* 
+		   we have equipment groups */
 		if (xg->eg.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (xg->bind.mgm || xg->bind.icc || xg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (xg->bind.mnt || xg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management 
-		 */
+		/* 
+		   engaged in management */
 		if (xg->mgm.next)
 			return (-EBUSY);
 	}
@@ -11886,14 +11707,12 @@ isdn_cha_dc(isdn_config_t * arg, struct dc *dc, int size, int force, int test)
 	if (cnf->fgid && (!dc->fg.fg || cnf->fgid != dc->fg.fg->id))
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (dc->fg.fg || dc->tg.tg)
 			return (-EBUSY);
-		/*
-		   engaged in management or monitoring 
-		 */
+		/* 
+		   engaged in management or monitoring */
 		if (dc->mgm.next || dc->xry.next)
 			return (-EBUSY);
 	}
@@ -11914,14 +11733,12 @@ isdn_cha_dl(isdn_config_t * arg, struct dl *dl, int size, int force, int test)
 	if (cnf->dcid && (!dl->dc.dc || cnf->dcid != dl->dc.dc->id))
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (dl->dc.dc)
 			return (-EBUSY);
-		/*
-		   engaged in management or monitoring 
-		 */
+		/* 
+		   engaged in management or monitoring */
 		if (dl->mgm.next || dl->xry.next)
 			return (-EBUSY);
 	}
@@ -11954,19 +11771,16 @@ isdn_del_ch(isdn_config_t * arg, struct ch *ch, int size, int force, int test)
 	if (!ch)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (ch->bind.mgm || ch->bind.icc || ch->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (ch->bind.mnt || ch->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in call 
-		 */
+		/* 
+		   engaged in call */
 		if (ch->cr.next)
 			return (-EBUSY);
 	}
@@ -11981,29 +11795,24 @@ isdn_del_tg(isdn_config_t * arg, struct tg *tg, int size, int force, int test)
 	if (!tg)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have channels 
-		 */
+		/* 
+		   we have channels */
 		if (tg->ch.list)
 			return (-EBUSY);
-		/*
-		   we have data links 
-		 */
+		/* 
+		   we have data links */
 		if (tg->dc.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (tg->bind.mgm || tg->bind.icc || tg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (tg->bind.mnt || tg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management 
-		 */
+		/* 
+		   engaged in management */
 		if (tg->mgm.next)
 			return (-EBUSY);
 	}
@@ -12018,29 +11827,24 @@ isdn_del_fg(isdn_config_t * arg, struct fg *fg, int size, int force, int test)
 	if (!fg)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have channels 
-		 */
+		/* 
+		   we have channels */
 		if (fg->ch.list)
 			return (-EBUSY);
-		/*
-		   we have data links 
-		 */
+		/* 
+		   we have data links */
 		if (fg->dc.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (fg->bind.mgm || fg->bind.icc || fg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (fg->bind.mnt || fg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management or monitoring 
-		 */
+		/* 
+		   engaged in management or monitoring */
 		if (fg->mgm.next || fg->xry.next)
 			return (-EBUSY);
 	}
@@ -12055,29 +11859,24 @@ isdn_del_eg(isdn_config_t * arg, struct eg *eg, int size, int force, int test)
 	if (!eg)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have transmission groups 
-		 */
+		/* 
+		   we have transmission groups */
 		if (eg->tg.list)
 			return (-EBUSY);
-		/*
-		   we have facility groups 
-		 */
+		/* 
+		   we have facility groups */
 		if (eg->fg.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (eg->bind.mgm || eg->bind.icc || eg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (eg->bind.mnt || eg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management 
-		 */
+		/* 
+		   engaged in management */
 		if (eg->mgm.next)
 			return (-EBUSY);
 	}
@@ -12092,24 +11891,20 @@ isdn_del_xg(isdn_config_t * arg, struct xg *xg, int size, int force, int test)
 	if (!xg)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have equipment groups 
-		 */
+		/* 
+		   we have equipment groups */
 		if (xg->eg.list)
 			return (-EBUSY);
-		/*
-		   bound for management or call control 
-		 */
+		/* 
+		   bound for management or call control */
 		if (xg->bind.mgm || xg->bind.icc || xg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or monitoring 
-		 */
+		/* 
+		   bound for maintenance or monitoring */
 		if (xg->bind.mnt || xg->bind.xry)
 			return (-EBUSY);
-		/*
-		   engaged in management 
-		 */
+		/* 
+		   engaged in management */
 		if (xg->mgm.next)
 			return (-EBUSY);
 	}
@@ -12124,14 +11919,12 @@ isdn_del_dc(isdn_config_t * arg, struct dc *dc, int size, int force, int test)
 	if (!dc)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 		if (dc->fg.fg || dc->tg.tg)
 			return (-EBUSY);
-		/*
-		   engaged in management or monitoring 
-		 */
+		/* 
+		   engaged in management or monitoring */
 		if (dc->mgm.next || dc->xry.next)
 			return (-EBUSY);
 	}
@@ -12146,14 +11939,12 @@ isdn_del_dl(isdn_config_t * arg, struct dl *dl, int size, int force, int test)
 	if (!dl)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (dl->dc.dc)
 			return (-EBUSY);
-		/*
-		   engaged in management or monitoring 
-		 */
+		/* 
+		   engaged in management or monitoring */
 		if (dl->mgm.next || dl->xry.next)
 			return (-EBUSY);
 	}
@@ -12195,9 +11986,8 @@ isdn_sta_ch(isdn_statem_t * arg, struct ch *ch, int size)
 	sta->mnt_bind = ch->bind.mnt ? ch->bind.mnt->id : 0;
 	sta->xry_bind = ch->bind.xry ? ch->bind.xry->id : 0;
 	sta->icc_bind = ch->bind.icc ? ch->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = ch->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -12218,9 +12008,8 @@ isdn_sta_tg(isdn_statem_t * arg, struct tg *tg, int size)
 	sta->mnt_bind = tg->bind.mnt ? tg->bind.mnt->id : 0;
 	sta->xry_bind = tg->bind.xry ? tg->bind.xry->id : 0;
 	sta->icc_bind = tg->bind.icc ? tg->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = tg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -12241,9 +12030,8 @@ isdn_sta_fg(isdn_statem_t * arg, struct fg *fg, int size)
 	sta->mnt_bind = fg->bind.mnt ? fg->bind.mnt->id : 0;
 	sta->xry_bind = fg->bind.xry ? fg->bind.xry->id : 0;
 	sta->icc_bind = fg->bind.icc ? fg->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = fg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -12264,9 +12052,8 @@ isdn_sta_eg(isdn_statem_t * arg, struct eg *eg, int size)
 	sta->mnt_bind = eg->bind.mnt ? eg->bind.mnt->id : 0;
 	sta->xry_bind = eg->bind.xry ? eg->bind.xry->id : 0;
 	sta->icc_bind = eg->bind.icc ? eg->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = eg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -12287,9 +12074,8 @@ isdn_sta_xg(isdn_statem_t * arg, struct xg *xg, int size)
 	sta->mnt_bind = xg->bind.mnt ? xg->bind.mnt->id : 0;
 	sta->xry_bind = xg->bind.xry ? xg->bind.xry->id : 0;
 	sta->icc_bind = xg->bind.icc ? xg->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = xg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -12335,9 +12121,8 @@ isdn_sta_df(isdn_statem_t * arg, df_t * df, int size)
 	sta->mnt_bind = df->bind.mnt ? df->bind.mnt->id : 0;
 	sta->xry_bind = df->bind.xry ? df->bind.xry->id : 0;
 	sta->icc_bind = df->bind.icc ? df->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = df->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -14018,8 +13803,8 @@ cc_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					ISDN_DRV_NAME, cc));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
+					cc));
 				ret = -EPERM;
 				break;
 			}
@@ -14031,8 +13816,8 @@ cc_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					ISDN_DRV_NAME, cc));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					cc));
 				ret = -EPERM;
 				break;
 			}
@@ -14042,15 +13827,15 @@ cc_w_ioctl(queue_t *q, mblk_t *mp)
 					break;
 			if (!dl) {
 				ret = -EINVAL;
-				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
-					ISDN_DRV_NAME, cc));
+				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", DRV_NAME,
+					cc));
 				break;
 			}
 			isdn_free_dl(dl->iq);
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", ISDN_DRV_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -14064,75 +13849,75 @@ cc_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(ISDN_IOCGOPTIONS):
-			printd(("%s; %p: -> ISDN_IOCGOPTIONS\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCGOPTIONS\n", DRV_NAME, cc));
 			ret = isdn_iocgoptions(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCSOPTIONS):
-			printd(("%s; %p: -> ISDN_IOCSOPTIONS\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCSOPTIONS\n", DRV_NAME, cc));
 			ret = isdn_iocsoptions(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCGCONFIG):
-			printd(("%s; %p: -> ISDN_IOCGCONFIG\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCGCONFIG\n", DRV_NAME, cc));
 			ret = isdn_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCSCONFIG):
-			printd(("%s; %p: -> ISDN_IOCSCONFIG\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCSCONFIG\n", DRV_NAME, cc));
 			ret = isdn_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCTCONFIG):
-			printd(("%s; %p: -> ISDN_IOCTCONFIG\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCTCONFIG\n", DRV_NAME, cc));
 			ret = isdn_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCCCONFIG):
-			printd(("%s; %p: -> ISDN_IOCCCONFIG\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCCCONFIG\n", DRV_NAME, cc));
 			ret = isdn_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCGSTATEM):
-			printd(("%s; %p: -> ISDN_IOCGSTATEM\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCGSTATEM\n", DRV_NAME, cc));
 			ret = isdn_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCCMRESET):
-			printd(("%s; %p: -> ISDN_IOCCMRESET\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCCMRESET\n", DRV_NAME, cc));
 			ret = isdn_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCGSTATSP):
-			printd(("%s; %p: -> ISDN_IOCGSTATSP\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCGSTATSP\n", DRV_NAME, cc));
 			ret = isdn_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCSSTATSP):
-			printd(("%s; %p: -> ISDN_IOCSSTATSP\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCSSTATSP\n", DRV_NAME, cc));
 			ret = isdn_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCGSTATS):
-			printd(("%s; %p: -> ISDN_IOCGSTATS\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCGSTATS\n", DRV_NAME, cc));
 			ret = isdn_iocgstats(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCCSTATS):
-			printd(("%s; %p: -> ISDN_IOCCSTATS\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCCSTATS\n", DRV_NAME, cc));
 			ret = isdn_ioccstats(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCGNOTIFY):
-			printd(("%s; %p: -> ISDN_IOCGNOTIFY\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCGNOTIFY\n", DRV_NAME, cc));
 			ret = isdn_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCSNOTIFY):
-			printd(("%s; %p: -> ISDN_IOCSNOTIFY\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCSNOTIFY\n", DRV_NAME, cc));
 			ret = isdn_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCCNOTIFY):
-			printd(("%s; %p: -> ISDN_IOCCNOTIFY\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCCNOTIFY\n", DRV_NAME, cc));
 			ret = isdn_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCCMGMT):
-			printd(("%s; %p: -> ISDN_IOCCMGMT\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCCMGMT\n", DRV_NAME, cc));
 			ret = isdn_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(ISDN_IOCCPASS):
-			printd(("%s; %p: -> ISDN_IOCCPASS\n", ISDN_DRV_NAME, cc));
+			printd(("%s; %p: -> ISDN_IOCCPASS\n", DRV_NAME, cc));
 			ret = isdn_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported ISDN ioctl %d\n", ISDN_DRV_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported ISDN ioctl %d\n", DRV_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -14176,165 +13961,165 @@ cc_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = cc_get_state(cc);
 	switch (*(ulong *) mp->b_rptr) {
 	case CC_INFO_REQ:
-		printd(("%s: %p: -> CC_INFO_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_INFO_REQ\n", DRV_NAME, cc));
 		rtn = cc_info_req(q, mp);
 		break;
 	case CC_OPTMGMT_REQ:
-		printd(("%s: %p: -> CC_OPTMGMT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_OPTMGMT_REQ\n", DRV_NAME, cc));
 		rtn = cc_optmgmt_req(q, mp);
 		break;
 	case CC_BIND_REQ:
-		printd(("%s: %p: -> CC_BIND_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_BIND_REQ\n", DRV_NAME, cc));
 		rtn = cc_bind_req(q, mp);
 		break;
 	case CC_UNBIND_REQ:
-		printd(("%s: %p: -> CC_UNBIND_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_UNBIND_REQ\n", DRV_NAME, cc));
 		rtn = cc_unbind_req(q, mp);
 		break;
 	case CC_ADDR_REQ:
-		printd(("%s: %p: -> CC_ADDR_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_ADDR_REQ\n", DRV_NAME, cc));
 		rtn = cc_addr_req(q, mp);
 		break;
 	case CC_SETUP_REQ:
-		printd(("%s: %p: -> CC_SETUP_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SETUP_REQ\n", DRV_NAME, cc));
 		rtn = cc_setup_req(q, mp);
 		break;
 	case CC_MORE_INFO_REQ:
-		printd(("%s: %p: -> CC_MORE_INFO_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_MORE_INFO_REQ\n", DRV_NAME, cc));
 		rtn = cc_more_info_req(q, mp);
 		break;
 	case CC_INFORMATION_REQ:
-		printd(("%s: %p: -> CC_INFORMATION_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_INFORMATION_REQ\n", DRV_NAME, cc));
 		rtn = cc_information_req(q, mp);
 		break;
 	case CC_CONT_CHECK_REQ:
-		printd(("%s: %p: -> CC_CONT_CHECK_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONT_CHECK_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_CONT_TEST_REQ:
-		printd(("%s: %p: -> CC_CONT_TEST_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONT_TEST_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_CONT_REPORT_REQ:
-		printd(("%s: %p: -> CC_CONT_REPORT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONT_REPORT_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_SETUP_RES:
-		printd(("%s: %p: -> CC_SETUP_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SETUP_RES\n", DRV_NAME, cc));
 		rtn = cc_setup_res(q, mp);
 		break;
 	case CC_PROCEEDING_REQ:
-		printd(("%s: %p: -> CC_PROCEEDING_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_PROCEEDING_REQ\n", DRV_NAME, cc));
 		rtn = cc_proceeding_req(q, mp);
 		break;
 	case CC_ALERTING_REQ:
-		printd(("%s: %p: -> CC_ALERTING_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_ALERTING_REQ\n", DRV_NAME, cc));
 		rtn = cc_alerting_req(q, mp);
 		break;
 	case CC_PROGRESS_REQ:
-		printd(("%s: %p: -> CC_PROGRESS_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_PROGRESS_REQ\n", DRV_NAME, cc));
 		rtn = cc_progress_req(q, mp);
 		break;
 #if 0
 	case CC_IBI_REQ:
-		printd(("%s: %p: -> CC_IBI_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_IBI_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 #endif
 	case CC_DISCONNECT_REQ:
-		printd(("%s: %p: -> CC_DISCONNECT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_DISCONNECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_disconnect_req(q, mp);
 		break;
 	case CC_CONNECT_REQ:
-		printd(("%s: %p: -> CC_CONNECT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONNECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_connect_req(q, mp);
 		break;
 	case CC_SETUP_COMPLETE_REQ:
-		printd(("%s: %p: -> CC_SETUP_COMPLETE_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SETUP_COMPLETE_REQ\n", DRV_NAME, cc));
 		rtn = cc_setup_complete_req(q, mp);
 		break;
 	case CC_NOTIFY_REQ:
-		printd(("%s: %p: -> CC_NOTIFY_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_NOTIFY_REQ\n", DRV_NAME, cc));
 		rtn = cc_notify_req(q, mp);
 		break;
 	case CC_SUSPEND_REQ:
-		printd(("%s: %p: -> CC_SUSPEND_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SUSPEND_REQ\n", DRV_NAME, cc));
 		rtn = cc_suspend_req(q, mp);
 		break;
 	case CC_SUSPEND_RES:
-		printd(("%s: %p: -> CC_SUSPEND_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SUSPEND_RES\n", DRV_NAME, cc));
 		rtn = cc_suspend_res(q, mp);
 		break;
 	case CC_SUSPEND_REJECT_REQ:
-		printd(("%s: %p: -> CC_SUSPEND_REJECT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SUSPEND_REJECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_suspend_reject_req(q, mp);
 		break;
 	case CC_RESUME_REQ:
-		printd(("%s: %p: -> CC_RESUME_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESUME_REQ\n", DRV_NAME, cc));
 		rtn = cc_resume_req(q, mp);
 		break;
 	case CC_RESUME_RES:
-		printd(("%s: %p: -> CC_RESUME_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESUME_RES\n", DRV_NAME, cc));
 		rtn = cc_resume_res(q, mp);
 		break;
 	case CC_RESUME_REJECT_REQ:
-		printd(("%s: %p: -> CC_RESUME_REJECT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESUME_REJECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_resume_reject_req(q, mp);
 		break;
 	case CC_REJECT_REQ:
-		printd(("%s: %p: -> CC_REJECT_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_REJECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_reject_req(q, mp);
 		break;
 	case CC_RELEASE_REQ:
-		printd(("%s: %p: -> CC_RELEASE_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RELEASE_REQ\n", DRV_NAME, cc));
 		rtn = cc_release_req(q, mp);
 		break;
 	case CC_RELEASE_RES:
-		printd(("%s: %p: -> CC_RELEASE_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RELEASE_RES\n", DRV_NAME, cc));
 		rtn = cc_release_res(q, mp);
 		break;
 	case CC_RESET_REQ:
-		printd(("%s: %p: -> CC_RESET_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESET_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_RESET_RES:
-		printd(("%s: %p: -> CC_RESET_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESET_RES\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_BLOCKING_REQ:
-		printd(("%s: %p: -> CC_BLOCKING_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_BLOCKING_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_BLOCKING_RES:
-		printd(("%s: %p: -> CC_BLOCKING_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_BLOCKING_RES\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_UNBLOCKING_REQ:
-		printd(("%s: %p: -> CC_UNBLOCKING_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_UNBLOCKING_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_UNBLOCKING_RES:
-		printd(("%s: %p: -> CC_UNBLOCKING_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_UNBLOCKING_RES\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_QUERY_REQ:
-		printd(("%s: %p: -> CC_QUERY_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_QUERY_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_QUERY_RES:
-		printd(("%s: %p: -> CC_QUERY_RES\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_QUERY_RES\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_RESTART_REQ:
-		printd(("%s: %p: -> CC_RESTART_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESTART_REQ\n", DRV_NAME, cc));
 		rtn = cc_restart_req(q, mp);
 		break;
 	case CC_STOP_REQ:
-		printd(("%s: %p: -> CC_STOP_REQ\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_STOP_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> CC_????\n", ISDN_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_????\n", DRV_NAME, cc));
 		rtn = cc_unknown_prim(q, mp);
 		break;
 	}
@@ -14355,106 +14140,104 @@ dl_r_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = dl_get_state(dl);
 	switch (*((ulong *) mp->b_rptr)) {
 	case DL_INFO_ACK:
-		printd(("%s: %p: DL_INFO_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_INFO_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_info_ack(q, mp);
 		break;
 	case DL_BIND_ACK:
-		printd(("%s: %p: DL_BIND_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_BIND_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_bind_ack(q, mp);
 		break;
 	case DL_SUBS_BIND_ACK:
-		printd(("%s: %p: DL_SUBS_BIND_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_SUBS_BIND_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_subs_bind_ack(q, mp);
 		break;
 	case DL_OK_ACK:
-		printd(("%s: %p: DL_OK_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_OK_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_ok_ack(q, mp);
 		break;
 	case DL_ERROR_ACK:
-		printd(("%s: %p: DL_ERROR_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_ERROR_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_error_ack(q, mp);
 		break;
 	case DL_CONNECT_IND:
-		printd(("%s: %p: DL_CONNECT_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_CONNECT_IND <-\n", DRV_NAME, dl));
 		rtn = dl_connect_ind(q, mp);
 		break;
 	case DL_CONNECT_CON:
-		printd(("%s: %p: DL_CONNECT_CON <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_CONNECT_CON <-\n", DRV_NAME, dl));
 		rtn = dl_connect_con(q, mp);
 		break;
 	case DL_TOKEN_ACK:
-		printd(("%s: %p: DL_TOKEN_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_TOKEN_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_token_ack(q, mp);
 		break;
 	case DL_DISCONNECT_IND:
-		printd(("%s: %p: DL_DISCONNECT_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_DISCONNECT_IND <-\n", DRV_NAME, dl));
 		rtn = dl_disconnect_ind(q, mp);
 		break;
 	case DL_RESET_IND:
-		printd(("%s: %p: DL_RESET_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_RESET_IND <-\n", DRV_NAME, dl));
 		rtn = dl_reset_ind(q, mp);
 		break;
 	case DL_RESET_CON:
-		printd(("%s: %p: DL_RESET_CON <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_RESET_CON <-\n", DRV_NAME, dl));
 		rtn = dl_reset_con(q, mp);
 		break;
 	case DL_UNITDATA_IND:
-		printd(("%s: %p: DL_UNITDATA_IND [%d] <-\n", ISDN_DRV_NAME, dl,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: DL_UNITDATA_IND [%d] <-\n", DRV_NAME, dl, msgdsize(mp->b_cont)));
 		rtn = dl_unitdata_ind(q, mp);
 		break;
 	case DL_UDERROR_IND:
-		printd(("%s: %p: DL_UDERROR_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_UDERROR_IND <-\n", DRV_NAME, dl));
 		rtn = dl_uderror_ind(q, mp);
 		break;
 	case DL_TEST_IND:
-		printd(("%s: %p: DL_TEST_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_TEST_IND <-\n", DRV_NAME, dl));
 		rtn = dl_test_ind(q, mp);
 		break;
 	case DL_TEST_CON:
-		printd(("%s: %p: DL_TEST_CON <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_TEST_CON <-\n", DRV_NAME, dl));
 		rtn = dl_test_con(q, mp);
 		break;
 	case DL_XID_IND:
-		printd(("%s: %p: DL_XID_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_XID_IND <-\n", DRV_NAME, dl));
 		rtn = dl_xid_ind(q, mp);
 		break;
 	case DL_XID_CON:
-		printd(("%s: %p: DL_XID_CON <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_XID_CON <-\n", DRV_NAME, dl));
 		rtn = dl_xid_con(q, mp);
 		break;
 	case DL_DATA_ACK_IND:
-		printd(("%s: %p: DL_DATA_ACK_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_DATA_ACK_IND <-\n", DRV_NAME, dl));
 		rtn = dl_data_ack_ind(q, mp);
 		break;
 	case DL_DATA_ACK_STATUS_IND:
-		printd(("%s: %p: DL_DATA_ACK_STATUS_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_DATA_ACK_STATUS_IND <-\n", DRV_NAME, dl));
 		rtn = dl_data_ack_status_ind(q, mp);
 		break;
 	case DL_REPLY_IND:
-		printd(("%s: %p: DL_REPLY_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_REPLY_IND <-\n", DRV_NAME, dl));
 		rtn = dl_reply_ind(q, mp);
 		break;
 	case DL_REPLY_STATUS_IND:
-		printd(("%s: %p: DL_REPLY_STATUS_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_REPLY_STATUS_IND <-\n", DRV_NAME, dl));
 		rtn = dl_reply_status_ind(q, mp);
 		break;
 	case DL_REPLY_UPDATE_STATUS_IND:
-		printd(("%s: %p: DL_REPLY_UPDATE_STATUS_IND <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_REPLY_UPDATE_STATUS_IND <-\n", DRV_NAME, dl));
 		rtn = dl_reply_update_status_ind(q, mp);
 		break;
 	case DL_PHYS_ADDR_ACK:
-		printd(("%s: %p: DL_PHYS_ADDR_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_PHYS_ADDR_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_phys_addr_ack(q, mp);
 		break;
 	case DL_GET_STATISTICS_ACK:
-		printd(("%s: %p: DL_GET_STATISTICS_ACK <-\n", ISDN_DRV_NAME, dl));
+		printd(("%s: %p: DL_GET_STATISTICS_ACK <-\n", DRV_NAME, dl));
 		rtn = dl_get_statistics_ack(q, mp);
 		break;
 	default:
-		/*
-		   reject what we don't recognize 
-		 */
+		/* 
+		   reject what we don't recognize */
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -14473,17 +14256,15 @@ dl_r_proto(queue_t *q, mblk_t *mp)
 STATIC int
 cc_w_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from above 
-	 */
+	/* 
+	   data from above */
 	return cc_data_req(q, mp);
 }
 STATIC int
 dl_r_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from below 
-	 */
+	/* 
+	   data from below */
 	return dl_data_ind(q, mp);
 }
 
@@ -14500,15 +14281,13 @@ dl_r_error(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	struct cr *cr;
 	int err;
-	/*
-	   treat the same as a disconnect 
-	 */
+	/* 
+	   treat the same as a disconnect */
 	for (cr = dl->dc.dc->fg.fg->cr.list; cr; cr = cr->fg.next) {
 		switch (cr_get_c_state(cr)) {
 		case U0_NULL:
-			/*
-			   do nothing 
-			 */
+			/* 
+			   do nothing */
 			break;
 		case U2_OVERLAP_SENDING:
 			if ((err = cc_connect_ind(q, cr, NULL)) < 0)
@@ -14526,9 +14305,8 @@ dl_r_error(queue_t *q, mblk_t *mp)
 			break;
 		default:
 			if (0) {
-				/*
-				   calls in inactive state 
-				 */
+				/* 
+				   calls in inactive state */
 				cr_timer_stop(cr, tall);
 				cr_set_c_state(cr, U0_NULL);
 				isdn_free_cr(cr);
@@ -14539,9 +14317,8 @@ dl_r_error(queue_t *q, mblk_t *mp)
 							goto error;
 					cr_timer_start(cr, t309);
 				}
-				/*
-				   remain in current state 
-				 */
+				/* 
+				   remain in current state */
 			}
 			break;
 		}
@@ -14577,9 +14354,8 @@ cc_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 cc_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return cc_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -14599,9 +14375,8 @@ cc_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 dl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return dl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -14659,7 +14434,7 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", ISDN_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -14675,7 +14450,7 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		if (cmajor == dmajor) {
 			ushort dminor = (*ip)->u.dev.cminor;
 			if (cminor < dminor) {
-				if (++cminor >= ISDN_CMINORS) {
+				if (++cminor >= NMINORS) {
 					if (++mindex >= ISDN_CMAJORS
 					    || !(cmajor = isdn_majors[mindex]))
 						break;
@@ -14686,15 +14461,15 @@ isdn_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (mindex >= ISDN_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", ISDN_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&isdn_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", ISDN_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(cc = isdn_alloc_cc(q, ip, devp, crp))) {
-		ptrace(("%s: ERROR: no memory\n", ISDN_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&isdn_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -14718,7 +14493,7 @@ isdn_close(queue_t *q, int flag, cred_t *crp)
 	(void) crp;
 	(void) h;
 	(void) s;
-	printd(("%s: %p: closing character device %d:%d\n", ISDN_DRV_NAME, cc, cc->u.dev.cmajor,
+	printd(("%s: %p: closing character device %d:%d\n", DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
 	spin_lock_irqsave(&isdn_lock, flags);
 	isdn_free_cc(q);
@@ -14751,75 +14526,75 @@ isdn_init_caches(void)
 	    && !(isdn_cc_cachep =
 		 kmem_cache_create("isdn_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_cc_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_cc_cachep", DRV_NAME);
 		goto no_cc;
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized isdn cc structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn cc structure cache\n", DRV_NAME));
 	if (!isdn_cr_cachep
 	    && !(isdn_cr_cachep =
 		 kmem_cache_create("isdn_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_cr_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_cr_cachep", DRV_NAME);
 		goto no_cr;
 	} else
-		printd(("%s: initialized isdn cr structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn cr structure cache\n", DRV_NAME));
 	if (!isdn_ch_cachep
 	    && !(isdn_ch_cachep =
 		 kmem_cache_create("isdn_ch_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_ch_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_ch_cachep", DRV_NAME);
 		goto no_ch;
 	} else
-		printd(("%s: initialized isdn ch structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn ch structure cache\n", DRV_NAME));
 	if (!isdn_tg_cachep
 	    && !(isdn_tg_cachep =
 		 kmem_cache_create("isdn_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_tg_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_tg_cachep", DRV_NAME);
 		goto no_tg;
 	} else
-		printd(("%s: initialized isdn fg structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn fg structure cache\n", DRV_NAME));
 	if (!isdn_fg_cachep
 	    && !(isdn_fg_cachep =
 		 kmem_cache_create("isdn_fg_cachep", sizeof(struct fg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_fg_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_fg_cachep", DRV_NAME);
 		goto no_fg;
 	} else
-		printd(("%s: initialized isdn fg structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn fg structure cache\n", DRV_NAME));
 	if (!isdn_eg_cachep
 	    && !(isdn_eg_cachep =
 		 kmem_cache_create("isdn_eg_cachep", sizeof(struct eg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_eg_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_eg_cachep", DRV_NAME);
 		goto no_eg;
 	} else
-		printd(("%s: initialized isdn eg structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn eg structure cache\n", DRV_NAME));
 	if (!isdn_xg_cachep
 	    && !(isdn_xg_cachep =
 		 kmem_cache_create("isdn_xg_cachep", sizeof(struct xg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_xg_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_xg_cachep", DRV_NAME);
 		goto no_xg;
 	} else
-		printd(("%s: initialized isdn xg structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized isdn xg structure cache\n", DRV_NAME));
 	if (!isdn_dc_cachep
 	    && !(isdn_dc_cachep =
 		 kmem_cache_create("isdn_dc_cachep", sizeof(struct dc), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_dc_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_dc_cachep", DRV_NAME);
 		goto no_dc;
 	} else
-		printd(("%s: initialized dc structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized dc structure cache\n", DRV_NAME));
 	if (!isdn_dl_cachep
 	    && !(isdn_dl_cachep =
 		 kmem_cache_create("isdn_dl_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isdn_dl_cachep", ISDN_DRV_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate isdn_dl_cachep", DRV_NAME);
 		goto no_dl;
 	} else
-		printd(("%s: initialized dl structure cache\n", ISDN_DRV_NAME));
+		printd(("%s: initialized dl structure cache\n", DRV_NAME));
 	return (0);
 	kmem_cache_destroy(isdn_dl_cachep);
       no_dl:
@@ -14841,64 +14616,74 @@ isdn_init_caches(void)
       no_cc:
 	return (-ENOMEM);
 }
-STATIC void
+STATIC int
 isdn_term_caches(void)
 {
+	int err = 0;
 	if (isdn_cc_cachep) {
-		if (kmem_cache_destroy(isdn_cc_cachep))
+		if (kmem_cache_destroy(isdn_cc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_cc_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_cc_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_cc_cachep\n", DRV_NAME));
 	}
 	if (isdn_cr_cachep) {
-		if (kmem_cache_destroy(isdn_cr_cachep))
+		if (kmem_cache_destroy(isdn_cr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_cr_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_cr_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_cr_cachep\n", DRV_NAME));
 	}
 	if (isdn_ch_cachep) {
-		if (kmem_cache_destroy(isdn_ch_cachep))
+		if (kmem_cache_destroy(isdn_ch_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_ch_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_ch_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_ch_cachep\n", DRV_NAME));
 	}
 	if (isdn_tg_cachep) {
-		if (kmem_cache_destroy(isdn_tg_cachep))
+		if (kmem_cache_destroy(isdn_tg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_tg_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_tg_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_tg_cachep\n", DRV_NAME));
 	}
 	if (isdn_fg_cachep) {
-		if (kmem_cache_destroy(isdn_fg_cachep))
+		if (kmem_cache_destroy(isdn_fg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_fg_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_fg_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_fg_cachep\n", DRV_NAME));
 	}
 	if (isdn_eg_cachep) {
-		if (kmem_cache_destroy(isdn_eg_cachep))
+		if (kmem_cache_destroy(isdn_eg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_eg_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_eg_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_eg_cachep\n", DRV_NAME));
 	}
 	if (isdn_xg_cachep) {
-		if (kmem_cache_destroy(isdn_xg_cachep))
+		if (kmem_cache_destroy(isdn_xg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_xg_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_xg_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_xg_cachep\n", DRV_NAME));
 	}
 	if (isdn_dc_cachep) {
-		if (kmem_cache_destroy(isdn_dc_cachep))
+		if (kmem_cache_destroy(isdn_dc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_dc_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_dc_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_dc_cachep\n", DRV_NAME));
 	}
 	if (isdn_dl_cachep) {
-		if (kmem_cache_destroy(isdn_dl_cachep))
+		if (kmem_cache_destroy(isdn_dl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_dl_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isdn_dl_cachep\n", ISDN_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isdn_dl_cachep\n", DRV_NAME));
 	}
-	return;
+	return (err);
 }
 
 /*
@@ -14910,7 +14695,7 @@ STATIC struct cc *
 isdn_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 {
 	struct cc *cc;
-	printd(("%s: %s: create cc dev = %d:%d\n", ISDN_DRV_NAME, __FUNCTION__, getmajor(*devp),
+	printd(("%s: %s: create cc dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
 	if ((cc = kmem_cache_alloc(isdn_cc_cachep, SLAB_ATOMIC))) {
 		bzero(cc, sizeof(*cc));
@@ -14918,7 +14703,7 @@ isdn_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->u.dev.cmajor = getmajor(*devp);
 		cc->u.dev.cminor = getminor(*devp);
 		cc->cred = *crp;
-		spin_lock_init(&cc->qlock); /* "cc-queue-lock" */
+		spin_lock_init(&cc->qlock);	/* "cc-queue-lock" */
 		(cc->oq = RD(q))->q_ptr = cc_get(cc);
 		(cc->iq = WR(q))->q_ptr = cc_get(cc);
 		cc->o_prim = &cc_r_prim;
@@ -14928,27 +14713,24 @@ isdn_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->i_state = LMI_UNUSABLE;
 		cc->i_style = LMI_STYLE1;
 		cc->i_version = 1;
-		spin_lock_init(&cc->lock); /* "cc-lock" */
-		/*
-		   initialize bind list 
-		 */
+		spin_lock_init(&cc->lock);	/* "cc-lock" */
+		/* 
+		   initialize bind list */
 		cc->bind.next = NULL;
 		cc->bind.prev = &cc->bind.next;
-		/*
-		   initialize conn list 
-		 */
+		/* 
+		   initialize conn list */
 		cc->conn.cpc = NULL;
 		cc->conn.mgm.cr = NULL;
-		/*
-		   place in master list 
-		 */
+		/* 
+		   place in master list */
 		if ((cc->next = *ccp))
 			cc->next->prev = &cc->next;
 		cc->prev = ccp;
 		*ccp = cc_get(cc);
 		master.cc.numb++;
 	} else
-		ptrace(("%s: %s: ERROR: failed to allocate cc structure\n", ISDN_DRV_NAME,
+		ptrace(("%s: %s: ERROR: failed to allocate cc structure\n", DRV_NAME,
 			__FUNCTION__));
 	return (cc);
 }
@@ -14958,7 +14740,7 @@ isdn_free_cc(queue_t *q)
 	struct cc *cc = CC_PRIV(q);
 	psw_t flags;
 	ensure(cc, return);
-	printd(("%s: %s: %p: free cc %d:%d\n", ISDN_DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
+	printd(("%s: %s: %p: free cc %d:%d\n", DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
 	spin_lock_irqsave(&cc->lock, flags);
 	{
@@ -14967,23 +14749,19 @@ isdn_free_cc(queue_t *q)
 		struct fg *fg;
 		struct eg *eg;
 		struct xg *xg;
-		/*
-		   stopping bufcalls 
-		 */
+		/* 
+		   stopping bufcalls */
 		ss7_unbufcall((str_t *) cc);
-		/*
-		   flushing buffser 
-		 */
+		/* 
+		   flushing buffser */
 		flushq(cc->oq, FLUSHALL);
 		flushq(cc->iq, FLUSHALL);
-		/*
-		   detach from call processing 
-		 */
+		/* 
+		   detach from call processing */
 		for (cr = cc->conn.cpc; cr; cr = cr->cpc.next)
 			cr_set_i_state(cr, cc, CCS_IDLE);
-		/*
-		   detach from management 
-		 */
+		/* 
+		   detach from management */
 		for (cr = cc->conn.mgm.cr; cr; cr = cr->mgm.next)
 			cr_set_m_state(cr, cc, CMS_IDLE);
 		for (tg = cc->conn.mgm.tg; tg; tg = tg->mgm.next)
@@ -14994,9 +14772,8 @@ isdn_free_cc(queue_t *q)
 			eg_set_m_state(eg, cc, CMS_IDLE);
 		for (xg = cc->conn.mgm.xg; xg; xg = xg->mgm.next)
 			xg_set_m_state(xg, cc, CMS_IDLE);
-		/*
-		   unbind 
-		 */
+		/* 
+		   unbind */
 		if (cc_get_state(cc) != CCS_UNBND) {
 			switch (cc->bind.type) {
 			case ISDN_BIND_CH:
@@ -15031,9 +14808,8 @@ isdn_free_cc(queue_t *q)
 		      not_bound:
 			cc_set_state(cc, CCS_UNBND);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*cc->prev = cc->next))
 			cc->next->prev = cc->prev;
 		cc->next = NULL;
@@ -15042,19 +14818,17 @@ isdn_free_cc(queue_t *q)
 		cc_put(cc);
 		assure(master.cc.numb > 0);
 		master.cc.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&cc->refcnt) > 1, cc_get(cc));
 		cc_put(xchg(&cc->oq->q_ptr, NULL));
 		ensure(atomic_read(&cc->refcnt) > 1, cc_get(cc));
 		cc_put(xchg(&cc->iq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&cc->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: cc lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, cc, atomic_read(&cc->refcnt)));
+				  DRV_NAME, __FUNCTION__, cc, atomic_read(&cc->refcnt)));
 			atomic_set(&cc->refcnt, 1);
 		}
 	}
@@ -15075,7 +14849,7 @@ cc_put(struct cc *cc)
 {
 	if (cc && atomic_dec_and_test(&cc->refcnt)) {
 		kmem_cache_free(isdn_cc_cachep, cc);
-		printd(("%s: %s: %p: deallocated cc structure", ISDN_DRV_NAME, __FUNCTION__, cc));
+		printd(("%s: %s: %p: deallocated cc structure", DRV_NAME, __FUNCTION__, cc));
 	}
 }
 
@@ -15086,30 +14860,27 @@ cc_put(struct cc *cc)
 STATIC struct cr *
 isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nch)
 {
-	/*
-	   create a call reference with a list of channels and user reference 
-	 */
+	/* 
+	   create a call reference with a list of channels and user reference */
 	struct cr *cr, **crp;
-	printd(("%s: %s: create cr->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create cr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((cr = kmem_cache_alloc(isdn_cr_cachep, SLAB_ATOMIC))) {
 		bzero(cr, sizeof(*cr));
 		cr_get(cr);	/* first get */
-		spin_lock_init(&cr->lock); /* "cr-lock" */
+		spin_lock_init(&cr->lock);	/* "cr-lock" */
 		cr->id = cr_get_id(id, fg);
 		cr->cref = cr->id;
 		cr->uref = id;
-		/*
-		   place in master list (ascending id) 
-		 */
+		/* 
+		   place in master list (ascending id) */
 		for (crp = &master.cr.list; *crp && (*crp)->id < cr->id; crp = &(*crp)->next) ;
 		if ((cr->next = *crp))
 			cr->next->prev = &cr->next;
 		cr->prev = crp;
 		*crp = cr_get(cr);
 		master.cr.numb++;
-		/*
-		   place in call control list (ascending user reference) 
-		 */
+		/* 
+		   place in call control list (ascending user reference) */
 		if (cc) {
 			for (crp = &cc->conn.cpc; *crp && (*crp)->uref < cr->uref;
 			     crp = &(*crp)->cpc.next) ;
@@ -15119,16 +14890,14 @@ isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 			*crp = cr_get(cr);
 			cc->conn.cpc = cr_get(cr);
 		}
-		/*
-		   add channels to call 
-		 */
+		/* 
+		   add channels to call */
 		while ((--nch) >= 0) {
 			struct ch *ch;
 			if ((ch = chp[nch])) {
 				if (ch->idle.fg) {
-					/*
-					   remove channel from facility group idle list 
-					 */
+					/* 
+					   remove channel from facility group idle list */
 					if ((*ch->idle.prev = ch->idle.next))
 						ch->idle.next->idle.prev = ch->idle.prev;
 					ch->idle.next = NULL;
@@ -15138,9 +14907,8 @@ isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 					fg_put(xchg(&ch->idle.fg, NULL));
 				} else
 					swerr();
-				/*
-				   add channel to call 
-				 */
+				/* 
+				   add channel to call */
 				if ((ch->cr.next = cr->ch.list))
 					ch->cr.next->cr.prev = &ch->cr.next;
 				ch->cr.prev = &cr->ch.list;
@@ -15150,9 +14918,8 @@ isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 			} else
 				swerr();
 		}
-		/*
-		   add call reference to facility group active call reference list (descending id) 
-		 */
+		/* 
+		   add call reference to facility group active call reference list (descending id) */
 		for (crp = &fg->cr.list; *crp && (*crp)->id < cr->id; crp = &(*crp)->next) ;
 		if ((cr->fg.next = *crp))
 			cr->fg.next->fg.prev = &cr->fg.next;
@@ -15161,36 +14928,32 @@ isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 		*crp = cr_get(cr);
 		fg->cr.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate cr structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate cr structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (cr);
 }
 STATIC void
 isdn_free_cr(struct cr *cr)
 {
-	/*
+	/* 
 	   free a call reference, this is done when call are released as well as when channels are
-	   being removed from under active calls 
-	 */
+	   being removed from under active calls */
 	psw_t flags;
 	ensure(cr, return);
-	printd(("%s: %s: %p free cr->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, cr, cr->id));
+	printd(("%s: %s: %p free cr->id = %ld\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 	spin_lock_irqsave(&cr->lock, flags);
 	{
 		struct ch *ch;
 		struct fg *fg;
-		/*
-		   stop all timers 
-		 */
+		/* 
+		   stop all timers */
 		__cr_timer_stop(cr, tall);
-		/*
-		   free retry buffer 
-		 */
+		/* 
+		   free retry buffer */
 		if (cr->retry)
 			freemsg(xchg(&cr->retry, NULL));
-		/*
-		   release call reference from call control 
-		 */
+		/* 
+		   release call reference from call control */
 		if (cr->cpc.cc) {
 			switch (cr_get_i_state(cr)) {
 			case U0_NULL:
@@ -15208,9 +14971,8 @@ isdn_free_cr(struct cr *cr)
 			cr_put(cr);
 			cc_put(xchg(&cr->cpc.cc, NULL));
 		}
-		/*
-		   release call reference from management 
-		 */
+		/* 
+		   release call reference from management */
 		if (cr->mgm.cc) {
 			switch (cr_get_m_state(cr)) {
 			case CMS_IDLE:
@@ -15227,9 +14989,8 @@ isdn_free_cr(struct cr *cr)
 			cr_put(cr);
 			cc_put(xchg(&cr->mgm.cc, NULL));
 		}
-		/*
-		   remove call reference from facility group 
-		 */
+		/* 
+		   remove call reference from facility group */
 		if ((fg = cr->fg.fg)) {
 			if ((*cr->fg.prev = cr->fg.next))
 				cr->fg.next->fg.prev = cr->fg.prev;
@@ -15238,9 +14999,8 @@ isdn_free_cr(struct cr *cr)
 			cr_put(cr);
 			fg->cr.numb--;
 			fg_put(xchg(&cr->fg.fg, NULL));
-			/*
-			   remove circuits from call reference and return to fg idle list 
-			 */
+			/* 
+			   remove circuits from call reference and return to fg idle list */
 			while ((ch = cr->ch.list)) {
 				if (ch->cr.cr) {
 					if ((*ch->cr.prev = ch->cr.next))
@@ -15264,9 +15024,8 @@ isdn_free_cr(struct cr *cr)
 			}
 		} else
 			swerr();
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		cr->id = 0;
 		cr->uref = 0;
 		cr->cref = 0;
@@ -15297,8 +15056,8 @@ cr_put(struct cr *cr)
 		assure(atomic_read(&cr->refcnt) > 1);
 		if (atomic_dec_and_test(&cr->refcnt)) {
 			kmem_cache_free(isdn_cr_cachep, cr);
-			printd(("%s: %s: %p: deallocated cr structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, cr));
+			printd(("%s: %s: %p: deallocated cr structure\n", DRV_NAME, __FUNCTION__,
+				cr));
 		}
 	}
 }
@@ -15340,25 +15099,23 @@ isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 	struct eg *eg = fg->eg.eg;
 	assure(eg == tg->eg.eg);
 #endif
-	printd(("%s: %s: create ch->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create ch->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((ch = kmem_cache_alloc(isdn_ch_cachep, SLAB_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
 		ch_get(ch);	/* first get */
-		spin_lock_init(&ch->lock); /* "ch-lock" */
+		spin_lock_init(&ch->lock);	/* "ch-lock" */
 		ch->id = id;
 		ch->ts = ts;
-		/*
-		   place in master list (ascending id) 
-		 */
+		/* 
+		   place in master list (ascending id) */
 		for (chp = &master.ch.list; *chp && (*chp)->id < id; chp = &(*chp)->next) ;
 		if ((ch->next = *chp))
 			ch->next->prev = &ch->next;
 		ch->prev = chp;
 		*chp = ch_get(ch);
 		master.ch.numb++;
-		/*
-		   place in transmission group list (ascending ts) 
-		 */
+		/* 
+		   place in transmission group list (ascending ts) */
 		for (chp = &tg->ch.list; *chp && (*chp)->ts < ts; chp = &(*chp)->tg.next) ;
 		if ((ch->tg.next = *chp))
 			ch->tg.next->tg.prev = &ch->tg.next;
@@ -15366,9 +15123,8 @@ isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 		*chp = ch_get(ch);
 		tg->ch.numb++;
 		ch->tg.tg = tg_get(tg);
-		/*
-		   place in facility group list (ascending id) 
-		 */
+		/* 
+		   place in facility group list (ascending id) */
 		for (chp = &fg->ch.list; *chp && (*chp)->id < id; chp = &(*chp)->fg.next) ;
 		if ((ch->fg.next = *chp))
 			ch->fg.next->fg.prev = &ch->fg.next;
@@ -15376,23 +15132,21 @@ isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 		*chp = ch_get(ch);
 		fg->ch.numb++;
 		ch->fg.fg = fg_get(fg);
-		/*
-		   place in facility group idle list 
-		 */
+		/* 
+		   place in facility group idle list */
 		if ((ch->idle.next = fg->idle.list))
 			ch->idle.next->idle.prev = &ch->idle.next;
 		ch->idle.prev = &fg->idle.list;
 		ch->idle.fg = fg_get(fg);
 		fg->idle.list = ch_get(ch);
 		fg->idle.numb++;
-		/*
-		   initialize call reference list 
-		 */
+		/* 
+		   initialize call reference list */
 		ch->cr.cr = NULL;
 		ch->cr.next = NULL;
 		ch->cr.prev = &ch->cr.next;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate ch structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate ch structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (ch);
 }
@@ -15402,60 +15156,53 @@ isdn_free_ch(struct ch *ch)
 	struct cc *cc;
 	psw_t flags;
 	ensure(ch, return);
-	printd(("%s: %s: %p free ch->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, ch, ch->id));
+	printd(("%s: %s: %p free ch->id = %ld\n", DRV_NAME, __FUNCTION__, ch, ch->id));
 	spin_lock_irqsave(&ch->lock, flags);
 	{
 		assure(!ch->cr.cr);
-		/*
-		   detach from call reference 
-		 */
+		/* 
+		   detach from call reference */
 		if (ch->cr.cr) {
-			/*
+			/* 
 			   we are currently engaged in a call on the circuit. This only occurs when 
-			   we are removing with force.  Free the call reference. 
-			 */
+			   we are removing with force.  Free the call reference. */
 			isdn_free_cr(ch->cr.cr);
 		}
 		assure(!ch->bind.mgm);
-		/*
-		   force unbind from listening management stream 
-		 */
+		/* 
+		   force unbind from listening management stream */
 		if ((cc = xchg(&ch->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ch->bind.mnt);
-		/*
-		   force unbind from listening maintenance stream 
-		 */
+		/* 
+		   force unbind from listening maintenance stream */
 		if ((cc = xchg(&ch->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ch->bind.xry);
-		/*
-		   force unbind from listening xray stream 
-		 */
+		/* 
+		   force unbind from listening xray stream */
 		if ((cc = xchg(&ch->bind.xry, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ch->bind.icc);
-		/*
-		   force unbind from listening call control stream 
-		 */
+		/* 
+		   force unbind from listening call control stream */
 		if ((cc = xchg(&ch->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ch->bind.ogc);
-		/*
-		   force unbind from outgoing call control streams 
-		 */
+		/* 
+		   force unbind from outgoing call control streams */
 		while ((cc = ch->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -15467,9 +15214,8 @@ isdn_free_ch(struct ch *ch)
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   remove from facility group idle list 
-		 */
+		/* 
+		   remove from facility group idle list */
 		if (ch->idle.fg) {
 			if ((*ch->idle.prev = ch->idle.next))
 				ch->idle.next->idle.prev = ch->idle.prev;
@@ -15478,9 +15224,8 @@ isdn_free_ch(struct ch *ch)
 			fg_put(xchg(&ch->idle.fg, NULL));
 			ch_put(ch);
 		}
-		/*
-		   remove from facility group list 
-		 */
+		/* 
+		   remove from facility group list */
 		if (ch->fg.fg) {
 			if ((*ch->fg.prev = ch->fg.next))
 				ch->fg.next->fg.prev = ch->fg.prev;
@@ -15490,9 +15235,8 @@ isdn_free_ch(struct ch *ch)
 			ensure(atomic_read(&ch->refcnt) > 1, ch_get(ch));
 			ch_put(ch);
 		}
-		/*
-		   remove from transmission group list 
-		 */
+		/* 
+		   remove from transmission group list */
 		if (ch->tg.tg) {
 			if ((*ch->tg.prev = ch->tg.next))
 				ch->tg.next->tg.prev = ch->tg.prev;
@@ -15502,9 +15246,8 @@ isdn_free_ch(struct ch *ch)
 			ensure(atomic_read(&ch->refcnt) > 1, ch_get(ch));
 			ch_put(ch);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*ch->prev = ch->next))
 			ch->next->prev = ch->prev;
 		ch->next = NULL;
@@ -15513,12 +15256,11 @@ isdn_free_ch(struct ch *ch)
 		ch_put(ch);
 		assure(master.ch.numb > 0);
 		master.ch.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&ch->refcnt) != 1) {
-			__printd(("%s: %p: ERROR: ch lingering reference count = %d\n",
-				  ISDN_DRV_NAME, ch, atomic_read(&ch->refcnt)));
+			__printd(("%s: %p: ERROR: ch lingering reference count = %d\n", DRV_NAME,
+				  ch, atomic_read(&ch->refcnt)));
 			atomic_set(&ch->refcnt, 1);
 		}
 	}
@@ -15542,8 +15284,8 @@ ch_put(struct ch *ch)
 		assure(atomic_read(&ch->refcnt) > 1);
 		if (atomic_dec_and_test(&ch->refcnt)) {
 			kmem_cache_free(isdn_ch_cachep, ch);
-			printd(("%s: %s: %p: deallocated ch structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, ch));
+			printd(("%s: %s: %p: deallocated ch structure\n", DRV_NAME, __FUNCTION__,
+				ch));
 		}
 	}
 }
@@ -15578,11 +15320,11 @@ STATIC struct tg *
 isdn_alloc_tg(ulong id, struct eg *eg)
 {
 	struct tg *tg, **tgp;
-	printd(("%s: %s: create tg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create tg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((tg = kmem_cache_alloc(isdn_tg_cachep, SLAB_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
 		tg_get(tg);	/* first get */
-		spin_lock_init(&tg->lock); /* "tg-lock" */
+		spin_lock_init(&tg->lock);	/* "tg-lock" */
 		if (tg->proto.popt & ISDN_POPT_USER) {
 			switch (eg->proto.pvar & SS7_PVAR_MASK) {
 			default:
@@ -15604,9 +15346,8 @@ isdn_alloc_tg(ulong id, struct eg *eg)
 				break;
 			}
 		}
-		/*
-		   place in master list (ascending id) 
-		 */
+		/* 
+		   place in master list (ascending id) */
 		tg->id = tg_get_id(id);
 		for (tgp = &master.tg.list; *tgp && (*tgp)->id < id; tgp = &(*tgp)->next) ;
 		if ((tg->next = *tgp))
@@ -15614,21 +15355,19 @@ isdn_alloc_tg(ulong id, struct eg *eg)
 		tg->prev = tgp;
 		*tgp = tg_get(tg);
 		master.tg.numb++;
-		/*
-		   place in equipment group list (any order) 
-		 */
+		/* 
+		   place in equipment group list (any order) */
 		tg->eg.eg = eg_get(eg);
 		if ((tg->eg.next = eg->tg.list))
 			tg->eg.next->eg.prev = &tg->eg.next;
 		tg->eg.prev = &eg->tg.list;
 		eg->tg.list = tg_get(tg);
 		eg->tg.numb++;
-		/*
-		   reset states 
-		 */
+		/* 
+		   reset states */
 		tg->g_state = CMS_IDLE;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate tg structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate tg structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (tg);
 }
@@ -15638,69 +15377,60 @@ isdn_free_tg(struct tg *tg)
 	struct cc *cc;
 	psw_t flags;
 	ensure(tg, return);
-	printd(("%s: %s: %p free tg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, tg, tg->id));
+	printd(("%s: %s: %p free tg->id = %ld\n", DRV_NAME, __FUNCTION__, tg, tg->id));
 	spin_lock_irqsave(&tg->lock, flags);
 	{
-		/*
-		   free all circuits 
-		 */
+		/* 
+		   free all circuits */
 		assure(!tg->ch.list);	/* only happens under force */
 		while (tg->ch.list)
 			isdn_free_ch(tg->ch.list);
-		/*
-		   free all d channels 
-		 */
+		/* 
+		   free all d channels */
 		assure(!tg->dc.list);	/* only happens under force */
 		while (tg->dc.list)
 			isdn_free_dc(tg->dc.list);
-		/*
-		   remove from active group management action 
-		 */
+		/* 
+		   remove from active group management action */
 		if ((cc = tg->mgm.cc)) {
-			/*
+			/* 
 			   We are currently engaged in management on the circuit group.  This only
 			   occurs when we are removing with force.  We must M_HANGUP the stream so
-			   that it knows not to expect anything more from us. 
-			 */
+			   that it knows not to expect anything more from us. */
 			m_error(NULL, cc, EPIPE);
 			tg_set_m_state(tg, cc, CMS_IDLE);
 			cc_set_state(cc, CCS_UNUSABLE);
 		}
-		/*
-		   force unbind listening managment streams 
-		 */
+		/* 
+		   force unbind listening managment streams */
 		if ((cc = xchg(&tg->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening maintenance streams 
-		 */
+		/* 
+		   force unbind listening maintenance streams */
 		if ((cc = xchg(&tg->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening xray streams 
-		 */
+		/* 
+		   force unbind listening xray streams */
 		if ((cc = xchg(&tg->bind.xry, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening call control streams 
-		 */
+		/* 
+		   force unbind listening call control streams */
 		if ((cc = xchg(&tg->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind all outgoing call control streams 
-		 */
+		/* 
+		   force unbind all outgoing call control streams */
 		while ((cc = tg->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -15713,9 +15443,8 @@ isdn_free_tg(struct tg *tg)
 			cc_put(cc);
 		}
 		if (tg->eg.eg) {
-			/*
-			   remove from equipment group list 
-			 */
+			/* 
+			   remove from equipment group list */
 			if ((*tg->eg.prev = tg->eg.next))
 				tg->eg.next->eg.prev = tg->eg.prev;
 			tg->eg.next = NULL;
@@ -15724,9 +15453,8 @@ isdn_free_tg(struct tg *tg)
 			ensure(atomic_read(&tg->refcnt) > 1, tg_get(tg));
 			tg_put(tg);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*tg->prev = tg->next))
 			tg->next->prev = tg->prev;
 		tg->next = NULL;
@@ -15735,12 +15463,11 @@ isdn_free_tg(struct tg *tg)
 		tg_put(tg);
 		assure(master.tg.numb > 0);
 		master.tg.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&tg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: tg lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, tg, atomic_read(&tg->refcnt)));
+				  DRV_NAME, __FUNCTION__, tg, atomic_read(&tg->refcnt)));
 			atomic_set(&tg->refcnt, 1);
 		}
 	}
@@ -15764,8 +15491,8 @@ tg_put(struct tg *tg)
 		assure(atomic_read(&tg->refcnt) > 1);
 		if (atomic_dec_and_test(&tg->refcnt)) {
 			kmem_cache_free(isdn_tg_cachep, tg);
-			printd(("%s: %s: %p: deallocated tg structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, tg));
+			printd(("%s: %s: %p: deallocated tg structure\n", DRV_NAME, __FUNCTION__,
+				tg));
 		}
 	}
 }
@@ -15800,11 +15527,11 @@ STATIC struct fg *
 isdn_alloc_fg(ulong id, struct eg *eg)
 {
 	struct fg *fg, **fgp;
-	printd(("%s: %s: create fg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create fg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((fg = kmem_cache_alloc(isdn_fg_cachep, SLAB_ATOMIC))) {
 		bzero(fg, sizeof(*fg));
 		fg_get(fg);	/* first get */
-		spin_lock_init(&fg->lock); /* "fg-lock" */
+		spin_lock_init(&fg->lock);	/* "fg-lock" */
 		fg->proto = eg->proto;	/* as a default */
 		if (fg->proto.popt & ISDN_POPT_USER) {
 			switch (fg->proto.pvar & SS7_PVAR_MASK) {
@@ -15827,9 +15554,8 @@ isdn_alloc_fg(ulong id, struct eg *eg)
 				break;
 			}
 		}
-		/*
-		   add to master list (ascending id order) 
-		 */
+		/* 
+		   add to master list (ascending id order) */
 		fg->id = fg_get_id(id);
 		for (fgp = &master.fg.list; *fgp && (*fgp)->id < id; fgp = &(*fgp)->next) ;
 		if ((fg->next = *fgp))
@@ -15837,9 +15563,8 @@ isdn_alloc_fg(ulong id, struct eg *eg)
 		fg->prev = fgp;
 		*fgp = fg_get(fg);
 		master.fg.numb++;
-		/*
-		   add to equipment group list (any order) 
-		 */
+		/* 
+		   add to equipment group list (any order) */
 		fg->eg.eg = eg_get(eg);
 		if ((fg->eg.next = eg->fg.list))
 			fg->eg.next->eg.prev = &fg->eg.next;
@@ -15847,7 +15572,7 @@ isdn_alloc_fg(ulong id, struct eg *eg)
 		eg->fg.list = fg_get(fg);
 		eg->fg.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate fg structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate fg structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (fg);
 }
@@ -15857,63 +15582,55 @@ isdn_free_fg(struct fg *fg)
 	struct cc *cc;
 	psw_t flags;
 	ensure(fg, return);
-	printd(("%s: %s: %p free fg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, fg, fg->id));
+	printd(("%s: %s: %p free fg->id = %ld\n", DRV_NAME, __FUNCTION__, fg, fg->id));
 	spin_lock_irqsave(&fg->lock, flags);
 	{
-		/*
-		   free all call references 
-		 */
+		/* 
+		   free all call references */
 		assure(!fg->cr.list);	/* only happens under force */
 		while (fg->cr.list)
 			isdn_free_cr(fg->cr.list);
-		/*
-		   free all circuits 
-		 */
+		/* 
+		   free all circuits */
 		assure(!fg->ch.list);	/* only happens under force */
 		while (fg->ch.list)
 			isdn_free_ch(fg->ch.list);
 		assure(fg->idle.list == NULL);
-		/*
-		   free all d channels 
-		 */
+		/* 
+		   free all d channels */
 		assure(!fg->dc.list);	/* only happens under force */
 		while (fg->dc.list)
 			isdn_free_dc(fg->dc.list);
-		/*
-		   force unbind listening managment streams 
-		 */
+		/* 
+		   force unbind listening managment streams */
 		if ((cc = xchg(&fg->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening maintenance streams 
-		 */
+		/* 
+		   force unbind listening maintenance streams */
 		if ((cc = xchg(&fg->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening xray streams 
-		 */
+		/* 
+		   force unbind listening xray streams */
 		if ((cc = xchg(&fg->bind.xry, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening call control streams 
-		 */
+		/* 
+		   force unbind listening call control streams */
 		if ((cc = xchg(&fg->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind all outgoing call control streams 
-		 */
+		/* 
+		   force unbind all outgoing call control streams */
 		while ((cc = fg->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -15926,9 +15643,8 @@ isdn_free_fg(struct fg *fg)
 			cc_put(cc);
 		}
 		if (fg->eg.eg) {
-			/*
-			   remove from equipment group list 
-			 */
+			/* 
+			   remove from equipment group list */
 			if ((*fg->eg.prev = fg->eg.next))
 				fg->eg.next->eg.prev = fg->eg.prev;
 			fg->eg.next = NULL;
@@ -15937,9 +15653,8 @@ isdn_free_fg(struct fg *fg)
 			ensure(atomic_read(&fg->refcnt) > 1, fg_get(fg));
 			fg_put(fg);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*fg->prev = fg->next))
 			fg->next->prev = fg->prev;
 		fg->next = NULL;
@@ -15948,12 +15663,11 @@ isdn_free_fg(struct fg *fg)
 		fg_put(fg);
 		assure(master.fg.numb > 0);
 		master.fg.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&fg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: fg lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, fg, atomic_read(&fg->refcnt)));
+				  DRV_NAME, __FUNCTION__, fg, atomic_read(&fg->refcnt)));
 			atomic_set(&fg->refcnt, 1);
 		}
 	}
@@ -15977,8 +15691,8 @@ fg_put(struct fg *fg)
 		assure(atomic_read(&fg->refcnt) > 1);
 		if (atomic_dec_and_test(&fg->refcnt)) {
 			kmem_cache_free(isdn_fg_cachep, fg);
-			printd(("%s: %s: %p: deallocated fg structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, fg));
+			printd(("%s: %s: %p: deallocated fg structure\n", DRV_NAME, __FUNCTION__,
+				fg));
 		}
 	}
 }
@@ -16013,11 +15727,11 @@ STATIC struct eg *
 isdn_alloc_eg(ulong id, struct xg *xg)
 {
 	struct eg *eg, **egp;
-	printd(("%s: %s: create eg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create eg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((eg = kmem_cache_alloc(isdn_eg_cachep, SLAB_ATOMIC))) {
 		bzero(eg, sizeof(*eg));
 		eg_get(eg);	/* first get */
-		spin_lock_init(&eg->lock); /* "eg-lock" */
+		spin_lock_init(&eg->lock);	/* "eg-lock" */
 		eg->proto = xg->proto;	/* as a default */
 		if (eg->proto.popt & ISDN_POPT_USER) {
 			switch (eg->proto.pvar & SS7_PVAR_MASK) {
@@ -16040,9 +15754,8 @@ isdn_alloc_eg(ulong id, struct xg *xg)
 				break;
 			}
 		}
-		/*
-		   add to master list (ascending id order) 
-		 */
+		/* 
+		   add to master list (ascending id order) */
 		eg->id = eg_get_id(id);
 		for (egp = &master.eg.list; *egp && (*egp)->id < id; egp = &(*egp)->next) ;
 		if ((eg->next = *egp))
@@ -16050,9 +15763,8 @@ isdn_alloc_eg(ulong id, struct xg *xg)
 		eg->prev = egp;
 		*egp = eg_get(eg);
 		master.eg.numb++;
-		/*
-		   add to exchange group list 
-		 */
+		/* 
+		   add to exchange group list */
 		eg->xg.xg = xg_get(xg);
 		if ((eg->xg.next = xg->eg.list))
 			eg->xg.next->xg.prev = &eg->xg.next;
@@ -16060,7 +15772,7 @@ isdn_alloc_eg(ulong id, struct xg *xg)
 		xg->eg.list = eg_get(eg);
 		xg->eg.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate eg structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate eg structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (eg);
 }
@@ -16070,56 +15782,49 @@ isdn_free_eg(struct eg *eg)
 	struct cc *cc;
 	psw_t flags;
 	ensure(eg, return);
-	printd(("%s: %s: %p free eg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, eg, eg->id));
+	printd(("%s: %s: %p free eg->id = %ld\n", DRV_NAME, __FUNCTION__, eg, eg->id));
 	spin_lock_irqsave(&eg->lock, flags);
 	{
-		/*
-		   free all transmission groups 
-		 */
+		/* 
+		   free all transmission groups */
 		assure(!eg->tg.list);	/* only under force */
 		while (eg->tg.list)
 			isdn_free_tg(eg->tg.list);
-		/*
-		   free all facility groups 
-		 */
+		/* 
+		   free all facility groups */
 		assure(!eg->fg.list);	/* only under force */
 		while (eg->fg.list)
 			isdn_free_fg(eg->fg.list);
-		/*
-		   force unbind from listening management stream 
-		 */
+		/* 
+		   force unbind from listening management stream */
 		if ((cc = xchg(&eg->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening maintennce stream 
-		 */
+		/* 
+		   force unbind from listening maintennce stream */
 		if ((cc = xchg(&eg->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening xray stream 
-		 */
+		/* 
+		   force unbind from listening xray stream */
 		if ((cc = xchg(&eg->bind.xry, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening call control stream 
-		 */
+		/* 
+		   force unbind from listening call control stream */
 		if ((cc = xchg(&eg->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from outgoing call control streams 
-		 */
+		/* 
+		   force unbind from outgoing call control streams */
 		while ((cc = eg->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -16131,9 +15836,8 @@ isdn_free_eg(struct eg *eg)
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   remove from exchange group list 
-		 */
+		/* 
+		   remove from exchange group list */
 		if (eg->xg.xg) {
 			if ((*eg->xg.prev = eg->xg.next))
 				eg->xg.next->xg.prev = eg->xg.prev;
@@ -16143,9 +15847,8 @@ isdn_free_eg(struct eg *eg)
 			ensure(atomic_read(&eg->refcnt) > 1, eg_get(eg));
 			eg_put(eg);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*eg->prev = eg->next))
 			eg->next->prev = eg->prev;
 		eg->next = NULL;
@@ -16154,12 +15857,11 @@ isdn_free_eg(struct eg *eg)
 		eg_put(eg);
 		assure(master.eg.numb > 0);
 		master.eg.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&eg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: eg lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, eg, atomic_read(&eg->refcnt)));
+				  DRV_NAME, __FUNCTION__, eg, atomic_read(&eg->refcnt)));
 			atomic_set(&eg->refcnt, 1);
 		}
 	}
@@ -16182,8 +15884,8 @@ eg_put(struct eg *eg)
 		assure(atomic_read(&eg->refcnt) > 1);
 		if (atomic_dec_and_test(&eg->refcnt)) {
 			kmem_cache_free(isdn_eg_cachep, eg);
-			printd(("%s: %s: %p: deallocated eg structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, eg));
+			printd(("%s: %s: %p: deallocated eg structure\n", DRV_NAME, __FUNCTION__,
+				eg));
 		}
 	}
 }
@@ -16219,11 +15921,11 @@ isdn_alloc_xg(ulong id)
 {
 	struct xg *xg, **xgp;
 	struct df *df = &master;
-	printd(("%s: %s: create xg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create xg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((xg = kmem_cache_alloc(isdn_xg_cachep, SLAB_ATOMIC))) {
 		bzero(xg, sizeof(*xg));
 		xg_get(xg);	/* first get */
-		spin_lock_init(&xg->lock); /* "xg-lock" */
+		spin_lock_init(&xg->lock);	/* "xg-lock" */
 		xg->proto = df->proto;	/* as a default */
 		if (xg->proto.popt & ISDN_POPT_USER) {
 			switch (xg->proto.pvar & SS7_PVAR_MASK) {
@@ -16246,9 +15948,8 @@ isdn_alloc_xg(ulong id)
 				break;
 			}
 		}
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		xg->id = xg_get_id(id);
 		for (xgp = &master.xg.list; *xgp && (*xgp)->id < id; xgp = &(*xgp)->next) ;
 		if ((xg->next = *xgp))
@@ -16257,11 +15958,10 @@ isdn_alloc_xg(ulong id)
 		*xgp = xg_get(xg);
 		master.xg.numb++;
 		todo(("Search I_LINKed DL for match\n"));
-		/*
-		   for now, make management establish XG before I_LINKing DL streams 
-		 */
+		/* 
+		   for now, make management establish XG before I_LINKing DL streams */
 	} else
-		printd(("%s: %s: ERROR: failed to allocate xg structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate xg structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (xg);
 }
@@ -16271,50 +15971,44 @@ isdn_free_xg(struct xg *xg)
 	struct cc *cc;
 	psw_t flags;
 	ensure(xg, return);
-	printd(("%s: %s: %p free xg->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, xg, xg->id));
+	printd(("%s: %s: %p free xg->id = %ld\n", DRV_NAME, __FUNCTION__, xg, xg->id));
 	spin_lock_irqsave(&xg->lock, flags);
 	{
-		/*
-		   freeing all equipment groups 
-		 */
+		/* 
+		   freeing all equipment groups */
 		assure(!xg->eg.list);	/* only under force */
 		while (xg->eg.list)
 			isdn_free_eg(xg->eg.list);
-		/*
-		   force unbind from listening management stream 
-		 */
+		/* 
+		   force unbind from listening management stream */
 		if ((cc = xchg(&xg->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening maintenance stream 
-		 */
+		/* 
+		   force unbind from listening maintenance stream */
 		if ((cc = xchg(&xg->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening xray stream 
-		 */
+		/* 
+		   force unbind from listening xray stream */
 		if ((cc = xchg(&xg->bind.xry, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening call control stream 
-		 */
+		/* 
+		   force unbind from listening call control stream */
 		if ((cc = xchg(&xg->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from outgoing call control streams 
-		 */
+		/* 
+		   force unbind from outgoing call control streams */
 		while ((cc = xg->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -16326,9 +16020,8 @@ isdn_free_xg(struct xg *xg)
 			cc_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*xg->prev = xg->next))
 			xg->next->prev = xg->prev;
 		xg->next = NULL;
@@ -16337,12 +16030,11 @@ isdn_free_xg(struct xg *xg)
 		xg_put(xg);
 		assure(master.xg.numb > 0);
 		master.xg.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&xg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: xg lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, xg, atomic_read(&xg->refcnt)));
+				  DRV_NAME, __FUNCTION__, xg, atomic_read(&xg->refcnt)));
 			atomic_set(&xg->refcnt, 1);
 		}
 	}
@@ -16365,8 +16057,8 @@ xg_put(struct xg *xg)
 		assure(atomic_read(&xg->refcnt) > 1);
 		if (atomic_dec_and_test(&xg->refcnt)) {
 			kmem_cache_free(isdn_xg_cachep, xg);
-			printd(("%s: %s: %p: deallocated xg structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, xg));
+			printd(("%s: %s: %p: deallocated xg structure\n", DRV_NAME, __FUNCTION__,
+				xg));
 		}
 	}
 }
@@ -16401,15 +16093,14 @@ STATIC struct dc *
 isdn_alloc_dc(ulong id, struct fg *fg, struct tg *tg)
 {
 	struct dc *dc;
-	printd(("%s: %s: create dc->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create dc->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((dc = kmem_cache_alloc(isdn_dc_cachep, SLAB_ATOMIC))) {
 		struct dc **dcp;
 		bzero(dc, sizeof(*dc));
 		dc_get(dc);	/* first get */
-		spin_lock_init(&dc->lock); /* "dc-lock" */
-		/*
-		   add to master list (ascending id order) 
-		 */
+		spin_lock_init(&dc->lock);	/* "dc-lock" */
+		/* 
+		   add to master list (ascending id order) */
 		dc->id = dc_get_id(id);
 		for (dcp = &master.dc.list; *dcp && (*dcp)->id < id; dcp = &(*dcp)->next) ;
 		if ((dc->next = *dcp))
@@ -16417,18 +16108,16 @@ isdn_alloc_dc(ulong id, struct fg *fg, struct tg *tg)
 		dc->prev = dcp;
 		*dcp = dc_get(dc);
 		master.dc.numb++;
-		/*
-		   add to facility group list 
-		 */
+		/* 
+		   add to facility group list */
 		dc->fg.fg = fg_get(fg);
 		if ((dc->fg.next = fg->dc.list))
 			dc->fg.next->fg.prev = &dc->fg.next;
 		dc->fg.prev = &fg->dc.list;
 		fg->dc.list = dc_get(dc);
 		fg->dc.numb++;
-		/*
-		   add to transmission group list 
-		 */
+		/* 
+		   add to transmission group list */
 		dc->tg.tg = tg_get(tg);
 		if ((dc->tg.next = tg->dc.list))
 			dc->tg.next->tg.prev = &dc->tg.next;
@@ -16436,7 +16125,7 @@ isdn_alloc_dc(ulong id, struct fg *fg, struct tg *tg)
 		tg->dc.list = dc_get(dc);
 		tg->dc.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to alllocated dc structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to alllocated dc structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (dc);
 }
@@ -16445,21 +16134,19 @@ isdn_free_dc(struct dc *dc)
 {
 	psw_t flags;
 	ensure(dc, return);
-	printd(("%s: %s: %p free dc->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, dc, dc->id));
+	printd(("%s: %s: %p free dc->id = %ld\n", DRV_NAME, __FUNCTION__, dc, dc->id));
 	spin_lock_irqsave(&dc->lock, flags);
 	{
 #if 0
-		/*
-		   free all data links 
-		 */
+		/* 
+		   free all data links */
 		assure(!dc->dl.list);	/* only happens under force */
 		while (dc->dl.list)
 			isdn_free_dl(dc->dl.list);
 #endif
 		if (dc->tg.tg) {
-			/*
-			   remove from transmission group list 
-			 */
+			/* 
+			   remove from transmission group list */
 			if ((*dc->tg.prev = dc->tg.next))
 				dc->tg.next->tg.prev = dc->tg.prev;
 			dc->tg.next = NULL;
@@ -16469,9 +16156,8 @@ isdn_free_dc(struct dc *dc)
 			dc_put(dc);
 		}
 		if (dc->fg.fg) {
-			/*
-			   remove from facility group list 
-			 */
+			/* 
+			   remove from facility group list */
 			if ((*dc->fg.prev = dc->fg.next))
 				dc->fg.next->fg.prev = dc->fg.prev;
 			dc->fg.next = NULL;
@@ -16480,9 +16166,8 @@ isdn_free_dc(struct dc *dc)
 			ensure(atomic_read(&dc->refcnt) > 1, dc_get(dc));
 			dc_put(dc);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*dc->prev = dc->next))
 			dc->next->prev = dc->prev;
 		dc->next = NULL;
@@ -16491,12 +16176,11 @@ isdn_free_dc(struct dc *dc)
 		dc_put(dc);
 		assure(master.dc.numb > 0);
 		master.dc.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&dc->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: dc lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, dc, atomic_read(&dc->refcnt)));
+				  DRV_NAME, __FUNCTION__, dc, atomic_read(&dc->refcnt)));
 			atomic_set(&dc->refcnt, 1);
 		}
 	}
@@ -16520,8 +16204,8 @@ dc_put(struct dc *dc)
 		assure(atomic_read(&dc->refcnt) > 1);
 		if (atomic_dec_and_test(&dc->refcnt)) {
 			kmem_cache_free(isdn_dc_cachep, dc);
-			printd(("%s: %s: %p: deallocated dc structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, dc));
+			printd(("%s: %s: %p: deallocated dc structure\n", DRV_NAME, __FUNCTION__,
+				dc));
 		}
 	}
 }
@@ -16556,13 +16240,13 @@ STATIC struct dl *
 isdn_alloc_dl(queue_t *q, struct dl **mpp, ulong index, cred_t *crp)
 {
 	struct dl *dl;
-	printd(("%s: %s: create dl index = %lu\n", ISDN_DRV_NAME, __FUNCTION__, index));
+	printd(("%s: %s: create dl index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((dl = kmem_cache_alloc(isdn_dl_cachep, SLAB_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		dl_get(dl);	/* first get */
 		dl->u.mux.index = index;
 		dl->cred = *crp;
-		spin_lock_init(&dl->qlock); /* "dl-queue-lock" */
+		spin_lock_init(&dl->qlock);	/* "dl-queue-lock" */
 		(dl->iq = RD(q))->q_ptr = dl_get(dl);
 		(dl->oq = WR(q))->q_ptr = dl_get(dl);
 		dl->o_prim = dl_w_prim;
@@ -16572,17 +16256,16 @@ isdn_alloc_dl(queue_t *q, struct dl **mpp, ulong index, cred_t *crp)
 		dl->i_state = LMI_UNUSABLE;
 		dl->i_style = LMI_STYLE1;
 		dl->i_version = 1;
-		spin_lock_init(&dl->lock); /* "dl-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&dl->lock);	/* "dl-lock" */
+		/* 
+		   place in master list */
 		if ((dl->next = *mpp))
 			dl->next->prev = &dl->next;
 		dl->prev = mpp;
 		*mpp = dl_get(dl);
 		master.dl.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate dl structure %lu\n", ISDN_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate dl structure %lu\n", DRV_NAME,
 			__FUNCTION__, index));
 	return (dl);
 }
@@ -16590,9 +16273,8 @@ STATIC void
 isdn_link_dl(ulong id, struct dl *dl, struct dc *dc)
 {
 	dl->id = dl_get_id(id);
-	/*
-	   link to facility group 
-	 */
+	/* 
+	   link to facility group */
 	if ((dl->dc.next = dc->dl.list))
 		dl->dc.next->dc.prev = &dl->dc.next;
 	dl->dc.prev = &dc->dl.list;
@@ -16605,9 +16287,8 @@ isdn_unlink_dl(struct dl *dl)
 {
 	struct df *df = &master;
 	dl->id = 0;
-	/*
-	   unlink from d channel 
-	 */
+	/* 
+	   unlink from d channel */
 	if (dl->dc.dc) {
 		if ((*dl->dc.prev = dl->dc.next))
 			dl->dc.next->dc.prev = dl->dc.prev;
@@ -16624,23 +16305,19 @@ isdn_free_dl(queue_t *q)
 	struct dl *dl = DL_PRIV(q);
 	psw_t flags;
 	ensure(dl, return);
-	printd(("%s: %s: %p free dl index = %lu\n", ISDN_DRV_NAME, __FUNCTION__, dl,
-		dl->u.mux.index));
+	printd(("%s: %s: %p free dl index = %lu\n", DRV_NAME, __FUNCTION__, dl, dl->u.mux.index));
 	spin_lock_irqsave(&dl->lock, flags);
 	{
-		/*
-		   flushing buffers 
-		 */
+		/* 
+		   flushing buffers */
 		ss7_unbufcall((str_t *) dl);
 		flushq(dl->iq, FLUSHALL);
 		flushq(dl->oq, FLUSHALL);
-		/*
-		   unlink 
-		 */
+		/* 
+		   unlink */
 		isdn_unlink_dl(dl);
-		/*
-		   remote from master list 
-		 */
+		/* 
+		   remote from master list */
 		if ((*dl->prev = dl->next))
 			dl->next->prev = dl->prev;
 		dl->next = NULL;
@@ -16649,19 +16326,17 @@ isdn_free_dl(queue_t *q)
 		dl_put(dl);
 		assure(master.dl.numb > 0);
 		master.dl.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&dl->refcnt) > 1, dl_get(dl));
 		dl_put(xchg(&dl->iq->q_ptr, NULL));
 		ensure(atomic_read(&dl->refcnt) > 1, dl_get(dl));
 		dl_put(xchg(&dl->oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&dl->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: dl lingering reference count = %d\n",
-				  ISDN_DRV_NAME, __FUNCTION__, dl, atomic_read(&dl->refcnt)));
+				  DRV_NAME, __FUNCTION__, dl, atomic_read(&dl->refcnt)));
 			atomic_set(&dl->refcnt, 1);
 		}
 	}
@@ -16684,8 +16359,8 @@ dl_put(struct dl *dl)
 		assure(atomic_read(&dl->refcnt) > 1);
 		if (atomic_dec_and_test(&dl->refcnt)) {
 			kmem_cache_free(isdn_dl_cachep, dl);
-			printd(("%s: %s: %p: deallocated dl structure\n", ISDN_DRV_NAME,
-				__FUNCTION__, dl));
+			printd(("%s: %s: %p: deallocated dl structure\n", DRV_NAME, __FUNCTION__,
+				dl));
 		}
 	}
 }
@@ -16709,78 +16384,142 @@ dl_get_id(ulong id)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int isdn_initialized = 0;
-STATIC void
-isdn_init(void)
-{
-	int err, mindex;
-	cmn_err(CE_NOTE, ISDN_BANNER);	/* console splash */
-	if ((err = isdn_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", ISDN_DRV_NAME);
-		isdn_initialized = err;
-		return;
-	}
-	for (mindex = 0; mindex < ISDN_CMAJORS; mindex++) {
-		if ((err =
-		     lis_register_strdev(isdn_majors[mindex], &isdn_info, ISDN_CMINORS,
-					 ISDN_DRV_NAME)) < 0) {
-			if (!mindex) {
-				cmn_err(CE_PANIC, "%s: could not register 1'st major %d",
-					ISDN_DRV_NAME, isdn_majors[mindex]);
-				isdn_term_caches();
-				isdn_initialized = err;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: could not register %d'th major", ISDN_DRV_NAME,
-				mindex + 1);
-			isdn_majors[mindex] = 0;
-		} else
-			isdn_majors[mindex] = err;
-	}
-	spin_lock_init(&isdn_lock); /* "isdn-open-list-lock" */
-	isdn_initialized = 1;
-	return;
-}
-STATIC void
-isdn_terminate(void)
-{
-	int err, mindex;
-	for (mindex = 0; mindex < ISDN_CMAJORS; mindex++) {
-		if (isdn_majors[mindex]) {
-			if ((err = lis_unregister_strdev(isdn_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: could not unregister major %d\n",
-					ISDN_DRV_NAME, isdn_majors[mindex]);
-			else
-				isdn_majors[mindex] = 0;
-		}
-	}
-	isdn_term_caches();
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the ISDN driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw isdn_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &isdn_info,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+isdn_register_strdev(major_t major)
 {
-	isdn_init();
-	if (isdn_initialized < 0)
-		return isdn_initialized;
+	int err;
+	if ((err = register_strdev(&isdn_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+isdn_unregister_strdev(major_t major)
 {
-	isdn_terminate();
+	int err;
+	if ((err = unregister_strdev(&isdn_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+isdn_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &isdn_info, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+isdn_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+isdnterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (isdn_majors[mindex]) {
+			if ((err = isdn_unregister_strdev(isdn_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					isdn_majors[mindex]);
+			if (mindex)
+				isdn_majors[mindex] = 0;
+		}
+	}
+	if ((err = isdn_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
+
+MODULE_STATIC int __init
+isdninit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = isdn_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		isdnterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = isdn_register_strdev(isdn_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					isdn_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				isdnterminate();
+				return (err);
+			}
+		}
+		if (isdn_majors[mindex] == 0)
+			isdn_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(isdn_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = isdn_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(isdninit);
+module_exit(isdnterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:31 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $";
 
 #include "compat.h"
 
@@ -69,7 +69,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"
@@ -182,8 +182,7 @@ daed_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct str *str;
-		/* 
-		   test for multiple push */
+		/* test for multiple push */
 		for (str = daed_list; str; str = str->next) {
 			if (str->u.dev.cmajor == cmajor && str->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -194,6 +193,7 @@ daed_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			MOD_DEC_USE_COUNT;
 			return (ENOMEM);
 		}
+		qprocson(q);
 		return (0);
 	}
 	MOD_DEC_USE_COUNT;

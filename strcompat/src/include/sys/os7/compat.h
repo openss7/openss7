@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.2 2004/08/27 00:53:12 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.3 2004/08/29 20:25:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 00:53:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:01 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -65,7 +65,7 @@
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	ifdef MODVERSIONS
 #	    include <linux/modversions.h>
-#	endif
+#	endif			/* MODVERSIONS */
 #	include <linux/module.h>
 #	include <linux/modversions.h>
 #	ifndef __GENKSYMS__
@@ -74,17 +74,18 @@
 #	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
 #		include <sys/streams/modversions.h>
 #	    endif
-#	endif
+#	endif			/* __GENKSYMS__ */
 #	include <linux/init.h>
-#   else
+#   else			/* HAVE_SYS_LIS_MODULE_H */
 #	include <sys/LiS/module.h>
-#   endif
-#endif
+#   endif			/* HAVE_SYS_LIS_MODULE_H */
+#endif				/* LINUX */
 
 #ifdef LINUX
 #include <linux/errno.h>
 #include <linux/types.h>
 #include <linux/interrupt.h>
+#include <linux/kdev_t.h>
 #endif				/* LINUX */
 
 #include <sys/stream.h>
@@ -96,19 +97,32 @@
 #ifdef LFS
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
-#endif
+#endif				/* LFS */
 
 #ifdef LIS
 #include <sys/osif.h>
 typedef void (*bufcall_fnc_t) (long);
 #ifdef LIS_2_12
 #define INT int
-#else
+#else				/* LIS_2_12 */
 #define INT void
-#endif
-#else
+#endif				/* LIS_2_12 */
+#else				/* LIS */
 #define INT int
-#endif
+#endif				/* LIS */
+
+#ifndef tid_t
+typedef int tid_t;
+#define tid_t tid_t
+#endif				/* tid_t */
+
+/* minor device number range */
+#if defined LIS
+#define NMINORS		MINORMASK	/* really 255 for LiS */
+#elif defined LFS
+#define NMINORS		((1UL<<16)-1)	/* really big for LFS */
+#else
+#define NMINORS		((1UL<<8)-1)	/* be conservative for others */
 #endif
 
 #include "debug.h"		/* generic debugging macros */
@@ -121,14 +135,17 @@ typedef void (*bufcall_fnc_t) (long);
 
 //#ifdef LINUX
 //#include <linux/interrupt.h>
-//#include "bufpool.h"		/* generic buffer pooling */
+//#include "bufpool.h"          /* generic buffer pooling */
 //#endif
 
 #ifdef LINUX
 #ifdef MODULE
 #define MODULE_STATIC STATIC
-#else				/* LINUX */
+#else				/* MODULE */
 #define MODULE_STATIC
+#endif				/* MODULE */
+#else				/* LINUX */
+#define MODULE_STATIC STATIC
 #endif				/* LINUX */
 
 #endif				/* __LOCAL_COMPAT_H__ */

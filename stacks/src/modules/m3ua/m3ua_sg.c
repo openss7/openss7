@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.2 2004/08/26 23:37:57 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.3 2004/08/29 20:25:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2004/08/26 23:37:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.3  2004/08/29 20:25:21  brian
+ - Updates to driver registration for Linux Fast-STREAMS.
+
  Revision 0.9.2.2  2004/08/26 23:37:57  brian
  - Converted for use with Linux Fast-STREAMS.
 
@@ -53,7 +56,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $";
 
 #include "compat.h"
 
@@ -76,7 +79,7 @@ MODULE_DESCRIPTION(M3UA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M3UA_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M3UA_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef M3UA_DEBUG
@@ -92,12 +95,8 @@ static int m3ua_debug = 2;
 #define M3UA_DRV_NAME		CONFIG_STREAMS_M3UA_NAME
 #define M3UA_CMAJORS		CONFIG_STREAMS_M3UA_NMAJORS
 #define M3UA_CMAJOR_0		CONFIG_STREAMS_M3UA_MAJOR
+#define M3UA_UNITS		CONFIG_STREAMS_M3UA_NMINORS
 #endif
-
-#ifndef M3UA_CMAJOR_0
-#define M3UA_CMAJOR_0 248
-#endif
-#define M3UA_NMINOR 255
 
 /*
  *  =========================================================================
@@ -107,9 +106,20 @@ static int m3ua_debug = 2;
  *  =========================================================================
  */
 
+#define DRV_ID		M3UA_DRV_ID
+#define DRV_NAME	M3UA_DRV_NAME
+#define CMAJORS		M3UA_CMAJORS
+#define CMAJOR_0	M3UA_CMAJOR_0
+#define UNITS		M3UA_UNITS
+#ifdef MODULE
+#define DRV_BANNER	M3UA_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	M3UA_SPLASH
+#endif				/* MODULE */
+
 static struct module_info m3ua_minfo = {
-	0,				/* Module ID number */
-	"m3ua",				/* Module name */
+	DRV_ID,				/* Module ID number */
+	DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted */
 	512,				/* Max packet size accepted */
 	8 * 512,			/* Hi water mark */
@@ -177,7 +187,7 @@ static struct qinit t_winit = {
 	NULL				/* Statistics */
 };
 
-MODULE_STATIC struct streamtab m3ua_info = {
+MODULE_STATIC struct streamtab m3uainfo = {
 	&m3ua_rinit,			/* Upper read queue */
 	&m3ua_winit,			/* Upper write queue */
 	&t_rinit,			/* Lower read queue */
@@ -200,7 +210,8 @@ MODULE_STATIC struct streamtab m3ua_info = {
  *  =========================================================================
  */
 
-static int mtp_transfer_ind(m3ua_t * m3)
+static int
+mtp_transfer_ind(m3ua_t * m3)
 {
 }
 
@@ -212,40 +223,52 @@ static int mtp_transfer_ind(m3ua_t * m3)
  *  =========================================================================
  */
 
-static int t_conn_req(t_t * t)
+static int
+t_conn_req(t_t * t)
 {
 }
-static int t_conn_res(t_t * t)
+static int
+t_conn_res(t_t * t)
 {
 }
-static int t_discon_req(t_t * t)
+static int
+t_discon_req(t_t * t)
 {
 }
-static int t_data_req(t_t * t)
+static int
+t_data_req(t_t * t)
 {
 }
-static int t_exdata_req(t_t * t)
+static int
+t_exdata_req(t_t * t)
 {
 }
-static int t_info_req(t_t * t)
+static int
+t_info_req(t_t * t)
 {
 }
-static int t_bind_req(t_t * t)
+static int
+t_bind_req(t_t * t)
 {
 }
-static int t_unbind_req(t_t * t)
+static int
+t_unbind_req(t_t * t)
 {
 }
-static int t_unitdata_req(t_t * t)
+static int
+t_unitdata_req(t_t * t)
 {
 }
-static int t_optmgmt_req(t_t * t)
+static int
+t_optmgmt_req(t_t * t)
 {
 }
-static int t_ordrel_req(t_t * t)
+static int
+t_ordrel_req(t_t * t)
 {
 }
-static int t_addr_req(t_t * t)
+static int
+t_addr_req(t_t * t)
 {
 }
 
@@ -257,58 +280,76 @@ static int t_addr_req(t_t * t)
  *  =========================================================================
  */
 
-static int m3ua_error_ind(m3ua_t * m3)
+static int
+m3ua_error_ind(m3ua_t * m3)
 {
 }
-static int m3ua_notify_ind(m3ua_t * m3)
+static int
+m3ua_notify_ind(m3ua_t * m3)
 {
 }
-static int m3ua_data_ind(m3ua_t * m3)
+static int
+m3ua_data_ind(m3ua_t * m3)
 {
 }
-static int m3ua_duna_ind(m3ua_t * m3)
+static int
+m3ua_duna_ind(m3ua_t * m3)
 {
 }
-static int m3ua_dava_ind(m3ua_t * m3)
+static int
+m3ua_dava_ind(m3ua_t * m3)
 {
 }
-static int m3ua_duad_ind(m3ua_t * m3)
+static int
+m3ua_duad_ind(m3ua_t * m3)
 {
 }
-static int m3ua_scon_ind(m3ua_t * m3)
+static int
+m3ua_scon_ind(m3ua_t * m3)
 {
 }
-static int m3ua_dupu_ind(m3ua_t * m3)
+static int
+m3ua_dupu_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspup_ind(m3ua_t * m3)
+static int
+m3ua_aspup_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspdn_ind(m3ua_t * m3)
+static int
+m3ua_aspdn_ind(m3ua_t * m3)
 {
 }
-static int m3ua_asphb_ind(m3ua_t * m3)
+static int
+m3ua_asphb_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspup_ack_ind(m3ua_t * m3)
+static int
+m3ua_aspup_ack_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspdn_ack_ind(m3ua_t * m3)
+static int
+m3ua_aspdn_ack_ind(m3ua_t * m3)
 {
 }
-static int m3ua_asphb_ack_ind(m3ua_t * m3)
+static int
+m3ua_asphb_ack_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspac_ind(m3ua_t * m3)
+static int
+m3ua_aspac_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspia_ind(m3ua_t * m3)
+static int
+m3ua_aspia_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspac_ack_ind(m3ua_t * m3)
+static int
+m3ua_aspac_ack_ind(m3ua_t * m3)
 {
 }
-static int m3ua_aspia_ack_ind(m3ua_t * m3)
+static int
+m3ua_aspia_ack_ind(m3ua_t * m3)
 {
 }
 
@@ -323,7 +364,8 @@ static int m3ua_aspia_ack_ind(m3ua_t * m3)
 #define M3UA_DSTR_FIRST
 #define M3UA_DSTR_LAST
 
-static int mtp_transfer_req(m3ua_t * m3, mblk_t * mp)
+static int
+mtp_transfer_req(m3ua_t * m3, mblk_t *mp)
 {
 	mtp_transfer_t *m = (mtp_transfer_ind_t *) mp->b_rptr;
 	/* 
@@ -332,19 +374,23 @@ static int mtp_transfer_req(m3ua_t * m3, mblk_t * mp)
 	 *  and send it to the ASP on the appropriate stream.
 	 */
 }
-static int mtp_pause_req(m3ua_t * m3, mblk_t * mp)
+static int
+mtp_pause_req(m3ua_t * m3, mblk_t *mp)
 {
 	mtp_pause_t *m = (mtp_pause_ind_t *) mp->b_rptr;
 }
-static int mtp_resume_req(m3ua_t * m3, mblk_t * mp)
+static int
+mtp_resume_req(m3ua_t * m3, mblk_t *mp)
 {
 	mtp_resume_t *m = (mtp_resume_ind_t *) mp->b_rptr;
 }
-static int mtp_status_req(m3ua_t * m3, mblk_t * mp)
+static int
+mtp_status_req(m3ua_t * m3, mblk_t *mp)
 {
 	mtp_status_t *m = (mtp_status_ind_t *) mp->b_rptr;
 }
-static int mtp_restart_complete_req(m3ua_t * m3, mblk_t * mp)
+static int
+mtp_restart_complete_req(m3ua_t * m3, mblk_t *mp)
 {
 	mtp_restart_comp_t *m = (mtp_restart_comp_t *) mp->b_rptr;
 }
@@ -360,46 +406,60 @@ static void
  */
 #define M3UA_USTR_FIRST	    T_CONN_IND
 #define M3UA_USTR_LAST	    T_ADDR_ACK
-static void t_conn_ind(t_t * t, mblk_t * mp)
+    static void
+t_conn_ind(t_t * t, mblk_t *mp)
 {
 }
-static void t_conn_con(t_t * t, mblk_t * mp)
+static void
+t_conn_con(t_t * t, mblk_t *mp)
 {
 }
-static void t_discon_ind(t_t * t, mblk_t * mp)
+static void
+t_discon_ind(t_t * t, mblk_t *mp)
 {
 }
-static void t_data_ind(t_t * t, mblk_t * mp)
+static void
+t_data_ind(t_t * t, mblk_t *mp)
 {
 }
-static void t_exdata_ind(t_t * t, mblk_t * mp)
+static void
+t_exdata_ind(t_t * t, mblk_t *mp)
 {
 }
-static void t_info_ack(t_t * t, mblk_t * mp)
+static void
+t_info_ack(t_t * t, mblk_t *mp)
 {
 }
-static void t_bind_ack(t_t * t, mblk_t * mp)
+static void
+t_bind_ack(t_t * t, mblk_t *mp)
 {
 }
-static void t_error_ack(t_t * t, mblk_t * mp)
+static void
+t_error_ack(t_t * t, mblk_t *mp)
 {
 }
-static void t_ok_ack(t_t * t, mblk_t * mp)
+static void
+t_ok_ack(t_t * t, mblk_t *mp)
 {
 }
-static void t_unitdata_ind(t_t * t, mblk_t * mp)
+static void
+t_unitdata_ind(t_t * t, mblk_t *mp)
 {
 }
-static void t_uderror_ind(t_t * t, mblk_t * mp)
+static void
+t_uderror_ind(t_t * t, mblk_t *mp)
 {
 }
-static void t_optmgmt_ack(t_t * t, mblk_t * mp)
+static void
+t_optmgmt_ack(t_t * t, mblk_t *mp)
 {
 }
-static void t_nosup(t_t * t, mblk_t * mp)
+static void
+t_nosup(t_t * t, mblk_t *mp)
 {
 }
-static void t_addr_ack(t_t * t, mblk_t * mp)
+static void
+t_addr_ack(t_t * t, mblk_t *mp)
 {
 }
 static void (*m3ua_t_ops[]) (t_t *, mblk_t *) = {
@@ -427,7 +487,8 @@ static void (*m3ua_t_ops[]) (t_t *, mblk_t *) = {
  *  =========================================================================
  */
 
-static int m3ua_do_ioctl(m3ua_t * m3, int cmd, void *arg)
+static int
+m3ua_do_ioctl(m3ua_t * m3, int cmd, void *arg)
 {
 	int nr = _IOC_NR(cmd);
 
@@ -443,7 +504,8 @@ static int m3ua_do_ioctl(m3ua_t * m3, int cmd, void *arg)
 #define abs(x) ((x)<0 ? -(x):(x))
 #endif
 
-static inline int m3ua_m_ioctl(queue_t * q, mblk_t * mp)
+static inline int
+m3ua_m_ioctl(queue_t *q, mblk_t *mp)
 {
 	t_t *t;
 	m3ua_t *m3ua = (m3ua_t *) q->q_ptr;
@@ -537,7 +599,8 @@ static inline int m3ua_m_ioctl(queue_t * q, mblk_t * mp)
  *  =========================================================================
  */
 
-static inline int m3ua_m_proto(queue_t * q, mblk_t * mp)
+static inline int
+m3ua_m_proto(queue_t *q, mblk_t *mp)
 {
 	int err = EOPNOTSUPP;
 	m3ua_t *m3ua = (m3ua_t *) q->q_ptr;
@@ -555,7 +618,8 @@ static inline int m3ua_m_proto(queue_t * q, mblk_t * mp)
 	return err;
 }
 
-static inline int t_m_proto(queue_t * q, mblk_t * mp)
+static inline int
+t_m_proto(queue_t *q, mblk_t *mp)
 {
 	int err = EOPNOTSUPP;
 	t_t *t = (t_t *) q->q_ptr;
@@ -581,7 +645,8 @@ static inline int t_m_proto(queue_t * q, mblk_t * mp)
  *  =========================================================================
  */
 
-static inline int m3ua_m_data(queue_t * q, mblk_t * mp)
+static inline int
+m3ua_m_data(queue_t *q, mblk_t *mp)
 {
 	m3ua_t *m3 = (m3ua_t *) q->q_ptr;
 	trace();
@@ -589,7 +654,8 @@ static inline int m3ua_m_data(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-static inline int t_m_data(queue_t * q, mblk_t * mp)
+static inline int
+t_m_data(queue_t *q, mblk_t *mp)
 {
 	t_t *t = (t_t *) q->q_ptr;
 	trace();
@@ -613,7 +679,8 @@ static inline int t_m_data(queue_t * q, mblk_t * mp)
  *  ------------------------------------------
  */
 
-static void m3ua_wput(queue_t * q, mblk_t * mp)
+static void
+m3ua_wput(queue_t *q, mblk_t *mp)
 {
 	int err = EOPNOTSUPP;
 
@@ -671,7 +738,8 @@ static void m3ua_wput(queue_t * q, mblk_t * mp)
 	return;
 }
 
-static void m3ua_rsrv(queue_t * q)
+static void
+m3ua_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 	int err = EOPNOTSUPP;
@@ -719,7 +787,8 @@ static void m3ua_rsrv(queue_t * q)
  *  ------------------------------------------
  */
 
-static void t_wput(queue_t * q, mblk_t * mp)
+static void
+t_wput(queue_t *q, mblk_t *mp)
 {
 	trace();
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q)))
@@ -728,7 +797,8 @@ static void t_wput(queue_t * q, mblk_t * mp)
 		putnext(q, mp);
 }
 
-static void t_wsrv(queue_t * q)
+static void
+t_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 
@@ -742,7 +812,8 @@ static void t_wsrv(queue_t * q)
 	}
 }
 
-static void t_rput(queue_t * q, mblk_t * mp)
+static void
+t_rput(queue_t *q, mblk_t *mp)
 {
 	int err = EOPNOTSUPP;
 
@@ -776,7 +847,8 @@ static void t_rput(queue_t * q, mblk_t * mp)
 	freemsg(mp);
 }
 
-static void t_rsrv(queue_t * q)
+static void
+t_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 	int err = EOPNOTSUPP;
@@ -825,7 +897,8 @@ static void t_rsrv(queue_t * q)
 static m3ua_t *m3ua_devices = NULL;
 static queue_t *m3ua_ctrlq = NULL;
 
-static int m3ua_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
+static int
+m3ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	m3ua_t *m3ua, **m3p = &m3ua_devices;
 	int cmajor = getmajor(*devp);
@@ -848,7 +921,7 @@ static int m3ua_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * cr
 	if (sflag == CLONEOPEN)
 		cminor = 1;
 
-	for (; cminor <= M3UA_NMINOR && *m3p; m3p = &(*m3p)->next) {
+	for (; cminor <= NMINORS && *m3p; m3p = &(*m3p)->next) {
 		int dminor = getminor((*m3p)->devnum);
 		if (cminor < dminor)
 			break;
@@ -880,7 +953,8 @@ static int m3ua_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * cr
 	return (0);
 }
 
-static int m3ua_close(queue_t * q, int flag, cred_t * crp)
+static int
+m3ua_close(queue_t *q, int flag, cred_t *crp)
 {
 	m3ua_t *m3 = (m3ua_t *) q->q_ptr;
 	kfree(m3);
@@ -888,71 +962,144 @@ static int m3ua_close(queue_t * q, int flag, cred_t * crp)
 }
 
 /*
- *  =======================================================================
+ *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Registration and initialization
  *
- *  =======================================================================
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
  */
 
-static int m3ua_initialized = 0;
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
-#ifndef LIS_REGISTERED
-static inline void m3ua_init(void)
-#else
-__initfunc(void m3ua_init(void))
-#endif
-{
-	if (m3ua_initialized)
-		return;
-	m3ua_initialized = 1;
-	printk(KERN_INFO LS_BANNER);	/* console splash */
-#ifndef LIS_REGISTERED
-	if (lis_register_strdev(LS_CMAJOR, &m3ua_info, LS_NMINOR, m3ua_minfo.mi_idname) < 0) {
-		cmn_err(CE_NOTE, "m3ua: couldn't register module\n");
-		m3ua_minfo.mi_idnum = 0;
-	}
-	m3ua_minfo.mi_idnum = 1;
-#endif
-};
-
-#ifndef LIS_REGISTERED
-static inline void m3ua_terminate(void)
-#else
-__initfunc(void m3ua_terminate(void))
-#endif
-{
-	if (!m3ua_initialized)
-		return;
-	m3ua_initialized = 0;
-#ifndef LIS_REGSITERED
-	if (m3ua_minfo.mi_idnum)
-		if (lis_unregister_strdev(m3ua_minfo.mi_idnum) < 0) {
-			cmn_err(CE_WARN, "m3ua: couldn't unregister module!\n");
-		}
-#endif
-};
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
+#ifdef LFS
 
-#ifdef MODULE
-int init_module(void)
+STATIC struct cdevsw m3ua_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &m3uainfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+m3ua_register_strdev(major_t major)
 {
-	trace();
-	m3ua_init();
+	int err;
+	if ((err = register_strdev(&m3ua_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void cleanup_module(void)
+STATIC int
+m3ua_unregister_strdev(major_t major)
 {
-	trace();
-	m3ua_terminate();
+	int err;
+	if ((err = unregister_strdev(&m3ua_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+m3ua_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &m3uainfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+m3ua_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+m3uaterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (m3ua_majors[mindex]) {
+			if ((err = m3ua_unregister_strdev(m3ua_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					m3ua_majors[mindex]);
+			if (mindex)
+				m3ua_majors[mindex] = 0;
+		}
+	}
+	if ((err = m3ua_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
+
+MODULE_STATIC int __init
+m3uainit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = m3ua_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		m3uaterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = m3ua_register_strdev(m3ua_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					m3ua_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				m3uaterminate();
+				return (err);
+			}
+		}
+		if (m3ua_majors[mindex] == 0)
+			m3ua_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(m3ua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
+		if (major == 0)
+			major = m3ua_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(m3uainit);
+module_exit(m3uaterminate);
+
+#endif				/* LINUX */

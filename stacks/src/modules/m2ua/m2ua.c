@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:55 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $"
 
-static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $";
+static char const ident[] =
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $";
 
 #include "compat.h"
 
@@ -66,7 +67,7 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:37:55 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:19 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -83,7 +84,7 @@ MODULE_DESCRIPTION(M2UA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M2UA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2UA_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -91,9 +92,8 @@ MODULE_LICENSE(M2UA_LICENSE);
 #define M2UA_DRV_NAME		CONFIG_STREAMS_M2UA_NAME
 #define M2UA_CMAJORS		CONFIG_STREAMS_M2UA_NMAJORS
 #define M2UA_CMAJOR_0		CONFIG_STREAMS_M2UA_MAJOR
+#define M2UA_UNITS		CONFIG_STREAMS_M2UA_NMINORS
 #endif
-
-#define M2UA_CMINORS 255
 
 /*
  *  =========================================================================
@@ -102,33 +102,45 @@ MODULE_LICENSE(M2UA_LICENSE);
  *
  *  =========================================================================
  */
+
+#define DRV_ID		M2UA_DRV_ID
+#define DRV_NAME	M2UA_DRV_NAME
+#define CMAJORS		M2UA_CMAJORS
+#define CMAJOR_0	M2UA_CMAJOR_0
+#define UNITS		M2UA_UNITS
+#ifdef MODULE
+#define DRV_BANNER	M2UA_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	M2UA_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info m2ua_winfo = {
-	mi_idnum:M2UA_DRV_ID,		/* Module ID number */
-	mi_idname:M2UA_DRV_NAME "-wr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-wr",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size expected */
 	mi_maxpsz:272 + 1,		/* Max packet size expected */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 STATIC struct module_info m2ua_rinfo = {
-	mi_idnum:M2UA_DRV_ID,		/* Module ID number */
-	mi_idname:M2UA_DRV_NAME "-rd",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-rd",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size expected */
 	mi_maxpsz:272 + 1,		/* Max packet size expected */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 STATIC struct module_info mux_winfo = {
-	mi_idnum:M2UA_DRV_ID,		/* Module ID number */
-	mi_idname:M2UA_DRV_NAME "-mxw",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-mxw",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size expected */
 	mi_maxpsz:272 + 1,		/* Max packet size expected */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 STATIC struct module_info mux_rinfo = {
-	mi_idnum:M2UA_DRV_ID,		/* Module ID number */
-	mi_idname:M2UA_DRV_NAME "-mxr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-mxr",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size expected */
 	mi_maxpsz:272 + 1,		/* Max packet size expected */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -164,7 +176,7 @@ STATIC struct qinit mux_winit = {
 	qi_minfo:&mux_winfo,		/* Information */
 };
 
-STATIC struct streamtab m2ua_info = {
+MODULE_STATIC struct streamtab m2uainfo = {
 	st_rdinit:&m2ua_rinit,		/* Upper read queue */
 	st_wrinit:&m2ua_winit,		/* Upper write queue */
 	st_muxrinit:&mux_rinit,		/* Lower read queue */
@@ -843,14 +855,14 @@ m_error(queue_t *q, sl_t * sl, int error)
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
-			printd(("%s: %p: <- M_HANGUP\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (-error);
 		} else {
 			mp->b_datap->db_type = M_ERROR;
 			*(mp->b_wptr)++ = error;
 			*(mp->b_wptr)++ = error;
-			printd(("%s: %p: <- M_ERROR\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- M_ERROR\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -880,7 +892,7 @@ slu_info_ack(queue_t *q, sl_t * sl, uchar *ppa_ptr, size_t ppa_len)
 		p->lmi_ppa_style = LMI_STYLE2;
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
-		printd(("%s: %p: <- LMI_INFO_ACK\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_INFO_ACK\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -913,7 +925,7 @@ slu_ok_ack(queue_t *q, sl_t * sl, long prim)
 			break;
 		}
 		p->lmi_state = sl_get_i_state(sl);
-		printd(("%s: %p: <- LMI_OK_ACK\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_OK_ACK\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -930,9 +942,8 @@ slu_error_ack(queue_t *q, sl_t * sl, long prim, long error)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
-	/*
-	   filter out queue returns 
-	 */
+	/* 
+	   filter out queue returns */
 	switch (error) {
 	case QR_ABSORBED:
 	case QR_TRIMMED:
@@ -972,7 +983,7 @@ slu_error_ack(queue_t *q, sl_t * sl, long prim, long error)
 			break;
 		}
 		p->lmi_state = sl_get_i_state(sl);
-		printd(("%s: %p: <- LMI_ERROR_ACK\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_ERROR_ACK\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -996,7 +1007,7 @@ slu_enable_con(queue_t *q, sl_t * sl)
 		assure(sl_get_i_state(sl) == LMI_ENABLE_PENDING);
 		sl_set_i_state(sl, LMI_ENABLED);
 		p->lmi_state = sl_get_i_state(sl);
-		printd(("%s: %p: <- LMI_ENABLE_CON\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_ENABLE_CON\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1020,7 +1031,7 @@ slu_disable_con(queue_t *q, sl_t * sl)
 		assure(sl_get_i_state(sl) == LMI_DISABLE_PENDING);
 		sl_set_i_state(sl, LMI_DISABLED);
 		p->lmi_state = sl_get_i_state(sl);
-		printd(("%s: %p: <- LMI_DISABLE_CON\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_DISABLE_CON\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1045,7 +1056,7 @@ slu_optmgmt_ack(queue_t *q, sl_t * sl, ulong flags, uchar *opt_ptr, size_t opt_l
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
 		p->lmi_mgmt_flags = flags;
-		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1070,7 +1081,7 @@ slu_error_ind(queue_t *q, sl_t * sl, ulong errno, ulong reason)
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
 		p->lmi_state = sl_get_i_state(sl);
-		printd(("%s: %p: <- LMI_ERROR_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- LMI_ERROR_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1095,7 +1106,7 @@ slu_stats_ind(queue_t *q, sl_t * sl, ulong interval, mblk_t *dp)
 			p->lmi_interval = interval;
 			p->lmi_timestamp = jiffies;
 			mp->b_cont = dp;
-			printd(("%s: %p: <- LMI_STATS_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- LMI_STATS_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1123,7 +1134,7 @@ slu_event_ind(queue_t *q, sl_t * sl, ulong oid, ulong level)
 			p->lmi_objectid = oid;
 			p->lmi_timestamp = jiffies;
 			p->lmi_severity = level;
-			printd(("%s: %p: <- LMI_EVENT_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- LMI_EVENT_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1167,7 +1178,7 @@ slu_pdu_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 				p->sl_primitive = SL_PDU_IND;
 				p->sl_mp = mpri;
 				mp->b_cont = dp;
-				printd(("%s: %p: <- SL_PDU_IND\n", M2UA_DRV_NAME, sl));
+				printd(("%s: %p: <- SL_PDU_IND\n", DRV_NAME, sl));
 				ss7_oput(sl->oq, mp);
 				return (QR_DONE);
 			}
@@ -1195,7 +1206,7 @@ slu_link_congested_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p->sl_primitive = SL_LINK_CONGESTED_IND;
 		p->sl_cong_status = m->cong.val;
 		p->sl_disc_status = m->disc.val;
-		printd(("%s: %p: <- SL_LINK_CONGESTED_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_LINK_CONGESTED_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1219,7 +1230,7 @@ slu_link_congestion_ceased_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = m->cong.val;
 		p->sl_disc_status = m->disc.val;
-		printd(("%s: %p: <- SL_LINK_CONGESTION_CEASED_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_LINK_CONGESTION_CEASED_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1260,7 +1271,7 @@ slu_retrieved_message_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 				p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
 				p->sl_mp = mpri;
 				mp->b_cont = dp;
-				printd(("%s: %p: <- SL_RETRIEVED_MESSAGE_IND\n", M2UA_DRV_NAME, sl));
+				printd(("%s: %p: <- SL_RETRIEVED_MESSAGE_IND\n", DRV_NAME, sl));
 				ss7_oput(sl->oq, mp);
 				return (QR_DONE);
 			}
@@ -1302,7 +1313,7 @@ slu_retrieval_complete_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 				p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
 				p->sl_mp = mpri;
 				mp->b_cont = dp;
-				printd(("%s: %p: <- SL_RETRIEVAL_COMPLETE_IND\n", M2UA_DRV_NAME, sl));
+				printd(("%s: %p: <- SL_RETRIEVAL_COMPLETE_IND\n", DRV_NAME, sl));
 				ss7_oput(sl->oq, mp);
 				return (QR_DONE);
 			}
@@ -1330,7 +1341,7 @@ slu_rb_cleared_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_RB_CLEARED_IND;
-			printd(("%s: %p: <- SL_RB_CLEARED_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- SL_RB_CLEARED_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1356,7 +1367,7 @@ slu_bsnt_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_BSNT_IND;
 			p->sl_bsnt = m->seqno.val;
-			printd(("%s: %p: <- SL_BSNT_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- SL_BSNT_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1381,7 +1392,7 @@ slu_in_service_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_IN_SERVICE_IND;
-			printd(("%s: %p: <- SL_IN_SERVICE_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- SL_IN_SERVICE_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1409,7 +1420,7 @@ slu_out_of_service_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_reason = reason;
-		printd(("%s: %p: <- SL_OUT_OF_SERVICE_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_OUT_OF_SERVICE_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1431,7 +1442,7 @@ slu_local_processor_outage_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_IND;
 		p->sl_timestamp = jiffies;
-		printd(("%s: %p: <- SL_LOCAL_PROCESSOR_OUTAGE_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_LOCAL_PROCESSOR_OUTAGE_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1453,7 +1464,7 @@ slu_local_processor_recovered_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_LOCAL_PROCESSOR_RECOVERED_IND;
 		p->sl_timestamp = jiffies;
-		printd(("%s: %p: <- SL_LOCAL_PROCESSOR_RECOVERED_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_LOCAL_PROCESSOR_RECOVERED_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1475,7 +1486,7 @@ slu_remote_processor_outage_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
 		p->sl_timestamp = jiffies;
-		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_OUTAGE_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_OUTAGE_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1497,7 +1508,7 @@ slu_remote_processor_recovered_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
 		p->sl_timestamp = jiffies;
-		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1519,7 +1530,7 @@ slu_rtb_cleared_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_RTB_CLEARED_IND;
-			printd(("%s: %p: <- SL_RTB_CLEARED_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- SL_RTB_CLEARED_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1544,7 +1555,7 @@ slu_retrieval_not_possible_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
-			printd(("%s: %p: <- SL_RETRIEVAL_NOT_POSSIBLE_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- SL_RETRIEVAL_NOT_POSSIBLE_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1570,7 +1581,7 @@ slu_bsnt_not_retrievable_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
 			p->sl_bsnt = m->seqno.ptr.c ? m->seqno.val : 0;
-			printd(("%s: %p: <- SL_BSNT_NOT_RETRIEVABLE_IND\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: <- SL_BSNT_NOT_RETRIEVABLE_IND\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1600,7 +1611,7 @@ slu_optmgmt_ack(queue_t *q, sl_t * sl, uchar *opt_ptr, size_t opt_len, ulong fla
 		p->mgmt_flags = flags;
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
-		printd(("%s: %p: <- SL_OPTMGMT_ACK\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_OPTMGMT_ACK\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1626,7 +1637,7 @@ slu_notify_ind(queue_t *q, sl_t * sl, ulong oid, ulong level)
 		p->sl_objectid = oid;
 		p->sl_timestamp = jiffies;
 		p->sl_severity = level;
-		printd(("%s: %p: <- SL_NOTIFY_IND\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: <- SL_NOTIFY_IND\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1655,7 +1666,7 @@ slp_info_req(queue_t *q, sl_t * sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1678,7 +1689,7 @@ slp_attach_req(queue_t *q, sl_t * sl, uchar *ppa_ptr, size_t ppa_len)
 		p->lmi_primitive = LMI_ATTACH_REQ;
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1699,7 +1710,7 @@ slp_detach_req(queue_t *q, sl_t * sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1722,7 +1733,7 @@ slp_enable_req(queue_t *q, sl_t * sl, uchar *rem_ptr, size_t rem_len)
 		p->lmi_primitive = LMI_ENABLE_REQ;
 		bcopy(rem_ptr, mp->b_wptr, rem_len);
 		mp->b_wptr += rem_len;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1743,7 +1754,7 @@ slp_disable_req(queue_t *q, sl_t * sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1771,7 +1782,7 @@ slp_optmgmt_req(queue_t *q, sl_t * sl, uchar *opt_ptr, size_t opt_len, ulong fla
 			p->lmi_mgmt_flags = flags;
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
-			printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1816,7 +1827,7 @@ slp_pdu_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 				p->sl_primitive = SL_PDU_REQ;
 				p->sl_mp = mpri;
 				mp->b_cont = dp;
-				printd(("%s: %p: SL_PDU_REQ ->\n", M2UA_DRV_NAME, sl));
+				printd(("%s: %p: SL_PDU_REQ ->\n", DRV_NAME, sl));
 				ss7_oput(sl->oq, mp);
 				return (QR_DONE);
 			}
@@ -1842,7 +1853,7 @@ slp_emergency_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_EMERGENCY_REQ;
-		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1863,7 +1874,7 @@ slp_emergency_ceases_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
-		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -1885,7 +1896,7 @@ slp_start_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_START_REQ;
-			printd(("%s: %p: SL_START_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_START_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1910,7 +1921,7 @@ slp_stop_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_STOP_REQ;
-			printd(("%s: %p: SL_STOP_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1935,7 +1946,7 @@ slp_retrieve_bsnt_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
-			printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1961,7 +1972,7 @@ slp_retrieval_request_and_fsnc_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
 			p->sl_fsnc = m->seqno.val;
-			printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -1986,7 +1997,7 @@ slp_clear_buffers_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
-			printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -2011,7 +2022,7 @@ slp_clear_rtb_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_CLEAR_RTB_REQ;
-			printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -2036,7 +2047,7 @@ slp_continue_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_CONTINUE_REQ;
-			printd(("%s: %p: SL_CONTINUE_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_CONTINUE_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -2060,7 +2071,7 @@ slp_local_processor_outage_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
-		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -2082,7 +2093,7 @@ slp_resume_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->sl_primitive = SL_RESUME_REQ;
-			printd(("%s: %p: SL_RESUME_REQ ->\n", M2UA_DRV_NAME, sl));
+			printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, sl));
 			ss7_oput(sl->oq, mp);
 			return (QR_DONE);
 		}
@@ -2106,7 +2117,7 @@ slp_congestion_discard_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
-		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -2127,7 +2138,7 @@ slp_congestion_accept_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
-		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -2148,7 +2159,7 @@ slp_no_congestion_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
-		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -2169,7 +2180,7 @@ slp_power_on_req(queue_t *q, sl_t * sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_POWER_ON_REQ;
-		printd(("%s: %p: SL_POWER_ON_REQ ->\n", M2UA_DRV_NAME, sl));
+		printd(("%s: %p: SL_POWER_ON_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
@@ -2189,8 +2200,8 @@ slp_power_on_req(queue_t *q, sl_t * sl)
  *  -----------------------------------
  */
 STATIC INLINE int
-t_conn_req(queue_t *q, xp_t * xp, uchar *dst_ptr,
-	   size_t dst_len, uchar *opt_ptr, size_t opt_len, mblk_t *dp)
+t_conn_req(queue_t *q, xp_t * xp, uchar *dst_ptr, size_t dst_len, uchar *opt_ptr, size_t opt_len,
+	   mblk_t *dp)
 {
 	if (canput(xp->oq)) {
 		mblk_t *mp;
@@ -2208,7 +2219,7 @@ t_conn_req(queue_t *q, xp_t * xp, uchar *dst_ptr,
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 			mp->b_cont = dp;
-			printd(("%s; %p: T_CONN_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_CONN_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2224,8 +2235,8 @@ t_conn_req(queue_t *q, xp_t * xp, uchar *dst_ptr,
  *  -----------------------------------
  */
 STATIC INLINE int
-t_conn_res(queue_t *q, xp_t * xp, ulong acceptor,
-	   uchar *opt_ptr, size_t opt_len, ulong seqno, mblk_t *dp)
+t_conn_res(queue_t *q, xp_t * xp, ulong acceptor, uchar *opt_ptr, size_t opt_len, ulong seqno,
+	   mblk_t *dp)
 {
 	if (canput(xp->oq)) {
 		mblk_t *mp;
@@ -2241,7 +2252,7 @@ t_conn_res(queue_t *q, xp_t * xp, ulong acceptor,
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 			mp->b_cont = dp;
-			printd(("%s; %p: T_CONN_RES ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_CONN_RES ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2268,7 +2279,7 @@ t_discon_req(queue_t *q, xp_t * xp, ulong seqno, mblk_t *dp)
 			p->PRIM_type = T_DISCON_REQ;
 			p->SEQ_number = seqno;
 			mp->b_cont = dp;
-			printd(("%s; %p: T_DISCON_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_DISCON_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2295,7 +2306,7 @@ t_data_req(queue_t *q, xp_t * xp, ulong more, mblk_t *dp)
 			p->PRIM_type = T_DATA_REQ;
 			p->MORE_flag = more;
 			mp->b_cont = dp;
-			printd(("%s; %p: T_DATA_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_DATA_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2322,7 +2333,7 @@ t_exdata_req(queue_t *q, xp_t * xp, ulong more, mblk_t *dp)
 			p->PRIM_type = T_EXDATA_REQ;
 			p->MORE_flag = more;
 			mp->b_cont = dp;
-			printd(("%s; %p: T_EXDATA_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_EXDATA_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2347,7 +2358,7 @@ t_info_req(queue_t *q, xp_t * xp)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->PRIM_type = T_INFO_REQ;
-			printd(("%s; %p: T_INFO_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_INFO_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2377,7 +2388,7 @@ t_bind_req(queue_t *q, xp_t * xp, uchar *add_ptr, size_t add_len, ulong conind)
 			p->CONIND_number = conind;
 			bcopy(add_ptr, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
-			printd(("%s; %p: T_BIND_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_BIND_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2402,7 +2413,7 @@ t_unbind_req(queue_t *q, xp_t * xp)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->PRIM_type = T_UNBIND_REQ;
-			printd(("%s; %p: T_UNBIND_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_UNBIND_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2418,8 +2429,8 @@ t_unbind_req(queue_t *q, xp_t * xp)
  *  -----------------------------------
  */
 STATIC INLINE int
-t_unitdata_req(queue_t *q, xp_t * xp, uchar *dst_ptr,
-	       size_t dst_len, uchar *opt_ptr, size_t opt_len, mblk_t *dp)
+t_unitdata_req(queue_t *q, xp_t * xp, uchar *dst_ptr, size_t dst_len, uchar *opt_ptr,
+	       size_t opt_len, mblk_t *dp)
 {
 	if (canput(xp->oq)) {
 		mblk_t *mp;
@@ -2433,7 +2444,7 @@ t_unitdata_req(queue_t *q, xp_t * xp, uchar *dst_ptr,
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) + dst_len : 0;
 			mp->b_cont = dp;
-			printd(("%s; %p: T_UNITDATA_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_UNITDATA_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2463,7 +2474,7 @@ t_optmgmt_req(queue_t *q, xp_t * xp, uchar *opt_ptr, size_t opt_len, ulong flags
 			p->MGMT_flags = flags;
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
-			printd(("%s; %p: T_OPTMGMT_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_OPTMGMT_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2488,7 +2499,7 @@ t_ordrel_req(queue_t *q, xp_t * xp)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->PRIM_type = T_ORDREL_REQ;
-			printd(("%s; %p: T_ORDREL_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_ORDREL_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2532,7 +2543,7 @@ t_optdata_req(queue_t *q, xp_t * xp, ulong flags, ulong sid, mblk_t *dp)
 				*((t_uscalar_t *) mp->b_wptr)++ = sid;
 			}
 			mp->b_cont = dp;
-			printd(("%s; %p: T_OPTDATA_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_OPTDATA_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2557,7 +2568,7 @@ t_addr_req(queue_t *q, xp_t * xp)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->PRIM_type = T_ADDR_REQ;
-			printd(("%s; %p: T_ADDR_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_ADDR_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2583,7 +2594,7 @@ t_capability_req(queue_t *q, xp_t * xp)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->PRIM_type = T_CAPABILITY_REQ;
-			printd(("%s; %p: T_CAPABILITY_REQ ->\n", M2UA_DRV_NAME, xp));
+			printd(("%s; %p: T_CAPABILITY_REQ ->\n", DRV_NAME, xp));
 			ss7_oput(xp->oq, mp);
 			return (QR_DONE);
 		}
@@ -2766,8 +2777,9 @@ STATIC INLINE int
 m2ua_send_mgmt_err(queue_t *q, xp_t * xp, uint ecode, uchar *dia_ptr, size_t dia_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    UA_SIZE(UA_PARM_ECODE) + dia_len ? UA_SIZE(UA_PARM_DIAG) + UA_PAD4(dia_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_ECODE) + dia_len ? UA_SIZE(UA_PARM_DIAG) +
+	    UA_PAD4(dia_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -2795,15 +2807,14 @@ m2ua_send_mgmt_err(queue_t *q, xp_t * xp, uint ecode, uchar *dia_ptr, size_t dia
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_mgmt_ntfy(queue_t *q, xp_t * xp, uint status,
-		    ulong *aspid, uint * iid, size_t num_iid, uchar *inf_ptr, size_t inf_len)
+m2ua_send_mgmt_ntfy(queue_t *q, xp_t * xp, uint status, ulong *aspid, uint * iid, size_t num_iid,
+		    uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    UA_SIZE(UA_PARM_STATUS) +
-	    aspid ? UA_SIZE(UA_PARM_ASPID) : 0 +
-	    num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
-	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_STATUS) + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 +
+	    num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -2845,8 +2856,9 @@ STATIC INLINE int
 m2ua_send_asps_aspup_req(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -2879,8 +2891,9 @@ STATIC INLINE int
 m2ua_send_asps_aspdn_req(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -2942,8 +2955,9 @@ STATIC INLINE int
 m2ua_send_asps_aspup_ack(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -2976,8 +2990,9 @@ STATIC INLINE int
 m2ua_send_asps_aspdn_ack(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + inf_len ? UA_PHDR_SIZE +
+	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -3036,14 +3051,13 @@ m2ua_send_asps_hbeat_ack(queue_t *q, xp_t * xp, uchar *hbt_ptr, size_t hbt_len)
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_aspt_aspac_req(queue_t *q, xp_t * xp, uint tmode,
-			 uint32_t * iid, size_t num_iid, uchar *inf_ptr, size_t inf_len)
+m2ua_send_aspt_aspac_req(queue_t *q, xp_t * xp, uint tmode, uint32_t *iid, size_t num_iid,
+			 uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    UA_SIZE(UA_PARM_TMODE) +
-	    num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
-	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_TMODE) + num_iid ? UA_PHDR_SIZE +
+	    num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -3078,12 +3092,12 @@ m2ua_send_aspt_aspac_req(queue_t *q, xp_t * xp, uint tmode,
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_aspt_aspia_req(queue_t *q, xp_t * xp,
-			 uint32_t * iid, size_t num_iid, uchar *inf_ptr, size_t inf_len)
+m2ua_send_aspt_aspia_req(queue_t *q, xp_t * xp, uint32_t *iid, size_t num_iid, uchar *inf_ptr,
+			 size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
+	size_t mlen =
+	    UA_MHDR_SIZE + num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
 	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
@@ -3117,14 +3131,13 @@ m2ua_send_aspt_aspia_req(queue_t *q, xp_t * xp,
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_aspt_aspac_ack(queue_t *q, xp_t * xp, uint tmode,
-			 uint32_t * iid, size_t num_iid, uchar *inf_ptr, size_t inf_len)
+m2ua_send_aspt_aspac_ack(queue_t *q, xp_t * xp, uint tmode, uint32_t *iid, size_t num_iid,
+			 uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    UA_SIZE(UA_PARM_TMODE) +
-	    num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
-	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
+	size_t mlen =
+	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_TMODE) + num_iid ? UA_PHDR_SIZE +
+	    num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -3159,12 +3172,12 @@ m2ua_send_aspt_aspac_ack(queue_t *q, xp_t * xp, uint tmode,
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_aspt_aspia_ack(queue_t *q, xp_t * xp,
-			 uint32_t * iid, size_t num_iid, uchar *inf_ptr, size_t inf_len)
+m2ua_send_aspt_aspia_ack(queue_t *q, xp_t * xp, uint32_t *iid, size_t num_iid, uchar *inf_ptr,
+			 size_t inf_len)
 {
 	mblk_t *mp;
-	size_t mlen = UA_MHDR_SIZE +
-	    num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
+	size_t mlen =
+	    UA_MHDR_SIZE + num_iid ? UA_PHDR_SIZE + num_iid * sizeof(uint32_t) : 0 +
 	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
@@ -3684,8 +3697,9 @@ m2ua_send_maup_retr_req(queue_t *q, gp_t * gp, mblk_t *bp)
 	mblk_t *mp;
 	union SL_primitives *p = (typeof(p)) bp->b_rptr;
 	static const size_t mlen =
-	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_ACTION) +
-	    (p->sl_primitive == SL_RETRIEVAL_REQUEST_AND_FSNC_REQ) ? UA_SIZE(M2UA_PARM_SEQNO) : 0;
+	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_ACTION) + (p->sl_primitive ==
+									       SL_RETRIEVAL_REQUEST_AND_FSNC_REQ)
+	    ? UA_SIZE(M2UA_PARM_SEQNO) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		mp->b_datap->db_type = M_DATA;
@@ -3874,8 +3888,9 @@ STATIC INLINE int
 m2ua_send_maup_cong_ind(queue_t *q, gp_t * gp, mblk_t *bp)
 {
 	mblk_t *mp;
-	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) +
-	    UA_SIZE(M2UA_PARM_CONG_STATUS) + UA_SIZE(M2UA_PARM_DISC_STATUS);
+	static const size_t mlen =
+	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_CONG_STATUS) +
+	    UA_SIZE(M2UA_PARM_DISC_STATUS);
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		union SL_primitives *p = (typeof(p)) bp->b_rptr;
@@ -3984,13 +3999,13 @@ STATIC INLINE void __o ## _start_timer_ ## __t (__o ## _t *__o, ulong val) \
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-spp_do_timeout(caddr_t data, const char *timer,
-	       ulong *timeo, int (to_fnc) (spp_t *), void (*exp_fnc) (caddr_t))
+spp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (spp_t *),
+	       void (*exp_fnc) (caddr_t))
 {
 	spp_t *spp = (spp_t *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&spp->lock)) {
-			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, spp, timer, jiffies));
+			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, spp, timer, jiffies));
 			switch (to_fnc(spp)) {
 			default:
 			case QR_DONE:
@@ -4005,11 +4020,10 @@ spp_do_timeout(caddr_t data, const char *timer,
 			}
 			spin_unlock(&spp->lock);
 		} else
-			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, spp, timer,
+			printd(("%s: %p: %s: timeout collision at %lu\n", DRV_NAME, spp, timer,
 				jiffies));
-		/*
-		   back off timer 100 ticks 
-		 */
+		/* 
+		   back off timer 100 ticks */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -4019,7 +4033,7 @@ spp_stop_timer(spp_t * spp, const char *timer, ulong *timeo)
 	ulong to;
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
-		printd(("%s: %p: stopping %s at %lu\n", M2UA_DRV_NAME, spp, timer, jiffies));
+		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, spp, timer, jiffies));
 		spp_put(spp);
 	}
 	return;
@@ -4027,7 +4041,7 @@ spp_stop_timer(spp_t * spp, const char *timer, ulong *timeo)
 STATIC INLINE void
 spp_start_timer(spp_t * spp, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
 {
-	printd(("%s: %p: starting %s %lu ms at %lu\n", M2UA_DRV_NAME, spp, timer, val * 1000 / HZ,
+	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, spp, timer, val * 1000 / HZ,
 		jiffies));
 	*timeo = timeout(exp_fnc, (caddr_t) spp_get(spp), val);
 }
@@ -4043,30 +4057,26 @@ __spp_timer_stop(spp_t * spp, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tack:
 		spp_stop_timer_tack(spp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tbeat:
 		spp_stop_timer_tbeat(spp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tidle:
 		spp_stop_timer_tidle(spp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4116,13 +4126,13 @@ spp_timer_start(spp_t * spp, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-as_do_timeout(caddr_t data, const char *timer, ulong *timeo,
-	      int (to_fnc) (as_t *), void (*exp_fnc) (caddr_t))
+as_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (as_t *),
+	      void (*exp_fnc) (caddr_t))
 {
 	as_t *as = (as_t *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&as->lock)) {
-			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, as, timer, jiffies));
+			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, as, timer, jiffies));
 			switch (to_fnc(as)) {
 			default:
 			case QR_DONE:
@@ -4137,11 +4147,10 @@ as_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			}
 			spin_unlock(&as->lock);
 		} else
-			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, as, timer,
+			printd(("%s: %p: %s: timeout collision at %lu\n", DRV_NAME, as, timer,
 				jiffies));
-		/*
-		   back off timer 100 ticks 
-		 */
+		/* 
+		   back off timer 100 ticks */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -4151,7 +4160,7 @@ as_stop_timer(as_t * as, const char *timer, ulong *timeo)
 	ulong to;
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
-		printd(("%s: %p: stopping %s at %lu\n", M2UA_DRV_NAME, as, timer, jiffies));
+		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, as, timer, jiffies));
 		as_put(as);
 	}
 	return;
@@ -4159,7 +4168,7 @@ as_stop_timer(as_t * as, const char *timer, ulong *timeo)
 STATIC INLINE void
 as_start_timer(as_t * as, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
 {
-	printd(("%s: %p: starting %s %lu ms at %lu\n", M2UA_DRV_NAME, as, timer, val * 1000 / HZ,
+	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, as, timer, val * 1000 / HZ,
 		jiffies));
 	*timeo = timeout(exp_fnc, (caddr_t) as_get(as), val);
 }
@@ -4173,16 +4182,14 @@ __as_timer_stop(as_t * as, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tack:
 		as_stop_timer_tack(as);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4226,13 +4233,13 @@ as_timer_start(as_t * as, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-sp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
-	      int (to_fnc) (sp_t *), void (*exp_fnc) (caddr_t))
+sp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (sp_t *),
+	      void (*exp_fnc) (caddr_t))
 {
 	sp_t *sp = (sp_t *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&sp->lock)) {
-			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, sp, timer, jiffies));
+			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, sp, timer, jiffies));
 			switch (to_fnc(sp)) {
 			default:
 			case QR_DONE:
@@ -4247,11 +4254,10 @@ sp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			}
 			spin_unlock(&sp->lock);
 		} else
-			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, sp, timer,
+			printd(("%s: %p: %s: timeout collision at %lu\n", DRV_NAME, sp, timer,
 				jiffies));
-		/*
-		   back off timer 100 ticks 
-		 */
+		/* 
+		   back off timer 100 ticks */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -4261,7 +4267,7 @@ sp_stop_timer(sp_t * sp, const char *timer, ulong *timeo)
 	ulong to;
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
-		printd(("%s: %p: stopping %s at %lu\n", M2UA_DRV_NAME, sp, timer, jiffies));
+		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, sp, timer, jiffies));
 		sp_put(sp);
 	}
 	return;
@@ -4269,7 +4275,7 @@ sp_stop_timer(sp_t * sp, const char *timer, ulong *timeo)
 STATIC INLINE void
 sp_start_timer(sp_t * sp, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
 {
-	printd(("%s: %p: starting %s %lu ms at %lu\n", M2UA_DRV_NAME, sp, timer, val * 1000 / HZ,
+	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, sp, timer, val * 1000 / HZ,
 		jiffies));
 	*timeo = timeout(exp_fnc, (caddr_t) sp_get(sp), val);
 }
@@ -4282,16 +4288,14 @@ __sp_timer_stop(sp_t * sp, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tack:
 		sp_stop_timer_tack(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4335,13 +4339,13 @@ sp_timer_start(sp_t * sp, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-sl_do_timeout(caddr_t data, const char *timer, ulong *timeo,
-	      int (to_fnc) (sl_t *), void (*exp_fnc) (caddr_t))
+sl_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (sl_t *),
+	      void (*exp_fnc) (caddr_t))
 {
 	sl_t *sl = (sl_t *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&sl->lock)) {
-			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, sl, timer, jiffies));
+			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, sl, timer, jiffies));
 			switch (to_fnc(sl)) {
 			default:
 			case QR_DONE:
@@ -4356,11 +4360,10 @@ sl_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			}
 			spin_unlock(&sl->lock);
 		} else
-			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, sl, timer,
+			printd(("%s: %p: %s: timeout collision at %lu\n", DRV_NAME, sl, timer,
 				jiffies));
-		/*
-		   back off timer 100 ticks 
-		 */
+		/* 
+		   back off timer 100 ticks */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -4370,7 +4373,7 @@ sl_stop_timer(sl_t * sl, const char *timer, ulong *timeo)
 	ulong to;
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
-		printd(("%s: %p: stopping %s at %lu\n", M2UA_DRV_NAME, sl, timer, jiffies));
+		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, sl, timer, jiffies));
 		sl_put(sl);
 	}
 	return;
@@ -4378,7 +4381,7 @@ sl_stop_timer(sl_t * sl, const char *timer, ulong *timeo)
 STATIC INLINE void
 sl_start_timer(sl_t * sl, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
 {
-	printd(("%s: %p: starting %s %lu ms at %lu\n", M2UA_DRV_NAME, sl, timer, val * 1000 / HZ,
+	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, sl, timer, val * 1000 / HZ,
 		jiffies));
 	*timeo = timeout(exp_fnc, (caddr_t) sl_get(sl), val);
 }
@@ -4391,16 +4394,14 @@ __sl_timer_stop(sl_t * sl, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tack:
 		sl_stop_timer_tack(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4444,13 +4445,13 @@ sl_timer_start(sl_t * sl, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-xp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
-	      int (to_fnc) (xp_t *), void (*exp_fnc) (caddr_t))
+xp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (xp_t *),
+	      void (*exp_fnc) (caddr_t))
 {
 	xp_t *xp = (xp_t *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&xp->lock)) {
-			printd(("%s: %p: %s: timeout at %lu\n", M2UA_DRV_NAME, xp, timer, jiffies));
+			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, xp, timer, jiffies));
 			switch (to_fnc(xp)) {
 			default:
 			case QR_DONE:
@@ -4465,11 +4466,10 @@ xp_do_timeout(caddr_t data, const char *timer, ulong *timeo,
 			}
 			spin_unlock(&xp->lock);
 		} else
-			printd(("%s: %p: %s: timeout collision at %lu\n", M2UA_DRV_NAME, xp, timer,
+			printd(("%s: %p: %s: timeout collision at %lu\n", DRV_NAME, xp, timer,
 				jiffies));
-		/*
-		   back off timer 100 ticks 
-		 */
+		/* 
+		   back off timer 100 ticks */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -4479,7 +4479,7 @@ xp_stop_timer(xp_t * xp, const char *timer, ulong *timeo)
 	ulong to;
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
-		printd(("%s: %p: stopping %s at %lu\n", M2UA_DRV_NAME, xp, timer, jiffies));
+		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, xp, timer, jiffies));
 		xp_put(xp);
 	}
 	return;
@@ -4487,7 +4487,7 @@ xp_stop_timer(xp_t * xp, const char *timer, ulong *timeo)
 STATIC INLINE void
 xp_start_timer(xp_t * xp, const char *timer, ulong *timeo, void (*exp_fnc) (caddr_t), ulong val)
 {
-	printd(("%s: %p: starting %s %lu ms at %lu\n", M2UA_DRV_NAME, xp, timer, val * 1000 / HZ,
+	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, xp, timer, val * 1000 / HZ,
 		jiffies));
 	*timeo = timeout(exp_fnc, (caddr_t) xp_get(xp), val);
 }
@@ -4500,16 +4500,14 @@ __xp_timer_stop(xp_t * xp, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tack:
 		xp_stop_timer_tack(xp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4845,10 +4843,9 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 			case AS_WACK_ASPIA:
 			case AS_ACTIVE:
 				if ((xp = gp->spp.spp->xp))
-					if ((err = m2ua_send_aspt_aspia_ack(q, xp,
-									    &as->iid,
-									    sizeof(as->iid), NULL,
-									    0)))
+					if ((err =
+					     m2ua_send_aspt_aspia_ack(q, xp, &as->iid,
+								      sizeof(as->iid), NULL, 0)))
 						return (err);
 				if ((err = gp_u_set_state(q, gp, AS_INACTIVE)))
 					return (err);
@@ -4880,10 +4877,10 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 			switch (gp_get_state(gp)) {
 			case AS_WACK_ASPAC:
 				if ((xp = gp->spp.spp->xp))
-					if ((err = m2ua_send_aspt_aspac_ack(q, xp, as->sp.sp->tmode,
-									    &as->iid,
-									    sizeof(as->iid), NULL,
-									    0)))
+					if ((err =
+					     m2ua_send_aspt_aspac_ack(q, xp, as->sp.sp->tmode,
+								      &as->iid, sizeof(as->iid),
+								      NULL, 0)))
 						return (err);
 				if ((err = gp_u_set_state(q, gp, AS_ACTIVE)))
 					return (err);
@@ -4918,17 +4915,16 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 	assure(as->ap.numb > 0);
 	ensure(oldstate <= AS_ACTIVE, return (-EFAULT));
 	for (newstate = AS_ACTIVE; newstate && as->gp.u.counts[newstate] != 0; newstate--) ;
-	/*
-	   propagate state changes to ASP 
-	 */
+	/* 
+	   propagate state changes to ASP */
 	if ((newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) && as->gp.u.c.active < as->minasp
 	    && as->minasp > 1)
 		newflags |= ASF_INSUFFICIENT_ASPS;
 	if ((newstate == AS_ACTIVE || newstate == AS_WACK_ASPIA) && as->gp.u.c.active == as->minasp
 	    && as->minasp > 1)
 		newflags |= ASF_MINIMUM_ASPS;
-	if ((newstate == AS_WACK_ASPAC || newstate == AS_INACTIVE) &&
-	    (oldstate == AS_WACK_ASPIA || oldstate == AS_ACTIVE))
+	if ((newstate == AS_WACK_ASPAC || newstate == AS_INACTIVE)
+	    && (oldstate == AS_WACK_ASPIA || oldstate == AS_ACTIVE))
 		newflags |= ASF_PENDING;
 	if (newstate == AS_WACK_ASPIA || newstate == AS_ACTIVE)
 		newflags &= ~ASF_PENDING;
@@ -4937,35 +4933,31 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 		ulong state = gp_get_state(gp);
 		if (state == AS_DOWN)
 			continue;
-		/*
-		   notify of state change 
-		 */
+		/* 
+		   notify of state change */
 		switch (newstate) {
 		default:
 		case AS_ACTIVE:
 		case AS_WACK_ASPIA:
 			if ((newflags & ASF_INSUFFICIENT_ASPS)
 			    && !(oldflags & ASF_INSUFFICIENT_ASPS))
-				/*
-				   notify of insufficient ASPs 
-				 */
+				/* 
+				   notify of insufficient ASPs */
 				if ((err =
 				     m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_AS_INSUFFICIENT_ASPS,
 							 NULL, NULL, 0, NULL, 0)))
 					return (err);
 			if (!(newflags & ASF_INSUFFICIENT_ASPS)
 			    && (oldflags & ASF_INSUFFICIENT_ASPS))
-				/*
-				   notify of AS active 
-				 */
+				/* 
+				   notify of AS active */
 				if ((err =
 				     m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_AS_ACTIVE, NULL, NULL, 0,
 							 NULL, 0)))
 					return (err);
 			if ((newflags & ASF_MINIMUM_ASPS) && !(oldflags & ASF_MINIMUM_ASPS))
-				/*
-				   notify of minimum ASPs 
-				 */
+				/* 
+				   notify of minimum ASPs */
 				if ((err =
 				     m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_AS_MINIMUM_ASPS, NULL,
 							 NULL, 0, NULL, 0)))
@@ -4975,13 +4967,11 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 			case AS_DOWN:
 			case AS_INACTIVE:
 			case AS_WACK_ASPAC:
-				/*
-				   withold AS_ACTIVE notification until sufficient ASPs 
-				 */
+				/* 
+				   withold AS_ACTIVE notification until sufficient ASPs */
 				if (!(newflags & ASF_INSUFFICIENT_ASPS))
-					/*
-					   notify of AS active 
-					 */
+					/* 
+					   notify of AS active */
 					if ((err =
 					     m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_AS_ACTIVE, NULL,
 								 NULL, 0, NULL, 0)))
@@ -4995,16 +4985,14 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 			switch (oldstate) {
 			case AS_ACTIVE:
 			case AS_WACK_ASPIA:
-				/*
-				   don't notify during override transitions 
-				 */
+				/* 
+				   don't notify during override transitions */
 				if (newstate != AS_WACK_ASPAC
 				    || as->sp.sp->tmode != UA_TMODE_OVERRIDE) {
 					if ((newflags & ASF_PENDING)) {
 						if (!(oldflags & ASF_PENDING))
-							/*
-							   notify of AS pending 
-							 */
+							/* 
+							   notify of AS pending */
 							if ((err =
 							     m2ua_send_mgmt_ntfy(q, xp,
 										 UA_STATUS_AS_PENDING,
@@ -5012,9 +5000,8 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 										 NULL, 0)))
 								return (err);
 					} else {
-						/*
-						   notify of AS inactive 
-						 */
+						/* 
+						   notify of AS inactive */
 						if ((err =
 						     m2ua_send_mgmt_ntfy(q, xp,
 									 UA_STATUS_AS_INACTIVE,
@@ -5029,9 +5016,8 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 	}
 	if (oldstate == newstate)
 		return (QR_DONE);
-	/*
-	   propagate state changes to AS-P 
-	 */
+	/* 
+	   propagate state changes to AS-P */
 	for (ap = as->ap.list; ap; ap = ap->u.next) {
 		ap->p.as->ap.u.counts[oldstate]--;
 		ap->p.as->ap.u.counts[newstate]++;
@@ -5208,20 +5194,17 @@ asp_set_state(queue_t *q, struct spp *spp, const ulong newstate)
 		switch (oldstate) {
 		default:
 			swerr();
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
 		case ASP_WACK_ASPUP:
-			/*
-			   move to the inactive state in all AS 
-			 */
+			/* 
+			   move to the inactive state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
 				if ((err = gp_u_set_state(q, gp, ASP_INACTIVE)))
 					return (err);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 			spp_set_state(spp, ASP_WACK_ASPDN);
 		case ASP_WACK_ASPDN:
 		case ASP_UP:
@@ -5236,20 +5219,17 @@ asp_set_state(queue_t *q, struct spp *spp, const ulong newstate)
 		switch (oldstate) {
 		default:
 			swerr();
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_UP:
 		case ASP_WACK_ASPDN:
-			/*
-			   move to the down state in all AS 
-			 */
+			/* 
+			   move to the down state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
 				if ((err = gp_u_set_state(q, gp, ASP_DOWN)))
 					return (err);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPUP:
 		case ASP_DOWN:
 			if ((err = m2ua_send_asps_aspdn_ack(q, spp->xp, NULL, NULL, 0)))
@@ -5278,35 +5258,30 @@ sgp_set_state(queue_t *q, struct spp *spp, const ulong newstate)
 		case ASP_WACK_ASPUP:
 			spp_timer_stop(spp, tack);
 			spp_set_state(spp, newstate);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
 			return (QR_DONE);
 		default:
 		case ASP_WACK_ASPDN:
 			spp_timer_stop(spp, tack);
-			/*
-			   move to the down state in all AS 
-			 */
+			/* 
+			   move to the down state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
 				if ((err = gp_p_set_state(q, gp, ASP_DOWN)))
 					return (err);
 			spp_set_state(spp, newstate);
 			return (QR_DONE);
 		case ASP_UP:
-			/*
-			   unsolicited ASPDN Ack 
-			 */
-			/*
-			   move to the down state in all AS 
-			 */
+			/* 
+			   unsolicited ASPDN Ack */
+			/* 
+			   move to the down state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
 				if ((err = gp_p_set_state(q, gp, ASP_DOWN)))
 					return (err);
-			/*
-			   try to bring it back up 
-			 */
+			/* 
+			   try to bring it back up */
 			if ((err = m2ua_send_asps_aspup_req(q, spp->xp, NULL, NULL, 0)))
 				return (err);
 			spp_timer_start(spp, tack);
@@ -5330,21 +5305,18 @@ sgp_set_state(queue_t *q, struct spp *spp, const ulong newstate)
 		case ASP_WACK_ASPDN:
 			spp_timer_stop(spp, tack);
 			spp_set_state(spp, newstate);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_UP:
 			return (QR_DONE);
 		default:
 		case ASP_WACK_ASPUP:
 			spp_timer_stop(spp, tack);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
-			/*
-			   move to the inactive state in all AS 
-			 */
+			/* 
+			   move to the inactive state in all AS */
 			for (gp = spp->gp.list; gp; gp = gp->spp.next)
 				if ((err = gp_p_set_state(q, gp, ASP_INACTIVE)))
 					return (err);
@@ -5455,7 +5427,7 @@ xp_tack_timeout(xp_t * xp)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE struct gp *
-spp_find_gp(struct spp *spp, uint32_t * iids, size_t iid_len)
+spp_find_gp(struct spp *spp, uint32_t *iids, size_t iid_len)
 {
 	int i;
 	struct gp *gp;
@@ -5470,9 +5442,8 @@ STATIC INLINE struct sl *
 ap_find_slu(struct ap *ap)
 {
 	struct sl *sl;
-	/*
-	   return first available link 
-	 */
+	/* 
+	   return first available link */
 	for (sl = ap->u.as->sl.list; sl && sl_tst_flags(sl, ASF_ACTIVE | ASF_PENDING);
 	     sl = sl->as.next) ;
 	return (sl);
@@ -5488,9 +5459,8 @@ ap_find_slu_next(struct ap *ap, struct sl *sl, const int command)
 	case UA_TMODE_LOADSHARE:
 		if (!command)
 			return (NULL);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case UA_TMODE_BROADCAST:
 		for (; sl && sl_tst_flags(sl, ASF_ACTIVE | ASF_PENDING); sl = sl->as.next) ;
 		return (sl);
@@ -5500,9 +5470,8 @@ STATIC INLINE struct gp *
 ap_find_asp(struct ap *ap)
 {
 	struct gp *gp;
-	/*
-	   return first available link 
-	 */
+	/* 
+	   return first available link */
 	for (gp = ap->u.as->gp.list; gp && gp_tst_flags(gp, ASF_ACTIVE | ASF_PENDING);
 	     gp = gp->as.next) ;
 	return gp;
@@ -5518,9 +5487,8 @@ ap_find_asp_next(struct ap *ap, struct gp *gp, const int command)
 	case UA_TMODE_LOADSHARE:
 		if (!command)
 			return (NULL);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case UA_TMODE_BROADCAST:
 		for (; gp && gp_tst_flags(gp, ASF_ACTIVE | ASF_PENDING); gp = gp->as.next) ;
 		return gp;
@@ -5530,9 +5498,8 @@ STATIC INLINE struct ap *
 as_p_find_ap(struct as *as)
 {
 	struct ap *ap;
-	/*
-	   return first available sp/sg 
-	 */
+	/* 
+	   return first available sp/sg */
 	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
 	     ap = ap->p.next) ;
 	return ap;
@@ -5548,13 +5515,11 @@ as_p_find_ap_next(struct as *as, struct ap *ap, const int command)
 	case UA_TMODE_LOADSHARE:
 		if (!command)
 			return (NULL);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case UA_TMODE_BROADCAST:
-		/*
-		   return first available sp/sg 
-		 */
+		/* 
+		   return first available sp/sg */
 		for (; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING); ap = ap->p.next) ;
 		return ap;
 	}
@@ -5567,9 +5532,8 @@ STATIC INLINE struct sl *
 ap_find_slp(struct ap *ap)
 {
 	struct sl *sl;
-	/*
-	   return first available link 
-	 */
+	/* 
+	   return first available link */
 	for (sl = ap->p.as->sl.list; sl && sl_tst_flags(sl, ASF_ACTIVE | ASF_PENDING);
 	     sl = sl->as.next) ;
 	return (sl);
@@ -5587,9 +5551,8 @@ STATIC INLINE struct gp *
 ap_find_sgp(struct ap *ap)
 {
 	struct gp *gp;
-	/*
-	   return first available link 
-	 */
+	/* 
+	   return first available link */
 	for (gp = ap->p.as->gp.list; gp && gp_tst_flags(gp, ASF_ACTIVE | ASF_PENDING);
 	     gp = gp->as.next) ;
 	return gp;
@@ -5607,9 +5570,8 @@ STATIC INLINE struct ap *
 as_u_find_ap(struct as *as)
 {
 	struct ap *ap;
-	/*
-	   return first available sg 
-	 */
+	/* 
+	   return first available sg */
 	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
 	     ap = ap->u.next) ;
 	return ap;
@@ -5742,23 +5704,21 @@ sgp_recv_asps_aspup_req(queue_t *q, m2ua_msg_t * m)
 	if (!(spp = xp->spp)) {
 		if (!(sp = xp->sp))
 			goto disable;
-		/*
+		/* 
 		   If we are not yet associated with an spp but we are associated with an sp (must
 		   be one or the other) then if there is an ASPID in the mssage then we can
 		   discover whether this is a unique ASP and associate it with the correct (or a
 		   new) spp.  If there is no ASPID in the message, we should refuse the ASPUP with
-		   an ERR. 
-		 */
+		   an ERR. */
 		if (!m->aspid.ptr.c)
 			goto needaspid;
 		if (!m->aspid.val)
 			goto badaspid;
 		for (spp = sp->spp.list; spp && spp->aspid != m->aspid.val; spp = spp->sp.next) ;
-		/*
+		/* 
 		   FEATURE: We create an ASP if a structure does not exist. This ASP is given
 		   access to all of the AS defined for this SGP.  If one wants security, the ASP
-		   should have never been allowed to connect. 
-		 */
+		   should have never been allowed to connect. */
 		if (!spp) {
 			if (!
 			    (spp =
@@ -5788,29 +5748,28 @@ sgp_recv_asps_aspup_req(queue_t *q, m2ua_msg_t * m)
 		if (spp_tst_flags(spp, ASF_MGMT_BLOCKED))
 			goto blocked;
 		asp_set_state(q, spp, ASP_WACK_ASPUP);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case ASP_WACK_ASPUP:
 		for (gp = spp->gp.list; gp; gp = gp->spp.next) {
 			struct as *as = gp->as.as;
 			struct xp *xp = gp->spp.spp->xp;
 			if (gp_get_state(gp) != AS_DOWN)
 				continue;
-			/*
+			/* 
 			   FEATURE: ASPs which have just come up should be immediately notified of
 			   AS state, they can then use the notifications to determine their next
-			   best action 
-			 */
+			   best action */
 			if (as_tst_flags(as, ASF_ACTIVE)) {
 				if ((err =
 				     m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_AS_ACTIVE, NULL, NULL, 0,
 							 NULL, 0)))
 					return (err);
 				if (as_tst_flags(as, ASF_INSUFFICIENT_ASPS) && as->minasp > 1)
-					if ((err = m2ua_send_mgmt_ntfy(q, xp,
-								       UA_STATUS_AS_INSUFFICIENT_ASPS,
-								       NULL, NULL, 0, NULL, 0)))
+					if ((err =
+					     m2ua_send_mgmt_ntfy(q, xp,
+								 UA_STATUS_AS_INSUFFICIENT_ASPS,
+								 NULL, NULL, 0, NULL, 0)))
 						return (err);
 				if (as_tst_flags(as, ASF_MINIMUM_ASPS) && as->minasp > 1)
 					if ((err =
@@ -5834,15 +5793,13 @@ sgp_recv_asps_aspup_req(queue_t *q, m2ua_msg_t * m)
 				return (err);
 		}
 		asp_set_state(q, spp, ASP_WACK_ASPDN);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case ASP_WACK_ASPDN:
 		todo(("Notify management that the ASP has come up\n"));
 		asp_set_state(q, spp, ASP_UP);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case ASP_UP:
 		if ((err = m2ua_send_asps_aspup_ack(q, xp, NULL, NULL, 0)))
 			return (err);
@@ -5889,12 +5846,11 @@ sgp_recv_asps_aspdn_req(queue_t *q, m2ua_msg_t * m)
 		return (-EPROTO);
 	}
 	if (m->aspid.ptr.c && m->aspid.val && m->aspid.val != spp->aspid) {
-		/*
+		/* 
 		   FEATURE: As discussed on SIGTRAN list it might be advantageous to have an ASP
 		   indicate ASP Down for an ASP other than itself.  To do so, it would include the
 		   ASPID of the other ASP. So, if there is an ASPID in the message, we look for the 
-		   other ASP. 
-		 */
+		   other ASP. */
 		for (spp = spp->sp.sp->spp.list; spp && spp->aspid != m->aspid.val;
 		     spp = spp->sp.next) ;
 		if (!spp || !spp->xp)
@@ -5904,24 +5860,21 @@ sgp_recv_asps_aspdn_req(queue_t *q, m2ua_msg_t * m)
 	switch (spp_get_state(spp)) {
 	case ASP_UP:
 		asp_set_state(q, spp, ASP_WACK_ASPDN);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case ASP_WACK_ASPDN:
 		for (gp = spp->gp.list; gp; gp = gp->spp.next)
 			if (gp_get_state(gp) != AS_DOWN)
 				if ((err = gp_u_set_state(q, gp, AS_DOWN)))
 					return (err);
 		asp_set_state(q, spp, ASP_WACK_ASPUP);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case ASP_WACK_ASPUP:
 		todo(("Notify management that the ASP has gone down\n"));
 		asp_set_state(q, spp, ASP_DOWN);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case ASP_DOWN:
 		if ((err = m2ua_send_asps_aspdn_ack(q, spp->xp, &spp->aspid, NULL, 0)))
 			return (err);
@@ -5965,9 +5918,8 @@ asp_recv_asps_aspup_ack(queue_t *q, m2ua_msg_t * m)
 		goto disable;
 	switch (spp_get_state(spp)) {
 	case ASP_UP:
-		/*
-		   ignore: probably a late ack to our ASPUP 
-		 */
+		/* 
+		   ignore: probably a late ack to our ASPUP */
 		return (QR_DONE);
 	case ASP_WACK_ASPUP:
 		todo(("Indicate to management that the ASP is up.\n"));
@@ -5998,17 +5950,15 @@ asp_recv_asps_aspdn_ack(queue_t *q, m2ua_msg_t * m)
 	switch (spp_get_state(spp)) {
 	case ASP_WACK_ASPDN:
 	case ASP_WACK_ASPUP:
-		/*
-		   solicited ASPDN Ack 
-		 */
+		/* 
+		   solicited ASPDN Ack */
 		todo(("Indicate to management that the ASP is down.\n"));
 		return sgp_set_state(q, spp, ASP_DOWN);
 	case ASP_UP:
-		/*
+		/* 
 		   unsolicited ASP Down: we attempt once to re-establish the ASP.  If the second
 		   attempt fails (in state ASP_WACK_ASPUP) we notify management and remain in the
-		   down state. 
-		 */
+		   down state. */
 		if ((err = m2ua_send_asps_aspup_req(q, xp, NULL, NULL, 0)))
 			return (err);
 		return sgp_set_state(q, spp, ASP_DOWN);
@@ -6094,9 +6044,8 @@ sgp_recv_aspt_aspac_req(queue_t *q, m2ua_msg_t * m)
 			goto blocked;
 		if ((err = gp_u_set_state(q, gp, AS_WACK_ASPAC)))
 			return (err);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPAC:
 		switch (as_get_state(as)) {
 		case AS_INACTIVE:
@@ -6105,14 +6054,13 @@ sgp_recv_aspt_aspac_req(queue_t *q, m2ua_msg_t * m)
 		case AS_WACK_ASPAC:
 			if (as->sp.sp->tmode != UA_TMODE_OVERRIDE)
 				return (QR_DONE);
-			/*
-			   look for activating ASP 
-			 */
+			/* 
+			   look for activating ASP */
 			for (g2 = as->gp.list; g2 && g2 != gp && gp_get_state(g2) != AS_WACK_ASPAC;
 			     g2 = g2->as.next) ;
 			if (g2) {
-				if ((x2 = g2->spp.spp->xp) &&
-				    (err = m2ua_send_aspt_aspia_ack(q, x2, NULL, 0, NULL, 0)))
+				if ((x2 = g2->spp.spp->xp)
+				    && (err = m2ua_send_aspt_aspia_ack(q, x2, NULL, 0, NULL, 0)))
 					return (err);
 				if ((err = gp_u_set_state(q, g2, AS_INACTIVE)))
 					return (err);
@@ -6129,14 +6077,13 @@ sgp_recv_aspt_aspac_req(queue_t *q, m2ua_msg_t * m)
 		case AS_WACK_ASPIA:
 			if (as->sp.sp->tmode != UA_TMODE_OVERRIDE)
 				break;
-			/*
-			   look for deactivating ASP 
-			 */
+			/* 
+			   look for deactivating ASP */
 			for (g2 = as->gp.list; g2 && g2 != gp && gp_get_state(g2) != AS_WACK_ASPIA;
 			     g2 = g2->as.next) ;
 			if (g2) {
-				if ((x2 = g2->spp.spp->xp) &&
-				    (err = m2ua_send_aspt_aspia_ack(q, x2, NULL, 0, NULL, 0)))
+				if ((x2 = g2->spp.spp->xp)
+				    && (err = m2ua_send_aspt_aspia_ack(q, x2, NULL, 0, NULL, 0)))
 					return (err);
 				if ((err = gp_u_set_state(q, g2, AS_INACTIVE)))
 					return (err);
@@ -6153,17 +6100,16 @@ sgp_recv_aspt_aspac_req(queue_t *q, m2ua_msg_t * m)
 		case AS_ACTIVE:
 			if (as->sp.sp->tmode != UA_TMODE_OVERRIDE)
 				break;
-			/*
-			   look for active ASP 
-			 */
+			/* 
+			   look for active ASP */
 			for (g2 = as->gp.list; g2 && g2 != gp && gp_get_state(g2) != AS_ACTIVE;
 			     g2 = g2->as.next) ;
 			if (g2) {
-				if ((x2 = g2->spp.spp->xp) &&
-				    (err =
-				     m2ua_send_mgmt_ntfy(q, x2, UA_STATUS_ALTERNATE_ASP_ACTIVE,
-							 &spp->aspid, &as->iid, sizeof(as->iid),
-							 NULL, 0)))
+				if ((x2 = g2->spp.spp->xp)
+				    && (err =
+					m2ua_send_mgmt_ntfy(q, x2, UA_STATUS_ALTERNATE_ASP_ACTIVE,
+							    &spp->aspid, &as->iid, sizeof(as->iid),
+							    NULL, 0)))
 					return (err);
 				if ((err = gp_u_set_state(q, g2, AS_INACTIVE)))
 					return (err);
@@ -6178,17 +6124,16 @@ sgp_recv_aspt_aspac_req(queue_t *q, m2ua_msg_t * m)
 			}
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPIA:
 		todo(("Notify management that ASP has gone active\n"));
 		if ((err = gp_u_set_state(q, gp, AS_ACTIVE)))
 			return (err);
 	case AS_ACTIVE:
-		if ((err = m2ua_send_aspt_aspac_ack(q, xp, as->sp.sp->tmode,
-						    m->iid.ptr.w, m->iid.len / sizeof(uint32_t),
-						    NULL, 0)))
+		if ((err =
+		     m2ua_send_aspt_aspac_ack(q, xp, as->sp.sp->tmode, m->iid.ptr.w,
+					      m->iid.len / sizeof(uint32_t), NULL, 0)))
 			return (err);
 		return (QR_DONE);
 	}
@@ -6247,9 +6192,8 @@ sgp_recv_aspt_aspia_req(queue_t *q, m2ua_msg_t * m)
 	case AS_ACTIVE:
 		if ((err = gp_u_set_state(q, gp, AS_WACK_ASPIA)))
 			return (err);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPIA:
 	case AS_WACK_ASPAC:
 	case AS_INACTIVE:
@@ -6293,19 +6237,16 @@ asp_recv_aspt_aspac_ack(queue_t *q, m2ua_msg_t * m)
 	case ASP_ACTIVE:
 		return (QR_DONE);
 	case ASP_WACK_ASPAC:
-		/*
-		   complete activation 
-		 */
+		/* 
+		   complete activation */
 		spp_set_state(gp->spp.spp, ASP_ACTIVE);
 		return (QR_DONE);
 	case ASP_INACTIVE:
-		/*
-		   activate 
-		 */
+		/* 
+		   activate */
 		spp_set_state(gp->spp.spp, ASP_ACTIVE);
-		/*
-		   attempt deactivation 
-		 */
+		/* 
+		   attempt deactivation */
 		return (QR_DONE);
 	}
 	return (-EPROTO);
@@ -6341,32 +6282,28 @@ asp_recv_aspt_aspia_ack(queue_t *q, m2ua_msg_t * m)
 		goto badiid;
 	switch (gp_get_state(gp)) {
 	case ASP_INACTIVE:
-		/*
-		   ignore, probably late ack to our ASPIA 
-		 */
-		/*
-		   XXX: maybe we should inform management here 
-		 */
+		/* 
+		   ignore, probably late ack to our ASPIA */
+		/* 
+		   XXX: maybe we should inform management here */
 		return (QR_DONE);
 	case ASP_WACK_ASPIA:
 		gp_p_set_state(q, gp, ASP_INACTIVE);
 		return (QR_DONE);
 	case ASP_WACK_ASPAC:
-		/*
-		   ignore, wait for timer to fire 
-		 */
-		/*
-		   XXX: maybe we should inform management here 
-		 */
+		/* 
+		   ignore, wait for timer to fire */
+		/* 
+		   XXX: maybe we should inform management here */
 		return (QR_DONE);
 	case ASP_ACTIVE:
-		/*
+		/* 
 		   This is an unsolicited ASP Inactive Ack.  It is the SGP forcing us to the
 		   inactive state.  We must placed the ASP in the inactive state and then try to
-		   bring it back up again. 
-		 */
-		if ((err = m2ua_send_aspt_aspac_req(q, xp, gp->as.as->sp.sp->tmode, m->iid.ptr.w,
-						    m->iid.len / sizeof(uint32_t), NULL, 0)))
+		   bring it back up again. */
+		if ((err =
+		     m2ua_send_aspt_aspac_req(q, xp, gp->as.as->sp.sp->tmode, m->iid.ptr.w,
+					      m->iid.len / sizeof(uint32_t), NULL, 0)))
 			return (err);
 		gp_p_set_state(q, gp, ASP_INACTIVE);
 		gp_p_set_state(q, gp, ASP_WACK_ASPAC);
@@ -6503,9 +6440,8 @@ sgp_recv_maup_estab_req(queue_t *q, m2ua_msg_t * m)
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
 			switch (sl_get_l_state(slp)) {
 			case SLS_WCON_RELREQ:
-				/*
-				   The signalling link has failed and we are restarting it. 
-				 */
+				/* 
+				   The signalling link has failed and we are restarting it. */
 				rare();
 			case SLS_IDLE:
 				if (!sl_tst_flags(slp, ASF_RETRIEVAL)) {
@@ -6515,28 +6451,25 @@ sgp_recv_maup_estab_req(queue_t *q, m2ua_msg_t * m)
 					sl_set_l_state(slp, SLS_WCON_EREQ);
 					return (QR_DONE);
 				} else {
-					/*
+					/* 
 					   Someone else is retrieving messages so we need to
 					   indicate that the signalling link has failed (reason
-					   will be unspecified). 
-					 */
+					   will be unspecified). */
 					if ((err = m2ua_send_maup_rel_ind(q, asp, NULL)) < 0)
 						return (err);
 					gp_set_l_state(asp, SLS_IDLE);
 					return (QR_DONE);
 				}
 			case SLS_WCON_EREQ:
-				/*
+				/* 
 				   The signalling link is already being established by some other
-				   signalling link user. Wait for establishment confirmation. 
-				 */
+				   signalling link user. Wait for establishment confirmation. */
 				gp_set_l_state(asp, SLS_WCON_EREQ);
 				return (QR_DONE);
 			case SLS_ESTABLISHED:
-				/*
+				/* 
 				   The signalling link is already established by some signalling
-				   link user. Indicate that the link is in service. 
-				 */
+				   link user. Indicate that the link is in service. */
 				if ((err = m2ua_send_maup_estab_con(q, asp, NULL)) < 0)
 					return (err);
 				gp_set_l_state(asp, SLS_ESTABLISHED);
@@ -6551,9 +6484,8 @@ sgp_recv_maup_estab_req(queue_t *q, m2ua_msg_t * m)
 				return (-EFAULT);
 			switch (gp_get_l_state(sgp)) {
 			case SLS_WCON_RELREQ:
-				/*
-				   The signalling link has failed and we are restarting it. 
-				 */
+				/* 
+				   The signalling link has failed and we are restarting it. */
 				rare();
 			case SLS_IDLE:
 				if (!gp_tst_flags(sgp, ASF_RETRIEVAL)) {
@@ -6565,28 +6497,25 @@ sgp_recv_maup_estab_req(queue_t *q, m2ua_msg_t * m)
 					}
 					return (-EBUSY);
 				} else {
-					/*
+					/* 
 					   Someone else is retrieving messages so we need to
 					   indicate that the signalling link has failed (reason
-					   will be unspecified). 
-					 */
+					   will be unspecified). */
 					if ((err = m2ua_send_maup_rel_ind(q, asp, NULL)) < 0)
 						return (err);
 					gp_set_l_state(asp, SLS_IDLE);
 					return (QR_DONE);
 				}
 			case SLS_WCON_EREQ:
-				/*
+				/* 
 				   The signalling link is already being established by some other
-				   signalling link user. Wait for establishment confirmation. 
-				 */
+				   signalling link user. Wait for establishment confirmation. */
 				gp_set_l_state(asp, SLS_WCON_EREQ);
 				return (QR_DONE);
 			case SLS_ESTABLISHED:
-				/*
+				/* 
 				   The signalling link is already established by some signalling
-				   link user. Indicate that the link is in service. 
-				 */
+				   link user. Indicate that the link is in service. */
 				if ((err = m2ua_send_maup_estab_con(q, asp, NULL)) < 0)
 					return (err);
 				gp_set_l_state(asp, SLS_ESTABLISHED);
@@ -6688,26 +6617,22 @@ sgp_recv_maup_rel_req(queue_t *q, m2ua_msg_t * m)
 			case SLS_ESTABLISHED:
 				if ((err = slp_stop_req(q, slp, m)))
 					return (err);
-				/*
-				   no confirmation from SL-P 
-				 */
+				/* 
+				   no confirmation from SL-P */
 				sl_set_l_state(slp, SLS_WCON_RELREQ);
-				/*
-				   fall through 
-				 */
+				/* 
+				   fall through */
 			case SLS_WCON_RELREQ:
 				sl_set_l_state(slp, SLS_IDLE);
-				/*
-				   fall through 
-				 */
+				/* 
+				   fall through */
 			case SLS_IDLE:
 				if ((err = m2ua_send_maup_rel_con(q, asp, NULL)))
 					return (err);
-				/*
+				/* 
 				   FIXME: All local signalling link users that believe the link to
 				   be active must be notified with a link failure with unspecified
-				   cause, or (better) a local processor outage. 
-				 */
+				   cause, or (better) a local processor outage. */
 				sl_set_l_state(slp, SLS_IDLE);
 				break;
 			default:
@@ -6730,11 +6655,10 @@ sgp_recv_maup_rel_req(queue_t *q, m2ua_msg_t * m)
 				break;
 			case SLS_IDLE:
 			case SLS_WCON_RELREQ:
-				/*
+				/* 
 				   The signalling link has already been put out of service by some
 				   other signalling link user or we can't put it out of service.
-				   Just silently accept the request. 
-				 */
+				   Just silently accept the request. */
 				if ((err = m2ua_send_maup_rel_con(q, asp, NULL)))
 					return (err);
 				break;
@@ -6909,10 +6833,9 @@ sgp_recv_maup_state_req(queue_t *q, m2ua_msg_t * m)
 			if (!sl_tst_flags(slp, ASF_OPERATION_PENDING)) {
 				switch (m->status.val) {
 				case M2UA_STATUS_LPO_SET:
-					/*
+					/* 
 					   FIXME: We can only set local processor outage at the
-					   physical link if we are the only signalling link user. 
-					 */
+					   physical link if we are the only signalling link user. */
 					if (!gp_tst_flags(asp, ASF_USR_PROC_OUTAGE)) {
 						if (!sl_tst_flags(slp, ASF_USR_PROC_OUTAGE)) {
 							if ((err =
@@ -6925,10 +6848,9 @@ sgp_recv_maup_state_req(queue_t *q, m2ua_msg_t * m)
 					}
 					break;
 				case M2UA_STATUS_LPO_CLEAR:
-					/*
+					/* 
 					   FIXME: We can only clr local processor outage at the
-					   physical link if we are the only signalling link user. 
-					 */
+					   physical link if we are the only signalling link user. */
 					if (gp_tst_flags(asp, ASF_USR_PROC_OUTAGE)) {
 						if (sl_tst_flags(slp, ASF_USR_PROC_OUTAGE)) {
 							if ((err = slp_resume_req(q, slp, m)))
@@ -6960,11 +6882,10 @@ sgp_recv_maup_state_req(queue_t *q, m2ua_msg_t * m)
 					}
 					break;
 				case M2UA_STATUS_FLUSH_BUFFERS:
-					/*
+					/* 
 					   If the commend has already been effected, we simply set
 					   our flag to indicate that we are interested in the
-					   response. 
-					 */
+					   response. */
 					if (!gp_tst_flags(asp, ASF_FLUSH_BUFFERS)) {
 						if (!sl_tst_flags(slp, ASF_FLUSH_BUFFERS)) {
 							if ((err =
@@ -6991,11 +6912,10 @@ sgp_recv_maup_state_req(queue_t *q, m2ua_msg_t * m)
 					}
 					break;
 				case M2UA_STATUS_CLEAR_RTB:
-					/*
+					/* 
 					   If the commend has already been effected, we simply set
 					   our flag to indicate that we are interested in the
-					   response. 
-					 */
+					   response. */
 					if (!gp_tst_flags(asp, ASF_CLEAR_RTB)) {
 						if (!sl_tst_flags(slp, ASF_CLEAR_RTB)) {
 							if ((err = slp_clear_rtb_req(q, slp, m)))
@@ -7006,9 +6926,8 @@ sgp_recv_maup_state_req(queue_t *q, m2ua_msg_t * m)
 					}
 					break;
 				case M2UA_STATUS_AUDIT:
-					/*
-					   ignore for now 
-					 */
+					/* 
+					   ignore for now */
 					break;
 				case M2UA_STATUS_CONG_CLEAR:
 					if (gp_tst_flags(asp, (ASF_CONG_ACCEPT | ASF_CONG_DISCARD))) {
@@ -7306,10 +7225,9 @@ sgp_recv_maup_retr_req(queue_t *q, m2ua_msg_t * m)
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
 			switch (m->action.val) {
 			case M2UA_ACTION_RTRV_BSN:
-				/*
+				/* 
 				   If the commend has already been effected, we simply set our flag 
-				   to indicate that we are interested in the response. 
-				 */
+				   to indicate that we are interested in the response. */
 				if (!sl_tst_flags(slp, ASF_BSNT_REQUEST)) {
 					if ((err = slp_retrieve_bsnt_req(q, slp, m)))
 						return (err);
@@ -7700,8 +7618,8 @@ sgp_recv_maup_data(queue_t *q, m2ua_msg_t * m)
 		return (QR_DONE);
 	if (!(as = asp->as.as))
 		return (-EFAULT);
-	if ((m->data1.ptr.w && m->data2.ptr.w) ||
-	    ((m->data1.ptr.w && m->data1.len < 4) || (m->data2.ptr.w && m->data2.len < 4)))
+	if ((m->data1.ptr.w && m->data2.ptr.w)
+	    || ((m->data1.ptr.w && m->data1.len < 4) || (m->data2.ptr.w && m->data2.len < 4)))
 		return (-EINVAL);
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
@@ -7739,7 +7657,7 @@ sgp_recv_maup_data(queue_t *q, m2ua_msg_t * m)
 STATIC int
 slu_recv_maup_data_ack(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
-	/*
+	/* 
 	 *  TODO: What we could do here is walk an internal transmit buffer at the SL-U and strike the acknowledged
 	 *  MSUs.  The purpose here is not retransmission but transmit buffer management.  This would give us some
 	 *  back-pressure when SCTP congestion occurs and we can inform MTP of the congestion at Level 3.  This
@@ -7753,7 +7671,7 @@ slu_recv_maup_data_ack(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 STATIC int
 slp_recv_maup_data_ack(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
-	/*
+	/* 
 	 *  Again what we could do is walk an internal receive buffer at the SL-P and strike the acknowledged MSUs.
 	 *  The purpose here is not retransmission but receive buffer management.  This would give us some
 	 *  back-pressure when SCTP congestion occurs and we can inform the link of the receive congestion.  This
@@ -8078,9 +7996,8 @@ m2ua_recv_msg(queue_t *q, mblk_t *mp)
 		} else if ((sp = xp->sp)) {
 			switch (sp->type) {
 			case M2UA_OBJ_TYPE_SP:
-				/*
-				   Unknown ASP connecting 
-				 */
+				/* 
+				   Unknown ASP connecting */
 				err = sgp_recv_msg(q, &msg);
 				break;
 			case M2UA_OBJ_TYPE_SG:
@@ -8172,7 +8089,7 @@ slu_info_req(queue_t *q, mblk_t *mp)
 	}
       badprim:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, sl));
 	goto error;
       error:
 	return slu_error_ack(q, sl, p->lmi_primitive, err);
@@ -8208,9 +8125,8 @@ slu_attach_req(queue_t *q, mblk_t *mp)
 	}
 	if (!as)
 		goto badppa;
-	/*
-	   link SL-U to AS-U 
-	 */
+	/* 
+	   link SL-U to AS-U */
 	if ((sl->as.next = as->sl.list))
 		sl->as.next->as.prev = &sl->as.next;
 	sl->as.prev = &as->sl.list;
@@ -8222,15 +8138,15 @@ slu_attach_req(queue_t *q, mblk_t *mp)
 	return slu_ok_ack(q, sl, p->lmi_primitive);
       badppa:
 	err = LMI_BADPPA;
-	ptrace(("%s: %p: PROTO: bad PPA\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: bad PPA\n", DRV_NAME, sl));
 	goto error;
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: PROTO: would place i/f out of state\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: would place i/f out of state\n", DRV_NAME, sl));
 	goto error;
       badprim:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, sl));
 	goto error;
       error:
 	return slu_error_ack(q, sl, p->lmi_primitive, err);
@@ -8256,9 +8172,8 @@ slu_detach_req(queue_t *q, mblk_t *mp)
 	sl_set_i_state(sl, LMI_DETACH_PENDING);
 	if ((err = sl_u_set_state(q, sl, AS_DOWN)))
 		goto error;
-	/*
-	   unlink SL-U from AS-U 
-	 */
+	/* 
+	   unlink SL-U from AS-U */
 	if ((as = sl->as.as)) {
 		if ((*sl->as.prev = sl->as.next))
 			sl->as.next->as.prev = sl->as.prev;
@@ -8271,15 +8186,15 @@ slu_detach_req(queue_t *q, mblk_t *mp)
 	return slu_ok_ack(q, sl, p->lmi_primitive);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: software error\n", M2UA_DRV_NAME, sl));
+	pswerr(("%s: %p: SWERR: software error\n", DRV_NAME, sl));
 	goto error;
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: PROTO: would place i/f out of state\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: would place i/f out of state\n", DRV_NAME, sl));
 	goto error;
       badprim:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, sl));
 	goto error;
       error:
 	return slu_error_ack(q, sl, p->lmi_primitive, err);
@@ -8323,9 +8238,8 @@ slu_enable_req(queue_t *q, mblk_t *mp)
 		if ((err = sl_u_set_state(q, sl, AS_WACK_ASPAC)))
 			goto error;
 		sl_set_i_state(sl, LMI_ENABLE_PENDING);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPAC:
 		switch (as_get_state(as)) {
 		case AS_INACTIVE:
@@ -8334,14 +8248,13 @@ slu_enable_req(queue_t *q, mblk_t *mp)
 		case AS_WACK_ASPAC:
 			if (as->sp.sp->tmode != UA_TMODE_OVERRIDE)
 				return (QR_DONE);	/* wait for activation to confirm */
-			/*
-			   look for activating ASP 
-			 */
+			/* 
+			   look for activating ASP */
 			for (asp = as->gp.list; asp && gp_get_state(asp) != AS_WACK_ASPAC;
 			     asp = asp->as.next) ;
 			if (asp) {
-				if ((xp = asp->spp.spp->xp) &&
-				    (err = m2ua_send_aspt_aspia_ack(q, xp, NULL, 0, NULL, 0)))
+				if ((xp = asp->spp.spp->xp)
+				    && (err = m2ua_send_aspt_aspia_ack(q, xp, NULL, 0, NULL, 0)))
 					goto error;
 				if ((err = gp_u_set_state(q, asp, AS_INACTIVE)))
 					goto error;
@@ -8350,14 +8263,13 @@ slu_enable_req(queue_t *q, mblk_t *mp)
 		case AS_WACK_ASPIA:
 			if (as->sp.sp->tmode != UA_TMODE_OVERRIDE)
 				break;
-			/*
-			   look for deactivating ASP 
-			 */
+			/* 
+			   look for deactivating ASP */
 			for (asp = as->gp.list; asp && gp_get_state(asp) != AS_WACK_ASPIA;
 			     asp = asp->as.next) ;
 			if (asp) {
-				if ((xp = asp->spp.spp->xp) &&
-				    (err = m2ua_send_aspt_aspia_ack(q, xp, NULL, 0, NULL, 0)))
+				if ((xp = asp->spp.spp->xp)
+				    && (err = m2ua_send_aspt_aspia_ack(q, xp, NULL, 0, NULL, 0)))
 					goto error;
 				if ((err = gp_u_set_state(q, asp, AS_INACTIVE)))
 					goto error;
@@ -8366,25 +8278,24 @@ slu_enable_req(queue_t *q, mblk_t *mp)
 		case AS_ACTIVE:
 			if (as->sp.sp->tmode != UA_TMODE_OVERRIDE)
 				break;
-			/*
-			   look for active ASP 
-			 */
+			/* 
+			   look for active ASP */
 			for (asp = as->gp.list; asp && gp_get_state(asp) != AS_ACTIVE;
 			     asp = asp->as.next) ;
 			if (asp) {
-				if ((xp = asp->spp.spp->xp) &&
-				    (err =
-				     m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_ALTERNATE_ASP_ACTIVE,
-							 NULL, &as->iid, sizeof(as->iid), NULL, 0)))
+				if ((xp = asp->spp.spp->xp)
+				    && (err =
+					m2ua_send_mgmt_ntfy(q, xp, UA_STATUS_ALTERNATE_ASP_ACTIVE,
+							    NULL, &as->iid, sizeof(as->iid), NULL,
+							    0)))
 					goto error;
 				if ((err = gp_u_set_state(q, asp, AS_INACTIVE)))
 					goto error;
 			}
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPIA:
 		todo(("Notify management that SL-U has gone active\n"));
 		if ((err = sl_u_set_state(q, sl, AS_ACTIVE)))
@@ -8397,23 +8308,23 @@ slu_enable_req(queue_t *q, mblk_t *mp)
 		return (QR_DONE);
 	}
       efault:
-	pswerr(("%s: %p: SWERR: software error\n", M2UA_DRV_NAME, sl));
+	pswerr(("%s: %p: SWERR: software error\n", DRV_NAME, sl));
 	return (-EFAULT);
       blocked:
 	err = -EBUSY;
-	ptrace(("%s: %p: PROTO: management blocked\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: management blocked\n", DRV_NAME, sl));
 	goto error;
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: PROTO: out of state\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: out of state\n", DRV_NAME, sl));
 	goto error;
       badprim:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, sl));
 	goto error;
       unusable:
 	err = -EAGAIN;
-	ptrace(("%s: %p: ERROR: waiting for stream to become usable\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: waiting for stream to become usable\n", DRV_NAME, sl));
 	goto error;
       error:
 	return slu_error_ack(q, sl, p->lmi_primitive, err);
@@ -8453,18 +8364,15 @@ slu_disable_req(queue_t *q, mblk_t *mp)
 		if ((err = sl_u_set_state(q, sl, AS_WACK_ASPIA)))
 			goto error;
 		sl_set_i_state(sl, LMI_DISABLE_PENDING);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPIA:
 		if (as_tst_flags(as, ASF_ACTIVE))
-			/*
-			   wait for deactivation to confirm 
-			 */
+			/* 
+			   wait for deactivation to confirm */
 			return (QR_DONE);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case AS_WACK_ASPAC:
 		todo(("Notify management that SL-U has gone inactive\n"));
 		if ((err = sl_u_set_state(q, sl, AS_INACTIVE)))
@@ -8478,19 +8386,19 @@ slu_disable_req(queue_t *q, mblk_t *mp)
 	rare();
 	return (QR_DONE);
       efault:
-	pswerr(("%s: %p: SWERR: software error\n", M2UA_DRV_NAME, sl));
+	pswerr(("%s: %p: SWERR: software error\n", DRV_NAME, sl));
 	return (-EFAULT);
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: PROTO: out of state\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: out of state\n", DRV_NAME, sl));
 	goto error;
       badprim:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", DRV_NAME, sl));
 	goto error;
       unusable:
 	err = -EAGAIN;
-	ptrace(("%s: %p: ERROR: waiting for stream to become usable\n", M2UA_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: waiting for stream to become usable\n", DRV_NAME, sl));
 	goto error;
       error:
 	return slu_error_ack(q, sl, p->lmi_primitive, err);
@@ -8600,15 +8508,15 @@ slu_write(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       badprim:
 	err = LMI_BADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive\n", DRV_NAME, slu));
 	goto error;
       error:
 	return m_error(q, slu, EPROTO);
@@ -8663,19 +8571,19 @@ slu_pdu_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       badprim:
 	err = LMI_BADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -8746,9 +8654,8 @@ slu_emergency_req(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -8759,15 +8666,15 @@ slu_emergency_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -8838,9 +8745,8 @@ slu_emergency_ceases_req(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -8851,15 +8757,15 @@ slu_emergency_ceases_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -8892,9 +8798,8 @@ slu_start_req(queue_t *q, mblk_t *mp)
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
 			switch (sl_get_l_state(slp)) {
 			case SLS_WCON_RELREQ:
-				/*
-				   The signalling link has failed and we are restarting it 
-				 */
+				/* 
+				   The signalling link has failed and we are restarting it */
 				rare();
 			case SLS_IDLE:
 				if (!sl_tst_flags(slp, ASF_RETRIEVAL)) {
@@ -8906,28 +8811,25 @@ slu_start_req(queue_t *q, mblk_t *mp)
 					}
 					goto ebusy;
 				} else {
-					/*
+					/* 
 					   Someone else is retrieving messages, so we need to
 					   indicate that the signalling link has failed (reason
-					   will be unspecified). 
-					 */
+					   will be unspecified). */
 					if ((err = slu_out_of_service_ind(q, slu, NULL)) < 0)
 						goto error;
 					sl_set_l_state(slu, SLS_IDLE);
 					return (QR_DONE);
 				}
 			case SLS_WCON_EREQ:
-				/*
+				/* 
 				   The signalling link is already being established by some other
-				   signalling link user. Wait for establishment confirmation. 
-				 */
+				   signalling link user. Wait for establishment confirmation. */
 				sl_set_l_state(slu, SLS_WCON_EREQ);
 				return (QR_DONE);
 			case SLS_ESTABLISHED:
-				/*
+				/* 
 				   The signalling link is already established by some other
-				   signalling link user. Indicate that the link is in service 
-				 */
+				   signalling link user. Indicate that the link is in service */
 				if ((err = slu_in_service_ind(q, slu, NULL)) < 0)
 					goto error;
 				sl_set_l_state(slu, SLS_ESTABLISHED);
@@ -8940,9 +8842,8 @@ slu_start_req(queue_t *q, mblk_t *mp)
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
 			switch (gp_get_l_state(sgp)) {
 			case SLS_WCON_RELREQ:
-				/*
-				   The signalling link failed and we are restarting it 
-				 */
+				/* 
+				   The signalling link failed and we are restarting it */
 				rare();
 			case SLS_IDLE:
 				if (!gp_tst_flags(sgp, ASF_RETRIEVAL)) {
@@ -8952,28 +8853,25 @@ slu_start_req(queue_t *q, mblk_t *mp)
 					gp_set_l_state(sgp, SLS_WCON_EREQ);
 					return (err);
 				} else {
-					/*
+					/* 
 					   Someone else is retrieving messages, so we need to
 					   indicate that the signalling link has failed (reason
-					   will be unspecified). 
-					 */
+					   will be unspecified). */
 					if ((err = slu_out_of_service_ind(q, slu, NULL)) < 0)
 						goto error;
 					sl_set_l_state(slu, SLS_IDLE);
 					return (err);
 				}
 			case SLS_WCON_EREQ:
-				/*
+				/* 
 				   The signalling link is already being established by some other
-				   signalling link user. Wait for establishment confirmation 
-				 */
+				   signalling link user. Wait for establishment confirmation */
 				sl_set_l_state(slu, SLS_WCON_EREQ);
 				return (QR_DONE);
 			case SLS_ESTABLISHED:
-				/*
+				/* 
 				   The signalling link is already established by some other
-				   signalling link user. Indicate that the link is in service 
-				 */
+				   signalling link user. Indicate that the link is in service */
 				if ((err = slu_in_service_ind(q, slu, NULL)) < 0)
 					goto error;
 				sl_set_l_state(slu, SLS_ESTABLISHED);
@@ -8984,9 +8882,8 @@ slu_start_req(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -8996,19 +8893,19 @@ slu_start_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9051,11 +8948,10 @@ slu_stop_req(queue_t *q, mblk_t *mp)
 				goto ebusy;
 			case SLS_IDLE:
 			case SLS_WCON_RELREQ:
-				/*
+				/* 
 				   The signalling link has already been put out of service by some
 				   other signalling link user or we can't put it out of service.
-				   Just silently accept the request. 
-				 */
+				   Just silently accept the request. */
 				sl_set_l_state(slu, SLS_IDLE);
 				return (QR_DONE);
 			default:
@@ -9074,11 +8970,10 @@ slu_stop_req(queue_t *q, mblk_t *mp)
 				return (err);
 			case SLS_IDLE:
 			case SLS_WCON_RELREQ:
-				/*
+				/* 
 				   The signalling link has already been put out of service by some
 				   other signalling link user or we can't put it out of service.
-				   Just silently accept the request. 
-				 */
+				   Just silently accept the request. */
 				sl_set_l_state(slu, SLS_IDLE);
 				return (QR_DONE);
 			default:
@@ -9087,9 +8982,8 @@ slu_stop_req(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	sl_set_l_state(slu, SLS_IDLE);
 	return (QR_DONE);
       discard:
@@ -9097,19 +8991,19 @@ slu_stop_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9188,9 +9082,8 @@ slu_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_bsnt_not_retrievable_ind(q, slu, NULL)) < 0)
 		goto error;
 	return (err);
@@ -9199,20 +9092,20 @@ slu_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       outstate:
 	fixme(("This should actually return BSNT not retrievable\n"));
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9253,16 +9146,14 @@ slu_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 					}
 					goto ebusy;
 				}
-				/*
-				   fall through 
-				 */
+				/* 
+				   fall through */
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
-				/*
+				/* 
 				   Retrieval is not possible or someone else is already retrieving. 
 				   Only one signalling link user can be allowed to retrieve.  We
-				   must refuse the retrieval request. 
-				 */
+				   must refuse the retrieval request. */
 				if ((err = slu_retrieval_not_possible_ind(q, slu, NULL)) < 0)
 					goto error;
 				sl_set_l_state(slu, SLS_IDLE);
@@ -9282,16 +9173,14 @@ slu_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 					sl_set_flags(slu, ASF_RETRIEVAL);
 					return (err);
 				}
-				/*
-				   fall through 
-				 */
+				/* 
+				   fall through */
 			case SLS_WCON_EREQ:
 			case SLS_ESTABLISHED:
-				/*
+				/* 
 				   Retrieval is not possible or someone else is already retrieving. 
 				   Only one signalling link user can be allowed to retrieve.  We
-				   must refuse the retrieval request. 
-				 */
+				   must refuse the retrieval request. */
 				if ((err = slu_retrieval_not_possible_ind(q, slu, NULL)) < 0)
 					goto error;
 				sl_set_l_state(slu, SLS_IDLE);
@@ -9301,9 +9190,8 @@ slu_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 			}
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_retrieval_not_possible_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_l_state(slu, SLS_IDLE);
@@ -9313,20 +9201,20 @@ slu_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       outstate:
 	fixme(("This should actually return BSNT not retrievable\n"));
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9357,9 +9245,8 @@ slu_clear_buffers_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
-			/*
-			   active or pending local slp 
-			 */
+			/* 
+			   active or pending local slp */
 			if (!sl_tst_flags(slp, ASF_FLUSH_BUFFERS)) {
 				if (sl_tst_flags(slp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
 					if (!canput(slp->oq))
@@ -9373,9 +9260,8 @@ slu_clear_buffers_req(queue_t *q, mblk_t *mp)
 			return (QR_ABSORBED);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			/*
-			   active or pending sgp 
-			 */
+			/* 
+			   active or pending sgp */
 			if (!gp_tst_flags(sgp, ASF_FLUSH_BUFFERS)) {
 				if (gp_tst_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
 					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
@@ -9388,9 +9274,8 @@ slu_clear_buffers_req(queue_t *q, mblk_t *mp)
 			return (QR_DONE);
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -9400,22 +9285,22 @@ slu_clear_buffers_req(queue_t *q, mblk_t *mp)
       outstate:
 	fixme(("This should actually return BSNT not retrievable\n"));
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       discard:
 	rare();
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9446,9 +9331,8 @@ slu_clear_rtb_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
-			/*
-			   active or pending local slp 
-			 */
+			/* 
+			   active or pending local slp */
 			if (!sl_tst_flags(slp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (sl_tst_flags(slp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
 					if (!canput(slp->oq))
@@ -9463,9 +9347,8 @@ slu_clear_rtb_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			/*
-			   active or pending sgp 
-			 */
+			/* 
+			   active or pending sgp */
 			if (!gp_tst_flags(sgp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (gp_tst_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
 					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
@@ -9478,9 +9361,8 @@ slu_clear_rtb_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -9489,22 +9371,22 @@ slu_clear_rtb_req(queue_t *q, mblk_t *mp)
 	return (err);
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       discard:
 	rare();
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9535,9 +9417,8 @@ slu_continue_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
-			/*
-			   active or pending local slp 
-			 */
+			/* 
+			   active or pending local slp */
 			if (!sl_tst_flags(slp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (sl_tst_flags(slp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
 					if (!canput(slp->oq))
@@ -9552,9 +9433,8 @@ slu_continue_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			/*
-			   active or pending sgp 
-			 */
+			/* 
+			   active or pending sgp */
 			if (!gp_tst_flags(sgp, (ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS))) {
 				if (gp_tst_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))) {
 					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
@@ -9567,9 +9447,8 @@ slu_continue_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
+	/* 
+	   No active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -9578,22 +9457,22 @@ slu_continue_req(queue_t *q, mblk_t *mp)
 	return (err);
       outstate:
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       discard:
 	rare();
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9622,9 +9501,8 @@ slu_local_processor_outage_req(queue_t *q, mblk_t *mp)
 		goto discard;	/* already done */
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
-			/*
-			   Active or pending slp 
-			 */
+			/* 
+			   Active or pending slp */
 			if (!sl_tst_flags(slp, ASF_USR_PROC_OUTAGE)) {
 				if (!canput(slp->oq))
 					goto ebusy;
@@ -9636,9 +9514,8 @@ slu_local_processor_outage_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			/*
-			   Active or pending sgp 
-			 */
+			/* 
+			   Active or pending sgp */
 			if (!gp_tst_flags(sgp, ASF_USR_PROC_OUTAGE)) {
 				if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
 					goto error;
@@ -9648,12 +9525,10 @@ slu_local_processor_outage_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 	}
-	/*
-	   No active or pending provider 
-	 */
-	/*
-	   just wait 
-	 */
+	/* 
+	   No active or pending provider */
+	/* 
+	   just wait */
 	sl_set_flags(slu, ASF_USR_PROC_OUTAGE);
 	return (err);
       discard:
@@ -9661,15 +9536,15 @@ slu_local_processor_outage_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -9694,14 +9569,13 @@ slu_resume_req(queue_t *q, mblk_t *mp)
 		goto protoshort;
 	if (!(as = slu->as.as))
 		goto efault;
-	if (!sl_tst_flags(slu, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE)) ||
-	    sl_tst_flags(slu, (ASF_PRV_PROC_OUTAGE | ASF_LOC_PROC_OUTAGE | ASF_REM_PROC_OUTAGE)))
+	if (!sl_tst_flags(slu, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE))
+	    || sl_tst_flags(slu, (ASF_PRV_PROC_OUTAGE | ASF_LOC_PROC_OUTAGE | ASF_REM_PROC_OUTAGE)))
 		goto outstate;
 	for (ap = as_p_find_ap(as); ap; ap = as_p_find_ap_next(as, ap, 1)) {
 		for (slp = ap_find_slp(ap); slp; slp = ap_find_slp_next(ap, slp, 1)) {
-			/*
-			   active or pending local slp 
-			 */
+			/* 
+			   active or pending local slp */
 			if (!sl_tst_flags
 			    (slp,
 			     (ASF_PRV_PROC_OUTAGE | ASF_LOC_PROC_OUTAGE | ASF_REM_PROC_OUTAGE))) {
@@ -9710,8 +9584,9 @@ slu_resume_req(queue_t *q, mblk_t *mp)
 						goto ebusy;
 					ss7_oput(slp->oq, mp);
 					err = QR_ABSORBED;
-					sl_clr_flags(slp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE |
-							   ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS));
+					sl_clr_flags(slp,
+						     (ASF_RECOVERY | ASF_USR_PROC_OUTAGE |
+						      ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS));
 				}
 			}
 			sl_clr_flags(slu,
@@ -9720,17 +9595,17 @@ slu_resume_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 		for (sgp = ap_find_sgp(ap); sgp; sgp = ap_find_sgp_next(ap, sgp, 1)) {
-			/*
-			   active or pending sgp 
-			 */
+			/* 
+			   active or pending sgp */
 			if (!gp_tst_flags
 			    (sgp,
 			     (ASF_PRV_PROC_OUTAGE | ASF_LOC_PROC_OUTAGE | ASF_REM_PROC_OUTAGE))) {
 				if (!gp_tst_flags(sgp, ASF_RECOVERY)) {
 					if ((err = m2ua_send_maup_state_req(q, sgp, mp)) < 0)
 						goto error;
-					gp_clr_flags(sgp, (ASF_RECOVERY | ASF_USR_PROC_OUTAGE |
-							   ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS));
+					gp_clr_flags(sgp,
+						     (ASF_RECOVERY | ASF_USR_PROC_OUTAGE |
+						      ASF_CLEAR_RTB | ASF_FLUSH_BUFFERS));
 				}
 			}
 			sl_clr_flags(slu,
@@ -9739,9 +9614,8 @@ slu_resume_req(queue_t *q, mblk_t *mp)
 			return (err);
 		}
 	}
-	/*
-	   no active or pending provider 
-	 */
+	/* 
+	   no active or pending provider */
 	if ((err = slu_local_processor_outage_ind(q, slu, NULL)) < 0)
 		goto error;
 	sl_set_flags(slu, ASF_PRV_PROC_OUTAGE);
@@ -9752,20 +9626,20 @@ slu_resume_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, slu));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: ERROR: software error\n", M2UA_DRV_NAME, slu));
+	pswerr(("%s: %p: ERROR: software error\n", DRV_NAME, slu));
 	goto error;
       outstate:
 	fixme(("This should actually return BSNT not retrievable\n"));
 	err = LMI_OUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, slu));
 	goto error;
       protoshort:
 	err = LMI_PROTOSHORT;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", M2UA_DRV_NAME, slu));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, slu));
 	goto error;
       error:
 	return slu_error_ack(q, slu, p->sl_primitive, err);
@@ -10120,9 +9994,8 @@ slp_disable_con(queue_t *q, mblk_t *mp)
 STATIC int
 slp_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	swerr();
 	return (-EFAULT);
 }
@@ -10177,9 +10050,8 @@ slp_error_ind(queue_t *q, mblk_t *mp)
 STATIC int
 slp_stats_ind(queue_t *q, mblk_t *mp)
 {
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	swerr();
 	return (-EFAULT);
 }
@@ -10193,9 +10065,8 @@ slp_stats_ind(queue_t *q, mblk_t *mp)
 STATIC int
 slp_event_ind(queue_t *q, mblk_t *mp)
 {
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	swerr();
 	return (-EFAULT);
 }
@@ -10207,9 +10078,8 @@ slp_event_ind(queue_t *q, mblk_t *mp)
 STATIC int
 slp_hangup(queue_t *q, mblk_t *mp)
 {
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	fixme(("Write this function\n"));
 	swerr();
 	return (-EFAULT);
@@ -10937,9 +10807,8 @@ slp_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 STATIC int
 slp_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	swerr();
 	return (-EFAULT);
 }
@@ -10953,9 +10822,8 @@ slp_optmgmt_ack(queue_t *q, mblk_t *mp)
 STATIC int
 slp_notify_ind(queue_t *q, mblk_t *mp)
 {
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	swerr();
 	return (-EFAULT);
 }
@@ -10976,9 +10844,8 @@ slp_notify_ind(queue_t *q, mblk_t *mp)
 STATIC int
 xp_conn_ind(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -10989,9 +10856,8 @@ xp_conn_ind(queue_t *q, mblk_t *mp)
 STATIC int
 xp_conn_con(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11016,24 +10882,21 @@ xp_discon_ind(queue_t *q, mblk_t *mp)
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
 			asp_set_state(q, spp, ASP_WACK_ASPDN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPDN:
 			for (asp = spp->gp.list; asp; asp = asp->spp.next)
 				if (gp_get_state(asp) != AS_DOWN)
 					if ((err = gp_u_set_state(q, asp, AS_DOWN)))
 						return (err);
 			asp_set_state(q, spp, ASP_WACK_ASPUP);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
 			asp_set_state(q, spp, ASP_DOWN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
 			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
 				if (spp_get_state(sp2) != ASP_DOWN
@@ -11049,24 +10912,21 @@ xp_discon_ind(queue_t *q, mblk_t *mp)
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
 			sgp_set_state(q, spp, ASP_WACK_ASPDN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPDN:
 			for (sgp = spp->gp.list; sgp; sgp = sgp->spp.next)
 				if (gp_get_state(sgp) != AS_DOWN)
 					if ((err = gp_p_set_state(q, sgp, AS_DOWN)))
 						return (err);
 			sgp_set_state(q, spp, ASP_WACK_ASPUP);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
 			sgp_set_state(q, spp, ASP_DOWN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
 			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
 				if (spp_get_state(sp2) != ASP_DOWN
@@ -11222,9 +11082,8 @@ xp_info_ack(queue_t *q, mblk_t *mp)
 STATIC int
 xp_bind_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11235,9 +11094,8 @@ xp_bind_ack(queue_t *q, mblk_t *mp)
 STATIC int
 xp_error_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11248,9 +11106,8 @@ xp_error_ack(queue_t *q, mblk_t *mp)
 STATIC int
 xp_ok_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11261,9 +11118,8 @@ xp_ok_ack(queue_t *q, mblk_t *mp)
 STATIC int
 xp_unitdata_ind(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11274,9 +11130,8 @@ xp_unitdata_ind(queue_t *q, mblk_t *mp)
 STATIC int
 xp_uderror_ind(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11287,9 +11142,8 @@ xp_uderror_ind(queue_t *q, mblk_t *mp)
 STATIC int
 xp_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 
@@ -11314,24 +11168,21 @@ xp_ordrel_ind(queue_t *q, mblk_t *mp)
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
 			asp_set_state(q, spp, ASP_WACK_ASPDN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPDN:
 			for (asp = spp->gp.list; asp; asp = asp->spp.next)
 				if (gp_get_state(asp) != AS_DOWN)
 					if ((err = gp_u_set_state(q, asp, AS_DOWN)))
 						return (err);
 			asp_set_state(q, spp, ASP_WACK_ASPUP);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
 			asp_set_state(q, spp, ASP_DOWN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
 			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
 				if (spp_get_state(sp2) != ASP_DOWN
@@ -11347,24 +11198,21 @@ xp_ordrel_ind(queue_t *q, mblk_t *mp)
 		switch (spp_get_state(spp)) {
 		case ASP_UP:
 			sgp_set_state(q, spp, ASP_WACK_ASPDN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPDN:
 			for (sgp = spp->gp.list; sgp; sgp = sgp->spp.next)
 				if (gp_get_state(sgp) != AS_DOWN)
 					if ((err = gp_p_set_state(q, sgp, AS_DOWN)))
 						return (err);
 			sgp_set_state(q, spp, ASP_WACK_ASPUP);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_WACK_ASPUP:
 			todo(("Notify management that the SPP has failed\n"));
 			sgp_set_state(q, spp, ASP_DOWN);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case ASP_DOWN:
 			for (sp2 = spp->sp.sp->spp.list; sp2 && sp2 != spp; sp2 = sp2->sp.next)
 				if (spp_get_state(sp2) != ASP_DOWN
@@ -11403,9 +11251,8 @@ xp_optdata_ind(queue_t *q, mblk_t *mp)
 		struct t_opthdr *oh = (struct t_opthdr *) op;
 		if (mp->b_wptr < oe)
 			goto efault;
-		/*
-		   parse the options 
-		 */
+		/* 
+		   parse the options */
 		for (; op + sizeof(*oh) <= oe && oh->len >= sizeof(*oh) && op + oh->len <= oe;
 		     op += oh->len, oh = (typeof(oh)) op)
 			if (oh->level == T_INET_SCTP && oh->name == T_SCTP_SID)
@@ -11518,9 +11365,8 @@ xp_addr_ack(queue_t *q, mblk_t *mp)
 STATIC int
 xp_capability_ack(queue_t *q, mblk_t *mp)
 {
-	/*
-	   can use this, not expecting it 
-	 */
+	/* 
+	   can use this, not expecting it */
 	return (-EPROTO);
 }
 #endif
@@ -11875,19 +11721,16 @@ m2ua_get_as(m2ua_config_t * arg, struct as *as, int size)
 		return (-EINVAL);
 	if (!as)
 		return (-EINVAL);
-	/*
-	   write out queried object 
-	 */
+	/* 
+	   write out queried object */
 	cnf->spid = as->sp.sp ? as->sp.sp->id : 0;
 	cnf->iid = as->iid;
 	cnf->add = as->add;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out the list of associated AS 
-	 */
+	/* 
+	   write out the list of associated AS */
 	cha = (typeof(cha)) (arg + 1);
-	for (ap = as->ap.list;
-	     ap && size >= sizeof(*arg) + sizeof(*cha) + sizeof(*arg);
+	for (ap = as->ap.list; ap && size >= sizeof(*arg) + sizeof(*cha) + sizeof(*arg);
 	     ap = (ap->u.as == as) ? ap->p.next : ap->u.next, size -=
 	     sizeof(*arg) + sizeof(*cha), arg = (typeof(arg)) (cha + 1), cha =
 	     (typeof(cha)) (arg + 1)) {
@@ -11898,12 +11741,10 @@ m2ua_get_as(m2ua_config_t * arg, struct as *as, int size)
 		cha->iid = oas->iid;
 		cha->add = oas->add;
 	}
-	/*
-	   write out the list of SL 
-	 */
+	/* 
+	   write out the list of SL */
 	chd = (typeof(chd)) (arg + 1);
-	for (sl = as->sl.list;
-	     sl && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
+	for (sl = as->sl.list; sl && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sl = sl->as.next, size -= sizeof(*arg) + sizeof(*chd), arg =
 	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = sl->type;
@@ -11914,9 +11755,8 @@ m2ua_get_as(m2ua_config_t * arg, struct as *as, int size)
 		chd->add = sl->add;
 		chd->proto = sl->proto;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -11935,19 +11775,16 @@ m2ua_get_sp(m2ua_config_t * arg, struct sp *sp, int size)
 		return (-EINVAL);
 	if (!sp)
 		return (-EINVAL);
-	/*
-	   write out queried object 
-	 */
+	/* 
+	   write out queried object */
 	cnf->spid = 0;
 	cnf->cost = sp->cost;
 	cnf->tmode = sp->tmode;
 	arg = (typeof(arg)) (cnf + 1);
 	chp = (typeof(chp)) (arg + 1);
-	/*
-	   write out the list of associated SPs 
-	 */
-	for (np = sp->np.list;
-	     np && size >= sizeof(*arg) + sizeof(*chp) + sizeof(*arg);
+	/* 
+	   write out the list of associated SPs */
+	for (np = sp->np.list; np && size >= sizeof(*arg) + sizeof(*chp) + sizeof(*arg);
 	     np = (sp == np->u.sp) ? np->p.next : np->u.next, size -=
 	     sizeof(*arg) + sizeof(*chp), arg = (typeof(arg)) (chp + 1), chp =
 	     (typeof(chp)) (arg + 1)) {
@@ -11958,12 +11795,10 @@ m2ua_get_sp(m2ua_config_t * arg, struct sp *sp, int size)
 		chp->cost = osp->cost;
 		chp->tmode = osp->tmode;
 	}
-	/*
-	   write out the list of AS 
-	 */
+	/* 
+	   write out the list of AS */
 	cha = (typeof(cha)) (arg + 1);
-	for (as = sp->as.list;
-	     as && size >= sizeof(*arg) + sizeof(*cha) + sizeof(*arg);
+	for (as = sp->as.list; as && size >= sizeof(*arg) + sizeof(*cha) + sizeof(*arg);
 	     as = as->sp.next, size -= sizeof(*arg) + sizeof(*cha), arg =
 	     (typeof(arg)) (cha + 1), cha = (typeof(cha)) (arg + 1)) {
 		arg->type = as->type;
@@ -11972,12 +11807,10 @@ m2ua_get_sp(m2ua_config_t * arg, struct sp *sp, int size)
 		cha->iid = as->iid;
 		cha->add = as->add;
 	}
-	/*
-	   write out the list of SPP 
-	 */
+	/* 
+	   write out the list of SPP */
 	chs = (typeof(chs)) (arg + 1);
-	for (spp = sp->spp.list;
-	     spp && size >= sizeof(*arg) + sizeof(*chs) + sizeof(*arg);
+	for (spp = sp->spp.list; spp && size >= sizeof(*arg) + sizeof(*chs) + sizeof(*arg);
 	     spp = spp->sp.next, size -= sizeof(*arg) + sizeof(*chs), arg =
 	     (typeof(arg)) (chs + 1), chs = (typeof(chs)) (arg + 1)) {
 		arg->type = spp->type;
@@ -11986,9 +11819,8 @@ m2ua_get_sp(m2ua_config_t * arg, struct sp *sp, int size)
 		chs->aspid = spp->aspid;
 		chs->cost = spp->cost;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -12003,16 +11835,14 @@ m2ua_get_spp(m2ua_config_t * arg, struct spp *spp, int size)
 		return (-EINVAL);
 	if (!spp)
 		return (-EINVAL);
-	/*
-	   write out queried object 
-	 */
+	/* 
+	   write out queried object */
 	cnf->spid = spp->sp.sp ? spp->sp.sp->id : 0;
 	cnf->aspid = spp->aspid;
 	cnf->cost = spp->cost;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of XP 
-	 */
+	/* 
+	   write out list of XP */
 	chd = (typeof(chd)) (arg + 1);
 	if ((xp = spp->xp) && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg)) {
 		arg->type = xp->type;
@@ -12022,9 +11852,8 @@ m2ua_get_spp(m2ua_config_t * arg, struct spp *spp, int size)
 		chd->muxid = xp->u.mux.index;
 		arg = (typeof(arg)) (chd + 1);
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -12037,18 +11866,16 @@ m2ua_get_sl(m2ua_config_t * arg, struct sl *sl, int size)
 		return (-EINVAL);
 	if (!sl)
 		return (-EINVAL);
-	/*
-	   write out queried object 
-	 */
+	/* 
+	   write out queried object */
 	cnf->asid = sl->as.as ? sl->as.as->id : 0;
 	cnf->muxid = sl->u.mux.index;
 	cnf->iid = sl->iid;
 	cnf->add = sl->add;
 	cnf->proto = sl->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -12061,16 +11888,14 @@ m2ua_get_xp(m2ua_config_t * arg, struct xp *xp, int size)
 		return (-EINVAL);
 	if (!xp)
 		return (-EINVAL);
-	/*
-	   write out queried object 
-	 */
+	/* 
+	   write out queried object */
 	cnf->sppid = xp->spp ? xp->spp->id : 0;
 	cnf->spid = xp->sp ? xp->sp->id : ((xp->spp && xp->spp->sp.sp) ? xp->spp->sp.sp->id : 0);
 	cnf->muxid = xp->u.mux.index;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -12085,17 +11910,14 @@ m2ua_get_df(m2ua_config_t * arg, struct df *df, int size)
 		return (-EINVAL);
 	if (!df)
 		return (-EINVAL);
-	/*
-	   write out queried object 
-	 */
+	/* 
+	   write out queried object */
 	cnf->proto = df->proto;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write out list of SP 
-	 */
+	/* 
+	   write out list of SP */
 	chd = (typeof(chd)) (arg + 1);
-	for (sp = df->sp.list;
-	     sp && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
+	for (sp = df->sp.list; sp && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sp = sp->next, size -= sizeof(*arg) + sizeof(*chd), arg =
 	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = sp->type;
@@ -12104,9 +11926,8 @@ m2ua_get_df(m2ua_config_t * arg, struct df *df, int size)
 		chd->cost = sp->cost;
 		chd->tmode = sp->tmode;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -12130,9 +11951,8 @@ m2ua_add_as(m2ua_config_t * arg, struct as *as, int size, int force, int test)
 	for (as = sp->as.list; as; as = as->sp.next)
 		if (as->iid == cnf->iid)
 			goto einval;
-	/*
-	   make sure user has specified correct types 
-	 */
+	/* 
+	   make sure user has specified correct types */
 	switch (arg->type) {
 	case M2UA_OBJ_TYPE_AS_U:
 		if (sp->type != M2UA_OBJ_TYPE_SP)
@@ -12169,9 +11989,8 @@ m2ua_add_sp(m2ua_config_t * arg, struct sp *sp, int size, int force, int test)
 		goto einval;
 	if (cnf->spid)
 		osp = sp_lookup(cnf->spid);
-	/*
-	   make sure user has specified correct types 
-	 */
+	/* 
+	   make sure user has specified correct types */
 	switch (arg->type) {
 	case M2UA_OBJ_TYPE_SP:
 		if (osp)
@@ -12217,9 +12036,8 @@ m2ua_add_spp(m2ua_config_t * arg, struct spp *spp, int size, int force, int test
 		for (spp = sp->spp.list; spp; spp = spp->sp.next)
 			if (spp->aspid == cnf->aspid)
 				goto einval;
-	/*
-	   make sure user has specified correct types 
-	 */
+	/* 
+	   make sure user has specified correct types */
 	switch (arg->type) {
 	case M2UA_OBJ_TYPE_ASP:
 		if (sp->type != M2UA_OBJ_TYPE_SP)
@@ -12266,14 +12084,12 @@ m2ua_add_sl(m2ua_config_t * arg, struct sl *sl, int size, int force, int test)
 		goto einval;
 	if (!(sl = (sl_t *) link_lookup(cnf->muxid)))
 		goto einval;
-	/*
-	   already typed 
-	 */
+	/* 
+	   already typed */
 	if (sl->type)
 		goto einval;
-	/*
-	   no, sorry, we can't link SL-Us 
-	 */
+	/* 
+	   no, sorry, we can't link SL-Us */
 	if (arg->type != M2UA_OBJ_TYPE_SL_P)
 		goto einval;
 	if (!test) {
@@ -12296,16 +12112,14 @@ m2ua_add_xp(m2ua_config_t * arg, struct xp *xp, int size, int force, int test)
 		sp = sp_lookup(cnf->spid);
 	if (cnf->sppid)
 		spp = spp_lookup(cnf->sppid);
-	/*
-	   must specify one or the other 
-	 */
+	/* 
+	   must specify one or the other */
 	if ((!spp && !sp) || (spp && sp))
 		goto einval;
 	if (!(xp = (xp_t *) link_lookup(cnf->muxid)))
 		goto einval;
-	/*
-	   already typed 
-	 */
+	/* 
+	   already typed */
 	if (xp->type)
 		goto einval;
 	if (!test) {
@@ -12340,17 +12154,15 @@ m2ua_cha_as(m2ua_config_t * arg, struct as *as, int size, int force, int test)
 		return (-EINVAL);
 	if (cnf->spid && cnf->spid != as->sp.sp->id)
 		return (-EINVAL);
-	/*
-	   can't change to existing iid 
-	 */
+	/* 
+	   can't change to existing iid */
 	if (cnf->iid && cnf->iid != as->iid)
 		for (a = as->sp.sp->as.list; a; a = a->sp.next)
 			if (a->iid == cnf->iid)
 				return (-EINVAL);
 	if (!force) {
-		/*
-		   involved with peer 
-		 */
+		/* 
+		   involved with peer */
 		if (as_get_state(as) != AS_INACTIVE)
 			return (-EBUSY);
 	}
@@ -12369,9 +12181,8 @@ m2ua_cha_sp(m2ua_config_t * arg, struct sp *sp, int size, int force, int test)
 	if (cnf->spid)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   has active AS 
-		 */
+		/* 
+		   has active AS */
 		if (sp_get_state(sp) != AS_INACTIVE)
 			return (-EBUSY);
 	}
@@ -12390,9 +12201,8 @@ m2ua_cha_spp(m2ua_config_t * arg, struct spp *spp, int size, int force, int test
 	if (cnf->spid && cnf->spid != spp->sp.sp->id)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   is active with peer 
-		 */
+		/* 
+		   is active with peer */
 		if (spp_get_state(spp) != ASP_DOWN)
 			return (-EBUSY);
 	}
@@ -12414,18 +12224,16 @@ m2ua_cha_sl(m2ua_config_t * arg, struct sl *sl, int size, int force, int test)
 		return (-EINVAL);
 	if (cnf->muxid && cnf->muxid != sl->u.mux.index)
 		return (-EINVAL);
-	/*
-	   can't change to existing iid 
-	 */
+	/* 
+	   can't change to existing iid */
 	if (cnf->iid && cnf->iid != sl->iid)
 		for (a = sl->as.as->sp.sp->as.list; a; a = a->sp.next)
 			for (s = a->sl.list; s; s = s->as.next)
 				if (s->iid == cnf->iid)
 					return (-EINVAL);
 	if (!force) {
-		/*
-		   involved providing service 
-		 */
+		/* 
+		   involved providing service */
 		if (as_get_state(sl->as.as) != AS_INACTIVE)
 			return (-EBUSY);
 	}
@@ -12449,14 +12257,12 @@ m2ua_cha_xp(m2ua_config_t * arg, struct xp *xp, int size, int force, int test)
 	if (cnf->muxid && cnf->muxid != xp->u.mux.index)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   nothing to change 
-		 */
+		/* 
+		   nothing to change */
 	}
 	if (!test) {
-		/*
-		   nothing to change 
-		 */
+		/* 
+		   nothing to change */
 	}
 	return (QR_DONE);
 }
@@ -12484,25 +12290,21 @@ m2ua_del_as(m2ua_config_t * arg, struct as *as, int size, int force, int test)
 	if (!as)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   attached to signalling link 
-		 */
+		/* 
+		   attached to signalling link */
 		if (as->sl.list)
 			return (-EBUSY);
-		/*
-		   attached to SPP 
-		 */
+		/* 
+		   attached to SPP */
 		if (as->gp.list)
 			return (-EBUSY);
-		/*
-		   not in idle state 
-		 */
+		/* 
+		   not in idle state */
 		if (as_get_state(as) != 0)
 			return (-EBUSY);
 #if 0
-		/*
-		   attached to other AS 
-		 */
+		/* 
+		   attached to other AS */
 		if (as->ap.list)
 			return (-EBUSY);
 #endif
@@ -12518,25 +12320,21 @@ m2ua_del_sp(m2ua_config_t * arg, struct sp *sp, int size, int force, int test)
 	if (!sp)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   attached AS 
-		 */
+		/* 
+		   attached AS */
 		if (sp->as.list)
 			return (-EBUSY);
-		/*
-		   attached SPP 
-		 */
+		/* 
+		   attached SPP */
 		if (sp->spp.list)
 			return (-EBUSY);
-		/*
-		   not in idle state 
-		 */
+		/* 
+		   not in idle state */
 		if (sp_get_state(sp) != 0)
 			return (-EBUSY);
 #if 0
-		/*
-		   attached to other SP 
-		 */
+		/* 
+		   attached to other SP */
 		if (sp->np.list)
 			return (-EBUSY);
 #endif
@@ -12552,25 +12350,21 @@ m2ua_del_spp(m2ua_config_t * arg, struct spp *spp, int size, int force, int test
 	if (!spp)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   attached to XP 
-		 */
+		/* 
+		   attached to XP */
 		if (spp->xp)
 			return (-EBUSY);
-		/*
-		   attached to AS 
-		 */
+		/* 
+		   attached to AS */
 		if (spp->gp.list)
 			return (-EBUSY);
-		/*
-		   not in idle state 
-		 */
+		/* 
+		   not in idle state */
 		if (spp_get_state(spp) != 0)
 			return (-EBUSY);
 #if 0
-		/*
-		   attached to SP 
-		 */
+		/* 
+		   attached to SP */
 		if (spp->sp.sp)
 			return (-EBUSY);
 #endif
@@ -12586,9 +12380,8 @@ m2ua_del_sl(m2ua_config_t * arg, struct sl *sl, int size, int force, int test)
 	if (!sl)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (sl->as.as)
 			return (-EBUSY);
 	}
@@ -12607,9 +12400,8 @@ m2ua_del_sl(m2ua_config_t * arg, struct sl *sl, int size, int force, int test)
 			sl->as.as->sl.numb--;
 			as_put(xchg(&sl->as.as, NULL));
 		}
-		/*
-		   we are now a typeless link waiting for I_UNLINK 
-		 */
+		/* 
+		   we are now a typeless link waiting for I_UNLINK */
 		sl->id = 0;
 		sl->type = 0;
 	}
@@ -12621,32 +12413,28 @@ m2ua_del_xp(m2ua_config_t * arg, struct xp *xp, int size, int force, int test)
 	if (!xp)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (xp->spp || xp->sp)
 			return (-EBUSY);
 	}
 	if (!test) {
 		noenable(xp->iq);
 		noenable(xp->oq);
-		/*
-		   unlink from spp 
-		 */
+		/* 
+		   unlink from spp */
 		if (xp->spp) {
 			fixme(("Check deactivation of all AS\n"));
 			xp_put(xchg(&xp->spp->xp, NULL));
 			spp_put(xchg(&xp->spp, NULL));
 		}
-		/*
-		   unlink from sp 
-		 */
+		/* 
+		   unlink from sp */
 		if (xp->sp) {
 			sp_put(xchg(&xp->sp, NULL));
 		}
-		/*
-		   we are now a typeless link waiting for I_UNLINK 
-		 */
+		/* 
+		   we are now a typeless link waiting for I_UNLINK */
 		xp->id = 0;
 		xp->type = 0;
 	}
@@ -12683,15 +12471,13 @@ m2ua_sta_as(m2ua_statem_t * arg, struct as *as, int size)
 	sta->as_numb = as->ap.numb;
 	sta->spp_numb = as->gp.numb;
 	p = (typeof(p)) (sta + 1);
-	/*
-	   list out id/state pairs for associated AS 
-	 */
+	/* 
+	   list out id/state pairs for associated AS */
 	for (ap = as->ap.list; ap && size >= 3 * sizeof(*p);
-	     ap = (as == ap->u.as) ? ap->p.next : ap->u.next,
-	     *p++ = (as == ap->u.as) ? ap->p.as->id : ap->u.as->id, *p++ = ap_get_state(ap)) ;
-	/*
-	   list out id/state pairs for associated SPP 
-	 */
+	     ap = (as == ap->u.as) ? ap->p.next : ap->u.next, *p++ =
+	     (as == ap->u.as) ? ap->p.as->id : ap->u.as->id, *p++ = ap_get_state(ap)) ;
+	/* 
+	   list out id/state pairs for associated SPP */
 	for (gp = as->gp.list; gp && size >= 3 * sizeof(*p);
 	     gp = gp->as.next, *p++ = gp->spp.spp->id, *p++ = gp_get_state(gp)) ;
 	*p++ = 0;
@@ -12710,12 +12496,11 @@ m2ua_sta_sp(m2ua_statem_t * arg, struct sp *sp, int size)
 	sta->timers = sp->timers;
 	sta->sp_numb = sp->np.numb;
 	p = (typeof(p)) (sta + 1);
-	/*
-	   list out id/state pairs for associated SP 
-	 */
+	/* 
+	   list out id/state pairs for associated SP */
 	for (np = sp->np.list; np && size >= 3 * sizeof(*p);
-	     np = (sp == np->u.sp) ? np->p.next : np->u.next,
-	     *p++ = (sp == np->u.sp) ? np->p.sp->id : np->u.sp->id, *p++ = np_get_state(np)) ;
+	     np = (sp == np->u.sp) ? np->p.next : np->u.next, *p++ =
+	     (sp == np->u.sp) ? np->p.sp->id : np->u.sp->id, *p++ = np_get_state(np)) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -12732,9 +12517,8 @@ m2ua_sta_spp(m2ua_statem_t * arg, struct spp *spp, int size)
 	sta->timers = spp->timers;
 	sta->as_numb = spp->gp.numb;
 	p = (typeof(p)) (sta + 1);
-	/*
-	   list out id/state pairs for associated AS 
-	 */
+	/* 
+	   list out id/state pairs for associated AS */
 	for (gp = spp->gp.list; gp && size >= 3 * sizeof(*p);
 	     gp = gp->spp.next, *p++ = gp->as.as->id, *p++ = gp_get_state(gp)) ;
 	*p++ = 0;
@@ -14505,29 +14289,27 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
-			ptrace(("%s: %p: I_PLINK\n", M2UA_DRV_NAME, s));
+			ptrace(("%s: %p: I_PLINK\n", DRV_NAME, s));
 			if (s != (str_t *) master.lm) {
 				ptrace(("%s: %p: ERROR: non-management attempt to I_PLINK\n",
-					M2UA_DRV_NAME, s));
+					DRV_NAME, s));
 				ret = -EOPNOTSUPP;
 				MOD_DEC_USE_COUNT;
 				break;
 			}
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR; Non-root attempt to I_PLINK\n",
-					M2UA_DRV_NAME, s));
+					DRV_NAME, s));
 				ret = -EPERM;
 				MOD_DEC_USE_COUNT;
 				break;
 			}
 		case _IOC_NR(I_LINK):
-			ptrace(("%s: %p: I_LINK\n", M2UA_DRV_NAME, s));
+			ptrace(("%s: %p: I_LINK\n", DRV_NAME, s));
 			spin_lock_irqsave(&master.lock, flags);
-			/*
-			   place in list in ascending index order 
-			 */
-			for (lkp = &master.link.list;
-			     *lkp && (*lkp)->str.u.mux.index < lb->l_index;
+			/* 
+			   place in list in ascending index order */
+			for (lkp = &master.link.list; *lkp && (*lkp)->str.u.mux.index < lb->l_index;
 			     lkp = (union link **) &(*lkp)->str.next) ;
 			if ((lk = m2ua_alloc_link(lb->l_qbot, lkp, lb->l_index, iocp->ioc_cr))) {
 				spin_unlock_irqrestore(&master.lock, flags);
@@ -14538,23 +14320,23 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
-			ptrace(("%s: %p: I_PUNLINK\n", M2UA_DRV_NAME, s));
+			ptrace(("%s: %p: I_PUNLINK\n", DRV_NAME, s));
 			if (s != (str_t *) master.lm) {
 				ptrace(("%s: %p: ERROR: non-management attempt to I_PUNLINK\n",
-					M2UA_DRV_NAME, s));
+					DRV_NAME, s));
 				ret = -EOPNOTSUPP;
 				MOD_DEC_USE_COUNT;
 				break;
 			}
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					M2UA_DRV_NAME, s));
+					DRV_NAME, s));
 				ret = -EPERM;
 				MOD_DEC_USE_COUNT;
 				break;
 			}
 		case _IOC_NR(I_UNLINK):
-			ptrace(("%s: %p: I_UNLINK\n", M2UA_DRV_NAME, s));
+			ptrace(("%s: %p: I_UNLINK\n", DRV_NAME, s));
 			spin_lock_irqsave(&master.lock, flags);
 			if ((lk = link_lookup(lb->l_index))) {
 				m2ua_free_link(lk->str.iq);
@@ -14563,14 +14345,14 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 				spin_unlock_irqrestore(&master.lock, flags);
 				break;
 			}
-			ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", M2UA_DRV_NAME, s));
+			ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", DRV_NAME, s));
 			ret = -EINVAL;
 			MOD_DEC_USE_COUNT;
 			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", M2UA_DRV_NAME,
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", DRV_NAME,
 				s, (char) type, nr));
 			ret = -EOPNOTSUPP;
 			MOD_DEC_USE_COUNT;
@@ -14607,8 +14389,8 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = sl_iocpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported SL ioctl %c, %d\n",
-				M2UA_DRV_NAME, s, (char) type, nr));
+			ptrace(("%s: %p: ERROR: Unsupported SL ioctl %c, %d\n", DRV_NAME, s,
+				(char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -14616,14 +14398,13 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 	}
 	case M2UA_IOC_MAGIC:
 	{
-		/*
+		/* 
 		   Note: only the layer management stream is permitted to perform M2UA IOCTLs. This 
 		   is because the SL User stream should be unaware that these IOCTLs exist so that
-		   an M2UA SL-U stream is completely transparent to an normal SL stream. 
-		 */
+		   an M2UA SL-U stream is completely transparent to an normal SL stream. */
 		if (s != (str_t *) master.lm) {
 			ptrace(("%s: %p: ERROR: non-management attempt at M2UA IOCTL\n",
-				M2UA_DRV_NAME, s));
+				DRV_NAME, s));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -14633,84 +14414,83 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(M2UA_IOCGOPTIONS):
-			printd(("%s: %p: -> M2UA_IOCGOPTIONS\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCGOPTIONS\n", DRV_NAME, s));
 			ret = m2ua_iocgoptions(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCSOPTIONS):
-			printd(("%s: %p: -> M2UA_IOCSOPTIONS\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCSOPTIONS\n", DRV_NAME, s));
 			ret = m2ua_iocsoptions(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCGCONFIG):
-			printd(("%s: %p: -> M2UA_IOCGCONFIG\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCGCONFIG\n", DRV_NAME, s));
 			ret = m2ua_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCSCONFIG):
-			printd(("%s: %p: -> M2UA_IOCSCONFIG\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCSCONFIG\n", DRV_NAME, s));
 			ret = m2ua_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCTCONFIG):
-			printd(("%s: %p: -> M2UA_IOCTCONFIG\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCTCONFIG\n", DRV_NAME, s));
 			ret = m2ua_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCCCONFIG):
-			printd(("%s: %p: -> M2UA_IOCCCONFIG\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCCCONFIG\n", DRV_NAME, s));
 			ret = m2ua_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCGSTATEM):
-			printd(("%s: %p: -> M2UA_IOCGSTATEM\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCGSTATEM\n", DRV_NAME, s));
 			ret = m2ua_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCCMRESET):
-			printd(("%s: %p: -> M2UA_IOCCMRESET\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCCMRESET\n", DRV_NAME, s));
 			ret = m2ua_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCGSTATSP):
-			printd(("%s: %p: -> M2UA_IOCGSTATSP\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCGSTATSP\n", DRV_NAME, s));
 			ret = m2ua_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCSSTATSP):
-			printd(("%s: %p: -> M2UA_IOCSSTATSP\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCSSTATSP\n", DRV_NAME, s));
 			ret = m2ua_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCGSTATS):
-			printd(("%s: %p: -> M2UA_IOCGSTATS\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCGSTATS\n", DRV_NAME, s));
 			ret = m2ua_iocgstats(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCCSTATS):
-			printd(("%s: %p: -> M2UA_IOCCSTATS\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCCSTATS\n", DRV_NAME, s));
 			ret = m2ua_ioccstats(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCGNOTIFY):
-			printd(("%s: %p: -> M2UA_IOCGNOTIFY\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCGNOTIFY\n", DRV_NAME, s));
 			ret = m2ua_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCSNOTIFY):
-			printd(("%s: %p: -> M2UA_IOCSNOTIFY\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCSNOTIFY\n", DRV_NAME, s));
 			ret = m2ua_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCCNOTIFY):
-			printd(("%s: %p: -> M2UA_IOCCNOTIFY\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCCNOTIFY\n", DRV_NAME, s));
 			ret = m2ua_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCCMGMT):
-			printd(("%s: %p: -> M2UA_IOCCMGMT\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCCMGMT\n", DRV_NAME, s));
 			ret = m2ua_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(M2UA_IOCCPASS):
-			printd(("%s: %p: -> M2UA_IOCCPASS\n", M2UA_DRV_NAME, s));
+			printd(("%s: %p: -> M2UA_IOCCPASS\n", DRV_NAME, s));
 			ret = m2ua_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unspported M2UA ioctl %c, %d\n",
-				M2UA_DRV_NAME, s, (char) type, nr));
+			ptrace(("%s: %p: ERROR: Unspported M2UA ioctl %c, %d\n", DRV_NAME, s,
+				(char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
 		break;
 	}
 	default:
-		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", M2UA_DRV_NAME, s, (char) type,
-			nr));
+		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", DRV_NAME, s, (char) type, nr));
 		ret = -EOPNOTSUPP;
 		break;
 	}
@@ -14821,109 +14601,109 @@ slu_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = s->i_state;
 	switch (*(ulong *) mp->b_rptr) {
 	case LMI_INFO_REQ:
-		printd(("%s: %p: -> LMI_INFO_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_INFO_REQ\n", DRV_NAME, s));
 		rtn = slu_info_req(q, mp);
 		break;
 	case LMI_ATTACH_REQ:
-		printd(("%s: %p: -> LMI_ATTACH_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_ATTACH_REQ\n", DRV_NAME, s));
 		rtn = slu_attach_req(q, mp);
 		break;
 	case LMI_DETACH_REQ:
-		printd(("%s: %p: -> LMI_DETACH_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_DETACH_REQ\n", DRV_NAME, s));
 		rtn = slu_detach_req(q, mp);
 		break;
 	case LMI_ENABLE_REQ:
-		printd(("%s: %p: -> LMI_ENABLE_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_ENABLE_REQ\n", DRV_NAME, s));
 		rtn = slu_enable_req(q, mp);
 		break;
 	case LMI_DISABLE_REQ:
-		printd(("%s: %p: -> LMI_DISABLE_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_DISABLE_REQ\n", DRV_NAME, s));
 		rtn = slu_disable_req(q, mp);
 		break;
 #if 0
 	case LMI_OPTMGMT_REQ:
-		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", DRV_NAME, s));
 		rtn = slu_optmgmt_req(q, mp);
 		break;
 #endif
 	case SL_PDU_REQ:
-		printd(("%s: %p: -> SL_PDU_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_PDU_REQ\n", DRV_NAME, s));
 		rtn = slu_pdu_req(q, mp);
 		break;
 	case SL_EMERGENCY_REQ:
-		printd(("%s: %p: -> SL_EMERGENCY_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_EMERGENCY_REQ\n", DRV_NAME, s));
 		rtn = slu_emergency_req(q, mp);
 		break;
 	case SL_EMERGENCY_CEASES_REQ:
-		printd(("%s: %p: -> SL_EMERGENCY_CEASES_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_EMERGENCY_CEASES_REQ\n", DRV_NAME, s));
 		rtn = slu_emergency_ceases_req(q, mp);
 		break;
 	case SL_START_REQ:
-		printd(("%s: %p: -> SL_START_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_START_REQ\n", DRV_NAME, s));
 		rtn = slu_start_req(q, mp);
 		break;
 	case SL_STOP_REQ:
-		printd(("%s: %p: -> SL_STOP_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_STOP_REQ\n", DRV_NAME, s));
 		rtn = slu_stop_req(q, mp);
 		break;
 	case SL_RETRIEVE_BSNT_REQ:
-		printd(("%s: %p: -> SL_RETRIEVE_BSNT_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RETRIEVE_BSNT_REQ\n", DRV_NAME, s));
 		rtn = slu_retrieve_bsnt_req(q, mp);
 		break;
 	case SL_RETRIEVAL_REQUEST_AND_FSNC_REQ:
-		printd(("%s: %p: -> SL_RETRIEVAL_REQUEST_AND_FSNC_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RETRIEVAL_REQUEST_AND_FSNC_REQ\n", DRV_NAME, s));
 		rtn = slu_retrieval_request_and_fsnc_req(q, mp);
 		break;
 	case SL_CLEAR_BUFFERS_REQ:
-		printd(("%s: %p: -> SL_CLEAR_BUFFERS_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_CLEAR_BUFFERS_REQ\n", DRV_NAME, s));
 		rtn = slu_clear_buffers_req(q, mp);
 		break;
 	case SL_CLEAR_RTB_REQ:
-		printd(("%s: %p: -> SL_CLEAR_RTB_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_CLEAR_RTB_REQ\n", DRV_NAME, s));
 		rtn = slu_clear_rtb_req(q, mp);
 		break;
 	case SL_CONTINUE_REQ:
-		printd(("%s: %p: -> SL_CONTINUE_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_CONTINUE_REQ\n", DRV_NAME, s));
 		rtn = slu_continue_req(q, mp);
 		break;
 	case SL_LOCAL_PROCESSOR_OUTAGE_REQ:
-		printd(("%s: %p: -> SL_LOCAL_PROCESSOR_OUTAGE_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_LOCAL_PROCESSOR_OUTAGE_REQ\n", DRV_NAME, s));
 		rtn = slu_local_processor_outage_req(q, mp);
 		break;
 	case SL_RESUME_REQ:
-		printd(("%s: %p: -> SL_RESUME_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RESUME_REQ\n", DRV_NAME, s));
 		rtn = slu_resume_req(q, mp);
 		break;
 	case SL_CONGESTION_DISCARD_REQ:
-		printd(("%s: %p: -> SL_CONGESTION_DISCARD_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_CONGESTION_DISCARD_REQ\n", DRV_NAME, s));
 		rtn = slu_congestion_discard_req(q, mp);
 		break;
 	case SL_CONGESTION_ACCEPT_REQ:
-		printd(("%s: %p: -> SL_CONGESTION_ACCEPT_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_CONGESTION_ACCEPT_REQ\n", DRV_NAME, s));
 		rtn = slu_congestion_accept_req(q, mp);
 		break;
 	case SL_NO_CONGESTION_REQ:
-		printd(("%s: %p: -> SL_NO_CONGESTION_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_NO_CONGESTION_REQ\n", DRV_NAME, s));
 		rtn = slu_no_congestion_req(q, mp);
 		break;
 	case SL_POWER_ON_REQ:
-		printd(("%s: %p: -> SL_POWER_ON_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_POWER_ON_REQ\n", DRV_NAME, s));
 		rtn = slu_power_on_req(q, mp);
 		break;
 #if 0
 	case SL_OPTMGMT_REQ:
-		printd(("%s: %p: -> SL_OPTMGMT_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_OPTMGMT_REQ\n", DRV_NAME, s));
 		rtn = slu_optmgmt_req(q, mp);
 		break;
 #endif
 #if 0
 	case SL_NOTIFY_REQ:
-		printd(("%s: %p: -> SL_NOTIFY_REQ\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_NOTIFY_REQ\n", DRV_NAME, s));
 		rtn = slu_notify_req(q, mp);
 		break;
 #endif
 	default:
-		printd(("%s: %p: -> SL_????\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_????\n", DRV_NAME, s));
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -14944,113 +14724,113 @@ slp_r_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = s->i_state;
 	switch (*(ulong *) mp->b_rptr) {
 	case LMI_INFO_ACK:
-		printd(("%s: %p: -> LMI_INFO_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_INFO_ACK\n", DRV_NAME, s));
 		rtn = slp_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: -> LMI_OK_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_OK_ACK\n", DRV_NAME, s));
 		rtn = slp_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: -> LMI_ERROR_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_ERROR_ACK\n", DRV_NAME, s));
 		rtn = slp_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: -> LMI_ENABLE_CON\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_ENABLE_CON\n", DRV_NAME, s));
 		rtn = slp_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: -> LMI_DISABLE_CON\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_DISABLE_CON\n", DRV_NAME, s));
 		rtn = slp_disable_con(q, mp);
 		break;
 #if 0
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: -> LMI_OPTNGNT_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_OPTNGNT_ACK\n", DRV_NAME, s));
 		rtn = slp_optmgmt_ack(q, mp);
 		break;
 #endif
 	case LMI_ERROR_IND:
-		printd(("%s: %p: -> LMI_ERROR_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_ERROR_IND\n", DRV_NAME, s));
 		rtn = slp_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: -> LMI_STATS_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_STATS_IND\n", DRV_NAME, s));
 		rtn = slp_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: -> LMI_EVENT_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> LMI_EVENT_IND\n", DRV_NAME, s));
 		rtn = slp_event_ind(q, mp);
 		break;
 	case SL_PDU_IND:
-		printd(("%s: %p: -> SL_PDU_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_PDU_IND\n", DRV_NAME, s));
 		rtn = slp_pdu_ind(q, mp);
 		break;
 	case SL_LINK_CONGESTED_IND:
-		printd(("%s: %p: -> SL_LINK_CONGESTED_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_LINK_CONGESTED_IND\n", DRV_NAME, s));
 		rtn = slp_link_congested_ind(q, mp);
 		break;
 	case SL_LINK_CONGESTION_CEASED_IND:
-		printd(("%s: %p: -> SL_LINK_CONGESTION_CEASED_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_LINK_CONGESTION_CEASED_IND\n", DRV_NAME, s));
 		rtn = slp_congestion_ceased_ind(q, mp);
 		break;
 	case SL_RETRIEVED_MESSAGE_IND:
-		printd(("%s: %p: -> SL_RETRIEVED_MESSAGE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RETRIEVED_MESSAGE_IND\n", DRV_NAME, s));
 		rtn = slp_retrieved_message_ind(q, mp);
 		break;
 	case SL_RETRIEVAL_COMPLETE_IND:
-		printd(("%s: %p: -> SL_RETRIEVAL_COMPLETE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RETRIEVAL_COMPLETE_IND\n", DRV_NAME, s));
 		rtn = slp_retrieval_complete_ind(q, mp);
 		break;
 	case SL_RB_CLEARED_IND:
-		printd(("%s: %p: -> SL_RB_CLEARED_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RB_CLEARED_IND\n", DRV_NAME, s));
 		rtn = slp_rb_cleared_ind(q, mp);
 		break;
 	case SL_BSNT_IND:
-		printd(("%s: %p: -> SL_BSNT_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_BSNT_IND\n", DRV_NAME, s));
 		rtn = slp_bsnt_ind(q, mp);
 		break;
 	case SL_IN_SERVICE_IND:
-		printd(("%s: %p: -> SL_IN_SERVICE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_IN_SERVICE_IND\n", DRV_NAME, s));
 		rtn = slp_in_service_ind(q, mp);
 		break;
 	case SL_OUT_OF_SERVICE_IND:
-		printd(("%s: %p: -> SL_OUT_OF_SERVICE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_OUT_OF_SERVICE_IND\n", DRV_NAME, s));
 		rtn = slp_out_of_service_ind(q, mp);
 		break;
 	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
-		printd(("%s: %p: -> SL_REMOTE_PROCESSOR_OUTAGE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_REMOTE_PROCESSOR_OUTAGE_IND\n", DRV_NAME, s));
 		rtn = slp_remote_processor_outage_ind(q, mp);
 		break;
 	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
-		printd(("%s: %p: -> SL_REMOTE_PROCESSOR_RECOVERED_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_REMOTE_PROCESSOR_RECOVERED_IND\n", DRV_NAME, s));
 		rtn = slp_remote_processor_recovered_ind(q, mp);
 		break;
 	case SL_RTB_CLEARED_IND:
-		printd(("%s: %p: -> SL_RTB_CLEARED_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RTB_CLEARED_IND\n", DRV_NAME, s));
 		rtn = slp_rtb_cleared_ind(q, mp);
 		break;
 	case SL_RETRIEVAL_NOT_POSSIBLE_IND:
-		printd(("%s: %p: -> SL_RETRIEVAL_NOT_POSSIBLE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_RETRIEVAL_NOT_POSSIBLE_IND\n", DRV_NAME, s));
 		rtn = slp_retrieval_not_possible_ind(q, mp);
 		break;
 	case SL_BSNT_NOT_RETRIEVABLE_IND:
-		printd(("%s: %p: -> SL_BSNT_NOT_RETRIEVABLE_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_BSNT_NOT_RETRIEVABLE_IND\n", DRV_NAME, s));
 		rtn = slp_bsnt_not_retrievable_ind(q, mp);
 		break;
 #if 0
 	case SL_OPTMGMT_ACK:
-		printd(("%s: %p: -> SL_OPTMGMT_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_OPTMGMT_ACK\n", DRV_NAME, s));
 		rtn = slp_optmgmt_ack(q, mp);
 		break;
 #endif
 #if 0
 	case SL_NOTIFY_IND:
-		printd(("%s: %p: -> SL_NOTIFY_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_NOTIFY_IND\n", DRV_NAME, s));
 		rtn = slp_notify_ind(q, mp);
 		break;
 #endif
 	default:
-		printd(("%s: %p: -> SL_????\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> SL_????\n", DRV_NAME, s));
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -15071,75 +14851,75 @@ xp_r_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = s->i_state;
 	switch (*(ulong *) mp->b_rptr) {
 	case T_CONN_IND:
-		printd(("%s: %p: -> T_CONN_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_CONN_IND\n", DRV_NAME, s));
 		rtn = xp_conn_ind(q, mp);
 		break;
 	case T_CONN_CON:
-		printd(("%s: %p: -> T_CONN_CON\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_CONN_CON\n", DRV_NAME, s));
 		rtn = xp_conn_con(q, mp);
 		break;
 	case T_DISCON_IND:
-		printd(("%s: %p: -> T_DISCON_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_DISCON_IND\n", DRV_NAME, s));
 		rtn = xp_discon_ind(q, mp);
 		break;
 	case T_DATA_IND:
-		printd(("%s: %p: -> T_DATA_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_DATA_IND\n", DRV_NAME, s));
 		rtn = xp_data_ind(q, mp);
 		break;
 	case T_EXDATA_IND:
-		printd(("%s: %p: -> T_EXDATA_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_EXDATA_IND\n", DRV_NAME, s));
 		rtn = xp_exdata_ind(q, mp);
 		break;
 	case T_INFO_ACK:
-		printd(("%s: %p: -> T_INFO_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_INFO_ACK\n", DRV_NAME, s));
 		rtn = xp_info_ack(q, mp);
 		break;
 	case T_BIND_ACK:
-		printd(("%s: %p: -> T_BIND_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_BIND_ACK\n", DRV_NAME, s));
 		rtn = xp_bind_ack(q, mp);
 		break;
 	case T_ERROR_ACK:
-		printd(("%s: %p: -> T_ERROR_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_ERROR_ACK\n", DRV_NAME, s));
 		rtn = xp_error_ack(q, mp);
 		break;
 	case T_OK_ACK:
-		printd(("%s: %p: -> T_OK_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_OK_ACK\n", DRV_NAME, s));
 		rtn = xp_ok_ack(q, mp);
 		break;
 	case T_UNITDATA_IND:
-		printd(("%s: %p: -> T_UNITDATA_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_UNITDATA_IND\n", DRV_NAME, s));
 		rtn = xp_unitdata_ind(q, mp);
 		break;
 	case T_UDERROR_IND:
-		printd(("%s: %p: -> T_UDERROR_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_UDERROR_IND\n", DRV_NAME, s));
 		rtn = xp_uderror_ind(q, mp);
 		break;
 	case T_OPTMGMT_ACK:
-		printd(("%s: %p: -> T_OPTMGMT_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_OPTMGMT_ACK\n", DRV_NAME, s));
 		rtn = xp_optmgmt_ack(q, mp);
 		break;
 	case T_ORDREL_IND:
-		printd(("%s: %p: -> T_ORDREL_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_ORDREL_IND\n", DRV_NAME, s));
 		rtn = xp_ordrel_ind(q, mp);
 		break;
 	case T_OPTDATA_IND:
-		printd(("%s: %p: -> T_OPTDATA_IND\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_OPTDATA_IND\n", DRV_NAME, s));
 		rtn = xp_optdata_ind(q, mp);
 		break;
 #ifdef T_ADDR_ACK
 	case T_ADDR_ACK:
-		printd(("%s: %p: -> T_ADDR_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_ADDR_ACK\n", DRV_NAME, s));
 		rtn = xp_addr_ack(q, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_ACK
 	case T_CAPABILITY_ACK:
-		printd(("%s: %p: -> T_CAPABILITY_ACK\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_CAPABILITY_ACK\n", DRV_NAME, s));
 		rtn = xp_capability_ack(q, mp);
 		break;
 #endif
 	default:
-		printd(("%s: %p: -> T_????\n", M2UA_DRV_NAME, s));
+		printd(("%s: %p: -> T_????\n", DRV_NAME, s));
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -15158,25 +14938,22 @@ xp_r_proto(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 slu_w_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from above 
-	 */
+	/* 
+	   data from above */
 	return slu_write(q, mp);
 }
 STATIC INLINE int
 slp_r_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from below 
-	 */
+	/* 
+	   data from below */
 	return slp_read(q, mp);
 }
 STATIC INLINE int
 xp_r_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from below 
-	 */
+	/* 
+	   data from below */
 	return xp_read(q, mp);
 }
 
@@ -15223,9 +15000,8 @@ slu_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 slu_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return slu_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -15245,9 +15021,8 @@ slu_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 slp_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return slp_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -15278,9 +15053,8 @@ slp_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 xp_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return xp_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -15338,7 +15112,7 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", M2UA_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -15350,9 +15124,8 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (EBUSY);
 	}
-	/*
-	   allocate a new device 
-	 */
+	/* 
+	   allocate a new device */
 	cminor = 2;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *pp; pp = (union priv **) &(*pp)->str.next) {
@@ -15366,7 +15139,7 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= M2UA_CMINORS) {
+				if (++cminor >= NMINORS) {
 					if (++mindex >= M2UA_CMAJORS
 					    || !(cmajor = m2ua_majors[mindex]))
 						break;
@@ -15377,15 +15150,15 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (mindex >= M2UA_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", M2UA_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", M2UA_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(p = m2ua_alloc_priv(q, pp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: no memory\n", M2UA_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -15404,7 +15177,7 @@ m2ua_close(queue_t *q, int flag, cred_t *crp)
 	str_t *s = STR_PRIV(q);
 	psw_t flags;
 	(void) s;
-	printd(("%s: %p: closing character device %d:%d\n", M2UA_DRV_NAME, s, s->u.dev.cmajor,
+	printd(("%s: %p: closing character device %d:%d\n", DRV_NAME, s, s->u.dev.cmajor,
 		s->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	{
@@ -15431,126 +15204,135 @@ STATIC kmem_cache_t *m2ua_sp_cachep = NULL;
 STATIC kmem_cache_t *m2ua_np_cachep = NULL;
 STATIC kmem_cache_t *m2ua_gp_cachep = NULL;
 
-STATIC void
+STATIC int
 m2ua_term_caches(void)
 {
+	int err = 0;
 	if (m2ua_priv_cachep) {
-		if (kmem_cache_destroy(m2ua_priv_cachep))
+		if (kmem_cache_destroy(m2ua_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_priv_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_priv_cachep\n", DRV_NAME));
 	}
 	if (m2ua_link_cachep) {
-		if (kmem_cache_destroy(m2ua_link_cachep))
+		if (kmem_cache_destroy(m2ua_link_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_link_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_link_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_link_cachep\n", DRV_NAME));
 	}
 	if (m2ua_as_cachep) {
-		if (kmem_cache_destroy(m2ua_as_cachep))
+		if (kmem_cache_destroy(m2ua_as_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_as_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_as_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_as_cachep\n", DRV_NAME));
 	}
 	if (m2ua_ap_cachep) {
-		if (kmem_cache_destroy(m2ua_ap_cachep))
+		if (kmem_cache_destroy(m2ua_ap_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_ap_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_ap_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_ap_cachep\n", DRV_NAME));
 	}
 	if (m2ua_gp_cachep) {
-		if (kmem_cache_destroy(m2ua_gp_cachep))
+		if (kmem_cache_destroy(m2ua_gp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_gp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_gp_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_gp_cachep\n", DRV_NAME));
 	}
 	if (m2ua_sp_cachep) {
-		if (kmem_cache_destroy(m2ua_sp_cachep))
+		if (kmem_cache_destroy(m2ua_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_sp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_sp_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_sp_cachep\n", DRV_NAME));
 	}
 	if (m2ua_np_cachep) {
-		if (kmem_cache_destroy(m2ua_np_cachep))
+		if (kmem_cache_destroy(m2ua_np_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_np_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_np_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_np_cachep\n", DRV_NAME));
 	}
 	if (m2ua_spp_cachep) {
-		if (kmem_cache_destroy(m2ua_spp_cachep))
+		if (kmem_cache_destroy(m2ua_spp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy m2ua_spp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed m2ua_spp_cachep\n", M2UA_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed m2ua_spp_cachep\n", DRV_NAME));
 	}
-	return;
+	return (err);
 }
 static int
 m2ua_init_caches(void)
 {
-	if (!m2ua_priv_cachep &&
-	    !(m2ua_priv_cachep =
-	      kmem_cache_create("m2ua_priv_cachep", sizeof(priv_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_priv_cachep", M2UA_DRV_NAME);
+	if (!m2ua_priv_cachep
+	    && !(m2ua_priv_cachep =
+		 kmem_cache_create("m2ua_priv_cachep", sizeof(priv_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_priv_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua link structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_link_cachep &&
-	    !(m2ua_link_cachep =
-	      kmem_cache_create("m2ua_link_cachep", sizeof(link_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_link_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua link structure cache\n", DRV_NAME));
+	if (!m2ua_link_cachep
+	    && !(m2ua_link_cachep =
+		 kmem_cache_create("m2ua_link_cachep", sizeof(link_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_link_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua link structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_as_cachep &&
-	    !(m2ua_as_cachep =
-	      kmem_cache_create("m2ua_as_cachep", sizeof(as_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_as_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua link structure cache\n", DRV_NAME));
+	if (!m2ua_as_cachep
+	    && !(m2ua_as_cachep =
+		 kmem_cache_create("m2ua_as_cachep", sizeof(as_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_as_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua as structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_ap_cachep &&
-	    !(m2ua_ap_cachep =
-	      kmem_cache_create("m2ua_ap_cachep", sizeof(ap_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_ap_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua as structure cache\n", DRV_NAME));
+	if (!m2ua_ap_cachep
+	    && !(m2ua_ap_cachep =
+		 kmem_cache_create("m2ua_ap_cachep", sizeof(ap_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_ap_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua ap structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_gp_cachep &&
-	    !(m2ua_gp_cachep =
-	      kmem_cache_create("m2ua_gp_cachep", sizeof(gp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_gp_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua ap structure cache\n", DRV_NAME));
+	if (!m2ua_gp_cachep
+	    && !(m2ua_gp_cachep =
+		 kmem_cache_create("m2ua_gp_cachep", sizeof(gp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_gp_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua gp structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_sp_cachep &&
-	    !(m2ua_sp_cachep =
-	      kmem_cache_create("m2ua_sp_cachep", sizeof(sp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_sp_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua gp structure cache\n", DRV_NAME));
+	if (!m2ua_sp_cachep
+	    && !(m2ua_sp_cachep =
+		 kmem_cache_create("m2ua_sp_cachep", sizeof(sp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_sp_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua sp structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_np_cachep &&
-	    !(m2ua_np_cachep =
-	      kmem_cache_create("m2ua_np_cachep", sizeof(np_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_np_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua sp structure cache\n", DRV_NAME));
+	if (!m2ua_np_cachep
+	    && !(m2ua_np_cachep =
+		 kmem_cache_create("m2ua_np_cachep", sizeof(np_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_np_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua np structure cache\n", M2UA_DRV_NAME));
-	if (!m2ua_spp_cachep &&
-	    !(m2ua_spp_cachep =
-	      kmem_cache_create("m2ua_spp_cachep", sizeof(spp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate m2ua_spp_cachep", M2UA_DRV_NAME);
+	printd(("%s: initialized m2ua np structure cache\n", DRV_NAME));
+	if (!m2ua_spp_cachep
+	    && !(m2ua_spp_cachep =
+		 kmem_cache_create("m2ua_spp_cachep", sizeof(spp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate m2ua_spp_cachep", DRV_NAME);
 		goto enomem;
 	}
-	printd(("%s: initialized m2ua spp structure cache\n", M2UA_DRV_NAME));
+	printd(("%s: initialized m2ua spp structure cache\n", DRV_NAME));
 	return (0);
       enomem:
 	m2ua_term_caches();
@@ -15566,22 +15348,20 @@ STATIC struct ap *
 m2ua_alloc_ap(struct as *as_u, struct as *as_p)
 {
 	struct ap *ap;
-	printd(("%s: %s: ap graph as %ld:%ld\n", M2UA_DRV_NAME, __FUNCTION__, as_u->id, as_p->id));
+	printd(("%s: %s: ap graph as %ld:%ld\n", DRV_NAME, __FUNCTION__, as_u->id, as_p->id));
 	if ((ap = kmem_cache_alloc(m2ua_ap_cachep, SLAB_ATOMIC))) {
 		bzero(ap, sizeof(*ap));
 		ap_set_state(ap, 0);
-		/*
-		   link to AS-U 
-		 */
+		/* 
+		   link to AS-U */
 		if ((ap->u.next = as_u->ap.list))
 			ap->u.next->u.prev = &ap->u.next;
 		ap->u.prev = &as_u->ap.list;
 		ap->u.as = as_get(as_u);
 		as_u->ap.list = ap;
 		as_u->ap.numb++;
-		/*
-		   link to AS-P 
-		 */
+		/* 
+		   link to AS-P */
 		if ((ap->p.next = as_p->ap.list))
 			ap->p.next->p.prev = &ap->p.next;
 		ap->p.prev = &as_p->ap.list;
@@ -15590,25 +15370,23 @@ m2ua_alloc_ap(struct as *as_u, struct as *as_p)
 		as_p->ap.numb++;
 	} else
 		printd(("%s: %s: ERROR: failed to allocated ap structure for as %lu:%lu\n",
-			M2UA_DRV_NAME, __FUNCTION__, as_u->id, as_p->id));
+			DRV_NAME, __FUNCTION__, as_u->id, as_p->id));
 	return (ap);
 }
 STATIC void
 m2ua_free_ap(struct ap *ap)
 {
 	if (ap) {
-		/*
-		   unlink AS-U 
-		 */
+		/* 
+		   unlink AS-U */
 		if ((*ap->u.prev = ap->u.next))
 			ap->u.next->u.prev = ap->u.prev;
 		ap->u.next = NULL;
 		ap->u.prev = &ap->u.next;
 		ap->u.as->ap.numb--;
 		as_put(xchg(&ap->u.as, NULL));
-		/*
-		   unlink AS-P 
-		 */
+		/* 
+		   unlink AS-P */
 		if ((*ap->p.prev = ap->p.next))
 			ap->p.next->p.prev = ap->p.prev;
 		ap->p.next = NULL;
@@ -15616,7 +15394,7 @@ m2ua_free_ap(struct ap *ap)
 		ap->p.as->ap.numb--;
 		as_put(xchg(&ap->p.as, NULL));
 		kmem_cache_free(m2ua_ap_cachep, ap);
-		printd(("%s: %s: %p: deallocated ap structure\n", M2UA_DRV_NAME, __FUNCTION__, ap));
+		printd(("%s: %s: %p: deallocated ap structure\n", DRV_NAME, __FUNCTION__, ap));
 		return;
 	}
 	swerr();
@@ -15631,22 +15409,20 @@ STATIC struct np *
 m2ua_alloc_np(struct sp *sp, struct sp *sg)
 {
 	struct np *np;
-	printd(("%s: %s: np graph sp %ld:%ld\n", M2UA_DRV_NAME, __FUNCTION__, sp->id, sg->id));
+	printd(("%s: %s: np graph sp %ld:%ld\n", DRV_NAME, __FUNCTION__, sp->id, sg->id));
 	if ((np = kmem_cache_alloc(m2ua_np_cachep, SLAB_ATOMIC))) {
 		bzero(np, sizeof(*np));
 		np_set_state(np, 0);
-		/*
-		   link to AS-U 
-		 */
+		/* 
+		   link to AS-U */
 		if ((np->u.next = sp->np.list))
 			np->u.next->u.prev = &np->u.next;
 		np->u.prev = &sp->np.list;
 		np->u.sp = sp_get(sp);
 		sp->np.list = np;
 		sp->np.numb++;
-		/*
-		   link to AS-P 
-		 */
+		/* 
+		   link to AS-P */
 		if ((np->p.next = sg->np.list))
 			np->p.next->p.prev = &np->p.next;
 		np->p.prev = &sg->np.list;
@@ -15655,25 +15431,23 @@ m2ua_alloc_np(struct sp *sp, struct sp *sg)
 		sg->np.numb++;
 	} else
 		printd(("%s: %s: ERROR: failed to allocated np structure for %lu:%lu\n",
-			M2UA_DRV_NAME, __FUNCTION__, sp->id, sg->id));
+			DRV_NAME, __FUNCTION__, sp->id, sg->id));
 	return (np);
 }
 STATIC void
 m2ua_free_np(struct np *np)
 {
 	if (np) {
-		/*
-		   unlink AS-U 
-		 */
+		/* 
+		   unlink AS-U */
 		if ((*np->u.prev = np->u.next))
 			np->u.next->u.prev = np->u.prev;
 		np->u.next = NULL;
 		np->u.prev = &np->u.next;
 		np->u.sp->np.numb--;
 		sp_put(xchg(&np->u.sp, NULL));
-		/*
-		   unlink AS-P 
-		 */
+		/* 
+		   unlink AS-P */
 		if ((*np->p.prev = np->p.next))
 			np->p.next->p.prev = np->p.prev;
 		np->p.next = NULL;
@@ -15681,7 +15455,7 @@ m2ua_free_np(struct np *np)
 		np->p.sp->np.numb--;
 		sp_put(xchg(&np->p.sp, NULL));
 		kmem_cache_free(m2ua_np_cachep, np);
-		printd(("%s: %s: %p: deallocated np structure\n", M2UA_DRV_NAME, __FUNCTION__, np));
+		printd(("%s: %s: %p: deallocated np structure\n", DRV_NAME, __FUNCTION__, np));
 		return;
 	}
 	swerr();
@@ -15696,23 +15470,21 @@ STATIC struct gp *
 m2ua_alloc_gp(ulong iid, struct as *as, struct spp *spp)
 {
 	struct gp *gp;
-	printd(("%s: %s: gp graph as %ld spp %lu\n", M2UA_DRV_NAME, __FUNCTION__, as->id, spp->id));
+	printd(("%s: %s: gp graph as %ld spp %lu\n", DRV_NAME, __FUNCTION__, as->id, spp->id));
 	if ((gp = kmem_cache_alloc(m2ua_gp_cachep, SLAB_ATOMIC))) {
 		bzero(gp, sizeof(gp));
 		gp->iid = iid;
 		gp_set_state(gp, 0);
-		/*
-		   link to AS 
-		 */
+		/* 
+		   link to AS */
 		if ((gp->as.next = as->gp.list))
 			gp->as.next->as.prev = &gp->as.next;
 		gp->as.prev = &as->gp.list;
 		gp->as.as = as_get(as);
 		as->gp.list = gp;
 		as->gp.numb++;
-		/*
-		   link to SPP 
-		 */
+		/* 
+		   link to SPP */
 		if ((gp->spp.next = spp->gp.list))
 			gp->spp.next->spp.prev = &gp->spp.next;
 		gp->spp.prev = &spp->gp.list;
@@ -15721,25 +15493,23 @@ m2ua_alloc_gp(ulong iid, struct as *as, struct spp *spp)
 		spp->gp.numb++;
 	} else
 		printd(("%s: %s: ERROR: failed to allocate gp structure for as %ld spp %ld\n",
-			M2UA_DRV_NAME, __FUNCTION__, as->id, spp->id));
+			DRV_NAME, __FUNCTION__, as->id, spp->id));
 	return (gp);
 }
 STATIC void
 m2ua_free_gp(struct gp *gp)
 {
 	if (gp) {
-		/*
-		   unlink from AS 
-		 */
+		/* 
+		   unlink from AS */
 		if ((*gp->as.prev = gp->as.next))
 			gp->as.next->as.prev = gp->as.prev;
 		gp->as.next = NULL;
 		gp->as.prev = &gp->as.next;
 		gp->as.as->gp.numb--;
 		as_put(xchg(&gp->as.as, NULL));
-		/*
-		   unlink from SPP 
-		 */
+		/* 
+		   unlink from SPP */
 		if ((*gp->spp.prev = gp->spp.next))
 			gp->spp.next->spp.prev = gp->spp.prev;
 		gp->spp.next = NULL;
@@ -15747,7 +15517,7 @@ m2ua_free_gp(struct gp *gp)
 		gp->spp.spp->gp.numb--;
 		spp_put(xchg(&gp->spp.spp, NULL));
 		kmem_cache_free(m2ua_gp_cachep, gp);
-		printd(("%s: %s: %p: deallocated gp structure\n", M2UA_DRV_NAME, __FUNCTION__, gp));
+		printd(("%s: %s: %p: deallocated gp structure\n", DRV_NAME, __FUNCTION__, gp));
 		return;
 	}
 	swerr();
@@ -15762,8 +15532,8 @@ STATIC union priv *
 m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, ushort bminor)
 {
 	union priv *p;
-	printd(("%s: %s: create priv dev = %d:%d\n", M2UA_DRV_NAME,
-		__FUNCTION__, getmajor(*devp), getminor(*devp)));
+	printd(("%s: %s: create priv dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
+		getminor(*devp)));
 	if ((p = kmem_cache_alloc(m2ua_priv_cachep, SLAB_ATOMIC))) {
 		str_t *s = (str_t *) p, **sp = (str_t **) pp;
 		bzero(p, sizeof(*p));
@@ -15771,7 +15541,7 @@ m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, ushort bm
 		s->u.dev.cmajor = getmajor(*devp);
 		s->u.dev.cminor = getminor(*devp);
 		s->cred = *crp;
-		spin_lock_init(&s->qlock); /* "priv-queue-lock" */
+		spin_lock_init(&s->qlock);	/* "priv-queue-lock" */
 		(s->oq = RD(q))->q_ptr = priv_get(p);
 		(s->iq = WR(q))->q_ptr = priv_get(p);
 		switch (bminor) {
@@ -15789,17 +15559,16 @@ m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, ushort bm
 		s->i_state = LMI_UNUSABLE;
 		s->i_style = LMI_STYLE2;
 		s->i_version = 1;
-		spin_lock_init(&s->lock); /* "priv-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&s->lock);	/* "priv-lock" */
+		/* 
+		   place in master list */
 		if ((s->next = *sp))
 			s->next->prev = &s->next;
 		s->prev = sp;
 		*pp = priv_get(p);
 		master.priv.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocated priv structure\n", M2UA_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocated priv structure\n", DRV_NAME,
 			__FUNCTION__));
 	return (p);
 }
@@ -15810,24 +15579,21 @@ m2ua_free_priv(queue_t *q)
 	struct str *s = &p->str;
 	psw_t flags;
 	ensure(p, return);
-	printd(("%s: %s: %p: free priv %d:%d\n", M2UA_DRV_NAME, __FUNCTION__, s, s->u.dev.cmajor,
+	printd(("%s: %s: %p: free priv %d:%d\n", DRV_NAME, __FUNCTION__, s, s->u.dev.cmajor,
 		s->u.dev.cminor));
 	spin_lock_irqsave(&s->lock, flags);
 	{
 		noenable(s->oq);
 		noenable(s->iq);
-		/*
-		   stopping bufcalls 
-		 */
+		/* 
+		   stopping bufcalls */
 		ss7_unbufcall(s);
-		/*
-		   flushing buffsers 
-		 */
+		/* 
+		   flushing buffsers */
 		flushq(s->oq, FLUSHALL);
 		flushq(s->iq, FLUSHALL);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*s->prev = s->next))
 			s->next->prev = s->prev;
 		s->next = NULL;
@@ -15838,19 +15604,17 @@ m2ua_free_priv(queue_t *q)
 		master.priv.numb--;
 		if (s == (str_t *) master.lm)
 			master.lm = NULL;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&s->refcnt) > 1, priv_get(p));
 		priv_put(xchg(&s->oq->q_ptr, NULL));
 		ensure(atomic_read(&s->refcnt) > 1, priv_get(p));
 		priv_put(xchg(&s->iq->q_ptr, NULL));
-		/*
-		   done check final count 
-		 */
+		/* 
+		   done check final count */
 		if (atomic_read(&s->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: priv lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, s, atomic_read(&s->refcnt)));
+				  DRV_NAME, __FUNCTION__, s, atomic_read(&s->refcnt)));
 			atomic_set(&s->refcnt, 1);
 		}
 	}
@@ -15875,7 +15639,7 @@ priv_put(union priv *priv)
 		assure(atomic_read(&priv->str.refcnt) > 1);
 		if (atomic_dec_and_test(&priv->str.refcnt)) {
 			kmem_cache_free(m2ua_priv_cachep, priv);
-			printd(("%s: %s: %p: deallocated priv structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated priv structure\n", DRV_NAME,
 				__FUNCTION__, priv));
 		}
 		return;
@@ -15892,70 +15656,65 @@ STATIC struct as *
 m2ua_alloc_as(ulong id, ulong type, struct sp *sp, uint32_t iid, m2ua_addr_t * add)
 {
 	struct as *as, **p;
-	printd(("%s: %s: create as->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create as->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((as = kmem_cache_alloc(m2ua_as_cachep, SLAB_ATOMIC))) {
 		struct spp *spp;
 		struct np *np;
 		bzero(as, sizeof(*as));
 		as_get(as);	/* first get */
-		spin_lock_init(&as->lock); /* "as-lock" */
+		spin_lock_init(&as->lock);	/* "as-lock" */
 		as->id = id;
 		as->type = type;
 		as->iid = iid;
 		as->add = *add;
-		/*
-		   insert into master list in ascending id order 
-		 */
+		/* 
+		   insert into master list in ascending id order */
 		for (p = &master.as.list; *p && (*p)->id < id; p = &(*p)->next) ;
 		if ((as->next = *p))
 			as->next->prev = &as->next;
 		as->prev = p;
 		*p = as_get(as);
 		master.as.numb++;
-		/*
-		   link to sp 
-		 */
+		/* 
+		   link to sp */
 		if ((as->sp.next = sp->as.list))
 			as->sp.next->sp.prev = &as->sp.next;
 		as->sp.prev = &sp->as.list;
 		as->sp.sp = sp_get(sp);
 		sp->as.list = as_get(as);
 		sp->as.numb++;
-		/*
-		   generate graph nodes for all of the SP's SPPs 
-		 */
+		/* 
+		   generate graph nodes for all of the SP's SPPs */
 		for (spp = sp->spp.list; spp; spp = spp->sp.next)
 			if (!m2ua_alloc_gp(iid, as, spp))
 				goto enomem;
-		/*
-		   generate graph nodes to all matching AS for other SPs 
-		 */
+		/* 
+		   generate graph nodes to all matching AS for other SPs */
 		if ((np = sp->np.list)) {
 			struct as *a2;
 			if (sp == np->u.sp)
 				for (; np; np = np->u.next)
 					for (a2 = np->p.sp->as.list; a2; a2 = a2->sp.next)
-						if ((!iid && a2->iid == iid) ||
-						    (add->spid == a2->add.spid &&
-						     add->sdti == a2->add.sdti
-						     && add->sdli == a2->add.sdli))
+						if ((!iid && a2->iid == iid)
+						    || (add->spid == a2->add.spid
+							&& add->sdti == a2->add.sdti
+							&& add->sdli == a2->add.sdli))
 							if (!m2ua_alloc_ap(as, a2))
 								goto enomem;
 			if (sp == np->p.sp)
 				for (; np; np = np->p.next)
 					for (a2 = np->u.sp->as.list; a2; a2 = a2->sp.next)
-						if ((!iid && a2->iid == iid) ||
-						    (add->spid == a2->add.spid &&
-						     add->sdti == a2->add.sdti
-						     && add->sdli == a2->add.sdli))
+						if ((!iid && a2->iid == iid)
+						    || (add->spid == a2->add.spid
+							&& add->sdti == a2->add.sdti
+							&& add->sdli == a2->add.sdli))
 							if (!m2ua_alloc_ap(a2, as))
 								goto enomem;
 		}
-		/*
-		   as structures are created without any linked sl structures 
-		 */
+		/* 
+		   as structures are created without any linked sl structures */
 	} else
-		printd(("%s: %s: ERROR: failed to allocate as structure %lu\n", M2UA_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate as structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (as);
       enomem:
@@ -15967,32 +15726,28 @@ m2ua_free_as(struct as *as)
 {
 	psw_t flags;
 	ensure(as, return);
-	printd(("%s: %s: %p free as->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, as, as->id));
+	printd(("%s: %s: %p free as->id = %ld\n", DRV_NAME, __FUNCTION__, as, as->id));
 	spin_lock_irqsave(&as->lock, flags);
 	{
 		struct sl *sl;
 		struct ap *ap;
 		struct gp *gp;
-		/*
-		   unlink from sl 
-		 */
+		/* 
+		   unlink from sl */
 		while ((sl = as->sl.list)) {
 			fixme(("Disable and hangup sl\n"));
 			m2ua_free_sl(sl);
 		}
-		/*
-		   unlink from other as 
-		 */
+		/* 
+		   unlink from other as */
 		while ((ap = as->ap.list))
 			m2ua_free_ap(ap);
-		/*
-		   unlink from spp 
-		 */
+		/* 
+		   unlink from spp */
 		while ((gp = as->gp.list))
 			m2ua_free_gp(gp);
-		/*
-		   unlink from sp 
-		 */
+		/* 
+		   unlink from sp */
 		if ((*as->sp.prev = as->sp.next))
 			as->sp.next->sp.prev = as->sp.prev;
 		as->sp.next = NULL;
@@ -16002,9 +15757,8 @@ m2ua_free_as(struct as *as)
 		assure(as->sp.sp->as.numb > 0);
 		as->sp.sp->as.numb--;
 		sp_put(xchg(&as->sp.sp, NULL));
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*as->prev = as->next))
 			as->next->prev = as->prev;
 		as->next = NULL;
@@ -16013,12 +15767,11 @@ m2ua_free_as(struct as *as)
 		as_put(as);
 		assure(master.as.numb > 0);
 		master.as.numb++;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&as->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: as lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, as, atomic_read(&as->refcnt)));
+				  DRV_NAME, __FUNCTION__, as, atomic_read(&as->refcnt)));
 			atomic_set(&as->refcnt, 1);
 		}
 	}
@@ -16042,7 +15795,7 @@ as_put(struct as *as)
 		assure(atomic_read(&as->refcnt) > 1);
 		if (atomic_dec_and_test(&as->refcnt)) {
 			kmem_cache_free(m2ua_as_cachep, as);
-			printd(("%s: %s: %p: deallocated as structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated as structure\n", DRV_NAME,
 				__FUNCTION__, as));
 		}
 		return;
@@ -16080,18 +15833,17 @@ STATIC struct sp *
 m2ua_alloc_sp(ulong id, ulong type, struct sp *osp, ulong cost, ulong tmode)
 {
 	struct sp *sp, **p;
-	printd(("%s: %s: create sp->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sp = kmem_cache_alloc(m2ua_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
-		spin_lock_init(&sp->lock); /* "sp-lock" */
+		spin_lock_init(&sp->lock);	/* "sp-lock" */
 		sp->id = id;
 		sp->type = type;
 		sp->cost = cost;
 		sp->tmode = tmode;
-		/*
-		   insert into master list in ascending id order 
-		 */
+		/* 
+		   insert into master list in ascending id order */
 		for (p = &master.sp.list; *p && (*p)->id < id; p = &(*p)->next) ;
 		if ((sp->next = *p))
 			sp->next->prev = &sp->next;
@@ -16099,17 +15851,15 @@ m2ua_alloc_sp(ulong id, ulong type, struct sp *osp, ulong cost, ulong tmode)
 		*p = sp_get(sp);
 		master.sp.numb++;
 		if (osp) {
-			/*
-			   link to other sp 
-			 */
+			/* 
+			   link to other sp */
 			if (!m2ua_alloc_np(sp, osp))
 				goto enomem;
 		}
-		/*
-		   when sp are created they have no as and no spp 
-		 */
+		/* 
+		   when sp are created they have no as and no spp */
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", M2UA_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sp);
       enomem:
@@ -16121,27 +15871,23 @@ m2ua_free_sp(struct sp *sp)
 {
 	psw_t flags;
 	ensure(sp, return);
-	printd(("%s: %s: %p free sp->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, sp, sp->id));
+	printd(("%s: %s: %p free sp->id = %ld\n", DRV_NAME, __FUNCTION__, sp, sp->id));
 	spin_lock_irqsave(&sp->lock, flags);
 	{
-		/*
-		   unlink from as 
-		 */
+		/* 
+		   unlink from as */
 		while (sp->as.list)
 			m2ua_free_as(sp->as.list);
-		/*
-		   unlink from spp 
-		 */
+		/* 
+		   unlink from spp */
 		while (sp->spp.list)
 			m2ua_free_spp(sp->spp.list);
-		/*
-		   unlink from other sp 
-		 */
+		/* 
+		   unlink from other sp */
 		while (sp->np.list)
 			m2ua_free_np(sp->np.list);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*sp->prev = sp->next))
 			sp->next->prev = sp->prev;
 		sp->next = NULL;
@@ -16150,12 +15896,11 @@ m2ua_free_sp(struct sp *sp)
 		sp_put(sp);
 		assure(master.sp.numb > 0);
 		master.sp.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sp->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: sp lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, sp, atomic_read(&sp->refcnt)));
+				  DRV_NAME, __FUNCTION__, sp, atomic_read(&sp->refcnt)));
 			atomic_set(&sp->refcnt, 1);
 		}
 	}
@@ -16179,7 +15924,7 @@ sp_put(struct sp *sp)
 		assure(atomic_read(&sp->refcnt) > 1);
 		if (atomic_dec_and_test(&sp->refcnt)) {
 			kmem_cache_free(m2ua_sp_cachep, sp);
-			printd(("%s: %s: %p: deallocated sp structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated sp structure\n", DRV_NAME,
 				__FUNCTION__, sp));
 		}
 		return;
@@ -16217,46 +15962,42 @@ STATIC struct spp *
 m2ua_alloc_spp(ulong id, ulong type, struct sp *sp, ulong aspid, ulong cost)
 {
 	struct spp *spp, **p;
-	printd(("%s: %s: create spp->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create spp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((spp = kmem_cache_alloc(m2ua_spp_cachep, SLAB_ATOMIC))) {
 		struct as *as;
 		bzero(spp, sizeof(*spp));
 		spp_get(spp);	/* first get */
-		spin_lock_init(&spp->lock); /* "spp-lock" */
+		spin_lock_init(&spp->lock);	/* "spp-lock" */
 		spp->id = id;
 		spp->type = type;
 		spp->aspid = aspid;
 		spp->cost = cost;
-		/*
-		   insert into master list in ascending id order 
-		 */
+		/* 
+		   insert into master list in ascending id order */
 		for (p = &master.spp.list; *p && (*p)->id < id; p = &(*p)->next) ;
 		if ((spp->next = *p))
 			spp->next->prev = &spp->next;
 		spp->prev = p;
 		*p = spp_get(spp);
 		master.spp.numb++;
-		/*
-		   link to sp 
-		 */
+		/* 
+		   link to sp */
 		if ((spp->sp.next = sp->spp.list))
 			spp->sp.next->sp.prev = &spp->sp.next;
 		spp->sp.prev = &sp->spp.list;
 		spp->sp.sp = sp_get(sp);
 		sp->spp.list = spp_get(spp);
 		sp->spp.numb++;
-		/*
-		   generate graph nodes for all other SP's AS's 
-		 */
+		/* 
+		   generate graph nodes for all other SP's AS's */
 		for (as = sp->as.list; as; as = as->sp.next)
 			if (!m2ua_alloc_gp(as->iid, as, spp))
 				goto enomem;
-		/*
-		   spp structures are created without any linked xp structures 
-		 */
+		/* 
+		   spp structures are created without any linked xp structures */
 	} else
-		printd(("%s: %s: ERROR: failed to allocate spp structure %lu\n",
-			M2UA_DRV_NAME, __FUNCTION__, id));
+		printd(("%s: %s: ERROR: failed to allocate spp structure %lu\n", DRV_NAME,
+			__FUNCTION__, id));
 	return (spp);
       enomem:
 	m2ua_free_spp(spp);
@@ -16267,26 +16008,23 @@ m2ua_free_spp(struct spp *spp)
 {
 	psw_t flags;
 	ensure(spp, return);
-	printd(("%s: %s: %p free spp->id = %ld\n", M2UA_DRV_NAME, __FUNCTION__, spp, spp->id));
+	printd(("%s: %s: %p free spp->id = %ld\n", DRV_NAME, __FUNCTION__, spp, spp->id));
 	spin_lock_irqsave(&spp->lock, flags);
 	{
 		struct xp *xp;
 		struct gp *gp;
-		/*
-		   unlink from xp 
-		 */
+		/* 
+		   unlink from xp */
 		if ((xp = spp->xp)) {
 			fixme(("Disable and hangup xp\n"));
 			m2ua_free_xp(xp);
 		}
-		/*
-		   unlink from as 
-		 */
+		/* 
+		   unlink from as */
 		while ((gp = spp->gp.list))
 			m2ua_free_gp(gp);
-		/*
-		   unlink from sp 
-		 */
+		/* 
+		   unlink from sp */
 		if ((*spp->sp.prev = spp->sp.next))
 			spp->sp.next->sp.prev = spp->sp.prev;
 		spp->sp.next = NULL;
@@ -16296,9 +16034,8 @@ m2ua_free_spp(struct spp *spp)
 		assure(spp->sp.sp->spp.numb > 0);
 		spp->sp.sp->spp.numb--;
 		sp_put(xchg(&spp->sp.sp, NULL));
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*spp->prev = spp->next))
 			spp->next->prev = spp->prev;
 		spp->next = NULL;
@@ -16307,12 +16044,11 @@ m2ua_free_spp(struct spp *spp)
 		spp_put(spp);
 		assure(master.spp.numb > 0);
 		master.spp.numb++;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&spp->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: spp lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, spp, atomic_read(&spp->refcnt)));
+				  DRV_NAME, __FUNCTION__, spp, atomic_read(&spp->refcnt)));
 			atomic_set(&spp->refcnt, 1);
 		}
 	}
@@ -16336,7 +16072,7 @@ spp_put(struct spp *spp)
 		assure(atomic_read(&spp->refcnt) > 1);
 		if (atomic_dec_and_test(&spp->refcnt)) {
 			kmem_cache_free(m2ua_spp_cachep, spp);
-			printd(("%s: %s: %p: deallocated spp structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated spp structure\n", DRV_NAME,
 				__FUNCTION__, spp));
 		}
 		return;
@@ -16377,9 +16113,8 @@ m2ua_alloc_sl(struct sl *sl, ulong id, ulong type, struct as *as, ulong iid, m2u
 	sl->type = type;
 	sl->iid = iid;
 	sl->add = *add;
-	/*
-	   link to AS 
-	 */
+	/* 
+	   link to AS */
 	if ((sl->as.next = as->sl.list))
 		sl->as.prev = &as->sl.list;
 	sl->as.as = as_get(as);
@@ -16387,9 +16122,8 @@ m2ua_alloc_sl(struct sl *sl, ulong id, ulong type, struct as *as, ulong iid, m2u
 	as->sl.numb++;
 	sl->o_prim = &slp_w_prim;
 	sl->i_prim = &slp_r_prim;
-	/*
-	   link is characterized, it can now be enabled 
-	 */
+	/* 
+	   link is characterized, it can now be enabled */
 	enableok(sl->oq);
 	enableok(sl->iq);
 	return;
@@ -16399,14 +16133,13 @@ m2ua_free_sl(struct sl *sl)
 {
 	psw_t flags;
 	ensure(sl, return);
-	printd(("%s: %s: %p free sl index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, sl, sl->u.mux.index));
+	printd(("%s: %s: %p free sl index = %lu\n", DRV_NAME, __FUNCTION__, sl, sl->u.mux.index));
 	spin_lock_irqsave(&sl->lock, flags);
 	{
 		noenable(sl->oq);
 		noenable(sl->iq);
-		/*
-		   remove from AS 
-		 */
+		/* 
+		   remove from AS */
 		if (sl->as.as) {
 			fixme(("Notify any active AS that we have gone away.\n"));
 			if ((*sl->as.prev = sl->as.next))
@@ -16421,15 +16154,13 @@ m2ua_free_sl(struct sl *sl)
 		}
 		sl->id = 0;
 		sl->type = 0;
-		/*
-		   flushing buffers 
-		 */
+		/* 
+		   flushing buffers */
 		ss7_unbufcall((str_t *) sl);
 		flushq(sl->oq, FLUSHALL);
 		flushq(sl->iq, FLUSHALL);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*sl->prev = sl->next))
 			sl->next->prev = sl->prev;
 		sl->next = NULL;
@@ -16438,19 +16169,17 @@ m2ua_free_sl(struct sl *sl)
 		sl_put(sl);
 		assure(master.link.numb > 0);
 		master.link.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
 		sl_put(xchg(&sl->oq->q_ptr, NULL));
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
 		sl_put(xchg(&sl->iq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sl->refcnt) != 1) {
 			__printd(("%s; %s: %p: ERROR: sl lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, sl, atomic_read(&sl->refcnt)));
+				  DRV_NAME, __FUNCTION__, sl, atomic_read(&sl->refcnt)));
 			atomic_set(&sl->refcnt, 1);
 		}
 	}
@@ -16474,7 +16203,7 @@ sl_put(struct sl *sl)
 		assure(atomic_read(&sl->refcnt) > 1);
 		if (atomic_dec_and_test(&sl->refcnt)) {
 			kmem_cache_free(m2ua_link_cachep, sl);
-			printd(("%s: %s: %p: deallocated sl structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated sl structure\n", DRV_NAME,
 				__FUNCTION__, sl));
 		}
 		return;
@@ -16513,21 +16242,19 @@ m2ua_alloc_xp(struct xp *xp, ulong id, ulong type, struct spp *spp, struct sp *s
 	xp->id = id;
 	xp->type = type;
 	if (spp) {
-		/*
+		/* 
 		   link to SPP: this is done when we know to which ASP or SGP the stream
 		   corresponds.  If the aspid of the corresponding SPP is zero, we will not require 
 		   an ASPID on ASPUP. If the aspid is non-zero, any provided ASPID must match the
-		   ASPID set. 
-		 */
+		   ASPID set. */
 		spp->xp = xp_get(xp);
 		xp->spp = spp_get(spp);
 	}
 	if (sp) {
-		/*
+		/* 
 		   link to SP: this is done when we don't know the ASP or SGP to which the
 		   transport stream corresponds, and we will wait for the ASPUP with an ASPID to
-		   determine to which SGP the stream cooresponds. 
-		 */
+		   determine to which SGP the stream cooresponds. */
 		xp->sp = sp_get(sp);
 	}
 	switch (xp->type) {
@@ -16538,9 +16265,8 @@ m2ua_alloc_xp(struct xp *xp, ulong id, ulong type, struct spp *spp, struct sp *s
 		xp->i_prim = &xp_r_prim;
 		break;
 	}
-	/*
-	   link is characterized, it can now be enabled 
-	 */
+	/* 
+	   link is characterized, it can now be enabled */
 	enableok(xp->iq);
 	enableok(xp->oq);
 }
@@ -16549,15 +16275,14 @@ m2ua_free_xp(struct xp *xp)
 {
 	psw_t flags;
 	ensure(xp, return);
-	printd(("%s: %s: %p free xp index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, xp, xp->u.mux.index));
+	printd(("%s: %s: %p free xp index = %lu\n", DRV_NAME, __FUNCTION__, xp, xp->u.mux.index));
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		mblk_t *b_next, *bp;
 		noenable(xp->iq);
 		noenable(xp->oq);
-		/*
-		   trash normal reassembly buffer 
-		 */
+		/* 
+		   trash normal reassembly buffer */
 		if ((b_next = xp->nm_reassem)) {
 			while ((bp = b_next)) {
 				b_next = bp->b_next;
@@ -16565,9 +16290,8 @@ m2ua_free_xp(struct xp *xp)
 			}
 			xp->nm_reassem = NULL;
 		}
-		/*
-		   trash expedited reassembly buffer 
-		 */
+		/* 
+		   trash expedited reassembly buffer */
 		if ((b_next = xp->ex_reassem)) {
 			while ((bp = b_next)) {
 				b_next = bp->b_next;
@@ -16575,31 +16299,27 @@ m2ua_free_xp(struct xp *xp)
 			}
 			xp->ex_reassem = NULL;
 		}
-		/*
-		   unlink from spp 
-		 */
+		/* 
+		   unlink from spp */
 		if (xp->spp) {
 			fixme(("Check deactivation of all AS\n"));
 			xp_put(xchg(&xp->spp->xp, NULL));
 			spp_put(xchg(&xp->spp, NULL));
 		}
-		/*
-		   unlink from sp 
-		 */
+		/* 
+		   unlink from sp */
 		if (xp->sp) {
 			sp_put(xchg(&xp->sp, NULL));
 		}
 		xp->id = 0;
 		xp->type = 0;
-		/*
-		   flushing buffers 
-		 */
+		/* 
+		   flushing buffers */
 		ss7_unbufcall((str_t *) xp);
 		flushq(xp->iq, FLUSHALL);
 		flushq(xp->oq, FLUSHALL);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*xp->prev = xp->next))
 			xp->next->prev = xp->prev;
 		xp->next = NULL;
@@ -16608,19 +16328,17 @@ m2ua_free_xp(struct xp *xp)
 		xp_put(xp);
 		assure(master.link.numb > 0);
 		master.link.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&xp->refcnt) > 1, xp_get(xp));
 		xp_put(xchg(&xp->iq->q_ptr, NULL));
 		ensure(atomic_read(&xp->refcnt) > 1, xp_get(xp));
 		xp_put(xchg(&xp->oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&xp->refcnt) != 1) {
 			__printd(("%s; %s: %p: ERROR: xp lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, xp, atomic_read(&xp->refcnt)));
+				  DRV_NAME, __FUNCTION__, xp, atomic_read(&xp->refcnt)));
 			atomic_set(&xp->refcnt, 1);
 		}
 	}
@@ -16644,7 +16362,7 @@ xp_put(struct xp *xp)
 		assure(atomic_read(&xp->refcnt) > 1);
 		if (atomic_dec_and_test(&xp->refcnt)) {
 			kmem_cache_free(m2ua_link_cachep, xp);
-			printd(("%s: %s: %p: deallocated xp structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated xp structure\n", DRV_NAME,
 				__FUNCTION__, xp));
 		}
 		return;
@@ -16663,8 +16381,8 @@ xp_lookup(ulong id)
 {
 	struct xp *xp;
 	for (xp = (struct xp *) master.link.list; xp; xp = xp->next) {
-		if (xp->type != M2UA_OBJ_TYPE_XP_SCTP &&
-		    xp->type != M2UA_OBJ_TYPE_XP_TCP && xp->type != M2UA_OBJ_TYPE_XP_SSCOP)
+		if (xp->type != M2UA_OBJ_TYPE_XP_SCTP && xp->type != M2UA_OBJ_TYPE_XP_TCP
+		    && xp->type != M2UA_OBJ_TYPE_XP_SSCOP)
 			continue;
 		if (xp->id != id)
 			continue;
@@ -16681,34 +16399,32 @@ STATIC union link *
 m2ua_alloc_link(queue_t *q, union link **lkp, ulong index, cred_t *crp)
 {
 	union link *lk;
-	printd(("%s: %s: create link index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, index));
+	printd(("%s: %s: create link index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((lk = kmem_cache_alloc(m2ua_link_cachep, SLAB_ATOMIC))) {
 		bzero(lk, sizeof(*lk));
 		link_get(lk);	/* first get */
 		lk->str.u.mux.index = index;
 		lk->str.cred = *crp;
-		spin_lock_init(&lk->str.qlock); /* "link-queue_lock" */
+		spin_lock_init(&lk->str.qlock);	/* "link-queue_lock" */
 		(lk->str.iq = RD(q))->q_ptr = link_get(lk);
 		(lk->str.oq = WR(q))->q_ptr = link_get(lk);
 		lk->str.i_state = LMI_UNUSABLE;
 		lk->str.i_style = LMI_STYLE2;
 		lk->str.i_version = 1;
-		spin_lock_init(&lk->str.lock); /* "link-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&lk->str.lock);	/* "link-lock" */
+		/* 
+		   place in master list */
 		if ((lk->str.next = (str_t *) * lkp))
 			lk->str.next->prev = &lk->str.next;
 		lk->str.prev = (str_t **) lkp;
 		*lkp = link_get(lk);
 		master.link.numb++;
-		/*
-		   link must remain disabled until it is characterized 
-		 */
+		/* 
+		   link must remain disabled until it is characterized */
 		noenable(lk->str.iq);
 		noenable(lk->str.oq);
 	} else
-		printd(("%s: %s: ERROR: failed to allocate link structure %lu\n", M2UA_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate link structure %lu\n", DRV_NAME,
 			__FUNCTION__, index));
 	return (lk);
 }
@@ -16732,24 +16448,21 @@ m2ua_free_link(queue_t *q)
 		swerr();
 		break;
 	}
-	/*
-	   untyped link not assigned to anything 
-	 */
-	printd(("%s: %s: %p free link index = %lu\n", M2UA_DRV_NAME, __FUNCTION__, lk,
+	/* 
+	   untyped link not assigned to anything */
+	printd(("%s: %s: %p free link index = %lu\n", DRV_NAME, __FUNCTION__, lk,
 		lk->str.u.mux.index));
 	spin_lock_irqsave(&lk->str.lock, flags);
 	{
 		noenable(lk->str.iq);
 		noenable(lk->str.oq);
-		/*
-		   flushing buffers 
-		 */
+		/* 
+		   flushing buffers */
 		ss7_unbufcall(&lk->str);
 		flushq(lk->str.iq, FLUSHALL);
 		flushq(lk->str.oq, FLUSHALL);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*lk->str.prev = lk->str.next))
 			lk->str.next->prev = lk->str.prev;
 		lk->str.next = NULL;
@@ -16758,19 +16471,17 @@ m2ua_free_link(queue_t *q)
 		link_put(lk);
 		assure(master.link.numb > 0);
 		master.link.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&lk->str.refcnt) > 1, link_get(lk));
 		link_put(xchg(&lk->str.iq->q_ptr, NULL));
 		ensure(atomic_read(&lk->str.refcnt) > 1, link_get(lk));
 		link_put(xchg(&lk->str.oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&lk->str.refcnt) != 1) {
 			__printd(("%s; %s: %p: ERROR: link lingering reference count = %d\n",
-				  M2UA_DRV_NAME, __FUNCTION__, lk, atomic_read(&lk->str.refcnt)));
+				  DRV_NAME, __FUNCTION__, lk, atomic_read(&lk->str.refcnt)));
 			atomic_set(&lk->str.refcnt, 1);
 		}
 	}
@@ -16794,7 +16505,7 @@ link_put(union link *lk)
 		assure(atomic_read(&lk->str.refcnt) > 1);
 		if (atomic_dec_and_test(&lk->str.refcnt)) {
 			kmem_cache_free(m2ua_link_cachep, lk);
-			printd(("%s: %s: %p: deallocated link structure\n", M2UA_DRV_NAME,
+			printd(("%s: %s: %p: deallocated link structure\n", DRV_NAME,
 				__FUNCTION__, lk));
 		}
 		return;
@@ -16812,87 +16523,142 @@ link_lookup(ulong index)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int m2ua_initialized = 0;
-STATIC void
-m2ua_init(void)
-{
-	int err, mindex;
-	cmn_err(CE_NOTE, M2UA_BANNER);	/* console splash */
-	if ((err = m2ua_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", M2UA_DRV_NAME);
-		m2ua_initialized = err;
-		return;
-	}
-	for (mindex = 0; mindex < M2UA_CMAJORS; mindex++) {
-		if ((err =
-		     lis_register_strdev(m2ua_majors[mindex], &m2ua_info, M2UA_CMINORS,
-					 M2UA_DRV_NAME)) < 0) {
-			if (!mindex) {
-				cmn_err(CE_PANIC,
-					"%s: could not register 1'st major %d",
-					M2UA_DRV_NAME, m2ua_majors[mindex]);
-				m2ua_term_caches();
-				m2ua_initialized = err;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: could not register %d'th major", M2UA_DRV_NAME,
-				mindex + 1);
-			m2ua_majors[mindex] = 0;
-		} else
-			m2ua_majors[mindex] = err;
-	}
-	spin_lock_init(&master.lock); /* "m2ua-master-list-lock" */
-	m2ua_initialized = 1;
-	return;
-}
-STATIC void
-m2ua_terminate(void)
-{
-	int err, mindex;
-	for (mindex = 0; mindex < M2UA_CMAJORS; mindex++) {
-		if (m2ua_majors[mindex]) {
-			if ((err = lis_unregister_strdev(m2ua_majors[mindex])))
-				cmn_err(CE_PANIC,
-					"%s: could not unregister major %d", M2UA_DRV_NAME,
-					m2ua_majors[mindex]);
-			else
-				m2ua_majors[mindex] = 0;
-		}
-	}
-	/*
-	   free all objects 
-	 */
-	while (master.sp.list)
-		m2ua_free_sp(master.sp.list);
-	m2ua_term_caches();
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw m2ua_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &m2uainfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+m2ua_register_strdev(major_t major)
 {
-	m2ua_init();
-	if (m2ua_initialized < 0)
-		return m2ua_initialized;
+	int err;
+	if ((err = register_strdev(&m2ua_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+m2ua_unregister_strdev(major_t major)
 {
-	m2ua_terminate();
+	int err;
+	if ((err = unregister_strdev(&m2ua_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+m2ua_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &m2uainfo, NMINOR, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+m2ua_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+m2uaterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (m2ua_majors[mindex]) {
+			if ((err = m2ua_unregister_strdev(m2ua_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					m2ua_majors[mindex]);
+			if (mindex)
+				m2ua_majors[mindex] = 0;
+		}
+	}
+	if ((err = m2ua_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
 
-// vim: tw=0 wm=4
+MODULE_STATIC int __init
+m2uainit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = m2ua_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		m2uaterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = m2ua_register_strdev(m2ua_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					m2ua_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				m2uaterminate();
+				return (err);
+			}
+		}
+		if (m2ua_majors[mindex] == 0)
+			m2ua_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(m2ua_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = m2ua_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(m2uainit);
+module_exit(m2uaterminate);
+
+#endif				/* LINUX */

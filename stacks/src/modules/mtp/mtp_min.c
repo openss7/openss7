@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:00 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $";
+static char const ident[] =
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -74,27 +75,27 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/xti_ss7.h>
 #include <sys/xti_mtp.h>
 
-#define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:00 $"
-#define MTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux STREAMS."
-#define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_LICENSE	"GPL"
-#define MTP_BANNER	MTP_DESCRIP	"\n" \
-			MTP_REVISION	"\n" \
-			MTP_COPYRIGHT	"\n" \
-			MTP_DEVICE	"\n" \
-			MTP_CONTACT
-#define MTP_SPLASH	MTP_DEVICE	" - " \
-			MTP_REVISION	"\n"
+#define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:24 $"
+#define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
+#define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define MTP_MIN_LICENSE		"GPL"
+#define MTP_MIN_BANNER		MTP_MIN_DESCRIP		"\n" \
+				MTP_MIN_REVISION	"\n" \
+				MTP_MIN_COPYRIGHT	"\n" \
+				MTP_MIN_DEVICE		"\n" \
+				MTP_MIN_CONTACT
+#define MTP_MIN_SPLASH		MTP_MIN_DESCRIP		"\n" \
+				MTP_MIN_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(MTP_CONTACT);
-MODULE_DESCRIPTION(MTP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(MTP_DEVICE);
+MODULE_AUTHOR(MTP_MIN_CONTACT);
+MODULE_DESCRIPTION(MTP_MIN_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MTP_MIN_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(MTP_LICENSE);
-#endif
+MODULE_LICENSE(MTP_MIN_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -102,9 +103,8 @@ MODULE_LICENSE(MTP_LICENSE);
 #define MTP_MIN_DRV_NAME	CONFIG_STREAMS_MTP_MIN_NAME
 #define MTP_MIN_CMAJORS		CONFIG_STREAMS_MTP_MIN_NMAJORS
 #define MTP_MIN_CMAJOR_0	CONFIG_STREAMS_MTP_MIN_MAJOR
+#define MTP_MIN_UNITS		CONFIG_STREAMS_MTP_MIN_NMINORS
 #endif
-
-#define MTP_MIN_CMINORS 255
 
 /*
  *  =========================================================================
@@ -114,33 +114,44 @@ MODULE_LICENSE(MTP_LICENSE);
  *  =========================================================================
  */
 
+#define DRV_ID		MTP_MIN_DRV_ID
+#define DRV_NAME	MTP_MIN_DRV_NAME
+#define CMAJORS		MTP_MIN_CMAJORS
+#define CMAJOR_0	MTP_MIN_CMAJOR_0
+#define UNITS		MTP_MIN_UNITS
+#ifdef MODULE
+#define DRV_BANNER	MTP_MIN_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	MTP_MIN_SPLASH
+#endif				/* MODULE */
+
 static struct module_info mtp_winfo = {
-	mi_idnum:MTP_MIN_DRV_ID,	/* Module ID number */
-	mi_idname:MTP_MIN_DRV_NAME "-wr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 static struct module_info mtp_rinfo = {
-	mi_idnum:MTP_MIN_DRV_ID,	/* Module ID number */
-	mi_idname:MTP_MIN_DRV_NAME "-rd",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 static struct module_info sl_winfo = {
-	mi_idnum:MTP_MIN_DRV_ID,	/* Module ID number */
-	mi_idname:MTP_MIN_DRV_NAME "-muxw",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 static struct module_info sl_rinfo = {
-	mi_idnum:MTP_MIN_DRV_ID,	/* Module ID number */
-	mi_idname:MTP_MIN_DRV_NAME "-muxr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -188,7 +199,7 @@ static struct qinit sl_winit = {
 	qi_minfo:&sl_winfo,		/* Information */
 };
 
-static struct streamtab mtp_info = {
+static struct streamtab mtp_mininfo = {
 	st_rdinit:&mtp_rinit,		/* Upper read queue */
 	st_wrinit:&mtp_winit,		/* Upper write queue */
 	st_muxrinit:&sl_rinit,		/* Lower read queue */
@@ -967,8 +978,7 @@ state_name(long state)
 static void
 mtp_set_state(mtp_t * m, long state)
 {
-	printd(("%s: %p: %s <- %s\n", MTP_MIN_DRV_NAME, m, state_name(state),
-		state_name(m->state)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, m, state_name(state), state_name(m->state)));
 	m->state = state;
 }
 static long
@@ -1004,10 +1014,10 @@ mtp_check_src(mtp_t * m, mtp_addr_t * src)
 		goto addrbusy;
 	return (0);
       noaddr:
-	printd(("%s: %p: ERROR: Couldn't allocate source address\n", MTP_MIN_DRV_NAME, m));
+	printd(("%s: %p: ERROR: Couldn't allocate source address\n", DRV_NAME, m));
 	return (TNOADDR);
       addrbusy:
-	printd(("%s: %p: ERROR: Source address in use\n", MTP_MIN_DRV_NAME, m));
+	printd(("%s: %p: ERROR: Source address in use\n", DRV_NAME, m));
 	return (TADDRBUSY);
 }
 
@@ -1032,10 +1042,10 @@ mtp_check_dst(mtp_t * m, mtp_addr_t * dst)
 		goto addrbusy;
 	return (0);
       noaddr:
-	printd(("%s: %p: ERROR: Couldn't allocate destination address\n", MTP_MIN_DRV_NAME, m));
+	printd(("%s: %p: ERROR: Couldn't allocate destination address\n", DRV_NAME, m));
 	return (TNOADDR);
       addrbusy:
-	printd(("%s: %p: ERROR: Destination address in use\n", MTP_MIN_DRV_NAME, m));
+	printd(("%s: %p: ERROR: Destination address in use\n", DRV_NAME, m));
 	return (TADDRBUSY);
 }
 
@@ -1155,7 +1165,7 @@ m_error(queue_t *q, int error)
 	if ((mp = mtp_allocb(q, 2, BPRI_MED))) {
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
-			printd(("%s: %p: <- M_HANGUP\n", MTP_MIN_DRV_NAME, m));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, m));
 			putnext(m->rq, mp);
 			return (-error);
 		} else {
@@ -1163,7 +1173,7 @@ m_error(queue_t *q, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			mtp_set_state(m, TS_NOSTATES);
-			printd(("%s; %p: <- M_ERROR\n", MTP_MIN_DRV_NAME, m));
+			printd(("%s; %p: <- M_ERROR\n", DRV_NAME, m));
 			putnext(m->rq, mp);
 			return (QR_DONE);
 		}
@@ -1197,11 +1207,11 @@ t_info_ack(queue_t *q)
 		p->SERV_type = T_CLTS;
 		p->CURRENT_state = m->state;
 		p->PROVIDER_flag = XPG4_1 & ~T_SNDZERO;
-		printd(("%s: %p: <- T_INFO_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
 }
 
@@ -1230,11 +1240,11 @@ t_bind_ack(queue_t *q, mtp_addr_t * add)
 		if ((err = mtp_bind(m, add)))
 			goto free_error;
 		mtp_set_state(m, TS_IDLE);
-		printd(("%s: %p: <- T_BIND_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
       free_error:
 	freemsg(mp);
@@ -1283,25 +1293,23 @@ t_error_ack(queue_t *q, ulong prim, long error)
 				mtp_set_state(m, TS_UNBND);
 				break;
 			default:
-				/*
+				/* 
 				   Note: if we are not in a WACK state we simply do not change
 				   state.  This occurs normally when we are responding to a
-				   T_OPTMGMT_REQ in other than TS_IDLE state. 
-				 */
+				   T_OPTMGMT_REQ in other than TS_IDLE state. */
 				break;
 			}
 		}
-		printd(("%s: %p: <- T_ERROR_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
-		/*
+		/* 
 		   Retruning -EPROTO here will make sure that the old state is restored correctly.
-		   If we return QR_DONE, then the state will never be restored. 
-		 */
+		   If we return QR_DONE, then the state will never be restored. */
 		if (error < 0)
 			return (error);
 		return (-EPROTO);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
 }
 
@@ -1344,18 +1352,17 @@ t_ok_ack(queue_t *q, ulong prim)
 			mtp_set_state(m, TS_IDLE);
 			break;
 		default:
-			/*
+			/* 
 			   Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   TS_IDLE state. 
-			 */
+			   TS_IDLE state. */
 			break;
 		}
-		printd(("%s: %p: <- T_OK_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
       free_error:
 	freemsg(mp);
@@ -1391,11 +1398,11 @@ t_unitdata_ind(queue_t *q, mtp_addr_t * src, mtp_opts_t * opt, mblk_t *dp)
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_UNITDATA_IND\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
 }
 
@@ -1432,14 +1439,14 @@ t_uderror_ind(queue_t *q, mtp_t * m, mtp_addr_t * dst, mtp_opts_t * opt, mblk_t 
 				mp->b_wptr += opt_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: <- T_UDERROR_IND\n", MTP_MIN_DRV_NAME, m));
+			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, m));
 			putnext(m->rq, mp);
 			return (QR_DONE);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: Flow controlled\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, m));
 	return (-EBUSY);
 }
 
@@ -1469,11 +1476,11 @@ t_optmgmt_ack(queue_t *q, ulong flags, mtp_opts_t * opt)
 		if (mtp_get_state(m) == TS_WACK_OPTREQ)
 			mtp_set_state(m, TS_IDLE);
 #endif
-		printd(("%s: %p: <- T_OPTMGMT_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
 }
 
@@ -1506,11 +1513,11 @@ t_addr_ack(queue_t *q, mtp_addr_t * loc, mtp_addr_t * rem)
 			bcopy(rem, mp->b_wptr, rem_len);
 			mp->b_wptr += rem_len;
 		}
-		printd(("%s: %p: <- T_ADDR_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
 }
 #endif
@@ -1544,11 +1551,11 @@ t_capability_ack(queue_t *q, ulong caps)
 			p->INFO_ack->PROVIDER_flag = XPG4_1 & ~T_SNDZERO;
 		} else
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-		printd(("%s: %p: <- T_CAPABILITY_ACK\n", MTP_MIN_DRV_NAME, m));
+		printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, m));
 		putnext(m->rq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, m));
 	return (-ENOBUFS);
 }
 #endif
@@ -1576,15 +1583,14 @@ sl_pdu_req(queue_t *q, mblk_t *dp)
 			p->sl_primitive = SL_PDU_REQ;
 			p->sl_mp = 0;
 			mp->b_cont = dp;
-			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", MTP_MIN_DRV_NAME, sl,
-				msgdsize(dp)));
+			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", DRV_NAME, sl, msgdsize(dp)));
 			putnext(sl->wq, mp);
 			return (QR_ABSORBED);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: flow controlled\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sl));
 	return (-EBUSY);
 }
 
@@ -1602,11 +1608,11 @@ sl_emergency_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_EMERGENCY_REQ;
-		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1624,11 +1630,11 @@ sl_emergency_ceases_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
-		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1646,11 +1652,11 @@ sl_start_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_START_REQ;
-		printd(("%s: %p: SL_START_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_START_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1668,11 +1674,11 @@ sl_stop_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_STOP_REQ;
-		printd(("%s: %p: SL_STOP_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1689,11 +1695,11 @@ sl_retrieve_bsnt_req(queue_t *q, sl_t * sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
-		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1712,11 +1718,11 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, ulong fsnc)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
 		p->sl_fsnc = fsnc;
-		printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1734,11 +1740,11 @@ sl_resume_req(queue_t *q)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_RESUME_REQ;
-		printd(("%s: %p: SL_RESUME_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1756,11 +1762,11 @@ sl_clear_buffers_req(queue_t *q)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
-		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1778,11 +1784,11 @@ sl_clear_rtb_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CLEAR_RTB_REQ;
-		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1800,11 +1806,11 @@ sl_local_processor_outage_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
-		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1822,11 +1828,11 @@ sl_congestion_discard_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
-		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1844,11 +1850,11 @@ sl_congestion_accept_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
-		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1866,11 +1872,11 @@ sl_no_congestion_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
-		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1888,11 +1894,11 @@ sl_power_on_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_POWER_ON_REQ;
-		printd(("%s: %p: SL_POWER_ON_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_POWER_ON_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1911,11 +1917,11 @@ sl_optmgmt_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_OPTMGMT_REQ;
-		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1933,11 +1939,11 @@ sl_notify_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_NOTIFY_REQ;
-		printd(("%s: %p: SL_NOTIFY_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: SL_NOTIFY_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 #endif
@@ -1955,11 +1961,11 @@ lmi_info_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -1981,11 +1987,11 @@ lmi_attach_req(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 			bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 			mp->b_wptr += ppa_len;
 		}
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2003,11 +2009,11 @@ lmi_detach_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2029,11 +2035,11 @@ lmi_enable_req(queue_t *q, caddr_t dst_ptr, size_t dst_len)
 			bcopy(dst_ptr, mp->b_wptr, dst_len);
 			mp->b_wptr += dst_len;
 		}
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2051,11 +2057,11 @@ lmi_disable_req(queue_t *q)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2080,11 +2086,11 @@ lmi_optmgmt_req(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MTP_MIN_DRV_NAME, sl));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2583,8 +2589,8 @@ mtp_enc_msg(queue_t *q, mtp_msg_t * m, int *errp)
  *  actual message.  The message can then be routed.
  */
 static inline void
-mtp_build_rl(mtp_msg_t * m, uint pvar, uint ni, uint mp,
-	     uint si, uint32_t dpc, uint32_t opc, uint sls)
+mtp_build_rl(mtp_msg_t * m, uint pvar, uint ni, uint mp, uint si, uint32_t dpc, uint32_t opc,
+	     uint sls)
 {
 	m->pvar = pvar;
 	m->ni = ni;
@@ -2603,8 +2609,8 @@ mtp_build_slc(mtp_msg_t * m, uint slc)
 		m->slc = slc;
 }
 static inline mblk_t *
-mtp_build_coo(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc, uint fsnl)
+mtp_build_coo(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc, uint fsnl)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2614,8 +2620,8 @@ mtp_build_coo(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_coa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc, uint fsnl)
+mtp_build_coa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc, uint fsnl)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2625,8 +2631,8 @@ mtp_build_coa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_cbd(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc, uint cbc)
+mtp_build_cbd(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc, uint cbc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2636,8 +2642,8 @@ mtp_build_cbd(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_cba(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc, uint cbc)
+mtp_build_cba(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc, uint cbc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2647,8 +2653,8 @@ mtp_build_cba(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_eco(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_eco(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2657,8 +2663,8 @@ mtp_build_eco(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_eca(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_eca(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_slc(m, slc);
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
@@ -2667,8 +2673,8 @@ mtp_build_eca(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_rct(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint mp)
+mtp_build_rct(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint mp)
 {
 	mtp_build_rl(m, pvar, ni, mp, 0, dpc, opc, sls);
 	m->h0 = 3;
@@ -2676,8 +2682,8 @@ mtp_build_rct(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tfc(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest, uint stat)
+mtp_build_tfc(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest, uint stat)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 3;
@@ -2687,8 +2693,8 @@ mtp_build_tfc(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tfp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_tfp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 4;
@@ -2697,8 +2703,8 @@ mtp_build_tfp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tcp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_tcp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 4;
@@ -2707,8 +2713,8 @@ mtp_build_tcp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tfr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_tfr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 4;
@@ -2717,8 +2723,8 @@ mtp_build_tfr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tcr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_tcr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 4;
@@ -2727,8 +2733,8 @@ mtp_build_tcr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tfa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_tfa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 4;
@@ -2737,8 +2743,8 @@ mtp_build_tfa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tca(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_tca(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 4;
@@ -2747,8 +2753,8 @@ mtp_build_tca(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_rst(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_rst(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 5;
@@ -2757,8 +2763,8 @@ mtp_build_rst(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_rsr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_rsr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 5;
@@ -2767,8 +2773,8 @@ mtp_build_rsr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_rcp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_rcp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 5;
@@ -2777,8 +2783,8 @@ mtp_build_rcp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_rcr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest)
+mtp_build_rcr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 5;
@@ -2787,8 +2793,8 @@ mtp_build_rcr(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lin(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lin(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2797,8 +2803,8 @@ mtp_build_lin(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lun(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lun(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2807,8 +2813,8 @@ mtp_build_lun(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lia(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lia(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2817,8 +2823,8 @@ mtp_build_lia(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lua(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lua(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2827,8 +2833,8 @@ mtp_build_lua(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lid(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lid(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2837,8 +2843,8 @@ mtp_build_lid(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lfu(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lfu(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2847,8 +2853,8 @@ mtp_build_lfu(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_llt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_llt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2857,8 +2863,8 @@ mtp_build_llt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_lrt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_lrt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2867,8 +2873,8 @@ mtp_build_lrt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_tra(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls)
+mtp_build_tra(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 7;
@@ -2876,8 +2882,8 @@ mtp_build_tra(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_trw(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls)
+mtp_build_trw(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 7;
@@ -2885,8 +2891,8 @@ mtp_build_trw(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_dlc(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc, uint sdli)
+mtp_build_dlc(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc, uint sdli)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2896,8 +2902,8 @@ mtp_build_dlc(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_css(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_css(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2906,8 +2912,8 @@ mtp_build_css(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_cns(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_cns(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2916,8 +2922,8 @@ mtp_build_cns(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_cnp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint slc)
+mtp_build_cnp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint slc)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2926,8 +2932,8 @@ mtp_build_cnp(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_upu(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest, uint upi)
+mtp_build_upu(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest, uint upi)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 10;
@@ -2937,8 +2943,8 @@ mtp_build_upu(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_upa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest, uint upi)
+mtp_build_upa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest, uint upi)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 10;
@@ -2948,8 +2954,8 @@ mtp_build_upa(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_upt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	      uint32_t dpc, uint32_t opc, uint sls, uint32_t dest, uint upi)
+mtp_build_upt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	      uint sls, uint32_t dest, uint upi)
 {
 	mtp_build_rl(m, pvar, ni, 3, 0, dpc, opc, sls);
 	m->h0 = 10;
@@ -2959,8 +2965,8 @@ mtp_build_upt(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_sltm(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	       uint32_t dpc, uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+mtp_build_sltm(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	       uint sls, uint slc, unsigned char *data, size_t dlen)
 {
 	mtp_build_rl(m, pvar, ni, 3, 1, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2971,8 +2977,8 @@ mtp_build_sltm(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_slta(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	       uint32_t dpc, uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+mtp_build_slta(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	       uint sls, uint slc, unsigned char *data, size_t dlen)
 {
 	mtp_build_rl(m, pvar, ni, 3, 1, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2983,8 +2989,8 @@ mtp_build_slta(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_ssltm(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-		uint32_t dpc, uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+mtp_build_ssltm(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc,
+		uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
 {
 	mtp_build_rl(m, pvar, ni, 3, 2, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -2995,8 +3001,8 @@ mtp_build_ssltm(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_sslta(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-		uint32_t dpc, uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+mtp_build_sslta(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc,
+		uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
 {
 	mtp_build_rl(m, pvar, ni, 3, 2, dpc, opc, sls);
 	mtp_build_slc(m, slc);
@@ -3007,9 +3013,8 @@ mtp_build_sslta(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
 	return mtp_enc_msg(q, m, errp);
 }
 static inline mblk_t *
-mtp_build_user(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni,
-	       uint32_t dpc, uint32_t opc, uint sls, uint mp, uint si,
-	       unsigned char *data, size_t dlen)
+mtp_build_user(queue_t *q, mtp_msg_t * m, int *errp, uint pvar, uint ni, uint32_t dpc, uint32_t opc,
+	       uint sls, uint mp, uint si, unsigned char *data, size_t dlen)
 {
 	mtp_build_rl(m, pvar, ni, mp, si, dpc, opc, sls);
 	m->data = data;
@@ -3035,12 +3040,12 @@ mtp_send_route(queue_t *q, mtp_msg_t * m, mblk_t *mp)
 		}
 		return (-EBUSY);
 	}
-	__ptrace(("%s: %p: Discarding message for DPC = %x\n", MTP_MIN_DRV_NAME, sl, m->dpc));
+	__ptrace(("%s: %p: Discarding message for DPC = %x\n", DRV_NAME, sl, m->dpc));
 	return (-EPROTO);
 }
 static int
-mtp_send_coo(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint slc, uint fsnl)
+mtp_send_coo(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	     uint fsnl)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3053,8 +3058,8 @@ mtp_send_coo(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_coa(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint slc, uint fsnl)
+mtp_send_coa(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	     uint fsnl)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3134,8 +3139,8 @@ mtp_send_rct(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_tfc(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint32_t dest, uint stat)
+mtp_send_tfc(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint32_t dest,
+	     uint stat)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3408,8 +3413,8 @@ mtp_send_trw(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_dlc(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint slc, uint sdli)
+mtp_send_dlc(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	     uint sdli)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3461,8 +3466,8 @@ mtp_send_cnp(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_upu(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint32_t dest, uint upi)
+mtp_send_upu(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint32_t dest,
+	     uint upi)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3475,8 +3480,8 @@ mtp_send_upu(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_upa(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint32_t dest, uint upi)
+mtp_send_upa(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint32_t dest,
+	     uint upi)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3489,8 +3494,8 @@ mtp_send_upa(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_upt(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint32_t dest, uint upi)
+mtp_send_upt(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint32_t dest,
+	     uint upi)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3503,8 +3508,8 @@ mtp_send_upt(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sl
 	return (err);
 }
 static int
-mtp_send_sltm(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint slc, unsigned char *data, size_t dlen)
+mtp_send_sltm(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	      unsigned char *data, size_t dlen)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3517,8 +3522,8 @@ mtp_send_sltm(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint s
 	return (err);
 }
 static int
-mtp_send_slta(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint slc, unsigned char *data, size_t dlen)
+mtp_send_slta(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	      unsigned char *data, size_t dlen)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3531,8 +3536,8 @@ mtp_send_slta(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint s
 	return (err);
 }
 static int
-mtp_send_ssltm(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	       uint slc, unsigned char *data, size_t dlen)
+mtp_send_ssltm(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	       unsigned char *data, size_t dlen)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3545,8 +3550,8 @@ mtp_send_ssltm(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint 
 	return (err);
 }
 static int
-mtp_send_sslta(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	       uint slc, unsigned char *data, size_t dlen)
+mtp_send_sslta(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
+	       unsigned char *data, size_t dlen)
 {
 	mblk_t *mp;
 	int err = 0;
@@ -3559,8 +3564,8 @@ mtp_send_sslta(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint 
 	return (err);
 }
 static int
-mtp_send_user(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint mp, uint si, unsigned char *data, size_t dlen)
+mtp_send_user(queue_t *q, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint mp,
+	      uint si, unsigned char *data, size_t dlen)
 {
 	mblk_t *bp;
 	int err = 0;
@@ -3707,9 +3712,8 @@ mtp_transfer_ind_local(queue_t *q, mtp_msg_t * m)
 	mtp_t *mtp;
 	if ((mtp = sl->users[m->si & 0x0f]))
 		return mtp_transfer_ind(q, mtp, m);
-	/*
-	   FIXME: should send unqeuipped user 
-	 */
+	/* 
+	   FIXME: should send unqeuipped user */
 	return (QR_DONE);
 }
 
@@ -3774,14 +3778,13 @@ sl_t1t_expiry(caddr_t data)
 	if (xchg(&sl->timers.t1t, 0)) {
 		mblk_t *mp;
 		if ((mp = mtp_alloc_expiry(t1t, data))) {
-			printd(("%s: %p: t1t timeout at %lu\n", MTP_MIN_DRV_NAME, sl, jiffies));
+			printd(("%s: %p: t1t timeout at %lu\n", DRV_NAME, sl, jiffies));
 			sl->refcnt--;
 			putq(sl->rq, mp);
 		} else {
-			printd(("%s: %p: t1t timeout collision\n", MTP_MIN_DRV_NAME, sl));
-			/*
-			   back off timer 100 ms 
-			 */
+			printd(("%s: %p: t1t timeout collision\n", DRV_NAME, sl));
+			/* 
+			   back off timer 100 ms */
 			sl->timers.t1t = timeout(&sl_t1t_expiry, (caddr_t) sl, 10);
 		}
 	}
@@ -3794,14 +3797,13 @@ sl_t2t_expiry(caddr_t data)
 	if (xchg(&sl->timers.t2t, 0)) {
 		mblk_t *mp;
 		if ((mp = mtp_alloc_expiry(t2t, data))) {
-			printd(("%s: %p: t2t timeout at %lu\n", MTP_MIN_DRV_NAME, sl, jiffies));
+			printd(("%s: %p: t2t timeout at %lu\n", DRV_NAME, sl, jiffies));
 			sl->refcnt--;
 			putq(sl->rq, mp);
 		} else {
-			printd(("%s: %p: t2t timeout collision\n", MTP_MIN_DRV_NAME, sl));
-			/*
-			   back off timer 100 ms 
-			 */
+			printd(("%s: %p: t2t timeout collision\n", DRV_NAME, sl));
+			/* 
+			   back off timer 100 ms */
 			sl->timers.t2t = timeout(&sl_t2t_expiry, (caddr_t) sl, 10);
 		}
 	}
@@ -3813,14 +3815,14 @@ sl_timer_stop(sl_t * sl, const uint t)
 	switch (t) {
 	case t1t:
 		if (sl->timers.t1t) {
-			printd(("%s: %p: stopping t1t at %lu\n", MTP_MIN_DRV_NAME, sl, jiffies));
+			printd(("%s: %p: stopping t1t at %lu\n", DRV_NAME, sl, jiffies));
 			untimeout(xchg(&sl->timers.t1t, 0));
 			sl->refcnt--;
 		}
 		break;
 	case t2t:
 		if (sl->timers.t2t) {
-			printd(("%s: %p: stopping t2t at %lu\n", MTP_MIN_DRV_NAME, sl, jiffies));
+			printd(("%s: %p: stopping t2t at %lu\n", DRV_NAME, sl, jiffies));
 			untimeout(xchg(&sl->timers.t2t, 0));
 			sl->refcnt--;
 		}
@@ -3839,13 +3841,13 @@ sl_timer_start(sl_t * sl, const uint t)
 		sl_timer_stop(sl, t);
 		switch (t) {
 		case t1t:
-			printd(("%s: %p: starting t1t %lu ms at %lu\n", MTP_MIN_DRV_NAME, sl,
+			printd(("%s: %p: starting t1t %lu ms at %lu\n", DRV_NAME, sl,
 				sl->config.t1t * 10, jiffies));
 			sl->timers.t1t = timeout(&sl_t1t_expiry, (caddr_t) sl, sl->config.t1t);
 			sl->refcnt++;
 			break;
 		case t2t:
-			printd(("%s: %p: starting t2t %lu ms at %lu\n", MTP_MIN_DRV_NAME, sl,
+			printd(("%s: %p: starting t2t %lu ms at %lu\n", DRV_NAME, sl,
 				sl->config.t2t * 10, jiffies));
 			sl->timers.t2t = timeout(&sl_t2t_expiry, (caddr_t) sl, sl->config.t2t);
 			sl->refcnt++;
@@ -3912,10 +3914,9 @@ mtp_recv_eca(queue_t *q, mblk_t *mp, mtp_msg_t * m)
 static int
 mtp_recv_rct(queue_t *q, mblk_t *mp, mtp_msg_t * m)
 {
-	/*
+	/* 
 	   13.9.6.  When a signalling route set congestino test message reaches its destination, it 
-	   is discarded. 
-	 */
+	   is discarded. */
 	return (QR_DONE);
 }
 static int
@@ -4149,9 +4150,8 @@ sl_t2t_timeout(queue_t *q)
 		unsigned long random = jiffies;
 		sl->flags &= ~SL_F_WACK_SLTM2;
 		sl->flags |= SL_F_WACK_SLTM;
-		/*
-		   generate new test pattern 
-		 */
+		/* 
+		   generate new test pattern */
 		sl->tlen = jiffies & 0xf;
 		for (i = 0; i < 4; i++)
 			bcopy(&random, sl->tdata + (i << 2), 4);
@@ -4190,8 +4190,9 @@ mtp_recv_slta(queue_t *q, mblk_t *mp, mtp_msg_t * m)
 	return (QR_DONE);
       failed:
 	if (sl->flags & SL_F_WACK_SLTM) {
-		if ((err = mtp_send_sltm(q, SS7_PVAR_ETSI_00, 0, sl->adj, sl->loc, 0, sl->slc,
-					 sl->tdata, sl->tlen)))
+		if ((err =
+		     mtp_send_sltm(q, SS7_PVAR_ETSI_00, 0, sl->adj, sl->loc, 0, sl->slc, sl->tdata,
+				   sl->tlen)))
 			return (err);
 		sl_timer_start(sl, t1t);
 		sl->flags &= ~SL_F_WACK_SLTM;
@@ -4202,7 +4203,7 @@ mtp_recv_slta(queue_t *q, mblk_t *mp, mtp_msg_t * m)
 	fixme(("Implement link failure function\n"));
 	goto wait_next;
       eproto:
-	__ptrace(("%s: %p: Unexpected SLTA\n", MTP_MIN_DRV_NAME, sl));
+	__ptrace(("%s: %p: Unexpected SLTA\n", DRV_NAME, sl));
 	return (-EPROTO);
 }
 
@@ -4680,9 +4681,8 @@ mtp_dec_user(mblk_t *mp, mtp_msg_t * m)
 static int
 mtp_dec_sio(mblk_t *mp, mtp_msg_t * m)
 {
-	/*
-	   decode si, mp and ni 
-	 */
+	/* 
+	   decode si, mp and ni */
 	switch (m->pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_JTTC:
 		if (mp->b_wptr < mp->b_rptr + 1)
@@ -4731,16 +4731,14 @@ mtp_dec_sio(mblk_t *mp, mtp_msg_t * m)
 static int
 mtp_dec_rl(mblk_t *mp, mtp_msg_t * m)
 {
-	/*
-	   decode the routing label 
-	 */
+	/* 
+	   decode the routing label */
 	switch (m->pvar & SS7_PVAR_MASK) {
 	default:
 	case SS7_PVAR_ETSI:
 	case SS7_PVAR_ITUT:
-		/*
-		   14-bit point codes - 32-bit RL 
-		 */
+		/* 
+		   14-bit point codes - 32-bit RL */
 		if (mp->b_wptr < mp->b_rptr + 4)
 			break;
 		m->dpc = (*mp->b_rptr++ | ((*mp->b_rptr & 0x3f) << 8));
@@ -4752,9 +4750,8 @@ mtp_dec_rl(mblk_t *mp, mtp_msg_t * m)
 	case SS7_PVAR_ANSI:
 	case SS7_PVAR_JTTC:
 	case SS7_PVAR_CHIN:
-		/*
-		   24-bit point codes - 56-bit RL 
-		 */
+		/* 
+		   24-bit point codes - 56-bit RL */
 		if (mp->b_wptr < mp->b_rptr + 7)
 			break;
 		m->dpc =
@@ -4878,10 +4875,10 @@ mtp_dec_msg(queue_t *q, mblk_t *mp, mtp_msg_t * m)
       discard:
 	return (-EPROTO);
       error:
-	ptrace(("%s: %p: DECODE: decoding error\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: DECODE: decoding error\n", DRV_NAME, sl));
 	return (err);
       emsgsize:
-	ptrace(("%s: %p: DECODE: decoding error\n", MTP_MIN_DRV_NAME, sl));
+	ptrace(("%s: %p: DECODE: decoding error\n", DRV_NAME, sl));
 	return (-EMSGSIZE);
 }
 
@@ -4899,16 +4896,15 @@ mtp_recv_msg(queue_t *q, mblk_t *mp)
 		goto eproto;
 	if (sl->adj != msg.opc)
 		goto eproto;
-	/*
-	   message is for us, process it 
-	 */
+	/* 
+	   message is for us, process it */
 	return mtp_proc_msg(q, mp, &msg);
       eproto:
 	ptrace(("%s: %p: DECODE: message not for us NI=%x, DPC=%x, OPC=%x, SI=%x\n",
-		MTP_MIN_DRV_NAME, sl, msg.ni, msg.dpc, msg.opc, msg.si));
+		DRV_NAME, sl, msg.ni, msg.dpc, msg.opc, msg.si));
 	return (-EPROTO);
       error:
-	ptrace(("%s: %p: DECODE: decoding error %d\n", MTP_MIN_DRV_NAME, sl, err));
+	ptrace(("%s: %p: DECODE: decoding error %d\n", DRV_NAME, sl, err));
 	return (err);
 }
 
@@ -4954,10 +4950,10 @@ sl_pdu_ind(queue_t *q, mblk_t *mp)
 		return (QR_TRIMMED);
 	return (err);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 }
 
@@ -4977,24 +4973,22 @@ sl_link_congested_ind(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if (sl->cong != p->sl_cong_state) {
-		/*
-		   check route and routeset 
-		 */
+		/* 
+		   check route and routeset */
 		sl->cong = p->sl_cong_status;
 	}
 	if (sl->disc != p->sl_disc_state) {
-		/*
-		   check route and routeset 
-		 */
+		/* 
+		   check route and routeset */
 		sl->disc = p->sl_disc_status;
 	}
 	fixme(("Write this function\n"));
 	return (QR_DONE);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5017,24 +5011,22 @@ sl_link_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if (sl->cong != p->sl_cong_state) {
-		/*
-		   check route and routeset 
-		 */
+		/* 
+		   check route and routeset */
 		sl->cong = p->sl_cong_status;
 	}
 	if (sl->disc != p->sl_disc_state) {
-		/*
-		   check route and routeset 
-		 */
+		/* 
+		   check route and routeset */
 		sl->disc = p->sl_disc_status;
 	}
 	fixme(("Write this function\n"));
 	return (QR_DONE);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5062,13 +5054,13 @@ sl_retrieved_message_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (QR_TRIMMED);
       efault:
-	ptrace(("%s: %p: ERROR: no data\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: no data\n", DRV_NAME, m));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5093,10 +5085,10 @@ sl_retrieval_complete_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5121,10 +5113,10 @@ sl_rb_cleared_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5149,10 +5141,10 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5177,10 +5169,10 @@ sl_in_service_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5205,10 +5197,10 @@ sl_out_of_service_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5233,10 +5225,10 @@ sl_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5261,10 +5253,10 @@ sl_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5289,10 +5281,10 @@ sl_rtb_cleared_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5317,10 +5309,10 @@ sl_retrieval_not_possible_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5345,10 +5337,10 @@ sl_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5373,7 +5365,7 @@ sl_optmgmt_ack(queue_t *q, mblk_t *mp)
 	return (-EFAULT);
 	return (-EOPNOTSUPP);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5397,7 +5389,7 @@ sl_notify_ind(queue_t *q, mblk_t *mp)
 	return (-EFAULT);
 	return (-EOPNOTSUPP);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5420,7 +5412,7 @@ lmi_info_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5453,10 +5445,10 @@ lmi_ok_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5493,10 +5485,10 @@ lmi_error_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5521,10 +5513,10 @@ lmi_enable_con(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5549,10 +5541,10 @@ lmi_disable_con(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	return (-EPROTO);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5575,7 +5567,7 @@ lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5598,7 +5590,7 @@ lmi_error_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5621,7 +5613,7 @@ lmi_stats_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5644,7 +5636,7 @@ lmi_event_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, m));
 	return (-EINVAL);
 #endif
 	__ptrace(("Unimplemented\n"));
@@ -5676,13 +5668,13 @@ mtp_data_req(queue_t *q, mblk_t *mp)
 		goto baddata;
 	return mtp_send_msg(m, NULL, &m->dst, mp);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_MIN_DRV_NAME, m, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, m, dlen));
 	goto error;
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       discard:
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, m));
 	return (QR_DONE);
       error:
 	return m_error(q, -EPROTO);
@@ -5731,9 +5723,8 @@ t_conn_req(queue_t *q, mblk_t *mp)
 			struct mtp_opts opts = { 0L, NULL, };
 			if (mtp_parse_opts(mtp, &opts, opt, p->OPT_length))
 				goto badopt;
-			/*
-			   TODO: set options first 
-			 */
+			/* 
+			   TODO: set options first */
 			if (mp->b_cont) {
 				putbq(q, mp->b_cont);	/* hold back data */
 				mp->b_cont = NULL;	/* abosrbed mp->b_cont */
@@ -5745,23 +5736,23 @@ t_conn_req(queue_t *q, mblk_t *mp)
 	}
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, m));
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, m));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is unusable\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, m));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid message format\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, m));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       error:
 	return t_error_ack(q, T_CONN_REQ, err);
@@ -5792,11 +5783,11 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	return t_ok_ack(q, T_DISCON_REQ);
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_MIN_DRV_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       error:
 	return t_error_ack(q, T_DISCON_REQ, err);
@@ -5825,16 +5816,16 @@ t_data_req(queue_t *q, mblk_t *mp)
 		return (QR_TRIMMED);
 	return (err);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_MIN_DRV_NAME, m, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, m, dlen));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_MIN_DRV_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", MTP_MIN_DRV_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       error:
 	return m_error(q, -EPROTO);
@@ -5884,9 +5875,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		goto badaddr;
 	{
 		mtp_addr_t *src = (typeof(src)) (mp->b_rptr + p->ADDR_offset);
-		/*
-		   we don't allow wildcards yet. 
-		 */
+		/* 
+		   we don't allow wildcards yet. */
 		if (src->mtp_family != AF_MTP)
 			goto badaddr;
 		if (!src->si || !src->pc)
@@ -5899,27 +5889,27 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	}
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, m));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate address\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: couldn't allocate address\n", DRV_NAME, m));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: address is invalid\n", DRV_NAME, m));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, m));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not support for T_CLTS\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: primitive not support for T_CLTS\n", DRV_NAME, m));
 	goto error;
       error:
 	return t_error_ack(q, T_BIND_REQ, err);
@@ -5940,7 +5930,7 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 	return t_ok_ack(q, T_UNBIND_REQ);
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       error:
 	return t_error_ack(q, T_UNBIND_REQ, err);
@@ -5985,22 +5975,22 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		}
 	}
       badopt:
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, m));
 	goto error;
       acces:
-	ptrace(("%s: %p: ERROR: no permission to address\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: no permission to address\n", DRV_NAME, m));
 	goto error;
       badadd:
-	ptrace(("%s: %p: ERROR: bad destination address\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: bad destination address\n", DRV_NAME, m));
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid parameter\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid parameter\n", DRV_NAME, m));
 	goto error;
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_MIN_DRV_NAME, m, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, m, dlen));
 	goto error;
       error:
 	return m_error(q, -EPROTO);
@@ -6054,19 +6044,19 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	}
       provspec:
 	err = err;
-	ptrace(("%s: %p: ERROR: provider specific\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: provider specific\n", DRV_NAME, m));
 	goto error;
       badflag:
 	err = TBADFLAG;
-	ptrace(("%s: %p: ERROR: bad options flags\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: bad options flags\n", DRV_NAME, m));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, m));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, m));
 	goto error;
       error:
 	return t_error_ack(q, T_OPTMGMT_REQ, err);
@@ -6092,7 +6082,7 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 	}
 	return t_ordrel_ind(q);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       error:
 	return m_error(q, EPROTO);
@@ -6128,17 +6118,17 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 	}
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, m));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, m));
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, m));
 	return m_error(q, EPROTO);
       discard:
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, m));
 	return (QR_DONE);
       error:
 	return t_error_ack(q, T_OPTDATA_REQ, err);
@@ -6186,7 +6176,7 @@ t_capability_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	return t_capability_ack(q, p->CAP_bits1);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_MIN_DRV_NAME, m));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, m));
 	return t_error_ack(q, T_CAPABILITY_REQ, -EINVAL);
 }
 #endif
@@ -6255,9 +6245,8 @@ mtp_iocsoption(queue_t *q, mblk_t *mp)
 		case SS7_PVAR_ANSI_00:
 		case SS7_PVAR_JTTC_94:
 		case SS7_PVAR_CHIN_00:
-			/*
-			   these are fully supported 
-			 */
+			/* 
+			   these are fully supported */
 			break;
 		default:
 			todo(("Implement and test other protocol variants\n"));
@@ -6459,7 +6448,7 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					MTP_MIN_DRV_NAME, m));
+					DRV_NAME, m));
 				ret = -EPERM;
 				break;
 			}
@@ -6471,7 +6460,7 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					MTP_MIN_DRV_NAME, m));
+					DRV_NAME, m));
 				ret = -EPERM;
 				break;
 			}
@@ -6488,8 +6477,7 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MTP_MIN_DRV_NAME,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -6626,119 +6614,118 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 	str_t *s = PRIV(q);
 	ulong oldstate = s->state;
 	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_IND) {
-		printd(("%s: %p: SL_PDU_IND [%d] <-\n", MTP_MIN_DRV_NAME, s, msgdsize(mp->b_cont)));
+		printd(("%s: %p: SL_PDU_IND [%d] <-\n", DRV_NAME, s, msgdsize(mp->b_cont)));
 		if ((rtn = sl_pdu_ind(q, mp)) < 0)
 			s->state = oldstate;
 		return (rtn);
 	}
 	switch (prim) {
 	case SL_PDU_IND:
-		printd(("%s: %p: SL_PDU_IND [%d] <-\n", MTP_MIN_DRV_NAME, s, msgdsize(mp->b_cont)));
+		printd(("%s: %p: SL_PDU_IND [%d] <-\n", DRV_NAME, s, msgdsize(mp->b_cont)));
 		rtn = sl_pdu_ind(q, mp);
 		break;
 	case SL_LINK_CONGESTED_IND:
-		printd(("%s: %p: SL_LINK_CONGESTED_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_LINK_CONGESTED_IND <-\n", DRV_NAME, s));
 		rtn = sl_link_congested_ind(q, mp);
 		break;
 	case SL_LINK_CONGESTION_CEASED_IND:
-		printd(("%s: %p: SL_LINK_CONGESTION_CEASED_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_LINK_CONGESTION_CEASED_IND <-\n", DRV_NAME, s));
 		rtn = sl_link_congestion_ceased_ind(q, mp);
 		break;
 	case SL_RETRIEVED_MESSAGE_IND:
-		printd(("%s: %p: SL_RETRIEVED_MESSAGE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_RETRIEVED_MESSAGE_IND <-\n", DRV_NAME, s));
 		rtn = sl_retrieved_message_ind(q, mp);
 		break;
 	case SL_RETRIEVAL_COMPLETE_IND:
-		printd(("%s: %p: SL_RETRIEVAL_COMPLETE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_RETRIEVAL_COMPLETE_IND <-\n", DRV_NAME, s));
 		rtn = sl_retrieval_complete_ind(q, mp);
 		break;
 	case SL_RB_CLEARED_IND:
-		printd(("%s: %p: SL_RB_CLEARED_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_RB_CLEARED_IND <-\n", DRV_NAME, s));
 		rtn = sl_rb_cleared_ind(q, mp);
 		break;
 	case SL_BSNT_IND:
-		printd(("%s: %p: SL_BSNT_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_BSNT_IND <-\n", DRV_NAME, s));
 		rtn = sl_bsnt_ind(q, mp);
 		break;
 	case SL_IN_SERVICE_IND:
-		printd(("%s: %p: SL_IN_SERVICE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_IN_SERVICE_IND <-\n", DRV_NAME, s));
 		rtn = sl_in_service_ind(q, mp);
 		break;
 	case SL_OUT_OF_SERVICE_IND:
-		printd(("%s: %p: SL_OUT_OF_SERVICE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_OUT_OF_SERVICE_IND <-\n", DRV_NAME, s));
 		rtn = sl_out_of_service_ind(q, mp);
 		break;
 	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
-		printd(("%s: %p: SL_REMOTE_PROCESSOR_OUTAGE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_REMOTE_PROCESSOR_OUTAGE_IND <-\n", DRV_NAME, s));
 		rtn = sl_remote_processor_outage_ind(q, mp);
 		break;
 	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
-		printd(("%s: %p: SL_REMOTE_PROCESSOR_RECOVERED_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_REMOTE_PROCESSOR_RECOVERED_IND <-\n", DRV_NAME, s));
 		rtn = sl_remote_processor_recovered_ind(q, mp);
 		break;
 	case SL_RTB_CLEARED_IND:
-		printd(("%s: %p: SL_RTB_CLEARED_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_RTB_CLEARED_IND <-\n", DRV_NAME, s));
 		rtn = sl_rtb_cleared_ind(q, mp);
 		break;
 	case SL_RETRIEVAL_NOT_POSSIBLE_IND:
-		printd(("%s: %p: SL_RETRIEVAL_NOT_POSSIBLE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_RETRIEVAL_NOT_POSSIBLE_IND <-\n", DRV_NAME, s));
 		rtn = sl_retrieval_not_possible_ind(q, mp);
 		break;
 	case SL_BSNT_NOT_RETRIEVABLE_IND:
-		printd(("%s: %p: SL_BSNT_NOT_RETRIEVABLE_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_BSNT_NOT_RETRIEVABLE_IND <-\n", DRV_NAME, s));
 		rtn = sl_bsnt_not_retrievable_ind(q, mp);
 		break;
 #if 0
 	case SL_OPTMGMT_ACK:
-		printd(("%s: %p: SL_OPTMGMT_ACK <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_OPTMGMT_ACK <-\n", DRV_NAME, s));
 		rtn = sl_optmgmt_ack(q, mp);
 		break;
 	case SL_NOTIFY_IND:
-		printd(("%s: %p: SL_NOTIFY_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: SL_NOTIFY_IND <-\n", DRV_NAME, s));
 		rtn = sl_notify_ind(q, mp);
 		break;
 #endif
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", DRV_NAME, s));
 		rtn = lmi_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_OK_ACK <-\n", DRV_NAME, s));
 		rtn = lmi_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", DRV_NAME, s));
 		rtn = lmi_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", DRV_NAME, s));
 		rtn = lmi_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", DRV_NAME, s));
 		rtn = lmi_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", DRV_NAME, s));
 		rtn = lmi_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", DRV_NAME, s));
 		rtn = lmi_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_STATS_IND <-\n", DRV_NAME, s));
 		rtn = lmi_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", DRV_NAME, s));
 		rtn = lmi_event_ind(q, mp);
 		break;
 	default:
-		/*
-		   reject what we don't recognize 
-		 */
-		printd(("%s: %p: ???? <-\n", MTP_MIN_DRV_NAME, s));
+		/* 
+		   reject what we don't recognize */
+		printd(("%s: %p: ???? <-\n", DRV_NAME, s));
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -6756,62 +6743,62 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = s->state;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case T_CONN_REQ:
-		printd(("%s: %p: -> T_CONN_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, s));
 		rtn = t_conn_req(q, mp);
 		break;
 	case T_CONN_RES:
-		printd(("%s: %p: -> T_CONN_RES\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, s));
 		rtn = t_error_ack(q, prim, TNOTSUPPORT);
 		break;
 	case T_DISCON_REQ:
-		printd(("%s: %p: -> T_DISCON_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, s));
 		rtn = t_discon_req(q, mp);
 		break;
 	case T_DATA_REQ:
-		printd(("%s: %p: -> T_DATA_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, s));
 		rtn = t_data_req(q, mp);
 		break;
 	case T_EXDATA_REQ:
-		printd(("%s: %p: -> T_EXDATA_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, s));
 		rtn = t_exdata_req(q, mp);
 		break;
 	case T_INFO_REQ:
-		printd(("%s: %p: -> T_INFO_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, s));
 		rtn = t_info_req(q, mp);
 		break;
 	case T_BIND_REQ:
-		printd(("%s: %p: -> T_BIND_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, s));
 		rtn = t_bind_req(q, mp);
 		break;
 	case T_UNBIND_REQ:
-		printd(("%s: %p: -> T_UNBIND_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, s));
 		rtn = t_unbind_req(q, mp);
 		break;
 	case T_UNITDATA_REQ:
-		printd(("%s: %p: -> T_UNITDATA_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, s));
 		rtn = t_unitdata_req(q, mp);
 		break;
 	case T_OPTMGMT_REQ:
-		printd(("%s: %p: -> T_OPTMGMT_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, s));
 		rtn = t_optmgmt_req(q, mp);
 		break;
 	case T_ORDREL_REQ:
-		printd(("%s: %p: -> T_ORDREL_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, s));
 		rtn = t_ordrel_req(q, mp);
 		break;
 	case T_OPTDATA_REQ:
-		printd(("%s: %p: -> T_OPTDATA_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, s));
 		rtn = t_optdata_req(q, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
-		printd(("%s: %p: -> T_ADDR_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, s));
 		rtn = t_addr_req(q, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_REQ
 	case T_CAPABILITY_REQ:
-		printd(("%s: %p: -> T_CAPABILITY_REQ\n", MTP_MIN_DRV_NAME, s));
+		printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, s));
 		rtn = t_capability_req(q, mp);
 		break;
 #endif
@@ -6859,11 +6846,11 @@ mtp_r_rse(queue_t *q, mblk_t *mp)
 	{
 		switch (*(ulong *) mp->b_rptr) {
 		case t1t:
-			printd(("%s: %p: t1t expiry at %lu\n", MTP_MIN_DRV_NAME, s, jiffies));
+			printd(("%s: %p: t1t expiry at %lu\n", DRV_NAME, s, jiffies));
 			rtn = sl_t1t_timeout(q);
 			break;
 		case t2t:
-			printd(("%s: %p: t1t expiry at %lu\n", MTP_MIN_DRV_NAME, s, jiffies));
+			printd(("%s: %p: t1t expiry at %lu\n", DRV_NAME, s, jiffies));
 			rtn = sl_t2t_timeout(q);
 			break;
 		default:
@@ -6885,7 +6872,7 @@ sl_w_rse(queue_t *q, mblk_t *mp)
 	{
 		switch (*(ulong *) mp->b_rptr) {
 		case t1:
-			printd(("%s: %p: t1 expiry at %lu\n", MTP_MIN_DRV_NAME, s, jiffies));
+			printd(("%s: %p: t1 expiry at %lu\n", DRV_NAME, s, jiffies));
 			rtn = sl_t1_expiry(q);
 			break;
 		default:
@@ -6948,9 +6935,8 @@ mtp_r_flush(queue_t *q, mblk_t *mp)
 {
 	str_t *s = PRIV(q);
 	if (*mp->b_rptr & FLUSHW) {
-		/*
-		   just in case upper doesn't loop properly 
-		 */
+		/* 
+		   just in case upper doesn't loop properly */
 		if (*mp->b_rtpr & FLUSHBAND)
 			flushband(s->wq, mp->b_rptr[1], FLUSHALL);
 		else
@@ -7015,9 +7001,8 @@ sl_w_flush(queue_t *q, mblk_t *mp)
 {
 	str_t *s = PRIV(q);
 	if (*mp->b_rptr & FLUSHR) {
-		/*
-		   just in case lower doesn't loop properly 
-		 */
+		/* 
+		   just in case lower doesn't loop properly */
 		if (*mp->b_rtpr & FLUSHBAND)
 			flushband(s->rq, mp->b_rptr[1], FLUSHALL);
 		else
@@ -7058,9 +7043,8 @@ mtp_r_prim(queue_t *q, mblk_t *mp)
 static int
 mtp_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -7079,9 +7063,8 @@ mtp_w_prim(queue_t *q, mblk_t *mp)
 static int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -7137,9 +7120,8 @@ mtp_putp(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), int (*wakeup
 	}
 	if (mtp_trylock(q)) {
 		do {
-			/*
-			   Fast Path 
-			 */
+			/* 
+			   Fast Path */
 			if ((rtn = (*proc) (q, mp)) == QR_ABSORBED)
 				break;
 			switch (rtn) {
@@ -7207,9 +7189,8 @@ mtp_srvp(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *
 	if (mtp_trylockq(q)) {
 		mblk_t *mp;
 		while ((mp = getq(q))) {
-			/*
-			   Fast Path 
-			 */
+			/* 
+			   Fast Path */
 			if ((rtn = proc(q, mp)) == QR_ABSORBED)
 				continue;
 			switch (rtn) {
@@ -7261,9 +7242,8 @@ mtp_srvp(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *
 					putbq(q, mp);
 					break;
 				}
-				/*
-				   Be careful not to put a priority message back on the queue. 
-				 */
+				/* 
+				   Be careful not to put a priority message back on the queue. */
 				if (mp->b_datap->db_type == M_PROTO) {
 					mp->b_datap->db_type = M_PROTO;
 					mp->b_band = 255;
@@ -7352,7 +7332,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: can't push as module\n", MTP_MIN_DRV_NAME));
+		ptrace(("%s: ERROR: can't push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -7366,22 +7346,22 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			break;
 		if (cminor == dminor) {
 			if (sflag == CLONEOPEN)
-				if (++cminor < MTP_MIN_CMINORS)
+				if (++cminor < NMINORS)
 					continue;
-			ptrace(("%s: ERROR: device in use\n", MTP_MIN_DRV_NAME));
+			ptrace(("%s: ERROR: device in use\n", DRV_NAME));
 			MOD_DEC_USE_COUNT;
 			return (EIO);
 		}
 	}
 	if (cminor >= MTP_NMAJOR) {
-		ptrace(("%s: ERROR: no device numbers available\n", MTP_MIN_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", MTP_MIN_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(mtp = mtp_alloc_priv(q, mtpp, devp, crp))) {
-		ptrace(("%s: ERROR: No memory\n", MTP_MIN_DRV_NAME));
+		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
@@ -7400,7 +7380,7 @@ mtp_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) mtp;
-	printd(("%s: closing character device %d:%d\n", MTP_MIN_DRV_NAME, mtp->u.dev.cmajor,
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, mtp->u.dev.cmajor,
 		mtp->u.dev.cminor));
 	mtp_free_priv(q);
 	MOD_DEC_USE_COUNT;
@@ -7410,65 +7390,142 @@ mtp_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-static int mtp_initialized = 0;
-static void
-mtp_init(void)
-{
-	int err;
-	cmn_err(CE_NOTE, MTP_BANNER);	/* console splash */
-	if ((err = mtp_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Counld not allocated caches", MTP_MIN_DRV_NAME);
-		mtp_initialized = err;
-		return;
-	}
-	if ((err =
-	     lis_register_strdev(MTP_MIN_CMAJOR_0, &mtp_info, MTP_MIN_CMINORS,
-				 MTP_MIN_DRV_NAME)) < 0) {
-		cmn_err(CE_PANIC, "%s: Can't register major %d", MTP_MIN_DRV_NAME,
-			MTP_MIN_CMAJOR_0);
-		mtp_term_caches();
-		mtp_initialized = err;
-		return;
-	}
-	mtp_initialized = 1;
-	return;
-}
-static void
-mtp_terminate(void)
-{
-	int err;
-	if (mtp_initialized > 0) {
-		if ((err = lis_unregister_strdev(MTP_MIN_CMAJOR_0)))
-			cmn_err(CE_PANIC, "%s: Can't unregister major %d\n", MTP_MIN_DRV_NAME,
-				MTP_MIN_CMAJOR_0);
-		mtp_term_caches();
-		mtp_initialized = 0;
-	}
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the MTP-MIN driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the MTP-MIN driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  LINUX MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw mtp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &mtp_mininfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+mtp_register_strdev(major_t major)
 {
-	mtp_init();
-	if (mtp_initialized < 0)
-		return mtp_initialized;
+	int err;
+	if ((err = register_strdev(&mtp_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+mtp_unregister_strdev(major_t major)
 {
-	mtp_terminate();
+	int err;
+	if ((err = unregister_strdev(&mtp_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+mtp_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &mtp_mininfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+mtp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+mtp_minterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (mtp_majors[mindex]) {
+			if ((err = mtp_unregister_strdev(mtp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					mtp_majors[mindex]);
+			if (mindex)
+				mtp_majors[mindex] = 0;
+		}
+	}
+	if ((err = mtp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+mtp_mininit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = mtp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		mtp_minterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = mtp_register_strdev(mtp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					mtp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				mtp_minterminate();
+				return (err);
+			}
+		}
+		if (mtp_majors[mindex] == 0)
+			mtp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(mtp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = mtp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(mtp_mininit);
+module_exit(mtp_minterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:59 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:59 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $"
 
-static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:59 $";
+static char const ident[] =
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -78,7 +79,7 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #include <sys/xti_mtp.h>
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:59 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:22 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -88,6 +89,8 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 			MTP_COPYRIGHT	"\n" \
 			MTP_DEVICE	"\n" \
 			MTP_CONTACT
+#define MTP_SPLASH	MTP_DESCRIP	"\n" \
+			MTP_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(MTP_CONTACT);
@@ -95,7 +98,7 @@ MODULE_DESCRIPTION(MTP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -103,9 +106,8 @@ MODULE_LICENSE(MTP_LICENSE);
 #define MTP_DRV_NAME		CONFIG_STREAMS_MTP_NAME
 #define MTP_CMAJORS		CONFIG_STREAMS_MTP_NMAJORS
 #define MTP_CMAJOR_0		CONFIG_STREAMS_MTP_MAJOR
+#define MTP_UNITS		CONFIG_STREAMS_MTP_NMINORS
 #endif
-
-#define MTP_CMINORS	255
 
 #define MTP_CMINOR_MTPI	0
 #define MTP_CMINOR_TPI	1
@@ -126,35 +128,44 @@ MODULE_LICENSE(MTP_LICENSE);
  *  =========================================================================
  */
 
-#define MTP_DRV_NAME	"mtp"
+#define DRV_ID		    MTP_DRV_ID
+#define DRV_NAME	    MTP_DRV_NAME
+#define CMAJORS		    MTP_CMAJORS
+#define CMAJOR_0	    MTP_CMAJOR_0
+#define UNITS		    MTP_UNITS
+#ifdef MODULE
+#define DRV_BANNER	    MTP_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	    MTP_SPLASH
+#endif				/* MODULE */
 
 STATIC struct module_info mtp_winfo = {
-	mi_idnum:MTP_DRV_ID,		/* Module ID number */
-	mi_idname:MTP_DRV_NAME "-wr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-wr",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 STATIC struct module_info mtp_rinfo = {
-	mi_idnum:MTP_DRV_ID,		/* Module ID number */
-	mi_idname:MTP_DRV_NAME "-rd",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-rd",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 STATIC struct module_info sl_winfo = {
-	mi_idnum:MTP_DRV_ID,		/* Module ID number */
-	mi_idname:MTP_DRV_NAME "-muxw",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-muxw",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 10,		/* Lo water mark */
 };
 STATIC struct module_info sl_rinfo = {
-	mi_idnum:MTP_DRV_ID,		/* Module ID number */
-	mi_idname:MTP_DRV_NAME "-muxr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-muxr",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -190,7 +201,7 @@ STATIC struct qinit sl_winit = {
 	qi_minfo:&sl_winfo,		/* Information */
 };
 
-STATIC struct streamtab mtp_info = {
+MODULE_STATIC struct streamtab mtpinfo = {
 	st_rdinit:&mtp_rinit,		/* Upper read queue */
 	st_wrinit:&mtp_winit,		/* Upper write queue */
 	st_muxrinit:&sl_rinit,		/* Lower read queue */
@@ -1086,7 +1097,7 @@ sl_i_state_name(struct sl *sl, long state)
 STATIC void
 mtp_set_state(struct mtp *mtp, long state)
 {
-	printd(("%s: %p: %s <- %s\n", MTP_DRV_NAME, mtp, mtp_state_name(mtp, state),
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, mtp, mtp_state_name(mtp, state),
 		mtp_state_name(mtp, mtp->prot->CURRENT_state)));
 	mtp->prot->CURRENT_state = state;
 }
@@ -1098,7 +1109,7 @@ mtp_get_state(struct mtp *mtp)
 STATIC INLINE void
 sl_set_l_state(struct sl *sl, long state)
 {
-	printd(("%s: %p: %s <- %s\n", MTP_DRV_NAME, sl, sl_state_name(sl, state),
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, sl, sl_state_name(sl, state),
 		sl_state_name(sl, sl->l_state)));
 	sl->l_state = state;
 }
@@ -1110,7 +1121,7 @@ sl_get_l_state(struct sl *sl)
 STATIC INLINE void
 sl_set_i_state(struct sl *sl, long state)
 {
-	printd(("%s: %p: %s <- %s\n", MTP_DRV_NAME, sl, sl_i_state_name(sl, state),
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, sl, sl_i_state_name(sl, state),
 		sl_i_state_name(sl, sl->i_state)));
 	sl->i_state = state;
 }
@@ -1148,11 +1159,11 @@ mtp_check_src(struct mtp *mtp, struct mtp_addr *src, int *errp)
 	return (sp);
       noaddr:
 	*errp = (TNOADDR);
-	printd(("%s: %p: ERROR: Couldn't allocate source address\n", MTP_DRV_NAME, mtp));
+	printd(("%s: %p: ERROR: Couldn't allocate source address\n", DRV_NAME, mtp));
 	return (NULL);
       addrbusy:
 	*errp = (TADDRBUSY);
-	printd(("%s: %p: ERROR: Source address in use\n", MTP_DRV_NAME, mtp));
+	printd(("%s: %p: ERROR: Source address in use\n", DRV_NAME, mtp));
 	return (NULL);
 }
 
@@ -1181,10 +1192,10 @@ mtp_check_dst(struct mtp *mtp, struct mtp_addr *dst)
 			goto addrbusy;
 	return (0);
       noaddr:
-	printd(("%s: %p: ERROR: Couldn't allocate source address\n", MTP_DRV_NAME, mtp));
+	printd(("%s: %p: ERROR: Couldn't allocate source address\n", DRV_NAME, mtp));
 	return (TNOADDR);
       addrbusy:
-	printd(("%s: %p: ERROR: Source address in use\n", MTP_DRV_NAME, mtp));
+	printd(("%s: %p: ERROR: Source address in use\n", DRV_NAME, mtp));
 	return (TADDRBUSY);
       efault:
 	swerr();
@@ -1208,18 +1219,16 @@ mtp_bind(struct mtp *mtp, struct mtp_addr *src)
 	mtp->prot = na_get(loc->na.na)->prot[src->si];	/* point to protocol profile */
 	loc->mtp.equipped |= (1 << src->si);
 	if (mtp->prot->SERV_type == T_CLTS) {
-		/*
-		   connectionless, add to user lists now 
-		 */
+		/* 
+		   connectionless, add to user lists now */
 		loc->mtp.available |= (1 << src->si);
 		if ((mtp->sp.next = loc->mtp.lists[src->si]))
 			mtp->sp.next->sp.prev = &mtp->sp.next;
 		mtp->sp.prev = &loc->mtp.lists[src->si];
 		loc->mtp.lists[src->si] = mtp_get(mtp);
 	}
-	/*
-	   connection oriented, add to user lists on connect only 
-	 */
+	/* 
+	   connection oriented, add to user lists on connect only */
 	return (0);
       error:
 	return (err);
@@ -1238,9 +1247,8 @@ mtp_unbind(struct mtp *mtp)
 	if (!mtp || !mtp->prot || !(loc = mtp->sp.loc) || !(na = loc->na.na))
 		goto efault;
 	if (mtp->prot->SERV_type == T_CLTS) {
-		/*
-		   connectionless, remove from user lists now 
-		 */
+		/* 
+		   connectionless, remove from user lists now */
 		if ((*(mtp->sp.prev) = mtp->sp.next))
 			mtp->sp.next->sp.prev = mtp->sp.prev;
 		else
@@ -1248,9 +1256,8 @@ mtp_unbind(struct mtp *mtp)
 		mtp->sp.next = NULL;
 		mtp_put(mtp);
 	}
-	/*
-	   connection oriented, already removed from user lists on disconnect 
-	 */
+	/* 
+	   connection oriented, already removed from user lists on disconnect */
 	mtp->sp.loc = NULL;
 	sp_put(loc);
 	na_put(na);
@@ -1386,7 +1393,7 @@ m_error(q, mtp, error)
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
-			printd(("%s: %p: <- M_HANGUP\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (-error);
 		} else {
@@ -1394,7 +1401,7 @@ m_error(q, mtp, error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			mtp_set_state(mtp, TS_NO_STATES);
-			printd(("%s; %p: <- M_ERROR\n", MTP_DRV_NAME, mtp));
+			printd(("%s; %p: <- M_ERROR\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (QR_DONE);
 		}
@@ -1434,17 +1441,16 @@ m_error_ack(q, mtp, prim, err)
 		p->mtp_error_primitive = prim;
 		p->mtp_mtpi_error = err < 0 ? MSYSERR : err;
 		p->mtp_unix_error = err < 0 ? -err : 0;
-		printd(("%s: %p: <- MTP_ERROR_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_ERROR_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
-		/*
+		/* 
 		   Returning -EPROTO here will make sure that the old state is restored correctly
-		   (in mtp_w_proto).  If we return QR_DONE, then the state will never be restored. 
-		 */
+		   (in mtp_w_proto).  If we return QR_DONE, then the state will never be restored. */
 		if (err >= 0)
 			err = -EPROTO;
 		return (err);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1481,18 +1487,17 @@ m_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 			mtp_set_state(mtp, MTPS_IDLE);
 			break;
 		default:
-			/*
+			/* 
 			   Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a MTP_OPTMGMT_REQ in other
-			   than MTPS_IDLE state. 
-			 */
+			   than MTPS_IDLE state. */
 			break;
 		}
-		printd(("%s: %p: <- MTP_OK_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_OK_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
       error:
 	freemsg(mp);
@@ -1523,11 +1528,11 @@ m_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 		if ((err = mtp_bind(mtp, add)))
 			goto error;
 		mtp_set_state(mtp, MTPS_IDLE);
-		printd(("%s: %p: <- MTP_BIND_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_BIND_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
       error:
 	freemsg(mp);
@@ -1561,11 +1566,11 @@ m_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
 			bcopy(rem, mp->b_wptr, rem_len);
 			mp->b_wptr += rem_len;
 		}
-		printd(("%s: %p: <- MTP_ADDR_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_ADDR_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1625,11 +1630,11 @@ m_info_ack(queue_t *q, struct mtp *mtp)
 			bcopy(&mtp->dst, mp->b_wptr, sizeof(mtp->dst));
 			mp->b_wptr += sizeof(mtp->dst);
 		}
-		printd(("%s: %p: <- MTP_INFO_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_INFO_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1656,11 +1661,11 @@ m_optmgmt_ack(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
 		}
 		if (mtp_get_state(mtp) == MTPS_WACK_OPTREQ)
 			mtp_set_state(mtp, MTPS_IDLE);
-		printd(("%s: %p: <- MTP_OPTMGMT_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_OPTMGMT_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1684,14 +1689,14 @@ m_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, ulong sls, ulo
 			p->mtp_mp = mp;
 			p->mtp_sls = sls;
 			bp->b_cont = dp;
-			printd(("%s: %p: <- MTP_TRANSFER_IND\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: <- MTP_TRANSFER_IND\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, bp);
 			return (QR_ABSORBED);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: Flow controlled\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, mtp));
 	return (-EBUSY);
 }
 
@@ -1715,11 +1720,11 @@ m_pause_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: <- MTP_TRANSFER_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_TRANSFER_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1743,11 +1748,11 @@ m_resume_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: <- MTP_RESUME_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_RESUME_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1779,11 +1784,11 @@ m_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add, struct mtp_opts 
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: <- MTP_STATUS_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_STATUS_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1800,11 +1805,11 @@ m_restart_complete_ind(queue_t *q, struct mtp *mtp)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_RESTART_COMPLETE_IND;
-		printd(("%s: %p: <- MTP_RESTART_COMPLETE_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- MTP_RESTART_COMPLETE_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -1845,7 +1850,7 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
 			bcopy(mp->b_wptr, qos, qos_len);
 			mp->b_wptr += qos_len;
 		}
-		printd(("%s: %p: <- N_CONN_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_CONN_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1885,7 +1890,7 @@ n_conn_con(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_addr *res,
 		if (mtp_get_state(mtp) != NS_WCON_CREQ)
 			swerr();
 		mtp_set_state(mtp, NS_DATA_XFER);
-		printd(("%s: %p: <- N_CONN_CON\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_CONN_CON\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1898,8 +1903,8 @@ n_conn_con(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_addr *res,
  *  -----------------------------------
  */
 STATIC INLINE int
-n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq,
-	     struct mtp_addr *res, mblk_t *dp)
+n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq, struct mtp_addr *res,
+	     mblk_t *dp)
 {
 	mblk_t *mp;
 	N_discon_ind_t *p;
@@ -1918,7 +1923,7 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq,
 			mp->b_wptr += res_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- N_DISCON_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_DISCON_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -1941,7 +1946,7 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 		p->PRIM_type = N_DATA_IND;
 		p->DATA_xfer_flags = flags;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- N_DATA_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_DATA_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -1964,7 +1969,7 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = N_EXDATA_IND;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- N_EXDATA_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_EXDATA_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -2089,7 +2094,7 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 			qor->sls_range = sp->ls.sls_mask;
 			qor->mp_range = (na->option.popt & SS7_POPT_MPLEV) ? 3 : 0;
 		}
-		printd(("%s: %p: <- N_INFO_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_INFO_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2124,12 +2129,11 @@ n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long err)
 		p->ERROR_prim = prim;
 		p->NPI_error = err < 0 ? NSYSERR : err;
 		p->UNIX_error = err < 0 ? -err : 0;
-		printd(("%s: %p: <- N_ERROR_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_ERROR_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
-		/*
+		/* 
 		   Retruning -EPROTO here will make sure that the old state is restored correctly.
-		   If we return QR_DONE, then the state will never be restored. 
-		 */
+		   If we return QR_DONE, then the state will never be restored. */
 		if (err >= 0)
 			err = -EPROTO;
 		return (err);
@@ -2178,15 +2182,14 @@ n_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 			mtp_set_state(mtp, NS_IDLE);
 			break;
 		default:
-			/*
+			/* 
 			   Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   TS_IDLE state. 
-			 */
+			   TS_IDLE state. */
 			seldom();
 			break;
 		}
-		printd(("%s: %p: <- N_OK_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_OK_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2222,7 +2225,7 @@ n_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 		if ((err = mtp_bind(mtp, add)))
 			goto free_error;
 		mtp_set_state(mtp, NS_IDLE);
-		printd(("%s: %p: <- N_BIND_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_BIND_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2261,7 +2264,7 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- N_UNITDATA_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_UNITDATA_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -2292,7 +2295,7 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- N_UDERROR_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_UDERROR_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2313,7 +2316,7 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = N_DATACK_IND;
-		printd(("%s: %p: <- N_DATACK_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_DATACK_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2336,7 +2339,7 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 		p->PRIM_type = N_RESET_IND;
 		p->RESET_orig = orig;
 		p->RESET_reason = reason;
-		printd(("%s: %p: <- N_RESET_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_RESET_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2357,7 +2360,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = N_RESET_CON;
-		printd(("%s: %p: <- N_RESET_CON\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- N_RESET_CON\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2372,7 +2375,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 STATIC INLINE int
 t_conn_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MTP_DRV_NAME, mtp));
+	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2404,7 +2407,7 @@ t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *o
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_CONN_CON\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_CONN_CON\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -2419,7 +2422,7 @@ t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *o
 STATIC INLINE int
 t_discon_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MTP_DRV_NAME, mtp));
+	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2439,14 +2442,14 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 			p->PRIM_type = T_DATA_IND;
 			p->MORE_flag = more;
 			mp->b_cont = dp;
-			printd(("%s: %p: <- T_DATA_IND\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: <- T_DATA_IND\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (QR_DONE);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: Flow controlled\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, mtp));
 	return (-EBUSY);
 }
 
@@ -2457,7 +2460,7 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 STATIC INLINE int
 t_exdata_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MTP_DRV_NAME, mtp));
+	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2475,11 +2478,11 @@ t_info_ack(queue_t *q, struct mtp *mtp)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_INFO_ACK;
 		*p = *mtp->prot;
-		printd(("%s: %p: <- T_INFO_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -2510,15 +2513,14 @@ t_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long error)
 		p->ERROR_prim = prim;
 		p->TLI_error = error < 0 ? TSYSERR : error;
 		p->UNIX_error = error < 0 ? -error : 0;
-		printd(("%s: %p: <- T_ERROR_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
-		/*
+		/* 
 		   Retruning -EPROTO here will make sure that the old state is restored correctly.
-		   If we return QR_DONE, then the state will never be restored. 
-		 */
+		   If we return QR_DONE, then the state will never be restored. */
 		return (-EPROTO);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -2564,18 +2566,17 @@ t_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 			mtp_set_state(mtp, TS_IDLE);
 			break;
 		default:
-			/*
+			/* 
 			   Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
-			   TS_IDLE state. 
-			 */
+			   TS_IDLE state. */
 			break;
 		}
-		printd(("%s: %p: <- T_OK_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
       free_error:
 	freemsg(mp);
@@ -2607,11 +2608,11 @@ t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 		if ((err = mtp_bind(mtp, add)))
 			goto free_error;
 		mtp_set_state(mtp, TS_IDLE);
-		printd(("%s: %p: <- T_BIND_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
       free_error:
 	freemsg(mp);
@@ -2646,11 +2647,11 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- T_UNITDATA_IND\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_UNITDATA_IND\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_ABSORBED);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -2688,14 +2689,14 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 				mp->b_wptr += opt_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: <- T_UDERROR_IND\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (QR_DONE);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: Flow controlled\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, mtp));
 	return (-EBUSY);
 }
 
@@ -2724,11 +2725,11 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
 		if (mtp_get_state(mtp) == TS_WACK_OPTREQ)
 			mtp_set_state(mtp, TS_IDLE);
 #endif
-		printd(("%s: %p: <- T_OPTMGMT_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 
@@ -2739,7 +2740,7 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
 STATIC int
 t_ordrel_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MTP_DRV_NAME, mtp));
+	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2766,14 +2767,14 @@ t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mb
 				mp->b_wptr += opt_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: <- T_OPTDATA_IND\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: <- T_OPTDATA_IND\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (QR_ABSORBED);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: Flow controlled\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, mtp));
 	return (-EBUSY);
 }
 
@@ -2805,11 +2806,11 @@ t_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
 			bcopy(rem, mp->b_wptr, rem_len);
 			mp->b_wptr += rem_len;
 		}
-		printd(("%s: %p: <- T_ADDR_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 #endif
@@ -2834,11 +2835,11 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 			p->INFO_ack = *(mtp->prot);
 		else
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-		printd(("%s: %p: <- T_CAPABILITY_ACK\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mtp));
 	return (-ENOBUFS);
 }
 #endif
@@ -2866,14 +2867,14 @@ sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *dp)
 			p->sl_primitive = SL_PDU_REQ;
 			p->sl_mp = 0;
 			mp->b_cont = dp;
-			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", MTP_DRV_NAME, sl, msgdsize(dp)));
+			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", DRV_NAME, sl, msgdsize(dp)));
 			ss7_oput(sl->oq, mp);
 			return (QR_ABSORBED);
 		}
-		ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 		return (-ENOBUFS);
 	}
-	ptrace(("%s: %p: ERROR: flow controlled\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, sl));
 	return (-EBUSY);
 }
 
@@ -2890,14 +2891,13 @@ sl_emergency_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_EMERGENCY_REQ;
-		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", MTP_DRV_NAME, sl));
-		/*
-		   does not change interface state 
-		 */
+		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, sl));
+		/* 
+		   does not change interface state */
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2914,14 +2914,13 @@ sl_emergency_ceases_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
-		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", MTP_DRV_NAME, sl));
-		/*
-		   does not change interface state 
-		 */
+		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, sl));
+		/* 
+		   does not change interface state */
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2938,15 +2937,14 @@ sl_start_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_START_REQ;
-		/*
-		   routing state of link does not change 
-		 */
-		printd(("%s: %p: SL_START_REQ ->\n", MTP_DRV_NAME, sl));
+		/* 
+		   routing state of link does not change */
+		printd(("%s: %p: SL_START_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_INSI);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2963,12 +2961,12 @@ sl_stop_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_STOP_REQ;
-		printd(("%s: %p: SL_STOP_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -2985,12 +2983,12 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
-		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_BSNT);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3008,12 +3006,12 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, ulong fsnc)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
 		p->sl_fsnc = fsnc;
-		printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WCON_RET);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3030,11 +3028,11 @@ sl_resume_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_RESUME_REQ;
-		printd(("%s: %p: SL_RESUME_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3051,12 +3049,12 @@ sl_clear_buffers_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
-		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3073,12 +3071,12 @@ sl_clear_rtb_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CLEAR_RTB_REQ;
-		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_CLRB);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3095,11 +3093,11 @@ sl_local_processor_outage_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
-		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3116,11 +3114,11 @@ sl_congestion_discard_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
-		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3137,11 +3135,11 @@ sl_congestion_accept_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
-		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3158,11 +3156,11 @@ sl_no_congestion_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
-		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3179,15 +3177,14 @@ sl_power_on_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_POWER_ON_REQ;
-		/*
-		   should maybe set routing state to active 
-		 */
-		printd(("%s: %p: SL_POWER_ON_REQ ->\n", MTP_DRV_NAME, sl));
+		/* 
+		   should maybe set routing state to active */
+		printd(("%s: %p: SL_POWER_ON_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3205,11 +3202,11 @@ sl_optmgmt_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_OPTMGMT_REQ;
-		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3226,11 +3223,11 @@ sl_notify_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sl_primitive = SL_NOTIFY_REQ;
-		printd(("%s: %p: SL_NOTIFY_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_NOTIFY_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 #endif
@@ -3247,11 +3244,11 @@ lmi_info_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3272,11 +3269,11 @@ lmi_attach_req(queue_t *q, struct sl *sl, caddr_t ppa_ptr, size_t ppa_len)
 			bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 			mp->b_wptr += ppa_len;
 		}
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3293,11 +3290,11 @@ lmi_detach_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3318,11 +3315,11 @@ lmi_enable_req(queue_t *q, struct sl *sl, caddr_t dst_ptr, size_t dst_len)
 			bcopy(dst_ptr, mp->b_wptr, dst_len);
 			mp->b_wptr += dst_len;
 		}
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3339,11 +3336,11 @@ lmi_disable_req(queue_t *q, struct sl *sl)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3367,11 +3364,11 @@ lmi_optmgmt_req(queue_t *q, struct sl *sl, ulong flags, caddr_t opt_ptr, size_t 
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 		ss7_oput(sl->oq, mp);
 		return (QR_DONE);
 	}
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, sl));
 	return (-ENOBUFS);
 }
 
@@ -3995,9 +3992,8 @@ __mtp_timer_stop(struct mtp *mtp, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4037,11 +4033,11 @@ mtp_timer_start(struct mtp *mtp, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, rs, t8, config);	/* transfer prohibited inhibitition timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, rs, t11, config);	/* waiting to begin transfer restricted */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, rs, t15, config);	/* waiting to start routeset congestion test */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, rs, t16, config);	/* waiting for routeset congestion status update */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, rs, t18a, config);
+SS7_DECLARE_TIMER(DRV_NAME, rs, t8, config);	/* transfer prohibited inhibitition timer */
+SS7_DECLARE_TIMER(DRV_NAME, rs, t11, config);	/* waiting to begin transfer restricted */
+SS7_DECLARE_TIMER(DRV_NAME, rs, t15, config);	/* waiting to start routeset congestion test */
+SS7_DECLARE_TIMER(DRV_NAME, rs, t16, config);	/* waiting for routeset congestion status update */
+SS7_DECLARE_TIMER(DRV_NAME, rs, t18a, config);
 
 STATIC INLINE void
 __rs_timer_stop(struct rs *rs, const uint t)
@@ -4050,44 +4046,38 @@ __rs_timer_stop(struct rs *rs, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t8:
 		rs_stop_timer_t8(rs);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t11:
 		rs_stop_timer_t11(rs);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t15:
 		rs_stop_timer_t15(rs);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t16:
 		rs_stop_timer_t16(rs);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t18a:
 		rs_stop_timer_t18a(rs);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4142,7 +4132,7 @@ rs_timer_start(struct rs *rs, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, cr, t6, rt.onto->config);
+SS7_DECLARE_TIMER(DRV_NAME, cr, t6, rt.onto->config);
 
 STATIC INLINE void
 __cr_timer_stop(struct cr *cr, const uint t)
@@ -4151,16 +4141,14 @@ __cr_timer_stop(struct cr *cr, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t6:
 		cr_stop_timer_t6(cr);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4203,7 +4191,7 @@ cr_timer_start(struct cr *cr, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, rt, t10, config);	/* waiting to repeat RST message */
+SS7_DECLARE_TIMER(DRV_NAME, rt, t10, config);	/* waiting to repeat RST message */
 
 STATIC INLINE void
 __rt_timer_stop(struct rt *rt, const uint t)
@@ -4212,16 +4200,14 @@ __rt_timer_stop(struct rt *rt, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t10:
 		rt_stop_timer_t10(rt);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4264,20 +4250,20 @@ rt_timer_start(struct rt *rt, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t1r, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t18, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t19, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t20, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t21, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t22a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t23a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t24a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t25a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t26a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t27a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t28a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t29a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sp, t30a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t1r, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t18, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t19, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t20, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t21, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t22a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t23a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t24a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t25a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t26a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t27a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t28a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t29a, config);	/* MTP restart timer */
+SS7_DECLARE_TIMER(DRV_NAME, sp, t30a, config);	/* MTP restart timer */
 
 STATIC INLINE void
 __sp_timer_stop(struct sp *sp, const uint t)
@@ -4286,107 +4272,92 @@ __sp_timer_stop(struct sp *sp, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t1r:
 		sp_stop_timer_t1r(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t18:
 		sp_stop_timer_t18(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t19:
 		sp_stop_timer_t19(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t20:
 		sp_stop_timer_t20(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t21:
 		sp_stop_timer_t21(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t22a:
 		sp_stop_timer_t22a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t23a:
 		sp_stop_timer_t23a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t24a:
 		sp_stop_timer_t24a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t25a:
 		sp_stop_timer_t25a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t26a:
 		sp_stop_timer_t26a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t27a:
 		sp_stop_timer_t27a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t28a:
 		sp_stop_timer_t28a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t29a:
 		sp_stop_timer_t29a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t30a:
 		sp_stop_timer_t30a(sp);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4468,11 +4439,11 @@ sp_timer_start(struct sp *sp, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, cb, t1, sl.from->config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, cb, t2, sl.from->config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, cb, t3, sl.from->config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, cb, t4, sl.from->config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, cb, t5, sl.from->config);
+SS7_DECLARE_TIMER(DRV_NAME, cb, t1, sl.from->config);
+SS7_DECLARE_TIMER(DRV_NAME, cb, t2, sl.from->config);
+SS7_DECLARE_TIMER(DRV_NAME, cb, t3, sl.from->config);
+SS7_DECLARE_TIMER(DRV_NAME, cb, t4, sl.from->config);
+SS7_DECLARE_TIMER(DRV_NAME, cb, t5, sl.from->config);
 
 STATIC INLINE void
 __cb_timer_stop(struct cb *cb, const uint t)
@@ -4481,44 +4452,38 @@ __cb_timer_stop(struct cb *cb, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t1:
 		cb_stop_timer_t1(cb);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t2:
 		cb_stop_timer_t2(cb);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t3:
 		cb_stop_timer_t3(cb);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t4:
 		cb_stop_timer_t4(cb);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t5:
 		cb_stop_timer_t5(cb);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4581,9 +4546,8 @@ __ls_timer_stop(struct ls *ls, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4623,7 +4587,7 @@ ls_timer_start(struct ls *ls, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, lk, t7, config);
+SS7_DECLARE_TIMER(DRV_NAME, lk, t7, config);
 
 STATIC INLINE void
 __lk_timer_stop(struct lk *lk, const uint t)
@@ -4632,16 +4596,14 @@ __lk_timer_stop(struct lk *lk, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t7:
 		lk_stop_timer_t7(lk);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -4684,23 +4646,23 @@ lk_timer_start(struct lk *lk, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t12, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t13, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t14, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t17, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t19a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t20a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t21a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t22, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t23, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t24, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t31a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t32a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t33a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t34a, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t1t, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t2t, config);
-SS7_DECLARE_TIMER(MTP_DRV_NAME, sl, t1s, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t12, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t13, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t14, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t17, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t19a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t20a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t21a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t22, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t23, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t24, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t31a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t32a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t33a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t34a, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t1t, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t2t, config);
+SS7_DECLARE_TIMER(DRV_NAME, sl, t1s, config);
 
 STATIC INLINE void
 __sl_timer_stop(struct sl *sl, const uint t)
@@ -4709,128 +4671,110 @@ __sl_timer_stop(struct sl *sl, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t12:
 		sl_stop_timer_t12(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t13:
 		sl_stop_timer_t13(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t14:
 		sl_stop_timer_t14(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t17:
 		sl_stop_timer_t17(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t19a:
 		sl_stop_timer_t19a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t20a:
 		sl_stop_timer_t20a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t21a:
 		sl_stop_timer_t21a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t22:
 		sl_stop_timer_t22(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t23:
 		sl_stop_timer_t23(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t24:
 		sl_stop_timer_t24(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t31a:
 		sl_stop_timer_t31a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t32a:
 		sl_stop_timer_t32a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t33a:
 		sl_stop_timer_t33a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t34a:
 		sl_stop_timer_t34a(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t1t:
 		sl_stop_timer_t1t(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t2t:
 		sl_stop_timer_t2t(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t1s:
 		sl_stop_timer_t1s(sl);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -5247,9 +5191,8 @@ mtp_send_link(queue_t *q, mblk_t *dp, struct sl *sl)
 	(void) q;
 	if (canput(sl->oq)) {
 		if (sl->lk.lk->ls.ls->lk.numb > 1) {
-			/*
-			   only rotate on combined linksets (i.e. not C-links) 
-			 */
+			/* 
+			   only rotate on combined linksets (i.e. not C-links) */
 			struct sp *sp = sl->lk.lk->sp.loc;
 			switch (sp->na.na->option.pvar) {
 			case SS7_PVAR_ANSI:
@@ -5257,17 +5200,15 @@ mtp_send_link(queue_t *q, mblk_t *dp, struct sl *sl)
 			case SS7_PVAR_CHIN:	/* ??? */
 			{
 				uint sls = dp->b_rptr[7] & sp->ls.sls_mask;
-				/*
+				/* 
 				   Actually, for 5-bit and 8-bit compatability, we rotate based on
-				   5 sls bits regardless of the number of bits in the SLS 
-				 */
+				   5 sls bits regardless of the number of bits in the SLS */
 				if (sls & 0x01)
 					sls = (sls & 0xe0) | ((sls & 0x1f) >> 1) | 0x10;
 				else
 					sls = (sls & 0xe0) | ((sls & 0x1f) >> 1) | 0x00;
-				/*
-				   rewrite sls in routing label 
-				 */
+				/* 
+				   rewrite sls in routing label */
 				dp->b_rptr[7] = sls;
 				break;
 			}
@@ -5311,54 +5252,46 @@ mtp_send_route(queue_t *q, struct sp *sp, mblk_t *mp, uint priority, uint32_t dp
 		goto efault;
 	if (!(ls = rl->ls.ls))
 		goto efault;
-	/*
-	   select active route based on sls 
-	 */
+	/* 
+	   select active route based on sls */
 	if (!(rt = rl->smap[sls_index(sls, ls->rl.sls_mask, ls->rl.sls_bits)].rt))
 		goto efault;
 	if (rt->type == MTP_OBJ_TYPE_CR) {
-		/*
-		   we are performing controlled rerouting, buffer message 
-		 */
+		/* 
+		   we are performing controlled rerouting, buffer message */
 		bufq_queue(&((struct cr *) rt)->buf, mp);
 		return (QR_DONE);
 	}
-	/*
+	/* 
 	   Selection signalling link in link (set): for ITU-T we need to use the bits that were not 
 	   used in route selection; for ANSI we use the least significant 4 bits (but could be 7
 	   for 8-bit SLSs) after route selection and sls rotation.  Again, the following algorithm
-	   does the job for both ITU-T and ANSI and will accomodate quad linksets to quad STPs. 
-	 */
-	/*
-	   select active signalling link based on sls 
-	 */
+	   does the job for both ITU-T and ANSI and will accomodate quad linksets to quad STPs. */
+	/* 
+	   select active signalling link based on sls */
 	if (!(sl = rt->lk.lk->smap[sls_index(sls, ls->lk.sls_mask, ls->lk.sls_bits)].sl))
 		goto efault;
-	/*
+	/* 
 	   Check for changeback on the signalling link index: normally the pointer is to a
 	   signalling link object not a changeback buffer object. This approach is faster than the
-	   previous approach. 
-	 */
+	   previous approach. */
 	if (sl->type == MTP_OBJ_TYPE_CB) {
-		/*
-		   we are performing changeback or changeover, buffer message 
-		 */
+		/* 
+		   we are performing changeback or changeover, buffer message */
 		bufq_queue(&((struct cb *) sl)->buf, mp);
 		return (QR_DONE);
 	}
 	if (!(na->option.popt & SS7_POPT_MPLEV))
 		priority = 0;
 	if (sl->cong_status > priority) {
-		/*
+		/* 
 		   As the message originated from us, we should treat this as though we received a
 		   TFC for the RCT message.  This means that the congestion priority on the
-		   routeset is increased to the congestion of the linkset. 
-		 */
+		   routeset is increased to the congestion of the linkset. */
 		rs_timer_stop(rs, t15);
 		rs_timer_stop(rs, t16);
-		/*
-		   signal congestion (just for RCT) 
-		 */
+		/* 
+		   signal congestion (just for RCT) */
 		if ((err = mtp_cong_status_ind_all_local(q, rs, sl->cong_status)))
 			return (err);
 		rs->cong_status = sl->cong_status;
@@ -5368,32 +5301,29 @@ mtp_send_route(queue_t *q, struct sp *sp, mblk_t *mp, uint priority, uint32_t dp
 		goto discard;
 	if (!canput(sl->oq))
 		goto ebusy;
-	/*
+	/* 
 	   Note: we do not do SLS bit rotation for messages sent from this signalling point, even
 	   if it is an STP.  We only perform SLS bit rotation on messages transferred across a
 	   Signalling Transfer Point (see mtp_xfer_route()). However, because we must unrotate all
 	   ANSI messages retrieved from the signalling link on changeover, we still need to rotate. 
 	 */
 	if (sl->lk.lk->ls.ls->lk.numb > 1) {
-		/*
+		/* 
 		   Only rotate when part of the sls was actually used for route selection (i.e. not 
-		   on C-Links or F-Links, but only on combined link sets (A-, B-, D-, E- Links) 
-		 */
+		   on C-Links or F-Links, but only on combined link sets (A-, B-, D-, E- Links) */
 		switch (na->option.pvar) {
 		case SS7_PVAR_ANSI:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_CHIN:	/* ??? */
-			/*
+			/* 
 			   XXX Actually, for 5-bit and 8-bit compatability, we rotate based on 5
-			   sls bits regardless of the number of bits in the SLS 
-			 */
+			   sls bits regardless of the number of bits in the SLS */
 			if (sls & 0x01)
 				sls = (sls & 0xe0) | ((sls & 0x1f) >> 1) | 0x10;
 			else
 				sls = (sls & 0xe0) | ((sls & 0x1f) >> 1) | 0x00;
-			/*
-			   rewrite sls in routing label 
-			 */
+			/* 
+			   rewrite sls in routing label */
 			mp->b_rptr[7] = sls;
 			break;
 		}
@@ -5402,12 +5332,11 @@ mtp_send_route(queue_t *q, struct sp *sp, mblk_t *mp, uint priority, uint32_t dp
 	ss7_oput(sl->oq, mp);	/* send message */
 	return (QR_DONE);
       discard:
-	/*
+	/* 
 	   This is for management messages only, so we do not report congestion or prohibited
 	   routes back to the user.  Oft times, we may blindly send management messages not
 	   considering the state of the routeset with the anticipation that they will be discarded
-	   if the routeset is not accessible. 
-	 */
+	   if the routeset is not accessible. */
 	freemsg(mp);
 	return (QR_DONE);	/* discard message */
       ebusy:
@@ -6086,13 +6015,11 @@ STATIC int
 mtp_tfr_broadcast(queue_t *q, struct rs *rs)
 {
 	struct sp *sp = rs->sp.sp;
-	/*
-	   don't inform local users 
-	 */
+	/* 
+	   don't inform local users */
 	if (sp->flags & SPF_XFER_FUNC) {
-		/*
-		   current and primary linksets were addressed during rerouting 
-		 */
+		/* 
+		   current and primary linksets were addressed during rerouting */
 		struct ls *lc = rs->rl.curr ? rs->rl.curr->ls.ls : NULL;	/* current link set 
 										 */
 		struct ls *lp = rs->rl.list ? rs->rl.list->ls.ls : NULL;	/* primary link set 
@@ -6181,16 +6108,14 @@ STATIC int
 mtp_tfa_broadcast(queue_t *q, struct rs *rs)
 {
 	struct sp *sp = rs->sp.sp;
-	/*
-	   inform users 
-	 */
+	/* 
+	   inform users */
 	int err;
 	if ((err = mtp_resume_ind_all_local(q, rs)))
 		return (err);
 	if (sp->flags & SPF_XFER_FUNC) {
-		/*
-		   current and primary linksets were addressed during rerouting below 
-		 */
+		/* 
+		   current and primary linksets were addressed during rerouting below */
 		struct ls *lc = rs->rl.curr ? rs->rl.curr->ls.ls : NULL;	/* current link set 
 										 */
 		struct ls *lp = rs->rl.list ? rs->rl.list->ls.ls : NULL;	/* primary link set 
@@ -6272,15 +6197,13 @@ mtp_xfer_route(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	struct rs *adj = lk->sp.adj;	/* the route set to the adjacent of the arriving link */
 	struct na *na = loc->na.na;	/* the local network appearance, protocol and options */
 	int err;
-	/*
+	/* 
 	   9.6.6 All messages to another destination received at a signalling point whose MTP is
-	   restarting are discarded. 
-	 */
+	   restarting are discarded. */
 	if (loc->state >= SP_RESTART)
 		goto discard;
-	/*
-	   this linear search could be changed to a hash later 
-	 */
+	/* 
+	   this linear search could be changed to a hash later */
 	for (rs = loc->rs.list; rs; rs = rs->sp.next)
 		if (rs->rs_type == RT_TYPE_MEMBER && rs->dest == m->dpc)
 			goto rs_found;
@@ -6288,68 +6211,60 @@ mtp_xfer_route(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		if (rs->rs_type == RT_TYPE_CLUSTER
 		    && rs->dest == (m->dpc & loc->na.na->mask.cluster))
 			goto rs_found;
-	/*
+	/* 
 	   Somebody could be probing our route sets.  There is an additional reason for not sending 
 	   responsive TFP here and it is described in Q.704: if we send TFP, we will get a lot of
 	   uninvited RST messages every T10 inquiring as to the state of the route, when a
 	   configuration error clearly exists.  We should screen this message and inform management 
-	   instead. 
-	 */
+	   instead. */
 	goto screened;
       rs_found:
 	todo(("This is where we could do enhanced gateway screening\n"));
 	switch (rs->state) {
 	case RS_RESTRICTED:
-		/*
-		   Note: rr.list will be null if we do not send TFR 
-		 */
+		/* 
+		   Note: rr.list will be null if we do not send TFR */
 		if (rs->rr.list) {
-			/*
+			/* 
 			   if the message came in on a link set to which we have not yet sent
-			   responsive TFR, then we should send responsive TFR 
-			 */
+			   responsive TFR, then we should send responsive TFR */
 			struct rr *rr;
 			for (rr = rs->rr.list; rr; rr = rr->rs.next) {
 				if (rr->lk == lk) {
-					/*
-					   send responsive TFR on this link 
-					 */
+					/* 
+					   send responsive TFR on this link */
 					fixme(("Send responsive TFR on this link\n"));
 					mtp_free_rr(rr);
 					break;
 				}
 			}
-			/*
+			/* 
 			   Note: if we are using TFR responsive method and this is the very first
-			   TFR sent, we need to start timer T18a. 
-			 */
+			   TFR sent, we need to start timer T18a. */
 			if ((rs->flags & RSF_TFR_PENDING)) {
 				rs->flags &= ~RSF_TFR_PENDING;
 				rs_timer_start(rs, t18a);
 			}
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case RS_CONGESTED:
 	case RS_DANGER:
 	case RS_ALLOWED:
 		break;
 	case RS_RESTART:
-		/*
+		/* 
 		   9.6.7 In adjacent signalling points during the restart procedure, message not
 		   part of the restart procedure but which are destined to or through the
-		   signalling point whose MTP is restarting, are discarded. 
-		 */
+		   signalling point whose MTP is restarting, are discarded. */
 		goto discard;
 	case RS_PROHIBITED:
 	case RS_BLOCKED:
 	case RS_INHIBITED:
 	case RS_INACTIVE:
-		/*
+		/* 
 		   if the destination is currently inaccessible and we have not sent a TFP within
-		   the last t8, send a responsive TFP 
-		 */
+		   the last t8, send a responsive TFP */
 		if (!rs->timers.t8) {
 			if (!(rs->flags & RSF_CLUSTER))
 				mtp_send_tfp(q, loc, m->ni, adj->dest, loc->pc, 0, rs->dest);
@@ -6363,52 +6278,45 @@ mtp_xfer_route(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		goto efault;
 	if (!(ls = rl->ls.ls))
 		goto efault;
-	/*
-	   select active route based on sls 
-	 */
+	/* 
+	   select active route based on sls */
 	if (!(rt = rl->smap[sls_index(m->sls, ls->rl.sls_mask, ls->rl.sls_bits)].rt))
 		goto efault;
 	if (rt->type == MTP_OBJ_TYPE_CR) {
-		/*
-		   we are performing controlled rerouting, buffer message 
-		 */
+		/* 
+		   we are performing controlled rerouting, buffer message */
 		bufq_queue(&((struct cr *) rt)->buf, mp);
 		return (QR_ABSORBED);
 	}
-	/*
+	/* 
 	   Selection signalling link in link (set): for ITU-T we need to use the bits that were not 
 	   used in route selection; for ANSI we use the least significant 4 bits (but could be 7
 	   for 8-bit SLSs) after route selection and sls rotation.  Again, the following algorithm
-	   does the job for both ITU-T and ANSI and will accomodate quad linksets to quad STPs. 
-	 */
-	/*
-	   select active signalling link based on sls 
-	 */
+	   does the job for both ITU-T and ANSI and will accomodate quad linksets to quad STPs. */
+	/* 
+	   select active signalling link based on sls */
 	if (!(sl = rt->lk.lk->smap[sls_index(m->sls, ls->lk.sls_mask, ls->lk.sls_bits)].sl))
 		goto efault;
-	/*
+	/* 
 	   Check for changeback on the signalling link index: normally the pointer is to a
 	   signalling link object not a changeback buffer object. This approach is faster than the
-	   previous approach. 
-	 */
+	   previous approach. */
 	if (sl->type == MTP_OBJ_TYPE_CB) {
-		/*
-		   we are performing changeback or changeover, buffer message 
-		 */
+		/* 
+		   we are performing changeback or changeover, buffer message */
 		bufq_queue(&((struct cb *) sl)->buf, mp);
 		return (QR_ABSORBED);
 	}
 	if (!(na->option.popt & SS7_POPT_MPLEV))
 		m->mp = 0;
-	/*
+	/* 
 	   ANSI T1.111.4 (2000) 3.8.2.2.  ...  When the transmit buffer is full, all messages
 	   destined for the link should be discarded.  Transfer controlled messages indicating
 	   level 3 congestion should be sent to the originators of messages destined for the
 	   congested link when the messages are received, if the received messages are not priority 
 	   3.  When priority 3 messages destined for a congested link are received and the transmit 
 	   buffer is full, transfer-controlled messages are not sent to the originators of the
-	   received priority 3 messages. 
-	 */
+	   received priority 3 messages. */
 	if (sl->cong_status > m->mp && m->mp != 3)
 		if ((err =
 		     mtp_send_tfc(q, loc, lk->ni, m->opc, loc->pc, m->sls, m->dpc,
@@ -6419,25 +6327,22 @@ mtp_xfer_route(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	if (!canput(sl->oq))
 		goto ebusy;
 	if (rl->rt.numb > 1) {
-		/*
+		/* 
 		   Only rotate when part of the sls was actually used for route selection (i.e. not 
-		   on C-Links or F-Links. 
-		 */
+		   on C-Links or F-Links. */
 		switch (na->option.pvar) {
 		case SS7_PVAR_ANSI:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_CHIN:	/* ??? */
-			/*
+			/* 
 			   Actually, for 5-bit and 8-bit compatability, we rotate based on 5 sls
-			   bits regardless of the number of bits in the SLS 
-			 */
+			   bits regardless of the number of bits in the SLS */
 			if (m->sls & 0x01)
 				m->sls = (m->sls & 0xe0) | ((m->sls & 0x1f) >> 1) | 0x10;
 			else
 				m->sls = (m->sls & 0xe0) | ((m->sls & 0x1f) >> 1) | 0x00;
-			/*
-			   rewrite sls in routing label 
-			 */
+			/* 
+			   rewrite sls in routing label */
 			mp->b_rptr[7] = m->sls;
 			break;
 		}
@@ -6541,9 +6446,8 @@ cr_cancel_buffer(struct cr *cr)
 		mtp_free_cr(cr);
 		return;
 	}
-	/*
-	   can't cancel, reroute forward 
-	 */
+	/* 
+	   can't cancel, reroute forward */
 	pswerr(("Forward routing non-cancellable controller rerouting buffer.\n"));
 	cr_reroute_buffer(cr);
 	return;
@@ -6610,9 +6514,8 @@ cb_cancel_buffer(struct cb *cb)
 		mtp_free_cb(cb);
 		return;
 	}
-	/*
-	   can't cancel, change forward 
-	 */
+	/* 
+	   can't cancel, change forward */
 	pswerr(("Forward change non-cancellable changeover/changeback buffer.\n"));
 	cb_reroute_buffer(cb);
 	return;
@@ -6643,20 +6546,17 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 	else {
 		int index;
 		while ((cr = rl_from->cr.list)) {
-			/*
+			/* 
 			   if there are existing controlled rerouting buffers in the SLS map, move
-			   them to the new route list, leaving messages and timers running 
-			 */
-			/*
-			   remove from old list 
-			 */
+			   them to the new route list, leaving messages and timers running */
+			/* 
+			   remove from old list */
 			rl_from->smap[cr->index].rt = cr->rt.onto;
 			if ((*cr->rl.prev = cr->rl.next))
 				cr->rl.next->rl.prev = cr->rl.prev;
 			rl_put(xchg(&cr->rl.rl, NULL));
-			/*
-			   insert into new list 
-			 */
+			/* 
+			   insert into new list */
 			if ((cr->rl.next = rl_onto->cr.list))
 				cr->rl.next->rl.prev = &cr->rl.next;
 			cr->prev = &rl_onto->cr.list;
@@ -6667,10 +6567,9 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 		}
 		for (index = 0; index < RT_SMAP_SIZE; index++) {
 			if (rl_onto->smap[index].rt->type == MTP_OBJ_TYPE_RT && !force) {
-				/*
+				/* 
 				   if there are not controlled rerouting buffers in the resulting
-				   SLS map, create them if we are doing controlled rerouting 
-				 */
+				   SLS map, create them if we are doing controlled rerouting */
 				struct rt *rt_from = rl_from->smap[index].rt;
 				struct rt *rt_onto = rl_onto->smap[index].rt;
 				if ((cr = mtp_alloc_cr(0, rl_onto, rt_from, rt_onto, index))) {
@@ -6681,44 +6580,37 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 			}
 		}
 	}
-	/*
-	   special transfer-allowed, -restricted, and -prohibited procedures only apply to STPs. 
-	 */
+	/* 
+	   special transfer-allowed, -restricted, and -prohibited procedures only apply to STPs. */
 	if (!sp->flags & SPF_XFER_FUNC) {
 		if (rl_from && rl_from != rl_prim) {
-			/*
-			   rerouting from a non-primary route list 
-			 */
+			/* 
+			   rerouting from a non-primary route list */
 			switch (rs->state) {
 			case RS_ALLOWED:
 			case RS_DANGER:
 			case RS_CONGESTED:
-				/*
-				   perform STP transfer-allowed procedure 
-				 */
+				/* 
+				   perform STP transfer-allowed procedure */
 				mtp_tfa_reroute(rl_from);
 				break;
 			case RS_RESTRICTED:
-				/*
-				   perform STP transfer-restricted procedure 
-				 */
+				/* 
+				   perform STP transfer-restricted procedure */
 				mtp_tfr_reroute(rl_from);
 				break;
 			}
 		}
 		if (rl_onto && rl_onto != rl_prim) {
-			/*
-			   rerouting onto a non-primary route list 
-			 */
-			/*
-			   perform STP transfer-prohibited procedure 
-			 */
+			/* 
+			   rerouting onto a non-primary route list */
+			/* 
+			   perform STP transfer-prohibited procedure */
 			mtp_tfp_reroute(rl_onto);
 		}
 	}
-	/*
-	   make new route list current 
-	 */
+	/* 
+	   make new route list current */
 	rs->rl.curr = rl_onto;
 }
 
@@ -6738,9 +6630,8 @@ rt_reroute(struct rl *rl, struct rt *rt_onto, ulong index, int force)
 	if (!(rt = rl->smap[index].rt) || rt->type == MTP_OBJ_TYPE_RT) {
 		if (rt != rt_onto) {
 			if (rt) {
-				/*
-				   unload existing route 
-				 */
+				/* 
+				   unload existing route */
 				rt->load--;
 				rt_put(xchg(&rl->smap[index].rt, NULL));
 			}
@@ -6749,9 +6640,8 @@ rt_reroute(struct rl *rl, struct rt *rt_onto, ulong index, int force)
 				cr_timer_start(cr, t6);
 				rl->smap[index].cr = cr_get(cr);
 			} else {
-				/*
-				   force reroute anyway 
-				 */
+				/* 
+				   force reroute anyway */
 				rl->smap[index].rt = rt_get(rt_onto);
 			}
 			rt_onto->load++;
@@ -6759,13 +6649,11 @@ rt_reroute(struct rl *rl, struct rt *rt_onto, ulong index, int force)
 	} else if ((cr = rl->smap[index].cr)->type == MTP_OBJ_TYPE_CR) {
 		rt = cr->rt.onto;
 		if (rt != rt_onto) {
-			/*
-			   move reroute buffer to new target and reload regardless of force 
-			 */
+			/* 
+			   move reroute buffer to new target and reload regardless of force */
 			if (rt) {
-				/*
-				   unload existing route 
-				 */
+				/* 
+				   unload existing route */
 				rt->load--;
 				rt_put(xchg(&cr->rt.onto, NULL));
 			}
@@ -6809,9 +6697,8 @@ rt_reroute_add(struct rl *rl, struct rt *rt_onto, int maxload)
 		if (rt->type == MTP_OBJ_TYPE_CR)
 			rt = ((struct cr *) rt)->rt.onto;
 		if ((slot == rt_onto->slot) || (slot != rt->slot && rt->load > maxload))
-			/*
-			   controlled rerouting for addition 
-			 */
+			/* 
+			   controlled rerouting for addition */
 			rt_reroute(rl, rt_onto, i, 0);
 	}
 	assure(rt_onto->load >= maxload - 1);
@@ -6844,9 +6731,8 @@ STATIC void
 rt_reroute_sub(struct rl *rl, struct rt *rt_from, int maxload)
 {
 	int i;
-	/*
-	   first cancel any route controlled rerouting to the failed route 
-	 */
+	/* 
+	   first cancel any route controlled rerouting to the failed route */
 	rt_reroute_can(rl, rt_from);
 	for (i = 0; i < RT_SMAP_SIZE && rt_from->load; i++) {
 		struct rt *rt = rl->smap[i].rt;
@@ -6856,9 +6742,8 @@ rt_reroute_sub(struct rl *rl, struct rt *rt_from, int maxload)
 			continue;
 		for (rt = rl->rt.list; rt; rt = rt->rl.next)
 			if (rt->load && rt->load < maxload)
-				/*
-				   force rerouting for subtraction 
-				 */
+				/* 
+				   force rerouting for subtraction */
 				rt_reroute(rl, rt, i, 1);
 	}
 	assure(rt_from->load == 0);
@@ -6874,9 +6759,8 @@ STATIC void
 rt_reroute_res(struct rl *rl, struct rt *rt_from, int maxload)
 {
 	int i;
-	/*
-	   first cancel any route controlled rerouting to the failed route 
-	 */
+	/* 
+	   first cancel any route controlled rerouting to the failed route */
 	rt_reroute_can(rl, rt_from);
 	for (i = 0; i < RT_SMAP_SIZE && rt_from->load; i++) {
 		struct rt *rt = rl->smap[i].rt;
@@ -6886,9 +6770,8 @@ rt_reroute_res(struct rl *rl, struct rt *rt_from, int maxload)
 			continue;
 		for (rt = rl->rt.list; rt; rt = rt->rl.next)
 			if (rt->state == RT_RESTRICTED && rt->load < maxload)
-				/*
-				   force rerouting under failure 
-				 */
+				/* 
+				   force rerouting under failure */
 				rt_reroute(rl, rt, i, 1);
 	}
 	assure(rt_from->load == 0);
@@ -6915,9 +6798,8 @@ sl_changeback(struct lk *lk, struct sl *sl_onto, ulong index)
 	}
 	if ((sl = *slp)) {
 		if (sl == sl_onto) {
-			/*
-			   we would be taking over our own change: just cancel the change 
-			 */
+			/* 
+			   we would be taking over our own change: just cancel the change */
 			cb_cancel_buffer(cb);
 			return;
 		}
@@ -6927,9 +6809,8 @@ sl_changeback(struct lk *lk, struct sl *sl_onto, ulong index)
 	}
 	*slp = sl_get(sl_onto);
 	sl_onto->load++;
-	/*
-	   if carrying traffic for the linkset 
-	 */
+	/* 
+	   if carrying traffic for the linkset */
 	if (lk->load && sl) {
 		struct rt *rt = NULL;
 		struct rl *rl;
@@ -6949,16 +6830,14 @@ sl_changeback(struct lk *lk, struct sl *sl_onto, ulong index)
 			return;
 		}
 		if (rt->state < RT_RESTART) {
-			/*
-			   sequence changeback 
-			 */
+			/* 
+			   sequence changeback */
 			mtp_send_cbd(NULL, loc, lk->ni, adj->dest, loc->pc, sl_onto->slc,
 				     sl_onto->slc, cb->cbc, sl);
 			cb_timer_start(cb, t4);
 		} else {
-			/*
-			   time controlled changeback 
-			 */
+			/* 
+			   time controlled changeback */
 			cb_timer_start(cb, t3);
 		}
 	}
@@ -6998,18 +6877,15 @@ sl_changeover(struct lk *lk, struct sl *sl_onto, ulong index)
 		else if (!(cb = mtp_alloc_cb(0, lk, sl, sl_onto, index)))
 			return;
 		if (adj->state < RS_RESTART) {
-			/*
-			   sequence changeover 
-			 */
-			/*
+			/* 
+			   sequence changeover */
+			/* 
 			   the changeover (COO or ECO) should be sent after BSNT retrieval succeeds 
-			   or fails 
-			 */
+			   or fails */
 			cb_timer_start(cb, t2);
 		} else {
-			/*
-			   time controlled changeover 
-			 */
+			/* 
+			   time controlled changeover */
 			cb_timer_start(cb, t1);
 		}
 	}
@@ -7029,9 +6905,8 @@ sl_changeback_add(struct lk *lk, struct sl *sl_onto, int maxload)
 		if (sl->type == MTP_OBJ_TYPE_CB)
 			sl = ((struct cb *) sl)->sl.onto;
 		if ((slot == sl_onto->slot) || (slot != sl->slot && sl->load > maxload))
-			/*
-			   changeback for addition 
-			 */
+			/* 
+			   changeback for addition */
 			sl_changeback(lk, sl_onto, i);
 	}
 	assure(sl_onto->load >= maxload - 1);
@@ -7062,9 +6937,8 @@ STATIC void
 sl_changeover_sub(struct lk *lk, struct sl *sl_from, int maxload)
 {
 	int i;
-	/*
-	   first cancel any signalling link changing over or back to the failed signalling link 
-	 */
+	/* 
+	   first cancel any signalling link changing over or back to the failed signalling link */
 	sl_changeover_can(lk, sl_from);
 	for (i = 0; i < SL_SMAP_SIZE && sl_from->load; i++) {
 		struct sl *sl = lk->smap[i].sl;
@@ -7074,9 +6948,8 @@ sl_changeover_sub(struct lk *lk, struct sl *sl_from, int maxload)
 			continue;
 		for (sl = lk->sl.list; sl; sl = sl->lk.next)
 			if (sl->load && sl->load < maxload)
-				/*
-				   changeover for subtraction 
-				 */
+				/* 
+				   changeover for subtraction */
 				sl_changeover(lk, sl, i);
 	}
 	assure(sl_from->load == 0);
@@ -7090,9 +6963,8 @@ STATIC void
 sl_changeover_res(struct lk *lk, struct sl *sl_from, int maxload)
 {
 	int i;
-	/*
-	   first cancel any signalling link changing over or back to the failed signalling link 
-	 */
+	/* 
+	   first cancel any signalling link changing over or back to the failed signalling link */
 	sl_changeover_can(lk, sl_from);
 	for (i = 0; i < RT_SMAP_SIZE && sl_from->load; i++) {
 		struct sl *sl = lk->smap[i].sl;
@@ -7102,9 +6974,8 @@ sl_changeover_res(struct lk *lk, struct sl *sl_from, int maxload)
 			continue;
 		for (sl = lk->sl.list; sl; sl = sl->lk.next)
 			if (sl->state == SL_INHIBITED && sl->load < maxload)
-				/*
-				   changeover for subtraction 
-				 */
+				/* 
+				   changeover for subtraction */
 				sl_changeover(lk, sl, i);
 	}
 	assure(sl_from->load = 0);
@@ -7204,32 +7075,28 @@ sp_set_state(queue_t *q, struct sp *sp, const ulong state)
 	if ((sp_newstate = mtp_flg_state(sp_newflags)) == sp_oldstate)
 		goto no_state_change;
 	if (sp_oldstate == SP_INACTIVE && sp_newstate < SP_RESTART) {
-		/*
-		   This is the first link in service (usable) at Level 3. 
-		 */
+		/* 
+		   This is the first link in service (usable) at Level 3. */
 		if (sp->timers.t1r) {
-			/*
+			/* 
 			   If we have a T1 timer running, this is a simple recovery.  We cancel the 
-			   t1 timer and move to the active state. 
-			 */
+			   t1 timer and move to the active state. */
 			sp_timer_stop(sp, t1r);
 		} else {
-			/*
+			/* 
 			   If T1 timer is not running (has expired) then an MTP restart procedure
-			   is required if the SP is an STP or is attached to an STP 
-			 */
+			   is required if the SP is an STP or is attached to an STP */
 			fixme(("Write this procedure\n"));
 			sp_newflags |= SPF_RESTART;
 			sp_newstate = SP_RESTART;
 		}
 	}
 	if (sp_newstate == SP_INACTIVE && sp_oldstate < SP_RESTART) {
-		/*
+		/* 
 		   This is the last link in service (usable) at level 3. We need to start T1 for
 		   the SP to determine whether MTP Restart is necessary on recovery.  We have
 		   already set emergency on all signalling links and have initiated restoration of
-		   any signalling links that have not been activated. 
-		 */
+		   any signalling links that have not been activated. */
 		fixme(("Don't need t1r because last t1 has already expired\n"));
 		if (!sp->timers.t1r)
 			sp_timer_start(sp, t1r);
@@ -7259,9 +7126,8 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 	if (rs_oldstate > RS_RESTART && rs_newstate <= RS_RESTART) {
 		if ((rs->flags & RSF_ADJACENT)
 		    && ((sp->flags & SPF_XFER_FUNC) || (rs->flags & RSF_XFER_FUNC))) {
-			/*
-			   perform adjacent restart procedure 
-			 */
+			/* 
+			   perform adjacent restart procedure */
 			fixme(("Write this procedure\n"));
 		}
 	}
@@ -7270,40 +7136,35 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 		rs_timer_stop(rs, t11);
 		rs_timer_stop(rs, t18a);
 		rs->flags &= ~RSF_TFR_PENDING;
-		/*
-		   purge responsive TFR list 
-		 */
+		/* 
+		   purge responsive TFR list */
 		while ((rr = rr_next)) {
 			rr_next = rr->rs.next;
 			mtp_free_rr(rr);
 		}
 	}
 	if (rs_newstate < RS_RESTRICTED && rs_oldstate >= RS_RESTRICTED) {
-		/*
-		   transfer allowed broadcast 
-		 */
+		/* 
+		   transfer allowed broadcast */
 		if ((err = mtp_tfa_broadcast(q, rs)) < 0)
 			return (err);
 	}
 	if (rs_newstate == RS_RESTRICTED && (sp->na.na->option.popt & SS7_POPT_TFR)) {
 		if (rs_oldstate < RS_RESTRICTED) {
-			/*
-			   prepare for transfer restricted broadcast 
-			 */
+			/* 
+			   prepare for transfer restricted broadcast */
 			rs_timer_start(rs, t11);
 		}
 		if (rs_oldstate > RS_RESTRICTED) {
-			/*
-			   transfer restricted broadcast 
-			 */
+			/* 
+			   transfer restricted broadcast */
 			if ((err = mtp_tfr_broadcast(q, rs)) < 0)
 				return (err);
 		}
 	}
 	if (rs_newstate > RS_RESTART && rs_oldstate <= RS_RESTART) {
-		/*
-		   transfer prohibited broadcast 
-		 */
+		/* 
+		   transfer prohibited broadcast */
 		if ((err = mtp_tfp_broadcast(q, rs)))
 			return (err);
 	}
@@ -7328,13 +7189,11 @@ rl_set_state(queue_t *q, struct rl *rl, const ulong state)
 	if ((rl_newstate = mtp_flg_state(rl_newflags)) == rl_oldstate)
 		goto no_state_change;
 	if (rl_newstate > RL_RESTRICTED && rl_oldstate < RL_RESTART) {
-		/*
-		   route list moved from accessible to inaccessible 
-		 */
+		/* 
+		   route list moved from accessible to inaccessible */
 		if (rl == rs->rl.curr) {
-			/*
-			   inaccessible route-list was current route-list 
-			 */
+			/* 
+			   inaccessible route-list was current route-list */
 			struct rl *ra;
 			for (ra = rs->rl.list; ra && (ra == rl || ra->state > RL_RESTRICTED);
 			     ra = ra->rs.next) ;
@@ -7343,13 +7202,11 @@ rl_set_state(queue_t *q, struct rl *rl, const ulong state)
 		}
 	}
 	if (rl_oldstate > RL_RESTRICTED && rl_newstate < RL_RESTART) {
-		/*
-		   route list moved from inaccessible to accessible 
-		 */
+		/* 
+		   route list moved from inaccessible to accessible */
 		if (!rs->rl.curr || rs->rl.curr->cost > rl->cost) {
-			/*
-			   accessible route-list is highest priority available route-list 
-			 */
+			/* 
+			   accessible route-list is highest priority available route-list */
 			rl_reroute(rs, rl, 0);
 			goto reroute;
 		}
@@ -7367,18 +7224,16 @@ rl_set_state(queue_t *q, struct rl *rl, const ulong state)
 		(&rs->rl.allowed)[rl_oldstate]--;
 		(&rs->rl.allowed)[rl_newstate]++;
 	}
-	/*
-	   push counts to ls 
-	 */
+	/* 
+	   push counts to ls */
 	(&rl->ls.ls->rl.allowed)[rl_oldstate]--;
 	(&rl->ls.ls->rl.allowed)[rl_newstate]++;
-	/*
+	/* 
 	   What we are more interested in than pushing state here is determining the route loading
 	   of the link, and whether the link is in danger of congestion due to route loading.  That 
 	   is a difficult thing to calculate, however.  The link can only be in danger of
 	   congestion if the routes assigned to it are actually active.  This might be better
-	   considered at the route-list/link-set level rather than at the route/link level 
-	 */
+	   considered at the route-list/link-set level rather than at the route/link level */
 	rl->state = rl_newstate;
       no_state_change:
 	rl->flags = rl_newflags;
@@ -7400,68 +7255,55 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 		goto no_flags_change;
 	if ((rt_newstate = mtp_flg_state(rt_newflags)) == rt_oldstate)
 		goto no_state_change;
-	/*
-	   ---------------------------------------------- 
-	 */
+	/* 
+	   ---------------------------------------------- */
 	if (rt_newflags & (RTF_PROHIBITED | RTF_RESTRICTED)) {
-		/*
-		   start signalling route set test procedure 
-		 */
+		/* 
+		   start signalling route set test procedure */
 		rt_timer_start(rt, t10);
 	} else {
-		/*
-		   stop signalling route set test procedure 
-		 */
+		/* 
+		   stop signalling route set test procedure */
 		rt_timer_stop(rt, t10);
 	}
 	if (rt_oldstate < RT_RESTART && rt_newstate > RT_RESTRICTED) {
 		int accessible = rl->rt.allowed + rl->rt.danger + rl->rt.congested;
 		int restricted = rl->rt.restricted;
 		if (rt_newstate != RT_RESTRICTED) {
-			/*
-			   route has moved from accessible to inaccessible 
-			 */
+			/* 
+			   route has moved from accessible to inaccessible */
 			if (accessible > 1) {
-				/*
-				   offload traffic to other accessible routes 
-				 */
+				/* 
+				   offload traffic to other accessible routes */
 				int maxload = RT_SMAP_SIZE / (accessible - 1) + 1;
 				rt_reroute_sub(rl, rt, maxload);
 			} else if (restricted) {
-				/*
-				   offload traffic to restricted routes 
-				 */
+				/* 
+				   offload traffic to restricted routes */
 				int maxload = RT_SMAP_SIZE / restricted + 1;
 				rt_reroute_res(rl, rt, maxload);
 			} else {
-				/*
-				   we are the last accessible route in route list 
-				 */
-				/*
-				   empty route list 
-				 */
+				/* 
+				   we are the last accessible route in route list */
+				/* 
+				   empty route list */
 				rt_reroute_all(rl, NULL, 1);
 			}
 		} else {
-			/*
-			   route has moved from restricted to inaccessible 
-			 */
+			/* 
+			   route has moved from restricted to inaccessible */
 			if (!accessible && restricted > 1) {
-				/*
-				   route was carrying traffic 
-				 */
-				/*
-				   offload traffic to other restricted routes 
-				 */
+				/* 
+				   route was carrying traffic */
+				/* 
+				   offload traffic to other restricted routes */
 				int maxload = RT_SMAP_SIZE / (restricted - 1) + 1;
 				rt_reroute_sub(rl, rt, maxload);
 			} else if (!accessible) {
-				/*
-				   we are the last accessible route in route list 
-				 */
-				/*
-				   empty route list 
-				 */
+				/* 
+				   we are the last accessible route in route list */
+				/* 
+				   empty route list */
 				rt_reroute_all(rl, NULL, 1);
 			}
 		}
@@ -7470,57 +7312,45 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 		int accessible = rl->rt.allowed + rl->rt.danger + rl->rt.congested;
 		int restricted = rl->rt.restricted;
 		if (rt_oldstate != RT_RESTRICTED) {
-			/*
-			   route has moved from inaccessible to accessible 
-			 */
+			/* 
+			   route has moved from inaccessible to accessible */
 			if (accessible == 0) {
-				/*
-				   only allowed route in route list 
-				 */
-				/*
-				   take over all traffic 
-				 */
+				/* 
+				   only allowed route in route list */
+				/* 
+				   take over all traffic */
 				rt_reroute_all(rl, rt, 0);
 			} else {
-				/*
-				   other routes are allowed 
-				 */
-				/*
-				   rebalance the route load 
-				 */
+				/* 
+				   other routes are allowed */
+				/* 
+				   rebalance the route load */
 				int maxload = RT_SMAP_SIZE / (accessible + 1) + 1;
 				rt_reroute_add(rl, rt, maxload);
 			}
 		} else {
-			/*
-			   route has moved from inaccessible to restricted 
-			 */
+			/* 
+			   route has moved from inaccessible to restricted */
 			if (accessible + restricted == 0) {
-				/*
-				   only accessible route in route list 
-				 */
-				/*
-				   take over all traffic 
-				 */
+				/* 
+				   only accessible route in route list */
+				/* 
+				   take over all traffic */
 				rt_reroute_all(rl, rt, 0);
 			} else if (!accessible) {
-				/*
-				   other routes are restricted but none are allowed 
-				 */
-				/*
-				   rebalance the route load 
-				 */
+				/* 
+				   other routes are restricted but none are allowed */
+				/* 
+				   rebalance the route load */
 				int maxload = RT_SMAP_SIZE / (restricted + 1) + 1;
 				rt_reroute_add(rl, rt, maxload);
 			}
 		}
 	}
-	/*
-	   ---------------------------------------------- 
-	 */
-	/*
-	   push state change to rl 
-	 */
+	/* 
+	   ---------------------------------------------- */
+	/* 
+	   push state change to rl */
 	(&rl->rt.allowed)[rt_oldstate]--;
 	(&rl->rt.allowed)[rt_newstate]++;
 	if ((rl_newstate = mtp_cnt_state((struct counters *) (&rl->rt), rl->state)) != rl->state)
@@ -7529,23 +7359,20 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 			(&rl->rt.allowed)[rt_newstate]--;
 			return (err);
 		}
-	/*
-	   push counts to lk 
-	 */
+	/* 
+	   push counts to lk */
 	(&rt->lk.lk->rt.allowed)[rt_oldstate]--;
 	(&rt->lk.lk->rt.allowed)[rt_newstate]++;
-	/*
+	/* 
 	   What we are more interested in than pushing state here is determining the route loading
 	   of the link, and whether the link is in danger of congestion due to route loading.  That 
 	   is a difficult thing to calculate, however.  The link can only be in danger of
 	   congestion if the routes assigned to it are actually active.  This might be better
-	   considered at the route-list/link-set level rather than at the route/link level 
-	 */
+	   considered at the route-list/link-set level rather than at the route/link level */
 #if 0
 	if ((lk_newstate = mtp_cnt_state((struct counters *) (&lk->rt), lk->state)) != lk->state) {
-		/*
-		   don't know quite what to do with this... 
-		 */
+		/* 
+		   don't know quite what to do with this... */
 	}
 #endif
 	rt->state = rt_newstate;
@@ -7571,15 +7398,12 @@ ls_set_state(queue_t *q, struct ls *ls, ulong state)
 		goto no_flags_change;
 	if ((ls_newstate = mtp_flg_state(ls_newflags)) == ls_oldstate)
 		goto no_state_change;
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   push state change to rl 
-	 */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   push state change to rl */
 	if (ls_newstate == SL_INACTIVE)
 		rl_newstate = MTP_BLOCKED;
 	else
@@ -7588,12 +7412,10 @@ ls_set_state(queue_t *q, struct ls *ls, ulong state)
 		if (rl_newstate != rl->state)
 			if ((err = rl_set_state(q, rl, rl_newstate)) < 0)
 				return (err);
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   push state change to sp 
-	 */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   push state change to sp */
 	(&sp->ls.allowed)[ls_oldstate]--;
 	(&sp->ls.allowed)[ls_newstate]++;
 	if ((sp_newstate = mtp_cnt_state((struct counters *) (&sp->ls), sp->state)) != sp->state)
@@ -7625,15 +7447,12 @@ lk_set_state(queue_t *q, struct lk *lk, ulong state)
 		goto no_flags_change;
 	if ((lk_newstate = mtp_flg_state(lk_newflags)) == lk_oldstate)
 		goto no_state_change;
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   push state change to rt 
-	 */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   push state change to rt */
 	if (lk_newstate == SL_INACTIVE)
 		rt_newstate = MTP_BLOCKED;
 	else
@@ -7642,12 +7461,10 @@ lk_set_state(queue_t *q, struct lk *lk, ulong state)
 		if (rt_newstate != rt->state)
 			if ((err = rt_set_state(q, rt, rt_newstate)) < 0)
 				return (err);
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   push state change to ls 
-	 */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   push state change to ls */
 	(&ls->lk.allowed)[lk_oldstate]--;
 	(&ls->lk.allowed)[lk_newstate]++;
 	if ((ls_newstate = mtp_cnt_state((struct counters *) (&ls->lk), ls->state)) != ls->state)
@@ -7677,75 +7494,61 @@ sl_set_state(queue_t *q, struct sl *sl, ulong state)
 		goto no_flags_change;
 	if ((sl_newstate = mtp_flg_state(sl_newflags)) == sl_oldstate)
 		goto no_state_change;
-	/*
-	   --------------------------------------------- 
-	 */
+	/* 
+	   --------------------------------------------- */
 	if (sl_newstate < SL_UNUSABLE && sl_oldstate > SL_CONGESTED) {
-		/*
-		   link has become usable from unusable 
-		 */
-		/*
+		/* 
+		   link has become usable from unusable */
+		/* 
 		   in all cases when we move to active, we could have our own changeover buffers
 		   hanging around or we could have links that at the time that they initiated
-		   changeover, they had no alternate (but they do now). 
-		 */
-		/*
-		   redistribute traffic to the new link if required 
-		 */
+		   changeover, they had no alternate (but they do now). */
+		/* 
+		   redistribute traffic to the new link if required */
 		int active =
 		    lk->sl.allowed + lk->sl.danger + lk->sl.congested + lk->sl.restricted + 1;
 		int maxload = SL_SMAP_SIZE / active + 1;
 		sl_changeback_add(lk, sl, maxload);
 	}
 	if (sl_newstate == SL_INHIBITED && sl_oldstate < SL_UNUSABLE) {
-		/*
-		   inihibited from usable 
-		 */
-		/*
+		/* 
+		   inihibited from usable */
+		/* 
 		   we already have a changeover buffer allocated at the beginning of the inhibition 
 		   process, this is just the final state change.  We should check if there are any
-		   changeovers or changebacks to us and redirect them. 
-		 */
+		   changeovers or changebacks to us and redirect them. */
 		fixme(("Write this function\n"));
 	}
 	if (sl_oldstate < SL_UNUSABLE && sl_newstate > SL_CONGESTED) {
-		/*
-		   unusable (blocked or inactive) from usable 
-		 */
+		/* 
+		   unusable (blocked or inactive) from usable */
 		int active = lk->sl.allowed + lk->sl.danger + lk->sl.congested;
 		int inhibited = lk->sl.restricted;
 		if (sl_oldstate != SL_INHIBITED) {
-			/*
-			   link has moved from active to unusable 
-			 */
+			/* 
+			   link has moved from active to unusable */
 			if (active > 1) {
-				/*
-				   offload traffic to other active links 
-				 */
+				/* 
+				   offload traffic to other active links */
 				int maxload = SL_SMAP_SIZE / (active - 1) + 1;
 				sl_changeover_sub(lk, sl, maxload);
 			} else if (inhibited) {
-				/*
-				   offload traffic to inhibited links 
-				 */
+				/* 
+				   offload traffic to inhibited links */
 				int maxload = SL_SMAP_SIZE / inhibited + 1;
 				sl_changeover_res(lk, sl, maxload);
 			}
 		} else {
-			/*
-			   link has moved from inhibited to unusable 
-			 */
-			/*
-			   link was not carrying traffic 
-			 */
+			/* 
+			   link has moved from inhibited to unusable */
+			/* 
+			   link was not carrying traffic */
 		}
 	}
-	/*
-	   --------------------------------------------- 
-	 */
-	/*
-	   push state change to lk 
-	 */
+	/* 
+	   --------------------------------------------- */
+	/* 
+	   push state change to lk */
 	(&lk->sl.allowed)[sl_oldstate]--;
 	(&lk->sl.allowed)[sl_newstate]++;
 	if ((lk_newstate = mtp_cnt_state((struct counters *) (&lk->sl), lk->state)) != lk->state)
@@ -7844,11 +7647,10 @@ mtp_lookup_rs(sl, m, type)
 	struct rs *rs;
 	struct lk *lk = sl->lk.lk;
 	struct sp *sp = lk->sp.loc;
-	/*
+	/* 
 	   Route set related message which arrive on link sets upon which we have no existing route 
 	   to the specified destination are suspect and should be ignored.  Several DoS attacks are 
-	   possible without this screening. 
-	 */
+	   possible without this screening. */
 	if (sp->flags & SPF_SECURITY) {
 		if (!mtp_lookup_rs_local(sl, m->dest, type))
 			goto error1;
@@ -7931,9 +7733,9 @@ mtp_lookup_rt_test(sl, m, type)
 	}
 	for (ls = sp->ls.list; ls; ls = ls->sp.next)
 		for (lk = ls->lk.list; lk; lk = lk->ls.next)
-			if ((rs = lk->sp.adj)->dest == m->opc &&
-			    ((!(rs->flags & RSF_CLUSTER) && type == RT_TYPE_MEMBER) ||
-			     ((rs->flags & RSF_CLUSTER) && type == RT_TYPE_CLUSTER)))
+			if ((rs = lk->sp.adj)->dest == m->opc
+			    && ((!(rs->flags & RSF_CLUSTER) && type == RT_TYPE_MEMBER)
+				|| ((rs->flags & RSF_CLUSTER) && type == RT_TYPE_CLUSTER)))
 				for (rt = lk->rt.list; rt; rt = rt->lk.next)
 					if ((rs = rt->rl.rl->rs.rs) && rs->dest == m->dest
 					    && rs->rs_type == type)
@@ -7990,8 +7792,8 @@ mtp_lookup_rt(sl, m, type)
 			goto error1;
 		if (type == RT_TYPE_CLUSTER && !(sp->flags & RSF_CLUSTER))
 			goto error2;
-		if ((type == RT_TYPE_MEMBER && m->dest == m->opc) ||
-		    (type == RT_TYPE_CLUSTER && m->dest == (m->opc & sp->na.na->mask.cluster)))
+		if ((type == RT_TYPE_MEMBER && m->dest == m->opc)
+		    || (type == RT_TYPE_CLUSTER && m->dest == (m->opc & sp->na.na->mask.cluster)))
 			goto error3;
 		if (!(rs = mtp_lookup_rs_local(sl, m->opc, RT_TYPE_MEMBER)))
 			goto error4;
@@ -8002,9 +7804,9 @@ mtp_lookup_rt(sl, m, type)
 	}
 	for (ls = sp->ls.list; ls; ls = ls->sp.next)
 		for (lk = ls->lk.list; lk; lk = lk->ls.next)
-			if ((rs = lk->sp.adj)->dest == m->opc &&
-			    ((!(rs->flags & RSF_CLUSTER) && type == RT_TYPE_MEMBER) ||
-			     ((rs->flags & RSF_CLUSTER) && type == RT_TYPE_CLUSTER)))
+			if ((rs = lk->sp.adj)->dest == m->opc
+			    && ((!(rs->flags & RSF_CLUSTER) && type == RT_TYPE_MEMBER)
+				|| ((rs->flags & RSF_CLUSTER) && type == RT_TYPE_CLUSTER)))
 				for (rt = lk->rt.list; rt; rt = rt->lk.next)
 					if ((rs = rt->rl.rl->rs.rs) && rs->dest == m->dest
 					    && rs->rs_type == type)
@@ -8053,14 +7855,13 @@ mtp_lookup_sl(sl, m)
 	struct ls *ls;
 	struct lk *lk;
 	struct sl *s2 = NULL;
-	/*
+	/* 
 	   Signalling link related messages which arrive on link sets upon which we have no
 	   existing route to the adjacent signalling point are suspect and should be ignored.
-	   Several DoS attacks are possible without this screening. 
-	 */
+	   Several DoS attacks are possible without this screening. */
 	if (sp->flags & SPF_SECURITY)
-		if (!mtp_lookup_rt_local(sl, m->opc, RT_TYPE_MEMBER) &&
-		    !mtp_lookup_rt_local(sl, m->opc & sp->na.na->mask.cluster, RT_TYPE_CLUSTER))
+		if (!mtp_lookup_rt_local(sl, m->opc, RT_TYPE_MEMBER)
+		    && !mtp_lookup_rt_local(sl, m->opc & sp->na.na->mask.cluster, RT_TYPE_CLUSTER))
 			goto screened;
 	for (ls = sp->ls.list; ls; ls = ls->sp.next)
 		for (lk = ls->lk.list; lk; lk = lk->ls.next)
@@ -8444,19 +8245,16 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 			goto error;
 		if ((err = sl_set_state(q, sl, SL_FAILED)) < 0)
 			goto error;
-		/*
-		   T19(ANSI) is a maintenance guard timer 
-		 */
+		/* 
+		   T19(ANSI) is a maintenance guard timer */
 		sl_timer_stop(sl, t19a);
-		/*
-		   wait for T17 before attempting restoration again 
-		 */
+		/* 
+		   wait for T17 before attempting restoration again */
 		sl_timer_start(sl, t17);
-		/*
+		/* 
 		   If we are waiting for in service then we do not change the routing state of the
 		   link.  Also, we do not need to perform retrieval because we have not sent
-		   anything on the link (other than SLTM). 
-		 */
+		   anything on the link (other than SLTM). */
 		return (QR_DONE);
 	case SLS_WCON_RET:
 	{
@@ -8465,16 +8263,13 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 		struct sp *sp = ls->sp.sp;
 		struct na *na = sp->na.na;
 		struct cb *cb;
-		/*
-		   We are already retrieving messages on the link 
-		 */
-		/*
-		   find all the changeover buffers 
-		 */
+		/* 
+		   We are already retrieving messages on the link */
+		/* 
+		   find all the changeover buffers */
 		for (cb = lk->cb.list; cb; cb = cb->lk.next) {
-			/*
-			   only consider changeover buffers that changeover from the failed link 
-			 */
+			/* 
+			   only consider changeover buffers that changeover from the failed link */
 			if (cb->sl.from == sl) {
 				mblk_t *bp, *bp_prev = bufq_tail(&sl->rbuf);
 				cb_timer_stop(cb, tall);
@@ -8486,43 +8281,37 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 						    (msg.sls, ls->lk.sls_mask,
 						     ls->lk.sls_bits) != cb->index)
 							continue;
-						/*
+						/* 
 						   unlink from retrieval buffer and add to head of
-						   changeover buffer 
-						 */
+						   changeover buffer */
 						fixme(("See if we have the correct sls\n"));
 						bp = bufq_unlink(&sl->rbuf, bp);
 						bufq_queue_head(&cb->buf, bp);
 						continue;
 					}
-					/*
-					   discard messages that can't be decoded 
-					 */
+					/* 
+					   discard messages that can't be decoded */
 					swerr();
 					freemsg(bufq_unlink(&sl->rbuf, bp));
 					continue;
 				}
-				/*
-				   release the changeback buffer 
-				 */
+				/* 
+				   release the changeback buffer */
 				cb_reroute_buffer(cb);
 			}
 		}
 	}
-		/*
-		   purge any remaining unclaimed messages 
-		 */
+		/* 
+		   purge any remaining unclaimed messages */
 		bufq_purge(&sl->rbuf);
 		if ((err = sl_set_state(q, sl, SL_UPDATED)) < 0)
 			goto error;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case SLS_PROC_OUTG:
 	case SLS_IN_SERVICE:
-		/*
-		   T31(ANSI) is a false congesiton detection timer 
-		 */
+		/* 
+		   T31(ANSI) is a false congesiton detection timer */
 		sl_timer_stop(sl, t31a);
 		if (sl->state < SL_UNUSABLE && (sl->flags & SLF_TRAFFIC)) {
 			if ((err = sl_stop_req(q, sl)))
@@ -8547,43 +8336,35 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 		if (sl->flags & SLF_BLOCKED) {
 			if ((err = sl_set_state(q, sl, SL_UNBLOCKED)) < 0)
 				goto error;
-			/*
-			   flush old signalling link buffers 
-			 */
+			/* 
+			   flush old signalling link buffers */
 			if ((err = sl_clear_buffers_req(NULL, sl)))
 				goto error;
 		}
-		/*
-		   purge any remaining unclaimed messages 
-		 */
+		/* 
+		   purge any remaining unclaimed messages */
 		bufq_purge(&sl->rbuf);
 		if ((err = sl_set_state(q, sl, SL_UPDATED)) < 0)
 			goto error;
 		if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_A) && sl->timers.t32a) {
-			/*
-			   ANSI link oscillation procedure A 
-			 */
-			/*
-			   link was in probation, now in suspension 
-			 */
+			/* 
+			   ANSI link oscillation procedure A */
+			/* 
+			   link was in probation, now in suspension */
 		} else if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_B) && sl->timers.t33a) {
-			/*
-			   ANSI link oscillation procedure B 
-			 */
-			/*
-			   link was in probation, now place it in suspension 
-			 */
+			/* 
+			   ANSI link oscillation procedure B */
+			/* 
+			   link was in probation, now place it in suspension */
 			sl_timer_stop(sl, t33a);
 			sl_timer_start(sl, t34a);
 		} else {
-			/*
-			   start restoration 
-			 */
+			/* 
+			   start restoration */
 			if ((err = sl_start_req(NULL, sl)))
 				goto error;
-			/*
-			   T19(ANSI) is a maintenance guard timer 
-			 */
+			/* 
+			   T19(ANSI) is a maintenance guard timer */
 			sl_timer_start(sl, t19a);
 		}
 		sl->flags &= ~(SLF_WACK_SLTM | SLF_WACK_SLTM2);
@@ -8613,14 +8394,12 @@ STATIC int
 cb_t1_timeout(struct cb *cb)
 {
 	struct sl *sl = cb->sl.from;
-	/*
-	   complete the changeover but discard buffer contents first 
-	 */
+	/* 
+	   complete the changeover but discard buffer contents first */
 	bufq_purge(&cb->buf);
 	cb_reroute_buffer(cb);
-	/*
-	   Also purge and reroute any other buffers pending on t1 for the same link 
-	 */
+	/* 
+	   Also purge and reroute any other buffers pending on t1 for the same link */
 	for (cb = sl->lk.lk->cb.list; cb; cb = cb->lk.next) {
 		if (cb->sl.from == sl && cb->timers.t1) {
 			cb_timer_stop(cb, t1);
@@ -8647,14 +8426,12 @@ STATIC int
 cb_t2_timeout(struct cb *cb)
 {
 	struct sl *sl = cb->sl.from;
-	/*
-	   complete the changeover but discard buffer contents first 
-	 */
+	/* 
+	   complete the changeover but discard buffer contents first */
 	bufq_purge(&cb->buf);
 	cb_reroute_buffer(cb);
-	/*
-	   Also purge and reroute any other buffers pending on t2 for the same link 
-	 */
+	/* 
+	   Also purge and reroute any other buffers pending on t2 for the same link */
 	for (cb = sl->lk.lk->cb.list; cb; cb = cb->lk.next) {
 		if (cb->sl.from == sl && cb->timers.t2) {
 			cb_timer_stop(cb, t2);
@@ -8686,9 +8463,8 @@ cb_t2_timeout(struct cb *cb)
 STATIC int
 cb_t3_timeout(struct cb *cb)
 {
-	/*
-	   restart traffic 
-	 */
+	/* 
+	   restart traffic */
 	return cb_reroute_buffer(cb);
 }
 
@@ -8723,9 +8499,8 @@ cb_t4_timeout(struct cb *cb)
 STATIC int
 cb_t5_timeout(struct cb *cb)
 {
-	/*
-	   restart traffic 
-	 */
+	/* 
+	   restart traffic */
 	return cb_reroute_buffer(cb);
 }
 
@@ -8741,9 +8516,8 @@ cb_t5_timeout(struct cb *cb)
 STATIC int
 cr_t6_timeout(struct cr *cr)
 {
-	/*
-	   restart traffic 
-	 */
+	/* 
+	   restart traffic */
 	return cr_reroute_buffer(cr);
 }
 
@@ -8870,60 +8644,52 @@ rs_t11_timeout(struct rs *rs)
 		case 0:
 			break;
 		case SS7_POPT_TFR:
-			/*
-			   old broadcast method - no responsive 
-			 */
+			/* 
+			   old broadcast method - no responsive */
 			if ((err = mtp_tfr_broadcast(NULL, rs)))
 				return (err);
 			break;
 		case SS7_POPT_TFRB:
 		case SS7_POPT_TFR | SS7_POPT_TFRB:
-			/*
+			/* 
 			   We don't acrtually regulate broadcast of TFR per ANSI T1.111.4-2000
 			   13.4.2 (1)(a).  If the operator wishes to regular the rate of TFRs
 			   initially sent, the Responsive method should be used (i.e. with
-			   SS7_POPT_TFRR 
-			 */
+			   SS7_POPT_TFRR */
 			if ((err = mtp_tfr_broadcast(NULL, rs)))
 				return (err);
 			if (sp->flags & SPF_XFER_FUNC)
-				/*
-				   prepare for final TFR response 
-				 */
+				/* 
+				   prepare for final TFR response */
 				rs_timer_start(rs, t18a);
 			break;
 		case SS7_POPT_TFRR:
 		case SS7_POPT_TFRR | SS7_POPT_TFRB:
 		case SS7_POPT_TFR | SS7_POPT_TFRR:
 		case SS7_POPT_TFR | SS7_POPT_TFRR | SS7_POPT_TFRB:
-			/*
+			/* 
 			   If both methods are specified, we will go with Responsive method because 
-			   it is a little more stable than non-regulated broadcasts 
-			 */
+			   it is a little more stable than non-regulated broadcasts */
 			if (sp->flags & SPF_XFER_FUNC) {
-				/*
-				   prepare for initial TFR response 
-				 */
+				/* 
+				   prepare for initial TFR response */
 				struct ls *ls;
 				struct lk *lk;
 				struct rr *rr;
-				/*
+				/* 
 				   What we have to do here is establish a structure linking every
 				   incoming linkset structure to which we offer a route to this
 				   routeset structure. Then if a message arrives for the routeset
 				   on a linkset matching one of these structures, we would send
-				   repsonsive TFR and then delete the structure. 
-				 */
-				/*
-				   establish new route restriction list 
-				 */
+				   repsonsive TFR and then delete the structure. */
+				/* 
+				   establish new route restriction list */
 				for (ls = sp->ls.list; ls; ls = ls->sp.next)
 					for (lk = ls->lk.list; lk; lk = lk->ls.next)
 						if (!(rr = mtp_alloc_rr(rs, lk)))
 							return (-ENOMEM);
-				/*
-				   we have to wait for the first TFR to start timer T18a 
-				 */
+				/* 
+				   we have to wait for the first TFR to start timer T18a */
 				rs->flags |= RSF_TFR_PENDING;
 				return (QR_DONE);
 			}
@@ -8944,9 +8710,8 @@ STATIC int
 rs_t18a_timeout(struct rs *rs)
 {
 	struct rr *rr, *rr_next = rs->rr.list;
-	/*
-	   purge any existing route restriction list 
-	 */
+	/* 
+	   purge any existing route restriction list */
 	while ((rr = rr_next)) {
 		rr_next = rr->rs.next;
 		mtp_free_rr(rr);
@@ -8958,9 +8723,8 @@ rs_t18a_timeout(struct rs *rs)
 	{
 		struct ls *ls;
 		struct lk *lk;
-		/*
-		   establish a new route restriction list 
-		 */
+		/* 
+		   establish a new route restriction list */
 		for (ls = rs->sp.sp->ls.list; ls; ls = ls->sp.next)
 			for (lk = ls->lk.list; lk; lk = lk->ls.next)
 				if (!(rr = mtp_alloc_rr(rs, lk)))
@@ -9109,12 +8873,10 @@ rs_t16_timeout(struct rs *rs)
 STATIC int
 sl_t17_timeout(struct sl *sl)
 {
-	/*
-	   simply attempt to restart the link 
-	 */
-	/*
-	   T19(ANSI) is a maintenance guard timer 
-	 */
+	/* 
+	   simply attempt to restart the link */
+	/* 
+	   T19(ANSI) is a maintenance guard timer */
 	sl_timer_start(sl, t19a);
 	return sl_start_req(NULL, sl);
 }
@@ -9202,9 +8964,8 @@ sl_t19a_timeout(struct sl *sl)
 	case SLS_WIND_INSI:
 		todo(("Management notification\n"));
 		sl_timer_start(sl, t19a);
-		/*
-		   kick it again 
-		 */
+		/* 
+		   kick it again */
 		return sl_start_req(NULL, sl);
 	}
 	rare();
@@ -9552,18 +9313,15 @@ sl_t32a_timeout(struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_OUT_OF_SERVICE:
-		/*
-		   we can now restore the link 
-		 */
-		/*
-		   T19(ANSI) is a maintenance guard timer 
-		 */
+		/* 
+		   we can now restore the link */
+		/* 
+		   T19(ANSI) is a maintenance guard timer */
 		sl_timer_start(sl, t19a);
 		return sl_start_req(NULL, sl);
 	case SLS_IN_SERVICE:
-		/*
-		   nothing to do 
-		 */
+		/* 
+		   nothing to do */
 		return (QR_DONE);
 	}
 	rare();
@@ -9593,9 +9351,8 @@ STATIC int
 sl_t33a_timeout(struct sl *sl)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE)
-		/*
-		   link has passed probation 
-		 */
+		/* 
+		   link has passed probation */
 		return (QR_DONE);
 	rare();
 	return (-EFAULT);
@@ -9610,12 +9367,10 @@ sl_t34a_timeout(struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_OUT_OF_SERVICE:
-		/*
-		   link has exited suspension 
-		 */
-		/*
-		   T19(ANSI) is a maintenance guard timer 
-		 */
+		/* 
+		   link has exited suspension */
+		/* 
+		   T19(ANSI) is a maintenance guard timer */
 		sl_timer_start(sl, t19a);
 		return sl_start_req(NULL, sl);
 	}
@@ -9651,9 +9406,8 @@ sl_t1t_timeout(struct sl *sl)
 	struct rs *rs = lk->sp.adj;
 	int err;
 	if (sl->flags & SLF_WACK_SLTM) {
-		/*
-		   first test failed -- repeat test 
-		 */
+		/* 
+		   first test failed -- repeat test */
 		if ((err =
 		     mtp_send_sltm(NULL, sp, lk->ni, rs->dest, sp->pc, sl->slc, sl->slc, sl->tdata,
 				   sl->tlen, sl)) < 0)
@@ -9662,19 +9416,16 @@ sl_t1t_timeout(struct sl *sl)
 		sl_timer_start(sl, t1t);
 		sl->flags |= SLF_WACK_SLTM2;
 	} else if (sl->flags & SLF_WACK_SLTM2) {
-		/*
-		   second test failed 
-		 */
+		/* 
+		   second test failed */
 		if (sl_get_l_state(sl) == SLS_WACK_SLTM) {
-			/*
-			   initial testing failed, fail link 
-			 */
+			/* 
+			   initial testing failed, fail link */
 			if ((err = sl_stop_restore(NULL, sl)) < 0)
 				return (err);
 		} else {
-			/*
-			   periodic testing failed, just report to management 
-			 */
+			/* 
+			   periodic testing failed, just report to management */
 			todo(("Report periodic test failure to management\n"));
 			sl_timer_start(sl, t2t);	/* restart periodic test */
 		}
@@ -9698,15 +9449,13 @@ sl_t2t_timeout(struct sl *sl)
 		struct sp *loc = lk->sp.loc;
 		struct rs *adj = lk->sp.adj;
 		int err, i;
-		/*
-		   generate new test data 
-		 */
+		/* 
+		   generate new test data */
 		sl->tlen = jiffies & 0x0f;
 		for (i = 0; i < sl->tlen; i++)
 			sl->tdata[i] ^= ((jiffies >> 8) & 0xff);
-		/*
-		   start new signalling link test 
-		 */
+		/* 
+		   start new signalling link test */
 		if ((err =
 		     mtp_send_sltm(NULL, loc, lk->ni, adj->dest, loc->pc, sl->slc, sl->slc,
 				   sl->tdata, sl->tlen, sl)))
@@ -9806,9 +9555,8 @@ mtp_recv_coo(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	struct lk *lk = sl->lk.lk;
 	struct sp *sp = lk->sp.loc;
 	int err;
-	/*
-	   first find the signalling link it pertains to 
-	 */
+	/* 
+	   first find the signalling link it pertains to */
 	if (!(sl = mtp_lookup_sl(sl, m)))
 		goto eproto;
 	switch (sl_get_l_state(sl)) {
@@ -9818,35 +9566,30 @@ mtp_recv_coo(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	case SLS_WACK_SLTM:
 		return sl_stop_restore(q, sl);
 	case SLS_WIND_BSNT:
-		/*
-		   haven't launched COO/ECO yet 
-		 */
+		/* 
+		   haven't launched COO/ECO yet */
 		sl->flags |= SLF_COO_RECV;
-		/*
-		   we will ack the COO when BSNT is retrieved or fails 
-		 */
+		/* 
+		   we will ack the COO when BSNT is retrieved or fails */
 		return (QR_DONE);
 	case SLS_WACK_COO:
 	case SLS_WACK_ECO:
 	case SLS_WCON_RET:
 		if (sl->fsnc != -1) {
-			/*
-			   BSNT already retrieved -- reply anyway with COA 
-			 */
+			/* 
+			   BSNT already retrieved -- reply anyway with COA */
 			if ((err =
 			     mtp_send_coa(q, sp, m->ni, m->opc, m->dpc, m->sls, m->slc, sl->fsnc)))
 				goto error;
 		} else {
-			/*
-			   BSNT failed retrieval -- reply anyway with ECA 
-			 */
+			/* 
+			   BSNT failed retrieval -- reply anyway with ECA */
 			if ((err = mtp_send_eca(q, sp, m->ni, m->opc, m->dpc, m->sls, m->slc)))
 				goto error;
 		}
 		if (sl_get_l_state(sl) != SLS_WCON_RET) {
-			/*
-			   initiate retrieval and wait for result 
-			 */
+			/* 
+			   initiate retrieval and wait for result */
 			if ((err = sl_set_state(q, sl, SL_RETRIEVAL)) < 0)
 				goto error;
 			return sl_retrieval_request_and_fsnc_req(q, sl, m->arg.fsnl);
@@ -9877,20 +9620,16 @@ mtp_recv_coa(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	switch (sl_get_l_state(sl)) {
 	case SLS_WACK_COO:
 	case SLS_WACK_ECO:
-		/*
-		   We were expecting a response 
-		 */
-		/*
-		   leave ack timer running to cover retrieval 
-		 */
-		/*
-		   do buffer updating because it is COA 
-		 */
+		/* 
+		   We were expecting a response */
+		/* 
+		   leave ack timer running to cover retrieval */
+		/* 
+		   do buffer updating because it is COA */
 		if ((err = sl_clear_rtb_req(q, sl)))
 			goto error;
-		/*
-		   initiate retrieval and wait for result 
-		 */
+		/* 
+		   initiate retrieval and wait for result */
 		if ((err = sl_set_state(q, sl, SL_RETRIEVAL)) < 0)
 			goto error;
 		return sl_retrieval_request_and_fsnc_req(q, sl, m->arg.fsnl);
@@ -9957,9 +9696,8 @@ mtp_recv_cba(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	for (cb = master.cb.list; cb; cb = cb->next) {
 		struct lk *lk = cb->lk.lk;
 		if (cb->cbc == m->arg.cbc && cb->slc == m->slc && m->opc == lk->sp.adj->dest)
-			/*
-			   restart traffic 
-			 */
+			/* 
+			   restart traffic */
 			return cb_reroute_buffer(cb);
 	}
 	return (-EPROTO);
@@ -9985,45 +9723,38 @@ mtp_recv_eco(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	case SLS_WACK_SLTM:
 		return sl_stop_restore(q, sl);
 	case SLS_WIND_BSNT:
-		/*
-		   haven't launched COO/ECO yet 
-		 */
+		/* 
+		   haven't launched COO/ECO yet */
 		sl->flags |= SLF_ECO_RECV;
-		/*
-		   we will ack the ECO when BSNT is retrieved or fails 
-		 */
+		/* 
+		   we will ack the ECO when BSNT is retrieved or fails */
 		return (QR_DONE);
 	case SLS_WACK_COO:
 	case SLS_WACK_ECO:
 	case SLS_WCON_RET:
 		if (sl->fsnc != -1) {
-			/*
-			   BSNT already retrieved -- reply anyway with COA 
-			 */
+			/* 
+			   BSNT already retrieved -- reply anyway with COA */
 			if ((err =
 			     mtp_send_coa(q, sp, m->ni, m->opc, m->dpc, m->sls, m->slc, sl->fsnc)))
 				goto error;
 		} else {
-			/*
-			   BSNT failed retrieval -- reply anyway with ECA 
-			 */
+			/* 
+			   BSNT failed retrieval -- reply anyway with ECA */
 			if ((err = mtp_send_eca(q, sp, m->ni, m->opc, m->dpc, m->sls, m->slc)))
 				goto error;
 		}
 		if (sl_get_l_state(sl) != SLS_WCON_RET) {
-			/*
+			/* 
 			   We didn't get FSNL in the ECO, therefore, we need to flush the
 			   retransmission buffer of potential duplicates before retrieving the
-			   transmission buffer. 
-			 */
-			/*
-			   do buffer flushing, and initiate retrieval 
-			 */
+			   transmission buffer. */
+			/* 
+			   do buffer flushing, and initiate retrieval */
 			if ((err = sl_clear_rtb_req(q, sl)))
 				goto error;
-			/*
-			   initiate retrieval and wait for result 
-			 */
+			/* 
+			   initiate retrieval and wait for result */
 			if ((err = sl_set_state(q, sl, SL_RETRIEVAL)) < 0)
 				goto error;
 			return sl_retrieval_request_and_fsnc_req(q, sl, -1UL);
@@ -10056,20 +9787,16 @@ mtp_recv_eca(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	switch (sl_get_l_state(sl)) {
 	case SLS_WACK_COO:
 	case SLS_WACK_ECO:
-		/*
-		   We were expecting a response 
-		 */
-		/*
-		   leave ack timer running to cover retrieval 
-		 */
-		/*
-		   we can't do buffer updating because it is ECA 
-		 */
+		/* 
+		   We were expecting a response */
+		/* 
+		   leave ack timer running to cover retrieval */
+		/* 
+		   we can't do buffer updating because it is ECA */
 		if ((err = sl_clear_rtb_req(q, sl)))
 			goto error;
-		/*
-		   initiate retrieval and wait for result 
-		 */
+		/* 
+		   initiate retrieval and wait for result */
 		if ((err = sl_set_state(q, sl, SL_RETRIEVAL)) < 0)
 			goto error;
 		return sl_retrieval_request_and_fsnc_req(q, sl, -1UL);
@@ -10148,12 +9875,11 @@ mtp_recv_tfc(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	if ((rs = mtp_lookup_rs(sl, m, RS_TYPE_MEMBER))) {
 		int err;
 		uint newstatus, popt = sl->lk.lk->sp.loc->na.na->option.popt;
-		/*
+		/* 
 		   13.7.6 In some circumstances it may happen that a signalling point receives a
 		   transfer-controlled message relating to a destination which is already
 		   inaccessible due to previous failures; in this case the transfer-controlled
-		   message is ignored. 
-		 */
+		   message is ignored. */
 		if (rs->state < RS_RESTART) {
 			if (popt & SS7_POPT_MPLEV) {
 				newstatus = m->arg.stat;
@@ -10181,9 +9907,8 @@ mtp_recv_tfc(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	      error:
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10214,9 +9939,8 @@ mtp_recv_tfp(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			return (QR_DONE);
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10235,9 +9959,8 @@ mtp_recv_tcp(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			return (QR_DONE);
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10268,9 +9991,8 @@ mtp_recv_tfr(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			return (QR_DONE);
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10289,9 +10011,8 @@ mtp_recv_tcr(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			return (QR_DONE);
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10327,9 +10048,8 @@ mtp_recv_tfa(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			return (QR_DONE);
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10348,9 +10068,8 @@ mtp_recv_tca(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			return (QR_DONE);
 		return (err);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10390,10 +10109,9 @@ mtp_recv_rst(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		struct sp *sp = lk->sp.loc;
 		struct rl *rl = rt->rl.rl;
 		struct rs *rs = rl->rs.rs;
-		/*
+		/* 
 		   treate a non-primary route that we are using as the current route (C-Links) as
-		   prohibited 
-		 */
+		   prohibited */
 		if (rs->rl.curr == rl && rs->rl.list != rl)
 			goto prohibited;
 		if (rs->flags & RSF_ALLOWED)
@@ -10406,9 +10124,8 @@ mtp_recv_rst(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		else
 			return (QR_DONE);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10426,10 +10143,9 @@ mtp_recv_rsr(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		struct sp *sp = lk->sp.loc;
 		struct rl *rl = rt->rl.rl;
 		struct rs *rs = rl->rs.rs;
-		/*
+		/* 
 		   treate a non-primary route that we are using as the current route (C-Links) as
-		   prohibited 
-		 */
+		   prohibited */
 		if (rs->rl.curr == rl && rs->rl.list != rl)
 			goto prohibited;
 		if (rs->flags & RSF_ALLOWED)
@@ -10442,9 +10158,8 @@ mtp_recv_rsr(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		else
 			return (QR_DONE);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10462,10 +10177,9 @@ mtp_recv_rcp(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		struct sp *sp = lk->sp.loc;
 		struct rl *rl = rt->rl.rl;
 		struct rs *rs = rl->rs.rs;
-		/*
+		/* 
 		   treate a non-primary route that we are using as the current route (C-Links) as
-		   prohibited 
-		 */
+		   prohibited */
 		if (rs->rl.curr == rl && rs->rl.list != rl)
 			goto prohibited;
 		if (rs->flags & RSF_ALLOWED)
@@ -10478,9 +10192,8 @@ mtp_recv_rcp(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		else
 			return (QR_DONE);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10498,10 +10211,9 @@ mtp_recv_rcr(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		struct sp *sp = lk->sp.loc;
 		struct rl *rl = rt->rl.rl;
 		struct rs *rs = rl->rs.rs;
-		/*
+		/* 
 		   treate a non-primary route that we are using as the current route (C-Links) as
-		   prohibited 
-		 */
+		   prohibited */
 		if (rs->rl.curr == rl && rs->rl.list != rl)
 			goto prohibited;
 		if (rs->flags & RSF_ALLOWED)
@@ -10514,9 +10226,8 @@ mtp_recv_rcr(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		else
 			return (QR_DONE);
 	}
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (-EPROTO);
 }
 
@@ -10768,35 +10479,30 @@ mtp_recv_slta(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			if (m->data[i] != sl->tdata[i])
 				goto failed;
 		if (sl_get_l_state(sl) == SLS_WACK_SLTM) {
-			/*
-			   the signalling link is now able to carry traffic 
-			 */
+			/* 
+			   the signalling link is now able to carry traffic */
 			sl_timer_stop(sl, t17);
 			if (sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_B) {
-				/*
-				   link is in probation 
-				 */
+				/* 
+				   link is in probation */
 				sl_timer_start(sl, t33a);
 			}
 			if ((err = sl_set_state(q, sl, SL_ACTIVE)))
 				return (err);
-			/*
-			   in service at level 3 
-			 */
+			/* 
+			   in service at level 3 */
 			sl_set_l_state(sl, SLS_IN_SERVICE);
 			return (QR_DONE);
 		}
-		/*
-		   no further action taken on success 
-		 */
+		/* 
+		   no further action taken on success */
 		sl_timer_start(sl, t2t);	/* start periodic test */
 		return (QR_DONE);
 	}
       failed:
 	if (sl->flags & SLF_WACK_SLTM) {
-		/*
-		   repeat test 
-		 */
+		/* 
+		   repeat test */
 		if ((err =
 		     mtp_send_sltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc, sl->slc, sl->tdata,
 				   sl->tlen, sl)))
@@ -10809,15 +10515,14 @@ mtp_recv_slta(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	if (sl_get_l_state(sl) == SLS_WACK_SLTM)
 		return sl_stop_restore(q, sl);
 	sl->flags &= ~SLF_WACK_SLTM2;
-	/*
+	/* 
 	   IMPLEMENTATION NOTE:- The action when the periodic test fails is for further study.
 	   Taking the link out of service can be an especially bad idea during times of congestion. 
 	   This is because the buffers may be filled with management messages already and the
 	   signaling link test might fail due to timeout. We merely report the information to
 	   management and leave the link in service. If the test failed because of an inserted
 	   loopback while the link is in service, the link will fail rapidly due to other causes.
-	   So we do nothing more than report to management. 
-	 */
+	   So we do nothing more than report to management. */
 	sl_timer_start(sl, t2t);	/* restart periodic test */
 	ptrace(("PROTOCOL ERROR: Periodic SLT failed\n"));
 	return (-EPROTO);
@@ -11025,19 +10730,17 @@ mtp_proc_msg(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	} else {
 		switch (m->si) {
 		default:	/* USER PART */
-			/*
+			/* 
 			   9.6.6 ... All messages received during the restart procedure concerning
-			   a local MTP User (service indicator != 0000 and != 0001) are discarded. 
-			 */
+			   a local MTP User (service indicator != 0000 and != 0001) are discarded. */
 			goto discard;
 		case 0:	/* SNMM */
-			/*
+			/* 
 			   9.6.6 ... All messages received with service indicator == 0000 in a
 			   restarting MTP for the signalling point itself are treated as described
 			   in the MTP restart procedure. Those messages not described elsewhere in
 			   the procedure are discarded and no further action is taken on them
-			   (message groups CHM, ECM, FCM, RSM, UFC, MIM and DLM). 
-			 */
+			   (message groups CHM, ECM, FCM, RSM, UFC, MIM and DLM). */
 			tag = ((m->h0 & 0x0f) << 4) | (m->h1 & 0x0f);
 			switch (tag) {
 			case 0x11:	/* coo */
@@ -11065,10 +10768,9 @@ mtp_proc_msg(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			case 0x52:	/* rsr */
 			case 0x53:	/* rcp */
 			case 0x54:	/* rcr */
-				/*
+				/* 
 				   9.6.3 A signalling route set test message received in a
-				   restarting MTP is ignored during the MTP restart procedure. 
-				 */
+				   restarting MTP is ignored during the MTP restart procedure. */
 			case 0x61:	/* lin */
 			case 0x62:	/* lun */
 			case 0x63:	/* lia */
@@ -11093,10 +10795,9 @@ mtp_proc_msg(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			}
 			break;
 		case 1:	/* SNTM */
-			/*
+			/* 
 			   9.6.7 ... Messages received with service indicator == 0001 are handled
-			   normally during the restart procedure. 
-			 */
+			   normally during the restart procedure. */
 			tag = ((m->h0 & 0x0f) << 4) | (m->h1 & 0x0f);
 			switch (tag) {
 			case 0x11:	/* sltm */
@@ -11116,7 +10817,7 @@ mtp_proc_msg(queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			break;
 		}
 	}
-	__ptrace(("%s: %p: DECODE: Invalid message type\n", MTP_DRV_NAME, sl));
+	__ptrace(("%s: %p: DECODE: Invalid message type\n", DRV_NAME, sl));
 	return (-EPROTO);
       discard:
 	return (QR_DONE);
@@ -11436,9 +11137,8 @@ mtp_dec_user(mblk_t *mp, struct mtp_msg *m)
 STATIC int
 mtp_dec_sio(mblk_t *mp, struct mtp_msg *m)
 {
-	/*
-	   decode si, mp and ni 
-	 */
+	/* 
+	   decode si, mp and ni */
 	switch (m->pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_JTTC:
 		if (mp->b_wptr < mp->b_rptr + 1)
@@ -11487,16 +11187,14 @@ mtp_dec_sio(mblk_t *mp, struct mtp_msg *m)
 STATIC int
 mtp_dec_rl(mblk_t *mp, struct mtp_msg *m)
 {
-	/*
-	   decode the routing label 
-	 */
+	/* 
+	   decode the routing label */
 	switch (m->pvar & SS7_PVAR_MASK) {
 	default:
 	case SS7_PVAR_ETSI:
 	case SS7_PVAR_ITUT:
-		/*
-		   14-bit point codes - 32-bit RL 
-		 */
+		/* 
+		   14-bit point codes - 32-bit RL */
 		if (mp->b_wptr < mp->b_rptr + 4)
 			break;
 		m->dpc = (*mp->b_rptr++ | ((*mp->b_rptr & 0x3f) << 8));
@@ -11507,9 +11205,8 @@ mtp_dec_rl(mblk_t *mp, struct mtp_msg *m)
 	case SS7_PVAR_ANSI:
 	case SS7_PVAR_JTTC:
 	case SS7_PVAR_CHIN:
-		/*
-		   24-bit point codes - 56-bit RL 
-		 */
+		/* 
+		   24-bit point codes - 56-bit RL */
 		if (mp->b_wptr < mp->b_rptr + 7)
 			break;
 		m->dpc = (*mp->b_rptr++ | (*mp->b_rptr++ << 8) | (*mp->b_rptr++ << 16));
@@ -11633,7 +11330,7 @@ mtp_dec_msg(queue_t *q, mblk_t *mp, struct mtp_msg *m, struct na *na)
 	mp->b_rptr = b_rptr;	/* restore read pointer */
 	return (QR_DONE);
       error:
-	ptrace(("%s: %p: DECODE: decoding error\n", MTP_DRV_NAME, SL_PRIV(q)));
+	ptrace(("%s: %p: DECODE: decoding error\n", DRV_NAME, SL_PRIV(q)));
 	mp->b_rptr = b_rptr;	/* restore read pointer */
 	return (err);
 }
@@ -11657,51 +11354,44 @@ sl_recv_msg(queue_t *q, mblk_t *mp)
 	if ((err = mtp_dec_msg(q, mp, &msg, na)))
 		goto error;
 	if (lk->ni != msg.ni)
-		/*
-		   network indicator must match 
-		 */
+		/* 
+		   network indicator must match */
 		goto screened;
 	if (msg.opc == adj->dest)
-		/*
-		   always listen to adjacent signalling point 
-		 */
+		/* 
+		   always listen to adjacent signalling point */
 		goto passed;
 	if (!(adj->flags & RSF_XFER_FUNC))
-		/*
-		   originator not adjacent, adjacent must be STP 
-		 */
+		/* 
+		   originator not adjacent, adjacent must be STP */
 		goto screened;
 	if (!mtp_lookup_rt_local(sl, msg.opc, RT_TYPE_MEMBER)) {
-		/*
+		/* 
 		   do not accept from originators to which we don't have a local route on the
-		   receiving signalling link 
-		 */
+		   receiving signalling link */
 		fixme(("Must also check for circular routes\n"));
 		goto screened;
 	}
       passed:
 	if (loc->pc == msg.dpc) {
-		/*
-		   message is for us, process it 
-		 */
+		/* 
+		   message is for us, process it */
 		todo(("Also check local aliases\n"));
 		return mtp_proc_msg(q, mp, &msg);
 	}
 	if ((loc->flags & SPF_XFER_FUNC)) {
-		/*
-		   message is not for us, transfer it 
-		 */
+		/* 
+		   message is not for us, transfer it */
 		return mtp_xfer_route(q, mp, &msg);
 	}
-	/*
-	   if we do not transfer, we cannot process messages not for us 
-	 */
+	/* 
+	   if we do not transfer, we cannot process messages not for us */
 	goto screened;
       screened:
 	todo(("Deliver screened message to MGMT\n"));
 	return (-EPROTO);
       error:
-	ptrace(("%s: %p: DECODE: decoding error %d\n", MTP_DRV_NAME, sl, err));
+	ptrace(("%s: %p: DECODE: decoding error %d\n", DRV_NAME, sl, err));
 	return (err);
 }
 
@@ -11729,7 +11419,7 @@ sl_data(queue_t *q, mblk_t *mp)
 		return (QR_ABSORBED);
 	return (err);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
 }
 
@@ -11753,10 +11443,10 @@ sl_pdu_ind(queue_t *q, mblk_t *mp)
 		return (QR_TRIMMED);
 	return (err);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -11784,24 +11474,22 @@ sl_link_congested_ind(queue_t *q, mblk_t *mp)
 	sl->disc_status = p->sl_disc_status <= 3 ? p->sl_disc_status : 3;
 	if (!old_status && new_status) {
 		sl_set_state(q, sl, SL_CONGESTED);
-		/*
-		   T31(ANSI) is a false congesiton detection timer 
-		 */
+		/* 
+		   T31(ANSI) is a false congesiton detection timer */
 		sl_timer_start(sl, t31a);
 	}
 	if (!new_status && old_status) {
 		sl_set_state(q, sl, SL_UNCONGESTED);
-		/*
-		   T31(ANSI) is a false congesiton detection timer 
-		 */
+		/* 
+		   T31(ANSI) is a false congesiton detection timer */
 		sl_timer_stop(sl, t31a);
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -11829,24 +11517,22 @@ sl_link_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 	sl->disc_status = p->sl_disc_status <= 3 ? p->sl_disc_status : 3;
 	if (!new_status && old_status) {
 		sl_set_state(q, sl, SL_UNCONGESTED);
-		/*
-		   T31(ANSI) is a false congesiton detection timer 
-		 */
+		/* 
+		   T31(ANSI) is a false congesiton detection timer */
 		sl_timer_stop(sl, t31a);
 	}
 	if (!old_status && new_status) {
 		sl_set_state(q, sl, SL_CONGESTED);
-		/*
-		   T31(ANSI) is a false congesiton detection timer 
-		 */
+		/* 
+		   T31(ANSI) is a false congesiton detection timer */
 		sl_timer_start(sl, t31a);
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -11868,26 +11554,23 @@ sl_retrieved_message_ind(queue_t *q, mblk_t *mp)
 	if (!mp->b_cont)
 		goto efault;
 	if (sl->lk.lk->ls.ls->lk.numb > 1) {
-		/*
-		   When the SLS was rotated for transmission, we need to unrotate on retrieval. 
-		 */
+		/* 
+		   When the SLS was rotated for transmission, we need to unrotate on retrieval. */
 		switch (sl->lk.lk->ls.ls->sp.sp->na.na->option.pvar) {
 		case SS7_PVAR_ANSI:
 		case SS7_PVAR_JTTC:
 		case SS7_PVAR_CHIN:	/* ??? */
 		{
-			/*
+			/* 
 			   XXX Actually, for 5-bit and 7-bit compatibility, we rotate based on 5
-			   sls bits regardless of the number of bits in the SLS 
-			 */
+			   sls bits regardless of the number of bits in the SLS */
 			ulong sls = mp->b_cont->b_rptr[7];
 			if (sls & 0x10)
 				sls = (sls & 0xe0) | ((sls & 0x0f) << 1) | 0x01;
 			else
 				sls = (sls & 0xe0) | ((sls & 0x0f) << 1) | 0x00;
-			/*
-			   rewrite sls in routing label 
-			 */
+			/* 
+			   rewrite sls in routing label */
 			mp->b_cont->b_rptr[7] = sls;
 		}
 		}
@@ -11896,13 +11579,13 @@ sl_retrieved_message_ind(queue_t *q, mblk_t *mp)
 	mp->b_cont = NULL;
 	return (QR_DONE);
       efault:
-	ptrace(("%s: %p: ERROR: no data\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: no data\n", DRV_NAME, sl));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -11935,27 +11618,24 @@ sl_retrieval_complete_ind(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (mp->b_cont) {
 		if (ls->lk.numb > 1) {
-			/*
+			/* 
 			   When the SLS was rotated for transmission, we need to unrotate on
-			   retrieval. 
-			 */
+			   retrieval. */
 			switch (na->option.pvar) {
 			case SS7_PVAR_ANSI:
 			case SS7_PVAR_JTTC:
 			case SS7_PVAR_CHIN:	/* ??? */
 			{
-				/*
+				/* 
 				   XXX Actually, for 5-bit and 7-bit compatibility, we rotate based 
-				   on 5 sls bits regardless of the number of bits in the SLS 
-				 */
+				   on 5 sls bits regardless of the number of bits in the SLS */
 				ulong sls = mp->b_cont->b_rptr[7];
 				if (sls & 0x10)
 					sls = (sls & 0xe0) | ((sls & 0x0f) << 1) | 0x01;
 				else
 					sls = (sls & 0xe0) | ((sls & 0x0f) << 1) | 0x00;
-				/*
-				   rewrite sls in routing label 
-				 */
+				/* 
+				   rewrite sls in routing label */
 				mp->b_cont->b_rptr[7] = sls;
 			}
 			}
@@ -11965,10 +11645,10 @@ sl_retrieval_complete_ind(queue_t *q, mblk_t *mp)
 	}
 	return sl_stop_restore(q, sl);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -11992,10 +11672,10 @@ sl_rb_cleared_ind(queue_t *q, mblk_t *mp)
 		goto outstate;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12017,9 +11697,8 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 		goto outstate;
 	sl->bsnt = p->sl_bsnt;
 	if (sl->flags & (SLF_COO_RECV | SLF_ECO_RECV)) {
-		/*
-		   send COA 
-		 */
+		/* 
+		   send COA */
 		if ((err =
 		     mtp_send_coa(q, loc, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc, sl->bsnt)))
 			return (err);
@@ -12031,9 +11710,8 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 			return (err);
 		return sl_retrieval_request_and_fsnc_req(q, sl, sl->fsnc);
 	} else {
-		/*
-		   send COO 
-		 */
+		/* 
+		   send COO */
 		if ((err =
 		     mtp_send_coo(q, loc, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc, sl->bsnt)))
 			return (err);
@@ -12042,10 +11720,10 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12109,15 +11787,13 @@ sl_in_service_ind(queue_t *q, mblk_t *mp)
 		goto einval;
 	if (sl_get_l_state(sl) != SLS_WIND_INSI)
 		goto outstate;
-	/*
-	   generate new test data 
-	 */
+	/* 
+	   generate new test data */
 	sl->tlen = jiffies & 0x0f;
 	for (i = 0; i < sl->tlen; i++)
 		sl->tdata[i] ^= ((jiffies >> 8) & 0xff);
-	/*
-	   start new signalling link test 
-	 */
+	/* 
+	   start new signalling link test */
 	if ((err =
 	     mtp_send_sltm(q, sp, lk->ni, rs->dest, sp->pc, sl->slc, sl->slc, sl->tdata, sl->tlen,
 			   sl)))
@@ -12129,13 +11805,12 @@ sl_in_service_ind(queue_t *q, mblk_t *mp)
 	sl_set_l_state(sl, SLS_WACK_SLTM);
 	return (QR_DONE);
       outstate:
-	/*
-	   FIXME: stop the link 
-	 */
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	/* 
+	   FIXME: stop the link */
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12289,10 +11964,10 @@ sl_out_of_service_ind(queue_t *q, mblk_t *mp)
 		goto outstate;
 	}
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12329,10 +12004,10 @@ sl_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 	sl_set_l_state(sl, SLS_PROC_OUTG);
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12362,10 +12037,10 @@ sl_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 	sl_set_l_state(sl, SLS_IN_SERVICE);
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12392,18 +12067,17 @@ sl_rtb_cleared_ind(queue_t *q, mblk_t *mp)
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
 		return (QR_DONE);
 	case SLS_WCON_RET:
-		/*
-		   we oft times blindly clear RTB before retrieval 
-		 */
+		/* 
+		   we oft times blindly clear RTB before retrieval */
 		return (QR_DONE);
 	default:
 		goto outstate;
 	}
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12434,16 +12108,15 @@ sl_retrieval_not_possible_ind(queue_t *q, mblk_t *mp)
 		goto einval;
 	if (sl_get_l_state(sl) != SLS_WCON_RET)
 		goto outstate;
-	/*
-	   purge any partial retrieval buffer 
-	 */
+	/* 
+	   purge any partial retrieval buffer */
 	bufq_purge(&sl->rbuf);
 	return sl_stop_restore(q, sl);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12465,17 +12138,15 @@ sl_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 		goto outstate;
 	sl->bsnt = -1UL;
 	if (sl->flags & (SLF_COO_RECV | SLF_ECO_RECV)) {
-		/*
-		   send ECA 
-		 */
+		/* 
+		   send ECA */
 		if ((err = mtp_send_eca(q, loc, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc)))
 			return (err);
 		if ((sl->flags & SLF_ECO_RECV) || sl->fsnc == -1UL) {
-			/*
+			/* 
 			   If we were not given the FSNC from the other end, because of ECO, then
 			   we clear the retransmission buffer before retrieval.  We can still
-			   retrieve the contents of the transmission buffer. 
-			 */
+			   retrieve the contents of the transmission buffer. */
 			if ((err = sl_clear_rtb_req(q, sl)))
 				return (err);
 			sl->fsnc = -1UL;
@@ -12484,9 +12155,8 @@ sl_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 			return (err);
 		return sl_retrieval_request_and_fsnc_req(q, sl, sl->fsnc);
 	} else {
-		/*
-		   send ECO 
-		 */
+		/* 
+		   send ECO */
 		if ((err = mtp_send_eco(q, loc, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc)))
 			return (err);
 		sl_set_l_state(sl, SLS_WACK_ECO);
@@ -12494,10 +12164,10 @@ sl_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12518,7 +12188,7 @@ sl_optmgmt_ack(queue_t *q, mblk_t *mp)
 	return (-EFAULT);
 	return (-EOPNOTSUPP);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12538,7 +12208,7 @@ sl_notify_ind(queue_t *q, mblk_t *mp)
 	return (-EFAULT);
 	return (-EOPNOTSUPP);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 #endif
@@ -12555,7 +12225,7 @@ lmi_info_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, SL_PRIV(q)));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, SL_PRIV(q)));
 	return (-EINVAL);
 }
 
@@ -12583,10 +12253,10 @@ lmi_ok_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12618,10 +12288,10 @@ lmi_error_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12641,10 +12311,10 @@ lmi_enable_con(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12664,10 +12334,10 @@ lmi_disable_con(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, sl));
 	return (-EPROTO);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, sl));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, sl));
 	return (-EINVAL);
 }
 
@@ -12684,7 +12354,7 @@ lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, SL_PRIV(q)));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, SL_PRIV(q)));
 	return (-EINVAL);
 }
 
@@ -12701,7 +12371,7 @@ lmi_error_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, SL_PRIV(q)));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, SL_PRIV(q)));
 	return (-EINVAL);
 }
 
@@ -12718,7 +12388,7 @@ lmi_stats_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, SL_PRIV(q)));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, SL_PRIV(q)));
 	return (-EINVAL);
 }
 
@@ -12735,7 +12405,7 @@ lmi_event_ind(queue_t *q, mblk_t *mp)
 	fixme(("Write this function\n"));
 	return (-EFAULT);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive formant\n", MTP_DRV_NAME, SL_PRIV(q)));
+	ptrace(("%s: %p: ERROR: invalid primitive formant\n", DRV_NAME, SL_PRIV(q)));
 	return (-EINVAL);
 }
 
@@ -12765,16 +12435,16 @@ m_data(queue_t *q, mblk_t *mp)
 		goto baddata;
 	return mtp_send_msg(q, mtp, NULL, &mtp->dst, mp);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mtp, dlen));
 	goto error;
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       discard:
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, mtp));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -12817,23 +12487,23 @@ m_bind_req(queue_t *q, mblk_t *mp)
 	}
       access:
 	err = MACCESS;
-	ptrace(("%s: %p: ERROR: no permission for requested address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no permission for requested address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = MBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: address is invalid\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = MNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = MOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -12857,11 +12527,11 @@ m_unbind_req(queue_t *q, mblk_t *mp)
 	return m_ok_ack(q, mtp, p->mtp_primitive);
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = MOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -12909,11 +12579,10 @@ m_conn_req(queue_t *q, mblk_t *mp)
 			mtp->dst = *dst;
 		}
 		mtp_set_state(mtp, MTPS_WACK_CREQ);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case MTPS_WACK_CREQ:
-		/*
+		/* 
 		 *  There is another thing to do once the connection has been established: that is to deliver MTP
 		 *  restart begins indication or to deliver MTP resume or MTP pause indications for the peer
 		 *  depending on the peer's state.
@@ -12946,27 +12615,27 @@ m_conn_req(queue_t *q, mblk_t *mp)
 	}
       access:
 	err = MACCESS;
-	ptrace(("%s: %p: ERROR: no permission for requested address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no permission for requested address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = MBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: address is invalid\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = MNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = MNOTSUPP;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = MOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -12998,21 +12667,20 @@ m_discon_req(queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	/*
-	   change state and let m_ok_ack do all the work 
-	 */
+	/* 
+	   change state and let m_ok_ack do all the work */
 	return m_ok_ack(q, mtp, p->mtp_primitive);
       notsupp:
 	err = MNOTSUPP;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = MOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -13046,11 +12714,11 @@ m_addr_req(queue_t *q, mblk_t *mp)
 	goto outstate;
       outstate:
 	err = MOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -13071,7 +12739,7 @@ m_info_req(queue_t *q, mblk_t *mp)
 	return m_info_ack(q, mtp);
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -13123,15 +12791,15 @@ m_optmgmt_req(queue_t *q, mblk_t *mp)
 	return m_optmgmt_ack(q, mtp, &opts, p->mtp_mgmt_flags);
       badprim:
 	err = MBADPRIM;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       badflag:
 	err = MBADFLAG;
-	ptrace(("%s: %p: ERROR: invalid flags\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid flags\n", DRV_NAME, mtp));
 	goto error;
       badopt:
 	err = MBADOPT;
-	ptrace(("%s: %p: ERROR: invalid options\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid options\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error_ack(q, mtp, p->mtp_primitive, err);
@@ -13165,19 +12833,19 @@ m_transfer_req(queue_t *q, mblk_t *mp)
 	return (err);
       baddata:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: amount of data is invalid\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: amount of data is invalid\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       discard:
 	rare();
@@ -13208,16 +12876,16 @@ t_data(queue_t *q, mblk_t *mp)
 		return (QR_ABSORBED);
 	return (err);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mtp, dlen));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -13266,9 +12934,8 @@ t_conn_req(queue_t *q, mblk_t *mp)
 			struct mtp_opts opts = { 0L, NULL, };
 			if (mtp_parse_opts(mtp, &opts, opt, p->OPT_length))
 				goto badopt;
-			/*
-			   TODO: set options first 
-			 */
+			/* 
+			   TODO: set options first */
 			if (mp->b_cont) {
 				putbq(q, mp->b_cont);	/* hold back data */
 				mp->b_cont = NULL;	/* abosrbed mp->b_cont */
@@ -13291,31 +12958,31 @@ t_conn_req(queue_t *q, mblk_t *mp)
 	}
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mtp));
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is unusable\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: couldn't allocate address\n", DRV_NAME, mtp));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid message format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -13347,21 +13014,20 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	/*
-	   change state and let t_ok_ack do all the work 
-	 */
+	/* 
+	   change state and let t_ok_ack do all the work */
 	return t_ok_ack(q, mtp, T_DISCON_REQ);
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -13392,19 +13058,19 @@ t_data_req(queue_t *q, mblk_t *mp)
 		return (QR_TRIMMED);
 	return (err);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mtp, dlen));
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: invalid primitive format\n", DRV_NAME));
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -13460,9 +13126,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	{
 		struct mtp_addr *src = (typeof(src)) (mp->b_rptr + p->ADDR_offset);
 		struct sp *loc;
-		/*
-		   we don't allow wildcards yet. 
-		 */
+		/* 
+		   we don't allow wildcards yet. */
 		if (src->family != AF_MTP)
 			goto badaddr;
 		if (!src->si || !src->pc)
@@ -13477,27 +13142,27 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	}
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: couldn't allocate address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: address is invalid\n", DRV_NAME, mtp));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not support for T_CLTS\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not support for T_CLTS\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -13519,7 +13184,7 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 	return t_ok_ack(q, mtp, T_UNBIND_REQ);
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -13545,8 +13210,8 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	if (dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
-	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length ||
-	    mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
+	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length
+	    || mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto einval;
 	else {
 		struct mtp_addr *dst = (typeof(dst)) (mp->b_rptr + p->DEST_offset);
@@ -13566,25 +13231,25 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		}
 	}
       badopt:
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mtp));
 	goto error;
       acces:
-	ptrace(("%s: %p: ERROR: no permission to address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no permission to address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
-	ptrace(("%s: %p: ERROR: bad destination address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad destination address\n", DRV_NAME, mtp));
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid parameter\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid parameter\n", DRV_NAME, mtp));
 	goto error;
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mtp, dlen));
 	goto error;
       notsupport:
-	ptrace(("%s: %p: ERROR: primitive not supported for T_COTS or T_COTS_ORD\n", MTP_DRV_NAME,
+	ptrace(("%s: %p: ERROR: primitive not supported for T_COTS or T_COTS_ORD\n", DRV_NAME,
 		mtp));
 	goto error;
       error:
@@ -13638,19 +13303,19 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	}
       provspec:
 	err = err;
-	ptrace(("%s: %p: ERROR: provider specific\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: provider specific\n", DRV_NAME, mtp));
 	goto error;
       badflag:
 	err = TBADFLAG;
-	ptrace(("%s: %p: ERROR: bad options flags\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad options flags\n", DRV_NAME, mtp));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mtp));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -13678,10 +13343,10 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 	}
 	return t_ordrel_ind(q, mtp);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupport:
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS or T_COTS\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS or T_COTS\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error(q, mtp, EPROTO);
@@ -13718,21 +13383,21 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 	}
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	return m_error(q, mtp, EPROTO);
       discard:
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", DRV_NAME, mtp));
 	return (QR_DONE);
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -13780,7 +13445,7 @@ t_capability_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	return t_capability_ack(q, mtp, p->CAP_bits1);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	return t_error_ack(q, mtp, p->PRIM_type, -EINVAL);
 }
 #endif
@@ -13808,22 +13473,21 @@ n_data(queue_t *q, mblk_t *mp)
 		goto outstate;
 	}
       ignore:
-	/*
-	   If we are in the idle state this is just spurious data, ignore it 
-	 */
+	/* 
+	   If we are in the idle state this is just spurious data, ignore it */
 	rare();
 	return (QR_DONE);
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       baddata:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad data\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad data\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -13867,41 +13531,40 @@ n_conn_req(queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (mtp_parse_qos(mtp, &opts, mp->b_rptr + p->QOS_offset, p->QOS_length))
 		goto badqostype;
-	/*
-	   TODO: set options first 
-	 */
+	/* 
+	   TODO: set options first */
 	mtp->dst = *dst;
 	mtp_set_state(mtp, NS_WCON_CREQ);
 	return n_conn_con(q, mtp, 0, &mtp->dst, NULL);
       badqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: bad qos type\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad qos type\n", DRV_NAME, mtp));
 	goto error;
 #if 0
       badqosparam:
 	err = NBADQOSPARAM;
-	ptrace(("%s: %p: ERROR: bad qos parameter\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad qos parameter\n", DRV_NAME, mtp));
 	goto error;
 #endif
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: bad destination address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad destination address\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate destination address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: couldn't allocate destination address\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for N_CLNS\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported for N_CLNS\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -13923,28 +13586,27 @@ n_conn_res(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	/*
+	/* 
 	   We never give an N_CONN_IND, so there is no reason for a N_CONN_RES.  We probably could
 	   do this * (issue an N_CONN_IND on a listening stream when there is no other MTP user for 
 	   the SI value and * send a UPU on an N_DISCON_REQ or just redirect all traffic for that
-	   user on a N_CONN_RES) but * that is for later. 
-	 */
+	   user on a N_CONN_RES) but * that is for later. */
 	goto eopnotsupp;
       eopnotsupp:
 	err = -EOPNOTSUPP;
-	ptrace(("%s: %p: ERROR: operation not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: operation not supported\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -13964,11 +13626,10 @@ n_discon_req(queue_t *q, mblk_t *mp)
 		goto notsupp;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	/*
+	/* 
 	   Currently there are only three states we can disconnect from.  The first does not
 	   happen. Only the second one is normal.  The third should occur during simulteneous
-	   diconnect only. 
-	 */
+	   diconnect only. */
 	switch (mtp_get_state(mtp)) {
 	case NS_WCON_CREQ:
 		mtp_set_state(mtp, NS_WACK_DREQ6);
@@ -13985,15 +13646,15 @@ n_discon_req(queue_t *q, mblk_t *mp)
 	return n_ok_ack(q, mtp, p->PRIM_type);
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -14016,13 +13677,12 @@ n_data_req(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (p->DATA_xfer_flags)
-		/*
+		/* 
 		   N_MORE_DATA_FLAG and N_RC_FLAG not supported yet.  We could do N_MORE_DATA_FLAG
 		   pretty easily by accumulating the packet until the last data request is
 		   received, but this would be rather pointless for small MTP packet sizes.
 		   N_RC_FLAG cannot be supported until the DLPI link driver is done and zero-loss
-		   operation is completed. 
-		 */
+		   operation is completed. */
 		goto notsupp;
 	if (dlen == 0 || dlen > i->TSDU_size || dlen > i->TIDU_size)
 		goto baddata;
@@ -14039,26 +13699,25 @@ n_data_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	}
       ignore:
-	/*
-	   If we are in the idle state this is just spurious data, ignore it 
-	 */
+	/* 
+	   If we are in the idle state this is just spurious data, ignore it */
 	rare();
 	return (QR_DONE);
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mtp));
 	goto error;
       baddata:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad data\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad data\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -14129,23 +13788,23 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	return n_bind_ack(q, mtp, &src);
       access:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: requested address invalid\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: requested address invalid\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -14169,11 +13828,11 @@ n_unbind_req(queue_t *q, mblk_t *mp)
 	return n_ok_ack(q, mtp, p->PRIM_type);
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -14226,31 +13885,31 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 	return (err);
       access:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: requested address invalid\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: requested address invalid\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", DRV_NAME, mtp));
 	goto error;
       baddata:
 	err = NBADDATA;
-	ptrace(("%s: %p: ERROR: invalid amount of data\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid amount of data\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       notsupp:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive type not supported\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive type not supported\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -14276,9 +13935,8 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 		mtp_set_state(mtp, NS_WACK_OPTREQ);
 #endif
 	if (p->OPTMGMT_flags)
-		/*
-		   Can't support DEFAULT_RC_SEL yet 
-		 */
+		/* 
+		   Can't support DEFAULT_RC_SEL yet */
 		goto badflags;
 	if (mtp_parse_qos(mtp, &opts, mp->b_rptr + p->QOS_offset, p->QOS_length))
 		goto badqostype;
@@ -14289,21 +13947,21 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 	return n_ok_ack(q, mtp, p->PRIM_type);
       badqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: invalid qos type\nn", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid qos type\nn", DRV_NAME, mtp));
 	goto error;
 #if 0
       badqosparam:
 	err = NBADQOSPARAM;
-	ptrace(("%s: %p: ERROR: invalid qos parameter\nn", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid qos parameter\nn", DRV_NAME, mtp));
 	goto error;
 #endif
       badflags:
 	err = NBADFLAG;
-	ptrace(("%s: %p: ERROR: invalid flag\nn", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid flag\nn", DRV_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, p->PRIM_type, err);
@@ -14318,9 +13976,8 @@ n_datack_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   We don't support DATACK yet.  With zero loss operation we will. 
-	 */
+	/* 
+	   We don't support DATACK yet.  With zero loss operation we will. */
 	rare();
 	return (QR_DONE);
 }
@@ -14348,9 +14005,8 @@ n_reset_res(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   ignore.  if the user wishes to respond to our reset indications that's fine. 
-	 */
+	/* 
+	   ignore.  if the user wishes to respond to our reset indications that's fine. */
 	rare();
 	return (QR_DONE);
 }
@@ -14378,9 +14034,8 @@ mtp_get_na(struct mtp_config *arg, struct na *na, int size)
 	if (!na || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of local signalling points 
-	 */
+	/* 
+	   write list of local signalling points */
 	chd = (typeof(chd)) (arg + 1);
 	for (sp = na->sp.list; sp && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sp = sp->na.next, size -= sizeof(*arg) + sizeof(*chd), arg =
@@ -14389,9 +14044,8 @@ mtp_get_na(struct mtp_config *arg, struct na *na, int size)
 		arg->id = sp->id;
 		chd->naid = sp->na.na ? sp->na.na->id : 0;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14409,9 +14063,8 @@ mtp_get_sp(struct mtp_config *arg, struct sp *sp, int size)
 	if (!sp || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of routesets 
-	 */
+	/* 
+	   write list of routesets */
 	chr = (typeof(chr)) (arg + 1);
 	for (rs = sp->rs.list; rs && size >= sizeof(*arg) + sizeof(*chr) + sizeof(*arg);
 	     rs = rs->sp.next, size -= sizeof(*arg) + sizeof(*chr), arg =
@@ -14421,9 +14074,8 @@ mtp_get_sp(struct mtp_config *arg, struct sp *sp, int size)
 		chr->spid = rs->sp.sp ? rs->sp.sp->id : 0;
 	}
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of linksets 
-	 */
+	/* 
+	   write list of linksets */
 	chl = (typeof(chl)) (arg + 1);
 	for (ls = sp->ls.list; ls && size >= sizeof(*arg) + sizeof(*chl) + sizeof(*arg);
 	     ls = ls->sp.next, size -= sizeof(*arg) + sizeof(*chl), arg =
@@ -14432,9 +14084,8 @@ mtp_get_sp(struct mtp_config *arg, struct sp *sp, int size)
 		arg->id = ls->id;
 		chr->spid = ls->sp.sp ? ls->sp.sp->id : 0;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14450,9 +14101,8 @@ mtp_get_rs(struct mtp_config *arg, struct rs *rs, int size)
 	if (!rs || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of routelists 
-	 */
+	/* 
+	   write list of routelists */
 	chd = (typeof(chd)) (arg + 1);
 	for (rl = rs->rl.list; rl && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     rl = rl->rs.next, size -= sizeof(*arg) + sizeof(*chd), arg =
@@ -14461,9 +14111,8 @@ mtp_get_rs(struct mtp_config *arg, struct rs *rs, int size)
 		arg->id = rl->id;
 		chd->rsid = rl->rs.rs ? rl->rs.rs->id : 0;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14479,9 +14128,8 @@ mtp_get_rl(struct mtp_config *arg, struct rl *rl, int size)
 	if (!rl || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of routes 
-	 */
+	/* 
+	   write list of routes */
 	chd = (typeof(chd)) (arg + 1);
 	for (rt = rl->rt.list; rt && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     rt = rt->rl.next, size -= sizeof(*arg) + sizeof(*chd), arg =
@@ -14490,9 +14138,8 @@ mtp_get_rl(struct mtp_config *arg, struct rl *rl, int size)
 		arg->id = rt->id;
 		chd->rlid = rt->rl.rl ? rt->rl.rl->id : 0;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14506,9 +14153,8 @@ mtp_get_rt(struct mtp_config *arg, struct rt *rt, int size)
 	if (!rt || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14524,9 +14170,8 @@ mtp_get_ls(struct mtp_config *arg, struct ls *ls, int size)
 	if (!ls || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of links 
-	 */
+	/* 
+	   write list of links */
 	chd = (typeof(chd)) (arg + 1);
 	for (lk = ls->lk.list; lk && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     lk = lk->ls.next, size -= sizeof(*arg) + sizeof(*chd), arg =
@@ -14535,9 +14180,8 @@ mtp_get_ls(struct mtp_config *arg, struct ls *ls, int size)
 		arg->id = lk->id;
 		chd->lsid = lk->ls.ls ? lk->ls.ls->id : 0;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14553,9 +14197,8 @@ mtp_get_lk(struct mtp_config *arg, struct lk *lk, int size)
 	if (!lk || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of signalling links 
-	 */
+	/* 
+	   write list of signalling links */
 	chd = (typeof(chd)) (arg + 1);
 	for (sl = lk->sl.list; sl && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     sl = sl->lk.next, size -= sizeof(*arg) + sizeof(*chd), arg =
@@ -14564,9 +14207,8 @@ mtp_get_lk(struct mtp_config *arg, struct lk *lk, int size)
 		arg->id = sl->id;
 		chd->lkid = sl->lk.lk ? sl->lk.lk->id : 0;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14580,9 +14222,8 @@ mtp_get_sl(struct mtp_config *arg, struct sl *sl, int size)
 	if (!sl || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14598,9 +14239,8 @@ mtp_get_df(struct mtp_config *arg, struct df *df, int size)
 	if (!df || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   write list of network appearances 
-	 */
+	/* 
+	   write list of network appearances */
 	chd = (typeof(chd)) (arg + 1);
 	for (na = df->na.list; na && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
 	     na = na->next, size -= sizeof(*arg) + sizeof(*chd), arg =
@@ -14608,9 +14248,8 @@ mtp_get_df(struct mtp_config *arg, struct df *df, int size)
 		arg->type = MTP_OBJ_TYPE_NA;
 		arg->id = na->id;
 	}
-	/*
-	   end list with zero object type 
-	 */
+	/* 
+	   end list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -14673,9 +14312,8 @@ mtp_add_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, con
 	for (na = master.na.list; na && na->id != cnf->naid; na = na->next) ;
 	if (!na)
 		return (-EINVAL);
-	/*
-	   signalling point point code must not be assigned yet 
-	 */
+	/* 
+	   signalling point point code must not be assigned yet */
 	for (sp = na->sp.list; sp && sp->pc != cnf->pc; sp = sp->na.next) ;
 	if (sp)
 		return (-EADDRINUSE);
@@ -14696,9 +14334,8 @@ mtp_add_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, con
 	for (sp = master.sp.list; sp && sp->id != cnf->spid; sp = sp->next) ;
 	if (!sp)
 		return (-EINVAL);
-	/*
-	   route set point code must not be assigned yet 
-	 */
+	/* 
+	   route set point code must not be assigned yet */
 	for (rs = sp->rs.list; rs && rs->dest != cnf->dest; rs = rs->sp.next) ;
 	if (rs)
 		return (-EADDRINUSE);
@@ -14823,9 +14460,8 @@ mtp_add_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, con
 	if (!test) {
 		sl->id = sl_get_id(arg->id);
 		if (lk) {
-			/*
-			   add to link (set) list 
-			 */
+			/* 
+			   add to link (set) list */
 			if ((sl->lk.next = lk->sl.list))
 				sl->lk.next->lk.prev = &sl->lk.next;
 			sl->lk.prev = &lk->sl.list;
@@ -14835,9 +14471,8 @@ mtp_add_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, con
 		}
 		sl->slc = cnf->slc;
 		{
-			/*
-			   defaults inherited from lk 
-			 */
+			/* 
+			   defaults inherited from lk */
 			sl->config.t1 = lk->config.t1;
 			sl->config.t2 = lk->config.t2;
 			sl->config.t3 = lk->config.t3;
@@ -14871,9 +14506,8 @@ mtp_add_df(struct mtp_config *arg, struct df *df, int size, const int force, con
 	mtp_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
 	if (df || (size -= sizeof(*cnf)) < 0)
 		return (-EMSGSIZE);
-	/*
-	   DF objects are not added statically 
-	 */
+	/* 
+	   DF objects are not added statically */
 	return (-EINVAL);
 }
 STATIC int
@@ -14940,15 +14574,13 @@ mtp_cha_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, con
 			return (-EINVAL);
 	if (!force) {
 		int i;
-		/*
-		   have users 
-		 */
+		/* 
+		   have users */
 		for (i = 0; i < 16; i++)
 			if (sp->mtp.lists[i])
 				return (-EBUSY);
-		/*
-		   have linksets 
-		 */
+		/* 
+		   have linksets */
 		if (sp->ls.list)
 			return (-EBUSY);
 	}
@@ -14976,9 +14608,8 @@ mtp_cha_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, con
 		if (r != rs && r->dest == cnf->dest)
 			return (-EINVAL);
 	if (!force) {
-		/*
-		   have route lists 
-		 */
+		/* 
+		   have route lists */
 		if (rs->rl.list)
 			return (-EBUSY);
 	}
@@ -15049,9 +14680,8 @@ mtp_cha_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, con
 		ulong mask = cnf->sls_mask;
 		ls->lk.sls_mask = cnf->sls_mask;
 		ls->lk.sls_bits = 0;
-		/*
-		   count the 1's in the mask 
-		 */
+		/* 
+		   count the 1's in the mask */
 		while (mask) {
 			if (mask & 0x01)
 				ls->lk.sls_bits++;
@@ -15151,9 +14781,8 @@ mtp_del_na(struct mtp_config *arg, struct na *na, int size, const int force, con
 	if (!na)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 		if (na->sp.list)
 			return (-EBUSY);
 	}
@@ -15169,9 +14798,8 @@ mtp_del_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, con
 		return (-EINVAL);
 	if (!force) {
 		int i;
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 		if (sp->ls.list || sp->rs.list)
 			return (-EBUSY);
 		for (i = 0; i < 16; i++)
@@ -15189,9 +14817,8 @@ mtp_del_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, con
 	if (!rs)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 		if (rs->rl.list || rs->rr.list)
 			return (-EBUSY);
 	}
@@ -15206,9 +14833,8 @@ mtp_del_rl(struct mtp_config *arg, struct rl *rl, int size, const int force, con
 	if (!rl)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 		if (rl->rt.list || rl->cr.list)
 			return (-EBUSY);
 	}
@@ -15223,9 +14849,8 @@ mtp_del_rt(struct mtp_config *arg, struct rt *rt, int size, const int force, con
 	if (!rt)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 	}
 	if (!test) {
 		mtp_free_rt(rt);
@@ -15238,9 +14863,8 @@ mtp_del_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, con
 	if (!ls)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 	}
 	if (!test) {
 		mtp_free_ls(ls);
@@ -15253,9 +14877,8 @@ mtp_del_lk(struct mtp_config *arg, struct lk *lk, int size, const int force, con
 	if (!lk)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal data structures 
-		 */
+		/* 
+		   bound to internal data structures */
 		if (lk->rt.list || lk->cb.list || lk->sl.list)
 			return (-EBUSY);
 	}
@@ -15270,9 +14893,8 @@ mtp_del_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, con
 	if (!sl)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (sl->lk.lk)
 			return (-EBUSY);
 	}
@@ -15291,9 +14913,8 @@ mtp_del_df(struct mtp_config *arg, struct df *df, int size, const int force, con
 		return (-EBUSY);
 	}
 	if (!test) {
-		/*
-		   can't delete default 
-		 */
+		/* 
+		   can't delete default */
 	}
 	return (QR_DONE);
 }
@@ -15343,10 +14964,9 @@ mtp_mgmt_na(queue_t *q, struct na *na, ulong action)
 {
 	int ret, err = 0;
 	struct sp *sp;
-	/*
+	/* 
 	   we actually don't manage network appearances, just all of the signalling points that
-	   make up a network appearance. 
-	 */
+	   make up a network appearance. */
 	for (sp = na->sp.list; sp; sp = sp->na.next)
 		if ((ret = mtp_mgmt_sp(q, sp, action)) < 0) {
 			if (ret != -EOPNOTSUPP)
@@ -15687,10 +15307,9 @@ mtp_mgmt_df(queue_t *q, struct df *df, ulong action)
 {
 	int ret, err = 0;
 	struct na *na;
-	/*
+	/* 
 	   we actually don't manage the default object, just all of the network appearances that
-	   make up the stack. 
-	 */
+	   make up the stack. */
 	for (na = df->na.list; na; na = na->next)
 		if ((ret = mtp_mgmt_na(q, na, action)) < 0) {
 			if (ret != -EOPNOTSUPP)
@@ -17112,8 +16731,8 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					MTP_DRV_NAME, mtp));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
+					mtp));
 				ret = -EPERM;
 				break;
 			}
@@ -17126,8 +16745,8 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					MTP_DRV_NAME, mtp));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					mtp));
 				ret = -EPERM;
 				break;
 			}
@@ -17137,15 +16756,15 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 					break;
 			if (!sl) {
 				ret = -EINVAL;
-				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
-					MTP_DRV_NAME, mtp));
+				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", DRV_NAME,
+					mtp));
 				break;
 			}
 			mtp_free_link(sl);
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MTP_DRV_NAME, mtp,
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, mtp,
 				nr));
 			ret = (-EOPNOTSUPP);
 			break;
@@ -17160,83 +16779,82 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(MTP_IOCGOPTION):	/* struct lmi_option */
-			printd(("%s: %p: -> MTP_IOCGOPTION\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCGOPTION\n", DRV_NAME, mtp));
 			ret = mtp_iocgoptions(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSOPTION):	/* struct lmi_option */
-			printd(("%s: %p: -> MTP_IOCSOPTION\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCSOPTION\n", DRV_NAME, mtp));
 			ret = mtp_iocsoptions(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCGCONFIG\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCGCONFIG\n", DRV_NAME, mtp));
 			ret = mtp_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCSCONFIG\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCSCONFIG\n", DRV_NAME, mtp));
 			ret = mtp_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCTCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCTCONFIG\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCTCONFIG\n", DRV_NAME, mtp));
 			ret = mtp_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCCCONFIG\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCCCONFIG\n", DRV_NAME, mtp));
 			ret = mtp_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGSTATEM):	/* struct mtp_statem */
-			printd(("%s: %p: -> MTP_IOCGSTATEM\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCGSTATEM\n", DRV_NAME, mtp));
 			ret = mtp_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCMRESET):	/* struct mtp_statem */
-			printd(("%s: %p: -> MTP_IOCCMRESET\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCCMRESET\n", DRV_NAME, mtp));
 			ret = mtp_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGSTATSP):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCGSTATSP\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCGSTATSP\n", DRV_NAME, mtp));
 			ret = mtp_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSSTATSP):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCSSTATSP\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCSSTATSP\n", DRV_NAME, mtp));
 			ret = mtp_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGSTATS):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCGSTATS\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCGSTATS\n", DRV_NAME, mtp));
 			ret = mtp_iocgstats(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSSTATS):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCSSTATS\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCSSTATS\n", DRV_NAME, mtp));
 			ret = mtp_iocsstats(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGNOTIFY):	/* struct mtp_notify */
-			printd(("%s: %p: -> MTP_IOCGNOTIFY\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCGNOTIFY\n", DRV_NAME, mtp));
 			ret = mtp_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSNOTIFY):	/* struct mtp_notify */
-			printd(("%s: %p: -> MTP_IOCSNOTIFY\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCSNOTIFY\n", DRV_NAME, mtp));
 			ret = mtp_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCNOTIFY):	/* struct mtp_notify */
-			printd(("%s: %p: -> MTP_IOCCNOTIFY\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCCNOTIFY\n", DRV_NAME, mtp));
 			ret = mtp_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCMGMT):	/* struct mtp_ctl */
-			printd(("%s: %p: -> MTP_IOCCMGMT\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCCMGMT\n", DRV_NAME, mtp));
 			ret = mtp_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCPASS):	/* ulong */
-			printd(("%s: %p: -> MTP_IOCCPASS\n", MTP_DRV_NAME, mtp));
+			printd(("%s: %p: -> MTP_IOCCPASS\n", DRV_NAME, mtp));
 			ret = mtp_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported MTP ioctl %d\n", MTP_DRV_NAME, mtp, nr));
+			ptrace(("%s: %p: ERROR: Unsupported MTP ioctl %d\n", DRV_NAME, mtp, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
 		break;
 	}
-		/*
-		   TODO: Need to add standard TPI/NPI ioctls 
-		 */
+		/* 
+		   TODO: Need to add standard TPI/NPI ioctls */
 	default:
 		ret = (-EOPNOTSUPP);
 		break;
@@ -17271,119 +16889,118 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	ulong oldstate = sl_get_l_state(sl);
 	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_IND) {
-		printd(("%s: %p: SL_PDU_IND [%d] <-\n", MTP_DRV_NAME, sl, msgdsize(mp->b_cont)));
+		printd(("%s: %p: SL_PDU_IND [%d] <-\n", DRV_NAME, sl, msgdsize(mp->b_cont)));
 		if ((rtn = sl_pdu_ind(q, mp)) < 0)
 			sl_set_l_state(sl, oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case SL_PDU_IND:
-		printd(("%s: %p: SL_PDU_IND [%d] <-\n", MTP_DRV_NAME, sl, msgdsize(mp->b_cont)));
+		printd(("%s: %p: SL_PDU_IND [%d] <-\n", DRV_NAME, sl, msgdsize(mp->b_cont)));
 		rtn = sl_pdu_ind(q, mp);
 		break;
 	case SL_LINK_CONGESTED_IND:
-		printd(("%s: %p: SL_LINK_CONGESTED_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_LINK_CONGESTED_IND <-\n", DRV_NAME, sl));
 		rtn = sl_link_congested_ind(q, mp);
 		break;
 	case SL_LINK_CONGESTION_CEASED_IND:
-		printd(("%s: %p: SL_LINK_CONGESTION_CEASED_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_LINK_CONGESTION_CEASED_IND <-\n", DRV_NAME, sl));
 		rtn = sl_link_congestion_ceased_ind(q, mp);
 		break;
 	case SL_RETRIEVED_MESSAGE_IND:
-		printd(("%s: %p: SL_RETRIEVED_MESSAGE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVED_MESSAGE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_retrieved_message_ind(q, mp);
 		break;
 	case SL_RETRIEVAL_COMPLETE_IND:
-		printd(("%s: %p: SL_RETRIEVAL_COMPLETE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVAL_COMPLETE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_retrieval_complete_ind(q, mp);
 		break;
 	case SL_RB_CLEARED_IND:
-		printd(("%s: %p: SL_RB_CLEARED_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RB_CLEARED_IND <-\n", DRV_NAME, sl));
 		rtn = sl_rb_cleared_ind(q, mp);
 		break;
 	case SL_BSNT_IND:
-		printd(("%s: %p: SL_BSNT_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_BSNT_IND <-\n", DRV_NAME, sl));
 		rtn = sl_bsnt_ind(q, mp);
 		break;
 	case SL_IN_SERVICE_IND:
-		printd(("%s: %p: SL_IN_SERVICE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_IN_SERVICE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_in_service_ind(q, mp);
 		break;
 	case SL_OUT_OF_SERVICE_IND:
-		printd(("%s: %p: SL_OUT_OF_SERVICE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_OUT_OF_SERVICE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_out_of_service_ind(q, mp);
 		break;
 	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
-		printd(("%s: %p: SL_REMOTE_PROCESSOR_OUTAGE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_REMOTE_PROCESSOR_OUTAGE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_remote_processor_outage_ind(q, mp);
 		break;
 	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
-		printd(("%s: %p: SL_REMOTE_PROCESSOR_RECOVERED_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_REMOTE_PROCESSOR_RECOVERED_IND <-\n", DRV_NAME, sl));
 		rtn = sl_remote_processor_recovered_ind(q, mp);
 		break;
 	case SL_RTB_CLEARED_IND:
-		printd(("%s: %p: SL_RTB_CLEARED_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RTB_CLEARED_IND <-\n", DRV_NAME, sl));
 		rtn = sl_rtb_cleared_ind(q, mp);
 		break;
 	case SL_RETRIEVAL_NOT_POSSIBLE_IND:
-		printd(("%s: %p: SL_RETRIEVAL_NOT_POSSIBLE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_RETRIEVAL_NOT_POSSIBLE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_retrieval_not_possible_ind(q, mp);
 		break;
 	case SL_BSNT_NOT_RETRIEVABLE_IND:
-		printd(("%s: %p: SL_BSNT_NOT_RETRIEVABLE_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_BSNT_NOT_RETRIEVABLE_IND <-\n", DRV_NAME, sl));
 		rtn = sl_bsnt_not_retrievable_ind(q, mp);
 		break;
 #if 0
 	case SL_OPTMGMT_ACK:
-		printd(("%s: %p: SL_OPTMGMT_ACK <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_OPTMGMT_ACK <-\n", DRV_NAME, sl));
 		rtn = sl_optmgmt_ack(q, mp);
 		break;
 	case SL_NOTIFY_IND:
-		printd(("%s: %p: SL_NOTIFY_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: SL_NOTIFY_IND <-\n", DRV_NAME, sl));
 		rtn = sl_notify_ind(q, mp);
 		break;
 #endif
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", DRV_NAME, sl));
 		rtn = lmi_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_OK_ACK <-\n", DRV_NAME, sl));
 		rtn = lmi_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", DRV_NAME, sl));
 		rtn = lmi_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", DRV_NAME, sl));
 		rtn = lmi_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", DRV_NAME, sl));
 		rtn = lmi_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", DRV_NAME, sl));
 		rtn = lmi_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", DRV_NAME, sl));
 		rtn = lmi_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_STATS_IND <-\n", DRV_NAME, sl));
 		rtn = lmi_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", MTP_DRV_NAME, sl));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", DRV_NAME, sl));
 		rtn = lmi_event_ind(q, mp);
 		break;
 	default:
-		/*
-		   reject what we don't recognize 
-		 */
-		printd(("%s: %p: ???? <-\n", MTP_DRV_NAME, sl));
+		/* 
+		   reject what we don't recognize */
+		printd(("%s: %p: ???? <-\n", DRV_NAME, sl));
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -17401,35 +17018,35 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = mtp_get_state(mtp);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MTP_BIND_REQ:
-		printd(("%s: %p: -> MTP_BIND_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_BIND_REQ\n", DRV_NAME, mtp));
 		rtn = m_bind_req(q, mp);
 		break;
 	case MTP_UNBIND_REQ:
-		printd(("%s: %p: -> MTP_UNBIND_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_UNBIND_REQ\n", DRV_NAME, mtp));
 		rtn = m_unbind_req(q, mp);
 		break;
 	case MTP_CONN_REQ:
-		printd(("%s: %p: -> MTP_CONN_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_CONN_REQ\n", DRV_NAME, mtp));
 		rtn = m_conn_req(q, mp);
 		break;
 	case MTP_DISCON_REQ:
-		printd(("%s: %p: -> MTP_DISCON_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_DISCON_REQ\n", DRV_NAME, mtp));
 		rtn = m_discon_req(q, mp);
 		break;
 	case MTP_ADDR_REQ:
-		printd(("%s: %p: -> MTP_ADDR_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_ADDR_REQ\n", DRV_NAME, mtp));
 		rtn = m_addr_req(q, mp);
 		break;
 	case MTP_INFO_REQ:
-		printd(("%s: %p: -> MTP_INFO_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_INFO_REQ\n", DRV_NAME, mtp));
 		rtn = m_info_req(q, mp);
 		break;
 	case MTP_OPTMGMT_REQ:
-		printd(("%s: %p: -> MTP_OPTMGMT_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_OPTMGMT_REQ\n", DRV_NAME, mtp));
 		rtn = m_optmgmt_req(q, mp);
 		break;
 	case MTP_TRANSFER_REQ:
-		printd(("%s: %p: -> MTP_TRANSFER_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> MTP_TRANSFER_REQ\n", DRV_NAME, mtp));
 		rtn = m_transfer_req(q, mp);
 		break;
 	default:
@@ -17450,62 +17067,62 @@ tpi_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = mtp_get_state(mtp);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case T_CONN_REQ:
-		printd(("%s: %p: -> T_CONN_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, mtp));
 		rtn = t_conn_req(q, mp);
 		break;
 	case T_CONN_RES:
-		printd(("%s: %p: -> T_CONN_RES\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, mtp));
 		rtn = t_error_ack(q, mtp, prim, TNOTSUPPORT);
 		break;
 	case T_DISCON_REQ:
-		printd(("%s: %p: -> T_DISCON_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, mtp));
 		rtn = t_discon_req(q, mp);
 		break;
 	case T_DATA_REQ:
-		printd(("%s: %p: -> T_DATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, mtp));
 		rtn = t_data_req(q, mp);
 		break;
 	case T_EXDATA_REQ:
-		printd(("%s: %p: -> T_EXDATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, mtp));
 		rtn = t_exdata_req(q, mp);
 		break;
 	case T_INFO_REQ:
-		printd(("%s: %p: -> T_INFO_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, mtp));
 		rtn = t_info_req(q, mp);
 		break;
 	case T_BIND_REQ:
-		printd(("%s: %p: -> T_BIND_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, mtp));
 		rtn = t_bind_req(q, mp);
 		break;
 	case T_UNBIND_REQ:
-		printd(("%s: %p: -> T_UNBIND_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, mtp));
 		rtn = t_unbind_req(q, mp);
 		break;
 	case T_UNITDATA_REQ:
-		printd(("%s: %p: -> T_UNITDATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, mtp));
 		rtn = t_unitdata_req(q, mp);
 		break;
 	case T_OPTMGMT_REQ:
-		printd(("%s: %p: -> T_OPTMGMT_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, mtp));
 		rtn = t_optmgmt_req(q, mp);
 		break;
 	case T_ORDREL_REQ:
-		printd(("%s: %p: -> T_ORDREL_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, mtp));
 		rtn = t_ordrel_req(q, mp);
 		break;
 	case T_OPTDATA_REQ:
-		printd(("%s: %p: -> T_OPTDATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, mtp));
 		rtn = t_optdata_req(q, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
-		printd(("%s: %p: -> T_ADDR_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, mtp));
 		rtn = t_addr_req(q, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_REQ
 	case T_CAPABILITY_REQ:
-		printd(("%s: %p: -> T_CAPABILITY_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, mtp));
 		rtn = t_capability_req(q, mp);
 		break;
 #endif
@@ -17527,55 +17144,55 @@ npi_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = mtp_get_state(mtp);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case N_CONN_REQ:
-		printd(("%s: %p: -> N_CONN_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_CONN_REQ\n", DRV_NAME, mtp));
 		rtn = n_conn_req(q, mp);
 		break;
 	case N_CONN_RES:
-		printd(("%s: %p: -> N_CONN_RES\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_CONN_RES\n", DRV_NAME, mtp));
 		rtn = n_conn_res(q, mp);
 		break;
 	case N_DISCON_REQ:
-		printd(("%s: %p: -> N_DISCON_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_DISCON_REQ\n", DRV_NAME, mtp));
 		rtn = n_discon_req(q, mp);
 		break;
 	case N_DATA_REQ:
-		printd(("%s: %p: -> N_DATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_DATA_REQ\n", DRV_NAME, mtp));
 		rtn = n_data_req(q, mp);
 		break;
 	case N_EXDATA_REQ:
-		printd(("%s: %p: -> N_EXDATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_EXDATA_REQ\n", DRV_NAME, mtp));
 		rtn = n_exdata_req(q, mp);
 		break;
 	case N_INFO_REQ:
-		printd(("%s: %p: -> N_INFO_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_INFO_REQ\n", DRV_NAME, mtp));
 		rtn = n_info_req(q, mp);
 		break;
 	case N_BIND_REQ:
-		printd(("%s: %p: -> N_BIND_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_BIND_REQ\n", DRV_NAME, mtp));
 		rtn = n_bind_req(q, mp);
 		break;
 	case N_UNBIND_REQ:
-		printd(("%s: %p: -> N_UNBIND_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_UNBIND_REQ\n", DRV_NAME, mtp));
 		rtn = n_unbind_req(q, mp);
 		break;
 	case N_UNITDATA_REQ:
-		printd(("%s: %p: -> N_UNITDATA_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_UNITDATA_REQ\n", DRV_NAME, mtp));
 		rtn = n_unitdata_req(q, mp);
 		break;
 	case N_OPTMGMT_REQ:
-		printd(("%s: %p: -> N_OPTMGMT_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_OPTMGMT_REQ\n", DRV_NAME, mtp));
 		rtn = n_optmgmt_req(q, mp);
 		break;
 	case N_DATACK_REQ:
-		printd(("%s: %p: -> N_DATACK_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_DATACK_REQ\n", DRV_NAME, mtp));
 		rtn = n_datack_req(q, mp);
 		break;
 	case N_RESET_REQ:
-		printd(("%s: %p: -> N_RESET_REQ\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_RESET_REQ\n", DRV_NAME, mtp));
 		rtn = n_reset_req(q, mp);
 		break;
 	case N_RESET_RES:
-		printd(("%s: %p: -> N_RESET_RES\n", MTP_DRV_NAME, mtp));
+		printd(("%s: %p: -> N_RESET_RES\n", DRV_NAME, mtp));
 		rtn = n_reset_res(q, mp);
 		break;
 	default:
@@ -17670,9 +17287,8 @@ mtp_r_prim(queue_t *q, mblk_t *mp)
 STATIC int
 mtp_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -17692,9 +17308,8 @@ mtp_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 tpi_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return tpi_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -17714,9 +17329,8 @@ tpi_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 npi_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return npi_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -17736,9 +17350,8 @@ npi_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 mgm_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -17758,9 +17371,8 @@ mgm_w_prim(queue_t *q, mblk_t *mp)
 STATIC int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -17814,7 +17426,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", MTP_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -17822,9 +17434,8 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	/*
-	   allocate a new device 
-	 */
+	/* 
+	   allocate a new device */
 	cminor = MTP_CMINOR_FREE;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *mtpp; mtpp = &(*mtpp)->next) {
@@ -17838,7 +17449,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= MTP_CMINORS) {
+				if (++cminor >= NMINORS) {
 					if (++mindex >= MTP_CMAJORS
 					    || !(cmajor = mtp_majors[mindex]))
 						break;
@@ -17849,15 +17460,15 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (mindex >= MTP_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", MTP_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", MTP_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(mtp = mtp_alloc_priv(q, mtpp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: no memory\n", MTP_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -17878,7 +17489,7 @@ mtp_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) mtp;
-	printd(("%s: closing character device %d:%d\n", MTP_DRV_NAME, mtp->u.dev.cmajor,
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, mtp->u.dev.cmajor,
 		mtp->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	mtp_free_priv(mtp);
@@ -17908,94 +17519,94 @@ STATIC kmem_cache_t *mtp_sl_cachep = NULL;	/* Signalling Link cache */
 STATIC int
 mtp_init_caches(void)
 {
-	if (!mtp_mt_cachep &&
-	    !(mtp_mt_cachep =
-	      kmem_cache_create("mtp_mt_cachep", sizeof(struct mtp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_mt_cachep", MTP_DRV_NAME);
+	if (!mtp_mt_cachep
+	    && !(mtp_mt_cachep =
+		 kmem_cache_create("mtp_mt_cachep", sizeof(struct mtp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_mt_cachep", DRV_NAME);
 		goto failed_mt;
 	} else
-		printd(("%s: initialized mt structure cache\n", MTP_DRV_NAME));
-	if (!mtp_na_cachep &&
-	    !(mtp_na_cachep =
-	      kmem_cache_create("mtp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_na_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized mt structure cache\n", DRV_NAME));
+	if (!mtp_na_cachep
+	    && !(mtp_na_cachep =
+		 kmem_cache_create("mtp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_na_cachep", DRV_NAME);
 		goto failed_na;
 	} else
-		printd(("%s: initialized sp structure cache\n", MTP_DRV_NAME));
-	if (!mtp_sp_cachep &&
-	    !(mtp_sp_cachep =
-	      kmem_cache_create("mtp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_sp_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized sp structure cache\n", DRV_NAME));
+	if (!mtp_sp_cachep
+	    && !(mtp_sp_cachep =
+		 kmem_cache_create("mtp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_sp_cachep", DRV_NAME);
 		goto failed_sp;
 	} else
-		printd(("%s: initialized sp structure cache\n", MTP_DRV_NAME));
-	if (!mtp_rs_cachep &&
-	    !(mtp_rs_cachep =
-	      kmem_cache_create("mtp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_rs_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized sp structure cache\n", DRV_NAME));
+	if (!mtp_rs_cachep
+	    && !(mtp_rs_cachep =
+		 kmem_cache_create("mtp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_rs_cachep", DRV_NAME);
 		goto failed_rs;
 	} else
-		printd(("%s: initialized rs structure cache\n", MTP_DRV_NAME));
-	if (!mtp_cr_cachep &&
-	    !(mtp_cr_cachep =
-	      kmem_cache_create("mtp_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_cr_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized rs structure cache\n", DRV_NAME));
+	if (!mtp_cr_cachep
+	    && !(mtp_cr_cachep =
+		 kmem_cache_create("mtp_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_cr_cachep", DRV_NAME);
 		goto failed_cr;
 	} else
-		printd(("%s: initialized cr structure cache\n", MTP_DRV_NAME));
-	if (!mtp_rl_cachep &&
-	    !(mtp_rl_cachep =
-	      kmem_cache_create("mtp_rl_cachep", sizeof(struct rl), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_rl_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized cr structure cache\n", DRV_NAME));
+	if (!mtp_rl_cachep
+	    && !(mtp_rl_cachep =
+		 kmem_cache_create("mtp_rl_cachep", sizeof(struct rl), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_rl_cachep", DRV_NAME);
 		goto failed_rl;
 	} else
-		printd(("%s: initialized rl structure cache\n", MTP_DRV_NAME));
-	if (!mtp_rt_cachep &&
-	    !(mtp_rt_cachep =
-	      kmem_cache_create("mtp_rt_cachep", sizeof(struct rt), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_rt_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized rl structure cache\n", DRV_NAME));
+	if (!mtp_rt_cachep
+	    && !(mtp_rt_cachep =
+		 kmem_cache_create("mtp_rt_cachep", sizeof(struct rt), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_rt_cachep", DRV_NAME);
 		goto failed_rt;
 	} else
-		printd(("%s: initialized rt structure cache\n", MTP_DRV_NAME));
-	if (!mtp_cb_cachep &&
-	    !(mtp_cb_cachep =
-	      kmem_cache_create("mtp_cb_cachep", sizeof(struct cb), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_cb_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized rt structure cache\n", DRV_NAME));
+	if (!mtp_cb_cachep
+	    && !(mtp_cb_cachep =
+		 kmem_cache_create("mtp_cb_cachep", sizeof(struct cb), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_cb_cachep", DRV_NAME);
 		goto failed_cb;
 	} else
-		printd(("%s: initialized cb structure cache\n", MTP_DRV_NAME));
-	if (!mtp_ls_cachep &&
-	    !(mtp_ls_cachep =
-	      kmem_cache_create("mtp_ls_cachep", sizeof(struct ls), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_ls_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized cb structure cache\n", DRV_NAME));
+	if (!mtp_ls_cachep
+	    && !(mtp_ls_cachep =
+		 kmem_cache_create("mtp_ls_cachep", sizeof(struct ls), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_ls_cachep", DRV_NAME);
 		goto failed_ls;
 	} else
-		printd(("%s: initialized ls structure cache\n", MTP_DRV_NAME));
-	if (!mtp_lk_cachep &&
-	    !(mtp_lk_cachep =
-	      kmem_cache_create("mtp_lk_cachep", sizeof(struct lk), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_lk_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized ls structure cache\n", DRV_NAME));
+	if (!mtp_lk_cachep
+	    && !(mtp_lk_cachep =
+		 kmem_cache_create("mtp_lk_cachep", sizeof(struct lk), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_lk_cachep", DRV_NAME);
 		goto failed_lk;
 	} else
-		printd(("%s: initialized lk structure cache\n", MTP_DRV_NAME));
-	if (!mtp_sl_cachep &&
-	    !(mtp_sl_cachep =
-	      kmem_cache_create("mtp_sl_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mtp_sl_cachep", MTP_DRV_NAME);
+		printd(("%s: initialized lk structure cache\n", DRV_NAME));
+	if (!mtp_sl_cachep
+	    && !(mtp_sl_cachep =
+		 kmem_cache_create("mtp_sl_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mtp_sl_cachep", DRV_NAME);
 		goto failed_sl;
 	} else
-		printd(("%s: initialized sl structure cache\n", MTP_DRV_NAME));
+		printd(("%s: initialized sl structure cache\n", DRV_NAME));
 	return (0);
       failed_sl:
 	kmem_cache_destroy(mtp_lk_cachep);
@@ -18020,75 +17631,88 @@ mtp_init_caches(void)
       failed_mt:
 	return (-ENOMEM);
 }
-STATIC void
+STATIC int
 mtp_term_caches(void)
 {
+	int err = 0;
 	if (mtp_mt_cachep) {
-		if (kmem_cache_destroy(mtp_mt_cachep))
+		if (kmem_cache_destroy(mtp_mt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_mt_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_mt_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_mt_cachep\n", DRV_NAME));
 	}
 	if (mtp_na_cachep) {
-		if (kmem_cache_destroy(mtp_na_cachep))
+		if (kmem_cache_destroy(mtp_na_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_na_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_na_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_na_cachep\n", DRV_NAME));
 	}
 	if (mtp_sp_cachep) {
-		if (kmem_cache_destroy(mtp_sp_cachep))
+		if (kmem_cache_destroy(mtp_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_sp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_sp_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_sp_cachep\n", DRV_NAME));
 	}
 	if (mtp_rs_cachep) {
-		if (kmem_cache_destroy(mtp_rs_cachep))
+		if (kmem_cache_destroy(mtp_rs_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_rs_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_rs_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_rs_cachep\n", DRV_NAME));
 	}
 	if (mtp_cr_cachep) {
-		if (kmem_cache_destroy(mtp_cr_cachep))
+		if (kmem_cache_destroy(mtp_cr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_cr_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_cr_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_cr_cachep\n", DRV_NAME));
 	}
 	if (mtp_rl_cachep) {
-		if (kmem_cache_destroy(mtp_rl_cachep))
+		if (kmem_cache_destroy(mtp_rl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_rl_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_rl_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_rl_cachep\n", DRV_NAME));
 	}
 	if (mtp_rt_cachep) {
-		if (kmem_cache_destroy(mtp_rt_cachep))
+		if (kmem_cache_destroy(mtp_rt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_rt_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_rt_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_rt_cachep\n", DRV_NAME));
 	}
 	if (mtp_cb_cachep) {
-		if (kmem_cache_destroy(mtp_cb_cachep))
+		if (kmem_cache_destroy(mtp_cb_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_cb_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_cb_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_cb_cachep\n", DRV_NAME));
 	}
 	if (mtp_ls_cachep) {
-		if (kmem_cache_destroy(mtp_ls_cachep))
+		if (kmem_cache_destroy(mtp_ls_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_ls_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_ls_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_ls_cachep\n", DRV_NAME));
 	}
 	if (mtp_lk_cachep) {
-		if (kmem_cache_destroy(mtp_lk_cachep))
+		if (kmem_cache_destroy(mtp_lk_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_lk_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_lk_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_lk_cachep\n", DRV_NAME));
 	}
 	if (mtp_sl_cachep) {
-		if (kmem_cache_destroy(mtp_sl_cachep))
+		if (kmem_cache_destroy(mtp_sl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_sl_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_sl_cachep\n", MTP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mtp_sl_cachep\n", DRV_NAME));
 	}
+	return (err);
 }
 
 /*
@@ -18122,7 +17746,7 @@ mtp_put(struct mtp *mtp)
 {
 	if (atomic_dec_and_test(&mtp->refcnt)) {
 		kmem_cache_free(mtp_mt_cachep, mtp);
-		printd(("%s: %s: %p: deallocated mtp private structure", MTP_DRV_NAME, __FUNCTION__,
+		printd(("%s: %s: %p: deallocated mtp private structure", DRV_NAME, __FUNCTION__,
 			mtp));
 	}
 }
@@ -18131,7 +17755,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, ushort b
 {
 	struct mtp *mt;
 	if ((mt = kmem_cache_alloc(mtp_mt_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated mt private structure\n", MTP_DRV_NAME, mt));
+		printd(("%s: %p: allocated mt private structure\n", DRV_NAME, mt));
 		bzero(mt, sizeof(*mt));
 		mt->priv_put = &mtp_put;
 		mt->u.dev.cmajor = getmajor(*devp);
@@ -18139,11 +17763,10 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, ushort b
 		mt->cred = *crp;
 		(mt->oq = RD(q))->q_ptr = mtp_get(mt);
 		(mt->iq = WR(q))->q_ptr = mtp_get(mt);
-		spin_lock_init(&mt->qlock); /* "mt-queue-lock" */
+		spin_lock_init(&mt->qlock);	/* "mt-queue-lock" */
 		mt->o_prim = &mtp_r_prim;
-		/*
-		   style of interface depends on bminor 
-		 */
+		/* 
+		   style of interface depends on bminor */
 		switch (bminor) {
 		case MTP_STYLE_MTPI:
 			mt->i_prim = &mtp_w_prim;
@@ -18161,24 +17784,22 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, ushort b
 		mt->i_state = 0;
 		mt->i_style = bminor;
 		mt->i_version = 1;
-		spin_lock_init(&mt->lock); /* "mt-queue-lock" */
+		spin_lock_init(&mt->lock);	/* "mt-queue-lock" */
 		if ((mt->next = *mtpp))
 			mt->next->prev = &mt->next;
 		mt->prev = mtpp;
 		*mtpp = mtp_get(mt);
-		/*
-		   not attached to sp yet 
-		 */
+		/* 
+		   not attached to sp yet */
 		mt->sp.loc = NULL;
 		mt->sp.rem = NULL;
 		mt->sp.next = NULL;
 		mt->sp.prev = &mt->sp.next;
-		/*
-		   set defaults 
-		 */
-		printd(("%s: %p: linked mt private structure\n", MTP_DRV_NAME, mt));
+		/* 
+		   set defaults */
+		printd(("%s: %p: linked mt private structure\n", DRV_NAME, mt));
 	} else
-		ptrace(("%s: ERROR: Could not allocate mt private structure\n", MTP_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate mt private structure\n", DRV_NAME));
 	return (mt);
 }
 STATIC void
@@ -18201,9 +17822,8 @@ mtp_free_priv(struct mtp *mtp)
 			rs_put(xchg(&mtp->sp.rem, NULL));
 		}
 		if (mtp->next || mtp->prev != &mtp->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*mtp->prev = mtp->next))
 				mtp->next->prev = mtp->prev;
 			mtp->next = NULL;
@@ -18257,7 +17877,7 @@ sl_put(struct sl *sl)
 	if (sl) {
 		if (atomic_dec_and_test(&sl->refcnt)) {
 			kmem_cache_free(mtp_sl_cachep, sl);
-			printd(("%s: %p: freed sl structure\n", MTP_DRV_NAME, sl));
+			printd(("%s: %p: freed sl structure\n", DRV_NAME, sl));
 		}
 	}
 }
@@ -18266,13 +17886,13 @@ mtp_alloc_link(queue_t *q, struct sl **slp, ulong index, cred_t *crp)
 {
 	struct sl *sl;
 	if ((sl = kmem_cache_alloc(mtp_sl_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated sl private structure %lu\n", MTP_DRV_NAME, sl, index));
+		printd(("%s: %p: allocated sl private structure %lu\n", DRV_NAME, sl, index));
 		bzero(sl, sizeof(*sl));
 		sl->priv_put = &sl_put;
 		sl_get(sl);	/* first get */
 		sl->u.mux.index = index;
 		sl->cred = *crp;
-		spin_lock_init(&sl->qlock); /* "sl-queue-lock" */
+		spin_lock_init(&sl->qlock);	/* "sl-queue-lock" */
 		(sl->iq = RD(q))->q_ptr = sl_get(sl);
 		(sl->oq = WR(q))->q_ptr = sl_get(sl);
 		sl->o_prim = sl_w_prim;
@@ -18281,10 +17901,9 @@ mtp_alloc_link(queue_t *q, struct sl **slp, ulong index, cred_t *crp)
 		sl->i_style = LMI_STYLE2;
 		sl->i_version = 1;
 		sl->l_state = SLS_OUT_OF_SERVICE;
-		spin_lock_init(&sl->lock); /* "sl-priv-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&sl->lock);	/* "sl-priv-lock" */
+		/* 
+		   place in master list */
 		if ((sl->next = *slp))
 			sl->next->prev = &sl->next;
 		sl->prev = slp;
@@ -18293,7 +17912,7 @@ mtp_alloc_link(queue_t *q, struct sl **slp, ulong index, cred_t *crp)
 		sl->id = index;	/* just use mux index for id */
 		sl->type = MTP_OBJ_TYPE_SL;
 	} else
-		ptrace(("%s: ERROR: Could not allocate sl private structure %lu\n", MTP_DRV_NAME,
+		ptrace(("%s: ERROR: Could not allocate sl private structure %lu\n", DRV_NAME,
 			index));
 	return (sl);
 }
@@ -18309,9 +17928,8 @@ mtp_free_link(struct sl *sl)
 		flushq(sl->iq, FLUSHALL);
 		sl_timer_stop(sl, tall);
 		if (sl->next || sl->prev != &sl->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*sl->prev = sl->next))
 				sl->next->prev = sl->prev;
 			sl->next = NULL;
@@ -18325,12 +17943,11 @@ mtp_free_link(struct sl *sl)
 		sl_put(xchg(&sl->iq->q_ptr, NULL));
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
 		sl_put(xchg(&sl->oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sl->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: sl lingering reference count = %d\n", MTP_DRV_NAME,
-				sl, atomic_read(&sl->refcnt)));
+			pswerr(("%s: %p: ERROR: sl lingering reference count = %d\n", DRV_NAME, sl,
+				atomic_read(&sl->refcnt)));
 			atomic_set(&sl->refcnt, 1);
 		}
 	}
@@ -18345,13 +17962,11 @@ mtp_free_sl(struct sl *sl)
 	spin_lock_irqsave(&sl->lock, flags);
 	{
 		struct lk *lk;
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		__sl_timer_stop(sl, tall);
-		/*
-		   remove from lk list 
-		 */
+		/* 
+		   remove from lk list */
 		if ((lk = sl->lk.lk)) {
 			if ((*sl->lk.prev = sl->lk.next))
 				sl->lk.next->lk.prev = sl->lk.prev;
@@ -18398,7 +18013,7 @@ cb_put(struct cb *cb)
 {
 	if (atomic_dec_and_test(&cb->refcnt)) {
 		kmem_cache_free(mtp_cb_cachep, cb);
-		printd(("%s: %p: freed cb structure\n", MTP_DRV_NAME, cb));
+		printd(("%s: %p: freed cb structure\n", DRV_NAME, cb));
 	}
 }
 STATIC struct cb *
@@ -18409,19 +18024,17 @@ mtp_alloc_cb(ulong id, struct lk *lk, struct sl *from, struct sl *onto, ulong in
 		bzero(cb, sizeof(*cb));
 		cb->priv_put = &cb_put;
 		bufq_init(&cb->buf);
-		spin_lock_init(&cb->lock); /* "cb-lock" */
+		spin_lock_init(&cb->lock);	/* "cb-lock" */
 		cb_get(cb);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((cb->next = master.cb.list))
 			cb->next->prev = &cb->next;
 		cb->prev = &master.cb.list;
 		master.cb.list = cb_get(cb);
 		master.cb.numb++;
-		/*
-		   add to link changeover buffer list 
-		 */
+		/* 
+		   add to link changeover buffer list */
 		if (lk) {
 			if ((cb->lk.next = lk->cb.list))
 				cb->lk.next->lk.prev = &cb->lk.next;
@@ -18436,9 +18049,9 @@ mtp_alloc_cb(ulong id, struct lk *lk, struct sl *from, struct sl *onto, ulong in
 		cb->slc = from->slc;
 		cb->sl.from = sl_get(from);
 		cb->sl.onto = sl_get(onto);
-		printd(("%s: %p: linked cb structure %lu\n", MTP_DRV_NAME, cb, cb->id));
+		printd(("%s: %p: linked cb structure %lu\n", DRV_NAME, cb, cb->id));
 	} else
-		ptrace(("%s: ERROR: Could not allocate cb structure %lu\n", MTP_DRV_NAME, id));
+		ptrace(("%s: ERROR: Could not allocate cb structure %lu\n", DRV_NAME, id));
 	return (cb);
 }
 STATIC void
@@ -18450,14 +18063,12 @@ mtp_free_cb(struct cb *cb)
 	{
 		struct lk *lk;
 		struct sl *sl;
-		/*
-		   stop timers and purge buffers 
-		 */
+		/* 
+		   stop timers and purge buffers */
 		cb_timer_stop(cb, tall);
 		bufq_purge(&cb->buf);
-		/*
-		   unlink from signalling links 
-		 */
+		/* 
+		   unlink from signalling links */
 		if ((sl = xchg(&cb->sl.onto, NULL))) {
 			sl->load--;
 			sl_put(sl);
@@ -18467,9 +18078,8 @@ mtp_free_cb(struct cb *cb)
 			sl_put(sl);
 		}
 		if ((lk = cb->lk.lk)) {
-			/*
-			   unlink from lk 
-			 */
+			/* 
+			   unlink from lk */
 			if ((*cb->lk.prev = cb->lk.next))
 				cb->lk.next->lk.prev = cb->lk.prev;
 			cb->lk.next = NULL;
@@ -18481,9 +18091,8 @@ mtp_free_cb(struct cb *cb)
 			lk_put(xchg(&cb->lk.lk, NULL));
 		}
 		if (cb->next || cb->prev != &cb->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*cb->prev = cb->next))
 				cb->next->prev = cb->prev;
 			cb->next = NULL;
@@ -18492,13 +18101,12 @@ mtp_free_cb(struct cb *cb)
 			assure(master.cb.numb > 0);
 			master.cb.numb--;
 		}
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		cb->id = 0;
 		if (atomic_read(&cb->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: cb lingering reference count = %d\n", MTP_DRV_NAME,
-				cb, atomic_read(&cb->refcnt)));
+			pswerr(("%s: %p: ERROR: cb lingering reference count = %d\n", DRV_NAME, cb,
+				atomic_read(&cb->refcnt)));
 			atomic_set(&cb->refcnt, 1);
 		}
 	}
@@ -18537,7 +18145,7 @@ lk_put(struct lk *lk)
 {
 	if (atomic_dec_and_test(&lk->refcnt)) {
 		kmem_cache_free(mtp_lk_cachep, lk);
-		printd(("%s: %p: freed lk structure\n", MTP_DRV_NAME, lk));
+		printd(("%s: %p: freed lk structure\n", DRV_NAME, lk));
 	}
 }
 STATIC struct lk *
@@ -18547,20 +18155,18 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 	if ((lk = kmem_cache_alloc(mtp_lk_cachep, SLAB_ATOMIC))) {
 		bzero(lk, sizeof(*lk));
 		lk->priv_put = &lk_put;
-		spin_lock_init(&lk->lock); /* "lk-lock" */
+		spin_lock_init(&lk->lock);	/* "lk-lock" */
 		lk_get(lk);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((lk->next = master.lk.list))
 			lk->next->prev = &lk->next;
 		lk->prev = &master.lk.list;
 		master.lk.list = lk_get(lk);
 		master.lk.numb++;
 		if (ls) {
-			/*
-			   add to linkset list 
-			 */
+			/* 
+			   add to linkset list */
 			if ((lk->ls.next = ls->lk.list))
 				lk->ls.next->ls.prev = &lk->ls.next;
 			lk->ls.prev = &ls->lk.list;
@@ -18568,27 +18174,23 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 			ls->lk.list = lk_get(lk);
 			ls->lk.numb++;
 		}
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		lk->id = lk_get_id(id);
 		lk->type = MTP_OBJ_TYPE_LK;
 		lk->ni = ni;
 		lk->slot = slot;
 		lk->sp.loc = sp_get(loc);
 		lk->sp.adj = rs_get(adj);
-		/*
-		   defaults inherited from ls 
-		 */
+		/* 
+		   defaults inherited from ls */
 		if (ls) {
-			/*
-			   sls bits and mask 
-			 */
+			/* 
+			   sls bits and mask */
 			lk->sl.sls_bits = ls->lk.sls_bits;
 			lk->sl.sls_mask = ls->lk.sls_mask;
-			/*
-			   signalling link timer defaults 
-			 */
+			/* 
+			   signalling link timer defaults */
 			lk->config.t1 = ls->config.t1;
 			lk->config.t2 = ls->config.t2;
 			lk->config.t3 = ls->config.t3;
@@ -18611,15 +18213,13 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 			lk->config.t1t = ls->config.t1t;
 			lk->config.t2t = ls->config.t2t;
 			lk->config.t1s = ls->config.t1s;
-			/*
-			   link timer defaults 
-			 */
+			/* 
+			   link timer defaults */
 			lk->config.t7 = ls->config.t7;
 		}
 		if (ls) {
-			/*
-			   automatically allocate routes if the linkset already has routesets 
-			 */
+			/* 
+			   automatically allocate routes if the linkset already has routesets */
 			struct rl *rl;
 			struct rt *rt;
 			for (rl = ls->rl.list; rl; rl = rl->ls.next)
@@ -18627,16 +18227,14 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 					goto free_error;
 		}
 		if (ls && adj) {
-			/*
-			   ensure that there is a route to the adjacent via this linkset 
-			 */
+			/* 
+			   ensure that there is a route to the adjacent via this linkset */
 			struct rl *rl;
 			for (rl = adj->rl.list; rl; rl = rl->rs.next)
 				if (rl->ls.ls == ls)
 					break;
-			/*
-			   cost is alway zero (0) because route is to adjacent 
-			 */
+			/* 
+			   cost is alway zero (0) because route is to adjacent */
 			if (!rl && !(rl = mtp_alloc_rl(0, adj, ls, 0)))
 				goto free_error;
 			adj->flags |= RSF_ADJACENT;
@@ -18658,28 +18256,23 @@ mtp_free_lk(struct lk *lk)
 		struct sl *sl;
 		struct rt *rt;
 		struct ls *ls;
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		__lk_timer_stop(lk, tall);
-		/*
-		   remove all changeback buffers 
-		 */
+		/* 
+		   remove all changeback buffers */
 		while ((cb = lk->cb.list))
 			mtp_free_cb(cb);
-		/*
-		   remove all routes 
-		 */
+		/* 
+		   remove all routes */
 		while ((rt = lk->rt.list))
 			mtp_free_rt(rt);
-		/*
-		   remove all signalling links 
-		 */
+		/* 
+		   remove all signalling links */
 		while ((sl = lk->sl.list))
 			mtp_free_sl(sl);
-		/*
-		   remove from ls list 
-		 */
+		/* 
+		   remove from ls list */
 		if ((ls = lk->ls.ls)) {
 			if ((*lk->ls.prev = lk->ls.next))
 				lk->ls.next->ls.prev = lk->ls.prev;
@@ -18690,9 +18283,8 @@ mtp_free_lk(struct lk *lk)
 			ls_put(xchg(&lk->ls.ls, NULL));
 		}
 		if (lk->next || lk->prev != &lk->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*lk->prev = lk->next))
 				lk->next->prev = lk->prev;
 			lk->next = NULL;
@@ -18736,7 +18328,7 @@ ls_put(struct ls *ls)
 {
 	if (atomic_dec_and_test(&ls->refcnt)) {
 		kmem_cache_free(mtp_ls_cachep, ls);
-		printd(("%s: %p: freed ls structure\n", MTP_DRV_NAME, ls));
+		printd(("%s: %p: freed ls structure\n", DRV_NAME, ls));
 	}
 }
 STATIC struct ls *
@@ -18746,37 +18338,33 @@ mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
 	if ((ls = kmem_cache_alloc(mtp_ls_cachep, SLAB_ATOMIC))) {
 		bzero(ls, sizeof(*ls));
 		ls->priv_put = &ls_put;
-		spin_lock_init(&ls->lock); /* "ls-lock" */
+		spin_lock_init(&ls->lock);	/* "ls-lock" */
 		ls_get(ls);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((ls->next = master.ls.list))
 			ls->next->prev = &ls->next;
 		ls->prev = &master.ls.list;
 		master.ls.list = ls_get(ls);
 		master.ls.numb++;
-		/*
-		   add to signalling point list 
-		 */
+		/* 
+		   add to signalling point list */
 		if ((ls->sp.next = sp->ls.list))
 			ls->sp.next->sp.prev = &ls->sp.next;
 		ls->sp.prev = &sp->ls.list;
 		ls->sp.sp = sp_get(sp);
 		sp->ls.list = ls_get(ls);
 		sp->ls.numb++;
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		ls->id = ls_get_id(id);
 		ls->type = MTP_OBJ_TYPE_LS;
 		ls->lk.sls_mask = sls_mask;
 		ls->lk.sls_bits = 0;
 		{
 			ulong mask = sls_mask;
-			/*
-			   count the 1's in the mask 
-			 */
+			/* 
+			   count the 1's in the mask */
 			while (mask) {
 				if (mask & 0x01)
 					ls->lk.sls_bits++;
@@ -18785,13 +18373,11 @@ mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
 		}
 		ls->rl.sls_mask = ~sls_mask & sp->ls.sls_mask;
 		ls->rl.sls_bits = sp->ls.sls_bits - ls->lk.sls_bits;
-		/*
-		   defaults inherited from sp 
-		 */
+		/* 
+		   defaults inherited from sp */
 		{
-			/*
-			   signalling link timer defaults 
-			 */
+			/* 
+			   signalling link timer defaults */
 			ls->config.t1 = sp->config.t1;
 			ls->config.t2 = sp->config.t2;
 			ls->config.t3 = sp->config.t3;
@@ -18814,9 +18400,8 @@ mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
 			ls->config.t1t = sp->config.t1t;
 			ls->config.t2t = sp->config.t2t;
 			ls->config.t1s = sp->config.t1s;
-			/*
-			   link timer defaults 
-			 */
+			/* 
+			   link timer defaults */
 			ls->config.t7 = sp->config.t7;
 		}
 	}
@@ -18832,24 +18417,20 @@ mtp_free_ls(struct ls *ls)
 		struct sp *sp;
 		struct rl *rl;
 		struct lk *lk;
-		/*
-		   stop all timers 
-		 */
+		/* 
+		   stop all timers */
 		__ls_timer_stop(ls, tall);
-		/*
-		   remove links 
-		 */
+		/* 
+		   remove links */
 		while ((lk = ls->lk.list))
 			mtp_free_lk(lk);
-		/*
-		   remove route lists 
-		 */
+		/* 
+		   remove route lists */
 		while ((rl = ls->rl.list))
 			mtp_free_rl(rl);
 		if ((sp = ls->sp.sp)) {
-			/*
-			   remove from signalling point list 
-			 */
+			/* 
+			   remove from signalling point list */
 			if ((*ls->sp.prev = ls->sp.next))
 				ls->sp.next->sp.prev = ls->sp.prev;
 			ls->sp.next = NULL;
@@ -18861,9 +18442,8 @@ mtp_free_ls(struct ls *ls)
 			sp_put(xchg(&ls->sp.sp, NULL));
 		}
 		if (ls->next || ls->prev != &ls->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*ls->prev = ls->next))
 				ls->next->prev = ls->prev;
 			ls->next = NULL;
@@ -18872,13 +18452,12 @@ mtp_free_ls(struct ls *ls)
 			assure(master.ls.numb > 0);
 			master.ls.numb--;
 		}
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		ls->id = 0;
 		if (atomic_read(&ls->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: ls lingering reference count = %d\n", MTP_DRV_NAME,
-				ls, atomic_read(&ls->refcnt)));
+			pswerr(("%s: %p: ERROR: ls lingering reference count = %d\n", DRV_NAME, ls,
+				atomic_read(&ls->refcnt)));
 			atomic_set(&ls->refcnt, 1);
 		}
 	}
@@ -18917,7 +18496,7 @@ cr_put(struct cr *cr)
 {
 	if (atomic_dec_and_test(&cr->refcnt)) {
 		kmem_cache_free(mtp_cr_cachep, cr);
-		printd(("%s: %p: freed cr structure\n", MTP_DRV_NAME, cr));
+		printd(("%s: %p: freed cr structure\n", DRV_NAME, cr));
 	}
 }
 STATIC struct cr *
@@ -18928,19 +18507,17 @@ mtp_alloc_cr(ulong id, struct rl *rl, struct rt *from, struct rt *onto, ulong in
 		bzero(cr, sizeof(*cr));
 		cr->priv_put = &cr_put;
 		bufq_init(&cr->buf);
-		spin_lock_init(&cr->lock); /* "cr-lock" */
+		spin_lock_init(&cr->lock);	/* "cr-lock" */
 		cr_get(cr);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((cr->next = master.cr.list))
 			cr->next->prev = &cr->next;
 		cr->prev = &master.cr.list;
 		master.cr.list = cr_get(cr);
 		master.cr.numb++;
-		/*
-		   add to route list controlled rerouting buffer list 
-		 */
+		/* 
+		   add to route list controlled rerouting buffer list */
 		if (rl) {
 			if ((cr->rl.next = rl->cr.list))
 				cr->rl.next->rl.prev = &cr->rl.next;
@@ -18970,14 +18547,12 @@ mtp_free_cr(struct cr *cr)
 	{
 		struct rt *rt;
 		struct rl *rl;
-		/*
-		   stop timers and purge queues 
-		 */
+		/* 
+		   stop timers and purge queues */
 		__cr_timer_stop(cr, tall);
 		bufq_purge(&cr->buf);
-		/*
-		   unlink from route sets 
-		 */
+		/* 
+		   unlink from route sets */
 		if ((rt = xchg(&cr->rt.onto, NULL))) {
 			rt->load--;
 			rt_put(rt);
@@ -18987,9 +18562,8 @@ mtp_free_cr(struct cr *cr)
 			rt_put(rt);
 		}
 		if ((rl = cr->rl.rl)) {
-			/*
-			   remove from route list 
-			 */
+			/* 
+			   remove from route list */
 			if ((*cr->rl.prev = cr->rl.next))
 				cr->rl.next->rl.prev = cr->rl.prev;
 			cr->rl.next = NULL;
@@ -19001,9 +18575,8 @@ mtp_free_cr(struct cr *cr)
 			rl_put(xchg(&cr->rl.rl, NULL));
 		}
 		if (cr->next || cr->prev != &cr->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*cr->prev = cr->next))
 				cr->next->prev = cr->prev;
 			cr->next = NULL;
@@ -19012,12 +18585,11 @@ mtp_free_cr(struct cr *cr)
 			assure(master.cr.numb > 0);
 			master.cr.numb--;
 		}
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&cr->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: cr lingering reference count = %d\n", MTP_DRV_NAME,
-				cr, atomic_read(&cr->refcnt)));
+			pswerr(("%s: %p: ERROR: cr lingering reference count = %d\n", DRV_NAME, cr,
+				atomic_read(&cr->refcnt)));
 			atomic_set(&cr->refcnt, 1);
 		}
 	}
@@ -19047,9 +18619,8 @@ mtp_alloc_rr(struct rs *rs, struct lk *lk)
 STATIC void
 mtp_free_rr(struct rr *rr)
 {
-	/*
-	   remove from rs list 
-	 */
+	/* 
+	   remove from rs list */
 	if (rr->rs.rs) {
 		if ((*rr->rs.prev = rr->rs.next))
 			rr->rs.next->rs.prev = rr->rs.prev;
@@ -19093,7 +18664,7 @@ rt_put(struct rt *rt)
 {
 	if (atomic_dec_and_test(&rt->refcnt)) {
 		kmem_cache_free(mtp_rt_cachep, rt);
-		printd(("%s: %p: freed rt structure\n", MTP_DRV_NAME, rt));
+		printd(("%s: %p: freed rt structure\n", DRV_NAME, rt));
 	}
 }
 STATIC struct rt *
@@ -19103,20 +18674,18 @@ mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
 	if ((rt = kmem_cache_alloc(mtp_rt_cachep, SLAB_ATOMIC))) {
 		bzero(rt, sizeof(*rt));
 		rt->priv_put = &rt_put;
-		spin_lock_init(&rt->lock); /* "rt-lock" */
+		spin_lock_init(&rt->lock);	/* "rt-lock" */
 		rt_get(rt);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((rt->next = master.rt.list))
 			rt->next->prev = &rt->next;
 		rt->prev = &master.rt.list;
 		master.rt.list = rt_get(rt);
 		master.rt.numb++;
 		if (rl) {
-			/*
-			   add to routelist list 
-			 */
+			/* 
+			   add to routelist list */
 			if ((rt->rl.next = rl->rt.list))
 				rt->rl.next->rl.prev = &rt->rl.next;
 			rt->rl.prev = &rl->rt.list;
@@ -19125,9 +18694,8 @@ mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
 			rl->rt.numb++;
 		}
 		if (lk) {
-			/*
-			   add to linkset list 
-			 */
+			/* 
+			   add to linkset list */
 			if ((rt->lk.next = lk->rt.list))
 				rt->lk.next->lk.prev = &rt->lk.next;
 			rt->lk.prev = &lk->rt.list;
@@ -19135,22 +18703,19 @@ mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
 			lk->rt.list = rt_get(rt);
 			lk->rt.numb++;
 		}
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		rt->id = rt_get_id(id);
 		rt->type = MTP_OBJ_TYPE_RT;
 		rt->state = RT_ALLOWED;
 		rt->flags = 0;
 		rt->load = 0;	/* not loaded yet */
 		rt->slot = slot;
-		/*
-		   defaults inherited from rl 
-		 */
+		/* 
+		   defaults inherited from rl */
 		{
-			/*
-			   route timer defaults 
-			 */
+			/* 
+			   route timer defaults */
 			rt->config.t6 = rl->config.t6;
 			rt->config.t10 = rl->config.t10;
 		}
@@ -19166,13 +18731,11 @@ mtp_free_rt(struct rt *rt)
 	{
 		struct lk *lk;
 		struct rl *rl;
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		__rt_timer_stop(rt, tall);
-		/*
-		   remove from rl list 
-		 */
+		/* 
+		   remove from rl list */
 		if ((rl = rt->rl.rl)) {
 			if ((*rt->rl.prev = rt->rl.next))
 				rt->rl.next->rl.prev = rt->rl.prev;
@@ -19184,9 +18747,8 @@ mtp_free_rt(struct rt *rt)
 			rl->rt.numb--;
 			rl_put(xchg(&rt->rl.rl, NULL));
 		}
-		/*
-		   remove from lk list 
-		 */
+		/* 
+		   remove from lk list */
 		if ((lk = rt->lk.lk)) {
 			if ((*rt->lk.prev = rt->lk.next))
 				rt->lk.next->lk.prev = rt->lk.prev;
@@ -19199,9 +18761,8 @@ mtp_free_rt(struct rt *rt)
 			lk_put(xchg(&rt->lk.lk, NULL));
 		}
 		if (rt->next || rt->prev != &rt->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*rt->prev = rt->next))
 				rt->next->prev = rt->prev;
 			rt->next = NULL;
@@ -19245,7 +18806,7 @@ rl_put(struct rl *rl)
 {
 	if (atomic_dec_and_test(&rl->refcnt)) {
 		kmem_cache_free(mtp_rl_cachep, rl);
-		printd(("%s: %p: freed rl structure\n", MTP_DRV_NAME, rl));
+		printd(("%s: %p: freed rl structure\n", DRV_NAME, rl));
 	}
 }
 STATIC struct rl *
@@ -19257,20 +18818,18 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 		struct rl **rlp;
 		bzero(rl, sizeof(*rl));
 		rl->priv_put = &rl_put;
-		spin_lock_init(&rl->lock); /* "rl-lock" */
+		spin_lock_init(&rl->lock);	/* "rl-lock" */
 		rl_get(rl);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((rl->next = master.rl.list))
 			rl->next->prev = &rl->next;
 		rl->prev = &master.rl.list;
 		master.rl.list = rl_get(rl);
 		master.rl.numb++;
 		if (rs) {
-			/*
-			   add to routset list (descending cost) 
-			 */
+			/* 
+			   add to routset list (descending cost) */
 			for (rlp = &rs->rl.list; (*rlp) && (*rlp)->cost < cost;
 			     rlp = &(*rlp)->rs.next) ;
 			if ((rl->rs.next = *rlp))
@@ -19281,9 +18840,8 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 			rs->rl.numb++;
 		}
 		if (ls) {
-			/*
-			   add to linkset list 
-			 */
+			/* 
+			   add to linkset list */
 			if ((rl->ls.next = ls->rl.list))
 				rl->ls.next->ls.prev = &rl->ls.next;
 			rl->ls.prev = &ls->rl.list;
@@ -19294,19 +18852,16 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 		rl->id = rl_get_id(id);
 		rl->type = MTP_OBJ_TYPE_RL;
 		rl->cost = cost;
-		/*
-		   defaults inherited from rs 
-		 */
+		/* 
+		   defaults inherited from rs */
 		if (rs) {
-			/*
-			   route timer defaults 
-			 */
+			/* 
+			   route timer defaults */
 			rl->config.t6 = rs->config.t6;
 			rl->config.t10 = rs->config.t10;
 		}
-		/*
-		   defaults inherited from ls 
-		 */
+		/* 
+		   defaults inherited from ls */
 		if (ls) {
 			rl->rt.sls_bits = ls->rl.sls_bits;
 			rl->rt.sls_mask = ls->rl.sls_mask;
@@ -19314,9 +18869,8 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 		if (rs && ls) {
 			struct lk *lk;
 			struct rt *rt;
-			/*
-			   automatically allocate routes 
-			 */
+			/* 
+			   automatically allocate routes */
 			for (lk = ls->lk.list; lk; lk = lk->ls.next)
 				if (!(rt = mtp_alloc_rt(0, rl, lk, lk->slot)))
 					goto free_error;
@@ -19338,23 +18892,19 @@ mtp_free_rl(struct rl *rl)
 		struct rt *rt;
 		struct ls *ls;
 		struct rs *rs;
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		// __rl_timer_stop(rl, tall); /* no timers */
-		/*
-		   remove all controlled rerouting buffers 
-		 */
+		/* 
+		   remove all controlled rerouting buffers */
 		while ((cr = rl->cr.list))
 			mtp_free_cr(cr);
-		/*
-		   remove all routes 
-		 */
+		/* 
+		   remove all routes */
 		while ((rt = rl->rt.list))
 			mtp_free_rt(rt);
-		/*
-		   remove from rs list 
-		 */
+		/* 
+		   remove from rs list */
 		if ((rs = rl->rs.rs)) {
 			if ((*rl->rs.prev = rl->rs.next))
 				rl->rs.next->rs.prev = rl->rs.prev;
@@ -19364,9 +18914,8 @@ mtp_free_rl(struct rl *rl)
 			rs->rl.numb--;
 			rs_put(xchg(&rl->rs.rs, NULL));
 		}
-		/*
-		   remove from ls list 
-		 */
+		/* 
+		   remove from ls list */
 		if ((ls = rl->ls.ls)) {
 			if ((*rl->ls.prev = rl->ls.next))
 				rl->ls.next->ls.prev = rl->ls.prev;
@@ -19377,9 +18926,8 @@ mtp_free_rl(struct rl *rl)
 			ls_put(xchg(&rl->ls.ls, NULL));
 		}
 		if (rl->next || rl->prev != &rl->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*rl->prev = rl->next))
 				rl->next->prev = rl->prev;
 			rl->next = NULL;
@@ -19423,7 +18971,7 @@ rs_put(struct rs *rs)
 {
 	if (atomic_dec_and_test(&rs->refcnt)) {
 		kmem_cache_free(mtp_rs_cachep, rs);
-		printd(("%s: %p: freed rs structure\n", MTP_DRV_NAME, rs));
+		printd(("%s: %p: freed rs structure\n", DRV_NAME, rs));
 	}
 }
 STATIC struct rs *
@@ -19433,20 +18981,18 @@ mtp_alloc_rs(ulong id, struct sp *sp, ulong dest, ulong flags)
 	if ((rs = kmem_cache_alloc(mtp_rs_cachep, SLAB_ATOMIC))) {
 		bzero(rs, sizeof(*rs));
 		rs->priv_put = &rs_put;
-		spin_lock_init(&rs->lock); /* "rs-lock" */
+		spin_lock_init(&rs->lock);	/* "rs-lock" */
 		rs_get(rs);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((rs->next = master.rs.list))
 			rs->next->prev = &rs->next;
 		rs->prev = &master.rs.list;
 		master.rs.list = rs_get(rs);
 		master.rs.numb++;
 		if (sp) {
-			/*
-			   add to sp list 
-			 */
+			/* 
+			   add to sp list */
 			if ((rs->sp.next = sp->rs.list))
 				rs->sp.next->sp.prev = &rs->sp.next;
 			rs->sp.prev = &sp->rs.list;
@@ -19454,25 +19000,21 @@ mtp_alloc_rs(ulong id, struct sp *sp, ulong dest, ulong flags)
 			sp->rs.list = rs_get(rs);
 			sp->rs.numb++;
 		}
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		rs->id = rs_get_id(id);
 		rs->type = MTP_OBJ_TYPE_RS;
 		rs->flags = flags & (RSF_TFR_PENDING | RSF_ADJACENT | RSF_CLUSTER | RSF_XFER_FUNC);
 		rs->dest = dest;
-		/*
-		   defaults inherited from sp 
-		 */
+		/* 
+		   defaults inherited from sp */
 		{
-			/*
-			   route timer defaults 
-			 */
+			/* 
+			   route timer defaults */
 			rs->config.t6 = sp->config.t6;
 			rs->config.t10 = sp->config.t10;
-			/*
-			   route set timer defaults 
-			 */
+			/* 
+			   route set timer defaults */
 			rs->config.t8 = sp->config.t8;
 			rs->config.t11 = sp->config.t11;
 			rs->config.t15 = sp->config.t15;
@@ -19492,23 +19034,19 @@ mtp_free_rs(struct rs *rs)
 		struct rr *rr;
 		struct rl *rl;
 		struct sp *sp;
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		__rs_timer_stop(rs, tall);
-		/*
-		   remove all route restrictions 
-		 */
+		/* 
+		   remove all route restrictions */
 		while ((rr = rs->rr.list))
 			mtp_free_rr(rr);
-		/*
-		   remove all route lists 
-		 */
+		/* 
+		   remove all route lists */
 		while ((rl = rs->rl.list))
 			mtp_free_rl(rl);
-		/*
-		   remove from sp list 
-		 */
+		/* 
+		   remove from sp list */
 		if ((sp = rs->sp.sp)) {
 			if ((*rs->sp.prev = rs->sp.next))
 				rs->sp.next->sp.prev = rs->sp.prev;
@@ -19519,9 +19057,8 @@ mtp_free_rs(struct rs *rs)
 			sp_put(xchg(&rs->sp.sp, NULL));
 		}
 		if (rs->next || rs->prev != &rs->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*rs->prev = rs->next))
 				rs->next->prev = rs->prev;
 			rs->next = NULL;
@@ -19565,7 +19102,7 @@ sp_put(struct sp *sp)
 {
 	if (atomic_dec_and_test(&sp->refcnt)) {
 		kmem_cache_free(mtp_sp_cachep, sp);
-		printd(("%s: %p: freed sp structure\n", MTP_DRV_NAME, sp));
+		printd(("%s: %p: freed sp structure\n", DRV_NAME, sp));
 	}
 }
 STATIC struct sp *
@@ -19575,20 +19112,18 @@ mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
 	if ((sp = kmem_cache_alloc(mtp_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp->priv_put = &sp_put;
-		spin_lock_init(&sp->lock); /* "sp-lock" */
+		spin_lock_init(&sp->lock);	/* "sp-lock" */
 		sp_get(sp);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((sp->next = master.sp.list))
 			sp->next->prev = &sp->next;
 		sp->prev = &master.sp.list;
 		master.sp.list = sp_get(sp);
 		master.sp.numb++;
 		if (na) {
-			/*
-			   add to na list 
-			 */
+			/* 
+			   add to na list */
 			if ((sp->na.next = na->sp.list))
 				sp->na.next->na.prev = &sp->na.next;
 			sp->na.prev = &na->sp.list;
@@ -19596,9 +19131,8 @@ mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
 			na->sp.list = sp_get(sp);
 			na->sp.numb++;
 		}
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		sp->id = sp_get_id(id);
 		sp->type = MTP_OBJ_TYPE_SP;
 		sp->flags =
@@ -19606,18 +19140,15 @@ mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
 			     SPF_XFER_FUNC);
 		sp->pc = pc;
 		sp->mtp.equipped = equipped;
-		/*
-		   defaults inherited from na 
-		 */
+		/* 
+		   defaults inherited from na */
 		{
-			/*
-			   sls bits and mask 
-			 */
+			/* 
+			   sls bits and mask */
 			sp->ls.sls_bits = na->sp.sls_bits;
 			sp->ls.sls_mask = na->sp.sls_mask;
-			/*
-			   signalling link timer defaults 
-			 */
+			/* 
+			   signalling link timer defaults */
 			sp->config.t1 = na->config.t1;
 			sp->config.t2 = na->config.t2;
 			sp->config.t3 = na->config.t3;
@@ -19640,26 +19171,22 @@ mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
 			sp->config.t1t = na->config.t1t;
 			sp->config.t2t = na->config.t2t;
 			sp->config.t1s = na->config.t1s;
-			/*
-			   link timer defaults 
-			 */
+			/* 
+			   link timer defaults */
 			sp->config.t7 = na->config.t7;
-			/*
-			   route timer defaults 
-			 */
+			/* 
+			   route timer defaults */
 			sp->config.t6 = na->config.t6;
 			sp->config.t10 = na->config.t10;
-			/*
-			   route set timer defaults 
-			 */
+			/* 
+			   route set timer defaults */
 			sp->config.t8 = na->config.t8;
 			sp->config.t11 = na->config.t11;
 			sp->config.t15 = na->config.t15;
 			sp->config.t16 = na->config.t16;
 			sp->config.t18a = na->config.t18a;
-			/*
-			   signalling point timer defaults 
-			 */
+			/* 
+			   signalling point timer defaults */
 			sp->config.t1r = na->config.t1r;
 			sp->config.t18 = na->config.t18;
 			sp->config.t19 = na->config.t19;
@@ -19688,24 +19215,20 @@ mtp_free_sp(struct sp *sp)
 		struct ls *ls;
 		struct rs *rs;
 		struct na *na;
-		/*
-		   stop timers 
-		 */
+		/* 
+		   stop timers */
 		__sp_timer_stop(sp, tall);
 		fixme(("Hangup on all mtp users\n"));
-		/*
-		   remove all route sets 
-		 */
+		/* 
+		   remove all route sets */
 		while ((rs = sp->rs.list))
 			mtp_free_rs(rs);
-		/*
-		   remove all link sets 
-		 */
+		/* 
+		   remove all link sets */
 		while ((ls = sp->ls.list))
 			mtp_free_ls(ls);
-		/*
-		   remove from na list 
-		 */
+		/* 
+		   remove from na list */
 		if ((na = sp->na.na)) {
 			if ((*sp->na.prev = sp->na.next))
 				sp->na.next->na.prev = sp->na.prev;
@@ -19716,9 +19239,8 @@ mtp_free_sp(struct sp *sp)
 			na_put(xchg(&sp->na.na, NULL));
 		}
 		if (sp->next || sp->prev != &sp->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*sp->prev = sp->next))
 				sp->next->prev = sp->prev;
 			sp->next = NULL;
@@ -19743,19 +19265,17 @@ mtp_alloc_na(ulong id, uint32_t member, uint32_t cluster, uint32_t network, uint
 	if ((na = kmem_cache_alloc(mtp_na_cachep, SLAB_ATOMIC))) {
 		bzero(na, sizeof(*na));
 		na->priv_put = &na_put;
-		spin_lock_init(&na->lock); /* "na-lock" */
+		spin_lock_init(&na->lock);	/* "na-lock" */
 		na_get(na);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((na->next = master.na.list))
 			na->next->prev = &na->next;
 		na->prev = &master.na.list;
 		master.na.list = na_get(na);
 		master.na.numb++;
-		/*
-		   fill out structure 
-		 */
+		/* 
+		   fill out structure */
 		na->id = na_get_id(id);
 		na->type = MTP_OBJ_TYPE_NA;
 		na->mask.member = member;
@@ -19764,9 +19284,8 @@ mtp_alloc_na(ulong id, uint32_t member, uint32_t cluster, uint32_t network, uint
 		na->sp.sls_bits = sls_bits;
 		na->sp.sls_mask = (1 << sls_bits) - 1;
 		na->option = *option;
-		/*
-		   populate defaults based on protoocl variant 
-		 */
+		/* 
+		   populate defaults based on protoocl variant */
 		switch ((na->option.pvar & SS7_PVAR_MASK)) {
 		default:
 		case SS7_PVAR_ITUT:
@@ -19793,15 +19312,13 @@ mtp_free_na(struct na *na)
 	spin_lock_irqsave(&na->lock, flags);
 	{
 		struct sp *sp;
-		/*
-		   remove all attached signalling points 
-		 */
+		/* 
+		   remove all attached signalling points */
 		while ((sp = na->sp.list))
 			mtp_free_sp(sp);
 		if (na->next || na->prev != &na->next) {
-			/*
-			   remove from master list 
-			 */
+			/* 
+			   remove from master list */
 			if ((*na->prev = na->next))
 				na->next->prev = na->prev;
 			na->next = NULL;
@@ -19841,84 +19358,149 @@ na_put(struct na *na)
 {
 	if (atomic_dec_and_test(&na->refcnt)) {
 		kmem_cache_free(mtp_na_cachep, na);
-		printd(("%s: %p: freed na structure\n", MTP_DRV_NAME, na));
+		printd(("%s: %p: freed na structure\n", DRV_NAME, na));
 	}
 }
 
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int mtp_initialized = 0;
-STATIC void
-mtp_init(void)
-{
-	int rtn, major;
-	unless(mtp_initialized, return);
-	cmn_err(CE_NOTE, MTP_BANNER);	/* console splash */
-	if ((rtn = mtp_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Counld not allocated caches", MTP_DRV_NAME);
-		mtp_initialized = rtn;
-		return;
-	}
-	for (major = 0; major < MTP_CMAJORS; major++) {
-		if ((rtn =
-		     lis_register_strdev(mtp_majors[major], &mtp_info, MTP_CMINORS,
-					 MTP_DRV_NAME)) <= 0) {
-			if (!major) {
-				cmn_err(CE_PANIC, "%s: Can't register 1'st major %d", MTP_DRV_NAME,
-					mtp_majors[0]);
-				mtp_term_caches();
-				mtp_initialized = rtn;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: Can't register %d'th major", MTP_DRV_NAME, major + 1);
-			mtp_majors[major] = 0;
-		} else if (major)
-			mtp_majors[major] = rtn;
-	}
-	spin_lock_init(&master.lock); /* "mtp-open-list-lock" */
-	mtp_initialized = 1;
-	return;
-}
-STATIC void
-mtp_terminate(void)
-{
-	int rtn, major;
-	for (major = 0; major < MTP_CMAJORS; major++) {
-		if (mtp_majors[major]) {
-			if ((rtn = lis_unregister_strdev(mtp_majors[major])))
-				cmn_err(CE_PANIC, "%s: Can't unregister major %d\n", MTP_DRV_NAME,
-					mtp_majors[major]);
-			if (major)
-				mtp_majors[major] = 0;
-		}
-	}
-	mtp_term_caches();
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  LINUX MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw mtp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &mtpinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+mtp_register_strdev(major_t major)
 {
-	mtp_init();
-	if (mtp_initialized < 0)
-		return mtp_initialized;
+	int err;
+	if ((err = register_strdev(&mtp_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+mtp_unregister_strdev(major_t major)
 {
-	mtp_terminate();
+	int err;
+	if ((err = unregister_strdev(&mtp_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+mtp_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &mtpinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+mtp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+mtpterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (mtp_majors[mindex]) {
+			if ((err = mtp_unregister_strdev(mtp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					mtp_majors[mindex]);
+			if (mindex)
+				mtp_majors[mindex] = 0;
+		}
+	}
+	if ((err = mtp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+mtpinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = mtp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		mtpterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = mtp_register_strdev(mtp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					mtp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				mtpterminate();
+				return (err);
+			}
+		}
+		if (mtp_majors[mindex] == 0)
+			mtp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(mtp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = mtp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(mtpinit);
+module_exit(mtpterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $
+ @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $"
+#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:17 $"
 
 static char const ident[] =
-    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:53 $";
+    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:17 $";
 
 #define __NO_VERSION__
 
+#define CONFIG_STREAMS_COMPAT_LIS
+#define _LIS_SOURCE
+
 #include "compat.h"
+
+#include <sys/lisddi.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>

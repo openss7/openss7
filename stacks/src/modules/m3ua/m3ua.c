@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $";
 
 #include "compat.h"
 
@@ -75,14 +75,18 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
+			M3UA_REVISION	"\n" \
 			M3UA_COPYRIGHT	"\n" \
 			M3UA_DEVICE	"\n" \
-			M3UA_CONTACT	"\n"
+			M3UA_CONTACT
+#define M3UA_SPLASH	M3UA_DESCRIP	"\n" \
+			M3UA_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(M3UA_CONTACT);
@@ -90,8 +94,16 @@ MODULE_DESCRIPTION(M3UA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M3UA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M3UA_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
+
+#ifdef LFS
+#define M3UA_DRV_ID	CONFIG_STREAMS_M3UA_MODID
+#define M3UA_DRV_NAME	CONFIG_STREAMS_M3UA_NAME
+#define M3UA_CMAJORS	CONFIG_STREAMS_M3UA_NMAJORS
+#define M3UA_CMAJOR_0	CONFIG_STREAMS_M3UA_MAJOR
+#define M3UA_UNITS	CONFIG_STREAMS_M3UA_NMINORS
+#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -101,9 +113,20 @@ MODULE_LICENSE(M3UA_LICENSE);
  *  =========================================================================
  */
 
+#define DRV_ID		M3UA_DRV_ID
+#define DRV_NAME	M3UA_DRV_NAME
+#define CMAJORS		M3UA_CMAJORS
+#define CMAJOR_0	M3UA_CMAJOR_0
+#define UNITS		M3UA_UNITS
+#ifdef MODULE
+#define DRV_BANNER	M3UA_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	M3UA_SPLASH
+#endif				/* MODULE */
+
 static struct module_info m3ua_minfo = {
-	0,				/* Module ID number */
-	"m3ua",				/* Module name */
+	DRV_ID,				/* Module ID number */
+	DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted *//* XXX */
 	512,				/* Max packet size accepted *//* XXX */
 	8 * 512,			/* Hi water mark *//* XXX */
@@ -130,12 +153,23 @@ static struct qinit m3ua_winit = {
 	NULL				/* Statistics */
 };
 
-MODULE_STATIC struct streamtab m3ua_info = {
+MODULE_STATIC struct streamtab m3uainfo = {
 	&m3ua_rinit,			/* Upper read queue */
 	&m3ua_winit,			/* Upper write queue */
 	&m3ua_rinit,			/* Lower read queue */
 	&m3ua_winit			/* Lower write queue */
 };
+
+STATIC int
+m3ua_init_caches(void)
+{
+	return (0);
+}
+STATIC int
+m3ua_term_caches(void)
+{
+	return (0);
+}
 
 /*
  *  =========================================================================
@@ -162,67 +196,142 @@ static struct ua_driver m3ua_dinfo = {
 /*
  *  =========================================================================
  *
- *  LiS MODULE INITIALIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
-static m3ua_initialized = 0;
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
-#ifndef LIS_REGISTERED
-static inline void m3ua_init(void)
-#else
-__initfunc(void m3ua_init(void))
-#endif
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw m3ua_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &m3uainfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+m3ua_register_strdev(major_t major)
 {
-	if (m3ua_initialized)
-		return;
-	m3ua_initialized = 1;
-	printk(KERN_INFO M2UA_BANNER);	/* console splash */
-#ifndef LIS_REGISTERED
-	if (lis_register_strdev(M2UA_CMAJOR, &m3ua_info, M2UA_NMINOR, m3ua_minfo.mi_idname) < 0) {
-		cmn_err(CE_NOTE, "m3ua: couldn't register driver!\n");
-		m3ua_minfo.mi_idnum = 0;
-	}
-	m3ua_minfo.mi_idnum = M2UA_CMAJOR;
-#endif
-	m3ua_driver = &m3ua_dinfo;
+	int err;
+	if ((err = register_strdev(&m3ua_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
 
-#ifndef LIS_REGISTERED
-static inline void m3ua_terminate(void)
-#else
-__initfunc(void m3ua_terminate(void))
-#endif
+STATIC int
+m3ua_unregister_strdev(major_t major)
 {
-	if (!m3ua_initialized)
-		return;
-	m3ua_initialized = 0;
-#ifndef LIS_REGISTERED
-	if (m3ua_minfo.mi_idnum)
-		if (lis_unregister_strdev(m3ua_minfo.mi_idnum) < 0)
-			cmn_err(CE_WARN, "m3ua: couldn't unregister driver!\n");
+	int err;
+	if ((err = unregister_strdev(&m3ua_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+m3ua_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &m3uainfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+m3ua_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+m3uaterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (m3ua_majors[mindex]) {
+			if ((err = m3ua_unregister_strdev(m3ua_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					m3ua_majors[mindex]);
+			if (mindex)
+				m3ua_majors[mindex] = 0;
+		}
+	}
+	if ((err = m3ua_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+m3uainit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = m3ua_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		m3uaterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = m3ua_register_strdev(m3ua_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					m3ua_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				m3uaterminate();
+				return (err);
+			}
+		}
+		if (m3ua_majors[mindex] == 0)
+			m3ua_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(m3ua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
-	m3ua_driver = NULL;
+		if (major == 0)
+			major = m3ua_majors[0];
+	}
+	return (0);
 }
 
 /*
- *  =========================================================================
- *
- *  LINUX KERNEL MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
+module_init(m3uainit);
+module_exit(m3uaterminate);
 
-#ifdef MODULE
-int init_module(void)
-{
-	m3ua_init();
-	return (0);
-}
-void cleanup_module(void)
-{
-	m3ua_terminate();
-	return;
-}
-#endif
+#endif				/* LINUX */

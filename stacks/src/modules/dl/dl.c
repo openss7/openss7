@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
 
-static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
+static char const ident[] =
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $";
 
 #include "compat.h"
 /*
@@ -61,8 +62,8 @@ static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.2 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.3 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:07 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -72,17 +73,24 @@ static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 			DL_COPYRIGHT	"\n" \
 			DL_DEVICE	"\n" \
 			DL_CONTACT
+#define DL_SPLASH	DL_DESCRIP	"\n" \
+			DL_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(DL_CONTACT);
 MODULE_DESCRIPTION(DL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(DL_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(DL_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
 #define DL_DRV_ID	CONFIG_STREAMS_DL_MODID
 #define DL_DRV_NAME	CONFIG_STREAMS_DL_NAME
+#define DL_CMAJORS	CONFIG_STREAMS_DL_NMAJORS
+#define DL_CMAJOR_0	CONFIG_STREAMS_DL_MAJOR
+#define DL_NMINOR	CONFIG_STREAMS_DL_NMINORS
 #endif
 
 /*
@@ -93,9 +101,19 @@ MODULE_LICENSE(DL_LICENSE);
  *  =========================================================================
  */
 
+#define DRV_ID		DL_DRV_ID
+#define DRV_NAME	DL_DRV_NAME
+#define CMAJOR_0	DL_CMAJOR_0
+#define NMINOR		DL_NMINOR
+#ifdef MODULE
+#define DRV_BANNER	DL_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	DL_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info dl_xinfo = {
-	mi_idnum:DL_DRV_ID,		/* Module ID number */
-	mi_idname:DL_DRV_NAME,		/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:(0),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -111,7 +129,7 @@ STATIC struct qinit dl_xinit = {
 	qi_minfo:&dl_xinfo,		/* Information */
 };
 
-STATIC struct streamtab dl_info = {
+MODULE_STATIC struct streamtab dlinfo = {
 	st_rdinit:&dl_xinit,		/* Upper read queue */
 	st_wrinit:&dl_xinit,		/* Upper write queue */
 };
@@ -123,8 +141,10 @@ STATIC struct streamtab dl_info = {
  *
  *  =========================================================================
  */
+STATIC int dl_majors[DL_CMAJORS] = {
+	DL_CMAJOR_0,
+};
 STATIC char drvname[FMNAMESZ + 9];
-STATIC int dl_majors[256];
 STATIC const char *dl_modules[256] = {
 	"dl",
 	"dl-dua",
@@ -180,9 +200,8 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		if (!(stab = lis_find_strdev(dl_majors[cminor])))
 			cmajor = dl_majors[cminor] = 0;
 		else if (strncmp(dl_modules[cminor], lis_fstr_sw[cmajor].f_name, FMNAMESZ) != 0) {
-			/*
-			   name changed 
-			 */
+			/* 
+			   name changed */
 			stab = NULL;
 			cmajor = dl_majors[cminor] = 0;
 		}
@@ -226,58 +245,142 @@ dl_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LIS MODULE INITIALIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int dl_initialized = 0;
-MODULE_STATIC void
-dl_init(void)
-{
-	int rtn;
-	unless(dl_initialized, return);
-	cmn_err(CE_NOTE, DL_BANNER);	/* console splash */
-	if ((rtn = lis_register_strdev(dl_majors[0], &dl_info, 255, DL_DRV_NAME)) <= 0) {
-		cmn_err(CE_PANIC, "%s: Cannot register major %d", DL_DRV_NAME, dl_majors[0]);
-		dl_initialized = rtn;
-		return;
-	}
-	dl_majors[0] = rtn;
-	LIS_DEVFLAGS(rtn) |= LIS_MODFLG_CLONE;
-	dl_initialized = 1;
-	return;
-}
-MODULE_STATIC void
-dl_terminate(void)
-{
-	int rtn;
-	if (dl_majors[0]) {
-		if ((rtn = lis_unregister_strdev(dl_majors[0])))
-			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", DL_DRV_NAME,
-				dl_majors[0]);
-		dl_majors[0] = 0;
-	}
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the DL driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the DL driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  LINUX MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw dl_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &dlinfo,
+	.d_flag = 0,
+	.d_mode = S_IFCHR,
+	.d_fop = NULL,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+dl_register_strdev(major_t major)
 {
-	dl_init();
-	if (dl_initialized < 0)
-		return dl_initialized;
+	int err;
+	if ((err = register_strdev(&dl_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+dl_unregister_strdev(major_t major)
 {
-	dl_terminate();
+	int err;
+	if ((err = unregister_strdev(&dl_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+dl_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &dlinfo, NMINOR, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+dl_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+dlterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (dl_majors[mindex]) {
+			if ((err = dl_unregister_strdev(dl_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", MOD_NAME,
+					dl_majors[mindex]);
+			if (mindex)
+				dl_majors[mindex] = 0;
+		}
+	}
+	if ((err = dl_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+dlinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = dl_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		dlterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = dl_register_strdev(dl_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", MOD_NAME,
+					dl_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					MOD_NAME, err);
+				dlterminate();
+				return (err);
+			}
+		}
+		if (dl_major[mindex] == 0)
+			dl_major[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(dl_major[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = dl_major[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(dlinit);
+module_exit(dlterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:13 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:31 $";
 
 #include "compat.h"
 
@@ -100,11 +100,7 @@ MODULE_LICENSE(SUA_LICENSE);
 #define SUA_DRV_NAME	CONFIG_STREAMS_SUA_NAME
 #define SUA_CMAJORS	CONFIG_STREAMS_SUA_NMAJORS
 #define SUA_CMAJOR_0	CONFIG_STREAMS_SUA_MAJOR
-#define SUA_NMINOR	CONFIG_STREAMS_SUA_NMINORS
-#endif
-
-#ifndef SUA_NMINOR
-#define SUA_NMINOR	255
+#define SUA_UNITS	CONFIG_STREAMS_SUA_NMINORS
 #endif
 
 /*
@@ -115,57 +111,71 @@ MODULE_LICENSE(SUA_LICENSE);
  *  ================================================================================
  */
 
+#define DRV_ID		SUA_DRV_ID
+#define DRV_NAME	SUA_DRV_NAME
+#define CMAJORS		SUA_CMAJORS
+#define CMAJOR_0	SUA_CMAJOR_0
+#define UNITS		SUA_UNITS
+#ifdef MODULE
+#define DRV_BANNER	SUA_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SUA_SPLASH
+#endif				/* MODULE */
+
 static struct module_info sua_minfo = {
-	SUA_DRV_ID,			/* Module ID number */
-	SUA_DRV_NAME,			/* Module name */
-	1,				/* Min packet size accepted *//* XXX */
-	512,				/* Max packet size accepted *//* XXX */
-	8 * 512,			/* Hi water mark *//* XXX */
-	1 * 512				/* Lo water mark *//* XXX */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted *//* XXX */
+	.mi_maxpsz = 512,		/* Max packet size accepted *//* XXX */
+	.mi_hiwat = 8 * 512,		/* Hi water mark *//* XXX */
+	.mi_lowat = 1 * 512,		/* Lo water mark *//* XXX */
 };
 
 static struct qinit sua_u_rinit = {
-	ua_rput,			/* Read put (msg from below) */
-	ua_rsrv,			/* Read queue service */
-	ua_open,			/* Each open */
-	ua_close,			/* Last close */
-	NULL,				/* Admin (not used) */
-	&sua_minfo,			/* Information */
-	NULL				/* Statistics */
+	.qi_putp = ua_rput,		/* Read put (msg from below) */
+	.qi_srvp = ua_rsrv,		/* Read queue service */
+	.qi_qopen = ua_open,		/* Each open */
+	.qi_qclose = ua_close,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &sua_minfo,		/* Information */
+	.qi_mstat = NULL,		/* Statistics */
 };
+
 static struct qinit sua_u_winit = {
-	ua_wput,			/* Write put (msg from above) */
-	ua_wsrv,			/* Write queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&sua_minfo,			/* Information */
-	NULL				/* Statistics */
+	.qi_putp = ua_wput,		/* Write put (msg from above) */
+	.qi_srvp = ua_wsrv,		/* Write queue service */
+	.qi_qopen = NULL,		/* Each open */
+	.qi_qclose = NULL,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &sua_minfo,		/* Information */
+	.qi_mstat = NULL,		/* Statistics */
 };
+
 static struct qinit sua_l_rinit = {
-	ua_rput,			/* Read put (msg from below) */
-	ua_rsrv,			/* Read queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&sua_minfo,			/* Information */
-	NULL				/* Statistics */
+	.qi_putp = ua_rput,		/* Read put (msg from below) */
+	.qi_srvp = ua_rsrv,		/* Read queue service */
+	.qi_qopen = NULL,		/* Each open */
+	.qi_qclose = NULL,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &sua_minfo,		/* Information */
+	.qi_mstat = NULL,		/* Statistics */
 };
+
 static struct qinit sua_l_winit = {
-	ua_wput,			/* Write put (msg from above) */
-	ua_wsrv,			/* Write queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&sua_minfo,			/* Information */
-	NULL				/* Statistics */
+	.qi_putp = ua_wput,		/* Write put (msg from above) */
+	.qi_srvp = ua_wsrv,		/* Write queue service */
+	.qi_qopen = NULL,		/* Each open */
+	.qi_qclose = NULL,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &sua_minfo,		/* Information */
+	.qi_mstat = NULL,		/* Statistics */
 };
 
 MODULE_STATIC struct streamtab sua_info = {
-	&sua_u_rinit,			/* Upper read queue */
-	&sua_u_winit,			/* Upper write queue */
-	&sua_l_rinit,			/* Lower read queue */
-	&sua_l_winit			/* Lower write queue */
+	.st_rdinit = &sua_u_rinit,	/* Upper read queue */
+	.st_wrinit = &sua_u_winit,	/* Upper write queue */
+	.st_muxrinit = &sua_l_rinit,	/* Lower read queue */
+	.st_muxwinit = &sua_l_winit,	/* Lower write queue */
 };
 
 /*
@@ -192,67 +202,143 @@ static struct ua_driver sua_dinfo = {
 
 /*
  *  =========================================================================
- *  
- *  LiS MODULE INITIALIZATION
- *  
+ *
+ *  Registration and initialization
+ *
  *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
-static sua_initialized = 0;
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SUA driver. (0 for allocation.)");
 
-#ifndef LiS_REGISTERED
-static inline void sua_init(void)
-#else
-__initfunc(void sua_init(void))
-#endif
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the SUA driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw sua_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &suainfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+sua_register_strdev(major_t major)
 {
-	if (sua_initialized)
-		return;
-	printk(KERN_INFO SUA_BANNER);	/* console splash */
-#ifndef LIS_REGISTERED
-	if (lis_register_strdev(SUA_CMAJOR_0, &sua_info, SUA_NMINOR, sua_minfo.mi_idname) < 0) {
-		cmn_err(CE_NOTE, "sua: couldn't register driver!\n");
-		sua_minfo.mi_idnum = 0;
-	}
-	sua_minfo.mi_idnum = SUA_CMAJOR_0;
-#endif
-	sua_driver = &sua_dinfo;
+	int err;
+	if ((err = register_strdev(&sua_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
 
-#ifndef LIS_REGISTERED
-static inline void sua_terminate(void)
-#else
-__initfunc(void sua_terminate(void))
-#endif
+STATIC int
+sua_unregister_strdev(major_t major)
 {
-	if (!sua_initialized)
-		return;
-	sua_intialized = 0;
-#ifndef LIS_REGISTERED
-	if (sua_minfo.mi_idnum)
-		if (lis_unregister_strdev(sua_minfo.mi_idnum) < 0)
-			cmn_err(CE_WARN, "sua: couldn't unregister driver!\n");
+	int err;
+	if ((err = unregister_strdev(&sua_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sua_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &suainfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+sua_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+suaterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (sua_majors[mindex]) {
+			if ((err = sua_unregister_strdev(sua_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					sua_majors[mindex]);
+			if (mindex)
+				sua_majors[mindex] = 0;
+		}
+	}
+	if ((err = sua_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+suainit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = sua_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		suaterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = sua_register_strdev(sua_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					sua_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				suaterminate();
+				return (err);
+			}
+		}
+		if (sua_majors[mindex] == 0)
+			sua_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(sua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
-	sua_driver = NULL;
+		if (major == 0)
+			major = sua_majors[0];
+	}
+	return (0);
 }
 
 /*
- *  =========================================================================
- *  
- *  LINUX KERNEL MODULE INITIALIZATION
- *  
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
+module_init(suainit);
+module_exit(suaterminate);
 
-#ifdef MODULE
-int init_module(void)
-{
-	sua_init();
-	return (0);
-}
-void cleanup_module(void)
-{
-	sua_terminate();
-	return;
-}
-#endif
+#endif				/* LINUX */

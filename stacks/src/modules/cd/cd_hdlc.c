@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:31 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -81,7 +81,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $"
 #define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -195,8 +195,7 @@ hdlc_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct str *str;
-		/* 
-		   test for multiple push */
+		/* test for multiple push */
 		for (str = hdlc_list; str; str = str->next) {
 			if (str->u.dev.cmajor == cmajor && str->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;

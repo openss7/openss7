@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:29 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:06 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:06 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:06 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4649,7 +4649,7 @@ sdt_free_priv(queue_t *q)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
-sdt_t *sdt_list = NULL;
+struct sdt *sdt_list = NULL;
 STATIC int
 sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
@@ -4660,17 +4660,27 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next != NULL) {
-		if (!(sdt_alloc_priv(q, &sdt_list, getmajor(*devp), getminor(*devp)))) {
-			MOD_DEC_USE_COUNT;
-			return ENOMEM;
+		int cmajor = getmajor(*devp);
+		int cminor = getminor(*devp);
+		struct sdt *sdt;
+		/* test for multiple push */
+		for (sdt = sdt_list; sdt; sdt = sdt->next) {
+			if (sdt->cmajor == cmajor && sdt->cminor == cminor) {
+				MOD_DEC_USE_COUNT;
+				return (ENXIO);
+			}
 		}
-		/* 
-		   generate immediate information request */
+		if (!(sdt_alloc_priv(q, &sdt_list, cmajor, cminor))) {
+			MOD_DEC_USE_COUNT;
+			return (ENOMEM);
+		}
+		qprocson(q);
+		/* generate immediate information request */
 		t_info_req(q);
 		return (0);
 	}
 	MOD_DEC_USE_COUNT;
-	return EIO;
+	return (EIO);
 }
 STATIC int
 sdt_close(queue_t *q, int flag, cred_t *crp)

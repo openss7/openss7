@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:51 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $"
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $";
+static char const ident[] =
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -79,7 +80,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:51 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:15 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -96,7 +97,7 @@ MODULE_DESCRIPTION(ISUP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ISUP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ISUP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -104,9 +105,8 @@ MODULE_LICENSE(ISUP_LICENSE);
 #define ISUP_DRV_NAME		CONFIG_STREAMS_ISUP_NAME
 #define ISUP_CMAJORS		CONFIG_STREAMS_ISUP_NMAJORS
 #define ISUP_CMAJOR_0		CONFIG_STREAMS_ISUP_MAJOR
-#endif
-
-#define ISUP_CMINORS 255
+#define ISUP_UNITS		CONFIG_STREAMS_ISUP_NMINORS
+#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -115,33 +115,45 @@ MODULE_LICENSE(ISUP_LICENSE);
  *
  *  =========================================================================
  */
+
+#define DRV_ID		ISUP_DRV_ID
+#define DRV_NAME	ISUP_DRV_NAME
+#define CMAJORS		ISUP_CMAJORS
+#define CMAJOR_0	ISUP_CMAJOR_0
+#define UNITS		ISUP_UNITS
+#ifdef MODULE
+#define DRV_BANNER	ISUP_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	ISUP_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info isup_winfo = {
-	mi_idnum:ISUP_DRV_ID,		/* Module ID number */
-	mi_idname:ISUP_DRV_NAME "-wr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-wr",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 STATIC struct module_info isup_rinfo = {
-	mi_idnum:ISUP_DRV_ID,		/* Module ID number */
-	mi_idname:ISUP_DRV_NAME "-rd",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-rd",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 STATIC struct module_info mtp_winfo = {
-	mi_idnum:ISUP_DRV_ID,		/* Module ID number */
-	mi_idname:ISUP_DRV_NAME "-mxw",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-mxw",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
 	mi_lowat:1 << 12,		/* Lo water mark */
 };
 STATIC struct module_info mtp_rinfo = {
-	mi_idnum:ISUP_DRV_ID,		/* Module ID number */
-	mi_idname:ISUP_DRV_NAME "-mxr",	/* Module ID name */
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME "-mxr",	/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:272 + 1,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -174,7 +186,7 @@ STATIC struct qinit mtp_winit = {
 	qi_minfo:&mtp_winfo,		/* Information */
 };
 
-STATIC struct streamtab isup_info = {
+STATIC struct streamtab isupinfo = {
 	st_rdinit:&isup_rinit,		/* Upper read queue */
 	st_wrinit:&isup_winit,		/* Upper write queue */
 	st_muxrinit:&mtp_rinit,		/* Lower read queue */
@@ -758,7 +770,7 @@ cs_set_state(struct cc *cc, const long newstate)
 {
 	long oldstate = cs_get_state(cc);
 	(void) oldstate;
-	printd(("%s: %p: %d:%d cc-state %s <- %s\n", ISUP_DRV_NAME, cc, cc->u.dev.cmajor,
+	printd(("%s: %p: %d:%d cc-state %s <- %s\n", DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor, cc_state_name(newstate), cc_state_name(oldstate)));
 	cc->state = newstate;
 }
@@ -767,7 +779,7 @@ ct_set_state(struct ct *ct, const long newstate)
 {
 	long oldstate = ct_get_state(ct);
 	(void) oldstate;
-	printd(("%s: %p: ct %2ld ct-state %s <- %s\n", ISUP_DRV_NAME, ct, ct->id,
+	printd(("%s: %p: ct %2ld ct-state %s <- %s\n", DRV_NAME, ct, ct->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	ct->state = newstate;
 }
@@ -776,7 +788,7 @@ cg_set_state(struct cg *cg, const long newstate)
 {
 	long oldstate = cg_get_state(cg);
 	(void) oldstate;
-	printd(("%s: %p: cg %2ld cg-state %s <- %s\n", ISUP_DRV_NAME, cg, cg->id,
+	printd(("%s: %p: cg %2ld cg-state %s <- %s\n", DRV_NAME, cg, cg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	cg->state = newstate;
 }
@@ -887,22 +899,20 @@ cg_set_m_state(struct cg *cg, struct cc *cc, const long newstate)
 {
 	if (cg && cc) {
 		long oldstate = cg_get_m_state(cg);
-		printd(("%s: %p: cg %2ld cc %d:%d g-state %s <- %s\n", ISUP_DRV_NAME, cg, cg->id,
+		printd(("%s: %p: cg %2ld cc %d:%d g-state %s <- %s\n", DRV_NAME, cg, cg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			cg->gmg.cc = cc_get(cc);
 			if ((cg->gmg.next = cc->conn.gmg))
 				cg->gmg.next->gmg.prev = &cg->gmg.next;
 			cg->gmg.prev = &cc->conn.gmg;
 			cc->conn.gmg = cg_get(cg);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			cg_put(xchg(&cc->conn.gmg, NULL));
 			if ((*cg->gmg.prev = cg->gmg.next))
 				cg->gmg.next->gmg.prev = cg->gmg.prev;
@@ -920,13 +930,12 @@ ct_set_m_state(struct ct *ct, struct cc *cc, const long newstate)
 {
 	if (ct && cc) {
 		long oldstate = ct_get_m_state(ct);
-		printd(("%s: %p: ct %2ld cc %d:%d m-state %s <- %s\n", ISUP_DRV_NAME, ct, ct->id,
+		printd(("%s: %p: ct %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, ct, ct->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
 		if (oldstate == CMS_IDLE && newstate != CMS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			cc_get_cref(ct, cc);
 			ct->mgm.cc = cc_get(cc);
 			if ((ct->mgm.next = cc->conn.mgm))
@@ -934,9 +943,8 @@ ct_set_m_state(struct ct *ct, struct cc *cc, const long newstate)
 			ct->mgm.prev = &cc->conn.mgm;
 			cc->conn.mgm = ct_get(ct);
 		} else if (oldstate != CMS_IDLE && newstate == CMS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			ct_put(xchg(&cc->conn.mgm, NULL));
 			if ((*ct->mgm.prev = ct->mgm.next))
 				ct->mgm.next->mgm.prev = ct->mgm.prev;
@@ -957,13 +965,12 @@ ct_set_t_state(struct ct *ct, struct cc *cc, const long newstate)
 {
 	if (ct && cc) {
 		long oldstate = ct_get_t_state(ct);
-		printd(("%s: %p: ct %2ld cc %d:%d t-state %s <- %s\n", ISUP_DRV_NAME, ct, ct->id,
+		printd(("%s: %p: ct %2ld cc %d:%d t-state %s <- %s\n", DRV_NAME, ct, ct->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, ck_state_name(newstate),
 			ck_state_name(oldstate)));
 		if (oldstate == CKS_IDLE && newstate != CKS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			cc_get_cref(ct, cc);
 			ct->tst.cc = cc_get(cc);
 			if ((ct->tst.next = cc->conn.tst))
@@ -971,9 +978,8 @@ ct_set_t_state(struct ct *ct, struct cc *cc, const long newstate)
 			ct->tst.prev = &cc->conn.tst;
 			cc->conn.tst = ct_get(ct);
 		} else if (oldstate != CKS_IDLE && newstate == CKS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			ct_put(xchg(&cc->conn.tst, NULL));
 			if ((*ct->tst.prev = ct->tst.next))
 				ct->tst.next->tst.prev = ct->tst.prev;
@@ -994,13 +1000,12 @@ ct_set_i_state(struct ct *ct, struct cc *cc, const long newstate)
 {
 	if (ct && cc) {
 		long oldstate = ct_get_i_state(ct);
-		printd(("%s: %p: ct %2ld cc %d:%d i-state %s <- %s\n", ISUP_DRV_NAME, ct, ct->id,
+		printd(("%s: %p: ct %2ld cc %d:%d i-state %s <- %s\n", DRV_NAME, ct, ct->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cc_state_name(newstate),
 			cc_state_name(oldstate)));
 		if (oldstate == CCS_IDLE && newstate != CCS_IDLE) {
-			/*
-			   make cc current 
-			 */
+			/* 
+			   make cc current */
 			cc_get_cref(ct, cc);
 			ct->cpc.cc = cc_get(cc);
 			if ((ct->cpc.next = cc->conn.cpc))
@@ -1008,9 +1013,8 @@ ct_set_i_state(struct ct *ct, struct cc *cc, const long newstate)
 			ct->cpc.prev = &cc->conn.cpc;
 			cc->conn.cpc = ct_get(ct);
 		} else if (oldstate != CCS_IDLE && newstate == CCS_IDLE) {
-			/*
-			   detach from current 
-			 */
+			/* 
+			   detach from current */
 			ct_put(xchg(&cc->conn.cpc, NULL));
 			if ((*ct->cpc.prev = ct->cpc.next))
 				ct->cpc.next->cpc.prev = ct->cpc.prev;
@@ -1032,17 +1036,15 @@ STATIC INLINE void
 ct_swap_cref(struct ct *ct, struct cc *cc)
 {
 	if (ct && cc) {
-		/*
-		   remove from old stream 
-		 */
+		/* 
+		   remove from old stream */
 		if ((*ct->cpc.prev = ct->cpc.next))
 			ct->cpc.next->cpc.prev = ct->cpc.prev;
 		ct->cpc.next = NULL;
 		ct->cpc.prev = &ct->cpc.next;
 		cc_put(xchg(&ct->cpc.cc, NULL));
-		/*
-		   add to new stream 
-		 */
+		/* 
+		   add to new stream */
 		ct->cpc.cc = cc_get(cc);
 		if ((ct->cpc.next = cc->conn.cpc))
 			ct->cpc.next->cpc.prev = &ct->cpc.next;
@@ -1063,24 +1065,21 @@ __ct_set_c_state(struct ct *ct, const long newstate)
 {
 	struct ct **ctp;
 	long oldstate = ct_get_c_state(ct);
-	printd(("%s: %p: ct %2ld c-state %s <- %s\n", ISUP_DRV_NAME, ct, ct->id,
+	printd(("%s: %p: ct %2ld c-state %s <- %s\n", DRV_NAME, ct, ct->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	if (oldstate == CTS_IDLE) {
-		/*
-		   possibly remove circuit from idle list 
-		 */
-		/*
-		   has no effect if not on list cause prev points to next 
-		 */
+		/* 
+		   possibly remove circuit from idle list */
+		/* 
+		   has no effect if not on list cause prev points to next */
 		if ((*ct->idle.prev = ct->idle.next))
 			ct->idle.next->idle.prev = ct->idle.prev;
 		ct->idle.next = NULL;
 		ct->idle.prev = &ct->idle.next;
 	}
 	if (newstate == CTS_IDLE && !(ct->flags & (CCTM_OUT_OF_SERVICE))) {
-		/*
-		   add circuit to idle list 
-		 */
+		/* 
+		   add circuit to idle list */
 		switch (ct->tg.tg->config.select_type) {
 		default:
 		case ISUP_SELECTION_TYPE_MRU:	/* head is most recently used - insert at head */
@@ -1098,9 +1097,8 @@ __ct_set_c_state(struct ct *ct, const long newstate)
 			     ctp = &((*ctp)->idle.next)) ;
 			break;
 		}
-		/*
-		   insert in tg idle list 
-		 */
+		/* 
+		   insert in tg idle list */
 		if ((ct->idle.next = *ctp))
 			ct->idle.next->idle.prev = &ct->idle.next;
 		ct->idle.prev = ctp;
@@ -1134,7 +1132,7 @@ ct_set(struct ct *ct, const ulong flags)
 	ct->flags |= flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: ct %2ld SET %s\n", ISUP_DRV_NAME, ct, ct->id,
+			printd(("%s: %p: ct %2ld SET %s\n", DRV_NAME, ct, ct->id,
 				ct_flag_name(newflags & (0x1UL << i))));
 	__ct_set_c_state(ct, ct_get_c_state(ct));
 	return (ct->flags);
@@ -1147,7 +1145,7 @@ ct_clr(struct ct *ct, const ulong flags)
 	ct->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: ct %2ld CLR %s\n", ISUP_DRV_NAME, ct, ct->id,
+			printd(("%s: %p: ct %2ld CLR %s\n", DRV_NAME, ct, ct->id,
 				ct_flag_name(newflags & (0x1UL << i))));
 	__ct_set_c_state(ct, ct_get_c_state(ct));
 	return (ct->flags);
@@ -1166,7 +1164,7 @@ cg_set(struct cg *cg, const ulong flags)
 	cg->flags |= flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: cg %2ld CLR %s\n", ISUP_DRV_NAME, cg, cg->id,
+			printd(("%s: %p: cg %2ld CLR %s\n", DRV_NAME, cg, cg->id,
 				ct_flag_name(newflags & (0x1UL << i))));
 	return (cg->flags);
 }
@@ -1179,7 +1177,7 @@ cg_clr(struct cg *cg, const ulong flags)
 	newflags = cg->flags ^ flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
-			printd(("%s: %p: cg %2ld CLR %s\n", ISUP_DRV_NAME, cg, cg->id,
+			printd(("%s: %p: cg %2ld CLR %s\n", DRV_NAME, cg, cg->id,
 				ct_flag_name(newflags & (0x1UL << i))));
 	return (cg->flags);
 }
@@ -1897,7 +1895,7 @@ m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | (band ? FLUSHBAND : 0);
 		*(mp->b_wptr)++ = band;
-		printd(("%s: %p: <- M_FLUSH\n", ISUP_DRV_NAME, pq));
+		printd(("%s: %p: <- M_FLUSH\n", DRV_NAME, pq));
 		putq(pq, mp);
 		return (QR_DONE);
 	}
@@ -1930,7 +1928,7 @@ m_error(queue_t *q, struct cc *cc, int error)
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
 			cs_set_state(cc, CCS_UNUSABLE);
-			printd(("%s: %p: <- M_HANGUP\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (-error);
 		} else {
@@ -1938,7 +1936,7 @@ m_error(queue_t *q, struct cc *cc, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			cs_set_state(cc, CCS_UNUSABLE);
-			printd(("%s: %p: <- M_ERROR\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- M_ERROR\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -1964,7 +1962,7 @@ cc_ok_ack(queue_t *q, struct cc *cc, struct ct *ct, long prim)
 		p->cc_correct_prim = prim;
 		p->cc_state = cc->state;
 		p->cc_call_ref = ct ? (ct->cref ? : ct->uref) : 0;
-		printd(("%s: %p: <- CC_OK_ACK\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_OK_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -1991,7 +1989,7 @@ cc_error_ack(queue_t *q, struct cc *cc, struct ct *ct, long prim, long error)
 		p->cc_unix_error = error < 0 ? -error : 0;
 		p->cc_state = cc->state;
 		p->cc_call_ref = ct ? (ct->cref ? : ct->uref) : 0;
-		printd(("%s: %p: <- CC_ERROR_ACK\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_ERROR_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2014,7 +2012,7 @@ cc_info_ack(queue_t *q, struct cc *cc)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->cc_primitive = CC_INFO_ACK;
 		fixme(("Fill out more the message\n"));
-		printd(("%s: %p: <- CC_INFO_ACK\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_INFO_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2045,7 +2043,7 @@ cc_bind_ack(queue_t *q, struct cc *cc, uchar *add_ptr, size_t add_len, ulong set
 			bcopy(add_ptr, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: <- CC_BIND_ACK\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_BIND_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2075,7 +2073,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, uchar *opt_ptr, size_t opt_len, ulong 
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- CC_OPTMGMT_ACK\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_OPTMGMT_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2111,7 +2109,7 @@ cc_addr_ack(queue_t *q, struct cc *cc, uchar *bind_ptr, size_t bind_len, ulong c
 			bcopy(conn_ptr, mp->b_wptr, conn_len);
 			mp->b_wptr += conn_len;
 		}
-		printd(("%s: %p: <- CC_ADDR_ACK\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_ADDR_ACK\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -2146,7 +2144,7 @@ cc_call_reattempt_ind(queue_t *q, struct cc *cc, struct ct *ct, ulong reason)
 			p->cc_primitive = CC_CALL_REATTEMPT_IND;
 			p->cc_user_ref = ct->uref;
 			p->cc_reason = reason;
-			printd(("%s: %p: <- CC_CALL_REATTEMPT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CALL_REATTEMPT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2178,9 +2176,10 @@ cc_setup_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_SETUP_IND;
 			p->cc_call_ref = ct->cref;
-			p->cc_call_flags = (((ulong) m->msg.iam.nci & 0xff) << 0) |
-			    (((ulong) m->msg.iam.fci & 0xffff) << 8) | (((ulong) m->msg.iam.
-									 cpc & 0xff) << 24);
+			p->cc_call_flags =
+			    (((ulong) m->msg.iam.nci & 0xff) << 0) | (((ulong) m->msg.iam.
+								       fci & 0xffff) << 8) |
+			    (((ulong) m->msg.iam.cpc & 0xff) << 24);
 			p->cc_call_type = (ulong) m->msg.iam.tmr & 0xff;
 			p->cc_cdpn_length = m->msg.iam.cdpn.len;
 			p->cc_cdpn_offset = cdpn_len ? sizeof(*p) : 0;
@@ -2200,7 +2199,7 @@ cc_setup_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 			a->scope = ISUP_SCOPE_CT;
 			a->id = ct->id;
 			a->cic = ct->cic;
-			printd(("%s: %p: <- CC_SETUP_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SETUP_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2231,7 +2230,7 @@ cc_more_info_ind(queue_t *q, struct cc *cc, struct ct *ct)
 			p->cc_user_ref = ct->uref;
 			p->cc_opt_length = 0;
 			p->cc_opt_offset = 0;
-			printd(("%s: %p: <- CC_MORE_INFO_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_MORE_INFO_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2275,7 +2274,7 @@ cc_information_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				bcopy(m->opt.ptr, mp->b_wptr, m->opt.len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_INFORMATION_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_INFORMATION_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2305,7 +2304,7 @@ cc_info_timeout_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->cc_primitive = CC_INFO_TIMEOUT_IND;
 			p->cc_call_ref = ct->cref;
-			printd(("%s: %p: <- CC_INFO_TIMEOUT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_INFO_TIMEOUT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2325,7 +2324,7 @@ STATIC INLINE int
 cc_cont_check_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 {
 	ensure(cc->oq, return (QR_DONE));
-	printd(("%s: MAINT: continuity check request on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME,
+	printd(("%s: MAINT: continuity check request on circuit id=%ld, cic=%ld\n", DRV_NAME,
 		ct->id, ct->cic));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
@@ -2343,7 +2342,7 @@ cc_cont_check_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 			a->scope = ISUP_SCOPE_CT;
 			a->id = ct->id;
 			a->cic = ct->cic;
-			printd(("%s: %p: <- CC_CONT_CHECK_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CONT_CHECK_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2380,7 +2379,7 @@ cc_cont_test_ind(queue_t *q, struct cc *cc, struct ct *ct)
 			a->scope = ISUP_SCOPE_CT;
 			a->id = ct->id;
 			a->cic = ct->cic;
-			printd(("%s: %p: <- CC_CONT_TEST_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CONT_TEST_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2423,7 +2422,7 @@ cc_cont_report_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 				p->cc_result = ISUP_COT_FAILURE;
 				break;
 			}
-			printd(("%s: %p: <- CC_CONT_REPORT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CONT_REPORT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2462,7 +2461,7 @@ cc_setup_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 			a->scope = ISUP_SCOPE_CT;
 			a->id = ct->id;
 			a->cic = ct->cic;
-			printd(("%s: %p: <- CC_SETUP_CON\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SETUP_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			cc_put_uref(ct, cc);
 			return (QR_DONE);
@@ -2518,7 +2517,7 @@ cc_proceeding_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				p->cc_opt_length = 0;
 				p->cc_opt_offset = 0;
 			}
-			printd(("%s: %p: <- CC_PROCEEDING_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_PROCEEDING_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2573,7 +2572,7 @@ cc_alerting_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				p->cc_opt_length = 0;
 				p->cc_opt_offset = 0;
 			}
-			printd(("%s: %p: <- CC_ALERTING_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_ALERTING_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2630,7 +2629,7 @@ cc_progress_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				p->cc_opt_length = 0;
 				p->cc_opt_offset = 0;
 			}
-			printd(("%s: %p: <- CC_PROGRESS_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_PROGRESS_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2685,7 +2684,7 @@ cc_ibi_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				p->cc_opt_length = 0;
 				p->cc_opt_offset = 0;
 			}
-			printd(("%s: %p: <- CC_IBI_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_IBI_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2740,7 +2739,7 @@ cc_connect_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				p->cc_opt_length = 0;
 				p->cc_opt_offset = 0;
 			}
-			printd(("%s: %p: <- CC_CONNECT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CONNECT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2772,7 +2771,7 @@ cc_setup_complete_ind(queue_t *q, struct ct *ct)
 			p->cc_call_ref = ct->cref;
 			p->cc_opt_length = 0;
 			p->cc_opt_offset = 0;
-			printd(("%s: %p: <- CC_SETUP_COMPLETE_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SETUP_COMPLETE_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2809,7 +2808,7 @@ cc_forwxfer_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				bcopy(m->opt.ptr, mp->b_wptr, m->opt.len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_FORWXFER_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_FORWXFER_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2847,7 +2846,7 @@ cc_suspend_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				bcopy(m->opt.ptr, mp->b_wptr, m->opt.len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_SUSPEND_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_SUSPEND_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2885,7 +2884,7 @@ cc_resume_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 				bcopy(m->opt.ptr, mp->b_wptr, m->opt.len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RESUME_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESUME_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2916,7 +2915,7 @@ cc_call_failure_ind(queue_t *q, struct cc *cc, struct ct *ct, ulong reason, ulon
 			p->cc_call_ref = ct->cref;
 			p->cc_reason = reason;
 			p->cc_cause = cause;
-			printd(("%s: %p: <- CC_CALL_FAILURE_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_CALL_FAILURE_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2954,7 +2953,7 @@ cc_release_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 				bcopy(m->opt.ptr, mp->b_wptr, m->opt.len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- CC_RELEASE_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RELEASE_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -2989,7 +2988,7 @@ cc_release_con(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 			bcopy(m->opt.ptr, mp->b_wptr, m->opt.len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- CC_RELEASE_CON\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: <- CC_RELEASE_CON\n", DRV_NAME, cc));
 		ss7_oput(cc->oq, mp);
 		return (QR_DONE);
 	}
@@ -3007,7 +3006,7 @@ cc_reset_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 {
 	ensure(cc, return QR_DONE);
 	ensure(cc->oq, return (QR_DONE));
-	printd(("%s: MAINT: reset indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id,
+	printd(("%s: MAINT: reset indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id,
 		ct->cic));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
@@ -3031,7 +3030,7 @@ cc_reset_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 				a->id = ct->id;
 				a->cic = ct->cic;
 			}
-			printd(("%s: %p: <- CC_RESET_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESET_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3075,7 +3074,7 @@ cc_reset_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 				a->id = ct->id;
 				a->cic = ct->cic;
 			}
-			printd(("%s: %p: <- CC_RESET_CON\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_RESET_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3096,7 +3095,7 @@ cc_blocking_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 {
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
-	printd(("%s: MAINT: blocking indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME,
+	printd(("%s: MAINT: blocking indication on circuit id=%ld, cic=%ld\n", DRV_NAME,
 		ct->id, ct->cic));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
@@ -3122,7 +3121,7 @@ cc_blocking_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 				a->id = ct->id;
 				a->cic = ct->cic;
 			}
-			printd(("%s: %p: <- CC_BLOCKING_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_BLOCKING_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3169,7 +3168,7 @@ cc_blocking_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 				a->id = ct->id;
 				a->cic = ct->cic;
 			}
-			printd(("%s: %p: <- CC_BLOCKING_CON\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_BLOCKING_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3190,7 +3189,7 @@ cc_unblocking_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 {
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
-	printd(("%s: MAINT: unblocking indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME,
+	printd(("%s: MAINT: unblocking indication on circuit id=%ld, cic=%ld\n", DRV_NAME,
 		ct->id, ct->cic));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
@@ -3230,7 +3229,7 @@ cc_unblocking_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 				a->id = ct->id;
 				a->cic = ct->cic;
 			}
-			printd(("%s: %p: <- CC_UNBLOCKING_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_UNBLOCKING_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3281,7 +3280,7 @@ cc_unblocking_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 				a->id = ct->id;
 				a->cic = ct->cic;
 			}
-			printd(("%s: %p: <- CC_UNBLOCKING_CON\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_UNBLOCKING_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3301,17 +3300,17 @@ STATIC INLINE int
 cc_query_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc;
-	if (!(cc = ct->bind.mgm) && !(cc = ct->cg.cg->bind.mgm) && !(cc = ct->tg.tg->bind.mgm) &&
-	    !(cc = ct->sr.sr->bind.mgm) && !(cc = ct->sp.sp->bind.mgm) && !(cc = master.bind.mgm)) {
-		/*
-		   Note: if nobody is listening, these indications should be logged. 
-		 */
+	if (!(cc = ct->bind.mgm) && !(cc = ct->cg.cg->bind.mgm) && !(cc = ct->tg.tg->bind.mgm)
+	    && !(cc = ct->sr.sr->bind.mgm) && !(cc = ct->sp.sp->bind.mgm)
+	    && !(cc = master.bind.mgm)) {
+		/* 
+		   Note: if nobody is listening, these indications should be logged. */
 		__printd(("%s: MAINT: unhandled query indication on circuit id=%ld, cic=%ld\n",
-			  ISUP_DRV_NAME, ct->id, ct->cic));
+			  DRV_NAME, ct->id, ct->cic));
 		return (QR_DONE);
 	}
 	ensure(cc->oq, return (QR_DONE));
-	printd(("%s: MAINT: query indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id,
+	printd(("%s: MAINT: query indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id,
 		ct->cic));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
@@ -3329,7 +3328,7 @@ cc_query_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 			a->scope = ISUP_SCOPE_CG;
 			a->id = ct->cg.cg->id;
 			a->cic = ct->cg.cg->cic;
-			printd(("%s: %p: <- CC_QUERY_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_QUERY_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3367,7 +3366,7 @@ cc_query_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 			a->scope = ISUP_SCOPE_CG;
 			a->id = ct->cg.cg->id;
 			a->cic = ct->cg.cg->cic;
-			printd(("%s: %p: <- CC_QUERY_CON\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_QUERY_CON\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3386,17 +3385,17 @@ STATIC INLINE int
 cc_maint_ind(queue_t *q, struct ct *ct, ulong reason)
 {
 	struct cc *cc;
-	if (!(cc = ct->bind.mnt) && !(cc = ct->cg.cg->bind.mnt) && !(cc = ct->tg.tg->bind.mnt) &&
-	    !(cc = ct->sr.sr->bind.mnt) && !(cc = ct->sp.sp->bind.mnt) && !(cc = master.bind.mnt)) {
-		/*
-		   Note: if nobody is listening, these indications should be logged. 
-		 */
-		__printd(("%s: MAINT: unhandled maintenance indication on circuit id=%ld, cic=%ld, reason=%lu\n", ISUP_DRV_NAME, ct->id, ct->cic, reason));
+	if (!(cc = ct->bind.mnt) && !(cc = ct->cg.cg->bind.mnt) && !(cc = ct->tg.tg->bind.mnt)
+	    && !(cc = ct->sr.sr->bind.mnt) && !(cc = ct->sp.sp->bind.mnt)
+	    && !(cc = master.bind.mnt)) {
+		/* 
+		   Note: if nobody is listening, these indications should be logged. */
+		__printd(("%s: MAINT: unhandled maintenance indication on circuit id=%ld, cic=%ld, reason=%lu\n", DRV_NAME, ct->id, ct->cic, reason));
 		return (QR_DONE);
 	}
 	ensure(cc->oq, return (QR_DONE));
 	printd(("%s: MAINT: maintenance indication on circuit id=%ld, cic=%ld, reason=%lu\n",
-		ISUP_DRV_NAME, ct->id, ct->cic, reason));
+		DRV_NAME, ct->id, ct->cic, reason));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_maint_ind *p;
@@ -3414,7 +3413,7 @@ cc_maint_ind(queue_t *q, struct ct *ct, ulong reason)
 			a->scope = ISUP_SCOPE_CT;
 			a->id = ct->id;
 			a->cic = ct->cic;
-			printd(("%s: %p: <- CC_MAINT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_MAINT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3431,17 +3430,16 @@ cc_cg_maint_ind(queue_t *q, struct cg *cg, ulong cic, ulong reason)
 	ensure(cg, return (QR_DONE));
 	ensure(cg->sr.sr, return (QR_DONE));
 	ensure(cg->sp.sp, return (QR_DONE));
-	if (!(cc = cg->bind.mnt) && !(cc = cg->sr.sr->bind.mnt) && !(cc = cg->sp.sp->bind.mnt) &&
-	    !(cc = master.bind.mnt)) {
-		/*
-		   Note: if nobody is listening, these indications should be logged. 
-		 */
-		__printd(("%s: MAINT: unhandled maintenance indication on circuit group id=%ld, cic=%ld, reason=%lu\n", ISUP_DRV_NAME, cg->id, cic, reason));
+	if (!(cc = cg->bind.mnt) && !(cc = cg->sr.sr->bind.mnt) && !(cc = cg->sp.sp->bind.mnt)
+	    && !(cc = master.bind.mnt)) {
+		/* 
+		   Note: if nobody is listening, these indications should be logged. */
+		__printd(("%s: MAINT: unhandled maintenance indication on circuit group id=%ld, cic=%ld, reason=%lu\n", DRV_NAME, cg->id, cic, reason));
 		return (QR_DONE);
 	}
 	ensure(cc->oq, return (QR_DONE));
 	printd(("%s: MAINT: maintenance indication on circuit group id=%ld, cic=%ld, reason=%lu\n",
-		ISUP_DRV_NAME, cg->id, cic, reason));
+		DRV_NAME, cg->id, cic, reason));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_maint_ind *p;
@@ -3459,7 +3457,7 @@ cc_cg_maint_ind(queue_t *q, struct cg *cg, ulong cic, ulong reason)
 			a->scope = ISUP_SCOPE_CG;
 			a->id = cg->id;
 			a->cic = cic;
-			printd(("%s: %p: <- CC_MAINT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_MAINT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3474,14 +3472,13 @@ cc_if_maint_ind(queue_t *q, struct sr *sr, ulong cic, ulong reason)
 {
 	struct cc *cc;
 	if (!(cc = sr->bind.mnt) && !(cc = sr->sp.sp->bind.mnt) && !(cc = master.bind.mnt)) {
-		/*
-		   Note: if nobody is listening, these indications should be logged. 
-		 */
-		__printd(("%s: MAINT: unhandled maintenance indication on signalling relation id=%ld, cic=%ld, reason=%lu\n", ISUP_DRV_NAME, sr->id, cic, reason));
+		/* 
+		   Note: if nobody is listening, these indications should be logged. */
+		__printd(("%s: MAINT: unhandled maintenance indication on signalling relation id=%ld, cic=%ld, reason=%lu\n", DRV_NAME, sr->id, cic, reason));
 		return (QR_DONE);
 	}
 	ensure(cc->oq, return (QR_DONE));
-	printd(("%s: MAINT: maintenance indication on signalling relation id=%ld, cic=%ld, reason=%lu\n", ISUP_DRV_NAME, sr->id, cic, reason));
+	printd(("%s: MAINT: maintenance indication on signalling relation id=%ld, cic=%ld, reason=%lu\n", DRV_NAME, sr->id, cic, reason));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_maint_ind *p;
@@ -3499,7 +3496,7 @@ cc_if_maint_ind(queue_t *q, struct sr *sr, ulong cic, ulong reason)
 			a->scope = ISUP_SCOPE_SR;
 			a->id = sr->id;
 			a->cic = cic;
-			printd(("%s: %p: <- CC_MAINT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_MAINT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3514,15 +3511,14 @@ cc_sr_maint_ind(queue_t *q, struct sr *sr, ulong reason)
 {
 	struct cc *cc;
 	if (!(cc = sr->bind.mnt) && !(cc = sr->sp.sp->bind.mnt) && !(cc = master.bind.mnt)) {
-		/*
-		   Note: if nobody is listening, these indications should be logged. 
-		 */
-		__printd(("%s: MAINT: unhandled maintenance indication on signalling relation id=%ld, reason=%lu\n", ISUP_DRV_NAME, sr->id, reason));
+		/* 
+		   Note: if nobody is listening, these indications should be logged. */
+		__printd(("%s: MAINT: unhandled maintenance indication on signalling relation id=%ld, reason=%lu\n", DRV_NAME, sr->id, reason));
 		return (QR_DONE);
 	}
 	ensure(cc->oq, return (QR_DONE));
 	printd(("%s: MAINT: maintenance indication on signalling relation id=%ld, reason=%lu\n",
-		ISUP_DRV_NAME, sr->id, reason));
+		DRV_NAME, sr->id, reason));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_maint_ind *p;
@@ -3540,7 +3536,7 @@ cc_sr_maint_ind(queue_t *q, struct sr *sr, ulong reason)
 			a->scope = ISUP_SCOPE_SR;
 			a->id = sr->id;
 			a->cic = 0;
-			printd(("%s: %p: <- CC_MAINT_IND\n", ISUP_DRV_NAME, cc));
+			printd(("%s: %p: <- CC_MAINT_IND\n", DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
 			return (QR_DONE);
 		}
@@ -3579,7 +3575,7 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: MTP_BIND_REQ ->\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_BIND_REQ ->\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -3600,7 +3596,7 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_UNBIND_REQ;
-		printd(("%s: %p: MTP_UNBIND_REQ ->\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_UNBIND_REQ ->\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -3629,7 +3625,7 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 		}
-		printd(("%s: %p: MTP_CONN_REQ ->\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_CONN_REQ ->\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -3651,7 +3647,7 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mtp_primitive = MTP_DISCON_REQ;
-			printd(("%s: %p: MTP_DISCON_REQ ->\n", ISUP_DRV_NAME, mtp));
+			printd(("%s: %p: MTP_DISCON_REQ ->\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (QR_DONE);
 		}
@@ -3675,7 +3671,7 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_ADDR_REQ;
-		printd(("%s: %p: MTP_ADDR_REQ ->\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_ADDR_REQ ->\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -3696,7 +3692,7 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mtp_primitive = MTP_INFO_REQ;
-		printd(("%s: %p: MTP_INFO_REQ ->\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_INFO_REQ ->\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -3724,7 +3720,7 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, ulong flags, uchar *opt_ptr, size_t
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: MTP_OPTMGMT_REQ ->\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_OPTMGMT_REQ ->\n", DRV_NAME, mtp));
 		ss7_oput(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -3756,7 +3752,7 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, mtp_addr_t * add, ulong prior, ulo
 				mp->b_wptr += add_len;
 			}
 			mp->b_cont = dp;
-			printd(("%s: %p: MTP_TRANSFER_REQ ->\n", ISUP_DRV_NAME, mtp));
+			printd(("%s: %p: MTP_TRANSFER_REQ ->\n", DRV_NAME, mtp));
 			ss7_oput(mtp->oq, mp);
 			return (QR_DONE);
 		}
@@ -4006,16 +4002,15 @@ STATIC INLINE int
 isup_check_cdpn(char *p, size_t l)
 {
 	if (l < 3) {
-		ptrace(("%s: PROTO: bad cdpn size\n", ISUP_DRV_NAME));
+		ptrace(("%s: PROTO: bad cdpn size\n", DRV_NAME));
 		return (-EMSGSIZE);	/* bad msg size */
 	}
 	if ((p[0] & 0x80) && ((p[l - 1] & 0xf0) != 0x00)) {
-		ptrace(("%s: PROTO: bad cdpn address filler\n", ISUP_DRV_NAME));
+		ptrace(("%s: PROTO: bad cdpn address filler\n", DRV_NAME));
 		return (-EINVAL);	/* bad filler */
 	}
-	/*
-	   can't check much else 
-	 */
+	/* 
+	   can't check much else */
 	return (0);
 }
 
@@ -4097,16 +4092,15 @@ STATIC INLINE int
 isup_check_subn(uchar *p, size_t l)
 {
 	if (l < 2) {
-		ptrace(("%s: PROTO: bad subn size\n", ISUP_DRV_NAME));
+		ptrace(("%s: PROTO: bad subn size\n", DRV_NAME));
 		return (-EMSGSIZE);	/* bad msg size */
 	}
 	if ((p[0] & 0x80) && ((p[l - 1] & 0xf0) != 0x00)) {
-		ptrace(("%s: PROTO: bad subn address filler\n", ISUP_DRV_NAME));
+		ptrace(("%s: PROTO: bad subn address filler\n", DRV_NAME));
 		return (-EINVAL);	/* bad filler */
 	}
-	/*
-	   can't check much else 
-	 */
+	/* 
+	   can't check much else */
 	return (0);
 }
 
@@ -7274,9 +7268,8 @@ isup_send_msg(queue_t *q, struct sr *sr, uchar mt, ulong prio, ulong sls, mblk_t
 				mp->b_wptr += sizeof(sr->add);
 				mp->b_cont = dp;
 				ss7_oput(mtp->oq, mp);
-				/*
-				   Q.752 11.1 
-				 */
+				/* 
+				   Q.752 11.1 */
 				sr->stats.msgs_sent++;
 				sr->stats.msgs_sent_by_type[mt]++;
 				sr->sp.sp->stats.msgs_sent++;
@@ -7323,9 +7316,8 @@ isup_send_cpy(queue_t *q, struct ct *ct, uchar mt, ulong prio, ulong sls, mblk_t
 					if (bp)
 						freemsg(bp);
 					ss7_oput(mtp->oq, mp);
-					/*
-					   Q.752 11.1 
-					 */
+					/* 
+					   Q.752 11.1 */
 					sr->stats.msgs_sent++;
 					sr->stats.msgs_sent_by_type[mt]++;
 					sr->sp.sp->stats.msgs_sent++;
@@ -7356,9 +7348,8 @@ isup_send_cpy(queue_t *q, struct ct *ct, uchar mt, ulong prio, ulong sls, mblk_t
  *  ITUT: F(NCI FCI CPC TMR) V(CDPN) O()
  */
 STATIC INLINE int
-isup_send_iam(queue_t *q, struct ct *ct, ulong type, ulong flags,
-	      uchar *usi_ptr, size_t usi_len, uchar *cdpn_ptr, size_t cdpn_len,
-	      uchar *opt_ptr, size_t opt_len)
+isup_send_iam(queue_t *q, struct ct *ct, ulong type, ulong flags, uchar *usi_ptr, size_t usi_len,
+	      uchar *cdpn_ptr, size_t cdpn_len, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	uint pvar = ct->tg.tg->proto.pvar;
@@ -7370,8 +7361,10 @@ isup_send_iam(queue_t *q, struct ct *ct, ulong type, ulong flags,
 	ulong tmr = type & 0xff;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_IAM) + size_nci(pvar, nci)
 	    + size_fci(pvar, fci) + size_cpc(pvar, cpc) + size_tmr(pvar, tmr)
-	    + (ansi ? size_usi(pvar, usi_len) + 1 : 0) + size_cdpn(pvar, cdpn_len) + 1
-	    + size_opt(pvar, opt_len) + 1;
+	    + (ansi ? size_usi(pvar, usi_len) + 1 : 0) + size_cdpn(pvar,
+								   cdpn_len) + 1 + size_opt(pvar,
+											    opt_len)
+	    + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
 		mp->b_datap->db_type = M_DATA;
@@ -7385,9 +7378,8 @@ isup_send_iam(queue_t *q, struct ct *ct, ulong type, ulong flags,
 		if (!ansi) {
 			*pp += 2;
 		} else {
-			/*
-			   ansi has extra mandatory variable parameter USI 
-			 */
+			/* 
+			   ansi has extra mandatory variable parameter USI */
 			*pp += 3;
 			*p = *pp - p;
 			p++;
@@ -8555,8 +8547,11 @@ isup_send_cqr(queue_t *q, struct ct *ct, uchar *rs_ptr, size_t rs_len, uchar *cs
 	mblk_t *mp;
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
-	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CQR) + size_rs(pvar, rs_len) + 1
-	    + size_csi(pvar, csi_len) + 1;
+	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CQR) + size_rs(pvar,
+										 rs_len) + 1 +
+	    size_csi(pvar,
+		     csi_len)
+	    + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
 		mp->b_datap->db_type = M_DATA;
@@ -8566,9 +8561,8 @@ isup_send_cqr(queue_t *q, struct ct *ct, uchar *rs_ptr, size_t rs_len, uchar *cs
 		*pp += 2;
 		*p = *pp - p;
 		p++;
-		/*
-		   RS never has a status field 
-		 */
+		/* 
+		   RS never has a status field */
 		pack_rs(pvar, pp, rs_ptr, rs_len);
 		*p = *pp - p;
 		p++;
@@ -8753,14 +8747,12 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_SING:
 		mlen += size_icci(pvar, icci_len);
-		/*
-		   fall thru 
-		 */
+		/* 
+		   fall thru */
 	case SS7_PVAR_SPAN:
 		mlen += size_opt(pvar, opt_len) + 1;
-		/*
-		   fall thru 
-		 */
+		/* 
+		   fall thru */
 	default:
 	case SS7_PVAR_ITUT:
 		break;
@@ -8773,9 +8765,8 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 		switch (pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_SING:
 			pack_icci(pvar, pp, icci_ptr, icci_len);
-			/*
-			   fall thru 
-			 */
+			/* 
+			   fall thru */
 		case SS7_PVAR_SPAN:
 			p = *pp;
 			*pp += 1;
@@ -8785,9 +8776,8 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 				pack_opt(pvar, pp, opt_ptr, opt_len);
 			} else
 				*p++ = 0;
-			/*
-			   fall thru 
-			 */
+			/* 
+			   fall thru */
 		default:
 		case SS7_PVAR_ITUT:
 			break;
@@ -9458,7 +9448,7 @@ ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 	struct ct *ct = (struct ct *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&ct->lock)) {
-			printd(("%s: %p: %s timeout at %lu\n", ISUP_DRV_NAME, ct, timer, jiffies));
+			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, ct, timer, jiffies));
 			switch (to_fnc(ct)) {
 			default:
 			case QR_DONE:
@@ -9473,11 +9463,10 @@ ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			}
 			spin_unlock(&ct->lock);
 		} else
-			printd(("%s: %p: %s timeout collision at %lu\n", ISUP_DRV_NAME, ct, timer,
+			printd(("%s: %p: %s timeout collision at %lu\n", DRV_NAME, ct, timer,
 				jiffies));
-		/*
-		   back off timer one tick 
-		 */
+		/* 
+		   back off timer one tick */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -9762,394 +9751,358 @@ __ct_timer_stop(struct ct *ct, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t1:
 		if ((to = xchg(&ct->timers.t1, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t1 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t1 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t2:
 		if ((to = xchg(&ct->timers.t2, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t2 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t2 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t3:
 		if ((to = xchg(&ct->timers.t3, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t3 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t3 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t5:
 		if ((to = xchg(&ct->timers.t5, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t5 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t5 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t6:
 		if ((to = xchg(&ct->timers.t6, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t6 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t6 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t7:
 		if ((to = xchg(&ct->timers.t7, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t7 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t7 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t8:
 		if ((to = xchg(&ct->timers.t8, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t8 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t8 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t9:
 		if ((to = xchg(&ct->timers.t9, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t9 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t9 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t10:
 		if ((to = xchg(&ct->timers.t10, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t10 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t10 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t11:
 		if ((to = xchg(&ct->timers.t11, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t11 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t11 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t24:
 		if ((to = xchg(&ct->timers.t24, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t24 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t24 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t31:
 		if ((to = xchg(&ct->timers.t31, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t31 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t31 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t32:
 		if ((to = xchg(&ct->timers.t32, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t32 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t32 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t33:
 		if ((to = xchg(&ct->timers.t33, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t33 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t33 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t34:
 		if ((to = xchg(&ct->timers.t34, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t34 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t34 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t35:
 		if ((to = xchg(&ct->timers.t35, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t35 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t35 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t38:
 		if ((to = xchg(&ct->timers.t38, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t38 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t38 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tacc_r:
 		if ((to = xchg(&ct->timers.tacc_r, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tacc_r at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping tacc_r at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tcra:
 		if ((to = xchg(&ct->timers.tcra, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tcra at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping tcra at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tcrm:
 		if ((to = xchg(&ct->timers.tcrm, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tcrm at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping tcrm at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case texm_d:
 		if ((to = xchg(&ct->timers.texm_d, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping texm_d at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping texm_d at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t12:
 		if ((to = xchg(&ct->timers.t12, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t12 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t12 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t13:
 		if ((to = xchg(&ct->timers.t13, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t13 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t13 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t14:
 		if ((to = xchg(&ct->timers.t14, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t14 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t14 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t15:
 		if ((to = xchg(&ct->timers.t15, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t15 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t15 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t16:
 		if ((to = xchg(&ct->timers.t16, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t16 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t16 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t17:
 		if ((to = xchg(&ct->timers.t17, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t17 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t17 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t25:
 		if ((to = xchg(&ct->timers.t25, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t25 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t25 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t26:
 		if ((to = xchg(&ct->timers.t26, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t26 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t26 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t27:
 		if ((to = xchg(&ct->timers.t27, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t27 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t27 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t36:
 		if ((to = xchg(&ct->timers.t36, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t36 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t36 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t37:
 		if ((to = xchg(&ct->timers.t37, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t37 at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping t37 at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tccr:
 		if ((to = xchg(&ct->timers.tccr, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tccr at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping tccr at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tccr_r:
 		if ((to = xchg(&ct->timers.tccr_r, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tccr_r at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping tccr_r at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tcvt:
 		if ((to = xchg(&ct->timers.tcvt, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tcvt at %lu\n", ISUP_DRV_NAME, ct, jiffies));
+			printd(("%s: %p: stopping tcvt at %lu\n", DRV_NAME, ct, jiffies));
 			ct_put(ct);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 }
 
@@ -10175,203 +10128,203 @@ ct_timer_start(struct ct *ct, const uint t)
 		__ct_timer_stop(ct, t);
 		switch (t) {
 		case t1:
-			printd(("%s: %p: starting t1 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t1 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t1 * 1000 / HZ, jiffies));
 			ct->timers.t1 = timeout(&ct_t1_expiry, (caddr_t) ct_get(ct), tg->config.t1);
 			break;
 		case t2:
-			printd(("%s: %p: starting t2 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t2 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t2 * 1000 / HZ, jiffies));
 			ct->timers.t2 = timeout(&ct_t2_expiry, (caddr_t) ct_get(ct), tg->config.t2);
 			break;
 		case t3:
-			printd(("%s: %p: starting t3 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t3 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t3 * 1000 / HZ, jiffies));
 			ct->timers.t3 = timeout(&ct_t3_expiry, (caddr_t) ct_get(ct), tg->config.t3);
 			break;
 		case t5:
-			printd(("%s: %p: starting t5 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t5 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t5 * 1000 / HZ, jiffies));
 			ct->timers.t5 = timeout(&ct_t5_expiry, (caddr_t) ct_get(ct), tg->config.t5);
 			break;
 		case t6:
-			printd(("%s: %p: starting t6 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t6 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t6 * 1000 / HZ, jiffies));
 			ct->timers.t6 = timeout(&ct_t6_expiry, (caddr_t) ct_get(ct), tg->config.t6);
 			break;
 		case t7:
-			printd(("%s: %p: starting t7 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t7 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t7 * 1000 / HZ, jiffies));
 			ct->timers.t7 = timeout(&ct_t7_expiry, (caddr_t) ct_get(ct), tg->config.t7);
 			break;
 		case t8:
-			printd(("%s: %p: starting t8 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t8 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t8 * 1000 / HZ, jiffies));
 			ct->timers.t8 = timeout(&ct_t8_expiry, (caddr_t) ct_get(ct), tg->config.t8);
 			break;
 		case t9:
-			printd(("%s: %p: starting t9 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t9 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t9 * 1000 / HZ, jiffies));
 			ct->timers.t9 = timeout(&ct_t9_expiry, (caddr_t) ct_get(ct), tg->config.t9);
 			break;
 		case t10:
-			printd(("%s: %p: starting t10 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t10 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t10 * 1000 / HZ, jiffies));
 			ct->timers.t10 =
 			    timeout(&ct_t10_expiry, (caddr_t) ct_get(ct), tg->config.t10);
 			break;
 		case t11:
-			printd(("%s: %p: starting t11 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t11 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t11 * 1000 / HZ, jiffies));
 			ct->timers.t11 =
 			    timeout(&ct_t11_expiry, (caddr_t) ct_get(ct), tg->config.t11);
 			break;
 		case t24:
-			printd(("%s: %p: starting t24 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t24 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t24 * 1000 / HZ, jiffies));
 			ct->timers.t24 =
 			    timeout(&ct_t24_expiry, (caddr_t) ct_get(ct), tg->config.t24);
 			break;
 		case t31:
-			printd(("%s: %p: starting t31 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t31 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t31 * 1000 / HZ, jiffies));
 			ct->timers.t31 =
 			    timeout(&ct_t31_expiry, (caddr_t) ct_get(ct), tg->config.t31);
 			break;
 		case t32:
-			printd(("%s: %p: starting t32 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t32 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t32 * 1000 / HZ, jiffies));
 			ct->timers.t32 =
 			    timeout(&ct_t32_expiry, (caddr_t) ct_get(ct), tg->config.t32);
 			break;
 		case t33:
-			printd(("%s: %p: starting t33 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t33 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t33 * 1000 / HZ, jiffies));
 			ct->timers.t33 =
 			    timeout(&ct_t33_expiry, (caddr_t) ct_get(ct), tg->config.t33);
 			break;
 		case t34:
-			printd(("%s: %p: starting t34 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t34 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t34 * 1000 / HZ, jiffies));
 			ct->timers.t34 =
 			    timeout(&ct_t34_expiry, (caddr_t) ct_get(ct), tg->config.t34);
 			break;
 		case t35:
-			printd(("%s: %p: starting t35 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t35 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t35 * 1000 / HZ, jiffies));
 			ct->timers.t35 =
 			    timeout(&ct_t35_expiry, (caddr_t) ct_get(ct), tg->config.t35);
 			break;
 		case t38:
-			printd(("%s: %p: starting t38 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t38 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t38 * 1000 / HZ, jiffies));
 			ct->timers.t38 =
 			    timeout(&ct_t38_expiry, (caddr_t) ct_get(ct), tg->config.t38);
 			break;
 		case tacc_r:
-			printd(("%s: %p: starting tacc_r %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting tacc_r %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.tacc_r * 1000 / HZ, jiffies));
 			ct->timers.tacc_r =
 			    timeout(&ct_tacc_r_expiry, (caddr_t) ct_get(ct), tg->config.tacc_r);
 			break;
 		case tcra:
-			printd(("%s: %p: starting tcra %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting tcra %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.tcra * 1000 / HZ, jiffies));
 			ct->timers.tcra =
 			    timeout(&ct_tcra_expiry, (caddr_t) ct_get(ct), tg->config.tcra);
 			break;
 		case tcrm:
-			printd(("%s: %p: starting tcrm %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting tcrm %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.tcrm * 1000 / HZ, jiffies));
 			ct->timers.tcrm =
 			    timeout(&ct_tcrm_expiry, (caddr_t) ct_get(ct), tg->config.tcrm);
 			break;
 		case texm_d:
-			printd(("%s: %p: starting texm_d %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting texm_d %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.texm_d * 1000 / HZ, jiffies));
 			ct->timers.texm_d =
 			    timeout(&ct_texm_d_expiry, (caddr_t) ct_get(ct), tg->config.texm_d);
 			break;
 		case t12:
-			printd(("%s: %p: starting t12 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t12 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t12 * 1000 / HZ, jiffies));
 			ct->timers.t12 =
 			    timeout(&ct_t12_expiry, (caddr_t) ct_get(ct), tg->config.t12);
 			break;
 		case t13:
-			printd(("%s: %p: starting t13 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t13 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t13 * 1000 / HZ, jiffies));
 			ct->timers.t13 =
 			    timeout(&ct_t13_expiry, (caddr_t) ct_get(ct), tg->config.t13);
 			break;
 		case t14:
-			printd(("%s: %p: starting t14 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t14 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t14 * 1000 / HZ, jiffies));
 			ct->timers.t14 =
 			    timeout(&ct_t14_expiry, (caddr_t) ct_get(ct), tg->config.t14);
 			break;
 		case t15:
-			printd(("%s: %p: starting t15 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t15 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t15 * 1000 / HZ, jiffies));
 			ct->timers.t15 =
 			    timeout(&ct_t15_expiry, (caddr_t) ct_get(ct), tg->config.t15);
 			break;
 		case t16:
-			printd(("%s: %p: starting t16 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t16 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t16 * 1000 / HZ, jiffies));
 			ct->timers.t16 =
 			    timeout(&ct_t16_expiry, (caddr_t) ct_get(ct), tg->config.t16);
 			break;
 		case t17:
-			printd(("%s: %p: starting t17 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t17 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t17 * 1000 / HZ, jiffies));
 			ct->timers.t17 =
 			    timeout(&ct_t17_expiry, (caddr_t) ct_get(ct), tg->config.t17);
 			break;
 		case t25:
-			printd(("%s: %p: starting t25 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t25 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t25 * 1000 / HZ, jiffies));
 			ct->timers.t25 =
 			    timeout(&ct_t25_expiry, (caddr_t) ct_get(ct), tg->config.t25);
 			break;
 		case t26:
-			printd(("%s: %p: starting t26 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t26 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t26 * 1000 / HZ, jiffies));
 			ct->timers.t26 =
 			    timeout(&ct_t26_expiry, (caddr_t) ct_get(ct), tg->config.t26);
 			break;
 		case t27:
-			printd(("%s: %p: starting t27 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t27 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t27 * 1000 / HZ, jiffies));
 			ct->timers.t27 =
 			    timeout(&ct_t27_expiry, (caddr_t) ct_get(ct), tg->config.t27);
 			break;
 		case t36:
-			printd(("%s: %p: starting t36 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t36 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t36 * 1000 / HZ, jiffies));
 			ct->timers.t36 =
 			    timeout(&ct_t36_expiry, (caddr_t) ct_get(ct), tg->config.t36);
 			break;
 		case t37:
-			printd(("%s: %p: starting t37 %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting t37 %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.t37 * 1000 / HZ, jiffies));
 			ct->timers.t37 =
 			    timeout(&ct_t37_expiry, (caddr_t) ct_get(ct), tg->config.t37);
 			break;
 		case tccr:
-			printd(("%s: %p: starting tccr %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting tccr %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.tccr * 1000 / HZ, jiffies));
 			ct->timers.tccr =
 			    timeout(&ct_tccr_expiry, (caddr_t) ct_get(ct), tg->config.tccr);
 			break;
 		case tccr_r:
-			printd(("%s: %p: starting tccr_r %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting tccr_r %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.tccr_r * 1000 / HZ, jiffies));
 			ct->timers.tccr_r =
 			    timeout(&ct_tccr_r_expiry, (caddr_t) ct_get(ct), tg->config.tccr_r);
 			break;
 		case tcvt:
-			printd(("%s: %p: starting tcvt %lu ms at %lu\n", ISUP_DRV_NAME, ct,
+			printd(("%s: %p: starting tcvt %lu ms at %lu\n", DRV_NAME, ct,
 				tg->config.tcvt * 1000 / HZ, jiffies));
 			ct->timers.tcvt =
 			    timeout(&ct_tcvt_expiry, (caddr_t) ct_get(ct), tg->config.tcvt);
@@ -10398,7 +10351,7 @@ cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 	struct cg *cg = (struct cg *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&cg->lock)) {
-			printd(("%s: %p: %s timeout at %lu\n", ISUP_DRV_NAME, cg, timer, jiffies));
+			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, cg, timer, jiffies));
 			switch (to_fnc(cg)) {
 			default:
 			case QR_DONE:
@@ -10413,11 +10366,10 @@ cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			}
 			spin_unlock(&cg->lock);
 		} else
-			printd(("%s: %p: %s timeout collision at %lu\n", ISUP_DRV_NAME, cg, timer,
+			printd(("%s: %p: %s timeout collision at %lu\n", DRV_NAME, cg, timer,
 				jiffies));
-		/*
-		   back off timer one tick 
-		 */
+		/* 
+		   back off timer one tick */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -10526,141 +10478,128 @@ __cg_timer_stop(struct cg *cg, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t18:
 		if ((to = xchg(&cg->timers.t18, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t18 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t18 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t19:
 		if ((to = xchg(&cg->timers.t19, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t19 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t19 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t20:
 		if ((to = xchg(&cg->timers.t20, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t20 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t20 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t21:
 		if ((to = xchg(&cg->timers.t21, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t21 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t21 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t22:
 		if ((to = xchg(&cg->timers.t22, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t22 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t22 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t23:
 		if ((to = xchg(&cg->timers.t23, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t23 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t23 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t28:
 		if ((to = xchg(&cg->timers.t28, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t28 at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping t28 at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tcgb:
 		if ((to = xchg(&cg->timers.tcgb, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tcgb at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping tcgb at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tgrs:
 		if ((to = xchg(&cg->timers.tgrs, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tgrs at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping tgrs at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case thga:
 		if ((to = xchg(&cg->timers.thga, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping thga at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping thga at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tscga:
 		if ((to = xchg(&cg->timers.tscga, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tscga at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping tscga at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case tscga_d:
 		if ((to = xchg(&cg->timers.tscga_d, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping tscga_d at %lu\n", ISUP_DRV_NAME, cg, jiffies));
+			printd(("%s: %p: stopping tscga_d at %lu\n", DRV_NAME, cg, jiffies));
 			cg_put(cg);
 		}
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 }
 
@@ -10685,73 +10624,73 @@ cg_timer_start(struct cg *cg, const uint t)
 		__cg_timer_stop(cg, t);
 		switch (t) {
 		case t18:
-			printd(("%s: %p: starting t18 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t18 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t18 * 1000 / HZ, jiffies));
 			cg->timers.t18 =
 			    timeout(&cg_t18_expiry, (caddr_t) cg_get(cg), sr->config.t18);
 			break;
 		case t19:
-			printd(("%s: %p: starting t19 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t19 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t19 * 1000 / HZ, jiffies));
 			cg->timers.t19 =
 			    timeout(&cg_t19_expiry, (caddr_t) cg_get(cg), sr->config.t19);
 			break;
 		case t20:
-			printd(("%s: %p: starting t20 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t20 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t20 * 1000 / HZ, jiffies));
 			cg->timers.t20 =
 			    timeout(&cg_t20_expiry, (caddr_t) cg_get(cg), sr->config.t20);
 			break;
 		case t21:
-			printd(("%s: %p: starting t21 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t21 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t21 * 1000 / HZ, jiffies));
 			cg->timers.t21 =
 			    timeout(&cg_t21_expiry, (caddr_t) cg_get(cg), sr->config.t21);
 			break;
 		case t22:
-			printd(("%s: %p: starting t22 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t22 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t22 * 1000 / HZ, jiffies));
 			cg->timers.t22 =
 			    timeout(&cg_t22_expiry, (caddr_t) cg_get(cg), sr->config.t22);
 			break;
 		case t23:
-			printd(("%s: %p: starting t23 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t23 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t23 * 1000 / HZ, jiffies));
 			cg->timers.t23 =
 			    timeout(&cg_t23_expiry, (caddr_t) cg_get(cg), sr->config.t23);
 			break;
 		case t28:
-			printd(("%s: %p: starting t28 %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting t28 %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.t28 * 1000 / HZ, jiffies));
 			cg->timers.t28 =
 			    timeout(&cg_t28_expiry, (caddr_t) cg_get(cg), sr->config.t28);
 			break;
 		case tcgb:
-			printd(("%s: %p: starting tcgb %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting tcgb %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.tcgb * 1000 / HZ, jiffies));
 			cg->timers.tcgb =
 			    timeout(&cg_tcgb_expiry, (caddr_t) cg_get(cg), sr->config.tcgb);
 			break;
 		case tgrs:
-			printd(("%s: %p: starting tgrs %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting tgrs %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.tgrs * 1000 / HZ, jiffies));
 			cg->timers.tgrs =
 			    timeout(&cg_tgrs_expiry, (caddr_t) cg_get(cg), sr->config.tgrs);
 			break;
 		case thga:
-			printd(("%s: %p: starting thga %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting thga %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.thga * 1000 / HZ, jiffies));
 			cg->timers.thga =
 			    timeout(&cg_thga_expiry, (caddr_t) cg_get(cg), sr->config.thga);
 			break;
 		case tscga:
-			printd(("%s: %p: starting tscga %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting tscga %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.tscga * 1000 / HZ, jiffies));
 			cg->timers.tscga =
 			    timeout(&cg_tscga_expiry, (caddr_t) cg_get(cg), sr->config.tscga);
 			break;
 		case tscga_d:
-			printd(("%s: %p: starting tscga_d %lu ms at %lu\n", ISUP_DRV_NAME, cg,
+			printd(("%s: %p: starting tscga_d %lu ms at %lu\n", DRV_NAME, cg,
 				sr->config.tscga_d * 1000 / HZ, jiffies));
 			cg->timers.tscga_d =
 			    timeout(&cg_tscga_d_expiry, (caddr_t) cg_get(cg), sr->config.tscga_d);
@@ -10778,7 +10717,7 @@ sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 	struct sr *sr = (struct sr *) data;
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&sr->lock)) {
-			printd(("%s: %p: %s timeout at %lu\n", ISUP_DRV_NAME, sr, timer, jiffies));
+			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, sr, timer, jiffies));
 			switch (to_fnc(sr)) {
 			default:
 			case QR_DONE:
@@ -10793,11 +10732,10 @@ sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 			}
 			spin_unlock(&sr->lock);
 		} else
-			printd(("%s: %p: %s timeout collision at %lu\n", ISUP_DRV_NAME, sr, timer,
+			printd(("%s: %p: %s timeout collision at %lu\n", DRV_NAME, sr, timer,
 				jiffies));
-		/*
-		   back off timer one tick 
-		 */
+		/* 
+		   back off timer one tick */
 		*timeo = timeout(exp_fnc, data, 100);
 	}
 }
@@ -10833,36 +10771,32 @@ __sr_timer_stop(struct sr *sr, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t4:
 		if ((to = xchg(&sr->timers.t4, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t4 at %lu\n", ISUP_DRV_NAME, sr, jiffies));
+			printd(("%s: %p: stopping t4 at %lu\n", DRV_NAME, sr, jiffies));
 			sr_put(sr);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t29:
 		if ((to = xchg(&sr->timers.t29, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t29 at %lu\n", ISUP_DRV_NAME, sr, jiffies));
+			printd(("%s: %p: stopping t29 at %lu\n", DRV_NAME, sr, jiffies));
 			sr_put(sr);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t30:
 		if ((to = xchg(&sr->timers.t30, 0))) {
 			untimeout(to);
-			printd(("%s: %p: stopping t30 at %lu\n", ISUP_DRV_NAME, sr, jiffies));
+			printd(("%s: %p: stopping t30 at %lu\n", DRV_NAME, sr, jiffies));
 			sr_put(sr);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 }
 
@@ -10886,18 +10820,18 @@ sr_timer_start(struct sr *sr, const uint t)
 		__sr_timer_stop(sr, t);
 		switch (t) {
 		case t4:
-			printd(("%s: %p: starting t4 %lu ms at %lu\n", ISUP_DRV_NAME, sr,
+			printd(("%s: %p: starting t4 %lu ms at %lu\n", DRV_NAME, sr,
 				sr->config.t4 * 1000 / HZ, jiffies));
 			sr->timers.t4 = timeout(&sr_t4_expiry, (caddr_t) sr_get(sr), sr->config.t4);
 			break;
 		case t29:
-			printd(("%s: %p: starting t29 %lu ms at %lu\n", ISUP_DRV_NAME, sr,
+			printd(("%s: %p: starting t29 %lu ms at %lu\n", DRV_NAME, sr,
 				sr->config.t29 * 1000 / HZ, jiffies));
 			sr->timers.t29 =
 			    timeout(&sr_t29_expiry, (caddr_t) sr_get(sr), sr->config.t29);
 			break;
 		case t30:
-			printd(("%s: %p: starting t30 %lu ms at %lu\n", ISUP_DRV_NAME, sr,
+			printd(("%s: %p: starting t30 %lu ms at %lu\n", DRV_NAME, sr,
 				sr->config.t30 * 1000 / HZ, jiffies));
 			sr->timers.t30 =
 			    timeout(&sr_t30_expiry, (caddr_t) sr_get(sr), sr->config.t30);
@@ -10941,11 +10875,11 @@ ct_block(queue_t *q, struct ct *ct)
 	case CCS_WIND_INFO:
 	case CCS_WRES_SIND:
 	case CCS_WREQ_PROCEED:
-		/*
-		   XXX These should probably be repeat attempt 
-		 */
-		if ((err = cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_BLOCKING,
-					       CC_CAUS_TEMPORARY_FAILURE)))
+		/* 
+		   XXX These should probably be repeat attempt */
+		if ((err =
+		     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_BLOCKING,
+					 CC_CAUS_TEMPORARY_FAILURE)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 		break;
@@ -11029,14 +10963,14 @@ ct_reset(queue_t *q, struct ct *ct)
 	case CCS_WIND_PROCEED:
 		if ((err = cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_RESET)))
 			return (err);
-		/*
-		   responsibility of CC to reattempt 
-		 */
+		/* 
+		   responsibility of CC to reattempt */
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 		break;
 	default:
-		if ((err = cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
-					       CC_CAUS_NORMAL_UNSPECIFIED)))
+		if ((err =
+		     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
+					 CC_CAUS_NORMAL_UNSPECIFIED)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 		break;
@@ -11164,9 +11098,8 @@ cg_h_block(queue_t *q, struct cg *cg)
 			}
 			switch (ct_get_t_state(ct)) {
 			case CKS_WCON_RELREQ:
-				/*
-				   confirm release 
-				 */
+				/* 
+				   confirm release */
 				if ((err = cc_release_con(q, ct->tst.cc, ct, NULL)))
 					return (err);
 				ct_set_t_state(ct, ct->tst.cc, CKS_IDLE);
@@ -11174,22 +11107,19 @@ cg_h_block(queue_t *q, struct cg *cg)
 			}
 			switch (ct_get_i_state(ct)) {
 			case CCS_WCON_RELREQ:
-				/*
-				   confirm release 
-				 */
+				/* 
+				   confirm release */
 				if ((err = cc_release_con(q, ct->cpc.cc, ct, NULL)))
 					return (err);
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				break;
 			case CCS_WRES_RELIND:
-				/*
-				   await response 
-				 */
+				/* 
+				   await response */
 				break;
 			default:
-				/*
-				   CC responsibility to abort COT 
-				 */
+				/* 
+				   CC responsibility to abort COT */
 				if ((err =
 				     cc_call_failure_ind(q, ct->cpc.cc, ct,
 							 ISUP_CALL_FAILURE_BLOCKING,
@@ -11198,9 +11128,8 @@ cg_h_block(queue_t *q, struct cg *cg)
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				break;
 			}
-			/*
-			   keep from being added to idle list 
-			 */
+			/* 
+			   keep from being added to idle list */
 			ct_set_c_state(ct, CTS_IDLE);
 		}
 	}
@@ -11295,9 +11224,8 @@ cg_reset(queue_t *q, struct cg *cg)
 				     cc_call_reattempt_ind(q, ct->cpc.cc, ct,
 							   ISUP_REATTEMPT_RESET)))
 					return (err);
-				/*
-				   responsibility of CC to reattempt 
-				 */
+				/* 
+				   responsibility of CC to reattempt */
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				break;
 			default:
@@ -11375,20 +11303,18 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct cc *cc, *ck;
-	printd(("%s; %p: IAM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: IAM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
 		break;
 	case CTS_OGC_WAIT_CCR:
-		/*
-		   glare scenario with CCR 
-		 */
+		/* 
+		   glare scenario with CCR */
 		break;
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
-		/*
-		   glare scenario 
-		 */
+		/* 
+		   glare scenario */
 		ct->tg.tg->stats.tg_dual_siezures++;
 		ct->sr.sr->stats.tg_dual_siezures++;
 		ct->sp.sp->stats.tg_dual_siezures++;
@@ -11398,18 +11324,16 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 		ct_timer_stop(ct, t7);
 		break;
 	default:
-		/*
-		   unexpected message 
-		 */
+		/* 
+		   unexpected message */
 		return (-EOPNOTSUPP);
 	}
 	switch (ct_get_t_state(ct)) {
 	case CKS_IDLE:
 		break;
 	case CKS_WREQ_CTEST:
-		/*
-		   second time through after error 
-		 */
+		/* 
+		   second time through after error */
 		break;
 	default:
 		swerr();
@@ -11424,12 +11348,10 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_WREQ_INFO:
 	case CCS_WCON_SREQ:
 	case CCS_WIND_PROCEED:
-		/*
-		   responsibility of CC to reattempt 
-		 */
-		/*
-		   CC responsibility to abort COT when it receives cc_reattempt_ind 
-		 */
+		/* 
+		   responsibility of CC to reattempt */
+		/* 
+		   CC responsibility to abort COT when it receives cc_reattempt_ind */
 		if ((err = cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_DUAL_SIEZURE)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
@@ -11438,9 +11360,8 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_WIND_INFO:
 	case CCS_WRES_SIND:
 	case CCS_WIND_CCREP:
-		/*
-		   second time through after error 
-		 */
+		/* 
+		   second time through after error */
 		break;
 	default:
 		swerr();
@@ -11451,20 +11372,18 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
 		ct_set_c_state(ct, CTS_IDLE);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CTS_IDLE:
 		if (m->msg.iam.cpc != ((ISUP_CPC_TEST_CALL >> 24) & 0xff)) {
-			/*
-			   not a test call - consider remote blocking 
-			 */
+			/* 
+			   not a test call - consider remote blocking */
 			if (ct_tst(ct, CCTF_REM_M_BLOCKED)
 			    && !(ct_tst(ct, CCTF_REM_M_UNBLOCK_PENDING))) {
 				struct cc *cm;
-				if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm) ||
-				    (cm = ct->tg.tg->bind.mgm) || (cm = ct->sr.sr->bind.mgm) ||
-				    (cm = ct->sp.sp->bind.mgm) || (cm = master.bind.mgm)) {
+				if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm)
+				    || (cm = ct->tg.tg->bind.mgm) || (cm = ct->sr.sr->bind.mgm)
+				    || (cm = ct->sp.sp->bind.mgm) || (cm = master.bind.mgm)) {
 					if (ct_get_m_state(ct) == CMS_IDLE)
 						ct_set_m_state(ct, cm, CMS_WRES_UBIND);
 					if ((err = cc_unblocking_ind(q, cm, ct, m)))
@@ -11472,18 +11391,17 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 					// ct_set(ct, CCTF_REM_M_UNBLOCK_PENDING);
 					ct_clr(ct, CCTF_REM_M_BLOCKED);
 				} else {
-					__printd(("%s: MGMT: unhandled unblocking indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id, ct->cic));
-					/*
-					   complete procedure automatically 
-					 */
+					__printd(("%s: MGMT: unhandled unblocking indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id, ct->cic));
+					/* 
+					   complete procedure automatically */
 					ct_clr(ct, CCTF_REM_M_BLOCKED);
 				}
 			} else if (ct_tst(ct, CCTF_REM_H_BLOCKED)
 				   && !(ct_tst(ct, CCTF_REM_H_UNBLOCK_PENDING))) {
 				struct cc *cm;
-				if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm) ||
-				    (cm = ct->tg.tg->bind.mgm) || (cm = ct->sr.sr->bind.mgm) ||
-				    (cm = ct->sp.sp->bind.mgm) || (cm = master.bind.mgm)) {
+				if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm)
+				    || (cm = ct->tg.tg->bind.mgm) || (cm = ct->sr.sr->bind.mgm)
+				    || (cm = ct->sp.sp->bind.mgm) || (cm = master.bind.mgm)) {
 					if (ct_get_m_state(ct) == CMS_IDLE)
 						ct_set_m_state(ct, cm, CMS_WRES_UBIND);
 					if ((err = cc_unblocking_ind(q, cm, ct, m)))
@@ -11491,10 +11409,9 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 					// ct_set(ct, CCTF_REM_H_UNBLOCK_PENDING);
 					ct_clr(ct, CCTF_REM_H_BLOCKED);
 				} else {
-					__printd(("%s: MGMT: unhandled unblocking indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id, ct->cic));
-					/*
-					   complete procedure automatically 
-					 */
+					__printd(("%s: MGMT: unhandled unblocking indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id, ct->cic));
+					/* 
+					   complete procedure automatically */
 					ct_clr(ct, CCTF_REM_H_BLOCKED);
 				}
 			}
@@ -11510,25 +11427,23 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 			if (ct->tg.tg->config.type == ISUP_TG_TYPE_OG)
 				goto outgoing_only;
 		}
-		/*
-		   look for listeners 
-		 */
-		if ((!(cc = ct->bind.icc) || cc->setind >= cc->maxind) &&
-		    (!(cc = ct->cg.cg->bind.icc) || cc->setind >= cc->maxind) &&
-		    (!(cc = ct->tg.tg->bind.icc) || cc->setind >= cc->maxind) &&
-		    (!(cc = ct->sr.sr->bind.icc) || cc->setind >= cc->maxind) &&
-		    (!(cc = ct->sp.sp->bind.icc) || cc->setind >= cc->maxind) &&
-		    (!(cc = master.bind.icc) || cc->setind >= cc->maxind)
+		/* 
+		   look for listeners */
+		if ((!(cc = ct->bind.icc) || cc->setind >= cc->maxind)
+		    && (!(cc = ct->cg.cg->bind.icc) || cc->setind >= cc->maxind)
+		    && (!(cc = ct->tg.tg->bind.icc) || cc->setind >= cc->maxind)
+		    && (!(cc = ct->sr.sr->bind.icc) || cc->setind >= cc->maxind)
+		    && (!(cc = ct->sp.sp->bind.icc) || cc->setind >= cc->maxind)
+		    && (!(cc = master.bind.icc) || cc->setind >= cc->maxind)
 		    ) ;
-		/*
-		   look for test 
-		 */
-		if ((!(ck = ct->bind.tst) || ck->setind >= ck->maxind) &&
-		    (!(ck = ct->cg.cg->bind.tst) || ck->setind >= ck->maxind) &&
-		    (!(ck = ct->tg.tg->bind.tst) || ck->setind >= ck->maxind) &&
-		    (!(ck = ct->sr.sr->bind.tst) || ck->setind >= ck->maxind) &&
-		    (!(ck = ct->sp.sp->bind.tst) || ck->setind >= ck->maxind) &&
-		    (!(ck = master.bind.tst) || ck->setind >= ck->maxind)
+		/* 
+		   look for test */
+		if ((!(ck = ct->bind.tst) || ck->setind >= ck->maxind)
+		    && (!(ck = ct->cg.cg->bind.tst) || ck->setind >= ck->maxind)
+		    && (!(ck = ct->tg.tg->bind.tst) || ck->setind >= ck->maxind)
+		    && (!(ck = ct->sr.sr->bind.tst) || ck->setind >= ck->maxind)
+		    && (!(ck = ct->sp.sp->bind.tst) || ck->setind >= ck->maxind)
+		    && (!(ck = master.bind.tst) || ck->setind >= ck->maxind)
 		    ) ;
 		if ((m->msg.iam.cpc == ((ISUP_CPC_TEST_CALL >> 24) & 0xff) && !(cc = ck)) || !cc)
 			goto temporary_failure;
@@ -11538,9 +11453,8 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 		ct_set_i_state(ct, cc, CCS_WIND_SETUP);
 		if ((err = cc_setup_ind(q, cc, ct, m)))
 			return (err);
-		/*
-		   store information from iam 
-		 */
+		/* 
+		   store information from iam */
 		switch (m->msg.iam.nci & ISUP_NCI_CONT_CHECK_MASK) {
 		case ISUP_NCI_CONT_CHECK_PREVIOUS:
 			ct_timer_start(ct, t8);
@@ -11553,9 +11467,8 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 					return (err);
 				ct_set_t_state(ct, ck, CKS_WREQ_CTEST);
 			}
-			/*
-			   responsibility of CM to perform loopback 
-			 */
+			/* 
+			   responsibility of CM to perform loopback */
 			ct_timer_start(ct, t8);
 			ct_set(ct, CCTM_CONT_CHECK);
 			ct_set_i_state(ct, cc, CCS_WIND_CCREP);
@@ -11576,14 +11489,12 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 		}
 		return (QR_DONE);
 	}
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
       temporary_failure:
-	/*
-	   no listening stream when there should be 
-	 */
+	/* 
+	   no listening stream when there should be */
 	if ((err = isup_send_rel(q, ct, CC_CAUS_TEMPORARY_FAILURE, NULL, 0)))
 		return (err);
 	ct_timer_start(ct, t5);
@@ -11591,9 +11502,8 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
 	return (QR_DONE);
       outgoing_only:
-	/*
-	   call received on outgoing trunk 
-	 */
+	/* 
+	   call received on outgoing trunk */
 	if ((err = isup_send_rel(q, ct, CC_CAUS_NO_ROUTE_TO_DESTINATION, NULL, 0)))
 		return (err);
 	ct_timer_start(ct, t5);
@@ -11610,7 +11520,7 @@ STATIC int
 isup_recv_sam(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: SAM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: SAM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 		break;
@@ -11619,13 +11529,11 @@ isup_recv_sam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	}
 	switch (ct_get_i_state(ct)) {
 	case CCS_WREQ_MORE:
-		/*
-		   skip optional CC_MORE_INFO_REQ 
-		 */
+		/* 
+		   skip optional CC_MORE_INFO_REQ */
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_INFO);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_INFO:
 		if ((err = cc_information_ind(q, ct, m)))
 			return (err);
@@ -11647,9 +11555,8 @@ isup_recv_sam(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -11660,10 +11567,9 @@ isup_recv_sam(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_inr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: INR <-\n", ISUP_DRV_NAME, ct));
-	/*
-	   unexpected message 
-	 */
+	printd(("%s; %p: INR <-\n", DRV_NAME, ct));
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -11674,11 +11580,10 @@ isup_recv_inr(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_inf(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: INF <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: INF <-\n", DRV_NAME, ct));
 	ct_timer_stop(ct, t33);
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -11690,17 +11595,15 @@ STATIC int
 isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: COT <-\n", ISUP_DRV_NAME, ct));
-	/*
-	   does not interrupt segmentation 
-	 */
+	printd(("%s; %p: COT <-\n", DRV_NAME, ct));
+	/* 
+	   does not interrupt segmentation */
 	if (!ct_tst(ct, CCTF_COR_PENDING))
 		goto unexpected;
 	switch (m->msg.cot.coti & (ISUP_COT_FAILURE | ISUP_COT_SUCCESS)) {
 	case ISUP_COT_SUCCESS:
-		/*
-		   responsibility of CC to remove loopback 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 			ct_timer_stop(ct, t8);
@@ -11747,9 +11650,8 @@ isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 		}
 		break;
 	case ISUP_COT_FAILURE:
-		/*
-		   responsibility of CC to remove loopback 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 			ct_timer_stop(ct, t35);
@@ -11763,15 +11665,13 @@ isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 					return (err);
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			}
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case CTS_ICC_WAIT_CCR:
 			ct_timer_stop(ct, t36);
 			if (ct_get_t_state(ct) == CKS_WIND_CCREP) {
-				/*
-				   responsibiltiy of CM to remove loopback 
-				 */
+				/* 
+				   responsibiltiy of CM to remove loopback */
 				if ((err = cc_cont_report_ind(q, ct->tst.cc, ct, m)))
 					return (err);
 				ct_set_t_state(ct, ct->tst.cc, CKS_IDLE);
@@ -11789,16 +11689,14 @@ isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 		ct_clr(ct, CCTM_CONT_CHECK);
 		break;
 	default:
-		/*
-		   bad parameter 
-		 */
+		/* 
+		   bad parameter */
 		return (-EPROTONOSUPPORT);
 	}
 	return (QR_DONE);
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -11839,7 +11737,7 @@ STATIC int
 isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: ACM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: ACM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
 	case CTS_OGC_WAIT_SAM:
@@ -11855,9 +11753,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_setup_con(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROCEED);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_PROCEED:
 		if (!(m->msg.acm.bci & ISUP_BCI_SUBSCRIBER_FREE)) {
 			if ((err = cc_proceeding_ind(q, ct, m)))
@@ -11865,9 +11762,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_ALERTING);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_ALERTING:
 		if (m->msg.acm.bci & ISUP_BCI_SUBSCRIBER_FREE) {
 			if ((err = cc_alerting_ind(q, ct, m)))
@@ -11875,9 +11771,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_PROGRESS:
 		if (!(m->msg.acm.bci & ISUP_BCI_SUBSCRIBER_FREE)) {
 			if ((err = cc_progress_ind(q, ct, m)))
@@ -11885,9 +11780,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_IBI:
 		if (m->oparm.obci.ptr
 		    && ((m->oparm.obci.val << 16) & ISUP_OBCI_INBAND_INFORMATION_AVAILABLE)) {
@@ -11896,17 +11790,15 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_CONNECT);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
 	case CTS_OGC_WAIT_SAM:
 		ct_timer_start(ct, t9);
-		/*
-		   release iam information 
-		 */
+		/* 
+		   release iam information */
 		ct_set_c_state(ct, CTS_OGC_WAIT_ANM);
 		return (QR_DONE);
 	default:
@@ -11914,10 +11806,9 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (-EFAULT);
 	}
       unexpected:
-	printd(("%s: %p: PROTO: unexpected message\n", ISUP_DRV_NAME, ct));
-	/*
-	   unexpected message 
-	 */
+	printd(("%s: %p: PROTO: unexpected message\n", DRV_NAME, ct));
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -11933,7 +11824,7 @@ STATIC int
 isup_recv_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: CON <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CON <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
 		ct_timer_stop(ct, t7);
@@ -11948,16 +11839,14 @@ isup_recv_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_setup_con(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_CONNECT);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_PROCEED:
 	case CCS_WIND_ALERTING:
 	case CCS_WIND_PROGRESS:
 	case CCS_WIND_CONNECT:
-		/*
-		   responsiblity of CC to start charging after receiving CC_CONNECT_IND 
-		 */
+		/* 
+		   responsiblity of CC to start charging after receiving CC_CONNECT_IND */
 		if ((err = cc_connect_ind(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_CONNECTED);
@@ -11965,16 +11854,14 @@ isup_recv_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 	}
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
-		/*
-		   release iam information 
-		 */
+		/* 
+		   release iam information */
 		ct_set_c_state(ct, CTS_OGC_ANSWERED);
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -11986,7 +11873,7 @@ STATIC int
 isup_recv_fot(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: FOT <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FOT <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_ANM:
 	case CTS_ICC_ANSWERED:
@@ -11999,9 +11886,8 @@ isup_recv_fot(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_CONNECTED:
 		if ((err = cc_forwxfer_ind(q, ct, m)))
 			return (err);
-		/*
-		   don't change state 
-		 */
+		/* 
+		   don't change state */
 	}
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_ANM:
@@ -12009,9 +11895,8 @@ isup_recv_fot(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -12023,7 +11908,7 @@ STATIC int
 isup_recv_anm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: ANM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: ANM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ANM:
 		ct_timer_stop(ct, t9);
@@ -12035,9 +11920,8 @@ isup_recv_anm(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_WIND_ALERTING:
 	case CCS_WIND_PROGRESS:
 	case CCS_WIND_CONNECT:
-		/*
-		   CC responsibility to start charging 
-		 */
+		/* 
+		   CC responsibility to start charging */
 		if ((err = cc_connect_ind(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_CONNECTED);
@@ -12051,9 +11935,8 @@ isup_recv_anm(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (-EFAULT);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -12089,7 +11972,7 @@ STATIC int
 isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: REL <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: REL <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_CCR:
 		if (ct_tst(ct, CCTF_COT_PENDING))
@@ -12118,9 +12001,8 @@ isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CTS_OGC_SUSPENDED:
 		ct_timer_stop(ct, t6);
 		ct_timer_stop(ct, t38);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CTS_OGC_ANSWERED:
 		break;
 	case CTS_ICC_SEND_RLC:
@@ -12162,12 +12044,10 @@ isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	case CTS_ICC_WAIT_SAM:
 	case CTS_ICC_WAIT_ACM:
-		/*
-		   responsibility of CC to remove loopback 
-		 */
-		/*
-		   release iam information 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
+		/* 
+		   release iam information */
 		goto release_icc;
 	case CTS_ICC_WAIT_ANM:
 	case CTS_ICC_SUSPENDED:
@@ -12175,17 +12055,15 @@ isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 		goto release_icc;
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
-		/*
-		   responsibility of CC to remove tone/detector 
-		 */
+		/* 
+		   responsibility of CC to remove tone/detector */
 		goto release_ogc;
 	case CTS_OGC_WAIT_ANM:
 		goto release_ogc;
 	case CTS_OGC_SUSPENDED:
 	case CTS_OGC_ANSWERED:
-		/*
-		   responsibility of CC to stop charging 
-		 */
+		/* 
+		   responsibility of CC to stop charging */
 		goto release_ogc;
 	case CTS_ICC_WAIT_RLC:
 	case CTS_OGC_WAIT_RLC:
@@ -12209,14 +12087,12 @@ isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 	return (QR_DONE);
       release_problem:
 	if (!ct_tst(ct, CCTF_LOC_M_BLOCK_PENDING)) {
-		/*
-		   call control disappeared for this circuit 
-		 */
+		/* 
+		   call control disappeared for this circuit */
 		if ((err = cc_maint_ind(q, ct, ISUP_MAINT_RELEASE_FAILURE)))
 			return (err);
-		/*
-		   Q.752 12.23 1st and delta 
-		 */
+		/* 
+		   Q.752 12.23 1st and delta */
 		ct->stats.ct_rel_problem++;
 		ct->tg.tg->stats.ct_rel_problem++;
 		ct->sr.sr->stats.ct_rel_problem++;
@@ -12226,9 +12102,8 @@ isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 	}
 	return (QR_DONE);
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -12271,7 +12146,7 @@ STATIC int
 isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: SUS <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: SUS <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_ANSWERED:
 	case CTS_ICC_SUSPENDED:
@@ -12286,13 +12161,11 @@ isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_suspend_ind(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_SUSPENDED);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_SUSPENDED:
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	}
 	switch (ct_get_c_state(ct)) {
@@ -12317,9 +12190,8 @@ isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((tg->config.flags & ISUP_TGF_INCOMING_INTERNATIONAL_EXCHANGE)
 		    && !(tg->config.flags & ISUP_TGF_SUSPEND_NATIONALLY_PERFORMED))
 			ct_timer_start(ct, t38);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 	case CTS_OGC_SUSPENDED:
 		ct_set(ct, CCTF_TERM_SUSPENDED);
@@ -12327,9 +12199,8 @@ isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -12371,7 +12242,7 @@ STATIC int
 isup_recv_res(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: RES <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: RES <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_SUSPENDED:
 		break;
@@ -12410,9 +12281,8 @@ isup_recv_res(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -12434,7 +12304,7 @@ STATIC int
 isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: RLC <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: RLC <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
 		break;
@@ -12457,9 +12327,8 @@ isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		break;
 	case CTS_OGC_ANSWERED:
 	case CTS_OGC_SUSPENDED:
-		/*
-		   stop charging 
-		 */
+		/* 
+		   stop charging */
 		break;
 	case CTS_ICC_WAIT_RLC:
 	case CTS_OGC_WAIT_RLC:
@@ -12486,8 +12355,9 @@ isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_IDLE:
 		break;
 	default:
-		if ((err = cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RECV_RLC,
-					       CC_CAUS_NORMAL_UNSPECIFIED)))
+		if ((err =
+		     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RECV_RLC,
+					 CC_CAUS_NORMAL_UNSPECIFIED)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 		break;
@@ -12506,9 +12376,8 @@ isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		break;
 	case CTS_ICC_WAIT_SAM:
 	case CTS_ICC_WAIT_ACM:
-		/*
-		   responsibility of CC to remove loopback 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
 		goto release_icc;
 	case CTS_ICC_WAIT_ANM:
 	case CTS_ICC_ANSWERED:
@@ -12516,23 +12385,20 @@ isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		goto release_icc;
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
-		/*
-		   responsibility of CC to remove tone/detector 
-		 */
+		/* 
+		   responsibility of CC to remove tone/detector */
 		goto release_ogc;
 	case CTS_OGC_WAIT_ANM:
 		goto release_ogc;
 	case CTS_OGC_ANSWERED:
 	case CTS_OGC_SUSPENDED:
-		/*
-		   CC responsibility to stop charging 
-		 */
+		/* 
+		   CC responsibility to stop charging */
 		goto release_ogc;
 	case CTS_ICC_WAIT_RLC:	/* call failure or reattempt */
 	case CTS_OGC_WAIT_RLC:	/* call failure or reattempt */
-		/*
-		   places circuit back in trunk group idle list 
-		 */
+		/* 
+		   places circuit back in trunk group idle list */
 		ct_set_c_state(ct, CTS_IDLE);
 		if (ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
 			ct_timer_stop(ct, t16);
@@ -12550,14 +12416,12 @@ isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected mesage 
-	 */
+	/* 
+	   unexpected mesage */
 	return (-EOPNOTSUPP);
       release_icc:
-	/*
-	   release iam information 
-	 */
+	/* 
+	   release iam information */
 	if ((err = isup_send_rel(q, ct, CC_CAUS_NORMAL_UNSPECIFIED, NULL, 0)))
 		return (err);
 	ct_timer_start(ct, t5);
@@ -12565,9 +12429,8 @@ isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 	ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
 	return (QR_DONE);
       release_ogc:
-	/*
-	   release iam information 
-	 */
+	/* 
+	   release iam information */
 	if ((err = isup_send_rel(q, ct, CC_CAUS_NORMAL_UNSPECIFIED, NULL, 0)))
 		return (err);
 	ct_timer_start(ct, t5);
@@ -12585,17 +12448,15 @@ isup_recv_ccr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct cc *ck;
-	printd(("%s; %p: CCR <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CCR <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
-		/*
-		   this is an initial CCR 
-		 */
+		/* 
+		   this is an initial CCR */
 		break;
 	case CTS_ICC_WAIT_CCR:
-		/*
-		   this is a recheck CCR 
-		 */
+		/* 
+		   this is a recheck CCR */
 		ct_timer_stop(ct, t27);
 		ct_timer_start(ct, t36);
 		break;
@@ -12607,34 +12468,31 @@ isup_recv_ccr(queue_t *q, struct ct *ct, isup_msg_t * m)
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 	}
 	if (!(ck = ct->tst.cc)) {
-		/*
-		   look for test 
-		 */
-		if (((ck = ct->bind.tst) && (ck->setind < ck->maxind)) ||
-		    ((ck = ct->cg.cg->bind.tst) && (ck->setind < ck->maxind)) ||
-		    ((ck = ct->tg.tg->bind.tst) && (ck->setind < ck->maxind)) ||
-		    ((ck = ct->sr.sr->bind.tst) && (ck->setind < ck->maxind)) ||
-		    ((ck = ct->sp.sp->bind.tst) && (ck->setind < ck->maxind)) ||
-		    ((ck = master.bind.tst) && (ck->setind < ck->maxind))
+		/* 
+		   look for test */
+		if (((ck = ct->bind.tst) && (ck->setind < ck->maxind))
+		    || ((ck = ct->cg.cg->bind.tst) && (ck->setind < ck->maxind))
+		    || ((ck = ct->tg.tg->bind.tst) && (ck->setind < ck->maxind))
+		    || ((ck = ct->sr.sr->bind.tst) && (ck->setind < ck->maxind))
+		    || ((ck = ct->sp.sp->bind.tst) && (ck->setind < ck->maxind))
+		    || ((ck = master.bind.tst) && (ck->setind < ck->maxind))
 		    )
 			ct_set_t_state(ct, ck, CKS_WIND_CONT);
 	}
 	if (ck) {
 		if ((err = cc_cont_check_ind(q, ck, ct, m)))
 			return (err);
-		/*
-		   CC responsibility to apply loopback and respond 
-		 */
+		/* 
+		   CC responsibility to apply loopback and respond */
 		ct_set_t_state(ct, ck, CKS_WREQ_CTEST);
 	} else
-		__printd(("%s: MAINT: unhandled continuity check request on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id, ct->cic));
+		__printd(("%s: MAINT: unhandled continuity check request on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id, ct->cic));
 	ct_set(ct, CCTM_CONT_CHECK);
 	ct_set_c_state(ct, CTS_ICC_WAIT_CCR);
 	return (QR_DONE);
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -12700,7 +12558,7 @@ isup_recv_rsc(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct cc *cm;
-	printd(("%s; %p: RSC <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: RSC <-\n", DRV_NAME, ct));
 	if (ct_get_c_state(ct) != CTS_IDLE) {
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
@@ -12747,9 +12605,8 @@ isup_recv_rsc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		case CCS_WREQ_INFO:
 		case CCS_WCON_SREQ:
 		case CCS_WIND_PROCEED:
-			/*
-			   responsibility of CC to reattempt 
-			 */
+			/* 
+			   responsibility of CC to reattempt */
 			if ((err = cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_RESET)))
 				return (err);
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
@@ -12759,24 +12616,21 @@ isup_recv_rsc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		case CCS_IDLE:
 			break;
 		default:
-			if ((err = cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
-						       CC_CAUS_NORMAL_UNSPECIFIED)))
+			if ((err =
+			     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
+						 CC_CAUS_NORMAL_UNSPECIFIED)))
 				return (err);
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			break;
 		}
-		/*
-		   responsibility of CC to remove loopback 
-		 */
-		/*
-		   release iam information 
-		 */
-		/*
-		   responsibility of CC to disconnect tone/detector 
-		 */
-		/*
-		   CC responsibility to stop charging 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
+		/* 
+		   release iam information */
+		/* 
+		   responsibility of CC to disconnect tone/detector */
+		/* 
+		   CC responsibility to stop charging */
 		ct_set_c_state(ct, CTS_IDLE);
 	}
 	if (ct_tst(ct, CCTF_LOC_M_BLOCKED | CCTF_LOC_M_BLOCK_PENDING))
@@ -12786,9 +12640,8 @@ isup_recv_rsc(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cg_h_block(q, ct->cg.cg)))
 			return (err);
 	if (!ct_tst(ct, CCTF_REM_RESET_PENDING)) {
-		/*
-		   find management to give inddication 
-		 */
+		/* 
+		   find management to give inddication */
 		if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm) || (cm = ct->tg.tg->bind.mgm)
 		    || (cm = ct->sr.sr->bind.mgm) || (cm = ct->sp.sp->bind.mgm)
 		    || (cm = master.bind.mgm)) {
@@ -12799,16 +12652,14 @@ isup_recv_rsc(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set(ct, CCTF_REM_RESET_PENDING);
 			// return (QR_DONE);
 		} else {
-			/*
-			   Note: if nobody is listening, these indications should be logged. 
-			 */
-			__printd(("%s: MGMT: unhandled reset indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id, ct->cic));
+			/* 
+			   Note: if nobody is listening, these indications should be logged. */
+			__printd(("%s: MGMT: unhandled reset indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id, ct->cic));
 			ct_set(ct, CCTF_REM_RESET_PENDING);
 		}
 	}
-	/*
-	   complete procedure automatically 
-	 */
+	/* 
+	   complete procedure automatically */
 	if (ct_tst(ct, CCTF_REM_RESET_PENDING)) {
 		if ((err = isup_send_rlc(q, ct, NULL, 0)))
 			return (err);
@@ -12836,10 +12687,9 @@ STATIC int
 isup_recv_blo(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: BLO <-\n", ISUP_DRV_NAME, ct));
-	/*
-	   does not interrupt segmentation 
-	 */
+	printd(("%s; %p: BLO <-\n", DRV_NAME, ct));
+	/* 
+	   does not interrupt segmentation */
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
@@ -12860,17 +12710,15 @@ isup_recv_blo(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_WIND_PROCEED:
 		if ((err = cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_BLOCKING)))
 			return (err);
-		/*
-		   responsibility of CC to reattempt 
-		 */
+		/* 
+		   responsibility of CC to reattempt */
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 		break;
 	}
 	if (!ct_tst(ct, CCTF_REM_M_BLOCK_PENDING)) {
 		struct cc *cm;
-		if ((cm = ct->bind.mgm) ||
-		    (cm = ct->cg.cg->bind.mgm) || (cm = ct->tg.tg->bind.mgm) ||
-		    (cm = ct->sr.sr->bind.mgm) || (cm = ct->sp.sp->bind.mgm)
+		if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm) || (cm = ct->tg.tg->bind.mgm)
+		    || (cm = ct->sr.sr->bind.mgm) || (cm = ct->sp.sp->bind.mgm)
 		    || (cm = master.bind.mgm)) {
 			if (ct_get_m_state(ct) == CMS_IDLE)
 				ct_set_m_state(ct, cm, CMS_WRES_BLIND);
@@ -12879,16 +12727,14 @@ isup_recv_blo(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set(ct, CCTF_REM_M_BLOCK_PENDING);
 			// return (QR_DONE);
 		} else {
-			/*
-			   Note: if nobody is listening, these indications should be logged. 
-			 */
-			__printd(("%s: MGMT: unhandled blocking indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id, ct->cic));
+			/* 
+			   Note: if nobody is listening, these indications should be logged. */
+			__printd(("%s: MGMT: unhandled blocking indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id, ct->cic));
 			ct_set(ct, CCTF_REM_M_BLOCK_PENDING);
 		}
 	}
-	/*
-	   complete procedure automatically 
-	 */
+	/* 
+	   complete procedure automatically */
 	if (ct_tst(ct, CCTF_REM_M_BLOCK_PENDING)) {
 		if ((err = isup_send_bla(q, ct)))
 			return (err);
@@ -12898,15 +12744,12 @@ isup_recv_blo(queue_t *q, struct ct *ct, isup_msg_t * m)
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
-		/*
-		   responsibility of CC to disconnect tone/detector 
-		 */
-		/*
-		   CC responsibility to release iam information 
-		 */
-		/*
-		   does not put on idle list because remote block pending 
-		 */
+		/* 
+		   responsibility of CC to disconnect tone/detector */
+		/* 
+		   CC responsibility to release iam information */
+		/* 
+		   does not put on idle list because remote block pending */
 		ct_timer_start(ct, t5);
 		ct_timer_start(ct, t1);
 		if ((err = isup_send_rel(q, ct, CC_CAUS_NORMAL_UNSPECIFIED, NULL, 0)))
@@ -12925,18 +12768,15 @@ STATIC int
 isup_recv_ubl(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: UBL <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: UBL <-\n", DRV_NAME, ct));
 	if (!ct_tst(ct, CCTF_REM_M_UNBLOCK_PENDING)) {
 		struct cc *cm;
-		/*
-		   does not interrupt segmentation 
-		 */
-		/*
-		   does not affect calls in progress 
-		 */
-		if ((cm = ct->bind.mgm) ||
-		    (cm = ct->cg.cg->bind.mgm) || (cm = ct->tg.tg->bind.mgm) ||
-		    (cm = ct->sr.sr->bind.mgm) || (cm = ct->sp.sp->bind.mgm)
+		/* 
+		   does not interrupt segmentation */
+		/* 
+		   does not affect calls in progress */
+		if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm) || (cm = ct->tg.tg->bind.mgm)
+		    || (cm = ct->sr.sr->bind.mgm) || (cm = ct->sp.sp->bind.mgm)
 		    || (cm = master.bind.mgm)) {
 			if (ct_get_m_state(ct) == CMS_IDLE)
 				ct_set_m_state(ct, cm, CMS_WRES_UBIND);
@@ -12945,13 +12785,12 @@ isup_recv_ubl(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set(ct, CCTF_REM_M_UNBLOCK_PENDING);
 			// return (QR_DONE);
 		} else {
-			__printd(("%s: MGMT: unhandled unblocking indication on circuit id=%ld, cic=%ld\n", ISUP_DRV_NAME, ct->id, ct->cic));
+			__printd(("%s: MGMT: unhandled unblocking indication on circuit id=%ld, cic=%ld\n", DRV_NAME, ct->id, ct->cic));
 			ct_set(ct, CCTF_REM_M_UNBLOCK_PENDING);
 		}
 	}
-	/*
-	   complete procedure automatically 
-	 */
+	/* 
+	   complete procedure automatically */
 	if (ct_tst(ct, CCTF_REM_M_UNBLOCK_PENDING)) {
 		if ((err = isup_send_uba(q, ct)))
 			return (err);
@@ -12969,7 +12808,7 @@ STATIC int
 isup_recv_bla(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: BLA <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: BLA <-\n", DRV_NAME, ct));
 	if (ct_tst(ct, CCTF_LOC_M_BLOCK_PENDING)) {
 		if (ct_get_m_state(ct) == CMS_WCON_BLREQ) {
 			if ((err = cc_blocking_con(q, ct, m)))
@@ -12979,36 +12818,30 @@ isup_recv_bla(queue_t *q, struct ct *ct, isup_msg_t * m)
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_SEND_RLC:
 		case CTS_OGC_SEND_RLC:
-			/*
-			   release problem, send rlc now 
-			 */
+			/* 
+			   release problem, send rlc now */
 			if ((err = isup_send_rlc(q, ct, NULL, 0)))
 				return (err);
 			ct_set_c_state(ct, CTS_IDLE);
 		}
-		/*
-		   does not interrupt segmentation 
-		 */
-		/*
-		   does not affect calls in progress 
-		 */
-		/*
-		   complete procedure automatically 
-		 */
+		/* 
+		   does not interrupt segmentation */
+		/* 
+		   does not affect calls in progress */
+		/* 
+		   complete procedure automatically */
 		ct_timer_stop(ct, t12);
 		ct_timer_stop(ct, t13);
 		ct_set(ct, CCTF_LOC_M_BLOCKED);
 		ct_clr(ct, CCTF_LOC_M_BLOCK_PENDING);
 		return (QR_DONE);
 	}
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	if ((err = cc_maint_ind(q, ct, ISUP_MAINT_UNEXPECTED_BLA)))
 		return (err);
-	/*
-	   Q.752 12.14 1st and delta 
-	 */
+	/* 
+	   Q.752 12.14 1st and delta */
 	ct->stats.ct_unexpected_bla++;
 	ct->tg.tg->stats.ct_unexpected_bla++;
 	ct->sr.sr->stats.ct_unexpected_bla++;
@@ -13025,33 +12858,29 @@ STATIC int
 isup_recv_uba(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: UBA <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: UBA <-\n", DRV_NAME, ct));
 	if (ct_tst(ct, CCTF_LOC_M_UNBLOCK_PENDING)) {
 		if (ct_get_m_state(ct) == CMS_WCON_UBREQ) {
 			if ((err = cc_unblocking_con(q, ct, m)))
 				return (err);
 			ct_set_m_state(ct, ct->mgm.cc, CMS_IDLE);
 		}
-		/*
-		   does not interrupt segmentation 
-		 */
-		/*
-		   does not affect calls in progress 
-		 */
+		/* 
+		   does not interrupt segmentation */
+		/* 
+		   does not affect calls in progress */
 		ct_timer_stop(ct, t14);
 		ct_timer_stop(ct, t15);
 		ct_clr(ct, CCTF_LOC_M_BLOCKED);
 		ct_clr(ct, CCTF_LOC_M_UNBLOCK_PENDING);
 		return (QR_DONE);
 	}
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	if ((err = cc_maint_ind(q, ct, ISUP_MAINT_UNEXPECTED_UBA)))
 		return (err);
-	/*
-	   Q.752 12.14 1st and delta 
-	 */
+	/* 
+	   Q.752 12.14 1st and delta */
 	ct->stats.ct_unexpected_uba++;
 	ct->tg.tg->stats.ct_unexpected_uba++;
 	ct->sr.sr->stats.ct_unexpected_uba++;
@@ -13073,10 +12902,9 @@ isup_recv_grs(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct ct *ct;
 	struct cg *cg = bc->cg.cg;
 	uchar rs[RS_MAX_RANGE] = { 0, };
-	printd(("%s; %p: GRS <-\n", ISUP_DRV_NAME, cg));
-	/*
-	   TODO: handle prearranged circuits when rs[0] == 0 
-	 */
+	printd(("%s; %p: GRS <-\n", DRV_NAME, cg));
+	/* 
+	   TODO: handle prearranged circuits when rs[0] == 0 */
 	rs[0] = m->msg.grs.rs.ptr[0];
 	for (ct = bc; ct; ct = ct->sr.next) {
 		o = ct->cic - bc->cic;
@@ -13133,9 +12961,8 @@ isup_recv_grs(queue_t *q, struct ct *bc, isup_msg_t * m)
 		case CCS_WREQ_INFO:
 		case CCS_WCON_SREQ:
 		case CCS_WIND_PROCEED:
-			/*
-			   responsibility of CC to reattempt 
-			 */
+			/* 
+			   responsibility of CC to reattempt */
 			if ((err = cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_RESET)))
 				return (err);
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
@@ -13145,24 +12972,21 @@ isup_recv_grs(queue_t *q, struct ct *bc, isup_msg_t * m)
 		case CCS_IDLE:
 			break;
 		default:
-			if ((err = cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
-						       CC_CAUS_NORMAL_UNSPECIFIED)))
+			if ((err =
+			     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
+						 CC_CAUS_NORMAL_UNSPECIFIED)))
 				return (err);
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			break;
 		}
-		/*
-		   responsibility of CC to remove loopback 
-		 */
-		/*
-		   release iam information 
-		 */
-		/*
-		   responsibility of CC to disconnect tone/detector 
-		 */
-		/*
-		   CC responsibility to stop charging 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
+		/* 
+		   release iam information */
+		/* 
+		   responsibility of CC to disconnect tone/detector */
+		/* 
+		   CC responsibility to stop charging */
 		ct_set_c_state(ct, CTS_IDLE);
 	}
 	if (!cg_tst(cg, CCTF_LOC_H_BLOCK_PENDING))
@@ -13170,9 +12994,8 @@ isup_recv_grs(queue_t *q, struct ct *bc, isup_msg_t * m)
 			if ((err = cg_h_block(q, cg)))
 				return (err);
 	if (!cg_tst(cg, CCTF_REM_RESET_PENDING)) {
-		/*
-		   find management to give inddication 
-		 */
+		/* 
+		   find management to give inddication */
 		if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm) || (cm = cg->sp.sp->bind.mgm)
 		    || (cm = master.bind.mgm)) {
 			if (cg_get_m_state(cg) == CMS_IDLE)
@@ -13182,16 +13005,14 @@ isup_recv_grs(queue_t *q, struct ct *bc, isup_msg_t * m)
 			cg_set(cg, CCTF_REM_RESET_PENDING);
 			// return (QR_DONE);
 		} else {
-			/*
-			   Note: if nobody is listening, these indications should be logged. 
-			 */
-			__printd(("%s: MGMT: unhandled reset indication on circuit group id=%ld, cic=%ld\n", ISUP_DRV_NAME, cg->id, ct->cic));
+			/* 
+			   Note: if nobody is listening, these indications should be logged. */
+			__printd(("%s: MGMT: unhandled reset indication on circuit group id=%ld, cic=%ld\n", DRV_NAME, cg->id, ct->cic));
 			cg_set(cg, CCTF_REM_RESET_PENDING);
 		}
 	}
-	/*
-	   complete procedure automatically 
-	 */
+	/* 
+	   complete procedure automatically */
 	if (cg_tst(cg, CCTF_REM_RESET_PENDING)) {
 		if ((err = isup_send_gra(q, bc, rs, ((rs[0] + 7) >> 3) + 1)))
 			return (err);
@@ -13217,7 +13038,7 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	int o, i, j;
 	uchar rs[RS_MAX_RANGE] = { 0, };
-	printd(("%s; %p: CGB <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: CGB <-\n", DRV_NAME, cg));
 	rs[0] = m->msg.cgb.rs.ptr[0];	/* TODO: handle prearranged */
 	switch (m->msg.cgb.cgi & 0x03) {
 	case ISUP_MAINTENANCE_ORIENTED:
@@ -13233,9 +13054,8 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 			ct_set(ct, CCTF_REM_G_BLOCK_PENDING);
 			if (ct_get_c_state(ct) == CTS_IDLE)
 				continue;
-			/*
-			   does not interrupt segmentation 
-			 */
+			/* 
+			   does not interrupt segmentation */
 			switch (ct_get_c_state(ct)) {
 			case CTS_OGC_WAIT_SAM:
 			case CTS_OGC_WAIT_ACM:
@@ -13258,32 +13078,28 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 				     cc_call_reattempt_ind(q, ct->cpc.cc, ct,
 							   ISUP_REATTEMPT_BLOCKING)))
 					return (err);
-				/*
-				   responsibility of CC to reattempt 
-				 */
+				/* 
+				   responsibility of CC to reattempt */
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				break;
 			}
 			switch (ct_get_c_state(ct)) {
 			case CTS_OGC_WAIT_SAM:
 			case CTS_OGC_WAIT_ACM:
-				/*
-				   responsibility of CC to disconnect tone/detector 
-				 */
-				/*
-				   CC responsibility to release iam information 
-				 */
-				/*
-				   does not put on idle list because remote blocked 
-				 */
+				/* 
+				   responsibility of CC to disconnect tone/detector */
+				/* 
+				   CC responsibility to release iam information */
+				/* 
+				   does not put on idle list because remote blocked */
 				ct_set_c_state(ct, CTS_IDLE);
 				break;
 			}
 		}
 		if (!cg_tst(cg, CCTF_REM_M_BLOCK_PENDING)) {
 			struct cc *cm;
-			if ((cm = cg->bind.mgm) ||
-			    (cm = cg->sr.sr->bind.mgm) || (cm = cg->sp.sp->bind.mgm)
+			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
+			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
 				if (cg_get_m_state(cg) == CMS_IDLE)
 					cg_set_m_state(cg, cm, CMS_WRES_BLIND);
@@ -13292,17 +13108,15 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 				cg_set(cg, CCTF_REM_M_BLOCK_PENDING);
 				// return (QR_DONE);
 			} else {
-				/*
+				/* 
 				   Note: if nobody is listening, these indications should be
-				   logged. 
-				 */
-				__printd(("%s: MGMT: unhandled blocking indication on circuit group id=%ld, cic=%ld\n", ISUP_DRV_NAME, cg->id, cg->cic));
+				   logged. */
+				__printd(("%s: MGMT: unhandled blocking indication on circuit group id=%ld, cic=%ld\n", DRV_NAME, cg->id, cg->cic));
 				cg_set(cg, CCTF_REM_M_BLOCK_PENDING);
 			}
 		}
-		/*
-		   complete procedure automatically 
-		 */
+		/* 
+		   complete procedure automatically */
 		if (cg_tst(cg, CCTF_REM_M_BLOCK_PENDING)) {
 			if ((err = isup_send_cgba(q, bc, m->msg.cgb.cgi, rs, m->msg.cgb.rs.len)))
 				return (err);
@@ -13356,9 +13170,8 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 			}
 			switch (ct_get_t_state(ct)) {
 			case CKS_WCON_RELREQ:
-				/*
-				   confirm release 
-				 */
+				/* 
+				   confirm release */
 				if ((err = cc_release_con(q, ct->tst.cc, ct, NULL)))
 					return (err);
 				ct_set_t_state(ct, ct->tst.cc, CKS_IDLE);
@@ -13366,24 +13179,21 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 			}
 			switch (ct_get_i_state(ct)) {
 			case CCS_WCON_RELREQ:
-				/*
-				   confirm release 
-				 */
+				/* 
+				   confirm release */
 				if ((err = cc_release_con(q, ct->cpc.cc, ct, NULL)))
 					return (err);
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				break;
 			case CCS_WRES_RELIND:
-				/*
-				   await response 
-				 */
+				/* 
+				   await response */
 				break;
 			case CCS_IDLE:
 				break;
 			default:
-				/*
-				   CC responsibility to abort COT 
-				 */
+				/* 
+				   CC responsibility to abort COT */
 				if ((err =
 				     cc_call_failure_ind(q, ct->cpc.cc, ct,
 							 ISUP_CALL_FAILURE_BLOCKING,
@@ -13392,15 +13202,14 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				break;
 			}
-			/*
-			   keep from being added to idle list 
-			 */
+			/* 
+			   keep from being added to idle list */
 			ct_set_c_state(ct, CTS_IDLE);
 		}
 		if (!cg_tst(cg, CCTF_REM_H_BLOCK_PENDING)) {
 			struct cc *cm;
-			if ((cm = cg->bind.mgm) ||
-			    (cm = cg->sr.sr->bind.mgm) || (cm = cg->sp.sp->bind.mgm)
+			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
+			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
 				if (cg_get_m_state(cg) == CMS_IDLE)
 					cg_set_m_state(cg, cm, CMS_WRES_BLIND);
@@ -13409,17 +13218,15 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 				cg_set(cg, CCTF_REM_H_BLOCK_PENDING);
 				// return (QR_DONE);
 			} else {
-				/*
+				/* 
 				   Note: if nobody is listening, these indications should be
-				   logged. 
-				 */
-				__printd(("%s: MGMT: unhandled blocking indication on circuit group id=%ld, cic=%ld\n", ISUP_DRV_NAME, cg->id, cg->cic));
+				   logged. */
+				__printd(("%s: MGMT: unhandled blocking indication on circuit group id=%ld, cic=%ld\n", DRV_NAME, cg->id, cg->cic));
 				cg_set(cg, CCTF_REM_H_BLOCK_PENDING);
 			}
 		}
-		/*
-		   complete procedure automatically 
-		 */
+		/* 
+		   complete procedure automatically */
 		if (cg_tst(cg, CCTF_REM_H_BLOCK_PENDING)) {
 			if ((err = isup_send_cgba(q, bc, m->msg.cgb.cgi, rs, m->msg.cgb.rs.len)))
 				return (err);
@@ -13433,9 +13240,8 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		return (QR_DONE);
 	}
-	/*
-	   bad mandatory parameter value 
-	 */
+	/* 
+	   bad mandatory parameter value */
 	return (-EINVAL);
 }
 
@@ -13451,7 +13257,7 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	int o, i, j;
 	uchar rs[RS_MAX_RANGE] = { 0, };
-	printd(("%s; %p: CGU <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: CGU <-\n", DRV_NAME, cg));
 	rs[0] = m->msg.cgu.rs.ptr[0];	/* TODO: handle prearranged */
 	switch (m->msg.cgu.cgi & 0x03) {
 	case ISUP_MAINTENANCE_ORIENTED:
@@ -13468,8 +13274,8 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		if (!cg_tst(cg, CCTF_REM_M_UNBLOCK_PENDING)) {
 			struct cc *cm;
-			if ((cm = cg->bind.mgm) ||
-			    (cm = cg->sr.sr->bind.mgm) || (cm = cg->sp.sp->bind.mgm)
+			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
+			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
 				if (cg_get_m_state(cg) == CMS_IDLE)
 					cg_set_m_state(cg, cm, CMS_WRES_UBIND);
@@ -13478,13 +13284,12 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 				cg_set(cg, CCTF_REM_M_UNBLOCK_PENDING);
 				// return (QR_DONE);
 			} else {
-				__printd(("%s: MGMT: unhandled unblocking indication on circuit group id=%ld, cic=%ld\n", ISUP_DRV_NAME, cg->id, cg->cic));
+				__printd(("%s: MGMT: unhandled unblocking indication on circuit group id=%ld, cic=%ld\n", DRV_NAME, cg->id, cg->cic));
 				cg_set(cg, CCTF_REM_M_UNBLOCK_PENDING);
 			}
 		}
-		/*
-		   complete procedure automatically 
-		 */
+		/* 
+		   complete procedure automatically */
 		if (cg_tst(cg, CCTF_REM_M_UNBLOCK_PENDING)) {
 			if ((err = isup_send_cgua(q, bc, m->msg.cgu.cgi, rs, m->msg.cgu.rs.len)))
 				return (err);
@@ -13511,8 +13316,8 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		if (!cg_tst(cg, CCTF_REM_H_UNBLOCK_PENDING)) {
 			struct cc *cm;
-			if ((cm = cg->bind.mgm) ||
-			    (cm = cg->sr.sr->bind.mgm) || (cm = cg->sp.sp->bind.mgm)
+			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
+			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
 				if (cg_get_m_state(cg) == CMS_IDLE)
 					cg_set_m_state(cg, cm, CMS_WRES_UBIND);
@@ -13521,13 +13326,12 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 				cg_set(cg, CCTF_REM_H_UNBLOCK_PENDING);
 				// return (QR_DONE);
 			} else {
-				__printd(("%s: MGMT: unhandled unblocking indication on circuit group id=%ld, cic=%ld\n", ISUP_DRV_NAME, cg->id, cg->cic));
+				__printd(("%s: MGMT: unhandled unblocking indication on circuit group id=%ld, cic=%ld\n", DRV_NAME, cg->id, cg->cic));
 				cg_set(cg, CCTF_REM_H_UNBLOCK_PENDING);
 			}
 		}
-		/*
-		   complete procedure automatically 
-		 */
+		/* 
+		   complete procedure automatically */
 		if (cg_tst(cg, CCTF_REM_H_UNBLOCK_PENDING)) {
 			if ((err = isup_send_cgua(q, bc, m->msg.cgu.cgi, rs, m->msg.cgu.rs.len)))
 				return (err);
@@ -13541,9 +13345,8 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		return (QR_DONE);
 	}
-	/*
-	   bad mandatory parameter value 
-	 */
+	/* 
+	   bad mandatory parameter value */
 	return (-EINVAL);
 }
 
@@ -13560,7 +13363,7 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	ulong CCTF_LOC_X_BLOCKED;
 	ulong CCTF_LOC_X_BLOCK_PENDING;
-	printd(("%s; %p: CGBA <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: CGBA <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_len != m->msg.cgba.rs.len
 	    || cg->rs_ptr[0] != m->msg.cgba.rs.ptr[0])
 		goto unexpected;
@@ -13574,9 +13377,8 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 		CCTF_LOC_X_BLOCK_PENDING = CCTF_LOC_H_BLOCK_PENDING;
 		break;
 	default:
-		/*
-		   bad mandatory parameter value 
-		 */
+		/* 
+		   bad mandatory parameter value */
 		return (-EINVAL);
 	}
 	if (!cg_tst(cg, CCTF_LOC_X_BLOCK_PENDING))
@@ -13601,14 +13403,12 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 			continue;
 		}
 		if (ask && !ack) {
-			/*
-			   missing acknowledgement 
-			 */
+			/* 
+			   missing acknowledgement */
 			if ((err = cc_maint_ind(q, ct, ISUP_MAINT_MISSING_ACK_IN_CGBA)))
 				return (err);
-			/*
-			   Q.752 12.8 1st and delta 
-			 */
+			/* 
+			   Q.752 12.8 1st and delta */
 			ct->stats.ct_missing_ack_cgba++;
 			cg->stats.ct_missing_ack_cgba++;
 			ct->tg.tg->stats.ct_missing_ack_cgba++;
@@ -13621,14 +13421,12 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 			continue;
 		}
 		if (!ask && ack) {
-			/*
-			   abnormal acknowledgement 
-			 */
+			/* 
+			   abnormal acknowledgement */
 			if ((err = cc_maint_ind(q, ct, ISUP_MAINT_ABNORMAL_ACK_IN_CGBA)))
 				return (err);
-			/*
-			   Q.752 12.10 1st and delta 
-			 */
+			/* 
+			   Q.752 12.10 1st and delta */
 			ct->stats.ct_abnormal_ack_cgba++;
 			cg->stats.ct_abnormal_ack_cgba++;
 			ct->tg.tg->stats.ct_abnormal_ack_cgba++;
@@ -13646,15 +13444,13 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 			ask = cg->rs_ptr[i] & (0x1 << j);
 			ack = m->msg.cgba.rs.ptr[i] & (0x1 << j);
 			if (!ask & ack) {
-				/*
-				   abnormal acknowledgement 
-				 */
+				/* 
+				   abnormal acknowledgement */
 				if ((err =
 				     cc_cg_maint_ind(q, cg, cic, ISUP_MAINT_ABNORMAL_ACK_IN_CGBA)))
 					return (err);
-				/*
-				   Q.752 12.10 1st and delta 
-				 */
+				/* 
+				   Q.752 12.10 1st and delta */
 				ct->stats.ct_abnormal_ack_cgba++;
 				cg->stats.ct_abnormal_ack_cgba++;
 				ct->tg.tg->stats.ct_abnormal_ack_cgba++;
@@ -13671,9 +13467,8 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
       unexpected:
 	if ((err = cc_maint_ind(q, bc, ISUP_MAINT_UNEXPECTED_CGBA)))
 		return (err);
-	/*
-	   Q.752 12.12 1st and delta 
-	 */
+	/* 
+	   Q.752 12.12 1st and delta */
 	cg->stats.cg_unexpected_cgba++;
 	cg->sr.sr->stats.cg_unexpected_cgba++;
 	cg->sp.sp->stats.cg_unexpected_cgba++;
@@ -13694,7 +13489,7 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 	int o, i, j, ask, ack;
 	ulong CCTF_LOC_X_BLOCKED;
 	ulong CCTF_LOC_X_UNBLOCK_PENDING;
-	printd(("%s; %p: CGUA <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: CGUA <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_len != m->msg.cgua.rs.len
 	    || cg->rs_ptr[0] != m->msg.cgua.rs.ptr[0])
 		goto unexpected;
@@ -13708,9 +13503,8 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 		CCTF_LOC_X_UNBLOCK_PENDING = CCTF_LOC_H_UNBLOCK_PENDING;
 		break;
 	default:
-		/*
-		   bad mandatory parameter value 
-		 */
+		/* 
+		   bad mandatory parameter value */
 		return (-EINVAL);
 	}
 	if (!cg_tst(cg, CCTF_LOC_X_UNBLOCK_PENDING))
@@ -13735,14 +13529,12 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 			continue;
 		}
 		if (ask && !ack) {
-			/*
-			   missing acknowledgement 
-			 */
+			/* 
+			   missing acknowledgement */
 			if ((err = cc_maint_ind(q, ct, ISUP_MAINT_MISSING_ACK_IN_CGUA)))
 				return (err);
-			/*
-			   Q.752 12.9 1st and delta 
-			 */
+			/* 
+			   Q.752 12.9 1st and delta */
 			ct->stats.ct_missing_ack_cgua++;
 			cg->stats.ct_missing_ack_cgua++;
 			ct->tg.tg->stats.ct_missing_ack_cgua++;
@@ -13755,14 +13547,12 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 			continue;
 		}
 		if (!ask && ack) {
-			/*
-			   abnormal acknowledgement 
-			 */
+			/* 
+			   abnormal acknowledgement */
 			if ((err = cc_maint_ind(q, ct, ISUP_MAINT_ABNORMAL_ACK_IN_CGUA)))
 				return (err);
-			/*
-			   Q.752 12.11 1st and delta 
-			 */
+			/* 
+			   Q.752 12.11 1st and delta */
 			ct->stats.ct_abnormal_ack_cgua++;
 			cg->stats.ct_abnormal_ack_cgua++;
 			ct->tg.tg->stats.ct_abnormal_ack_cgua++;
@@ -13780,15 +13570,13 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 			ask = cg->rs_ptr[i] & (0x1 << j);
 			ack = m->msg.cgua.rs.ptr[i] & (0x1 << j);
 			if (!ask & ack) {
-				/*
-				   abnormal acknowledgement 
-				 */
+				/* 
+				   abnormal acknowledgement */
 				if ((err =
 				     cc_cg_maint_ind(q, cg, cic, ISUP_MAINT_ABNORMAL_ACK_IN_CGUA)))
 					return (err);
-				/*
-				   Q.752 12.10 1st and delta 
-				 */
+				/* 
+				   Q.752 12.10 1st and delta */
 				ct->stats.ct_abnormal_ack_cgua++;
 				cg->stats.ct_abnormal_ack_cgua++;
 				ct->tg.tg->stats.ct_abnormal_ack_cgua++;
@@ -13805,9 +13593,8 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
       unexpected:
 	if ((err = cc_maint_ind(q, bc, ISUP_MAINT_UNEXPECTED_CGUA)))
 		return (err);
-	/*
-	   Q.752 12.13 1st and delta 
-	 */
+	/* 
+	   Q.752 12.13 1st and delta */
 	cg->stats.cg_unexpected_cgua++;
 	cg->sr.sr->stats.cg_unexpected_cgua++;
 	cg->sp.sp->stats.cg_unexpected_cgua++;
@@ -13822,7 +13609,7 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 STATIC int
 isup_recv_cmr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CMR <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CMR <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13833,7 +13620,7 @@ isup_recv_cmr(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cmc(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CMC <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CMC <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13844,7 +13631,7 @@ isup_recv_cmc(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cmrj(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CMRJ <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CMRJ <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13855,7 +13642,7 @@ isup_recv_cmrj(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_far(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: FAR <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FAR <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13866,7 +13653,7 @@ isup_recv_far(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_faa(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: FAA <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FAA <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13877,7 +13664,7 @@ isup_recv_faa(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_frj(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: FRJ <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FRJ <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13888,7 +13675,7 @@ isup_recv_frj(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_fad(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: FAD <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FAD <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13899,7 +13686,7 @@ isup_recv_fad(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_fai(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: FAI <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FAI <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13911,7 +13698,7 @@ STATIC int
 isup_recv_lpa(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: LPA <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: LPA <-\n", DRV_NAME, ct));
 	if (ct->tg.tg->proto.popt & SS7_POPT_LPA) {
 		if (!ct_tst(ct, CCTF_LPA_PENDING))
 			goto unexpected;
@@ -13931,12 +13718,10 @@ isup_recv_lpa(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (QR_DONE);
 	}
       unexpected:
-	/*
-	   unexpected 
-	 */
-	/*
-	   not supported 
-	 */
+	/* 
+	   unexpected */
+	/* 
+	   not supported */
 	return (-EOPNOTSUPP);
 }
 
@@ -13947,7 +13732,7 @@ isup_recv_lpa(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_drs(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: DRS <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: DRS <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13958,7 +13743,7 @@ isup_recv_drs(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_pam(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: PAM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: PAM <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -13973,7 +13758,7 @@ isup_recv_gra(queue_t *q, struct ct *bc, isup_msg_t * m)
 	int o, i, j, mblock;
 	struct ct *ct;
 	struct cg *cg = bc->cg.cg;
-	printd(("%s; %p: GRA <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: GRA <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_ptr[0] != m->msg.gra.rs.ptr[0])
 		goto unexpected;
 	if (!cg_tst(cg, CCTF_LOC_RESET_PENDING))
@@ -14015,7 +13800,7 @@ isup_recv_cqm(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	int j;
 	uchar csi[RS_MAX_RANGE] = { 0, };
-	printd(("%s; %p: CQM <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: CQM <-\n", DRV_NAME, cg));
 	if (!cg_tst(cg, CCTF_REM_QUERY_PENDING)) {
 		struct cc *cm;
 		for (ct = bc; ct; ct = ct->sr.next) {
@@ -14033,16 +13818,14 @@ isup_recv_cqm(queue_t *q, struct ct *bc, isup_msg_t * m)
 			cg_set(cg, CCTF_REM_QUERY_PENDING);
 			// return (QR_DONE);
 		} else {
-			/*
-			   Note: if nobody is listening, these indications should be logged. 
-			 */
-			__printd(("%s: MGMT: unhandled query indication on circuit group id=%ld, cic=%ld\n", ISUP_DRV_NAME, cg->id, cg->cic));
+			/* 
+			   Note: if nobody is listening, these indications should be logged. */
+			__printd(("%s: MGMT: unhandled query indication on circuit group id=%ld, cic=%ld\n", DRV_NAME, cg->id, cg->cic));
 			cg_set(cg, CCTF_REM_QUERY_PENDING);
 		}
 	}
-	/*
-	   complete procedure automatically 
-	 */
+	/* 
+	   complete procedure automatically */
 	for (j = 0; j < RS_MAX_RANGE; j++)
 		csi[j] = 0x3;	/* unequipped */
 	for (ct = bc; ct; ct = ct->sr.next) {
@@ -14126,7 +13909,7 @@ isup_recv_cqr(queue_t *q, struct ct *bc, isup_msg_t * m)
 	int j;
 	struct ct *ct;
 	struct cg *cg = bc->cg.cg;
-	printd(("%s; %p: CQR <-\n", ISUP_DRV_NAME, cg));
+	printd(("%s; %p: CQR <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_ptr[0] != m->msg.cqr.rs.ptr[0])
 		goto unexpected;
 	if (!(cg_tst(cg, CCTF_LOC_QUERY_PENDING)))
@@ -14152,9 +13935,8 @@ isup_recv_cqr(queue_t *q, struct ct *bc, isup_msg_t * m)
 				case 0x03:	/* unequipped */
 					ct_set(ct, CCTF_LOC_S_BLOCKED);
 					ct_clr(ct, CCTF_LOC_QUERY_PENDING);
-					/*
-					   notify maintenance 
-					 */
+					/* 
+					   notify maintenance */
 					break;
 				}
 			} else {
@@ -14267,8 +14049,9 @@ isup_recv_cqr(queue_t *q, struct ct *bc, isup_msg_t * m)
 					if (ct_tst(ct, CCTF_REM_H_BLOCKED))
 						ct_clr(ct, CCTF_REM_H_BLOCKED);
 					if (!ct_tst(ct, CCTF_LOC_H_BLOCKED))
-						if ((err = cg_unblock(q, ct->cg.cg,
-								      ISUP_HARDWARE_FAILURE_ORIENTED)))
+						if ((err =
+						     cg_unblock(q, ct->cg.cg,
+								ISUP_HARDWARE_FAILURE_ORIENTED)))
 							return (err);
 					break;
 				case 0x20:	/* hardware blocked remote */
@@ -14282,8 +14065,9 @@ isup_recv_cqr(queue_t *q, struct ct *bc, isup_msg_t * m)
 					if (!ct_tst(ct, CCTF_REM_H_BLOCKED))
 						ct_set(ct, CCTF_REM_H_BLOCKED);
 					if (!ct_tst(ct, CCTF_LOC_H_BLOCKED))
-						if ((err = cg_unblock(q, ct->cg.cg,
-								      ISUP_HARDWARE_FAILURE_ORIENTED)))
+						if ((err =
+						     cg_unblock(q, ct->cg.cg,
+								ISUP_HARDWARE_FAILURE_ORIENTED)))
 							return (err);
 					break;
 				}
@@ -14330,22 +14114,20 @@ STATIC int
 isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: CPG <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CPG <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
 		ct_timer_stop(ct, t7);
 		switch (m->msg.cpg.evnt & ISUP_EVNT_MASK) {
 		case ISUP_EVNT_ALERTING:
 		case ISUP_EVNT_IBI:
-			/*
-			   discard 
-			 */
+			/* 
+			   discard */
 			return (QR_DONE);
 		case ISUP_EVNT_PROGRESS:
 		default:
-			/*
-			   see Q.730 
-			 */
+			/* 
+			   see Q.730 */
 			break;
 		}
 		break;
@@ -14361,22 +14143,19 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_setup_con(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROCEED);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_PROCEED:
-		/*
-		   need ACM (not CPG) in these states 
-		 */
+		/* 
+		   need ACM (not CPG) in these states */
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_PROGRESS) {
 			if ((err = cc_proceeding_ind(q, ct, m)))
 				return (err);
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_ALERTING);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_ALERTING:
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_ALERTING) {
 			if ((err = cc_alerting_ind(q, ct, m)))
@@ -14384,9 +14163,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_PROGRESS:
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_PROGRESS) {
 			if ((err = cc_progress_ind(q, ct, m)))
@@ -14394,9 +14172,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WIND_IBI:
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_IBI) {
 			if ((err = cc_ibi_ind(q, ct, m)))
@@ -14404,9 +14181,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_CONNECT);
 			break;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
@@ -14417,9 +14193,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 		return (-EFAULT);
 	}
       unexpected:
-	/*
-	   unexpected message 
-	 */
+	/* 
+	   unexpected message */
 	return (-EOPNOTSUPP);
 }
 
@@ -14430,7 +14205,7 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_usr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: USR <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: USR <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14442,15 +14217,13 @@ STATIC int
 isup_recv_ucic(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: UCIC <-\n", ISUP_DRV_NAME, ct));
-	/*
-	   unexpected message 
-	 */
+	printd(("%s; %p: UCIC <-\n", DRV_NAME, ct));
+	/* 
+	   unexpected message */
 	if ((err = cc_maint_ind(q, ct, ISUP_MAINT_UNEQUIPPED_CIC)))
 		return (err);
-	/*
-	   Custom 1s and delta 
-	 */
+	/* 
+	   Custom 1s and delta */
 	ct->sr.sr->stats.sr_unequipped_cic++;
 	fixme(("Write this function\n"));
 	swerr();
@@ -14464,10 +14237,9 @@ isup_recv_ucic(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cfn(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CFN <-\n", ISUP_DRV_NAME, ct));
-	/*
-	   discard 
-	 */
+	printd(("%s; %p: CFN <-\n", DRV_NAME, ct));
+	/* 
+	   discard */
 	return (QR_DONE);
 }
 
@@ -14479,7 +14251,7 @@ STATIC int
 isup_recv_olm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: OLM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: OLM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
@@ -14500,12 +14272,10 @@ isup_recv_olm(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CCS_WREQ_INFO:
 	case CCS_WCON_SREQ:
 	case CCS_WREQ_PROCEED:
-		/*
-		   CC responsibility to release call 
-		 */
-		/*
-		   CC should not reattempt on this trunk group 
-		 */
+		/* 
+		   CC responsibility to release call */
+		/* 
+		   CC should not reattempt on this trunk group */
 		if (ct->cpc.cc)
 			if ((err =
 			     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T3_TIMEOUT,
@@ -14535,7 +14305,7 @@ isup_recv_olm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_crg(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CRG <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CRG <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14546,7 +14316,7 @@ isup_recv_crg(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_nrm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: NRM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: NRM <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14557,7 +14327,7 @@ isup_recv_nrm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_fac(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: FAC <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: FAC <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14569,7 +14339,7 @@ STATIC int
 isup_recv_upt(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
-	printd(("%s; %p: UPT <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: UPT <-\n", DRV_NAME, ct));
 	if ((err = isup_send_upa(q, ct, NULL, 0)))
 		return (err);
 	return (QR_DONE);
@@ -14584,7 +14354,7 @@ isup_recv_upa(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct sr *sr = ct->sr.sr;
-	printd(("%s; %p: UPA <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: UPA <-\n", DRV_NAME, ct));
 	if (!(sr->proto.popt & SS7_POPT_UPT))
 		goto unexpected;
 	if (sr->flags & CCTF_UPT_PENDING) {
@@ -14592,16 +14362,14 @@ isup_recv_upa(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_sr_maint_ind(q, sr, ISUP_MAINT_USER_PART_AVAILABLE)))
 			return (err);
 		sr->flags &= ~CCTF_UPT_PENDING;
-		/*
-		   Q.752 10.9 duration 
-		 */
+		/* 
+		   Q.752 10.9 duration */
 		sr->stats.sr_up_unavailable = jiffies - sr->stats.sr_up_unavailable;
 	}
 	return (QR_DONE);
       unexpected:
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	return (-ENOPROTOOPT);
 }
 
@@ -14612,7 +14380,7 @@ isup_recv_upa(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_idr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: IDR <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: IDR <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14623,7 +14391,7 @@ isup_recv_idr(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_irs(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: IRS <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: IRS <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14637,32 +14405,29 @@ isup_recv_irs(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_sgm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: SGM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: SGM <-\n", DRV_NAME, ct));
 	if (ct->timers.t34) {
 		ct_timer_stop(ct, 34);
 		if (ct->sgm) {
 			fixme(("Handle segmentation\n"));
-			/*
+			/* 
 			   Here we should just add the optional parameters in the SEG message to
 			   the optional parameters in the stored message.  We could do this by
 			   trimming the CIC, MT and optional parameters pointer and then
 			   concatenating the parameters with the original message.  First the EOP
-			   parameter must be truncated from the first message. 
-			 */
+			   parameter must be truncated from the first message. */
 			return (-EFAULT);
 		} else {
-			/*
+			/* 
 			   2.9.5.1 d) if a segmentation message is received and if the circuit is
 			   seized by the call, in case the segmentation has not been announced in
 			   the simple segmentation indicator, the segmenetation, message shall be
-			   discarded; 
-			 */
+			   discarded; */
 			int err;
 			if ((err = cc_maint_ind(q, ct, ISUP_MAINT_SEGMENTATION_DISCARDED)))
 				return (err);
-			/*
-			   Custom 1st and delta 
-			 */
+			/* 
+			   Custom 1st and delta */
 			ct->stats.ct_segm_discarded++;
 			ct->tg.tg->stats.ct_segm_discarded++;
 			ct->sr.sr->stats.ct_segm_discarded++;
@@ -14671,9 +14436,8 @@ isup_recv_sgm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			return (QR_DONE);
 		}
 	}
-	/*
-	   unexpected 
-	 */
+	/* 
+	   unexpected */
 	return (-ENOPROTOOPT);
 }
 
@@ -14684,7 +14448,7 @@ isup_recv_sgm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cra(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CRA <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CRA <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14695,7 +14459,7 @@ isup_recv_cra(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_crm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CRM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CRM <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14706,7 +14470,7 @@ isup_recv_crm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cvr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CVR <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CVR <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14717,7 +14481,7 @@ isup_recv_cvr(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cvt(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CVT <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CVT <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14728,7 +14492,7 @@ isup_recv_cvt(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_exm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: EXM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: EXM <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14739,7 +14503,7 @@ isup_recv_exm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_non(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: NON <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: NON <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14750,7 +14514,7 @@ isup_recv_non(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_llm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: LLM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: LLM <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14761,7 +14525,7 @@ isup_recv_llm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_cak(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: CAK <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: CAK <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14772,7 +14536,7 @@ isup_recv_cak(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_tcm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: TCM <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: TCM <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14783,7 +14547,7 @@ isup_recv_tcm(queue_t *q, struct ct *ct, isup_msg_t * m)
 STATIC int
 isup_recv_mcp(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
-	printd(("%s; %p: MCP <-\n", ISUP_DRV_NAME, ct));
+	printd(("%s; %p: MCP <-\n", DRV_NAME, ct));
 	return (-ENOPROTOOPT);
 }
 
@@ -14815,9 +14579,8 @@ isup_dec_unrecognized(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	if (*p)
 		isup_dec_opt(pvar, p + *p, e, m);
-	/*
-	   unrecognized message 
-	 */
+	/* 
+	   unrecognized message */
 	return (-ENOPROTOOPT);
 }
 
@@ -15163,14 +14926,12 @@ isup_dec_grs(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		/*
-		   ANSI allows range value of zero for pre-arranged circuit groups 
-		 */
+		/* 
+		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1 && v->ptr[0] == 0)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 	case SS7_PVAR_ITUT:
 		if (v->len != 1 || v->ptr[0] < 1 || v->ptr[0] > 31)
@@ -15200,17 +14961,15 @@ isup_dec_cgb(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		/*
-		   ANSI allows range value of zero for pre-arranged circuit groups 
-		 */
+		/* 
+		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1) {
 			if (v->ptr[0] == 0)
 				break;
 			return (-EINVAL);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 	case SS7_PVAR_ITUT:
 	{
@@ -15249,17 +15008,15 @@ isup_dec_cgu(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		/*
-		   ANSI allows range value of zero for pre-arranged circuit groups 
-		 */
+		/* 
+		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1) {
 			if (v->ptr[0] == 0)
 				break;
 			return (-EINVAL);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 	{
 		int i, j, set;
@@ -15297,17 +15054,15 @@ isup_dec_cgba(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		/*
-		   ANSI allows range value of zero for pre-arranged circuit groups 
-		 */
+		/* 
+		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1) {
 			if (v->ptr[0] == 0)
 				break;
 			return (-EINVAL);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 	case SS7_PVAR_ITUT:
 	{
@@ -15346,17 +15101,15 @@ isup_dec_cgua(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		/*
-		   ANSI allows range value of zero for pre-arranged circuit groups 
-		 */
+		/* 
+		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1) {
 			if (v->ptr[0] == 0)
 				break;
 			return (-EINVAL);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 	case SS7_PVAR_ITUT:
 	{
@@ -15617,14 +15370,12 @@ isup_dec_cqm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		/*
-		   ANSI allows range value of zero for pre-arranged circuit groups 
-		 */
+		/* 
+		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1 && v->ptr[0] == 0)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	default:
 	case SS7_PVAR_ITUT:
 		if (v->len != 1 || v->ptr[0] < 1 || v->ptr[0] > 31)
@@ -16105,9 +15856,8 @@ ct_t1_timeout(struct ct *ct)
 		ct_set_t_state(ct, ct->tst.cc, CKS_IDLE);
 	}
 #endif
-	/*
-	   release call control immediately and let maintenance take over circuit 
-	 */
+	/* 
+	   release call control immediately and let maintenance take over circuit */
 	if (ct_get_i_state(ct) == CCS_WCON_RELREQ) {
 		if ((err = cc_release_con(NULL, ct->cpc.cc, ct, NULL)))
 			return (err);
@@ -16120,9 +15870,8 @@ ct_t1_timeout(struct ct *ct)
 		struct mtp *mtp;
 		struct sr *sr = ct->sr.sr;
 		ct_timer_start(ct, t1);
-		/*
-		   resend contents of retrans buffer 
-		 */
+		/* 
+		   resend contents of retrans buffer */
 		if ((mtp = sr->mtp) || (mtp = sr->sp.sp->mtp))
 			if ((mp = dupmsg(ct->rel)))
 				ss7_oput(mtp->oq, mp);
@@ -16130,9 +15879,8 @@ ct_t1_timeout(struct ct *ct)
 		return (QR_DONE);
 	}
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16149,9 +15897,8 @@ ct_t2_timeout(struct ct *ct)
 	int err;
 	switch (ct_get_i_state(ct)) {
 	case CCS_SUSPENDED:
-		/*
-		   CC responsibility to stop charging 
-		 */
+		/* 
+		   CC responsibility to stop charging */
 		if (ct->cpc.cc)
 			if ((err =
 			     cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T2_TIMEOUT,
@@ -16169,9 +15916,8 @@ ct_t2_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16187,16 +15933,14 @@ ct_t3_timeout(struct ct *ct)
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
-		/*
-		   returned to idle pool after delay 
-		 */
+		/* 
+		   returned to idle pool after delay */
 		ct_set_c_state(ct, CTS_IDLE);
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16249,9 +15993,8 @@ sr_t4_timeout(struct sr *sr)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16284,9 +16027,8 @@ ct_t5_timeout(struct ct *ct)
 			ct_timer_stop(ct, t1);
 			if (ct->rel)
 				freemsg(xchg(&ct->rel, NULL));
-			/*
-			   Q.752 12.5 on occurence 
-			 */
+			/* 
+			   Q.752 12.5 on occurence */
 			if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T5_TIMEOUT)))
 				return (err);
 			ct_set(ct, CCTF_LOC_RESET_PENDING);
@@ -16297,9 +16039,8 @@ ct_t5_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16322,9 +16063,8 @@ ct_t6_timeout(struct ct *ct)
 	int err;
 	switch (ct_get_i_state(ct)) {
 	case CCS_SUSPENDED:
-		/*
-		   CC responsibility to stop charging 
-		 */
+		/* 
+		   CC responsibility to stop charging */
 		if (ct->cpc.cc)
 			if ((err =
 			     cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T6_TIMEOUT,
@@ -16342,9 +16082,8 @@ ct_t6_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16367,8 +16106,9 @@ ct_t7_timeout(struct ct *ct)
 	case CCS_WREQ_INFO:
 	case CCS_WCON_SREQ:
 	case CCS_WIND_PROCEED:
-		if ((err = cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T7_TIMEOUT,
-					       CC_CAUS_ADDRESS_INCOMPLETE)))
+		if ((err =
+		     cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T7_TIMEOUT,
+					 CC_CAUS_ADDRESS_INCOMPLETE)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 	}
@@ -16382,9 +16122,8 @@ ct_t7_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16411,9 +16150,8 @@ ct_t8_timeout(struct ct *ct)
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
 	case CTS_ICC_WAIT_ACM:
-		/*
-		   responsibility of CC to remove COT 
-		 */
+		/* 
+		   responsibility of CC to remove COT */
 		if (ct_get_i_state(ct) != CCS_IDLE) {
 			if ((err =
 			     cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T8_TIMEOUT,
@@ -16426,9 +16164,8 @@ ct_t8_timeout(struct ct *ct)
 				return (err);
 			ct_set_t_state(ct, ct->tst.cc, CKS_IDLE);
 		}
-		/*
-		   release iam information 
-		 */
+		/* 
+		   release iam information */
 		ct_timer_start(ct, t5);
 		ct_timer_start(ct, t1);
 		if ((err = isup_send_rel(NULL, ct, CC_CAUS_TEMPORARY_FAILURE, NULL, 0)))
@@ -16437,9 +16174,8 @@ ct_t8_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16458,16 +16194,16 @@ STATIC int
 ct_t9_timeout(struct ct *ct)
 {
 	int err;
-	/*
-	   this should probably be only in the backward direction 
-	 */
+	/* 
+	   this should probably be only in the backward direction */
 	switch (ct_get_i_state(ct)) {
 	case CCS_WIND_PROCEED:
 	case CCS_WIND_ALERTING:
 	case CCS_WIND_PROGRESS:
 	case CCS_WIND_CONNECT:
-		if ((err = cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T9_TIMEOUT,
-					       CC_CAUS_NO_ANSWER)))
+		if ((err =
+		     cc_call_failure_ind(NULL, ct->cpc.cc, ct, ISUP_CALL_FAILURE_T9_TIMEOUT,
+					 CC_CAUS_NO_ANSWER)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 	}
@@ -16481,9 +16217,8 @@ ct_t9_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16540,9 +16275,8 @@ ct_t10_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16583,9 +16317,8 @@ ct_t11_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16606,9 +16339,8 @@ ct_t12_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16626,9 +16358,8 @@ ct_t13_timeout(struct ct *ct)
 		ct_timer_stop(ct, t12);
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T13_TIMEOUT)))
 			return (err);
-		/*
-		   Q.752 12.16 1st and delta 
-		 */
+		/* 
+		   Q.752 12.16 1st and delta */
 		ct->stats.ct_t13_expiry++;
 		ct->tg.tg->stats.ct_t13_expiry++;
 		ct->sr.sr->stats.ct_t13_expiry++;
@@ -16639,9 +16370,8 @@ ct_t13_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16677,9 +16407,8 @@ ct_t15_timeout(struct ct *ct)
 		ct_timer_stop(ct, t14);
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T15_TIMEOUT)))
 			return (err);
-		/*
-		   Q.752 12.17 1st and delta 
-		 */
+		/* 
+		   Q.752 12.17 1st and delta */
 		ct->stats.ct_t15_expiry++;
 		ct->tg.tg->stats.ct_t15_expiry++;
 		ct->sr.sr->stats.ct_t15_expiry++;
@@ -16708,9 +16437,8 @@ ct_t16_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16728,9 +16456,8 @@ ct_t17_timeout(struct ct *ct)
 		ct_timer_stop(ct, t16);
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T17_TIMEOUT)))
 			return (err);
-		/*
-		   Q.752 12.1 1st and delat 
-		 */
+		/* 
+		   Q.752 12.1 1st and delat */
 		ct->stats.ct_t17_expiry++;
 		ct->tg.tg->stats.ct_t17_expiry++;
 		ct->sr.sr->stats.ct_t17_expiry++;
@@ -16741,9 +16468,8 @@ ct_t17_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16769,9 +16495,8 @@ cg_t18_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16791,9 +16516,8 @@ cg_t19_timeout(struct cg *cg)
 		cg_timer_stop(cg, t18);
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T19_TIMEOUT)))
 			return (err);
-		/*
-		   Q.752 12.18 1st and delta 
-		 */
+		/* 
+		   Q.752 12.18 1st and delta */
 		cg->stats.cg_t19_expiry++;
 		ensure(cg->sr.sr, return (QR_DONE));
 		cg->sr.sr->stats.cg_t19_expiry++;
@@ -16809,9 +16533,8 @@ cg_t19_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16837,9 +16560,8 @@ cg_t20_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16858,9 +16580,8 @@ cg_t21_timeout(struct cg *cg)
 		cg_timer_stop(cg, t20);
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T21_TIMEOUT)))
 			return (err);
-		/*
-		   Q.752 12.19 1st and delta 
-		 */
+		/* 
+		   Q.752 12.19 1st and delta */
 		cg->stats.cg_t21_expiry++;
 		cg->sr.sr->stats.cg_t21_expiry++;
 		cg->sp.sp->stats.cg_t21_expiry++;
@@ -16874,9 +16595,8 @@ cg_t21_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16897,9 +16617,8 @@ cg_t22_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16917,9 +16636,8 @@ cg_t23_timeout(struct cg *cg)
 		cg_timer_stop(cg, t22);
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T23_TIMEOUT)))
 			return (err);
-		/*
-		   Q.752 1st and delta 
-		 */
+		/* 
+		   Q.752 1st and delta */
 		cg->stats.cg_t23_expiry++;
 		cg->sr.sr->stats.cg_t23_expiry++;
 		cg->sp.sp->stats.cg_t23_expiry++;
@@ -16929,9 +16647,8 @@ cg_t23_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -16951,18 +16668,17 @@ ct_t24_timeout(struct ct *ct)
 		case CTS_OGC_WAIT_SAM:
 		case CTS_OGC_WAIT_ACM:
 			if (ct_get_i_state(ct) != CCS_IDLE) {
-				/*
-				   responsibility of CC to reattempt 
-				 */
-				if ((err = cc_call_reattempt_ind(NULL, ct->cpc.cc, ct,
-								 ISUP_REATTEMPT_T24_TIMEOUT)))
+				/* 
+				   responsibility of CC to reattempt */
+				if ((err =
+				     cc_call_reattempt_ind(NULL, ct->cpc.cc, ct,
+							   ISUP_REATTEMPT_T24_TIMEOUT)))
 					return (err);
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			}
 			if (ct_get_t_state(ct) == CKS_WREQ_CCREP) {
-				/*
-				   responsibility of CM to remove COT 
-				 */
+				/* 
+				   responsibility of CM to remove COT */
 				if ((err = cc_cont_report_ind(NULL, ct->tst.cc, ct, NULL)))
 					return (err);
 				ct_set_t_state(ct, ct->tst.cc, CKS_WIND_CTEST);
@@ -16971,9 +16687,8 @@ ct_t24_timeout(struct ct *ct)
 			break;
 		case CTS_OGC_WAIT_CCR:
 			if (ct_get_t_state(ct) == CKS_WREQ_CCREP) {
-				/*
-				   responsibility of CM to remove COT 
-				 */
+				/* 
+				   responsibility of CM to remove COT */
 				if ((err = cc_cont_report_ind(NULL, ct->tst.cc, ct, NULL)))
 					return (err);
 				ct_set_t_state(ct, ct->tst.cc, CKS_WIND_CTEST);
@@ -16988,9 +16703,8 @@ ct_t24_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17010,15 +16724,14 @@ ct_t25_timeout(struct ct *ct)
 			struct cc *ck;
 			switch (ct_get_t_state(ct)) {
 			case CKS_IDLE:
-				/*
-				   find test 
-				 */
-				if (((ck = ct->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->cg.cg->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->tg.tg->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->sr.sr->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->sp.sp->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = master.bind.tst) && ck->setind < ck->maxind)
+				/* 
+				   find test */
+				if (((ck = ct->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->cg.cg->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->tg.tg->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->sr.sr->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->sp.sp->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = master.bind.tst) && ck->setind < ck->maxind)
 				    ) {
 					ct_set_t_state(ct, ck, CKS_WIND_CONT);
 					if ((err = cc_cont_test_ind(NULL, ck, ct)))
@@ -17034,9 +16747,8 @@ ct_t25_timeout(struct ct *ct)
 			}
 		}
 		if (!ct_tst(ct, CCTF_COT_PENDING)) {
-			/*
-			   repeat COT test 
-			 */
+			/* 
+			   repeat COT test */
 			if ((err = isup_send_ccr(NULL, ct)))
 				return (err);
 			if (!(ct->tg.tg->proto.popt & SS7_POPT_LPA))
@@ -17048,9 +16760,8 @@ ct_t25_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17070,15 +16781,14 @@ ct_t26_timeout(struct ct *ct)
 			struct cc *ck;
 			switch (ct_get_t_state(ct)) {
 			case CKS_IDLE:
-				/*
-				   find test 
-				 */
-				if (((ck = ct->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->cg.cg->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->tg.tg->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->sr.sr->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = ct->sp.sp->bind.tst) && ck->setind < ck->maxind) ||
-				    ((ck = master.bind.tst) && ck->setind < ck->maxind)
+				/* 
+				   find test */
+				if (((ck = ct->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->cg.cg->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->tg.tg->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->sr.sr->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = ct->sp.sp->bind.tst) && ck->setind < ck->maxind)
+				    || ((ck = master.bind.tst) && ck->setind < ck->maxind)
 				    ) {
 					ct_set_t_state(ct, ck, CKS_WIND_CONT);
 					if ((err = cc_cont_test_ind(NULL, ck, ct)))
@@ -17094,9 +16804,8 @@ ct_t26_timeout(struct ct *ct)
 			}
 		}
 		if (!ct_tst(ct, CCTF_COT_PENDING)) {
-			/*
-			   repeat COT test 
-			 */
+			/* 
+			   repeat COT test */
 			if ((err = isup_send_ccr(NULL, ct)))
 				return (err);
 			if (!(ct->tg.tg->proto.popt & SS7_POPT_LPA))
@@ -17108,9 +16817,8 @@ ct_t26_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17142,18 +16850,16 @@ ct_t27_timeout(struct ct *ct)
 			ct_set(ct, CCTF_LOC_RESET_PENDING);
 			ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CTS_ICC_WAIT_RLC:
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T27_TIMEOUT)))
 			return (err);
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17178,9 +16884,8 @@ cg_t28_timeout(struct cg *cg)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17218,14 +16923,12 @@ sr_t30_timeout(struct sr *sr)
 	int err;
 	if (sr->cong_level) {
 		if (sr->cong_level == 1) {
-			/*
-			   congestion will cease with next operation 
-			 */
+			/* 
+			   congestion will cease with next operation */
 			if ((err = cc_sr_maint_ind(NULL, sr, ISUP_MAINT_USER_PART_UNCONGESTED)))
 				return (err);
-			/*
-			   Q.752 10.13 duration 
-			 */
+			/* 
+			   Q.752 10.13 duration */
 			sr->stats.sr_up_congested = jiffies - sr->stats.sr_up_congested;
 		} else
 			sr_timer_start(sr, t30);
@@ -17292,18 +16995,16 @@ ct_t34_timeout(struct ct *ct)
 		switch ((err = mtp_read(NULL, ct->sgm, ct->sr.sr))) {
 		case QR_DONE:
 			freemsg(ct->sgm);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case QR_ABSORBED:
 			ct->sgm = NULL;
 			return (QR_DONE);
 		}
 		return (err);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	return (QR_DONE);
 }
@@ -17341,9 +17042,8 @@ ct_t35_timeout(struct ct *ct)
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 	case CTS_ICC_WAIT_ACM:
-		/*
-		   release iam information 
-		 */
+		/* 
+		   release iam information */
 		ct_timer_start(ct, t5);
 		ct_timer_start(ct, t1);
 		if ((err = isup_send_rel(NULL, ct, CC_CAUS_ADDRESS_INCOMPLETE, NULL, 0)))
@@ -17352,9 +17052,8 @@ ct_t35_timeout(struct ct *ct)
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17386,18 +17085,16 @@ ct_t36_timeout(struct ct *ct)
 			ct_set(ct, CCTF_LOC_RESET_PENDING);
 		}
 		ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CTS_ICC_WAIT_RLC:
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T36_TIMEOUT)))
 			return (err);
 	      done:
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	goto done;
 }
@@ -17544,9 +17241,8 @@ ct_t38_timeout(struct ct *ct)
 		ct_set_c_state(ct, CTS_OGC_WAIT_RLC);
 		return (QR_DONE);
 	}
-	/*
-	   stagnant timer 
-	 */
+	/* 
+	   stagnant timer */
 	rare();
 	return (QR_DONE);
 }
@@ -17712,15 +17408,13 @@ mtp_hangup(struct mtp *mtp)
 {
 	if (mtp->sr) {
 		struct sr *sr = mtp->sr;
-		/*
-		   perform equivalent of MTP-PAUSE procedure for remote signalling point 
-		 */
+		/* 
+		   perform equivalent of MTP-PAUSE procedure for remote signalling point */
 		if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 			struct ct *ct;
 			for (ct = sr->ct.list; ct; ct = ct->sr.next)
-				/*
-				   this will idle circuits from the idle list 
-				 */
+				/* 
+				   this will idle circuits from the idle list */
 				ct_set(ct, CCTF_LOC_S_BLOCKED);
 			sr->flags |= CCTF_LOC_S_BLOCKED;
 		}
@@ -17728,23 +17422,20 @@ mtp_hangup(struct mtp *mtp)
 		struct sr *sr;
 		struct sp *sp = mtp->sp;
 		for (sr = sp->sr.list; sr; sr = sr->sp.next) {
-			/*
-			   perform equivalent of MTP-PAUSE procedure for remote signalling point 
-			 */
+			/* 
+			   perform equivalent of MTP-PAUSE procedure for remote signalling point */
 			if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 				struct ct *ct;
 				for (ct = sr->ct.list; ct; ct = ct->sr.next)
-					/*
-					   this will idle circuits from the idle list 
-					 */
+					/* 
+					   this will idle circuits from the idle list */
 					ct_set(ct, CCTF_LOC_S_BLOCKED);
 				sr->flags |= CCTF_LOC_S_BLOCKED;
 			}
 		}
 	} else {
-		/*
-		   mtp lower stream is not attached to a signalling relation 
-		 */
+		/* 
+		   mtp lower stream is not attached to a signalling relation */
 		rare();
 	}
 	fixme(("Notify management of failed lower stream\n"));
@@ -17779,7 +17470,7 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 #if 0
 	{
 		int i;
-		printd(("%s: MSG:", ISUP_DRV_NAME));
+		printd(("%s: MSG:", DRV_NAME));
 		for (i = 0; i < mp->b_wptr - mp->b_rptr; i++)
 			printd((" %02X", (unsigned char) mp->b_rptr[i]));
 		printd(("\n"));
@@ -17788,9 +17479,8 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	if (p + 1 > e)
 		goto emsgsize;
 	msg.mt = *p++;
-	/*
-	   Q.752 11.2 
-	 */
+	/* 
+	   Q.752 11.2 */
 	sr->stats.msgs_recv++;
 	sr->stats.msgs_recv_by_type[msg.mt]++;
 	sr->sp.sp->stats.msgs_recv++;
@@ -17804,11 +17494,10 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	if (!ct->tg.tg)
 		goto unequipped;
 	pvar = ct->tg.tg->proto.pvar;	/* use trunk group protocol variant */
-	/*
+	/* 
 	   2.1.12 f) In case any other message except the ones listed below is received before the
 	   segmentation message containing the second segment the exchange should react as if the
-	   second segment is lost, i.e., the timer T34 is stopped and the call continues 
-	 */
+	   second segment is lost, i.e., the timer T34 is stopped and the call continues */
 	if ((cc = ct->cpc.cc) && ct->sgm) {
 		switch (msg.mt) {
 		case ISUP_MT_COT:
@@ -18085,9 +17774,8 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		switch (err) {
 		case QR_DONE:
 			freemsg(ct->sgm);
-			/*
-			   fall through 
-			 */
+			/* 
+			   fall through */
 		case QR_ABSORBED:
 			ct->sgm = NULL;
 			return (QR_RETRY);
@@ -18095,24 +17783,21 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	}
 	switch (err) {
 	case -EOPNOTSUPP:
-		/*
+		/* 
 		   2.5.9.1 f) if other unexpected signalling messages are received, the following
-		   actions will be undertaken: 
-		 */
+		   actions will be undertaken: */
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/*
-			   responsibility of CC to remove loopback 
-			 */
+			/* 
+			   responsibility of CC to remove loopback */
 			if (ct_tst(ct, CCTF_COR_PENDING))
 				ct_timer_stop(ct, t8);
 			break;
 		case CTS_OGC_WAIT_SAM:
 		case CTS_OGC_WAIT_ACM:
-			/*
-			   responsibility of CC to disconnect tone/detector 
-			 */
+			/* 
+			   responsibility of CC to disconnect tone/detector */
 			if (ct_tst(ct, CCTF_COT_PENDING))
 				ct_timer_stop(ct, t24);
 			ct_timer_stop(ct, t7);
@@ -18130,12 +17815,12 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		case CCS_WIND_INFO:
 		case CCS_WRES_SIND:
 		case CCS_WREQ_PROCEED:
-			/*
+			/* 
 			   If the circuit is seized by an incoming call, any interconnected
-			   circuits will be released. 
-			 */
-			if ((err = cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
-						       CC_CAUS_INVALID_MESSAGE)))
+			   circuits will be released. */
+			if ((err =
+			     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
+						 CC_CAUS_INVALID_MESSAGE)))
 				return (err);
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			break;
@@ -18143,49 +17828,42 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		case CCS_WREQ_INFO:
 		case CCS_WCON_SREQ:
 		case CCS_WIND_PROCEED:
-			/*
+			/* 
 			   If the circuit is seized by an outgoing call, an automatic repeat
-			   attempt is provided on another circuit. 
-			 */
+			   attempt is provided on another circuit. */
 			if ((err =
 			     cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_UNEXPECTED)))
 				return (err);
-			/*
-			   responsibility of CC to reattempt 
-			 */
+			/* 
+			   responsibility of CC to reattempt */
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			break;
 		}
 		switch (ct_get_c_state(ct)) {
-			/*
+			/* 
 			   -- if the circuit is seized by a call, before receipt of a backward
 			   message required for the call setup, the Reset Circuit Message is sent
 			   (or, in the case of a multirate connection type or N x 64 kbit/s
 			   connection type call, a circuit group reset message or multiple reset
-			   circuit messages are sent). 
-			 */
+			   circuit messages are sent). */
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/*
+			/* 
 			   If the circuit is seized by an incoming call, any interconnected
-			   circuits will be released. 
-			 */
+			   circuits will be released. */
 		case CTS_OGC_WAIT_SAM:
 		case CTS_OGC_WAIT_ACM:
-			/*
+			/* 
 			   If the circuit is seized by an outgoing call, an automatic repeat
-			   attempt is provided on another circuit. 
-			 */
+			   attempt is provided on another circuit. */
 		case CTS_IDLE:
-			/*
-			   -- if the circuit is idle, the reset circuit message is sent; 
-			 */
+			/* 
+			   -- if the circuit is idle, the reset circuit message is sent; */
 			if (!ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
 				if ((err = cc_maint_ind(q, ct, ISUP_MAINT_UNEXPECTED_MESSAGE)))
 					return (err);
-				/*
-				   Q.752 12.21 1st and delta 
-				 */
+				/* 
+				   Q.752 12.21 1st and delta */
 				ct->stats.ct_unexpected_msg++;
 				ct->tg.tg->stats.ct_unexpected_msg++;
 				ct->sr.sr->stats.ct_unexpected_msg++;
@@ -18209,11 +17887,10 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		case CTS_OGC_WAIT_RLC:
 		case CTS_ICC_SEND_RLC:
 		case CTS_OGC_SEND_RLC:
-			/*
+			/* 
 			   -- if the circuit is seized by a call after receipt of a backward
 			   message required for the call setup, the unexpected signalling message
-			   is discarded ... 
-			 */
+			   is discarded ... */
 			err = QR_DONE;
 			break;
 		}
@@ -18222,57 +17899,47 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		switch (ct->tg.tg->config.exchange_type) {
 		default:
 			if (cc->mci & ISUP_MCI_E_BIT) {
-				/*
-				   discard 
-				 */
+				/* 
+				   discard */
 				return (QR_DONE);
 			}
-			/*
-			   release call 
-			 */
+			/* 
+			   release call */
 			return (QR_DONE);
 		case ISUP_XCHG_TYPE_B:
 			if (cc->mci & ISUP_MCI_B_BIT) {
-				/*
-				   release call 
-				 */
+				/* 
+				   release call */
 				return (QR_DONE);
 			}
 			if (cc->mci & ISUP_MCI_D_BIT) {
-				/*
-				   discard message 
-				 */
+				/* 
+				   discard message */
 				if (cc->mci & ISUP_MCI_C_BIT) {
-					/*
-					   send notification 
-					 */
+					/* 
+					   send notification */
 				}
 				return (QR_DONE);
 			}
 			if (1 /* pass_along_possible */ ) {
-				/*
-				   pass along 
-				 */
+				/* 
+				   pass along */
 				return (QR_ABSORBED);
 			}
 			if (cc->mci & ISUP_MCI_E_BIT) {
-				/*
-				   discard message 
-				 */
+				/* 
+				   discard message */
 				if (cc->mci & ISUP_MCI_C_BIT) {
-					/*
-					   send notification 
-					 */
+					/* 
+					   send notification */
 				}
 				return (QR_DONE);
 			}
-			/*
-			   release call 
-			 */
+			/* 
+			   release call */
 			if (cc->mci & ISUP_MCI_C_BIT) {
-				/*
-				   send notification 
-				 */
+				/* 
+				   send notification */
 			}
 			return (QR_DONE);
 		}
@@ -18284,19 +17951,16 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 			switch (cc->pci & (ISUP_PCI_G_BIT | ISUP_PCI_F_BIT)) {
 			case 0:
 			case ISUP_PCI_G_BIT | ISUP_PCI_F_BIT:
-				/*
-				   release call 
-				 */
+				/* 
+				   release call */
 				return (QR_DONE);
 			case ISUP_PCI_G_BIT:
-				/*
-				   discard parameter 
-				 */
+				/* 
+				   discard parameter */
 				return (QR_DONE);
 			case ISUP_PCI_F_BIT:
-				/*
-				   discard message 
-				 */
+				/* 
+				   discard message */
 				return (-EPROTO);
 			}
 			swerr();
@@ -18307,35 +17971,29 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 				       ISUP_PCI_E_BIT)) {
 			case 0:
 			case ISUP_PCI_C_BIT:
-				/*
-				   pass on parameter 
-				 */
+				/* 
+				   pass on parameter */
 				return (QR_DONE);
 			case ISUP_PCI_E_BIT:
-				/*
-				   discard parameter 
-				 */
+				/* 
+				   discard parameter */
 				return (QR_DONE);
 			case ISUP_PCI_D_BIT:
 			case ISUP_PCI_D_BIT | ISUP_PCI_E_BIT:
-				/*
-				   discard message 
-				 */
+				/* 
+				   discard message */
 				return (-EPROTO);
 			case ISUP_PCI_C_BIT | ISUP_PCI_E_BIT:
 			case ISUP_PCI_C_BIT | ISUP_PCI_D_BIT:
 			case ISUP_PCI_C_BIT | ISUP_PCI_D_BIT | ISUP_PCI_E_BIT:
-				/*
-				   discard message 
-				 */
-				/*
-				   send notification 
-				 */
+				/* 
+				   discard message */
+				/* 
+				   send notification */
 				return (-EPROTO);
 			default:
-				/*
-				   release call 
-				 */
+				/* 
+				   release call */
 				return (-EPROTO);
 			}
 			swerr();
@@ -18345,14 +18003,12 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	}
 	return (err);
       unequipped:
-	/*
-	   the circuit does is not equipped, respond with unequipped cic 
-	 */
+	/* 
+	   the circuit does is not equipped, respond with unequipped cic */
 	if ((err = cc_if_maint_ind(q, sr, msg.cic, ISUP_MAINT_UNEQUIPPED_CIC)))
 		return (err);
-	/*
-	   Custom 1st and delta 
-	 */
+	/* 
+	   Custom 1st and delta */
 	sr->sp.sp->stats.sr_unequipped_cic++;
 	if (sr->proto.popt & SS7_POPT_UCIC)
 		isup_send_ucic(q, sr, msg.cic);
@@ -18497,7 +18153,7 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
 #if defined(_SAFE)||defined(_DEBUG)
@@ -18505,7 +18161,7 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EBUSY);
 #endif
@@ -18513,14 +18169,14 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EFAULT);
       emsgsize:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: Bad message size\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: Bad message size\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EMSGSIZE);
 }
@@ -18597,7 +18253,7 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
 #if defined(_SAFE)||defined(_DEBUG)
@@ -18605,7 +18261,7 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EBUSY);
 #endif
@@ -18613,14 +18269,14 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EFAULT);
       emsgsize:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
 	swerr();
-	__ptrace(("%s: %p: ERROR: Bad message size\n", ISUP_DRV_NAME, mtp));
+	__ptrace(("%s: %p: ERROR: Bad message size\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EMSGSIZE);
 }
@@ -18726,9 +18382,8 @@ mtp_pause_ind(queue_t *q, mblk_t *mp)
 	if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 		struct ct *ct;
 		for (ct = sr->ct.list; ct; ct = ct->sr.next) {
-			/*
-			   this will remove idle circuits from the idle list 
-			 */
+			/* 
+			   this will remove idle circuits from the idle list */
 			ct_set(ct, CCTF_LOC_S_BLOCKED);
 		}
 		sr->flags |= CCTF_LOC_S_BLOCKED;
@@ -18775,9 +18430,8 @@ mtp_resume_ind(queue_t *q, mblk_t *mp)
 	if (sr->flags & CCTF_LOC_S_BLOCKED) {
 		struct ct *ct;
 		for (ct = sr->ct.list; ct; ct = ct->sr.next) {
-			/*
-			   this will add idle circuits to the idle list 
-			 */
+			/* 
+			   this will add idle circuits to the idle list */
 			ct_clr(ct, CCTF_LOC_S_BLOCKED);
 		}
 		sr->flags &= ~CCTF_LOC_S_BLOCKED;
@@ -18859,9 +18513,8 @@ mtp_status_ind(queue_t *q, mblk_t *mp)
 	case MTP_STATUS_TYPE_CONG:
 		if (sr->proto.popt & SS7_POPT_MPLEV) {
 			int level;
-			/*
-			   multiple congestion levels ala ANSI 
-			 */
+			/* 
+			   multiple congestion levels ala ANSI */
 			switch (p->mtp_status) {
 			case MTP_STATUS_CONGESTION_LEVEL0:
 				level = 0;
@@ -18880,16 +18533,14 @@ mtp_status_ind(queue_t *q, mblk_t *mp)
 			}
 			if (sr->cong_level < level) {
 				if (!sr->cong_level) {
-					/*
-					   congestion begins 
-					 */
+					/* 
+					   congestion begins */
 					if ((err =
 					     cc_sr_maint_ind(q, sr,
 							     ISUP_MAINT_USER_PART_CONGESTED)))
 						return (err);
-					/*
-					   Q.752 10.11 duration 
-					 */
+					/* 
+					   Q.752 10.11 duration */
 					sr->stats.sr_up_congested =
 					    jiffies - sr->stats.sr_up_congested;
 				}
@@ -18897,21 +18548,18 @@ mtp_status_ind(queue_t *q, mblk_t *mp)
 				sr_timer_start(sr, t30);
 			}
 		} else {
-			/*
-			   single congestion level ala ITU 
-			 */
+			/* 
+			   single congestion level ala ITU */
 			if (!sr->timers.t29) {
 				if (!sr->cong_level) {
-					/*
-					   congestion begins 
-					 */
+					/* 
+					   congestion begins */
 					if ((err =
 					     cc_sr_maint_ind(q, sr,
 							     ISUP_MAINT_USER_PART_CONGESTED)))
 						return (err);
-					/*
-					   Q.752 10.11 duration 
-					 */
+					/* 
+					   Q.752 10.11 duration */
 					sr->stats.sr_up_congested =
 					    jiffies - sr->stats.sr_up_congested;
 				}
@@ -18924,38 +18572,33 @@ mtp_status_ind(queue_t *q, mblk_t *mp)
 	case MTP_STATUS_TYPE_UPU:
 		switch (p->mtp_status) {
 		case MTP_STATUS_UPU_UNEQUIPPED:
-			/*
-			   inform management 
-			 */
+			/* 
+			   inform management */
 			if ((err = cc_sr_maint_ind(q, sr, ISUP_MAINT_USER_PART_UNEQUIPPED)))
 				return (err);
-			/*
+			/* 
 			   2.13.2 ... When an MTP-STATUS primitive with the cause "user part
 			   unavailability - unequipped remote user" is received, the management
 			   system should be informed to restrict further traffic. The ISDN User
-			   Part should not initiate the available test procedure for this case. 
-			 */
+			   Part should not initiate the available test procedure for this case. */
 			return (QR_DONE);
 		case MTP_STATUS_UPU_UNKNOWN:
 		case MTP_STATUS_UPU_INACCESSIBLE:
 			if ((err = cc_sr_maint_ind(q, sr, ISUP_MAINT_USER_PART_UNAVAILABLE)))
 				return (err);
-			/*
-			   Q.752 10.8 on occurence, 10.10 duration 
-			 */
+			/* 
+			   Q.752 10.8 on occurence, 10.10 duration */
 			sr->stats.sr_up_unavailable = jiffies - sr->stats.sr_up_unavailable;
-			/*
-			   start UPU procedures 
-			 */
+			/* 
+			   start UPU procedures */
 			if (!(sr->flags & CCTF_UPT_PENDING)) {
 				if ((sr->proto.popt & SS7_POPT_UPT) && sr->ct.list) {
 					if ((err = isup_send_upt(q, sr->ct.list, NULL, 0)))
 						return (err);
 					sr_timer_start(sr, t4);
 				} else {
-					/*
-					   send some other message 
-					 */
+					/* 
+					   send some other message */
 				}
 				sr->flags |= CCTF_UPT_PENDING;
 			}
@@ -18996,9 +18639,8 @@ mtp_restart_complete_ind(queue_t *q, mblk_t *mp)
 		if (sr->flags & CCTF_LOC_S_BLOCKED) {
 			struct ct *ct;
 			for (ct = sr->ct.list; ct; ct = ct->sr.next) {
-				/*
-				   this will add idle circuits to the idle list 
-				 */
+				/* 
+				   this will add idle circuits to the idle list */
 				ct_clr(ct, CCTF_LOC_S_BLOCKED);
 			}
 			sr->flags &= ~CCTF_LOC_S_BLOCKED;
@@ -19179,9 +18821,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	{
 		struct df *df;
 		df = &master;
-		/*
-		   bind to default 
-		 */
+		/* 
+		   bind to default */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_TEST)
 				ccp = &df->bind.tst;
@@ -19216,9 +18857,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = sp->id;
 		}
-		/*
-		   bind to local signalling point 
-		 */
+		/* 
+		   bind to local signalling point */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_TEST)
 				ccp = &sp->bind.tst;
@@ -19253,9 +18893,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = sr->id;
 		}
-		/*
-		   bind to remote signalling point 
-		 */
+		/* 
+		   bind to remote signalling point */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_TEST)
 				ccp = &sr->bind.tst;
@@ -19290,9 +18929,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = tg->id;
 		}
-		/*
-		   bind to trunk group 
-		 */
+		/* 
+		   bind to trunk group */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_TEST)
 				ccp = &tg->bind.tst;
@@ -19327,9 +18965,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = cg->id;
 		}
-		/*
-		   bind to circuit group 
-		 */
+		/* 
+		   bind to circuit group */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_TEST)
 				ccp = &cg->bind.tst;
@@ -19364,9 +19001,8 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 			add.id = ct->id;
 		}
-		/*
-		   bind to circuit 
-		 */
+		/* 
+		   bind to circuit */
 		if (p->cc_setup_ind) {
 			if (p->cc_bind_flags & CC_TEST)
 				ccp = &ct->bind.tst;
@@ -19604,9 +19240,8 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 		goto badopt;
 	if (isup_check_addr(add_ptr, add_len) < 0)
 		goto badaddr;
-	/*
-	   cannot trust alignment of address 
-	 */
+	/* 
+	   cannot trust alignment of address */
 	bcopy(add_ptr, &add, add_len);
 	switch (cs_get_state(cc)) {
 	case CCS_IDLE:
@@ -19619,30 +19254,26 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	if (!add_len) {
 		switch (cc->bind.type) {
 		case ISUP_BIND_SR:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!(ct = cc->bind.u.sr->ct.list))
 				goto failbusy;
 			break;
 		case ISUP_BIND_TG:
-			/*
-			   select next idle circuit 
-			 */
+			/* 
+			   select next idle circuit */
 			if (!(ct = cc->bind.u.tg->idle))
 				goto failbusy;
 			break;
 		case ISUP_BIND_CG:
-			/*
-			   select the first circuit 
-			 */
+			/* 
+			   select the first circuit */
 			if (!(ct = cc->bind.u.cg->ct.list))
 				goto failbusy;
 			break;
 		case ISUP_BIND_CT:
-			/*
-			   select bound circuit 
-			 */
+			/* 
+			   select bound circuit */
 			ct = cc->bind.u.ct;
 			break;
 		case ISUP_BIND_DF:
@@ -19650,20 +19281,19 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			goto noaddr;
 		default:
 			pswerr(("%s: %p: SWERR: invalid cc bind type %d in bound state\n",
-				ISUP_DRV_NAME, cc, cc->bind.type));
+				DRV_NAME, cc, cc->bind.type));
 			goto efault;
 		}
 	} else {
 		switch (add.scope) {
 		case ISUP_SCOPE_SR:
-			/*
+			/* 
 			   Note: if we are bound to a remote signalling point we can specify an
 			   address with scope signalling relation and a cic within the bound
 			   signalling relation to specify a circuit.  If the cic == 0, the first
 			   circuit in the signalling relation will be selected.  cic == 0 is the
 			   same as not specifying an address at all, so this option is useful only
-			   for specifying a cic within a signalling relation. 
-			 */
+			   for specifying a cic within a signalling relation. */
 			if (cc->bind.type != ISUP_BIND_SR)
 				goto noaddr;
 			if (add.id && add.id != cc->bind.u.sr->id)
@@ -19678,14 +19308,13 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			}
 			break;
 		case ISUP_SCOPE_TG:
-			/*
+			/* 
 			   Note: if we are bound to a trunk group we can specify an address with
 			   scope trunk group and a cic within the bound trunk group to specify a
 			   circuit.  If the cic == 0, the next idle circuit in the bound trunk
 			   group will be selected.  cic == 0 is the same as not specifying an
 			   address at all, so this option is useful only for specifying a cic
-			   within a bound trunk group. 
-			 */
+			   within a bound trunk group. */
 			if (cc->bind.type != ISUP_BIND_TG)
 				goto badaddr;
 			if (add.id && add.id != cc->bind.u.tg->id)
@@ -19702,14 +19331,13 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			}
 			break;
 		case ISUP_SCOPE_CG:
-			/*
+			/* 
 			   Note: if we are bound to a circuit group we can specify an address with
 			   scope circuit group and a cic within the bound circuit group to sepcify
 			   a circuit. If the cic == 0, the first circuit in the bound circuit group 
 			   will be selected.  cic == 0 is the same as not specifying an address at
 			   all, so this option is useful only for specifying a cic within a bound
-			   circuit group. 
-			 */
+			   circuit group. */
 			if (cc->bind.type != ISUP_BIND_CG)
 				goto badaddr;
 			if (add.id && add.id != cc->bind.u.cg->id)
@@ -19726,11 +19354,10 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			}
 			break;
 		case ISUP_SCOPE_CT:
-			/*
+			/* 
 			   Note: we can always specify a circuit no matter how we are bound by
 			   sepcifying an address with scope circuit and a circuit id and optional
-			   cic. 
-			 */
+			   cic. */
 			if (!add.id)
 				goto noaddr;
 			switch (cc->bind.type) {
@@ -19808,20 +19435,21 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	if (ct_get_c_state(ct) != CTS_IDLE)
 		goto reattempt_busy;
 	todo(("Check if circuit requires continuity check\n"));
-	/*
-	   look for test 
-	 */
-	if ((!(ck = ct->bind.tst) || ck->setind >= ck->maxind) &&
-	    (!(ck = ct->cg.cg->bind.tst) || ck->setind >= ck->maxind) &&
-	    (!(ck = ct->tg.tg->bind.tst) || ck->setind >= ck->maxind) &&
-	    (!(ck = ct->sr.sr->bind.tst) || ck->setind >= ck->maxind) &&
-	    (!(ck = ct->sp.sp->bind.tst) || ck->setind >= ck->maxind) &&
-	    (!(ck = master.bind.tst) || ck->setind >= ck->maxind)
+	/* 
+	   look for test */
+	if ((!(ck = ct->bind.tst) || ck->setind >= ck->maxind)
+	    && (!(ck = ct->cg.cg->bind.tst) || ck->setind >= ck->maxind)
+	    && (!(ck = ct->tg.tg->bind.tst) || ck->setind >= ck->maxind)
+	    && (!(ck = ct->sr.sr->bind.tst) || ck->setind >= ck->maxind)
+	    && (!(ck = ct->sp.sp->bind.tst) || ck->setind >= ck->maxind) && (!(ck = master.bind.tst)
+									     || ck->setind >=
+									     ck->maxind)
 	    )
 		p->cc_call_flags &= ~ISUP_NCI_CONT_CHECK_REQUIRED;	/* go without cot */
 	ct_timer_start(ct, t7);
-	if ((err = isup_send_iam(q, ct, p->cc_call_flags, p->cc_call_type, NULL, 0,
-				 cdpn_ptr, cdpn_len, opt_ptr, opt_len)))
+	if ((err =
+	     isup_send_iam(q, ct, p->cc_call_flags, p->cc_call_type, NULL, 0, cdpn_ptr, cdpn_len,
+			   opt_ptr, opt_len)))
 		return (err);
 	switch (p->cc_call_flags & ISUP_NCI_CONT_CHECK_MASK) {
 	case ISUP_NCI_CONT_CHECK_REQUIRED:
@@ -19830,10 +19458,9 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 		case CKS_IDLE:
 		case CKS_WIND_CONT:
 			if (!(ct->tg.tg->proto.popt & SS7_POPT_LPA)) {
-				/*
+				/* 
 				   if we are not going to receive confirmation from the other side
-				   (LPA message) we should issue the confirmation now 
-				 */
+				   (LPA message) we should issue the confirmation now */
 				ct_set_t_state(ct, ck, CKS_WIND_CONT);
 				if ((err = cc_cont_test_ind(q, ck, ct)))
 					return (err);
@@ -19845,9 +19472,8 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 		ct_set_i_state(ct, cc, CCS_WCON_SREQ);
 		break;
 	case ISUP_NCI_CONT_CHECK_PREVIOUS:
-		/*
-		   responsibility of CC to report cot 
-		 */
+		/* 
+		   responsibility of CC to report cot */
 		ct_set(ct, CCTF_COR_PENDING);
 		ct_set_i_state(ct, cc, CCS_WREQ_CCREP);
 		break;
@@ -19869,17 +19495,15 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       reattempt_busy:
-	/*
-	   responsibility of CC to reattempt 
-	 */
+	/* 
+	   responsibility of CC to reattempt */
 	if ((err = cc_call_reattempt_ind(q, cc, ct, ISUP_REATTEMPT_CIRCUIT_BUSY)))
 		return (err);
 	return (QR_DONE);
       reattempt_blocking:
-	printd(("%s: %p: circuit id=%ld, i_state = %ld, c_state = %ld, m_tate = %ld, flags = %08lx\n", ISUP_DRV_NAME, cc, ct->id, ct->i_state, ct->c_state, ct->m_state, ct->flags));
-	/*
-	   responsibility of CC to reattempt 
-	 */
+	printd(("%s: %p: circuit id=%ld, i_state = %ld, c_state = %ld, m_tate = %ld, flags = %08lx\n", DRV_NAME, cc, ct->id, ct->i_state, ct->c_state, ct->m_state, ct->flags));
+	/* 
+	   responsibility of CC to reattempt */
 	if ((err = cc_call_reattempt_ind(q, cc, ct, ISUP_REATTEMPT_BLOCKING)))
 		return (err);
 	return (QR_DONE);
@@ -19888,7 +19512,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 				   CC_CAUS_NO_CCT_AVAILABLE);
 #if defined(_SAFE)||defined(_DEBUG)
       null_bind:
-	pswerr(("%s: %p: SWERR: null bind pointer in bound state\n", ISUP_DRV_NAME, cc));
+	pswerr(("%s: %p: SWERR: null bind pointer in bound state\n", DRV_NAME, cc));
 	goto efault;
 #endif
       efault:
@@ -20020,16 +19644,14 @@ cc_information_req(queue_t *q, mblk_t *mp)
 	case CCS_WREQ_INFO:
 		switch (ct_get_c_state(ct)) {
 		case CTS_OGC_WAIT_SAM:
-			/*
-			   restart if running 
-			 */
+			/* 
+			   restart if running */
 			if (ct->timers.t7)
 				ct_timer_start(ct, t7);
 			if ((err = isup_send_sam(q, ct, subn_ptr, subn_len, opt_ptr, opt_len)))
 				return (err);
-			/*
-			   if there is an ST code in the subn then make this state change 
-			 */
+			/* 
+			   if there is an ST code in the subn then make this state change */
 			if (isup_st_in_subn(subn_ptr, subn_len))
 				ct_set_c_state(ct, CTS_OGC_WAIT_ACM);
 			break;
@@ -20041,9 +19663,8 @@ cc_information_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_INFO);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WACK_INFO:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20106,10 +19727,9 @@ cc_cont_check_req(queue_t *q, mblk_t *mp)
 	case CKS_IDLE:
 	case CKS_WIND_CONT:
 		if (!(ct->tg.tg->proto.popt & SS7_POPT_LPA)) {
-			/*
+			/* 
 			   if we are not going to receive confirmation from the other side (LPA
-			   message) we should issue the confirmation now 
-			 */
+			   message) we should issue the confirmation now */
 			ct_set_t_state(ct, cc, CKS_WIND_CONT);
 			if ((err = cc_cont_test_ind(q, cc, ct)))
 				return (err);
@@ -20119,9 +19739,8 @@ cc_cont_check_req(queue_t *q, mblk_t *mp)
 		break;
 	case CKS_WREQ_CCREP:
 	case CKS_WIND_CTEST:
-		/*
-		   second time through after error 
-		 */
+		/* 
+		   second time through after error */
 		break;
 	default:
 		goto outstate;
@@ -20185,9 +19804,8 @@ cc_cont_test_req(queue_t *q, mblk_t *mp)
 			ct_swap_cref(ct, ac);
 		}
 		ct_set_t_state(ct, ct->tst.cc, CKS_WIND_CCREP);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CKS_WIND_CCREP:
 		break;
 	default:
@@ -20235,8 +19853,8 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 		goto badflag;
 	if (p->cc_user_ref && p->cc_call_ref)
 		goto badclr;
-	if ((cc->conn.tst && !(ct = cc_find_tst_cref(cc, p->cc_call_ref))) ||
-	    (cc->conn.cpc && !(ct = cc_find_cpc_uref(cc, p->cc_user_ref))) || !ct)
+	if ((cc->conn.tst && !(ct = cc_find_tst_cref(cc, p->cc_call_ref)))
+	    || (cc->conn.cpc && !(ct = cc_find_cpc_uref(cc, p->cc_user_ref))) || !ct)
 		goto badclr;
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_SAM:
@@ -20272,11 +19890,11 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 				switch (ct_get_c_state(ct)) {
 				case CTS_OGC_WAIT_SAM:
 				case CTS_OGC_WAIT_ACM:
-					/*
-					   responsibility of CC to reattempt 
-					 */
-					if ((err = cc_call_reattempt_ind(NULL, ct->cpc.cc, ct,
-									 ISUP_REATTEMPT_COT_FAILURE)))
+					/* 
+					   responsibility of CC to reattempt */
+					if ((err =
+					     cc_call_reattempt_ind(NULL, ct->cpc.cc, ct,
+								   ISUP_REATTEMPT_COT_FAILURE)))
 						return (err);
 					ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 				}
@@ -20286,9 +19904,8 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 		case CCS_WIND_MORE:
 		case CCS_WREQ_INFO:
 		case CCS_WIND_PROCEED:
-			/*
-			   second time through after error 
-			 */
+			/* 
+			   second time through after error */
 			break;
 		default:
 			trace();
@@ -20328,9 +19945,8 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 				case CTS_OGC_WAIT_SAM:
 				case CTS_OGC_WAIT_ACM:
 					if (ct_get_i_state(ct) != CCS_IDLE) {
-						/*
-						   responsibility of CC to reattempt 
-						 */
+						/* 
+						   responsibility of CC to reattempt */
 						if ((err =
 						     cc_call_reattempt_ind(NULL, ct->cpc.cc, ct,
 									   ISUP_REATTEMPT_COT_FAILURE)))
@@ -20348,18 +19964,16 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 			break;
 		case CKS_IDLE:
 		case CKS_WIND_CTEST:
-			/*
-			   second time through after error 
-			 */
+			/* 
+			   second time through after error */
 			break;
 		default:
 			trace();
 			goto outstate;
 		}
 	}
-	/*
-	   responsibility of CM to remove COT 
-	 */
+	/* 
+	   responsibility of CM to remove COT */
 	if (ct_tst(ct, CCTF_COT_PENDING))
 		ct_timer_stop(ct, t24);
 	if ((err = isup_send_cot(q, ct, p->cc_result)))
@@ -20491,9 +20105,8 @@ cc_proceeding_req(queue_t *q, mblk_t *mp)
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/*
-			   release iam information 
-			 */
+			/* 
+			   release iam information */
 			if ((err = isup_send_acm(q, ct, p->cc_flags, opt_ptr, opt_len)))
 				return (err);
 			ct_set_c_state(ct, CTS_ICC_WAIT_ANM);
@@ -20507,9 +20120,8 @@ cc_proceeding_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_PROCEED);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WACK_PROCEED:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20573,9 +20185,8 @@ cc_alerting_req(queue_t *q, mblk_t *mp)
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/*
-			   release iam information 
-			 */
+			/* 
+			   release iam information */
 			if ((err = isup_send_acm(q, ct, p->cc_flags, opt_ptr, opt_len)))
 				return (err);
 			ct_set_c_state(ct, CTS_ICC_WAIT_ANM);
@@ -20594,9 +20205,8 @@ cc_alerting_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_ALERTING);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WACK_ALERTING:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20660,12 +20270,10 @@ cc_progress_req(queue_t *q, mblk_t *mp)
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/*
-			   can we not send CPG before ACM? 
-			 */
-			/*
-			   release iam information 
-			 */
+			/* 
+			   can we not send CPG before ACM? */
+			/* 
+			   release iam information */
 			if ((err = isup_send_acm(q, ct, p->cc_flags, opt_ptr, opt_len)))
 				return (err);
 			ct_set_c_state(ct, CTS_ICC_WAIT_ANM);
@@ -20684,9 +20292,8 @@ cc_progress_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_PROGRESS);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WACK_PROGRESS:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20776,20 +20383,17 @@ cc_ibi_req(queue_t *q, mblk_t *mp)
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/*
-			   release iam information 
-			 */
-			/*
-			   need to add ibi (obci) and cause value to opt parms 
-			 */
+			/* 
+			   release iam information */
+			/* 
+			   need to add ibi (obci) and cause value to opt parms */
 			if ((err = isup_send_acm(q, ct, p->cc_flags, opt_ptr, opt_len)))
 				return (err);
 			ct_set_c_state(ct, CTS_ICC_WAIT_ANM);
 			break;
 		case CTS_ICC_WAIT_ANM:
-			/*
-			   need to add ibi (obci) and cause value to opt parms 
-			 */
+			/* 
+			   need to add ibi (obci) and cause value to opt parms */
 			if ((err = isup_send_cpg(q, ct, ISUP_EVNT_IBI, opt_ptr, opt_len)))
 				return (err);
 			ct_set_c_state(ct, CTS_ICC_WAIT_ANM);
@@ -20803,9 +20407,8 @@ cc_ibi_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_IBI);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WACK_IBI:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20887,9 +20490,8 @@ cc_connect_req(queue_t *q, mblk_t *mp)
 		ct_set_i_state(ct, cc, CCS_CONNECTED);
 		break;
 	case CCS_CONNECTED:
-		/*
-		   second time through 
-		 */
+		/* 
+		   second time through */
 		break;
 	case CCS_WRES_RELIND:
 		goto ignore;
@@ -20900,9 +20502,8 @@ cc_connect_req(queue_t *q, mblk_t *mp)
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 	case CTS_ICC_WAIT_ACM:
-		/*
-		   release iam information 
-		 */
+		/* 
+		   release iam information */
 		if ((err = isup_send_con(q, ct, p->cc_flags, opt_ptr, opt_len)))
 			return (err);
 		ct_set_c_state(ct, CTS_ICC_ANSWERED);
@@ -21047,9 +20648,8 @@ cc_forwxfer_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_FORWXFER);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CCS_WACK_FORWXFER:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -21177,12 +20777,11 @@ cc_suspend_req(queue_t *q, mblk_t *mp)
 				break;
 			}
 		}
-		if ((tg->config.flags & ISUP_TGF_INCOMING_INTERNATIONAL_EXCHANGE) &&
-		    !(tg->config.flags & ISUP_TGF_SUSPEND_NATIONALLY_PERFORMED))
+		if ((tg->config.flags & ISUP_TGF_INCOMING_INTERNATIONAL_EXCHANGE)
+		    && !(tg->config.flags & ISUP_TGF_SUSPEND_NATIONALLY_PERFORMED))
 			ct_timer_start(ct, t38);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	}
 	case CTS_OGC_SUSPENDED:
 	{
@@ -21389,9 +20988,13 @@ cc_release_req(queue_t *q, mblk_t *mp)
 	}
 	if (p->cc_user_ref && p->cc_call_ref)
 		goto badclr;
-	if ((cc->conn.cpc && !(ct = cc_find_cpc_cref(cc, p->cc_call_ref)) &&
-	     !(ct = cc_find_cpc_uref(cc, p->cc_user_ref))) ||
-	    (cc->conn.tst && !(ct = cc_find_tst_cref(cc, p->cc_call_ref))) || !ct)
+	if ((cc->conn.cpc && !(ct = cc_find_cpc_cref(cc, p->cc_call_ref))
+	     && !(ct = cc_find_cpc_uref(cc, p->cc_user_ref))) || (cc->conn.tst
+								  && !(ct =
+								       cc_find_tst_cref(cc,
+											p->
+											cc_call_ref)))
+	    || !ct)
 		goto badclr;
 	if (cc == ct->tst.cc) {
 		switch (ct_get_t_state(ct)) {
@@ -21399,12 +21002,10 @@ cc_release_req(queue_t *q, mblk_t *mp)
 			ct_set_t_state(ct, ct->tst.cc, CKS_WCON_RELREQ);
 			break;
 		case CKS_WRES_RELIND:
-			/*
-			   dual release case, treat the request as a response 
-			 */
-			/*
-			   user should treat indication as confirmation 
-			 */
+			/* 
+			   dual release case, treat the request as a response */
+			/* 
+			   user should treat indication as confirmation */
 			ct_set_t_state(ct, ct->tst.cc, CKS_IDLE);
 			break;
 		case CKS_IDLE:
@@ -21422,12 +21023,10 @@ cc_release_req(queue_t *q, mblk_t *mp)
 		}
 		switch (ct_get_i_state(ct)) {
 		case CCS_WRES_RELIND:
-			/*
-			   dual release case, treat the request as a response 
-			 */
-			/*
-			   user should treat indication as confirmation 
-			 */
+			/* 
+			   dual release case, treat the request as a response */
+			/* 
+			   user should treat indication as confirmation */
 			ct_set_i_state(ct, cc, CCS_IDLE);
 			break;
 		default:
@@ -21441,17 +21040,14 @@ cc_release_req(queue_t *q, mblk_t *mp)
 	case CTS_ICC_WAIT_SAM:
 	case CTS_ICC_WAIT_ACM:
 	case CTS_ICC_WAIT_CCR:
-		/*
-		   CC responsibility to abort COT and remove loopback 
-		 */
+		/* 
+		   CC responsibility to abort COT and remove loopback */
 		if (ct_tst(ct, CCTF_COR_PENDING))
 			ct_timer_stop(ct, t8);
-		/*
-		   responsibility of CC to remove loopback 
-		 */
-		/*
-		   release iam information 
-		 */
+		/* 
+		   responsibility of CC to remove loopback */
+		/* 
+		   release iam information */
 		goto release_icc;
 	case CTS_ICC_WAIT_ANM:
 	case CTS_ICC_ANSWERED:
@@ -21463,44 +21059,38 @@ cc_release_req(queue_t *q, mblk_t *mp)
 		if (ct_tst(ct, CCTF_COT_PENDING))
 			ct_timer_stop(ct, t24);
 		ct_timer_stop(ct, t7);
-		/*
-		   responsibility of CC to abort COT 
-		 */
+		/* 
+		   responsibility of CC to abort COT */
 		goto release_ogc;
 	case CTS_OGC_WAIT_ANM:
 		goto release_ogc;
 	case CTS_OGC_SUSPENDED:
 		ct_timer_stop(ct, t6);
 		ct_timer_stop(ct, t38);
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case CTS_OGC_ANSWERED:
-		/*
-		   stop charging 
-		 */
+		/* 
+		   stop charging */
 		goto release_ogc;
 	case CTS_ICC_SEND_RLC:
 	case CTS_OGC_SEND_RLC:
-		/*
-		   waiting to send release complete -- dual release 
-		 */
+		/* 
+		   waiting to send release complete -- dual release */
 		if ((err = isup_send_rlc(q, ct, opt_ptr, opt_len)))
 			return (err);
 		ct_set_c_state(ct, CTS_IDLE);
 	case CTS_IDLE:
-		/*
-		   ignore it 
-		 */
+		/* 
+		   ignore it */
 		return (QR_DONE);
 	default:
 		swerr();
 		goto outstate;
 	}
       release_icc:
-	/*
-	   release iam information 
-	 */
+	/* 
+	   release iam information */
 	ct_timer_start(ct, t5);
 	ct_timer_start(ct, t1);
 	if ((err = isup_send_rel(q, ct, p->cc_cause, opt_ptr, opt_len)))
@@ -21508,9 +21098,8 @@ cc_release_req(queue_t *q, mblk_t *mp)
 	ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
 	return (QR_DONE);
       release_ogc:
-	/*
-	   release iam information 
-	 */
+	/* 
+	   release iam information */
 	ct_timer_start(ct, t5);
 	ct_timer_start(ct, t1);
 	if ((err = isup_send_rel(q, ct, p->cc_cause, opt_ptr, opt_len)))
@@ -21557,9 +21146,13 @@ cc_release_res(queue_t *q, mblk_t *mp)
 	}
 	if (p->cc_user_ref && p->cc_call_ref)
 		goto badclr;
-	if ((cc->conn.cpc && !(ct = cc_find_cpc_cref(cc, p->cc_call_ref)) &&
-	     !(ct = cc_find_cpc_uref(cc, p->cc_user_ref))) ||
-	    (cc->conn.tst && !(ct = cc_find_tst_cref(cc, p->cc_call_ref))) || !ct)
+	if ((cc->conn.cpc && !(ct = cc_find_cpc_cref(cc, p->cc_call_ref))
+	     && !(ct = cc_find_cpc_uref(cc, p->cc_user_ref))) || (cc->conn.tst
+								  && !(ct =
+								       cc_find_tst_cref(cc,
+											p->
+											cc_call_ref)))
+	    || !ct)
 		goto badclr;
 	if (cc == ct->tst.cc && ct_get_t_state(ct) != CKS_WRES_RELIND)
 		goto outstate;
@@ -21572,9 +21165,8 @@ cc_release_res(queue_t *q, mblk_t *mp)
 			return (err);
 		ct_set_c_state(ct, CTS_IDLE);
 	case CTS_IDLE:
-		/*
-		   ignore it 
-		 */
+		/* 
+		   ignore it */
 		break;
 	default:
 		swerr();
@@ -21635,9 +21227,8 @@ cc_reset_req(queue_t *q, mblk_t *mp)
 	if (p->cc_flags & ISUP_GROUP) {
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 			goto badaddr;
-		/*
-		   need at least two circuits for a group action 
-		 */
+		/* 
+		   need at least two circuits for a group action */
 		if (!cg->ct.list || !cg->ct.list->cg.next)
 			goto badaddr;
 		if (cg_get_m_state(cg) != CMS_IDLE)
@@ -21695,9 +21286,8 @@ cc_reset_res(queue_t *q, mblk_t *mp)
 	if (p->cc_flags & ISUP_GROUP) {
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && !(cg = cc->conn.gmg))
 			goto badaddr;
-		/*
-		   complete procedure 
-		 */
+		/* 
+		   complete procedure */
 		if (cg_tst(cg, CCTF_REM_RESET_PENDING)) {
 			struct ct *bc = NULL;
 			int o, i, j;
@@ -21718,8 +21308,9 @@ cc_reset_res(queue_t *q, mblk_t *mp)
 				return (err);
 			for (ct = cg->ct.list; ct; ct = ct->sr.next)
 				if (ct_tst(ct, CCTF_REM_RESET_PENDING))
-					ct_clr(ct, (CCTF_REM_M_BLOCKED | CCTF_REM_H_BLOCKED |
-						    CCTF_REM_RESET_PENDING));
+					ct_clr(ct,
+					       (CCTF_REM_M_BLOCKED | CCTF_REM_H_BLOCKED |
+						CCTF_REM_RESET_PENDING));
 			cg_clr(cg,
 			       (CCTF_REM_M_BLOCKED | CCTF_REM_H_BLOCKED | CCTF_REM_RESET_PENDING));
 		}
@@ -21731,9 +21322,8 @@ cc_reset_res(queue_t *q, mblk_t *mp)
 	} else {
 		if (!(ct = isup_find_cct(cc, add_ptr, add_len)) && !(ct = cc->conn.mgm))
 			goto badaddr;
-		/*
-		   complete procedure 
-		 */
+		/* 
+		   complete procedure */
 		if (ct_tst(ct, CCTF_REM_RESET_PENDING)) {
 			if ((err = isup_send_rlc(q, ct, NULL, 0)))
 				return (err);
@@ -21790,9 +21380,8 @@ cc_blocking_req(queue_t *q, mblk_t *mp)
 		ulong cgi = (p->cc_flags & ISUP_HARDWARE_FAILURE_ORIENTED);
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 			goto noaddr;
-		/*
-		   need at least two circuits for a group action 
-		 */
+		/* 
+		   need at least two circuits for a group action */
 		if (!cg->ct.list || !cg->ct.list->cg.next)
 			goto badaddr;
 		if (cg_get_m_state(cg) != CMS_IDLE)
@@ -21820,7 +21409,7 @@ cc_blocking_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       badflag:
-	printd(("%s: %s: %p: ERROR bad flags = 0x%08lx\n", ISUP_DRV_NAME, __FUNCTION__, cc,
+	printd(("%s: %s: %p: ERROR bad flags = 0x%08lx\n", DRV_NAME, __FUNCTION__, cc,
 		p->cc_flags));
 	return cc_error_ack(q, cc, ct, p->cc_primitive, CCBADFLAG);
       noaddr:
@@ -21868,9 +21457,8 @@ cc_blocking_res(queue_t *q, mblk_t *mp)
 		ulong CCTF_REM_X_BLOCKED = cgi ? CCTF_REM_H_BLOCKED : CCTF_REM_M_BLOCKED;
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && !(cg = cc->conn.gmg))
 			goto badaddr;
-		/*
-		   complete procedure 
-		 */
+		/* 
+		   complete procedure */
 		if (cg_tst(cg, CCTF_REM_X_BLOCK_PENDING)) {
 			struct ct *bc = NULL;
 			int o, i, j;
@@ -21906,9 +21494,8 @@ cc_blocking_res(queue_t *q, mblk_t *mp)
 			goto badflag;
 		if (!(ct = isup_find_cct(cc, add_ptr, add_len)) && !(ct = cc->conn.cpc))
 			goto badaddr;
-		/*
-		   complete procedure 
-		 */
+		/* 
+		   complete procedure */
 		if (ct_tst(ct, CCTF_REM_M_BLOCK_PENDING)) {
 			if ((err = isup_send_bla(q, ct)))
 				return (err);
@@ -21918,15 +21505,12 @@ cc_blocking_res(queue_t *q, mblk_t *mp)
 		switch (ct_get_c_state(ct)) {
 		case CTS_OGC_WAIT_SAM:
 		case CTS_OGC_WAIT_ACM:
-			/*
-			   responsibility of CC to disconnect tone/detector 
-			 */
-			/*
-			   CC responsibility to release iam information 
-			 */
-			/*
-			   does not put on idle list because remote block pending 
-			 */
+			/* 
+			   responsibility of CC to disconnect tone/detector */
+			/* 
+			   CC responsibility to release iam information */
+			/* 
+			   does not put on idle list because remote block pending */
 			ct_timer_start(ct, t5);
 			ct_timer_start(ct, t1);
 			if ((err = isup_send_rel(q, ct, CC_CAUS_NORMAL_UNSPECIFIED, NULL, 0)))
@@ -21985,9 +21569,8 @@ cc_unblocking_req(queue_t *q, mblk_t *mp)
 		ulong cgi = (p->cc_flags & ISUP_HARDWARE_FAILURE_ORIENTED);
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 			goto badaddr;
-		/*
-		   need at least two circuits for a group action 
-		 */
+		/* 
+		   need at least two circuits for a group action */
 		if (!cg->ct.list || !cg->ct.list->cg.next)
 			goto badaddr;
 		if (cg_get_m_state(cg) != CMS_IDLE)
@@ -22055,9 +21638,8 @@ cc_unblocking_res(queue_t *q, mblk_t *mp)
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len))
 		    && (!(ct = cc->conn.cpc) || !(cg = ct->cg.cg)))
 			goto badaddr;
-		/*
-		   complete procedure 
-		 */
+		/* 
+		   complete procedure */
 		if (cg_tst(cg, CCTF_REM_X_UNBLOCK_PENDING)) {
 			struct ct *bc = NULL;
 			int o, i, j;
@@ -22093,9 +21675,8 @@ cc_unblocking_res(queue_t *q, mblk_t *mp)
 			goto badflag;
 		if (!(ct = isup_find_cct(cc, add_ptr, add_len)) && !(ct = cc->conn.cpc))
 			goto badaddr;
-		/*
-		   complete procedure 
-		 */
+		/* 
+		   complete procedure */
 		if (ct_tst(ct, CCTF_REM_M_UNBLOCK_PENDING)) {
 			if ((err = isup_send_uba(q, ct)))
 				return (err);
@@ -22153,9 +21734,8 @@ cc_query_req(queue_t *q, mblk_t *mp)
 	if (p->cc_flags & ISUP_GROUP) {
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 			goto badaddr;
-		/*
-		   need at least two circuits for a group action 
-		 */
+		/* 
+		   need at least two circuits for a group action */
 		if (!cg->ct.list || !cg->ct.list->cg.next)
 			goto badaddr;
 		if (cg_get_m_state(cg) != CMS_IDLE)
@@ -22214,9 +21794,8 @@ cc_query_res(queue_t *q, mblk_t *mp)
 		goto badflag;
 	if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 		goto badaddr;
-	/*
-	   complete procedure 
-	 */
+	/* 
+	   complete procedure */
 	if (cg_tst(cg, CCTF_REM_QUERY_PENDING)) {
 		struct ct *bc = NULL;
 		int j;
@@ -22539,9 +22118,8 @@ isup_get_ct(isup_config_t * arg, struct ct *ct, int size)
 	cnf->tgid = ct->tg.tg ? ct->tg.tg->id : 0;
 	cnf->cic = ct->cic;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22557,23 +22135,21 @@ isup_get_cg(isup_config_t * arg, struct cg *cg, int size)
 	if (!cg)
 		return (-EINVAL);
 	cnf->srid = cg->sr.sr ? cg->sr.sr->id : 0;
-	/*
-	   write out list of circuit configurations following trunk group configurations 
-	 */
+	/* 
+	   write out list of circuit configurations following trunk group configurations */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (ct = cg->ct.list; ct && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     ct = ct->cg.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     ct = ct->cg.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_CT;
 		arg->id = ct->id;
 		chd->cgid = ct->cg.cg ? ct->cg.cg->id : 0;
 		chd->tgid = ct->tg.tg ? ct->tg.tg->id : 0;
 		chd->cic = ct->cic;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22590,23 +22166,21 @@ isup_get_tg(isup_config_t * arg, struct tg *tg, int size)
 		return (-EINVAL);
 	cnf->srid = tg->sr.sr ? tg->sr.sr->id : 0;
 	cnf->proto = tg->proto;
-	/*
-	   write out list of circuit configurations following trunk group configuration 
-	 */
+	/* 
+	   write out list of circuit configurations following trunk group configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (ct = tg->ct.list; ct && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     ct = ct->tg.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     ct = ct->tg.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_CT;
 		arg->id = ct->id;
 		chd->cgid = ct->cg.cg ? ct->cg.cg->id : 0;
 		chd->tgid = ct->tg.tg ? ct->tg.tg->id : 0;
 		chd->cic = ct->cic;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22626,38 +22200,34 @@ isup_get_sr(isup_config_t * arg, struct sr *sr, int size)
 	cnf->spid = sr->sp.sp ? sr->sp.sp->id : 0;
 	cnf->proto = sr->proto;
 	cnf->add = sr->add;
-	/*
+	/* 
 	   write out the list of circuit group and trunk group configurations following remote
-	   signalling point configuration 
-	 */
+	   signalling point configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chc = (typeof(chc)) (arg + 1);
-	/*
-	   circuit groups 
-	 */
+	/* 
+	   circuit groups */
 	for (cg = sr->cg.list; cg && size >= sizeof(*arg) + sizeof(*chc) + sizeof(*arg);
-	     cg = cg->sr.next, size -= sizeof(*arg) + sizeof(*chc),
-	     arg = (typeof(arg)) (chc + 1), chc = (typeof(chc)) (arg + 1)) {
+	     cg = cg->sr.next, size -= sizeof(*arg) + sizeof(*chc), arg =
+	     (typeof(arg)) (chc + 1), chc = (typeof(chc)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_CG;
 		arg->id = cg->id;
 		chc->srid = cg->sr.sr ? cg->sr.sr->id : 0;
 	}
 	cht = (typeof(cht)) chc;
-	/*
-	   trunk groups 
-	 */
+	/* 
+	   trunk groups */
 	for (tg = sr->tg.list; tg && size >= sizeof(*arg) + sizeof(*cht) + sizeof(*arg);
-	     tg = tg->sr.next, size -= sizeof(*arg) + sizeof(*cht),
-	     arg = (typeof(arg)) (cht + 1), cht = (typeof(cht)) (arg + 1)) {
+	     tg = tg->sr.next, size -= sizeof(*arg) + sizeof(*cht), arg =
+	     (typeof(arg)) (cht + 1), cht = (typeof(cht)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_SP;
 		arg->id = tg->id;
 		cht->srid = tg->sr.sr ? tg->sr.sr->id : 0;
 		cht->proto = tg->proto;
 	}
 	todo(("Should also print associated message transfer parts\n"));
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22674,15 +22244,14 @@ isup_get_sp(isup_config_t * arg, struct sp *sp, int size)
 		return (-EINVAL);
 	cnf->proto = sp->proto;
 	cnf->add = sp->add;
-	/*
+	/* 
 	   write out the list of remote signalling point configurations following local signalling
-	   point configuration 
-	 */
+	   point configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (sr = sp->sr.list; sr && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     sr = sr->sp.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     sr = sr->sp.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_SR;
 		arg->id = sr->id;
 		chd->spid = sr->sp.sp ? sr->sp.sp->id : 0;
@@ -22690,9 +22259,8 @@ isup_get_sp(isup_config_t * arg, struct sp *sp, int size)
 		chd->add = sr->add;
 	}
 	todo(("Should also print associated message transfer parts\n"));
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22710,18 +22278,16 @@ isup_get_mtp(isup_config_t * arg, struct mtp *mtp, int size)
 	if (!mtp)
 		return (-EINVAL);
 	cnf->proto = mtp->proto;
-	/*
+	/* 
 	   write out remote signalling point or local signalling point configuration following
-	   message transfer part configuration 
-	 */
+	   message transfer part configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chr = (typeof(chr)) (arg + 1);
-	/*
-	   remote signalling point 
-	 */
+	/* 
+	   remote signalling point */
 	for (sr = mtp->sr; sr && size >= sizeof(*arg) + sizeof(*chr) + sizeof(*arg);
-	     sr = NULL, size -= sizeof(*arg) + sizeof(*chr),
-	     arg = (typeof(arg)) (chr + 1), chr = (typeof(chr)) (arg + 1)) {
+	     sr = NULL, size -= sizeof(*arg) + sizeof(*chr), arg = (typeof(arg)) (chr + 1), chr =
+	     (typeof(chr)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_SR;
 		arg->id = sr->id;
 		chr->spid = sr->sp.sp ? sr->sp.sp->id : 0;
@@ -22729,20 +22295,18 @@ isup_get_mtp(isup_config_t * arg, struct mtp *mtp, int size)
 		chr->add = sr->add;
 	}
 	chp = (typeof(chp)) chr;
-	/*
-	   local signalling point 
-	 */
+	/* 
+	   local signalling point */
 	for (sp = mtp->sp; sp && size >= sizeof(*arg) + sizeof(*chp) + sizeof(*arg);
-	     sp = NULL, size -= sizeof(*arg) + sizeof(*chp),
-	     arg = (typeof(arg)) (chp + 1), chp = (typeof(chp)) (arg + 1)) {
+	     sp = NULL, size -= sizeof(*arg) + sizeof(*chp), arg = (typeof(arg)) (chp + 1), chp =
+	     (typeof(chp)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_SP;
 		arg->id = sp->id;
 		chp->proto = sp->proto;
 		chp->add = sp->add;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22758,22 +22322,20 @@ isup_get_df(isup_config_t * arg, struct df *df, int size)
 	if (!df)
 		return (-EINVAL);
 	cnf->proto = df->proto;
-	/*
-	   write out the list of SP configurations following default configuration 
-	 */
+	/* 
+	   write out the list of SP configurations following default configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (sp = df->sp.list; sp && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     sp = sp->next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     sp = sp->next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = ISUP_OBJ_TYPE_SP;
 		arg->id = sp->id;
 		chd->proto = sp->proto;
 		chd->add = sp->add;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -22803,11 +22365,10 @@ isup_add_ct(isup_config_t * arg, struct ct *ct, int size, int force, int test)
 	for (ct = cg->ct.list; ct; ct = ct->cg.next)
 		if (ct->cic == cnf->cic)
 			return (-EINVAL);
-	/*
+	/* 
 	   TODO:- if the circuit group selected is not a pre-determined circuit group, we will have 
 	   to check to make sure that the CIC of the circuit being added does not exceed the range
-	   of the group.  We should also add the circuit to the new range and status parameter. 
-	 */
+	   of the group.  We should also add the circuit to the new range and status parameter. */
 	if (!test) {
 		if (!(ct = isup_alloc_ct(ct_get_id(arg->id), tg, cg, cnf->cic)))
 			return (-ENOMEM);
@@ -22864,9 +22425,8 @@ isup_add_sr(isup_config_t * arg, struct sr *sr, int size, int force, int test)
 		sp = sp_lookup(cnf->spid);
 	if (!sp)
 		return (-EINVAL);
-	/*
-	   network appearance of remote must match network appearance of local 
-	 */
+	/* 
+	   network appearance of remote must match network appearance of local */
 	if (sp->add.ni != cnf->add.ni)
 		return (-EINVAL);
 	for (sr = sp->sr.list; sr; sr = sr->sp.next)
@@ -22969,45 +22529,38 @@ isup_cha_ct(isup_config_t * arg, struct ct *ct, int size, int force, int test)
 		return (-EINVAL);
 	if (cnf->tgid && cnf->tgid != ct->tg.tg->id)
 		return (-EINVAL);
-	/*
-	   can't change to existing cic 
-	 */
+	/* 
+	   can't change to existing cic */
 	for (c = ct->sr.sr->ct.list; c; c = c->sr.next)
 		if (c->cic == cnf->cic)
 			return (-EINVAL);
 	if (!force) {
-		/*
-		   bound for maintenance or call control 
-		 */
+		/* 
+		   bound for maintenance or call control */
 		if (ct->bind.tst || ct->bind.mgm || ct->bind.icc || ct->bind.ogc)
 			return (-EBUSY);
-		/*
-		   involved in call or local maintenance 
-		 */
+		/* 
+		   involved in call or local maintenance */
 		if (ct->cpc.cc || ct->tst.cc || ct->mgm.cc)
 			return (-EBUSY);
-		/*
-		   involved in processing with remote switch 
-		 */
+		/* 
+		   involved in processing with remote switch */
 		if (ct_get_c_state(ct) != CTS_IDLE)
 			return (-EBUSY);
-		/*
-		   involved in processing with call control interface 
-		 */
+		/* 
+		   involved in processing with call control interface */
 		if (ct_get_i_state(ct) != CCS_IDLE)
 			return (-EBUSY);
-		/*
-		   involved in processing with local maintenance 
-		 */
+		/* 
+		   involved in processing with local maintenance */
 		if (ct_get_m_state(ct) != CMS_IDLE)
 			return (-EBUSY);
 	}
-	/*
+	/* 
 	   TODO:- if the circuit group selected is not a pre-determined circuit group, we will have 
 	   to check to make sure that the CIC of the circuit being changed does not exceed the
 	   range of the group.  We should also change the circuit in the range and status
-	   parameter. 
-	 */
+	   parameter. */
 	if (!test) {
 		ct->cic = cnf->cic;
 	}
@@ -23021,30 +22574,25 @@ isup_cha_cg(isup_config_t * arg, struct cg *cg, int size, int force, int test)
 		return (-EINVAL);
 	if (cnf->srid && cnf->srid != cg->sr.sr->id)
 		return (-EINVAL);
-	/*
+	/* 
 	   TODO:- if we are changing the options from preassigned to non-preassigned, then we
 	   should check to make sure that the resulting range and status is not outside of the
-	   permitted range. 
-	 */
+	   permitted range. */
 	if (!force) {
-		/*
-		   we have circuits 
-		 */
+		/* 
+		   we have circuits */
 		if (cg->ct.list)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or call control 
-		 */
+		/* 
+		   bound for maintenance or call control */
 		if (cg->bind.tst || cg->bind.mgm || cg->bind.icc || cg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   involved in local maintenance 
-		 */
+		/* 
+		   involved in local maintenance */
 		if (cg->gmg.cc)
 			return (-EBUSY);
-		/*
-		   involved in processing with local maintenance 
-		 */
+		/* 
+		   involved in processing with local maintenance */
 		if (cg_get_m_state(cg) != CMS_IDLE)
 			return (-EBUSY);
 	}
@@ -23062,14 +22610,12 @@ isup_cha_tg(isup_config_t * arg, struct tg *tg, int size, int force, int test)
 	if (cnf->srid && cnf->srid != tg->sr.sr->id)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have circuits 
-		 */
+		/* 
+		   we have circuits */
 		if (tg->ct.list)
 			return (-EBUSY);
-		/*
-		   bound to a stream for call control or management 
-		 */
+		/* 
+		   bound to a stream for call control or management */
 		if (tg->bind.tst || tg->bind.mgm || tg->bind.icc || tg->bind.ogc)
 			return (-EBUSY);
 	}
@@ -23087,32 +22633,27 @@ isup_cha_sr(isup_config_t * arg, struct sr *sr, int size, int force, int test)
 		return (-EINVAL);
 	if (cnf->spid && cnf->spid != sr->sp.sp->id)
 		return (-EINVAL);
-	/*
-	   can't change network appearance 
-	 */
+	/* 
+	   can't change network appearance */
 	if (cnf->add.ni != sr->add.ni)
 		return (-EINVAL);
-	/*
-	   cannot change address to an existing remote address 
-	 */
+	/* 
+	   cannot change address to an existing remote address */
 	for (s = master.sr.list; s; s = s->next)
 		if (s->add.ni == cnf->add.ni && s->add.pc == cnf->add.pc
 		    && s->add.si == cnf->add.si)
 			return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to a call control or maangement stream 
-		 */
+		/* 
+		   bound to a call control or maangement stream */
 		if (sr->bind.tst || sr->bind.mgm || sr->bind.icc || sr->bind.ogc)
 			return (-EBUSY);
-		/*
-		   we are attached to a live MTP lower stream 
-		 */
+		/* 
+		   we are attached to a live MTP lower stream */
 		if (sr->mtp)
 			return (-EBUSY);
-		/*
-		   we have circuit groups and trunk groups 
-		 */
+		/* 
+		   we have circuit groups and trunk groups */
 		if (sr->cg.list || sr->tg.list)
 			return (-EBUSY);
 	}
@@ -23129,32 +22670,27 @@ isup_cha_sp(isup_config_t * arg, struct sp *sp, int size, int force, int test)
 	isup_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!sp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   can't change network appearance 
-	 */
+	/* 
+	   can't change network appearance */
 	if (cnf->add.ni != sp->add.ni)
 		return (-EINVAL);
-	/*
-	   can't change to an existing local 
-	 */
+	/* 
+	   can't change to an existing local */
 	for (s = master.sp.list; s; s = s->next)
 		if (s->add.ni == cnf->add.ni && s->add.pc == cnf->add.pc
 		    && s->add.si == cnf->add.si)
 			return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to call control or management 
-		 */
+		/* 
+		   bound to call control or management */
 		if (sp->bind.tst || sp->bind.mgm || sp->bind.icc || sp->bind.ogc)
 			return (-EBUSY);
-		/*
-		   attached to live MTP interface 
-		 */
+		/* 
+		   attached to live MTP interface */
 		if (sp->mtp)
 			return (-EBUSY);
-		/*
-		   we have remote signalling points associated 
-		 */
+		/* 
+		   we have remote signalling points associated */
 		if (sp->sr.list)
 			return (-EBUSY);
 	}
@@ -23177,9 +22713,8 @@ isup_cha_mtp(isup_config_t * arg, struct mtp *mtp, int size, int force, int test
 	if (cnf->muxid && cnf->muxid != mtp->u.mux.index)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (mtp->sp || mtp->sr)
 			return (-EBUSY);
 	}
@@ -23212,29 +22747,24 @@ isup_del_ct(isup_config_t * arg, struct ct *ct, int size, int force, int test)
 	if (!ct)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound for maintenance or call control 
-		 */
+		/* 
+		   bound for maintenance or call control */
 		if (ct->bind.tst || ct->bind.mgm || ct->bind.icc || ct->bind.ogc)
 			return (-EBUSY);
-		/*
-		   involved in call or local maintenance 
-		 */
+		/* 
+		   involved in call or local maintenance */
 		if (ct->cpc.cc || ct->tst.cc || ct->mgm.cc)
 			return (-EBUSY);
-		/*
-		   involved in processing with remote switch 
-		 */
+		/* 
+		   involved in processing with remote switch */
 		if (ct_get_c_state(ct) != CTS_IDLE)
 			return (-EBUSY);
-		/*
-		   involved in processing with call control interface 
-		 */
+		/* 
+		   involved in processing with call control interface */
 		if (ct_get_i_state(ct) != CCS_IDLE)
 			return (-EBUSY);
-		/*
-		   involved in processing with local maintenance 
-		 */
+		/* 
+		   involved in processing with local maintenance */
 		if (ct_get_m_state(ct) != CMS_IDLE)
 			return (-EBUSY);
 	}
@@ -23249,24 +22779,20 @@ isup_del_cg(isup_config_t * arg, struct cg *cg, int size, int force, int test)
 	if (!cg)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have circuits 
-		 */
+		/* 
+		   we have circuits */
 		if (cg->ct.list)
 			return (-EBUSY);
-		/*
-		   bound for maintenance or call control 
-		 */
+		/* 
+		   bound for maintenance or call control */
 		if (cg->bind.tst || cg->bind.mgm || cg->bind.icc || cg->bind.ogc)
 			return (-EBUSY);
-		/*
-		   involved in local maintenance 
-		 */
+		/* 
+		   involved in local maintenance */
 		if (cg->gmg.cc)
 			return (-EBUSY);
-		/*
-		   involved in processing with local maintenance 
-		 */
+		/* 
+		   involved in processing with local maintenance */
 		if (cg_get_m_state(cg) != CMS_IDLE)
 			return (-EBUSY);
 	}
@@ -23281,14 +22807,12 @@ isup_del_tg(isup_config_t * arg, struct tg *tg, int size, int force, int test)
 	if (!tg)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   we have circuits 
-		 */
+		/* 
+		   we have circuits */
 		if (tg->ct.list)
 			return (-EBUSY);
-		/*
-		   bound to a stream for call control or management 
-		 */
+		/* 
+		   bound to a stream for call control or management */
 		if (tg->bind.tst || tg->bind.mgm || tg->bind.icc || tg->bind.ogc)
 			return (-EBUSY);
 	}
@@ -23303,19 +22827,16 @@ isup_del_sr(isup_config_t * arg, struct sr *sr, int size, int force, int test)
 	if (!sr)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to a call control or maangement stream 
-		 */
+		/* 
+		   bound to a call control or maangement stream */
 		if (sr->bind.tst || sr->bind.mgm || sr->bind.icc || sr->bind.ogc)
 			return (-EBUSY);
-		/*
-		   we are attached to a live MTP lower stream 
-		 */
+		/* 
+		   we are attached to a live MTP lower stream */
 		if (sr->mtp)
 			return (-EBUSY);
-		/*
-		   we have circuit groups and trunk groups 
-		 */
+		/* 
+		   we have circuit groups and trunk groups */
 		if (sr->cg.list || sr->tg.list)
 			return (-EBUSY);
 	}
@@ -23330,19 +22851,16 @@ isup_del_sp(isup_config_t * arg, struct sp *sp, int size, int force, int test)
 	if (!sp)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to call control or management 
-		 */
+		/* 
+		   bound to call control or management */
 		if (sp->bind.tst || sp->bind.mgm || sp->bind.icc || sp->bind.ogc)
 			return (-EBUSY);
-		/*
-		   attached to live MTP interface 
-		 */
+		/* 
+		   attached to live MTP interface */
 		if (sp->mtp)
 			return (-EBUSY);
-		/*
-		   we have remote signalling points associated 
-		 */
+		/* 
+		   we have remote signalling points associated */
 		if (sp->sr.list)
 			return (-EBUSY);
 	}
@@ -23357,9 +22875,8 @@ isup_del_mtp(isup_config_t * arg, struct mtp *mtp, int size, int force, int test
 	if (!mtp)
 		return (-EINVAL);
 	if (!force) {
-		/*
-		   bound to internal datastructures 
-		 */
+		/* 
+		   bound to internal datastructures */
 		if (mtp->sp || mtp->sr)
 			return (-EBUSY);
 	}
@@ -23404,9 +22921,8 @@ isup_sta_ct(isup_statem_t * arg, struct ct *ct, int size)
 	sta->mgm_bind = ct->bind.mgm ? ct->bind.mgm->id : 0;
 	sta->mnt_bind = ct->bind.mnt ? ct->bind.mnt->id : 0;
 	sta->icc_bind = ct->bind.icc ? ct->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = ct->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -23428,9 +22944,8 @@ isup_sta_cg(isup_statem_t * arg, struct cg *cg, int size)
 	sta->mgm_bind = cg->bind.mgm ? cg->bind.mgm->id : 0;
 	sta->mnt_bind = cg->bind.mnt ? cg->bind.mnt->id : 0;
 	sta->icc_bind = cg->bind.icc ? cg->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = cg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -23451,9 +22966,8 @@ isup_sta_tg(isup_statem_t * arg, struct tg *tg, int size)
 	sta->mgm_bind = tg->bind.mgm ? tg->bind.mgm->id : 0;
 	sta->mnt_bind = tg->bind.mnt ? tg->bind.mnt->id : 0;
 	sta->icc_bind = tg->bind.icc ? tg->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = tg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -23475,9 +22989,8 @@ isup_sta_sr(isup_statem_t * arg, struct sr *sr, int size)
 	sta->mgm_bind = sr->bind.mgm ? sr->bind.mgm->id : 0;
 	sta->mnt_bind = sr->bind.mnt ? sr->bind.mnt->id : 0;
 	sta->icc_bind = sr->bind.icc ? sr->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = sr->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -23498,9 +23011,8 @@ isup_sta_sp(isup_statem_t * arg, struct sp *sp, int size)
 	sta->mgm_bind = sp->bind.mgm ? sp->bind.mgm->id : 0;
 	sta->mnt_bind = sp->bind.mnt ? sp->bind.mnt->id : 0;
 	sta->icc_bind = sp->bind.icc ? sp->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = sp->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -23531,9 +23043,8 @@ isup_sta_df(isup_statem_t * arg, struct df *df, int size)
 	sta->mgm_bind = df->bind.mgm ? df->bind.mgm->id : 0;
 	sta->mnt_bind = df->bind.mnt ? df->bind.mnt->id : 0;
 	sta->icc_bind = df->bind.icc ? df->bind.icc->id : 0;
-	/*
-	   fit in a many as we can 
-	 */
+	/* 
+	   fit in a many as we can */
 	for (cc = df->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
 	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
 	*p++ = 0;
@@ -25078,21 +24589,20 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
-			ptrace(("%s: %p: I_PLINK\n", ISUP_DRV_NAME, cc));
+			ptrace(("%s: %p: I_PLINK\n", DRV_NAME, cc));
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					ISUP_DRV_NAME, cc));
+					DRV_NAME, cc));
 				ret = -EPERM;
 				break;
 			}
 		case _IOC_NR(I_LINK):
-			ptrace(("%s: %p: I_LINK\n", ISUP_DRV_NAME, cc));
+			ptrace(("%s: %p: I_LINK\n", DRV_NAME, cc));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
 			spin_lock_irqsave(&master.lock, flags);
 			{
-				/*
-				   place in list in ascending index order 
-				 */
+				/* 
+				   place in list in ascending index order */
 				for (mtpp = &master.mtp.list;
 				     *mtpp && (*mtpp)->u.mux.index < lb->l_index;
 				     mtpp = &(*mtpp)->next) ;
@@ -25107,15 +24617,15 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
-			ptrace(("%s: %p: I_PUNLINK\n", ISUP_DRV_NAME, cc));
+			ptrace(("%s: %p: I_PUNLINK\n", DRV_NAME, cc));
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					ISUP_DRV_NAME, cc));
+					DRV_NAME, cc));
 				ret = -EPERM;
 				break;
 			}
 		case _IOC_NR(I_UNLINK):
-			ptrace(("%s: %p: I_UNLINK\n", ISUP_DRV_NAME, cc));
+			ptrace(("%s: %p: I_UNLINK\n", DRV_NAME, cc));
 			spin_lock_irqsave(&master.lock, flags);
 			{
 				for (mtp = master.mtp.list; mtp; mtp = mtp->next)
@@ -25124,7 +24634,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 				if (!mtp) {
 					ret = -EINVAL;
 					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
-						ISUP_DRV_NAME, cc));
+						DRV_NAME, cc));
 					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
@@ -25135,7 +24645,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", ISUP_DRV_NAME,
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", DRV_NAME,
 				cc, (char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
@@ -25150,75 +24660,75 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(ISUP_IOCGOPTIONS):
-			printd(("%s; %p: -> ISUP_IOCGOPTIONS\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCGOPTIONS\n", DRV_NAME, cc));
 			ret = isup_iocgoptions(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCSOPTIONS):
-			printd(("%s; %p: -> ISUP_IOCSOPTIONS\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCSOPTIONS\n", DRV_NAME, cc));
 			ret = isup_iocsoptions(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCGCONFIG):
-			printd(("%s; %p: -> ISUP_IOCGCONFIG\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCGCONFIG\n", DRV_NAME, cc));
 			ret = isup_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCSCONFIG):
-			printd(("%s; %p: -> ISUP_IOCSCONFIG\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCSCONFIG\n", DRV_NAME, cc));
 			ret = isup_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCTCONFIG):
-			printd(("%s; %p: -> ISUP_IOCTCONFIG\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCTCONFIG\n", DRV_NAME, cc));
 			ret = isup_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCCCONFIG):
-			printd(("%s; %p: -> ISUP_IOCCCONFIG\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCCCONFIG\n", DRV_NAME, cc));
 			ret = isup_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCGSTATEM):
-			printd(("%s; %p: -> ISUP_IOCGSTATEM\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCGSTATEM\n", DRV_NAME, cc));
 			ret = isup_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCCMRESET):
-			printd(("%s; %p: -> ISUP_IOCCMRESET\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCCMRESET\n", DRV_NAME, cc));
 			ret = isup_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCGSTATSP):
-			printd(("%s; %p: -> ISUP_IOCGSTATSP\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCGSTATSP\n", DRV_NAME, cc));
 			ret = isup_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCSSTATSP):
-			printd(("%s; %p: -> ISUP_IOCSSTATSP\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCSSTATSP\n", DRV_NAME, cc));
 			ret = isup_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCGSTATS):
-			printd(("%s; %p: -> ISUP_IOCGSTATS\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCGSTATS\n", DRV_NAME, cc));
 			ret = isup_iocgstats(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCCSTATS):
-			printd(("%s; %p: -> ISUP_IOCCSTATS\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCCSTATS\n", DRV_NAME, cc));
 			ret = isup_ioccstats(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCGNOTIFY):
-			printd(("%s; %p: -> ISUP_IOCGNOTIFY\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCGNOTIFY\n", DRV_NAME, cc));
 			ret = isup_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCSNOTIFY):
-			printd(("%s; %p: -> ISUP_IOCSNOTIFY\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCSNOTIFY\n", DRV_NAME, cc));
 			ret = isup_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCCNOTIFY):
-			printd(("%s; %p: -> ISUP_IOCCNOTIFY\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCCNOTIFY\n", DRV_NAME, cc));
 			ret = isup_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCCMGMT):
-			printd(("%s; %p: -> ISUP_IOCCMGMT\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCCMGMT\n", DRV_NAME, cc));
 			ret = isup_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(ISUP_IOCCPASS):
-			printd(("%s; %p: -> ISUP_IOCCPASS\n", ISUP_DRV_NAME, cc));
+			printd(("%s; %p: -> ISUP_IOCCPASS\n", DRV_NAME, cc));
 			ret = isup_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported ISUP ioctl %c, %d\n", ISUP_DRV_NAME, cc,
+			ptrace(("%s: %p: ERROR: Unsupported ISUP ioctl %c, %d\n", DRV_NAME, cc,
 				(char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
@@ -25226,7 +24736,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 		break;
 	}
 	default:
-		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", ISUP_DRV_NAME, cc, (char) type,
+		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", DRV_NAME, cc, (char) type,
 			nr));
 		ret = -EOPNOTSUPP;
 		break;
@@ -25265,159 +24775,159 @@ isup_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = cs_get_state(cc);
 	switch (*(ulong *) mp->b_rptr) {
 	case CC_INFO_REQ:
-		printd(("%s: %p: -> CC_INFO_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_INFO_REQ\n", DRV_NAME, cc));
 		rtn = cc_info_req(q, mp);
 		break;
 	case CC_OPTMGMT_REQ:
-		printd(("%s: %p: -> CC_OPTMGMT_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_OPTMGMT_REQ\n", DRV_NAME, cc));
 		rtn = cc_optmgmt_req(q, mp);
 		break;
 	case CC_BIND_REQ:
-		printd(("%s: %p: -> CC_BIND_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_BIND_REQ\n", DRV_NAME, cc));
 		rtn = cc_bind_req(q, mp);
 		break;
 	case CC_UNBIND_REQ:
-		printd(("%s: %p: -> CC_UNBIND_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_UNBIND_REQ\n", DRV_NAME, cc));
 		rtn = cc_unbind_req(q, mp);
 		break;
 	case CC_ADDR_REQ:
-		printd(("%s: %p: -> CC_ADDR_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_ADDR_REQ\n", DRV_NAME, cc));
 		rtn = cc_addr_req(q, mp);
 		break;
 	case CC_SETUP_REQ:
-		printd(("%s: %p: -> CC_SETUP_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SETUP_REQ\n", DRV_NAME, cc));
 		rtn = cc_setup_req(q, mp);
 		break;
 	case CC_MORE_INFO_REQ:
-		printd(("%s: %p: -> CC_MORE_INFO_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_MORE_INFO_REQ\n", DRV_NAME, cc));
 		rtn = cc_more_info_req(q, mp);
 		break;
 	case CC_INFORMATION_REQ:
-		printd(("%s: %p: -> CC_INFORMATION_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_INFORMATION_REQ\n", DRV_NAME, cc));
 		rtn = cc_information_req(q, mp);
 		break;
 	case CC_CONT_CHECK_REQ:
-		printd(("%s: %p: -> CC_CONT_CHECK_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONT_CHECK_REQ\n", DRV_NAME, cc));
 		rtn = cc_cont_check_req(q, mp);
 		break;
 	case CC_CONT_TEST_REQ:
-		printd(("%s: %p: -> CC_CONT_TEST_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONT_TEST_REQ\n", DRV_NAME, cc));
 		rtn = cc_cont_test_req(q, mp);
 		break;
 	case CC_CONT_REPORT_REQ:
-		printd(("%s: %p: -> CC_CONT_REPORT_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONT_REPORT_REQ\n", DRV_NAME, cc));
 		rtn = cc_cont_report_req(q, mp);
 		break;
 	case CC_SETUP_RES:
-		printd(("%s: %p: -> CC_SETUP_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SETUP_RES\n", DRV_NAME, cc));
 		rtn = cc_setup_res(q, mp);
 		break;
 	case CC_PROCEEDING_REQ:
-		printd(("%s: %p: -> CC_PROCEEDING_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_PROCEEDING_REQ\n", DRV_NAME, cc));
 		rtn = cc_proceeding_req(q, mp);
 		break;
 	case CC_ALERTING_REQ:
-		printd(("%s: %p: -> CC_ALERTING_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_ALERTING_REQ\n", DRV_NAME, cc));
 		rtn = cc_alerting_req(q, mp);
 		break;
 	case CC_PROGRESS_REQ:
-		printd(("%s: %p: -> CC_PROGRESS_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_PROGRESS_REQ\n", DRV_NAME, cc));
 		rtn = cc_progress_req(q, mp);
 		break;
 	case CC_IBI_REQ:
-		printd(("%s: %p: -> CC_IBI_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_IBI_REQ\n", DRV_NAME, cc));
 		rtn = cc_ibi_req(q, mp);
 		break;
 	case CC_CONNECT_REQ:
-		printd(("%s: %p: -> CC_CONNECT_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_CONNECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_connect_req(q, mp);
 		break;
 	case CC_SETUP_COMPLETE_REQ:
-		printd(("%s: %p: -> CC_SETUP_COMPLETE_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SETUP_COMPLETE_REQ\n", DRV_NAME, cc));
 		rtn = cc_setup_complete_req(q, mp);
 		break;
 	case CC_FORWXFER_REQ:
-		printd(("%s: %p: -> CC_FORWXFER_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_FORWXFER_REQ\n", DRV_NAME, cc));
 		rtn = cc_forwxfer_req(q, mp);
 		break;
 	case CC_SUSPEND_REQ:
-		printd(("%s: %p: -> CC_SUSPEND_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SUSPEND_REQ\n", DRV_NAME, cc));
 		rtn = cc_suspend_req(q, mp);
 		break;
 	case CC_SUSPEND_RES:
-		printd(("%s: %p: -> CC_SUSPEND_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SUSPEND_RES\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_SUSPEND_REJECT_REQ:
-		printd(("%s: %p: -> CC_SUSPEND_REJECT_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_SUSPEND_REJECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_RESUME_REQ:
-		printd(("%s: %p: -> CC_RESUME_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESUME_REQ\n", DRV_NAME, cc));
 		rtn = cc_resume_req(q, mp);
 		break;
 	case CC_RESUME_RES:
-		printd(("%s: %p: -> CC_RESUME_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESUME_RES\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_RESUME_REJECT_REQ:
-		printd(("%s: %p: -> CC_RESUME_REJECT_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESUME_REJECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_REJECT_REQ:
-		printd(("%s: %p: -> CC_REJECT_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_REJECT_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_RELEASE_REQ:
-		printd(("%s: %p: -> CC_RELEASE_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RELEASE_REQ\n", DRV_NAME, cc));
 		rtn = cc_release_req(q, mp);
 		break;
 	case CC_RELEASE_RES:
-		printd(("%s: %p: -> CC_RELEASE_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RELEASE_RES\n", DRV_NAME, cc));
 		rtn = cc_release_res(q, mp);
 		break;
 	case CC_RESET_REQ:
-		printd(("%s: %p: -> CC_RESET_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESET_REQ\n", DRV_NAME, cc));
 		rtn = cc_reset_req(q, mp);
 		break;
 	case CC_RESET_RES:
-		printd(("%s: %p: -> CC_RESET_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESET_RES\n", DRV_NAME, cc));
 		rtn = cc_reset_res(q, mp);
 		break;
 	case CC_BLOCKING_REQ:
-		printd(("%s: %p: -> CC_BLOCKING_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_BLOCKING_REQ\n", DRV_NAME, cc));
 		rtn = cc_blocking_req(q, mp);
 		break;
 	case CC_BLOCKING_RES:
-		printd(("%s: %p: -> CC_BLOCKING_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_BLOCKING_RES\n", DRV_NAME, cc));
 		rtn = cc_blocking_res(q, mp);
 		break;
 	case CC_UNBLOCKING_REQ:
-		printd(("%s: %p: -> CC_UNBLOCKING_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_UNBLOCKING_REQ\n", DRV_NAME, cc));
 		rtn = cc_unblocking_req(q, mp);
 		break;
 	case CC_UNBLOCKING_RES:
-		printd(("%s: %p: -> CC_UNBLOCKING_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_UNBLOCKING_RES\n", DRV_NAME, cc));
 		rtn = cc_unblocking_res(q, mp);
 		break;
 	case CC_QUERY_REQ:
-		printd(("%s: %p: -> CC_QUERY_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_QUERY_REQ\n", DRV_NAME, cc));
 		rtn = cc_query_req(q, mp);
 		break;
 	case CC_QUERY_RES:
-		printd(("%s: %p: -> CC_QUERY_RES\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_QUERY_RES\n", DRV_NAME, cc));
 		rtn = cc_query_res(q, mp);
 		break;
 	case CC_RESTART_REQ:
-		printd(("%s: %p: -> CC_RESTART_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_RESTART_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	case CC_STOP_REQ:
-		printd(("%s: %p: -> CC_STOP_REQ\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_STOP_REQ\n", DRV_NAME, cc));
 		rtn = cc_unsupported_prim(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> CC_????\n", ISUP_DRV_NAME, cc));
+		printd(("%s: %p: -> CC_????\n", DRV_NAME, cc));
 		rtn = cc_unknown_prim(q, mp);
 		break;
 	}
@@ -25438,51 +24948,51 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = mtp->i_state;
 	switch (*((ulong *) mp->b_rptr)) {
 	case MTP_OK_ACK:
-		printd(("%s: %p: MTP_OK_ACK <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_OK_ACK <-\n", DRV_NAME, mtp));
 		rtn = mtp_ok_ack(q, mp);
 		break;
 	case MTP_ERROR_ACK:
-		printd(("%s: %p: MTP_ERROR_ACK <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_ERROR_ACK <-\n", DRV_NAME, mtp));
 		rtn = mtp_error_ack(q, mp);
 		break;
 	case MTP_BIND_ACK:
-		printd(("%s: %p: MTP_BIND_ACK <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_BIND_ACK <-\n", DRV_NAME, mtp));
 		rtn = mtp_bind_ack(q, mp);
 		break;
 	case MTP_ADDR_ACK:
-		printd(("%s: %p: MTP_ADDR_ACK <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_ADDR_ACK <-\n", DRV_NAME, mtp));
 		rtn = mtp_addr_ack(q, mp);
 		break;
 	case MTP_INFO_ACK:
-		printd(("%s: %p: MTP_INFO_ACK <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_INFO_ACK <-\n", DRV_NAME, mtp));
 		rtn = mtp_info_ack(q, mp);
 		break;
 	case MTP_OPTMGMT_ACK:
-		printd(("%s: %p: MTP_OPTMGMT_ACK <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_OPTMGMT_ACK <-\n", DRV_NAME, mtp));
 		rtn = mtp_optmgmt_ack(q, mp);
 		break;
 	case MTP_TRANSFER_IND:
-		printd(("%s: %p: MTP_TRANSFER_IND <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_TRANSFER_IND <-\n", DRV_NAME, mtp));
 		rtn = mtp_transfer_ind(q, mp);
 		break;
 	case MTP_PAUSE_IND:
-		printd(("%s: %p: MTP_PAUSE_IND <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_PAUSE_IND <-\n", DRV_NAME, mtp));
 		rtn = mtp_pause_ind(q, mp);
 		break;
 	case MTP_RESUME_IND:
-		printd(("%s: %p: MTP_RESUME_IND <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_RESUME_IND <-\n", DRV_NAME, mtp));
 		rtn = mtp_resume_ind(q, mp);
 		break;
 	case MTP_STATUS_IND:
-		printd(("%s: %p: MTP_STATUS_IND <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_STATUS_IND <-\n", DRV_NAME, mtp));
 		rtn = mtp_status_ind(q, mp);
 		break;
 	case MTP_RESTART_COMPLETE_IND:
-		printd(("%s: %p: MTP_RESART_COMPLETE_IND <-\n", ISUP_DRV_NAME, mtp));
+		printd(("%s: %p: MTP_RESART_COMPLETE_IND <-\n", DRV_NAME, mtp));
 		rtn = mtp_restart_complete_ind(q, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? %lu <-\n", ISUP_DRV_NAME, mtp, *(ulong *) mp->b_rptr));
+		printd(("%s: %p: ???? %lu <-\n", DRV_NAME, mtp, *(ulong *) mp->b_rptr));
 		rtn = mtp_unrecognized_prim(q, mp);
 		break;
 	}
@@ -25501,22 +25011,19 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 STATIC int
 isup_w_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from above 
-	 */
+	/* 
+	   data from above */
 	return isup_write(q, mp);
 }
 STATIC int
 mtp_r_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from below 
-	 */
+	/* 
+	   data from below */
 	swerr();
-	/*
+	/* 
 	   we need the MTP-TRANSFER-IND because we cannot tell which switch the message came from
-	   without it. 
-	 */
+	   without it. */
 	return (-EFAULT);
 }
 
@@ -25559,9 +25066,8 @@ isup_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 isup_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return isup_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -25581,9 +25087,8 @@ isup_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 mtp_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -25639,7 +25144,7 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", ISUP_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -25647,9 +25152,8 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	/*
-	   allocate a new device 
-	 */
+	/* 
+	   allocate a new device */
 	cminor = 1;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *ccp; ccp = &(*ccp)->next) {
@@ -25663,7 +25167,7 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= ISUP_CMINORS) {
+				if (++cminor >= NMINORS) {
 					if (++mindex >= ISUP_CMAJORS
 					    || !(cmajor = isup_majors[mindex]))
 						break;
@@ -25674,15 +25178,15 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (mindex >= ISUP_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", ISUP_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", ISUP_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(cc = isup_alloc_cc(q, ccp, devp, crp))) {
-		ptrace(("%s: ERROR: no memory\n", ISUP_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -25706,7 +25210,7 @@ isup_close(queue_t *q, int flag, cred_t *crp)
 	(void) crp;
 	(void) s;
 	(void) h;
-	printd(("%s: %p: closing character device %d:%d\n", ISUP_DRV_NAME, cc, cc->u.dev.cmajor,
+	printd(("%s: %p: closing character device %d:%d\n", DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	{
@@ -25735,63 +25239,63 @@ STATIC kmem_cache_t *isup_mtp_cachep = NULL;
 STATIC int
 isup_init_caches(void)
 {
-	if (!isup_cc_cachep &&
-	    !(isup_cc_cachep =
-	      kmem_cache_create("isup_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_cc_cachep", ISUP_DRV_NAME);
+	if (!isup_cc_cachep
+	    && !(isup_cc_cachep =
+		 kmem_cache_create("isup_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_cc_cachep", DRV_NAME);
 		goto no_cc;
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized isup cc structure cache\n", ISUP_DRV_NAME));
-	if (!isup_tg_cachep &&
-	    !(isup_tg_cachep =
-	      kmem_cache_create("isup_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_tg_cachep", ISUP_DRV_NAME);
+		printd(("%s: initialized isup cc structure cache\n", DRV_NAME));
+	if (!isup_tg_cachep
+	    && !(isup_tg_cachep =
+		 kmem_cache_create("isup_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_tg_cachep", DRV_NAME);
 		goto no_tg;
 	} else
-		printd(("%s: initialized isup tg structure cache\n", ISUP_DRV_NAME));
-	if (!isup_cg_cachep &&
-	    !(isup_cg_cachep =
-	      kmem_cache_create("isup_cg_cachep", sizeof(struct cg), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_cg_cachep", ISUP_DRV_NAME);
+		printd(("%s: initialized isup tg structure cache\n", DRV_NAME));
+	if (!isup_cg_cachep
+	    && !(isup_cg_cachep =
+		 kmem_cache_create("isup_cg_cachep", sizeof(struct cg), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_cg_cachep", DRV_NAME);
 		goto no_cg;
 	} else
-		printd(("%s: initialized isup tg structure cache\n", ISUP_DRV_NAME));
-	if (!isup_ct_cachep &&
-	    !(isup_ct_cachep =
-	      kmem_cache_create("isup_ct_cachep", sizeof(struct ct), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_ct_cachep", ISUP_DRV_NAME);
+		printd(("%s: initialized isup tg structure cache\n", DRV_NAME));
+	if (!isup_ct_cachep
+	    && !(isup_ct_cachep =
+		 kmem_cache_create("isup_ct_cachep", sizeof(struct ct), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_ct_cachep", DRV_NAME);
 		goto no_ct;
 	} else
-		printd(("%s: initialized isup ct structure cache\n", ISUP_DRV_NAME));
-	if (!isup_sr_cachep &&
-	    !(isup_sr_cachep =
-	      kmem_cache_create("isup_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_sr_cachep", ISUP_DRV_NAME);
+		printd(("%s: initialized isup ct structure cache\n", DRV_NAME));
+	if (!isup_sr_cachep
+	    && !(isup_sr_cachep =
+		 kmem_cache_create("isup_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_sr_cachep", DRV_NAME);
 		goto no_sr;
 	} else
-		printd(("%s: initialized isup sr structure cache\n", ISUP_DRV_NAME));
-	if (!isup_sp_cachep &&
-	    !(isup_sp_cachep =
-	      kmem_cache_create("isup_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_sp_cachep", ISUP_DRV_NAME);
+		printd(("%s: initialized isup sr structure cache\n", DRV_NAME));
+	if (!isup_sp_cachep
+	    && !(isup_sp_cachep =
+		 kmem_cache_create("isup_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_sp_cachep", DRV_NAME);
 		goto no_sp;
 	} else
-		printd(("%s: initialized isup sp structure cache\n", ISUP_DRV_NAME));
-	if (!isup_mtp_cachep &&
-	    !(isup_mtp_cachep =
-	      kmem_cache_create("isup_mtp_cachep", sizeof(struct mtp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate isup_mtp_cachep", ISUP_DRV_NAME);
+		printd(("%s: initialized isup sp structure cache\n", DRV_NAME));
+	if (!isup_mtp_cachep
+	    && !(isup_mtp_cachep =
+		 kmem_cache_create("isup_mtp_cachep", sizeof(struct mtp), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate isup_mtp_cachep", DRV_NAME);
 		goto no_mtp;
 	} else
-		printd(("%s: initialized mtp structure cache\n", ISUP_DRV_NAME));
+		printd(("%s: initialized mtp structure cache\n", DRV_NAME));
 	return (0);
       no_mtp:
 	kmem_cache_destroy(isup_sp_cachep);
@@ -25808,52 +25312,60 @@ isup_init_caches(void)
       no_cc:
 	return (-ENOMEM);
 }
-STATIC void
+STATIC int
 isup_term_caches(void)
 {
+	int err = 0;
 	if (isup_cc_cachep) {
-		if (kmem_cache_destroy(isup_cc_cachep))
+		if (kmem_cache_destroy(isup_cc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_cc_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_cc_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_cc_cachep\n", DRV_NAME));
 	}
 	if (isup_tg_cachep) {
-		if (kmem_cache_destroy(isup_tg_cachep))
+		if (kmem_cache_destroy(isup_tg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_tg_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_tg_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_tg_cachep\n", DRV_NAME));
 	}
 	if (isup_cg_cachep) {
-		if (kmem_cache_destroy(isup_cg_cachep))
+		if (kmem_cache_destroy(isup_cg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_cg_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_cg_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_cg_cachep\n", DRV_NAME));
 	}
 	if (isup_ct_cachep) {
-		if (kmem_cache_destroy(isup_ct_cachep))
+		if (kmem_cache_destroy(isup_ct_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_ct_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_ct_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_ct_cachep\n", DRV_NAME));
 	}
 	if (isup_sr_cachep) {
-		if (kmem_cache_destroy(isup_sr_cachep))
+		if (kmem_cache_destroy(isup_sr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_sr_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_sr_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_sr_cachep\n", DRV_NAME));
 	}
 	if (isup_sp_cachep) {
-		if (kmem_cache_destroy(isup_sp_cachep))
+		if (kmem_cache_destroy(isup_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_sp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_sp_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_sp_cachep\n", DRV_NAME));
 	}
 	if (isup_mtp_cachep) {
-		if (kmem_cache_destroy(isup_mtp_cachep))
+		if (kmem_cache_destroy(isup_mtp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_mtp_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed isup_mtp_cachep\n", ISUP_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed isup_mtp_cachep\n", DRV_NAME));
 	}
-	return;
+	return (err);
 }
 
 /*
@@ -25865,7 +25377,7 @@ STATIC struct cc *
 isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 {
 	struct cc *cc;
-	printd(("%s: %s: create cc dev = %d:%d\n", ISUP_DRV_NAME, __FUNCTION__, getmajor(*devp),
+	printd(("%s: %s: create cc dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
 	if ((cc = kmem_cache_alloc(isup_cc_cachep, SLAB_ATOMIC))) {
 		bzero(cc, sizeof(*cc));
@@ -25873,7 +25385,7 @@ isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->u.dev.cmajor = getmajor(*devp);
 		cc->u.dev.cminor = getminor(*devp);
 		cc->cred = *crp;
-		spin_lock_init(&cc->qlock); /* "cc-queue-lock" */
+		spin_lock_init(&cc->qlock);	/* "cc-queue-lock" */
 		(cc->oq = RD(q))->q_ptr = cc_get(cc);
 		(cc->iq = WR(q))->q_ptr = cc_get(cc);
 		cc->o_prim = &isup_r_prim;
@@ -25883,22 +25395,20 @@ isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 		cc->i_state = LMI_UNUSABLE;
 		cc->i_style = LMI_STYLE1;
 		cc->i_version = 1;
-		spin_lock_init(&cc->lock); /* "cc-lock" */
-		/*
-		   initialize bind list 
-		 */
+		spin_lock_init(&cc->lock);	/* "cc-lock" */
+		/* 
+		   initialize bind list */
 		cc->bind.next = NULL;
 		cc->bind.prev = &cc->bind.next;
-		/*
-		   place in master list 
-		 */
+		/* 
+		   place in master list */
 		if ((cc->next = *ccp))
 			cc->next->prev = &cc->next;
 		cc->prev = ccp;
 		*ccp = cc_get(cc);
 		master.cc.numb++;
 	} else
-		ptrace(("%s: %s: ERROR: failed to allocate cc structure\n", ISUP_DRV_NAME,
+		ptrace(("%s: %s: ERROR: failed to allocate cc structure\n", DRV_NAME,
 			__FUNCTION__));
 	return (cc);
 }
@@ -25908,42 +25418,35 @@ isup_free_cc(queue_t *q)
 	struct cc *cc = CC_PRIV(q);
 	psw_t flags;
 	ensure(cc, return);
-	printd(("%s: %s: %p: free cc %d:%d\n", ISUP_DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
+	printd(("%s: %s: %p: free cc %d:%d\n", DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
 	spin_lock_irqsave(&cc->lock, flags);
 	{
-		/*
-		   stopping bufcalls 
-		 */
+		/* 
+		   stopping bufcalls */
 		ss7_unbufcall((str_t *) cc);
-		/*
-		   flushing buffser 
-		 */
+		/* 
+		   flushing buffser */
 		flushq(cc->oq, FLUSHALL);
 		flushq(cc->iq, FLUSHALL);
-		/*
-		   detach from call processing 
-		 */
+		/* 
+		   detach from call processing */
 		if (cc->conn.cpc)
 			ct_set_i_state(cc->conn.cpc, cc, CCS_IDLE);
-		/*
-		   detach from circuit test 
-		 */
+		/* 
+		   detach from circuit test */
 		if (cc->conn.tst)
 			ct_set_t_state(cc->conn.tst, cc, CKS_IDLE);
-		/*
-		   detach from circuit management 
-		 */
+		/* 
+		   detach from circuit management */
 		if (cc->conn.mgm)
 			ct_set_m_state(cc->conn.mgm, cc, CMS_IDLE);
-		/*
-		   detach from circuit group management 
-		 */
+		/* 
+		   detach from circuit group management */
 		if (cc->conn.gmg)
 			cg_set_m_state(cc->conn.gmg, cc, CMS_IDLE);
-		/*
-		   unbind 
-		 */
+		/* 
+		   unbind */
 		if (cs_get_state(cc) != CCS_UNBND) {
 			switch (cc->bind.type) {
 			case ISUP_BIND_CT:
@@ -25978,9 +25481,8 @@ isup_free_cc(queue_t *q)
 		      not_bound:
 			cs_set_state(cc, CCS_UNBND);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*cc->prev = cc->next))
 			cc->next->prev = cc->prev;
 		cc->next = NULL;
@@ -25989,19 +25491,17 @@ isup_free_cc(queue_t *q)
 		cc_put(cc);
 		assure(master.cc.numb > 0);
 		master.cc.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&cc->refcnt) > 1, cc_get(cc));
 		cc_put(xchg(&cc->oq->q_ptr, NULL));
 		ensure(atomic_read(&cc->refcnt) > 1, cc_get(cc));
 		cc_put(xchg(&cc->iq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&cc->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: cc lingering reference count = %d\n",
-				  ISUP_DRV_NAME, __FUNCTION__, cc, atomic_read(&cc->refcnt)));
+				  DRV_NAME, __FUNCTION__, cc, atomic_read(&cc->refcnt)));
 			atomic_set(&cc->refcnt, 1);
 		}
 	}
@@ -26022,7 +25522,7 @@ cc_put(struct cc *cc)
 {
 	if (cc && atomic_dec_and_test(&cc->refcnt)) {
 		kmem_cache_free(isup_cc_cachep, cc);
-		printd(("%s: %s: %p: deallocated cc structure", ISUP_DRV_NAME, __FUNCTION__, cc));
+		printd(("%s: %s: %p: deallocated cc structure", DRV_NAME, __FUNCTION__, cc));
 	}
 }
 
@@ -26038,25 +25538,23 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 	struct sr *sr = tg->sr.sr;
 	struct sp *sp = sr->sp.sp;
 	assure(sr == cg->sr.sr);
-	printd(("%s: %s: create ct->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create ct->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((ct = kmem_cache_alloc(isup_ct_cachep, SLAB_ATOMIC))) {
 		bzero(ct, sizeof(*ct));
 		ct_get(ct);	/* first get */
-		spin_lock_init(&ct->lock); /* "ct-lock" */
+		spin_lock_init(&ct->lock);	/* "ct-lock" */
 		ct->id = id;
 		ct->cic = cic;
-		/*
-		   place in master list (ascending id) 
-		 */
+		/* 
+		   place in master list (ascending id) */
 		for (ctp = &master.ct.list; *ctp && (*ctp)->id < id; ctp = &(*ctp)->next) ;
 		if ((ct->next = *ctp))
 			ct->next->prev = &ct->next;
 		ct->prev = ctp;
 		*ctp = ct_get(ct);
 		master.ct.numb++;
-		/*
-		   place in circuit group list (ascending cic) 
-		 */
+		/* 
+		   place in circuit group list (ascending cic) */
 		for (ctp = &cg->ct.list; *ctp && (*ctp)->cic < cic; ctp = &(*ctp)->cg.next) ;
 		if ((ct->cg.next = *ctp))
 			ct->cg.next->cg.prev = &ct->cg.next;
@@ -26064,14 +25562,12 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 		*ctp = ct_get(ct);
 		cg->ct.numb++;
 		ct->cg.cg = cg_get(cg);
-		/*
-		   adjust base cic if no blocking pending 
-		 */
+		/* 
+		   adjust base cic if no blocking pending */
 		if (!cg_tst(cg, CCTF_LOC_M_BLOCK_PENDING | CCTF_LOC_H_BLOCK_PENDING))
 			cg->cic = cg->ct.list->cic;
-		/*
-		   place in trunk group list (ascending cic) 
-		 */
+		/* 
+		   place in trunk group list (ascending cic) */
 		for (ctp = &tg->ct.list; *ctp && (*ctp)->cic < cic; ctp = &(*ctp)->tg.next) ;
 		if ((ct->tg.next = *ctp))
 			ct->tg.next->tg.prev = &ct->tg.next;
@@ -26079,9 +25575,8 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 		*ctp = ct_get(ct);
 		tg->ct.numb++;
 		ct->tg.tg = tg_get(tg);
-		/*
-		   place in signalling relation list (ascending cic) 
-		 */
+		/* 
+		   place in signalling relation list (ascending cic) */
 		for (ctp = &sr->ct.list; *ctp && (*ctp)->cic < cic; ctp = &(*ctp)->sr.next) ;
 		if ((ct->sr.next = *ctp))
 			ct->sr.next->sr.prev = &ct->sr.next;
@@ -26089,9 +25584,8 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 		*ctp = ct_get(ct);
 		sr->ct.numb++;
 		ct->sr.sr = sr_get(sr);
-		/*
-		   place in signalling point list (ascending cic) 
-		 */
+		/* 
+		   place in signalling point list (ascending cic) */
 		for (ctp = &sp->ct.list; *ctp && (*ctp)->cic < cic; ctp = &(*ctp)->sp.next) ;
 		if ((ct->sp.next = *ctp))
 			ct->sp.next->sp.prev = &ct->sp.next;
@@ -26099,9 +25593,8 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 		*ctp = ct_get(ct);
 		sp->ct.numb++;
 		ct->sp.sp = sp_get(sp);
-		/*
-		   reset idle (this will place us in the trunk group idle list) 
-		 */
+		/* 
+		   reset idle (this will place us in the trunk group idle list) */
 		ct->idle.next = NULL;
 		ct->idle.prev = &ct->idle.next;
 		ct_set_c_state(ct, CTS_IDLE);
@@ -26115,7 +25608,7 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 		ct->tst.next = NULL;
 		ct->tst.prev = &ct->tst.next;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate ct structure %lu\n", ISUP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate ct structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (ct);
 }
@@ -26125,102 +25618,89 @@ isup_free_ct(struct ct *ct)
 	struct cc *cc;
 	psw_t flags;
 	ensure(ct, return);
-	printd(("%s: %s: %p free ct->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, ct, ct->id));
+	printd(("%s: %s: %p free ct->id = %ld\n", DRV_NAME, __FUNCTION__, ct, ct->id));
 	spin_lock_irqsave(&ct->lock, flags);
 	{
-		/*
-		   stop all timers 
-		 */
+		/* 
+		   stop all timers */
 		__ct_timer_stop(ct, tall);
-		/*
-		   free messages 
-		 */
+		/* 
+		   free messages */
 		if (ct->sgm)
 			freemsg(xchg(&ct->sgm, NULL));
 		if (ct->rel)
 			freemsg(xchg(&ct->rel, NULL));
 		assure(!ct->cpc.cc);
-		/*
-		   detach from active call processing 
-		 */
+		/* 
+		   detach from active call processing */
 		if ((cc = ct->cpc.cc)) {
-			/*
+			/* 
 			   We are currently engaged in a call on the circuit.  This only occurs
 			   when we are removing with force.  We must M_HANGUP the stream so that it 
-			   knows not to expect anything more from us. 
-			 */
+			   knows not to expect anything more from us. */
 			m_error(NULL, cc, EPIPE);
 			ct_set_i_state(ct, cc, CCS_IDLE);
 			cs_set_state(cc, CCS_UNUSABLE);
 		}
 		assure(!ct->tst.cc);
-		/*
-		   detach from active call testing 
-		 */
+		/* 
+		   detach from active call testing */
 		if ((cc = ct->tst.cc)) {
-			/*
+			/* 
 			   We are currently engaged in a test call on the circuit.  This only
 			   occures when we are removing with force.  We must M_HANGUP the stream so 
-			   that it knows not to expecte anything more from us. 
-			 */
+			   that it knows not to expecte anything more from us. */
 			m_error(NULL, cc, EPIPE);
 			ct_set_t_state(ct, cc, CKS_IDLE);
 			cs_set_state(cc, CCS_UNUSABLE);
 		}
 		assure(!ct->mgm.cc);
-		/*
-		   detach from active management action 
-		 */
+		/* 
+		   detach from active management action */
 		if ((cc = ct->mgm.cc)) {
-			/*
+			/* 
 			   We are currently engaged in management on the circuit. This only occurs
 			   when we are removing with force.  we must M_HANGUP the stream so that it 
-			   knows not to expect anything more from us. 
-			 */
+			   knows not to expect anything more from us. */
 			m_error(NULL, cc, EPIPE);
 			ct_set_m_state(ct, cc, CMS_IDLE);
 			cs_set_state(cc, CCS_UNUSABLE);
 		}
 		assure(!ct->bind.tst);
-		/*
-		   force unbind from listening call test stream 
-		 */
+		/* 
+		   force unbind from listening call test stream */
 		if ((cc = xchg(&ct->bind.tst, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ct->bind.mgm);
-		/*
-		   force unbind from listening management stream 
-		 */
+		/* 
+		   force unbind from listening management stream */
 		if ((cc = xchg(&ct->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ct->bind.mnt);
-		/*
-		   force unbind from listening maintenance stream 
-		 */
+		/* 
+		   force unbind from listening maintenance stream */
 		if ((cc = xchg(&ct->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ct->bind.icc);
-		/*
-		   force unbind from listening call control stream 
-		 */
+		/* 
+		   force unbind from listening call control stream */
 		if ((cc = xchg(&ct->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
 		assure(!ct->bind.ogc);
-		/*
-		   force unbind from outgoing call control streams 
-		 */
+		/* 
+		   force unbind from outgoing call control streams */
 		while ((cc = ct->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -26233,19 +25713,16 @@ isup_free_ct(struct ct *ct)
 			cc_put(cc);
 		}
 		assure(!ct->idle.next);
-		/*
-		   remove from trunk group idle list 
-		 */
+		/* 
+		   remove from trunk group idle list */
 		if ((*ct->idle.prev = ct->idle.next))
 			ct->idle.next->idle.prev = ct->idle.prev;
 		ct->idle.next = NULL;
 		ct->idle.prev = &ct->idle.next;
-		/*
-		   (don't do reference counts on idle list) 
-		 */
-		/*
-		   remove from trunk group list 
-		 */
+		/* 
+		   (don't do reference counts on idle list) */
+		/* 
+		   remove from trunk group list */
 		if (ct->tg.tg) {
 			if ((*ct->tg.prev = ct->tg.next))
 				ct->tg.next->tg.prev = ct->tg.prev;
@@ -26255,9 +25732,8 @@ isup_free_ct(struct ct *ct)
 			ensure(atomic_read(&ct->refcnt) > 1, ct_get(ct));
 			ct_put(ct);
 		}
-		/*
-		   remove from circuit group list 
-		 */
+		/* 
+		   remove from circuit group list */
 		if (ct->cg.cg) {
 			if ((*ct->cg.prev = ct->cg.next))
 				ct->cg.next->cg.prev = ct->cg.prev;
@@ -26267,9 +25743,8 @@ isup_free_ct(struct ct *ct)
 			ensure(atomic_read(&ct->refcnt) > 1, ct_get(ct));
 			ct_put(ct);
 		}
-		/*
-		   remove from signalling relation list 
-		 */
+		/* 
+		   remove from signalling relation list */
 		if (ct->sr.sr) {
 			if ((*ct->sr.prev = ct->sr.next))
 				ct->sr.next->sr.prev = ct->sr.prev;
@@ -26279,9 +25754,8 @@ isup_free_ct(struct ct *ct)
 			ensure(atomic_read(&ct->refcnt) > 1, ct_get(ct));
 			ct_put(ct);
 		}
-		/*
-		   remove from signalling point list 
-		 */
+		/* 
+		   remove from signalling point list */
 		if (ct->sp.sp) {
 			if ((*ct->sp.prev = ct->sp.next))
 				ct->sp.next->sp.prev = ct->sp.prev;
@@ -26291,9 +25765,8 @@ isup_free_ct(struct ct *ct)
 			ensure(atomic_read(&ct->refcnt) > 1, ct_get(ct));
 			ct_put(ct);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*ct->prev = ct->next))
 			ct->next->prev = ct->prev;
 		ct->next = NULL;
@@ -26302,12 +25775,11 @@ isup_free_ct(struct ct *ct)
 		ct_put(ct);
 		assure(master.ct.numb > 0);
 		master.ct.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&ct->refcnt) != 1) {
 			__printd(("%s: %p: ERROR: ct lingering reference count = %d\n",
-				  ISUP_DRV_NAME, ct, atomic_read(&ct->refcnt)));
+				  DRV_NAME, ct, atomic_read(&ct->refcnt)));
 			atomic_set(&ct->refcnt, 1);
 		}
 
@@ -26332,7 +25804,7 @@ ct_put(struct ct *ct)
 		assure(atomic_read(&ct->refcnt) > 1);
 		if (atomic_dec_and_test(&ct->refcnt)) {
 			kmem_cache_free(isup_ct_cachep, ct);
-			printd(("%s: %s: %p: deallocated ct structure\n", ISUP_DRV_NAME,
+			printd(("%s: %s: %p: deallocated ct structure\n", DRV_NAME,
 				__FUNCTION__, ct));
 		}
 	}
@@ -26368,11 +25840,11 @@ STATIC struct cg *
 isup_alloc_cg(ulong id, struct sr *sr)
 {
 	struct cg *cg, **cgp;
-	printd(("%s: %s: create cg->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create cg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((cg = kmem_cache_alloc(isup_cg_cachep, SLAB_ATOMIC))) {
 		bzero(cg, sizeof(*cg));
 		cg_get(cg);	/* first get */
-		spin_lock_init(&cg->lock); /* "cg-lock" */
+		spin_lock_init(&cg->lock);	/* "cg-lock" */
 		cg->id = id;
 		switch (sr->proto.pvar & SS7_PVAR_MASK) {
 		default:
@@ -26383,41 +25855,37 @@ isup_alloc_cg(ulong id, struct sr *sr)
 			cg->config = ansi_cg_config_defaults;
 			break;
 		}
-		/*
-		   place in master list (ascending id) 
-		 */
+		/* 
+		   place in master list (ascending id) */
 		for (cgp = &master.cg.list; *cgp && (*cgp)->id < id; cgp = &(*cgp)->next) ;
 		if ((cg->next = *cgp))
 			cg->next->prev = &cg->next;
 		cg->prev = cgp;
 		*cgp = cg_get(cg);
 		master.cg.numb++;
-		/*
-		   place in signalling relation list (any order) 
-		 */
+		/* 
+		   place in signalling relation list (any order) */
 		cg->sr.sr = sr_get(sr);
 		if ((cg->sr.next = sr->cg.list))
 			cg->sr.next->sr.prev = &cg->sr.next;
 		cg->sr.prev = &sr->cg.list;
 		sr->cg.list = cg_get(cg);
 		sr->cg.numb++;
-		/*
-		   place in signalling point list (any order) 
-		 */
+		/* 
+		   place in signalling point list (any order) */
 		cg->sp.sp = sp_get(sr->sp.sp);
 		if ((cg->sp.next = sr->sp.sp->cg.list))
 			cg->sp.next->sr.prev = &cg->sp.next;
 		cg->sp.prev = &sr->sp.sp->cg.list;
 		sr->sp.sp->cg.list = cg_get(cg);
 		sr->sp.sp->cg.numb++;
-		/*
-		   reset states 
-		 */
+		/* 
+		   reset states */
 		cg->g_state = CMS_IDLE;
 		cg->gmg.next = NULL;
 		cg->gmg.prev = &cg->gmg.next;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate cg structure %lu\n", ISUP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate cg structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (cg);
 }
@@ -26427,66 +25895,57 @@ isup_free_cg(struct cg *cg)
 	struct cc *cc;
 	psw_t flags;
 	ensure(cg, return);
-	printd(("%s: %s: %p free cg->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, cg, cg->id));
+	printd(("%s: %s: %p free cg->id = %ld\n", DRV_NAME, __FUNCTION__, cg, cg->id));
 	spin_lock_irqsave(&cg->lock, flags);
 	{
-		/*
-		   stop all timers 
-		 */
+		/* 
+		   stop all timers */
 		__cg_timer_stop(cg, tall);
-		/*
-		   free all circuits 
-		 */
+		/* 
+		   free all circuits */
 		while (cg->ct.list)
 			isup_free_ct(cg->ct.list);
-		/*
-		   remove from active group management action 
-		 */
+		/* 
+		   remove from active group management action */
 		if ((cc = cg->gmg.cc)) {
-			/*
+			/* 
 			   We are currently engaged in management on the circuit group.  This only
 			   occurs when we are removing with force.  We must M_HANGUP the stream so
-			   that it knows not to expect anything more from us. 
-			 */
+			   that it knows not to expect anything more from us. */
 			m_error(NULL, cc, EPIPE);
 			cg_set_m_state(cg, cc, CMS_IDLE);
 			cs_set_state(cc, CCS_UNUSABLE);
 		}
-		/*
-		   force unbind listening call test streams 
-		 */
+		/* 
+		   force unbind listening call test streams */
 		if ((cc = xchg(&cg->bind.tst, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening managment streams 
-		 */
+		/* 
+		   force unbind listening managment streams */
 		if ((cc = xchg(&cg->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening maintenance streams 
-		 */
+		/* 
+		   force unbind listening maintenance streams */
 		if ((cc = xchg(&cg->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening call control streams 
-		 */
+		/* 
+		   force unbind listening call control streams */
 		if ((cc = xchg(&cg->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind all outgoing call control streams 
-		 */
+		/* 
+		   force unbind all outgoing call control streams */
 		while ((cc = cg->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -26499,9 +25958,8 @@ isup_free_cg(struct cg *cg)
 			cc_put(cc);
 		}
 		if (cg->sp.sp) {
-			/*
-			   remove from signalling point list 
-			 */
+			/* 
+			   remove from signalling point list */
 			if ((*cg->sp.prev = cg->sp.next))
 				cg->sp.next->sp.prev = cg->sp.prev;
 			cg->sp.next = NULL;
@@ -26511,9 +25969,8 @@ isup_free_cg(struct cg *cg)
 			cg_put(cg);
 		}
 		if (cg->sr.sr) {
-			/*
-			   remove from signalling relation list 
-			 */
+			/* 
+			   remove from signalling relation list */
 			if ((*cg->sr.prev = cg->sr.next))
 				cg->sr.next->sr.prev = cg->sr.prev;
 			cg->sr.next = NULL;
@@ -26522,9 +25979,8 @@ isup_free_cg(struct cg *cg)
 			ensure(atomic_read(&cg->refcnt) > 1, cg_get(cg));
 			cg_put(cg);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*cg->prev = cg->next))
 			cg->next->prev = cg->prev;
 		cg->next = NULL;
@@ -26533,12 +25989,11 @@ isup_free_cg(struct cg *cg)
 		cg_put(cg);
 		assure(master.cg.numb > 0);
 		master.cg.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&cg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: cg lingering reference count = %d\n",
-				  ISUP_DRV_NAME, __FUNCTION__, cg, atomic_read(&cg->refcnt)));
+				  DRV_NAME, __FUNCTION__, cg, atomic_read(&cg->refcnt)));
 			atomic_set(&cg->refcnt, 1);
 		}
 	}
@@ -26562,7 +26017,7 @@ cg_put(struct cg *cg)
 		assure(atomic_read(&cg->refcnt) > 1);
 		if (atomic_dec_and_test(&cg->refcnt)) {
 			kmem_cache_free(isup_cg_cachep, cg);
-			printd(("%s: %s: %p: deallocated cg structure\n", ISUP_DRV_NAME,
+			printd(("%s: %s: %p: deallocated cg structure\n", DRV_NAME,
 				__FUNCTION__, cg));
 		}
 	}
@@ -26598,11 +26053,11 @@ STATIC struct tg *
 isup_alloc_tg(ulong id, struct sr *sr)
 {
 	struct tg *tg, **tgp;
-	printd(("%s: %s: create tg->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create tg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((tg = kmem_cache_alloc(isup_tg_cachep, SLAB_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
 		tg_get(tg);	/* first get */
-		spin_lock_init(&tg->lock); /* "tg-lock" */
+		spin_lock_init(&tg->lock);	/* "tg-lock" */
 		tg->id = id;
 		tg->proto.pvar = SS7_PVAR_ITUT_96;
 		tg->proto.popt = 0;
@@ -26628,7 +26083,7 @@ isup_alloc_tg(ulong id, struct sr *sr)
 		sr->tg.list = tg_get(tg);
 		sr->tg.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate tg structure %lu\n", ISUP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate tg structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (tg);
 }
@@ -26638,50 +26093,44 @@ isup_free_tg(struct tg *tg)
 	struct cc *cc;
 	psw_t flags;
 	ensure(tg, return);
-	printd(("%s: %s: %p free tg->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, tg, tg->id));
+	printd(("%s: %s: %p free tg->id = %ld\n", DRV_NAME, __FUNCTION__, tg, tg->id));
 	spin_lock_irqsave(&tg->lock, flags);
 	{
-		/*
-		   free all circuits 
-		 */
+		/* 
+		   free all circuits */
 		while (tg->ct.list)
 			isup_free_ct(tg->ct.list);
 		assure(tg->idle == NULL);
-		/*
-		   force unbind listening call test streams 
-		 */
+		/* 
+		   force unbind listening call test streams */
 		if ((cc = xchg(&tg->bind.tst, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening managment streams 
-		 */
+		/* 
+		   force unbind listening managment streams */
 		if ((cc = xchg(&tg->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening maintenance streams 
-		 */
+		/* 
+		   force unbind listening maintenance streams */
 		if ((cc = xchg(&tg->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind listening call control streams 
-		 */
+		/* 
+		   force unbind listening call control streams */
 		if ((cc = xchg(&tg->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind all outgoing call control streams 
-		 */
+		/* 
+		   force unbind all outgoing call control streams */
 		while ((cc = tg->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -26694,9 +26143,8 @@ isup_free_tg(struct tg *tg)
 			cc_put(cc);
 		}
 		if (tg->sr.sr) {
-			/*
-			   remove from signalling reference list 
-			 */
+			/* 
+			   remove from signalling reference list */
 			if ((*tg->sr.prev = tg->sr.next))
 				tg->sr.next->sr.prev = tg->sr.prev;
 			tg->sr.next = NULL;
@@ -26705,9 +26153,8 @@ isup_free_tg(struct tg *tg)
 			ensure(atomic_read(&tg->refcnt) > 1, tg_get(tg));
 			tg_put(tg);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*tg->prev = tg->next))
 			tg->next->prev = tg->prev;
 		tg->next = NULL;
@@ -26716,12 +26163,11 @@ isup_free_tg(struct tg *tg)
 		tg_put(tg);
 		assure(master.tg.numb > 0);
 		master.tg.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&tg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: tg lingering reference count = %d\n",
-				  ISUP_DRV_NAME, __FUNCTION__, tg, atomic_read(&tg->refcnt)));
+				  DRV_NAME, __FUNCTION__, tg, atomic_read(&tg->refcnt)));
 			atomic_set(&tg->refcnt, 1);
 		}
 	}
@@ -26745,7 +26191,7 @@ tg_put(struct tg *tg)
 		assure(atomic_read(&tg->refcnt) > 1);
 		if (atomic_dec_and_test(&tg->refcnt)) {
 			kmem_cache_free(isup_tg_cachep, tg);
-			printd(("%s: %s: %p: deallocated tg structure\n", ISUP_DRV_NAME,
+			printd(("%s: %s: %p: deallocated tg structure\n", DRV_NAME,
 				__FUNCTION__, tg));
 		}
 	}
@@ -26781,24 +26227,22 @@ STATIC struct sr *
 isup_alloc_sr(ulong id, struct sp *sp, mtp_addr_t * add)
 {
 	struct sr *sr, **srp;
-	printd(("%s: %s: create sr->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sr = kmem_cache_alloc(isup_sr_cachep, SLAB_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
 		sr_get(sr);	/* first get */
-		spin_lock_init(&sr->lock); /* "sr-lock" */
+		spin_lock_init(&sr->lock);	/* "sr-lock" */
 		sr->id = id;
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		for (srp = &master.sr.list; *srp && (*srp)->id < id; srp = &(*srp)->next) ;
 		if ((sr->next = *srp))
 			sr->next->prev = &sr->next;
 		sr->prev = srp;
 		*srp = sr_get(sr);
 		master.sr.numb++;
-		/*
-		   add to signalling point list of signalling relations 
-		 */
+		/* 
+		   add to signalling point list of signalling relations */
 		sr->sp.sp = sp_get(sp);
 		if ((sr->sp.next = sp->sr.list))
 			sr->sp.next->sp.prev = &sr->sp.next;
@@ -26817,7 +26261,7 @@ isup_alloc_sr(ulong id, struct sp *sp, mtp_addr_t * add)
 			break;
 		}
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sr structure %lu\n", ISUP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sr structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sr);
 }
@@ -26827,66 +26271,57 @@ isup_free_sr(struct sr *sr)
 	struct cc *cc;
 	psw_t flags;
 	ensure(sr, return);
-	printd(("%s: %s: %p free sr->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, sr, sr->id));
+	printd(("%s: %s: %p free sr->id = %ld\n", DRV_NAME, __FUNCTION__, sr, sr->id));
 	spin_lock_irqsave(&sr->lock, flags);
 	{
-		/*
-		   stop all timers 
-		 */
+		/* 
+		   stop all timers */
 		__sr_timer_stop(sr, tall);
-		/*
-		   free all trunk groups 
-		 */
+		/* 
+		   free all trunk groups */
 		while (sr->tg.list)
 			isup_free_tg(sr->tg.list);
-		/*
-		   free all circuit groups 
-		 */
+		/* 
+		   free all circuit groups */
 		while (sr->cg.list)
 			isup_free_cg(sr->cg.list);
 		assure(sr->ct.list == NULL);
-		/*
-		   unlink from message transfer part 
-		 */
+		/* 
+		   unlink from message transfer part */
 		if (sr->mtp) {
 			sr_put(xchg(&sr->mtp->sr, NULL));
 			mtp_put(xchg(&sr->mtp, NULL));
 		}
-		/*
-		   force unbind from listening call test stream 
-		 */
+		/* 
+		   force unbind from listening call test stream */
 		if ((cc = xchg(&sr->bind.tst, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening management stream 
-		 */
+		/* 
+		   force unbind from listening management stream */
 		if ((cc = xchg(&sr->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening maintennce stream 
-		 */
+		/* 
+		   force unbind from listening maintennce stream */
 		if ((cc = xchg(&sr->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening call control stream 
-		 */
+		/* 
+		   force unbind from listening call control stream */
 		if ((cc = xchg(&sr->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from outgoing call control streams 
-		 */
+		/* 
+		   force unbind from outgoing call control streams */
 		while ((cc = sr->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -26898,9 +26333,8 @@ isup_free_sr(struct sr *sr)
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   remove from signalling point list 
-		 */
+		/* 
+		   remove from signalling point list */
 		if (sr->sp.sp) {
 			if ((*sr->sp.prev = sr->sp.next))
 				sr->sp.next->sp.prev = sr->sp.prev;
@@ -26910,9 +26344,8 @@ isup_free_sr(struct sr *sr)
 			ensure(atomic_read(&sr->refcnt) > 1, sr_get(sr));
 			sr_put(sr);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*sr->prev = sr->next))
 			sr->next->prev = sr->prev;
 		sr->next = NULL;
@@ -26921,12 +26354,11 @@ isup_free_sr(struct sr *sr)
 		sr_put(sr);
 		assure(master.sr.numb > 0);
 		master.sr.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sr->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: sr lingering reference count = %d\n",
-				  ISUP_DRV_NAME, __FUNCTION__, sr, atomic_read(&sr->refcnt)));
+				  DRV_NAME, __FUNCTION__, sr, atomic_read(&sr->refcnt)));
 			atomic_set(&sr->refcnt, 1);
 		}
 	}
@@ -26949,7 +26381,7 @@ sr_put(struct sr *sr)
 		assure(atomic_read(&sr->refcnt) > 1);
 		if (atomic_dec_and_test(&sr->refcnt)) {
 			kmem_cache_free(isup_sr_cachep, sr);
-			printd(("%s: %s: %p: deallocated sr structure\n", ISUP_DRV_NAME,
+			printd(("%s: %s: %p: deallocated sr structure\n", DRV_NAME,
 				__FUNCTION__, sr));
 		}
 	}
@@ -26985,11 +26417,11 @@ STATIC struct sp *
 isup_alloc_sp(ulong id, mtp_addr_t * add)
 {
 	struct sp *sp, **spp;
-	printd(("%s: %s: create sp->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sp = kmem_cache_alloc(isup_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
-		spin_lock_init(&sp->lock); /* "sp-lock" */
+		spin_lock_init(&sp->lock);	/* "sp-lock" */
 		sp->id = id;
 		sp->add = *add;
 		for (spp = &master.sp.list; *spp && (*spp)->id < id; spp = &(*spp)->next) ;
@@ -26999,11 +26431,10 @@ isup_alloc_sp(ulong id, mtp_addr_t * add)
 		*spp = sp_get(sp);
 		master.sp.numb++;
 		todo(("Search I_LINKed MTP for match\n"));
-		/*
-		   for now, make management establish SP before I_LINKing MTP streams 
-		 */
+		/* 
+		   for now, make management establish SP before I_LINKing MTP streams */
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", ISUP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sp);
 }
@@ -27013,59 +26444,52 @@ isup_free_sp(struct sp *sp)
 	struct cc *cc;
 	psw_t flags;
 	ensure(sp, return);
-	printd(("%s: %s: %p free sp->id = %ld\n", ISUP_DRV_NAME, __FUNCTION__, sp, sp->id));
+	printd(("%s: %s: %p free sp->id = %ld\n", DRV_NAME, __FUNCTION__, sp, sp->id));
 	spin_lock_irqsave(&sp->lock, flags);
 	{
-		/*
-		   freeing all signalling relations 
-		 */
+		/* 
+		   freeing all signalling relations */
 		while (sp->sr.list)
 			isup_free_sr(sp->sr.list);
 		assure(sp->tg.list == NULL);
 		assure(sp->cg.list == NULL);
 		assure(sp->ct.list == NULL);
-		/*
-		   unlink from message transfer part 
-		 */
+		/* 
+		   unlink from message transfer part */
 		if (sp->mtp) {
 			sp_put(xchg(&sp->mtp->sp, NULL));
 			mtp_put(xchg(&sp->mtp, NULL));
 		}
-		/*
-		   force unbind from listening call test stream 
-		 */
+		/* 
+		   force unbind from listening call test stream */
 		if ((cc = xchg(&sp->bind.tst, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening management stream 
-		 */
+		/* 
+		   force unbind from listening management stream */
 		if ((cc = xchg(&sp->bind.mgm, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening maintenance stream 
-		 */
+		/* 
+		   force unbind from listening maintenance stream */
 		if ((cc = xchg(&sp->bind.mnt, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from listening call control stream 
-		 */
+		/* 
+		   force unbind from listening call control stream */
 		if ((cc = xchg(&sp->bind.icc, NULL))) {
 			m_error(NULL, cc, EPIPE);
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   force unbind from outgoing call control streams 
-		 */
+		/* 
+		   force unbind from outgoing call control streams */
 		while ((cc = sp->bind.ogc)) {
 			if ((*cc->bind.prev = cc->bind.next))
 				cc->bind.next->bind.prev = cc->bind.prev;
@@ -27077,9 +26501,8 @@ isup_free_sp(struct sp *sp)
 			cs_set_state(cc, CCS_UNUSABLE);
 			cc_put(cc);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*sp->prev = sp->next))
 			sp->next->prev = sp->prev;
 		sp->next = NULL;
@@ -27088,12 +26511,11 @@ isup_free_sp(struct sp *sp)
 		sp_put(sp);
 		assure(master.sp.numb > 0);
 		master.sp.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&sp->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: sp lingering reference count = %d\n",
-				  ISUP_DRV_NAME, __FUNCTION__, sp, atomic_read(&sp->refcnt)));
+				  DRV_NAME, __FUNCTION__, sp, atomic_read(&sp->refcnt)));
 			atomic_set(&sp->refcnt, 1);
 		}
 	}
@@ -27116,7 +26538,7 @@ sp_put(struct sp *sp)
 		assure(atomic_read(&sp->refcnt) > 1);
 		if (atomic_dec_and_test(&sp->refcnt)) {
 			kmem_cache_free(isup_sp_cachep, sp);
-			printd(("%s: %s: %p: deallocated sp structure\n", ISUP_DRV_NAME,
+			printd(("%s: %s: %p: deallocated sp structure\n", DRV_NAME,
 				__FUNCTION__, sp));
 		}
 	}
@@ -27152,13 +26574,13 @@ STATIC struct mtp *
 isup_alloc_mtp(queue_t *q, struct mtp **mpp, ulong index, cred_t *crp)
 {
 	struct mtp *mtp;
-	printd(("%s: %s: create mtp index = %lu\n", ISUP_DRV_NAME, __FUNCTION__, index));
+	printd(("%s: %s: create mtp index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((mtp = kmem_cache_alloc(isup_mtp_cachep, SLAB_ATOMIC))) {
 		bzero(mtp, sizeof(*mtp));
 		mtp_get(mtp);	/* first get */
 		mtp->u.mux.index = index;
 		mtp->cred = *crp;
-		spin_lock_init(&mtp->qlock); /* "mtp-queue-lock" */
+		spin_lock_init(&mtp->qlock);	/* "mtp-queue-lock" */
 		(mtp->iq = RD(q))->q_ptr = mtp_get(mtp);
 		(mtp->oq = WR(q))->q_ptr = mtp_get(mtp);
 		mtp->o_prim = mtp_w_prim;
@@ -27168,17 +26590,16 @@ isup_alloc_mtp(queue_t *q, struct mtp **mpp, ulong index, cred_t *crp)
 		mtp->i_state = LMI_UNUSABLE;
 		mtp->i_style = LMI_STYLE1;
 		mtp->i_version = 1;
-		spin_lock_init(&mtp->lock); /* "mtp-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&mtp->lock);	/* "mtp-lock" */
+		/* 
+		   place in master list */
 		if ((mtp->next = *mpp))
 			mtp->next->prev = &mtp->next;
 		mtp->prev = mpp;
 		*mpp = mtp_get(mtp);
 		master.mtp.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate mtp structure %lu\n", ISUP_DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate mtp structure %lu\n", DRV_NAME,
 			__FUNCTION__, index));
 	return (mtp);
 }
@@ -27188,25 +26609,22 @@ isup_free_mtp(queue_t *q)
 	struct mtp *mtp = MTP_PRIV(q);
 	psw_t flags;
 	ensure(mtp, return);
-	printd(("%s: %s: %p free mtp index = %lu\n", ISUP_DRV_NAME, __FUNCTION__, mtp,
+	printd(("%s: %s: %p free mtp index = %lu\n", DRV_NAME, __FUNCTION__, mtp,
 		mtp->u.mux.index));
 	spin_lock_irqsave(&mtp->lock, flags);
 	{
-		/*
-		   flushing buffers 
-		 */
+		/* 
+		   flushing buffers */
 		ss7_unbufcall((str_t *) mtp);
 		flushq(mtp->iq, FLUSHALL);
 		flushq(mtp->oq, FLUSHALL);
-		/*
-		   unlink from signalling relation 
-		 */
+		/* 
+		   unlink from signalling relation */
 		if (mtp->sr) {
 			struct sr *sr = mtp->sr;
 			if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
-				/*
-				   software block all circuits 
-				 */
+				/* 
+				   software block all circuits */
 				struct ct *ct;
 				for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 					ct_set(ct, CCTF_LOC_S_BLOCKED);
@@ -27216,16 +26634,14 @@ isup_free_mtp(queue_t *q)
 			mtp_put(xchg(&mtp->sr->mtp, NULL));
 			sr_put(xchg(&mtp->sr, NULL));
 		}
-		/*
-		   unlink from signalling point 
-		 */
+		/* 
+		   unlink from signalling point */
 		if (mtp->sp) {
 			struct sr *sr;
 			for (sr = mtp->sp->sr.list; sr; sr = sr->sp.next) {
 				if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
-					/*
-					   software block all circuits 
-					 */
+					/* 
+					   software block all circuits */
 					struct ct *ct;
 					for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 						ct_set(ct, CCTF_LOC_S_BLOCKED);
@@ -27236,9 +26652,8 @@ isup_free_mtp(queue_t *q)
 			mtp_put(xchg(&mtp->sp->mtp, NULL));
 			sp_put(xchg(&mtp->sp, NULL));
 		}
-		/*
-		   remote from master list 
-		 */
+		/* 
+		   remote from master list */
 		if ((*mtp->prev = mtp->next))
 			mtp->next->prev = mtp->prev;
 		mtp->next = NULL;
@@ -27247,19 +26662,17 @@ isup_free_mtp(queue_t *q)
 		mtp_put(mtp);
 		assure(master.mtp.numb > 0);
 		master.mtp.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&mtp->refcnt) > 1, mtp_get(mtp));
 		mtp_put(xchg(&mtp->iq->q_ptr, NULL));
 		ensure(atomic_read(&mtp->refcnt) > 1, mtp_get(mtp));
 		mtp_put(xchg(&mtp->oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&mtp->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: mtp lingering reference count = %d\n",
-				  ISUP_DRV_NAME, __FUNCTION__, mtp, atomic_read(&mtp->refcnt)));
+				  DRV_NAME, __FUNCTION__, mtp, atomic_read(&mtp->refcnt)));
 			atomic_set(&mtp->refcnt, 1);
 		}
 	}
@@ -27282,7 +26695,7 @@ mtp_put(struct mtp *mtp)
 		assure(atomic_read(&mtp->refcnt) > 1);
 		if (atomic_dec_and_test(&mtp->refcnt)) {
 			kmem_cache_free(isup_mtp_cachep, mtp);
-			printd(("%s: %s: %p: deallocated mtp structure\n", ISUP_DRV_NAME,
+			printd(("%s: %s: %p: deallocated mtp structure\n", DRV_NAME,
 				__FUNCTION__, mtp));
 		}
 	}
@@ -27307,83 +26720,142 @@ mtp_get_id(ulong id)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int isup_initialized = 0;
-STATIC void
-isup_init(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the ISUP driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the ISUP driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw isup_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &isupinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+isup_register_strdev(major_t major)
 {
-	int err, mindex;
-	cmn_err(CE_NOTE, ISUP_BANNER);	/* console splash */
-	if ((err = isup_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", ISUP_DRV_NAME);
-		isup_initialized = err;
-		return;
-	}
-	for (mindex = 0; mindex < ISUP_CMAJORS; mindex++) {
-		if ((err =
-		     lis_register_strdev(isup_majors[mindex], &isup_info, ISUP_CMINORS,
-					 ISUP_DRV_NAME)) < 0) {
-			if (!mindex) {
-				cmn_err(CE_PANIC, "%s: could not register 1'st major %d",
-					ISUP_DRV_NAME, isup_majors[mindex]);
-				isup_term_caches();
-				isup_initialized = err;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: could not register %d'th major", ISUP_DRV_NAME,
-				mindex + 1);
-			isup_majors[mindex] = 0;
-		} else if (mindex)
-			isup_majors[mindex] = err;
-	}
-	spin_lock_init(&master.lock); /* "isup-master-list-lock" */
-	isup_initialized = 1;
-	return;
+	int err;
+	if ((err = register_strdev(&isup_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
-STATIC void
-isup_terminate(void)
+
+STATIC int
+isup_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = unregister_strdev(&isup_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+isup_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &isupinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+isup_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+isupterminate(void)
 {
 	int err, mindex;
-	for (mindex = 0; mindex < ISUP_CMAJORS; mindex++) {
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (isup_majors[mindex]) {
-			if ((err = lis_unregister_strdev(isup_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: could not unregister major %d\n",
-					ISUP_DRV_NAME, isup_majors[mindex]);
+			if ((err = isup_unregister_strdev(isup_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					isup_majors[mindex]);
 			if (mindex)
 				isup_majors[mindex] = 0;
 		}
 	}
-	/*
-	   free all objects 
-	 */
-	while (master.sp.list)
-		isup_free_sp(master.sp.list);
-	isup_term_caches();
+	if ((err = isup_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
 
-/*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
- */
-int
-init_module(void)
+MODULE_STATIC int __init
+isupinit(void)
 {
-	isup_init();
-	if (isup_initialized < 0)
-		return isup_initialized;
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = isup_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		isupterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = isup_register_strdev(isup_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					isup_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				isupterminate();
+				return (err);
+			}
+		}
+		if (isup_majors[mindex] == 0)
+			isup_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(isup_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = isup_majors[0];
+	}
 	return (0);
 }
 
-void
-cleanup_module(void)
-{
-	isup_terminate();
-	return;
-}
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(isupinit);
+module_exit(isupterminate);
+
+#endif				/* LINUX */

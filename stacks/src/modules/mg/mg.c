@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:58 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $"
 
-static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $";
+static char const ident[] =
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $";
 
 #include "compat.h"
 
@@ -64,7 +65,7 @@ static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:58 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -74,6 +75,8 @@ static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 			MG_COPYRIGHT	"\n" \
 			MG_DEVICE	"\n" \
 			MG_CONTACT
+#define MG_SPLASH	MG_DESCRIP	"\n" \
+			MG_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(MG_CONTACT);
@@ -81,7 +84,7 @@ MODULE_DESCRIPTION(MG_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MG_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MG_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -89,9 +92,8 @@ MODULE_LICENSE(MG_LICENSE);
 #define MG_DRV_NAME		CONFIG_STREAMS_MG_NAME
 #define MG_CMAJORS		CONFIG_STREAMS_MG_NMAJORS
 #define MG_CMAJOR_0		CONFIG_STREAMS_MG_MAJOR
-#endif
-
-#define MG_CMINORS 255
+#define MG_UNITS		CONFIG_STREAMS_MG_NMINORS
+#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -100,46 +102,58 @@ MODULE_LICENSE(MG_LICENSE);
  *
  *  =========================================================================
  */
-static struct module_info mg_winfo = {
-	mi_idnum:MG_DRV_ID,			/* Module ID number */
-	mi_idname:MG_DRV_NAME "-wr",	/* Module ID name */
+
+#define DRV_ID		MG_DRV_ID
+#define DRV_NAME	MG_DRV_NAME
+#define CMAJORS		MG_CMAJORS
+#define CMAJOR_0	MG_CMAJOR_0
+#define UNITS		MG_UNITS
+#ifdef MODULE
+#define DRV_BANNER	MG_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	MG_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info mg_winfo = {
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
 	mi_lowat:0,			/* Lo water mark */
 };
 
-static struct module_info mg_rinfo = {
-	mi_idnum:MG_DRV_ID,			/* Module ID number */
-	mi_idname:MG_DRV_NAME "-rd",	/* Module ID name */
+STATIC struct module_info mg_rinfo = {
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
 	mi_lowat:0,			/* Lo water mark */
 };
 
-static struct module_info mux_winfo = {
-	mi_idnum:MG_DRV_ID,			/* Module ID number */
-	mi_idname:MG_DRV_NAME "-muxw",	/* Module ID name */
+STATIC struct module_info mux_winfo = {
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
 	mi_lowat:0,			/* Lo water mark */
 };
 
-static struct module_info mux_rinfo = {
-	mi_idnum:MG_DRV_ID,			/* Module ID number */
-	mi_idname:MG_DRV_NAME "-muxr",	/* Module ID name */
+STATIC struct module_info mux_rinfo = {
+	mi_idnum:DRV_ID,		/* Module ID number */
+	mi_idname:DRV_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
 	mi_lowat:0,			/* Lo water mark */
 };
 
-static int mg_open(queue_t *, dev_t *, int, int, cred_t *);
-static int mg_close(queue_t *, int, cred_t *);
+STATIC int mg_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int mg_close(queue_t *, int, cred_t *);
 
-static struct qinit mg_rinit = {
+STATIC struct qinit mg_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
 	qi_srvp:ss7_osrv,		/* Read queue service */
 	qi_qopen:mg_open,		/* Each open */
@@ -147,25 +161,25 @@ static struct qinit mg_rinit = {
 	qi_minfo:&mg_rinfo,		/* Information */
 };
 
-static struct qinit mg_winit = {
+STATIC struct qinit mg_winit = {
 	qi_putp:ss7_iput,		/* Write put (message from above) */
 	qi_srvp:ss7_isrv,		/* Write queue service */
 	qi_minfo:&mg_winfo,		/* Information */
 };
 
-static struct qinit mux_rinit = {
+STATIC struct qinit mux_rinit = {
 	qi_putp:ss7_iput,		/* Read put (message from below) */
 	qi_srvp:ss7_isrv,		/* Read queue service */
 	qi_minfo:&mux_rinfo,		/* Information */
 };
 
-static struct qinit mux_winit = {
+STATIC struct qinit mux_winit = {
 	qi_putp:ss7_oput,		/* Write put (message from above) */
 	qi_srvp:ss7_osrv,		/* Write queue service */
 	qi_minfo:&mux_winfo,		/* Information */
 };
 
-static struct streamtab mg_info = {
+MODULE_STATIC struct streamtab mginfo = {
 	st_rdinit:&mg_rinit,		/* Upper read queue */
 	st_wrinit:&mg_winit,		/* Upper write queue */
 	st_muxrinit:&mux_rinit,		/* Lower read queue */
@@ -216,9 +230,9 @@ typedef struct df {
 	struct mg_notify_df notify;	/* default notificiations */
 } df_t;
 
-static struct df master;
+STATIC struct df master;
 
-static inline struct df *
+STATIC inline struct df *
 df_lookup(ulong id)
 {
 	if (id)
@@ -242,12 +256,14 @@ typedef struct mg {
 } mg_t;
 #define MG_PRIV(__q) ((struct mg *)(__q)->q_ptr)
 
-static struct mg *mg_alloc_priv(queue_t *, struct mg **, dev_t *, cred_t *);
-static void mg_free_priv(struct mg *);
-static struct mg *mg_lookup(ulong);
-static ulong mg_get_id(ulong);
-static struct mg *mg_get(struct mg *);
-static void mg_put(struct mg *);
+STATIC struct mg *mg_alloc_priv(queue_t *, struct mg **, dev_t *, cred_t *);
+STATIC void mg_free_priv(struct mg *);
+STATIC struct mg *mg_lookup(ulong);
+#if 0
+STATIC ulong mg_get_id(ulong);
+#endif
+STATIC struct mg *mg_get(struct mg *);
+STATIC void mg_put(struct mg *);
 
 /*
    communications session 
@@ -263,12 +279,12 @@ typedef struct se {
 	struct mg_notify_se notify;	/* session notificiations */
 } se_t;
 
-static struct se *se_alloc_priv(ulong, struct mg *);
-static void se_free_priv(struct se *);
-static struct se *se_lookup(ulong, struct mg *);
-static ulong se_get_id(ulong);
-static struct se *se_get(struct se *);
-static void se_put(struct se *);
+STATIC struct se *se_alloc_priv(ulong, struct mg *);
+STATIC void se_free_priv(struct se *);
+STATIC struct se *se_lookup(ulong, struct mg *);
+STATIC ulong se_get_id(ulong);
+STATIC struct se *se_get(struct se *);
+STATIC void se_put(struct se *);
 
 /*
    connection leg structure 
@@ -284,12 +300,12 @@ typedef struct lg {
 	struct mg_notify_lg notify;	/* leg notificiations */
 } lg_t;
 
-static struct lg *lg_alloc_priv(ulong id, struct se *se);
-static void lg_free_priv(struct lg *);
-static struct lg *lg_lookup(ulong, struct se *);
-static ulong lg_get_id(ulong);
-static struct lg *lg_get(struct lg *);
-static void lg_put(struct lg *);
+STATIC struct lg *lg_alloc_priv(ulong id, struct se *se);
+STATIC void lg_free_priv(struct lg *);
+STATIC struct lg *lg_lookup(ulong, struct se *);
+STATIC ulong lg_get_id(ulong);
+STATIC struct lg *lg_get(struct lg *);
+STATIC void lg_put(struct lg *);
 
 /*
    connection structure 
@@ -303,8 +319,8 @@ typedef struct cn {
 	SLIST_LINKAGE (ch, cn, og);	/* O/G channel linkage */
 } cn_t;
 
-static struct cn *cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad);
-static void cn_free_priv(struct cn *);
+STATIC struct cn *cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad);
+STATIC void cn_free_priv(struct cn *);
 
 #define MGF_PULL_PENDING	0x00000001
 #define MGF_PUSH_PENDING	0x00000002
@@ -325,9 +341,9 @@ typedef struct ac {
 	SLIST_LINKAGE (ch, ac, ch);	/* O/G channel linkage */
 } ac_t;
 
-static struct ac *ac_alloc_priv(ulong, ulong, ulong, ulong, struct ch *, mblk_t *);
-static void ac_free_priv(struct ac *);
-static ulong ac_get_id(ulong);
+STATIC struct ac *ac_alloc_priv(ulong, ulong, ulong, ulong, struct ch *, mblk_t *);
+STATIC void ac_free_priv(struct ac *);
+STATIC ulong ac_get_id(ulong);
 
 /*
    channel structure 
@@ -348,12 +364,12 @@ typedef struct ch {
 	struct mg_notify_ch notify;	/* channel notificiations */
 } ch_t;
 
-static struct ch *ch_alloc_priv(ulong, struct mx *, ulong, ulong);
-static void ch_free_priv(struct ch *);
-static struct ch *ch_lookup(ulong);
-static ulong ch_get_id(ulong);
-static struct ch *ch_get(struct ch *);
-static void ch_put(struct ch *);
+STATIC struct ch *ch_alloc_priv(ulong, struct mx *, ulong, ulong);
+STATIC void ch_free_priv(struct ch *);
+STATIC struct ch *ch_lookup(ulong);
+STATIC ulong ch_get_id(ulong);
+STATIC struct ch *ch_get(struct ch *);
+STATIC void ch_put(struct ch *);
 
 /*
    multiplex structure 
@@ -369,14 +385,14 @@ typedef struct mx {
 } mx_t;
 #define MX_PRIV(__q) ((struct mx *)(__q)->q_ptr)
 
-static struct mx *mx_alloc_link(queue_t *, struct mx **, ulong, cred_t *);
-static void mx_free_link(struct mx *);
-static struct mx *mx_lookup(ulong);
-static ulong mx_get_id(ulong);
-static struct mx *mx_get(struct mx *);
-static void mx_put(struct mx *);
+STATIC struct mx *mx_alloc_link(queue_t *, struct mx **, ulong, cred_t *);
+STATIC void mx_free_link(struct mx *);
+STATIC struct mx *mx_lookup(ulong);
+STATIC ulong mx_get_id(ulong);
+STATIC struct mx *mx_get(struct mx *);
+STATIC void mx_put(struct mx *);
 
-static struct mg_opt_conf_mx mg_default = {
+STATIC struct mg_opt_conf_mx mg_default = {
 	flags:0,
 	encoding:MX_ENCODING_G711_PCM_A,
 	block_size:64,
@@ -414,7 +430,7 @@ static struct mg_opt_conf_mx mg_default = {
  *  .01wxyz.........        s110wxyz
  *  .1wxyz..........        s111wxyz
  */
-static inline int16_t
+STATIC inline int16_t
 pcma2pcml(uint8_t s)
 {
 	int seg, lval;
@@ -423,7 +439,7 @@ pcma2pcml(uint8_t s)
 	lval = ((seg ? 0x084 : 0x004) | ((uint16_t) (s & 0x0f) << 3)) << (seg ? seg : 1);
 	return ((s & 0x80) ? lval : -lval);
 }
-static inline uint8_t
+STATIC inline uint8_t
 pcml2pcma(int16_t s)
 {
 	int seg, shft;
@@ -444,7 +460,7 @@ pcml2pcma(int16_t s)
 		aval = 0x7f;
 	return ((aval | sign) ^ 0x55);
 }
-static inline uint8_t
+STATIC inline uint8_t
 pcmu2pcma(uint8_t s)
 {
 	static uint8_t utoa[] = {
@@ -482,7 +498,7 @@ pcmu2pcma(uint8_t s)
  *  .1wxyz..........        s111wxyz
  *  1000000010000100        s1111111
  */
-static inline int16_t
+STATIC inline int16_t
 pcmu2pcml(uint8_t s)
 {
 	int seg, lval;
@@ -491,7 +507,7 @@ pcmu2pcml(uint8_t s)
 	lval = ((0x084 | ((uint16_t) (s & 0x0f) << 3)) << seg) - (33 << 2);
 	return ((s & 0x80) ? -lval : lval);
 }
-static inline uint8_t
+STATIC inline uint8_t
 pcml2pcmu(int16_t s)
 {
 	int seg, shft;
@@ -513,7 +529,7 @@ pcml2pcmu(int16_t s)
 		uval = 0x7f;
 	return ((uval | sign) ^ 0xff);
 }
-static inline uint8_t
+STATIC inline uint8_t
 pcma2pcmu(uint8_t s)
 {
 	static uint8_t atou[] = {
@@ -778,9 +794,8 @@ mg_convert_input(queue_t *q, mblk_t *dp, struct cn *cn)
 	ulong ic_type = cn->ic.ch->config.encoding;
 	ulong og_type = cn->og.ch->config.encoding;
 	if (cn->og.ch->og.conn + cn->og.ch->ac.conn > 1) {	/* conferencing */
-		/*
-		   need to perform conferencing, convert and pad to 16-bit signed native 
-		 */
+		/* 
+		   need to perform conferencing, convert and pad to 16-bit signed native */
 		og_type = MX_ENCODING_G711_PCM_L;
 	}
 	if (ic_type == MX_ENCODING_NONE)
@@ -805,9 +820,8 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 	uint cons;
 	size_t samples = ch->config.samples;
 	if (mx->ch.conn > 1) {
-		/*
-		   we need an MX_DATA_REQ on the front of the data 
-		 */
+		/* 
+		   we need an MX_DATA_REQ on the front of the data */
 		struct MX_data_req *p;
 		if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
 			goto enobufs;
@@ -816,25 +830,22 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 		p->mx_primitive = MX_DATA_REQ;
 		p->mx_slot = ch->mx_slot;
 	}
-	/*
-	   calculate padding for confrence 
-	 */
+	/* 
+	   calculate padding for confrence */
 	for (pad = -1, cons = ch->og.conn + ch->ac.conn; cons; pad++, cons >>= 1) ;
 	if (pad < 0)
 		goto efault;
 	if (!pad && !ch->ac.conn) {
-		/*
-		   just one connection active 
-		 */
+		/* 
+		   just one connection active */
 		size_t bytes = ch->config.block_size >> 3;
 		for (cn = ch->og.list; cn; cn = cn->og.next)
 			if (!(cn->flags & MGF_PULL_PENDING) && (cn->flags & MGF_OG_READY))
 				break;
 		if (!cn)
 			goto efault;
-		/*
-		   pull up samples on active connection 
-		 */
+		/* 
+		   pull up samples on active connection */
 		if (!pullupmsg(cn->buf, bytes))
 			goto enobufs;
 		if (!(dp = ss7_dupb(q, cn->buf)))
@@ -849,22 +860,19 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 		}
 	} else {
 		ulong og_type;
-		/*
-		   need to perform conferencing of connections and actions 
-		 */
+		/* 
+		   need to perform conferencing of connections and actions */
 		size_t bytes = samples << 1;
 		ensure(dp, return (-EFAULT));
-		/*
-		   we need a working/result buffer 
-		 */
+		/* 
+		   we need a working/result buffer */
 		if (!(dp = ss7_allocb(q, bytes, BPRI_MED)))
 			goto enobufs;
 		dp->b_datap->db_type = M_DATA;
 		bzero(dp->b_rptr, bytes);
 		dp->b_wptr += bytes;
-		/*
-		   conference in connections and actions 
-		 */
+		/* 
+		   conference in connections and actions */
 		for (cn = ch->og.list; cn; cn = cn->og.next) {
 			if (!(cn->flags & MGF_PULL_PENDING) && (cn->flags & MGF_OG_READY)) {
 				int16_t *ip, *op;
@@ -885,9 +893,8 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 				cn->flags |= MGF_PULL_PENDING;
 			}
 		}
-		/*
-		   actions are always PCM_L coding 
-		 */
+		/* 
+		   actions are always PCM_L coding */
 		for (ac = ch->ac.list; ac; ac = ac->ch.next) {
 			if (!(ac->flags & MGF_PULL_PENDING) && (ac->flags & MGF_OG_READY)) {
 				switch (ac->type) {
@@ -931,14 +938,12 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 			cn->flags &= ~MGF_PULL_PENDING;
 		for (ac = ch->ac.list; ac; ac = ac->ch.next)
 			ac->flags &= ~MGF_PULL_PENDING;
-		/*
-		   convert summation buffer to results buffer in place 
-		 */
+		/* 
+		   convert summation buffer to results buffer in place */
 		if ((og_type = ch->config.encoding) == MX_ENCODING_NONE)
 			og_type = ch->lg.lg->se.se->config.encoding;
-		/*
-		   when we convert conference info, it is always in PCM_L format 
-		 */
+		/* 
+		   when we convert conference info, it is always in PCM_L format */
 		switch (og_type) {
 		default:
 		case MX_ENCODING_NONE:
@@ -1009,9 +1014,8 @@ mg_wakeup_multiplex(struct mx *mx)
 		for (ch = mx->ch.list; ch; ch = ch->mx.next)
 			ch->flags &= ~MGF_PUSH_PENDING;
 	}
-	/*
-	   wait for more data, or a backenable to pull frames 
-	 */
+	/* 
+	   wait for more data, or a backenable to pull frames */
 	return;
 }
 
@@ -1116,7 +1120,8 @@ ch_write(queue_t *q, mblk_t *dp, struct ch *ch)
  *  M_FLUSH
  *  -----------------------------------
  */
-static int
+#if 0
+STATIC int
 m_flush(queue_t *q, struct mg *mg, int band, int flags, int what)
 {
 	mblk_t *mp;
@@ -1124,18 +1129,19 @@ m_flush(queue_t *q, struct mg *mg, int band, int flags, int what)
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | band ? FLUSHBAND : 0;
 		*(mp->b_wptr)++ = band;
-		printd(("%s: %p: <- M_FLUSH\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: <- M_FLUSH\n", DRV_NAME, mg));
 		ss7_oput(mg->oq, mp);
 		return (QR_DONE);
 	}
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  M_ERROR
  *  -----------------------------------
  */
-static int
+STATIC int
 m_error(queue_t *q, struct mg *mg, int error)
 {
 	mblk_t *mp;
@@ -1156,7 +1162,7 @@ m_error(queue_t *q, struct mg *mg, int error)
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
-			printd(("%s: %p: <- M_HANGUP\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		} else {
@@ -1164,7 +1170,7 @@ m_error(queue_t *q, struct mg *mg, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			mg->i_state = MGS_UNUSABLE;
-			printd(("%s: %p: <- M_ERROR\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- M_ERROR\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1179,12 +1185,12 @@ m_error(queue_t *q, struct mg *mg, int error)
  *  The preferred method for sending data to the media gateway user is to just
  *  send M_DATA blocks for efficiency and speed.
  */
-static inline int
+STATIC inline int
 mg_read(queue_t *q, struct mg *mg, mblk_t *dp)
 {
 	if (mg && mg->oq) {
 		if (canput(mg->oq)) {
-			printd(("%s: %p: <- M_DATA\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- M_DATA\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, dp);
 			return (QR_DONE);
 		}
@@ -1202,7 +1208,7 @@ mg_read(queue_t *q, struct mg *mg, mblk_t *dp)
  *  Acknowledges and information requets and provides information about the connection points
  *  in which the MG is bound.
  */
-static inline int
+STATIC inline int
 mg_info_ack(queue_t *q)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -1230,10 +1236,9 @@ mg_info_ack(queue_t *q)
 		o->ch_tx_channels = mg->config.tx_channels;
 		o->ch_rx_channels = mg->config.rx_channels;
 		o->ch_flags = mg->config.flags;
-		/*
-		   state does not change 
-		 */
-		printd(("%s: %p: <- MG_INFO_ACK\n", MG_DRV_NAME, mg));
+		/* 
+		   state does not change */
+		printd(("%s: %p: <- MG_INFO_ACK\n", DRV_NAME, mg));
 		ss7_oput(mg->oq, mp);
 		return (QR_DONE);
 	}
@@ -1247,7 +1252,7 @@ mg_info_ack(queue_t *q)
  *  Acknowledges and reports success of failure of the requested operation on provider or
  *  channel options associated with the requesting stream.
  */
-static inline int
+STATIC inline int
 mg_optmgmt_ack(queue_t *q, struct mg *mg, uchar *opt_ptr, size_t opt_len, ulong flags)
 {
 	if (mg && mg->oq) {
@@ -1264,7 +1269,7 @@ mg_optmgmt_ack(queue_t *q, struct mg *mg, uchar *opt_ptr, size_t opt_len, ulong 
 				bcopy(opt_ptr, mp->b_wptr, opt_len);
 				mp->b_wptr += opt_len;
 			}
-			printd(("%s: %p: <- MG_OPTMGMT_ACK\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_OPTMGMT_ACK\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1280,7 +1285,7 @@ mg_optmgmt_ack(queue_t *q, struct mg *mg, uchar *opt_ptr, size_t opt_len, ulong 
  *  -----------------------------------
  *  Positively acknowledges the last operation requiring acknowledgement.
  */
-static inline int
+STATIC inline int
 mg_ok_ack(queue_t *q, struct mg *mg, long prim)
 {
 	if (mg && mg->oq) {
@@ -1291,7 +1296,7 @@ mg_ok_ack(queue_t *q, struct mg *mg, long prim)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mg_primitive = MG_OK_ACK;
 			p->mg_correct_prim = prim;
-			printd(("%s: %p: <- MG_OK_ACK\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_OK_ACK\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1308,7 +1313,7 @@ mg_ok_ack(queue_t *q, struct mg *mg, long prim)
  *  Negatively acknowledges the last operation requiring negative acknolwedgement and provides
  *  the error type and unix error.
  */
-static inline int
+STATIC inline int
 mg_error_ack(queue_t *q, struct mg *mg, long prim, long error)
 {
 	if (mg && mg->oq) {
@@ -1321,7 +1326,7 @@ mg_error_ack(queue_t *q, struct mg *mg, long prim, long error)
 			p->mg_error_primitive = prim;
 			p->mg_error_type = error < 0 ? MGSYSERR : error;
 			p->mg_unix_error = error < 0 ? -error : 0;
-			printd(("%s: %p: <- MG_ERROR_ACK\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_ERROR_ACK\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1338,7 +1343,7 @@ mg_error_ack(queue_t *q, struct mg *mg, long prim, long error)
  *  Acknowledges the attachment of ther requesting stream to a newly created or existing
  *  communications session (context).
  */
-static inline int
+STATIC inline int
 mg_attach_ack(queue_t *q, struct mg *mg, struct ch *ch)
 {
 	if (mg && mg->oq) {
@@ -1351,7 +1356,7 @@ mg_attach_ack(queue_t *q, struct mg *mg, struct ch *ch)
 			p->mg_mx_id = ch->mx.mx ? ch->mx.mx->id : 0;
 			p->mg_mx_slot = ch->mx_slot;
 			p->mg_ch_id = ch->id;
-			printd(("%s: %p: <- MG_ATTACH_ACK\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_ATTACH_ACK\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1368,7 +1373,7 @@ mg_attach_ack(queue_t *q, struct mg *mg, struct ch *ch)
  *  Confirms that the requested channel or requesting stream has joined the communications
  *  session.
  */
-static inline int
+STATIC inline int
 mg_join_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 {
 	if (mg && mg->oq) {
@@ -1380,7 +1385,7 @@ mg_join_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 			p->mg_primitive = MG_JOIN_CON;
 			p->mg_se_id = se->id;
 			p->mg_tp_id = lg->id;
-			printd(("%s: %p: <- MG_JOIN_CON\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_JOIN_CON\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1398,7 +1403,7 @@ mg_join_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
  *  confirmed until the last MG_ACTION_REQ has been issued by the MG user.  The end of restricted duration actions
  *  will be indicated with the MG_ACTION_IND primitive.
  */
-static inline int
+STATIC inline int
 mg_action_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac *ac)
 {
 	if (mg && mg->oq) {
@@ -1412,7 +1417,7 @@ mg_action_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
 			p->mg_se_id = se->id;
 			p->mg_tp_id = lg->id;
 			p->mg_action_id = ac->id;
-			printd(("%s: %p: <- MG_ACTION_CON\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_ACTION_CON\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1428,7 +1433,7 @@ mg_action_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
  *  -----------------------------------
  *  Indicates that the action identified by the indicated action identifier has completed.
  */
-static inline int
+STATIC inline int
 mg_action_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac *ac)
 {
 	if (mg && mg->oq) {
@@ -1442,7 +1447,7 @@ mg_action_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
 			p->mg_se_id = se->id;
 			p->mg_tp_id = lg->id;
 			p->mg_action_id = ac->id;
-			printd(("%s: %p: <- MG_ACTION_IND\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_ACTION_IND\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1458,7 +1463,7 @@ mg_action_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
  *  -----------------------------------
  *  Confirms that the indicated channel has been connected as requested.
  */
-static inline int
+STATIC inline int
 mg_conn_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 {
 	if (mg && mg->oq) {
@@ -1474,7 +1479,7 @@ mg_conn_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 				lg->state = MGS_CONNECTED;
 			if (se)
 				se->state = MGS_CONNECTED;
-			printd(("%s: %p: <- MG_CONN_CON\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_CONN_CON\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1490,7 +1495,7 @@ mg_conn_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
  *  -----------------------------------
  *  Inidicates that data was received on a connected channel.
  */
-static inline int
+STATIC inline int
 mg_data_ind(queue_t *q, struct mg *mg, ulong flags, mblk_t *dp)
 {
 	if (mg && mg->oq) {
@@ -1502,7 +1507,7 @@ mg_data_ind(queue_t *q, struct mg *mg, ulong flags, mblk_t *dp)
 			p->mg_primitive = MG_DATA_IND;
 			p->mg_flags = flags;
 			mp->b_cont = dp;
-			printd(("%s: %p: <- MG_DATA_IND\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_DATA_IND\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1519,7 +1524,7 @@ mg_data_ind(queue_t *q, struct mg *mg, ulong flags, mblk_t *dp)
  *  Indicates that a channel has been disconnected as a result of a lower level failure and the
  *  cause of the disconnection.
  */
-static inline int
+STATIC inline int
 mg_discon_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong flags, ulong cause)
 {
 	if (mg && mg->oq) {
@@ -1552,7 +1557,7 @@ mg_discon_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
 					}
 					break;
 				}
-			printd(("%s: %p: <- MG_DISCON_IND\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_DISCON_IND\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1568,7 +1573,7 @@ mg_discon_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
  *  -----------------------------------
  *  Confirms that the indicated channel has been disconnected as requested.
  */
-static inline int
+STATIC inline int
 mg_discon_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong flags)
 {
 	if (mg && mg->oq) {
@@ -1605,7 +1610,7 @@ mg_discon_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
 					break;
 				}
 			}
-			printd(("%s: %p: <- MG_DISCON_CON\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_DISCON_CON\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1622,7 +1627,7 @@ mg_discon_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
  *  Indicates that a channel has left a communication session as a result of a lower level
  *  failure and the cause of the deletion.
  */
-static inline int
+STATIC inline int
 mg_leave_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong cause)
 {
 	if (mg && mg->oq) {
@@ -1640,7 +1645,7 @@ mg_leave_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong caus
 			}
 			if (se) {
 			}
-			printd(("%s: %p: <- MG_LEAVE_IND\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_LEAVE_IND\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1657,7 +1662,7 @@ mg_leave_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong caus
  *  Confirms that the indicated channel or requesting stream has left the communications
  *  session as requested.
  */
-static inline int
+STATIC inline int
 mg_leave_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 {
 	if (mg && mg->oq) {
@@ -1674,7 +1679,7 @@ mg_leave_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 			}
 			if (se) {
 			}
-			printd(("%s: %p: <- MG_LEAVE_CON\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_LEAVE_CON\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1690,7 +1695,7 @@ mg_leave_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
  *  -----------------------------------
  *  Indicates to the media gateway user that an event has occured on in the session.
  */
-static inline int
+STATIC inline int
 mg_notify_ind(queue_t *q, struct mg *mg, ulong event, uchar *dia_ptr, size_t dia_len)
 {
 	if (mg && mg->oq) {
@@ -1707,7 +1712,7 @@ mg_notify_ind(queue_t *q, struct mg *mg, ulong event, uchar *dia_ptr, size_t dia
 				bcopy(dia_ptr, mp->b_wptr, dia_len);
 				mp->b_wptr += dia_len;
 			}
-			printd(("%s: %p: <- MG_NOTIFY_IND\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: <- MG_NOTIFY_IND\n", DRV_NAME, mg));
 			ss7_oput(mg->oq, mp);
 			return (QR_DONE);
 		}
@@ -1731,12 +1736,12 @@ mg_notify_ind(queue_t *q, struct mg *mg, ulong event, uchar *dia_ptr, size_t dia
  *  The preferred method for sending data to the multiplex provider is to just send M_DATA blocks for efficiency and
  *  speed.
  */
-static inline int
+STATIC inline int
 mx_write(queue_t *q, struct mx *mx, mblk_t *dp)
 {
 	if (mx && mx->oq) {
 		if (canput(mx->oq)) {
-			printd(("%s: %p: M_DATA ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: M_DATA ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, dp);
 			return (QR_ABSORBED);
 		}
@@ -1754,7 +1759,7 @@ mx_write(queue_t *q, struct mx *mx, mblk_t *dp)
  *  Requests that the multiplex provider return information concerning the multiplex provider and any attached
  *  slots.
  */
-static inline int
+STATIC inline int
 mx_info_req(queue_t *q, struct mx *mx)
 {
 	if (mx && mx->oq) {
@@ -1764,7 +1769,7 @@ mx_info_req(queue_t *q, struct mx *mx)
 			mp->b_datap->db_type = M_PCPROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mx_primitive = MX_INFO_REQ;
-			printd(("%s: %p: MX_INFO_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: MX_INFO_REQ ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -1781,7 +1786,7 @@ mx_info_req(queue_t *q, struct mx *mx)
  *  Requests that the multiplex provider attach the requesting stream to the specified multiplex (address) with the
  *  specified options.
  */
-static inline int
+STATIC inline int
 mx_attach_req(queue_t *q, struct mx *mx, uchar *add_ptr, size_t add_len, ulong flags)
 {
 	if (mx && mx->oq) {
@@ -1798,7 +1803,7 @@ mx_attach_req(queue_t *q, struct mx *mx, uchar *add_ptr, size_t add_len, ulong f
 				bcopy(add_ptr, mp->b_wptr, add_len);
 				mp->b_wptr += add_len;
 			}
-			printd(("%s: %p: MX_ATTACH_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: MX_ATTACH_REQ ->\n", DRV_NAME, mx));
 			mx->state = MGS_WACK_AREQ;
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
@@ -1815,7 +1820,7 @@ mx_attach_req(queue_t *q, struct mx *mx, uchar *add_ptr, size_t add_len, ulong f
  *  -----------------------------------
  *  Requests that the attached multiplex be enabled and confirmed enabled with a MX_ENABLE_CON.
  */
-static inline int
+STATIC inline int
 mx_enable_req(queue_t *q, struct mx *mx)
 {
 	if (mx && mx->oq) {
@@ -1826,7 +1831,7 @@ mx_enable_req(queue_t *q, struct mx *mx)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mx_primitive = MX_ENABLE_REQ;
 			mx->state = MGS_WCON_JREQ;
-			printd(("%s: %p: MX_ENABLE_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: MX_ENABLE_REQ ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -1845,7 +1850,7 @@ mx_enable_req(queue_t *q, struct mx *mx)
  *  multiplex and subsequent data received on the multiplex will be delivered as MX_DATA_IND.  Any M_DATA blocks
  *  provided with the connect request will be transmitted immediately following the successful connection.
  */
-static inline int
+STATIC inline int
 mx_connect_req(queue_t *q, struct mx *mx, struct ch *ch)
 {
 	if (mx && mx->oq) {
@@ -1858,7 +1863,7 @@ mx_connect_req(queue_t *q, struct mx *mx, struct ch *ch)
 			p->mx_conn_flags = ch->flags & (MXF_RX_DIR | MXF_TX_DIR);
 			p->mx_slot = ch->mx_slot;
 			ch->state = MGS_WCON_CREQ;
-			printd(("%s; %p: MX_CONNECT_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s; %p: MX_CONNECT_REQ ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -1877,7 +1882,7 @@ mx_connect_req(queue_t *q, struct mx *mx, struct ch *ch)
  *  each byte of the data corresponds to one slot in the multiplex.  If slot is specified 0 <= slot < n, where n is
  *  the number of slots in the multiplex, then the data consists of data only for the specified slot.
  */
-static inline int
+STATIC inline int
 mx_data_req(queue_t *q, struct mx *mx, ulong slot, mblk_t *dp)
 {
 	if (mx && mx->oq) {
@@ -1890,7 +1895,7 @@ mx_data_req(queue_t *q, struct mx *mx, ulong slot, mblk_t *dp)
 				p->mx_primitive = MX_DATA_REQ;
 				p->mx_slot = slot;
 				mp->b_cont = dp;
-				printd(("%s; %p: MX_DATA_REQ ->\n", MG_DRV_NAME, mx));
+				printd(("%s; %p: MX_DATA_REQ ->\n", DRV_NAME, mx));
 				ss7_oput(mx->oq, mp);
 				return (QR_ABSORBED);
 			}
@@ -1912,7 +1917,7 @@ mx_data_req(queue_t *q, struct mx *mx, ulong slot, mblk_t *dp)
  *  slot from the requesting stream.  When successful, subsequent received data and MX_DATA_REQ for the disconnected
  *  slot will be discarded.
  */
-static inline int
+STATIC inline int
 mx_disconnect_req(queue_t *q, struct mx *mx, struct ch *ch, ulong flags)
 {
 	if (mx && mx->oq) {
@@ -1926,7 +1931,7 @@ mx_disconnect_req(queue_t *q, struct mx *mx, struct ch *ch, ulong flags)
 			p->mx_slot = ch->mx_slot;
 			ch->state = MGS_WCON_DREQ;
 			ch->flags &= ~flags;
-			printd(("%s: %p: MX_DISCONNECT_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: MX_DISCONNECT_REQ ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -1942,7 +1947,7 @@ mx_disconnect_req(queue_t *q, struct mx *mx, struct ch *ch, ulong flags)
  *  -----------------------------------
  *  Requests that the attached multiplex be disabled and the disabling confirmed with a MX_DISABLE_CON primitive.
  */
-static inline int
+STATIC inline int
 mx_disable_req(queue_t *q, struct mx *mx)
 {
 	if (mx && mx->oq) {
@@ -1953,7 +1958,7 @@ mx_disable_req(queue_t *q, struct mx *mx)
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mx_primitive = MX_DISABLE_REQ;
 			mx->state = MGS_WCON_LREQ;
-			printd(("%s: %p: MX_DISABLE_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: MX_DISABLE_REQ ->\n", DRV_NAME, mx));
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -1969,7 +1974,7 @@ mx_disable_req(queue_t *q, struct mx *mx)
  *  -----------------------------------
  *  Request that the multiplex provider detach the requesting stream from the currently attached multiplex.
  */
-static inline int
+STATIC inline int
 mx_detach_req(queue_t *q, struct mx *mx)
 {
 	if (mx && mx->oq) {
@@ -1979,7 +1984,7 @@ mx_detach_req(queue_t *q, struct mx *mx)
 			mp->b_datap->db_type = MX_DETACH_REQ;
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->mx_primitive = MX_DETACH_REQ;
-			printd(("%s: %p: MX_DETACH_REQ ->\n", MG_DRV_NAME, mx));
+			printd(("%s: %p: MX_DETACH_REQ ->\n", DRV_NAME, mx));
 			mx->state = MGS_WACK_UREQ;
 			ss7_oput(mx->oq, mp);
 			return (QR_DONE);
@@ -2032,7 +2037,7 @@ mx_detach_req(queue_t *q, struct mx *mx)
  *  Preferred way of receiving data from multiplex provider.  The multiplex provider should always
  *  give us data as M_DATA blocks.
  */
-static int
+STATIC int
 mx_read(queue_t *q, mblk_t *dp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2055,7 +2060,7 @@ mx_read(queue_t *q, mblk_t *dp)
  *  -----------------------------------
  *  Indicates information about the multiplex provider and any attached multiplex.
  */
-static int
+STATIC int
 mx_info_ack(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2080,7 +2085,7 @@ mx_info_ack(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Indicates that the last operation requiring acknowledgement was successful.
  */
-static int
+STATIC int
 mx_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2111,7 +2116,7 @@ mx_ok_ack(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Indicates that the last operation requiring negative acknowledgement was unsuccessful.
  */
-static int
+STATIC int
 mx_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2137,7 +2142,7 @@ mx_error_ack(queue_t *q, mblk_t *mp)
  *  confirmation.  If they are, and this is the last channel to be enabled in the leg, we confirm the leg and
  *  session joined to any MG user.
  */
-static int
+STATIC int
 mx_enable_con(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2196,7 +2201,7 @@ mx_enable_con(queue_t *q, mblk_t *mp)
  *  any of the channels at the other end of a connection to these channels are awaiting connection at their end.  If
  *  we are the last channel to connect, we confirm the leg and the session connected to any MG user.
  */
-static int
+STATIC int
 mx_connect_con(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2220,18 +2225,16 @@ mx_connect_con(queue_t *q, mblk_t *mp)
 	for (c2 = lg->ch.list; c2; c2 = c2->lg.next) {
 		if (c2 == ch)
 			continue;
-		/*
+		/* 
 		   if there are any other channels in the multirate group waiting for confirmed
-		   connection, just wait for them. 
-		 */
+		   connection, just wait for them. */
 		if (c2->state == MGS_WCON_CREQ)
 			goto done;
 		for (cn = c2->ic.list; cn; cn = cn->ic.next) {
 			if ((cn->state == MGS_WCON_CREQ) && (c3 = cn->og.ch)) {
-				/*
+				/* 
 				   if the outgoing end of the connection is waiting for confirmed
-				   connection, just wait for them 
-				 */
+				   connection, just wait for them */
 				if (c3->state == MGS_WCON_CREQ)
 					goto done;
 				if (c3->state == MGS_CONNECTED)
@@ -2240,10 +2243,9 @@ mx_connect_con(queue_t *q, mblk_t *mp)
 		}
 		for (cn = c2->og.list; cn; cn = cn->og.next) {
 			if ((cn->state == MGS_WCON_CREQ) && (c3 = cn->ic.ch)) {
-				/*
+				/* 
 				   if the incoming end of the connection is waiting for confirmed
-				   connection, just wait for them 
-				 */
+				   connection, just wait for them */
 				if (c3->state == MGS_WCON_CREQ)
 					goto done;
 				if (c3->state == MGS_CONNECTED)
@@ -2259,20 +2261,20 @@ mx_connect_con(queue_t *q, mblk_t *mp)
 	ch->state = MGS_CONNECTED;
 	return (QR_DONE);
       efault:
-	pswerr(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	pswerr(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	ch->state = MGS_CONNECTED;
 	return (-EFAULT);
       ignore:
-	ptrace(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	ptrace(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	return (QR_DONE);	/* ignore */
       enxio:
-	pswerr(("%s: No such channel %lu for multiplex %lu\n", MG_DRV_NAME, p->mx_slot, mx->id));
+	pswerr(("%s: No such channel %lu for multiplex %lu\n", DRV_NAME, p->mx_slot, mx->id));
 	return (-ENXIO);
       outstate:
-	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EPROTO);
       emsgsize:
-	pswerr(("%s: Bad message message size on multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Bad message message size on multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EMSGSIZE);
 }
 
@@ -2283,7 +2285,7 @@ mx_connect_con(queue_t *q, mblk_t *mp)
  *  a simple multiplex (one channel); the simple multiplex provider should only send us raw M_DATA blocks where
  *  possible.
  */
-static int
+STATIC int
 mx_data_ind(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2306,20 +2308,20 @@ mx_data_ind(queue_t *q, mblk_t *mp)
 		return (QR_TRIMMED);
 	return (err);
       efault:
-	pswerr(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	pswerr(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	ch->state = MGS_JOINED;
 	return (-EFAULT);
       ignore:
-	ptrace(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	ptrace(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	return (QR_DONE);
       enxio:
-	pswerr(("%s: No such channel %lu for multiplex %lu\n", MG_DRV_NAME, p->mx_slot, mx->id));
+	pswerr(("%s: No such channel %lu for multiplex %lu\n", DRV_NAME, p->mx_slot, mx->id));
 	return (-ENXIO);
       outstate:
-	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EPROTO);
       emsgsize:
-	pswerr(("%s: Bad message message size on multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Bad message message size on multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EMSGSIZE);
 }
 
@@ -2330,7 +2332,7 @@ mx_data_ind(queue_t *q, mblk_t *mp)
  *  disconnection (normaly multiplex provider lower layer fault), and also includes any data
  *  which has arrived on the attached and disconnected multiplex before it was disconnected.
  */
-static int
+STATIC int
 mx_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2352,38 +2354,34 @@ mx_disconnect_ind(queue_t *q, mblk_t *mp)
 	if (!(lg = ch->lg.lg) || lg->state == MGS_JOINED)
 		goto efault;
 	for (c2 = lg->ch.list; c2; c2 = c2->lg.next) {
-		/*
-		   When one channel in a multirate group is lost, they must all be disconnected 
-		 */
+		/* 
+		   When one channel in a multirate group is lost, they must all be disconnected */
 		if (c2->state != MXS_CONNECTED && c2->state != MXS_WCON_CREQ)
 			continue;
 		if (p->mx_conn_flags & MXF_RX_DIR) {
 			while ((cn = c2->ic.list)) {
-				/*
-				   check if we are only connection to other end 
-				 */
-				if ((c3 = cn->og.ch) && c3->state == MXS_CONNECTED &&
-				    c3->flags & MXF_TX_DIR && c3->og.numb == 1 &&
-				    (err = mx_disconnect_req(q, c3->mx.mx, c3, MXF_TX_DIR)))
+				/* 
+				   check if we are only connection to other end */
+				if ((c3 = cn->og.ch) && c3->state == MXS_CONNECTED
+				    && c3->flags & MXF_TX_DIR && c3->og.numb == 1
+				    && (err = mx_disconnect_req(q, c3->mx.mx, c3, MXF_TX_DIR)))
 					return (err);
 				cn_free_priv(c2->ic.list);
 			}
 		}
 		if (p->mx_conn_flags & MXF_TX_DIR) {
 			while ((cn = c2->og.list)) {
-				/*
-				   check if we are only connection to other end 
-				 */
-				if ((c3 = cn->ic.ch) && c3->state == MGS_CONNECTED &&
-				    c3->flags & MXF_RX_DIR && c3->ic.numb == 1 &&
-				    (err = mx_disconnect_req(q, c3->mx.mx, c3, MXF_RX_DIR)))
+				/* 
+				   check if we are only connection to other end */
+				if ((c3 = cn->ic.ch) && c3->state == MGS_CONNECTED
+				    && c3->flags & MXF_RX_DIR && c3->ic.numb == 1
+				    && (err = mx_disconnect_req(q, c3->mx.mx, c3, MXF_RX_DIR)))
 					return (err);
 				cn_free_priv(c2->og.list);
 			}
 		}
-		/*
-		   disconnect other channels in this leg 
-		 */
+		/* 
+		   disconnect other channels in this leg */
 		if ((c2 != ch) && (err = mx_disconnect_req(q, c2->mx.mx, c2, p->mx_conn_flags)))
 			return (err);
 	}
@@ -2394,20 +2392,20 @@ mx_disconnect_ind(queue_t *q, mblk_t *mp)
 	ch->state = MGS_JOINED;
 	return (QR_DONE);
       efault:
-	pswerr(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	pswerr(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	ch->state = MGS_JOINED;
 	return (-EFAULT);
       ignore:
-	ptrace(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	ptrace(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	return (QR_DONE);	/* ignore */
       enxio:
-	pswerr(("%s: No such channel %lu for multiplex %lu\n", MG_DRV_NAME, p->mx_slot, mx->id));
+	pswerr(("%s: No such channel %lu for multiplex %lu\n", DRV_NAME, p->mx_slot, mx->id));
 	return (-ENXIO);
       outstate:
-	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EPROTO);
       emsgsize:
-	pswerr(("%s: Bad message size on multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Bad message size on multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EMSGSIZE);
 }
 
@@ -2418,7 +2416,7 @@ mx_disconnect_ind(queue_t *q, mblk_t *mp)
  *  disconnection was completed.  We must also effect and confirm any pending
  *  topology requests.
  */
-static int
+STATIC int
 mx_disconnect_con(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2444,10 +2442,9 @@ mx_disconnect_con(queue_t *q, mblk_t *mp)
 	for (c2 = lg->ch.list; c2; c2 = c2->lg.next) {
 		if (c2 == ch)
 			continue;
-		/*
+		/* 
 		   if there are any other channels in the multirate group waiting for confirmed
-		   disconnection, just wait for them 
-		 */
+		   disconnection, just wait for them */
 		if (c2->state == MGS_WCON_DREQ)
 			goto done_ch;
 	}
@@ -2465,19 +2462,19 @@ mx_disconnect_con(queue_t *q, mblk_t *mp)
 	ch->state = MGS_JOINED;
 	return (QR_DONE);
       efault_lg:
-	pswerr(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	pswerr(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	goto done_lg;
       efault_ch:
-	pswerr(("%s: Ignoring unexpected message on channel %lu\n", MG_DRV_NAME, ch->id));
+	pswerr(("%s: Ignoring unexpected message on channel %lu\n", DRV_NAME, ch->id));
 	goto done_ch;
       enxio:
-	pswerr(("%s: No such channel %lu for multiplex %lu\n", MG_DRV_NAME, p->mx_slot, mx->id));
+	pswerr(("%s: No such channel %lu for multiplex %lu\n", DRV_NAME, p->mx_slot, mx->id));
 	return (-ENXIO);
       outstate:
-	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Receiving messages for disabled multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EPROTO);
       emsgsize:
-	pswerr(("%s: Bad message size on multiplex %lu\n", MG_DRV_NAME, mx->id));
+	pswerr(("%s: Bad message size on multiplex %lu\n", DRV_NAME, mx->id));
 	return (-EMSGSIZE);
 }
 
@@ -2488,7 +2485,7 @@ mx_disconnect_con(queue_t *q, mblk_t *mp)
  *  lower layer fault.  The cause is also indicated.  For common circuits, this indicates the
  *  abortive release of the circuit.
  */
-static int
+STATIC int
 mx_disable_ind(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2540,7 +2537,7 @@ mx_disable_ind(queue_t *q, mblk_t *mp)
  *  Confirms that the attached multiplex was disabled as requested.  For common circuits this is
  *  the same as confirming the release of the circuit.
  */
-static int
+STATIC int
 mx_disable_con(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -2603,7 +2600,7 @@ mx_disable_con(queue_t *q, mblk_t *mp)
  *  This is the preferred way for an MG stream to provide data to the connection point, but it is only valid for the
  *  first channel.
  */
-static int
+STATIC int
 mg_write(queue_t *q, mblk_t *dp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2626,7 +2623,7 @@ mg_write(queue_t *q, mblk_t *dp)
  *  Requests that the provider return in an MG_INFO_ACK information about the provider and any
  *  attached communications sessions (contexts).
  */
-static int
+STATIC int
 mg_info_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2652,7 +2649,7 @@ mg_info_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider set, negotiate, or get option information and return
  *  acknowledgement using an MG_OPTMGMT_ACK.
  */
-static int
+STATIC int
 mg_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2680,13 +2677,11 @@ mg_optmgmt_req(queue_t *q, mblk_t *mp)
 			switch (p->mg_mgmt_flags) {
 			case 0:
 			case MG_NEGOTIATE:
-				/*
-				   negotiate current 
-				 */
+				/* 
+				   negotiate current */
 			case MG_SET_OPT:
-				/*
-				   set current 
-				 */
+				/* 
+				   set current */
 				mg->config.block_size = o->ch.ch_block_size;
 				mg->config.encoding = o->ch.ch_encoding;
 				mg->config.sample_size = o->ch.ch_sample_size;
@@ -2718,9 +2713,8 @@ mg_optmgmt_req(queue_t *q, mblk_t *mp)
 	} else {
 		union MG_options opts;
 		o = &opts;
-		/*
-		   no options 
-		 */
+		/* 
+		   no options */
 		switch (p->mg_mgmt_flags) {
 		case MX_GET_OPT:
 			o->ch.mg_obj_type = MG_OBJ_TYPE_CH;
@@ -2770,7 +2764,7 @@ mg_optmgmt_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider attach the specified multiplex and slot to a specified or newly created channel id.
  *  The primitive is acknowledged wtih the MG_ATTACH_ACK.
  */
-static int
+STATIC int
 mg_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2784,9 +2778,8 @@ mg_attach_req(queue_t *q, mblk_t *mp)
 	case MGS_DETACHED:
 	case MGS_ATTACHED:
 		if (!p->mg_mx_id) {
-			/*
-			   requesting stream 
-			 */
+			/* 
+			   requesting stream */
 			mx = (struct mx *) mg;
 		} else {
 			if (!(mx = mx_lookup(p->mg_mx_id)))
@@ -2802,14 +2795,12 @@ mg_attach_req(queue_t *q, mblk_t *mp)
 			goto enomem;
 		mg->i_state = MGS_WACK_AREQ;
 		goto channel_known;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case MGS_WACK_AREQ:
 		if (!p->mg_mx_id) {
-			/*
-			   requesting stream 
-			 */
+			/* 
+			   requesting stream */
 			mx = (struct mx *) mg;
 		} else {
 			if (!(mx = mx_lookup(p->mg_mx_id)))
@@ -2848,7 +2839,7 @@ mg_attach_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider detach the requesting stream from an attached channel and acknowledge success with an
  *  MG_OK_ACK or MG_ERROR_ACK.
  */
-static int
+STATIC int
 mg_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2863,9 +2854,8 @@ mg_detach_req(queue_t *q, mblk_t *mp)
 			goto badid;
 		ch_free_priv(ch);
 		mg->i_state = MGS_WACK_DREQ;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case MGS_WACK_DREQ:
 		if ((err = mg_ok_ack(q, mg, p->mg_primitive)) < 0)
 			return (err);
@@ -2895,7 +2885,7 @@ mg_detach_req(queue_t *q, mblk_t *mp)
  *  confirmed.  This primitive is confirmed with the MG_JOIN_CON primitive.  It is refused with the MG_ERROR_ACK or
  *  MG_LEAVE_IND primitive.
  */
-static int
+STATIC int
 mg_join_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -2945,9 +2935,8 @@ mg_join_req(queue_t *q, mblk_t *mp)
 			goto enomem;
 		}
 		for (slot = 0, chp = &lg->ch.list; idp < edp; idp++, slot++) {
-			/*
-			   link channels to leg 
-			 */
+			/* 
+			   link channels to leg */
 			if ((ch->lg.next = *chp))
 				ch->lg.next->lg.prev = &ch->lg.next;
 			ch->lg.next = *chp;
@@ -2966,9 +2955,8 @@ mg_join_req(queue_t *q, mblk_t *mp)
 			goto efault;
 	      lg_known:
 		waiting = 0;
-		/*
-		   make sure all the muxltiplex are enabled 
-		 */
+		/* 
+		   make sure all the muxltiplex are enabled */
 		for (ch = lg->ch.list; ch; ch = ch->lg.next) {
 			if ((mx = ch->mx.mx)) {
 				if (mx == (struct mx *) mg)
@@ -3028,7 +3016,7 @@ mg_join_req(queue_t *q, mblk_t *mp)
  *  (e.g., MG_ACTION_LOOPBACK).  Some actions performed on a termination point will be performed on individual
  *  channels that make up the termination point (e.g., MG_ACTION_LOOPBACK).
  */
-static int
+STATIC int
 mg_action_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3094,7 +3082,7 @@ mg_action_req(queue_t *q, mblk_t *mp)
  *  action be aborted.  If the action identifier is zero, this primitive requests that all actions ont the specified
  *  termination point be aborted.
  */
-static int
+STATIC int
 mg_abort_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3117,9 +3105,8 @@ mg_abort_req(queue_t *q, mblk_t *mp)
 	if (!((1 << lg->state) && (MGSF_JOINED | MGSF_CONNECTED)))
 		goto outstate;
 	if (p->mg_action_id) {
-		/*
-		   abort specified action on termination point 
-		 */
+		/* 
+		   abort specified action on termination point */
 		for (ch = lg->ch.list; ch; ch = ch->lg.next)
 			for (ac = ch->ac.list; ac; ac = ac->ch.next)
 				if (ac->id == p->mg_action_id)
@@ -3131,9 +3118,8 @@ mg_abort_req(queue_t *q, mblk_t *mp)
 		ac_free_priv(ac);	/* this will destroy the action */
 		return (QR_DONE);
 	} else {
-		/*
-		   abort all actions on termination point 
-		 */
+		/* 
+		   abort all actions on termination point */
 		for (ch = lg->ch.list; ch; ch = ch->lg.next)
 			while ((ac = ch->ac.list))
 				ac_free_priv(ac);
@@ -3159,7 +3145,7 @@ mg_abort_req(queue_t *q, mblk_t *mp)
  *  specified (mg_tp_id is zero) it is assumed that all participants (joined termination points) in the
  *  communications session are to be connected to all other participants in the communication session in full mesh.
  */
-static int
+STATIC int
 mg_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3257,8 +3243,13 @@ mg_conn_req(queue_t *q, mblk_t *mp)
 					continue;
 				}
 				ch->flags |=
-				    ((p->mg_conn_flags & MGF_IC_DIR) ? MXF_TX_DIR : 0) |
-				    ((p->mg_conn_flags & MGF_OG_DIR) ? MXF_RX_DIR : 0);
+				    ((p->mg_conn_flags & MGF_IC_DIR) ? MXF_TX_DIR : 0) | ((p->
+											   mg_conn_flags
+											   &
+											   MGF_OG_DIR)
+											  ?
+											  MXF_RX_DIR
+											  : 0);
 				if ((err = mx_connect_req(q, mx, ch)) < 0)
 					return (err);
 				ch->state = MGS_WCON_CREQ;
@@ -3292,7 +3283,7 @@ mg_conn_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the provider send data to the communications session.
  */
-static int
+STATIC int
 mg_data_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3328,7 +3319,7 @@ mg_data_req(queue_t *q, mblk_t *mp)
  *  is specified, it contains the list of other termination points in the session from which the specified
  *  termination point is to be disconnected in the direction requested.
  */
-static int
+STATIC int
 mg_discon_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3377,9 +3368,8 @@ mg_discon_req(queue_t *q, mblk_t *mp)
 			case MGS_CONNECTED:
 				if (p->mg_conn_flags & MGF_IC_DIR) {
 					while ((cn = ch->ic.list)) {
-						/*
-						   check if we are only connection to other end 
-						 */
+						/* 
+						   check if we are only connection to other end */
 						if ((c2 = cn->og.ch) && c2->state == MXS_CONNECTED
 						    && c2->flags & MXF_TX_DIR && c2->og.numb == 1
 						    && (err =
@@ -3391,9 +3381,8 @@ mg_discon_req(queue_t *q, mblk_t *mp)
 				}
 				if (p->mg_conn_flags & MGF_OG_DIR) {
 					while ((cn = ch->og.list)) {
-						/*
-						   check if we are only connection to other end 
-						 */
+						/* 
+						   check if we are only connection to other end */
 						if ((c2 = cn->ic.ch) && c2->state == MXS_CONNECTED
 						    && c2->flags & MXF_RX_DIR && c2->ic.numb == 1
 						    && (err =
@@ -3443,7 +3432,7 @@ mg_discon_req(queue_t *q, mblk_t *mp)
  *  leave the specified communication session.  Once all termination points leave a communications session, the
  *  communications session is destroyed.
  */
-static int
+STATIC int
 mg_leave_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3473,9 +3462,8 @@ mg_leave_req(queue_t *q, mblk_t *mp)
 			waiting = 0;
 			goto lg_known;
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case MGS_WACK_LREQ:
 		break;
 	default:
@@ -3513,9 +3501,8 @@ mg_leave_req(queue_t *q, mblk_t *mp)
 						if ((err = mx_disable_req(q, mx)) < 0)
 							return (err);
 						mx->state = MXS_WCON_DREQ;
-						/*
-						   fall through 
-						 */
+						/* 
+						   fall through */
 					case MXS_WCON_DREQ:
 						waiting = 1;
 						continue;
@@ -3551,7 +3538,7 @@ mg_leave_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider provide event notifications to the requesting stream as
  *  specified in the request.
  */
-static int
+STATIC int
 mg_notify_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -3732,20 +3719,18 @@ mg_get_mg(mg_config_t * arg, struct mg *mg, int size)
 		return (-EINVAL);
 	if (!mg || size < sizeof(*arg))
 		return (-EINVAL);
-	/*
-	   write out list of session configuration following media gateway configuration 
-	 */
+	/* 
+	   write out list of session configuration following media gateway configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (se = mg->se.list; se && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     se = se->mg.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     se = se->mg.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = MG_OBJ_TYPE_SE;
 		arg->id = se->id;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -3760,21 +3745,19 @@ mg_get_se(mg_config_t * arg, struct se *se, int size)
 		return (-EINVAL);
 	if (!se || size < sizeof(*arg))
 		return (-EINVAL);
-	/*
-	   write out list of session configuration following media gateway configuration 
-	 */
+	/* 
+	   write out list of session configuration following media gateway configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (lg = se->lg.list; lg && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     lg = lg->se.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     lg = lg->se.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = MG_OBJ_TYPE_LG;
 		arg->id = lg->id;
 		chd->seid = lg->se.se ? lg->se.se->id : 0;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -3790,14 +3773,13 @@ mg_get_lg(mg_config_t * arg, struct lg *lg, int size)
 	if (!lg || size < sizeof(*arg))
 		return (-EINVAL);
 	cnf->seid = lg->se.se ? lg->se.se->id : 0;
-	/*
-	   write out list of session configuration following media gateway configuration 
-	 */
+	/* 
+	   write out list of session configuration following media gateway configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (ch = lg->ch.list; ch && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     ch = ch->lg.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     ch = ch->lg.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = MG_OBJ_TYPE_CH;
 		arg->id = ch->id;
 		chd->tpid = ch->lg.lg ? ch->lg.lg->id : 0;
@@ -3805,9 +3787,8 @@ mg_get_lg(mg_config_t * arg, struct lg *lg, int size)
 		chd->slot = ch->mx_slot;
 		chd->encoding = ch->config.encoding;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -3825,9 +3806,8 @@ mg_get_ch(mg_config_t * arg, struct ch *ch, int size)
 	cnf->slot = ch->mx_slot;
 	cnf->encoding = ch->config.encoding;
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -3843,14 +3823,13 @@ mg_get_mx(mg_config_t * arg, struct mx *mx, int size)
 	if (!mx || size < sizeof(*arg))
 		return (-EINVAL);
 	cnf->muxid = mx->u.mux.index;
-	/*
-	   write out list of session configuration following media gateway configuration 
-	 */
+	/* 
+	   write out list of session configuration following media gateway configuration */
 	arg = (typeof(arg)) (cnf + 1);
 	chd = (typeof(chd)) (arg + 1);
 	for (ch = mx->ch.list; ch && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     ch = ch->mx.next, size -= sizeof(*arg) + sizeof(*chd),
-	     arg = (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
+	     ch = ch->mx.next, size -= sizeof(*arg) + sizeof(*chd), arg =
+	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
 		arg->type = MG_OBJ_TYPE_CH;
 		arg->id = ch->id;
 		chd->tpid = ch->lg.lg ? ch->lg.lg->id : 0;
@@ -3858,9 +3837,8 @@ mg_get_mx(mg_config_t * arg, struct mx *mx, int size)
 		chd->slot = ch->mx_slot;
 		chd->encoding = ch->config.encoding;
 	}
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -3874,9 +3852,8 @@ mg_get_df(mg_config_t * arg, struct df *df, int size)
 	if (!df || size < sizeof(*arg))
 		return (-EINVAL);
 	arg = (typeof(arg)) (cnf + 1);
-	/*
-	   terminate list with zero object type 
-	 */
+	/* 
+	   terminate list with zero object type */
 	arg->type = 0;
 	arg->id = 0;
 	return (QR_DONE);
@@ -3892,9 +3869,8 @@ mg_add_mg(mg_config_t * arg, struct mg *mg, int size, int force, int test)
 	mg_conf_mg_t *cnf = (typeof(cnf)) (arg + 1);
 	if (mg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   MG objects are not added statically 
-	 */
+	/* 
+	   MG objects are not added statically */
 	return (-EINVAL);
 }
 STATIC int
@@ -3903,9 +3879,8 @@ mg_add_se(mg_config_t * arg, struct se *se, int size, int force, int test)
 	mg_conf_se_t *cnf = (typeof(cnf)) (arg + 1);
 	if (se || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   SE objects are not added statically 
-	 */
+	/* 
+	   SE objects are not added statically */
 	return (-EINVAL);
 }
 STATIC int
@@ -3914,20 +3889,17 @@ mg_add_lg(mg_config_t * arg, struct lg *lg, int size, int force, int test)
 	mg_conf_lg_t *cnf = (typeof(cnf)) (arg + 1);
 	if (lg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   LG objects are not added statically 
-	 */
+	/* 
+	   LG objects are not added statically */
 	return (-EINVAL);
 }
 STATIC int
 mg_add_ch(mg_config_t * arg, struct ch *ch, int size, int force, int test)
 {
-	/*
-	   Channels for lower MX streams are allocated statically. 
-	 */
-	/*
-	   Channels for upper MG streams are allocated dynamically. 
-	 */
+	/* 
+	   Channels for lower MX streams are allocated statically. */
+	/* 
+	   Channels for upper MG streams are allocated dynamically. */
 	struct mx *mx;
 	mg_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
 	if (ch || (size -= sizeof(*cnf)) < 0)
@@ -3993,9 +3965,8 @@ mg_cha_mg(mg_config_t * arg, struct mg *mg, int size, int force, int test)
 	mg_conf_mg_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!mg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   nothing to change 
-	 */
+	/* 
+	   nothing to change */
 	return (QR_DONE);
 }
 STATIC int
@@ -4004,9 +3975,8 @@ mg_cha_se(mg_config_t * arg, struct se *se, int size, int force, int test)
 	mg_conf_se_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!se || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   nothing to change 
-	 */
+	/* 
+	   nothing to change */
 	return (QR_DONE);
 }
 STATIC int
@@ -4015,9 +3985,8 @@ mg_cha_lg(mg_config_t * arg, struct lg *lg, int size, int force, int test)
 	mg_conf_lg_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!lg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   nothing to change 
-	 */
+	/* 
+	   nothing to change */
 	return (QR_DONE);
 }
 STATIC int
@@ -4026,9 +3995,8 @@ mg_cha_ch(mg_config_t * arg, struct ch *ch, int size, int force, int test)
 	mg_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!ch || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   nothing to change 
-	 */
+	/* 
+	   nothing to change */
 	return (QR_DONE);
 }
 STATIC int
@@ -4037,9 +4005,8 @@ mg_cha_mx(mg_config_t * arg, struct mx *mx, int size, int force, int test)
 	mg_conf_mx_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!mx || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   nothing to change 
-	 */
+	/* 
+	   nothing to change */
 	return (QR_DONE);
 }
 STATIC int
@@ -4048,9 +4015,8 @@ mg_cha_df(mg_config_t * arg, struct df *df, int size, int force, int test)
 	mg_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
-	/*
-	   nothing to change 
-	 */
+	/* 
+	   nothing to change */
 	return (QR_DONE);
 }
 
@@ -4875,7 +4841,7 @@ mg_iocsoptions(queue_t *q, mblk_t *mp)
  *  Get configuration by object type and id.  Also gets the configuration of
  *  as many children of the object as will fit in the provided buffer.
  */
-static int
+STATIC int
 mg_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5114,7 +5080,7 @@ mg_ioccconfig(queue_t *q, mblk_t *mp)
  *  MG_IOCGSTATEM
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5161,7 +5127,7 @@ mg_iocgstatem(queue_t *q, mblk_t *mp)
  *  MG_IOCCMRESET
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
@@ -5177,7 +5143,7 @@ mg_ioccmreset(queue_t *q, mblk_t *mp)
  *  MG_IOCGSTATSP
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5224,7 +5190,7 @@ mg_iocgstatsp(queue_t *q, mblk_t *mp)
  *  MG_IOCSSTATSP
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5271,7 +5237,7 @@ mg_iocsstatsp(queue_t *q, mblk_t *mp)
  *  MG_IOCGSTATS
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_iocgstats(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5318,7 +5284,7 @@ mg_iocgstats(queue_t *q, mblk_t *mp)
  *  MG_IOCCSTATS
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_ioccstats(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5365,7 +5331,7 @@ mg_ioccstats(queue_t *q, mblk_t *mp)
  *  MG_IOCGNOTIFY
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5412,7 +5378,7 @@ mg_iocgnotify(queue_t *q, mblk_t *mp)
  *  MG_IOCSNOTIFY
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5459,7 +5425,7 @@ mg_iocsnotify(queue_t *q, mblk_t *mp)
  *  MG_IOCCNOTIFY
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5634,7 +5600,7 @@ mg_ioccpass(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 mg_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
@@ -5656,7 +5622,7 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", MG_DRV_NAME,
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
 					mg));
 				ret = -EPERM;
 				break;
@@ -5669,8 +5635,8 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					MG_DRV_NAME, mg));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					mg));
 				ret = -EPERM;
 				break;
 			}
@@ -5680,15 +5646,15 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 					break;
 			if (!mx) {
 				ret = -EINVAL;
-				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
-					MG_DRV_NAME, mg));
+				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", DRV_NAME,
+					mg));
 				break;
 			}
 			mx_free_link(mx);
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MG_DRV_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -5696,84 +5662,83 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 	}
 	case MG_IOC_MAGIC:
 	{
-		/*
-		   These are MG IOCTLs. 
-		 */
+		/* 
+		   These are MG IOCTLs. */
 		if (count < size) {
 			ret = -EINVAL;
 			break;
 		}
 		switch (nr) {
 		case _IOC_NR(MG_IOCGOPTIONS):
-			printd(("%s: %p: -> MG_IOCGOPTIONS\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCGOPTIONS\n", DRV_NAME, mg));
 			ret = mg_iocgoptions(q, mp);
 			break;
 		case _IOC_NR(MG_IOCSOPTIONS):
-			printd(("%s: %p: -> MG_IOCSOPTIONS\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCSOPTIONS\n", DRV_NAME, mg));
 			ret = mg_iocsoptions(q, mp);
 			break;
 		case _IOC_NR(MG_IOCGCONFIG):
-			printd(("%s: %p: -> MG_IOCGCONFIG\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCGCONFIG\n", DRV_NAME, mg));
 			ret = mg_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(MG_IOCSCONFIG):
-			printd(("%s: %p: -> MG_IOCSCONFIG\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCSCONFIG\n", DRV_NAME, mg));
 			ret = mg_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(MG_IOCTCONFIG):
-			printd(("%s: %p: -> MG_IOCTCONFIG\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCTCONFIG\n", DRV_NAME, mg));
 			ret = mg_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(MG_IOCCCONFIG):
-			printd(("%s: %p: -> MG_IOCCCONFIG\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCCCONFIG\n", DRV_NAME, mg));
 			ret = mg_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(MG_IOCGSTATEM):
-			printd(("%s: %p: -> MG_IOCGSTATEM\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCGSTATEM\n", DRV_NAME, mg));
 			ret = mg_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(MG_IOCCMRESET):
-			printd(("%s: %p: -> MG_IOCCMRESET\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCCMRESET\n", DRV_NAME, mg));
 			ret = mg_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(MG_IOCGSTATSP):
-			printd(("%s: %p: -> MG_IOCGSTATSP\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCGSTATSP\n", DRV_NAME, mg));
 			ret = mg_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(MG_IOCSSTATSP):
-			printd(("%s: %p: -> MG_IOCSSTATSP\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCSSTATSP\n", DRV_NAME, mg));
 			ret = mg_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(MG_IOCGSTATS):
-			printd(("%s: %p: -> MG_IOCGSTATS\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCGSTATS\n", DRV_NAME, mg));
 			ret = mg_iocgstats(q, mp);
 			break;
 		case _IOC_NR(MG_IOCCSTATS):
-			printd(("%s: %p: -> MG_IOCCSTATS\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCCSTATS\n", DRV_NAME, mg));
 			ret = mg_ioccstats(q, mp);
 			break;
 		case _IOC_NR(MG_IOCGNOTIFY):
-			printd(("%s: %p: -> MG_IOCGNOTIFY\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCGNOTIFY\n", DRV_NAME, mg));
 			ret = mg_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(MG_IOCSNOTIFY):
-			printd(("%s: %p: -> MG_IOCSNOTIFY\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCSNOTIFY\n", DRV_NAME, mg));
 			ret = mg_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(MG_IOCCNOTIFY):
-			printd(("%s: %p: -> MG_IOCCNOTIFY\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCCNOTIFY\n", DRV_NAME, mg));
 			ret = mg_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(MG_IOCCMGMT):
-			printd(("%s: %p: -> MG_IOCCMGMT\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCCMGMT\n", DRV_NAME, mg));
 			ret = mg_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(MG_IOCCPASS):
-			printd(("%s: %p: -> MG_IOCCPASS\n", MG_DRV_NAME, mg));
+			printd(("%s: %p: -> MG_IOCCPASS\n", DRV_NAME, mg));
 			ret = mg_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported MG ioctl %c, %d\n", MG_DRV_NAME, mg,
+			ptrace(("%s: %p: ERROR: Unsupported MG ioctl %c, %d\n", DRV_NAME, mg,
 				(char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
@@ -5784,14 +5749,13 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		struct mx *mx;
 		ulong mxid;
-		/*
+		/* 
 		   These are MX IOCTLs. They differ from normal MX IOCTLs in the fact that they
 		   have a Multiplex Identifier as a discriminator in the first long in the
 		   argument. This is used to find the lower stream and is stripped and then the
 		   IOCTL is passed to the lower stream.  We intercept the ACK or NAK from the lower 
 		   stream and place the discrimintor back on the argument before passing it back
-		   up. 
-		 */
+		   up. */
 		ret = -EINVAL;
 		if (count < size)
 			break;
@@ -5831,7 +5795,7 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 mx_r_iocack(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
@@ -5869,7 +5833,7 @@ mx_r_iocack(queue_t *q, mblk_t *mp)
  *  Primitives from MGC to MG.
  *  -----------------------------------
  */
-static int
+STATIC int
 mg_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -5877,55 +5841,55 @@ mg_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MG_INFO_REQ:
-		printd(("%s: %p: -> MG_INFO_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_INFO_REQ\n", DRV_NAME, mg));
 		rtn = mg_info_req(q, mp);
 		break;
 	case MG_OPTMGMT_REQ:
-		printd(("%s: %p: -> MG_OPTMGMT_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_OPTMGMT_REQ\n", DRV_NAME, mg));
 		rtn = mg_optmgmt_req(q, mp);
 		break;
 	case MG_ATTACH_REQ:
-		printd(("%s: %p: -> MG_ATTACH_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_ATTACH_REQ\n", DRV_NAME, mg));
 		rtn = mg_attach_req(q, mp);
 		break;
 	case MG_DETACH_REQ:
-		printd(("%s: %p: -> MG_DETACH_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_DETACH_REQ\n", DRV_NAME, mg));
 		rtn = mg_detach_req(q, mp);
 		break;
 	case MG_JOIN_REQ:
-		printd(("%s: %p: -> MG_JOIN_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_JOIN_REQ\n", DRV_NAME, mg));
 		rtn = mg_join_req(q, mp);
 		break;
 	case MG_ACTION_REQ:
-		printd(("%s: %p: -> MG_ACTION_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_ACTION_REQ\n", DRV_NAME, mg));
 		rtn = mg_action_req(q, mp);
 		break;
 	case MG_ABORT_REQ:
-		printd(("%s: %p: -> MG_ABORT_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_ABORT_REQ\n", DRV_NAME, mg));
 		rtn = mg_abort_req(q, mp);
 		break;
 	case MG_CONN_REQ:
-		printd(("%s: %p: -> MG_CONN_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_CONN_REQ\n", DRV_NAME, mg));
 		rtn = mg_conn_req(q, mp);
 		break;
 	case MG_DATA_REQ:
-		printd(("%s: %p: -> MG_DATA_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_DATA_REQ\n", DRV_NAME, mg));
 		rtn = mg_data_req(q, mp);
 		break;
 	case MG_DISCON_REQ:
-		printd(("%s: %p: -> MG_DISCON_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_DISCON_REQ\n", DRV_NAME, mg));
 		rtn = mg_discon_req(q, mp);
 		break;
 	case MG_LEAVE_REQ:
-		printd(("%s: %p: -> MG_LEAVE_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_LEAVE_REQ\n", DRV_NAME, mg));
 		rtn = mg_leave_req(q, mp);
 		break;
 	case MG_NOTIFY_REQ:
-		printd(("%s: %p: -> MG_NOTIFY_REQ\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_NOTIFY_REQ\n", DRV_NAME, mg));
 		rtn = mg_notify_req(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> MG_????\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: -> MG_????\n", DRV_NAME, mg));
 		rtn = mg_error_ack(q, mg, prim, MGNOTSUPP);
 		break;
 	}
@@ -5936,7 +5900,7 @@ mg_w_proto(queue_t *q, mblk_t *mp)
  *  Primitives from MX to MG.
  *  -----------------------------------
  */
-static int
+STATIC int
 mx_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -5944,47 +5908,47 @@ mx_r_proto(queue_t *q, mblk_t *mp)
 	(void) mx;
 	switch (*((ulong *) mp->b_rptr)) {
 	case MX_INFO_ACK:
-		printd(("%s: %p: MX_INFO_ACK <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_INFO_ACK <-\n", DRV_NAME, mx));
 		rtn = mx_info_ack(q, mp);
 		break;
 	case MX_OK_ACK:
-		printd(("%s: %p: MX_OK_ACK <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_OK_ACK <-\n", DRV_NAME, mx));
 		rtn = mx_ok_ack(q, mp);
 		break;
 	case MX_ERROR_ACK:
-		printd(("%s: %p: MX_ERROR_ACK <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_ERROR_ACK <-\n", DRV_NAME, mx));
 		rtn = mx_error_ack(q, mp);
 		break;
 	case MX_ENABLE_CON:
-		printd(("%s: %p: MX_ENABLE_CON <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_ENABLE_CON <-\n", DRV_NAME, mx));
 		rtn = mx_enable_con(q, mp);
 		break;
 	case MX_CONNECT_CON:
-		printd(("%s: %p: MX_CONNECT_CON <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_CONNECT_CON <-\n", DRV_NAME, mx));
 		rtn = mx_connect_con(q, mp);
 		break;
 	case MX_DATA_IND:
-		printd(("%s: %p: MX_DATA_IND <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_DATA_IND <-\n", DRV_NAME, mx));
 		rtn = mx_data_ind(q, mp);
 		break;
 	case MX_DISCONNECT_IND:
-		printd(("%s: %p: MX_DISCONNECT_IND <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_DISCONNECT_IND <-\n", DRV_NAME, mx));
 		rtn = mx_disconnect_ind(q, mp);
 		break;
 	case MX_DISCONNECT_CON:
-		printd(("%s: %p: MX_DISCONNECT_CON <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_DISCONNECT_CON <-\n", DRV_NAME, mx));
 		rtn = mx_disconnect_con(q, mp);
 		break;
 	case MX_DISABLE_IND:
-		printd(("%s: %p: MX_DISABLE_IND <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_DISABLE_IND <-\n", DRV_NAME, mx));
 		rtn = mx_disable_ind(q, mp);
 		break;
 	case MX_DISABLE_CON:
-		printd(("%s: %p: MX_DISABLE_CON <-\n", MG_DRV_NAME, mx));
+		printd(("%s: %p: MX_DISABLE_CON <-\n", DRV_NAME, mx));
 		rtn = mx_disable_con(q, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? %lu <-\n", MG_DRV_NAME, mx, *(ulong *) mp->b_rptr));
+		printd(("%s: %p: ???? %lu <-\n", DRV_NAME, mx, *(ulong *) mp->b_rptr));
 		rtn = -EFAULT;
 		break;
 	}
@@ -5998,22 +5962,20 @@ mx_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 mg_w_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from above 
-	 */
-	printd(("%s: %p: -> M_DATA\n", MG_DRV_NAME, MG_PRIV(q)));
+	/* 
+	   data from above */
+	printd(("%s: %p: -> M_DATA\n", DRV_NAME, MG_PRIV(q)));
 	return mg_write(q, mp);
 }
-static int
+STATIC int
 mx_r_data(queue_t *q, mblk_t *mp)
 {
-	/*
-	   data from below 
-	 */
-	printd(("%s: %p: M_DATA <-\n", MG_DRV_NAME, MX_PRIV(q)));
+	/* 
+	   data from below */
+	printd(("%s: %p: M_DATA <-\n", DRV_NAME, MX_PRIV(q)));
 	return mx_read(q, mp);
 }
 
@@ -6024,13 +5986,13 @@ mx_r_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 mx_r_error(queue_t *q, mblk_t *mp)
 {
 	fixme(("Unimmplemented function\n"));
 	return (-EFAULT);
 }
-static int
+STATIC int
 mx_r_hangup(queue_t *q, mblk_t *mp)
 {
 	fixme(("Unimmplemented function\n"));
@@ -6044,7 +6006,7 @@ mx_r_hangup(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-static inline int
+STATIC inline int
 mg_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -6053,12 +6015,11 @@ mg_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-static inline int
+STATIC inline int
 mg_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mg_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6073,12 +6034,11 @@ mg_w_prim(queue_t *q, mblk_t *mp)
 	seldom();
 	return (QR_PASSFLOW);
 }
-static inline int
+STATIC inline int
 mx_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mx_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -6098,7 +6058,7 @@ mx_r_prim(queue_t *q, mblk_t *mp)
 	seldom();
 	return (QR_PASSFLOW);
 }
-static inline int
+STATIC inline int
 mx_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -6115,13 +6075,13 @@ mx_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-static ushort mg_majors[MG_CMAJORS] = { MG_CMAJOR_0, };
+STATIC ushort mg_majors[MG_CMAJORS] = { MG_CMAJOR_0, };
 
 /*
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
@@ -6135,7 +6095,7 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", MG_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
@@ -6151,7 +6111,7 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		if (cmajor == dmajor) {
 			ushort dminor = (*mgp)->u.dev.cminor;
 			if (cminor < dminor) {
-				if (++cminor >= MG_CMINORS) {
+				if (++cminor >= NMINORS) {
 					if (++mindex >= MG_CMAJORS || !(cmajor = mg_majors[mindex]))
 						break;
 					cminor = 0;
@@ -6161,15 +6121,15 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	if (mindex >= MG_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", MG_DRV_NAME));
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", MG_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(mg = mg_alloc_priv(q, mgp, devp, crp))) {
-		ptrace(("%s: ERROR: no memory\n", MG_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -6182,14 +6142,14 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 mg_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct mg *mg = MG_PRIV(q);
 	(void) flag;
 	(void) crp;
 	(void) mg;
-	printd(("%s: %p: closing character device %d:%d\n", MG_DRV_NAME, mg, mg->u.dev.cmajor,
+	printd(("%s: %p: closing character device %d:%d\n", DRV_NAME, mg, mg->u.dev.cmajor,
 		mg->u.dev.cminor));
 	mg_free_priv(mg);
 	MOD_DEC_USE_COUNT;
@@ -6203,66 +6163,73 @@ mg_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-static kmem_cache_t *mg_priv_cachep = NULL;
-static kmem_cache_t *se_priv_cachep = NULL;
-static kmem_cache_t *lg_priv_cachep = NULL;
-static kmem_cache_t *cn_priv_cachep = NULL;
-static kmem_cache_t *ac_priv_cachep = NULL;
-static kmem_cache_t *ch_priv_cachep = NULL;
-static kmem_cache_t *mx_priv_cachep = NULL;
+STATIC kmem_cache_t *mg_priv_cachep = NULL;
+STATIC kmem_cache_t *se_priv_cachep = NULL;
+STATIC kmem_cache_t *lg_priv_cachep = NULL;
+STATIC kmem_cache_t *cn_priv_cachep = NULL;
+STATIC kmem_cache_t *ac_priv_cachep = NULL;
+STATIC kmem_cache_t *ch_priv_cachep = NULL;
+STATIC kmem_cache_t *mx_priv_cachep = NULL;
 
-static int
+STATIC int
 mg_init_caches(void)
 {
-	if (!mg_priv_cachep &&
-	    !(mg_priv_cachep = kmem_cache_create
-	      ("mg_priv_cachep", sizeof(struct mg), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mg_priv_cachep", MG_DRV_NAME);
+	if (!mg_priv_cachep
+	    && !(mg_priv_cachep =
+		 kmem_cache_create("mg_priv_cachep", sizeof(struct mg), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mg_priv_cachep", DRV_NAME);
 		goto no_mg;
 	} else
-		printd(("%s: initialized mg private structure cache\n", MG_DRV_NAME));
-	if (!se_priv_cachep &&
-	    !(se_priv_cachep = kmem_cache_create
-	      ("se_priv_cachep", sizeof(struct se), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate se_priv_cachep", MG_DRV_NAME);
+		printd(("%s: initialized mg private structure cache\n", DRV_NAME));
+	if (!se_priv_cachep
+	    && !(se_priv_cachep =
+		 kmem_cache_create("se_priv_cachep", sizeof(struct se), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate se_priv_cachep", DRV_NAME);
 		goto no_se;
 	} else
-		printd(("%s: initialized se private structure cache\n", MG_DRV_NAME));
-	if (!lg_priv_cachep &&
-	    !(lg_priv_cachep = kmem_cache_create
-	      ("lg_priv_cachep", sizeof(struct lg), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate lg_priv_cachep", MG_DRV_NAME);
+		printd(("%s: initialized se private structure cache\n", DRV_NAME));
+	if (!lg_priv_cachep
+	    && !(lg_priv_cachep =
+		 kmem_cache_create("lg_priv_cachep", sizeof(struct lg), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate lg_priv_cachep", DRV_NAME);
 		goto no_lg;
 	} else
-		printd(("%s: initialized lg private structure cache\n", MG_DRV_NAME));
-	if (!cn_priv_cachep &&
-	    !(cn_priv_cachep = kmem_cache_create
-	      ("cn_priv_cachep", sizeof(struct cn), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate cn_priv_cachep", MG_DRV_NAME);
+		printd(("%s: initialized lg private structure cache\n", DRV_NAME));
+	if (!cn_priv_cachep
+	    && !(cn_priv_cachep =
+		 kmem_cache_create("cn_priv_cachep", sizeof(struct cn), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate cn_priv_cachep", DRV_NAME);
 		goto no_cn;
 	} else
-		printd(("%s: initialized cn private structure cache\n", MG_DRV_NAME));
-	if (!ac_priv_cachep &&
-	    !(ac_priv_cachep = kmem_cache_create
-	      ("ac_priv_cachep", sizeof(struct ac), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate ac_priv_cachep", MG_DRV_NAME);
+		printd(("%s: initialized cn private structure cache\n", DRV_NAME));
+	if (!ac_priv_cachep
+	    && !(ac_priv_cachep =
+		 kmem_cache_create("ac_priv_cachep", sizeof(struct ac), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate ac_priv_cachep", DRV_NAME);
 		goto no_ac;
 	} else
-		printd(("%s: initialized ac private structure cache\n", MG_DRV_NAME));
-	if (!ch_priv_cachep &&
-	    !(ch_priv_cachep = kmem_cache_create
-	      ("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", MG_DRV_NAME);
+		printd(("%s: initialized ac private structure cache\n", DRV_NAME));
+	if (!ch_priv_cachep
+	    && !(ch_priv_cachep =
+		 kmem_cache_create("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", DRV_NAME);
 		goto no_ch;
 	} else
-		printd(("%s: initialized ch private structure cache\n", MG_DRV_NAME));
-	if (!mx_priv_cachep &&
-	    !(mx_priv_cachep = kmem_cache_create
-	      ("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", MG_DRV_NAME);
+		printd(("%s: initialized ch private structure cache\n", DRV_NAME));
+	if (!mx_priv_cachep
+	    && !(mx_priv_cachep =
+		 kmem_cache_create("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", DRV_NAME);
 		goto no_ch;
 	} else
-		printd(("%s: initialized mx private structure cache\n", MG_DRV_NAME));
+		printd(("%s: initialized mx private structure cache\n", DRV_NAME));
 	return (0);
 	// no_mx:
 	// kmem_cache_destroy(ch_priv_cachep);
@@ -6280,70 +6247,78 @@ mg_init_caches(void)
 	return (-ENOMEM);
 }
 
-static void
+STATIC int
 mg_term_caches(void)
 {
+	int err = 0;
 	if (mg_priv_cachep) {
-		if (kmem_cache_destroy(mg_priv_cachep))
+		if (kmem_cache_destroy(mg_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mg_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mg_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mg_priv_cachep\n", DRV_NAME));
 	}
 	if (se_priv_cachep) {
-		if (kmem_cache_destroy(se_priv_cachep))
+		if (kmem_cache_destroy(se_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy se_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed se_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed se_priv_cachep\n", DRV_NAME));
 	}
 	if (lg_priv_cachep) {
-		if (kmem_cache_destroy(lg_priv_cachep))
+		if (kmem_cache_destroy(lg_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy lg_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed lg_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed lg_priv_cachep\n", DRV_NAME));
 	}
 	if (cn_priv_cachep) {
-		if (kmem_cache_destroy(cn_priv_cachep))
+		if (kmem_cache_destroy(cn_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy cn_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed cn_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed cn_priv_cachep\n", DRV_NAME));
 	}
 	if (ac_priv_cachep) {
-		if (kmem_cache_destroy(ac_priv_cachep))
+		if (kmem_cache_destroy(ac_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ac_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed ac_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed ac_priv_cachep\n", DRV_NAME));
 	}
 	if (ch_priv_cachep) {
-		if (kmem_cache_destroy(ch_priv_cachep))
+		if (kmem_cache_destroy(ch_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ch_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed ch_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed ch_priv_cachep\n", DRV_NAME));
 	}
 	if (mx_priv_cachep) {
-		if (kmem_cache_destroy(mx_priv_cachep))
+		if (kmem_cache_destroy(mx_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mx_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mx_priv_cachep\n", MG_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed mx_priv_cachep\n", DRV_NAME));
 	}
-	return;
+	return (err);
 }
 
 /*
  *  MG allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct mg *
+STATIC struct mg *
 mg_alloc_priv(queue_t *q, struct mg **mgp, dev_t *devp, cred_t *crp)
 {
 	struct mg *mg;
 	if ((mg = kmem_cache_alloc(mg_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated mg private structure %d:%d\n", MG_DRV_NAME, mg,
+		printd(("%s: %p: allocated mg private structure %d:%d\n", DRV_NAME, mg,
 			getmajor(*devp), getminor(*devp)));
 		bzero(mg, sizeof(*mg));
 		mg->u.dev.cmajor = getmajor(*devp);
 		mg->u.dev.cminor = getminor(*devp);
 		mg->cred = *crp;
-		spin_lock_init(&mg->qlock); /* "mg-queue-lock" */
+		spin_lock_init(&mg->qlock);	/* "mg-queue-lock" */
 		(mg->iq = WR(q))->q_ptr = mg_get(mg);
 		(mg->oq = RD(q))->q_ptr = mg_get(mg);
 		mg->o_prim = mg_r_prim;
@@ -6353,21 +6328,20 @@ mg_alloc_priv(queue_t *q, struct mg **mgp, dev_t *devp, cred_t *crp)
 		mg->i_state = MGS_DETACHED;
 		mg->i_style = LMI_STYLE1;
 		mg->i_version = 1;
-		spin_lock_init(&mg->lock); /* "mg-priv-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&mg->lock);	/* "mg-priv-lock" */
+		/* 
+		   place in master list */
 		if ((mg->next = *mgp))
 			mg->next->prev = &mg->next;
 		mg->prev = mgp;
 		*mgp = mg_get(mg);
 		master.mg.numb++;
 	} else
-		ptrace(("%s: ERROR: Could not allocate mg private structure %d:%d\n", MG_DRV_NAME,
+		ptrace(("%s: ERROR: Could not allocate mg private structure %d:%d\n", DRV_NAME,
 			getmajor(*devp), getminor(*devp)));
 	return (mg);
 }
-static void
+STATIC void
 mg_free_priv(struct mg *mg)
 {
 	psw_t flags;
@@ -6380,19 +6354,16 @@ mg_free_priv(struct mg *mg)
 		flushq(mg->oq, FLUSHALL);
 		flushq(mg->iq, FLUSHALL);
 		// mg_timer_stop(mg, tall);
-		/*
-		   free all channels 
-		 */
+		/* 
+		   free all channels */
 		while ((ch = mg->ch.list))
 			ch_free_priv(ch);
-		/*
-		   free all sessions 
-		 */
+		/* 
+		   free all sessions */
 		while ((se = mg->se.list))
 			se_free_priv(se);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*mg->prev = mg->next))
 			mg->next->prev = mg->prev;
 		mg->next = NULL;
@@ -6401,19 +6372,17 @@ mg_free_priv(struct mg *mg)
 		mg_put(mg);
 		ensure(master.mg.numb > 0, master.mg.numb++);
 		master.mg.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&mg->refcnt) > 1, mg_get(mg));
 		mg_put((mg_t *) xchg(&(mg->iq->q_ptr), NULL));
 		ensure(atomic_read(&mg->refcnt) > 1, mg_get(mg));
 		mg_put((mg_t *) xchg(&(mg->oq->q_ptr), NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&mg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: mg lingering reference count = %d\n",
-				  MG_DRV_NAME, __FUNCTION__, mg, atomic_read(&mg->refcnt)));
+				  DRV_NAME, __FUNCTION__, mg, atomic_read(&mg->refcnt)));
 			atomic_set(&mg->refcnt, 1);
 		}
 	}
@@ -6421,7 +6390,7 @@ mg_free_priv(struct mg *mg)
 	mg_put(mg);		/* final put */
 	return;
 }
-static struct mg *
+STATIC struct mg *
 mg_lookup(ulong id)
 {
 	struct mg *mg = NULL;
@@ -6429,7 +6398,8 @@ mg_lookup(ulong id)
 		for (mg = master.mg.list; mg && mg->id != id; mg = mg->next) ;
 	return (mg);
 }
-static ulong
+#if 0
+STATIC ulong
 mg_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -6437,18 +6407,19 @@ mg_get_id(ulong id)
 		for (id = ++sequence; mg_lookup(id); id = ++sequence) ;
 	return (id);
 }
-static struct mg *
+#endif
+STATIC struct mg *
 mg_get(struct mg *mg)
 {
 	atomic_inc(&mg->refcnt);
 	return (mg);
 }
-static void
+STATIC void
 mg_put(struct mg *mg)
 {
 	if (atomic_dec_and_test(&mg->refcnt)) {
 		kmem_cache_free(mg_priv_cachep, mg);
-		printd(("%s: %p: freed mg private structure\n", MG_DRV_NAME, mg));
+		printd(("%s: %p: freed mg private structure\n", DRV_NAME, mg));
 	}
 }
 
@@ -6456,25 +6427,23 @@ mg_put(struct mg *mg)
  *  SE allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct se *
+STATIC struct se *
 se_alloc_priv(ulong id, struct mg *mg)
 {
 	struct se *se, **sep;
 	if ((se = kmem_cache_alloc(se_priv_cachep, SLAB_ATOMIC))) {
 		bzero(se, sizeof(*se));
-		spin_lock_init(&se->lock); /* "se-lock" */
+		spin_lock_init(&se->lock);	/* "se-lock" */
 		se_get(se);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((se->next = master.se.list))
 			se->next->prev = &se->next;
 		se->prev = &master.se.list;
 		master.se.list = se_get(se);
 		master.se.numb++;
-		/*
-		   link to mg in id order 
-		 */
+		/* 
+		   link to mg in id order */
 		se->id = se_get_id(id);
 		se->type = MG_OBJ_TYPE_SE;
 		se->state = MGS_ATTACHED;
@@ -6486,12 +6455,12 @@ se_alloc_priv(ulong id, struct mg *mg)
 		se->mg.mg = mg_get(mg);
 		*sep = se_get(se);
 		mg->se.numb++;
-		printd(("%s: %p: linked se structure %lu\n", MG_DRV_NAME, se, se->id));
+		printd(("%s: %p: linked se structure %lu\n", DRV_NAME, se, se->id));
 	} else
-		ptrace(("%s: ERROR: Could not allocate se structure %lu\n", MG_DRV_NAME, id));
+		ptrace(("%s: ERROR: Could not allocate se structure %lu\n", DRV_NAME, id));
 	return (se);
 }
-static void
+STATIC void
 se_free_priv(struct se *se)
 {
 	psw_t flags;
@@ -6508,9 +6477,8 @@ se_free_priv(struct se *se)
 			fixme(("Do more than this!\n"));
 			se_put(xchg(&mg->se.list, NULL));
 		}
-		/*
-		   unlink from mg 
-		 */
+		/* 
+		   unlink from mg */
 		if ((*se->mg.prev = se->mg.next))
 			se->mg.next->mg.prev = se->mg.prev;
 		se->mg.next = NULL;
@@ -6520,9 +6488,8 @@ se_free_priv(struct se *se)
 		mg_put(xchg(&se->mg.mg, NULL));
 		assure(mg->se.numb > 0);
 		mg->se.numb--;
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*se->prev = se->next))
 			se->next->prev = se->prev;
 		se->next = NULL;
@@ -6531,12 +6498,11 @@ se_free_priv(struct se *se)
 		se_put(se);
 		assure(master.se.numb > 0);
 		master.se.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&se->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: se lingering reference count = %d\n",
-				  MG_DRV_NAME, __FUNCTION__, se, atomic_read(&se->refcnt)));
+				  DRV_NAME, __FUNCTION__, se, atomic_read(&se->refcnt)));
 			atomic_set(&se->refcnt, 1);
 		}
 	}
@@ -6544,7 +6510,7 @@ se_free_priv(struct se *se)
 	se_put(se);		/* final put */
 	return;
 }
-static struct se *
+STATIC struct se *
 se_lookup(ulong id, struct mg *mg)
 {
 	struct se *se = NULL;
@@ -6552,7 +6518,7 @@ se_lookup(ulong id, struct mg *mg)
 		for (se = mg->se.list; se && se->id != id; se = se->next) ;
 	return (se);
 }
-static ulong
+STATIC ulong
 se_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -6560,18 +6526,18 @@ se_get_id(ulong id)
 		id = ++sequence;
 	return (id);
 }
-static struct se *
+STATIC struct se *
 se_get(struct se *se)
 {
 	atomic_inc(&se->refcnt);
 	return (se);
 }
-static void
+STATIC void
 se_put(struct se *se)
 {
 	if (atomic_dec_and_test(&se->refcnt)) {
 		kmem_cache_free(se_priv_cachep, se);
-		printd(("%s: %p: freed se structure\n", MG_DRV_NAME, se));
+		printd(("%s: %p: freed se structure\n", DRV_NAME, se));
 	}
 }
 
@@ -6579,25 +6545,23 @@ se_put(struct se *se)
  *  LG allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct lg *
+STATIC struct lg *
 lg_alloc_priv(ulong id, struct se *se)
 {
 	struct lg *lg;
 	if ((lg = kmem_cache_alloc(lg_priv_cachep, SLAB_ATOMIC))) {
 		bzero(lg, sizeof(*lg));
-		spin_lock_init(&lg->lock); /* "lg-lock" */
+		spin_lock_init(&lg->lock);	/* "lg-lock" */
 		lg_get(lg);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((lg->next = master.lg.list))
 			lg->next->prev = &lg->next;
 		lg->prev = &master.lg.list;
 		master.lg.list = lg_get(lg);
 		master.lg.numb++;
-		/*
-		   add to se list 
-		 */
+		/* 
+		   add to se list */
 		lg->id = lg_get_id(id);
 		lg->type = MG_OBJ_TYPE_LG;
 		lg->state = MGS_JOINED;
@@ -6608,12 +6572,12 @@ lg_alloc_priv(ulong id, struct se *se)
 		lg->se.se = se_get(se);
 		se->lg.list = lg_get(lg);
 		se->lg.numb++;
-		printd(("%s: %p: linked lg structure %lu\n", MG_DRV_NAME, lg, lg->id));
+		printd(("%s: %p: linked lg structure %lu\n", DRV_NAME, lg, lg->id));
 	} else
-		ptrace(("%s: ERROR: Could not allocate lg structure %lu\n", MG_DRV_NAME, id));
+		ptrace(("%s: ERROR: Could not allocate lg structure %lu\n", DRV_NAME, id));
 	return (lg);
 }
-static void
+STATIC void
 lg_free_priv(struct lg *lg)
 {
 	psw_t flags;
@@ -6622,22 +6586,19 @@ lg_free_priv(struct lg *lg)
 	{
 		struct se *se;
 		struct ch *ch;
-		/*
-		   unlink channels 
-		 */
+		/* 
+		   unlink channels */
 		while ((ch = lg->ch.list)) {
-			/*
-			   disconnect channel 
-			 */
+			/* 
+			   disconnect channel */
 			while (ch->og.list)
 				cn_free_priv(ch->og.list);
 			while (ch->ic.list)
 				cn_free_priv(ch->ic.list);
 			while (ch->ac.list)
 				ac_free_priv(ch->ac.list);
-			/*
-			   unlink channel from lg 
-			 */
+			/* 
+			   unlink channel from lg */
 			ch->lg_slot = -1UL;
 			if ((*ch->lg.prev = ch->lg.next))
 				ch->lg.next->lg.prev = ch->lg.prev;
@@ -6647,9 +6608,8 @@ lg_free_priv(struct lg *lg)
 			lg_put(xchg(&ch->lg.lg, NULL));
 			lg->ch.numb--;
 		}
-		/*
-		   unlink from se 
-		 */
+		/* 
+		   unlink from se */
 		if ((se = lg->se.se)) {
 			if ((*lg->se.prev = lg->se.next))
 				lg->se.next->se.prev = lg->se.prev;
@@ -6660,33 +6620,30 @@ lg_free_priv(struct lg *lg)
 			assure(se->lg.numb > 0);
 			se->lg.numb--;
 			se_put(xchg(&lg->se.se, NULL));
-			/*
-			   destroy se if we are the last leg 
-			 */
+			/* 
+			   destroy se if we are the last leg */
 			if (!(se->lg.list))
 				se_free_priv(se);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*lg->prev = lg->next))
 			lg->next->prev = lg->prev;
 		lg->next = NULL;
 		lg->prev = &lg->next;
 		lg->id = 0;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&lg->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: lg lingering reference count = %d\n",
-				  MG_DRV_NAME, __FUNCTION__, lg, atomic_read(&lg->refcnt)));
+				  DRV_NAME, __FUNCTION__, lg, atomic_read(&lg->refcnt)));
 			atomic_set(&lg->refcnt, 1);
 		}
 	}
 	spin_unlock_irqrestore(&lg->lock, flags);
 	lg_put(lg);		/* final put */
 }
-static struct lg *
+STATIC struct lg *
 lg_lookup(ulong id, struct se *se)
 {
 	struct lg *lg = NULL;
@@ -6694,7 +6651,7 @@ lg_lookup(ulong id, struct se *se)
 		for (lg = se->lg.list; lg && lg->id != id; lg = lg->next) ;
 	return (lg);
 }
-static ulong
+STATIC ulong
 lg_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -6702,18 +6659,18 @@ lg_get_id(ulong id)
 		id = ++sequence;
 	return (id);
 }
-static struct lg *
+STATIC struct lg *
 lg_get(struct lg *lg)
 {
 	atomic_inc(&lg->refcnt);
 	return (lg);
 }
-static void
+STATIC void
 lg_put(struct lg *lg)
 {
 	if (atomic_dec_and_test(&lg->refcnt)) {
 		kmem_cache_free(lg_priv_cachep, lg);
-		printd(("%s: %p: freed lg structure\n", MG_DRV_NAME, lg));
+		printd(("%s: %p: freed lg structure\n", DRV_NAME, lg));
 	}
 }
 
@@ -6721,23 +6678,21 @@ lg_put(struct lg *lg)
  *  CN allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct cn *
+STATIC struct cn *
 cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad)
 {
-	/*
-	   Form a connection between in an incoming and outgoing leg 
-	 */
+	/* 
+	   Form a connection between in an incoming and outgoing leg */
 	struct cn *cn;
 	if ((cn = kmem_cache_alloc(cn_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated cn private structure\n", MG_DRV_NAME, cn));
+		printd(("%s: %p: allocated cn private structure\n", DRV_NAME, cn));
 		bzero(cn, sizeof(*cn));
 		cn->state = MGS_WCON_CREQ;
 		cn->flags = 0;
 		cn->pad = pad;
 		if (ic) {
-			/*
-			   link to incoming ch 
-			 */
+			/* 
+			   link to incoming ch */
 			cn->ic.ch = ch_get(ic);
 			if ((cn->ic.next = ic->ic.list))
 				cn->ic.next->ic.prev = &cn->ic.next;
@@ -6746,9 +6701,8 @@ cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad)
 			ic->ic.numb++;
 		}
 		if (og) {
-			/*
-			   link to outgoing ch 
-			 */
+			/* 
+			   link to outgoing ch */
 			cn->og.ch = ch_get(og);
 			if ((cn->og.next = og->og.list))
 				cn->og.next->og.prev = &cn->og.next;
@@ -6757,24 +6711,22 @@ cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad)
 			og->og.numb++;
 		}
 	} else
-		ptrace(("%s: ERROR: Could not allocate cn structure\n", MG_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate cn structure\n", DRV_NAME));
 	return (cn);
 }
-static void
+STATIC void
 cn_free_priv(struct cn *cn)
 {
 	struct ch *ch;
 	ensure(cn, return);
-	/*
-	   free buffers 
-	 */
+	/* 
+	   free buffers */
 	if (cn->buf) {
 		cn->samples = 0;
 		freemsg(xchg(&cn->buf, NULL));
 	}
-	/*
-	   unlink from ic 
-	 */
+	/* 
+	   unlink from ic */
 	if ((ch = cn->ic.ch)) {
 		if ((*cn->ic.prev = cn->ic.next))
 			cn->ic.next->ic.prev = cn->ic.prev;
@@ -6783,9 +6735,8 @@ cn_free_priv(struct cn *cn)
 		ch->ic.numb--;
 		ch_put(xchg(&cn->ic.ch, NULL));
 	}
-	/*
-	   unlink from og 
-	 */
+	/* 
+	   unlink from og */
 	if ((ch = cn->og.ch)) {
 		if ((*cn->og.prev = cn->og.next))
 			cn->og.next->og.prev = cn->og.prev;
@@ -6795,19 +6746,19 @@ cn_free_priv(struct cn *cn)
 		ch_put(xchg(&cn->og.ch, NULL));
 	}
 	kmem_cache_free(cn_priv_cachep, cn);
-	printd(("%s: %p: freed cn private structure\n", MG_DRV_NAME, cn));
+	printd(("%s: %p: freed cn private structure\n", DRV_NAME, cn));
 }
 
 /*
  *  AC allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct ac *
+STATIC struct ac *
 ac_alloc_priv(ulong id, ulong type, ulong flags, ulong duration, struct ch *ch, mblk_t *dp)
 {
 	struct ac *ac;
 	if ((ac = kmem_cache_alloc(ac_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated ac private structure\n", MG_DRV_NAME, ac));
+		printd(("%s: %p: allocated ac private structure\n", DRV_NAME, ac));
 		bzero(ac, sizeof(*ac));
 		ac->id = ac_get_id(id);
 		ac->type = type;
@@ -6820,9 +6771,8 @@ ac_alloc_priv(ulong id, ulong type, ulong flags, ulong duration, struct ch *ch, 
 			ac->pos = -1UL;
 			ac->buf = NULL;
 		}
-		/*
-		   link to ch 
-		 */
+		/* 
+		   link to ch */
 		if ((ac->ch.next = ch->ac.list))
 			ac->ch.next->ch.prev = &ac->ch.next;
 		ac->ch.prev = &ch->ac.list;
@@ -6830,10 +6780,10 @@ ac_alloc_priv(ulong id, ulong type, ulong flags, ulong duration, struct ch *ch, 
 		ch->ac.list = ac;
 		ch->ac.numb++;
 	} else
-		ptrace(("%s: ERROR: Could not allocate ac private structure\n", MG_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate ac private structure\n", DRV_NAME));
 	return (ac);
 }
-static void
+STATIC void
 ac_free_priv(struct ac *ac)
 {
 	struct ch *ch;
@@ -6841,9 +6791,8 @@ ac_free_priv(struct ac *ac)
 	if ((ch = ac->ch.ch)) {
 		if (ac->buf)
 			freemsg(xchg(&ac->buf, NULL));
-		/*
-		   unlink from ch 
-		 */
+		/* 
+		   unlink from ch */
 		if ((*ac->ch.prev = ac->ch.next))
 			ac->ch.next->ch.prev = ac->ch.prev;
 		ac->ch.next = NULL;
@@ -6854,9 +6803,9 @@ ac_free_priv(struct ac *ac)
 	if (ac->buf)
 		freemsg(xchg(&ac->buf, NULL));
 	kmem_cache_free(ac_priv_cachep, ac);
-	printd(("%s: %p: freed ac private structure\n", MG_DRV_NAME, ac));
+	printd(("%s: %p: freed ac private structure\n", DRV_NAME, ac));
 }
-static ulong
+STATIC ulong
 ac_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -6869,17 +6818,16 @@ ac_get_id(ulong id)
  *  CH allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct ch *
+STATIC struct ch *
 ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 {
 	struct ch *ch;
 	if ((ch = kmem_cache_alloc(ch_priv_cachep, SLAB_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
-		spin_lock_init(&ch->lock); /* "ch-lock" */
+		spin_lock_init(&ch->lock);	/* "ch-lock" */
 		ch_get(ch);	/* first get */
-		/*
-		   add to master list 
-		 */
+		/* 
+		   add to master list */
 		if ((ch->next == master.ch.list))
 			ch->next->prev = &ch->next;
 		ch->prev = &master.ch.list;
@@ -6889,9 +6837,8 @@ ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 			struct ch **chp;
 			for (chp = &mx->ch.list; (*chp) && (*chp)->mx_slot < slot;
 			     (*chp) = (*chp)->mx.next) ;
-			/*
-			   add to mx list at slot position 
-			 */
+			/* 
+			   add to mx list at slot position */
 			ch->mx_slot = slot;
 			if ((ch->mx.next = *chp))
 				ch->mx.next->mx.prev = &ch->mx.next;
@@ -6938,12 +6885,12 @@ ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 			ch->config.sample_size = 8;
 			break;
 		}
-		printd(("%s: %p: linked ch structure %lu\n", MG_DRV_NAME, ch, ch->id));
+		printd(("%s: %p: linked ch structure %lu\n", DRV_NAME, ch, ch->id));
 	} else
-		ptrace(("%s: ERROR: Could not allocate ch structure %lu\n", MG_DRV_NAME, id));
+		ptrace(("%s: ERROR: Could not allocate ch structure %lu\n", DRV_NAME, id));
 	return (ch);
 }
-static void
+STATIC void
 ch_free_priv(struct ch *ch)
 {
 	psw_t flags;
@@ -6954,25 +6901,21 @@ ch_free_priv(struct ch *ch)
 		struct lg *lg;
 		struct cn *cn;
 		struct ac *ac;
-		/*
-		   clear action list 
-		 */
+		/* 
+		   clear action list */
 		while ((ac = ch->ac.list))
 			ac_free_priv(ac);
-		/*
-		   clear outgoing connection list 
-		 */
+		/* 
+		   clear outgoing connection list */
 		while ((cn = ch->og.list))
 			cn_free_priv(cn);
-		/*
-		   clear incoming ocnnection list 
-		 */
+		/* 
+		   clear incoming ocnnection list */
 		while ((cn = ch->ic.list))
 			cn_free_priv(cn);
 		if ((mx = ch->mx.mx)) {
-			/*
-			   unlink from mx 
-			 */
+			/* 
+			   unlink from mx */
 			if ((*ch->mx.prev = ch->mx.next))
 				ch->mx.next->mx.prev = ch->mx.prev;
 			ch->mx.next = NULL;
@@ -6984,9 +6927,8 @@ ch_free_priv(struct ch *ch)
 			mx_put(xchg(&ch->mx.mx, NULL));
 		}
 		if ((lg = ch->lg.lg)) {
-			/*
-			   unlink from lg 
-			 */
+			/* 
+			   unlink from lg */
 			if ((*ch->lg.prev = ch->lg.next))
 				ch->lg.next->lg.prev = ch->lg.prev;
 			ch->lg.next = NULL;
@@ -6996,14 +6938,12 @@ ch_free_priv(struct ch *ch)
 			assure(lg->ch.numb > 0);
 			lg->ch.numb--;
 			lg_put(xchg(&ch->lg.lg, NULL));
-			/*
-			   we must destroy leg now (this may destroy se too) 
-			 */
+			/* 
+			   we must destroy leg now (this may destroy se too) */
 			lg_free_priv(lg);
 		}
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*ch->prev = ch->next))
 			ch->next->prev = ch->prev;
 		ch->next = NULL;
@@ -7012,20 +6952,19 @@ ch_free_priv(struct ch *ch)
 		ch_put(ch);
 		assure(master.ch.numb > 0);
 		master.ch.numb--;
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		ch->id = 0;
 		if (atomic_read(&ch->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: ch lingering reference count = %d\n",
-				  MG_DRV_NAME, __FUNCTION__, ch, atomic_read(&ch->refcnt)));
+				  DRV_NAME, __FUNCTION__, ch, atomic_read(&ch->refcnt)));
 			atomic_set(&ch->refcnt, 1);
 		}
 	}
 	spin_unlock_irqrestore(&ch->lock, flags);
 	ch_put(ch);		/* final put */
 }
-static struct ch *
+STATIC struct ch *
 ch_lookup(ulong id)
 {
 	struct ch *ch = NULL;
@@ -7033,7 +6972,7 @@ ch_lookup(ulong id)
 		for (ch = master.ch.list; ch && ch->id != id; ch = ch->next) ;
 	return (ch);
 }
-static ulong
+STATIC ulong
 ch_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -7041,18 +6980,18 @@ ch_get_id(ulong id)
 		id = ++sequence;
 	return (id);
 }
-static struct ch *
+STATIC struct ch *
 ch_get(struct ch *ch)
 {
 	atomic_inc(&ch->refcnt);
 	return (ch);
 }
-static void
+STATIC void
 ch_put(struct ch *ch)
 {
 	if (atomic_dec_and_test(&ch->refcnt)) {
 		kmem_cache_free(ch_priv_cachep, ch);
-		printd(("%s: %p: freed ch structure\n", MG_DRV_NAME, ch));
+		printd(("%s: %p: freed ch structure\n", DRV_NAME, ch));
 	}
 }
 
@@ -7060,17 +6999,17 @@ ch_put(struct ch *ch)
  *  MX allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct mx *
+STATIC struct mx *
 mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 {
 	struct mx *mx;
 	if ((mx = kmem_cache_alloc(mx_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated mx private structure %lu\n", MG_DRV_NAME, mx, index));
+		printd(("%s: %p: allocated mx private structure %lu\n", DRV_NAME, mx, index));
 		bzero(mx, sizeof(*mx));
 		mx_get(mx);	/* first get */
 		mx->u.mux.index = index;
 		mx->cred = *crp;
-		spin_lock_init(&mx->qlock); /* "mx-queue-lock" */
+		spin_lock_init(&mx->qlock);	/* "mx-queue-lock" */
 		(mx->iq = RD(q))->q_ptr = mx_get(mx);
 		(mx->oq = WR(q))->q_ptr = mx_get(mx);
 		mx->o_prim = mx_w_prim;
@@ -7081,10 +7020,9 @@ mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 		mx->i_style = LMI_STYLE1;
 		mx->i_version = 1;
 		mx->state = MXS_ATTACHED;	/* must be linked in attached state */
-		spin_lock_init(&mx->lock); /* "mx-priv-lock" */
-		/*
-		   place in master list 
-		 */
+		spin_lock_init(&mx->lock);	/* "mx-priv-lock" */
+		/* 
+		   place in master list */
 		if ((mx->next = *mxp))
 			mx->next->prev = &mx->next;
 		mx->prev = mxp;
@@ -7093,11 +7031,11 @@ mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 		mx->id = index;	/* just use mux index for id */
 		mx->type = MG_OBJ_TYPE_MX;
 	} else
-		ptrace(("%s: ERROR: Could not allocate mx private structure %lu\n", MG_DRV_NAME,
+		ptrace(("%s: ERROR: Could not allocate mx private structure %lu\n", DRV_NAME,
 			index));
 	return (mx);
 }
-static void
+STATIC void
 mx_free_link(struct mx *mx)
 {
 	psw_t flags;
@@ -7109,14 +7047,12 @@ mx_free_link(struct mx *mx)
 		flushq(mx->oq, FLUSHALL);
 		flushq(mx->iq, FLUSHALL);
 		// mx_timer_stop(mx, tall);
-		/*
-		   free all channels 
-		 */
+		/* 
+		   free all channels */
 		while ((ch = mx->ch.list))
 			ch_free_priv(ch);
-		/*
-		   remove from master list 
-		 */
+		/* 
+		   remove from master list */
 		if ((*mx->prev = mx->next))
 			mx->next->prev = mx->prev;
 		mx->next = NULL;
@@ -7125,19 +7061,17 @@ mx_free_link(struct mx *mx)
 		mx_put(mx);
 		ensure(master.mx.numb > 0, master.mx.numb++);
 		master.mx.numb--;
-		/*
-		   remove from queues 
-		 */
+		/* 
+		   remove from queues */
 		ensure(atomic_read(&mx->refcnt) > 1, mx_get(mx));
 		mx_put(xchg(&mx->iq->q_ptr, NULL));
 		ensure(atomic_read(&mx->refcnt) > 1, mx_get(mx));
 		mx_put(xchg(&mx->oq->q_ptr, NULL));
-		/*
-		   done, check final count 
-		 */
+		/* 
+		   done, check final count */
 		if (atomic_read(&mx->refcnt) != 1) {
 			__printd(("%s: %s: %p: ERROR: mx lingering reference count = %d\n",
-				  MG_DRV_NAME, __FUNCTION__, mx, atomic_read(&mx->refcnt)));
+				  DRV_NAME, __FUNCTION__, mx, atomic_read(&mx->refcnt)));
 			atomic_set(&mx->refcnt, 1);
 		}
 	}
@@ -7145,7 +7079,7 @@ mx_free_link(struct mx *mx)
 	mx_put(mx);		/* final put */
 	return;
 }
-static struct mx *
+STATIC struct mx *
 mx_lookup(ulong id)
 {
 	struct mx *mx = NULL;
@@ -7153,7 +7087,7 @@ mx_lookup(ulong id)
 		for (mx = master.mx.list; mx && mx->id != id; mx = mx->next) ;
 	return (mx);
 }
-static ulong
+STATIC ulong
 mx_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -7161,7 +7095,7 @@ mx_get_id(ulong id)
 		for (id = ++sequence; mx_lookup(id); id = ++sequence) ;
 	return (id);
 }
-static struct mx *
+STATIC struct mx *
 mx_get(struct mx *mx)
 {
 	assure(mx);
@@ -7169,7 +7103,7 @@ mx_get(struct mx *mx)
 		atomic_inc(&mx->refcnt);
 	return (mx);
 }
-static void
+STATIC void
 mx_put(struct mx *mx)
 {
 	assure(mx);
@@ -7177,8 +7111,8 @@ mx_put(struct mx *mx)
 		assure(atomic_read(&mx->refcnt) > 1);
 		if (atomic_dec_and_test(&mx->refcnt)) {
 			kmem_cache_free(mx_priv_cachep, mx);
-			printd(("%s: %s: %p: freed mx private structure\n", MG_DRV_NAME,
-				__FUNCTION__, mx));
+			printd(("%s: %s: %p: freed mx private structure\n", DRV_NAME, __FUNCTION__,
+				mx));
 		}
 	}
 }
@@ -7186,78 +7120,142 @@ mx_put(struct mx *mx)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-static int mg_initialized = 0;
-static void
-mg_init(void)
-{
-	int err, mindex;
-	cmn_err(CE_NOTE, MG_BANNER);	/* console splash */
-	if ((err = mg_init_caches()) < 0) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", MG_DRV_NAME);
-		mg_initialized = err;
-		return;
-	}
-	for (mindex = 0; mindex < MG_CMAJORS; mindex++) {
-		if ((err =
-		     lis_register_strdev(mg_majors[mindex], &mg_info, MG_CMINORS, MG_DRV_NAME)) < 0) {
-			if (!mindex) {
-				cmn_err(CE_PANIC, "%s: could not register 1'st major %d",
-					MG_DRV_NAME, mg_majors[mindex]);
-				mg_term_caches();
-				mg_initialized = err;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: could not register %d'th major", MG_DRV_NAME, mindex + 1);
-			mg_majors[mindex] = 0;
-		} else
-			mg_majors[mindex] = err;
-	}
-	spin_lock_init(&master.lock); /* "mg-master-list-lock" */
-	mg_initialized = 1;
-	return;
-}
-static void
-mg_terminate(void)
-{
-	int err, mindex;
-	for (mindex = 0; mindex < MG_CMAJORS; mindex++) {
-		if (mg_majors[mindex]) {
-			if ((err = lis_unregister_strdev(mg_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: could not unregister major %d\n",
-					MG_DRV_NAME, mg_majors[mindex]);
-			else
-				mg_majors[mindex] = 0;
-		}
-	}
-	mg_term_caches();
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct cdevsw mg_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &mginfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+mg_register_strdev(major_t major)
 {
-	mg_init();
-	if (mg_initialized < 0)
-		return mg_initialized;
+	int err;
+	if ((err = register_strdev(&mg_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+mg_unregister_strdev(major_t major)
 {
-	mg_terminate();
-	(void) mg_get_id;
-	(void) m_flush;
+	int err;
+	if ((err = unregister_strdev(&mg_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+mg_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &mginfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+mg_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+mgterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (mg_majors[mindex]) {
+			if ((err = mg_unregister_strdev(mg_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					mg_majors[mindex]);
+			if (mindex)
+				mg_majors[mindex] = 0;
+		}
+	}
+	if ((err = mg_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
 	return;
 }
+
+MODULE_STATIC int __init
+mginit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = mg_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		mgterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = mg_register_strdev(mg_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					mg_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				mgterminate();
+				return (err);
+			}
+		}
+		if (mg_majors[mindex] == 0)
+			mg_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(mg_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = mg_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(mginit);
+module_exit(mgterminate);
+
+#endif				/* LINUX */

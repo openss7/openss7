@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:32 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:10 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:10 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:10 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1833,7 +1833,7 @@ bc_table_generate(void)
  *  Table allocation
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC int
 hdlc_free_tables(void)
 {
 	if (bc_table) {
@@ -1848,6 +1848,7 @@ hdlc_free_tables(void)
 		free_pages((unsigned long) xchg(&rx_table, NULL), xchg(&rx_order, 0));
 		printd(("cd: freed Rx table kernel pages\n"));
 	}
+	return (0);
 }
 STATIC int
 hdlc_init_tables(void)
@@ -3711,8 +3712,7 @@ cd_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct cd *cd;
-		/* 
-		   test for multiple push */
+		/* test for multiple push */
 		for (cd = cd_list; cd; cd = cd->next) {
 			if (cd->u.dev.cmajor == cmajor && cd->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -3723,8 +3723,8 @@ cd_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			MOD_DEC_USE_COUNT;
 			return (ENOMEM);
 		}
-		/* 
-		   generate immediate information request */
+		qprocson(q);
+		/* generate immediate information request */
 		ch_info_req(q, cd);
 		return (0);
 	}
@@ -3831,6 +3831,10 @@ hdlcinit(void)
 #else
 	cmn_err(CE_NOTE, HDLC_SPLASH);	/* console splash */
 #endif
+	if ((err = hdlc_init_tables())) {
+		cmn_err(CE_WARN, "%s: could not init tables, err = %d", MOD_NAME, err);
+		return (err);
+	}
 	if ((err = hdlc_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
@@ -3849,6 +3853,8 @@ MODULE_STATIC void __exit
 hdlcterminate(void)
 {
 	int err;
+	if ((err = hdlc_free_tables()))
+		cmn_err(CE_WARN, "%s: could not free tables", MOD_NAME);
 	if ((err = hdlc_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = hdlc_term_caches()))

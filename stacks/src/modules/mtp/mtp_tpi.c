@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:37 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:37 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:37 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:37 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -77,7 +77,7 @@ static char const ident[] =
 #define INLINE			/* let compiler do its job */
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:37 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:25 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2837,8 +2837,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct mtp *mtp;
-		/* 
-		   test for multiple push */
+		/* test for multiple push */
 		for (mtp = mtp_opens; mtp; mtp = mtp->next) {
 			if (mtp->u.dev.cmajor == cmajor && mtp->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -2850,6 +2849,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			return (ENOMEM);
 		}
 		fixme(("Get information from below.\n"));
+		qprocson(q);
 #if 0
 		/* 
 		   generate immediate information request */
@@ -2862,7 +2862,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);
 	}
 	MOD_DEC_USE_COUNT;
-	return EIO;
+	return (EIO);
 }
 
 /*

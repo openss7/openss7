@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 00:53:13 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $";
 
 #include "compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION		"LfS $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:13 $"
+#define MX_SDL_REVISION		"LfS $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -74,9 +74,9 @@ static char const ident[] =
 				MX_SDL_REVISION		"\n" \
 				MX_SDL_COPYRIGHT	"\n" \
 				MX_SDL_DEVICE		"\n" \
-				MX_SDL_CONTACT		"\n"
-#define MX_SDL_SPLASH		MX_SDL_DEVICE		" - " \
-				MX_SDL_REVISION		"\n"
+				MX_SDL_CONTACT
+#define MX_SDL_SPLASH		MX_SDL_DESCRIP		"\n" \
+				MX_SDL_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(MX_SDL_CONTACT);
@@ -84,13 +84,13 @@ MODULE_DESCRIPTION(MX_SDL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MX_SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MX_SDL_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
 #define MX_SDL_MOD_ID	CONFIG_STREAMS_MX_SDL_MODID
 #define MX_SDL_MOD_NAME	CONFIG_STREAMS_MX_SDL_NAME
-#endif
+#endif				/* LFS */
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -113,31 +113,39 @@ MODULE_LICENSE(MX_SDL_LICENSE);
  *  =========================================================================
  */
 
-static struct module_info mx_minfo = {
-	mi_idnum:MX_SDL_MOD_ID,		/* Module ID number */
-	mi_idname:MX_SDL_MOD_NAME,	/* Module ID name */
+#define MOD_ID		MX_SDL_MOD_ID
+#define MOD_NAME	MX_SDL_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	MX_SDL_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	MX_SDL_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info mx_minfo = {
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module ID name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
 	mi_lowat:0,			/* Lo water mark */
 };
 
-static int mx_open(queue_t *, dev_t *, int, int, cred_t *);
-static int mx_close(queue_t *, int, cred_t *);
+STATIC int mx_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int mx_close(queue_t *, int, cred_t *);
 
-static struct qinit mx_rinit = {
+STATIC struct qinit mx_rinit = {
 	qi_putp:ss7_oput,		/* Read put (message from below) */
 	qi_qopen:mx_open,		/* Each open */
 	qi_qclose:mx_close,		/* Last close */
 	qi_minfo:&mx_minfo,		/* Information */
 };
 
-static struct qinit mx_winit = {
+STATIC struct qinit mx_winit = {
 	qi_putp:ss7_iput,		/* Write put (message from above) */
 	qi_minfo:&mx_minfo,		/* Information */
 };
 
-static struct streamtab mx_info = {
+MODULE_STATIC struct streamtab mx_sdlinfo = {
 	st_rdinit:&mx_rinit,		/* Upper read queue */
 	st_wrinit:&mx_winit,		/* Upper write queue */
 };
@@ -174,12 +182,12 @@ struct mx_config mx_default = {
 	opt_flags:MX_PARM_OPT_CLRCH,	/* option flags */
 };
 
-static struct mx *mx_opens = NULL;
+STATIC struct mx *mx_opens = NULL;
 
-static struct mx *mx_alloc_priv(queue_t *, struct mx **, dev_t *, cred_t *);
-static struct mx *mx_get(struct mx *);
-static void mx_put(struct mx *);
-static void mx_free_priv(queue_t *);
+STATIC struct mx *mx_alloc_priv(queue_t *, struct mx **, dev_t *, cred_t *);
+STATIC struct mx *mx_get(struct mx *);
+STATIC void mx_put(struct mx *);
+STATIC void mx_free_priv(queue_t *);
 
 /*
  *  =========================================================================
@@ -200,7 +208,8 @@ static void mx_free_priv(queue_t *);
  *  M_ERROR
  *  -----------------------------------
  */
-static int m_error(queue_t *q, struct mx *mx, int error)
+STATIC int
+m_error(queue_t *q, struct mx *mx, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
@@ -221,7 +230,7 @@ static int m_error(queue_t *q, struct mx *mx, int error)
 		if (hangup) {
 			mp->b_datap->db_type = M_HANGUP;
 			mx->state = MXS_UNUSABLE;
-			printd(("%s: %p: <- M_HANGUP\n", MX_SDL_MOD_NAME, mx));
+			printd(("%s: %p: <- M_HANGUP\n", MOD_NAME, mx));
 			putnext(mx->oq, mp);
 			return (-error);
 		} else {
@@ -229,7 +238,7 @@ static int m_error(queue_t *q, struct mx *mx, int error)
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			*(mp->b_wptr)++ = error < 0 ? -error : error;
 			mx->state = MXS_UNUSABLE;
-			printd(("%s: %p: <- M_ERROR\n", MX_SDL_MOD_NAME, mx));
+			printd(("%s: %p: <- M_ERROR\n", MOD_NAME, mx));
 			putnext(mx->oq, mp);
 			return (QR_DONE);
 		}
@@ -244,7 +253,8 @@ static int m_error(queue_t *q, struct mx *mx, int error)
  *  Indicates to the multiplex user information concerning the multiplex provider and the
  *  attached multiplex (if any).
  */
-static inline int mx_info_ack(queue_t *q, struct mx *mx)
+STATIC INLINE int
+mx_info_ack(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	struct MX_info_ack *p;
@@ -274,7 +284,7 @@ static inline int mx_info_ack(queue_t *q, struct mx *mx)
 		o->cp_tx_channels = mx->config.tx_channels;
 		o->cp_rx_channels = mx->config.rx_channels;
 		o->cp_opt_flags = mx->config.opt_flags;
-		printd(("%s: %p: <- MX_INFO_ACK\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_INFO_ACK\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -286,8 +296,8 @@ static inline int mx_info_ack(queue_t *q, struct mx *mx)
  *  MX_OPTMGMT_ACK
  *  -----------------------------------
  */
-static inline int mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len,
-				 ulong flags)
+STATIC INLINE int
+mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len, ulong flags)
 {
 	mblk_t *mp;
 	struct MX_optmgmt_ack *p;
@@ -302,7 +312,7 @@ static inline int mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: <- MX_OPTMGMT_ACK\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_OPTMGMT_ACK\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -317,7 +327,8 @@ static inline int mx_optmgmt_ack(queue_t *q, struct mx *mx, uchar *opt_ptr, size
  *  acknowledgement was completed successfully.  (There are only two
  *  operations requiring acknowledgement: MX_ATTACH_REQ and MX_DETACH_REQ.)
  */
-static inline int mx_ok_ack(queue_t *q, struct mx *mx)
+STATIC INLINE int
+mx_ok_ack(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	struct MX_ok_ack *p;
@@ -343,7 +354,7 @@ static inline int mx_ok_ack(queue_t *q, struct mx *mx)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_OK_ACK\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_OK_ACK\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -360,7 +371,8 @@ static inline int mx_ok_ack(queue_t *q, struct mx *mx)
  *  acknowledgement or confirmation.  In addition, this error is returned when
  *  unrecognized primitives are sent.
  */
-static inline int mx_error_ack(queue_t *q, struct mx *mx, ulong prim, long error)
+STATIC INLINE int
+mx_error_ack(queue_t *q, struct mx *mx, ulong prim, long error)
 {
 	mblk_t *mp;
 	struct MX_error_ack *p;
@@ -409,7 +421,7 @@ static inline int mx_error_ack(queue_t *q, struct mx *mx, ulong prim, long error
 			p->mx_state = mx->state;
 			break;
 		}
-		printd(("%s: %p: <- MX_ERROR_ACK\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_ERROR_ACK\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -423,7 +435,8 @@ static inline int mx_error_ack(queue_t *q, struct mx *mx, ulong prim, long error
  *  Confirms to the multiplex user that the attached multiplex was enabled as
  *  requested.
  */
-static inline int mx_enable_con(queue_t *q, struct mx *mx)
+STATIC INLINE int
+mx_enable_con(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	struct MX_enable_con *p;
@@ -441,7 +454,7 @@ static inline int mx_enable_con(queue_t *q, struct mx *mx)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_ENABLE_CON\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_ENABLE_CON\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -455,7 +468,8 @@ static inline int mx_enable_con(queue_t *q, struct mx *mx)
  *  Confirms to the multiplex user that the enabled or connected multiplex was
  *  connected in the requested direction.
  */
-static inline int mx_connect_con(queue_t *q, struct mx *mx, ulong flags, ulong slot)
+STATIC INLINE int
+mx_connect_con(queue_t *q, struct mx *mx, ulong flags, ulong slot)
 {
 	mblk_t *mp;
 	struct MX_connect_con *p;
@@ -475,7 +489,7 @@ static inline int mx_connect_con(queue_t *q, struct mx *mx, ulong flags, ulong s
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_CONNECT_CON\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_CONNECT_CON\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -490,7 +504,8 @@ static inline int mx_connect_con(queue_t *q, struct mx *mx, ulong flags, ulong s
  *  This is the non-preferred way of sending data to the multiplex user.  We
  *  should normally just send M_DATA blocks.
  */
-static inline int mx_data_ind(queue_t *q, struct mx *mx)
+STATIC INLINE int
+mx_data_ind(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	struct MX_data_ind *p;
@@ -499,7 +514,7 @@ static inline int mx_data_ind(queue_t *q, struct mx *mx)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->mx_primitive = MX_DATA_IND;
 		p->mx_slot = 0;
-		printd(("%s: %p: <- MX_DATA_IND\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DATA_IND\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -517,7 +532,8 @@ static inline int mx_data_ind(queue_t *q, struct mx *mx)
  *  alarms).  This indication is rather optional, as carrier alarms are also
  *  indicated to management streams for the underlying devices.
  */
-static inline int mx_disconnect_ind(queue_t *q, struct mx *mx, ulong flags, ulong slot)
+STATIC INLINE int
+mx_disconnect_ind(queue_t *q, struct mx *mx, ulong flags, ulong slot)
 {
 	mblk_t *mp;
 	struct MX_disconnect_ind *p;
@@ -540,7 +556,7 @@ static inline int mx_disconnect_ind(queue_t *q, struct mx *mx, ulong flags, ulon
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_DISCONNECT_IND\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISCONNECT_IND\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -554,7 +570,8 @@ static inline int mx_disconnect_ind(queue_t *q, struct mx *mx, ulong flags, ulon
  *  Confirms to the multiplex user that the requested directions were
  *  disconnected as requested.
  */
-static inline int mx_disconnect_con(queue_t *q, struct mx *mx, ulong flags, ulong slot)
+STATIC INLINE int
+mx_disconnect_con(queue_t *q, struct mx *mx, ulong flags, ulong slot)
 {
 	mblk_t *mp;
 	struct MX_disconnect_con *p;
@@ -580,7 +597,7 @@ static inline int mx_disconnect_con(queue_t *q, struct mx *mx, ulong flags, ulon
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_DISCONNECT_CON\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISCONNECT_CON\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -596,7 +613,8 @@ static inline int mx_disconnect_con(queue_t *q, struct mx *mx, ulong flags, ulon
  *  the underlying stream, but is optional.  The multiplex user should detach
  *  and reattach the stream.
  */
-static inline int mx_disable_ind(queue_t *q, struct mx *mx, long cause)
+STATIC INLINE int
+mx_disable_ind(queue_t *q, struct mx *mx, long cause)
 {
 	mblk_t *mp;
 	struct MX_disable_ind *p;
@@ -606,7 +624,7 @@ static inline int mx_disable_ind(queue_t *q, struct mx *mx, long cause)
 		p->mx_primitive = MX_DISABLE_IND;
 		p->mx_cause = cause;
 		mx->state = MXS_UNUSABLE;
-		printd(("%s: %p: <- MX_DISABLE_IND\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISABLE_IND\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -618,7 +636,8 @@ static inline int mx_disable_ind(queue_t *q, struct mx *mx, long cause)
  *  MX_DISABLE_CON
  *  -----------------------------------
  */
-static inline int mx_disable_con(queue_t *q, struct mx *mx)
+STATIC INLINE int
+mx_disable_con(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	struct MX_disable_con *p;
@@ -641,7 +660,7 @@ static inline int mx_disable_con(queue_t *q, struct mx *mx)
 			freemsg(mp);
 			return (-EFAULT);
 		}
-		printd(("%s: %p: <- MX_DISABLE_CON\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: <- MX_DISABLE_CON\n", MOD_NAME, mx));
 		putnext(mx->oq, mp);
 		return (QR_DONE);
 	}
@@ -660,7 +679,8 @@ static inline int mx_disable_con(queue_t *q, struct mx *mx)
  *  LMI_INFO_REQ
  *  -----------------------------------
  */
-static inline int lmi_info_req(queue_t *q, struct mx *mx)
+STATIC INLINE int
+lmi_info_req(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	lmi_info_req_t *p;
@@ -668,7 +688,7 @@ static inline int lmi_info_req(queue_t *q, struct mx *mx)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -682,7 +702,8 @@ static inline int lmi_info_req(queue_t *q, struct mx *mx)
  *  Requests that the provider attach the requesting stream to the specified
  *  PPA.  This is only valid for STYLE 2 devices.
  */
-static inline int lmi_attach_req(queue_t *q, struct mx *mx, uchar *ppa_ptr, size_t ppa_len)
+STATIC INLINE int
+lmi_attach_req(queue_t *q, struct mx *mx, uchar *ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_attach_req_t *p;
@@ -695,7 +716,7 @@ static inline int lmi_attach_req(queue_t *q, struct mx *mx, uchar *ppa_ptr, size
 			mp->b_wptr += ppa_len;
 		}
 		mx->state = MXS_WACK_AREQ;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -709,7 +730,8 @@ static inline int lmi_attach_req(queue_t *q, struct mx *mx, uchar *ppa_ptr, size
  *  Requests that the provider detach the requesting stream from the attached
  *  PPA.  This is only valid for STYLE 2 devices.
  */
-static inline int lmi_detach_req(queue_t *q, struct mx *mx)
+STATIC INLINE int
+lmi_detach_req(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	lmi_detach_req_t *p;
@@ -718,7 +740,7 @@ static inline int lmi_detach_req(queue_t *q, struct mx *mx)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
 		mx->state = MXS_WACK_UREQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -733,7 +755,8 @@ static inline int lmi_detach_req(queue_t *q, struct mx *mx)
  *  remote address (if required).  Typically we do not have remote addresses
  *  for channels.
  */
-static inline int lmi_enable_req(queue_t *q, struct mx *mx)
+STATIC INLINE int
+lmi_enable_req(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	lmi_enable_req_t *p;
@@ -746,7 +769,7 @@ static inline int lmi_enable_req(queue_t *q, struct mx *mx)
 			mp->b_wptr += mx->rem_len;
 		}
 		mx->state = MXS_WCON_EREQ;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -760,7 +783,8 @@ static inline int lmi_enable_req(queue_t *q, struct mx *mx)
  *  Requests that the provider disable the attached stream for the enabled
  *  remote address.
  */
-static inline int lmi_disable_req(queue_t *q, struct mx *mx)
+STATIC INLINE int
+lmi_disable_req(queue_t *q, struct mx *mx)
 {
 	mblk_t *mp;
 	lmi_disable_req_t *p;
@@ -769,7 +793,7 @@ static inline int lmi_disable_req(queue_t *q, struct mx *mx)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		mx->state = MXS_WCON_RREQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -782,8 +806,8 @@ static inline int lmi_disable_req(queue_t *q, struct mx *mx)
  *  -----------------------------------
  *  Requests that the provider get, set or negotiate the specified options.
  */
-static inline int lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len,
-				  ulong flags)
+STATIC INLINE int
+lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, size_t opt_len, ulong flags)
 {
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
@@ -798,7 +822,7 @@ static inline int lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, siz
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -813,7 +837,8 @@ static inline int lmi_optmgmt_req(queue_t *q, struct mx *mx, uchar *opt_ptr, siz
  *  non-preferred method for sending data to the lower level and is not used
  *  by this module.
  */
-static inline int sdl_bits_for_transmission_req(queue_t *q, struct mx *mx, mblk_t *dp)
+STATIC INLINE int
+sdl_bits_for_transmission_req(queue_t *q, struct mx *mx, mblk_t *dp)
 {
 	mblk_t *mp;
 	sdl_bits_for_transmission_req_t *p;
@@ -822,7 +847,7 @@ static inline int sdl_bits_for_transmission_req(queue_t *q, struct mx *mx, mblk_
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_BITS_FOR_TRANSMISSION_REQ;
 		mp->b_cont = dp;
-		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -835,7 +860,8 @@ static inline int sdl_bits_for_transmission_req(queue_t *q, struct mx *mx, mblk_
  *  -----------------------------------
  *  Requests that the provider connect the stream in the specified directions.
  */
-static inline int sdl_connect_req(queue_t *q, struct mx *mx, ulong flags)
+STATIC INLINE int
+sdl_connect_req(queue_t *q, struct mx *mx, ulong flags)
 {
 	mblk_t *mp;
 	sdl_connect_req_t *p;
@@ -845,7 +871,7 @@ static inline int sdl_connect_req(queue_t *q, struct mx *mx, ulong flags)
 		p->sdl_primitive = SDL_CONNECT_REQ;
 		p->sdl_flags = flags;
 		mx->state = MXS_WCON_CREQ;
-		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -857,7 +883,8 @@ static inline int sdl_connect_req(queue_t *q, struct mx *mx, ulong flags)
  *  SDL_DISCONNECT_REQ
  *  -----------------------------------
  */
-static inline int sdl_disconnect_req(queue_t *q, struct mx *mx, ulong flags)
+STATIC INLINE int
+sdl_disconnect_req(queue_t *q, struct mx *mx, ulong flags)
 {
 	mblk_t *mp;
 	sdl_disconnect_req_t *p;
@@ -867,7 +894,7 @@ static inline int sdl_disconnect_req(queue_t *q, struct mx *mx, ulong flags)
 		p->sdl_primitive = SDL_DISCONNECT_REQ;
 		p->sdl_flags = flags;
 		mx->state = MXS_WCON_DREQ;
-		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MOD_NAME, mx));
 		putnext(mx->iq, mp);
 		return (QR_DONE);
 	}
@@ -886,7 +913,8 @@ static inline int sdl_disconnect_req(queue_t *q, struct mx *mx, ulong flags)
  *  LMI_INFO_ACK
  *  -----------------------------------
  */
-static int lmi_info_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_info_ack(queue_t *q, mblk_t *mp)
 {
 	/* discard */
 	return (QR_DONE);
@@ -896,7 +924,8 @@ static int lmi_info_ack(queue_t *q, mblk_t *mp)
  *  LMI_OK_ACK
  *  -----------------------------------
  */
-static int lmi_ok_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	return mx_ok_ack(q, mx);
@@ -906,7 +935,8 @@ static int lmi_ok_ack(queue_t *q, mblk_t *mp)
  *  LMI_ERROR_ACK
  *  -----------------------------------
  */
-static int lmi_error_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	long prim, error = -EFAULT;
@@ -970,7 +1000,8 @@ static int lmi_error_ack(queue_t *q, mblk_t *mp)
  *  LMI_ENABLE_CON
  *  -----------------------------------
  */
-static int lmi_enable_con(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_enable_con(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	return mx_enable_con(q, mx);
@@ -980,7 +1011,8 @@ static int lmi_enable_con(queue_t *q, mblk_t *mp)
  *  LMI_DISABLE_CON
  *  -----------------------------------
  */
-static int lmi_disable_con(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_disable_con(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	return mx_disable_con(q, mx);
@@ -990,7 +1022,8 @@ static int lmi_disable_con(queue_t *q, mblk_t *mp)
  *  LMI_OPTMGMT_ACK
  *  -----------------------------------
  */
-static int lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -1004,7 +1037,8 @@ static int lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
  *  indicates when a Red Alarm condition occurs so that we can notify of
  *  hardware failure.
  */
-static int lmi_error_ind(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_error_ind(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -1015,7 +1049,8 @@ static int lmi_error_ind(queue_t *q, mblk_t *mp)
  *  LMI_STATS_IND
  *  -----------------------------------
  */
-static int lmi_stats_ind(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_stats_ind(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -1029,7 +1064,8 @@ static int lmi_stats_ind(queue_t *q, mblk_t *mp)
  *  indicates when a Red Alarm condition occurs so that we can notify of
  *  hardware failure.
  */
-static int lmi_event_ind(queue_t *q, mblk_t *mp)
+STATIC int
+lmi_event_ind(queue_t *q, mblk_t *mp)
 {
 	/* not expecting these */
 	swerr();
@@ -1040,7 +1076,8 @@ static int lmi_event_ind(queue_t *q, mblk_t *mp)
  *  M_DATA
  *  -----------------------------------
  */
-static int mx_read(queue_t *q, mblk_t *mp)
+STATIC int
+mx_read(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	if (!mp || !msgdsize(mp))
@@ -1072,7 +1109,8 @@ static int mx_read(queue_t *q, mblk_t *mp)
  *  SDL_RECEIVED_BITS_IND
  *  -----------------------------------
  */
-static int sdl_received_bits_ind(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_received_bits_ind(queue_t *q, mblk_t *mp)
 {
 	sdl_received_bits_ind_t *p = (typeof(p)) mp->b_rptr;
 	int err;
@@ -1090,7 +1128,8 @@ static int sdl_received_bits_ind(queue_t *q, mblk_t *mp)
  *  SDL_DISCONNECT_IND
  *  -----------------------------------
  */
-static int sdl_disconnect_ind(queue_t *q, mblk_t *mp)
+STATIC int
+sdl_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	sdl_disconnect_ind_t *p = (typeof(p)) mp->b_rptr;
@@ -1121,7 +1160,8 @@ static int sdl_disconnect_ind(queue_t *q, mblk_t *mp)
  *  block onto the transmit stream of the multiplex.  This is the preferred
  *  method of sending data to the multiplex.
  */
-static int mx_write(queue_t *q, mblk_t *mp)
+STATIC int
+mx_write(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	if (!mp || !msgdsize(mp))
@@ -1154,7 +1194,8 @@ static int mx_write(queue_t *q, mblk_t *mp)
  *  Requests that the multiplex provider return information about the provider
  *  and the attached multiplex (if any).
  */
-static int mx_info_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_info_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_info_req *p = (typeof(p)) mp->b_rptr;
@@ -1175,7 +1216,8 @@ static int mx_info_req(queue_t *q, mblk_t *mp)
  *  Requests that the multiplex provider set, get or negotiate provider or
  *  attached multiplex options.
  */
-static int mx_optmgmt_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_optmgmt_req *p = (typeof(p)) mp->b_rptr;
@@ -1283,7 +1325,8 @@ static int mx_optmgmt_req(queue_t *q, mblk_t *mp)
  *  Requests that the multiplex provider attached the requesting stream to the
  *  specified multiplex (specified in the multiplex address).
  */
-static int mx_attach_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_attach_req *p = (typeof(p)) mp->b_rptr;
@@ -1305,7 +1348,8 @@ static int mx_attach_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the multiplex provider enable the attached multiplex.
  */
-static int mx_enable_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_enable_req *p = (typeof(p)) mp->b_rptr;
@@ -1326,7 +1370,8 @@ static int mx_enable_req(queue_t *q, mblk_t *mp)
  *  Requests that the multiplex provider connect the specified direction on the
  *  attached and enabled multiplex.
  */
-static int mx_connect_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_connect_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_connect_req *p = (typeof(p)) mp->b_rptr;
@@ -1366,7 +1411,8 @@ static int mx_connect_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider send data on the connected multiplex on the
  *  specified mux slot.  This module only provides one slot.
  */
-static int mx_data_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_data_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_data_req *p = (typeof(p)) mp->b_rptr;
@@ -1388,7 +1434,8 @@ static int mx_data_req(queue_t *q, mblk_t *mp)
  *  Requests that the provider disconnect the specified direction for the
  *  attached, enabled and connected multiplex.
  */
-static int mx_disconnect_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_disconnect_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_disconnect_req *p = (typeof(p)) mp->b_rptr;
@@ -1425,7 +1472,8 @@ static int mx_disconnect_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the provider disable the attached and enabled multiplex.
  */
-static int mx_disable_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_disable_req *p = (typeof(p)) mp->b_rptr;
@@ -1449,7 +1497,8 @@ static int mx_disable_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  Requests that the provider detach the attached multiplex.
  */
-static int mx_detach_req(queue_t *q, mblk_t *mp)
+STATIC int
+mx_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_detach_req *p = (typeof(p)) mp->b_rptr;
@@ -1479,7 +1528,8 @@ static int mx_detach_req(queue_t *q, mblk_t *mp)
  *  MX_IOCGCONFIG
  *  -----------------------------------
  */
-static int mx_iocgconfig(struct mx *mx, struct mx_config *p)
+STATIC int
+mx_iocgconfig(struct mx *mx, struct mx_config *p)
 {
 	*p = mx->config;
 	return (0);
@@ -1489,8 +1539,9 @@ static int mx_iocgconfig(struct mx *mx, struct mx_config *p)
  *  MX_IOCSCONFIG
  *  -----------------------------------
  */
-static int mx_ioctconfig(struct mx *, struct mx_config *);
-static int mx_iocsconfig(struct mx *mx, struct mx_config *p)
+STATIC int mx_ioctconfig(struct mx *, struct mx_config *);
+STATIC int
+mx_iocsconfig(struct mx *mx, struct mx_config *p)
 {
 	int err;
 	if ((err = mx_ioctconfig(mx, p)))
@@ -1503,7 +1554,8 @@ static int mx_iocsconfig(struct mx *mx, struct mx_config *p)
  *  MX_IOCTCONFIG
  *  -----------------------------------
  */
-static int mx_ioctconfig(struct mx *mx, struct mx_config *p)
+STATIC int
+mx_ioctconfig(struct mx *mx, struct mx_config *p)
 {
 	if (p->block_size <= 0 || p->block_size & 0x7)
 		goto einval;
@@ -1534,7 +1586,8 @@ static int mx_ioctconfig(struct mx *mx, struct mx_config *p)
  *  MX_IOCCCONFIG
  *  -----------------------------------
  */
-static int mx_ioccconfig(struct mx *mx, struct mx_config *p)
+STATIC int
+mx_ioccconfig(struct mx *mx, struct mx_config *p)
 {
 	*p = mx->config = mx_default;
 	return (0);
@@ -1544,7 +1597,8 @@ static int mx_ioccconfig(struct mx *mx, struct mx_config *p)
  *  MX_IOCGSTATEM
  *  -----------------------------------
  */
-static int mx_iocgstatem(struct mx *mx, struct mx_statem *p)
+STATIC int
+mx_iocgstatem(struct mx *mx, struct mx_statem *p)
 {
 	p->state = mx->state;
 	p->flags = mx->flags;
@@ -1555,7 +1609,8 @@ static int mx_iocgstatem(struct mx *mx, struct mx_statem *p)
  *  MX_IOCCMRESET
  *  -----------------------------------
  */
-static int mx_ioccmreset(struct mx *mx, struct mx_statem *p)
+STATIC int
+mx_ioccmreset(struct mx *mx, struct mx_statem *p)
 {
 	mx->state = p->state;
 	mx->flags = p->flags;
@@ -1566,7 +1621,8 @@ static int mx_ioccmreset(struct mx *mx, struct mx_statem *p)
  *  MX_IOCGSTATSP
  *  -----------------------------------
  */
-static int mx_iocgstatsp(struct mx *mx, struct mx_stats *p)
+STATIC int
+mx_iocgstatsp(struct mx *mx, struct mx_stats *p)
 {
 	*p = mx->statsp;
 	return (0);
@@ -1576,7 +1632,8 @@ static int mx_iocgstatsp(struct mx *mx, struct mx_stats *p)
  *  MX_IOCSSTATSP
  *  -----------------------------------
  */
-static int mx_iocsstatsp(struct mx *mx, struct mx_stats *p)
+STATIC int
+mx_iocsstatsp(struct mx *mx, struct mx_stats *p)
 {
 	mx->statsp = *p;
 	return (0);
@@ -1586,7 +1643,8 @@ static int mx_iocsstatsp(struct mx *mx, struct mx_stats *p)
  *  MX_IOCGSTATS
  *  -----------------------------------
  */
-static int mx_iocgstats(struct mx *mx, struct mx_stats *p)
+STATIC int
+mx_iocgstats(struct mx *mx, struct mx_stats *p)
 {
 	*p = mx->stats;
 	return (0);
@@ -1596,7 +1654,8 @@ static int mx_iocgstats(struct mx *mx, struct mx_stats *p)
  *  MX_IOCCSTATS
  *  -----------------------------------
  */
-static int mx_ioccstats(struct mx *mx, struct mx_stats *p)
+STATIC int
+mx_ioccstats(struct mx *mx, struct mx_stats *p)
 {
 	bzero(&mx->stats, sizeof(mx->stats));
 	return (0);
@@ -1606,7 +1665,8 @@ static int mx_ioccstats(struct mx *mx, struct mx_stats *p)
  *  MX_IOCGNOTIFY
  *  -----------------------------------
  */
-static int mx_iocgnotify(struct mx *mx, struct mx_notify *p)
+STATIC int
+mx_iocgnotify(struct mx *mx, struct mx_notify *p)
 {
 	*p = mx->notify;
 	return (0);
@@ -1616,7 +1676,8 @@ static int mx_iocgnotify(struct mx *mx, struct mx_notify *p)
  *  MX_IOCSNOTIFY
  *  -----------------------------------
  */
-static int mx_iocsnotify(struct mx *mx, struct mx_notify *p)
+STATIC int
+mx_iocsnotify(struct mx *mx, struct mx_notify *p)
 {
 	mx->notify.events |= p->events;
 	return (0);
@@ -1626,7 +1687,8 @@ static int mx_iocsnotify(struct mx *mx, struct mx_notify *p)
  *  MX_IOCCNOTIFY
  *  -----------------------------------
  */
-static int mx_ioccnotify(struct mx *mx, struct mx_notify *p)
+STATIC int
+mx_ioccnotify(struct mx *mx, struct mx_notify *p)
 {
 	mx->notify.events &= ~p->events;
 	return (0);
@@ -1636,7 +1698,8 @@ static int mx_ioccnotify(struct mx *mx, struct mx_notify *p)
  *  SDL_IOCGCONFIG
  *  -----------------------------------
  */
-static int sdl_iocgconfig_req(queue_t *q)
+STATIC int
+sdl_iocgconfig_req(queue_t *q)
 {
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1663,7 +1726,8 @@ static int sdl_iocgconfig_req(queue_t *q)
 	rare();
 	return (-ENOBUFS);
 }
-static int sdl_iocgconfig_ack(struct mx *mx, sdl_config_t * p)
+STATIC int
+sdl_iocgconfig_ack(struct mx *mx, sdl_config_t * p)
 {
 	/* ignore */
 	switch (mx->state) {
@@ -1733,7 +1797,8 @@ static int sdl_iocgconfig_ack(struct mx *mx, sdl_config_t * p)
 	mx->state = MXS_UNUSABLE;
 	return m_error(mx->oq, mx, -EFAULT);
 }
-static int sdl_iocgconfig_nak(struct mx *mx, sdl_config_t * p)
+STATIC int
+sdl_iocgconfig_nak(struct mx *mx, sdl_config_t * p)
 {
 	swerr();
 	return m_error(mx->oq, mx, -EFAULT);
@@ -1744,7 +1809,8 @@ static int sdl_iocgconfig_nak(struct mx *mx, sdl_config_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
+STATIC int
+sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
 {
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1772,12 +1838,14 @@ static int sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_iocsstatsp_ack(struct mx *mx, sdl_stats_t * p)
+STATIC int
+sdl_iocsstatsp_ack(struct mx *mx, sdl_stats_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_iocsstatsp_nak(struct mx *mx, sdl_stats_t * p)
+STATIC int
+sdl_iocsstatsp_nak(struct mx *mx, sdl_stats_t * p)
 {
 	swerr();
 	return m_error(mx->oq, mx, -EFAULT);
@@ -1788,7 +1856,8 @@ static int sdl_iocsstatsp_nak(struct mx *mx, sdl_stats_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_iocgstats_req(queue_t *q)
+STATIC int
+sdl_iocgstats_req(queue_t *q)
 {
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1816,12 +1885,14 @@ static int sdl_iocgstats_req(queue_t *q)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_iocgstats_ack(struct mx *mx, sdl_stats_t * p)
+STATIC int
+sdl_iocgstats_ack(struct mx *mx, sdl_stats_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_iocgstats_nak(struct mx *mx, sdl_stats_t * p)
+STATIC int
+sdl_iocgstats_nak(struct mx *mx, sdl_stats_t * p)
 {
 	swerr();
 	return m_error(mx->oq, mx, -EFAULT);
@@ -1832,7 +1903,8 @@ static int sdl_iocgstats_nak(struct mx *mx, sdl_stats_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_ioccstats_req(queue_t *q)
+STATIC int
+sdl_ioccstats_req(queue_t *q)
 {
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1860,12 +1932,14 @@ static int sdl_ioccstats_req(queue_t *q)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_ioccstats_ack(struct mx *mx, sdl_stats_t * p)
+STATIC int
+sdl_ioccstats_ack(struct mx *mx, sdl_stats_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_ioccstats_nak(struct mx *mx, sdl_stats_t * p)
+STATIC int
+sdl_ioccstats_nak(struct mx *mx, sdl_stats_t * p)
 {
 	swerr();
 	return m_error(mx->oq, mx, -EFAULT);
@@ -1876,7 +1950,8 @@ static int sdl_ioccstats_nak(struct mx *mx, sdl_stats_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
+STATIC int
+sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
 {
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1904,12 +1979,14 @@ static int sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_iocsnotify_ack(struct mx *mx, sdl_notify_t * p)
+STATIC int
+sdl_iocsnotify_ack(struct mx *mx, sdl_notify_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_iocsnotify_nak(struct mx *mx, sdl_notify_t * p)
+STATIC int
+sdl_iocsnotify_nak(struct mx *mx, sdl_notify_t * p)
 {
 	swerr();
 	return m_error(mx->oq, mx, -EFAULT);
@@ -1920,7 +1997,8 @@ static int sdl_iocsnotify_nak(struct mx *mx, sdl_notify_t * p)
  *  -----------------------------------
  */
 #if 0
-static int sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
+STATIC int
+sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
 {
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
@@ -1948,12 +2026,14 @@ static int sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
 	return (-ENOBUFS);
 }
 #endif
-static int sdl_ioccnotify_ack(struct mx *mx, sdl_notify_t * p)
+STATIC int
+sdl_ioccnotify_ack(struct mx *mx, sdl_notify_t * p)
 {
 	/* ignore */
 	return (QR_DONE);
 }
-static int sdl_ioccnotify_nak(struct mx *mx, sdl_notify_t * p)
+STATIC int
+sdl_ioccnotify_nak(struct mx *mx, sdl_notify_t * p)
 {
 	swerr();
 	return m_error(mx->oq, mx, -EFAULT);
@@ -1970,7 +2050,8 @@ static int sdl_ioccnotify_nak(struct mx *mx, sdl_notify_t * p)
  *
  *  -------------------------------------------------------------------------
  */
-static int mx_w_ioctl(queue_t *q, mblk_t *mp)
+STATIC int
+mx_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2027,7 +2108,7 @@ static int mx_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = mx_ioccnotify(mx, arg);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported MX ioctl %d\n", MX_SDL_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported MX ioctl %d\n", MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -2059,7 +2140,8 @@ static int mx_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int mx_r_iocack(queue_t *q, mblk_t *mp)
+STATIC int
+mx_r_iocack(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2101,7 +2183,8 @@ static int mx_r_iocack(queue_t *q, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
 }
-static int mx_r_iocnak(queue_t *q, mblk_t *mp)
+STATIC int
+mx_r_iocnak(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2155,7 +2238,8 @@ static int mx_r_iocnak(queue_t *q, mblk_t *mp)
  *  Primitives from MG to MX.
  *  -----------------------------------
  */
-static int mx_w_proto(queue_t *q, mblk_t *mp)
+STATIC int
+mx_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct mx *mx = MX_PRIV(q);
@@ -2163,43 +2247,43 @@ static int mx_w_proto(queue_t *q, mblk_t *mp)
 	(void) mx;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MX_INFO_REQ:
-		printd(("%s: %p: -> MX_INFO_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_INFO_REQ\n", MOD_NAME, mx));
 		rtn = mx_info_req(q, mp);
 		break;
 	case MX_OPTMGMT_REQ:
-		printd(("%s: %p: -> MX_OPTMGMT_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_OPTMGMT_REQ\n", MOD_NAME, mx));
 		rtn = mx_optmgmt_req(q, mp);
 		break;
 	case MX_ATTACH_REQ:
-		printd(("%s: %p: -> MX_ATTACH_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_ATTACH_REQ\n", MOD_NAME, mx));
 		rtn = mx_attach_req(q, mp);
 		break;
 	case MX_ENABLE_REQ:
-		printd(("%s: %p: -> MX_ENABLE_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_ENABLE_REQ\n", MOD_NAME, mx));
 		rtn = mx_enable_req(q, mp);
 		break;
 	case MX_CONNECT_REQ:
-		printd(("%s: %p: -> MX_CONNECT_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_CONNECT_REQ\n", MOD_NAME, mx));
 		rtn = mx_connect_req(q, mp);
 		break;
 	case MX_DATA_REQ:
-		printd(("%s: %p: -> MX_DATA_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DATA_REQ\n", MOD_NAME, mx));
 		rtn = mx_data_req(q, mp);
 		break;
 	case MX_DISCONNECT_REQ:
-		printd(("%s: %p: -> MX_DISCONNECT_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DISCONNECT_REQ\n", MOD_NAME, mx));
 		rtn = mx_disconnect_req(q, mp);
 		break;
 	case MX_DISABLE_REQ:
-		printd(("%s: %p: -> MX_DISABLE_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DISABLE_REQ\n", MOD_NAME, mx));
 		rtn = mx_disable_req(q, mp);
 		break;
 	case MX_DETACH_REQ:
-		printd(("%s: %p: -> MX_DETACH_REQ\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_DETACH_REQ\n", MOD_NAME, mx));
 		rtn = mx_detach_req(q, mp);
 		break;
 	default:
-		printd(("%s: %p: -> MX_????\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: -> MX_????\n", MOD_NAME, mx));
 		rtn = mx_error_ack(q, mx, prim, MXNOTSUPP);
 		break;
 	}
@@ -2210,58 +2294,59 @@ static int mx_w_proto(queue_t *q, mblk_t *mp)
  *  Primitives from SDL to MX.
  *  -----------------------------------
  */
-static int mx_r_proto(queue_t *q, mblk_t *mp)
+STATIC int
+mx_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct mx *mx = MX_PRIV(q);
 	(void) mx;
 	switch (*((ulong *) mp->b_rptr)) {
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", MOD_NAME, mx));
 		rtn = lmi_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_OK_ACK <-\n", MOD_NAME, mx));
 		rtn = lmi_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", MOD_NAME, mx));
 		rtn = lmi_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", MOD_NAME, mx));
 		rtn = lmi_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", MOD_NAME, mx));
 		rtn = lmi_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MOD_NAME, mx));
 		rtn = lmi_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", MOD_NAME, mx));
 		rtn = lmi_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_STATS_IND <-\n", MOD_NAME, mx));
 		rtn = lmi_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", MOD_NAME, mx));
 		rtn = lmi_event_ind(q, mp);
 		break;
 	case SDL_RECEIVED_BITS_IND:
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND <-\n", MOD_NAME, mx));
 		rtn = sdl_received_bits_ind(q, mp);
 		break;
 	case SDL_DISCONNECT_IND:
-		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", MOD_NAME, mx));
 		rtn = sdl_disconnect_ind(q, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? %lu <-\n", MX_SDL_MOD_NAME, mx, *(ulong *) mp->b_rptr));
+		printd(("%s: %p: ???? %lu <-\n", MOD_NAME, mx, *(ulong *) mp->b_rptr));
 		rtn = -EFAULT;
 		break;
 	}
@@ -2275,16 +2360,18 @@ static int mx_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int mx_w_data(queue_t *q, mblk_t *mp)
+STATIC int
+mx_w_data(queue_t *q, mblk_t *mp)
 {
 	/* data from above */
-	printd(("%s: %p: -> M_DATA\n", MX_SDL_MOD_NAME, MX_PRIV(q)));
+	printd(("%s: %p: -> M_DATA\n", MOD_NAME, MX_PRIV(q)));
 	return mx_write(q, mp);
 }
-static int mx_r_data(queue_t *q, mblk_t *mp)
+STATIC int
+mx_r_data(queue_t *q, mblk_t *mp)
 {
 	/* data from below */
-	printd(("%s: %p: M_DATA <-\n", MX_SDL_MOD_NAME, MX_PRIV(q)));
+	printd(("%s: %p: M_DATA <-\n", MOD_NAME, MX_PRIV(q)));
 	return mx_read(q, mp);
 }
 
@@ -2295,7 +2382,8 @@ static int mx_r_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int mx_r_error(queue_t *q, mblk_t *mp)
+STATIC int
+mx_r_error(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	int err;
@@ -2309,7 +2397,8 @@ static int mx_r_error(queue_t *q, mblk_t *mp)
 		return (QR_PASSALONG);
 	}
 }
-static int mx_r_hangup(queue_t *q, mblk_t *mp)
+STATIC int
+mx_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	int err;
@@ -2331,7 +2420,8 @@ static int mx_r_hangup(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-static inline int mx_w_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+mx_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -2349,7 +2439,8 @@ static inline int mx_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-static inline int mx_r_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+mx_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -2385,7 +2476,8 @@ static inline int mx_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-static int mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int
+mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
@@ -2423,7 +2515,8 @@ static int mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-static int mx_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+mx_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
 	(void) crp;
@@ -2439,39 +2532,43 @@ static int mx_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-static kmem_cache_t *mx_priv_cachep = NULL;
-static int mx_init_caches(void)
+STATIC kmem_cache_t *mx_priv_cachep = NULL;
+STATIC int
+mx_init_caches(void)
 {
 	if (!mx_priv_cachep &&
 	    !(mx_priv_cachep =
 	      kmem_cache_create("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL,
 				NULL))) {
-		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", MX_SDL_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", MOD_NAME);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized mx private structure cache\n", MX_SDL_MOD_NAME));
+		printd(("%s: initialized mx private structure cache\n", MOD_NAME));
 	return (0);
 }
-static void mx_term_caches(void)
+STATIC int
+mx_term_caches(void)
 {
 	if (mx_priv_cachep) {
-		if (kmem_cache_destroy(mx_priv_cachep))
+		if (kmem_cache_destroy(mx_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mx_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mx_priv_cachep\n", MX_SDL_MOD_NAME));
+			return (-EBUSY);
+		} else
+			printd(("%s: destroyed mx_priv_cachep\n", MOD_NAME));
 	}
-	return;
+	return (0);
 }
 
 /*
  *  MX allocation and deallocation
  *  -------------------------------------------------------------------------
  */
-static struct mx *mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t *crp)
+STATIC struct mx *
+mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t *crp)
 {
 	struct mx *mx;
 	if ((mx = kmem_cache_alloc(mx_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated mx private structure\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: allocated mx private structure\n", MOD_NAME, mx));
 		bzero(mx, sizeof(*mx));
 		mx->u.dev.cmajor = getmajor(*devp);
 		mx->u.dev.cminor = getminor(*devp);
@@ -2489,13 +2586,14 @@ static struct mx *mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t
 			mx->next->prev = &mx->next;
 		mx->prev = chp;
 		*chp = mx_get(mx);
-		printd(("%s: %p: linked mx private structure\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: linked mx private structure\n", MOD_NAME, mx));
 		mx->config = mx_default;
 	} else
-		ptrace(("%s: ERROR: Could not allocate mx private structure\n", MX_SDL_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate mx private structure\n", MOD_NAME));
 	return (mx);
 }
-static void mx_free_priv(queue_t *q)
+STATIC void
+mx_free_priv(queue_t *q)
 {
 	struct mx *mx = MX_PRIV(q);
 	psw_t flags = 0;
@@ -2520,66 +2618,132 @@ static void mx_free_priv(queue_t *q)
 	mx_put(mx);		/* final put */
 	return;
 }
-static struct mx *mx_get(struct mx *mx)
+STATIC struct mx *
+mx_get(struct mx *mx)
 {
 	atomic_inc(&mx->refcnt);
 	return (mx);
 }
-static void mx_put(struct mx *mx)
+STATIC void
+mx_put(struct mx *mx)
 {
 	if (atomic_dec_and_test(&mx->refcnt)) {
 		kmem_cache_free(mx_priv_cachep, mx);
-		printd(("%s: %p: freed mx private structure\n", MX_SDL_MOD_NAME, mx));
+		printd(("%s: %p: freed mx private structure\n", MOD_NAME, mx));
 	}
 }
 
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-static int mx_initialized = 0;
-static void mx_init(void)
-{
-	unless(mx_initialized > 0, return);
-	cmn_err(CE_NOTE, MX_SDL_BANNER);	/* console splash */
-	if ((mx_initialized = mx_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", MX_SDL_MOD_NAME);
-	} else if ((mx_initialized = lis_register_strmod(&mx_info, MX_SDL_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: could not register module", MX_SDL_MOD_NAME);
-		mx_term_caches();
-	}
-	return;
-}
-static void mx_terminate(void)
-{
-	ensure(mx_initialized > 0, return);
-	if ((mx_initialized = lis_unregister_strmod(&mx_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: could not unregister module", MX_SDL_MOD_NAME);
-	} else {
-		mx_term_caches();
-	}
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int init_module(void)
+#ifdef LFS
+
+STATIC struct fmodsw mx_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &mx_sdlinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+mx_register_strmod(void)
 {
-	mx_init();
-	if (mx_initialized < 0)
-		return mx_initialized;
+	int err;
+	if ((err = register_strmod(&mx_fmod)) < 0)
+		return (err);
 	return (0);
 }
-void cleanup_module(void)
+
+STATIC int
+mx_unregister_strmod(void)
 {
-	mx_terminate();
+	int err;
+	if ((err = unregister_strmod(&mx_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+mx_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&mx_sdlinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+mx_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&mx_sdlinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+mx_sdlinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = mx_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = mx_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		mx_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+mx_sdlterminate(void)
+{
+	int err;
+	if ((err = mx_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = mx_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(mx_sdlinit);
+module_exit(mx_sdlterminate);
+
+#endif				/* LINUX */

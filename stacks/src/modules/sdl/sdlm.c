@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:08 $ by $Author: brian $
+ Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $";
+static char const ident[] =
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -65,6 +66,9 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $
  */
 #include "compat.h"
 
+#include <sys/dlpi.h>
+#include <sys/dlpi_mtp2.h>
+
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
 #include <ss7/devi.h>
@@ -72,77 +76,41 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#define DL_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
-#define DL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
-#define DL_DEVICE	"Supportes OpenSS7 SDL Drivers."
-#define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DL_LICENSE	"GPL"
-#define DL_BANNER	DL_DESCRIP	"\n" \
-			DL_REVISION	"\n" \
-			DL_COPYRIGHT	"\n" \
-			DL_DEVICE	"\n" \
-			DL_CONTACT	"\n"
-#define DL_SPLASH	DL_DEVICE	" - " \
-			DL_REVISION	"\n"
+#define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
+			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
+#define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
+#define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SDLM_LICENSE	"GPL"
+#define SDLM_BANNER	SDLM_DESCRIP	"\n" \
+			SDLM_REVISION	"\n" \
+			SDLM_COPYRIGHT	"\n" \
+			SDLM_DEVICE	"\n" \
+			SDLM_CONTACT	"\n"
+#define SDLM_SPLASH	SDLM_DESCRIP	"\n" \
+			SDLM_REVISION
 
-MODULE_AUTHOR(DL_CONTACT);
-MODULE_DESCRIPTION(DL_DESCRIP);
-MODULE_SUPPORTED_DEVICE(DL_DEVICE);
-MODULE_LICENSE(DL_LICENSE);
+#ifdef LINUX
+MODULE_AUTHOR(SDLM_CONTACT);
+MODULE_DESCRIPTION(SDLM_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SDLM_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(SDLM_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
-#ifndef SDLM_DRV_NAME
-#   ifdef CONFIG_STREAMS_SDLM_NAME
-#	define SDLM_DRV_NAME CONFIG_STREAMS_SDLM_NAME
-#   else
-#	define SDLM_DRV_NAME "sdl-mux"
-#   endif
-#endif
+#ifdef LFS
+#define SDLM_DRV_ID		CONFIG_STREAMS_SDLM_MODID
+#define SDLM_DRV_NAME		CONFIG_STREAMS_SDLM_NAME
+#define SDLM_CMAJORS		CONFIG_STREAMS_SDLM_NMAJORS
+#define SDLM_CMAJOR_0		CONFIG_STREAMS_SDLM_MAJOR
+#define SDLM_CMAJOR_1		CONFIG_STREAMS_SDLM_MAJOR_1
+#define SDLM_UNITS		CONFIG_STREAMS_SDLM_NMINORS
+#endif				/* LFS */
 
-#ifndef SDLM_DRV_ID
-#   ifdef CONFIG_STREAMS_SDLM_MODID
-#	define SDLM_DRV_ID CONFIG_STREAMS_SDLM_MODID
-#   else
-#	define SDLM_DRV_ID 0
-#   endif
-#endif
-
-#ifndef SDLM_CMAJORS
-#   ifdef CONFIG_STREAMS_SDLM_NMAJORS
-#	define SDLM_CMAJORS CONFIG_STREAMS_SDLM_NMAJORS
-#   else
-#	define SDLM_CMAJORS 2
-#   endif
-#endif
-
-#ifndef SDLM_CMAJOR_0
-#   ifdef CONFIG_STREAMS_SDLM_MAJOR
-#	define SDLM_CMAJOR_0 CONFIG_STREAMS_SDLM_MAJOR
-#   else
-#	define SDLM_CMAJOR_0 0
-#   endif
-#endif
-
-#ifndef SDLM_CMAJOR_1
-#   ifdef CONFIG_STREAMS_SDLM_MAJOR_1
-#	define SDLM_CMAJOR_1 CONFIG_STREAMS_SDLM_MAJOR_1
-#   else
-#	define SDLM_CMAJOR_1 0
-#   endif
-#endif
-
-unsigned short modid = SDLM_DRV_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for SDL Multiplexer. (0 for allocation)");
-
-unsigned short major = SDLM_CMAJOR_0;
-MODULE_PARM(major, "h");
-MODULE_PARM_DESC(major, "Major device number for SDL Multiplexer. (0 for allocation)");
-
-#define DL_NMAJOR (SDLM_CMAJORS - 1)
-#define LM_NMAJOR 1
-
-#define SDLM_CMINORS 256
+#define DL_NMAJOR	(SDLM_CMAJORS - 1)
+#define LM_NMAJOR	1
 
 /*
  *  =========================================================================
@@ -152,104 +120,127 @@ MODULE_PARM_DESC(major, "Major device number for SDL Multiplexer. (0 for allocat
  *  =========================================================================
  */
 
+#define DRV_ID		SDLM_DRV_ID
+#define DRV_NAME	SDLM_DRV_NAME
+#define CMAJORS		SDLM_CMAJORS
+#define CMAJOR_0	SDLM_CMAJOR_0
+#define CMAJOR_1	SDLM_CMAJOR_1
+#define UNITS		SDLM_UNITS
+#ifdef MODULE
+#define DRV_BANNER	SDLM_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SDLM_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info dl_minfo = {
-	SDLM_DRV_ID,			/* Module ID number */
-	SDLM_DRV_NAME,			/* Module name */
-	0,				/* Min packet size accepted */
-	INFPSZ,				/* Max packet size accepted */
-	1 << 15,			/* Hi water mark */
-	1 << 10				/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
-STATIC int dl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int dl_close(queue_t *, int, cred_t *);
+STATIC int sdlm_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sdlm_close(queue_t *, int, cred_t *);
 
-STATIC int dl_m_rput(queue_t *, mblk_t *);
-STATIC int dl_m_rsrv(queue_t *);
-
-STATIC struct qinit dl_m_rinit = {
-	dl_m_rput,			/* Read put (msg from below) */
-	dl_m_rsrv,			/* Read queue service */
-	dl_open,			/* Each open */
-	dl_close,			/* Last close */
-	NULL,				/* Admin (not used) */
-	&dl_minfo,			/* Information */
-	NULL				/* Statistics */
+STATIC struct module_stat dl_rmstat = {
+	.ms_pcnt = 0,			/* calls to qi_putp() */
+	.ms_scnt = 0,			/* calls to qi_srvp() */
+	.ms_ocnt = 0,			/* calls to qi_qopen() */
+	.ms_ccnt = 0,			/* calls to qi_qclose() */
+	.ms_acnt = 0,			/* calls to qi_qadmin() */
+	.ms_xprt = NULL,		/* module private stats */
+	.ms_xsize = 0,			/* length of private stats */
+	.ms_flags = 0,			/* bool stats -- for future use */
 };
 
-STATIC int dl_m_wput(queue_t *, mblk_t *);
-STATIC int dl_m_wsrv(queue_t *);
-
-STATIC struct qinit dl_m_winit = {
-	dl_m_wput,			/* Write put (msg from above) */
-	dl_m_wsrv,			/* Write queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&dl_minfo,			/* Information */
-	NULL				/* Statistics */
+STATIC struct module_stat dl_wmstat = {
+	.ms_pcnt = 0,			/* calls to qi_putp() */
+	.ms_scnt = 0,			/* calls to qi_srvp() */
+	.ms_ocnt = 0,			/* calls to qi_qopen() */
+	.ms_ccnt = 0,			/* calls to qi_qclose() */
+	.ms_acnt = 0,			/* calls to qi_qadmin() */
+	.ms_xprt = NULL,		/* module private stats */
+	.ms_xsize = 0,			/* length of private stats */
+	.ms_flags = 0,			/* bool stats -- for future use */
 };
 
-STATIC struct streamtab dl_m_info = {
-	&dl_m_rinit,			/* Upper read queue */
-	&dl_m_winit,			/* Upper write queue */
-	NULL,				/* Lower read queue */
-	NULL				/* Lower write queue */
+STATIC int dl_r_prim(queue_t *, mblk_t *);
+
+STATIC struct qinit dl_rinit = {
+	.qi_putp = ss7_oput,		/* Read put (msg from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = sdlm_open,		/* Each open */
+	.qi_qclose = sdlm_close,	/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &dl_minfo,		/* Information */
+	.qi_mstat = &dl_rmstat,		/* Statistics */
 };
 
-STATIC int dl_u_rput(queue_t *, mblk_t *);
+STATIC int dl_w_prim(queue_t *, mblk_t *);
 
-STATIC struct qinit dl_u_rinit = {
-	dl_u_rput,			/* Read put (msg from below) */
-	NULL,				/* Read queue service */
-	dl_open,			/* Each open */
-	dl_close,			/* Last close */
-	NULL,				/* Admin (not used) */
-	&dl_minfo,			/* Information */
-	NULL				/* Statistics */
+STATIC struct qinit dl_winit = {
+	.qi_putp = ss7_iput,		/* Write put (msg from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_qopen = NULL,		/* Each open */
+	.qi_qclose = NULL,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &dl_minfo,		/* Information */
+	.qi_mstat = &dl_wmstat,		/* Statistics */
 };
 
-STATIC int dl_u_wput(queue_t *, mblk_t *);
-
-STATIC struct qinit dl_u_winit = {
-	dl_u_wput,			/* Write put (msg from above) */
-	NULL,				/* Write queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&dl_minfo,			/* Information */
-	NULL				/* Statistics */
+STATIC struct module_stat dl_lr_mstat = {
+	.ms_pcnt = 0,			/* calls to qi_putp() */
+	.ms_scnt = 0,			/* calls to qi_srvp() */
+	.ms_ocnt = 0,			/* calls to qi_qopen() */
+	.ms_ccnt = 0,			/* calls to qi_qclose() */
+	.ms_acnt = 0,			/* calls to qi_qadmin() */
+	.ms_xprt = NULL,		/* module private stats */
+	.ms_xsize = 0,			/* length of private stats */
+	.ms_flags = 0,			/* bool stats -- for future use */
 };
 
-STATIC int dl_l_rput(queue_t *, mblk_t *);
-
-STATIC struct qinit dl_l_rinit = {
-	dl_l_rput,			/* Read put (msg from below) */
-	NULL,				/* Read queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&dl_minfo,			/* Information */
-	NULL				/* Statistics */
+STATIC struct module_stat dl_lw_mstat = {
+	.ms_pcnt = 0,			/* calls to qi_putp() */
+	.ms_scnt = 0,			/* calls to qi_srvp() */
+	.ms_ocnt = 0,			/* calls to qi_qopen() */
+	.ms_ccnt = 0,			/* calls to qi_qclose() */
+	.ms_acnt = 0,			/* calls to qi_qadmin() */
+	.ms_xprt = NULL,		/* module private stats */
+	.ms_xsize = 0,			/* length of private stats */
+	.ms_flags = 0,			/* bool stats -- for future use */
 };
 
-STATIC int dl_l_wput(queue_t *, mblk_t *);
+STATIC int sd_r_prim(queue_t *, mblk_t *);
 
-STATIC struct qinit dl_l_winit = {
-	dl_l_wput,			/* Write put (msg from above) */
-	NULL,				/* Write queue service */
-	NULL,				/* Each open */
-	NULL,				/* Last close */
-	NULL,				/* Admin (not used) */
-	&dl_minfo,			/* Information */
-	NULL				/* Statistics */
+STATIC struct qinit sd_rinit = {
+	.qi_putp = ss7_iput,		/* Read put (msg from below) */
+	.qi_srvp = ss7_isrv,		/* Read queue service */
+	.qi_qopen = NULL,		/* Each open */
+	.qi_qclose = NULL,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &dl_minfo,		/* Information */
+	.qi_mstat = &dl_lr_mstat,	/* Statistics */
 };
 
-STATIC struct streamtab dl_u_info = {
-	&dl_u_rinit,			/* Upper read queue */
-	&dl_u_winit,			/* Upper write queue */
-	&dl_l_rinit,			/* Lower read queue */
-	&dl_l_winit			/* Lower write queue */
+STATIC int sd_w_prim(queue_t *, mblk_t *);
+
+STATIC struct qinit sd_winit = {
+	.qi_putp = ss7_oput,		/* Write put (msg from above) */
+	.qi_srvp = ss7_osrv,		/* Write queue service */
+	.qi_qopen = NULL,		/* Each open */
+	.qi_qclose = NULL,		/* Last close */
+	.qi_qadmin = NULL,		/* Admin (not used) */
+	.qi_minfo = &dl_minfo,		/* Information */
+	.qi_mstat = &dl_lw_mstat,	/* Statistics */
+};
+
+STATIC struct streamtab sdlminfo = {
+	.st_rdinit = &dl_rinit,		/* Upper read queue */
+	.st_wrinit = &dl_winit,		/* Upper write queue */
+	.st_muxrinit = &sd_rinit,	/* Lower read queue */
+	.st_muxwinit = &sd_winit,	/* Lower write queue */
 };
 
 /*
@@ -260,22 +251,22 @@ STATIC struct streamtab dl_u_info = {
  *  =========================================================================
  */
 typedef struct dl {
-	struct dl *next;
-	struct dl **prev;
-	union {
-		dev_t devid;
-		int muxid;
-	} u;
-	queue_t *rq;
-	queue_t *wq;
-	ulong ppa;
+	STR_DECLARATION (struct dl);	/* stream declaration */
 } dl_t;
+#define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
 
-#define DL_PRIV(__q) ((dl_t *)((__q)->q_ptr))
+typedef struct sd {
+	STR_DECLARATION (struct sd);	/* stream declaration */
+	ulong ppa;
+} sd_t;
+#define SD_PRIV(__q) ((struct sd *)((__q)->q_ptr))
 
-dl_t *dl_opens = NULL;
-dl_t *dl_links = NULL;
-dl_t *dl_ctrls = NULL;
+typedef struct df {
+	spinlock_t lock;		/* structure lock */
+	SLIST_HEAD (dl, dl);		/* master list of dl structures */
+	SLIST_HEAD (sd, sd);		/* master list of sd structures */
+} df_t;
+STATIC struct df master;
 
 /*
  *  -------------------------------------------------------------------------
@@ -285,58 +276,233 @@ dl_t *dl_ctrls = NULL;
  *  -------------------------------------------------------------------------
  */
 
-STATIC kmem_cache_t *dl_cachep = NULL;
-STATIC int dl_cachep_allocated = 0;
-
-STATIC void
-dl_term_caches(void)
-{
-	if (dl_cachep) {
-		if (dl_cachep_allocated)
-			kmem_cache_destroy(dl_cachep);
-		dl_cachep = NULL;
-	}
-	return;
-}
+STATIC kmem_cache_t *sdlm_dl_cachep = NULL;
+STATIC kmem_cache_t *sdlm_sd_cachep = NULL;
 
 STATIC int
-dl_init_caches(void)
+sdlm_term_caches(void)
 {
-	if (!dl_cachep) {
-		if (!(dl_cachep =
-		      kmem_cache_create("dl_cachep", sizeof(dl_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-					NULL))) {
-			dl_term_caches();
-			return (ENOMEM);
-		}
-		dl_cachep_allocated = 1;
+	int err = 0;
+	if (sdlm_sd_cachep) {
+		if (kmem_cache_destroy(sdlm_sd_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy sdlm_sd_cachep", __FUNCTION__);
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sdlm_sd_cachep\n", DRV_NAME));
 	}
+	if (sdlm_dl_cachep) {
+		if (kmem_cache_destroy(sdlm_dl_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy sdlm_dl_cachep", __FUNCTION__);
+			err = -EBUSY;
+		} else
+			printd(("%s: destroyed sdlm_dl_cachep\n", DRV_NAME));
+	}
+	return (err);
+}
+STATIC int
+sdlm_init_caches(void)
+{
+	if (!sdlm_dl_cachep
+	    && !(sdlm_dl_cachep = kmem_cache_create("sdlm_dl_cachep", sizeof(struct dl), 0,
+						    SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sdlm_dl_cachep", DRV_NAME);
+		goto error;
+	} else
+		printd(("%s: initialized sdlm dl structure cache\n", DRV_NAME));
+	if (!sdlm_sd_cachep
+	    && !(sdlm_sd_cachep = kmem_cache_create("sdlm_sd_cachep", sizeof(struct sd), 0,
+						    SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate sdlm_sd_cachep", DRV_NAME);
+		goto error;
+	} else
+		printd(("%s: initialized sdlm sd structure cache\n", DRV_NAME));
 	return (0);
+      error:
+	sdlm_term_caches();
+	return (-ENOMEM);
 }
 
-STATIC dl_t *
-dl_alloc_priv(queue_t *q)
+STATIC struct dl *
+dl_get(struct dl *dl)
 {
-	dl_t *dl;
-	if ((dl = kmem_cache_alloc(dl_cachep, SLAB_ATOMIC))) {
-		MOD_INC_USE_COUNT;
-		bzero(dl, sizeof(*dl));
-		dl->rq = RD(q);
-		dl->wq = WR(q);
-		DL_PRIV(dl->rq) = DL_PRIV(dl->wq) = dl;
-	}
+	assure(dl);
+	if (dl)
+		atomic_inc(&dl->refcnt);
 	return (dl);
 }
 
 STATIC void
-dl_free_priv(queue_t *q)
+dl_put(struct dl *dl)
 {
-	dl_t *dl = DL_PRIV(q);
-	DL_PRIV(dl->rq) = DL_PRIV(dl->wq) = NULL;
-	dl->rq = NULL;
-	dl->wq = NULL;
-	kmem_cache_free(dl_cachep, dl);
-	MOD_DEC_USE_COUNT;
+	if (dl && atomic_dec_and_test(&dl->refcnt)) {
+		kmem_cache_free(sdlm_dl_cachep, dl);
+		printd(("%s: %s: %p: deallocated dl structure\n", DRV_NAME, __FUNCTION__, dl));
+	}
+}
+
+STATIC struct dl *
+sdlm_alloc_dl(queue_t *q, struct dl **dpp, major_t cmajor, minor_t cminor, cred_t *crp)
+{
+	struct dl *dl;
+	printd(("%s: %s: create dl device = %hu:%hu\n", DRV_NAME, __FUNCTION__, cmajor, cminor));
+	if ((dl = kmem_cache_alloc(sdlm_dl_cachep, SLAB_ATOMIC))) {
+		bzero(dl, sizeof(*dl));
+		dl_get(dl);	/* first get */
+		dl->u.dev.cmajor = cmajor;
+		dl->u.dev.cminor = cminor;
+		dl->cred = *crp;
+		spin_lock_init(&dl->qlock);
+		(dl->iq = RD(q))->q_ptr = dl_get(dl);
+		(dl->oq = RD(q))->q_ptr = dl_get(dl);
+		dl->i_prim = dl_r_prim;
+		dl->o_prim = dl_w_prim;
+		dl->i_wakeup = NULL;
+		dl->o_wakeup = NULL;
+		dl->i_state = DL_UNATTACHED;
+		dl->i_style = DL_STYLE2;
+		dl->i_version = 2;
+		spin_lock_init(&dl->lock);
+		/* place in master list */
+		if ((dl->next = *dpp))
+			dl->next->prev = &dl->next;
+		dl->prev = dpp;
+		*dpp = dl_get(dl);
+		master.dl.numb++;
+	} else
+		printd(("%s: %s: ERROR: failed to allocate dl structure %hu:%hu\n", DRV_NAME,
+			__FUNCTION__, cmajor, cminor));
+	return (dl);
+}
+
+STATIC void
+sdlm_free_dl(queue_t *q)
+{
+	struct dl *dl = (struct dl *) q->q_ptr;
+	psw_t flags;
+	ensure(dl, return);
+	printd(("%s: %s: %p: free dl %hu:%hu\n", DRV_NAME, __FUNCTION__, dl, dl->u.dev.cmajor,
+		dl->u.dev.cminor));
+	spin_lock_irqsave(&dl->lock, flags);
+	{
+		/* stopping bufcalls */
+		ss7_unbufcall((str_t *) dl);
+		/* flush buffers */
+		flushq(dl->oq, FLUSHALL);
+		flushq(dl->iq, FLUSHALL);
+		/* remove from master list */
+		if ((*dl->prev = dl->next))
+			dl->next->prev = dl->prev;
+		dl->next = NULL;
+		dl->prev = &dl->next;
+		ensure(atomic_read(&dl->refcnt) > 1, dl_get(dl));
+		dl_put(dl);
+		assure(master.dl.numb > 0);
+		master.dl.numb--;
+		/* remove from queues */
+		ensure(atomic_read(&dl->refcnt) > 1, dl_get(dl));
+		dl_put(xchg(&dl->oq->q_ptr, NULL));
+		ensure(atomic_read(&dl->refcnt) > 1, dl_get(dl));
+		dl_put(xchg(&dl->iq->q_ptr, NULL));
+		/* done, check final count */
+		if (atomic_read(&dl->refcnt) != 1) {
+			pswerr(("%s: %s: %p: ERROR: dl lingering reference count = %d\n",
+				DRV_NAME, __FUNCTION__, dl, atomic_read(&dl->refcnt)));
+			atomic_set(&dl->refcnt, 1);
+		}
+	}
+	spin_unlock_irqrestore(&dl->lock, flags);
+	dl_put(dl);		/* final put */
+	return;
+}
+
+STATIC struct sd *
+sd_get(struct sd *sd)
+{
+	assure(sd);
+	if (sd)
+		atomic_inc(&sd->refcnt);
+	return (sd);
+}
+
+STATIC void
+sd_put(struct sd *sd)
+{
+	if (sd && atomic_dec_and_test(&sd->refcnt)) {
+		kmem_cache_free(sdlm_sd_cachep, sd);
+		printd(("%s: %s: %p: deallocated sd structure", DRV_NAME, __FUNCTION__, dl));
+	}
+}
+
+STATIC struct sd *
+sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
+{
+	struct sd *sd;
+	printd(("%s: %s: create sd index = %lu\n", DRV_NAME, __FUNCITON__, index));
+	if ((sd = kmem_cache_alloc(sdlm_sd_cachep, SLAB_ATOMIC))) {
+		bzero(sd, sizeof(*sd));
+		sd_get(sd);	/* first get */
+		sd->u.mux.index = index;
+		sd->cred = *crp;
+		spin_lock_init(&sd->qlock);
+		(sd->iq = RD(q))->q_ptr = sd_get(sd);
+		(sd->oq = WR(q))->q_ptr = sd_get(sd);
+		sd->o_prim = sd_w_prim;
+		sd->i_prim = sd_r_prim;
+		sd->o_wakeup = NULL;
+		sd->i_wakeup = NULL;
+		sd->i_state = LMI_UNATTACHED;
+		sd->i_version = LMI_STYLE2;
+		spin_lock_init(&sd->lock);
+		/* place in master list */
+		if ((sd->next = *spp))
+			sd->next->prev = &sd->next;
+		sd->prev = spp;
+		*spp = sd_get(sd);
+		master.sd.numb++;
+	} else
+		printd(("%s: %s: ERROR: failed to allocate sd structure %lu\n", DRV_NAME,
+			__FUNCTION__, index));
+	return (sd);
+}
+
+STATIC void
+sdlm_free_sd(queue_t *q)
+{
+	struct sd *sd = (struct sd *) q->q_ptr;
+	psw_t flags;
+	ensure(sd, return);
+	printd(("%s: %s: %p: free sd %lu\n", DRV_NAME, __FUNCTION__, sd, sd->u.mux.index));
+	spin_lock_irqsave(&sd->lock, flags);
+	{
+		/* stopping bufcalls */
+		ss7_unbufcall((str_t *) sd);
+		/* flush buffers */
+		flushq(sd->oq, FLUSHALL);
+		flushq(sd->iq, FLUSHALL);
+		/* remove from master list */
+		if ((*sd->prev = sd->next))
+			sd->next->prev = sd->prev;
+		sd->next = NULL;
+		sd->prev = &sd->next;
+		ensure(atomic_read(&sd->refcnt) > 1, sd_get(sd));
+		sd_put(sd);
+		assure(master.sd.numb > 0);
+		master.sd.numb--;
+		/* remove from queues */
+		ensure(atomic_read(&sd->refcnt) > 1, sd_get(sd));
+		sd_put(xchg(&sd->oq->q_ptr, NULL));
+		ensure(atomic_read(&sd->refcnt) > 1, sd_get(sd));
+		sd_put(xchg(&sd->iq->q_ptr, NULL));
+		/* done, check final count */
+		if (atomic_read(&sd->refcnt) != 1) {
+			pswerr(("%s: %s: %p: ERROR: sd lingering reference count = %d\n",
+				DRV_NAME, __FUNCTION__, sd, atomic_read(&sd->refcnt)));
+			atomic_set(&sd->refcnt, 1);
+		}
+	}
+	spin_unlock_irqrestore(&sd->lock, flags);
+	sd_put(sd);		/* final put */
+	return;
 }
 
 /*
@@ -362,9 +528,8 @@ STATIC INLINE int
 lmi_error_ack_reply(queue_t *q, mblk_t *mp, int prim, int state, int err)
 {
 	lmi_error_ack_t *p;
-	/*
-	   return a negative acknowledgement 
-	 */
+	/* 
+	   return a negative acknowledgement */
 	mp->b_wptr = mp->b_rptr;
 	p = ((typeof(p)) mp->b_wptr)++;
 	p->lmi_primitive = LMI_ERROR_ACK;
@@ -401,16 +566,14 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	if (q->q_next)
 		goto loutstate;
 	{
-		dl_t *du = DL_PRIV(q), *dl;
+		struct dl *dl = DL_PRIV(q);
+		struct sd *sd;
 		ulong ppa = *((ulong *) &m->lmi_ppa);
-		for (dl = dl_links; dl && dl->ppa != ppa; dl = dl->next) ;
-		if (!dl || dl->rq->q_next)
+		for (sd = master.sd.list; sd && sd->ppa != ppa; sd = sd->next) ;
+		if (!sd || sd->iq->q_next)
 			goto lbadppa;
-		/*
-		   link queues together 
-		 */
-		du->wq->q_next = dl->wq;
-		dl->rq->q_next = du->rq;
+		/* link queues together */
+		weldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
 		return lmi_ok_ack_reply(q, mp, LMI_ATTACH_REQ, LMI_DISABLED);
 	}
       lbadppa:
@@ -444,23 +607,18 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 	if (!q->q_next)
 		goto loutstate;
 	{
-		dl_t *du = DL_PRIV(q);
-		dl_t *dl = DL_PRIV(q->q_next);
-		/*
-		   disconnect them 
-		 */
-		du->wq->q_next = NULL;
-		dl->rq->q_next = NULL;
-		{
-			lmi_ok_ack_t *p;
-			mp->b_wptr = mp->b_rptr;
-			p = ((typeof(p)) mp->b_wptr)++;
-			p->lmi_primitive = LMI_OK_ACK;
-			p->lmi_correct_primitive = LMI_DETACH_REQ;
-			p->lmi_state = LMI_UNATTACHED;
-			qreply(q, mp);
-			return (0);
-		}
+		lmi_ok_ack_t *p;
+		struct dl *dl = DL_PRIV(q);
+		struct sd *sd = SD_PRIV(q->q_next);
+		/* disconnect them */
+		unweldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
+		mp->b_wptr = mp->b_rptr;
+		p = ((typeof(p)) mp->b_wptr)++;
+		p->lmi_primitive = LMI_OK_ACK;
+		p->lmi_correct_primitive = LMI_DETACH_REQ;
+		p->lmi_state = LMI_UNATTACHED;
+		qreply(q, mp);
+		return (0);
 	}
       loutstate:
 	err = LMI_OUTSTATE;
@@ -482,167 +640,158 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 /*
- *  CTRL Queues
- *  -----------------------------------
+ *  -------------------------------------------------------------------------
+ *
+ *  M_PROTO, M_PCPROTO Handling
+ *
+ *  -------------------------------------------------------------------------
  */
 STATIC int
-dl_r_prim(queue_t *q, mblk_t *mp)
+dl_w_proto(queue_t *q, mblk_t *mp)
 {
-	switch (mp->b_datap->db_type) {
-	case M_DATA:
-	case M_PROTO:
-	case M_PCPROTO:
-	case M_FLUSH:
+	long prim = *((long *) mp->b_rptr);
+	switch (prim) {
+	case LMI_ATTACH_REQ:
+		return ((int) lmi_attach_req(q, mp));
+	case LMI_DETACH_REQ:
+		return ((int) lmi_detach_req(q, mp));
+	case LMI_INFO_REQ:
+	case LMI_ENABLE_REQ:
+	case LMI_DISABLE_REQ:
+	case LMI_OPTMGMT_REQ:
+		if (q->q_next) {
+			putnext(q, mp);
+			return ((int) (0));
+		}
+		ptrace(("ERROR: would place i/f out of state\n"));
+		return lmi_error_ack_reply(q, mp, prim, LMI_UNATTACHED, LMI_OUTSTATE);
+	case SDL_BITS_FOR_TRANSMISSION_REQ:
+	case SDL_CONNECT_REQ:
+	case SDL_DISCONNECT_REQ:
+		if (q->q_next) {
+			putnext(q, mp);
+			return ((int) (0));
+		}
+		return ((int) m_error_reply(q, mp, EPIPE));
 	default:
-		break;
+		freemsg(mp);
+		return ((int) m_error_reply(q, mp, EPROTO));
 	}
-	return (QR_PASSALONG);
 }
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  M_IOCTL Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
 STATIC int
-dl_w_prim(queue_t *q, mblk_t *mp)
+dl_w_ioctl(queue_t *q, mblk_t *mp)
 {
-	switch (mp->b_datap->db_type) {
-	case M_DATA:
-	case M_PROTO:
-	case M_PCPROTO:
-	case M_FLUSH:
-	case M_IOCTL:
-	default:
-		break;
-	}
-	return (QR_PASSALONG);
-}
-STATIC int
-dl_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
-{
-	if (mp->b_datap->db_type >= QPCTL && !q->q_count) {
-		int rtn;
-		switch ((rtn = (*proc) (q, mp))) {
-		case QR_DONE:
-			freemsg(mp);
-		case QR_ABSORBED:
-			break;
-		case QR_TRIMMED:
-			freeb(mp);
-			break;
-		case QR_LOOP:
-			if (!q->q_next) {
-				qreply(q, mp);
-				break;
-			}
-		case QR_PASSALONG:
-			if (q->q_next) {
-				putnext(q, mp);
-				break;
-			}
-			rtn = -EOPNOTSUPP;
-		default:
-			ptrace(("ERROR: (q dropping) %d\n", rtn));
-			freemsg(mp);
-			break;
-		case QR_DISABLE:
-			putq(q, mp);
-			rtn = 0;
-			break;
-		case QR_PASSFLOW:
-			if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-				putnext(q, mp);
-				break;
-			}
-		case -ENOBUFS:
-		case -EBUSY:
-		case -EAGAIN:
-		case -ENOMEM:
-			putq(q, mp);
+	struct dl *dl = DL_PRIV(q);
+	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
+	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
+	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+	int ret = 0;
+	(void) dl;
+	(void) size;
+	(void) count;
+	switch (type) {
+	case _IOC_TYPE(__SID):
+	{
+		psw_t flags;
+		struct sd *sd, **spp;
+		struct linkblk *lb = (struct linkblk *) arg;
+		if (!lb) {
+			swerr();
+			ret = -EINVAL;
 			break;
 		}
-		return (rtn);
+		switch (nr) {
+		case _IOC_NR(I_PLINK):
+			ptrace(("%s: %p: I_PLINK\n", DRV_NAME, dl));
+			if (iocp->ioc_cr->cr_uid != 0) {
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
+					dl));
+				ret = -EPERM;
+				break;
+			}
+		case _IOC_NR(I_LINK):
+			ptrace(("%s: %p: I_LINK\n", DRV_NAME, dl));
+			MOD_INC_USE_COUNT;	/* keep module from unloading */
+			spin_lock_irqsave(&master.lock, flags);
+			{
+				/* place in list in ascending index order */
+				for (spp = &master.sd.list;
+				     *spp && (*spp)->u.mux.index < lb->l_index;
+				     spp = &(*spp)->next) ;
+				if ((sd =
+				     sdlm_alloc_sd(lb->l_qbot, spp, lb->l_index, iocp->ioc_cr))) {
+					spin_unlock_irqrestore(&master.lock, flags);
+					break;
+				}
+				MOD_DEC_USE_COUNT;
+				ret = -ENOMEM;
+			}
+			spin_unlock_irqrestore(&master.lock, flags);
+			break;
+		case _IOC_NR(I_PUNLINK):
+			ptrace(("%s: %p: I_PUNLINK\n", DRV_NAME, dl));
+			if (iocp->ioc_cr->cr_uid != 0) {
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					dl));
+				ret = -EPERM;
+				break;
+			}
+		case _IOC_NR(I_UNLINK):
+			ptrace(("%s: %p: I_UNLINK\n", DRV_NAME, dl));
+			spin_lock_irqsave(&master.lock, flags);
+			{
+				for (sd = master.sd.list; sd; sd = sd->next)
+					if (sd->u.mux.index == lb->l_index)
+						break;
+				if (!sd) {
+					ret = -EINVAL;
+					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
+						DRV_NAME, dl));
+					spin_unlock_irqrestore(&master.lock, flags);
+					break;
+				}
+				sdlm_free_sd(sd->iq);
+				MOD_DEC_USE_COUNT;
+			}
+			spin_unlock_irqrestore(&master.lock, flags);
+			break;
+		default:
+		case _IOC_NR(I_STR):
+			ptrace(("%s: %p: ERROR: Unspported STREAMS ioctl %c, %d\n", DRV_NAME, dl,
+				(char) type, nr));
+			ret = -EOPNOTSUPP;
+			break;
+		}
+		break;
+	}
+	default:
+		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", DRV_NAME, dl, (char) type,
+			nr));
+		ret = -EOPNOTSUPP;
+		break;
+	}
+	if (ret > 0) {
+		return (ret);
+	} else if (ret == 0) {
+		mp->b_datap->db_type = M_IOCACK;
+		iocp->ioc_error = 0;
+		iocp->ioc_rval = 0;
 	} else {
-		putq(q, mp);
-		return (0);
+		mp->b_datap->db_type = M_IOCNAK;
+		iocp->ioc_error = -ret;
+		iocp->ioc_rval = -1;
 	}
-}
-STATIC int
-dl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
-{
-	int rtn;
-	mblk_t *mp;
-	while ((mp = getq(q))) {
-		switch ((rtn = (*proc) (q, mp))) {
-		case QR_DONE:
-			freemsg(mp);
-		case QR_ABSORBED:
-			continue;
-		case QR_TRIMMED:
-			freeb(mp);
-			continue;
-		case QR_LOOP:
-			if (!q->q_next) {
-				qreply(q, mp);
-				continue;
-			}
-		case QR_PASSALONG:
-			if (q->q_next) {
-				putnext(q, mp);
-				continue;
-			}
-			rtn = -EOPNOTSUPP;
-		default:
-			ptrace(("ERROR: (q dropping) %d\n", rtn));
-			freemsg(mp);
-			continue;
-		case QR_DISABLE:
-			ptrace(("ERROR: (q disabling) %d\n", rtn));
-			noenable(q);
-			putq(q, mp);
-			rtn = 0;
-			break;
-		case QR_PASSFLOW:
-			if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-				putnext(q, mp);
-				continue;
-			}
-		case -ENOBUFS:
-		case -EBUSY:
-		case -EAGAIN:
-		case -ENOMEM:
-			ptrace(("ERROR: (q stalled) %d\n", rtn));
-			if (mp->b_datap->db_type < QPCTL) {
-				putbq(q, mp);
-				return (rtn);
-			}
-			if (mp->b_datap->db_type == M_PCPROTO) {
-				mp->b_datap->db_type = M_PROTO;
-				mp->b_band = 255;
-				putq(q, mp);
-				break;
-			}
-			ptrace(("ERROR: (q dropping) %d\n", rtn));
-			freemsg(mp);
-			continue;
-		}
-	}
-	return (0);
-}
-STATIC int
-dl_m_rput(queue_t *q, mblk_t *mp)
-{
-	return ((int) dl_putq(q, mp, &dl_r_prim));
-}
-STATIC int
-dl_m_rsrv(queue_t *q)
-{
-	return ((int) dl_srvq(q, &dl_r_prim));
-}
-STATIC int
-dl_m_wput(queue_t *q, mblk_t *mp)
-{
-	return ((int) dl_putq(q, mp, &dl_w_prim));
-}
-STATIC int
-dl_m_wsrv(queue_t *q)
-{
-	return ((int) dl_srvq(q, &dl_w_prim));
+	qreply(q, mp);
+	return (QR_ABSORBED);
 }
 
 /*
@@ -650,64 +799,30 @@ dl_m_wsrv(queue_t *q)
  *  -----------------------------------
  */
 STATIC int
-dl_u_rput(queue_t *q, mblk_t *mp)
-{
-	putnext(q, mp);
-	return ((int) (0));
-}
-STATIC int
-dl_u_wput(queue_t *q, mblk_t *mp)
+dl_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+		return ss7_r_flush(q, mp);
+	default:
+		return (QR_PASSFLOW);
+	}
+}
+STATIC int
+dl_w_prim(queue_t *q, mblk_t *mp)
+{
+	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+		return ss7_w_flush(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
-	{
-		long prim = *((long *) mp->b_rptr);
-		switch (prim) {
-		case LMI_ATTACH_REQ:
-			return ((int) lmi_attach_req(q, mp));
-		case LMI_DETACH_REQ:
-			return ((int) lmi_detach_req(q, mp));
-		case LMI_INFO_REQ:
-		case LMI_ENABLE_REQ:
-		case LMI_DISABLE_REQ:
-		case LMI_OPTMGMT_REQ:
-			if (q->q_next) {
-				putnext(q, mp);
-				return ((int) (0));
-			}
-			ptrace(("ERROR: would place i/f out of state\n"));
-			return lmi_error_ack_reply(q, mp, prim, LMI_UNATTACHED, LMI_OUTSTATE);
-		case SDL_BITS_FOR_TRANSMISSION_REQ:
-		case SDL_CONNECT_REQ:
-		case SDL_DISCONNECT_REQ:
-			if (q->q_next) {
-				putnext(q, mp);
-				return ((int) (0));
-			}
-			return ((int) m_error_reply(q, mp, EPIPE));
-		default:
-			freemsg(mp);
-			return ((int) m_error_reply(q, mp, EPROTO));
-		}
-	}
-		break;
-	case M_FLUSH:
-		if (q->q_next)
-			putnext(q, mp);
-		else
-			qreply(q, mp);
-		break;
+		return dl_w_proto(q, mp);
+	case M_IOCTL:
+		return dl_w_ioctl(q, mp);
 	default:
-		if (q->q_next)
-			putnext(q, mp);
-		else {
-			freemsg(mp);
-			return ((int) (-EOPNOTSUPP));
-		}
-		break;
+	case M_DATA:
+		return (QR_PASSFLOW);
 	}
-	return ((int) (0));
 }
 
 /*
@@ -715,25 +830,24 @@ dl_u_wput(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  */
 STATIC int
-dl_l_rput(queue_t *q, mblk_t *mp)
+sd_r_prim(queue_t *q, mblk_t *mp)
 {
-	if (q->q_next) {
-		putnext(q, mp);
-		return ((int) (0));
+	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+		return ss7_r_flush(q, mp);
+	default:
+		return (QR_PASSFLOW);
 	}
-	if (mp->b_datap->db_type == M_FLUSH) {
-		qreply(q, mp);
-		return ((int) (0));
-	}
-	ptrace(("ERROR: receive message for detached stream\n"));
-	freemsg(mp);
-	return ((int) (-EOPNOTSUPP));
 }
 STATIC int
-dl_l_wput(queue_t *q, mblk_t *mp)
+sd_w_prim(queue_t *q, mblk_t *mp)
 {
-	putnext(q, mp);
-	return ((int) (0));
+	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+		return ss7_w_flush(q, mp);
+	default:
+		return (QR_PASSFLOW);
+	}
 }
 
 /*
@@ -743,61 +857,50 @@ dl_l_wput(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
+STATIC major_t sdlm_majors[SDLM_CMAJORS] = { SDLM_CMAJOR_0, };
 
 /*
  *  OPEN
  *  -------------------------------------------------------------------------
  */
 STATIC int
-dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+sdlm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int cmajor = getmajor(*devp);
-	int cminor = getminor(*devp);
-	int lmajor = 0;
-	int lminor = 0;
-	dl_t *dl = NULL, **dlp = &dl;
+	psw_t flags;
+	int mindex = 0;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	struct dl *dl, **dpp;
+	MOD_INC_USE_COUNT;
+	if (q->q_ptr != NULL) {
+		MOD_DEC_USE_COUNT;
+		return (0);	/* already open */
+	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("ERROR: Cannot open as module\n"));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
+		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
-	if (SDLM_CMAJOR_1 <= cmajor && cmajor < SDLM_CMAJOR_1 + LM_NMAJOR && crp->cr_uid != 0) {
-		ptrace(("ERROR: r00t permission needed for control stream\n"));
-		return (EPERM);
+	if (cmajor != CMAJOR_0 || cminor > 0) {
+		MOD_DEC_USE_COUNT;
+		return (ENXIO);
 	}
-	if (DL_PRIV(q)) {
-		ptrace(("INFO: Already open\n"));
-		return (0);
-	}
-	if ((cmajor == SDLM_CMAJOR_0 || cmajor == SDLM_CMAJOR_1) && cminor == 0) {
-		ptrace(("INFO: Clone open in effect\n"));
-		sflag = CLONEOPEN;
-		cminor = 1;
-	}
-	if (SDLM_CMAJOR_0 <= cmajor && cmajor < SDLM_CMAJOR_0 + DL_NMAJOR) {
-		dlp = &dl_opens;
-		lminor = SDLM_CMINORS;
-		lmajor = SDLM_CMAJOR_0 + DL_NMAJOR;
-	}
-	if (SDLM_CMAJOR_1 <= cmajor && cmajor < SDLM_CMAJOR_1 + LM_NMAJOR) {
-		dlp = &dl_ctrls;
-		lminor = SDLM_CMINORS;
-		lmajor = SDLM_CMAJOR_1 + LM_NMAJOR;
-	}
-	for (dlp = &dl_opens; *dlp; dlp = &((*dlp)->next)) {
-		ushort dmajor = getmajor((*dlp)->u.devid);
-		if (cmajor < dmajor)
+	/* allocate a new device */
+	cminor = 1;
+	spin_lock_irqsave(&master.lock, flags);
+	for (dpp = &master.dl.list; *dpp; dpp = &(*dpp)->next) {
+		major_t dmajor = (*dpp)->u.dev.cmajor;
+		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = getminor((*dlp)->u.devid);
+			minor_t dminor = (*dpp)->u.dev.cminor;
 			if (cminor < dminor)
 				break;
+			if (cminor > dminor)
+				continue;
 			if (cminor == dminor) {
-				if (sflag != CLONEOPEN) {
-					ptrace(("ERROR: Requested device in use\n"));
-					return (EIO);
-				}
-				if (++cminor > lminor) {
-					if (++cmajor >= lmajor)
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = sdlm_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -805,20 +908,21 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (cmajor >= lmajor) {
-		ptrace(("ERROR: No device available\n"));
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
+		spin_unlock_irqrestore(&master.lock, flags);
+		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	if (!(dl = dl_alloc_priv(q))) {
-		ptrace(("ERROR: Could not allocate private structure\n"));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
+	*devp = makedevice(cmajor, cminor);
+	if (!(dl = sdlm_alloc_dl(q, dpp, cmajor, cminor, crp))) {
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
+		spin_unlock_irqrestore(&master.lock, flags);
+		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
-	*devp = makedevice(cmajor, cminor);
-	dl->u.devid = *devp;
-	if ((dl->next = *dlp))
-		dl->next->prev = &dl->next;
-	dl->prev = dlp;
-	*dlp = dl;
+	spin_unlock_irqrestore(&master.lock, flags);
 	return (0);
 }
 
@@ -827,173 +931,161 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-dl_close(queue_t *q, int flag, cred_t *crp)
+sdlm_close(queue_t *q, int flag, cred_t *crp)
 {
-	dl_t *dl = DL_PRIV(q);
-	if ((*(dl->prev) = dl->next))
-		dl->next->prev = dl->prev;
-	dl->prev = NULL;
-	dl->next = NULL;
-	dl_free_priv(q);
+	struct dl *dl = DL_PRIV(q);
+	psw_t flags;
+	(void) dl;
+	printd(("%s: %p: closing character device %hu:%hu\n", DRV_NAME, dl, dl->u.dev.cmajor,
+		cc->u.dev.cminor));
+	spin_lock_irqsave(&master.lock, flags);
+	{
+		sdlm_free_dl(q);
+	}
+	spin_unlock_irqrestore(&master.lock, flags);
+	MOD_DEC_USE_COUNT;
 	return (0);
 }
 
-STATIC int dl_initialized = 0;
+/*
+ *  =========================================================================
+ *
+ *  Registration and initialization
+ *
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SDL-MUX driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the SDL-MUX driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
 #ifdef LFS
-/*
- *  =========================================================================
- *
- *  Linux Fast-STREAMS Module Initialization
- *
- *  =========================================================================
- */
-STATIC struct cdevsw dl_u_cdev = {
-	.d_name = SDLM_DRV_NAME,
-	.d_str = &dl_u_info,
+
+STATIC struct cdevsw sdlm_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &sdlminfo,
 	.d_flag = 0,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
 
-STATIC struct cdevsw dl_m_cdev = {
-	.d_name = SDLM_DRV_NAME,
-	.d_str = &dl_m_info,
-	.d_flag = 0,
-	.d_fop = NULL,
-	.d_mode = S_IFCHR,
-	.d_kmod = THIS_MODULE,
-};
-
-STATIC void
-dl_init(void)
+STATIC int
+sdlm_register_strdev(major_t major)
 {
-	int i, err;
-	ensure(dl_initialized == 0, return);
-	for (i = 0; i < DL_NMAJOR; i++) {
-		if ((err = register_strdev(&dl_u_cdev, SDLM_CMAJOR_0 + i)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
-				SDLM_CMAJOR_0 + i);
-		}
-	}
-	for (i = 0; i < LM_NMAJOR; i++) {
-		if ((err = register_strdev(&dl_m_cdev, SDLM_CMAJOR_1 + i)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
-				SDLM_CMAJOR_1 + i);
-		}
-	}
-	dl_init_caches();
-	dl_initialized = 1;
-	return;
-}
-STATIC void
-dl_terminate(void)
-{
-	int i, err;
-	unless(dl_initialized == 0, return);
-	for (i = 0; i < DL_NMAJOR; i++) {
-		if ((err = unregister_strdev(&dl_u_cdev, SDLM_CMAJOR_0 + i)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
-				SDLM_DRV_NAME, SDLM_CMAJOR_0 + i);
-		}
-	}
-	for (i = 0; i < LM_NMAJOR; i++) {
-		if ((err = unregister_strdev(&dl_m_cdev, SDLM_CMAJOR_1 + i)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
-				SDLM_DRV_NAME, SDLM_CMAJOR_0 + i);
-		}
-	}
-	dl_term_caches();
-	dl_initialized = 0;
-	return;
-}
-
-#elif defined LIS
-/*
- *  =========================================================================
- *
- *  LiS Module Initialization
- *
- *  =========================================================================
- */
-void
-dl_init(void)
-{
-	int i, err;
-	unless(dl_initialized > 0, return);
-	for (i = 0; i < DL_NMAJOR; i++) {
-		if ((err = lis_register_strdev(SDLM_CMAJOR_0 + i, &dl_u_info, SDLM_CMINORS,
-					       dl_minfo.mi_idname)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
-				SDLM_CMAJOR_0);
-		}
-	}
-	for (i = 0; i < LM_NMAJOR; i++) {
-		if ((err = lis_register_strdev(SDLM_CMAJOR_1 + i, &dl_m_info, SDLM_CMINORS,
-					       dl_minfo.mi_idname)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't register driver cmajor %d\n", SDLM_DRV_NAME,
-				SDLM_CMAJOR_1);
-		}
-	}
-	dl_init_caches();
-	dl_initialized = 1;
-	return;
-}
-
-void
-dl_terminate(void)
-{
-	int i, err;
-	ensure(dl_initialized > 0, return);
-	for (i = 0; i < DL_NMAJOR; i++) {
-		if ((err = lis_unregister_strdev(SDLM_CMAJOR_0 + i)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
-				SDLM_DRV_NAME, SDLM_CMAJOR_0);
-		}
-	}
-	for (i = 0; i < LM_NMAJOR; i++) {
-		if ((err = lis_unregister_strdev(SDLM_CMAJOR_1 + i)) < 0) {
-			cmn_err(CE_WARN, "%s: couldn't unregister driver cmajor %d\n",
-				SDLM_DRV_NAME, SDLM_CMAJOR_1);
-		}
-	}
-	dl_term_caches();
-	dl_initialized = 0;
-	return;
-}
-#endif
-
-/*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
- */
-
-int __init
-_dl_init(void)
-{
-#ifdef MODULE
-	cmn_err(CE_NOTE, DL_BANNER);
-#else
-	cmn_err(CE_NOTE, DL_SPLASH);
-#endif
-	dl_init();
-	if (dl_initialized < 0)
-		return (dl_initialized);
+	int err;
+	if ((err = register_strdev(&sdlm_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
 
-void __exit
-_dl_exit(void)
+STATIC int
+sdlm_unregister_strdev(major_t major)
 {
-	(void) ss7_oput;
-	(void) ss7_iput;
-	(void) ss7_unbufcall;
-	return dl_terminate();
+	int err;
+	if ((err = unregister_strdev(&sdlm_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
 
-module_init(_dl_init);
-module_exit(_dl_exit);
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sdlm_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &sdlminfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+sdlm_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+sdlmterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (sdlm_majors[mindex]) {
+			if ((err = sdlm_unregister_strdev(sdlm_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					sdlm_majors[mindex]);
+			if (mindex)
+				sdlm_majors[mindex] = 0;
+		}
+	}
+	if ((err = sdlm_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+sdlminit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = sdlm_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		sdlmterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = sdlm_register_strdev(sdlm_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					sdlm_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				sdlmterminate();
+				return (err);
+			}
+		}
+		if (sdlm_majors[mindex] == 0)
+			sdlm_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(sdlm_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = sdlm_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sdlminit);
+module_exit(sdlmterminate);
+
+#endif				/* LINUX */
