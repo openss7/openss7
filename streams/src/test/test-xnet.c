@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/06/09 08:32:59 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:59 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:59 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -12515,6 +12515,7 @@ main(int argc, char *argv[])
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);

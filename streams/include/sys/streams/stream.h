@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.19 2004/06/06 09:47:42 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.21 2004/06/09 08:43:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:42 $ by $Author: brian $
+ Last Modified $Date: 2004/06/09 08:43:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/06 09:47:42 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/09 08:43:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

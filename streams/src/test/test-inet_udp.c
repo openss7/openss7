@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/27 08:55:47 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/09 08:32:58 $
 
  -----------------------------------------------------------------------------
 
@@ -52,12 +52,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:47 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/06/09 08:32:58 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_udp.c,v $
- Revision 0.9.2.3  2004/05/27 08:55:47  brian
- - Stabilizing release.
+ Revision 0.9.2.4  2004/06/09 08:32:58  brian
+ - Open works fine but don't want to hold dentries in cache.
+
+ Revision 1.4  2004/06/09 08:32:58  brian
+ - Open works fine but don't want to hold dentries in cache.
 
  Revision 1.3  2004/05/27 08:55:47  brian
  - Stabilizing release.
@@ -109,9 +112,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/27 08:55:47 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/09 08:32:58 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/27 08:55:47 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/09 08:32:58 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -4155,6 +4158,7 @@ main(int argc, char *argv[])
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);

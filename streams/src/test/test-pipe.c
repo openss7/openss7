@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-echo.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:58 $
+ @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/09 08:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:58 $ by $Author: brian $
+ Last Modified $Date: 2004/06/09 08:32:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
- $Log: test-echo.c,v $
- Revision 0.9.2.2  2004/06/09 08:32:58  brian
- - Open works fine but don't want to hold dentries in cache.
-
- Revision 1.2  2004/06/09 08:32:58  brian
+ $Log: test-pipe.c,v $
+ Revision 0.9  2004/06/09 08:32:59  brian
  - Open works fine but don't want to hold dentries in cache.
 
  Revision 1.2  2004/06/08 02:27:36  brian
@@ -64,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-echo.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:58 $"
+#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/09 08:32:59 $"
 
-static char const ident[] = "$RCSfile: test-echo.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:58 $";
+static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/09 08:32:59 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -100,8 +97,8 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *spkgname = "LfS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI";
-static const char *shortname = "ECHO";
-static char devname[256] = "/dev/echo";
+static const char *shortname = "PIPE";
+static char devname[256] = "/dev/sfx";
 
 static int exit_on_failure = 0;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/06 09:47:53 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/09 08:32:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
+ Last Modified $Date: 2004/06/09 08:32:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/06 09:47:53 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/09 08:32:52 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/06 09:47:53 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/09 08:32:52 $";
 
 #define __NO_VERSION__
 
@@ -220,6 +220,7 @@ int adjmsg(mblk_t *mp, ssize_t length)
       error:
 	return (0);
 }
+
 EXPORT_SYMBOL(adjmsg);
 
 /**
@@ -254,6 +255,7 @@ mblk_t *allocb(size_t size, uint priority)
 	// error:
 	return (NULL);
 }
+
 EXPORT_SYMBOL(allocb);
 
 /**
@@ -279,6 +281,7 @@ mblk_t *copyb(mblk_t *bp)
 	}
 	return (mp);
 }
+
 EXPORT_SYMBOL(copyb);
 
 /**
@@ -299,6 +302,7 @@ mblk_t *copymsg(mblk_t *msg)
 	freemsg(mp);
 	return (NULL);
 }
+
 EXPORT_SYMBOL(copymsg);
 
 /**
@@ -327,6 +331,7 @@ mblk_t *dupb(mblk_t *bp)
 	}
 	return (mp);
 }
+
 EXPORT_SYMBOL(dupb);
 
 /**
@@ -348,6 +353,7 @@ mblk_t *dupmsg(mblk_t *msg)
 	freemsg(mp);
 	return (NULL);
 }
+
 EXPORT_SYMBOL(dupmsg);
 
 /**
@@ -377,6 +383,7 @@ mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freein
 	}
 	return (mp);
 }
+
 EXPORT_SYMBOL(esballoc);
 
 /**
@@ -414,6 +421,7 @@ void freeb(mblk_t *mp)
 	swerr();
 	return;
 }
+
 EXPORT_SYMBOL(freeb);
 
 /**
@@ -534,6 +542,7 @@ mblk_t *msgpullup(mblk_t *msg, ssize_t length)
 		freemsg(mp);
 	return (mp);
 }
+
 EXPORT_SYMBOL(msgpullup);
 
 /**
@@ -626,6 +635,7 @@ int pullupmsg(mblk_t *mp, ssize_t len)
       error:
 	return (0);
 }
+
 EXPORT_SYMBOL(pullupmsg);
 
 /**
@@ -692,6 +702,7 @@ int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		return (0);
 	}
 }
+
 EXPORT_SYMBOL_GPL(appq);
 
 /**
@@ -764,6 +775,7 @@ int bcanget(queue_t *q, int band)
 	qrunlock(q, &flags);
 	return (result);
 }
+
 EXPORT_SYMBOL_GPL(bcanget);
 
 /*
@@ -846,6 +858,7 @@ int bcanput(queue_t *q, int band)
 	hrunlock(q);
 	return (result);
 }
+
 EXPORT_SYMBOL(bcanput);
 
 /**
@@ -871,6 +884,7 @@ int bcanputnext(queue_t *q, int band)
 	hrunlock(q);
 	return (result);
 }
+
 EXPORT_SYMBOL(bcanputnext);
 
 /**
@@ -912,6 +926,7 @@ int canget(queue_t *q)
 		qbackenable(q);
 	return (result & 1);
 }
+
 EXPORT_SYMBOL_GPL(canget);
 
 /*
@@ -948,6 +963,7 @@ int canput(queue_t *q)
 	hrunlock(q);
 	return (result);
 }
+
 EXPORT_SYMBOL(canput);
 
 /**
@@ -962,6 +978,7 @@ int canputnext(queue_t *q)
 	hrunlock(q);
 	return (result);
 }
+
 EXPORT_SYMBOL(canputnext);
 
 /*
@@ -1095,6 +1112,7 @@ void flushband(queue_t *q, int band, int flag)
 	mb();
 	freechain(mp, mpp);
 }
+
 EXPORT_SYMBOL(flushband);
 
 /**
@@ -1108,6 +1126,7 @@ unsigned long freezestr(queue_t *q)
 	qwlock(q, NULL);
 	return ((q->q_iflags = flags));
 }
+
 EXPORT_SYMBOL(freezestr);
 
 /**
@@ -1204,6 +1223,7 @@ mblk_t *getq(queue_t *q)
 		qbackenable(q);
 	return (mp);
 }
+
 EXPORT_SYMBOL(getq);
 
 /*
@@ -1320,6 +1340,7 @@ int insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		return (0);
 	}
 }
+
 EXPORT_SYMBOL(insq);
 
 /**
@@ -1396,6 +1417,7 @@ void put(queue_t *q, mblk_t *mp)
 	_put(q, mp);
 	hrunlock(q);
 }
+
 EXPORT_SYMBOL(put);
 
 /**
@@ -1409,6 +1431,7 @@ void putnext(queue_t *q, mblk_t *mp)
 	_put(q->q_next, mp);
 	hrunlock(q);
 }
+
 EXPORT_SYMBOL(putnext);
 
 /*
@@ -1531,6 +1554,7 @@ int putbq(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 }
+
 EXPORT_SYMBOL(putbq);
 
 /**
@@ -1708,6 +1732,7 @@ int putq(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 }
+
 EXPORT_SYMBOL(putq);
 
 int setsq(queue_t *q, struct fmodsw *fmod, int mux);
@@ -1727,48 +1752,72 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 	dev_t odev;
 	struct cdevsw *cdev;
 	int err;
-	if (!(q = allocq()))
-		goto enomem;
-	if ((err = setsq(q, fmod, 0)) < 0)
+	err = -ENOMEM;
+	ptrace(("%s: attaching module %s\n", __FUNCTION__, fmod->f_name));
+	if (!(q = allocq())) {
+		printd(("%s: could not alloca queue pair\n", __FUNCTION__));
+		goto error;
+	}
+	if ((err = setsq(q, fmod, 0)) < 0) {
+		printd(("%s: could not set queues\n", __FUNCTION__));
 		goto freeq_error;
+	}
 	qinsert(sd->sd_rq, q);	/* half insert under stream head */
 	qprocsoff(q);		/* does not alter q_next pointers, just flags */
-	odev = *devp;
-	if ((err = qopen(q, devp, oflag, sflag, crp)))
-		goto error;
+	odev = *devp;		/* remember calling device number */
+	if ((err = qopen(q, devp, oflag, sflag, crp))) {
+		if (err > 0)
+			err = -err;
+		printd(("%s: error from qopen, errno %d\n", __FUNCTION__, -err));
+		goto qerror;
+	}
 	if (sflag != MODOPEN) {
 		/* magic garden */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
-			if (!(cdev = cdrv_get(getmajor(*devp))))
+			printd(("%s: returned major %hu is not called major %hu\n", __FUNCTION__,
+				getmajor(*devp), getmajor(odev)));
+			err = -ENOENT;
+			if (!(cdev = cdrv_get(getmajor(*devp)))) {
+				printd(("%s: could not find new major %hu\n", __FUNCTION__,
+					getmajor(*devp)));
 				goto enoent;
-			if (!(st = cdev->d_str))
+			}
+			err = -ENOENT;
+			if (!(st = cdev->d_str)) {
+				pswerr(("%s: device has no streamtab, should not happen\n",
+					__FUNCTION__));
 				goto put_noent;
-			setsq(q, (struct fmodsw *) cdev, 0);
+			}
+			if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0) {
+				printd(("%s: could not set queues to new streamtab\n",
+					__FUNCTION__));
+				goto put_noent;
+			}
 			cdrv_put(cdev);
 		}
-	} else if (odev != *devp)
-		swerr();
+	} else if (odev != *devp) {
+		/* module is supposed to ignore devp */
+		*devp = odev;
+		pswerr(("%s: module altered device number\n", __FUNCTION__));
+	}
 	qprocson(q);		/* in case qopen() forgot */
 	return (0);
       put_noent:
 	cdrv_put(cdev);
       enoent:
-	err = -ENOENT;
 	qdetach(q, oflag, crp);	/* need to call close */
-	return (err);
-      error:
+	goto error;
+      qerror:
 	*devp = odev;
 	qprocsoff(q);		/* doesn't alter anything if procs still turned off */
 	qdelete(q);		/* remove half insert */
-	qput(&q);
-	return (err);
       freeq_error:
 	qput(&q);
+      error:
 	return (err);
-      enomem:
-	return (-ENOMEM);
 }
+
 EXPORT_SYMBOL_GPL(qattach);
 
 /**
@@ -1786,6 +1835,7 @@ int qclose(queue_t *q, int oflag, cred_t *crp)
 			qprocsoff(q);
 	return (result);
 }
+
 EXPORT_SYMBOL_GPL(qclose);
 
 /**
@@ -1808,6 +1858,7 @@ void qdelete(queue_t *q)
 	unsigned long flags;
 	struct queinfo *qu = (typeof(qu)) q;
 	struct stdata *sd = qu->qu_str;
+	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 	wq = rq + 1;
@@ -1837,11 +1888,16 @@ void qdelete(queue_t *q)
  */
 int qdetach(queue_t *q, int flags, cred_t *crp)
 {
-	int err = qclose(q, flags, crp);
+	int err;
+	ptrace(("%s: detaching queue\n", __FUNCTION__));
+	err = qclose(q, flags, crp);
+	if (err)
+		printd(("%s: error on qclose, errno %d\n", __FUNCTION__, -err));
 	qprocsoff(q);		/* in case qi_qclose procedure forgot */
 	qdelete(q);
 	return (err);
 }
+
 EXPORT_SYMBOL_GPL(qdetach);
 
 /**
@@ -1866,6 +1922,7 @@ void qinsert(queue_t *brq, queue_t *irq)
 	struct queinfo *bqu = (typeof(bqu)) brq;
 	queue_t *bwq = brq + 1;
 	unsigned long flags;
+	ptrace(("%s: half insert of queue pair under stream head\n", __FUNCTION__));
 	hwlock(brq, &flags);
 	iqu->qu_str = sd_get(bqu->qu_str);
 	irq->q_next = qget(brq);
@@ -1892,6 +1949,7 @@ int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return q_open(q, devp, oflag, sflag, crp);
 	return (-ENOPKG);
 }
+
 EXPORT_SYMBOL_GPL(qopen);
 
 /**
@@ -1915,6 +1973,7 @@ void qprocsoff(queue_t *q)
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+	ptrace(("%s: turning off procs\n", __FUNCTION__));
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
 		set_bit(QHLIST_BIT, &wq->q_flag);
@@ -1936,8 +1995,10 @@ void qprocsoff(queue_t *q)
 		hwunlock(rq, &flags);
 		/* put procs must check QHLIST bit after acquiring hrlock */
 		/* srv procs must check QNOENB bit after acquiring hrlock */
-	}
+	} else
+		printd(("%s: procs already turned off\n", __FUNCTION__));
 }
+
 EXPORT_SYMBOL(qprocsoff);
 
 /**
@@ -1961,6 +2022,7 @@ void qprocson(queue_t *q)
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+	ptrace(("%s: turning on procs\n", __FUNCTION__));
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
 		clear_bit(QHLIST_BIT, &wq->q_flag);
@@ -1979,8 +2041,10 @@ void qprocson(queue_t *q)
 			qput(&qn);
 		}
 		hwunlock(rq, &flags);
-	}
+	} else
+		printd(("%s: procs already turned on\n", __FUNCTION__));
 }
+
 EXPORT_SYMBOL(qprocson);
 
 /**
@@ -2004,6 +2068,7 @@ int qpop(struct stdata *sd, int oflag, cred_t *crp)
       eperm:
 	return (-EPERM);
 }
+
 EXPORT_SYMBOL_GPL(qpop);
 
 /**
@@ -2033,6 +2098,7 @@ int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *c
       enosr:
 	return (-ENOSR);
 }
+
 EXPORT_SYMBOL_GPL(qpush);
 
 /**
@@ -2067,6 +2133,7 @@ ssize_t qcountstrm(queue_t *q)
 	hrunlock(q);
 	return (count);
 }
+
 EXPORT_SYMBOL_GPL(qcountstrm);
 
 /**
@@ -2136,6 +2203,7 @@ void rmvq(queue_t *q, mblk_t *mp)
 	if (backenable)
 		qbackenable(q);
 }
+
 EXPORT_SYMBOL(rmvq);
 
 /**
@@ -2183,6 +2251,7 @@ void setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	qwunlock(wq, &flags);
 	qwunlock(rq, &flags);
 }
+
 EXPORT_SYMBOL_GPL(setq);
 
 struct syncq syncq_global;
@@ -2341,6 +2410,7 @@ int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 	}
 	return (-err);
 }
+
 EXPORT_SYMBOL(strqget);
 
 /**
@@ -2416,6 +2486,7 @@ int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 	}
 	return (-err);
 }
+
 EXPORT_SYMBOL(strqset);
 
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
@@ -2459,6 +2530,7 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 	va_end(args);
 	return (1);
 }
+
 EXPORT_SYMBOL(strlog);
 
 /**
@@ -2472,6 +2544,7 @@ void unfreezestr(queue_t *q, unsigned long flags)
 	qwunlock(q, NULL);
 	hwunlock(q, &flags);
 }
+
 EXPORT_SYMBOL(unfreezestr);
 
 /**
@@ -2511,6 +2584,7 @@ void vcmn_err(int err_lvl, const char *fmt, va_list args)
 	spin_unlock_irqrestore(&cmn_err_lock, flags);
 	return;
 }
+
 #if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL_GPL(vcmn_err);
 #endif
@@ -2529,6 +2603,7 @@ void cmn_err(int err_lvl, const char *fmt, ...)
 	va_end(args);
 	return;
 }
+
 EXPORT_SYMBOL(cmn_err);
 
 __EXTERN_INLINE int copyin(const void *from, void *to, size_t len);

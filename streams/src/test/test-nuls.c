@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-nuls.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/08 02:27:36 $
+ @(#) $RCSfile: test-nuls.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/09 08:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/08 02:27:36 $ by $Author: brian $
+ Last Modified $Date: 2004/06/09 08:32:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: test-nuls.c,v $
- Revision 0.9.2.2  2004/06/08 02:27:36  brian
- - Framework for testing streams.
+ Revision 0.9.2.3  2004/06/09 08:32:59  brian
+ - Open works fine but don't want to hold dentries in cache.
+
+ Revision 1.3  2004/06/09 08:32:59  brian
+ - Open works fine but don't want to hold dentries in cache.
 
  Revision 1.2  2004/06/08 02:27:36  brian
  - Framework for testing streams.
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-nuls.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/08 02:27:36 $"
+#ident "@(#) $RCSfile: test-nuls.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/09 08:32:59 $"
 
-static char const ident[] = "$RCSfile: test-nuls.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/08 02:27:36 $";
+static char const ident[] = "$RCSfile: test-nuls.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/09 08:32:59 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -97,7 +100,8 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *spkgname = "LfS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI";
-static const char *shortname = "nuls";
+static const char *shortname = "NULS";
+static char devname[256] = "/dev/nuls";
 
 static int exit_on_failure = 0;
 
@@ -123,7 +127,6 @@ int test_fd[3] = { 0, 0, 0 };
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
-char  dev[BUFSIZE] = "/dev/nuls";
 
 struct strbuf ctrl = { BUFSIZE, -1, cbuf };
 struct strbuf data = { BUFSIZE, -1, dbuf };
@@ -936,7 +939,7 @@ static int end_tests(void)
 
 int preamble_0(int child)
 {
-	if (!test_fd[child] && test_open(child, dev) != __RESULT_SUCCESS)
+	if (!test_fd[child] && test_open(child, devname) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -1258,6 +1261,12 @@ int do_tests(void)
 	int num_exit;
 	print_header();
 	show = 0;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "\nUsing device %s\n\n", devname);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
 	if (begin_tests() == __RESULT_SUCCESS) {
 		end_tests();
 		show = 1;
@@ -1496,6 +1505,10 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -d, --device DEVICE\n\
+        Device name to open [default: %2$s].\n\
+    -e, --exit\n\
+        Exit on the first failed or inconclusive test case.\n\
     -l, --list [RANGE]\n\
         List test case names within a range [default: all] and exit.\n\
     -f, --fast [SCALE]\n\
@@ -1517,7 +1530,7 @@ Options:\n\
         Prints this usage message and exists\n\
     -V, --version\n\
         Prints the version and exists\n\
-", argv[0]);
+", argv[0], devname);
 }
 
 int main(int argc, char *argv[])
@@ -1538,6 +1551,7 @@ int main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"device",	required_argument,	NULL, 'd'},
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
@@ -1550,15 +1564,22 @@ int main(int argc, char *argv[])
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "el::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhV?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "el::f::so:t:mqvhV?");
+		c = getopt(argc, argv, "d:el::f::so:t:mqvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'd':
+			if (optarg) {
+				snprintf(devname, sizeof(devname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
 		case 'e':
 			exit_on_failure = 1;
 			break;
@@ -1608,26 +1629,29 @@ int main(int argc, char *argv[])
 			summary = 1;
 			break;
 		case 'o':
-			if (!range) {
-				for (t = tests; t->numb; t++)
-					t->run = 0;
-				tests_to_run = 0;
-			}
-			range = 1;
-			for (n = 0, t = tests; t->numb; t++)
-				if (!strncmp(t->numb, optarg, 16)) {
-					if (!t->result) {
-						t->run = 1;
-						n++;
-						tests_to_run++;
-					}
+			if (optarg) {
+				if (!range) {
+					for (t = tests; t->numb; t++)
+						t->run = 0;
+					tests_to_run = 0;
 				}
-			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
-				fflush(stderr);
-				goto bad_option;
+				range = 1;
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, 16)) {
+						if (!t->result) {
+							t->run = 1;
+							n++;
+							tests_to_run++;
+						}
+					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
+				}
+				break;
 			}
-			break;
+			goto bad_option;
 		case 'q':
 			verbose = 0;
 			break;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
+ Last Modified $Date: 2004/06/09 08:32:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:34 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/09 08:32:49 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -190,7 +190,7 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);	/* can't open as module */
-	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
+	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
 		return (ENOMEM);	/* no memory */
 	bzero(p, sizeof(*p));
 	switch (sflag) {

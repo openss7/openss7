@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/27 08:55:47 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/09 08:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 08:55:47 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/06/09 08:32:59 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/27 08:55:47 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/09 08:32:59 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/27 08:55:47 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/09 08:32:59 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -5144,6 +5144,7 @@ main(int argc, char *argv[])
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"?",		no_argument,		NULL, 'h'},
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long(argc, argv, "f::so:t:mvhqV?", long_options, &option_index);

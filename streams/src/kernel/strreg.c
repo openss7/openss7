@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/06/06 23:10:47 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/06/09 08:32:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 23:10:47 $ by $Author: brian $
+ Last Modified $Date: 2004/06/09 08:32:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/06/06 23:10:47 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/06/09 08:32:52 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/06/06 23:10:47 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/06/09 08:32:52 $";
 
 #define __NO_VERSION__
 
@@ -734,58 +734,90 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 	struct cdevsw *cdev;
 	struct devnode *cmin;
 	struct str_args *argp = ext_file->private_data;
+	ptrace(("%s: performing special open\n", __FUNCTION__));
 	err = ENXIO;
 	if (!(cdev = cdrv_get(getmajor(argp->dev))))
 		goto exit;
+	printd(("%s: open of driver %s\n", __FUNCTION__, cdev->d_name));
 	err = ENOENT;
 	if (!(parent = dget(cdev->d_dentry)))
 		goto cput_exit;
+	printd(("%s: parent dentry %s\n", __FUNCTION__, parent->d_name.name));
 	err = -ENOMEM;
 	if (!(inode = parent->d_inode))
 		goto pput_exit;
+	printd(("%s: parent inode %ld\n", __FUNCTION__, inode->i_ino));
 	err = -ENODEV;
 	if (is_bad_inode(inode))
 		goto pput_exit;
 	if ((err = down_interruptible(&inode->i_sem)) < 0)
 		goto pput_exit;
+	printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(argp->dev)));
 	if ((cmin = cmin_get(cdev, getminor(argp->dev)))) {
+		printd(("%s: found minor device %hu\n", __FUNCTION__, getminor(argp->dev)));
 		dentry = dget(cmin->n_dentry);
 	} else {
 		char buf[32];
 		struct qstr name;
 		name.name = buf;
-		name.len = snprintf(buf, sizeof(buf), "%u", getminor(argp->dev));
+		name.len = snprintf(buf, 32, "%u", getminor(argp->dev));
+		name.len = strnlen(buf, 32-1);
 		name.hash = full_name_hash(name.name, name.len);
+		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__,
+			getminor(argp->dev), name.name, name.len));
 		dentry = lookup_hash(&name, parent);
 	}
-	if (!dentry)
-		goto pput_exit;
-	if ((err = PTR_ERR(dentry)) < 0)
-		goto pput_exit;
+	err = -ENOENT; /* XXX */
+	if (!dentry) {
+		ptrace(("%s: dentry lookup is NULL\n", __FUNCTION__));
+		goto up_exit;
+	}
+	err = PTR_ERR(dentry);
+	if (IS_ERR(dentry)) {
+		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -err));
+		goto up_exit;
+	}
 	/* we only fail to get an inode when memory allocation fails */
 	err = -ENOMEM;
-	if (!dentry->d_inode)
+	if (!dentry->d_inode) {
+		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
 		goto dput_exit;
+	}
 	/* we only get a bad inode when there is no device entry */
 	err = -ENODEV;
-	if (is_bad_inode(dentry->d_inode))
+	if (is_bad_inode(dentry->d_inode)) {
+		ptrace(("%s: bad inode on lookup\n", __FUNCTION__));
 		goto dput_exit;
+	}
 	up(&inode->i_sem);
 	inode = NULL;
+	printd(("%s: opening dentry %p\n", __FUNCTION__, dentry));
 	file = dentry_open2(dentry, ext_file, cdev);
-	if ((err = PTR_ERR(file)) < 0)
+	err = PTR_ERR(file);
+	if (IS_ERR(file)) {
+		ptrace(("%s: dentry_open2 returned error, errno %d\n", __FUNCTION__, -err));
 		goto dput_exit;
+	}
 	if (err == 0) {
+		printd(("%s: swapping file pointers\n", __FUNCTION__));
 		file_swap_put(ext_file, file);
 		goto cput_exit;
 	}
 	/* fifo returns 1 on exit to cleanup shadow pointer and use existing file pointer */
 	err = 0;
       dput_exit:
+	printd(("%s: putting dentry\n", __FUNCTION__));
 	dput(dentry);
+      up_exit:
+	if (inode) {
+		printd(("%s: releasing inode semaphore\n", __FUNCTION__));
+		up(&inode->i_sem);
+	}
       pput_exit:
+	printd(("%s: putting parent dentry\n", __FUNCTION__));
 	dput(parent);
       cput_exit:
+	printd(("%s: putting driver\n", __FUNCTION__));
 	cdrv_put(cdev);
       exit:
 	return (err);

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2004/06/07 17:43:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2004/06/09 08:32:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/07 17:43:07 $ by $Author: brian $
+# Last Modified $Date: 2004/06/09 08:32:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,7 +74,20 @@ dist_sbin_SCRIPTS		= \
 				$(srcdir)/src/util/strload \
 				$(srcdir)/src/util/strsetup
 
-libexec_PROGRAMS		=
+libexec_PROGRAMS		= \
+				test-clone \
+				test-connld \
+				test-echo \
+				test-fifo \
+				test-log \
+				test-nsdev \
+				test-nuls \
+				test-pipe \
+				test-pipemod \
+				test-sad \
+				test-sc \
+				test-streams
+
 
 if WITH_TLI
 
@@ -447,6 +460,80 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
+test_clone_SOURCES		= src/test/test-clone.c
+test_clone_LDFLAGS		= libstreams.la
+test_clone_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_clone_CFLAGS		= $(LFS_CFLAGS)
+
+test_connld_SOURCES		= src/test/test-connld.c
+test_connld_LDFLAGS		= libstreams.la
+test_connld_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_connld_CFLAGS		= $(LFS_CFLAGS)
+
+test_echo_SOURCES		= src/test/test-echo.c
+test_echo_LDFLAGS		= libstreams.la
+test_echo_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_echo_CFLAGS		= $(LFS_CFLAGS)
+
+test_fifo_SOURCES		= src/test/test-fifo.c
+test_fifo_LDFLAGS		= libstreams.la
+test_fifo_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_fifo_CFLAGS		= $(LFS_CFLAGS)
+
+test_log_SOURCES		= src/test/test-log.c
+test_log_LDFLAGS		= libstreams.la
+test_log_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_log_CFLAGS			= $(LFS_CFLAGS)
+
+test_nsdev_SOURCES		= src/test/test-nsdev.c
+test_nsdev_LDFLAGS		= libstreams.la
+test_nsdev_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_nsdev_CFLAGS		= $(LFS_CFLAGS)
+
+test_nuls_SOURCES		= src/test/test-nuls.c
+test_nuls_LDFLAGS		= libstreams.la
+test_nuls_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_nuls_CFLAGS		= $(LFS_CFLAGS)
+
+test_pipe_SOURCES		= src/test/test-pipe.c
+test_pipe_LDFLAGS		= libstreams.la
+test_pipe_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_pipe_CFLAGS		= $(LFS_CFLAGS)
+
+test_pipemod_SOURCES		= src/test/test-pipemod.c
+test_pipemod_LDFLAGS		= libstreams.la
+test_pipemod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_pipemod_CFLAGS		= $(LFS_CFLAGS)
+
+test_sad_SOURCES		= src/test/test-sad.c
+test_sad_LDFLAGS		= libstreams.la
+test_sad_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_sad_CFLAGS			= $(LFS_CFLAGS)
+
+test_sc_SOURCES			= src/test/test-sc.c
+test_sc_LDFLAGS			= libstreams.la
+test_sc_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_sc_CFLAGS			= $(LFS_CFLAGS)
+
+test_streams_SOURCES		= src/test/test-streams.c
+test_streams_LDFLAGS		= libstreams.la
+test_streams_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_streams_CFLAGS		= $(LFS_CFLAGS)
+
+if WITH_TLI
+
+test_timod_SOURCES		= src/test/test-timod.c
+test_timod_LDFLAGS		= libstreams.la
+test_timod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CFLAGS		= $(USER_CFLAGS)
+
+test_tirdwr_SOURCES		= src/test/test-tirdwr.c
+test_tirdwr_LDFLAGS		= libstreams.la
+test_tirdwr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CFLAGS		= $(USER_CFLAGS)
+
+endif
+
 if WITH_INET
 
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
@@ -463,20 +550,6 @@ test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_LDFLAGS		= libstreams.la
 test_inet_tcp_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
-
-endif
-
-if WITH_TLI
-
-test_timod_SOURCES		= src/test/test-timod.c
-test_timod_LDFLAGS		= libstreams.la
-test_timod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_timod_CFLAGS		= $(USER_CFLAGS)
-
-test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_LDFLAGS		= libstreams.la
-test_tirdwr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 endif
 
