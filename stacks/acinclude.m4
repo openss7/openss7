@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9 2004/01/17 07:50:02 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/02/17 06:32:11 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/01/17 07:50:02 $ by $Author: brian $
+dnl Last Modified $Date: 2004/02/17 06:32:11 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -66,6 +66,7 @@ m4_include([m4/rpm.m4])
 AC_DEFUN(AC_SS7,
 [
     _SS7_OPTIONS
+    _SS7_SETUP_PUBLIC
     _SS7_SETUP_DEBUG
     _SS7_CHECK_LIS_HEADERS
     _SS7_CHECK_XTI_HEADERS
@@ -101,6 +102,21 @@ AC_DEFUN(_SS7_OPTIONS,
 			        @<:@default=INCLUDEDIR/LiS@:>@]),
 		[with_lis=$withval],
 		[with_lis=''])
+    AC_ARG_ENABLE([inet],
+                  AC_HELP_STRING([--enable-inet],
+                                 [enable inet package. @<:@default=no@:>@]),
+                  [enable_inet=$enableval],
+                  [enable_inet=''])
+    AC_ARG_ENABLE([sctp2],
+                  AC_HELP_STRING([--enable-sctp2],
+                                 [enable sctp2 package. @<:@default=no@:>@]),
+                  [enable_sctp2=$enableval],
+                  [enable_sctp2=''])
+    AC_ARG_ENABLE([public],
+                  AC_HELP_STRING([--enable-public],
+                                 [enable public release. @<:@default=yes@:>@]),
+                  [enable_public=$enableval],
+                  [enable_public=''])
     AC_ARG_ENABLE([k-debug],
                   AC_HELP_STRING([--enable-k-debug],
                                  [enable kernel module run-time debugging.
@@ -120,6 +136,22 @@ AC_DEFUN(_SS7_OPTIONS,
                   [enable_k_safe=$enableval],
                   [enable_k_safe=''])
 ])# _SS7_OPTIONS
+# =========================================================================
+
+# =========================================================================
+# _SS7_SETUP_PUBLIC
+# -------------------------------------------------------------------------
+AC_DEFUN(_SS7_SETUP_PUBLIC,
+[
+    AC_CACHE_CHECK([for public release], [ss7_cv_public], [dnl
+        if test :"$enable_public" = :no ; then
+            ss7_cv_public=no
+        else
+            ss7_cv_public=yes
+        fi
+    ])
+    AM_CONDITIONAL(SS7_PUBLIC_RELEASE, test :"$ss7_cv_public" = :yes)
+])# _SS7_SETUP_PUBLIC
 # =========================================================================
 
 # =========================================================================

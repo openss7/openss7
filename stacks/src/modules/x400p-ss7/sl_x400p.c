@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:15 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:37 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:24:15 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:24:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:15 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:37 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:15 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:37 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -86,14 +86,14 @@ static char const ident[] =
 #include <asm/dma.h>
 #include <linux/pci.h>
 
-#include "../debug.h"
-#include "../bufq.h"
-#include "../priv.h"
-#include "../lock.h"
-#include "../queue.h"
-#include "../allocb.h"
-#include "../timer.h"
-#include "../bufpool.h"
+#include "debug.h"
+#include "bufq.h"
+#include "priv.h"
+#include "lock.h"
+#include "queue.h"
+#include "allocb.h"
+#include "timer.h"
+#include "bufpool.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -105,7 +105,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #ifdef X400P_SL_DOWNLOAD_FIRMWARE
-#include "x400pfw.h"		/* X400P-SS7 firmware load */
+#include "x400p-ss7/x400pfw.h"		/* X400P-SS7 firmware load */
 #endif
 
 #define X400P_SL_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
@@ -125,10 +125,6 @@ MODULE_SUPPORTED_DEVICE(X400P_SL_DEVICE);
 MODULE_LICENSE(X400P_SL_LICENSE);
 #endif
 
-#ifndef X400P_SL_CMAJOR
-#error "X400P_SL_CMAJOR must be defined\n"
-#endif
-#define X400P_SL_NMAJOR 4
 #define X400P_SL_NMINOR 255
 
 /*
@@ -139,8 +135,8 @@ MODULE_LICENSE(X400P_SL_LICENSE);
  *  =======================================================================
  */
 
-#define XP_DRV_ID	X400P_SL_CMAJOR
-#define XP_DRV_NAME	"x400p-sl"
+#define XP_DRV_ID	SL_X400P_DRV_ID
+#define XP_DRV_NAME	SL_X400P_DRV_NAME
 
 STATIC struct module_info xp_rinfo = {
 	mi_idnum:XP_DRV_ID,			/* Module ID number */
@@ -1666,7 +1662,7 @@ STATIC INLINE void __xp_timer_stop(struct xp *xp, const uint t)
 }
 STATIC INLINE void xp_timer_stop(struct xp *xp, const uint t)
 {
-	int flags;
+	psw_t flags;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
 		__xp_timer_stop(xp, t);
@@ -1675,7 +1671,7 @@ STATIC INLINE void xp_timer_stop(struct xp *xp, const uint t)
 }
 STATIC INLINE void xp_timer_start(struct xp *xp, const uint t)
 {
-	int flags;
+	psw_t flags;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
 		__xp_timer_stop(xp, t);
@@ -5065,7 +5061,7 @@ STATIC int xp_send_data(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int ret;
-	int flags = 0;
+	psw_t flags = 0;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	/* locks are probably uncecessary here */
@@ -5109,7 +5105,7 @@ STATIC int sl_pdu_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int ret;
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto discard;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5129,7 +5125,7 @@ STATIC int sl_pdu_req(queue_t *q, mblk_t *mp)
 STATIC int sl_emergency_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5150,7 +5146,7 @@ STATIC int sl_emergency_req(queue_t *q, mblk_t *mp)
 STATIC int sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5171,7 +5167,7 @@ STATIC int sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 STATIC int sl_start_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5192,7 +5188,7 @@ STATIC int sl_start_req(queue_t *q, mblk_t *mp)
 STATIC int sl_stop_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5214,7 +5210,7 @@ STATIC int sl_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int err;
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5239,7 +5235,7 @@ STATIC int sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr >= mp->b_rptr + sizeof(*p)) {
 		struct xp *xp = XP_PRIV(q);
 		int err;
-		int flags;
+		psw_t flags;
 		if (xp->i_state != LMI_ENABLED)
 			goto eproto;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5262,7 +5258,7 @@ STATIC int sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 STATIC int sl_resume_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5284,7 +5280,7 @@ STATIC int sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int err;
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5304,7 +5300,7 @@ STATIC int sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 STATIC int sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5325,7 +5321,7 @@ STATIC int sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 STATIC int sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5346,7 +5342,7 @@ STATIC int sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 STATIC int sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5367,7 +5363,7 @@ STATIC int sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 STATIC int sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5388,7 +5384,7 @@ STATIC int sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 STATIC int sl_no_congestion_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5409,7 +5405,7 @@ STATIC int sl_no_congestion_req(queue_t *q, mblk_t *mp)
 STATIC int sl_power_on_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5461,7 +5457,7 @@ STATIC int sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5481,7 +5477,7 @@ STATIC int sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5501,7 +5497,7 @@ STATIC int sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5521,7 +5517,7 @@ STATIC int sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5541,7 +5537,7 @@ STATIC int sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5561,7 +5557,7 @@ STATIC int sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5581,7 +5577,7 @@ STATIC int sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5601,7 +5597,7 @@ STATIC int sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	if (xp->i_state != LMI_ENABLED)
 		goto eproto;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -5634,7 +5630,7 @@ STATIC int sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
 STATIC int sdl_connect_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	sdl_connect_req_t *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto eproto;
@@ -5670,7 +5666,7 @@ STATIC int sdl_connect_req(queue_t *q, mblk_t *mp)
 STATIC int sdl_disconnect_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags;
+	psw_t flags;
 	sdl_disconnect_req_t *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto eproto;
@@ -5727,7 +5723,7 @@ STATIC int lmi_info_req(queue_t *q, mblk_t *mp)
  */
 STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	int err, card, span, chan, slot;
 	struct cd *cd;
 	struct sp *sp = NULL;
@@ -5979,7 +5975,7 @@ STATIC int lmi_detach_req(queue_t *q, mblk_t *mp)
 	struct sp *sp;
 	struct cd *cd;
 	int err, slot;
-	int flags = 0;
+	psw_t flags = 0;
 	/* validate detach */
 	if (xp->i_state != LMI_DISABLED)
 		return lmi_error_ack(q, xp, xp->i_state, LMI_DETACH_REQ, 0, LMI_OUTSTATE);
@@ -6087,7 +6083,7 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
 		{
-			int flags = 0;
+			psw_t flags = 0;
 			printd(("%s: performing enable on E1 span %d\n", XP_DRV_NAME, span));
 			lis_spin_lock_irqsave(&cd->lock, &flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -6166,7 +6162,7 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 		{
 			int byte, val, c;
 			unsigned short mask = 0;
-			int flags = 0;
+			psw_t flags = 0;
 			printd(("%s: performing enable on T1 span %d\n", XP_DRV_NAME, span));
 			lis_spin_lock_irqsave(&cd->lock, &flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -6264,7 +6260,7 @@ STATIC int lmi_disable_req(queue_t *q, mblk_t *mp)
 		return (err);
 	/* commit disable */
 	if ((sp = xp->sp) && (cd = sp->cd)) {
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&cd->lock, &flags);
 		{
 			int slot, boff;
@@ -6355,7 +6351,7 @@ STATIC int sl_iocgoptions(queue_t *q, mblk_t *mp)
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			*arg = xp->option;
@@ -6372,7 +6368,7 @@ STATIC int sl_iocsoptions(queue_t *q, mblk_t *mp)
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			xp->option = *arg;
@@ -6389,7 +6385,7 @@ STATIC int sl_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			*arg = xp->sl.config;
@@ -6406,7 +6402,7 @@ STATIC int sl_iocsconfig(queue_t *q, mblk_t *mp)
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			xp->sl.config = *arg;
@@ -6423,7 +6419,7 @@ STATIC int sl_ioctconfig(queue_t *q, mblk_t *mp)
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -6440,7 +6436,7 @@ STATIC int sl_ioccconfig(queue_t *q, mblk_t *mp)
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -6457,7 +6453,7 @@ STATIC int sl_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			*arg = xp->sl.statem;
@@ -6474,7 +6470,7 @@ STATIC int sl_ioccmreset(queue_t *q, mblk_t *mp)
 		sl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			xp->sl.statem = *arg;
@@ -6491,7 +6487,7 @@ STATIC int sl_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			*arg = xp->sl.statsp;
@@ -6508,7 +6504,7 @@ STATIC int sl_iocsstatsp(queue_t *q, mblk_t *mp)
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			xp->sl.statsp = *arg;
@@ -6525,7 +6521,7 @@ STATIC int sl_iocgstats(queue_t *q, mblk_t *mp)
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			*arg = xp->sl.stats;
@@ -6542,7 +6538,7 @@ STATIC int sl_ioccstats(queue_t *q, mblk_t *mp)
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			bzero(&xp->sl.stats, sizeof(xp->sl.stats));
@@ -6559,7 +6555,7 @@ STATIC int sl_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			*arg = xp->sl.notify;
@@ -6576,7 +6572,7 @@ STATIC int sl_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			xp->sl.notify.events |= arg->events;
@@ -6593,7 +6589,7 @@ STATIC int sl_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
-		int flags = 0;
+		psw_t flags = 0;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
 			xp->sl.notify.events &= ~(arg->events);
@@ -6615,7 +6611,7 @@ STATIC int sl_ioccnotify(queue_t *q, mblk_t *mp)
 STATIC int sdt_test_config(struct xp *xp, sdt_config_t * arg)
 {
 	int ret = 0;
-	int flags = 0;
+	psw_t flags = 0;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	do {
 		if (!arg->t8)
@@ -6650,7 +6646,7 @@ STATIC int sdt_test_config(struct xp *xp, sdt_config_t * arg)
 }
 STATIC int sdt_commit_config(struct xp *xp, sdt_config_t * arg)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
 		sdt_test_config(xp, arg);
@@ -6664,7 +6660,7 @@ STATIC int sdt_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6680,7 +6676,7 @@ STATIC int sdt_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6696,7 +6692,7 @@ STATIC int sdt_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6712,7 +6708,7 @@ STATIC int sdt_iocsconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6748,7 +6744,7 @@ STATIC int sdt_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6772,7 +6768,7 @@ STATIC int sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6788,7 +6784,7 @@ STATIC int sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6804,7 +6800,7 @@ STATIC int sdt_iocgstats(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6818,7 +6814,7 @@ STATIC int sdt_iocgstats(queue_t *q, mblk_t *mp)
 }
 STATIC int sdt_ioccstats(queue_t *q, mblk_t *mp)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	struct xp *xp = XP_PRIV(q);
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -6832,7 +6828,7 @@ STATIC int sdt_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6848,7 +6844,7 @@ STATIC int sdt_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6864,7 +6860,7 @@ STATIC int sdt_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -6879,7 +6875,7 @@ STATIC int sdt_ioccnotify(queue_t *q, mblk_t *mp)
 STATIC int sdt_ioccabort(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -6900,7 +6896,7 @@ STATIC int sdt_ioccabort(queue_t *q, mblk_t *mp)
 STATIC int sdl_test_config(struct xp *xp, sdl_config_t * arg)
 {
 	int ret = 0;
-	int flags = 0;
+	psw_t flags = 0;
 	if (!xp)
 		return (-EFAULT);
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -7137,7 +7133,7 @@ STATIC void sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 	int chan_reconfig = 0, span_reconfig = 0, card_reconfig = 0;
 	struct sp *sp = NULL;
 	struct cd *cd = NULL;
-	int flags = 0;
+	psw_t flags = 0;
 	if (!xp)
 		return;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -7361,7 +7357,7 @@ STATIC int sdl_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (lmi_option_t *) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7382,7 +7378,7 @@ STATIC int sdl_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7404,7 +7400,7 @@ STATIC int sdl_iocgconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		struct sp *sp;
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		bzero(arg, sizeof(*arg));
 		lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -7499,7 +7495,7 @@ STATIC int sdl_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7534,7 +7530,7 @@ STATIC int sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7555,7 +7551,7 @@ STATIC int sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		fixme(("FIXME: check these settings\n"));
 		lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -7577,7 +7573,7 @@ STATIC int sdl_iocgstats(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7597,7 +7593,7 @@ STATIC int sdl_iocgstats(queue_t *q, mblk_t *mp)
 STATIC int sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -7615,7 +7611,7 @@ STATIC int sdl_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7636,7 +7632,7 @@ STATIC int sdl_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7657,7 +7653,7 @@ STATIC int sdl_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -7677,7 +7673,7 @@ STATIC int sdl_ioccnotify(queue_t *q, mblk_t *mp)
 STATIC int sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -7694,7 +7690,7 @@ STATIC int sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 STATIC int sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -8634,7 +8630,7 @@ STATIC INLINE int xp_w_flush(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	if (*mp->b_rptr & FLUSHW) {
 		if (xp) {
-			int flags;
+			psw_t flags;
 			lis_spin_lock_irqsave(&xp->lock, &flags);
 			if (xp->tx.cmp) {
 				xp->tx.cmp = NULL;
@@ -8650,7 +8646,7 @@ STATIC INLINE int xp_w_flush(queue_t *q, mblk_t *mp)
 	}
 	if (*mp->b_rptr & FLUSHR) {
 		if (xp) {
-			int flags;
+			psw_t flags;
 			lis_spin_lock_irqsave(&xp->lock, &flags);
 			if (xp->rx.cmp) {
 				freeb(xp->rx.cmp);
@@ -8919,7 +8915,7 @@ STATIC struct xp *xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t
 
 STATIC void xp_free_priv(struct xp *xp)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	ensure(xp, return);
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -9105,7 +9101,7 @@ STATIC struct cd *xp_alloc_cd(void)
 /* Note: called with card interrupts disabled and pci resources deallocated */
 STATIC void xp_free_cd(struct cd *cd)
 {
-	int flags;
+	psw_t flags;
 	lis_spin_lock_irqsave(&cd->lock, &flags);
 	{
 		int span;
@@ -9442,7 +9438,7 @@ STATIC INLINE void xp_pci_cleanup(void)
  *  =========================================================================
  */
 STATIC int xp_initialized = 0;
-STATIC int xp_majors[X400P_SL_NMAJOR] = { 0, };
+STATIC int xp_majors[SL_X400P_CMAJORS] = { 0, };
 STATIC void xp_init(void)
 {
 	int err, major;
@@ -9467,11 +9463,11 @@ STATIC void xp_init(void)
 		return;
 	}
 	ss7_bufpool_init(&xp_bufpool);
-	for (major = 0; major < X400P_SL_NMAJOR; major++) {
+	for (major = 0; major < SL_X400P_CMAJORS; major++) {
 		if ((err =
-		     lis_register_strdev(X400P_SL_CMAJOR + major, &xp_info, X400P_SL_NMINOR, XP_DRV_NAME)) <= 0) {
+		     lis_register_strdev(SL_X400P_CMAJOR_0 + major, &xp_info, X400P_SL_NMINOR, XP_DRV_NAME)) <= 0) {
 			cmn_err(CE_WARN, "%s: ERROR: couldn't register driver for major %d", XP_DRV_NAME,
-				major + X400P_SL_CMAJOR);
+				major + SL_X400P_CMAJOR_0);
 			xp_initialized = err;
 			for (major -= 1; major >= 0; major--)
 				lis_unregister_strdev(xp_majors[major]);
@@ -9483,14 +9479,14 @@ STATIC void xp_init(void)
 		} else
 			xp_majors[major] = err;
 	}
-	xp_initialized = X400P_SL_CMAJOR;
+	xp_initialized = SL_X400P_CMAJOR_0;
 	return;
 }
 STATIC void xp_terminate(void)
 {
 	int err, major;
 	ensure(xp_initialized, return);
-	for (major = 0; major < X400P_SL_NMAJOR; major++) {
+	for (major = 0; major < SL_X400P_CMAJORS; major++) {
 		if (xp_majors[major]) {
 			if ((err = lis_unregister_strdev(xp_majors[major])))
 				cmn_err(CE_PANIC, "%s: couldn't unregister driver for major %d\n", XP_DRV_NAME,

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/02/12 02:34:06 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:28:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/12 02:34:06 $ by $Author: brian $
+# Last Modified $Date: 2004/02/17 06:28:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
 	@list='$(KERNEL_MODULES)'; for p in $$list; do \
 		if test -f $$p; then \
-			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
+			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|_|-|g'`" ; \
 			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
 			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULE)" ; then \
@@ -123,7 +123,7 @@ install-data-local: $(man_MANS) $(mansrcdir)/$(MANMACRO_PFX).macros $(mansrcdir)
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
 	@list='$(KERNEL_MODULES)'; for p in $$list; do \
-		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
+		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|_|-|g'`" ; \
 		echo "$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 		$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
 	done

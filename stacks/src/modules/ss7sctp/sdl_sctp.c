@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:50 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:50 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:24:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:50 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
 
-static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:50 $";
+static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -84,7 +84,7 @@ static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9 $
 #include "timer.h"
 
 #define SDL_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:50 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -561,6 +561,7 @@ sdl_daedr_su_in_error_ind(sdl_t * sp)
  *  SDL_DAEDT_TRANSMISSION_REQUEST_IND
  *  ---------------------------------------------
  */
+#if 0
 static int
 sdl_daedt_transmission_request_ind(sdl_t * sp)
 {
@@ -577,6 +578,7 @@ sdl_daedt_transmission_request_ind(sdl_t * sp)
 	rare();
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  =========================================================================
@@ -660,14 +662,18 @@ static int
 sdl_write(sdl_t * sp, mblk_t *mp)
 {
 	int err;
+#if 0
 	uint xsn = sp->lmi_conf.popt & SS7_POPT_XSN;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
+#endif
 	N_qos_sel_data_sctp_t qos = { N_QOS_SEL_DATA_SCTP, SDL_PPI, 0, 0, 0, 0 };
 
 	if ((err = n_data_req(sp, 0, &qos, sizeof(qos), mp)))
 		return (err);
+#if 0
 	if ((!xsn && mlen > 5) || (xsn && mlen > 8))
 		sdl_daedt_transmission_request_ind(sp);
+#endif
 	return (0);
 }
 
@@ -887,12 +893,12 @@ m_error_reply(sdl_t * sp, int err)
 	return (-ENOBUFS);
 }
 static int
-sdl_daedt_xmit_req(sdl_t * sp, mblk_t *mp)
+sdl_bits_for_transmission_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sdl_daedt_transmission_req_t *p = (sdl_daedt_transmission_req_t *) mp->b_rptr;
+	sdl_bits_for_transmission_req_t *p = (sdl_bits_for_transmission_req_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -937,11 +943,11 @@ sdl_daedt_xmit_req(sdl_t * sp, mblk_t *mp)
  *  ---------------------------------------------
  */
 static int
-sdl_daedt_start_req(sdl_t * sp, mblk_t *mp)
+sdl_connect_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sdl_daedt_start_req_t *p = (sdl_daedt_start_req_t *) mp->b_rptr;
+	sdl_connect_req_t *p = (sdl_connect_req_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -952,6 +958,10 @@ sdl_daedt_start_req(sdl_t * sp, mblk_t *mp)
 				   enable the transmitter section 
 				 */
 				sp->flags |= SDL_FLAG_TX_ENABLED;
+				/*
+				   enable the receiver section 
+				 */
+				sp->flags |= SDL_FLAG_RX_ENABLED;
 				return (0);
 
 			}
@@ -972,11 +982,11 @@ sdl_daedt_start_req(sdl_t * sp, mblk_t *mp)
  *  ---------------------------------------------
  */
 static int
-sdl_daedr_start_req(sdl_t * sp, mblk_t *mp)
+sdl_disconnect_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-	sdl_daedr_start_req_t *p = (sdl_daedr_start_req_t *) mp->b_rptr;
+	sdl_disconnect_req_t *p = (sdl_disconnect_req_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -984,9 +994,13 @@ sdl_daedr_start_req(sdl_t * sp, mblk_t *mp)
 			if (sp->state == LMI_ENABLED) {
 
 				/*
-				   enable the receiver section 
+				   disable the transmitter section 
 				 */
-				sp->flags |= SDL_FLAG_RX_ENABLED;
+				sp->flags &= ~SDL_FLAG_TX_ENABLED;
+				/*
+				   disable the receiver section 
+				 */
+				sp->flags &= ~SDL_FLAG_RX_ENABLED;
 				return (0);
 
 			}
@@ -1054,7 +1068,7 @@ n_discon_ind(sdl_t * sp, mblk_t *mp)
 	return (0);
 }
 
-/*
+/* 
  *  N_DATA_IND
  *  ---------------------------------------------
  */
@@ -1068,33 +1082,30 @@ n_data_ind(sdl_t * sp, mblk_t *mp)
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	ensure(mlen >= sizeof(*p), return (-EFAULT));
-	if (mlen <= sp->sdl_conf.m) {
-		if ((dp = mp->b_cont)) {
-			if (sp->state == LMI_ENABLED) {
-				if (sp->flags & SDL_FLAG_RX_ENABLED) {
-					if (canputnext(sp->iq)) {
-						if ((err = sdl_read(sp, dp)))
-							return (err);
-						mp->b_cont = NULL;	/* absorbed data portion */
-						return (0);
-					}
-					seldom();
-					return (-EBUSY);	/* flow controlled */
+	(void) mlen;
+	if ((dp = mp->b_cont)) {
+		if (sp->state == LMI_ENABLED) {
+			if (sp->flags & SDL_FLAG_RX_ENABLED) {
+				if (canputnext(sp->iq)) {
+					if ((err = sdl_read(sp, dp)))
+						return (err);
+					mp->b_cont = NULL;	/* absorbed data portion */
+					return (0);
 				}
 				seldom();
-				return (0);	/* ignore unless enabled */
+				return (-EBUSY);	/* flow controlled */
 			}
-			rare();
-			return (-EPROTO);	/* ignore data in other states */
+			seldom();
+			return (0);	/* ignore unless enabled */
 		}
 		rare();
-		return (-EFAULT);
+		return (-EPROTO);	/* ignore data in other states */
 	}
 	rare();
-	return (-EMSGSIZE);
+	return (-EFAULT);
 }
 
-/*
+/* 
  *  N_EXDATA_IND
  *  ---------------------------------------------
  */
@@ -1108,30 +1119,27 @@ n_exdata_ind(sdl_t * sp, mblk_t *mp)
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	ensure(mlen >= sizeof(*p), return (-EFAULT));
-	if (mlen <= sp->sdl_conf.m) {
-		if ((dp = mp->b_cont)) {
-			if (sp->state == LMI_ENABLED) {
-				if (sp->flags & SDL_FLAG_RX_ENABLED) {
-					if (bcanputnext(sp->iq, 1)) {
-						if ((err = sdl_read(sp, dp)))
-							return (err);
-						mp->b_cont = NULL;	/* absorbed data portion */
-						return (0);
-					}
-					seldom();
-					return (-EBUSY);	/* flow controlled */
+	(void) mlen;
+	if ((dp = mp->b_cont)) {
+		if (sp->state == LMI_ENABLED) {
+			if (sp->flags & SDL_FLAG_RX_ENABLED) {
+				if (bcanputnext(sp->iq, 1)) {
+					if ((err = sdl_read(sp, dp)))
+						return (err);
+					mp->b_cont = NULL;	/* absorbed data portion */
+					return (0);
 				}
 				seldom();
-				return (0);	/* ignore unless enabled */
+				return (-EBUSY);	/* flow controlled */
 			}
-			rare();
-			return (-EPROTO);	/* ignore data in other states */
+			seldom();
+			return (0);	/* ignore unless enabled */
 		}
 		rare();
-		return (-EFAULT);
+		return (-EPROTO);	/* ignore data in other states */
 	}
 	rare();
-	return (-EMSGSIZE);
+	return (-EFAULT);
 }
 
 /*
@@ -1458,14 +1466,14 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 	case LMI_OPTMGMT_REQ:
 		rtn = lmi_optmgmt_req(sp, mp);
 		break;
-	case SDL_DAEDT_TRANSMISSION_REQ:
-		rtn = sdl_daedt_xmit_req(sp, mp);
+	case SDL_BITS_FOR_TRANSMISSION_REQ:
+		rtn = sdl_bits_for_transmission_req(sp, mp);
 		break;
-	case SDL_DAEDT_START_REQ:
-		rtn = sdl_daedt_start_req(sp, mp);
+	case SDL_CONNECT_REQ:
+		rtn = sdl_connect_req(sp, mp);
 		break;
-	case SDL_DAEDR_START_REQ:
-		rtn = sdl_daedr_start_req(sp, mp);
+	case SDL_DISCONNECT_REQ:
+		rtn = sdl_disconnect_req(sp, mp);
 		break;
 	default:
 		rtn = -EOPNOTSUPP;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9 2004/01/17 08:07:46 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.1 2004/02/17 06:26:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:07:46 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:26:15 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -311,7 +311,7 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 	return (rtn);
 }
 
-STATIC int
+STATIC INLINE int
 ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -343,7 +343,7 @@ ss7_osrv(queue_t *q)
 	return (-EFAULT);
 }
 
-STATIC int
+STATIC INLINE int
 ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);

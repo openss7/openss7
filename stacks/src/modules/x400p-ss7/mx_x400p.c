@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:24:14 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:24:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,11 +74,12 @@ static char const ident[] =
 #include <ss7/mxi.h>
 #include <ss7/mxi_ioctl.h>
 
-#include "../debug.h"
-#include "../priv.h"
-#include "../lock.h"
-#include "../queue.h"
-#include "../allocb.h"
+#include "debug.h"
+#include "bufq.h"
+#include "priv.h"
+#include "lock.h"
+#include "queue.h"
+#include "allocb.h"
 
 #define MX_DESCRIP	"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
@@ -118,8 +119,8 @@ MODULE_LICENSE(MX_LICENSE);
  *  =========================================================================
  */
 
-#define MX_MOD_ID   MX_IOC_MAGIC
-#define MX_MOD_NAME "x400p-mx"
+#define MX_MOD_ID   MX__MOD_ID
+#define MX_MOD_NAME MX__MOD_NAME
 
 static struct module_info mx_minfo = {
 	mi_idnum:MX_MOD_ID,			/* Module ID number */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:13 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:24:13 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:24:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:13 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:13 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,11 +74,12 @@ static char const ident[] =
 #include <ss7/chi.h>
 #include <ss7/chi_ioctl.h>
 
-#include "../debug.h"
-#include "../priv.h"
-#include "../lock.h"
-#include "../queue.h"
-#include "../allocb.h"
+#include "debug.h"
+#include "bufq.h"
+#include "priv.h"
+#include "lock.h"
+#include "queue.h"
+#include "allocb.h"
 
 #define CH_DESCRIP	"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
@@ -105,8 +106,8 @@ MODULE_LICENSE(CH_LICENSE);
  *  =========================================================================
  */
 
-#define CH_MOD_ID   CH_IOC_MAGIC
-#define CH_MOD_NAME "ch"
+#define CH_MOD_ID   CH__MOD_ID
+#define CH_MOD_NAME CH__MOD_NAME
 
 static struct module_info ch_minfo = {
 	mi_idnum:CH_MOD_ID,			/* Module ID number */
@@ -2469,7 +2470,7 @@ static struct ch *ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t
 static void ch_free_priv(queue_t *q)
 {
 	struct ch *ch = CH_PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	ensure(ch, return);
 	lis_spin_lock_irqsave(&ch->lock, &flags);
 	{

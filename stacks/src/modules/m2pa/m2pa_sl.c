@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/21 21:24:51 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:23:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,6 +78,8 @@ static char const ident[] =
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
+// #define _DEBUG
+
 #include "debug.h"
 #include "bufq.h"
 #include "priv.h"
@@ -87,9 +89,9 @@ static char const ident[] =
 #include "timer.h"
 
 #define M2PA_DESCRIP	"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $"
-#define M2PA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define M2PA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
+#define M2PA_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:23:03 $"
+#define M2PA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define M2PA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M2PA_LICENSE	"GPL"
 #define M2PA_BANNER	M2PA_DESCRIP	"\n" \
@@ -206,7 +208,8 @@ STATIC void sl_put(struct sl *sl);
 #define M2PA_VERSION_DRAFT6_1	0x61
 #define M2PA_VERSION_DRAFT6_9	0x69
 #define M2PA_VERSION_DRAFT10	0xa0
-#define M2PA_VERSION_DEFAULT	M2PA_VERSION_DRAFT10
+#define M2PA_VERSION_DRAFT11	0xb0
+#define M2PA_VERSION_DEFAULT	M2PA_VERSION_DRAFT11
 
 /*
  *  =========================================================================
@@ -1027,13 +1030,14 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		   It looks like the sequence numbers stuck. 
 		 */
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
 			*((uint32_t *) mp->b_wptr)++ =
 			    __constant_htonl(5 * sizeof(uint32_t) + sizeof(filler));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
 			*((uint32_t *) mp->b_wptr)++ = status;
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
@@ -1115,8 +1119,8 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
 			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
 			*((uint32_t *) mp->b_wptr)++ = status;
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
@@ -1142,12 +1146,13 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		return (-ENOBUFS);
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
 			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
 			*((uint32_t *) mp->b_wptr)++ = status;
 			switch (status) {
 			case M2PA_STATUS_PROCESSOR_OUTAGE:
@@ -1279,8 +1284,8 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
 			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
 			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_IN_SERVICE;
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
@@ -1307,8 +1312,8 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
 			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(4 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1319,6 +1324,7 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		return (-ENOBUFS);
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		/*
 		   Acknowledgements must be sent immediately on the next outgoing message.  We
 		   check to see if there is a pending MSU waiting to be sent that will actually be
@@ -1337,8 +1343,8 @@ sl_send_ack(queue_t *q, struct sl *sl)
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
 			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(4 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1401,12 +1407,13 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT6_9:
 		default:
 		case M2PA_VERSION_DRAFT10:
+		case M2PA_VERSION_DRAFT11:
 			if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
 				*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
 				*((uint32_t *) mp->b_wptr)++ = htonl(dlen + 4 * sizeof(uint32_t));
-				*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-				*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt + 1);
+				*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
+				*((uint32_t *) mp->b_wptr)++ = htonl((sl->fsnt + 1) & 0xffffff);
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -1962,6 +1969,17 @@ sl_lsc_power_on(queue_t *q, struct sl *sl)
 {
 	int err;
 	if (sl_get_state(sl) == MS_POWER_OFF) {
+		sl->rmsu = 0;
+		sl->rack = 0;
+		sl->fsnr = 0xffffff;
+		sl->bsnr = 0xffffff;
+		sl->fsnx = 0;
+		sl->tmsu = 0;
+		sl->tack = 0;
+		sl->fsnt = 0xffffff;
+		sl->back = 0;
+		sl->bbsn = 0;
+		sl->bfsn = 0;
 		sl->flags = 0;
 		if ((err = sl_send_status(q, sl, M2PA_STATUS_OUT_OF_SERVICE)) < 0)
 			return (err);
@@ -1979,12 +1997,12 @@ sl_lsc_start(queue_t *q, struct sl *sl)
 	if (sl_get_state(sl) == MS_OUT_OF_SERVICE) {
 		sl->rmsu = 0;
 		sl->rack = 0;
-		sl->fsnr = 0;
-		sl->bsnr = 0;
-		sl->fsnx = 1;
+		sl->fsnr = 0xffffff;
+		sl->bsnr = 0xffffff;
+		sl->fsnx = 0;
 		sl->tmsu = 0;
 		sl->tack = 0;
-		sl->fsnt = 0;
+		sl->fsnt = 0xffffff;
 		sl->back = 0;
 		sl->bbsn = 0;
 		sl->bfsn = 0;
@@ -2019,7 +2037,7 @@ sl_t2_timeout(struct sl *sl)
 }
 
 STATIC int
-sl_ready(struct sl *sl)
+sl_ready(queue_t *q, struct sl *sl)
 {
 	int err;
 	sl->flags &= ~MF_LOC_EMERG;
@@ -2047,6 +2065,7 @@ sl_ready(struct sl *sl)
 				return (err);
 			sl->tmsu++;
 			sl->fsnt++;
+			sl->fsnt &= 0xffffff;
 			bufq_queue(&sl->rtb, bufq_dequeue(&sl->tb));
 			sl->tmsu--;
 			sl->tack++;
@@ -2067,6 +2086,12 @@ sl_ready(struct sl *sl)
 			sl->flags |= MF_RECV_MSU;
 			sl_is_stats(NULL, sl);
 			sl_set_state(sl, MS_IN_SERVICE);
+		} else if (sl->flags & MF_RPO) {
+			if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+				return (err);
+			sl->flags &= ~MF_SEND_MSU;
+			sl->flags &= ~MF_RECV_MSU;
+			sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		} else {
 			sl_timer_start(sl, t1);
 			sl_set_state(sl, MS_ALIGNED_READY);
@@ -2099,7 +2124,7 @@ sl_lsc_status_alignment(queue_t *q, struct sl *sl)
 	case MS_ALIGNED:
 		if (proving)
 			return (QR_DONE);
-		return sl_ready(sl);
+		return sl_ready(q, sl);
 	case MS_PROVING:
 		sl_aerm_stop(q, sl);
 		sl_timer_stop(sl, t4);
@@ -2192,7 +2217,7 @@ sl_lsc_status_proving_normal(queue_t *q, struct sl *sl)
 			sl_set_state(sl, MS_PROVING);
 			return (QR_DONE);
 		}
-		return sl_ready(sl);
+		return sl_ready(q, sl);
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIN)
@@ -2239,7 +2264,7 @@ sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
 			sl_set_state(sl, MS_PROVING);
 			return (QR_DONE);
 		}
-		return sl_ready(sl);
+		return sl_ready(q, sl);
 	case MS_PROVING:
 		if (sl->flags & MF_REM_EMERG)
 			return (QR_DONE);
@@ -2308,7 +2333,7 @@ sl_t4_timeout(struct sl *sl)
 	int err;
 	if (sl_get_state(sl) == MS_PROVING) {
 		sl_aerm_stop(NULL, sl);
-		if ((err = sl_ready(sl)))
+		if ((err = sl_ready(NULL, sl)))
 			return (err);
 		return (0);
 	}
@@ -2317,6 +2342,7 @@ sl_t4_timeout(struct sl *sl)
 	return (-EPROTO);
 }
 
+STATIC void sl_tx_wakeup(queue_t *q);
 STATIC INLINE int
 sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 {
@@ -2353,9 +2379,10 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 			   synchronization was required. 
 			 */
 			if (sl->flags & MF_WAIT_SYNC) {
-				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr));
+				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
 				sl->flags &= ~MF_WAIT_SYNC;
 				sl->flags |= MF_SEND_MSU;
+				sl_tx_wakeup(q);
 			}
 		}
 	case MS_OUT_OF_SERVICE:
@@ -2390,6 +2417,7 @@ sl_rx_wakeup(queue_t *q)
 				sl->sl.stats.sl_recv_sio_sif_octets += mp->b_wptr - mp->b_rptr - 1;
 				sl->rmsu++;
 				sl->fsnr++;
+				sl->fsnr &= 0xffffff;
 				sl_rb_congestion_function(q, sl);
 				if (!(sl->flags & MF_CONG_ACCEPT))
 					sl->rack += xchg(&sl->rmsu, 0);
@@ -2416,6 +2444,18 @@ sl_rx_wakeup(queue_t *q)
 #define diff32(__s1,__s2) (before32(__s1,__s2) ? \
 		((int32_t)((uint32_t)(__s2)-(uint32_t)(__s1))) : \
 		((int32_t)((uint32_t)(__s1)-(uint32_t)(__s2))))
+/*
+   is s2<=s1<=s3 
+ */
+/* XXX: think these through again */
+#define between24(__s1,__s2,__s3) ((((uint32_t)(__s3)-(uint32_t)(__s2))&0xffffff)>=(((uint32_t)(__s1)-(uint32_t)(__s2))&0xffffff))
+#define outside24(__s1,__s2,__s3) between24(__s1,__s3,__s2)
+#define before24(__s1,__s2) (((uint32_t)(__s1)-(uint32_t)(__s2))&0x800000)
+#define after24(__s1,__s2) ((__s1)!=(__s2)&&!before24(__s1,__s2))
+#define diff24(__s1,__s2) ((before24(__s1,__s2) ? \
+		((int32_t)((uint32_t)(__s2)-(uint32_t)(__s1))) : \
+		((int32_t)((uint32_t)(__s1)-(uint32_t)(__s2))))&0xffffff)
+
 /*
    is s2<=s1<=s3 
  */
@@ -2506,11 +2546,11 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint32_t)) {
 			int msu;
-			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++);
-			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++);
+			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
 			mlen -= 2 * sizeof(uint32_t);
 			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
-			if ((uint32_t) fsnr != (uint32_t) (sl->fsnx - msu)) {
+			if ((uint32_t) fsnr != (uint32_t) ((sl->fsnx - msu) & 0xffffff)) {
 				if (sl->bfsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_FIBR)
 						if ((err =
@@ -2526,12 +2566,13 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 					return (-EPROTO);
 				}
 				printd(("%s: %p: Received bad fsn = %u, expecting %u\n",
-					M2PA_SL_MOD_NAME, sl, fsnr, (sl->fsnx - msu)));
+					M2PA_SL_MOD_NAME, sl, fsnr, (sl->fsnx - msu) & 0xffffff));
 				sl->bfsn++;
+				sl->bfsn &= 0xffffff;
 				return (-EPROTO);
 			} else
 				sl->bfsn = 0;
-			if (!between32(bsnr, sl->bsnr, sl->fsnt)) {
+			if (!between24(bsnr, sl->bsnr, sl->fsnt)) {
 				if (sl->bbsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
@@ -2549,8 +2590,9 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				printd(("%s: %p: Received bad bsn = %u, expecting %u\n",
 					M2PA_SL_MOD_NAME, sl, bsnr, sl->fsnt));
 				sl->bbsn++;
+				sl->bbsn &= 0xffffff;
 			} else {
-				if ((err = sl_txc_datack(q, sl, diff32(sl->bsnr, bsnr))) < 0)
+				if ((err = sl_txc_datack(q, sl, diff24(sl->bsnr, bsnr))) < 0)
 					return (err);
 				sl->bsnr = bsnr;
 				sl->bbsn = 0;
@@ -2563,19 +2605,14 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 	default:
 	case M2PA_VERSION_DRAFT10:
 	{
-		/*
-		   In the final, when we are waiting for synchronization (we have sent
-		   PROCESSOR_RECOVERED but have not yet received IN_SERVICE, DATA or DATA-ACK) we
-		   do not check the sequence number, but resynchornize to the provided number. 
-		 */
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint32_t)) {
 			int msu;
-			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++);
-			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++);
+			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
 			mlen -= 2 * sizeof(uint32_t);
 			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
-			if ((uint32_t) fsnr != (uint32_t) (sl->fsnx - msu)) {
+			if ((uint32_t) fsnr != (uint32_t) ((sl->fsnx - msu) & 0xffffff)) {
 				if (sl->bfsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_FIBR)
 						if ((err =
@@ -2591,12 +2628,13 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 					return (-EPROTO);
 				}
 				printd(("%s: %p: Received bad fsn = %u, expecting %u\n",
-					M2PA_SL_MOD_NAME, sl, fsnr, (sl->fsnx - msu)));
+					M2PA_SL_MOD_NAME, sl, fsnr, (sl->fsnx - msu) & 0xffffff));
 				sl->bfsn++;
+				sl->bfsn &= 0xffffff;
 				return (-EPROTO);
 			} else
 				sl->bfsn = 0;
-			if (!between32(bsnr, sl->bsnr, sl->fsnt)) {
+			if (!between24(bsnr, sl->bsnr, sl->fsnt)) {
 				if (sl->bbsn) {
 					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
 						if ((err =
@@ -2614,8 +2652,55 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 				printd(("%s: %p: Received bad bsn = %u, expecting %u\n",
 					M2PA_SL_MOD_NAME, sl, bsnr, sl->fsnt));
 				sl->bbsn++;
+				sl->bbsn &= 0xffffff;
 			} else {
-				if ((err = sl_txc_datack(q, sl, diff32(sl->bsnr, bsnr))) < 0)
+				if ((err = sl_txc_datack(q, sl, diff24(sl->bsnr, bsnr))) < 0)
+					return (err);
+				sl->bsnr = bsnr;
+				sl->bbsn = 0;
+			}
+			break;
+		}
+		rare();
+		return (-EMSGSIZE);
+	}
+	case M2PA_VERSION_DRAFT11:
+	{
+		/* In the final, when we are waiting for synchronization (we have sent
+		   PROCESSOR_RECOVERED but have not yet received IN_SERVICE, DATA or DATA-ACK) we
+		   do not check the sequence number, but resynchornize to the provided number. */
+		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
+		if (mlen >= 2 * sizeof(uint32_t)) {
+			int msu;
+			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			mlen -= 2 * sizeof(uint32_t);
+			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
+			/* In the final we discard out of sequence FSNs but do two out of three on
+			   BSNs */
+			if ((uint32_t) fsnr != (uint32_t) ((sl->fsnx - msu) & 0xffffff))
+				return (-EPROTO);
+			if (!between24(bsnr, sl->bsnr, sl->fsnt)) {
+				if (sl->bbsn) {
+					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
+						if ((err =
+						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+								   0, NULL, 0)) < 0)
+							return (err);
+					if ((err =
+					     sl_lsc_out_of_service(q, sl,
+								   SL_FAIL_ABNORMAL_BSNR)) < 0)
+						return (err);
+					printd(("%s: %p: Link failed: Abnormal BSNR\n",
+						M2PA_SL_MOD_NAME, sl));
+					return (-EPROTO);
+				}
+				printd(("%s: %p: Received bad bsn = %u, expecting %u\n",
+					M2PA_SL_MOD_NAME, sl, bsnr, sl->fsnt));
+				sl->bbsn++;
+				sl->bbsn &= 0xffffff;
+			} else {
+				if ((err = sl_txc_datack(q, sl, diff24(sl->bsnr, bsnr))) < 0)
 					return (err);
 				sl->bsnr = bsnr;
 				sl->bbsn = 0;
@@ -2651,6 +2736,7 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 					bufq_queue(&sl->rb, mp);
 					sl_rb_congestion_function(q, sl);
 					sl->fsnx++;
+					sl->fsnx &= 0xffffff;
 					return (QR_ABSORBED);
 				}
 				return (QR_DONE);
@@ -2691,6 +2777,7 @@ sl_tx_wakeup(queue_t *q)
 					return;
 				sl->tmsu++;
 				sl->fsnt++;
+				sl->fsnt &= 0xffffff;
 				bufq_queue(&sl->rtb, bufq_dequeue(&sl->tb));
 				sl->tmsu--;
 				sl->tack++;
@@ -2751,7 +2838,7 @@ sl_txc_datack(queue_t *q, struct sl *sl, ulong count)
 		if (sl->rtb.q_count == 0) {
 			sl_timer_stop(sl, t7);
 			sl_timer_stop(sl, t6);
-		} else if (!(sl->flags & MF_REM_BUSY))
+		} else if (!(sl->flags & (MF_REM_BUSY | MF_RPO)))
 			sl_timer_start(sl, t7);
 		sl->flags &= ~MF_RTB_FULL;
 		sl_check_congestion(q, sl);
@@ -2877,6 +2964,7 @@ sl_lsc_no_congestion(queue_t *q, struct sl *sl)
 	sl->rack += xchg(&sl->rmsu, 0);
 	return (0);
 }
+
 STATIC INLINE int
 sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 {
@@ -2884,29 +2972,31 @@ sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 	switch (sl_get_state(sl)) {
 	case MS_OUT_OF_SERVICE:
 	case MS_NOT_ALIGNED:
+		/* ignored in these states */
+		return (QR_DONE);
 	case MS_ALIGNED:
 	case MS_PROVING:
-		if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
-				return (err);
-		/*
-		   just remember for later 
-		 */
-		sl->flags |= MF_RPO;
-		ptrace(("%s: %p: RPO Begins\n", M2PA_SL_MOD_NAME, sl));
+		if (!(sl->flags & MF_RPO)) {
+			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
+				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+					return (err);
+			/* just remember for later */
+			sl->flags |= MF_RPO;
+			ptrace(("%s: %p: RPO Begins\n", M2PA_SL_MOD_NAME, sl));
+		}
 		return (QR_DONE);
 	case MS_ALIGNED_READY:
 	case MS_ALIGNED_NOT_READY:
-		if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
-				return (err);
 		if (!(sl->flags & MF_RPO)) {
+			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
+				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+					return (err);
 			if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
 				return (err);
 			sl->flags |= MF_RPO;
+			sl_rpo_stats(q, sl);
+			ptrace(("%s: %p: RPO Begins\n", M2PA_SL_MOD_NAME, sl));
 		}
-		sl_rpo_stats(q, sl);
-		ptrace(("%s: %p: RPO Begins\n", M2PA_SL_MOD_NAME, sl));
 		sl_timer_stop(sl, t1);
 		sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		return (QR_DONE);
@@ -2942,21 +3032,24 @@ sl_lsc_status_processor_outage(queue_t *q, struct sl *sl)
 		sl_set_state(sl, MS_PROCESSOR_OUTAGE);
 		return (QR_DONE);
 	case MS_PROCESSOR_OUTAGE:
-		if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
-			if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
-				return (err);
 		if (!(sl->flags & MF_RPO)) {
-			if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
-				return (err);
-			sl->flags |= MF_RPO;
+			if (sl->sl.notify.events & SL_EVT_RPO_BEGIN)
+				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_BEGIN, 0, NULL, 0)) < 0)
+					return (err);
+			if (!(sl->flags & MF_RPO)) {
+				if ((err = sl_remote_processor_outage_ind(q, sl)) < 0)
+					return (err);
+				sl->flags |= MF_RPO;
+			}
+			ptrace(("%s: %p: RPO Begins\n", M2PA_SL_MOD_NAME, sl));
 		}
-		ptrace(("%s: %p: RPO Begins\n", M2PA_SL_MOD_NAME, sl));
 		return (QR_DONE);
 	}
 	ptrace(("%s: %p: Received status PROCESSOR_OUTAGE in unexpected state %lu\n",
 		M2PA_SL_MOD_NAME, sl, sl_get_state(sl)));
 	return (-EPROTO);
 }
+
 STATIC INLINE int
 sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 {
@@ -3215,7 +3308,7 @@ sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 				   send READY, and also use the BSN from the received message to
 				   synchronize FSN. 
 				 */
-				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr));
+				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr)) & 0xffffff;
 				if ((err = sl_send_status(q, sl, M2PA_STATUS_IN_SERVICE)))
 					return (err);
 			}
@@ -3438,6 +3531,7 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
 		while (sl->rtb.q_msgs && sl->fsnt != fsnc) {
 			freemsg(bufq_dequeue(&sl->rtb));
 			sl->fsnt--;
+			sl->fsnt &= 0xffffff;
 		}
 		while ((mp = bufq_dequeue(&sl->rtb))) {
 			if ((err = sl_retrieved_message_ind(q, sl, mp)) < 0) {
@@ -3737,6 +3831,7 @@ sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT6_9:
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		ptrace(("%s: %p: ERROR: Invalid message for version\n", M2PA_SL_MOD_NAME, sl));
 		return (-EPROTO);
 	}
@@ -3766,6 +3861,7 @@ sl_recv_proving(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT6_9:
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		ptrace(("%s: %p: ERROR: Invalid message for version\n", M2PA_SL_MOD_NAME, sl));
 		return (-EPROTO);
 	}
@@ -3796,6 +3892,7 @@ sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT6_1:
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		/*
 		   In the final analysis, sequence numbers are included in status messages. 
 		 */
@@ -3859,6 +3956,7 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT6_9:
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		/*
 		   In the final, sequence numbers are 24 bit values in a 32 bit field. 
 		 */
@@ -3904,6 +4002,7 @@ sl_recv_data(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT6_9:
 	default:
 	case M2PA_VERSION_DRAFT10:
+	case M2PA_VERSION_DRAFT11:
 		/*
 		   In the final, zero-length data messages are used as spearate acknowledgements. 
 		 */

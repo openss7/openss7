@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:24:14 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:24:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -80,12 +80,13 @@ static char const ident[] =
 #include <asm/dma.h>
 #include <linux/pci.h>
 
-#include "../debug.h"
-#include "../priv.h"
-#include "../lock.h"
-#include "../queue.h"
-#include "../allocb.h"
-#include "../timer.h"
+#include "debug.h"
+#include "bufq.h"
+#include "priv.h"
+#include "lock.h"
+#include "queue.h"
+#include "allocb.h"
+#include "timer.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -93,7 +94,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #ifdef X400P_DOWNLOAD_FIRMWARE
-#include "x400pfw.h"		/* X400P-SS7 firmware load */
+#include "x400p-ss7/x400pfw.h"		/* X400P-SS7 firmware load */
 #endif
 
 #define X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
@@ -113,10 +114,6 @@ MODULE_SUPPORTED_DEVICE(X400P_DEVICE);
 MODULE_LICENSE(X400P_LICENSE);
 #endif
 
-#ifndef X400P_SDL_CMAJOR
-#error "X400P_SDL_CMAJOR must be defined\n"
-#endif
-#define X400P_SDL_NMAJOR 4
 #define X400P_SDL_NMINOR 255
 
 /*
@@ -127,8 +124,8 @@ MODULE_LICENSE(X400P_LICENSE);
  *  =======================================================================
  */
 
-#define X400P_DRV_ID	SDL_IOC_MAGIC
-#define X400P_DRV_NAME	"x400p-sdl"
+#define X400P_DRV_ID	SDL_X400P_DRV_ID
+#define X400P_DRV_NAME	SDL_X400P_DRV_NAME
 
 STATIC struct module_info xp_rinfo = {
 	mi_idnum:X400P_DRV_ID,			/* Module ID number */
@@ -2581,7 +2578,7 @@ STATIC struct xp *xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t
 
 STATIC void xp_free_priv(struct xp *xp)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	ensure(xp, return);
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -2750,7 +2747,7 @@ STATIC struct cd *xp_alloc_cd(void)
 }
 STATIC void xp_free_cd(struct cd *cd)
 {
-	int flags;
+	psw_t flags;
 	lis_spin_lock_irqsave(&cd->lock, &flags);
 	{
 		int span;
@@ -3118,7 +3115,7 @@ STATIC INLINE void xp_pci_cleanup(void)
  *  =========================================================================
  */
 STATIC int xp_initialized = 0;
-STATIC int xp_majors[X400P_SDL_NMAJOR] = { 0, };
+STATIC int xp_majors[SDL_X400P_CMAJORS] = { 0, };
 STATIC void xp_init(void)
 {
 	int err, major;
@@ -3135,12 +3132,12 @@ STATIC void xp_init(void)
 		xp_initialized = err;
 		return;
 	}
-	for (major = 0; major < X400P_SDL_NMAJOR; major++) {
+	for (major = 0; major < SDL_X400P_CMAJORS; major++) {
 		if ((err =
-		     lis_register_strdev(X400P_SDL_CMAJOR + major, &xp_info, X400P_SDL_NMINOR,
+		     lis_register_strdev(SDL_X400P_CMAJOR_0 + major, &xp_info, X400P_SDL_NMINOR,
 					 X400P_DRV_NAME)) <= 0) {
 			cmn_err(CE_WARN, "X400P-SS7: ERROR: couldn't register driver for major %d",
-				major + X400P_SDL_CMAJOR);
+				major + SDL_X400P_CMAJOR_0);
 			xp_initialized = err;
 			for (major -= 1; major >= 0; major--)
 				lis_unregister_strdev(xp_majors[major]);
@@ -3150,14 +3147,14 @@ STATIC void xp_init(void)
 		} else
 			xp_majors[major] = err;
 	}
-	xp_initialized = X400P_SDL_CMAJOR;
+	xp_initialized = SDL_X400P_CMAJOR_0;
 	return;
 }
 STATIC void xp_terminate(void)
 {
 	int err, major;
 	ensure(xp_initialized, return);
-	for (major = 0; major < X400P_SDL_NMAJOR; major++) {
+	for (major = 0; major < SDL_X400P_CMAJORS; major++) {
 		if (xp_majors[major]) {
 			if ((err = lis_unregister_strdev(xp_majors[major])))
 				cmn_err(CE_PANIC, "X400P-SS7: couldn't unregister driver for major %d\n",

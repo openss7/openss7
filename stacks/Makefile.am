@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/12 02:36:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:32:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,338 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/12 02:36:30 $ by $Author: brian $
+# Last Modified $Date: 2004/02/17 06:32:11 $ by $Author: brian $
 #
 # =============================================================================
+
+if SS7_PUBLIC_RELEASE
+
+libexec_PROGRAMS		= \
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp \
+				  test-m2pa \
+				  test-q781 \
+				  test-sctp \
+				  test-sctp \
+				  test-sctp_n \
+				  test-sctp_nc \
+				  test-sctp_ns \
+				  test-sctp_t \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps \
+				  test-x100p \
+				  test-x400p
+
+EXTRA_PROGRAMS			= \
+				  perftest \
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp \
+				  test-m2pa \
+				  test-q781 \
+				  test-q781-pipe \
+				  test-q784 \
+				  test-sctp \
+				  test-sctp \
+				  test-sctp_n \
+				  test-sctp_nc \
+				  test-sctp_ns \
+				  test-sctp_t \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps \
+				  test-x100p \
+				  test-x400p \
+				  test-x400p-cap \
+				  test-x400p-cap2 \
+				  test-x400p-hsl \
+				  test-x400p-perf \
+				  test-x400p-sdl \
+				  test-x400p-sdt \
+				  test-x400p-sdt2 \
+				  test-x400p-sl
+
+sbin_PROGRAMS			= \
+				  ss7makenodes
+
+ss7makenodes_SOURCES		= ss7makenodes.c
+ss7makenodes_DEPENDENCIES	= strconf.h
+ss7makenodes_LDDADD		=
+ss7makenodes_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+ss7makenodes_CFLAGS		= @USER_CFLAGS@
+
+test_inet_raw_SOURCES		= src/test/inet/test-inet_raw.c
+test_inet_raw_LDFLAGS		= -lLiS
+test_inet_raw_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_inet_raw_CFLAGS		= @USER_CFLAGS@
+
+test_inet_tcp_SOURCES		= src/test/inet/test-inet_tcp.c
+test_inet_tcp_LDFLAGS		= -lLiS
+test_inet_tcp_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_inet_tcp_CFLAGS		= @USER_CFLAGS@
+
+test_inet_udp_SOURCES		= src/test/inet/test-inet_udp.c
+test_inet_udp_LDFLAGS		= -lLiS
+test_inet_udp_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_inet_udp_CFLAGS		= @USER_CFLAGS@
+
+test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
+test_tcpc_LDFLAGS		= -lLiS
+test_tcpc_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_tcpc_CFLAGS		= @USER_CFLAGS@
+
+test_tcps_SOURCES		= src/test/inet/test-tcps.c
+test_tcps_LDFLAGS		= -lLiS
+test_tcps_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_tcps_CFLAGS		= @USER_CFLAGS@
+
+test_udpc_SOURCES		= src/test/inet/test-udpc.c
+test_udpc_LDFLAGS		= -lLiS
+test_udpc_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_udpc_CFLAGS		= @USER_CFLAGS@
+
+test_udps_SOURCES		= src/test/inet/test-udps.c
+test_udps_LDFLAGS		= -lLiS
+test_udps_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_udps_CFLAGS		= @USER_CFLAGS@
+
+#test_q784_SOURCES		= src/test/isup/test-q784.c
+#test_q784_LDFLAGS		= -lLiS
+#test_q784_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_q784_CFLAGS		= @USER_CFLAGS@
+
+test_m2pa_SOURCES		= src/test/m2pa/test-m2pa.c
+test_m2pa_LDFLAGS		= -lLiS
+test_m2pa_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_m2pa_CFLAGS		= @USER_CFLAGS@
+
+#perftest_SOURCES		= src/test/perftest.c
+#perftest_LDFLAGS		= -lLiS
+#perftest_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#perftest_CFLAGS		= @USER_CFLAGS@
+
+test_sctp_SOURCES		= src/test/sctp/test-sctp.c
+test_sctp_LDFLAGS		= -lLiS
+test_sctp_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_sctp_CFLAGS		= @USER_CFLAGS@
+
+test_sctp_n_SOURCES		= src/test/sctp/test-sctp_n.c
+test_sctp_n_LDFLAGS		= -lLiS
+test_sctp_n_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_sctp_n_CFLAGS		= @USER_CFLAGS@
+
+test_sctp_nc_SOURCES		= src/test/sctp/test-sctp_nc.c
+test_sctp_nc_LDFLAGS		= -lLiS
+test_sctp_nc_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_sctp_nc_CFLAGS		= @USER_CFLAGS@
+
+test_sctp_ns_SOURCES		= src/test/sctp/test-sctp_ns.c
+test_sctp_ns_LDFLAGS		= -lLiS
+test_sctp_ns_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_sctp_ns_CFLAGS		= @USER_CFLAGS@
+
+test_sctp_t_SOURCES		= src/test/sctp/test-sctp_t.c
+test_sctp_t_LDFLAGS		= -lLiS
+test_sctp_t_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_sctp_t_CFLAGS		= @USER_CFLAGS@
+
+test_q781_SOURCES		= src/test/sl/test-q781.c
+test_q781_LDFLAGS		= -lLiS
+test_q781_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_q781_CFLAGS		= @USER_CFLAGS@
+
+#test_q781_pipe_SOURCES		= src/test/sl/test-q781-pipe.c
+#test_q781_pipe_LDFLAGS		= -lLiS
+#test_q781_pipe_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_q781_pipe_CFLAGS		= @USER_CFLAGS@
+
+test_x100p_SOURCES		= src/test/x400p-ss7/test-x100p.c
+test_x100p_LDFLAGS		= -lLiS
+test_x100p_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_x100p_CFLAGS		= @USER_CFLAGS@
+
+test_x400p_SOURCES		= src/test/x400p-ss7/test-x400p.c
+test_x400p_LDFLAGS		= -lLiS
+test_x400p_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_x400p_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_cap2_SOURCES	= src/test/x400p-ss7/test-x400p-cap2.c
+#test_x400p_cap2_LDFLAGS	= -lLiS
+#test_x400p_cap2_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_cap2_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_cap_SOURCES		= src/test/x400p-ss7/test-x400p-cap.c
+#test_x400p_cap_LDFLAGS		= -lLiS
+#test_x400p_cap_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_cap_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_hsl_SOURCES		= src/test/x400p-ss7/test-x400p-hsl.c
+#test_x400p_hsl_LDFLAGS		= -lLiS
+#test_x400p_hsl_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_hsl_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_perf_SOURCES	= src/test/x400p-ss7/test-x400p-perf.c
+#test_x400p_perf_LDFLAGS	= -lLiS
+#test_x400p_perf_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_perf_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_sdl_SOURCES		= src/test/x400p-ss7/test-x400p-sdl.c
+#test_x400p_sdl_LDFLAGS		= -lLiS
+#test_x400p_sdl_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_sdl_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_sdt2_SOURCES	= src/test/x400p-ss7/test-x400p-sdt2.c
+#test_x400p_sdt2_LDFLAGS	= -lLiS
+#test_x400p_sdt2_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_sdt2_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_sdt_SOURCES		= src/test/x400p-ss7/test-x400p-sdt.c
+#test_x400p_sdt_LDFLAGS		= -lLiS
+#test_x400p_sdt_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_sdt_CFLAGS		= @USER_CFLAGS@
+
+#test_x400p_sl_SOURCES		= src/test/x400p-ss7/test-x400p-sl.c
+#test_x400p_sl_LDFLAGS		= -lLiS
+#test_x400p_sl_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+#test_x400p_sl_CFLAGS		= @USER_CFLAGS@
+
+ADDON_LIBS			= libSS7sctp.a
+ADDON_OBJS			= streams-sctp.o
+
+noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
+EXTRA_LIBRARIES			= libSS7sctp.a
+
+nodist_EXTRA_libSS7mods_a_SOURCES	= \
+				  src/modules/inet/inet.c \
+				  src/modules/m2pa/m2pa_sl.c \
+				  src/modules/sdl/sdl.c \
+				  src/modules/sdl/sdlm.c \
+				  src/modules/sdl/spm.c \
+				  src/modules/sdt/sdt.c \
+				  src/modules/sl/sl.c \
+				  src/modules/sl/sl_mux.c \
+				  src/modules/sl/sm_mod.c \
+				  src/modules/ss7ip/sdt_tpi.c \
+				  src/modules/ss7ip/sl_tpi.c \
+				  src/modules/ss7sctp/sdt_sctp.c \
+				  src/modules/ss7sctp/sdl_sctp.c \
+				  src/modules/x400p-ss7/x400p-ss7.c \
+				  src/modules/x400p-ss7/x100p-ss7.c \
+				  src/modules/x400p-ss7/x400pfw.h \
+				  src/include/os7/allocb.h \
+				  src/include/os7/bufpool.h \
+				  src/include/os7/bufq.h \
+				  src/include/os7/debug.h \
+				  src/include/os7/lock.h \
+				  src/include/os7/priv.h \
+				  src/include/os7/queue.h \
+				  src/include/os7/timer.h \
+				  ./strconf.h
+
+mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
+
+nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
+
+
+#nodist_EXTRA_libSS7mods_a_SOURCES	= \
+#				  src/modules/isdn/isdn.c \
+#				  src/modules/isup/isup.c \
+#				  src/modules/lm/lm.c \
+#				  src/modules/lm/lm.h \
+#				  src/modules/m2ua/m2ua.c \
+#				  src/modules/mg/mg.c \
+#				  src/modules/mtp/mtp.c \
+#				  src/modules/mtp/mtp_npi.c \
+#				  src/modules/mtp/mtp_tpi.c \
+#				  src/modules/mx/mx_sdl.c \
+#				  src/modules/sccp/sccp.c \
+#				  src/modules/x400p-ss7/sl_x400p.c \
+#				  src/modules/x400p-ss7/sl_x100p.c \
+#				  src/modules/x400p-ss7/sdt_x400p.c \
+#				  src/modules/x400p-ss7/sdl_x400p.c \
+#				  src/modules/x400p-ss7/ch_x400p.c \
+#				  src/modules/x400p-ss7/mx_x400p.c \
+#				  src/modules/x400p-ss7/x400p_mx.c \
+#				  src/modules/sctp/sctp2.c
+#				  src/modules/cd/cd.c \
+#				  src/modules/cd/cd.h \
+#				  src/modules/cd/cd_daed.c \
+#				  src/modules/cd/cd_hdlc.c \
+#				  src/modules/dl/dl.c \
+#				  src/modules/dl/dl_dua.c \
+#				  src/modules/dl/dl_gr303.c \
+#				  src/modules/dl/dl_gr303ua.c \
+#				  src/modules/dl/dl_gsma.c \
+#				  src/modules/dl/dl_h225.c \
+#				  src/modules/dl/dl_iua.c \
+#				  src/modules/dl/dl_lapb.c \
+#				  src/modules/dl/dl_lapd.c \
+#				  src/modules/dl/dl_lapf.c \
+#				  src/modules/dl/dl_v52.c \
+#				  src/modules/dl/dl_v5ua.c \
+#				  src/modules/hdlc/hdlc.c \
+#				  src/modules/acb56/sdl_acb56.c \
+#				  src/modules/acb56/sdt_acb56.c \
+#				  src/modules/acb56/sl_acb56.c \
+#				  src/modules/h225/h225.c \
+#				  src/modules/m2tp/m2tp.c \
+#				  src/modules/mtp/mtp_min.c \
+#				  src/modules/sdl/cdi.c \
+#				  src/modules/sdl/cdi_mod.c \
+#				  src/modules/sdt/sdtmux.c \
+#				  src/modules/sl/slm.c \
+#				  src/modules/sscop/sscop.c \
+#				  src/modules/sscop/sscop2.c \
+#				  src/modules/tcap/tcap.c \
+#				  src/modules/tcap/tc.c \
+#				  src/modules/tcap/tr.c \
+#				  src/modules/x400p-ss7/crc.c
+
+libSS7mods_a_DEPENDENCIES	= ./config.h ./strconf.h
+libSS7mods_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules -I@srcdir@/src/modules -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libSS7mods_a_CFLAGS		= @KERNEL_CFLAGS@
+
+nodist_EXTRA_libSS7sctp_a_SOURCES = \
+				  src/modules/sctp/sctp.c \
+				  src/modules/sctp/sctp_cache.c \
+				  src/modules/sctp/sctp_cookie.c \
+				  src/modules/sctp/sctp_hash.c \
+				  src/modules/sctp/sctp_input.c \
+				  src/modules/sctp/sctp_msg.c \
+				  src/modules/sctp/sctp_n.c \
+				  src/modules/sctp/sctp_output.c \
+				  src/modules/sctp/sctp_route.c \
+				  src/modules/sctp/sctp_t.c \
+				  src/modules/sctp/sctp_cache.h \
+				  src/modules/sctp/sctp_cookie.h \
+				  src/modules/sctp/sctp_defs.h \
+				  src/modules/sctp/sctp.h \
+				  src/modules/sctp/sctp_hash.h \
+				  src/modules/sctp/sctp_input.h \
+				  src/modules/sctp/sctp_msg.h \
+				  src/modules/sctp/sctp_n.h \
+				  src/modules/sctp/sctp_output.h \
+				  src/modules/sctp/sctp_route.h \
+				  src/modules/sctp/sctp_t.h \
+				  ./strconf.h
+sctp_source_FILES		= $(nodist_EXTRA_libSS7sctp_a_SOURCES)
+nodist_libSS7sctp_a_SOURCES	= $(sctp_source_FILES)
+
+libSS7sctp_a_DEPENDENCIES	= 
+libSS7sctp_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/sctp -I@srcdir@/src/modules/sctp -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libSS7sctp_a_CFLAGS		= @KERNEL_CFLAGS@
+
+streams-sctp.o: $(libSS7sctp_a_OBJECTS)
+	$(LD) -r -o $@ $^
+
+KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
+EXTRA_KERNEL_MODULES		= 
+
+else
 
 libexec_PROGRAMS		= \
 				  perftest \
@@ -260,7 +589,7 @@ ADDON_OBJS			= streams-sctp.o
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= libSS7sctp.a libSS7sscop.a libSS7m3ua.a libSS7sua.a libSS7tua.a libSS7tali.a
 
-libSS7mods_a_SOURCES		= \
+nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/cd/cd.c \
 				  src/modules/cd/cd_daed.c \
 				  src/modules/cd/cd_hdlc.c \
@@ -299,6 +628,19 @@ libSS7mods_a_SOURCES		= \
 				  src/modules/ss7ip/sdt_tpi.c \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \
+				  src/modules/ss7sctp/sdl_sctp.c \
+				  src/modules/x400p-ss7/x400p-ss7.c \
+				  src/modules/x400p-ss7/x100p-ss7.c \
+				  src/modules/x400p-ss7/sl_x400p.c \
+				  src/modules/x400p-ss7/sl_x100p.c \
+				  src/modules/x400p-ss7/sdt_x400p.c \
+				  src/modules/x400p-ss7/sdl_x400p.c \
+				  src/modules/x400p-ss7/ch_x400p.c \
+				  src/modules/x400p-ss7/mx_x400p.c \
+				  src/modules/x400p-ss7/x400p_mx.c \
+				  src/modules/x400p-ss7/x400pfw.h \
+				  src/modules/lm/lm.h \
+				  src/modules/cd/cd.h \
 				  src/include/os7/allocb.h \
 				  src/include/os7/bufpool.h \
 				  src/include/os7/bufq.h \
@@ -310,39 +652,33 @@ libSS7mods_a_SOURCES		= \
 				  ./strconf.h
 #				  src/modules/sctp/sctp2.c  # later
 
-EXTRA_libSS7mods_a_SOURCES	= \
-				  src/modules/acb56/sdl_acb56.c \
-				  src/modules/acb56/sdt_acb56.c \
-				  src/modules/acb56/sl_acb56.c \
-				  src/modules/h225/h225.c \
-				  src/modules/m2tp/m2tp.c \
-				  src/modules/mtp/mtp_min.c \
-				  src/modules/sdl/cdi.c \
-				  src/modules/sdl/cdi_mod.c \
-				  src/modules/sdt/sdtmux.c \
-				  src/modules/sl/slm.c \
-				  src/modules/ss7sctp/sdl_sctp.c \
-				  src/modules/sscop/sscop.c \
-				  src/modules/sscop/sscop2.c \
-				  src/modules/tcap/tcap.c \
-				  src/modules/tcap/tc.c \
-				  src/modules/tcap/tr.c \
-				  src/modules/x400p-ss7/ch_x400p.c \
-				  src/modules/x400p-ss7/crc.c \
-				  src/modules/x400p-ss7/mx_x400p.c \
-				  src/modules/x400p-ss7/sdl_x400p.c \
-				  src/modules/x400p-ss7/sdt_x400p.c \
-				  src/modules/x400p-ss7/sl_x100p.c \
-				  src/modules/x400p-ss7/sl_x400p.c \
-				  src/modules/x400p-ss7/x100p-ss7.c \
-				  src/modules/x400p-ss7/x400p_mx.c \
-				  src/modules/x400p-ss7/x400p-ss7.c
+mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
+
+nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
+
+#nodist_EXTRA_libSS7mods_a_SOURCES	= \
+#				  src/modules/acb56/sdl_acb56.c \
+#				  src/modules/acb56/sdt_acb56.c \
+#				  src/modules/acb56/sl_acb56.c \
+#				  src/modules/h225/h225.c \
+#				  src/modules/m2tp/m2tp.c \
+#				  src/modules/mtp/mtp_min.c \
+#				  src/modules/sdl/cdi.c \
+#				  src/modules/sdl/cdi_mod.c \
+#				  src/modules/sdt/sdtmux.c \
+#				  src/modules/sl/slm.c \
+#				  src/modules/sscop/sscop.c \
+#				  src/modules/sscop/sscop2.c \
+#				  src/modules/tcap/tcap.c \
+#				  src/modules/tcap/tc.c \
+#				  src/modules/tcap/tr.c \
+#				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= ./config.h ./strconf.h
 libSS7mods_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules -I@srcdir@/src/modules -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
 libSS7mods_a_CFLAGS		= @KERNEL_CFLAGS@
 
-libSS7sctp_a_SOURCES		= \
+nodist_EXTRA_libSS7sctp_a_SOURCES = \
 				  src/modules/sctp/sctp.c \
 				  src/modules/sctp/sctp_cache.c \
 				  src/modules/sctp/sctp_cookie.c \
@@ -365,6 +701,9 @@ libSS7sctp_a_SOURCES		= \
 				  src/modules/sctp/sctp_route.h \
 				  src/modules/sctp/sctp_t.h \
 				  ./strconf.h
+sctp_source_FILES		= $(nodist_EXTRA_libSS7sctp_a_SOURCES)
+nodist_libSS7sctp_a_SOURCES	= $(sctp_source_FILES)
+
 libSS7sctp_a_DEPENDENCIES	= 
 libSS7sctp_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/sctp -I@srcdir@/src/modules/sctp -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
 libSS7sctp_a_CFLAGS		= @KERNEL_CFLAGS@
@@ -372,7 +711,7 @@ libSS7sctp_a_CFLAGS		= @KERNEL_CFLAGS@
 streams-sctp.o: $(libSS7sctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-libSS7m3ua_a_SOURCES		= \
+nodist_EXTRA_libSS7m3ua_a_SOURCES = \
 				  src/modules/m3ua/m3ua_as.c \
 				  src/modules/m3ua/m3ua_asp.c \
 				  src/modules/m3ua/m3ua.c \
@@ -398,6 +737,8 @@ libSS7m3ua_a_SOURCES		= \
 				  src/modules/m3ua/m3ua_nsp.h \
 				  src/modules/m3ua/m3ua_tsp.h \
 				  ./strconf.h
+m3ua_source_FILES		= $(nodist_EXTRA_libSS7m3ua_a_SOURCES)
+nodist_libSS7m3ua_a_SOURCES	= $(m3ua_source_FILES)
 
 libSS7m3ua_a_DEPENDENCIES	= 
 libSS7m3ua_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/m3ua -I@srcdir@/src/modules/m3ua -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
@@ -406,7 +747,7 @@ libSS7m3ua_a_CFLAGS		= @KERNEL_CFLAGS@
 streams-m3ua.o: $(libSS7m3ua_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-libSS7sscop_a_SOURCES		= \
+nodist_EXTRA_libSS7sscop_a_SOURCES = \
 				  src/modules/sscop/sscop_ip.c \
 				  src/modules/sscop/sscop_n2.c \
 				  src/modules/sscop/sscop_n.c \
@@ -426,6 +767,8 @@ libSS7sscop_a_SOURCES		= \
 				  src/modules/sscop/sscop_t_prov.h \
 				  src/modules/sscop/sscop_user.h \
 				  ./strconf.h
+sscop_source_FILES		= $(nodist_EXTRA_libSS7sscop_a_SOURCES)
+nodist_libSS7sscop_a_SOURCES	= $(sscop_source_FILES)
 
 libSS7sscop_a_DEPENDENCIES	= 
 libSS7sscop_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/sscop -I@srcdir@/src/modules/sscop -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
@@ -434,7 +777,7 @@ libSS7sscop_a_CFLAGS		= @KERNEL_CFLAGS@
 streams-sscop.o: $(libSS7sscop_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-libSS7sua_a_SOURCES		= \
+nodist_EXTRA_libSS7sua_a_SOURCES = \
 				  src/modules/sua/sua_asp.c \
 				  src/modules/sua/sua.c \
 				  src/modules/sua/sua_lm.c \
@@ -458,6 +801,8 @@ libSS7sua_a_SOURCES		= \
 				  src/modules/sua/sua_send.h \
 				  src/modules/sua/sua_tsp.h \
 				  ./strconf.h
+sua_source_FILES		= $(nodist_EXTRA_libSS7sua_a_SOURCES)
+nodist_libSS7sua_a_SOURCES	= $(sua_source_FILES)
 
 libSS7sua_a_DEPENDENCIES	= 
 libSS7sua_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/sua -I@srcdir@/src/modules/sua -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
@@ -466,7 +811,7 @@ libSS7sua_a_CFLAGS		= @KERNEL_CFLAGS@
 streams-sua.o: $(libSS7sua_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-libSS7tua_a_SOURCES		= \
+nodist_EXTRA_libSS7tua_a_SOURCES = \
 				  src/modules/tua/tua_asp.c \
 				  src/modules/tua/tua.c \
 				  src/modules/tua/tua_sgp.c \
@@ -477,6 +822,8 @@ libSS7tua_a_SOURCES		= \
 				  src/modules/tua/tua.h \
 				  src/modules/tua/tua_msg.h \
 				  ./strconf.h
+tua_source_FILES		= $(nodist_EXTRA_libSS7tua_a_SOURCES)
+nodist_libSS7tua_a_SOURCES	= $(tua_source_FILES)
 
 libSS7tua_a_DEPENDENCIES	= 
 libSS7tua_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/tua -I@srcdir@/src/modules/tua -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
@@ -485,7 +832,7 @@ libSS7tua_a_CFLAGS		= @KERNEL_CFLAGS@
 streams-tua.o: $(libSS7tua_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-libSS7tali_a_SOURCES		= \
+nodist_EXTRA_libSS7tali_a_SOURCES = \
 				  src/modules/tali/tali.c \
 				  src/modules/tali/tali_isup.c \
 				  src/modules/tali/tali_lm.c \
@@ -495,6 +842,8 @@ libSS7tali_a_SOURCES		= \
 				  src/modules/tali/tali.h \
 				  src/modules/tali/tali_msgs.h \
 				  ./strconf.h
+tali_source_FILES		= $(nodist_EXTRA_libSS7tali_a_SOURCES)
+nodist_libSS7tali_a_SOURCES	= $(tali_source_FILES)
 
 libSS7tali_a_DEPENDENCIES	= 
 libSS7tali_a_CPPFLAGS		= -I./src/include/os7 -I@srcdir@/src/include/os7 -I./src/modules/tali -I@srcdir@/src/modules/tali -imacros ./strconf.h @SS7_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
@@ -505,6 +854,8 @@ streams-tali.o: $(libSS7tali_a_OBJECTS)
 
 KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
+
+endif
 
 KERNEL_MODCONF			= conf.modules
 KERNEL_SUBDIR			= ss7
@@ -796,23 +1147,6 @@ nobase_include_HEADERS = \
 	src/include/sys/xti_ss7.h src/include/sys/xti_sscop.h src/include/sys/xti_tcap.h \
 	src/include/sys/xti_tcp.h src/include/sys/xti_udp.h
 
-EXTRA_HEADERS = \
-	src/modules/lm/lm.h src/modules/m3ua/m3ua_asp.h src/modules/m3ua/m3ua_data.h src/modules/m3ua/m3ua.h \
-	src/modules/m3ua/m3ua_lm.h src/modules/m3ua/m3ua_msg.h src/modules/m3ua/m3ua_mtp.h \
-	src/modules/m3ua/m3ua_nsp.h src/modules/m3ua/m3ua_tsp.h src/modules/sctp/sctp_cache.h \
-	src/modules/sctp/sctp_cookie.h src/modules/sctp/sctp_defs.h src/modules/sctp/sctp.h \
-	src/modules/sctp/sctp_hash.h src/modules/sctp/sctp_input.h src/modules/sctp/sctp_msg.h \
-	src/modules/sctp/sctp_n.h src/modules/sctp/sctp_output.h src/modules/sctp/sctp_route.h \
-	src/modules/sctp/sctp_t.h src/modules/sscop/sccop_user.h src/modules/sscop/sscop.h \
-	src/modules/sscop/sscop_msgs.h src/modules/sscop/sscop_n_prov.h src/modules/sscop/sscop_prov.h \
-	src/modules/sscop/sscop_send.h src/modules/sscop/sscop_time.h src/modules/sscop/sscop_t_prov.h \
-	src/modules/sscop/sscop_user.h src/modules/sua/sua_asp.h src/modules/sua/sua_ctrl.h \
-	src/modules/sua/sua_data.h src/modules/sua/sua.h src/modules/sua/sua_lm.h src/modules/sua/sua_msg.h \
-	src/modules/sua/sua_nsp.h src/modules/sua/sua_sccp.h src/modules/sua/sua_send.h \
-	src/modules/sua/sua_tsp.h src/modules/tali/tali_data.h src/modules/tali/tali.h \
-	src/modules/tali/tali_msgs.h src/modules/tua/tua_asp.h src/modules/tua/tua_data.h \
-	src/modules/tua/tua.h src/modules/tua/tua_msg.h src/modules/x400p-ss7/x400pfw.h src/modules/cd/cd.h
-
 noinst_SCRIPTS = \
 	$(auxdir)/strconf-sh
 
@@ -921,9 +1255,17 @@ uninstall-devices: $(STRMAKENODES)
 
 all-am: conf.modules strconf.h devices.lst
 
+ss7_source_FILES		= $(mods_source_FILES) \
+				  $(sctp_source_FILES) \
+				  $(sscop_source_FILES) \
+				  $(m3ua_source_FILES) \
+				  $(sua_source_FILES) \
+				  $(tua_source_FILES) \
+				  $(tali_source_FILES)
+
 EXTRA_DIST = openss7.spec openss7-logo-small.gif $(man_MANS) $(noinst_SCRIPTS) \
 	     doc/man/openss7.macros doc/man/openss7.refs $(strconf_FILES) \
-	     src/include/xti_inet.h $(EXTRA_HEADERS)
+	     src/include/xti_inet.h $(ss7_source_FILES)
 
 SUBDIRS = doc
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:24:14 $ by $Author: brian $
+ Last Modified $Date: 2004/02/17 06:24:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:14 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -80,7 +80,8 @@ static char const ident[] =
 #include <asm/dma.h>
 #include <linux/pci.h>
 
-#include "../debug.h"
+#include "debug.h"
+#include "bufq.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -90,7 +91,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #ifdef X400P_SDT_DOWNLOAD_FIRMWARE
-#include "x400pfw.h"		/* X400P-SS7 firmware load */
+#include "x400p-ss7/x400pfw.h"		/* X400P-SS7 firmware load */
 #endif
 
 #define X400P_SDT_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
@@ -110,10 +111,6 @@ MODULE_SUPPORTED_DEVICE(X400P_SDT_DEVICE);
 MODULE_LICENSE(X400P_SDT_LICENSE);
 #endif
 
-#ifndef X400P_SDT_CMAJOR
-#error "X400P_SDT_CMAJOR must be defined\n"
-#endif
-#define X400P_SDT_NMAJOR 4
 #define X400P_SDT_NMINOR 255
 
 /*
@@ -124,8 +121,8 @@ MODULE_LICENSE(X400P_SDT_LICENSE);
  *  =======================================================================
  */
 
-#define X400P_SDT_DRV_ID	X400P_SDT_CMAJOR
-#define X400P_SDT_DRV_NAME	"x400p-sdt"
+#define X400P_SDT_DRV_ID	SDT_X400P_DRV_ID
+#define X400P_SDT_DRV_NAME	SDT_X400P_DRV_NAME
 
 STATIC struct module_info xp_rinfo = {
 	mi_idnum:X400P_SDT_DRV_ID,		/* Module ID number */
@@ -611,7 +608,7 @@ STATIC void xp_free_priv(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
 	xp_span_t *sp;
-	int flags = 0;
+	psw_t flags = 0;
 	ensure(xp, return);
 	if ((sp = xp->sp)) {
 		int slot;
@@ -850,6 +847,7 @@ STATIC mblk_t *xp_allocb(queue_t *q, size_t size, int prior)
 	return (NULL);
 }
 
+#if 0
 /*
  *  ESBALLOC
  *  -------------------------------------------------------------------------
@@ -875,6 +873,7 @@ STATIC mblk_t *xp_esballoc(queue_t *q, unsigned char *base, size_t size, int pri
 		return (NULL);
 	}
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -2602,7 +2601,7 @@ STATIC int xp_send_data(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	int ret;
-	int flags = 0;
+	psw_t flags = 0;
 	if (xp->state != LMI_ENABLED)
 		return (-EPROTO);
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -2638,7 +2637,7 @@ STATIC int sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2666,7 +2665,7 @@ STATIC int sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2693,7 +2692,7 @@ STATIC int sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2714,7 +2713,7 @@ STATIC int sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2734,7 +2733,7 @@ STATIC int sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2754,7 +2753,7 @@ STATIC int sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2774,7 +2773,7 @@ STATIC int sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	int ret;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
@@ -2797,7 +2796,7 @@ STATIC int sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2838,7 +2837,7 @@ STATIC int lmi_info_req(queue_t *q, mblk_t *mp)
  */
 STATIC int lmi_attach_req(queue_t *q, mblk_t *mp)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	int err, card, span, chan, slot;
 	xp_card_t *cp;
 	xp_span_t *sp = NULL;
@@ -3122,7 +3121,7 @@ STATIC int lmi_detach_req(queue_t *q, mblk_t *mp)
 	xp_span_t *sp;
 	xp_card_t *cp;
 	int err, slot;
-	int flags = 0;
+	psw_t flags = 0;
 	/* validate detach */
 	if (xp->state != LMI_DISABLED)
 		return lmi_error_ack(q, xp->state, LMI_DETACH_REQ, 0, LMI_OUTSTATE);
@@ -3225,7 +3224,7 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 		switch (cp->ifgtype) {
 		case SDL_GTYPE_E1:
 		{
-			int flags = 0;
+			psw_t flags = 0;
 			printd(("E400P-SS7: performing enable on E1 span %d\n", span));
 			lis_spin_lock_irqsave(&cp->lock, &flags);
 			// cp->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -3304,7 +3303,7 @@ STATIC int lmi_enable_req(queue_t *q, mblk_t *mp)
 		{
 			int byte, val, c;
 			unsigned short mask = 0;
-			int flags = 0;
+			psw_t flags = 0;
 			printd(("T400P-SS7: performing enable on T1 span %d\n", span));
 			lis_spin_lock_irqsave(&cp->lock, &flags);
 			// cp->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -3390,7 +3389,7 @@ STATIC int lmi_disable_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	int err;
-	int flags = 0;
+	psw_t flags = 0;
 	/* validate disable */
 	if (xp->state != LMI_ENABLED)
 		goto lmi_outstate;
@@ -3464,7 +3463,7 @@ STATIC int lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 STATIC int sdt_test_config(xp_t * xp, sdt_config_t * arg)
 {
 	int ret = 0;
-	int flags = 0;
+	psw_t flags = 0;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	do {
 		if (!arg->t8)
@@ -3499,7 +3498,7 @@ STATIC int sdt_test_config(xp_t * xp, sdt_config_t * arg)
 }
 STATIC int sdt_commit_config(xp_t * xp, sdt_config_t * arg)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
 		sdt_test_config(xp, arg);
@@ -3513,7 +3512,7 @@ STATIC int sdt_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3529,7 +3528,7 @@ STATIC int sdt_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3545,7 +3544,7 @@ STATIC int sdt_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3561,7 +3560,7 @@ STATIC int sdt_iocsconfig(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3597,7 +3596,7 @@ STATIC int sdt_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3621,7 +3620,7 @@ STATIC int sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3637,7 +3636,7 @@ STATIC int sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3653,7 +3652,7 @@ STATIC int sdt_iocgstats(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3667,7 +3666,7 @@ STATIC int sdt_iocgstats(queue_t *q, mblk_t *mp)
 }
 STATIC int sdt_ioccstats(queue_t *q, mblk_t *mp)
 {
-	int flags = 0;
+	psw_t flags = 0;
 	xp_t *xp = PRIV(q);
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -3681,7 +3680,7 @@ STATIC int sdt_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3697,7 +3696,7 @@ STATIC int sdt_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3713,7 +3712,7 @@ STATIC int sdt_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -3736,7 +3735,7 @@ STATIC int sdt_ioccnotify(queue_t *q, mblk_t *mp)
 STATIC int sdl_test_config(xp_t * xp, sdl_config_t * arg)
 {
 	int ret = 0;
-	int flags = 0;
+	psw_t flags = 0;
 	if (!xp)
 		return (-EFAULT);
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -3995,7 +3994,7 @@ STATIC void sdl_commit_config(xp_t * xp, sdl_config_t * arg)
 	int chan_reconfig = 0, span_reconfig = 0, card_reconfig = 0;
 	xp_span_t *sp = NULL;
 	xp_card_t *cp = NULL;
-	int flags = 0;
+	psw_t flags = 0;
 	if (!xp)
 		return;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -4284,7 +4283,7 @@ STATIC int sdl_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (lmi_option_t *) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4305,7 +4304,7 @@ STATIC int sdl_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4327,7 +4326,7 @@ STATIC int sdl_iocgconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
 		xp_span_t *sp;
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		bzero(arg, sizeof(*arg));
 		lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -4421,7 +4420,7 @@ STATIC int sdl_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4456,7 +4455,7 @@ STATIC int sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4477,7 +4476,7 @@ STATIC int sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		fixme(("FIXME: check these settings\n"));
 		lis_spin_lock_irqsave(&xp->lock, &flags);
@@ -4499,7 +4498,7 @@ STATIC int sdl_iocgstats(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4519,7 +4518,7 @@ STATIC int sdl_iocgstats(queue_t *q, mblk_t *mp)
 STATIC int sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -4537,7 +4536,7 @@ STATIC int sdl_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4558,7 +4557,7 @@ STATIC int sdl_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4579,7 +4578,7 @@ STATIC int sdl_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
-		int flags = 0;
+		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		lis_spin_lock_irqsave(&xp->lock, &flags);
 		{
@@ -4599,7 +4598,7 @@ STATIC int sdl_ioccnotify(queue_t *q, mblk_t *mp)
 STATIC int sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -4616,7 +4615,7 @@ STATIC int sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 STATIC int sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
-	int flags = 0;
+	psw_t flags = 0;
 	(void) mp;
 	lis_spin_lock_irqsave(&xp->lock, &flags);
 	{
@@ -6142,7 +6141,7 @@ STATIC INLINE void xp_pci_cleanup(void)
  *  =========================================================================
  */
 STATIC int xp_initialized = 0;
-STATIC int xp_majors[X400P_SDT_NMAJOR] = { 0, };
+STATIC int xp_majors[SDT_X400P_CMAJORS] = { 0, };
 STATIC void xp_init(void)
 {
 	int err, major;
@@ -6167,12 +6166,12 @@ STATIC void xp_init(void)
 		return;
 	}
 	xp_bufpool_init();
-	for (major = 0; major < X400P_SDT_NMAJOR; major++) {
+	for (major = 0; major < SDT_X400P_CMAJORS; major++) {
 		if ((err =
-		     lis_register_strdev(X400P_SDT_CMAJOR + major, &xp_info, X400P_SDT_NMINOR,
+		     lis_register_strdev(SDT_X400P_CMAJOR_0 + major, &xp_info, X400P_SDT_NMINOR,
 					 X400P_SDT_DRV_NAME)) <= 0) {
 			cmn_err(CE_WARN, "X400P-SS7: ERROR: couldn't register driver for major %d",
-				major + X400P_SDT_CMAJOR);
+				major + SDT_X400P_CMAJOR_0);
 			xp_initialized = err;
 			for (major -= 1; major >= 0; major--)
 				lis_unregister_strdev(xp_majors[major]);
@@ -6184,14 +6183,14 @@ STATIC void xp_init(void)
 		} else
 			xp_majors[major] = err;
 	}
-	xp_initialized = X400P_SDT_CMAJOR;
+	xp_initialized = SDT_X400P_CMAJOR_0;
 	return;
 }
 STATIC void xp_terminate(void)
 {
 	int err, major;
 	ensure(xp_initialized, return);
-	for (major = 0; major < X400P_SDT_NMAJOR; major++) {
+	for (major = 0; major < SDT_X400P_CMAJORS; major++) {
 		if (xp_majors[major]) {
 			if ((err = lis_unregister_strdev(xp_majors[major])))
 				cmn_err(CE_PANIC, "X400P-SS7: couldn't unregister driver for major %d\n",
