@@ -39,7 +39,7 @@
 #ifndef _STRPORT_H
 #define _STRPORT_H
 
-#ident "@(#) LiS strport.h 2.2 10/25/02 21:32:03 "
+#ident "@(#) LiS strport.h 2.5 10/7/03 15:27:10 "
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -59,6 +59,49 @@
 #elif defined(PORTABLE)
 #include <sys/LiS/port-mdep.h>
 #endif /* !__MSDOS__ */
+
+/*
+ * linux/types.h does not have intptr_t or uintptr_t
+ * For user level pgms, stdint.h supplies these
+ */
+#if defined(__KERNEL__) && !defined(_INTTYPES_H)
+#define _INTTYPES_H	1		/* kernel types.h is just as good */
+ 					/* with the addition of these */
+# if defined(_ASM_IA64_UNISTD_H)
+#  ifndef intptr_t
+typedef long		_intptr_t;
+#  define intptr_t	_intptr_t
+#  endif
+typedef unsigned long	uintptr_t;
+# else					/* _ASM_IA64_UNISTD_H */
+#  ifndef intptr_t
+typedef int		_intptr_t;
+#  define intptr_t	_intptr_t
+#  endif
+typedef unsigned int	uintptr_t;
+# endif					/* _ASM_IA64_UNISTD_H */
+
+/*
+ * Define some selected formatting phrases that we would have gotten
+ * had we included the real inttypes.h.
+ */
+# if defined(_ASM_IA64_UNISTD_H)
+#  define PRIx32	"x"
+#  define PRIx64	"qx"
+#  define PRId32	"d"
+#  define PRId64	"qd"
+#  define PRIu32	"u"
+#  define PRIu64	"qu"
+# else					/* _ASM_IA64_UNISTD_H */
+#  define PRIx32	"x"
+#  define PRIx64	"lx"
+#  define PRId32	"d"
+#  define PRId64	"ld"
+#  define PRIu32	"u"
+#  define PRIu64	"lu"
+# endif					/* _ASM_IA64_UNISTD_H */
+
+#endif
 
 /*
  * Establish some version dependent sub-defines for all to see.
