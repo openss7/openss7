@@ -1,0 +1,185 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH FATTACH 8 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B fattach
+\- attach a
+.BR STREAMS "\-based"
+file to a path name in the file system
+.SH SYNOPSIS
+.BI "fattach [-v] [-m|-u|-M" "<mode>" "] [-p|-c|" "<STREAMS path>" "] " "<path> ..."
+.br
+.B  "fattach -?"
+.SH DESCRIPTION
+The
+.B fattach
+program provides a command-line interface to the underlying
+.BR fattach "(3) "
+function.
+If the
+.B "\-p"
+and/or the
+.B "\-c"
+option is specified, a
+.BR STREAMS "\-based
+.I pipe
+is created and its two ends are alternately attached to the path names
+given.  In this mode of usage, at least two path names are required,
+but there need not be an even number of path names (i.e., the pipe ends
+need not be attached to the same number of paths).
+.sp
+If the
+.B "\-p"
+and
+.B "\-c"
+options are not specified, the first path name given must identify
+a
+.BR STREAMS "\-based"
+file.  That file will be opened, and it will be attached
+to each of the path names subsequently specified (of which there must
+be at least one).
+.SH OPTIONS
+.TP
+.B "\-p"
+Create a
+.BR STREAMS "\-based"
+pipe, to which to attach the subsequently specified path names.
+The first path will be attached to the first pipe end, the second to the
+second pipe end, the third to the first pipe end, etc., until the list
+of path names is exhausted.
+.sp
+By default, the 
+.IR umask
+(see
+.BR umask "(2)) "
+is also applied to each end of the pipe after attaching. (See
+.BR fattach "(3))."
+.TP
+.B "\-c"
+Like
+.B "\-p" (both may be given), but additionally pushes the
+.B connld
+module onto the first end of the pipe.  This conveniently creates a
+free-standing
+.I "pipe-serving"
+pipe (see
+.BR connld "(9), "
+and below).
+.TP
+.B "\-m"
+Apply the mode of the last-specified path(s) to the attached
+.BR STREAMS "\-based"
+file(s) after attaching.  (See
+.BR fattach "(3)."
+.TP
+.B "\-u"
+Apply the
+.IR umask
+(see
+.BR umask "(2)) "
+the
+.BR STREAMS "\-based"
+file after attaching. (See
+.BR fattach "(3))."
+This is done by default when a pipe is created via
+.BR "\-p" .
+.TP
+.BI "\-M" " <mode>"
+Apply the given mode to the
+.BR STREAMS "\-based"
+file(s) after attaching.  (See
+.BR fattach "(3))."
+.TP
+.B "\-v"
+Operate in a "verbose" manner.  This causes
+.B fattach
+to report its progress via message output to
+.B stdout
+or
+.BR stderr .
+.TP
+.B "\-?"
+Provide a usage summary.
+.SH "RETURN VALUE"
+Upon successful completion, i.e., if all given path names are attached
+to,
+.B fattach
+returns 0.  Upon failure,
+.B fattach
+returns 1.
+However, the failure of one more attachments does not otherwise affect
+those that succeed, and the user is responsible for detaching any that
+may have succeeded if that is the desired behavior in the event of any
+failures.
+.SH "APPLICATION USAGE"
+The
+.B "\-p"
+and
+.B "\-c"
+options provide a convenient means for creating free-standing
+.I mounted
+.BR pipes ". "
+The openers of the paths attached via
+.B "\-p"
+will share a single pipe, while the openers of the paths attached via
+.B "\-c"
+will have access to a
+.I "pipe-serving"
+pipe.  I.e., each open of the first end (e.g., the
+.I client
+end) will generate a new pipe, one end of which will be given to the
+opener, and the other end of which will be passed as if by the
+.B I_SENDFD
+.I ioctl
+to the path attached to the other end (e.g., the
+.I server
+end).  Each opener of the server path could
+.BR poll "(2) "
+for input, receive a new pipe end using the
+.B I_RECVFD
+.IR ioctl ", "
+and then close the server path, therefter using the new pipe end to
+communicate with the corresponding opener of the client path (note that
+the sense of
+.I client
+and
+.I server
+will in fact depend on the application - users of the two paths need
+only be aware of whether or not an
+.B I_RECVFD
+.I ioctl
+must be performed).
+.SH "SEE ALSO"
+.BR connld "(9), "
+.BR fattach "(3), "
+.BR fdetach "(3), "
+.BR fdetach "(8), "
+.BR STREAMS "(4), "
+.BR umask "(2)"
+.SH HISTORY
+An
+.B fdetach
+function has been provided for various
+.B STREAMS
+implementations based on SVR4
+.BR STREAMS .
+Not all of these have provided a corresponding utility program of this
+sort.
+.SH AUTHOR
+John Boyd, protologos LLC.

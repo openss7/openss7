@@ -1,0 +1,125 @@
+.\"
+.\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the
+.\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
+.\" MA 02139, USA.
+.\"
+.TH FDETACH 8 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.SH NAME
+.B fdetach
+\- detach
+.BR STREAMS "\-based"
+file(s) from path name(s) in the file system
+.SH SYNOPSIS
+.BI "fdetach [-v] " "<path> ..."
+.br
+.B "fdetach -a"
+.br
+.B "fattach -?"
+.SH DESCRIPTION
+The
+.B fdetach
+program provides a command-line interface to the underlying
+.BR fdetach "(3) "
+function.
+.sp
+It is thus intended to provide a convenient means to dismantle so-called
+.I mounted
+.BR STREAMS .
+.sp
+If the
+.B "\-a"
+option is specified, all currently attached
+.BR STREAMS "\-based
+files are detached.
+If the
+.B "\-a"
+option is not specified, the path names given are taken to identify
+paths to which
+.BR STREAMS "\-based"
+files are currently attached.
+Those files will be detached from these paths.
+.SH OPTIONS
+.TP
+.B "\-a"
+Undo all attachments currently in effect.
+.TP
+.B "\-v"
+Operate in a "verbose" manner.  This causes
+.B fdetach
+to report its progress via message output to
+.B stdout
+or
+.BR stderr .
+.TP
+.B "\-?"
+Provide a usage summary.
+.SH "RETURN VALUE"
+Upon successful completion, i.e., if all given path names identify
+.I mounted
+.B STREAMS
+and these are all successfully detached, 
+.B fdetach
+returns 0.  Upon failure,
+.B fdetach
+returns 1.
+.sp
+Note, however, that a failure indication does not mean that no action
+is taken; i.e., those detachments that succeed are not affected by
+those that fail.
+.SH WARNINGS
+It should be noted that although the
+.B fdetach
+program implements the
+.B "\-a"
+option, by passing "*" to the
+.B fdetach
+function, this is not at all equivalent to specifying "*" on the
+command line when executing the program.
+Normally, "*" specified on the command line will be converted by
+a shell into a list of all files in the current working directory.
+By contrast, the
+.B "\-a"
+option causes the
+.B fdetach
+operation to operate not with respect to path names at all, but with
+respect to
+.B STREAMS
+devices currently active within the
+.B STREAMS
+subsystem.  I.e., each active stream head is examined for attachments,
+and any attachments found are dismantled.
+.sp
+The intended use for the
+.B "\-a"
+option is thus to undo all attachments, e.g., in preparation
+for unloading the
+.B STREAMS
+subsystem.
+.SH "SEE ALSO"
+.BR fdetach "(3), "
+.BR fattach "(8), "
+.BR STREAMS "(4) "
+.SH HISTORY
+An
+.B fdetach
+function has been provided for various
+.B STREAMS
+implementations based on SVR4
+.BR STREAMS .
+Not all of these have provided a corresponding utility program of this
+sort.
+.SH AUTHOR
+John Boyd, protologos LLC.
