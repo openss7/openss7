@@ -1,0 +1,262 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 03:05:11 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/07/04 03:05:11 $ by $Author: brian $
+#
+# =============================================================================
+
+if RPM_BUILD_KERNEL
+
+all-am: $(KERNEL_MODULES)
+
+STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
+
+install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
+	@$(NORMAL_INSTALL)
+	@k='$(DESTDIR)$(kmoduledir)' ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	echo "$(mkinstalldirs) $$d" ; \
+	$(mkinstalldirs) $$d ; \
+	list='$(KERNEL_MODULES)'; for p in $$list; do \
+		if test -f $$p; then \
+			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
+			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f" ; \
+			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f ; \
+			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
+				echo "$(STRIP_KERNEL_MODULES) $$d/$$f" ; \
+				$(STRIP_KERNEL_MODULES) $$d/$$f ; \
+			fi ; \
+		else :; fi ; \
+	done ; \
+	if test -n "$(KERNEL_MODCONF)" ; then \
+		echo "$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT)" ; \
+		$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT) ; \
+	fi
+
+install-exec-local: install-modules
+
+#
+# The post-modules target checks for a fully configured install directory by checking for the
+# existence of the /etc/modules.conf file in the target install directory $(DESTDIR)$(krootdir).
+#
+# If it exists, then we are doing a non-rpm (autoconf) install and need to configure
+# /etc/modules.conf in the target directory.  First we check if modules.conf has already been
+# patched by looking for our include statement.  If we have already patched up the modules.conf
+# file, we just leave it.
+#
+# If an adjustment needs to be made, we next check for an older non-rpm LiS distribution by checking
+# for the tell-tale 'BEGIN LiS' string in modules.conf.  If there is an older non-rpm LiS, we remove
+# any reference to any of our installable modules that may have previously been referenced in the
+# modules.conf by LiS before proceeding.  We also need to force remove any kernel modules left by
+# LiS in the misc modules subdirectory that have the same name as our installable modules.
+#
+# If we have a older rpm LiS or LfS distribution as indicated by the telltale lines in modules.conf,
+# we must remove any references to our installable modules that may have previously been referenced
+# in the modules.lis by LiS or modules.streams by LfS before proceeding.  We also need to force
+# remove any kernel modules left by the older rpm LiS or LfS in the misc or streams subdirectory
+# that have the same name as our installable modules.
+#
+# Lastly, we add our prune and include lines to the modules.conf file.  If we have a usable system
+# map file and an executable depmod, we perform the depmod.  Finally we invoke installation of any
+# necessary devices.
+#
+# This autoconf installation process has the side effect that upon uninstall of this package, any
+# modules replaced from LiS or LfS will be lost.  A fresh install of the older LiS or LfS may be
+# required to restore them.  Use current version of the openss7 autoconf/rpm LiS or LfS instead,
+# please.
+#
+post-modules:
+	@r='$(DESTDIR)$(krootdir)' ; k='$(DESTDIR)$(kmoduledir)' ; conf_fil="$$r/etc/modules.conf" ; \
+	if test -r $$conf_fil ; then \
+		if ( grep -q 'include.*modules.$(KMODCONF_EXT)' $$conf_fil ) ; then :; else \
+			conf_new="$$conf_fil.new.$$$$" ; \
+			cp -f $$conf_fil $$conf_new ; \
+			if ( grep -q 'BEGIN LiS' $$conf_fil ) ; then \
+				conf_tmp="$$conf_fil.tmp.$$$$" ; \
+				list='$(KERNEL_MODULES)'; for p in $$list; do \
+					m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\\.o$$||'`" ; \
+					sed -e "/$$m/d" $$conf_new > $$conf_tmp ; \
+					mv -f $$conf_tmp $$conf_new ; \
+					echo "rm -f $$k/misc/$$m.o" ; \
+					rm -f "$$k/misc/$$m.o" ; \
+				done ; \
+				echo "rmdir --ignore-fail-on-non-empty $$k/misc" ; \
+				rmdir --ignore-fail-on-non-empty $$k/misc ; \
+			fi ; \
+			for ext in lis streams ; do \
+				if ( grep -q "include.*modules.$$ext" $$conf_fil ) ; then \
+					modl_fil="$$k/modules.$$ext" ; \
+					if test -f $$modl_fil ; then \
+						modl_tmp="$$mod_fil.tmp.$$$$" ; \
+						modl_new="$$mod_fil.new.$$$$" ; \
+						cp -f $$modl_fil $$modl_new ; \
+						list='$(KERNEL_MODULES)'; for p in $$list ; do \
+							m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\\.o$$||'`" ; \
+							sed -e "/$$m/d" $$modl_new > $$modl_tmp ; \
+							mv -f $$modl_tmp $$modl_new ; \
+							for dir in misc lis streams ; do \
+								echo "rm -f $$k/$$dir/$$m.o" ; \
+								rm -f "$$k/$$dir/$$m.o" ; \
+							done ; \
+						done ; \
+						for dir in misc lis streams ; do \
+							rmdir --ignore-fail-on-non-empty $$k/$$dir ; \
+						done ; \
+					fi ; \
+				fi ; \
+			done ; \
+			echo 'prune modules.$(KMODCONF_EXT)' >> $$conf_new ; \
+			echo 'if -f /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
+			echo 'include /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
+			echo 'endif' >> $$conf_new ; \
+			chmod --reference=$$conf_fil $$conf_new ; \
+			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
+			rm -f "$$conf_new" ; \
+		fi ; \
+		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
+			s='$(DESTDIR)$(ksysmap)' ; \
+			if test -r $$s ; then \
+				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
+			fi ; \
+		fi ; \
+		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-devices ; \
+		u="$$r/usr/src" ; \
+		if test -d $$u ; then \
+			p="$$u/$(PACKAGE_NAME)" ; \
+			d=`(cd $(srcdir); pwd)` ; \
+			echo "rm -f $$p" ; \
+			rm -f "$$p" ; \
+			echo "$(LN_S) -f $$d $$p" ; \
+			$(LN_S) -f "$$d" "$$p" ; \
+		fi ; \
+	fi
+
+#
+# This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
+# installs.  It is only executed when the install directory is fully configured for kernel modules.
+# That is, this does not run when building an rpm because the binaries are installed in a temporary,
+# unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
+# target with install-exec-hook that runs after install-exec has completed.
+#
+install-exec-hook: post-modules
+
+uninstall-modules:
+	@$(NORMAL_UNINSTALL)
+	@k='$(DESTDIR)$(kmoduledir)' ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	list='$(KERNEL_MODULES)'; for p in $$list; do \
+		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
+		echo "$(LIBTOOL) --mode=uninstall rm -f $$d/$$p" ; \
+		$(LIBTOOL) --mode=uninstall rm -f "$$d/$$p" ; \
+	done ; \
+	echo "rmdir --ignore-fail-on-non-empty $$d" ; \
+	rmdir --ignore-fail-on-non-empty "$$d" ; \
+	echo "rm -f $$k/modules.$(KMODCONF_EXT)" ; \
+	rm -f "$$k/modules.$(KMODCONF_EXT)"
+
+uninstall-local: uninstall-modules
+
+#
+# The postun-modules target checks for a fully configured uninstall directory by checking for the
+# existence of the /etc/modules.conf file in the target uninstall directory $(DESTDIR)$(krootdir).
+# It it exists, then we are doing a non-rpm (autoconf) uninstall and need to unconfigure
+# modules.conf in the target directory.
+#
+# First which check if there are any remaning modules.ext files that belong to other kernel
+# releases.  If there are, we do not remove the patch from modules.conf because it is still needed
+# by the other kernels.  If there are not, the prune and include patch is removed from the
+# modules.conf file.
+#
+# If we have a usable system map file and an executable depmod, we perform the depmod.  Finally we
+# invoke removal of any installed devices.
+#
+# It is not possible to restore any modules or associated modules.conf entries for non-rpm or older
+# rpm LiS or LfS releases.  You need to reinstall those packages (if desired) to restore the removed
+# modules and entries.  Use current versions of the openss7 autoconf/rpm LiS or LfS instead, please.
+#
+postun-modules:
+	@r='$(DESTDIR)$(krootdir)' ; \
+	conf_fil="$$r/etc/modules.conf" ; \
+	if test -r $$conf_fil ; then \
+		l=yes ; \
+		for f in $$r/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
+			if test -f $$f ; then l=no ; break ; fi ; \
+		done ; \
+		if test ":$$l" = :yes ; then \
+			conf_new="$$conf_fil.new.$$$$" ; \
+			sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_fil > $$conf_new ; \
+			chmod --reference=$$conf_fil $$conf_new ; \
+			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
+			rm -f $$conf_new ; \
+		fi ; \
+		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
+			s='$(DESTDIR)$(ksysmap)' ; \
+			if test -r $$s ; then \
+				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
+			fi ; \
+		fi ; \
+		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
+		p="$$r/usr/src/$(PACKAGE_NAME)" ; \
+		echo "rm -f $$p" ; \
+		rm -f "$$p" ; \
+	fi
+
+#
+# This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when
+# the uninstall directory is fully configured for kernel modules.  That is, this does not run when
+# building an rpm because the binaries are not uninstalled (they are usually just removed
+# wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
+# runs after uninstall has completed.
+#
+uninstall-hook: postun-modules
+
+endif
+
+.PHONY: install-modules post-modules uninstall-modules postun-modules
+
+# vim: ft=automake
