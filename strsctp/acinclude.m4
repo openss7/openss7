@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/12/18 11:15:25 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2005/01/11 04:23:07 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/18 11:15:25 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/11 04:23:07 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -72,7 +72,6 @@ m4_include([m4/strconf.m4])
 # -------------------------------------------------------------------------
 AC_DEFUN([AC_SCTP], [dnl
     _OPENSS7_PACKAGE([SCTP], [OpenSS7 STREAMS SCTP])
-    ac_default_prefix='/usr'
     _SCTP_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
@@ -85,18 +84,25 @@ AC_DEFUN([AC_SCTP], [dnl
     _LINUX_STREAMS
     _XNS
     _XTI
-    SCTP_INCLUDES="-I- -imacros ./config.h${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS} -I./src/include -I${srcdir}/src/include"
+    SCTP_INCLUDES="-I- -imacros ./config.h"
+    SCTP_INCLUDES="${SCTP_INCLUDES}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}"
+    SCTP_INCLUDES="${SCTP_INCLUDES}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}"
+    SCTP_INCLUDES="${SCTP_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    SCTP_INCLUDES="${SCTP_INCLUDES} -I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
     AC_MSG_NOTICE([final user    INCLUDES  = $SCTP_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+    AC_SUBST([SCTP_INCLUDES])dnl
+    AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
-    AC_SUBST([SCTP_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
     _SCTP_SETUP
@@ -108,39 +114,124 @@ AC_DEFUN([AC_SCTP], [dnl
 # _SCTP_OPTIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_OPTIONS], [dnl
-    _SCTP_OPENSS7_SCTP
     _SCTP_CHECK_SCTP
 ])# _SCTP_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _SCTP_OPENSS7_SCTP
+# _SCTP_SETUP_DEBUG
 # -------------------------------------------------------------------------
-# Check if we have OpenSS7 Kernel SCTP implementation.  If we do, we should
-# warn or something.
+AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
+    case "$linux_cv_debug" in
+    _DEBUG)
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_DEBUG], [], [Define to perform
+                            internal structure tracking within SCTP as well as
+                            to provide additional /proc filesystem files for
+                            examining internal structures.])
+        ;;
+    _TEST)
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_TEST], [], [Define to perform
+                            performance testing with debugging.  This mode
+                            does not dump massive amounts of information into
+                            system logs, but peforms all assertion checks.])
+        ;;
+    _SAFE)
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_SAFE], [], [Define to perform
+                            fundamental assertion checks.  This is a safer
+                            mode of operation.])
+        ;;
+    _NONE | *)
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_NONE], [], [Define to perform no
+                            assertion checks but report software errors.  This
+                            is the smallest footprint, highest performance
+                            mode of operation.])
+        ;;
+    esac
+])# _SCTP_SETUP_DEBUG
+# =========================================================================
+
+# =========================================================================
+# _SCTP_OTHER_SCTP
 # -------------------------------------------------------------------------
-AC_DEFUN([_SCTP_OPENSS7_SCTP], [dnl
-    AC_CACHE_CHECK([for sctp openss7 kernel], [sctp_cv_openss7_sctp], [dnl
-        _LINUX_KERNEL_ENV([dnl
-            AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <net/sctp.h>
-#ifdef SCTPCB_FLAG_CONF
-    yes_we_have_openss7_kernel_sctp
-#endif
-            ], [sctp_cv_openss7_sctp=yes], [sctp_cv_openss7_sctp=no]) ]) ])
-    AC_MSG_CHECKING([for sctp openss7 sctp kernel])
-    if test :"${sctp_cv_openss7_sctp:-no}" = :yes ; then
-        AC_DEFINE([HAVE_OPENSS7_SCTP], [1],
-        [Define if your kernel supports the OpenSS7 Linux Kernel Sockets SCTP
-        patches.  This enables support in the SCTP driver for STREAMS on top
-        of the OpenSS7 Linux Kernel Sockets SCTP implementation.])
+AC_DEFUN([_SCTP_OTHER_SCTP], [dnl
+    sctp_cv_other_sctp='no'
+    sctp_cv_lksctp_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
+    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
+        sctp_cv_other_sctp='lksctp'
+        sctp_cv_lksctp_sctp='yes'
+        AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
+**** such a bastardized kernel will most likely result in an unstable
+**** situation.  Try a different kernel, or try recompiling your kernel with
+**** lksctp removed (or at least compiled as a module).
+**** ])
     fi
-    AC_MSG_RESULT([${sctp_cv_openss7_sctp:-no}])
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
+        sctp_cv_other_sctp='lksctp'
+        sctp_cv_lksctp_sctp='yes'
+        AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
+            greater kernels have this poorman version of SCTP included in the
+            kernel.  Define this symbol if you have such a bastardized kernel.
+            When we have such a kernel we need to define lksctp's header
+            wrapper defines so that none of the lksctp header files are
+            included (we use our own instead).])
+    fi
+    sctp_cv_openss7_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
+    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
+        sctp_cv_other_sctp='openss7'
+        sctp_cv_openss7_sctp='yes'
+        AC_MSG_WARN([
+**** 
+**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
+**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
+**** kernel can lead to difficulties.  Try a different kernel, or try
+**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
+        sctp_cv_other_sctp='openss7'
+        sctp_cv_openss7_sctp='yes'
+        AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
+            the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
+            support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
+            Kernel Sockets SCTP implementation.])
+    fi
+    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${sctp_cv_lksctp_sctp:-no}"  = :yes])dnl
     AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${sctp_cv_openss7_sctp:-no}" = :yes])dnl
-])# _SCTP_OPENSS7_SCTP
+])# _SCTP_OTHER_SCTP
+# =========================================================================
+
+# =========================================================================
+# _SCTP_SETUP
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_SETUP], [dnl
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _SCTP_OTHER_SCTP
+    _SCTP_SETUP_MODULE
+    _SCTP_CHECK_KERNEL
+    _SCTP_SETUP_DEBUG
+])# _SCTP_SETUP
+# =========================================================================
+
+# =========================================================================
+# _SCTP_SETUP_MODULE
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
+    if test :"${linux_cv_modules:-yes}" = :yes ; then
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_MODULE], [], [When defined, SCTP is
+                            being compiled as a loadable kernel module.])
+    else
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG], [], [When defined, SCTP is being
+                            compiled as a kernel linkable object.])
+    fi
+])# _SCTP_SETUP_MODULE
 # =========================================================================
 
 # =========================================================================
@@ -185,11 +276,11 @@ AC_DEFUN([_SCTP_CHECK_SCTP], [dnl
 # =========================================================================
 
 # =========================================================================
-# _SCTP_SETUP
+# _SCTP_CHECK_KERNEL
 # -------------------------------------------------------------------------
-AC_DEFUN([_SCTP_SETUP], [dnl
+AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
     _LINUX_KERNEL_ENV([dnl
-        AC_CACHE_CHECK([for sctp ip_route_output], [sctp_cv_have_ip_route_output], [dnl
+        AC_CACHE_CHECK([for kernel ip_route_output], [linux_cv_have_ip_route_output], [dnl
             CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
@@ -198,12 +289,98 @@ AC_DEFUN([_SCTP_SETUP], [dnl
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>]],
-                [[ip_route_output(NULL, 0, 0, 0, 0);]])
-            ],
-            [sctp_cv_have_ip_route_output='yes'],
-            [sctp_cv_have_ip_route_output='no']) ])
+                [[ip_route_output(NULL, 0, 0, 0, 0);]]) ],
+                    [linux_cv_have_ip_route_output='yes'],
+                    [linux_cv_have_ip_route_output='no'])
+            ])
+        if test :$linux_cv_have_ip_route_output = :yes ; then
+            AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [], [Define if you have the explicit
+                version of ip_route_output.])
+        fi
     ])
-    if test :"${sctp_cv_have_ip_route_output:-no}" = :yes ; then
+    _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [
+#include <linux/config.h>
+#include <linux/sysctl.h>
+#include <linux/types.h>
+#include <linux/fcntl.h>
+#include <linux/random.h>
+#include <linux/init.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <linux/ipsec.h>
+#include <linux/poll.h>
+#include <linux/slab.h>
+#include <linux/mm.h>
+#include <linux/module.h>
+#include <linux/proc_fs.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+    ])
+    _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+    ])
+    _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
+                          struct inet_protocol.no_policy,
+                          struct dst_entry.path,
+                          struct sk_buff.h.sh,
+                          struct sock.protinfo.af_inet.ttl,
+                          struct sock.protoinfo.af_inet.uc_ttl,
+                          struct sock.tp_pinfo.af_sctp], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/protocol.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
+    _LINUX_KERNEL_SYMBOLS([afinet_get_info,
+                           icmp_err_convert,
+                           icmp_statistics,
+                           inet_bind,
+                           inet_getname,
+                           inet_ioctl,
+                           inet_multi_getname,
+                           ip_cmsg_send,
+                           ip_getsockopt,
+                           ip_route_output_flow,
+                           __ip_route_output_key,
+                           ip_rt_min_pmtu,
+                           ip_rt_mtu_expires,
+                           ip_rt_update_pmtu,
+                           ipsec_sk_policy,
+                           ip_setsockopt,
+                           snmp_get_info,
+                           socket_get_info,
+                           sysctl_ip_dynaddr,
+                           sysctl_ip_nonlocal_bind,
+                           tcp_prot,
+                           udp_prot,
+                           raw_prot,
+                           tcp_memory_allocated,
+                           tcp_orphan_count,
+                           tcp_sockets_allocated,
+                           tcp_tw_count,
+                           ip_frag_nqueues,
+                           ip_frag_mem,
+                           __xfrm_policy_check,
+                           xfrm_policy_delete,
+                           __xfrm_sk_clone_policy])
+    if test :"${linux_cv_have_ip_route_output:-no}" = :yes ; then
         AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT], [], [Most 2.4 kernels have
         the function ip_route_output() defined.  Newer RH kernels (EL3) use
         the 2.6 functions and do not provide ip_route_output().  Define this
@@ -230,7 +407,7 @@ AC_DEFUN([_SCTP_SETUP], [dnl
                     ])
         ])
     fi
-    AC_REQUIRE([_SCTP_OPENSS7_SCTP])dnl
+    AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
 dnl if test :"${sctp_cv_openss7_sctp:-no}" = :yes ; then
 dnl     with_sctp='no'
 dnl     with_sctp2='no'
@@ -338,7 +515,88 @@ dnl fi
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
-])# _SCTP_SETUP
+    _LINUX_KERNEL_EXPORTS([
+            add_wait_queue,
+            add_wait_queue_exclusive,
+            alloc_skb,
+            create_proc_entry,
+            del_timer,
+            dev_base,
+            do_softirq,
+            free_pages,
+            __generic_copy_to_user,
+            __get_free_pages,
+            __get_user_4,
+            inet_accept,
+            inet_add_protocol,
+            inet_addr_type,
+            inet_del_protocol,
+            inet_family_ops,
+            inet_getsockopt,
+            inet_recvmsg,
+            inet_register_protosw,
+            inet_release,
+            inet_sendmsg,
+            inet_setsockopt,
+            inet_shutdown,
+            inet_stream_connect,
+            inet_unregister_protosw,
+            ip_cmsg_recv,
+            ip_fragment,
+            ip_route_output_key,
+            __ip_select_ident,
+            ip_send_check,
+            irq_stat,
+            jiffies,
+            kfree,
+            __kfree_skb,
+            kill_pg,
+            kill_proc,
+            kmem_cache_alloc,
+            kmem_cache_create,
+            kmem_cache_free,
+            kmem_find_general_cachep,
+            __lock_sock,
+            mod_timer,
+            net_statistics,
+            nf_hooks,
+            nf_hook_slow,
+            num_physpages,
+            __out_of_line_bug,
+            panic,
+            __pollwait,
+            printk,
+            proc_net,
+            ___pskb_trim,
+            put_cmsg,
+            __release_sock,
+            remove_proc_entry,
+            remove_wait_queue,
+            schedule_timeout,
+            secure_tcp_sequence_number,
+            send_sig,
+            sk_alloc,
+            skb_clone,
+            skb_copy_datagram_iovec,
+            skb_linearize,
+            skb_over_panic,
+            skb_realloc_headroom,
+            skb_under_panic,
+            sk_free,
+            sk_run_filter,
+            sock_no_mmap,
+            sock_no_sendpage,
+            sock_no_socketpair,
+            sock_wake_async,
+            sock_wfree,
+            sprintf,
+            __wake_up], [], [dnl
+            AC_MSG_WARN([
+**** 
+**** Linux kernel symbol ']LK_Export[' should be exported but it
+**** isn't.  This could cause problems later.
+**** ])])
+])# _SCTP_CHECK_KERNEL
 # =========================================================================
 
 # =========================================================================
@@ -392,7 +650,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     fi
     AC_MSG_RESULT([$sctp_cv_throttle_heartbeats])
     AC_MSG_CHECKING([for sctp dicard out-of-the-blue])
-    AC_REQUIRE([_SCTP_OPENSS7_SCTP])dnl
+    AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
     AC_ARG_ENABLE([sctp-discard-ootb],
         AS_HELP_STRING([--enable-sctp-discard-ootb],
             [enable discard out-of-the-blue packets. @<:@default=no@:>@]),
@@ -481,7 +739,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     if test :"$sctp_cv_adler32" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADLER_32], [], [
             This provides the ability to use the older RFC 2960 Adler32
-            checksum.  If CONFIG_SCTP_CRC_32 below is not selected, the Adler32
+            checksum.  If SCTP_CONFIG_CRC_32 below is not selected, the Adler32
             checksum is always provided.])dnl
     fi
     AM_CONDITIONAL([WITH_ADLER_32], [test :"$sctp_cv_adler32" = :yes])dnl
@@ -500,7 +758,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_CRC_32C], [], [
             This provides the ability to use the newer CRC-32c checksum as
             described in RFC 3309.  When this is selected and
-            CONFIG_SCTP_ADLER_32 is not selected above, then the only checksum
+            SCTP_CONFIG_ADLER_32 is not selected above, then the only checksum
             that will be used is the CRC-32c checksum.])dnl
     fi
     AM_CONDITIONAL([WITH_CRC_32C], [test :"$sctp_cv_crc32c" = :yes])dnl

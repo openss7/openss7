@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/12/17 13:30:34 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.6 2005/01/11 04:23:08 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/17 13:30:34 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/11 04:23:08 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -68,7 +68,7 @@ if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; 
 if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
 
 AC_CONFIG_SRCDIR([src/drivers/sctp.c])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h src/drivers/sctp_hooks.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
