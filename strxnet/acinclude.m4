@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.10 2004/11/08 06:53:43 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.11 2005/01/26 09:16:06 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/08 06:53:43 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/26 09:16:06 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -82,6 +82,7 @@ AC_DEFUN([AC_XNET], [dnl
     USER_CFLAGS="${CFLAGS}"
     _LINUX_KERNEL
     _LINUX_STREAMS
+    with_xnet='yes'
     _XOPEN
     XNET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
