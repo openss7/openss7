@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# $1 is the name of the LiS shared library
+#
+#
+# must be root
+#
+if [ `id -u` != "0" ]; then
+    exit 0
+fi
+#
+ldconfig
