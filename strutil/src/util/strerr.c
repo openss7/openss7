@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/14 21:53:25 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/18 01:36:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/14 21:53:25 $ by $Author: brian $
+ Last Modified $Date: 2005/02/18 01:36:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/14 21:53:25 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/18 01:36:06 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/14 21:53:25 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/18 01:36:06 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -98,6 +98,7 @@ char cfgfile[256] = "";
 char outpdir[256] = "/var/log/streams";
 char devname[256] = "";
 char mailuid[256] = "";
+char pidfile[256] = "";
 
 static void version(int argc, char **argv)
 {
@@ -147,6 +148,8 @@ Options:\n\
         redirect output to OUTFILE, default: ${BASENAME}.mm-dd\n\
     -e, --errfile ERRFILE\n\
         redirect errors to ERRFILE, default: ${BASENAME}.errors\n\
+    -p, --pidfile PIDFILE\n\
+        when ruunning as daemon, output pid to PIDFILE, default: /var/run/strerr.pid\n\
     -l, --logdev LOGDEVICE\n\
         log device to open, default: '/dev/strlog'\n\
     -q, --quiet\n\
@@ -390,6 +393,23 @@ void strerr_enter(int argc, char *argv[])
 			perror(__FUNCTION__);
 			exit(2);
 		} else if (pid != 0) {
+			if (nomead || pidfile[0] != '\0') {
+				FILE *pidf;
+				/* initialize default filename */
+				if (pidfile[0] == '\0')
+					snprintf(pidfile, sizeof(pidfile), "%s", "/var/run/strerr.pid");
+				if (output > 1)
+					syslog(LOG_NOTICE, "Writing daemon pid to file %s", pidfile);
+				if ((pidf = fopen(pidfile, "w+"))) {
+					fprintf(pidf, "%d", (int)pid);
+					fflush(pidf);
+					fclose(pidf);
+				} else {
+					syslog(LOG_ERR, "%m");
+					syslog(LOG_ERR, "Could not write pid to file %s", pidfile);
+					strerr_exit(2);
+				}
+			}
 			/* parent exits */
 			exit(0);
 		}
@@ -490,6 +510,7 @@ int main(int argc, char *argv[])
 			{"basename",	required_argument,	NULL, 'b'},
 			{"outfile",	required_argument,	NULL, 'o'},
 			{"errfile",	required_argument,	NULL, 'e'},
+			{"pidfile",	required_argument,	NULL, 'p'},
 			{"logdev",	required_argument,	NULL, 'l'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
@@ -501,10 +522,10 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long_only(argc, argv, "a:d:nb:o:e:l:qDvhVC?", long_options,
+		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?", long_options,
 				     &option_index);
 #else
-		c = getopt(argc, argv, "a:d:nb:o:e:l:qDvhVC?");
+		c = getopt(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?");
 #endif
 		if (c == -1) {
 			if (debug)
@@ -529,6 +550,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'e':	/* -e, --errfile ERRFILE */
 			strncpy(errfile, optarg, 256);
+			break;
+		case 'p':	/* -p, --pidfile PIDFILE */
+			strncpy(pidfile, optarg, 256);
 			break;
 		case 'l':	/* -l, --logdev DEVNAME */
 			strncpy(devname, optarg, 256);

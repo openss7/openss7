@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/18 01:36:07 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -13,7 +13,7 @@
 # strerr:	start and stop strerr facility
 # chkconfig:	- 55 55
 # lockfile:	/var/lock/subsys/strerr
-# config:	/etc/sysconfig/strerr
+# config:	/etc/default/strerr
 # processname:	strerr
 # pidfile:	/var/run/strerr.pid
 # probe:	true
@@ -42,7 +42,7 @@
 ### END INIT INFO
 
 # Source init script functions library
-. /etc/init.d/functions
+[ -f /etc/init.d/functions ] && . /etc/init.d/functions
 
 name='strerr'
 lockfile="/var/lock/subsys/$name"
@@ -72,8 +72,28 @@ RETVAL=0
 
 umask 077
 
+build_options() {
+    # Build up the options string
+    STRERR_OPTIONS=
+    [ -n "$STRERROPTIONS" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }${STRERROPTIONS}"
+    [ -n "$STRERR_MAILUID" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-a ${STRERR_MAILUID}"
+    [ -n "$STRERR_DIRECTORY" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-d ${STRERR_DIRECTORY}"
+    [ -n "$STRERR_BASENAME" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-b ${STRERR_BASENAME}"
+    [ -n "$STRERR_OUTFILE" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-o ${STRERR_OUTFILE}"
+    [ -n "$STRERR_ERRFILE" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-e ${STRERR_ERRFILE}"
+    [ -n "$STRERR_LOGDEVICE" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-l ${STRERR_LOGDEVICE}"
+}
+
 start() {
-    daemon strerr $STRERR_OPTIONS
+    build_options
+    daemon $processname -p $pidfile $STRERR_OPTIONS
     RETVAL=$?
     [ $RETVAL -eq 0 ] && touch $lockfile
     RETVAL=$?
@@ -102,22 +122,6 @@ reload() {
 
 case "$1" in
     (start|stop|reload|restart)
-	# Build up the options string
-	STRERR_OPTIONS="-n"
-	[ -n "$STRERROPTIONS" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }${STRERROPTIONS}"
-	[ -n "$STRERR_MAILUID" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }-a ${STRERR_MAILUID}"
-	[ -n "$STRERR_DIRECTORY" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }-d ${STRERR_DIRECTORY}"
-	[ -n "$STRERR_BASENAME" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }-b ${STRERR_BASENAME}"
-	[ -n "$STRERR_OUTFILE" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }-o ${STRERR_OUTFILE}"
-	[ -n "$STRERR_ERRFILE" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }-e ${STRERR_ERRFILE}"
-	[ -n "$STRERR_LOGDEVICE" ] && \
-	    STRERR_OPTIONS="${STRERR_OPTIONS:+ }-l ${STRERR_LOGDEVICE}"
 	$1 || RETVAL=$?
 	;;
     (status)
@@ -170,7 +174,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/18 01:36:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -216,7 +220,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
+# Last Modified $Date: 2005/02/18 01:36:07 $ by $Author: brian $
 #
 # =============================================================================
 

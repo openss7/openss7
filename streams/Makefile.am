@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/02/17 11:40:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/02/18 01:12:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/17 11:40:43 $ by $Author: brian $
+# Last Modified $Date: 2005/02/18 01:12:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,6 +54,8 @@
 # General rules
 #
 include am/openss7.am
+
+dist_sysconf_DATA =
 
 if RPM_BUILD_USER
 
@@ -78,6 +80,11 @@ dist_sbin_SCRIPTS		= \
 				src/util/strclean \
 				src/util/strload \
 				src/util/strsetup
+
+dist_sysconf_DATA		+= \
+				strsetup.conf \
+				strload.conf
+
 
 libexec_PROGRAMS		= \
 				test-clone \
@@ -641,7 +648,7 @@ dist_config_DATA		= \
 				src/util/sysconfig/streams \
 				src/util/sysconfig/strerr
 
-dist_sysconf_DATA		= \
+dist_sysconf_DATA		+= \
 				src/util/sysconfig/streams.conf
 
 endif

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/18 01:36:07 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -81,7 +81,7 @@ start() {
     for module in streams streams-clone streams-sth ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
-		modprobe -q $module
+		insmod -k -q -- $module
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || return $RETVAL
 	fi
@@ -225,7 +225,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/18 01:36:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -271,7 +271,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
+# Last Modified $Date: 2005/02/18 01:36:07 $ by $Author: brian $
 #
 # =============================================================================
 

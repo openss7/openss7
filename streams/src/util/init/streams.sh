@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/18 01:36:07 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -8,11 +8,98 @@
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
 # permissions.
 
-exit $?
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+name='specfs'
+config="/etc/default/$name"
+desc="the STREAMS subsystem"
+
+[ -e /proc/modules ] || exit 0
+
+# Specify defaults
+
+# Source config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+RETVAL=0
+
+if [ "$VERBOSE" -ne 0 ] ; then
+    redir='>/dev/null 2>&1'
+else
+    redir=
+fi
+
+build_options() {
+    # Build up the options string
+}
+
+start() {
+    echo -n "Loading STREAMS kernel modules: "
+    for module in streams streams-clone streams-sth ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	    echo -n "$module "
+	    insmod -k -q -- $module $redir
+	    [ $? -eq 0 ] || echo -n "(failed)"
+	fi
+    done
+    echo "."
+
+    echo -n "Starting $desc: $name "
+    build_options
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+	echo "."
+    else
+	echo "(failed.)"
+    fi
+    return $RETVAL
+}
+
+stop() {
+    echo -n "Stopping $desc: $name "
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+	echo "."
+    else
+	echo "(failed.)"
+    fi
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+show() {
+    echo "$name.sh: show: not yet implemented." >&2
+    return 1
+}
+
+usage() {
+    echo "Usage: /etc/init.d/$name.sh (start|stop|restart|force-reload|show)" >&2
+    return 1
+}
+
+case "$1" in
+    (start|stop|restart|show)
+	$1 || RETVAL=$?
+	;;
+    (force-reload)
+	restart || RETVAL=$?
+	;;
+    (*)
+	usage || RETVAL=$?
+	;;
+esac
+
+[ "${0##*/}" = "$name.sh" ] && exit $RETVAL
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/18 01:36:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -58,7 +145,7 @@ exit $?
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
+# Last Modified $Date: 2005/02/18 01:36:07 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -1,18 +1,154 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/18 01:36:07 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
 # permissions.
+#
+# These are arguments to update-rc.d ala chkconfig and lsb.  They are recognized
+# by openss7 install_initd and remove_initd scripts.  Each line specifies
+# arguments to add and remove links after the the name argument:
+#
+# strerr:	start and stop strerr facility
+# update-rc.d:	stop 20 0 1 6 .
+# config:	/etc/default/strerr
+# processname:	strerr
+# pidfile:	/var/run/strerr.pid
+# probe:	false
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is \
+#		responsible for starting and stopping the STREAMS error \
+#		logger.  The STREAMS error logger should only be run under \
+#		exceptional circumstances and this init script not activated \
+#		automatically.
+#
 
-exit $?
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+name='strerr'
+config="/etc/default/$name"
+processname="$name"
+pidfile="/var/run/$processname.pid"
+execfile="/usr/sbin/$processname"
+desc="the STREAMS error logger"
+
+[ -x $execfile ] || exit 0
+
+# Specify defaults
+
+STRERROPTIONS=
+STRERR_MAILUID=
+STRERR_DIRECTORY="/var/log/streams"
+STRERR_BASENAME="error"
+STRERR_OUTFILE=
+STRERR_ERRFILE=
+STRERR_LOGDEVICE="/dev/streams/log"
+STRERR_OPTIONS=
+
+# Source config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+RETVAL=0
+
+umask 077
+
+build_options() {
+    # Build up the options string
+    STRERR_OPTIONS=
+    [ -n "$STRERROPTIONS" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }${STRERROPTIONS}"
+    [ -n "$STRERR_MAILUID" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-a ${STRERR_MAILUID}"
+    [ -n "$STRERR_DIRECTORY" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-d ${STRERR_DIRECTORY}"
+    [ -n "$STRERR_BASENAME" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-b ${STRERR_BASENAME}"
+    [ -n "$STRERR_OUTFILE" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-o ${STRERR_OUTFILE}"
+    [ -n "$STRERR_ERRFILE" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-e ${STRERR_ERRFILE}"
+    [ -n "$STRERR_LOGDEVICE" ] && \
+	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-l ${STRERR_LOGDEVICE}"
+}
+
+start() {
+    echo -n "Starting $desc: $name "
+    build_options
+    start-stop-daemon --start --quiet --pidfile $pidfile \
+	--exec $execfile -- $STRACE_OPTIONS
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+	echo "."
+    else
+	echo "(failed.)"
+    fi
+    return $RETVAL
+}
+
+stop() {
+    echo -n "Stopping $desc: $name "
+    start-stop-daemon --stop --quiet --retry=1 --oknodo --pidfile $pidfile \
+	--exec $execfile
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+	echo "."
+    else
+	echo "(failed.)"
+    fi
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reload() {
+    echo -n "Reloading $desc: $name "
+    start-stop-daemon --stop --quiet --signal=1 --pidfile $pidfile \
+	--exec $execfile
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+	echo "."
+    else
+	echo "(failed.)"
+    fi
+    return $RETVAL
+}
+
+show() {
+    echo "$name.sh: show: not yet implemented." >&2
+    return 1
+}
+
+usage() {
+    echo "Usage: /etc/init.d/$name.sh (start|stop|restart|reload|force-reload|show)" >&2
+    return 1
+}
+
+case "$1" in
+    (start|stop|reload|restart|show)
+	$1 || RETVAL=$?
+	;;
+    (force-reload)
+	reload || RETVAL=$?
+	;;
+    (*)
+	usage || RETVAL=$?
+	;;
+esac
+
+[ "${0##*/}" = "$name.sh" ] && exit $RETVAL
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/14 23:39:04 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/18 01:36:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -58,7 +194,7 @@ exit $?
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
+# Last Modified $Date: 2005/02/18 01:36:07 $ by $Author: brian $
 #
 # =============================================================================
 
