@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:30 $ by $Author: brian $
+ Last Modified $Date: 2005/01/24 07:48:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $";
 
 #include "compat.h"
 
@@ -61,7 +61,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:30 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -899,7 +899,7 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	/* allocate a new device */
 	cminor = 1;
-	spin_lock_irqsave(&master.sl.list, flags);
+	spin_lock_irqsave(&master.lock, flags);
 	for (spp = &master.sl.list; *spp; spp = &(*spp)->next) {
 		major_t dmajor = (*spp)->u.dev.cmajor;
 		if (cmajor != dmajor)

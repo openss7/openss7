@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/18 01:01:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/01/24 07:45:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 01:01:48 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 07:45:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -302,7 +302,15 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
-libSS7mods_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules -I$(srcdir)/src/modules -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libSS7mods_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules \
+				  -I$(srcdir)/src/modules \
+				  -imacros ./strconf.h \
+				  $(SS7_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 

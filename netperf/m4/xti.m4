@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.13 2005/01/23 08:26:00 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.14 2005/01/24 07:33:00 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/23 08:26:00 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -113,10 +113,11 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
             xti_where="strxnet/src/include"
             for xti_d in . .. 
             do
-                xti_dir=`echo "$srcdir/$xti_d/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                xti_dir="$srcdir/$xti_d/$xti_where"
                 xti_bld=`echo "$xti_here/$xti_d/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $xti_dir -a -r $xti_dir/$xti_what 
                 then
+                    xti_dir=`(cd $xti_dir; pwd)`
                     xti_cv_includes="$xti_dir $xti_bld"
                     xti_cv_ldadd=`echo "$xti_here/$xti_d/strxnet/libxnet.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xns.m4,v 0.9.2.8 2005/01/23 00:24:47 brian Exp $
+dnl @(#) $Id: xns.m4,v 0.9.2.9 2005/01/24 07:33:00 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/23 00:24:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -113,9 +113,10 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
             xns_here=`pwd`
             xns_where="strxns/src/include"
             for xns_d in . .. ; do
-                xns_dir=`echo "$srcdir/$xns_d/$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                xns_dir="$srcdir/$xns_d/$xns_where"
                 xns_bld=`echo "$xns_here/$xns_d/$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
+                    xns_dir=`(cd $xns_dir; pwd)`
                     xns_cv_includes="$xns_dir $xns_bld"
                     break
                 fi

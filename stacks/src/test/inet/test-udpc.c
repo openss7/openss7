@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 19:33:35 $
+ @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:49:02 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 19:33:35 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:49:02 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 19:33:35 $"
+#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:49:02 $"
 
 static char const ident[] =
-    "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 19:33:35 $";
+    "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:49:02 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -408,6 +408,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

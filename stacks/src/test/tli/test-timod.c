@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:24 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:50:44 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 09:31:24 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:50:44 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:24 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:50:44 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:24 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:50:44 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -134,6 +134,7 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -241,6 +242,7 @@ enum {
 #undef HZ
 #define HZ 1000
 
+#if 0
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
@@ -283,11 +285,13 @@ static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
+#endif
 
 long test_start = 0;
 
 static int state;
 
+#if 0
 /*
  *  Return the current time in milliseconds.
  */
@@ -361,6 +365,7 @@ check_time(const char *t, long i, long lo, long hi)
 	else
 		return FAILURE;
 }
+#endif
 
 static int
 time_event(int event)
@@ -426,12 +431,14 @@ start_tt(long duration)
 	timer_timeout = 0;
 	return SUCCESS;
 }
+#if 0
 static int
 start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int
 stop_tt(void)
@@ -1637,6 +1644,7 @@ do_signal(int fd, int action)
 	return SCRIPTERROR;
 }
 
+#if 0
 static int
 top_signal(int action)
 {
@@ -1648,6 +1656,7 @@ bot_signal(int action)
 {
 	return do_signal(bot_fd, action);
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -2023,7 +2032,7 @@ bot_decode_ctrl(struct strbuf *ctrl, struct strbuf *data)
 static int
 top_get_data(int action)
 {
-	int ret;
+	int ret = FAILURE;
 	switch (action) {
 	case __TEST_READ:
 	{
@@ -2130,7 +2139,7 @@ top_get_data(int action)
 static int
 bot_get_data(int action)
 {
-	int ret;
+	int ret = FAILURE;
 	switch (action) {
 	case __TEST_READ:
 	{
@@ -2600,6 +2609,7 @@ postamble_0(int fd)
 	return SUCCESS;
 };
 
+#if 0
 static int
 preamble_1_top(int fd)
 {
@@ -2638,6 +2648,7 @@ postamble_1_bot(int fd)
 		}
 	return SCRIPTERROR;
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -2883,6 +2894,7 @@ test_case_2_1_8_2_bot(int fd)
 	return test_case_2_1_bot(fd, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
 
+#if 0
 #define desc_case_2_1_9 "\
 Performing IO controls on the timod module\n\
 -- TI_SYNC IO control positive acknowledgement\n\
@@ -2898,6 +2910,7 @@ test_case_2_1_9_bot(int fd)
 {
 	return test_case_2_1_bot(fd, __TEST_INFO_REQ, __TEST_INFO_ACK);
 }
+#endif
 
 #define desc_case_2_1_10 "\
 Performing IO controls on the timod module\n\
@@ -3131,6 +3144,7 @@ test_case_2_2_8_2_bot(int fd)
 	return test_case_2_2_bot(fd, __TEST_DISCON_REQ, __TEST_ERROR_ACK);
 }
 
+#if 0
 #define desc_case_2_2_9 "\
 Performing IO controls on the timod module\n\
 -- TI_SYNC IO control negative acknowledgement\n\
@@ -3146,6 +3160,7 @@ test_case_2_2_9_bot(int fd)
 {
 	return test_case_2_2_bot(fd, __TEST_INFO_REQ, __TEST_ERROR_ACK);
 }
+#endif
 
 #define desc_case_2_2_10 "\
 Performing IO controls on the timod module\n\
@@ -4252,7 +4267,7 @@ test_run(struct test_side *top_side, struct test_side *bot_side)
 {
 	int children = 0;
 	pid_t got_chld, top_chld = 0, bot_chld = 0;
-	int got_stat, top_stat, bot_stat;
+	int got_stat, top_stat = FAILURE, bot_stat = FAILURE;
 	start_tt(5000);
 	if (top_side) {
 		switch ((top_chld = fork())) {
@@ -4561,7 +4576,6 @@ do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	int num_exit;
 	if (verbose) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nXNS 5.2 - OpenSS7 XTI/TLI Library - Conformance Test Program.\n");
@@ -4938,6 +4952,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

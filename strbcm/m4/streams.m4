@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.30 2005/01/23 08:26:00 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.31 2005/01/24 07:33:00 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/23 08:26:00 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -227,10 +227,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
             streams_where="LiS/include"
             for streams_d in . .. 
             do
-                streams_dir=`echo "$srcdir/$streams_d/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                streams_dir="$srcdir/$streams_d/$streams_where"
                 streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what 
                 then
+                    streams_dir=`(cd $streams_dir; pwd)`
                     streams_cv_lis_includes="$streams_dir $streams_bld"
                     streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break
@@ -337,10 +338,11 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
             streams_where="streams/include"
             for streams_d in . .. 
             do
-                streams_dir=`echo "$srcdir/$streams_d/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                streams_dir="$srcdir/$streams_d/$streams_where"
                 streams_bld=`echo "$streams_here/$streams_d/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what 
                 then
+                    streams_dir=`(cd $streams_dir; pwd)`
                     streams_cv_lfs_includes="$streams_dir $streams_bld"
                     streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:14 $
+ @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:46:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 09:31:14 $ by $Author: brian $
+ Last Modified $Date: 2005/01/24 07:46:40 $ by $Author: brian $
 
  $Log: tpi.h,v $
+ Revision 0.9.2.3  2005/01/24 07:46:40  brian
+ - Removed compiler warnings.
+
  Revision 0.9.2.2  2004/09/02 09:31:14  brian
  - Synchronization with other packages.
 
@@ -63,7 +66,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #if 0
 #if !defined _XTI_H && !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
@@ -155,7 +158,7 @@
 /*
    The following are _XOPEN_SOURCE (XPG4 and up).  
  */
-#if _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
+#if defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
 #define T_CURRENT	0x0080	/* get current options */
 #define T_PARTSUCCESS	0x0100	/* partial success */
 #define T_READONLY	0x0200	/* option is read only */

@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/23 00:24:47 $
+dnl @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/24 07:33:00 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/23 00:24:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -107,9 +107,10 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
             sctp_here=`pwd`
             sctp_where="strsctp/src/include"
             for sctp_d in . .. ; do
-                sctp_dir=`echo "$srcdir/$sctp_d/$sctp_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                sctp_dir="$srcdir/$sctp_d/$sctp_where"
                 sctp_bld=`echo "$sctp_here/$sctp_d/$sctp_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $sctp_dir -a -r $sctp_dir/$sctp_what ; then
+                    sctp_dir=`(cd $sctp_dir; pwd)`
                     sctp_cv_includes="$sctp_dir $sctp_bld"
                     break
                 fi

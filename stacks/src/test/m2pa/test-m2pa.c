@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:25:26 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:34 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:25:26 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:49:34 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:25:26 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:34 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:25:26 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:34 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -77,6 +77,8 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <stdint.h>
 #include <sys/types.h>
 #include <asm/byteorder.h>
+
+#include <netinet/in.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -1922,9 +1924,9 @@ pt_decode_msg(unsigned char *buf)
 	case N_BIND_ACK:
 		if (verbose > 1) {
 			printf("              !bind ack                                             \n");
-			printf("    cons = %lu\n", p->npi.bind_ack.CONIND_number);
-			printf("    tok  = %lx\n", p->npi.bind_ack.TOKEN_value);
-			printf("    alen = %lu\n", p->npi.bind_ack.ADDR_length);
+			printf("    cons = %lu\n", (ulong)p->npi.bind_ack.CONIND_number);
+			printf("    tok  = %lx\n", (ulong)p->npi.bind_ack.TOKEN_value);
+			printf("    alen = %lu\n", (ulong)p->npi.bind_ack.ADDR_length);
 			if (p->npi.bind_ack.ADDR_length == 14) {
 				addr_t *a = (addr_t *) (buf + p->npi.bind_ack.ADDR_offset);
 				printf("    port = %u\n", ntohs(a->port));
@@ -1983,7 +1985,7 @@ pt_decode_msg(unsigned char *buf)
 		}
 		return UNKNOWN;
 	default:
-		printf("         !(unknown %3ld)                                             \n", p->npi.type);
+		printf("         !(unknown %3ld)                                             \n", (long)p->npi.type);
 		FFLUSH(stdout);
 		return UNKNOWN;
 	}
@@ -2191,9 +2193,9 @@ iut_decode_msg(unsigned char *buf)
 	case N_BIND_ACK:
 		if (verbose > 1) {
 			printf("                                             !bind ack              \n");
-			printf("                                                   cons = %lu\n", p->npi.bind_ack.CONIND_number);
-			printf("                                                   tok  = %lx\n", p->npi.bind_ack.TOKEN_value);
-			printf("                                                   alen = %lu\n", p->npi.bind_ack.ADDR_length);
+			printf("                                                   cons = %lu\n", (ulong)p->npi.bind_ack.CONIND_number);
+			printf("                                                   tok  = %lx\n", (ulong)p->npi.bind_ack.TOKEN_value);
+			printf("                                                   alen = %lu\n", (ulong)p->npi.bind_ack.ADDR_length);
 			if (p->npi.bind_ack.ADDR_length == 14) {
 				addr_t *a = (addr_t *) (buf + p->npi.bind_ack.ADDR_offset);
 				printf("                                                   port = %u\n", ntohs(a->port));
@@ -2314,9 +2316,9 @@ mgm_decode_msg(unsigned char *buf)
 	case N_BIND_ACK:
 		if (verbose > 1) {
 			printf("             !bind ack |                                            \n");
-			printf("    cons = %lu\n", p->npi.bind_ack.CONIND_number);
-			printf("    tok  = %lx\n", p->npi.bind_ack.TOKEN_value);
-			printf("    alen = %lu\n", p->npi.bind_ack.ADDR_length);
+			printf("    cons = %lu\n", (ulong)p->npi.bind_ack.CONIND_number);
+			printf("    tok  = %lx\n", (ulong)p->npi.bind_ack.TOKEN_value);
+			printf("    alen = %lu\n", (ulong)p->npi.bind_ack.ADDR_length);
 			if (p->npi.bind_ack.ADDR_length == 14) {
 				addr_t *a = (addr_t *) (buf + p->npi.bind_ack.ADDR_offset);
 				printf("    port = %u\n", ntohs(a->port));
@@ -2371,7 +2373,7 @@ mgm_decode_msg(unsigned char *buf)
 		}
 		return UNKNOWN;
 	default:
-		printf("      !(uninown %5ld) |                                            \n", p->npi.type);
+		printf("      !(uninown %5ld) |                                            \n", (long)p->npi.type);
 		FFLUSH(stdout);
 		return UNKNOWN;
 	}
@@ -7637,7 +7639,7 @@ Reverse direction\
 static int
 test_case_4_1b(void)
 {
-	int dat = 0, msu = 0, ind = 0;
+	int dat = 0, msu = 0;
 	for (;;) {
 		switch (state) {
 		case 0:
@@ -11937,11 +11939,13 @@ begin_test_case(void)
 	expand = 1;
 	return (SUCCESS);
 }
+#if 0
 static int
 end_tests(void)
 {
 	return (SUCCESS);
 }
+#endif
 
 int
 do_tests(void)
@@ -12278,7 +12282,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long)timer_scale);
 			break;
 		case 's':
 			summary = 1;
@@ -12357,6 +12361,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

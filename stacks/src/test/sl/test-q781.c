@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $
+ @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:50:02 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 18:14:52 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:50:02 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $"
+#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:50:02 $"
 
 static char const ident[] =
-    "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $";
+    "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:50:02 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -142,6 +142,7 @@ typedef struct timer_range {
 
 enum { t1 = 0, t2, t3, t4n, t4e, t5, t6, t7, tmax };
 
+#if 0
 static timer_range_t timer[tmax] = {
 	{40000, 50000},		/* Timer T1 30000 */
 	{5000, 150000},		/* Timer T2 5000 */
@@ -152,9 +153,11 @@ static timer_range_t timer[tmax] = {
 	{3000, 6000},		/* Timer T6 300 */
 	{500, 2000}		/* Timer T7 50 */
 };
+#endif
 
 long test_start = 0;
 
+#if 0
 /* 
  *  Return the current time in milliseconds.
  */
@@ -203,6 +206,7 @@ check_time(const char *t, long beg, long lo, long hi)
 	else
 		return FAILURE;
 }
+#endif
 
 static int timer_timeout = 0;
 
@@ -1477,6 +1481,7 @@ event(void)
 	return wait_event(-1);
 }
 
+#if 0
 static int
 check_snibs(unsigned char bsnib, unsigned char fsnib)
 {
@@ -5754,6 +5759,7 @@ test_5_5b(void)
 		}
 	}
 }
+#endif
 
 static int
 test_6_1(void)
@@ -5849,6 +5855,7 @@ test_6_2(void)
 	}
 }
 
+#if 0
 static int
 test_6_3(void)
 {
@@ -7463,6 +7470,7 @@ test_9_3(void)
 		}
 	}
 }
+#endif
 
 static int
 test_9_4(void)
@@ -7554,6 +7562,7 @@ test_9_4(void)
 	}
 }
 
+#if 0
 static int
 test_9_5(void)
 {
@@ -8224,6 +8233,7 @@ test_10_3(void)
 		}
 	}
 }
+#endif
 
 #ifndef HZ
 #define HZ 100
@@ -9077,6 +9087,7 @@ iut_power_off(void)
 	return SUCCESS;
 }
 
+#if 0
 static int
 link_power_off(void)
 {
@@ -9122,6 +9133,7 @@ link_out_of_service(void)
 	start_tt(TEST_TIMEOUT);
 	return SUCCESS;
 }
+#endif
 
 static int
 link_in_service(void)
@@ -10210,6 +10222,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/23 21:21:50 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/24 12:03:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/23 21:21:50 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 12:03:27 $ by $Author: brian $
 #
 # =============================================================================
 
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.4 2005/01/23 21:21:50 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.6 2005/01/24 12:03:27 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7], [0.9.2], [bugs@openss7.org], [openss7])
 
@@ -72,9 +72,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_TARGET
 
-dnl AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
-AM_INIT_AUTOMAKE([OpenSS7], [0.9.2-1])
-dnl AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION-1)
 AM_MAINTAINER_MODE
 
 dnl
@@ -171,6 +169,5 @@ AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero get
 
 AC_OS7
 
-AC_CONFIG_SUBDIRS([sctp iperf LiS streams strxns strxnet strsctp netperf])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

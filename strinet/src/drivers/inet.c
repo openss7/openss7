@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/10 20:57:07 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/24 07:43:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/10 20:57:07 $ by $Author: brian $
+ Last Modified $Date: 2005/01/24 07:43:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/10 20:57:07 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/24 07:43:29 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/10 20:57:07 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/24 07:43:29 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -83,6 +83,8 @@ static char const ident[] =
 #include <linux/in.h>
 #include <linux/un.h>
 #include <linux/ip.h>
+
+#undef ASSERT
 
 #include <net/sock.h>
 #include <net/udp.h>
@@ -214,7 +216,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/10 20:57:07 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/24 07:43:29 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -7857,12 +7859,14 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							    ss_overall_result(&overall,
 									      T_PARTSUCCESS);
 						}
+#if 0
 						if (*valp > 255) {
 							*valp = 255;
 							oh->status =
 							    ss_overall_result(&overall,
 									      T_PARTSUCCESS);
 						}
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -9304,12 +9308,14 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							    ss_overall_result(&overall,
 									      T_PARTSUCCESS);
 						}
+#if 0
 						if (*valp > 255) {
 							*valp = 255;
 							oh->status =
 							    ss_overall_result(&overall,
 									      T_PARTSUCCESS);
 						}
+#endif
 					}
 					ss->options.ip.ttl = *valp;
 					np->ttl = *valp;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:53 $
+ @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:51:14 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 18:14:53 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:51:14 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:53 $"
+#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:51:14 $"
 
 static char const ident[] =
-    "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:53 $";
+    "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/24 07:51:14 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -10424,6 +10424,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

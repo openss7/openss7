@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 09:31:20 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:01 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 09:31:20 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:49:01 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.4  2005/01/24 07:49:01  brian
+ - Removed compiler warnings.
+
  Revision 0.9.2.3  2004/09/02 09:31:20  brian
  - Synchronization with other packages.
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 09:31:20 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:01 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 09:31:20 $";
+    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:01 $";
 
 /*
  *  Simple test program for INET streams.
@@ -100,6 +103,7 @@ static char const ident[] =
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -239,6 +243,7 @@ enum {
 #undef HZ
 #define HZ 1000
 
+#if 0
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
@@ -281,11 +286,13 @@ static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
+#endif
 
 long test_start = 0;
 
 static int state;
 
+#if 0
 /* 
  *  Return the current time in milliseconds.
  */
@@ -365,6 +372,7 @@ check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif
 
 static int
 time_event(int event)
@@ -430,12 +438,14 @@ start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+#if 0
 static int
 start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int
 stop_tt(void)
@@ -1065,7 +1075,7 @@ addr_string(char *add_ptr, size_t add_len)
 				(a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	snprintf(buf + len, sizeof(buf) - len, "\0");
+	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
 
@@ -1310,11 +1320,11 @@ value_string(struct t_opthdr *oh)
 		case T_IP_OPTIONS:
 			break;
 		case T_IP_TOS:
-			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+			if ((oh->len = sizeof(*oh) + sizeof(unsigned char)))
 				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
 			return buf;
 		case T_IP_TTL:
-			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+			if ((oh->len = sizeof(*oh) + sizeof(unsigned char)))
 				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
 			return buf;
 		case T_IP_REUSEADDR:
@@ -1343,7 +1353,7 @@ value_string(struct t_opthdr *oh)
 			return yesno_string(oh);
 		case T_TCP_MAXSEG:
 			if (oh->len == sizeof(*oh) + sizeof(t_uscalar_t))
-				snprintf(buf, sizeof(buf), "%lu", *((t_uscalar_t *) T_OPT_DATA(oh)));
+				snprintf(buf, sizeof(buf), "%lu", (ulong)*((t_uscalar_t *) T_OPT_DATA(oh)));
 			return buf;
 		case T_TCP_KEEPALIVE:
 			return yesno_string(oh);
@@ -1461,12 +1471,13 @@ print_options(int fd, char *opt_ptr, size_t opt_len)
 	if (verbose < 4)
 		return;
 	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+#if 0
 		char *level = level_string(oh);
+#endif
 		char *name = name_string(oh);
 		char *status = status_string(oh);
 		char *value = value_string(oh);
 		int len = oh->len - sizeof(*oh);
-		unsigned char *val = _T_OPT_DATA_OFS(oh, 0);
 		if (len < 0)
 			break;
 		if (fd == conn_fd) {
@@ -1669,14 +1680,14 @@ print_event_conn(int fd, int event)
 	case __EVENT_OPTDATA_REQ:
 		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03lu:-U-) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03lu:-U-) ->\\               |  |                    [%d]\n", (ulong)opt_data.sid_val, state);
 			else
-				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03lu:-U-) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03lu:-U-) ->\\               |  |                    [%d]\n", (ulong)opt_data.sid_val, state);
 		} else {
 			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03lu:---) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03lu:---) ->\\               |  |                    [%d]\n", (ulong)opt_data.sid_val, state);
 			else
-				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03lu:---) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03lu:---) ->\\               |  |                    [%d]\n", (ulong)opt_data.sid_val, state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		break;
@@ -1725,7 +1736,7 @@ print_event_conn(int fd, int event)
 		fprintf(stdout, "T_CAPABILITY_ACK<--/|                               |  |                    [%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1834,9 +1845,9 @@ print_event_resp(int fd, int event)
 		break;
 	case __EVENT_OPTDATA_REQ:
 		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
-			fprintf(stdout, "                    |               /<- - (%03lu:-U-) + -|<--- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+			fprintf(stdout, "                    |               /<- - (%03lu:-U-) + -|<--- T_OPTDATA_REQ  [%d]\n", (ulong)opt_data.sid_val, state);
 		else
-			fprintf(stdout, "                    |               /<- - (%03lu:---) + -|<--- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+			fprintf(stdout, "                    |               /<- - (%03lu:---) + -|<--- T_OPTDATA_REQ  [%d]\n", (ulong)opt_data.sid_val, state);
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		break;
 	case __EVENT_OPTDATA_IND:
@@ -1884,7 +1895,7 @@ print_event_resp(int fd, int event)
 		fprintf(stdout, "                    |                               |  |\\-->T_CAPABILITY_ACK[%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -1993,9 +2004,9 @@ print_event_list(int fd, int event)
 		break;
 	case __EVENT_OPTDATA_REQ:
 		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
-			fprintf(stdout, "                    |               /<- -(%03lu:-U-)- |<-+---- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+			fprintf(stdout, "                    |               /<- -(%03lu:-U-)- |<-+---- T_OPTDATA_REQ  [%d]\n", (ulong)opt_data.sid_val, state);
 		else
-			fprintf(stdout, "                    |               /<- -(%03lu:---)- |<-+---- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+			fprintf(stdout, "                    |               /<- -(%03lu:---)- |<-+---- T_OPTDATA_REQ  [%d]\n", (ulong)opt_data.sid_val, state);
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
 		break;
 	case __EVENT_OPTDATA_IND:
@@ -2043,7 +2054,7 @@ print_event_list(int fd, int event)
 		fprintf(stdout, "                    |                               |\\-+--->T_CAPABILITY_ACK[%d]\n", state);
 		break;
 	case __EVENT_UNKNOWN:
-		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", (long)cmd.tpi.type, state);
 		break;
 	default:
 	case __RESULT_SCRIPT_ERROR:
@@ -3169,7 +3180,6 @@ Attempts to invoke connection oriented primitives.\n\
 int
 test_case_4_1(int fd)
 {
-	static char dat[] = "Dummy message.";
 	state = 0;
 	if (inet_conn_req(fd, &addr1, NULL) != __RESULT_SUCCESS)
 		goto failure;
@@ -3196,7 +3206,6 @@ Attempts to invoke connection oriented primitives.\n\
 int
 test_case_4_2(int fd)
 {
-	static char dat[] = "Dummy message.";
 	state = 0;
 	if (inet_conn_res(fd, fd, NULL) != __RESULT_SUCCESS)
 		goto failure;
@@ -3223,7 +3232,6 @@ Attempts to invoke connection oriented primitives.\n\
 int
 test_case_4_3(int fd)
 {
-	static char dat[] = "Dummy message.";
 	state = 0;
 	if (inet_discon_req(fd, 0) != __RESULT_SUCCESS)
 		goto failure;
@@ -3331,7 +3339,6 @@ Attempts to invoke connection oriented primitives.\n\
 int
 test_case_4_7(int fd)
 {
-	static char dat[] = "Dummy message.";
 	state = 0;
 	if (inet_ordrel_req(fd) != __RESULT_SUCCESS)
 		goto failure;
@@ -3641,7 +3648,7 @@ test_run(struct test_side *conn_side, struct test_side *resp_side, struct test_s
 {
 	int children = 0;
 	pid_t got_chld, conn_chld = 0, resp_chld = 0, list_chld = 0;
-	int got_stat, conn_stat, resp_stat, list_stat;
+	int got_stat, conn_stat = __RESULT_FAILURE, resp_stat = __RESULT_FAILURE, list_stat = __RESULT_FAILURE;
 	start_tt(5000);
 	if (conn_side) {
 		switch ((conn_chld = fork())) {
@@ -3873,7 +3880,6 @@ do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	int num_exit;
 	if (verbose > 0) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nXNS 5.2/TPI Rev 2 - OpenSS7 INET Driver - RAW - Conformance Test Program.\n");
@@ -4278,6 +4284,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

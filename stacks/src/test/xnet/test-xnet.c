@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:25 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:51:45 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 09:31:25 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:51:45 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:25 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:51:45 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:25 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:51:45 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -143,6 +143,7 @@ static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -374,6 +375,7 @@ enum {
 #undef HZ
 #define HZ 1000
 
+#if 0 
 /* *INDENT-OFF* */
 static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
@@ -416,11 +418,13 @@ static timer_range_t timer[tmax] = {
 	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
 };
 /* *INDENT-ON* */
+#endif
 
 long test_start = 0;
 
 static int state;
 
+#if 0
 /*
  *  Return the current time in milliseconds.
  */
@@ -494,6 +498,7 @@ check_time(const char *t, long i, long lo, long hi)
 	else
 		return FAILURE;
 }
+#endif
 
 static int
 time_event(int event)
@@ -559,12 +564,14 @@ start_tt(long duration)
 	timer_timeout = 0;
 	return SUCCESS;
 }
+#if 0 
 static int
 start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int
 stop_tt(void)
@@ -840,7 +847,7 @@ do_signal(int fd, int action)
 			test_pband = 0;
 			break;
 		case __TEST_DATA_REQ:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--T_DATA_REQ------->|  |                               |                    [%d]\n", state);
 				fflush(stdout);
@@ -854,7 +861,7 @@ do_signal(int fd, int action)
 			test_pband = 0;
 			break;
 		case __TEST_EXDATA_REQ:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--T_EXDATA_REQ----->|  |                               |                    [%d]\n", state);
 				fflush(stdout);
@@ -910,7 +917,7 @@ do_signal(int fd, int action)
 			test_pband = 0;
 			break;
 		case __TEST_UNITDATA_REQ:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--T_UNITDATA_REQ--->|  |                               |                    [%d]\n", state);
 				fflush(stdout);
@@ -1258,7 +1265,7 @@ do_signal(int fd, int action)
 		case __TEST_T_SND:
 		{
 			int nbytes = sprintf(test_udata, "Test t_snd data for transmission.");
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--t_snd(3)--------->|  |  %4d bytes                   |                    [%d]\n", nbytes, state);
 				fflush(stdout);
@@ -1303,7 +1310,7 @@ do_signal(int fd, int action)
 			return (SUCCESS);
 		case __TEST_T_SNDUDATA:
 			test_sndudata.udata.len = sprintf(test_udata, "Test t_sndudata data.");
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--t_sndudata(3)---->|  |  %4d bytes                   |                    [%d]\n", test_sndudata.udata.len, state);
 				fflush(stdout);
@@ -1321,7 +1328,7 @@ do_signal(int fd, int action)
 			test_t_iov[2].iov_len = sprintf(test_t_iov[2].iov_base, "Writev test datum for vector 2.");
 			test_t_iov[3].iov_base = dbuf + test_t_iov[2].iov_len;
 			test_t_iov[3].iov_len = sprintf(test_t_iov[3].iov_base, "Writev test datum for vector 3.");
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--t_sndv(3)-------->|  |  %2d x %4d bytes              |                    [%d]\n", test_iovcount, test_t_iov[0].iov_len, state);
 				fflush(stdout);
@@ -1340,7 +1347,7 @@ do_signal(int fd, int action)
 			test_t_iov[3].iov_base = dbuf + test_t_iov[2].iov_len;
 			test_t_iov[3].iov_len = sprintf(test_t_iov[3].iov_base, "Writev test datum for vector 3.");
 			test_sndudata.udata.len = 0;
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "--t_sndvudata(3)--->|  |  %2d x %4d bytes              |                    [%d]\n", test_iovcount, test_t_iov[0].iov_len, state);
 				fflush(stdout);
@@ -1967,7 +1974,7 @@ do_signal(int fd, int action)
 			data->len = sprintf(dbuf, "Normal test data.");
 			test_pflags = MSG_BAND;
 			test_pband = 0;
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |  |< %4d bytes- - - - - - - - - -|<-T_DATA_IND%c------ (%d)\n", data->len, MORE_flag ? '+' : '-', state);
 				fflush(stdout);
@@ -2058,7 +2065,7 @@ do_signal(int fd, int action)
 			test_pband = 0;
 			break;
 		case __TEST_UNITDATA_IND:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |  |< - - - - - - - - - - - - - - -|<-T_UNIDATA_IND---- (%d)\n", state);
 				fflush(stdout);
@@ -2217,6 +2224,7 @@ do_signal(int fd, int action)
 	return SCRIPTERROR;
 }
 
+#if 0 
 static int
 top_signal(int action)
 {
@@ -2228,6 +2236,7 @@ bot_signal(int action)
 {
 	return do_signal(bot_fd, action);
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -2241,7 +2250,7 @@ static int
 do_decode_data(int fd, struct strbuf *data)
 {
 	if (fd == top_fd) {
-		if (verbose && show_data || verbose > 1) {
+		if ((verbose && show_data) || verbose > 1) {
 			lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "<-DATA--------------|  |  %4d bytes                   |                    [%d]\n", data->len, state);
 			fflush(stdout);
@@ -2250,7 +2259,7 @@ do_decode_data(int fd, struct strbuf *data)
 		return (__TEST_DATA);
 	}
 	if (fd == bot_fd) {
-		if (verbose && show_data || verbose > 1) {
+		if ((verbose && show_data) || verbose > 1) {
 			lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    |  |- %4d bytes- - - - - - - - - >|--DATA------------> (%d)\n", data->len, state);
 			fflush(stdout);
@@ -2296,7 +2305,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 			ret = __TEST_DISCON_IND;
 			break;
 		case T_DATA_IND:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "<-T_DATA_IND--------|  |                               |                    [%d]\n", state);
 				fflush(stdout);
@@ -2351,7 +2360,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 			ret = __TEST_OK_ACK;
 			break;
 		case T_UNITDATA_IND:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "<-T_UNITDATA_REQ----|  |                               |                    [%d]\n", state);
 				fflush(stdout);
@@ -2463,7 +2472,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_DATA_REQ:
 			MORE_flag = p->data_req.MORE_flag;
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_DATA_REQ%c-----> (%d)\n", MORE_flag ? '+' : '-', state);
 				fflush(stdout);
@@ -2473,7 +2482,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_EXDATA_REQ:
 			MORE_flag = p->data_req.MORE_flag;
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_EXDATA_REQ%c---> (%d)\n", MORE_flag ? '+' : '-', state);
 				fflush(stdout);
@@ -2510,7 +2519,7 @@ do_decode_ctrl(int fd, struct strbuf *ctrl, struct strbuf *data)
 			ret = __TEST_UNBIND_REQ;
 			break;
 		case T_UNITDATA_REQ:
-			if (verbose && show_data || verbose > 1) {
+			if ((verbose && show_data) || verbose > 1) {
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |  |- - - - - - - - - - - - - - - >|--T_UNITDATA_REQ--> (%d)\n", state);
 				fflush(stdout);
@@ -2609,7 +2618,7 @@ bot_decode_ctrl(struct strbuf *ctrl, struct strbuf *data)
 static int
 top_get_data(int action)
 {
-	int ret;
+	int ret = FAILURE;
 	switch (action) {
 	case __TEST_READ:
 	{
@@ -2703,7 +2712,7 @@ top_get_data(int action)
 static int
 bot_get_data(int action)
 {
-	int ret;
+	int ret = FAILURE;
 	switch (action) {
 	case __TEST_READ:
 	{
@@ -12250,7 +12259,6 @@ do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	int num_exit;
 	if (verbose) {
 		lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nXNS 5.2 - OpenSS7 XTI/TLI Library - Conformance Test Program.\n");
@@ -12629,6 +12637,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

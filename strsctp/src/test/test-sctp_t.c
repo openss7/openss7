@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:57:38 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/24 07:42:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 16:57:38 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/24 07:42:32 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:57:38 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/24 07:42:32 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:57:38 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/24 07:42:32 $";
 
 /* 
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -133,7 +133,7 @@ ulong tsn[10] = { 0, };
 ulong sid[10] = { 0, };
 ulong ssn[10] = { 0, };
 ulong ppi[10] = { 0, };
-ulong exp[10] = { 0, };
+ulong exc[10] = { 0, };
 
 union {
 	union T_primitives tpi;
@@ -1765,13 +1765,13 @@ void print_event_conn(int fd, int event)
 	case __EVENT_OPTDATA_IND:
 		parse_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-			exp[fd] = 1;
+			exc[fd] = 1;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03d:-U-)- /               |  |                    [%d]\n", (int)sid[fd], state);
 			else
 				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03d:-U-)- /               |  |                    [%d]\n", (int)sid[fd], state);
 		} else {
-			exp[fd] = 0;
+			exc[fd] = 0;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03d:%03d)- /               |  |                    [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
@@ -1926,13 +1926,13 @@ void print_event_resp(int fd, int event)
 	case __EVENT_OPTDATA_IND:
 		parse_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-			exp[fd] = 1;
+			exc[fd] = 1;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |               \\ - - (%03d:-U-) +->|---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], state);
 			else
 				fprintf(stdout, "                    |               \\ - - (%03d:-U-) +->|---> T_OPTDATA_IND  [%d]\n", (int)sid[fd], state);
 		} else {
-			exp[fd] = 0;
+			exc[fd] = 0;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |               \\ - - (%03d:%03d) +->|---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
@@ -2085,13 +2085,13 @@ void print_event_list(int fd, int event)
 		break;
 	case __EVENT_OPTDATA_IND:
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-			exp[fd] = 1;
+			exc[fd] = 1;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |               \\ - -(%03d:-U-)->|--+---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], state);
 			else
 				fprintf(stdout, "                    |               \\ - -(%03d:-U-)->|--+---> T_OPTDATA_IND  [%d]\n", (int)sid[fd], state);
 		} else {
-			exp[fd] = 0;
+			exc[fd] = 0;
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |               \\ - -(%03d:%03d)->|--+---> T_OPTDATA_IND+ [%d]\n", (int)sid[fd], (int)ssn[fd], state);
 			else
@@ -5026,7 +5026,7 @@ int test_case_9_4_conn(int fd)
 	while (J < TEST_TOTAL || P < TEST_TOTAL) {
 		switch (wait_event(fd, LONGER_WAIT)) {
 		case __EVENT_OPTDATA_IND:
-			if (!exp[fd]) {
+			if (!exc[fd]) {
 				j[sid[fd]]++;
 				J++;
 			} else {
@@ -5100,7 +5100,7 @@ int test_case_9_4_resp(int fd)
 	while (J < TEST_TOTAL || P < TEST_TOTAL) {
 		switch (wait_event(fd, LONGER_WAIT)) {
 		case __EVENT_OPTDATA_IND:
-			if (!exp[fd]) {
+			if (!exc[fd]) {
 				j[sid[fd]]++;
 				J++;
 			} else {

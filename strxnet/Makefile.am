@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/18 01:02:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/24 07:40:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 01:02:16 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 07:40:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -263,8 +263,7 @@ libXNETmods_a_CPPFLAGS		= \
 				  -I$(srcdir)/src/include/os7 \
 				  -I./src/modules \
 				  -I$(srcdir)/src/modules \
-				  -imacros \
-				  ./strconf.h \
+				  -imacros ./strconf.h \
 				  $(XNET_INCLUDES) \
 				  $(KERNEL_CPPFLAGS) \
 				  $(KERNEL_MODFLAGS)

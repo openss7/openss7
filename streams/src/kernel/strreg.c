@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/24 07:44:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/24 07:44:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/24 07:44:26 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/24 07:44:26 $";
 
 #define __NO_VERSION__
 
@@ -789,6 +789,6 @@ int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 	return (err);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || CONFIG_STREAMS_CLONE_MODULE || CONFIG_STREAMS_NSDEV_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE
 EXPORT_SYMBOL_GPL(spec_open);
 #endif
