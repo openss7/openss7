@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/12/15 15:08:57 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/12/18 19:06:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/15 15:08:57 $ by $Author: brian $
+# Last Modified $Date: 2004/12/18 19:06:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -157,22 +157,26 @@ sign:
 		$(RPM) --resign $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMSOPTS) -- SRPMS/$(tardir).src.rpm ; \
 	fi
 
+#
+#   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
+#   --without popt syntax, so we have to expand them to --defines.
+#
 rebuild:
 	@if test ! -f SRPMS/$(tardir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
-	kernels="`find $(DESTDIR)/lib/modules -type d -name '2\.4\.*'`" ; \
+	kernels="`find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
 	for t in $$targets ; do \
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --without tools --define \"_kversion $$k\" --target $$t -- SRPMS/$(tardir).src.rpm" ; \
-				$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --without tools --define "_kversion $$k" --target $$t -- SRPMS/$(tardir).src.rpm ; \
+				echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define \"_without_tools --without-tools\" --define \"_kversion $$k\" --target $$t -- SRPMS/$(tardir).src.rpm" ; \
+				$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define "_without_tools --without-tools"--define "_kversion $$k" --target $$t -- SRPMS/$(tardir).src.rpm ; \
 			fi ; \
 		done ; \
-		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(tardir).src.rpm" ; \
-		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(tardir).src.rpm ; \
+		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define \"_without_modules --without-modules\" --define \"_kversion $$k\" --target $$t -- SRPMS/$(tardir).src.rpm" ; \
+		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define "_without_modules --without-modules" --define "_kversion $$k" --target $$t -- SRPMS/$(tardir).src.rpm ; \
 	done
 
 resign: sign
