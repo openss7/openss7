@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:23 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/10/07 07:28:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/15 19:56:23 $ by $Author: brian $
+ Last Modified $Date: 2004/10/07 07:28:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:23 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/10/07 07:28:57 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:23 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/10/07 07:28:57 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -3859,7 +3859,7 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 					goto tbufovflw;
 				if (unitdata->opt.maxlen && unitdata->opt.maxlen < p->unitdata_ind.OPT_length)
 					goto tbufovflw;
-				if (unitdata->addr.maxlen && (unitdata->addr.len = p->unitdata_ind.OPT_length))
+				if (unitdata->addr.maxlen && (unitdata->addr.len = p->unitdata_ind.SRC_length))
 					memcpy(unitdata->addr.buf,
 					       (char *) p + p->unitdata_ind.SRC_offset, unitdata->addr.len);
 				if (unitdata->opt.maxlen && (unitdata->opt.len = p->unitdata_ind.OPT_length))
@@ -5919,10 +5919,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.5 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.6 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.5 $)
- * @date \$Date: 2004/08/15 19:56:23 $
+ * @version \$Name:  $(\$Revision: 0.9.2.6 $)
+ * @date \$Date: 2004/10/07 07:28:57 $
  *
  * @}
  */
