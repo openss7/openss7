@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _TICLTS_H
 #define _TICLTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9 2004/04/06 12:27:29 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,15 +46,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/06 12:27:29 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _TIUSER_H
 #define _TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
 #include <sys/tiuser.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* _TIUSER_H */

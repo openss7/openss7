@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,15 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
+
+ $Log: ticlts.h,v $
+ Revision 0.9.2.1  2004/05/16 04:12:32  brian
+ - Updating strxnet release.
+
+ Revision 0.9  2004/05/14 08:00:02  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 0.9.2.1  2004/04/13 12:12:52  brian
+ - Rearranged header files.
 
  *****************************************************************************/
 
 #ifndef _SYS_TICLTS_H
 #define _SYS_TICLTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
+#if 0
 #if !defined _TICLTS_H && !defined __KERNEL__
 #error ****
 #error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
@@ -61,6 +72,7 @@
 #error **** INSTEAD OF <sys/ticlts.h>.
 #error ****
 #endif				/* !defined _TICLTS_H && !defined __KERNEL__ */
+#endif
 
 #define TCL_BADADDR	    EINVAL	/* bad address format or illegal address values */
 #define TCL_BADOPT	    EINVAL	/* bad options format or illegal options values */

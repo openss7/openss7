@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: xti_ip.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
+ @(#) $Id: xti_local.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -50,50 +49,66 @@
 
  *****************************************************************************/
 
-#ifndef _SYS_XTI_IP_H
-#define _SYS_XTI_IP_H
+#ifndef _SYS_XTI_LOCAL_H
+#define _SYS_XTI_LOCAL_H
 
-#ident "@(#) $RCSfile: xti_ip.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#include <config.h>
 
-/*
- * IP level
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
+
+/**
+ * \defgroup libxti OpenSS7 XTI Library
+ * \brief OpenSS7 XNS/XTI Library Calls
+ *
+ * This manpage contains documentation of OpenSS7 XTI Library functions that
+ * are generated automatically from the source code with doxygen.  This
+ * documentation is intended to be used for maintainers of the OpenSS7 XTI
+ * Library and is not intended for users of the OpenSS7 XTI Library.  Users
+ * should consult the documentation found in xti(3).
+ *
+ * \author Brian F. G. Bidulock
+ * \version \$Name:  $(\$Revision: 0.9.2.1 $)
+ * \date \$Date: 2004/05/16 04:12:33 $
  */
-#define T_INET_IP		0	/* IP level (same as protocol number) */
 
-/*
- * IP level Options
- */
-#define T_IP_OPTIONS		1	/* IP per-packet options */
-#define T_IP_TOS		2	/* IP per-packet type of service */
-#define T_IP_TTL		3	/* IP per-packet time to live */
-#define T_IP_REUSEADDR		4	/* allow local address reuse */
-#define T_IP_DONTROUTE		5	/* just use interface addresses */
-#define T_IP_BROADCAST		6	/* permit sending of broadcast msgs */
-#define T_IP_ADDR		7	/* dest/srce address of recv/sent packet */
+#define _SC_T_IOV_MAX		0
+#define _SC_T_DEFAULT_ADDRLEN	1
+#define _SC_T_DEFAULT_CONNLEN	2
+#define _SC_T_DEFAULT_DISCLEN	3
+#define _SC_T_DEFAULT_OPTLEN	4
+#define _SC_T_DEFAULT_DATALEN	5
 
-/*
- *  IP_TOS precedence levels
- */
-#define T_ROUTINE		0
-#define T_PRIORITY		1
-#define T_IMMEDIATE		2
-#define T_FLASH			3
-#define T_OVERRIDEFLASH		4
-#define T_CRITIC_ECP		5
-#define T_INETCONTROL		6
-#define T_NETCONTROL		7
+#define _T_DEFAULT_ADDRLEN	128
+#define _T_DEFAULT_CONNLEN	256
+#define _T_DEFAULT_DISCLEN	256
+#define _T_DEFAULT_OPTLEN	256
+#define _T_DEFAULT_DATALEN	1024
+#define _T_TIMEOUT		-1
+#define _T_IOV_MAX		16
 
-/*
- *  IP_TOS type of service
- */
-#define T_NOTOS			0
-#define T_LDELAY		(1<<4)
-#define T_HITHRPT		(1<<3)
-#define T_HIREL			(1<<2)
-#define T_LOCOST		(1<<1)
+#ifdef XNET_THREAD_SAFE
+extern pthread_mutex_t _t_fds_mutex;
+#endif
 
-#define SET_TOS(prec, tos) \
-	(((0x7 & (prec)) << 5) | ((T_NOTOS|T_LDELAY|T_HITHRPT|T_HIREL|T_LOCOST) & (tos)))
+extern struct t_info *fds[];
 
-#endif				/* _SYS_XTI_IP_H */
+extern int t_errno;
+extern int *_t_errno(void);
+extern int _t_ioctl(int fd, int cmd, void *arg);
+extern int _t_strioctl(int fd, int cmd, void *arg, size_t arglen);
+extern int _t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags);
+extern int _t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flags);
+extern int _t_rcvconnect(int fd, struct t_call *call, struct t_info *info);
+extern int _t_getinfo(int fd, struct t_info *info);
 
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
+
+#endif				/* _SYS_XTI_LOCAL_H */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_ip.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,50 +50,80 @@
 
  *****************************************************************************/
 
-#ifndef _SYS_XTI_IP_H
-#define _SYS_XTI_IP_H
+#ifndef _SYS_XTI_MOSI_H
+#define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_ip.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
-
-/*
- * IP level
- */
-#define T_INET_IP		0	/* IP level (same as protocol number) */
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
 
 /*
- * IP level Options
+   mosi address structure 
  */
-#define T_IP_OPTIONS		1	/* IP per-packet options */
-#define T_IP_TOS		2	/* IP per-packet type of service */
-#define T_IP_TTL		3	/* IP per-packet time to live */
-#define T_IP_REUSEADDR		4	/* allow local address reuse */
-#define T_IP_DONTROUTE		5	/* just use interface addresses */
-#define T_IP_BROADCAST		6	/* permit sending of broadcast msgs */
-#define T_IP_ADDR		7	/* dest/srce address of recv/sent packet */
+
+struct t_mosiaddr {
+	t_uscalar_t flags;
+	t_scalar_t osi_ap_inv_id;
+	t_scalar_t osi_ae_inv_id;
+	unsigned int osi_apt_len;
+	unsigned int osi_aeq_len;
+	unsigned int osi_paddr_len;
+	unsigned char osi_addr[MAX_ADDR];
+};
+
+#define T_ISO_APCO	0x0200
+#define T_ISO_APCL	0x0300
+#define T_AP_CNTX_NAME	0x1
+#define T_AP_PCL	0x2
+
+#define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthder)).
 
 /*
- *  IP_TOS precedence levels
+   presentation context definition and result list option 
  */
-#define T_ROUTINE		0
-#define T_PRIORITY		1
-#define T_IMMEDIATE		2
-#define T_FLASH			3
-#define T_OVERRIDEFLASH		4
-#define T_CRITIC_ECP		5
-#define T_INETCONTROL		6
-#define T_NETCONTROL		7
+
+struct t_ap_pco_el {
+	t_scalar_t count;
+	t_scalar_t offset;
+};
 
 /*
- *  IP_TOS type of service
+   presentation context item header 
  */
-#define T_NOTOS			0
-#define T_LDELAY		(1<<4)
-#define T_HITHRPT		(1<<3)
-#define T_HIREL			(1<<2)
-#define T_LOCOST		(1<<1)
 
-#define SET_TOS(prec, tos) \
-	(((0x7 & (prec)) << 5) | ((T_NOTOS|T_LDELAY|T_HITHRPT|T_HIREL|T_LOCOST) & (tos)))
+struct t_ap_pc_item {
+	t_scalar_t pci;			/* unique odd integer */
+	t_scalar_t res;			/* result of negotiation */
+};
 
-#endif				/* _SYS_XTI_IP_H */
+/*
+   presentation context item element 
+ */
 
+struct t_app_syn_off {
+	t_scalar_t size;		/* length of syntax object identifier contents */
+	t_scalar_t offset;		/* offset of object identifier for the syntax */
+};
+
+/*
+   values for res of a presentation context item 
+ */
+
+#define T_PCL_ACCEPT		    0x0000	/* pres. context accepted */
+#define T_PCL_USER_REJ		    0x0100	/* pres. context rejected by perr application */
+#define T_PCL_PREJ_RSN_NSPEC	    0x0200	/* prov. reject: no reason specified */
+#define T_PCL_PREJ_A_SYTX_NSUP	    0x0201	/* prov. reject: abstract syntax not supported */
+#define T_PCL_PREJ_T_SYTX_NSUP	    0x0202	/* prov. reject: transfer syntax not supported */
+#define T_PCL_PREJ_LMT_DCS_EXCEED   0x0203	/* prov. reject: local limit on DCS exceeded */
+
+/*
+   reason codes for disconnection 
+ */
+
+#define T_AC_U_AARE_NONE	    0x0001	/* con rej by peer user: no reason given */
+#define T_AC_C_U_AARE_ACN	    0x0002	/* con rej: application context name not supported */
+#define T_AC_U_AARE_APT		    0x0003	/* con rej: AP title not recognized */
+#define T_AC_U_AARE_AEQ		    0x0005	/* con rej: AE qualifier not recognized */
+#define T_AC_U_AARE_PEER_AUTH	    0x000e	/* con rej: authentication required */
+#define T_AC_P_ABRT_NSPEC	    0x0011	/* aborted by peer: not reason given */
+#define T_AC_P_AARE_VERSION	    0x0012	/* con rej: no common version */
+
+#endif				/* _SYS_XTI_MOSI_H */

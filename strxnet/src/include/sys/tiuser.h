@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9 2004/04/06 12:27:29 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/06 12:27:29 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* 
  * The following are the events returned from t_look().

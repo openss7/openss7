@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tli.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: tli.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TLI_H
 #define _SYS_TLI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
+#if 0
 #if !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
 #error ****
-#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
+#error **** DO NOT INCLUDE SYSTEM HEADER FILES DIRECTLY IN USER-SPACE
 #error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <tiuser.h>
 #error **** OR <tihdr.h> INSTEAD OF <sys/tiuser.h> OR <sys/tihdr.h>.
 #error ****
 #endif				/* !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__ */
+#endif
 
 /* This header file is included by <tiuser.h> and <tihdr.h>. */
 

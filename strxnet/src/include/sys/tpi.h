@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9.2.1 2004/04/06 12:33:12 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.2 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,15 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/06 12:33:12 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
+#if 0
 #if !defined _XTI_H && !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
 #error ****
 #error **** Do not include system header files directly in user-space
@@ -61,16 +63,16 @@
 #error **** instead of <sys/timod.h>.
 #error ****
 #endif
+#endif
 
-/* 
- *  This file contains definitions that are common to XTI, TLI and TPI.  It is
- *  included by <xti.h> and <tiuser.h> as well as <tihdr.h>.
+/*
+   This file contains definitions that are common to XTI, TLI and TPI.  It is included by <xti.h>
+   and <tiuser.h> as well as <tihdr.h>. 
  */
 
-/* 
- *  Transport service error numbers (error codes used by TLI transport
- *  providers) The following are the error codes needed by both the kernel level
- *  transport providers and the user level library.
+/*
+   Transport service error numbers (error codes used by TLI transport providers) The following are
+   the error codes needed by both the kernel level transport providers and the user level library. 
  */
 #define TBADADDR	 1	/* Bad address format */
 #define TBADOPT		 2	/* Bad options format */
@@ -91,8 +93,8 @@
 #define TNOREL		17	/* No orderly release indication		*/	/* not TPI */
 #define TNOTSUPPORT	18	/* Not supported */
 #define TSTATECHNG	19	/* State is currently changing			*/	/* not TPI */
-/* 
- *  The following are XPG3 and up.
+/*
+   The following are XPG3 and up.  
  */
 #if defined _XPG3 || defined _XOPEN_SOURCE || defined __KERNEL__
 #define TNOSTRUCTYPE	20	/* Structure type not supported			*/	/* not TPI */
@@ -100,8 +102,8 @@
 #define TBADQLEN	22	/* Listener queue length limit is zero		*/	/* not TPI */
 #define TADDRBUSY	23	/* Address already in use			*/	/* not TPI */
 #endif
-/* 
- *  The following are _XOPEN_SOURCE (XPG4 and up).
+/*
+   The following are _XOPEN_SOURCE (XPG4 and up).  
  */
 #if defined _XOPEN_SOURCE || defined __KERNEL__
 #define TINDOUT		24	/* Outstanding connect indications		*/	/* not TPI */
@@ -113,14 +115,14 @@
 #endif
 
 /*
- *  Transport service types
+   Transport service types 
  */
 #define T_COTS		1	/* Connection oriented transport service */
 #define T_COTS_ORD	2	/* COTS with orderly release */
 #define T_CLTS		3	/* Connectionless transport service */
 
-/* 
- *  Transport provider flags
+/*
+   Transport provider flags 
  */
 #define T_SNDZERO	0x001	/* Must match <sys/strops.h>: SNDZERO */
 #define T_SENDZERO	0x001	/* supports 0-length TSDUs */
@@ -129,8 +131,8 @@
 				   XPG4 and supports the new primitives T_ADDR_REQ and T_ADDR_ACK */
 #define T_XPG4_1	0x100	/* XPG4 and higher */
 
-/* 
- *  Flags used from user level library routines.
+/*
+   Flags used from user level library routines.  
  */
 #define T_MORE		0x001	/* more data */
 #define T_EXPEDITED	0x002	/* expedited data */
@@ -140,8 +142,8 @@
 #define T_DEFAULT	0x0010	/* get default options */
 #define T_SUCCESS	0x0020	/* success */
 #define T_FAILURE	0x0040	/* failure */
-/* 
- *  The following are _XOPEN_SOURCE (XPG4 and up).
+/*
+   The following are _XOPEN_SOURCE (XPG4 and up).  
  */
 #if _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
 #define T_CURRENT	0x0080	/* get current options */
@@ -152,8 +154,8 @@
 
 #define T_ALLOPT	0	/* All options at a level */
 
-/* 
- *  General purpose constants
+/*
+   General purpose constants 
  */
 #define T_UNSPEC	(~0-2)	/* Unspecified value */
 #define T_INVALID	(-2)	/* No sense */
@@ -167,8 +169,8 @@
 				   requirement */
 
 #if !(defined _XPG4_2 || defined _XOPEN_SOURCE) || defined __KERNEL__
-/* 
- *  Older TLI options format and support macros.
+/*
+   Older TLI options format and support macros.  
  */
 struct opthdr {
 	t_uscalar_t level;		/* Option level */
@@ -185,8 +187,8 @@ struct opthdr {
 #endif
 
 #if defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
-/* 
- *  Newer XOPEN options format and support macros.
+/*
+   Newer XOPEN options format and support macros.  
  */
 struct t_opthdr {
 	t_uscalar_t len;		/* Option length, incl. header */

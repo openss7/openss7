@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/06 12:33:12 $
+ @(#) $Id: tihdr.h,v 0.9.2.3 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; either version 2.1 of the License, or (at your option)
- any later version.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -46,33 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/06 12:33:12 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
 
  $Log: tihdr.h,v $
- Revision 0.9.2.2  2004/04/06 12:33:12  brian
- - Working up header files.
+ Revision 0.9.2.3  2004/05/16 04:12:33  brian
+ - Updating strxnet release.
 
- Revision 0.9.2.1  2004/04/05 12:39:05  brian
- - Working up XNET release.
-
- Revision 0.9  2004/04/03 22:37:08  brian
- - Initial cut of new strxnet rpm release.
-
- Revision 0.9  2004/04/03 12:44:17  brian
- - Initial cut of new strinet package.
+ Revision 1.4  2004/05/14 08:00:02  brian
+ - Updated xns, tli, inet, xnet and documentation.
 
  *****************************************************************************/
 
 #ifndef _SYS_TIHDR_H
 #define _SYS_TIHDR_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
-
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define T_CURRENT_VERSION 5
 
@@ -593,11 +580,5 @@ union T_primitives {
 	struct T_capability_req capability_req;
 	struct T_capability_ack capability_ack;
 };
-
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
 
 #endif				/* _SYS_TIHDR_H */

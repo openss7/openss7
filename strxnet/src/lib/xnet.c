@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/16 04:12:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/16 04:12:34 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/16 04:12:34 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -91,9 +91,6 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <sys/types.h>
 #include <sys/stropts.h>
 #include <sys/poll.h>
-#include <xti.h>
-#include <tihdr.h>
-#include <timod.h>
 
 #if 0
 #pragma weak getpmsg
@@ -111,6 +108,10 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <pthread.h>
 #include <linux/limits.h>
 #include <values.h>
+
+#include <xti.h>
+#include <tihdr.h>
+#include <timod.h>
 
 #undef min
 #define min(a, b) (a < b ? a : b)
@@ -5906,10 +5907,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.1 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.2 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.1 $)
- * @date \$Date: 2004/04/05 12:39:05 $
+ * @version \$Name:  $(\$Revision: 0.9.2.2 $)
+ * @date \$Date: 2004/05/16 04:12:34 $
  *
  * @}
  */

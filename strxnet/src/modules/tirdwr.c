@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $";
 
 #if defined(_LIS_SOURCE) && !defined(MODULE)
 #   error ****
@@ -63,13 +63,16 @@ static char const ident[] =
 #   error ****
 #endif
 
+#ifdef LINUX
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef CONFIG_MODVERSIONS
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #include <linux/init.h>
+#endif
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

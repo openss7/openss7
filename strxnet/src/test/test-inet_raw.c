@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:37:53 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $
 
  -----------------------------------------------------------------------------
 
@@ -52,15 +52,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/05/16 04:12:35 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_raw.c,v $
- Revision 0.9  2004/04/05 12:37:53  brian
- - Working up XNET release.
+ Revision 0.9.2.1  2004/05/16 04:12:35  brian
+ - Updating strxnet release.
 
- Revision 0.9  2004/04/03 12:44:17  brian
- - Initial cut of new strinet package.
+ Revision 0.9.4.7  2004/04/13 12:12:54  brian
+ - Rearranged header files.
+
+ Revision 0.9.4.6  2004/04/13 06:04:03  brian
+ - INET driver works pretty good now.
+
+ Revision 0.9.4.5  2004/04/12 20:50:03  brian
+ - Added ability to list test cases.
+
+ Revision 0.9.4.4  2004/04/12 20:18:00  brian
+ - Test cases pass.
 
  Revision 0.9.4.3  2004/03/31 09:00:50  brian
  - Working up new inet driver and documentation.
@@ -82,14 +91,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:37:53 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:37:53 $";
+    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $";
 
-/*
+/* 
  *  Simple test program for INET streams.
  */
+#include <stropts.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -100,26 +110,49 @@ static char const ident[] =
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <signal.h>
+#include <sys/uio.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
 
-#include <stropts.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define NEED_T_USCALAR_T
 
-#include <xti.h>
+#include <sys/types.h>
 #include <tihdr.h>
+#include <xti.h>
 #include <xti_inet.h>
+#include <sys/xti_sctp.h>
 
-int verbose = 1;
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Configuration
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int verbose = 1;
+
+static int show_msg = 0;
+static int show_acks = 0;
+static int show_timeout = 0;
+
+static int last_event = 0;
+static int last_errno = 0;
+static int last_prim = 0;
+
+static int conn_fd = 0;
+static int resp_fd = 0;
+static int list_fd = 0;
 
 #define BUFSIZE 5*4096
+
 #define FFLUSH(stream)
 
 #define SHORT_WAIT 10
@@ -138,8 +171,8 @@ union {
 
 char dbuf[BUFSIZE];
 
-struct strbuf ctrl = { BUFSIZE, 0, cmd.cbuf };
-struct strbuf data = { BUFSIZE, 0, dbuf };
+struct strbuf ctrl = { BUFSIZE, -1, cmd.cbuf };
+struct strbuf data = { BUFSIZE, -1, dbuf };
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cmd.cbuf},
@@ -148,449 +181,874 @@ struct strfdinsert fdi = {
 	0,
 	0
 };
+int flags = 0;
 
 struct timeval when;
 
-#define INCONCLUSIVE -2
-#define SUCCESS 0
-#define FAILURE -1
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Events and Actions
+ *
+ *  -------------------------------------------------------------------------
+ */
+enum {
+	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
+	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0,
+	__RESULT_FAILURE = 1, __EVENT_CONN_REQ = 2, __EVENT_CONN_RES,
+	__EVENT_DISCON_REQ, __EVENT_DATA_REQ, __EVENT_EXDATA_REQ,
+	__EVENT_INFO_REQ, __EVENT_BIND_REQ, __EVENT_UNBIND_REQ,
+	__EVENT_UNITDATA_REQ, __EVENT_OPTMGMT_REQ, __EVENT_ORDREL_REQ,
+	__EVENT_OPTDATA_REQ, __EVENT_ADDR_REQ, __EVENT_CAPABILITY_REQ,
+	__EVENT_CONN_IND, __EVENT_CONN_CON, __EVENT_DISCON_IND,
+	__EVENT_DATA_IND, __EVENT_EXDATA_IND, __EVENT_INFO_ACK,
+	__EVENT_BIND_ACK, __EVENT_ERROR_ACK, __EVENT_OK_ACK,
+	__EVENT_UNITDATA_IND, __EVENT_UDERROR_IND, __EVENT_OPTMGMT_ACK,
+	__EVENT_ORDREL_IND, __EVENT_OPTDATA_IND, __EVENT_ADDR_ACK,
+	__EVENT_CAPABILITY_ACK, __EVENT_WRITE, __EVENT_WRITEV,
+	__EVENT_PUTMSG_DATA, __EVENT_PUTPMSG_DATA, __EVENT_PUSH, __EVENT_POP,
+	__EVENT_READ, __EVENT_READV, __EVENT_GETMSG, __EVENT_GETPMSG,
+	__EVENT_DATA,
+};
 
+/* 
+ *  -------------------------------------------------------------------------
+ */
 const char *device = "/dev/rawip";
 int show = 1;
-int state;
-int fd1, fd2, fd3;
-struct sockaddr_in addr1, addr2, addr3;
-unsigned short port1 = 140, port2 = 140, port3 = 140;
+struct sockaddr_in addr1, addr2, addr3, addr4;
+unsigned short port1 = 140, port2 = 140, port3 = 140, port4 = 140;
 
-/*
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Timer Functions
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/* 
+ *  Timer values for tests: each timer has a low range (minus error margin)
+ *  and a high range (plus error margin).
+ */
+
+static long timer_scale = 1;
+
+#define TEST_TIMEOUT 5000
+
+typedef struct timer_range {
+	long lo;
+	long hi;
+} timer_range_t;
+
+enum {
+	t1 = 0, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15,
+	t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29,
+	t30, t31, t32, t33, t34, t35, t36, t37, t38, tmax
+};
+
+#undef HZ
+#define HZ 1000
+
+/* *INDENT-OFF* */
+static timer_range_t timer[tmax] = {
+	{(15 * HZ),		(60 * HZ)},		/* T1 15-60 seconds */
+	{(3 * 60 * HZ),		(3 * 60 * HZ)},		/* T2 3 minutes */
+	{(2 * 60 * HZ),		(2 * 60 * HZ)},		/* T3 2 minutes */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T4 5-15 minutes */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T5 5-15 minutes */
+	{(10 * HZ),		(32 * HZ)},		/* T6 10-32 seconds (specified in Q.118) */
+	{(20 * HZ),		(30 * HZ)},		/* T7 20-30 seconds */
+	{(10 * HZ),		(15 * HZ)},		/* T8 10-15 seconds */
+	{(2 * 60 * HZ),		(4 * 60 * HZ)},		/* T9 2-4 minutes (specified in Q.118) */
+	{(4 * HZ),		(6 * HZ)},		/* T10 4-6 seconds */
+	{(15 * HZ),		(20 * HZ)},		/* T11 15-20 seconds */
+	{(15 * HZ),		(60 * HZ)},		/* T12 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T13 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T14 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T15 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T16 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T17 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T18 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T19 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T20 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T21 5-15 minutes */
+	{(15 * HZ),		(60 * HZ)},		/* T22 15-60 seconds */
+	{(5 * 60 * HZ),		(15 * 60 * HZ)},	/* T23 5-15 minutes */
+	{(1 * HZ),		(2 * HZ)},		/* T24 < 2 seconds */
+	{(1 * HZ),		(10 * HZ)},		/* T25 1-10 seconds */
+	{(1 * 60 * HZ),		(3 * 60 * HZ)},		/* T26 1-3 minutes */
+	{(4 * 60 * HZ),		(4 * 60 * HZ)},		/* T27 4 minutes */
+	{(10 * HZ),		(10 * HZ)},		/* T28 10 seconds */
+	{(300 * HZ / 1000),	(600 * HZ / 1000)},	/* T29 300-600 milliseconds */
+	{(5 * HZ),		(10 * HZ)},		/* T30 5-10 seconds */
+	{(6 * 60 * HZ),		(7 * 60 * HZ)},		/* T31 > 6 minutes */
+	{(3 * HZ),		(5 * HZ)},		/* T32 3-5 seconds */
+	{(12 * HZ),		(15 * HZ)},		/* T33 12-15 seconds */
+	{(12 * HZ),		(15 * HZ)},		/* T34 12-15 seconds */
+	{(15 * HZ),		(20 * HZ)},		/* T35 15-20 seconds */
+	{(15 * HZ),		(20 * HZ)},		/* T36 15-20 seconds */
+	{(2 * HZ),		(4 * HZ)},		/* T37 2-4 seconds */
+	{(15 * HZ),		(20 * HZ)}		/* T38 15-20 seconds */
+};
+/* *INDENT-ON* */
+
+long test_start = 0;
+
+static int state;
+
+/* 
+ *  Return the current time in milliseconds.
+ */
+static long
+now(void)
+{
+	long ret;
+	struct timeval now;
+	if (gettimeofday(&now, NULL)) {
+		last_errno = errno;
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
+		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+		return (0);
+	}
+	if (!test_start)	/* avoid blowing over precision */
+		test_start = now.tv_sec;
+	ret = (now.tv_sec - test_start) * 1000L;
+	ret += (now.tv_usec + 999L) / 1000L;
+	return ret;
+}
+static long
+milliseconds(char *t)
+{
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    .               :               .  .                    \n");
+		fprintf(stdout, "                    .             %6s            .  .                    <%d>\n", t, state);
+		fprintf(stdout, "                    .               :               .  .                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return now();
+}
+static long
+milliseconds_2nd(char *t)
+{
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    .               :   :           .  .                    \n");
+		fprintf(stdout, "                    .               : %6s        .  .                    <%d>\n", t, state);
+		fprintf(stdout, "                    .               :   :           .  .                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return now();
+}
+
+/* 
+ *  Check the current time against the beginning time provided as an argnument
+ *  and see if the time inverval falls between the low and high values for the
+ *  timer as specified by arguments.  Return SUCCESS if the interval is within
+ *  the allowable range and FAILURE otherwise.
+ */
+static int
+check_time(const char *t, long i, long lo, long hi)
+{
+	float tol, dlo, dhi, itv;
+	itv = i * timer_scale;
+	dlo = lo;
+	dhi = hi;
+	tol = 100 * timer_scale;
+	itv = itv / 1000;
+	dlo = dlo / 1000;
+	dhi = dhi / 1000;
+	tol = tol / 1000;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n", dlo - tol, itv, dhi + tol, t, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (dlo - tol <= itv && itv <= dhi + tol)
+		return __RESULT_SUCCESS;
+	else
+		return __RESULT_FAILURE;
+}
+
+static int
+time_event(int event)
+{
+	if (verbose > 4) {
+		float t, m;
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		if (!test_start)
+			test_start = now.tv_sec;
+		t = (now.tv_sec - test_start);
+		m = now.tv_usec;
+		m = m / 1000000;
+		t += m;
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    | %11.6g                   |  |                    <%d>\n", t, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return (event);
+}
+
+static int timer_timeout = 0;
+
+static void
+timer_handler(int signum)
+{
+	if (signum == SIGALRM)
+		timer_timeout = 1;
+	return;
+}
+
+static int
+timer_sethandler(void)
+{
+	sigset_t mask;
+	struct sigaction act;
+	act.sa_handler = timer_handler;
+	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		return __RESULT_FAILURE;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	return __RESULT_SUCCESS;
+}
+
+/* 
+ *  Start an interval timer as the overall test timer.
+ */
+static int
+start_tt(long duration)
+{
+	struct itimerval setting = {
+		{0, 0},
+		{duration / 1000, (duration % 1000) * 1000}
+	};
+	if (timer_sethandler())
+		return __RESULT_FAILURE;
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	timer_timeout = 0;
+	return __RESULT_SUCCESS;
+}
+static int
+start_st(long duration)
+{
+	long sdur = (duration + timer_scale - 1) / timer_scale;
+	return start_tt(sdur);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	sigset_t mask;
+	struct sigaction act;
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	act.sa_handler = SIG_DFL;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		return __RESULT_FAILURE;
+	timer_timeout = 0;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
+	return __RESULT_SUCCESS;
+}
+
+/* 
  *  Options
  */
-/*
+/* 
  * data options 
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr csm_hdr __attribute__ ((packed));
-	t_scalar_t csm_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr __attribute__ ((packed)); t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr csm_hdr __attribute__ ((packed)); t_scalar_t csm_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr __attribute__ ((packed)); t_scalar_t ppi_val __attribute__ ((packed));
+	struct t_opthdr sid_hdr __attribute__ ((packed)); t_scalar_t sid_val __attribute__ ((packed));
 } opt_data = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TOS, T_SUCCESS}
-	, 0x0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TTL, T_SUCCESS}
-	, 64, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
-	, 10, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
-, 0};
+	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS} , 0x0
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS} , 64
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS} , 10
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS} , 0
+};
 
-/*
+/* 
  * receive data options 
  */
 typedef struct rdat_opt {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
-	struct t_opthdr ssn_hdr __attribute__ ((packed));
-	t_scalar_t ssn_val __attribute__ ((packed));
-	struct t_opthdr tsn_hdr __attribute__ ((packed));
-	t_scalar_t tsn_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr __attribute__ ((packed)); t_scalar_t ppi_val __attribute__ ((packed));
+	struct t_opthdr sid_hdr __attribute__ ((packed)); t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr ssn_hdr __attribute__ ((packed)); t_scalar_t ssn_val __attribute__ ((packed));
+	struct t_opthdr tsn_hdr __attribute__ ((packed)); t_scalar_t tsn_val __attribute__ ((packed));
 } rdat_opt_t;
-/*
+/* 
  * connect options 
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed));
-	t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed));
-	t_scalar_t reu_val __attribute__ ((packed));
-	struct t_opthdr ist_hdr __attribute__ ((packed));
-	t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed));
-	t_scalar_t ost_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr __attribute__ ((packed)); t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr bca_hdr __attribute__ ((packed)); t_scalar_t bca_val __attribute__ ((packed));
+	struct t_opthdr reu_hdr __attribute__ ((packed)); t_scalar_t reu_val __attribute__ ((packed));
+	struct t_opthdr ist_hdr __attribute__ ((packed)); t_scalar_t ist_val __attribute__ ((packed));
+	struct t_opthdr ost_hdr __attribute__ ((packed)); t_scalar_t ost_val __attribute__ ((packed));
 } opt_conn = {
 	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TOS, T_SUCCESS}
-	, 0x0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TTL, T_SUCCESS}
-	, 64, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS,
-		    T_SUCCESS}
-	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS,
-		    T_SUCCESS}
-, 1};
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS} , 0x0
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS} , 64
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS} , 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS} , 1
+};
 
-/*
+/* 
  * management options 
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed));
-	t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed));
-	t_scalar_t reu_val __attribute__ ((packed));
-	struct t_opthdr ndl_hdr __attribute__ ((packed));
-	t_scalar_t ndl_val __attribute__ ((packed));
-	struct t_opthdr mxs_hdr __attribute__ ((packed));
-	t_scalar_t mxs_val __attribute__ ((packed));
-	struct t_opthdr kpa_hdr __attribute__ ((packed));
-	t_scalar_t kpa_val __attribute__ ((packed));
-	struct t_opthdr csm_hdr __attribute__ ((packed));
-	t_scalar_t csm_val __attribute__ ((packed));
-	struct t_opthdr nod_hdr __attribute__ ((packed));
-	t_scalar_t nod_val __attribute__ ((packed));
-	struct t_opthdr crk_hdr __attribute__ ((packed));
-	t_scalar_t crk_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
-	struct t_opthdr rcv_hdr __attribute__ ((packed));
-	t_scalar_t rcv_val __attribute__ ((packed));
-	struct t_opthdr ckl_hdr __attribute__ ((packed));
-	t_scalar_t ckl_val __attribute__ ((packed));
-	struct t_opthdr skd_hdr __attribute__ ((packed));
-	t_scalar_t skd_val __attribute__ ((packed));
-	struct t_opthdr prt_hdr __attribute__ ((packed));
-	t_scalar_t prt_val __attribute__ ((packed));
-	struct t_opthdr art_hdr __attribute__ ((packed));
-	t_scalar_t art_val __attribute__ ((packed));
-	struct t_opthdr irt_hdr __attribute__ ((packed));
-	t_scalar_t irt_val __attribute__ ((packed));
-	struct t_opthdr hbi_hdr __attribute__ ((packed));
-	t_scalar_t hbi_val __attribute__ ((packed));
-	struct t_opthdr rin_hdr __attribute__ ((packed));
-	t_scalar_t rin_val __attribute__ ((packed));
-	struct t_opthdr rmn_hdr __attribute__ ((packed));
-	t_scalar_t rmn_val __attribute__ ((packed));
-	struct t_opthdr rmx_hdr __attribute__ ((packed));
-	t_scalar_t rmx_val __attribute__ ((packed));
-	struct t_opthdr ist_hdr __attribute__ ((packed));
-	t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed));
-	t_scalar_t ost_val __attribute__ ((packed));
-	struct t_opthdr cin_hdr __attribute__ ((packed));
-	t_scalar_t cin_val __attribute__ ((packed));
-	struct t_opthdr tin_hdr __attribute__ ((packed));
-	t_scalar_t tin_val __attribute__ ((packed));
-	struct t_opthdr mac_hdr __attribute__ ((packed));
-	t_scalar_t mac_val __attribute__ ((packed));
-	struct t_opthdr dbg_hdr __attribute__ ((packed));
-	t_scalar_t dbg_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr __attribute__ ((packed)); t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr bca_hdr __attribute__ ((packed)); t_scalar_t bca_val __attribute__ ((packed));
+	struct t_opthdr reu_hdr __attribute__ ((packed)); t_scalar_t reu_val __attribute__ ((packed));
+#if 0
+	struct t_opthdr ndl_hdr __attribute__ ((packed)); t_scalar_t ndl_val __attribute__ ((packed));
+	struct t_opthdr mxs_hdr __attribute__ ((packed)); t_scalar_t mxs_val __attribute__ ((packed));
+	struct t_opthdr kpa_hdr __attribute__ ((packed)); t_scalar_t kpa_val __attribute__ ((packed));
+	struct t_opthdr csm_hdr __attribute__ ((packed)); t_scalar_t csm_val __attribute__ ((packed));
+	struct t_opthdr nod_hdr __attribute__ ((packed)); t_scalar_t nod_val __attribute__ ((packed));
+	struct t_opthdr crk_hdr __attribute__ ((packed)); t_scalar_t crk_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr __attribute__ ((packed)); t_scalar_t ppi_val __attribute__ ((packed));
+	struct t_opthdr sid_hdr __attribute__ ((packed)); t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr rcv_hdr __attribute__ ((packed)); t_scalar_t rcv_val __attribute__ ((packed));
+	struct t_opthdr ckl_hdr __attribute__ ((packed)); t_scalar_t ckl_val __attribute__ ((packed));
+	struct t_opthdr skd_hdr __attribute__ ((packed)); t_scalar_t skd_val __attribute__ ((packed));
+	struct t_opthdr prt_hdr __attribute__ ((packed)); t_scalar_t prt_val __attribute__ ((packed));
+	struct t_opthdr art_hdr __attribute__ ((packed)); t_scalar_t art_val __attribute__ ((packed));
+	struct t_opthdr irt_hdr __attribute__ ((packed)); t_scalar_t irt_val __attribute__ ((packed));
+	struct t_opthdr hbi_hdr __attribute__ ((packed)); t_scalar_t hbi_val __attribute__ ((packed));
+	struct t_opthdr rin_hdr __attribute__ ((packed)); t_scalar_t rin_val __attribute__ ((packed));
+	struct t_opthdr rmn_hdr __attribute__ ((packed)); t_scalar_t rmn_val __attribute__ ((packed));
+	struct t_opthdr rmx_hdr __attribute__ ((packed)); t_scalar_t rmx_val __attribute__ ((packed));
+	struct t_opthdr ist_hdr __attribute__ ((packed)); t_scalar_t ist_val __attribute__ ((packed));
+	struct t_opthdr ost_hdr __attribute__ ((packed)); t_scalar_t ost_val __attribute__ ((packed));
+	struct t_opthdr cin_hdr __attribute__ ((packed)); t_scalar_t cin_val __attribute__ ((packed));
+	struct t_opthdr tin_hdr __attribute__ ((packed)); t_scalar_t tin_val __attribute__ ((packed));
+	struct t_opthdr mac_hdr __attribute__ ((packed)); t_scalar_t mac_val __attribute__ ((packed));
+	struct t_opthdr dbg_hdr __attribute__ ((packed)); t_scalar_t dbg_val __attribute__ ((packed));
+#endif
 } opt_optm = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TOS, T_SUCCESS}
-	, 0x0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TTL, T_SUCCESS}
-	, 64, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}
-	, 576, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}
-	, T_YES, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}
-	, T_YES, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
-	, 10, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE,
-		    T_SUCCESS}
-	, 60000, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY,
-		    T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS,
-		    T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS,
-		    T_SUCCESS}
-	, 12, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES,
-		    T_SUCCESS}
-	, 12, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL,
-		    T_SUCCESS}
-	, 200, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL,
-		    T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS,
-		    T_SUCCESS}
-	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS,
-		    T_SUCCESS}
-	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC,
-		    T_SUCCESS}
-	, 1000, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL,
-		    T_SUCCESS}
-	, 50, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE,
-		    T_SUCCESS}
-	, T_SCTP_HMAC_NONE, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
-, 0};
+	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+#if 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS} , 576
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS} , T_YES
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS} , T_YES
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS} , 10
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS} , 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS} , 60000
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS} , 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS} , 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS} , 12
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS} , 12
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS} , 200
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS} , 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS} , 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS} , 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS} , 1
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS} , 1
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS} , 1000
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS} , 50
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS} , T_SCTP_HMAC_NONE
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS} , 0
+#endif
+};
 
 char *
-err_string(ulong error)
+errno_string(long err)
 {
-	switch (error) {
-	case TBADADDR:
-		return ("TBADADDR");
-	case TBADOPT:
-		return ("TBADOPT");
-	case TACCES:
-		return ("TACCES");
-	case TBADF:
-		return ("TBADF");
-	case TNOADDR:
-		return ("TNOADDR");
-	case TOUTSTATE:
-		return ("TOUTSTATE");
-	case TBADSEQ:
-		return ("TBADSEQ");
-	case TSYSERR:
-		return ("TSYSERR");
-	case TLOOK:
-		return ("TLOOK");
-	case TBADDATA:
-		return ("TBADDATA");
-	case TBUFOVFLW:
-		return ("TBUFOVFLW");
-	case TFLOW:
-		return ("TFLOW");
-	case TNODATA:
-		return ("TNODATA");
-	case TNODIS:
-		return ("TNODIS");
-	case TNOUDERR:
-		return ("TNOUDERR");
-	case TBADFLAG:
-		return ("TBADFLAG");
-	case TNOREL:
-		return ("TNOREL");
-	case TNOTSUPPORT:
-		return ("TNOTSUPPORT");
-	case TSTATECHNG:
-		return ("TSTATECHNG");
-	case TNOSTRUCTYPE:
-		return ("TNOSTRUCTTYPE");
-	case TBADNAME:
-		return ("TBADNAME");
-	case TBADQLEN:
-		return ("TBADQLEN");
-	case TADDRBUSY:
-		return ("TADDRBUSY");
-	case TINDOUT:
-		return ("TINDOUT");
-	case TPROVMISMATCH:
-		return ("TPROVMISMATCH");
-	case TRESQLEN:
-		return ("TRESQLEN");
-	case TRESADDR:
-		return ("TRESADDR");
-	case TQFULL:
-		return ("TQFULL");
-	case TPROTO:
-		return ("TPROTO");
+	switch (err) {
+	case 0:
+		return ("ok");
+	case EPERM:
+		return ("[EPERM]");
+	case ENOENT:
+		return ("[ENOENT]");
+	case ESRCH:
+		return ("[ESRCH]");
+	case EINTR:
+		return ("[EINTR]");
+	case EIO:
+		return ("[EIO]");
+	case ENXIO:
+		return ("[ENXIO]");
+	case E2BIG:
+		return ("[E2BIG]");
+	case ENOEXEC:
+		return ("[ENOEXEC]");
+	case EBADF:
+		return ("[EBADF]");
+	case ECHILD:
+		return ("[ECHILD]");
+	case EAGAIN:
+		return ("[EAGAIN]");
+	case ENOMEM:
+		return ("[ENOMEM]");
+	case EACCES:
+		return ("[EACCES]");
+	case EFAULT:
+		return ("[EFAULT]");
+	case ENOTBLK:
+		return ("[ENOTBLK]");
+	case EBUSY:
+		return ("[EBUSY]");
+	case EEXIST:
+		return ("[EEXIST]");
+	case EXDEV:
+		return ("[EXDEV]");
+	case ENODEV:
+		return ("[ENODEV]");
+	case ENOTDIR:
+		return ("[ENOTDIR]");
+	case EISDIR:
+		return ("[EISDIR]");
+	case EINVAL:
+		return ("[EINVAL]");
+	case ENFILE:
+		return ("[ENFILE]");
+	case EMFILE:
+		return ("[EMFILE]");
+	case ENOTTY:
+		return ("[ENOTTY]");
+	case ETXTBSY:
+		return ("[ETXTBSY]");
+	case EFBIG:
+		return ("[EFBIG]");
+	case ENOSPC:
+		return ("[ENOSPC]");
+	case ESPIPE:
+		return ("[ESPIPE]");
+	case EROFS:
+		return ("[EROFS]");
+	case EMLINK:
+		return ("[EMLINK]");
+	case EPIPE:
+		return ("[EPIPE]");
+	case EDOM:
+		return ("[EDOM]");
+	case ERANGE:
+		return ("[ERANGE]");
+	case EDEADLK:
+		return ("[EDEADLK]");
+	case ENAMETOOLONG:
+		return ("[ENAMETOOLONG]");
+	case ENOLCK:
+		return ("[ENOLCK]");
+	case ENOSYS:
+		return ("[ENOSYS]");
+	case ENOTEMPTY:
+		return ("[ENOTEMPTY]");
+	case ELOOP:
+		return ("[ELOOP]");
+	case ENOMSG:
+		return ("[ENOMSG]");
+	case EIDRM:
+		return ("[EIDRM]");
+	case ECHRNG:
+		return ("[ECHRNG]");
+	case EL2NSYNC:
+		return ("[EL2NSYNC]");
+	case EL3HLT:
+		return ("[EL3HLT]");
+	case EL3RST:
+		return ("[EL3RST]");
+	case ELNRNG:
+		return ("[ELNRNG]");
+	case EUNATCH:
+		return ("[EUNATCH]");
+	case ENOCSI:
+		return ("[ENOCSI]");
+	case EL2HLT:
+		return ("[EL2HLT]");
+	case EBADE:
+		return ("[EBADE]");
+	case EBADR:
+		return ("[EBADR]");
+	case EXFULL:
+		return ("[EXFULL]");
+	case ENOANO:
+		return ("[ENOANO]");
+	case EBADRQC:
+		return ("[EBADRQC]");
+	case EBADSLT:
+		return ("[EBADSLT]");
+	case EBFONT:
+		return ("[EBFONT]");
+	case ENOSTR:
+		return ("[ENOSTR]");
+	case ENODATA:
+		return ("[ENODATA]");
+	case ETIME:
+		return ("[ETIME]");
+	case ENOSR:
+		return ("[ENOSR]");
+	case ENONET:
+		return ("[ENONET]");
+	case ENOPKG:
+		return ("[ENOPKG]");
+	case EREMOTE:
+		return ("[EREMOTE]");
+	case ENOLINK:
+		return ("[ENOLINK]");
+	case EADV:
+		return ("[EADV]");
+	case ESRMNT:
+		return ("[ESRMNT]");
+	case ECOMM:
+		return ("[ECOMM]");
+	case EPROTO:
+		return ("[EPROTO]");
+	case EMULTIHOP:
+		return ("[EMULTIHOP]");
+	case EDOTDOT:
+		return ("[EDOTDOT]");
+	case EBADMSG:
+		return ("[EBADMSG]");
+	case EOVERFLOW:
+		return ("[EOVERFLOW]");
+	case ENOTUNIQ:
+		return ("[ENOTUNIQ]");
+	case EBADFD:
+		return ("[EBADFD]");
+	case EREMCHG:
+		return ("[EREMCHG]");
+	case ELIBACC:
+		return ("[ELIBACC]");
+	case ELIBBAD:
+		return ("[ELIBBAD]");
+	case ELIBSCN:
+		return ("[ELIBSCN]");
+	case ELIBMAX:
+		return ("[ELIBMAX]");
+	case ELIBEXEC:
+		return ("[ELIBEXEC]");
+	case EILSEQ:
+		return ("[EILSEQ]");
+	case ERESTART:
+		return ("[ERESTART]");
+	case ESTRPIPE:
+		return ("[ESTRPIPE]");
+	case EUSERS:
+		return ("[EUSERS]");
+	case ENOTSOCK:
+		return ("[ENOTSOCK]");
+	case EDESTADDRREQ:
+		return ("[EDESTADDRREQ]");
+	case EMSGSIZE:
+		return ("[EMSGSIZE]");
+	case EPROTOTYPE:
+		return ("[EPROTOTYPE]");
+	case ENOPROTOOPT:
+		return ("[ENOPROTOOPT]");
+	case EPROTONOSUPPORT:
+		return ("[EPROTONOSUPPORT]");
+	case ESOCKTNOSUPPORT:
+		return ("[ESOCKTNOSUPPORT]");
+	case EOPNOTSUPP:
+		return ("[EOPNOTSUPP]");
+	case EPFNOSUPPORT:
+		return ("[EPFNOSUPPORT]");
+	case EAFNOSUPPORT:
+		return ("[EAFNOSUPPORT]");
+	case EADDRINUSE:
+		return ("[EADDRINUSE]");
+	case EADDRNOTAVAIL:
+		return ("[EADDRNOTAVAIL]");
+	case ENETDOWN:
+		return ("[ENETDOWN]");
+	case ENETUNREACH:
+		return ("[ENETUNREACH]");
+	case ENETRESET:
+		return ("[ENETRESET]");
+	case ECONNABORTED:
+		return ("[ECONNABORTED]");
+	case ECONNRESET:
+		return ("[ECONNRESET]");
+	case ENOBUFS:
+		return ("[ENOBUFS]");
+	case EISCONN:
+		return ("[EISCONN]");
+	case ENOTCONN:
+		return ("[ENOTCONN]");
+	case ESHUTDOWN:
+		return ("[ESHUTDOWN]");
+	case ETOOMANYREFS:
+		return ("[ETOOMANYREFS]");
+	case ETIMEDOUT:
+		return ("[ETIMEDOUT]");
+	case ECONNREFUSED:
+		return ("[ECONNREFUSED]");
+	case EHOSTDOWN:
+		return ("[EHOSTDOWN]");
+	case EHOSTUNREACH:
+		return ("[EHOSTUNREACH]");
+	case EALREADY:
+		return ("[EALREADY]");
+	case EINPROGRESS:
+		return ("[EINPROGRESS]");
+	case ESTALE:
+		return ("[ESTALE]");
+	case EUCLEAN:
+		return ("[EUCLEAN]");
+	case ENOTNAM:
+		return ("[ENOTNAM]");
+	case ENAVAIL:
+		return ("[ENAVAIL]");
+	case EISNAM:
+		return ("[EISNAM]");
+	case EREMOTEIO:
+		return ("[EREMOTEIO]");
+	case EDQUOT:
+		return ("[EDQUOT]");
+	case ENOMEDIUM:
+		return ("[ENOMEDIUM]");
+	case EMEDIUMTYPE:
+		return ("[EMEDIUMTYPE]");
 	default:
-		return ("(unknown)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "[%ld]", err);
+		return buf;
+	}
 	}
 }
 
-void
-print_error(ulong error)
+char *
+terrno_string(ulong terr, long uerr)
 {
-	printf("%s\n", err_string(error));
+	switch (terr) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(uerr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "[%lu]", terr);
+		return buf;
+	}
+	}
 }
 
-char *
-prim_string(ulong prim)
+const char *
+event_string(int event)
 {
-	switch (prim) {
-	case T_CONN_REQ:
+	switch (event) {
+	case __EVENT_NO_MSG:
+		return ("NO MESSAGE");
+	case __EVENT_TIMEOUT:
+		return ("TIMEOUT");
+	case __EVENT_UNKNOWN:
+		return ("UNKNOWN");
+	case __RESULT_DECODE_ERROR:
+		return ("DECODE ERROR");
+	case __RESULT_SCRIPT_ERROR:
+		return ("SCRIPT ERROR");
+	case __RESULT_INCONCLUSIVE:
+		return ("INCONCLUSIVE");
+	case __RESULT_SUCCESS:
+		return ("SUCCESS");
+	case __RESULT_FAILURE:
+		return ("FAILURE");
+	case __EVENT_CONN_REQ:
 		return ("T_CONN_REQ");
-	case T_CONN_RES:
+	case __EVENT_CONN_RES:
 		return ("T_CONN_RES");
-	case T_DISCON_REQ:
+	case __EVENT_DISCON_REQ:
 		return ("T_DISCON_REQ");
-	case T_DATA_REQ:
+	case __EVENT_DATA_REQ:
 		return ("T_DATA_REQ");
-	case T_EXDATA_REQ:
+	case __EVENT_EXDATA_REQ:
 		return ("T_EXDATA_REQ");
-	case T_OPTDATA_REQ:
+	case __EVENT_OPTDATA_REQ:
 		return ("T_OPTDATA_REQ");
-	case T_INFO_REQ:
+	case __EVENT_INFO_REQ:
 		return ("T_INFO_REQ");
-	case T_BIND_REQ:
+	case __EVENT_BIND_REQ:
 		return ("T_BIND_REQ");
-	case T_UNBIND_REQ:
+	case __EVENT_UNBIND_REQ:
 		return ("T_UNBIND_REQ");
-	case T_UNITDATA_REQ:
+	case __EVENT_UNITDATA_REQ:
 		return ("T_UNITDATA_REQ");
-	case T_OPTMGMT_REQ:
+	case __EVENT_OPTMGMT_REQ:
 		return ("T_OPTMGMT_REQ");
-	case T_ORDREL_REQ:
+	case __EVENT_ORDREL_REQ:
 		return ("T_ORDREL_REQ");
-	case T_CONN_IND:
+	case __EVENT_CONN_IND:
 		return ("T_CONN_IND");
-	case T_CONN_CON:
+	case __EVENT_CONN_CON:
 		return ("T_CONN_CON");
-	case T_DISCON_IND:
+	case __EVENT_DISCON_IND:
 		return ("T_DISCON_IND");
-	case T_DATA_IND:
+	case __EVENT_DATA_IND:
 		return ("T_DATA_IND");
-	case T_EXDATA_IND:
+	case __EVENT_EXDATA_IND:
 		return ("T_EXDATA_IND");
-	case T_OPTDATA_IND:
+	case __EVENT_OPTDATA_IND:
 		return ("T_OPTDATA_IND");
-	case T_INFO_ACK:
+	case __EVENT_INFO_ACK:
 		return ("T_INFO_ACK");
-	case T_BIND_ACK:
+	case __EVENT_BIND_ACK:
 		return ("T_BIND_ACK");
-	case T_ERROR_ACK:
+	case __EVENT_ERROR_ACK:
 		return ("T_ERROR_ACK");
-	case T_OK_ACK:
+	case __EVENT_OK_ACK:
 		return ("T_OK_ACK");
-	case T_UNITDATA_IND:
+	case __EVENT_UNITDATA_IND:
 		return ("T_UNITDATA_IND");
-	case T_UDERROR_IND:
+	case __EVENT_UDERROR_IND:
 		return ("T_UDERROR_IND");
-	case T_OPTMGMT_ACK:
+	case __EVENT_OPTMGMT_ACK:
 		return ("T_OPTMGMT_ACK");
-	case T_ORDREL_IND:
+	case __EVENT_ORDREL_IND:
 		return ("T_ORDREL_IND");
-	case T_ADDR_REQ:
+	case __EVENT_ADDR_REQ:
 		return ("T_ADDR_REQ");
-	case T_ADDR_ACK:
+	case __EVENT_ADDR_ACK:
 		return ("T_ADDR_ACK");
-	case FAILURE:
-		return ("(nothing)");
+	case __EVENT_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case __EVENT_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
 	default:
 		return ("(unexpected");
 	}
 }
 
-void
-print_prim(ulong prim)
-{
-	printf("%s", prim_string(prim));
-}
-
-void
-print_state(ulong state)
+const char *
+state_string(ulong state)
 {
 	switch (state) {
 	case TS_UNBND:
-		printf("TS_UNBND");
-		break;
+		return ("TS_UNBND");
 	case TS_WACK_BREQ:
-		printf("TS_WACK_BREQ");
-		break;
+		return ("TS_WACK_BREQ");
 	case TS_WACK_UREQ:
-		printf("TS_WACK_UREQ");
-		break;
+		return ("TS_WACK_UREQ");
 	case TS_IDLE:
-		printf("TS_IDLE");
-		break;
+		return ("TS_IDLE");
 	case TS_WACK_OPTREQ:
-		printf("TS_WACK_OPTREQ");
-		break;
+		return ("TS_WACK_OPTREQ");
 	case TS_WACK_CREQ:
-		printf("TS_WACK_CREQ");
-		break;
+		return ("TS_WACK_CREQ");
 	case TS_WCON_CREQ:
-		printf("TS_WCON_CREQ");
-		break;
+		return ("TS_WCON_CREQ");
 	case TS_WRES_CIND:
-		printf("TS_WRES_CIND");
-		break;
+		return ("TS_WRES_CIND");
 	case TS_WACK_CRES:
-		printf("TS_WACK_CRES");
-		break;
+		return ("TS_WACK_CRES");
 	case TS_DATA_XFER:
-		printf("TS_DATA_XFER");
-		break;
+		return ("TS_DATA_XFER");
 	case TS_WIND_ORDREL:
-		printf("TS_WIND_ORDREL");
-		break;
+		return ("TS_WIND_ORDREL");
 	case TS_WREQ_ORDREL:
-		printf("TS_WRES_ORDREL");
-		break;
+		return ("TS_WRES_ORDREL");
 	case TS_WACK_DREQ6:
-		printf("TS_WACK_DREQ6");
-		break;
+		return ("TS_WACK_DREQ6");
 	case TS_WACK_DREQ7:
-		printf("TS_WACK_DREQ7");
-		break;
+		return ("TS_WACK_DREQ7");
 	case TS_WACK_DREQ9:
-		printf("TS_WACK_DREQ9");
-		break;
+		return ("TS_WACK_DREQ9");
 	case TS_WACK_DREQ10:
-		printf("TS_WACK_DREQ10");
-		break;
+		return ("TS_WACK_DREQ10");
 	case TS_WACK_DREQ11:
-		printf("TS_WACK_DREQ11");
-		break;
+		return ("TS_WACK_DREQ11");
 	default:
-		printf("(unknown [%lu])", state);
-		break;
+		return ("(unknown)");
 	}
-	printf("\n");
 }
 
 void
@@ -600,1077 +1058,1049 @@ print_addr(char *add_ptr, size_t add_len)
 	if (add_len) {
 		if (add_len != sizeof(*a))
 			printf("Aaarrg! add_len = %d, ", add_len);
-		printf("%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff,
-		       (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff,
-		       (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+		printf("%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		printf("(no address)");
 	printf("\n");
 }
 
-void
-print_opt(char *opt_ptr, size_t opt_len)
+char *
+addr_string(char *add_ptr, size_t add_len)
 {
-	struct t_opthdr *oh = (struct t_opthdr *) opt_ptr;
-	size_t opt_rem = opt_len;
-
-	if (opt_len) {
-		while (opt_rem && opt_rem > sizeof(*oh) && oh->len <= opt_rem) {
-			char result[128] = "(failure)";
-
-			long val = *((t_scalar_t *) (oh + 1));
-
-			printf("\n\t");
-			switch (oh->level) {
-			case T_INET_IP:
-				switch (oh->name) {
-				case T_IP_OPTIONS:
-					printf("T_IP_OPTIONS = ");
-					sprintf(result, "%s", "(not impl)");
-					break;
-				case T_IP_TOS:
-					printf("T_IP_TOS = ");
-					sprintf(result, "0x%lx", val);
-					break;
-				case T_IP_TTL:
-					printf("T_IP_TTL = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_IP_REUSEADDR:
-					printf("T_IP_REUSEADDR = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				case T_IP_DONTROUTE:
-					printf("T_IP_DONTROUTE = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				case T_IP_BROADCAST:
-					printf("T_IP_BROADCAST = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				default:
-					printf("(bad option name %lu)", oh->name);
-					break;
-				}
-				break;
-			case T_INET_TCP:
-				switch (oh->name) {
-				case T_TCP_NODELAY:
-					printf("T_TCP_NODELAY = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				case T_TCP_MAXSEG:
-					printf("T_TCP_MAXSEG = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_TCP_KEEPALIVE:
-					printf("T_TCP_KEEPALIVE = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				default:
-					printf("(bad option name %lu)", oh->name);
-					break;
-				}
-				break;
-			case T_INET_UDP:
-				switch (oh->name) {
-				case T_UDP_CHECKSUM:
-					printf("T_UDP_CHECKSUM = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				default:
-					printf("(bad option name %lu)", oh->name);
-					break;
-				}
-				break;
-			case T_INET_SCTP:
-				switch (oh->name) {
-				case T_SCTP_NODELAY:
-					printf("T_SCTP_NODELAY = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				case T_SCTP_CORK:
-					printf("T_SCTP_CORK = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				case T_SCTP_PPI:
-					printf("T_SCTP_PPI = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_SID:
-					printf("T_SCTP_SID = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_SSN:
-					printf("T_SCTP_SSN = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_TSN:
-					printf("T_SCTP_TSN = ");
-					sprintf(result, "%lu", (ulong) val);
-					break;
-				case T_SCTP_RECVOPT:
-					printf("T_SCTP_RECVOPT = ");
-					sprintf(result, "%s", val == T_YES ? "T_YES" : "T_NO");
-					break;
-				case T_SCTP_COOKIE_LIFE:
-					printf("T_SCTP_COOKIE_LIFE = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_SACK_DELAY:
-					printf("T_SCTP_SACK_DELAY = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_PATH_MAX_RETRANS:
-					printf("T_SCTP_PATH_MAX_RETRANS = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_ASSOC_MAX_RETRANS:
-					printf("T_SCTP_ASSOC_MAX_RETRANS = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_MAX_INIT_RETRIES:
-					printf("T_SCTP_MAX_INIT_RETRIES = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_HEARTBEAT_ITVL:
-					printf("T_SCTP_HEARTBEAT_ITVL = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_RTO_INITIAL:
-					printf("T_SCTP_RTO_INITIAL = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_RTO_MIN:
-					printf("T_SCTP_RTO_MIN = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_RTO_MAX:
-					printf("T_SCTP_RTO_MAX = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_OSTREAMS:
-					printf("T_SCTP_OSTREAMS = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_ISTREAMS:
-					printf("T_SCTP_ISTREAMS = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_COOKIE_INC:
-					printf("T_SCTP_COOKIE_INC = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_THROTTLE_ITVL:
-					printf("T_SCTP_THROTTLE_ITVL = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_MAC_TYPE:
-					printf("T_SCTP_MAC_TYPE = ");
-					switch (val) {
-					default:
-					case T_SCTP_HMAC_NONE:
-						sprintf(result, "NONE");
-						break;
-					case T_SCTP_HMAC_SHA1:
-						sprintf(result, "SHA_1");
-						break;
-					case T_SCTP_HMAC_MD5:
-						sprintf(result, "MD5");
-						break;
-					}
-					break;
-				case T_SCTP_HB:
-					printf("T_SCTP_HB = ");
-					sprintf(result, "%s", "(undone)");
-					break;
-				case T_SCTP_RTO:
-					printf("T_SCTP_RTO = ");
-					sprintf(result, "%s", "(undone)");
-					break;
-				case T_SCTP_MAXSEG:
-					printf("T_SCTP_MAXSEG = ");
-					sprintf(result, "%ld", val);
-					break;
-				case T_SCTP_STATUS:
-					printf("T_SCTP_STATUS = ");
-					sprintf(result, "%s", "(undone)");
-					break;
-				case T_SCTP_DEBUG:
-					printf("T_SCTP_DEBUG = ");
-					if (!val)
-						sprintf(result, "(none)");
-					else {
-						char *where = result;
-						if (val & SCTP_OPTION_DROPPING)
-							where += sprintf(where, " DROPPING");
-						if (val & SCTP_OPTION_BREAK)
-							where += sprintf(where, " BREAK");
-						if (val & SCTP_OPTION_DBREAK)
-							where += sprintf(where, " DBREAK");
-						if (val & SCTP_OPTION_RANDOM)
-							where += sprintf(where, " RANDOM");
-					}
-					break;
-				default:
-					printf("(bad option name %lu)", oh->name);
-					break;
-				}
-				break;
-			default:
-				printf("(bad option level %lu)", oh->level);
-				break;
-			}
-			printf("%s", result);
-			opt_rem -= oh->len;
-			oh = (struct t_opthdr *) (((char *) oh) + oh->len);
-		}
-		if (opt_rem)
-			printf("\n\tBadly formatted options.");
+	static char buf[128];
+	size_t len = 0;
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	if (add_len) {
+		if (add_len != sizeof(*a))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
+		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d",
+				(a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
-		printf("(no opt)");
-	printf("\n");
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	snprintf(buf + len, sizeof(buf) - len, "\0");
+	return buf;
+}
+
+char *
+status_string(struct t_opthdr *oh)
+{
+	switch (oh->status) {
+	case 0:
+		return (NULL);
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	default:
+		return ("(unknown status)");
+	}
+}
+
+char *
+level_string(struct t_opthdr *oh)
+{
+	switch (oh->level) {
+	case XTI_GENERIC:
+		return ("XTI_GENERIC");
+	case T_INET_IP:
+		return ("T_INET_IP");
+	case T_INET_UDP:
+		return ("T_INET_UDP");
+	case T_INET_TCP:
+		return ("T_INET_TCP");
+	case T_INET_SCTP:
+		return ("T_INET_SCTP");
+	default:
+		return ("(unknown level)");
+	}
+}
+
+char *
+name_string(struct t_opthdr *oh)
+{
+	if (oh->name == T_ALLOPT)
+		return ("T_ALLOPT");
+	switch (oh->level) {
+	case XTI_GENERIC:
+		switch (oh->name) {
+		case XTI_DEBUG:
+			return ("XTI_DEBUG");
+		case XTI_LINGER:
+			return ("XTI_LINGER");
+		case XTI_RCVBUF:
+			return ("XTI_RCVBUF");
+		case XTI_RCVLOWAT:
+			return ("XTI_RCVLOWAT");
+		case XTI_SNDBUF:
+			return ("XTI_SNDBUF");
+		case XTI_SNDLOWAT:
+			return ("XTI_SNDLOWAT");
+		}
+		break;
+	case T_INET_IP:
+		switch (oh->name) {
+		case T_IP_OPTIONS:
+			return ("T_IP_OPTIONS");
+		case T_IP_TOS:
+			return ("T_IP_TOS");
+		case T_IP_TTL:
+			return ("T_IP_TTL");
+		case T_IP_REUSEADDR:
+			return ("T_IP_REUSEADDR");
+		case T_IP_DONTROUTE:
+			return ("T_IP_DONTROUTE");
+		case T_IP_BROADCAST:
+			return ("T_IP_BROADCAST");
+		case T_IP_ADDR:
+			return ("T_IP_ADDR");
+		}
+		break;
+	case T_INET_UDP:
+		switch (oh->name) {
+		case T_UDP_CHECKSUM:
+			return ("T_UDP_CHECKSUM");
+		}
+		break;
+	case T_INET_TCP:
+		switch (oh->name) {
+		case T_TCP_NODELAY:
+			return ("T_TCP_NODELAY");
+		case T_TCP_MAXSEG:
+			return ("T_TCP_MAXSEG");
+		case T_TCP_KEEPALIVE:
+			return ("T_TCP_KEEPALIVE");
+		case T_TCP_CORK:
+			return ("T_TCP_CORK");
+		case T_TCP_KEEPIDLE:
+			return ("T_TCP_KEEPIDLE");
+		case T_TCP_KEEPINTVL:
+			return ("T_TCP_KEEPINTVL");
+		case T_TCP_KEEPCNT:
+			return ("T_TCP_KEEPCNT");
+		case T_TCP_SYNCNT:
+			return ("T_TCP_SYNCNT");
+		case T_TCP_LINGER2:
+			return ("T_TCP_LINGER2");
+		case T_TCP_DEFER_ACCEPT:
+			return ("T_TCP_DEFER_ACCEPT");
+		case T_TCP_WINDOW_CLAMP:
+			return ("T_TCP_WINDOW_CLAMP");
+		case T_TCP_INFO:
+			return ("T_TCP_INFO");
+		case T_TCP_QUICKACK:
+			return ("T_TCP_QUICKACK");
+		}
+		break;
+	case T_INET_SCTP:
+		switch (oh->name) {
+		case T_SCTP_NODELAY:
+			return ("T_SCTP_NODELAY");
+		case T_SCTP_CORK:
+			return ("T_SCTP_CORK");
+		case T_SCTP_PPI:
+			return ("T_SCTP_PPI");
+		case T_SCTP_SID:
+			return ("T_SCTP_SID");
+		case T_SCTP_SSN:
+			return ("T_SCTP_SSN");
+		case T_SCTP_TSN:
+			return ("T_SCTP_TSN");
+		case T_SCTP_RECVOPT:
+			return ("T_SCTP_RECVOPT");
+		case T_SCTP_COOKIE_LIFE:
+			return ("T_SCTP_COOKIE_LIFE");
+		case T_SCTP_SACK_DELAY:
+			return ("T_SCTP_SACK_DELAY");
+		case T_SCTP_PATH_MAX_RETRANS:
+			return ("T_SCTP_PATH_MAX_RETRANS");
+		case T_SCTP_ASSOC_MAX_RETRANS:
+			return ("T_SCTP_ASSOC_MAX_RETRANS");
+		case T_SCTP_MAX_INIT_RETRIES:
+			return ("T_SCTP_MAX_INIT_RETRIES");
+		case T_SCTP_HEARTBEAT_ITVL:
+			return ("T_SCTP_HEARTBEAT_ITVL");
+		case T_SCTP_RTO_INITIAL:
+			return ("T_SCTP_RTO_INITIAL");
+		case T_SCTP_RTO_MIN:
+			return ("T_SCTP_RTO_MIN");
+		case T_SCTP_RTO_MAX:
+			return ("T_SCTP_RTO_MAX");
+		case T_SCTP_OSTREAMS:
+			return ("T_SCTP_OSTREAMS");
+		case T_SCTP_ISTREAMS:
+			return ("T_SCTP_ISTREAMS");
+		case T_SCTP_COOKIE_INC:
+			return ("T_SCTP_COOKIE_INC");
+		case T_SCTP_THROTTLE_ITVL:
+			return ("T_SCTP_THROTTLE_ITVL");
+		case T_SCTP_MAC_TYPE:
+			return ("T_SCTP_MAC_TYPE");
+		case T_SCTP_CKSUM_TYPE:
+			return ("T_SCTP_CKSUM_TYPE");
+		case T_SCTP_ECN:
+			return ("T_SCTP_ECN");
+		case T_SCTP_ALI:
+			return ("T_SCTP_ALI");
+		case T_SCTP_ADD:
+			return ("T_SCTP_ADD");
+		case T_SCTP_SET:
+			return ("T_SCTP_SET");
+		case T_SCTP_ADD_IP:
+			return ("T_SCTP_ADD_IP");
+		case T_SCTP_DEL_IP:
+			return ("T_SCTP_DEL_IP");
+		case T_SCTP_SET_IP:
+			return ("T_SCTP_SET_IP");
+		case T_SCTP_PR:
+			return ("T_SCTP_PR");
+		case T_SCTP_LIFETIME:
+			return ("T_SCTP_LIFETIME");
+		case T_SCTP_DISPOSITION:
+			return ("T_SCTP_DISPOSITION");
+		case T_SCTP_MAX_BURST:
+			return ("T_SCTP_MAX_BURST");
+		case T_SCTP_HB:
+			return ("T_SCTP_HB");
+		case T_SCTP_RTO:
+			return ("T_SCTP_RTO");
+		case T_SCTP_MAXSEG:
+			return ("T_SCTP_MAXSEG");
+		case T_SCTP_STATUS:
+			return ("T_SCTP_STATUS");
+		case T_SCTP_DEBUG:
+			return ("T_SCTP_DEBUG");
+		}
+		break;
+	}
+	return ("(unknown name)");
+}
+
+char *
+yesno_string(struct t_opthdr *oh)
+{
+	switch (*((t_uscalar_t *) T_OPT_DATA(oh))) {
+	case T_YES:
+		return ("T_YES");
+	case T_NO:
+		return ("T_NO");
+	default:
+		return ("(invalid)");
+	}
+}
+
+char *
+value_string(struct t_opthdr *oh)
+{
+	static char buf[64] = "(invalid)";
+	if (oh->len == sizeof(*oh))
+		return (NULL);
+	switch (oh->level) {
+	case XTI_GENERIC:
+		switch (oh->name) {
+		case XTI_DEBUG:
+			break;
+		case XTI_LINGER:
+			break;
+		case XTI_RCVBUF:
+			break;
+		case XTI_RCVLOWAT:
+			break;
+		case XTI_SNDBUF:
+			break;
+		case XTI_SNDLOWAT:
+			break;
+		}
+		break;
+	case T_INET_IP:
+		switch (oh->name) {
+		case T_IP_OPTIONS:
+			break;
+		case T_IP_TOS:
+			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
+			return buf;
+		case T_IP_TTL:
+			if (oh->len = sizeof(*oh) + sizeof(unsigned char))
+				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
+			return buf;
+		case T_IP_REUSEADDR:
+			return yesno_string(oh);
+		case T_IP_DONTROUTE:
+			return yesno_string(oh);
+		case T_IP_BROADCAST:
+			return yesno_string(oh);
+		case T_IP_ADDR:
+			if (oh->len == sizeof(*oh) + sizeof(uint32_t)) {
+				uint32_t addr = *((uint32_t *) T_OPT_DATA(oh));
+				snprintf(buf, sizeof(buf), "%d.%d.%d.%d", (addr >> 0) & 0x00ff, (addr >> 8) & 0x00ff, (addr >> 16) & 0x00ff, (addr >> 24) & 0x00ff);
+			}
+			return buf;
+		}
+		break;
+	case T_INET_UDP:
+		switch (oh->name) {
+		case T_UDP_CHECKSUM:
+			return yesno_string(oh);
+		}
+		break;
+	case T_INET_TCP:
+		switch (oh->name) {
+		case T_TCP_NODELAY:
+			return yesno_string(oh);
+		case T_TCP_MAXSEG:
+			if (oh->len == sizeof(*oh) + sizeof(t_uscalar_t))
+				snprintf(buf, sizeof(buf), "%lu", *((t_uscalar_t *) T_OPT_DATA(oh)));
+			return buf;
+		case T_TCP_KEEPALIVE:
+			return yesno_string(oh);
+		case T_TCP_CORK:
+			return yesno_string(oh);
+		case T_TCP_KEEPIDLE:
+			break;
+		case T_TCP_KEEPINTVL:
+			break;
+		case T_TCP_KEEPCNT:
+			break;
+		case T_TCP_SYNCNT:
+			break;
+		case T_TCP_LINGER2:
+			break;
+		case T_TCP_DEFER_ACCEPT:
+			break;
+		case T_TCP_WINDOW_CLAMP:
+			break;
+		case T_TCP_INFO:
+			break;
+		case T_TCP_QUICKACK:
+			break;
+		}
+		break;
+	case T_INET_SCTP:
+		switch (oh->name) {
+		case T_SCTP_NODELAY:
+			return yesno_string(oh);
+		case T_SCTP_CORK:
+			return yesno_string(oh);
+		case T_SCTP_PPI:
+			break;
+		case T_SCTP_SID:
+			break;
+		case T_SCTP_SSN:
+			break;
+		case T_SCTP_TSN:
+			break;
+		case T_SCTP_RECVOPT:
+			return yesno_string(oh);
+		case T_SCTP_COOKIE_LIFE:
+			break;
+		case T_SCTP_SACK_DELAY:
+			break;
+		case T_SCTP_PATH_MAX_RETRANS:
+			break;
+		case T_SCTP_ASSOC_MAX_RETRANS:
+			break;
+		case T_SCTP_MAX_INIT_RETRIES:
+			break;
+		case T_SCTP_HEARTBEAT_ITVL:
+			break;
+		case T_SCTP_RTO_INITIAL:
+			break;
+		case T_SCTP_RTO_MIN:
+			break;
+		case T_SCTP_RTO_MAX:
+			break;
+		case T_SCTP_OSTREAMS:
+			break;
+		case T_SCTP_ISTREAMS:
+			break;
+		case T_SCTP_COOKIE_INC:
+			break;
+		case T_SCTP_THROTTLE_ITVL:
+			break;
+		case T_SCTP_MAC_TYPE:
+			break;
+		case T_SCTP_CKSUM_TYPE:
+			break;
+		case T_SCTP_ECN:
+			break;
+		case T_SCTP_ALI:
+			break;
+		case T_SCTP_ADD:
+			break;
+		case T_SCTP_SET:
+			break;
+		case T_SCTP_ADD_IP:
+			break;
+		case T_SCTP_DEL_IP:
+			break;
+		case T_SCTP_SET_IP:
+			break;
+		case T_SCTP_PR:
+			break;
+		case T_SCTP_LIFETIME:
+			break;
+		case T_SCTP_DISPOSITION:
+			break;
+		case T_SCTP_MAX_BURST:
+			break;
+		case T_SCTP_HB:
+			break;
+		case T_SCTP_RTO:
+			break;
+		case T_SCTP_MAXSEG:
+			break;
+		case T_SCTP_STATUS:
+			break;
+		case T_SCTP_DEBUG:
+			break;
+		}
+		break;
+	}
+	return ("(unknown value)");
+}
+
+
+void
+print_options(int fd, char *opt_ptr, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	if (verbose < 4)
+		return;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		char *level = level_string(oh);
+		char *name = name_string(oh);
+		char *status = status_string(oh);
+		char *value = value_string(oh);
+		int len = oh->len - sizeof(*oh);
+		unsigned char *val = _T_OPT_DATA_OFS(oh, 0);
+		if (len < 0)
+			break;
+		if (fd == conn_fd) {
+#if 0
+			fprintf(stdout, "%-20s|                               |  |                    \n", level);
+#endif
+			fprintf(stdout, "%-20s|                               |  |                    \n", name);
+			if (status)
+				fprintf(stdout, "%-20s|                               |  |                    \n", status);
+			if (value)
+				fprintf(stdout, "%-20s|                               |  |                    \n", value);
+#if 0
+			fprintf(stdout, "len = %03d           |                               |  |                    \n", len);
+#endif
+		}
+		if (fd == resp_fd) {
+#if 0
+			fprintf(stdout, "                    |                               |  |     %-15s\n", level);
+#endif
+			fprintf(stdout, "                    |                               |  |     %-15s\n", name);
+			if (status)
+				fprintf(stdout, "                    |                               |  |     %-15s\n", status);
+			if (value)
+				fprintf(stdout, "                    |                               |  |     %-15s\n", value);
+#if 0
+			fprintf(stdout, "                    |                               |  |     len = %03d      \n", len);
+#endif
+		}
+		if (fd == list_fd) {
+#if 0
+			fprintf(stdout, "                    |                               |  |     %-15s\n", level);
+#endif
+			fprintf(stdout, "                    |                               |  |     %-15s\n", name);
+			if (status)
+				fprintf(stdout, "                    |                               |  |     %-15s\n", status);
+			if (value)
+				fprintf(stdout, "                    |                               |  |     %-15s\n", value);
+#if 0
+			fprintf(stdout, "                    |                               |  |     len = %03d      \n", len);
+#endif
+		}
+	}
+}
+
+char *
+mgmtflag_string(t_uscalar_t flag)
+{
+	switch (flag) {
+	case T_NEGOTIATE:
+		return ("T_NEGOTIATE");
+	case T_CHECK:
+		return ("T_CHECK");
+	case T_DEFAULT:
+		return ("T_DEFAULT");
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_CURRENT:
+		return ("T_CURRENT");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	}
+	return "(unknown flag)";
 }
 
 void
-print_size(ulong size)
+print_mgmtflag(int fd, t_uscalar_t flag)
 {
+	if (verbose < 2)
+		return;
+	if (fd == conn_fd) {
+		fprintf(stdout, "%-20s|                               |  |                    \n", mgmtflag_string(flag));
+	}
+	if (fd == resp_fd) {
+		fprintf(stdout, "                    |                               |  |     %-15s\n", mgmtflag_string(flag));
+	}
+	if (fd == list_fd) {
+		fprintf(stdout, "                    |                               |  |     %-15s\n", mgmtflag_string(flag));
+	}
+}
+
+
+
+char *
+size_string(ulong size)
+{
+	static char buf[128];
 	switch (size) {
-	case -1UL:
-		printf("T_INFINITE\n");
+	case T_INFINITE:
+		return ("T_INFINITE");
+	case T_INVALID:
+		return ("T_INVALID");
+	case T_UNSPEC:
+		return ("T_UNSPEC");
+	}
+	snprintf(buf, sizeof(buf), "%lu", size);
+	return buf;
+}
+
+void
+print_event_conn(int fd, int event)
+{
+	switch (event) {
+	case __EVENT_INFO_REQ:
+		fprintf(stdout, "T_INFO_REQ    ----->|                               |  |                    [%d]\n", state);
 		break;
-	case -2UL:
-		printf("T_INVALID\n");
+	case __EVENT_INFO_ACK:
+		fprintf(stdout, "T_INFO_ACK    <----/|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_OPTMGMT_REQ:
+		fprintf(stdout, "T_OPTMGMT_REQ ----->|                               |  |                    [%d]\n", state);
+		print_mgmtflag(fd, cmd.tpi.optmgmt_req.MGMT_flags);
+		print_options(fd, cmd.cbuf + cmd.tpi.optmgmt_req.OPT_offset, cmd.tpi.optmgmt_req.OPT_length);
+		break;
+	case __EVENT_OPTMGMT_ACK:
+		fprintf(stdout, "T_OPTMGMT_ACK <----/|                               |  |                    [%d]\n", state);
+		print_mgmtflag(fd, cmd.tpi.optmgmt_ack.MGMT_flags);
+		print_options(fd, cmd.cbuf + cmd.tpi.optmgmt_ack.OPT_offset, cmd.tpi.optmgmt_ack.OPT_length);
+		break;
+	case __EVENT_BIND_REQ:
+		fprintf(stdout, "T_BIND_REQ    ----->|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_BIND_ACK:
+		fprintf(stdout, "T_BIND_ACK    <----/|                               |  |                    [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "%-20s|                               |  |                    \n", addr_string(cmd.cbuf + cmd.tpi.bind_ack.ADDR_offset, cmd.tpi.bind_ack.ADDR_length));
+		}
+		break;
+	case __EVENT_ADDR_REQ:
+		fprintf(stdout, "T_ADDR_REQ    ----->|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_ADDR_ACK:
+		fprintf(stdout, "T_ADDR_ACK    <----/|                               |  |                    [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "%-20s|                               |  |                    \n", addr_string(cmd.cbuf + cmd.tpi.addr_ack.LOCADDR_offset, cmd.tpi.addr_ack.LOCADDR_length));
+			fprintf(stdout, "%-20s|                               |  |                    \n", addr_string(cmd.cbuf + cmd.tpi.addr_ack.REMADDR_offset, cmd.tpi.addr_ack.REMADDR_length));
+		}
+		break;
+	case __EVENT_UNBIND_REQ:
+		fprintf(stdout, "T_UNBIND_REQ  ----->|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_ERROR_ACK:
+		fprintf(stdout, "T_ERROR_ACK   <----/|                               |  |                    [%d]\n", state);
+		fprintf(stdout, "%-15s     |                               |  |                    \n", terrno_string(cmd.tpi.error_ack.TLI_error, cmd.tpi.error_ack.UNIX_error));
+		break;
+	case __EVENT_OK_ACK:
+		fprintf(stdout, "T_OK_ACK      <----/|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_UNITDATA_REQ:
+		fprintf(stdout, "T_UNITDATA_REQ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "%-20s|                               |  |                    \n", addr_string(cmd.cbuf + cmd.tpi.unitdata_req.DEST_offset, cmd.tpi.unitdata_req.DEST_length));
+			print_options(fd, cmd.cbuf + cmd.tpi.unitdata_req.OPT_offset, cmd.tpi.unitdata_req.OPT_length);
+		}
+		break;
+	case __EVENT_UNITDATA_IND:
+		fprintf(stdout, "T_UNITDATA_IND<-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "%-20s|                               |  |                    \n", addr_string(cmd.cbuf + cmd.tpi.unitdata_ind.SRC_offset, cmd.tpi.unitdata_ind.SRC_length));
+			print_options(fd, cmd.cbuf + cmd.tpi.unitdata_ind.OPT_offset, cmd.tpi.unitdata_ind.OPT_length);
+		}
+		break;
+	case __EVENT_UDERROR_IND:
+		fprintf(stdout, "T_UDERROR_IND <----/|<- - - - - - - /               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_CONN_REQ:
+		fprintf(stdout, "T_CONN_REQ    ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_req.OPT_offset, cmd.tpi.conn_req.OPT_length);
+		break;
+	case __EVENT_CONN_IND:
+		fprintf(stdout, "T_CONN_IND    <-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_ind.OPT_offset, cmd.tpi.conn_ind.OPT_length);
+		seq[fd] = cmd.tpi.conn_ind.SEQ_number;
+		break;
+	case __EVENT_CONN_RES:
+		fprintf(stdout, "T_CONN_RES    ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_res.OPT_offset, cmd.tpi.conn_res.OPT_length);
+		break;
+	case __EVENT_CONN_CON:
+		fprintf(stdout, "T_CONN_CON    <-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_con.OPT_offset, cmd.tpi.conn_con.OPT_length);
+		break;
+	case __EVENT_DATA_REQ:
+		fprintf(stdout, "T_DATA_REQ    ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_DATA_IND:
+		fprintf(stdout, "T_DATA_IND    <-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_EXDATA_REQ:
+		fprintf(stdout, "T_EXDATA_REQ  ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_EXDATA_IND:
+		fprintf(stdout, "T_EXDATA_IND  <-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_OPTDATA_REQ:
+		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX) {
+			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03lu:-U-) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+			else
+				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03lu:-U-) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+		} else {
+			if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "T_OPTDATA_REQ+----->| - (%03lu:---) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+			else
+				fprintf(stdout, "T_OPTDATA_REQ ----->| - (%03lu:---) ->\\               |  |                    [%d]\n", opt_data.sid_val, state);
+		}
+		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
+		break;
+	case __EVENT_OPTDATA_IND:
+		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
+			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03lu:-U-)- / [%010lu]  |  |                    [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
+			else
+				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03lu:-U-)- / [%010lu]  |  |                    [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
+		} else {
+			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03lu:%03lu)- / [%010lu]  |  |                    [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
+			else
+				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03lu:%03lu)- / [%010lu]  |  |                    [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
+		}
+		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
+		tsn[fd] = ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val;
+		sid[fd] = ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val;
+		break;
+	case __EVENT_DISCON_REQ:
+		fprintf(stdout, "T_DISCON_REQ  ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_DISCON_IND:
+		fprintf(stdout, "T_DISCON_IND  <-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_ORDREL_REQ:
+		fprintf(stdout, "T_ORDREL_REQ  ----->| - - - - - - ->\\               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_ORDREL_IND:
+		fprintf(stdout, "T_ORDREL_IND  <-----|<- - - - - - - /               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_CAPABILITY_REQ:
+		fprintf(stdout, "T_CAPABILITY_REQ--->|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_CAPABILITY_ACK:
+		fprintf(stdout, "T_CAPABILITY_ACK<--/|                               |  |                    [%d]\n", state);
+		break;
+	case __EVENT_UNKNOWN:
+		fprintf(stdout, "????%4ld????  ?----?|?- - - - - - -?                |  |                    [%d]\n", cmd.tpi.type, state);
 		break;
 	default:
-		printf("%lu\n", size);
+	case __RESULT_SCRIPT_ERROR:
 		break;
 	}
 }
 
 void
-print_msg(int fd)
+print_event_resp(int fd, int event)
 {
-	if (ctrl.len > 0) {
-		switch (show) {
-		case 0:
-			return;
-
-		case 2:
-			printf("%d-", fd);
-			print_prim(cmd.tpi.type);
-			printf(":\n");
-
-			switch (cmd.tpi.type) {
-			case T_INFO_REQ:
-				break;
-
-			case T_INFO_ACK:
-				printf("  TSDU_size      = ");
-				print_size(cmd.tpi.info_ack.TSDU_size);
-				printf("  ETSDU_size     = ");
-				print_size(cmd.tpi.info_ack.ETSDU_size);
-				printf("  CDATA_size     = ");
-				print_size(cmd.tpi.info_ack.CDATA_size);
-				printf("  DDATA_size     = ");
-				print_size(cmd.tpi.info_ack.DDATA_size);
-				printf("  ADDR_size      = ");
-				print_size(cmd.tpi.info_ack.ADDR_size);
-				printf("  OPT_size       = ");
-				print_size(cmd.tpi.info_ack.OPT_size);
-				printf("  TIDU_size      = ");
-				print_size(cmd.tpi.info_ack.TIDU_size);
-				printf("  SERV_type      = ");
-				switch (cmd.tpi.info_ack.SERV_type) {
-				case T_COTS:
-					printf("T_COTS\n");
-					break;
-				case T_COTS_ORD:
-					printf("T_COTS_ORD\n");
-					break;
-				case T_CLTS:
-					printf("T_CLTS\n");
-					break;
-				default:
-					printf("(unknown)\n");
-					break;
-				}
-				printf("  CURRENT_state  = ");
-				print_state(cmd.tpi.info_ack.CURRENT_state);
-				printf("  PROVIDER_flag  = ");
-				if (cmd.tpi.info_ack.PROVIDER_flag & T_SNDZERO)
-					printf("T_SNDZERO\n");
-				if (cmd.tpi.info_ack.PROVIDER_flag & XPG4_1)
-					printf(" XPG4_1\n");
-				break;
-
-			case T_OPTMGMT_REQ:
-				printf("  MGMT_flags     = ");
-				switch (cmd.tpi.optmgmt_req.MGMT_flags) {
-				case T_NEGOTIATE:
-					printf("T_NEGOTIATE\n");
-					break;
-				case T_CHECK:
-					printf("T_CHECK\n");
-					break;
-				case T_CURRENT:
-					printf("T_CURRENT\n");
-					break;
-				case T_DEFAULT:
-					printf("T_DEFAULT\n");
-					break;
-				default:
-					break;
-				}
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.optmgmt_req.OPT_offset,
-					  cmd.tpi.optmgmt_req.OPT_length);
-				break;
-
-			case T_OPTMGMT_ACK:
-				printf("  MGMT_flags     = ");
-				switch (cmd.tpi.optmgmt_ack.MGMT_flags) {
-				case T_NEGOTIATE:
-					printf("T_NEGOTIATE\n");
-					break;
-				case T_CHECK:
-					printf("T_CHECK\n");
-					break;
-				case T_CURRENT:
-					printf("T_CURRENT\n");
-					break;
-				case T_DEFAULT:
-					printf("T_DEFAULT\n");
-					break;
-				default:
-					break;
-				}
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.optmgmt_ack.OPT_offset,
-					  cmd.tpi.optmgmt_ack.OPT_length);
-				break;
-
-			case T_BIND_REQ:
-				printf("  ADDR           = ");
-				print_addr(cmd.cbuf + cmd.tpi.bind_req.ADDR_offset,
-					   cmd.tpi.bind_req.ADDR_length);
-				printf("  CONIND_number  = %lu\n", cmd.tpi.bind_req.CONIND_number);
-				break;
-
-			case T_BIND_ACK:
-				printf("  ADDR           = ");
-				print_addr(cmd.cbuf + cmd.tpi.bind_ack.ADDR_offset,
-					   cmd.tpi.bind_ack.ADDR_length);
-				printf("  CONIND_number  = %lu\n", cmd.tpi.bind_ack.CONIND_number);
-				break;
-
-			case T_ADDR_REQ:
-				break;
-
-			case T_ADDR_ACK:
-				printf("  LOCADDR        = ");
-				print_addr(cmd.cbuf + cmd.tpi.addr_ack.LOCADDR_offset,
-					   cmd.tpi.addr_ack.LOCADDR_length);
-				printf("  REMADDR        = ");
-				print_addr(cmd.cbuf + cmd.tpi.addr_ack.REMADDR_offset,
-					   cmd.tpi.addr_ack.REMADDR_length);
-				break;
-
-			case T_UNBIND_REQ:
-				break;
-
-			case T_ERROR_ACK:
-				printf("  ERROR_prim     = ");
-				print_prim(cmd.tpi.error_ack.ERROR_prim);
-				printf("\n");
-				printf("  TLI_error      = ");
-				print_error(cmd.tpi.error_ack.TLI_error);
-				printf("  UNIX_error     = %lu (%s)\n",
-				       cmd.tpi.error_ack.UNIX_error,
-				       strerror(cmd.tpi.error_ack.UNIX_error));
-				break;
-
-			case T_OK_ACK:
-				printf("  CORRECT_prim   = ");
-				print_prim(cmd.tpi.ok_ack.CORRECT_prim);
-				printf("\n");
-				break;
-
-			case T_UNITDATA_REQ:
-				printf("  DEST           = ");
-				print_addr(cmd.cbuf + cmd.tpi.unitdata_req.DEST_offset,
-					   cmd.tpi.unitdata_req.DEST_length);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.unitdata_req.OPT_offset,
-					  cmd.tpi.unitdata_req.OPT_length);
-				break;
-
-			case T_UNITDATA_IND:
-				printf("  SRC            = ");
-				print_addr(cmd.cbuf + cmd.tpi.unitdata_ind.SRC_offset,
-					   cmd.tpi.unitdata_ind.SRC_length);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.unitdata_ind.OPT_offset,
-					  cmd.tpi.unitdata_ind.OPT_length);
-				break;
-
-			case T_UDERROR_IND:
-				printf("  DEST           = ");
-				print_addr(cmd.cbuf + cmd.tpi.uderror_ind.DEST_offset,
-					   cmd.tpi.uderror_ind.DEST_length);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.uderror_ind.OPT_offset,
-					  cmd.tpi.uderror_ind.OPT_length);
-				printf("  ERROR_type     = %lu\n", cmd.tpi.uderror_ind.ERROR_type);
-				break;
-
-			case T_CONN_REQ:
-				printf("  DEST           = ");
-				print_addr(cmd.cbuf + cmd.tpi.conn_req.DEST_offset,
-					   cmd.tpi.conn_req.DEST_length);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.conn_req.OPT_offset,
-					  cmd.tpi.conn_req.OPT_length);
-				break;
-
-			case T_CONN_IND:
-				printf("  SRC            = ");
-				print_addr(cmd.cbuf + cmd.tpi.conn_ind.SRC_offset,
-					   cmd.tpi.conn_ind.SRC_length);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.conn_ind.OPT_offset,
-					  cmd.tpi.conn_ind.OPT_length);
-				printf("  SEQ_number     = %lx\n", cmd.tpi.conn_ind.SEQ_number);
-				seq[fd] = cmd.tpi.conn_ind.SEQ_number;
-				break;
-
-			case T_CONN_RES:
-				printf("  ACCEPTOR_id    = %d\n", fdi.fildes);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.conn_res.OPT_offset,
-					  cmd.tpi.conn_res.OPT_length);
-				printf("  SEQ_number     = %lx\n", cmd.tpi.conn_res.SEQ_number);
-				break;
-
-			case T_CONN_CON:
-				printf("  RES            = ");
-				print_addr(cmd.cbuf + cmd.tpi.conn_con.RES_offset,
-					   cmd.tpi.conn_con.RES_length);
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.conn_con.OPT_offset,
-					  cmd.tpi.conn_con.OPT_length);
-				break;
-
-			case T_DATA_REQ:
-				printf("  MORE_flag      = %lu\n", cmd.tpi.data_req.MORE_flag);
-				printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case T_DATA_IND:
-				printf("  MORE_flag      = %lu\n", cmd.tpi.data_ind.MORE_flag);
-				printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case T_EXDATA_REQ:
-				printf("  MORE_flag      = %lu\n", cmd.tpi.exdata_req.MORE_flag);
-				printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case T_EXDATA_IND:
-				printf("  MORE_flag      = %lu\n", cmd.tpi.exdata_ind.MORE_flag);
-				printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case T_OPTDATA_REQ:
-				printf("  DATA_flag      = ");
-				if (cmd.tpi.optdata_req.DATA_flag & T_ODF_MORE)
-					printf("T_ODF_MORE ");
-				if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
-					printf("T_ODF_EX ");
-				printf("\n");
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.optdata_req.OPT_offset,
-					  cmd.tpi.optdata_req.OPT_length);
-				printf("  DATA           = %s\n", dbuf);
-				break;
-
-			case T_OPTDATA_IND:
-				printf("  DATA_flag      = ");
-				if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
-					printf("T_ODF_MORE ");
-				if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX)
-					printf("T_ODF_EX ");
-				printf("\n");
-				printf("  OPT            = ");
-				print_opt(cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset,
-					  cmd.tpi.optdata_ind.OPT_length);
-				printf("  DATA           = %s\n", dbuf);
-				tsn[fd] =
-				    ((rdat_opt_t *) (cmd.cbuf +
-						     cmd.tpi.optdata_ind.OPT_offset))->tsn_val;
-				sid[fd] =
-				    ((rdat_opt_t *) (cmd.cbuf +
-						     cmd.tpi.optdata_ind.OPT_offset))->sid_val;
-				break;
-
-			case T_DISCON_REQ:
-				printf("  SEQ_number     = %lx\n", cmd.tpi.discon_req.SEQ_number);
-				break;
-
-			case T_DISCON_IND:
-			{
-				long reason = (long) cmd.tpi.discon_ind.DISCON_reason;
-				if (reason >= 0)
-					printf("  DISCON_reason  = %lu\n", (ulong) reason);
-				else
-					printf("  DISCON_reason  = %ld (%s)\n", reason,
-					       strerror(-reason));
-				printf("  SEQ_number     = %lx\n", cmd.tpi.discon_ind.SEQ_number);
-				break;
-			}
-
-			case T_ORDREL_REQ:
-				break;
-
-			case T_ORDREL_IND:
-				break;
-
-			default:
-				printf("Unrecognized primitive %lu!\n", cmd.tpi.type);
-				break;
-			}
-			break;
-		case 1:
-			if (fd == fd1) {
-				switch (cmd.tpi.type) {
-				case T_INFO_REQ:
-					printf
-					    ("T_INFO_REQ    ----->|                               |  |                    \n");
-					break;
-				case T_INFO_ACK:
-					printf
-					    ("T_INFO_ACK    <-----|                               |  |                    \n");
-					break;
-				case T_OPTMGMT_REQ:
-					printf
-					    ("T_OPTMGMT_REQ ----->|                               |  |                    \n");
-					break;
-				case T_OPTMGMT_ACK:
-					printf
-					    ("T_OPTMGMT_ACK <-----|                               |  |                    \n");
-					break;
-				case T_BIND_REQ:
-					printf
-					    ("T_BIND_REQ    ----->|                               |  |                    \n");
-					break;
-				case T_BIND_ACK:
-					printf
-					    ("T_BIND_ACK    <-----|                               |  |                    \n");
-					break;
-				case T_ADDR_REQ:
-					printf
-					    ("T_ADDR_REQ    ----->|                               |  |                    \n");
-					break;
-				case T_ADDR_ACK:
-					printf
-					    ("T_ADDR_ACK    <-----|                               |  |                    \n");
-					break;
-				case T_UNBIND_REQ:
-					printf
-					    ("T_UNBIND_REQ  ----->|                               |  |                    \n");
-					break;
-				case T_ERROR_ACK:
-					printf
-					    ("T_ERROR_ACK   <----/|                               |  |                    \n");
-					printf
-					    ("[%-11s]       |                               |  |                    \n",
-					     err_string(cmd.tpi.error_ack.TLI_error));
-					break;
-				case T_OK_ACK:
-					printf
-					    ("T_OK_ACK      <----/|                |              |  |                    \n");
-					break;
-				case T_UNITDATA_REQ:
-					printf
-					    ("T_UNITDATA_REQ----->|--------------->|                 |                    \n");
-					break;
-				case T_UNITDATA_IND:
-					printf
-					    ("T_UNITDATA_IND<-----|<---------------|                 |                    \n");
-					break;
-				case T_UDERROR_IND:
-					printf
-					    ("T_UDERROR_IND <-----|<---------------|                 |                    \n");
-					break;
-				case T_CONN_REQ:
-					printf
-					    ("T_CONN_REQ    ----->|--------------->|              |  |                    \n");
-					break;
-				case T_CONN_IND:
-					printf
-					    ("T_CONN_IND    <-----|<---------------|              |  |                    \n");
-					seq[fd] = cmd.tpi.conn_ind.SEQ_number;
-					break;
-				case T_CONN_RES:
-					printf
-					    ("T_CONN_RES    ----->|--------------->|              |  |                    \n");
-					break;
-				case T_CONN_CON:
-					printf
-					    ("T_CONN_CON    <-----|<---------------|              |  |                    \n");
-					break;
-				case T_DATA_REQ:
-					printf
-					    ("T_DATA_REQ    ----->|--------------->|                 |                    \n");
-					break;
-				case T_DATA_IND:
-					printf
-					    ("T_DATA_IND    <-----|<---------------|                 |                    \n");
-					break;
-				case T_EXDATA_REQ:
-					printf
-					    ("T_EXDATA_REQ  ----->|--------------->|                 |                    \n");
-					break;
-				case T_EXDATA_IND:
-					printf
-					    ("T_EXDATA_IND  <-----|<---------------|                 |                    \n");
-					break;
-				case T_OPTDATA_REQ:
-					if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
-						printf
-						    ("T_OPTDATA_REQ ----->|---(%03lu:-U-)--->|                 |                    \n",
-						     opt_data.sid_val);
-					else
-						printf
-						    ("T_OPTDATA_REQ ----->|---(%03lu:---)--->|                 |                    \n",
-						     opt_data.sid_val);
-					break;
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX)
-						printf
-						    ("T_OPTDATA_IND <-----|<--(%03lu:-U-)----|  [%010lu]   |                    \n",
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->
-						     tsn_val);
-					else
-						printf
-						    ("T_OPTDATA_IND <-----|<--(%03lu:%03lu)----|  [%010lu]   |                    \n",
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->ssn_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->
-						     tsn_val);
-					tsn[fd] =
-					    ((rdat_opt_t *) (cmd.cbuf +
-							     cmd.tpi.optdata_ind.OPT_offset))->
-					    tsn_val;
-					sid[fd] =
-					    ((rdat_opt_t *) (cmd.cbuf +
-							     cmd.tpi.optdata_ind.OPT_offset))->
-					    sid_val;
-					break;
-				case T_DISCON_REQ:
-					printf
-					    ("T_DISCON_REQ  ----->|--------------->|              |  |                    \n");
-					break;
-				case T_DISCON_IND:
-					printf
-					    ("T_DISCON_IND  <-----|<---------------|              |  |                    \n");
-					break;
-				case T_ORDREL_REQ:
-					printf
-					    ("T_ORDREL_REQ  ----->|--------------->|              |  |                    \n");
-					break;
-				case T_ORDREL_IND:
-					printf
-					    ("T_ORDREL_IND  <-----|<---------------|              |  |                    \n");
-					break;
-				default:
-					printf
-					    ("????%4ld????  ?----?|                                  |                    \n",
-					     cmd.tpi.type);
-					break;
-				}
-			}
-			if (fd == fd2) {
-				switch (cmd.tpi.type) {
-				case T_INFO_REQ:
-					printf
-					    ("                    |                               |<-+------ T_INFO_REQ   \n");
-					break;
-				case T_INFO_ACK:
-					printf
-					    ("                    |                               |--+-----> T_INFO_ACK   \n");
-					break;
-				case T_OPTMGMT_REQ:
-					printf
-					    ("                    |                               |<-+------ T_OPTMGMT_REQ\n");
-					break;
-				case T_OPTMGMT_ACK:
-					printf
-					    ("                    |                               |--+-----> T_OPTMGMT_ACK\n");
-					break;
-				case T_BIND_REQ:
-					printf
-					    ("                    |                               |<-+------ T_BIND_REQ   \n");
-					break;
-				case T_BIND_ACK:
-					printf
-					    ("                    |                               |--+-----> T_BIND_ACK   \n");
-					break;
-				case T_ADDR_REQ:
-					printf
-					    ("                    |                               |<-+------ T_ADDR_REQ   \n");
-					break;
-				case T_ADDR_ACK:
-					printf
-					    ("                    |                               |--+-----> T_ADDR_ACK   \n");
-					break;
-				case T_UNBIND_REQ:
-					printf
-					    ("                    |                               |<-+------ T_UNBIND_REQ \n");
-					break;
-				case T_ERROR_ACK:
-					printf
-					    ("                    |                               |\\-+-----> T_ERROR_ACK  \n");
-					printf
-					    ("                    |                               |          [%-11s]\n",
-					     err_string(cmd.tpi.error_ack.TLI_error));
-					break;
-				case T_OK_ACK:
-					printf
-					    ("                    |                |              |\\-+-----> T_OK_ACK     \n");
-					break;
-				case T_UNITDATA_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ T_UNITDATA_REQ\n");
-					break;
-				case T_UNITDATA_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_UNITDATA_IND\n");
-					break;
-				case T_UDERROR_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_UDERROR_IND \n");
-					break;
-				case T_CONN_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ T_CONN_REQ    \n");
-					break;
-				case T_CONN_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_CONN_IND    \n");
-					seq[fd] = cmd.tpi.conn_ind.SEQ_number;
-					break;
-				case T_CONN_RES:
-					printf
-					    ("                    |                |<-------------|<-+------ T_CONN_RES    \n");
-					break;
-				case T_CONN_CON:
-					printf
-					    ("                    |                |------------->|--+-----> T_CONN_CON    \n");
-					break;
-				case T_DATA_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ T_DATA_REQ    \n");
-					break;
-				case T_DATA_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_DATA_IND    \n");
-					break;
-				case T_EXDATA_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ T_EXDATA_REQ  \n");
-					break;
-				case T_EXDATA_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_EXDATA_IND  \n");
-					break;
-				case T_OPTDATA_REQ:
-					if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
-						printf
-						    ("                    |                |<--(%03lu:-U-)--|<-+------ T_OPTDATA_REQ\n",
-						     opt_data.sid_val);
-					else
-						printf
-						    ("                    |                |<--(%03lu:---)--|<-+------ T_OPTDATA_REQ\n",
-						     opt_data.sid_val);
-					break;
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX)
-						printf
-						    ("                    |  [%010lu]  |---(%03lu:-U-)->|--+-----> T_OPTDATA_IND\n",
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->
-						     sid_val);
-					else
-						printf
-						    ("                    |  [%010lu]  |---(%03lu:%03lu)->|--+-----> T_OPTDATA_IND\n",
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->
-						     ssn_val);
-					tsn[fd] =
-					    ((rdat_opt_t *) (cmd.cbuf +
-							     cmd.tpi.optdata_ind.OPT_offset))->
-					    tsn_val;
-					sid[fd] =
-					    ((rdat_opt_t *) (cmd.cbuf +
-							     cmd.tpi.optdata_ind.OPT_offset))->
-					    sid_val;
-					break;
-				case T_DISCON_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ T_DISCON_REQ \n");
-					break;
-				case T_DISCON_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_DISCON_IND \n");
-					break;
-				case T_ORDREL_REQ:
-					printf
-					    ("                    |                |<-------------|<-+------ T_ORDREL_REQ \n");
-					break;
-				case T_ORDREL_IND:
-					printf
-					    ("                    |                |------------->|--+-----> T_ORDREL_IND \n");
-					break;
-				default:
-					printf
-					    ("                    |                               |?-+-----? ????%4ld???? \n",
-					     cmd.tpi.type);
-					break;
-				}
-			}
-			if (fd == fd3) {
-				switch (cmd.tpi.type) {
-				case T_INFO_REQ:
-					printf
-					    ("                    |                               |  |<----- T_INFO_REQ   \n");
-					break;
-				case T_INFO_ACK:
-					printf
-					    ("                    |                               |  |-----> T_INFO_ACK   \n");
-					break;
-				case T_OPTMGMT_REQ:
-					printf
-					    ("                    |                               |  |<----- T_OPTMGMT_REQ\n");
-					break;
-				case T_OPTMGMT_ACK:
-					printf
-					    ("                    |                               |  |-----> T_OPTMGMT_ACK\n");
-					break;
-				case T_BIND_REQ:
-					printf
-					    ("                    |                               |  |<----- T_BIND_REQ   \n");
-					break;
-				case T_BIND_ACK:
-					printf
-					    ("                    |                               |  |-----> T_BIND_ACK   \n");
-					break;
-				case T_ADDR_REQ:
-					printf
-					    ("                    |                               |  |<----- T_ADDR_REQ   \n");
-					break;
-				case T_ADDR_ACK:
-					printf
-					    ("                    |                               |  |-----> T_ADDR_ACK   \n");
-					break;
-				case T_UNBIND_REQ:
-					printf
-					    ("                    |                               |  |<----- T_UNBIND_REQ \n");
-					break;
-				case T_ERROR_ACK:
-					printf
-					    ("                    |                               |  |\\----> T_ERROR_ACK  \n");
-					printf
-					    ("                    |                               |  |       [%-11s]\n",
-					     err_string(cmd.tpi.error_ack.TLI_error));
-					break;
-				case T_OK_ACK:
-					printf
-					    ("                    |                |              |  |\\----> T_OK_ACK     \n");
-					break;
-				case T_UNITDATA_REQ:
-					printf
-					    ("                    |                |<----------------|<----- T_UNITDATA_REQ\n");
-					break;
-				case T_UNITDATA_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_UNITDATA_IND\n");
-					break;
-				case T_UDERROR_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_UDERROR_IND \n");
-					break;
-				case T_CONN_REQ:
-					printf
-					    ("                    |                |<----------------|<----- T_CONN_REQ    \n");
-					break;
-				case T_CONN_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_CONN_IND    \n");
-					seq[fd] = cmd.tpi.conn_ind.SEQ_number;
-					break;
-				case T_CONN_RES:
-					printf
-					    ("                    |                |<----------------|<----- T_CONN_RES    \n");
-					break;
-				case T_CONN_CON:
-					printf
-					    ("                    |                |---------------->|-----> T_CONN_CON    \n");
-					break;
-				case T_DATA_REQ:
-					printf
-					    ("                    |                |<----------------|<----- T_DATA_REQ    \n");
-					break;
-				case T_DATA_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_DATA_IND    \n");
-					break;
-				case T_EXDATA_REQ:
-					printf
-					    ("                    |                |<----------------|<----- T_EXDATA_REQ  \n");
-					break;
-				case T_EXDATA_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_EXDATA_IND  \n");
-					break;
-				case T_OPTDATA_REQ:
-					if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
-						printf
-						    ("                    |                |<---(%03lu:-U-)----|<----- T_OPTDATA_REQ\n",
-						     opt_data.sid_val);
-					else
-						printf
-						    ("                    |                |<---(%03lu:---)----|<----- T_OPTDATA_REQ\n",
-						     opt_data.sid_val);
-					break;
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX)
-						printf
-						    ("                    |  [%010lu]  |----(%03lu:-U-)--->|-----> T_OPTDATA_IND\n",
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->
-						     sid_val);
-					else
-						printf
-						    ("                    |  [%010lu]  |----(%03lu:%03lu)--->|-----> T_OPTDATA_IND\n",
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->tsn_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->sid_val,
-						     (ulong) ((rdat_opt_t *) (cmd.cbuf +
-									      cmd.tpi.optdata_ind.
-									      OPT_offset))->
-						     ssn_val);
-					tsn[fd] =
-					    ((rdat_opt_t *) (cmd.cbuf +
-							     cmd.tpi.optdata_ind.OPT_offset))->
-					    tsn_val;
-					sid[fd] =
-					    ((rdat_opt_t *) (cmd.cbuf +
-							     cmd.tpi.optdata_ind.OPT_offset))->
-					    sid_val;
-					break;
-				case T_DISCON_REQ:
-					printf
-					    ("                    |                |<----------------|<----- T_DISCON_REQ \n");
-					break;
-				case T_DISCON_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_DISCON_IND \n");
-					break;
-				case T_ORDREL_REQ:
-					printf
-					    ("                    |                |<----------------|<----- T_ORDREL_REQ \n");
-					break;
-				case T_ORDREL_IND:
-					printf
-					    ("                    |                |---------------->|-----> T_ORDREL_IND \n");
-					break;
-				default:
-					printf
-					    ("                    |                               |  |?----? ????%4ld???? \n",
-					     cmd.tpi.type);
-					break;
-				}
-			}
-			break;
+	switch (event) {
+	case __EVENT_INFO_REQ:
+		fprintf(stdout, "                    |                               |  |<--- T_INFO_REQ     [%d]\n", state);
+		break;
+	case __EVENT_INFO_ACK:
+		fprintf(stdout, "                    |                               |  |\\--> T_INFO_ACK---> [%d]\n", state);
+		break;
+	case __EVENT_OPTMGMT_REQ:
+		fprintf(stdout, "                    |                               |  |<--- T_OPTMGMT_REQ  [%d]\n", state);
+		print_mgmtflag(fd, cmd.tpi.optmgmt_req.MGMT_flags);
+		print_options(fd, cmd.cbuf + cmd.tpi.optmgmt_req.OPT_offset, cmd.tpi.optmgmt_req.OPT_length);
+		break;
+	case __EVENT_OPTMGMT_ACK:
+		fprintf(stdout, "                    |                               |  |\\--> T_OPTMGMT_ACK  [%d]\n", state);
+		print_mgmtflag(fd, cmd.tpi.optmgmt_ack.MGMT_flags);
+		print_options(fd, cmd.cbuf + cmd.tpi.optmgmt_ack.OPT_offset, cmd.tpi.optmgmt_ack.OPT_length);
+		break;
+	case __EVENT_BIND_REQ:
+		fprintf(stdout, "                    |                               |  |<--- T_BIND_REQ     [%d]\n", state);
+		break;
+	case __EVENT_BIND_ACK:
+		fprintf(stdout, "                    |                               |  |\\--> T_BIND_ACK     [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n", addr_string(cmd.cbuf + cmd.tpi.bind_ack.ADDR_offset, cmd.tpi.bind_ack.ADDR_length));
 		}
+		break;
+	case __EVENT_ADDR_REQ:
+		fprintf(stdout, "                    |                               |  |<--- T_ADDR_REQ     [%d]\n", state);
+		break;
+	case __EVENT_ADDR_ACK:
+		fprintf(stdout, "                    |                               |  |\\--> T_ADDR_ACK     [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.addr_ack.LOCADDR_offset, cmd.tpi.addr_ack.LOCADDR_length));
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.addr_ack.REMADDR_offset, cmd.tpi.addr_ack.REMADDR_length));
+		}
+		break;
+	case __EVENT_UNBIND_REQ:
+		fprintf(stdout, "                    |                               |  |<--- T_UNBIND_REQ   [%d]\n", state);
+		break;
+	case __EVENT_ERROR_ACK:
+		fprintf(stdout, "                    |                               |  |\\--> T_ERROR_ACK    [%d]\n", state);
+		fprintf(stdout, "                    |                               |  |     %-15s\n", terrno_string(cmd.tpi.error_ack.TLI_error, cmd.tpi.error_ack.UNIX_error));
+		break;
+	case __EVENT_OK_ACK:
+		fprintf(stdout, "                    |                               |  |\\--> T_OK_ACK       [%d]\n", state);
+		break;
+	case __EVENT_UNITDATA_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_UNITDATA_REQ [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.unitdata_req.DEST_offset, cmd.tpi.unitdata_req.DEST_length));
+			print_options(fd, cmd.cbuf + cmd.tpi.unitdata_req.OPT_offset, cmd.tpi.unitdata_req.OPT_length);
+		}
+		break;
+	case __EVENT_UNITDATA_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_UNITDATA_IND [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.unitdata_ind.SRC_offset, cmd.tpi.unitdata_ind.SRC_length));
+			print_options(fd, cmd.cbuf + cmd.tpi.unitdata_ind.OPT_offset, cmd.tpi.unitdata_ind.OPT_length);
+		}
+		break;
+	case __EVENT_UDERROR_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|\\--> T_UDERROR_IND  [%d]\n", state);
+		break;
+	case __EVENT_CONN_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_CONN_REQ     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_req.OPT_offset, cmd.tpi.conn_req.OPT_length);
+		break;
+	case __EVENT_CONN_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_CONN_IND     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_ind.OPT_offset, cmd.tpi.conn_ind.OPT_length);
+		seq[fd] = cmd.tpi.conn_ind.SEQ_number;
+		break;
+	case __EVENT_CONN_RES:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_CONN_RES     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_res.OPT_offset, cmd.tpi.conn_res.OPT_length);
+		break;
+	case __EVENT_CONN_CON:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_CONN_CON     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_con.OPT_offset, cmd.tpi.conn_con.OPT_length);
+		break;
+	case __EVENT_DATA_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_DATA_REQ     [%d]\n", state);
+		break;
+	case __EVENT_DATA_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_DATA_IND     [%d]\n", state);
+		break;
+	case __EVENT_EXDATA_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_EXDATA_REQ   [%d]\n", state);
+		break;
+	case __EVENT_EXDATA_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_EXDATA_IND   [%d]\n", state);
+		break;
+	case __EVENT_OPTDATA_REQ:
+		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
+			fprintf(stdout, "                    |               /<- - (%03lu:-U-) + -|<--- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+		else
+			fprintf(stdout, "                    |               /<- - (%03lu:---) + -|<--- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
+		break;
+	case __EVENT_OPTDATA_IND:
+		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
+			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:-U-) +->|---> T_OPTDATA_IND  [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+			else
+				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:-U-) +->|---> T_OPTDATA_IND  [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+		} else {
+			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:%03lu) +->|---> T_OPTDATA_IND  [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
+			else
+				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:%03lu) +->|---> T_OPTDATA_IND  [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
+		}
+		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
+		tsn[fd] = ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val;
+		sid[fd] = ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val;
+		break;
+	case __EVENT_DISCON_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_DISCON_REQ   [%d]\n", state);
+		break;
+	case __EVENT_DISCON_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_DISCON_IND   [%d]\n", state);
+		break;
+	case __EVENT_ORDREL_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - + -|<--- T_ORDREL_REQ   [%d]\n", state);
+		break;
+	case __EVENT_ORDREL_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_ORDREL_IND   [%d]\n", state);
+		break;
+	case __EVENT_CAPABILITY_REQ:
+		fprintf(stdout, "                    |                               |  |<---T_CAPABILITY_REQ[%d]\n", state);
+		break;
+	case __EVENT_CAPABILITY_ACK:
+		fprintf(stdout, "                    |                               |  |\\-->T_CAPABILITY_ACK[%d]\n", state);
+		break;
+	case __EVENT_UNKNOWN:
+		fprintf(stdout, "                    |                               |  |?--? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		break;
+	default:
+	case __RESULT_SCRIPT_ERROR:
+		break;
 	}
-	FFLUSH(stdout);
+}
+
+void
+print_event_list(int fd, int event)
+{
+	switch (event) {
+	case __EVENT_INFO_REQ:
+		fprintf(stdout, "                    |                               |<-+---- T_INFO_REQ     [%d]\n", state);
+		break;
+	case __EVENT_INFO_ACK:
+		fprintf(stdout, "                    |                               |\\-+---> T_INFO_ACK     [%d]\n", state);
+		break;
+	case __EVENT_OPTMGMT_REQ:
+		fprintf(stdout, "                    |                               |<-+---- T_OPTMGMT_REQ  [%d]\n", state);
+		print_mgmtflag(fd, cmd.tpi.optmgmt_req.MGMT_flags);
+		print_options(fd, cmd.cbuf + cmd.tpi.optmgmt_req.OPT_offset, cmd.tpi.optmgmt_req.OPT_length);
+		break;
+	case __EVENT_OPTMGMT_ACK:
+		fprintf(stdout, "                    |                               |\\-+---- T_OPTMGMT_ACK  [%d]\n", state);
+		print_mgmtflag(fd, cmd.tpi.optmgmt_ack.MGMT_flags);
+		print_options(fd, cmd.cbuf + cmd.tpi.optmgmt_ack.OPT_offset, cmd.tpi.optmgmt_ack.OPT_length);
+		break;
+	case __EVENT_BIND_REQ:
+		fprintf(stdout, "                    |                               |<-+---- T_BIND_REQ     [%d]\n", state);
+		break;
+	case __EVENT_BIND_ACK:
+		fprintf(stdout, "                    |                               |\\-+---> T_BIND_ACK     [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n", addr_string(cmd.cbuf + cmd.tpi.bind_ack.ADDR_offset, cmd.tpi.bind_ack.ADDR_length));
+		}
+		break;
+	case __EVENT_ADDR_REQ:
+		fprintf(stdout, "                    |                               |<-+---- T_ADDR_REQ     [%d]\n", state);
+		break;
+	case __EVENT_ADDR_ACK:
+		fprintf(stdout, "                    |                               |\\-+---> T_ADDR_ACK     [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.addr_ack.LOCADDR_offset, cmd.tpi.addr_ack.LOCADDR_length));
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.addr_ack.REMADDR_offset, cmd.tpi.addr_ack.REMADDR_length));
+		}
+		break;
+	case __EVENT_UNBIND_REQ:
+		fprintf(stdout, "                    |                               |<-+---- T_UNBIND_REQ   [%d]\n", state);
+		break;
+	case __EVENT_ERROR_ACK:
+		fprintf(stdout, "                    |                               |\\-+---> T_ERROR_ACK    [%d]\n", state);
+		fprintf(stdout, "                    |                               |   .    %-15s\n", terrno_string(cmd.tpi.error_ack.TLI_error, cmd.tpi.error_ack.UNIX_error));
+		break;
+	case __EVENT_OK_ACK:
+		fprintf(stdout, "                    |                               |\\-+---> T_OK_ACK       [%d]\n", state);
+		break;
+	case __EVENT_UNITDATA_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_UNITDATA_REQ [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.unitdata_req.DEST_offset, cmd.tpi.unitdata_req.DEST_length));
+			print_options(fd, cmd.cbuf + cmd.tpi.unitdata_req.OPT_offset, cmd.tpi.unitdata_req.OPT_length);
+		}
+		break;
+	case __EVENT_UNITDATA_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_UNITDATA_IND [%d]\n", state);
+		if (verbose > 1) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n",
+				addr_string(cmd.cbuf + cmd.tpi.unitdata_ind.SRC_offset, cmd.tpi.unitdata_ind.SRC_length));
+			print_options(fd, cmd.cbuf + cmd.tpi.unitdata_ind.OPT_offset, cmd.tpi.unitdata_ind.OPT_length);
+		}
+		break;
+	case __EVENT_UDERROR_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|\\-+---> T_UDERROR_IND  [%d]\n", state);
+		break;
+	case __EVENT_CONN_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_CONN_REQ     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_req.OPT_offset, cmd.tpi.conn_req.OPT_length);
+		break;
+	case __EVENT_CONN_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_CONN_IND     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_ind.OPT_offset, cmd.tpi.conn_ind.OPT_length);
+		seq[fd] = cmd.tpi.conn_ind.SEQ_number;
+		break;
+	case __EVENT_CONN_RES:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_CONN_RES     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_res.OPT_offset, cmd.tpi.conn_res.OPT_length);
+		break;
+	case __EVENT_CONN_CON:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_CONN_CON     [%d]\n", state);
+		print_options(fd, cmd.cbuf + cmd.tpi.conn_con.OPT_offset, cmd.tpi.conn_con.OPT_length);
+		break;
+	case __EVENT_DATA_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_DATA_REQ     [%d]\n", state);
+		break;
+	case __EVENT_DATA_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_DATA_IND     [%d]\n", state);
+		break;
+	case __EVENT_EXDATA_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_EXDATA_REQ   [%d]\n", state);
+		break;
+	case __EVENT_EXDATA_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_EXDATA_IND   [%d]\n", state);
+		break;
+	case __EVENT_OPTDATA_REQ:
+		if (cmd.tpi.optdata_req.DATA_flag & T_ODF_EX)
+			fprintf(stdout, "                    |               /<- -(%03lu:-U-)- |<-+---- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+		else
+			fprintf(stdout, "                    |               /<- -(%03lu:---)- |<-+---- T_OPTDATA_REQ  [%d]\n", opt_data.sid_val, state);
+		print_options(fd, cmd.cbuf + cmd.tpi.optdata_req.OPT_offset, cmd.tpi.optdata_req.OPT_length);
+		break;
+	case __EVENT_OPTDATA_IND:
+		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
+			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:-U-)->|--+---> T_OPTDATA_IND+ [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+			else
+				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:-U-)->|--+---> T_OPTDATA_IND  [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+		} else {
+			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
+				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:%03lu)->|--+---> T_OPTDATA_IND+ [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
+			else
+				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:%03lu)->|--+---> T_OPTDATA_IND  [%d]\n",
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
+		}
+		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
+		tsn[fd] = ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val;
+		sid[fd] = ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val;
+		break;
+	case __EVENT_DISCON_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_DISCON_REQ   [%d]\n", state);
+		break;
+	case __EVENT_DISCON_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_DISCON_IND   [%d]\n", state);
+		break;
+	case __EVENT_ORDREL_REQ:
+		fprintf(stdout, "                    |               /<- - - - - - - |<-+---- T_ORDREL_REQ   [%d]\n", state);
+		break;
+	case __EVENT_ORDREL_IND:
+		fprintf(stdout, "                    |               \\ - - - - - - ->|--+---> T_ORDREL_IND   [%d]\n", state);
+		break;
+	case __EVENT_CAPABILITY_REQ:
+		fprintf(stdout, "                    |                               |<-+----T_CAPABILITY_REQ[%d]\n", state);
+		break;
+	case __EVENT_CAPABILITY_ACK:
+		fprintf(stdout, "                    |                               |\\-+--->T_CAPABILITY_ACK[%d]\n", state);
+		break;
+	case __EVENT_UNKNOWN:
+		fprintf(stdout, "                    |                               |?-+---? ????%4ld????   [%d]\n", cmd.tpi.type, state);
+		break;
+	default:
+	case __RESULT_SCRIPT_ERROR:
+		break;
+	}
+}
+
+void
+print_event(int fd, int event)
+{
+	if (verbose < 1 || !show)
+		return;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (fd == conn_fd)
+		print_event_conn(fd, event);
+	else if (fd == resp_fd)
+		print_event_resp(fd, event);
+	else if (fd == list_fd)
+		print_event_list(fd, event);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return;
 }
 
 void
 print_less(int fd)
 {
-	switch (show) {
-	case 1:
-		switch (fd) {
-		case 0:
-			printf
-			    (" .         .  <---->|                .                 |<---->  .         . \n");
-			printf
-			    (" .  (more) .  <---->|                .                 |<---->  . (more)  . \n");
-			printf
-			    (" .         .  <---->|                .                 |<---->  .         . \n");
-			break;
-		case 3:
-			printf
-			    (" .         .  <---->|                .              |  |                    \n");
-			printf
-			    (" .  (more) .  <---->|                .              |  |                    \n");
-			printf
-			    (" .         .  <---->|                .              |  |                    \n");
-			break;
-		case 4:
-			printf
-			    ("                    |                .              |<-+----->  .         . \n");
-			printf
-			    ("                    |                .              |<-+----->  . (more)  . \n");
-			printf
-			    ("                    |                .              |<-+----->  .         . \n");
-			break;
-		case 5:
-			printf
-			    ("                    |                .              |  |<---->  .         . \n");
-			printf
-			    ("                    |                .              |  |<---->  . (more)  . \n");
-			printf
-			    ("                    |                .              |  |<---->  .         . \n");
-			break;
-		}
-		break;
-	case 2:
-		printf("%d-(more) ...\n", fd);
-		break;
+	if (verbose < 1 || !show)
+		return;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (fd == conn_fd) {
+		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
+		fprintf(stdout, " .  (more) .  <---->|               .               :  :                    [%d]\n", state);
+		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
+	} else if (fd == resp_fd) {
+		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
+		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .   [%d]\n", state);
+		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
+	} else if (fd == list_fd) {
+		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
+		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .   [%d]\n", state);
+		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
 	}
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
 	show = 0;
 	return;
 }
@@ -1681,289 +2111,495 @@ print_more(void)
 	show = 1;
 }
 
-int
-get_msg(int fd, int wait)
+void
+print_open(int *fdp)
 {
-	int ret;
-	int flags = 0;
-	while ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {
-		switch (errno) {
+	if (verbose > 3) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fdp == &conn_fd)
+			fprintf(stdout, "open()        ----->v                                                       \n");
+		else if (fdp == &resp_fd)
+			fprintf(stdout, "                    |                                  v<--- open()         \n");
+		else if (fdp == &list_fd)
+			fprintf(stdout, "                    |                               v<-|---- open()         \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_close(int *fdp)
+{
+	if (verbose > 3) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fdp == &conn_fd)
+			fprintf(stdout, "close()       ----->X                               |  |                    \n");
+		else if (fdp == &resp_fd)
+			fprintf(stdout, "                                                    |  X<--- close()        \n");
+		else if (fdp == &list_fd)
+			fprintf(stdout, "                                                    X<------ close()        \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_command(int fd, const char *command)
+{
+	if (verbose > 3) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout, "%-14s----->|                               |  |                    [%d]\n", command, state);
+		else if (fd == resp_fd)
+			fprintf(stdout, "                    |                               |  |<--- %-14s [%d]\n", command, state);
+		else if (fd == list_fd)
+			fprintf(stdout, "                    |                               |<-+---- %-14s [%d]\n", command, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_errno(int fd, long error)
+{
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout, "%-14s<----/|                               |  |                    [%d]\n", errno_string(error), state);
+		else if (fd == resp_fd)
+			fprintf(stdout, "                    |                               |  |\\--> %-14s [%d]\n", errno_string(error), state);
+		else if (fd == list_fd)
+			fprintf(stdout, "                    |                               |\\-+---> %-14s [%d]\n", errno_string(error), state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_success(int fd)
+{
+	if (verbose > 4) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout, "ok            <----/|                               |  |                    [%d]\n", state);
+		else if (fd == resp_fd)
+			fprintf(stdout, "                    |                               |  |\\--> ok             [%d]\n", state);
+		else if (fd == list_fd)
+			fprintf(stdout, "                    |                               |\\-+---> ok             [%d]\n", state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+static int
+decode_data(int fd)
+{
+	int event = __RESULT_DECODE_ERROR;
+	if (data.len >= 0)
+		event = __EVENT_DATA;
+	if (verbose > 0 && show)
+		print_event(fd, event);
+	return ((last_event = event));
+}
+
+static int
+decode_ctrl(int fd)
+{
+	int event = __RESULT_DECODE_ERROR;
+	if (ctrl.len >= sizeof(cmd.tpi.type))
+		switch ((last_prim = cmd.tpi.type)) {
+		case T_CONN_REQ:
+			event = __EVENT_CONN_REQ;
+			break;
+		case T_CONN_RES:
+			event = __EVENT_CONN_RES;
+			break;
+		case T_DISCON_REQ:
+			event = __EVENT_DISCON_REQ;
+			break;
+		case T_DATA_REQ:
+			event = __EVENT_DATA_REQ;
+			break;
+		case T_EXDATA_REQ:
+			event = __EVENT_EXDATA_REQ;
+			break;
+		case T_INFO_REQ:
+			event = __EVENT_INFO_REQ;
+			break;
+		case T_BIND_REQ:
+			event = __EVENT_BIND_REQ;
+			break;
+		case T_UNBIND_REQ:
+			event = __EVENT_UNBIND_REQ;
+			break;
+		case T_UNITDATA_REQ:
+			event = __EVENT_UNITDATA_REQ;
+			break;
+		case T_OPTMGMT_REQ:
+			event = __EVENT_OPTMGMT_REQ;
+			break;
+		case T_ORDREL_REQ:
+			event = __EVENT_ORDREL_REQ;
+			break;
+		case T_OPTDATA_REQ:
+			event = __EVENT_OPTDATA_REQ;
+			break;
+		case T_ADDR_REQ:
+			event = __EVENT_ADDR_REQ;
+			break;
+		case T_CAPABILITY_REQ:
+			event = __EVENT_CAPABILITY_REQ;
+			break;
+		case T_CONN_IND:
+			event = __EVENT_CONN_IND;
+			break;
+		case T_CONN_CON:
+			event = __EVENT_CONN_CON;
+			break;
+		case T_DISCON_IND:
+			event = __EVENT_DISCON_IND;
+			break;
+		case T_DATA_IND:
+			event = __EVENT_DATA_IND;
+			break;
+		case T_EXDATA_IND:
+			event = __EVENT_EXDATA_IND;
+			break;
+		case T_INFO_ACK:
+			event = __EVENT_INFO_ACK;
+			break;
+		case T_BIND_ACK:
+			event = __EVENT_BIND_ACK;
+			break;
+		case T_ERROR_ACK:
+			event = __EVENT_ERROR_ACK;
+			break;
+		case T_OK_ACK:
+			event = __EVENT_OK_ACK;
+			break;
+		case T_UNITDATA_IND:
+			event = __EVENT_UNITDATA_IND;
+			break;
+		case T_UDERROR_IND:
+			event = __EVENT_UDERROR_IND;
+			break;
+		case T_OPTMGMT_ACK:
+			event = __EVENT_OPTMGMT_ACK;
+			break;
+		case T_ORDREL_IND:
+			event = __EVENT_ORDREL_IND;
+			break;
+		case T_OPTDATA_IND:
+			event = __EVENT_OPTDATA_IND;
+			break;
+		case T_ADDR_ACK:
+			event = __EVENT_ADDR_ACK;
+			break;
+		case T_CAPABILITY_ACK:
+			event = __EVENT_CAPABILITY_ACK;
+			break;
 		default:
-		case EPROTO:
-		case EINVAL:
-			printf("ERROR: getmsg: [%d] %s\n", errno, strerror(errno));
-			exit(2);
-		case EINTR:
-		case ERESTART:
-			continue;
-		case EAGAIN:
+			event = __EVENT_UNKNOWN;
 			break;
 		}
-		break;
+	if (verbose > 0 && show)
+		print_event(fd, event);
+	return ((last_event = event));
+}
+
+static int
+decode_msg(int fd)
+{
+	if (ctrl.len >= 0) {
+		if ((last_event = decode_ctrl(fd)) != __EVENT_UNKNOWN)
+			return time_event(last_event);
+	} else if (data.len >= 0) {
+		if ((last_event = decode_data(fd)) != __EVENT_UNKNOWN)
+			return time_event(last_event);
 	}
-	if (!ret) {
-		gettimeofday(&when, NULL);
-		if (show)
-			print_msg(fd);
-		return (cmd.tpi.type);
-	}
-	if (!wait) {
-		/*
-		 * printf("Nothing to get on getmsg\n"); 
-		 */
-		return (FAILURE);
-	}
-	do {
-		struct pollfd pfd[] = {
-			{fd, POLLIN | POLLPRI, 0}
-		};
-		if (!(ret = poll(pfd, 1, wait))) {
-			/*
-			 * printf("Timeout on poll for getmsg\n"); 
-			 */
-			return (FAILURE);
-		}
-		if (ret == 1 || ret == 2) {
-			if (pfd[0].revents & (POLLIN | POLLPRI)) {
-				flags = 0;
-				if (getmsg(fd, &ctrl, &data, &flags) == 0) {
-					gettimeofday(&when, NULL);
-					if (show)
-						print_msg(fd);
-					return (cmd.tpi.type);
-				}
-				printf("ERROR: getmsg: [%d] %s\n", errno, strerror(errno));
-				return (FAILURE);
+	return ((last_event = __EVENT_NO_MSG));
+}
+
+int
+wait_event(int fd, int wait)
+{
+	for (;;) {
+		struct pollfd pfd[] = { {fd, POLLIN | POLLPRI, 0} };
+		if (timer_timeout) {
+			timer_timeout = 0;
+			if (show_timeout || verbose > 1) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				if (fd == conn_fd)
+					fprintf(stdout, "++++++++++++++++++++|+++++++++++ TIMEOUT +++++++++++|  |                    [%d]\n", state);
+				else if (fd == resp_fd)
+					fprintf(stdout, "                    |+++++++++++ TIMEOUT +++++++++++|  |++++++++++++++++++++[%d]\n", state);
+				else if (fd == list_fd)
+					fprintf(stdout, "                    |+++++++++++ TIMEOUT +++++++++++|++|++++++++++++++++++++[%d]\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+				show_timeout--;
 			}
+			last_event = __EVENT_TIMEOUT;
+			return time_event(__EVENT_TIMEOUT);
 		}
-		if (ret == -1) {
-			printf("ERROR: poll: [%d] %s\n", errno, strerror(errno));
-			return (FAILURE);
+		print_command(fd, "poll()");
+		pfd[0].fd = fd;
+		pfd[0].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
+		pfd[0].revents = 0;
+		switch (poll(pfd, 1, wait)) {
+		case -1:
+			print_errno(fd, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				break;
+			return (__RESULT_FAILURE);
+		case 0:
+			print_success(fd);
+			last_event = __EVENT_NO_MSG;
+			return time_event(__EVENT_NO_MSG);
+		case 1:
+			print_success(fd);
+			if (pfd[0].revents) {
+				int ret;
+				ctrl.len = -1;
+				data.len = -1;
+				flags = 0;
+				for (;;) {
+					print_command(fd, "getmsg()");
+					if ((ret = getmsg(fd, &ctrl, &data, &flags)) >= 0)
+						break;
+					print_errno(fd, (last_errno = errno));
+					if (last_errno == EINTR || last_errno == ERESTART)
+						continue;
+					if (last_errno == EAGAIN)
+						break;
+					return __RESULT_FAILURE;
+				}
+				if (ret < 0)
+					break;
+				if (ret == 0) {
+					print_success(fd);
+					if ((last_event = decode_msg(fd)) != __EVENT_NO_MSG)
+						return (last_event);
+				}
+			}
+		default:
+			break;
 		}
 	}
-	while (1);
+	return __EVENT_UNKNOWN;
+}
+
+int
+get_event(int fd)
+{
+	return wait_event(fd, -1);
+}
+
+void
+test_sleep(int fd, unsigned long t)
+{
+	if (verbose > 0 && show) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout, "/ / / / / / / / / / | / / / Waiting %03lu seconds / / |  |                    [%d]\n", t, state);
+		else if (fd == resp_fd)
+			fprintf(stdout, "                    | / / / Waiting %03lu seconds / / |  | / / / / / / / / / /[%d]\n", t, state);
+		else if (fd == list_fd)
+			fprintf(stdout, "                    | / / / Waiting %03lu seconds / / |/ | / / / / / / / / / /[%d]\n", t, state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	sleep(t);
 }
 
 int
 expect(int fd, int wait, int want)
 {
-	int got;
-	if ((got = get_msg(fd, wait)) == want)
-		return (SUCCESS);
-	else {
-		switch (show) {
-		case 1:
-			switch (fd) {
-			case 3:
-				printf
-				    ("(%-12s)<-????X[Expected]                     X  X                    \n",
-				     prim_string(want));
-				break;
-			case 4:
-				printf
-				    ("                    X                     [Expected]X--X\?\?\?\?->(%-12s)\n",
-				     prim_string(want));
-				break;
-			case 5:
-				printf
-				    ("                    X                     [Expected]X  X\?\?\?\?->(%-12s)\n",
-				     prim_string(want));
-				break;
-			}
-			break;
-		case 2:
-			printf("%d-ERROR: Expected ", fd);
-			print_prim(want);
-			printf(" got ");
-			print_prim(got);
-			printf("\n");
-			break;
-		}
-		return (FAILURE);
+	if ((last_event = wait_event(fd, wait)) == want)
+		return (__RESULT_SUCCESS);
+	if (verbose > 1 && show) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		if (fd == conn_fd)
+			fprintf(stdout, "- (%-15s) | - - - - - [Expected]- - - - - |  |                    [%d]\n", event_string(want), state);
+		else if (fd == resp_fd)
+			fprintf(stdout, "                    | - - - - - [Expected]- - - - - |  | (%-15s) -[%d]\n", event_string(want), state);
+		else if (fd == list_fd)
+			fprintf(stdout, "                    | - - - - - [Expected]- - - - - |- | (%-15s) -[%d]\n", event_string(want), state);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
 	}
+	return (__RESULT_FAILURE);
 }
 
 int
 put_msg(int fd, int band, int flags, int wait)
 {
 	int ret;
-	struct strbuf *mydata = data.len ? &data : NULL;
-	while ((ret = putpmsg(fd, &ctrl, mydata, band, flags)) < 0) {
-		switch (errno) {
-		default:
-			printf("%d-ERROR: putpmsg: [%d] %s\n", fd, errno, strerror(errno));
-			exit(2);
+	struct strbuf *myctrl = ctrl.len >= 0 ? &ctrl : NULL;
+	struct strbuf *mydata = data.len >= 0 ? &data : NULL;
+	decode_msg(fd);
+	for (;;) {
+		print_command(fd, "putpmsg()");
+		if ((ret = putpmsg(fd, myctrl, mydata, band, flags)) >= 0)
 			break;
-		case EINTR:
-		case ERESTART:
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
-		case EAGAIN:
+		if (last_errno == EAGAIN)
 			break;
-		}
-		break;
+		return (__RESULT_FAILURE);
 	}
-	if (!ret) {
-		gettimeofday(&when, NULL);
-		if (show)
-			print_msg(fd);
-		return (SUCCESS);
-	}
+	print_success(fd);
+	if (!ret)
+		return (__RESULT_SUCCESS);
 	if (!wait) {
-		/*
+		/* 
 		 * printf("Nothing put on putpmsg\n"); 
 		 */
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	}
-	do {
+	for (;;) {
 		int flag = band ? POLLWRNORM | POLLOUT : POLLWRBAND;
 		struct pollfd pfd[] = {
 			{fd, flag, 0}
 		};
 		if (!(ret = poll(pfd, 1, wait))) {
-			/*
+			/* 
 			 * printf("Timeout on poll for putpmsg\n"); 
 			 */
-			return (FAILURE);
+			return (__RESULT_FAILURE);
 		}
 		if (ret == 1 || ret == 2) {
 			if (pfd[0].revents & (POLLOUT | POLLWRNORM | POLLWRBAND)) {
-				if (putpmsg(fd, &ctrl, mydata, band, flags) == 0) {
-					gettimeofday(&when, NULL);
-					if (show)
-						print_msg(fd);
-					return (SUCCESS);
-				}
+				if (putpmsg(fd, myctrl, mydata, band, flags) == 0)
+					return (__RESULT_SUCCESS);
 				printf("%d-ERROR: putpmsg: [%d] %s\n", fd, errno, strerror(errno));
-				return (FAILURE);
+				return (__RESULT_FAILURE);
 			}
 		}
 		if (ret == -1) {
 			printf("%d-ERROR: poll: [%d] %s\n", fd, errno, strerror(errno));
-			return (FAILURE);
+			return (__RESULT_FAILURE);
 		}
 	}
-	while (1);
 }
 
 int
-put_fdi(int fd, int fd2, int offset, int flags)
+put_fdi(int fd, int resfd, int offset, int flags)
 {
 	fdi.flags = flags;
-	fdi.fildes = fd2;
+	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (show)
-		print_msg(fd);
-	gettimeofday(&when, NULL);
-	if (ioctl(fd, I_FDINSERT, &fdi) < 0) {
-		printf("ERROR: ioctl: [%d] %s\n", errno, strerror(errno));
-		exit(2);
+	decode_msg(fd);
+	for (;;) {
+		print_command(fd, "ioctl()");
+		if (ioctl(fd, I_FDINSERT, &fdi) >= 0) {
+			print_success(fd);
+			return (__RESULT_SUCCESS);
+		}
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
 	}
-	return (SUCCESS);
 }
 
 int
-inet_open(const char *name)
+inet_open(const char *name, int *fdp)
 {
 	int fd;
-	if ((fd = open(name, O_NONBLOCK | O_RDWR)) < 0)
-		printf("ERROR: open: [%d] %s\n", errno, strerror(errno));
-	else
-		switch (show) {
-		case 1:
-			switch (fd) {
-			case 3:
-				printf
-				    ("OPEN          ----->v                                                       \n");
-				break;
-			case 4:
-				printf
-				    ("                    |                               v<-------- OPEN         \n");
-				break;
-			case 5:
-				printf
-				    ("                    |                               |  v<----- OPEN         \n");
-				break;
-			}
-			break;
-		case 2:
-			printf("\n%d-OPEN: %s\n", fd, name);
-			break;
+	for (;;) {
+		print_open(fdp);
+		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+			*fdp = fd;
+			print_success(fd);
+			return (__RESULT_SUCCESS);
 		}
-	return (fd);
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
+	}
 }
 
 int
-inet_close(int fd)
+inet_close(int *fdp)
 {
-	int ret;
-	if ((ret = close(fd)) < 0)
-		printf("ERROR: close: [%d] %s\n", errno, strerror(errno));
-	else
-		switch (show) {
-		case 1:
-			switch (fd) {
-			case 3:
-				printf
-				    ("CLOSE         ----->X                               |  |                    \n");
-				break;
-			case 4:
-				printf
-				    ("                                                    X<-+------ CLOSE        \n");
-				break;
-			case 5:
-				printf
-				    ("                                                       X<----- CLOSE        \n");
-				break;
-			}
-			break;
-		case 2:
-			printf("\n%d-CLOSE:\n", fd);
-			break;
+	int fd = *fdp;
+	*fdp = 0;
+	for (;;) {
+		print_close(fdp);
+		if (close(fd) >= 0) {
+			print_success(fd);
+			return __RESULT_SUCCESS;
 		}
-	return (ret);
+		print_errno(fd, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return __RESULT_FAILURE;
+	}
 }
 
 int
 inet_info_req(int fd)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.info_req);
 	cmd.tpi.type = T_INFO_REQ;
+	data.len = -1;
+	return put_msg(fd, 0, MSG_HIPRI, 0);
+}
+
+int
+inet_addr_req(int fd)
+{
+	ctrl.len = sizeof(cmd.tpi.addr_req);
+	cmd.tpi.type = T_ADDR_REQ;
+	data.len = -1;
+	return put_msg(fd, 0, MSG_HIPRI, 0);
+}
+
+int
+inet_capability_req(int fd)
+{
+	ctrl.len = sizeof(cmd.tpi.capability_req);
+	cmd.tpi.type = T_CAPABILITY_REQ;
+	data.len = -1;
 	return put_msg(fd, 0, MSG_HIPRI, 0);
 }
 
 int
 inet_optmgmt_req(int fd, ulong flags)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.optmgmt_req) + sizeof(opt_optm);
 	cmd.tpi.type = T_OPTMGMT_REQ;
 	cmd.tpi.optmgmt_req.MGMT_flags = flags;
 	cmd.tpi.optmgmt_req.OPT_length = sizeof(opt_optm);
 	cmd.tpi.optmgmt_req.OPT_offset = sizeof(cmd.tpi.optmgmt_req);
 	bcopy(&opt_optm, (cmd.cbuf + sizeof(cmd.tpi.optmgmt_req)), sizeof(opt_optm));
+	data.len = -1;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
 int
 inet_bind_req(int fd, struct sockaddr_in *addr, int coninds)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.bind_req) + sizeof(*addr);
 	cmd.tpi.type = T_BIND_REQ;
-	cmd.tpi.bind_req.ADDR_length = sizeof(*addr);
-	cmd.tpi.bind_req.ADDR_offset = sizeof(cmd.tpi.bind_req);
+	cmd.tpi.bind_req.ADDR_length = addr ? sizeof(*addr) : 0;
+	cmd.tpi.bind_req.ADDR_offset = addr ? sizeof(cmd.tpi.bind_req) : 0;
 	cmd.tpi.bind_req.CONIND_number = coninds;
-	bcopy(addr, (&cmd.tpi.bind_req) + 1, sizeof(*addr));
+	if (addr)
+		bcopy(addr, (&cmd.tpi.bind_req) + 1, sizeof(*addr));
+	data.len = -1;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
 int
 inet_unbind_req(int fd)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.unbind_req);
 	cmd.tpi.type = T_UNBIND_REQ;
+	data.len = -1;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
@@ -1972,7 +2608,7 @@ inet_unitdata_req(int fd, struct sockaddr_in *addr, const char *dat, size_t len,
 {
 	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.maxlen = len;
 		data.len = len;
@@ -1985,11 +2621,10 @@ inet_unitdata_req(int fd, struct sockaddr_in *addr, const char *dat, size_t len,
 	cmd.tpi.unitdata_req.OPT_length = sizeof(opt_data);
 	cmd.tpi.unitdata_req.OPT_offset = sizeof(cmd.tpi.unitdata_req) + sizeof(*addr);
 	bcopy(addr, (cmd.cbuf + sizeof(cmd.tpi.unitdata_req)), sizeof(*addr));
-	bcopy(&opt_data, (cmd.cbuf + sizeof(cmd.tpi.unitdata_req) + sizeof(*addr)),
-	      sizeof(opt_data));
+	bcopy(&opt_data, (cmd.cbuf + sizeof(cmd.tpi.unitdata_req) + sizeof(*addr)), sizeof(opt_data));
 	ret = put_msg(fd, 0, MSG_BAND, wait);
 	data.maxlen = BUFSIZE;
-	data.len = 0;
+	data.len = -1;
 	data.buf = dbuf;
 	return (ret);
 }
@@ -1997,8 +2632,9 @@ inet_unitdata_req(int fd, struct sockaddr_in *addr, const char *dat, size_t len,
 int
 inet_conn_req(int fd, struct sockaddr_in *addr, const char *dat)
 {
+	int ret;
 	if (!dat)
-		data.len = 0;
+		data.len = -1;
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
@@ -2011,12 +2647,17 @@ inet_conn_req(int fd, struct sockaddr_in *addr, const char *dat)
 	cmd.tpi.conn_req.OPT_offset = sizeof(cmd.tpi.conn_req) + sizeof(*addr);
 	bcopy(addr, (cmd.cbuf + sizeof(cmd.tpi.conn_req)), sizeof(*addr));
 	bcopy(&opt_conn, (cmd.cbuf + sizeof(cmd.tpi.conn_req) + sizeof(*addr)), sizeof(opt_conn));
-	return put_msg(fd, 0, MSG_BAND, 0);
+	ret = put_msg(fd, 0, MSG_BAND, 0);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
-inet_conn_res(int fd, int fd2, const char *dat)
+inet_conn_res(int fd, int resfd, const char *dat)
 {
+	int ret;
 	if (!dat)
 		fdi.databuf.len = 0;
 	else {
@@ -2029,25 +2670,29 @@ inet_conn_res(int fd, int fd2, const char *dat)
 	cmd.tpi.conn_res.SEQ_number = seq[fd];
 	cmd.tpi.conn_res.OPT_offset = 0;
 	cmd.tpi.conn_res.OPT_length = 0;
-	return put_fdi(fd, fd2, 4, 0);
+	ret = put_fdi(fd, resfd, 4, 0);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
 inet_discon_req(int fd, ulong seq)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.discon_req);
 	cmd.tpi.type = T_DISCON_REQ;
 	cmd.tpi.discon_req.SEQ_number = seq;
+	data.len = -1;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
 int
 inet_ordrel_req(int fd)
 {
-	data.len = 0;
 	ctrl.len = sizeof(cmd.tpi.ordrel_req);
 	cmd.tpi.type = T_ORDREL_REQ;
+	data.len = -1;
 	return put_msg(fd, 0, MSG_BAND, 0);
 }
 
@@ -2056,7 +2701,7 @@ inet_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 {
 	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.maxlen = len;
 		data.len = len;
@@ -2067,7 +2712,7 @@ inet_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 	cmd.tpi.data_req.MORE_flag = flags & T_MORE;
 	ret = put_msg(fd, 0, MSG_BAND, wait);
 	data.maxlen = BUFSIZE;
-	data.len = 0;
+	data.len = -1;
 	data.buf = dbuf;
 	return (ret);
 }
@@ -2075,8 +2720,9 @@ inet_ndata_req(int fd, ulong flags, const char *dat, size_t len, int wait)
 int
 inet_data_req(int fd, ulong flags, const char *dat, int wait)
 {
+	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
@@ -2084,14 +2730,19 @@ inet_data_req(int fd, ulong flags, const char *dat, int wait)
 	ctrl.len = sizeof(cmd.tpi.data_req);
 	cmd.tpi.type = T_DATA_REQ;
 	cmd.tpi.data_req.MORE_flag = flags & T_MORE;
-	return put_msg(fd, 0, MSG_BAND, wait);
+	ret = put_msg(fd, 0, MSG_BAND, wait);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
 inet_exdata_req(int fd, ulong flags, const char *dat)
 {
+	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
@@ -2099,14 +2750,19 @@ inet_exdata_req(int fd, ulong flags, const char *dat)
 	ctrl.len = sizeof(cmd.tpi.exdata_req);
 	cmd.tpi.type = T_EXDATA_REQ;
 	cmd.tpi.exdata_req.MORE_flag = flags & T_MORE;
-	return put_msg(fd, 1, MSG_BAND, 0);
+	ret = put_msg(fd, 1, MSG_BAND, 0);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
 int
 inet_optdata_req(int fd, ulong flags, const char *dat, int wait)
 {
+	int ret;
 	if (!dat)
-		return (FAILURE);
+		return (__RESULT_FAILURE);
 	else {
 		data.len = strlen(dat) + 1;
 		strncpy(dbuf, dat, BUFSIZE);
@@ -2117,540 +2773,145 @@ inet_optdata_req(int fd, ulong flags, const char *dat, int wait)
 	cmd.tpi.optdata_req.OPT_length = sizeof(opt_data);
 	cmd.tpi.optdata_req.OPT_offset = sizeof(cmd.tpi.optdata_req);
 	bcopy(&opt_data, cmd.cbuf + sizeof(cmd.tpi.optdata_req), sizeof(opt_data));
-	return put_msg(fd, flags & T_ODF_EX ? 1 : 0, MSG_BAND, wait);
+	ret = put_msg(fd, flags & T_ODF_EX ? 1 : 0, MSG_BAND, wait);
+	data.maxlen = BUFSIZE;
+	data.len = -1;
+	data.buf = dbuf;
+	return (ret);
 }
 
-int
-inet_wait(int fd, int wait)
-{
-	return get_msg(fd, wait);
-}
+/* 
+ *  -------------------------------------------------------------------------
+ *  -------------------------------------------------------------------------
+ */
 
-void
-inet_sleep(unsigned long t)
-{
-	switch (show) {
-	case 1:
-		printf
-		    ("/ / / / / / / / / / / / / / Waiting %04lu seconds / / / / / / / / / / / / / /\n",
-		     t);
-		break;
-	case 2:
-		printf("Waiting for %lu seconds...\n", t);
-		break;
-	}
-	sleep(t);
-	if (show == 2)
-		printf(" ...done\n");
-}
+/* 
+ *  -------------------------------------------------------------------------
+ *  -------------------------------------------------------------------------
+ */
 
-int
+static int
 begin_tests(void)
 {
 	addr1.sin_family = AF_INET;
 	addr1.sin_port = htons(port1);
 	inet_aton("127.0.0.1", &addr1.sin_addr);
-
 	addr2.sin_family = AF_INET;
 	addr2.sin_port = htons(port2);
 	inet_aton("127.0.0.2", &addr2.sin_addr);
-
 	addr3.sin_family = AF_INET;
 	addr3.sin_port = htons(port3);
 	inet_aton("127.0.0.3", &addr3.sin_addr);
-
+	addr4.sin_family = AF_INET;
+	addr4.sin_port = htons(port4);
+	inet_aton("127.0.0.4", &addr4.sin_addr);
+	if (inet_open(device, &conn_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	if (inet_open(device, &resp_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	if (inet_open(device, &list_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
 	state = 0;
-
-	return (SUCCESS);
+	return (__RESULT_SUCCESS);
 }
 
-int
+static int
 end_tests(void)
 {
-	return (SUCCESS);
+	show_acks = 0;
+	if (inet_close(&conn_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	if (inet_close(&resp_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	if (inet_close(&list_fd) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return (__RESULT_SUCCESS);
 }
 
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Preambles and postables
+ *
+ *  -------------------------------------------------------------------------
+ */
+
 int
-preamble_X(void)
+preamble_0(int fd)
 {
-	return (SUCCESS);
+	return __RESULT_SUCCESS;
 }
 
 int
-postamble_X(void)
+postamble_0(int fd)
 {
-	return (SUCCESS);
+	return __RESULT_SUCCESS;
 }
 
 int
-preamble_0(void)
+preamble_1(int fd)
 {
-	if ((fd1 = inet_open(device)) < 0)
-		return (FAILURE);
-	if ((fd2 = inet_open(device)) < 0)
-		return (FAILURE);
-	if ((fd3 = inet_open(device)) < 0)
-		return (FAILURE);
-
-	return (SUCCESS);
+	struct sockaddr_in *addr = NULL;
+	if (fd == conn_fd)
+		addr = &addr1;
+	else if (fd == resp_fd)
+		addr = &addr2;
+	else if (fd == list_fd)
+		addr = &addr3;
+	state = 0;
+	if (inet_bind_req(fd, addr, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
-postamble_0(void)
+preamble_1s(int fd)
 {
-	do {
-		if (inet_close(fd1) == FAILURE)
-			break;
-		if (inet_close(fd2) == FAILURE)
-			break;
-		if (inet_close(fd3) == FAILURE)
-			break;
-		return (SUCCESS);
-	}
-	while (0);
-	return (FAILURE);
+	if (preamble_1(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 3;
+	test_sleep(fd, 1);
+	state = 4;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
-preamble_1(void)
+postamble_1(int fd)
 {
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if ((fd1 = inet_open(device)) < 0)
-				break;
-			state = 1;
-		case 1:
-			if ((fd2 = inet_open(device)) < 0)
-				break;
-			state = 2;
-		case 2:
-			if ((fd3 = inet_open(device)) < 0)
-				break;
-			state = 3;
-		case 3:
-			if (inet_optmgmt_req(fd1, T_NEGOTIATE) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd1, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (inet_bind_req(fd1, &addr1, 0) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (expect(fd1, NORMAL_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (inet_optmgmt_req(fd2, T_NEGOTIATE) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd2, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 9;
-		case 9:
-			if (inet_bind_req(fd2, &addr2, 5) == FAILURE)
-				break;
-			state = 10;
-		case 10:
-			if (expect(fd2, NORMAL_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			state = 11;
-		case 11:
-			if (inet_optmgmt_req(fd3, T_NEGOTIATE) == FAILURE)
-				break;
-			state = 12;
-		case 12:
-			if (expect(fd3, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 13;
-		case 13:
-			if (inet_bind_req(fd3, &addr3, 0) == FAILURE)
-				break;
-			state = 14;
-		case 14:
-			if (expect(fd3, NORMAL_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
-preamble_2(void)
+postamble_1e(int fd)
 {
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (preamble_1() == FAILURE)
-				break;
-			state = 15;
-		case 15:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 16;
-		case 16:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 17;
-		case 17:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 18;
-		case 18:
-			if (inet_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 19;
-		case 19:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 20;
-		case 20:
-			if (expect(fd1, LONG_WAIT, T_CONN_CON) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_unbind_req(fd) == __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state = 1;
+	return (__RESULT_SUCCESS);
+      failure:
+	expect(fd, SHORT_WAIT, __EVENT_OK_ACK);
+	return (__RESULT_FAILURE);
 }
 
-int
-preamble_2b(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (preamble_1() == FAILURE)
-				break;
-			state = 15;
-		case 15:
-			if (inet_conn_req(fd1, &addr2, "Hello World!") == FAILURE)
-				break;
-			state = 16;
-		case 16:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 17;
-		case 17:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 18;
-		case 18:
-			if (inet_conn_res(fd2, fd3, "Hello There!") == FAILURE)
-				break;
-			state = 19;
-		case 19:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 20;
-		case 20:
-			if (expect(fd1, LONG_WAIT, T_CONN_CON) == FAILURE)
-				break;
-			state = 21;
-		case 21:
-			if (expect(fd3, NORMAL_WAIT, T_EXDATA_IND) == FAILURE)
-				break;
-			state = 22;
-		case 22:
-			if (expect(fd1, NORMAL_WAIT, T_EXDATA_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-int
-preamble_3(void)
-{
-	return preamble_1();
-}
-
-int
-preamble_3b(void)
-{
-	opt_optm.rcv_val = T_YES;
-	opt_optm.ist_val = 32;
-	opt_optm.ost_val = 32;
-	opt_conn.ist_val = 32;
-	opt_conn.ost_val = 32;
-	return preamble_2();
-}
-
-int
-preamble_4(void)
-{
-	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
-	return preamble_2();
-}
-
-int
-preamble_4b(void)
-{
-	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
-	return preamble_2();
-}
-
-int
-preamble_5(void)
-{
-	// opt_optm.dbg_val =
-	// SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
-	opt_optm.dbg_val = SCTP_OPTION_BREAK;
-	return preamble_2();
-}
-
-int
-preamble_6(void)
-{
-	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
-	return preamble_3b();
-}
-
-int
-preamble_7(void)
-{
-	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
-	return preamble_1();
-}
-
-int
-preamble_8(void)
-{
-	opt_optm.mac_val = T_SCTP_HMAC_MD5;
-	return preamble_1();
-}
-
-int
-postamble_1(void)
-{
-	uint failed = -1;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_unbind_req(fd1) == FAILURE) {
-				failed = state;
-				state = 1;
-				continue;
-			}
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 1;
-		case 1:
-			if (inet_unbind_req(fd2) == FAILURE) {
-				failed = state;
-				state = 2;
-				continue;
-			}
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 2;
-		case 2:
-			if (inet_unbind_req(fd3) == FAILURE) {
-				failed = state;
-				state = 3;
-				continue;
-			}
-			if (expect(fd3, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 3;
-		case 3:
-			if (inet_close(fd1) == FAILURE)
-				failed = state;
-			if (inet_close(fd2) == FAILURE)
-				failed = state;
-			if (inet_close(fd3) == FAILURE)
-				failed = state;
-		}
-		opt_data.sid_val = 0;
-		opt_optm.mac_val = T_SCTP_HMAC_NONE;
-		opt_optm.dbg_val = 0;
-		opt_optm.rcv_val = T_NO;
-		opt_optm.ist_val = 1;
-		opt_optm.ost_val = 1;
-		opt_conn.ist_val = 1;
-		opt_conn.ost_val = 1;
-		if (failed != -1) {
-			state = failed;
-			return (FAILURE);
-		}
-		return (SUCCESS);
-	}
-}
-
-int
-postamble_2(void)
-{
-	uint failed = -1;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_discon_req(fd1, 0) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 2;
-		case 2:
-			if (expect(fd3, LONG_WAIT, T_DISCON_IND) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 6;
-			continue;
-		case 4:
-			if (inet_discon_req(fd3, 0) == FAILURE) {
-				failed = state;
-				state = 6;
-				continue;
-			}
-			state = 5;
-		case 5:
-			if (expect(fd3, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 6;
-		case 6:
-			if (inet_unbind_req(fd1) == FAILURE)
-				failed = state;
-			else if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 7;
-		case 7:
-			if (inet_unbind_req(fd2) == FAILURE)
-				failed = state;
-			else if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 8;
-		case 8:
-			if (inet_unbind_req(fd3) == FAILURE)
-				failed = state;
-			else if (expect(fd3, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 9;
-		case 9:
-			if (inet_close(fd1) == FAILURE)
-				failed = state;
-			if (inet_close(fd2) == FAILURE)
-				failed = state;
-			if (inet_close(fd3) == FAILURE)
-				failed = state;
-		}
-		opt_data.sid_val = 0;
-		opt_optm.mac_val = T_SCTP_HMAC_NONE;
-		opt_optm.dbg_val = 0;
-		opt_optm.rcv_val = T_NO;
-		opt_optm.ist_val = 1;
-		opt_optm.ost_val = 1;
-		opt_conn.ist_val = 1;
-		opt_conn.ost_val = 1;
-		if (failed != -1) {
-			state = failed;
-			return (FAILURE);
-		}
-		return (SUCCESS);
-	}
-}
-
-int
-postamble_3(void)
-{
-	uint failed = -1;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_ordrel_req(fd1) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 1;
-		case 1:
-			if (expect(fd3, LONG_WAIT, T_ORDREL_IND) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 2;
-		case 2:
-			if (inet_ordrel_req(fd3) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, T_ORDREL_IND) == FAILURE) {
-				failed = state;
-				state = 4;
-				continue;
-			}
-			state = 6;
-			continue;
-		case 4:
-			if (postamble_2() == FAILURE)
-				failed = state;
-			break;
-		case 6:
-			if (inet_unbind_req(fd1) == FAILURE)
-				failed = state;
-			else if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 7;
-		case 7:
-			if (inet_unbind_req(fd2) == FAILURE)
-				failed = state;
-			else if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 8;
-		case 8:
-			if (inet_unbind_req(fd3) == FAILURE)
-				failed = state;
-			else if (expect(fd3, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				failed = state;
-			state = 9;
-		case 9:
-			if (inet_close(fd1) == FAILURE)
-				failed = state;
-			if (inet_close(fd2) == FAILURE)
-				failed = state;
-			if (inet_close(fd3) == FAILURE)
-				failed = state;
-		}
-		opt_data.sid_val = 0;
-		opt_optm.mac_val = T_SCTP_HMAC_NONE;
-		opt_optm.dbg_val = 0;
-		opt_optm.rcv_val = T_NO;
-		opt_optm.ist_val = 1;
-		opt_optm.ost_val = 1;
-		opt_conn.ist_val = 1;
-		opt_conn.ost_val = 1;
-		if (failed != -1) {
-			state = failed;
-			return (FAILURE);
-		}
-		return (SUCCESS);
-	}
-}
-
-/*
+/* 
  *  =========================================================================
  *
  *  The Test Cases...
@@ -2658,1957 +2919,1151 @@ postamble_3(void)
  *  =========================================================================
  */
 
-/*
+/* 
  *  Open and Close 3 streams.
  */
-#define desc_case_0 "\
-Test Case 0:\n\
+#define name_case_1_1 "Open and close 3 streams"
+#define desc_case_1_1 "\
 Checks that three streams can be opened and closed."
 int
-test_case_0(void)
+test_case_1_1(int fd)
 {
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if ((fd1 = inet_open(device)) < 0)
-				break;
-			state = 1;
-		case 1:
-			if ((fd2 = inet_open(device)) < 0)
-				break;
-			state = 2;
-		case 2:
-			if ((fd3 = inet_open(device)) < 0)
-				break;
-			state = 3;
-		case 3:
-			if (inet_close(fd1) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (inet_close(fd2) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (inet_close(fd3) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	return (__RESULT_SUCCESS);
 }
 
-/*
- *  Do options management.
+#define test_case_1_1_conn test_case_1_1
+#define test_case_1_1_resp test_case_1_1
+#define test_case_1_1_list test_case_1_1
+
+/* 
+ *  Request information.
  */
-#define desc_case_0b "\
-Test Case 0(b):\n\
+#define name_case_1_2 "Request information."
+#define desc_case_1_2 "\
 Checks that information can be requested on each of three streasm."
 int
-test_case_0b(void)
+test_case_1_2(int fd)
 {
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_info_req(fd1) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, NORMAL_WAIT, T_INFO_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (inet_info_req(fd2) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd2, NORMAL_WAIT, T_INFO_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (inet_info_req(fd3) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, NORMAL_WAIT, T_INFO_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_info_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, NORMAL_WAIT, __EVENT_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
+#define test_case_1_2_conn test_case_1_2
+#define test_case_1_2_resp test_case_1_2
+#define test_case_1_2_list test_case_1_2
+
+/* 
+ *  Request capabilities.
+ */
+#define name_case_1_3 "Request capabilities."
+#define desc_case_1_3 "\
+Checks that capabilities can be requested on each of three streasm."
+int
+test_case_1_3(int fd)
+{
+	state = 0;
+	if (inet_capability_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, NORMAL_WAIT, __EVENT_CAPABILITY_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_conn test_case_1_3
+#define test_case_1_3_resp test_case_1_3
+#define test_case_1_3_list test_case_1_3
+
+/* 
+ *  Request addresses.
+ */
+#define name_case_1_4 "Request addresses."
+#define desc_case_1_4 "\
+Checks that addresses can be requested on each of three streasm."
+int
+test_case_1_4(int fd)
+{
+	state = 0;
+	if (inet_addr_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, NORMAL_WAIT, __EVENT_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_conn test_case_1_4
+#define test_case_1_4_resp test_case_1_4
+#define test_case_1_4_list test_case_1_4
+
+/* 
  *  Do options management.
  */
-#define desc_case_1 "\
-Test Case 1(a):\n\
-Checks that options management can be performed on several streams\n\
-and that one stream can be bound and unbound."
+#define name_case_2_1 "Perform options management."
+#define desc_case_2_1 "\
+Checks that options management can be performed on several streams."
 int
-test_case_1(void)
+test_case_2_1(int fd)
 {
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			inet_optmgmt_req(fd1, T_NEGOTIATE);
-			if (expect(fd1, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			inet_info_req(fd1);
-			if (expect(fd1, SHORT_WAIT, T_INFO_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			inet_optmgmt_req(fd1, T_CURRENT);
-			if (expect(fd1, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			inet_optmgmt_req(fd2, T_NEGOTIATE);
-			if (expect(fd2, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			inet_info_req(fd2);
-			if (expect(fd2, SHORT_WAIT, T_INFO_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			inet_optmgmt_req(fd2, T_CURRENT);
-			if (expect(fd2, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			inet_optmgmt_req(fd3, T_NEGOTIATE);
-			if (expect(fd3, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			inet_info_req(fd3);
-			if (expect(fd3, SHORT_WAIT, T_INFO_ACK) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			inet_optmgmt_req(fd3, T_CURRENT);
-			if (expect(fd3, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_optmgmt_req(fd, T_DEFAULT) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	if (inet_optmgmt_req(fd, T_CURRENT) != __RESULT_SUCCESS)
+		goto failure;
+	state = 3;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 4;
+	if (inet_optmgmt_req(fd, T_CHECK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 5;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 6;
+	if (inet_optmgmt_req(fd, T_NEGOTIATE) != __RESULT_SUCCESS)
+		goto failure;
+	state = 7;
+	if (expect(fd, NORMAL_WAIT, __EVENT_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 8;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
+#define test_case_2_1_conn test_case_2_1
+#define test_case_2_1_resp test_case_2_1
+#define test_case_2_1_list test_case_2_1
+
+/* 
  *  Bind and unbind three streams.
  */
-#define desc_case_1b "\
-Test Case 1(b):\n\
-Checks that three streams can be bound and unbound with\n\
-one stream as listener."
+#define name_case_2_2 "Bind and unbind three streams."
+#define desc_case_2_2 "\
+Checks that three streams can be bound and unbound.  One is bound to\n\
+a normal address, another to a null address, the last to a wildcard\n\
+address."
 int
-test_case_1b(void)
+test_case_2_2(int fd, struct sockaddr_in *addr)
 {
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			inet_bind_req(fd1, &addr1, 0);
-			if (expect(fd1, SHORT_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			inet_bind_req(fd2, &addr2, 5);
-			if (expect(fd2, SHORT_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			inet_bind_req(fd3, &addr3, 0);
-			if (expect(fd3, SHORT_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			inet_unbind_req(fd1);
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			inet_unbind_req(fd2);
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			inet_unbind_req(fd3);
-			if (expect(fd3, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_bind_req(fd, addr, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __EVENT_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	if (inet_addr_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 3;
+	if (expect(fd, SHORT_WAIT, __EVENT_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 4;
+	if (inet_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 5;
+	if (expect(fd, SHORT_WAIT, __EVENT_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 6;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
+static int
+test_case_2_2_conn(int fd)
+{
+	return test_case_2_2(fd, &addr1);
+}
+static int
+test_case_2_2_resp(int fd)
+{
+	state = 0;
+	if (inet_bind_req(fd, NULL, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __EVENT_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	if (cmd.tpi.error_ack.TLI_error != TNOADDR)
+		goto failure;
+	state = 3;
+	if (inet_addr_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 4;
+	if (expect(fd, SHORT_WAIT, __EVENT_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 5;
+	if (inet_unbind_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 6;
+	if (expect(fd, SHORT_WAIT, __EVENT_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 7;
+	if (cmd.tpi.error_ack.TLI_error != TOUTSTATE)
+		goto failure;
+	state = 8;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+static int
+test_case_2_2_list(int fd)
+{
+	addr4.sin_addr.s_addr = INADDR_ANY;
+	return test_case_2_2(fd, &addr4);
+}
+
+/* 
  *  Transfer connectionless data.
  */
-#define desc_case_2L "\
-Test Case 2: (Connectionless)\n\
+#define name_case_3_1 "Transfer connectionless data."
+#define desc_case_3_1 "\
 Attempts to transfer connectionless data."
 int
-test_case_2L(void)
+test_case_3_1(int fd, struct sockaddr_in *addr)
 {
 	const char msg[] = "This is a test connectionless message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_unitdata_req(fd1, &addr2, msg, strlen(msg), 0) != SUCCESS)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, NORMAL_WAIT, T_UNITDATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (inet_unitdata_req(fd1, &addr3, msg, strlen(msg), 0) != SUCCESS)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd3, NORMAL_WAIT, T_UNITDATA_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_unitdata_req(fd, addr, msg, strlen(msg), 0) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, LONG_WAIT, __EVENT_UNITDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Attempt a connection with no listener.
+static int
+test_case_3_1_conn(int fd)
+{
+	return test_case_3_1(fd, &addr2);
+}
+static int
+test_case_3_1_resp(int fd)
+{
+	return test_case_3_1(fd, &addr3);
+}
+static int
+test_case_3_1_list(int fd)
+{
+	return test_case_3_1(fd, &addr1);
+}
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_2 "\
-Test Case 2:\n\
-Attempts a connection with no listener.  The connection attempt\n\
-should time out."
+#define name_case_4_1 "Unsupported T_CONN_REQ."
+#define desc_case_4_1 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_CONN_REQ."
 int
-test_case_2(void)
+test_case_4_1(int fd)
 {
-	int i;
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_optmgmt_req(fd1, T_NEGOTIATE) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OPTMGMT_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (inet_bind_req(fd1, &addr1, 0) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, SHORT_WAIT, T_BIND_ACK) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			for (i = 0; i < 25; i++)
-				if (expect(fd1, LONG_WAIT, T_DISCON_IND) == SUCCESS)
-					break;
-				else
-					inet_sleep((opt_optm.rmx_val * opt_optm.irt_val +
-						    999) / 1000);
-			if (i == 25)
-				break;
-			state = 7;
-		case 7:
-			if (inet_unbind_req(fd1) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_conn_req(fd, &addr1, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __EVENT_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Attempt and withdraw a connection request.
+#define test_case_4_1_conn test_case_4_1
+#define test_case_4_1_resp test_case_4_1
+#define test_case_4_1_list test_case_4_1
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_2a "\
-Test Case 2(a):\n\
-Attempts and then withdraws a connection request.  The connection\n\
-should disconnect at both ends."
+#define name_case_4_2 "Unsupported T_CONN_RES."
+#define desc_case_4_2 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_CONN_RES."
 int
-test_case_2a(void)
+test_case_4_2(int fd)
 {
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_discon_req(fd1, 0) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd2, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_conn_res(fd, fd, NULL) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	if (expect(fd, SHORT_WAIT, __EVENT_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 3;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Attempt and refuse a connection request.
+#define test_case_4_2_conn test_case_4_2
+#define test_case_4_2_resp test_case_4_2
+#define test_case_4_2_list test_case_4_2
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_3 "\
-Test Case 3:\n\
-Attempts a connection which is refused by the receiving end.\n\
-The connection should disconnect at the attempting end."
+#define name_case_4_3 "Unsupported T_DISCON_REQ."
+#define desc_case_4_3 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_DISCON_REQ."
 int
-test_case_3(void)
+test_case_4_3(int fd)
 {
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			inet_conn_req(fd1, &addr2, NULL);
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			inet_discon_req(fd2, seq[fd2]);
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (expect(fd1, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_discon_req(fd, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __EVENT_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Attempt and delayed refuse a connection request.
+#define test_case_4_3_conn test_case_4_3
+#define test_case_4_3_resp test_case_4_3
+#define test_case_4_3_list test_case_4_3
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_3b "\
-Test Case 3(b):\n\
-Attempts a delayed refusal of a connection requrest.  This delayed\n\
-refusal should come after the connector has already timed out."
+#define name_case_4_4 "Unsupported T_DATA_REQ."
+#define desc_case_4_4 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_DATA_REQ."
 int
-test_case_3b(void)
+test_case_4_4(int fd)
 {
-	int i;
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			for (i = 0; i < 25; i++)
-				if (expect(fd1, LONG_WAIT, T_DISCON_IND) == SUCCESS)
-					break;
-				else
-					inet_sleep((opt_optm.rmx_val * opt_optm.irt_val +
-						    999) / 1000);
-			if (i == 25)
-				break;
-			state = 4;
-		case 4:
-			if (inet_discon_req(fd2, seq[fd2]) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_data_req(fd, 0, dat, 0) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Accept a connection.
+#define test_case_4_4_conn test_case_4_4
+#define test_case_4_4_resp test_case_4_4
+#define test_case_4_4_list test_case_4_4
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_4 "\
-Test Case 4:\n\
-Accept a connection and then disconnect.  This connection attempt\n\
-should be successful."
+#define name_case_4_5 "Unsupported T_EXDATA_REQ."
+#define desc_case_4_5 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_EXDATA_REQ."
 int
-test_case_4(void)
+test_case_4_5(int fd)
 {
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd1, LONG_WAIT, T_CONN_CON) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (inet_discon_req(fd3, 0) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd3, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd1, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_exdata_req(fd, 0, dat) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Attempt and delayed accept a connection request.
+#define test_case_4_5_conn test_case_4_5
+#define test_case_4_5_resp test_case_4_5
+#define test_case_4_5_list test_case_4_5
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_4b "\
-Test Case 4(b):\n\
-Attempt a connection and delay the acceptance of the connection request.\n\
-This should result in a disconnection indication after the connection is\n\
-accepted.  "
+#define name_case_4_6 "Unsupported T_OPTDATA_REQ."
+#define desc_case_4_6 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_OPTDATA_REQ."
 int
-test_case_4b(void)
+test_case_4_6(int fd)
 {
-	int i;
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			for (i = 0; i < 25; i++)
-				if (expect(fd1, LONG_WAIT, T_DISCON_IND) == SUCCESS)
-					break;
-				else
-					inet_sleep((opt_optm.rmx_val * opt_optm.irt_val +
-						    999) / 1000 + 1);
-			if (i == 25)
-				break;
-			state = 4;
-		case 4:
-			if (inet_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (expect(fd3, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (inet_data_req(fd3, 0, "Hello!", 0) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd3, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_optdata_req(fd, 0, dat, SHORT_WAIT) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Accept a connection.
+#define test_case_4_6_conn test_case_4_6
+#define test_case_4_6_resp test_case_4_6
+#define test_case_4_6_list test_case_4_6
+
+/* 
+ *  Negative test cases on connection oriented primitives.
  */
-#define desc_case_5 "\
-Test Case 5:\n\
-Attempt and accept a connection.  This should be successful.  The\n\
-accepting stream uses the T_SCTP_HMAC_NONE signature on its cookie."
+#define name_case_4_7 "Unsupported T_ORDREL_REQ."
+#define desc_case_4_7 "\
+Attempts to invoke connection oriented primitives.\n\
+- T_ORDREL_REQ."
 int
-test_case_5(void)
+test_case_4_7(int fd)
 {
+	static char dat[] = "Dummy message.";
 	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd1, LONG_WAIT, T_CONN_CON) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (inet_discon_req(fd1, 0) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd3, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
+	if (inet_ordrel_req(fd) != __RESULT_SUCCESS)
+		goto failure;
+	state = 1;
+	if (expect(fd, SHORT_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state = 2;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-/*
- *  Accept a connection (MD5 hashed cookie)
+#define test_case_4_7_conn test_case_4_7
+#define test_case_4_7_resp test_case_4_7
+#define test_case_4_7_list test_case_4_7
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Test case child scheduler
+ *
+ *  -------------------------------------------------------------------------
  */
-#define desc_case_5b "\
-Test Case 5(b):\n\
-Attempt and accept a connection.  This should be successful.  The\n\
-accepting stream uses the T_SCTP_HMAC_MD5 signature on its cookie."
-int
-test_case_5b(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd1, LONG_WAIT, T_CONN_CON) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (inet_discon_req(fd1, 0) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd3, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Accept a connection (SHA1 hashed cookie)
- */
-#define desc_case_5c "\
-Test Case 5(c):\n\
-Attempt and accept a connection.  This should be successful.  The\n\
-accepting stream uses the T_SCTP_HMAC_SHA1 signature on its cookie."
-int
-test_case_5c(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_conn_req(fd1, &addr2, NULL) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd2, LONG_WAIT, T_CONN_IND) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_conn_res(fd2, fd3, NULL) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (expect(fd2, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd1, LONG_WAIT, T_CONN_CON) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (inet_discon_req(fd1, 0) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd1, SHORT_WAIT, T_OK_ACK) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd3, LONG_WAIT, T_DISCON_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect with data.
- */
-#define desc_case_6 "\
-Test Case 6:\n\
-Attempt and accept a connection where data is also passed in the\n\
-connection request and the connection response.  This should result\n\
-in DATA chunks being bundled with the COOKIE-ECHO and COOKIE-ACK\n\
-chunks in the SCTP messages."
-int
-test_case_6(void)
-{
-	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, 0, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hellos Again!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hellos Again!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (expect(fd1, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			for (i = 0; i < 21; i++)
-				if (inet_data_req(fd3, 0, "Hello Too!", 0) == FAILURE)
-					break;
-			if (i < 21)
-				break;
-			state = 4;
-		case 4:
-			for (i = 0; i < 21; i++)
-				if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-					break;
-			if (i < 21)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, SHORT_WAIT, FAILURE) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect and send partial data.
- */
-#define desc_case_6b "\
-Test Case 6(b):\n\
-Connect and send partial data (i.e., data with more flag set)."
-int
-test_case_6b(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello There.", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect and send partial data.
- */
-#define desc_case_6c "\
-Test Case 6(c):\n\
-Connect and send partial data and expedited data on multiple streams.\n\
-Expedited data should be delivered between ordered data fragments on\n\
-the same stream and delivered to the user first."
-int
-test_case_6c(void)
-{
-	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			opt_data.sid_val = 0;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 1;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 2;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 3;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 0;
-			if (inet_exdata_req(fd1, 0, "Hello There.") == FAILURE)
-				break;
-			opt_data.sid_val = 0;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 1;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 2;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 3;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 0;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 1;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 2;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 3;
-			if (inet_optdata_req(fd1, T_MORE, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 0;
-			if (inet_optdata_req(fd1, 0, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 1;
-			if (inet_optdata_req(fd1, 0, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 2;
-			if (inet_optdata_req(fd1, 0, "Hello There.", 0) == FAILURE)
-				break;
-			opt_data.sid_val = 3;
-			if (inet_optdata_req(fd1, 0, "Hello There.", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_OPTDATA_IND) == FAILURE)
-				break;
-			if (!(cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX))
-				break;
-			state = 2;
-		case 2:
-			for (i = 0; i < 16; i++)
-				if (expect(fd3, NORMAL_WAIT, T_OPTDATA_IND) == FAILURE)
-					break;
-			if (i < 16)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Test fragmentation by sending very large packets.
- */
-#define desc_case_7 "\
-Test Case 7(a):\n\
-Connect and send very large packets to test fragmentation."
-int
-test_case_7(void)
-{
-	unsigned char lbuf[100000];
-	int i = 0, j = 0, k = 0, f = 0;
-	size_t len = 0;
-	const char nrm[] = "Hello.";
-	const char urg[] = "Urgent.";
-	bzero(lbuf, sizeof(lbuf));
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (i < 4 && inet_ndata_req(fd1, 0, lbuf, sizeof(lbuf), 0) == SUCCESS)
-				i++;
-			if (j < 4 && inet_exdata_req(fd1, 0, urg) == SUCCESS)
-				j++;
-			if (k < 4 && inet_data_req(fd1, 0, nrm, 0) == SUCCESS)
-				k++;
-			state = 1;
-		case 1:
-			if (len < i * sizeof(lbuf) + j * sizeof(urg) + k * sizeof(nrm)) {
-				int ret;
-				switch ((ret = get_msg(fd3, SHORT_WAIT))) {
-				case T_EXDATA_IND:
-				case T_DATA_IND:
-					len += data.len;
-				case FAILURE:
-					ret = 0;
-					break;
-				}
-				if (ret)
-					break;
-			}
-			if (f++ < 10000) {
-				if (i < 4 || j < 4 || k < 4) {
-					state = 0;
-					continue;
-				}
-				if (len < i * sizeof(lbuf) + j * sizeof(urg) + k * sizeof(nrm)) {
-					state = 1;
-					continue;
-				}
-			} else {
-				printf("i = %d, j = %d, k = %d\n", i, j, k);
-				printf("Received %u bytes, expecting %u\n", len,
-				       i * sizeof(lbuf) + j * sizeof(urg) + k * sizeof(nrm));
-				break;
-			}
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Test coallescing packets by sending many small fragmented pieces.
- */
-#define desc_case_7b "\
-Test Case 7(b):\n\
-Connect and send many small packets to test coallescing of packets."
-int
-test_case_7b(void)
-{
-	int s = 0, r = 0;
-	size_t snd_bytes = 0;
-	size_t rcv_bytes = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, T_MORE, "Hi There.", 0) == FAILURE)
-				break;
-			snd_bytes += data.len;
-			if (s++ < 4)
-				continue;
-			print_less(fd1);
-			state = 1;
-		case 1:
-			while (inet_data_req(fd1, T_MORE, "Hi There.", 0) == SUCCESS) {
-				snd_bytes += data.len;
-				s++;
-			}
-			print_more();
-			state = 2;
-		case 2:
-			if (expect(fd3, 0, T_DATA_IND) == FAILURE)
-				break;
-			rcv_bytes += data.len;
-			if (r++ < 4)
-				continue;
-			print_less(fd3);
-			state = 3;
-		case 3:
-			if (expect(fd3, 0, T_DATA_IND) == FAILURE)
-				break;
-			rcv_bytes += data.len;
-			r++;
-			if (data.len != 10) {
-				print_more();
-				print_msg(fd3);
-				state = 5;
-				continue;
-			}
-			if (rcv_bytes < snd_bytes)
-				continue;
-			state = 4;
-		case 4:
-			print_more();
-			state = 5;
-		case 5:
-			if (rcv_bytes < snd_bytes) {
-				if (expect(fd3, 0, T_DATA_IND) == FAILURE)
-					break;
-				rcv_bytes += data.len;
-				r++;
-				continue;
-			}
-			if (rcv_bytes != snd_bytes)
-				break;
-			return (SUCCESS);
-		}
-		printf("Sent %3d messages making %6u bytes.\n", s, snd_bytes);
-		printf("Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
-		print_more();
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect with transfer data and orderly release.
- */
-#define desc_case_8 "\
-Test Case 8(a):\n\
-Connect, transfer data and perform orderly release."
-int
-test_case_8(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (inet_ordrel_req(fd1) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd3, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (inet_ordrel_req(fd3) == FAILURE)
-				break;
-			state = 9;
-		case 9:
-			if (expect(fd1, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect with orderly release and late data transfer.
- */
-#define desc_case_8b "\
-Test Case 8(b):\n\
-Connect, transfer data and perform orderly release but transfer\n\
-data after release has been initiated"
-int
-test_case_8b(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (inet_ordrel_req(fd1) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd3, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 9;
-		case 9:
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 10;
-		case 10:
-			if (inet_ordrel_req(fd3) == FAILURE)
-				break;
-			state = 11;
-		case 11:
-			if (expect(fd1, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect with attempted simultaneous orderly release.
- */
-#define desc_case_8c "\
-Test Case 8(c):\n\
-Connect, transfer data and perform orderly release but attempt\n\
-to perform a simultaneous release from both sides.  (This might\n\
-or might not result in a simultaneous release attempt.)"
-int
-test_case_8c(void)
-{
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 3;
-		case 3:
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			if (inet_ordrel_req(fd1) == FAILURE)
-				break;
-			state = 5;
-		case 5:
-			if (inet_ordrel_req(fd3) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd3, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			state = 9;
-		case 9:
-			if (expect(fd1, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Connect with orderly release under noise.
- */
-#define desc_case_8d "\
-Test Case 8(d):\n\
-Connect, transfer data and perform orderly release under noise."
-int
-test_case_8d(void)
-{
-	int i;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-				break;
-			state = 1;
-		case 1:
-			if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-				break;
-			state = 2;
-		case 2:
-			for (i = 0; i < 20; i++)
-				if (inet_data_req(fd1, 0, "Hello World!", 0) == FAILURE)
-					break;
-			if (i < 20)
-				break;
-			state = 3;
-		case 3:
-			if (inet_ordrel_req(fd1) == FAILURE)
-				break;
-			state = 4;
-		case 4:
-			for (i = 0; i < 20; i++)
-				if (inet_data_req(fd3, 0, "Hello World!", 0) == FAILURE)
-					break;
-			if (i < 20)
-				break;
-			state = 5;
-		case 5:
-			if (inet_ordrel_req(fd3) == FAILURE)
-				break;
-			state = 6;
-		case 6:
-			for (i = 0; i < 20; i++) {
-				if (expect(fd3, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-					break;
-				if (expect(fd1, NORMAL_WAIT, T_DATA_IND) == FAILURE)
-					break;
-			}
-			if (i < 20)
-				break;
-			state = 7;
-		case 7:
-			if (expect(fd3, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			state = 8;
-		case 8:
-			if (expect(fd1, LONG_WAIT, T_ORDREL_IND) == FAILURE)
-				break;
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-/*
- *  Delivering ordered data under noise.
- */
-#define desc_case_9a "\
-Test Case 9(a):\n\
-Delivery of ordered data under noise with acknowledgement."
-#define TEST_PACKETS 300
-int
-test_case_9a(void)
-{
-	int i = 0, j = 0, l = 0, m = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (i < TEST_PACKETS) {
-				inet_data_req(fd1, 0, "Pattern-1", 0);
-				i++;
-			}
-			while (j < TEST_PACKETS) {
-				switch (get_msg(fd3, wait)) {
-				case T_DATA_IND:
-					j++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9a_failure;
-				}
-				break;
-			}
-			if (l < TEST_PACKETS) {
-				inet_data_req(fd3, 0, "Pattern-3", 0);
-				l++;
-			}
-			while (m < TEST_PACKETS) {
-				switch (get_msg(fd1, wait)) {
-				case T_DATA_IND:
-					m++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9a_failure;
-				}
-				break;
-			}
-			if (i >= TEST_PACKETS && l >= TEST_PACKETS)
-				wait = 20;
-			if (f > TEST_PACKETS * 10)
-				goto test_case_9a_failure;
-			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS
-			    || m < TEST_PACKETS)
-				continue;
-			return (SUCCESS);
-		}
-	      test_case_9a_failure:
-		printf("%d sent %d inds %d\n", fd1, i, j);
-		printf("%d sent %d inds %d\n", fd3, l, m);
-		printf("%d failures\n", f);
-		return (FAILURE);
-	}
-}
-
-/*
- *  Delivering out-of-order data under noise.
- */
-#define desc_case_9b "\
-Test Case 9(b):\n\
-Delivery of un-ordered data under noise."
-int
-test_case_9b(void)
-{
-	int i = 0, j = 0, l = 0, m = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (i < TEST_PACKETS) {
-				inet_exdata_req(fd1, 0, "Pattern-1");
-				i++;
-			}
-			while (j < TEST_PACKETS) {
-				switch (get_msg(fd3, wait)) {
-				case T_EXDATA_IND:
-					j++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9b_failure;
-				}
-				break;
-			}
-			if (l < TEST_PACKETS) {
-				inet_exdata_req(fd3, 0, "Pattern-3");
-				l++;
-			}
-			while (m < TEST_PACKETS) {
-				switch (get_msg(fd1, wait)) {
-				case T_EXDATA_IND:
-					m++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9b_failure;
-				}
-				break;
-			}
-			if (i >= TEST_PACKETS && l >= TEST_PACKETS)
-				wait = 20;
-			if (f > TEST_PACKETS * 10)
-				goto test_case_9b_failure;
-			if (i < TEST_PACKETS || j < TEST_PACKETS || l < TEST_PACKETS
-			    || m < TEST_PACKETS)
-				continue;
-			return (SUCCESS);
-		}
-	      test_case_9b_failure:
-		printf("%d sent %d inds %d\n", fd1, i, j);
-		printf("%d sent %d inds %d\n", fd3, l, m);
-		printf("%d failures\n", f);
-		return (FAILURE);
-	}
-}
-
-#undef TEST_PACKETS
-
-#define TEST_PACKETS 10
-#define TEST_STREAMS 32
-#define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
-/*
- *  Delivering ordered data in multiple streams under noise.
- */
-#define desc_case_9c "\
-Test Case 9(c):\n\
-Delivery of ordered data in multiple streams under noise."
-int
-test_case_9c(void)
-{
-	int i[TEST_STREAMS] = { 0, };
-	int j[TEST_STREAMS] = { 0, };
-	int l[TEST_STREAMS] = { 0, };
-	int m[TEST_STREAMS] = { 0, };
-	int I = 0, J = 0, L = 0, M = 0;
-	int s = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
-				opt_data.sid_val = s;
-				inet_optdata_req(fd1, 0, "Pattern-1", 0);
-				i[s]++;
-				I++;
-			}
-			while (J < TEST_TOTAL) {
-				switch (get_msg(fd3, wait)) {
-				case T_OPTDATA_IND:
-					j[sid[fd3]]++;
-					J++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9c_failure;
-				}
-				break;
-			}
-			if (L < TEST_TOTAL && l[s] < TEST_PACKETS) {
-				opt_data.sid_val = s;
-				inet_optdata_req(fd3, 0, "Pattern-3", 0);
-				l[s]++;
-				L++;
-			}
-			while (M < TEST_TOTAL) {
-				switch (get_msg(fd1, wait)) {
-				case T_OPTDATA_IND:
-					m[sid[fd1]]++;
-					M++;
-					continue;
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9c_failure;
-				}
-				break;
-			}
-			if (++s >= TEST_STREAMS)
-				s = 0;
-			if (I >= TEST_TOTAL && L >= TEST_TOTAL)
-				wait = 20;
-			if (f > TEST_TOTAL * 10)
-				goto test_case_9c_failure;
-			if (i[s] < TEST_PACKETS || l[s] < TEST_PACKETS)
-				continue;
-			if (J < TEST_TOTAL || M < TEST_TOTAL)
-				continue;
-			for (s = 0; s < TEST_STREAMS; s++) {
-				if (j[s] != TEST_PACKETS || m[s] != TEST_PACKETS)
-					goto test_case_9c_failure;
-			}
-			return (SUCCESS);
-		}
-	      test_case_9c_failure:
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd1, i[s], j[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd3, l[s], m[s]);
-		printf("%d failures\n", f);
-		return (FAILURE);
-	}
-}
-
-/*
- *  Delivering ordered and unordered data in multiple streams under noise.
- */
-#define desc_case_9d "\
-Test Case 9(d):\n\
-Delivery of ordered and un-ordered data in multiple streams under noise."
-int
-test_case_9d(void)
-{
-	int i[TEST_STREAMS] = { 0, };
-	int j[TEST_STREAMS] = { 0, };
-	int l[TEST_STREAMS] = { 0, };
-	int m[TEST_STREAMS] = { 0, };
-	int o[TEST_STREAMS] = { 0, };
-	int p[TEST_STREAMS] = { 0, };
-	int q[TEST_STREAMS] = { 0, };
-	int r[TEST_STREAMS] = { 0, };
-	int I = 0, J = 0, L = 0, M = 0, O = 0, P = 0, Q = 0, R = 0;
-	int s = 0, f = 0;
-	int wait = 0;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			if (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
-				opt_data.sid_val = s;
-				inet_optdata_req(fd1, 0, "Pattern-1", 0);
-				i[s]++;
-				I++;
-			}
-			while (J < TEST_TOTAL || P < TEST_TOTAL) {
-				switch (get_msg(fd3, wait)) {
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-						p[sid[fd3]]++;
-						P++;
-						continue;
-					} else {
-						j[sid[fd3]]++;
-						J++;
-						continue;
-					}
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (O < TEST_TOTAL && o[s] < TEST_PACKETS) {
-				opt_data.sid_val = s;
-				inet_optdata_req(fd1, T_ODF_EX, "Pattern-1", 0);
-				o[s]++;
-				O++;
-			}
-			while (J < TEST_TOTAL || P < TEST_TOTAL) {
-				switch (get_msg(fd3, wait)) {
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-						p[sid[fd3]]++;
-						P++;
-						continue;
-					} else {
-						j[sid[fd3]]++;
-						J++;
-						continue;
-					}
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (L < TEST_TOTAL && l[s] < TEST_PACKETS) {
-				opt_data.sid_val = s;
-				inet_optdata_req(fd3, 0, "Pattern-3", 0);
-				l[s]++;
-				L++;
-			}
-			while (M < TEST_TOTAL || R < TEST_TOTAL) {
-				switch (get_msg(fd1, wait)) {
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-						r[sid[fd1]]++;
-						R++;
-						continue;
-					} else {
-						m[sid[fd1]]++;
-						M++;
-						continue;
-					}
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (Q < TEST_TOTAL && q[s] < TEST_PACKETS) {
-				opt_data.sid_val = s;
-				inet_optdata_req(fd3, T_ODF_EX, "Pattern-3", 0);
-				q[s]++;
-				Q++;
-			}
-			while (M < TEST_TOTAL || R < TEST_TOTAL) {
-				switch (get_msg(fd1, wait)) {
-				case T_OPTDATA_IND:
-					if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
-						r[sid[fd1]]++;
-						R++;
-						continue;
-					} else {
-						m[sid[fd1]]++;
-						M++;
-						continue;
-					}
-				case FAILURE:
-					f++;
-					break;
-				default:
-					goto test_case_9d_failure;
-				}
-				break;
-			}
-			if (++s >= TEST_STREAMS)
-				s = 0;
-			if (I >= TEST_TOTAL && L >= TEST_TOTAL && O >= TEST_TOTAL
-			    && Q >= TEST_TOTAL)
-				wait = 20;
-			if (f > TEST_TOTAL * 10)
-				goto test_case_9d_failure;
-			if (i[s] < TEST_PACKETS || l[s] < TEST_PACKETS)
-				continue;
-			if (o[s] < TEST_PACKETS || q[s] < TEST_PACKETS)
-				continue;
-			if (J < TEST_TOTAL || M < TEST_TOTAL || P < TEST_TOTAL || R < TEST_TOTAL)
-				continue;
-			for (s = 0; s < TEST_STREAMS; s++) {
-				if (j[s] != TEST_PACKETS || m[s] != TEST_PACKETS
-				    || p[s] != TEST_PACKETS || r[s] != TEST_PACKETS)
-					goto test_case_9d_failure;
-			}
-			return (SUCCESS);
-		}
-	      test_case_9d_failure:
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd1, i[s], j[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd1, o[s], p[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd3, l[s], m[s]);
-		for (s = 0; s < TEST_STREAMS; s++)
-			printf("%d send %d inds %d\n", fd3, q[s], r[s]);
-		printf("%d failures\n", f);
-		return (FAILURE);
-	}
-}
-
-/*
- *  Data for destination failure testing.
- */
-#define desc_case_10a "\
-Test Case 10(a):\n\
-Delivery of ordered data with destination failure."
-int
-test_case_10a(void)
-{
-	int i, j, k;
-	state = 0;
-	for (;;) {
-		switch (state) {
-		case 0:
-			for (j = 0; j < 20; j++) {
-				for (i = 0; i < 20; i++) {
-					inet_data_req(fd1, 0, "Test Pattern-1", 0);
-					inet_data_req(fd3, 0, "Test Pattern-3", 0);
-				}
-				for (i = 0, k = 0; i < 20 || k < 20;) {
-					switch (inet_wait(fd1, SHORT_WAIT)) {
-					case T_DATA_IND:
-						i++;
-					case FAILURE:
-						break;
-					default:
-						return (FAILURE);
-					}
-					switch (inet_wait(fd3, SHORT_WAIT)) {
-					case T_DATA_IND:
-						k++;
-					case FAILURE:
-						break;
-					default:
-						return (FAILURE);
-					}
-				}
-			}
-			return (SUCCESS);
-		}
-		return (FAILURE);
-	}
-}
-
-long
-time_sub(struct timeval *t1, struct timeval *t2)
-{
-	return ((t1->tv_sec - t2->tv_sec) * 1000000 + (t1->tv_usec - t2->tv_usec));
-}
-
-/*
- *  Data for destination failure testing.
- */
-#define desc_case_10b "\
-Test Case 10(b):\n\
-Delivery of ordered data with destination failure."
-int
-test_case_10b(void)
-{
-#define SETS 1000
-#define REPS 1
-	int ret, i, j, k, n = 0;
-	struct result {
-		uint req_idx;
-		struct timeval req;
-		uint ind_idx;
-		struct timeval ind;
-	};
-	struct result times[SETS * REPS];
-	ulong total = 0;
-	bzero(times, sizeof(times));
-	state = 0;
-	ret = FAILURE;
-	for (;;) {
-		switch (state) {
-		case 0:
-			show = 0;
-			for (j = 0; j < SETS; j++) {
-				for (i = 0; i < REPS; i++) {
-					// inet_data_req(fd1, 0, "This is a much longer test
-					// pattern that is being used to see whether we can
-					// generate some congestion and it is called Test
-					// Pattern-1", 0);
-					inet_data_req(fd1, 0, "Test Pattern-1", 0);
-					times[j * REPS + i].req = when;
-					times[j * REPS + i].req_idx = n++;
-				}
-				for (k = 0; k < REPS;) {
-					switch (inet_wait(fd3, SHORT_WAIT)) {
-					case T_DATA_IND:
-						times[j * REPS + k].ind = when;
-						times[j * REPS + k].ind_idx = n++;
-						k++;
-						break;
-					case FAILURE:
-						break;
-					default:
-						show = 1;
-						goto test_case_10b_failed;
-					}
-				}
-			}
-			show = 1;
-			ret = SUCCESS;
-		}
-	      test_case_10b_failed:
-		k = 0;
-		for (n = 0; n < 2 * SETS * REPS; n++) {
-			for (i = 0; i < SETS * REPS; i++) {
-				if (times[i].req_idx == n) {
-					printf
-					    ("T_DATA_REQ    ----->|--------------->|                 |                    \n");
-					break;
-				}
-				if (times[i].ind_idx == n) {
-					printf
-					    ("                    |                |-%9ld usec->|-----> T_DATA_IND   \n",
-					     time_sub(&times[i].ind, &times[i].req));
-					k++;
-					total += time_sub(&times[i].ind, &times[i].req);
-					break;
-				}
-			}
-		}
-		total /= k;
-		printf
-		    ("                    |                |                 |                    \n");
-		printf("                    |        average = %9ld usec  |                    \n",
-		       total);
-		printf
-		    ("                    |                |                 |                    \n");
-		return (ret);
-	}
-}
-
-struct test_case {
-	const char *name;
-	int (*preamble) (void);
-	int (*testcase) (void);
-	int (*postamble) (void);
-} tests[] = {
-	{
-	desc_case_0, &preamble_X, &test_case_0, &postamble_X}, {
-	desc_case_0b, &preamble_0, &test_case_0b, &postamble_0}, {
-	desc_case_1, &preamble_0, &test_case_1, &postamble_0}, {
-	desc_case_1b, &preamble_0, &test_case_1b, &postamble_0}, {
-	desc_case_2L, &preamble_1, &test_case_2L, &postamble_1}
-#if 0
-	, {
-	desc_case_2, &preamble_0, &test_case_2, &postamble_0}, {
-	desc_case_2a, &preamble_1, &test_case_2a, &postamble_1}, {
-	desc_case_3, &preamble_1, &test_case_3, &postamble_1}, {
-	desc_case_3b, &preamble_1, &test_case_3b, &postamble_1}, {
-	desc_case_4, &preamble_1, &test_case_4, &postamble_1}, {
-	desc_case_4b, &preamble_1, &test_case_4b, &postamble_1}, {
-	desc_case_5, &preamble_1, &test_case_5, &postamble_1}, {
-	desc_case_5b, &preamble_8, &test_case_5b, &postamble_1}, {
-	desc_case_5c, &preamble_7, &test_case_5c, &postamble_1}, {
-	desc_case_6, &preamble_2b, &test_case_6, &postamble_3}, {
-	desc_case_6b, &preamble_2, &test_case_6b, &postamble_3}, {
-	desc_case_6c, &preamble_3b, &test_case_6c, &postamble_3}, {
-	desc_case_7, &preamble_2, &test_case_7, &postamble_3}, {
-	desc_case_7b, &preamble_2, &test_case_7b, &postamble_3}, {
-	desc_case_8, &preamble_2, &test_case_8, &postamble_1}, {
-	desc_case_8b, &preamble_2, &test_case_8b, &postamble_1}, {
-	desc_case_8c, &preamble_2, &test_case_8c, &postamble_1}, {
-	desc_case_8d, &preamble_4b, &test_case_8d, &postamble_1}, {
-	desc_case_9a, &preamble_4, &test_case_9a, &postamble_3}, {
-	desc_case_9b, &preamble_4, &test_case_9b, &postamble_3}, {
-	desc_case_9c, &preamble_6, &test_case_9c, &postamble_3}, {
-	desc_case_9d, &preamble_6, &test_case_9d, &postamble_3}, {
-	desc_case_10a, &preamble_5, &test_case_10a, &postamble_3}, {
-	desc_case_10b, &preamble_5, &test_case_10b, &postamble_3}
-#endif
+struct test_side {
+	int (*preamble) (int);		/* test preamble */
+	int (*testcase) (int);		/* test case */
+	int (*postamble) (int);		/* test postamble */
 };
 
 int
-run_tests(void)
+conn_run(struct test_side *side)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "--------------------+------------Preamble-----------+--+                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (side->preamble && side->preamble(conn_fd) != __RESULT_SUCCESS) {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n", state);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		result = __RESULT_INCONCLUSIVE;
+	} else {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "--------------------+--------------Test-------------+--+                    \n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		switch (side->testcase(conn_fd)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_FAILURE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "####################|########## SCRIPT ERROR #######|##|                    [%d]\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			if (verbose > 2) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "********************|************ PASSED ***********|**|                    [%d]\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "--------------------+------------Postamble----------+--+                    \n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		if (side->postamble && side->postamble(conn_fd) != __RESULT_SUCCESS) {
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if (result == __RESULT_SUCCESS)
+				result = __RESULT_INCONCLUSIVE;
+		}
+	}
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "--------------------+-------------------------------+--+                    \n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	exit(result);
+}
+
+int
+resp_run(struct test_side *side)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    +------------Preamble-----------+  +--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (side->preamble && side->preamble(resp_fd) != __RESULT_SUCCESS) {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n", state);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		result = __RESULT_INCONCLUSIVE;
+	} else {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "                    +--------------Test-------------+  +--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		switch (side->testcase(resp_fd)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_FAILURE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|  |XXXXXXXXXXXXXXXXXXX(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |######### SCRIPT ERROR ########|  |###################(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			if (verbose > 2) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |************ PASSED ***********|  |********************(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "                    +------------Postamble----------+  +--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		if (side->postamble && side->postamble(resp_fd) != __RESULT_SUCCESS) {
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if (result == __RESULT_SUCCESS)
+				result = __RESULT_INCONCLUSIVE;
+		}
+	}
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    +-------------------------------+  +--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	exit(result);
+}
+
+int
+list_run(struct test_side *side)
+{
+	int result = __RESULT_SCRIPT_ERROR;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    +------------Preamble-----------+--+--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (side->preamble && side->preamble(list_fd) != __RESULT_SUCCESS) {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n", state);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		result = __RESULT_INCONCLUSIVE;
+	} else {
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "                    +--------------Test-------------+--+--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		switch (side->testcase(list_fd)) {
+		default:
+		case __RESULT_INCONCLUSIVE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_FAILURE:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_FAILURE;
+			break;
+		case __RESULT_SCRIPT_ERROR:
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |######### SCRIPT ERROR ########|##|###################(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SCRIPT_ERROR;
+			break;
+		case __RESULT_SUCCESS:
+			if (verbose > 2) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |************ PASSED ***********|**|********************(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			result = __RESULT_SUCCESS;
+			break;
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "                    +------------Postamble----------+--+--------------------\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		if (side->postamble && side->postamble(list_fd) != __RESULT_SUCCESS) {
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n", state);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			if (result == __RESULT_SUCCESS)
+				result = __RESULT_INCONCLUSIVE;
+		}
+	}
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "                    +-------------------------------+--+--------------------\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	exit(result);
+}
+
+/* 
+ *  Fork multiple children to do the actual testing.  The conn child is the
+ *  connecting process, the resp child is the responding process.
+ */
+
+int
+test_run(struct test_side *conn_side, struct test_side *resp_side, struct test_side *list_side)
+{
+	int children = 0;
+	pid_t got_chld, conn_chld = 0, resp_chld = 0, list_chld = 0;
+	int got_stat, conn_stat, resp_stat, list_stat;
+	start_tt(5000);
+	if (conn_side) {
+		switch ((conn_chld = fork())) {
+		case 00:	/* we are the child */
+			exit(conn_run(conn_side));	/* execute conn state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		conn_stat = __RESULT_SUCCESS;
+	if (resp_side) {
+		switch ((resp_chld = fork())) {
+		case 00:	/* we are the child */
+			exit(resp_run(resp_side));	/* execute resp state machine */
+		case -1:	/* error */
+			if (conn_chld)
+				kill(conn_chld, SIGKILL);	/* toast conn child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		resp_stat = __RESULT_SUCCESS;
+	if (list_side) {
+		switch ((list_chld = fork())) {
+		case 00:	/* we are the child */
+			exit(list_run(list_side));	/* execute list state machine */
+		case -1:	/* error */
+			if (conn_chld)
+				kill(conn_chld, SIGKILL);	/* toast conn child */
+			if (resp_chld)
+				kill(resp_chld, SIGKILL);	/* toast resp child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		list_stat = __RESULT_SUCCESS;
+	for (; children > 0; children--) {
+		if ((got_chld = wait(&got_stat)) > 0) {
+			if (WIFEXITED(got_stat)) {
+				int status = WEXITSTATUS(got_stat);
+				if (got_chld == conn_chld) {
+					conn_stat = status;
+					conn_chld = 0;
+				}
+				if (got_chld == resp_chld) {
+					resp_stat = status;
+					resp_chld = 0;
+				}
+				if (got_chld == list_chld) {
+					list_stat = status;
+					list_chld = 0;
+				}
+			} else if (WIFSIGNALED(got_stat)) {
+				int signal = WTERMSIG(got_stat);
+				if (got_chld == conn_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n", signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					conn_stat = __RESULT_FAILURE;
+					conn_chld = 0;
+				}
+				if (got_chld == resp_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "                    |@@@@@@@@@@ TERMINATED @@@@@@@@@|  |@@@@@@@@@@@@@@@@@@@@{%d}\n", signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					resp_stat = __RESULT_FAILURE;
+					resp_chld = 0;
+				}
+				if (got_chld == list_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "                    |@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@@{%d}\n", signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					list_stat = __RESULT_FAILURE;
+					list_chld = 0;
+				}
+			} else if (WIFSTOPPED(got_stat)) {
+				int signal = WSTOPSIG(got_stat);
+				if (got_chld == conn_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n", signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					conn_stat = __RESULT_FAILURE;
+					conn_chld = 0;
+				}
+				if (got_chld == resp_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "                    |&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |&&&&&&&&&&&&&&&&&&&&{%d}\n", signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (list_chld)
+						kill(list_chld, SIGKILL);
+					resp_stat = __RESULT_FAILURE;
+					resp_chld = 0;
+				}
+				if (got_chld == list_chld) {
+					if (verbose > 0) {
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "                    |&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&&&{%d}\n", signal);
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+					}
+					if (conn_chld)
+						kill(conn_chld, SIGKILL);
+					if (resp_chld)
+						kill(resp_chld, SIGKILL);
+					list_stat = __RESULT_FAILURE;
+					list_chld = 0;
+				}
+			}
+		} else {
+			if (timer_timeout) {
+				timer_timeout = 0;
+				if (show_timeout || verbose) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n", state);
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+					show_timeout--;
+				}
+				last_event = __EVENT_TIMEOUT;
+			}
+			if (conn_chld) {
+				kill(conn_chld, SIGKILL);
+				conn_stat = __RESULT_FAILURE;
+				conn_chld = 0;
+			}
+			if (resp_chld) {
+				kill(resp_chld, SIGKILL);
+				resp_stat = __RESULT_FAILURE;
+				resp_chld = 0;
+			}
+			if (list_chld) {
+				kill(list_chld, SIGKILL);
+				list_stat = __RESULT_FAILURE;
+				list_chld = 0;
+			}
+			break;
+		}
+	}
+	stop_tt();
+	if (conn_stat == __RESULT_FAILURE || resp_stat == __RESULT_FAILURE || list_stat == __RESULT_FAILURE)
+		return (__RESULT_FAILURE);
+	if (conn_stat == __RESULT_SUCCESS && resp_stat == __RESULT_SUCCESS && list_stat == __RESULT_SUCCESS)
+		return (__RESULT_SUCCESS);
+	return (__RESULT_INCONCLUSIVE);
+}
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Test case lists
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+struct test_case {
+	const char *numb;		/* test case number */
+	const char *name;		/* test case name */
+	const char *desc;		/* test case description */
+	struct test_side conn;		/* connecting process */
+	struct test_side resp;		/* responding process */
+	struct test_side list;		/* listening process */
+	int run;			/* whether to run this test */
+	int result;			/* results of test */
+} tests[] = {
+	{ "1.1", name_case_1_1, desc_case_1_1, { &preamble_0, &test_case_1_1_conn, &postamble_0}, { &preamble_0, &test_case_1_1_resp, &postamble_0}, { &preamble_0, &test_case_1_1_list, &postamble_0}, 0, 0}
+	, { "1.2", name_case_1_2, desc_case_1_2, { &preamble_0, &test_case_1_2_conn, &postamble_0}, { &preamble_0, &test_case_1_2_resp, &postamble_0}, { &preamble_0, &test_case_1_2_list, &postamble_0}, 0, 0}
+	, { "1.3", name_case_1_3, desc_case_1_3, { &preamble_0, &test_case_1_3_conn, &postamble_0}, { &preamble_0, &test_case_1_3_resp, &postamble_0}, { &preamble_0, &test_case_1_3_list, &postamble_0}, 0, 0}
+	, { "1.4", name_case_1_4, desc_case_1_4, { &preamble_0, &test_case_1_4_conn, &postamble_0}, { &preamble_0, &test_case_1_4_resp, &postamble_0}, { &preamble_0, &test_case_1_4_list, &postamble_0}, 0, 0}
+	, { "2.1", name_case_2_1, desc_case_2_1, { &preamble_0, &test_case_2_1_conn, &postamble_0}, { &preamble_0, &test_case_2_1_resp, &postamble_0}, { &preamble_0, &test_case_2_1_list, &postamble_0}, 0, 0}
+	, { "2.2", name_case_2_2, desc_case_2_2, { &preamble_0, &test_case_2_2_conn, &postamble_0}, { &preamble_0, &test_case_2_2_resp, &postamble_0}, { &preamble_0, &test_case_2_2_list, &postamble_0}, 0, 0}
+	, { "3.1", name_case_3_1, desc_case_3_1, { &preamble_1s, &test_case_3_1_conn, &postamble_1}, { &preamble_1s, &test_case_3_1_resp, &postamble_1}, { &preamble_1s, &test_case_3_1_list, &postamble_1}, 0, 0}
+	, { "4.1", name_case_4_1, desc_case_4_1, { &preamble_1, &test_case_4_1_conn, &postamble_1}, { &preamble_1, &test_case_4_1_resp, &postamble_1}, { &preamble_1, &test_case_4_1_list, &postamble_1}, 0, 0}
+	, { "4.2", name_case_4_2, desc_case_4_2, { &preamble_1, &test_case_4_2_conn, &postamble_1}, { &preamble_1, &test_case_4_2_resp, &postamble_1}, { &preamble_1, &test_case_4_2_list, &postamble_1}, 0, 0}
+	, { "4.3", name_case_4_3, desc_case_4_3, { &preamble_1, &test_case_4_3_conn, &postamble_1}, { &preamble_1, &test_case_4_3_resp, &postamble_1}, { &preamble_1, &test_case_4_3_list, &postamble_1}, 0, 0}
+	, { "4.4", name_case_4_4, desc_case_4_4, { &preamble_1, &test_case_4_4_conn, &postamble_1e}, { &preamble_1, &test_case_4_4_resp, &postamble_1e}, { &preamble_1, &test_case_4_4_list, &postamble_1e}, 0, 0}
+	, { "4.5", name_case_4_5, desc_case_4_5, { &preamble_1, &test_case_4_5_conn, &postamble_1e}, { &preamble_1, &test_case_4_5_resp, &postamble_1e}, { &preamble_1, &test_case_4_5_list, &postamble_1e}, 0, 0}
+	, { "4.6", name_case_4_6, desc_case_4_6, { &preamble_1, &test_case_4_6_conn, &postamble_1e}, { &preamble_1, &test_case_4_6_resp, &postamble_1e}, { &preamble_1, &test_case_4_6_list, &postamble_1e}, 0, 0}
+	, { "4.7", name_case_4_7, desc_case_4_7, { &preamble_1, &test_case_4_7_conn, &postamble_1e}, { &preamble_1, &test_case_4_7_resp, &postamble_1e}, { &preamble_1, &test_case_4_7_list, &postamble_1e}, 0, 0}
+	, { NULL,}
+};
+
+static int summary = 0;
+
+int
+do_tests(void)
 {
 	int i;
-	int result = INCONCLUSIVE;
+	int result = __RESULT_INCONCLUSIVE;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	printf("Simple test program for streams-inet driver.\n");
-	if (begin_tests() == SUCCESS) {
-		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)); i++) {
-			printf("\n%s\n", tests[i].name);
-			printf
-			    ("---------------------------------Preamble-----------------------------------\n");
-			if (tests[i].preamble() != SUCCESS) {
-				printf
-				    ("                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-				     state);
-				result = INCONCLUSIVE;
-			} else {
-				printf
-				    ("--------------------|--------------Test-------------|--|--------------------\n");
-				if (tests[i].testcase() == FAILURE) {
-					printf
-					    ("                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    \n");
-					result = FAILURE;
-				} else {
-					printf
-					    ("                    |************ PASSED ***********|**|                    \n");
-					result = SUCCESS;
-				}
+	int num_exit;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "\n\nXNS 5.2/TPI Rev 2 - OpenSS7 INET Driver - RAW - Conformance Test Program.\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	show = 0;
+	if (begin_tests() == __RESULT_SUCCESS) {
+		end_tests();
+		show = 1;
+		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+			if (tests[i].result)
+				continue;
+			if (!tests[i].run) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				continue;
 			}
-			printf
-			    ("--------------------|------------Postamble----------|--|--------------------\n");
-			if (tests[i].postamble() != SUCCESS) {
-				printf
-				    ("                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-				     state);
-				if (result == SUCCESS)
-					result = INCONCLUSIVE;
+			if (verbose > 0) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "\nTest Case INET-RAW/%s: %s\n", tests[i].numb, tests[i].name);
+				if (verbose > 1)
+					fprintf(stdout, "%s\n", tests[i].numb, tests[i].desc);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			printf
-			    ("----------------------------------------------------------------------------\n");
+			if ((result = begin_tests()) != __RESULT_SUCCESS)
+				goto inconclusive;
+			result = test_run(&tests[i].conn, &tests[i].resp, &tests[i].list);
+			end_tests();
 			switch (result) {
-			case SUCCESS:
+			case __RESULT_SUCCESS:
 				successes++;
-				printf("*********\n");
-				printf("********* Test Case SUCCESSFUL\n");
-				printf("*********\n\n");
+				if (verbose > 0) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "*********\n");
+					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
+					fprintf(stdout, "*********\n\n");
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
-			case FAILURE:
+			case __RESULT_FAILURE:
 				failures++;
-				printf("XXXXXXXXX\n");
-				printf("XXXXXXXXX Test Case FAILED\n");
-				printf("XXXXXXXXX\n\n");
+				if (verbose > 0) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
 			default:
-			case INCONCLUSIVE:
+			case __RESULT_INCONCLUSIVE:
+			      inconclusive:
 				inconclusive++;
-				printf("?????????\n");
-				printf("????????? Test Case INCONCLUSIVE\n");
-				printf("?????????\n\n");
+				if (verbose > 0) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "?????????\n");
+					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
+					fprintf(stdout, "?????????\n\n");
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+				}
 				break;
 			}
+			tests[i].result = result;
 		}
-	} else
-		printf("Test setup failed!\n");
-	end_tests();
-	printf("Done.\n\n");
-	printf("========= %2d successes   \n", successes);
-	printf("========= %2d failures    \n", failures);
-	printf("========= %2d inconclusive\n", inconclusive);
-	return (0);
+		if (summary && verbose) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "\n\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+				if (tests[i].run) {
+					lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "Test Case INET-RAW/%-10s ", tests[i].numb);
+					fflush(stdout);
+					lockf(fileno(stdout), F_ULOCK, 0);
+					switch (tests[i].result) {
+					case __RESULT_SUCCESS:
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SUCCESS\n");
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_FAILURE:
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "FAILURE\n");
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+						lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "INCONCLUSIVE\n");
+						fflush(stdout);
+						lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					}
+				}
+			}
+		}
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "Done.\n\n");
+			fprintf(stdout, "========= %2d successes   \n", successes);
+			fprintf(stdout, "========= %2d failures    \n", failures);
+			fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		return (0);
+	} else {
+		end_tests();
+		show = 1;
+		if (verbose > 0) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "Test setup failed!\n");
+			fflush(stdout);
+			lockf(fileno(stdout), F_ULOCK, 0);
+		}
+		return (2);
+	}
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+XNS 5.2/TPI Rev 2 - OpenSS7 INET Driver - RAW - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
 }
 
 void
@@ -4652,11 +4107,23 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
-    -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-	This option may be repeated.\n\
+    -l, --list [RANGE]\n\
+        List test case names within a range [default: all] and exit.\n\
+    -f, --fast [SCALE]\n\
+        Increase speed of tests by scaling timers [default: 50]\n\
+    -s, --summary\n\
+        Print a test case summary at end of testing [default: off]\n\
+    -o, --onetest [TESTCASE]\n\
+        Run a single test case.\n\
+    -t, --tests [RANGE]\n\
+        Run a range of test cases.\n\
+    -m, --messages\n\
+        Display messages. [default: off]\n\
     -q, --quiet\n\
         Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+        This option may be repeated.\n\
     -h, --help, -?, --?\n\
         Prints this usage message and exists\n\
     -V, --version\n\
@@ -4667,24 +4134,108 @@ Options:\n\
 int
 main(int argc, char *argv[])
 {
+	size_t l, n;
+	int range = 0;
+	struct test_case *t;
+	int tests_to_run = 0;
+	for (t = tests; t->numb; t++) {
+		if (!t->result) {
+			t->run = 1;
+			tests_to_run++;
+		}
+	}
 	for (;;) {
 		int c, val;
 #if defined _GNU_SOURCE
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			{"quiet", 0, 0, 'q'},
-			{"verbose", 2, 0, 'v'},
-			{"help", 0, 0, 'h'},
-			{"version", 0, 0, 'V'},
-			{"?", 0, 0, 'h'},
+			{"list",	optional_argument,	NULL, 'l'},
+			{"fast",	optional_argument,	NULL, 'f'},
+			{"summary",	no_argument,		NULL, 's'},
+			{"onetest",	required_argument,	NULL, 'o'},
+			{"tests",	required_argument,	NULL, 't'},
+			{"messages",	no_argument,		NULL, 'm'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
 		};
-		c = getopt_long_only(argc, argv, "v:hqV?", long_options, &option_index);
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "v:hqV?");
+		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'l':
+			if (optarg) {
+				l = strnlen(optarg, 16);
+				fprintf(stdout, "\n");
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, l)) {
+						fprintf(stdout, "Test Case INET-UDP/%s: %s\n", t->numb, t->name);
+						if (verbose > 1)
+							fprintf(stdout, "%s\n\n", t->desc);
+						fflush(stdout);
+						n++;
+					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			} else {
+				fprintf(stdout, "\n");
+				for (t = tests; t->numb; t++) {
+					fprintf(stdout, "Test Case INET-UDP/%s: %s\n", t->numb, t->name);
+					if (verbose > 1)
+						fprintf(stdout, "%s\n\n", t->desc);
+					fflush(stdout);
+				}
+				if (verbose <= 1)
+					fprintf(stdout, "\n");
+				fflush(stdout);
+				exit(0);
+			}
+			break;
+		case 'f':
+			if (optarg)
+				timer_scale = atoi(optarg);
+			else
+				timer_scale = 50;
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			break;
+		case 's':
+			summary = 1;
+			break;
+		case 'o':
+			if (!range) {
+				for (t = tests; t->numb; t++)
+					t->run = 0;
+				tests_to_run = 0;
+			}
+			range = 1;
+			for (n = 0, t = tests; t->numb; t++)
+				if (!strncmp(t->numb, optarg, 16)) {
+					if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+					}
+				}
+			if (!n) {
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+				fflush(stderr);
+				goto bad_option;
+			}
+			break;
 		case 'v':
 			if (optarg == NULL) {
 				verbose++;
@@ -4693,6 +4244,31 @@ main(int argc, char *argv[])
 			if ((val = strtol(optarg, NULL, 0)) < 0)
 				goto bad_option;
 			verbose = val;
+			break;
+		case 't':
+			l = strnlen(optarg, 16);
+			if (!range) {
+				for (t = tests; t->numb; t++)
+					t->run = 0;
+				tests_to_run = 0;
+			}
+			range = 1;
+			for (n = 0, t = tests; t->numb; t++)
+				if (!strncmp(t->numb, optarg, l)) {
+					if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+					}
+				}
+			if (!n) {
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+				fflush(stderr);
+				goto bad_option;
+			}
+			break;
+		case 'm':
+			show_msg = 1;
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
@@ -4708,20 +4284,29 @@ main(int argc, char *argv[])
 		      bad_nonopt:
 			if (optind < argc && verbose) {
 				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-				for (; optind < argc; optind++)
-					fprintf(stderr, "%s ", argv[optind]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
 				fprintf(stderr, "\n");
+				fflush(stderr);
 			}
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
 	}
-	/*
+	/* 
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	run_tests();
+	if (!tests_to_run) {
+		if (verbose > 0) {
+			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
+			fflush(stderr);
+		}
+		exit(2);
+	}
+	splash(argc, argv);
+	do_tests();
 	exit(0);
 }

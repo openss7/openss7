@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticotsord.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: ticotsord.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
+
+ $Log: ticotsord.h,v $
+ Revision 0.9.2.1  2004/05/16 04:12:32  brian
+ - Updating strxnet release.
+
+ Revision 0.9  2004/05/14 08:00:01  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 0.9.2.1  2004/04/13 12:12:51  brian
+ - Rearranged header files.
 
  *****************************************************************************/
 
 #ifndef _TICOTSORD_H
 #define _TICOTSORD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

@@ -1,27 +1,27 @@
 /*****************************************************************************
 
- @(#) $Id: xti_tcp.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: xti_tcp.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2004 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,20 +41,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __XTI_TCP_H__
-#define __XTI_TCP_H__
+#ifndef _SYS_XTI_TCP_H
+#define _SYS_XTI_TCP_H
 
-#ident "@(#) $RCSfile: xti_tcp.h,v $ $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
-
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+#ident "@(#) $RCSfile: xti_tcp.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /*
  * TCP level
@@ -138,10 +137,5 @@ struct t_tcp_info {
 	t_uscalar_t tcpi_reordering;
 };
 
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
+#endif				/* _SYS_XTI_TCP_H */
 
-#endif				/* __XTI_TCP_H__ */

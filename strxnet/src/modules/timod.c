@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -74,12 +74,16 @@ static char const ident[] =
 #   error ****
 #endif
 
+#ifdef LINUX
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef CONFIG_MODVERSIONS
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+#endif
+
 #include <linux/init.h>
 
 #include <sys/stream.h>
@@ -94,7 +98,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

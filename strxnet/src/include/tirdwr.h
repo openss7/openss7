@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
 
- -----------------------------------------------------------------------------
  $Log: tirdwr.h,v $
- Revision 0.9  2004/04/05 12:37:53  brian
- - Working up XNET release.
+ Revision 0.9.2.1  2004/05/16 04:12:32  brian
+ - Updating strxnet release.
+
+ Revision 0.9  2004/05/14 08:00:01  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 0.9.2.1  2004/04/13 12:12:51  brian
+ - Rearranged header files.
 
  *****************************************************************************/
 
 #ifndef _TIRDWR_H
 #define _TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:37:53 $"
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:32 $"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
