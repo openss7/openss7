@@ -31,7 +31,7 @@
  * 
  */
 
-#ident "@(#) LiS port-mdep.c 2.15 5/30/03 21:40:40 "
+#ident "@(#) LiS port-mdep.c 2.16 11/23/03 19:58:44 "
 
 #include <sys/stream.h>
 #include <sys/LiS/errmsg.h>
@@ -130,31 +130,6 @@ port_copyin_str(struct file *f, const char *ustr, char **kstr, int maxb)
 
 } /* port_copyin_str */
 
-/************************************************************************
-*                            lis_errmsg                                 *
-*************************************************************************
-*									*
-* Return a pointer to a string that will serve as a prefix for the	*
-* standard lis error message.						*
-*									*
-************************************************************************/
-char  *lis_errmsg( int lvl )
-{
-    switch(lvl)
-    {
-    case LIS_PANIC:
-	return("PANIC");
-    case LIS_ERROR:
-	return("ERROR");
-    case LIS_WARN:
-	return("WARNING");
-    case LIS_DEBUG:
-	return("DEBUG");
-    default:
-	return("unknown severity");
-    }
-
-} /*lis_errmsg*/
 
 /************************************************************************
 *                         Timer Mechanism                               *

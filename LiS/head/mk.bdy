@@ -31,7 +31,7 @@ CC += -DLiS -D__KERNEL__ -DVERSION_2 $(XOPTS) $(OPT)
 #
 # The object files that need to be made for all targets
 #
-OBJS = head.o dki.o msg.o mod.o buffcall.o mdep.o errmsg.o events.o \
+OBJS = head.o dki.o msg.o mod.o buffcall.o mdep.o events.o \
 	msgutl.o queue.o safe.o stats.o stream.o strmdbg.o wait.o \
 	cmn_err.o slog.o sputbuf.o version.o
 
@@ -45,7 +45,7 @@ endif
 all: streamshead.o
 
 clean: 
-	-rm -f streamshead.o $(OBJS) $(XOBJS)
+	-rm -f streamshead.o $(OBJS) $(XOBJS) $(ASMOBJS)
 
 realclean: clean
 	-rm -f .depend
@@ -59,7 +59,13 @@ realclean: clean
 %.o: %.c
 	$(CC) -c -o $@ $<
 
-streamshead.o: $(OBJS) $(XOBJS)
+%.o: $(HEADDIR)/%.S
+	$(CC) -c -o $@ $<
+
+%.o: %.S
+	$(CC) -c -o $@ $<
+
+streamshead.o: $(OBJS) $(XOBJS) $(ASMOBJS)
 	$(LD) -r -o $@ $^
 
 #
@@ -88,5 +94,6 @@ mod.o: $(HEADDIR)/modconf.inc
 -include .depend
 
 common-dep:
-	$(CC) -M -DDEP $(OBJS:%.o=$(HEADDIR)/%.c) >.depend
+	$(CC) -M -DDEP$(ASMOBJS:%.o=$(HEADDIR)/%.S) $(OBJS:%.o=$(HEADDIR)/%.c)  >.depend
+
 

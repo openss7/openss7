@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.114 10/21/03 19:02:18 "
+#ident "@(#) LiS linux-mdep.c 2.116 11/23/03 19:58:44 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -585,24 +585,6 @@ static struct inode *lis_get_new_inode(struct super_block *sb)
     return(i);
 }
 
-/*  -------------------------------------------------------------------  */
-/* get a err msg for error level
- */
-char  *lis_errmsg( int lvl )
-{
-    switch(lvl){
-    case LIS_PANIC:
-	return(KERN_EMERG);
-    case LIS_ERROR:
-	return(KERN_ERR);
-    case LIS_WARN:
-	return(KERN_WARNING);
-    case LIS_DEBUG:
-	return(KERN_DEBUG);
-    default:
-	return("unknown severity");
-    }
-} /*lis_errmsg*/
 
 /*  -------------------------------------------------------------------  */
 /*				    Timeouts                             */
@@ -3663,7 +3645,7 @@ int lis_init_module( void )
     lis_start_qsched() ;		/* ensure q running process going */
     printk(
 	"Linux STREAMS Subsystem ready.\n"
-	"Copyright (c) 1997-2002 David Grothe, et al, http://www.gcom.com\n"
+	"Copyright (c) 1997-2003 David Grothe, et al, http://www.gcom.com\n"
 	"Major device number %d.\n"
 	"Version %s %s. Compiled for kernel version %s.\n"
 	"Using %s %s\n"

@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.130 10/10/03 19:57:37 "
+#ident "@(#) LiS head.c 2.133 11/23/03 19:58:44 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -3338,7 +3338,7 @@ copyout_blks(struct file *f, char *ubuff, long count, mblk_t *mp)
 	return(err) ;				/* something went wrong */
 
     if (count != 0)			/* hopefully, copied whole buffer */
-	lis_error(LIS_WARN,"copyout_blks",
+	printk("LiS:copyout_blks:"
 		  "count (%d) doesn't match data (%d)", ocount, ocount-count);
     return(0) ;
 }
@@ -4420,11 +4420,10 @@ retry_clone:
 
 	cnt = lis_apushm(KDEV_TO_INT(i->i_rdev), mods);
 	for (j = 0; j < cnt; ++j) {
-	    modID_t mod = lis_findmod(mods[j]);
-	    streamtab_t *st;
+	    streamtab_t *st = lis_modstr(lis_loadmod(mods[j]));
 
 	    /* printk("autopushing %s\n", mods[j]); */
-	    if (mod == LIS_NULL_MID) {
+	    if (!st) {
 		/*
 		 *  Module not present. Probably one of:
 		 *  a) Module open for a previous autopush slept, giving
@@ -4434,9 +4433,6 @@ retry_clone:
 		err = -ENOSR; /* Assume (a), retry may succeed */
 		goto error_rtn;
 	    }
-
-	    st = lis_fmod_sw[mod].f_str;
-	    ASSERT(st != NULL);
 	    
 	    CP(head,st) ;
 	    err = push_mod( head, st, &ndev, f->f_flags, &creds ) ;
@@ -6091,7 +6087,7 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 		printk("lis_strioctl(...,I_PUSH,\"%s\") %s <<\n",
 			mname, hd->sd_name) ;
 
-	    if ((st = lis_modstr(lis_findmod(mname))) == NULL)
+	    if ((st = lis_modstr(lis_loadmod(mname))) == NULL)
 	    {
 		err=-EINVAL;
 		if ( LIS_DEBUG_IOCTL )
@@ -6288,38 +6284,36 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	{
 	    char *mname = NULL;
 	    queue_t *q;
+	    int nmods = hd->sd_pushcnt;
 
 	    if ((err=lis_check_umem(f,VERIFY_READ,(char*)arg,FMNAMESZ+1))<0)
 		RTN(err);
-	    if (hd->sd_pushcnt){
-		if ((err=lis_copyin_str(f,(char*)arg,&mname,FMNAMESZ+1))<0)
-		    RTN(err);
-		if ( LIS_DEBUG_IOCTL )
-		    printk("lis_strioctl(...,I_FIND,\"%s\") \"%s\"\n",
-			   mname, hd->sd_name);
-		for (q=hd->sd_wq; 
-		     q && strncmp(lis_queue_name(q),mname,FMNAMESZ);
-		     q=q->q_next )
-		{
-		    if (!LIS_CHECK_Q_MAGIC(q))
-		    {
-			FREE(mname) ;
-			RTN(-EINVAL);
-		    }
-		    if (!SAMESTR(q)) break ;
-		}
-		if (q){		
-		    FREE(mname) ;
-		    RTN(1);	/* found! */
-		}
-	    }
-	    if (mname == NULL)
-	        RTN(0);		/* not present */
-
-	    if (!lis_findmod(mname))
+	    if ((err=lis_copyin_str(f,(char*)arg,&mname,FMNAMESZ+1))<0)
+		RTN(err);
+	    if (!*mname)  /* no name here! */
 	    {
-		FREE(mname) ;
-		RTN(-EINVAL);	/* not a valid module */
+		FREE(mname);
+		RTN(-EINVAL);
+	    }
+
+	    if ( LIS_DEBUG_IOCTL )
+		printk("lis_strioctl(...,I_FIND,\"%s\") \"%s\" %d module(s)\n",
+		       mname, hd->sd_name, nmods);
+
+	    for (q=(hd->sd_wq ? hd->sd_wq->q_next : NULL);
+		 q && nmods; q=q->q_next, nmods--)
+	    {
+		if (!LIS_CHECK_Q_MAGIC(q))
+		{
+		    FREE(mname) ;
+		    RTN(-EINVAL);
+		}
+		if (strncmp(lis_queue_name(q),mname,FMNAMESZ) == 0)
+		{
+		    FREE(mname);
+		    RTN(1);
+		}
+		if (!SAMESTR(q)) break ;
 	    }
 
 	    FREE(mname) ;
@@ -6596,10 +6590,15 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
     case I_LIST:
 	if (!arg)		/* want number of modules */
 	{
+	    int nmods = hd->sd_pushcnt;
+
+	    /* Add 1 to nmods (for driver) if not pipe/FIFO */
+	    if (!F_ISSET(hd->sd_flag,STFIFO)) nmods++;
+
 	    if ( LIS_DEBUG_IOCTL )
 		printk("lis_strioctl(...,I_LIST,NULL) \"%s\" >> return %d\n",
-		       hd->sd_name, hd->sd_pushcnt+1) ;
-	    RTN(hd->sd_pushcnt+1); /* +1 for driver  */
+		       hd->sd_name, nmods) ;
+	    RTN(nmods);
 	}
 	else {
 	    str_list_t list;
@@ -6835,29 +6834,34 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 
     case I_LIS_QRUN_STATS:
       {
-        lis_qrun_stats_t	stats ;
+        lis_qrun_stats_t	*stats ;
 
-	err = lis_check_umem(f,VERIFY_WRITE, (char*)arg, sizeof(stats)) ; 
+	err = lis_check_umem(f,VERIFY_WRITE, (char*)arg, sizeof(*stats)) ; 
 	if (err < 0)
 	    RTN(err);
 
-	stats.num_cpus = lis_num_cpus;
-	stats.num_qrunners = lis_atomic_read(&lis_runq_cnt) ;
-	stats.queues_running = lis_atomic_read(&lis_queues_running) ;
-	stats.runq_req_cnt = lis_atomic_read(&lis_runq_req_cnt) ;
-	memcpy(stats.runq_cnts, (void *)lis_runq_cnts, sizeof(stats.runq_cnts));
-	memcpy(stats.queuerun_cnts, (void *)lis_queuerun_cnts,
-						sizeof(stats.queuerun_cnts)) ;
-	memcpy(stats.active_flags, (void *)lis_runq_active_flags,
-						sizeof(stats.active_flags)) ;
-	memcpy(stats.runq_pids, (void *)lis_runq_pids, sizeof(stats.runq_pids));
-	memcpy(stats.runq_wakeups, (void *)lis_runq_wakeups,
-						sizeof(stats.runq_wakeups));
-	memcpy(stats.setqsched_cnts, (void *)lis_setqsched_cnts,
-					    sizeof(stats.setqsched_cnts));
-	memcpy(stats.setqsched_isr_cnts, (void *)lis_setqsched_isr_cnts,
-					    sizeof(stats.setqsched_isr_cnts));
-	err = lis_copyout(f,&stats,(char*)arg,sizeof(stats));
+        stats = (lis_qrun_stats_t*)ALLOCF(sizeof(lis_qrun_stats_t),"stats ");
+        if (stats == NULL)
+	    RTN(-ENOMEM);
+
+	stats->num_cpus = lis_num_cpus;
+	stats->num_qrunners = lis_atomic_read(&lis_runq_cnt) ;
+	stats->queues_running = lis_atomic_read(&lis_queues_running) ;
+	stats->runq_req_cnt = lis_atomic_read(&lis_runq_req_cnt) ;
+	memcpy(stats->runq_cnts, (void *)lis_runq_cnts, sizeof(stats->runq_cnts));
+	memcpy(stats->queuerun_cnts, (void *)lis_queuerun_cnts,
+						sizeof(stats->queuerun_cnts)) ;
+	memcpy(stats->active_flags, (void *)lis_runq_active_flags,
+						sizeof(stats->active_flags)) ;
+	memcpy(stats->runq_pids, (void *)lis_runq_pids, sizeof(stats->runq_pids));
+	memcpy(stats->runq_wakeups, (void *)lis_runq_wakeups,
+						sizeof(stats->runq_wakeups));
+	memcpy(stats->setqsched_cnts, (void *)lis_setqsched_cnts,
+					    sizeof(stats->setqsched_cnts));
+	memcpy(stats->setqsched_isr_cnts, (void *)lis_setqsched_isr_cnts,
+					sizeof(stats->setqsched_isr_cnts));
+	err = lis_copyout(f,stats,(char*)arg,sizeof(*stats));
+        FREE(stats);
 	RTN(err);
       }
 
@@ -7692,7 +7696,7 @@ lis_strclose(struct inode *i, struct file *f)
 
     if (!i)
     {
-	lis_error(LIS_ERROR,"strclose","called w/ null inode");
+	printk("lis_strclose: called w/ null inode");
 	CLOCKOFF(CLOSETIME) ;
 	RTNX;
     }
@@ -7715,8 +7719,7 @@ lis_strclose(struct inode *i, struct file *f)
 
     if (!I_COUNT(i))
     {
-	lis_error(LIS_ERROR,"strclose",
-		  "called with unused inode (inode 0x%x file 0x%x)",
+	printk("lis_strclose: called with unused inode (inode 0x%x file 0x%x)",
 		  (long)i, (long)f);
 	CLOCKOFF(CLOSETIME) ;
 	RTNX;
@@ -7732,8 +7735,7 @@ lis_strclose(struct inode *i, struct file *f)
 
     if (!(head = FILE_STR(f)))
     {
-	lis_error(LIS_ERROR,"strclose",
-		  "called with null stream (inode 0x%x file 0x%x)",
+	printk("lis_strclose: called with null stream (inode 0x%x file 0x%x)",
 		  (long)i, (long)f);
 	CLOCKOFF(CLOSETIME) ;
 	RTNX;

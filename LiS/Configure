@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.74 9/24/03"
+Configure_version="2.78 11/23/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -9,7 +9,122 @@ else
     MAKE_INVOKED=0
 fi
 
+## DEBUG
+# set -x
+
+usage()
+{
+cat <<EOF
+
+NAME
+       Configure -- configure script for Linux Streams.
+
+SYNOPSIS
+       Configure [options] 
+
+DESCRIPTION
+       Collect Linux streams configuration. Interactively by default or
+       option parsing.
+
+OPTIONS
+       -h,--help Print out this message
+
+       -m|--onmachine Install on this machine [y|n]
+
+       -l|--levelrun Configure to run in :
+                     l=kernel,u=serspace,q=QNX
+
+       -n|--nativecompiler Use native C (or cross compiling) [y|n] 
+
+       -r|--onrunning Compile on current running kernel [y|n]
+
+       -s|--ksourcedir Kernel source directory <STRING>
+
+       -v|--versionlinux  Kernel version <STRING> (uname -r) 
+
+       -M|--loadmodules If answer is no must run 'make modules_install' to
+                        install modules [y|n]
+
+       -L|--moduleslocation  Kernel modules location <STRING>
+
+       -b|--backcompat [y|n] y =  LiS backward compatible constants 
+                             n =  UnixWare/Solaris compatible constants 
+
+       -S|--solaris Use Solaris style cmn_err [y|N]
+
+       -g|--sourcedebug Source level debugging [y|N]
+
+       -R|--sharedlibs Use shared libraries [Y|n]
+
+       -c|--intcpuflags  "int or unsigned long" type for CPU [y|n] 
+
+       -i|--forcenewinode Force new_inode usage (only when not detected) [y|n]
+       
+EXAMPLE 
+
+ ./Configure --onmachine=n --levelrun=l --nativecompiler=y --onrunning=n 
+ --ksourcedir=/usr/src/kernel-headers-2.4.22-1-686-smp 
+ --versionlinux=2.4.22-1-686-smp    --loadmodules=n 
+ --moduleslocation=/lib/modules/2.4.22-1-686-smp/ --backcompat=n 
+ --solaris=n --sourcedebug=y --sharedlibs=y --intcpuflags=n --forcenewinode=y 
+
+EOF
+}
+
+
+
+## CMDLINE parsing to collect all possible values.
+if getopt -u -V >/dev/null 2>&1; then
+    UOP=-u
+fi
+OPT=`getopt $UOP -l"onmachine:,levelrun:,nativecompiler:,onrunning:,ksourcedir:\
+,versionlinux:,loadmodules:,moduleslocation:,backcompat:,solaris:,sourcedebug:,sharedlibs:\
+,intcpuflags:,forcenewinode:,help" \
+       "m:l:n:r:s:v:M:b:S:g:R:c:i:h"  "$@" `
+
+if [ $? != 0 ] ;then 
+echo "run $0 -h for details"
+exit 2 
+fi
+
+### This reset the input in order to use normal variables..
+eval set -- "$OPT"
+
+# Sets positional parameters to command-line arguments.
+# WARNING -u do have unquoted arguments
+# unset ALL OPT_* for safety
+
+unset OPT_ONMACHINE OPT_LEVELRUN OPT_NATIVECOMPILER OPT_ONRUNNINGLNX \
+      OPT_KSOURCEDIR OPT_VERSIONLINUX OPT_LOADMODULES OPT_MODULESLOCATION \
+      OPT_BACKCOMPAT OPT_SOLARISSTYLE OPT_SRCDBG OPT_SHAREDLIBS \
+      OPT_INTCPUFLAGS OPT_FORCENEWINODE CONFIG\
+
+## PARSE OPTIONS AND SET VARIABLES USED in script
+while [ ! -z "$1" ]
+do
+case "$1" in
+     -m|--onmachine) OPT_ONMACHINE=$2; shift ;;
+     -l|--levelrun) OPT_LEVELRUN=$2; shift ;;
+     -n|--nativecompiler) OPT_NATIVECOMPILER=$2; shift ;;
+     -r|--onrunning) OPT_ONRUNNINGLNX=$2; shift ;;
+     -s|--ksourcedir) OPT_KSOURCEDIR=$2; shift ;;
+     -v|--versionlinux) OPT_VERSIONLINUX=$2; shift ;;
+     -M|--loadmodules) OPT_LOADMODULES=$2; shift ;;
+     -L|--moduleslocation)  OPT_MODULESLOCATION=$2; shift ;;
+     -b|--backcompat) OPT_BACKCOMPAT=$2; shift ;;
+     -S|--solaris) OPT_SOLARISSTYLE=$2; shift ;;
+     -g|--sourcedebug) OPT_SRCDBG=$2; shift ;;
+     -R|--sharedlibs)OPT_SHAREDLIBS=$2; shift ;;
+     -c|--intcpuflags) OPT_INTCPUFLAGS=$2; shift ;;
+     -i|--forcenewinode) OPT_FORCENEWINODE=$2; shift ;;
+     -h|--help) usage ; exit 0;;
+      *) shift ; break;;
+    esac
+    shift
+done
+
 CONFIG=${1:-config.in}
+echo "CONFIG=$CONFIG"
 
 #
 # agument parsing
@@ -85,6 +200,7 @@ do_confirm()
 # Inputs:
 # 	PROMPT has the string to prompt the user with.
 #	DEFAULT is the default response to use for empty input
+#       ARGVVALUE is the value collected by ARG parsing -> no interaction
 # Outputs:
 #	RESULT has the response from the user
 #
@@ -92,7 +208,14 @@ do_read_dir()
 {
     n=4
     while :; do
-	do_readstring
+	 if [ "$ARGVVALUE..." = "..." ]; then
+         #interact with user..
+         do_readstring
+         else
+         RESULT=${ARGVVALUE}
+             # to avoid loops
+        unset  ARGVVALUE 
+         fi
 	if [ -d $RESULT ]; then
 	    return 0
 	fi
@@ -109,6 +232,7 @@ do_read_dir()
 # Inputs:
 # 	PROMPT has the string to prompt the user with.
 #	RESPONSE has the responses that are valid
+#       ARGVVALUE is the value collected by ARG parsing -> no interaction
 #	DEFAULT is the default response to use for empty input
 # Outputs:
 #	RESULT has the response from the user
@@ -138,7 +262,15 @@ do_read_choice()
     fi
 
     while :; do
-	do_readstring
+        if [ "$ARGVVALUE..." = "..." ]; then
+         #interact with user..
+         do_readstring
+         else
+         # use the response from CLI
+         RESULT=${ARGVVALUE}
+        # to avoid loop
+        unset  ARGVVALUE
+         fi
 	for i in $RESPONSE; do
 	    if [ "$i" = "$RESULT" ]; then
 		return
@@ -300,6 +432,7 @@ for another machine?\n\
 Please enter y or n"
     RESPONSE="y n"
     DEFAULT=y
+    ARGVVALUE="$OPT_ONMACHINE"
     do_read_choice
     BEEN_HERE_DONE_THIS=1
     if [ "$RESULT..." = "n..." ]; then
@@ -789,7 +922,16 @@ get_empty_inode_option()
 	    echo "LiS will probably print warnings related to"
 	    echo "these symbols, and LiS will probably fail to"
 	    echo "load as a module."
-	    do_confirm
+	     if [ "$OPT_FORCENEWINODE..." = "..." ] ;then
+	      do_confirm
+             else
+                 if  [ "$OPT_FORCENEWINODE" = "y" ] ;then
+             	    GET_EMPTY_INODE="new_inode(LIS_SB)" 
+                    echo "***new_inode FORCED***"
+                else
+           	    GET_EMPTY_INODE="get_empty_inode()" 
+                fi
+             fi
 	fi
 	return
     else
@@ -802,7 +944,16 @@ get_empty_inode_option()
 	echo "LiS will probably print warnings related to"
 	echo "these symbols, and LiS will probably fail to"
 	echo "load as a module."
-	do_confirm
+        if [ "$OPT_FORCENEWINODE..." = "..." ] ;then
+            do_confirm
+        else
+            if  [ "$OPT_FORCENEWINODE" = "y" ] ;then
+                GET_EMPTY_INODE="new_inode(LIS_SB)" 
+                echo "***new_inode FORCED***"
+            else
+                GET_EMPTY_INODE="get_empty_inode()" 
+            fi
+        fi
     fi
 }
 
@@ -945,6 +1096,7 @@ How do you want to configure STREAMS?\n\
 Please enter your choice"
 RESPONSE="l u q"
 DEFAULT="$TARGET"
+ARGVVALUE="$OPT_LEVELRUN"
 do_read_choice
 TARGET=$RESULT
 
@@ -957,6 +1109,7 @@ Are you using the native Linux C compiler (y) or\n\
 are you cross-compiling using a different compiler (n)?\n\
 Native C (y) or cross-compile (n)?"
         RESPONSE="y n"
+        ARGVVALUE=$OPT_NATIVECOMPILER
         do_read_choice
         case $RESULT in
 	    y)
@@ -993,6 +1146,7 @@ Native C (y) or cross-compile (n)?"
 Do you intend to run LiS on this machine with\n\
 the currently running kernel?"
     RESPONSE="y n"
+    ARGVVALUE=${OPT_ONRUNNINGLNX}
     do_read_choice
     case $RESULT in
 	y) USE_RUNNING_KERNEL=y ;;
@@ -1012,6 +1166,7 @@ the currently running kernel?"
 	    DEFAULT="/usr/src/linux"
 	    check_ksrc
 	fi
+        ARGVVALUE=${OPT_KSOURCEDIR}
 	if do_read_dir; then
 	    KSRC=$RESULT
 	    NOKSRC=0
@@ -1076,6 +1231,8 @@ your kernel in $KSRC yet.  You should do that now to avoid\n\
 problems with the installation.\n\
 Do you want to do that now?"
         RESPONSE="y n"
+        ## This is purely an interactive choice.. CLI options will avoid it
+        unset ARGVVALUE
         do_read_choice
         case $RESULT in
 	    y)
@@ -1115,6 +1272,8 @@ It appears that you have not done a 'make dep' on your kernel yet.\n\
 You will have to do this to proceed.\n\
 Do you want to do that now?"
         RESPONSE="y n"
+        ## This is purely an interactive choice.. CLI options will avoid it
+        unset ARGVVALUE
         do_read_choice
         case $RESULT in
 	    y)
@@ -1141,8 +1300,12 @@ Do you want to do that now?"
     else
 	DEFAULT=$KVER
 	PROMPT="Which version of the kernel are you building for?"
+        if [ "$OPT_VERSIONLINUX..." = "..." ]; then
 	do_readstring
 	KVER=$RESULT
+        else
+        KVER=${OPT_VERSIONLINUX}
+        fi
     fi
     
     KVER_PATCH=`echo ${KVER}|sed -e "s/[^\.]\.[^\.]\.//"`
@@ -1193,6 +1356,7 @@ This allows you to load it by typing in \"insmod streams\".\n\
 Please enter y or n "
     RESPONSE="y n"
     DEFAULT="$MOD_INSTALL"
+    ARGVVALUE=${OPT_LOADMODULES}
     do_read_choice
     MOD_INSTALL=$RESULT
 
@@ -1229,10 +1393,12 @@ Please enter y or n "
 	if [ -d $DEFAULT ]; then
 	    MOD_INST_DIR=$DEFAULT
 	else
+            ARGVVALUE=${OPT_MODULESLOCATION}
 	    do_read_dir
 	    MOD_INST_DIR=$RESULT
 	fi
     else
+            ARGVVALUE=${OPT_MODULESLOCATION}        
 	do_read_dir
 	MOD_INST_DIR=$RESULT
     fi
@@ -1287,6 +1453,7 @@ you should answer Yes to this question.\n\
 Please enter y or n"
 RESPONSE="y n"
 DEFAULT=$LIS_OLD_CONSTS
+ARGVVALUE=${OPT_BACKCOMPAT}
 do_read_choice
 LIS_OLD_CONSTS=$RESULT
 if [ "$LIS_OLD_CONSTS..." = "y..." ]; then
@@ -1317,6 +1484,7 @@ style cmn_err the newline goes on the beginning.\n\
 Please enter y or n"
 RESPONSE="n y"
 DEFAULT=$SOLARIS_STYLE_CMN_ERR
+ARGVVALUE=${OPT_SOLARISSTYLE}
 do_read_choice
 SOLARIS_STYLE_CMN_ERR=$RESULT
 
@@ -1341,6 +1509,7 @@ gdbstub patch is installed in the kernel for kernel source level debugging.\n\
 Please enter y or n"
 RESPONSE="y n"
 DEFAULT=$DBG_OPT
+ARGVVALUE=${OPT_SRCDBG}
 do_read_choice
 DBG_OPT=$RESULT
 
@@ -1360,6 +1529,7 @@ LD_LIBRARY_PATH environment variable.
 Please enter y or n"
     RESPONSE="y n"
     DEFAULT=$LIS_SHLIB
+    ARGVVALUE=${OPT_SHAREDLIBS}
     do_read_choice
     LIS_SHLIB=$RESULT
 else
@@ -1381,6 +1551,7 @@ compile your driver code.\n\
 Please enter y or n"
 RESPONSE="y n"
 DEFAULT=$INT_PSW
+ARGVVALUE=${OPT_INTCPUFLAGS}
 do_read_choice
 INT_PSW=$RESULT
 
@@ -1409,6 +1580,9 @@ fi
 #
 # 2.4.20 (or thereabouts) changed the location of the signal mask lock
 #
+# Must set default to no.
+SIGMASKLOCK=n
+
 if [ "$TARGET" = "l" ]; then
     if [ -f $KSRC/include/linux/sched.h ]; then
 	if grep -q 'sigmask_lock' $KSRC/include/linux/sched.h; then
@@ -1474,7 +1648,10 @@ if   [ "$TARGET" = "l"  ]; then
 	    echo "the standard gcc compiler version `C_compiler_version gcc`,"
 	    echo "but there may be problems when you try to run LiS."
 	    echo
+            # this is informative and should not block a batch configuration.
+            if [ "$OPT_NATIVECOMPILER..." = "..." ] ;then
 	    do_confirm
+            fi
 	    CC_NAME=gcc
 	    CC_VERS=`C_compiler_version gcc`
 	else
@@ -1490,6 +1667,11 @@ if   [ "$TARGET" = "l"  ]; then
     cc)		CC_OPTIMIZE=-O2;;
     *)		CC_OPTIMIZE=-O2;;
     esac
+    if $CC_NAME -mpreferred-stack-boundary=2 -S -o /dev/null -xc /dev/null \
+	>/dev/null 2>&1
+    then
+	CC_OPTIMIZE="$CC_OPTIMIZE -mpreferred-stack-boundary=2"
+    fi
 else
     echo
     echo "Non-Linux install.  Using cc as default C compiler."
@@ -1585,9 +1767,9 @@ if [ "$TARGET" = "l" ]; then
     cfg_out MACHINE $MACHINE
     cfg_out CC_NAME $CC_NAME
     cfg_out CC_VERS $CC_VERS
-    cfg_out CC_OPTIMIZE $CC_OPTIMIZE
+    cfg_out CC_OPTIMIZE "$CC_OPTIMIZE"
     cfg_out MACHINE_INCL $MACHINE_INCL
-    cfg_out_str GET_EMPTY_INODE $GET_EMPTY_INODE 
+    cfg_out_str GET_EMPTY_INODE $GET_EMPTY_INODE
     #cfg_out REGISTER_SYSCALLS $REGISTER_SYSCALLS
     cfg_out INT_PSW $INT_PSW
 fi

@@ -38,7 +38,6 @@ FILES="\
 ./LiS-$LISVER/head/buffcall.c \
 ./LiS-$LISVER/head/cmn_err.c \
 ./LiS-$LISVER/head/dki.c \
-./LiS-$LISVER/head/errmsg.c \
 ./LiS-$LISVER/head/events.c \
 ./LiS-$LISVER/head/head.c \
 ./LiS-$LISVER/head/linux-mdep.c \
@@ -139,7 +138,6 @@ FILES="\
 ./LiS-$LISVER/libc/linux35/asm/unistd.h \
 ./LiS-$LISVER/libc/user/Makefile \
 ./LiS-$LISVER/libc/mk.bdy \
-./LiS-$LISVER/libc/poll.c \
 ./LiS-$LISVER/libc/putpmsg.c \
 ./LiS-$LISVER/libc/getmsg.c \
 ./LiS-$LISVER/libc/putmsg.c \
@@ -165,6 +163,7 @@ FILES="\
 ./LiS-$LISVER/pkg/Makefile \
 ./LiS-$LISVER/pkg/proto/Makefile \
 ./LiS-$LISVER/pkg/proto/Space.c \
+./LiS-$LISVER/util/linux/LiS.spec.in \
 ./LiS-$LISVER/util/linux/Makefile \
 ./LiS-$LISVER/util/linux/fattach.c \
 ./LiS-$LISVER/util/linux/fdetach.c \
