@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 12:43:59 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/10 04:24:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 12:43:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/10 04:24:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 12:43:59 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/10 04:24:25 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 12:43:59 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/10 04:24:25 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -12766,6 +12766,10 @@ recv_tcp_conn_rr()
   
 }
 
+#ifndef MSG_EOF
+#define MSG_EOF MSG_FIN
+#endif
+
 #ifdef DO_SCTP
 #ifdef DO_1644
 
@@ -13154,10 +13158,6 @@ newport:
     /* Connect up to the remote port on the data socket. Since this is */
     /* a test for RFC_1644-style transactional TCP, we can use the */
     /* sendto() call instead of calling connect and then send() */
-
-#ifndef MSG_EOF
-#define MSG_EOF MSG_FIN
-#endif
 
     /* send the request */
     if((len=sendto(send_socket,
