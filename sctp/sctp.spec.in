@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/12/21 12:23:52 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/12/23 12:49:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 12:23:52 $ by $Author: brian $
+# Last Modified $Date: 2004/12/23 12:49:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,8 +73,6 @@
 %global core_name core-%{_kversion}
 %global info_name info-%{_kversion}
 %global epoch @PACKAGE_EPOCH@
-%global majbase @STRCONF_MAJBASE@
-%global makedev @STRCONF_MAKEDEV@
 %global base @PACKAGE_TARNAME@
 %global infofiles %{name} STREAMS SPG porting
 %global title @PACKAGE_TITLE@
@@ -93,11 +91,9 @@
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
 %if %{BUILD_tools}
-%global BUILD_libs    1
 %global BUILD_devs    %newrpm
 %global MAKE_devs     %oldrpm
 %else
-%global BUILD_libs    0
 %global BUILD_devs    0
 %global MAKE_devs     0
 %endif
@@ -110,7 +106,7 @@
 
 Summary:        %{title} (SVR 4.2 MP STREAMS)
 %if %{?_without_public: 0}%{!?_without_public: 1}
-Name:           @PACKAGE_NAME@
+Name:           @PACKAGE_TARNAME@
 %else
 Name:           @PACKAGE_NAME@-bin
 %endif
@@ -251,7 +247,6 @@ fi
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
-    --with-base-major=%{majbase} \
     %{?_with_k_optimize:         %_with_k_optimize} \
     %{?_with_cooked_manpages:    %_with_cooked_manpages} \
     %{?_without_cooked_manpages: %_without_cooked_manpages} \
@@ -477,153 +472,6 @@ fi
 %endif
 
 # ===========================================================================
-%package %{info_name}
-
-Summary:        %{title} core kernel module symbol versions.
-Group:          System Environment/Kernel
-Prefix:         %{_includedir}/sctp
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
-Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{info_name}
-The %{name}-%{info_name} package contains the kernel modules symbol
-information for development of kernel modules against the core kernel modules
-included in the %{name}-core package.  This package is tied to the core kernel
-modules and kernel for which they were compiled.  This package applies to core
-kernel modules %{name}-%{core_name} for kernel version %{_kversion}.
-
-%if %{BUILD_modules}
-%files %{info_name}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_includedir}/sctp/%{kernel_version}/*
-%endif
-
-# ===========================================================================
-%package dev
-
-Summary:        %{title} devices.
-Group:          System Environment/Base
-Conflicts:      %{_conflict}-dev
-Requires:       dev >= 3.3
-Obsoletes:      %{name}-devs
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description dev
-The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for %{title}.
-
-%if %{MAKE_devs}
-%post dev
-#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing
-#   rootless builds because they have no %%dev macro, so in that case we just run the makenodes
-#   program that was generated in the build to create devices.
-if [ $1 = 0 ] ; then
-    /usr/sbin/@STRMAKENODES@
-fi
-
-%preun dev
-#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing
-#   rootless builds because they have no %%dev macro, so in that case we just run the makenodes
-#   program that was generated in the build to create devices.
-if [ $1 = 0 ] ; then
-    /usr/sbin/@STRMAKENODES@ --remove
-fi
-
-%endif
-
-# ---------------------------------------------------------------------------
-%if %{MAKE_devs}
-%files dev
-%defattr(-,root,root)
-%endif
-%if %{BUILD_devs}
-%files dev -f %{makedev}
-%defattr(-,root,root)
-%endif
-
-# ===========================================================================
-%package lib
-
-Summary:        %{title} run-time libraries.
-Group:          System Environment/Libraries
-Prefix:         %{_libdir}
-Prefix:         %{_datadir}/locale
-Obsoletes:      %{name}-libs
-Prereq:         /sbin/ldconfig
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description lib
-The %{name}-lib package contains the run-time shared libraries necessary to
-run applications programs developed for %{title}.
-
-%pre lib
-# ---------------------------------------------------------------------------
-if [ $1 = 0 ] ; then
-#   this is supposed to be a fresh install
-#   see if there are any libraries hanging around from a non-rpm install
-    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*%{libname}\> | cut '-d ' -f4 ) 2>/dev/null`"
-    if [ -n "$old_libs" ] ; then
-#       old libraries hanging around, delete them
-        echo "warning: Deleting old non-rpm libraries $old_libs" >&2
-        rm -f $old_libs
-    fi
-else
-    :
-#   upgrade, let RPM do its job
-fi
-
-%post lib
-# ---------------------------------------------------------------------------
-# do a load config
-if [ $1 = 0 ] ; then
-#   end of fresh install, do /sbin/ldconfig
-    /sbin/ldconfig >/dev/null
-else
-    :
-#   upgrade, wait for old postun
-fi
-
-%postun lib
-# ---------------------------------------------------------------------------
-# whether complete removal or upgrade, do a load config
-/sbin/ldconfig
-
-%if %{BUILD_libs}
-%files lib
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.so*
-%{_libdir}/*.la
-#%{_datadir}/locale/*
-%endif
-
-# ===========================================================================
 %package doc
 
 Summary:        %{title} manpages, manuals and docs.
@@ -680,9 +528,6 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
-%doc ABOUT-NLS
-%endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual
 %{_infodir}/*
@@ -696,7 +541,6 @@ fi
 
 Summary:        %{title} headers, libs and docs.
 Group:          Development/System
-Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 #Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 #Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
@@ -722,12 +566,7 @@ manual pages necessary for developing %{title} application programs.
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
-%{_libdir}/*.a
-%endif
-%dir %{_includedir}/sctp
-%{_includedir}/sctp/*.h
-%{_includedir}/sctp/sys/*
+%{_includedir}/*
 %endif
 
 # ===========================================================================
@@ -762,79 +601,14 @@ to create and distribute this rpm.
 %endif
 
 # ===========================================================================
-%package util
-
-Summary:        %{title} admin utilities.
-Group:          System Environment/Base
-Prefix:         %{_bindir}
-Prefix:         %{_sbindir}
-Prefix:         %{_libexecdir}
-Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
-Conflicts:      %{_conflict}-util
-Obsoletes:      %{name}-utils
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description util
-The %{name}-util package provides adminstrative and configuration test
-utilities and commands associated with the %{title} package.
-
-%pre util
-# ---------------------------------------------------------------------------
-if [ $1 = 0 ]; then
-# this is a fresh install, look for old non-rpm tools
-    if [ -n "`which fattach 2>/dev/null`" ]; then
-        for prog in ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf sctp strmakenodes
-        do
-            location="`which $prog 2>/dev/null`"
-            while [ -n "$location" -a -x "$location" ] ; do
-                eval "rm -f $location"
-                location="`which $prog 2>/dev/null`"
-            done
-        done
-    fi
-# old non-rpm distro puts some man pages in the wrong place, clean them out
-    if [ -f /usr/man/man3/fattach.3 ] ; then
-        rm -f /usr/man/man3/fattach.3 2>/dev/null
-        rm -f /usr/man/man3/detach.3 2>/dev/null
-        rm -f /usr/man/man3/isastream.3 2>/dev/null
-        rmdir -p /usr/man/man3 2>/dev/null
-        rm -f /usr/man/man8/fattach.8 2>/dev/null
-        rm -f /usr/man/man8/fdetach.8 2>/dev/null
-        rmdir -p /usr/man/man8 2>/dev/null
-        rm -f /usr/man/man9/connld.9 2>/dev/null
-        rm -f /usr/man/man9/fifo.9 2>/dev/null
-        rm -f /usr/man/man9/pipemod.9 2>/dev/null
-        rmdir -p /usr/man/man9 2>/dev/null
-        rmdir -p /usr/man 2>/dev/null
-    fi
-else
-    :
-#   upgrade, let rpm do its job
-fi
-
-%if %{BUILD_tools}
-%files util
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_bindir}/*
-%{_sbindir}/*
-%{_libexecdir}/*
-%endif
-
-# ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.2  2004/12/21 12:23:52  brian
-# - Proper install scriplets for SCTP package.
+# Revision 0.9.2.3  2004/12/23 12:49:15  brian
+# - Corrections for first rpm build.
+#
+# Revision 1.3  2004/12/23 12:49:15  brian
+# - Corrections for first rpm build.
 #
 # Revision 1.2  2004/12/21 12:23:52  brian
 # - Proper install scriplets for SCTP package.

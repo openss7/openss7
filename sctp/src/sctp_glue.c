@@ -67,6 +67,44 @@ static char const ident[] = "sctp_glue.c,v LINUX-2-4-20-SCTP(1.1.6.3) 2004/02/09
 #include <linux/random.h>
 #include <linux/init.h>
 #include <linux/socket.h>
+#include <net/sock.h>
+#include <linux/ipsec.h>
+#include <linux/poll.h>
+#include <linux/slab.h>
+#include <linux/mm.h>
+
+#ifdef CONFIG_SCTP_MODULE
+#include <linux/module.h>
+#include <linux/proc_fs.h>
+#include <net/protocol.h>
+#endif
+
+#include <net/inet_common.h>
+#ifdef HAVE_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#include <net/icmp.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <net/ip.h>
+#ifdef	CONFIG_IP_MASQUERADE
+#include <net/ip_masq.h>
+#endif
+#ifdef	CONFIG_SCTP_ECN
+#include <net/inet_ecn.h>
+#endif
+
+#include <asm/uaccess.h>
+#include <asm/segment.h>
+
+#include <linux/inet.h>
+#include <linux/stddef.h>
+#include <linux/string.h>
+#include <asm/types.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+
 #include "include/net/net_sock.h"
 #include "include/net/net_snmp.h"
 #include "include/net/net_sctp.h"

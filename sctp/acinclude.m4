@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.12 2004/12/22 12:11:51 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.14 2004/12/23 12:32:16 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/22 12:11:51 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/23 12:32:16 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -296,7 +296,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
                            __xfrm_sk_clone_policy])
     _LINUX_KERNEL_ENV([dnl
         AC_CACHE_CHECK([for kernel struct sk_buff.cb size], [linux_cv_sk_buff_cb_size], [dnl
-            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src $SCTP_INCLUDES $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -354,8 +354,8 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
             ;;
     esac
     _LINUX_KERNEL_ENV([dnl
-        AC_CACHE_CHECK([for kernel struct sock.tp_pinfo size], [linux_cv_sock_tp_pinfo_size], [dnl
-            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src $SCTP_INCLUDES $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+        AC_CACHE_CHECK([for kernel struct sock union size], [linux_cv_sock_size], [dnl
+            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -371,35 +371,55 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
 #include "include/linux/linux_sctp.h"
 #include "include/net/net_sctp.h"
                 ]], [[
-extern size_t the_size_of_tcp_opt;
-extern size_t the_size_of_os7_sctp_opt;
-struct sock system_sock_structure;
-struct __os7_sctp_opt myopt;
-if (sizeof(system_sock_structure.tp_pinfo) < sizeof(myopt)) {
-    the_size_of_tcp_opt = sizeof(struct tcp_opt);
-    the_size_of_os7_sctp_opt = sizeof(struct __os7_sctp_opt);
-    invoke_some_function_that_does_not_exist(NULL, 0, 0);
+if (sizeof(((struct sock *)(0))->tp_pinfo) < sizeof(struct __os7_sctp_opt_dummy)) {
+    first_overlap_section_of_sctp_opt_is_too_large(NULL, 0, 0);
+}
+if (sizeof(((struct sock *)(0))->protinfo) < sizeof(((struct sock *)(0))->protinfo.af_inet) +
+    sizeof(struct __os7_sctp_opt) - sizeof(struct __os7_sctp_opt_dummy) -
+    sizeof(((struct __os7_sctp_opt *)(0))->__jump)) {
+    second_overlap_section_of_sctp_opt_is_too_large(NULL, 0, 0);
 }
                 ]])
                 ], [dnl
-    if ( objdump -r conftest.$ac_objext | grep -q invoke_some_function_that_does_not_exist ) 2>/dev/null
+    if ( objdump -r conftest.$ac_objext | grep -q overlap_section_of_sctp_opt_is_too_large ) 2>/dev/null
     then
-        linux_cv_sock_tp_pinfo_size='toosmall'
+        linux_cv_sock_size='toosmall'
+        if ( objdump -r conftest.$ac_objext | grep -q first_overlap_section_of_sctp_opt_is_too_large ) 2>/dev/null
+        then
+            linux_cv_sock_tp_pinfo_size='(tp_pinfo)'
+            linux_cv_sock_size="$linux_cv_sock_size (tp_pinfo)"
+        else
+            linux_cv_sock_tp_pinfo_size=''
+        fi
+        if ( objdump -r conftest.$ac_objext | grep -q second_overlap_section_of_sctp_opt_is_too_large ) 2>/dev/null
+        then
+            linux_cv_sock_protinfo_size='(protinfo)'
+            linux_cv_sock_size="$linux_cv_sock_size (protinfo)"
+        else
+            linux_cv_sock_protonfo_size=''
+        fi
         cp -f conftest.$ac_objext error_object.$ac_objext
     else
         linux_cv_sock_tp_pinfo_size='ok'
-    fi], [dnl
-        linux_cv_sock_tp_pinfo_size='unknown'])
+        linux_cv_sock_protinfo_size='ok'
+        linux_cv_sock_size='ok'
+    fi
+                ], [dnl
+        linux_cv_sock_tp_pinfo_size='unknown'
+        linux_cv_sock_protinfo_size='unknown'
+        linux_cv_sock_size='unknown'
+        cp -f conftest.$ac_objext error_object.$ac_objext
+            ])
         ])
     ])
-    case :$linux_cv_sock_tp_pinfo_size in
+    case :$linux_cv_sock_size in
         :ok)
             ;;
-        :toosmall)
+        :toosmall*)
             # Another question, is lksctp bigger than tcp?
             AC_MSG_ERROR([
 **** 
-**** ERROR: The size of the socket private information union (tp_pinfo) in
+**** ERROR: The size of a socket information union $linux_cv_sock_tp_pinfo_size$linux_cv_sock_protinfo_size in
 **** struct sock is plain too small to accept the size of the sctp_opt private
 **** structure.  There is nothing that can be done about this as the size of
 **** the private information union is compiled into the kernel.  You have no

@@ -241,8 +241,8 @@ extern atomic_t __os7_sctp_socket_count;
 /*
  *  Private struct macros
  */
-#define __sp_offset ((unsigned int)&(((struct sock *)(0))->tp_pinfo.af_tcp))
-#define SCTP_PROT(__sk) ((struct __os7_sctp_opt *)&(__sk)->tp_pinfo.af_tcp)
+#define __sp_offset ((unsigned int)&(((struct sock *)(0))->tp_pinfo))
+#define SCTP_PROT(__sk) ((struct __os7_sctp_opt *)&(__sk)->tp_pinfo)
 #define SCTP_SOCK(__sp) ((struct sock *)(((uint8_t *)(__sp)) - __sp_offset))
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/12/22 11:27:54 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/12/23 12:21:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/22 11:27:54 $ by $Author: brian $
+ Last Modified $Date: 2004/12/23 12:21:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/12/22 11:27:54 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/12/23 12:21:07 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/12/22 11:27:54 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/12/23 12:21:07 $";
 
 #include <linux/config.h>
 #include <linux/sysctl.h>
@@ -105,7 +105,7 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $
 #include "include/net/net_snmp.h"
 #include "include/os7_namespace.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.8 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.9 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
@@ -10057,7 +10057,14 @@ STATIC struct sock *sctp_conn_res(struct sock *lsk, struct sk_buff *skb, int *er
 	 *  Initialize protocol information
 	 */
 	sp = SCTP_PROT(sk);
+#if 0
 	memset(sp, 0, sizeof(*sp));	/* more zeros than anything else */
+#else
+	/* break zero set into two pieces */
+	memset(&sk->tp_pinfo, 0, sizeof(sk->tp_pinfo));
+	memset((__u8 *)&sk->protinfo + sizeof(sk->protinfo.af_inet), 0,
+			sizeof(sk->protinfo) - sizeof(sk->protinfo.af_inet));
+#endif
 	/* initialize timers */
 	init_timer(&sp->timer_init);
 	sp->timer_init.function = &sctp_init_timeout;
