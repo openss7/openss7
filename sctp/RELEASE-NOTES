@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: RELEASE-NOTES,v 0.9.2.4 2002/05/14 12:53:19 brian Exp $
+# $Id: RELEASE-NOTES,v 0.9.2.5 2003/04/09 13:24:16 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -29,9 +29,17 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2002/05/14 12:53:19 $ by $Author: brian $
+# Last Modified $Date: 2003/04/09 13:24:16 $ by $Author: brian $
 # 
 # *****************************************************************************
+
+Release linux-sctp-0.2.14 (Prerelease2-14)
+
+	Included ADD-IP and PR-SCTP and IG changes.
+
+Release linux-sctp-0.2.13 (Prerelease2-13)
+
+	Bug fixes.
 
 Release linux-sctp-0.2.4: (Prerelease2-4)
 
