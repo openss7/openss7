@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/03/23 09:17:20 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/03/24 12:45:43 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/23 09:17:20 $ by $Author: brian $
+## Last Modified $Date: 2005/03/24 12:45:43 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -227,43 +227,33 @@ srpm: $(redhat_src_file)
 # This is the type of thing that needs to be included in the master makefile to build rpms for the
 # current target, we also build any defined AM_RPMTARGETS
 ##
-one-rpm: $(redhat_spec_file) $(redhat_source_files) $(redhat_directories)
+each-rpm: $(redhat_spec_file) $(redhat_source_files) $(redhat_directories)
 	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
 ##
-# This below is pretty obfuscated, but it is what we need to rebujild and rpm once for LiS and
+# This below is pretty obfuscated, but it is what we need to rebujild an rpm once for LiS and
 # another time for Linux Fast-STREAMS.  When we drop LiS support, this can be cleaned out.  This
 # uses the sneaky GNU make trick that per-target variables can be defined for the target and its
 # dependents, in our case the single build target.  Packages that do not build for STREAMS should
 # define conditionals WITH_LIS and WITH_LFS to be false and the plain rule above will be used
 # instead.
 ##
+one-rpm:
+@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='' each-rpm
+
 lis-rpm:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lis --with-lis"' one-rpm
+@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lis --with-lis"' each-rpm
 
 lfs-rpm:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs"' one-rpm
+@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs"' each-rpm
 
-AM_RPMSMAKETARGETS	=
-
-if WITH_LIS
-AM_RPMSMAKETARGETS	+= lis-rpm
-endif
-if WITH_LFS
-AM_RPMSMAKETARGETS	+= lfs-rpm
-endif
-if WITH_LIS
-else
-if WITH_LFS
-else
-AM_RPMSMAKETARGETS	+= one-rpm
-endif
-endif
+rpms: lis-rpm lfs-rpm one-rpm
 
 # Another sneaky trick
-all-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-
-rpms: $(AM_RPMSMAKETARGETS)
+all-one-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+all-lis-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+all-lfs-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 
 sign srpm-sign: $(srpm)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
@@ -276,7 +266,7 @@ sign srpm-sign: $(srpm)
 #   --without popt syntax, so we have to expand them to --defines.
 ##
 
-rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
@@ -293,7 +283,7 @@ rebuild:
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
 	done
 
-resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
 	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
@@ -317,8 +307,8 @@ resign: sign
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
 
-RELEASE			+= srpm rebuild
-RELEASE_SIGN		+= srpm-sign resign
+RELEASE			+= all-srpm all-one-rpm all-lis-rpm all-lfs-rpm
+RELEASE_SIGN		+= all-sign all-resign
 RELEASE_DIRECTORIES	+= $(redhat_directories)
 
 ##
@@ -364,8 +354,8 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 			   .rpmrelease \
 			   .rpmepoch
 
-MY_PHONY		+= srpm rpms one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign
-ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-sign all-rebuild all-resign
+MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign
+ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-sign all-rebuild all-resign
 
 endif
 ## BUILD_RPMS
