@@ -421,7 +421,9 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_SYSMAP,
             eval "k_sysmap_search_path=\"
                 ${with_k_sysmap}
                 ${linux_cv_k_build}/System.map-${linux_cv_k_release}
+                /boot/System.map-${linux_cv_k_release}
                 ${linux_cv_k_build}/System.map
+                /boot/System.map
                 /proc/ksyms\""
         else
             eval "k_sysmap_search_path=\"
