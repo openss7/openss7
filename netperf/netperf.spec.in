@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2005/03/29 17:16:32 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2005/04/02 16:25:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:16:32 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:25:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,11 +57,20 @@
 %global BUILD_lis     1
 %global BUILD_lfs     0
 
-%global epoch @PACKAGE_RPMEPOCH@
-%global base @PACKAGE_TARNAME@
-%global infofiles %{name}
-%global title @PACKAGE_TITLE@
-%global stitle @PACKAGE_SHORTTITLE@
+%global epoch       @PACKAGE_RPMEPOCH@
+%global base        @PACKAGE_LCNAME@
+%global title       @PACKAGE_TITLE@
+%global stitle      @PACKAGE_SHORTTITLE@
+
+#global libraries
+#global tools
+%global infofiles   %{name}
+#global initfiles
+
+%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
+%{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
+%{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
+%{!?_kmoduledir:     %{expand: %%global _kmoduledir   %%{_lib}/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -120,17 +129,11 @@ Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
 Release:        @PACKAGE_RPMRELEASE@
 License:        GPL
-Group:          System Environment/Base
-%if %{?url: 1}%{!?url: 0}
-URL:            %{url}
-%endif
-%if %{?_xpm_icon: 1}%{!?_xpm_icon: 0}
-Icon:           %{_xpm_icon}
-%endif
-%if %{?_gif_icon: 1}%{!?_gif_icon: 0}
-Icon:           %{_gif_icon}
-%endif
-ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
+Group:          System Environment/Kernel
+%{?url:URL:            %{url}}
+%{?_xpm_icon:Icon:           %{_xpm_icon}}
+%{?_gif_icon:Icon:           %{_gif_icon}}
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
@@ -138,12 +141,12 @@ Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      netperf
 Conflicts:      %{base}-%{_conflict}
-%if %{?buildroot: 0}%{!?buildroot: 1}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
-%endif
+%{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 Provides:       netperf
 BuildRequires:  %{_streams}-devel >= %{_strvers}
+
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
 %else
@@ -176,13 +179,23 @@ BuildRequires:  strsctp-devel >= %{epoch}:0.9.2
 %endif
 # these are some needs of the configure script
 # to manipulate manual pages:
+BuildRequires:  /usr/bin/groff
 BuildRequires:  /usr/bin/soelim
 BuildRequires:  /usr/bin/refer
 BuildRequires:  /usr/bin/tbl
 BuildRequires:  /usr/bin/pic
 BuildRequires:  /usr/bin/gzip
+
 # to generate kernel symbols:
 #BuildRequires:  /sbin/genksyms
+
+# to build documentation
+#BuildRequires: transfig >= 3.2
+#BuildRequires: ImageMagick
+#BuildRequires: tetex >= 1.0
+#BuildRequires: ghostscript >= 6.51
+# to install documentation
+BuildRequires: texinfo >= 4.0
 # find the rest automagically
 Autoreq:        true
 
@@ -206,7 +219,7 @@ other architectures as well.
 
 preferred_cflags="%{optflags}"
 
-%ifarch %{ix86}
+%ifarch %ix86
 preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
 %endif
 
@@ -291,13 +304,12 @@ make check
 # in case it was not cleaned
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
-%if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
-# we are going to create debug packages, so we need to install unstripped binaries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
-%else
-# use libtoolized install-strip to strip binaries, modules, shared and static libraries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
-%endif
+# if we are going to create debug packages, we need to install unstripped
+# binaries; otherwise use libtoolized install-strip to strip binaries, modules,
+# shared and static libraries.
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
+    %{!?_enable_debug_packages: install-strip} \
+    %{?_enable_debug_packages: install}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -364,9 +376,13 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.20  2005/03/29 17:16:32  brian
-# - Updated lsms and added LSM to distribution.
+# Revision 1.1.2.21  2005/04/02 16:25:29  brian
+# - more adjustments to arch indep build
 #
+
+* Tue Mar 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.20  2005/03/29 17:16:32  brian
+- Updated lsms and added LSM to distribution.
 
 * Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.19  2005/03/28 07:42:29  brian

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/26 22:12:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/02 16:26:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:26:16 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
 	ss7/capi.h \
@@ -210,5 +213,8 @@ nobase_pkginclude_HEADERS = \
 #	os7/priv.h
 #	os7/queue.h
 #	os7/timer.h
+
+## PKG_BUILD_ARCH
+endif
 
 # vim: ft=automake

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/26 22:12:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/02 16:28:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:48 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:28:05 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
 MANMACRO_PFX			= @PACKAGE_TARNAME@
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 man_MANS = \
 	man4/XNS.4 \
@@ -504,6 +507,8 @@ dist_noinst_MANS = \
 	man8/ldltest.8.man \
 	man8/strxns_mknod.8.man
 
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/man.am
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/24 02:11:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/04/02 16:47:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:09 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,13 +55,16 @@
 ##
 include am/openss7.am
 
-dist_sysconf_DATA =
-
 lib_LTLIBRARIES			= 
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 if PUBLIC_RELEASE
+## PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  test-tirdwr \
@@ -71,14 +74,18 @@ EXTRA_PROGRAMS			+= \
 
 libexec_PROGRAMS		= 
 if WITH_TLI
+## WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-tirdwr \
 				  test-timod
+## WITH_TLI
 endif
 if WITH_XNET
+## WITH_XNET
 libexec_PROGRAMS		+= \
 				  test-xnet \
 				  test-xnet_thr
+## WITH_XNET
 endif
 
 sbin_PROGRAMS			= \
@@ -91,6 +98,7 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
+## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -100,9 +108,11 @@ test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
+## WITH_TLI
 endif
 
 if WITH_XNET
+## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -120,11 +130,14 @@ libxnet_la_LDFLAGS		= -version-info 0:0:0
 libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
+## WITH_XNET
 endif
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -156,11 +169,15 @@ libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## PUBLIC_RELEASE
 else
+## ! PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  test-tirdwr \
@@ -170,14 +187,18 @@ EXTRA_PROGRAMS			+= \
 
 libexec_PROGRAMS		= 
 if WITH_TLI
+## WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-tirdwr \
 				  test-timod
+## WITH_TLI
 endif
 if WITH_XNET
+## WITH_XNET
 libexec_PROGRAMS		+= \
 				  test-xnet \
 				  test-xnet_thr
+## WITH_XNET
 endif
 
 sbin_PROGRAMS			= \
@@ -190,6 +211,7 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
+## WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDADD		= $(STREAMS_LDADD)
 test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -199,9 +221,11 @@ test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
+## WITH_TLI
 endif
 
 if WITH_XNET
+## WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
 test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -219,11 +243,14 @@ libxnet_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0
 libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
+## WITH_XNET
 endif
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -255,8 +282,13 @@ libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## ! PUBLIC_RELEASE
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 xnet_source_FILES		= $(mods_source_FILES)
@@ -290,8 +322,13 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				src/util/modutils/@PACKAGE_LCNAME@
+endif
+endif
 
 ##
 ## Rules for building libraries
@@ -321,33 +358,47 @@ include am/genksyms.am
 include am/strconf.am
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = src intl m4 po doc tests
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
-
-endif
 
 dist_config_DATA		=
 
-dist_sysconf_DATA		+=
+## ! WITH_RCSD_DIRECTORY
+endif
 
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms

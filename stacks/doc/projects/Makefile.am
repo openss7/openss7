@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/26 22:12:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/02 16:25:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:13 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:25:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@ info_TEXINFOS		= hlr.texi voip.texi
 EXTRA_info_TEXINFOS	= \
 			texi/args.texi \
 			$(top_srcdir)/scripts/texi/fdl.texi
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 FIG_FIGS		= \
 			c.fig \
@@ -140,6 +143,8 @@ PS_PSS			= \
 			stack.ps \
 			tcap.ps
 
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/info.am
 

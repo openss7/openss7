@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 22:12:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/02 16:27:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:45 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:27:40 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 tli_headers	= \
 	sys/tihdr.h \
@@ -101,13 +104,19 @@ sock_headers	= \
 nobase_pkginclude_HEADERS = 
 
 if WITH_TLI
+## WITH_TLI
 nobase_pkginclude_HEADERS += $(tli_headers) $(unix_headers)
+## WITH_TLI
 endif
 if WITH_XNET
+## WITH_XNET
 nobase_pkginclude_HEADERS += $(xnet_headers) $(inet_headers) $(sctp_headers) $(osi_headers) $(atm_headers)
+## WITH_XNET
 endif
 if WITH_SOCK
+## WITH_SOCK
 nobase_pkginclude_HEADERS += $(sock_headers)
+## WITH_SOCK
 endif
 
 dist_noinst_HEADERS = \
@@ -122,5 +131,8 @@ dist_noinst_HEADERS = \
 
 nobase_nodist_pkginclude_HEADERS = 
 #	sys/strxnet/modversions.h
+
+## PKG_BUILD_ARCH
+endif
 
 # vim: ft=automake

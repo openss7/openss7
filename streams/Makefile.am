@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/04/02 03:46:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2005/04/02 16:47:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 03:46:29 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -369,8 +369,13 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				src/util/modutils/streams
+endif
+endif
 
 ##
 ## Rules for building libraries
@@ -647,8 +652,8 @@ if RPM_BUILD_USER
 
 SUBDIRS = include doc tests
 
-## RPM_BUILD_USER
-endif
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 if INSTALL_INITSCRIPTS
 ## INSTALL_INITSCRIPTS
@@ -662,6 +667,9 @@ dist_initrd_SCRIPTS		= \
 				src/util/init/streams.sh \
 				src/util/init/strerr.sh
 
+dist_sysconf_DATA		+= \
+				src/util/sysconfig/streams.conf
+
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
@@ -672,19 +680,22 @@ dist_initrd_SCRIPTS		= \
 				src/util/init/streams \
 				src/util/init/strerr
 
-## ! WITH_RCSD_DIRECTORY
-endif
-
 dist_config_DATA		= \
 				src/util/sysconfig/specfs \
 				src/util/sysconfig/strace \
 				src/util/sysconfig/streams \
 				src/util/sysconfig/strerr
 
-dist_sysconf_DATA		+= \
-				src/util/sysconfig/streams.conf
+## ! WITH_RCSD_DIRECTORY
+endif
 
 ## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##

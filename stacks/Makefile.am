@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/03/24 02:11:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/04/02 16:47:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:00 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,11 +55,14 @@
 ##
 include am/openss7.am
 
-dist_sysconf_DATA 		=
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 if PUBLIC_RELEASE
+## PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 libexec_PROGRAMS		= \
 				  test-m2pa \
@@ -203,9 +206,11 @@ test_x400p_CFLAGS		= $(USER_CFLAGS)
 #test_x400p_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -306,11 +311,15 @@ libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## PUBLIC_RELEASE
 else
+## ! PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 libexec_PROGRAMS		= \
 				  perftest \
@@ -465,9 +474,11 @@ test_x400p_sl_LDFLAGS		= $(STREAMS_LDADD)
 test_x400p_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -538,8 +549,10 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  config.h strconf.h
 
 if WITH_LIS
+## WITH_LIS
 nodist_EXTRA_libSS7mods_a_SOURCES	+= \
 				  src/modules/dl/dl.c
+## WITH_LIS
 endif
 
 mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
@@ -717,11 +730,14 @@ streams-tali.o: $(libSS7tali_a_OBJECTS)
 
 EXTRA_KERNEL_MODULES		+= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
 
+## RPM_BUILD_KERNEL
 endif
 
+## ! PUBLIC_RELEASE
 endif
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 test_timod_SOURCES		= src/test/tli/test-timod.c
 test_timod_LDFLAGS		= $(STREAMS_LDADD) -lxnet
@@ -734,9 +750,11 @@ test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
+## WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-timod \
 				  test-tirdwr
+## WITH_TLI
 endif
 
 test_inet_raw_SOURCES		= src/test/inet/test-inet_raw.c
@@ -765,29 +783,41 @@ test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_INET
+## WITH_INET
 libexec_PROGRAMS		+= \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp
+## WITH_INET
 endif
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 if WITH_TLI
+## WITH_TLI
 nodist_libSS7mods_a_SOURCES	+= \
 				  src/modules/ti/timod.c \
 				  src/include/timod.h \
 				  src/modules/ti/tirdwr.c \
 				  src/include/tirdwr.h
+## WITH_TLI
 endif
 
 if WITH_INET
+## WITH_INET
 nodist_libSS7mods_a_SOURCES	+= \
 				  src/modules/inet/inet.c
+## WITH_INET
 endif
 
+## RPM_BUILD_KERNEL
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 ss7_source_FILES		= $(mods_source_FILES) \
@@ -863,17 +893,27 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				src/util/modutils/@PACKAGE_LCNAME@
+endif
+endif
 
 ##
 ## Rules for building libraries
 ##
 include am/libraries.am
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 if WITH_XNET
+## WITH_XNET
 lib_LTLIBRARIES			= libxnet.la
 libexec_PROGRAMS		+= \
 				  test-xnet \
@@ -883,8 +923,13 @@ libxnet_la_LDFLAGS		= -no-undefined -version-info 0:0:0
 libxnet_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -I$(srcdir)/src/include/xti -I./src/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= $(STREAMS_LDADD)
+## WITH_XNET
 endif
 
+## RPM_BUILD_USER
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 INET_MKDEV			= scripts/inet_mkdev
@@ -894,6 +939,7 @@ dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV) 
 
 if WITH_INET
+## WITH_INET
 
 install-inet-devices: $(INET_MKDEV)
 	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
@@ -907,12 +953,15 @@ uninstall-inet-devices:
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
 	fi
 
+## WITH_INET
 else
+## ! WITH_INET
 
 install-inet-devices:
 
 uninstall-inet-devices:
 
+## ! WITH_INET
 endif
 
 INSTALL_EXEC_HOOK += install-inet-devices
@@ -944,37 +993,55 @@ include am/genksyms.am
 include am/strconf.am
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = src doc tests
 
 if WITH_XNET
+## WITH_XNET
+
 SUBDIRS += intl m4 po
+
+## WITH_XNET
 endif
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
-
-endif
 
 dist_config_DATA		=
 
-dist_sysconf_DATA		+=
+## ! WITH_RCSD_DIRECTORY
+endif
 
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms

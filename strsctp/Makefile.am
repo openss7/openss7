@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/01 09:52:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/02 16:47:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 09:52:27 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,13 +55,16 @@
 ##
 include am/openss7.am
 
-dist_sysconf_DATA =
-
 lib_LTLIBRARIES			=
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 if PUBLIC_RELEASE
+## PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 libexec_PROGRAMS		= \
 				  test-sctp \
@@ -111,9 +114,11 @@ test_sctp_t_LDFLAGS		= $(STREAMS_LDADD)
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSCTPsctp.a
 ADDON_MODS			= streams-sctp.o
@@ -177,34 +182,46 @@ sctp2_source_FILES		= \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h
 if WITH_HMAC_MD5
+## WITH_HMAC_MD5
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_md5.c \
 				  src/drivers/sctp_md5.h \
 				  src/drivers/sctp_hmac_md5.c \
 				  src/drivers/sctp_hmac_md5.h
+## WITH_HMAC_MD5
 endif
 if WITH_HMAC_SHA1
+## WITH_HMAC_SHA1
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_sha1.c \
 				  src/drivers/sctp_sha1.h \
 				  src/drivers/sctp_hmac_sha1.c \
 				  src/drivers/sctp_hmac_sha1.h
+## WITH_HMAC_SHA1
 endif
 if WITH_ADLER_32
+## WITH_ADLER_32
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_adler32.c \
 				  src/drivers/sctp_adler32.h
+## WITH_ADLER_32
 endif
 if WITH_CRC_32C
+## WITH_CRC_32C
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_crc32c.c \
 				  src/drivers/sctp_crc32c.h
+## WITH_CRC_32C
 endif
 if WITH_SCTP
+## WITH_SCTP
 nodist_libSCTPsctp_a_SOURCES	= $(sctp_source_FILES)
+## WITH_SCTP
 endif
 if WITH_SCTP2
+## WITH_SCTP2
 nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
+## WITH_SCTP2
 endif
 libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/sctp_hooks.h
 libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
@@ -216,11 +233,15 @@ streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 
 EXTRA_KERNEL_MODULES		+=
 
+## RPM_BUILD_KERNEL
 endif
 
+## PUBLIC_RELEASE
 else
+## ! PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 libexec_PROGRAMS		= \
 				  test-sctp \
@@ -270,9 +291,11 @@ test_sctp_t_LDFLAGS		= $(STREAMS_LDADD)
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSCTPsctp.a
 ADDON_MODS			= streams-sctp.o
@@ -336,34 +359,46 @@ sctp2_source_FILES		= \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h
 if WITH_HMAC_MD5
+## WITH_HMAC_MD5
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_md5.c \
 				  src/drivers/sctp_md5.h \
 				  src/drivers/sctp_hmac_md5.c \
 				  src/drivers/sctp_hmac_md5.h
+## WITH_HMAC_MD5
 endif
 if WITH_HMAC_SHA1
+## WITH_HMAC_SHA1
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_sha1.c \
 				  src/drivers/sctp_sha1.h \
 				  src/drivers/sctp_hmac_sha1.c \
 				  src/drivers/sctp_hmac_sha1.h
+## WITH_HMAC_SHA1
 endif
 if WITH_ADLER_32
+## WITH_ADLER_32
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_adler32.c \
 				  src/drivers/sctp_adler32.h
+## WITH_ADLER_32
 endif
 if WITH_CRC_32C
+## WITH_CRC_32C
 sctp2_source_FILES		+= \
 				  src/drivers/sctp_crc32c.c \
 				  src/drivers/sctp_crc32c.h
+## WITH_CRC_32C
 endif
 if WITH_SCTP
+## WITH_SCTP
 nodist_libSCTPsctp_a_SOURCES	= $(sctp_source_FILES)
+## WITH_SCTP
 endif
 if WITH_SCTP2
+## WITH_SCTP2
 nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
+## WITH_SCTP2
 endif
 libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
@@ -375,8 +410,13 @@ streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 
 EXTRA_KERNEL_MODULES		+=
 
+## RPM_BUILD_KERNEL
 endif
 
+## ! PUBLIC_RELEASE
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 EXTRA_DIST			+= $(sctp_source_FILES) $(sctp2_source_FILES)
@@ -408,8 +448,13 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				src/util/modutils/@PACKAGE_LCNAME@
+endif
+endif
 
 ##
 ## Rules for building libraries
@@ -439,33 +484,47 @@ include am/genksyms.am
 include am/strconf.am
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = src doc tests
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
-
-endif
 
 dist_config_DATA		=
 
-dist_sysconf_DATA		+=
+## ! WITH_RCSD_DIRECTORY
+endif
 
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/26 22:12:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/02 16:26:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:33 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:26:47 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 tli_headers	= \
 	sys/ticlts.h \
@@ -78,5 +81,8 @@ nobase_pkginclude_HEADERS = \
 
 nobase_nodist_pkginclude_HEADERS = 
 #	sys/strinet/modversions.h
+
+## PKG_BUILD_ARCH
+endif
 
 # vim: ft=automake

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.9 $) $Date: 2005/04/02 03:23:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.11 $) $Date: 2005/04/02 16:47:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,8 +54,6 @@
 ## General rules
 ##
 include am/openss7.am
-
-dist_sysconf_DATA =
 
 if LIS_USER_TARGET
 
@@ -258,8 +256,13 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				util/modutils/streams
+endif
+endif
 
 ##
 ## Rules for building libraries
@@ -399,11 +402,24 @@ include am/strconf.am
 EXTRA_DIST			+= Config.user
 
 if RPM_BUILD_USER
-
-SUBDIRS = include man manual tests . testsuite
-
 ## RPM_BUILD_USER
+
+SUBDIRS =
+
+if PKG_BUILD_ARCH
+SUBDIRS += include
 endif
+
+if PKG_BUILD_INDEP
+SUBDIRS += man manual
+endif
+
+if PKG_BUILD_ARCH
+SUBDIRS += tests . testsuite
+endif
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 if INSTALL_INITSCRIPTS
 ## INSTALL_INITSCRIPTS
@@ -414,22 +430,29 @@ if WITH_RCSD_DIRECTORY
 dist_initrd_SCRIPTS		= \
 				util/init/streams.sh
 
+dist_sysconf_DATA		= \
+				util/sysconfig/streams.conf
+
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				util/init/streams
-## ! WITH_RCSD_DIRECTORY
-endif
 
 dist_config_DATA		= \
 				util/sysconfig/streams
 
-dist_sysconf_DATA		+= \
-				util/sysconfig/streams.conf
+## ! WITH_RCSD_DIRECTORY
+endif
 
 ## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##

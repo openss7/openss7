@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/24 02:11:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/02 16:47:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:05 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,13 +55,16 @@
 ##
 include am/openss7.am
 
-dist_sysconf_DATA =
-
 lib_LTLIBRARIES			=
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 if PUBLIC_RELEASE
+## PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
@@ -97,9 +100,11 @@ test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -130,11 +135,15 @@ libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## PUBLIC_RELEASE
 else
+## ! PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
@@ -170,9 +179,11 @@ test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -203,8 +214,13 @@ libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## ! PUBLIC_RELEASE
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 inet_source_FILES		= $(mods_source_FILES)
@@ -238,8 +254,13 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				src/util/modutils/@PACKAGE_LCNAME@
+endif
+endif
 
 ##
 ## Rules for building libraries
@@ -275,6 +296,7 @@ dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 install-inet-devices: $(INET_MKDEV)
 	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
@@ -288,12 +310,15 @@ uninstall-inet-devices: $(INET_RMDEV)
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
 	fi
 
+## RPM_BUILD_KERNEL
 else
+## ! RPM_BUILD_KERNEL
 
 install-inet-devices:
 
 uninstall-inet-devices:
 
+## ! RPM_BUILD_KERNEL
 endif
 
 INSTALL_EXEC_HOOK += install-inet-devices
@@ -303,33 +328,47 @@ UNINSTALL_HOOK += uninstall-inet-devices
 .PHONY: install-inet-devices uninstall-inet-devices
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = src doc tests
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
-
-endif
 
 dist_config_DATA		=
 
-dist_sysconf_DATA		+=
+## ! WITH_RCSD_DIRECTORY
+endif
 
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms

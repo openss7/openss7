@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/17 11:18:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/02 16:26:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 11:18:44 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:26:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,6 +63,14 @@ include ../am/openss7.am
 
 # my rule
 TESTSUITE		= testsuite
+
+# my rule
+EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
+# my rule
+dist_noinst_SCRIPTS	+= $(TESTSUITE)
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -101,11 +109,6 @@ atconfig: $(top_builddir)/config.status
 #
 #atlocal: $(srcdir)/atlocal.in $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
-
-# my rule
-EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
-# my rule
-dist_noinst_SCRIPTS	+= $(TESTSUITE)
 
 # my rule
 all-testsuite: $(TESTSUITE)
@@ -170,6 +173,9 @@ ALL_LOCAL += all-testsuite
 INSTALLCHECK_LOCAL += installcheck-testsuite
 
 CLEAN_LOCAL += clean-testsuite
+
+## PKG_BUILD_ARCH
+endif
 
 .PHONY: all-testsuite installcheck-testsuite clean-testsuite \
 	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod

@@ -54,6 +54,12 @@ include ../am/openss7.am
 
 EXTRA_DIST += index.html ui_license.html dast.gif
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
 SUBDIRS = man
+
+## PKG_BUILD_INDEP
+endif
 
 # vim: ft=automake

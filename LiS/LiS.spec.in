@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2005/04/02 03:23:38 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2005/04/02 22:13:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 03:23:38 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 22:13:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -123,8 +123,8 @@
 %{?_with_arch:       %{expand: %%global BUILD_arch    1}}
 %{?_with_public:     %{expand: %%global BUILD_source  1}}
 
-%global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
 %if %{BUILD_arch}
 %global BUILD_source  0
@@ -147,7 +147,6 @@
 %global BUILD_source  0
 %endif
 
-%global _streams lis
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
@@ -251,8 +250,8 @@
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
 
 # a macro to build require one package of the same version as another
-%global buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
-%global requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+%define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
 
 Summary:        %{title} (SVR 4 STREAMS)
 Name:           @PACKAGE@
@@ -275,7 +274,7 @@ BuildRequires:  kernel-source = %{kernel_source}
 BuildRequires:  modutils >= 2.4.12
 %endif
 
-%global newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+%define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
@@ -361,12 +360,12 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
 fi
 %endif
 
-%global cache_file %{_builddir}/%{_target_platform}-%{kernel_version}-config.cache
-%global csite_file %{_builddir}/%{_target_platform}-config.site
-%global mpost_file %{_builddir}/%{_target_platform}-%{kernel_version}-modpost.cache
+%define cache_file %{_builddir}/%{_target_platform}-%{kernel_version}-config.cache
+%define csite_file %{_builddir}/%{_target_platform}-config.site
+%define mpost_file %{_builddir}/%{_target_platform}-%{kernel_version}-modpost.cache
 
-%global enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
-%global disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
 
 ./configure \
     CC="${CC}" \
@@ -759,13 +758,7 @@ kernel modules %{name}-%{core_name} for kernel version %{_kversion}.
 %{_includedir}/%{name}/%{kernel_version}/*
 %endif
 
-%if %{FILES_ko_modules}
-%files %{info_name}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_includedir}/%{name}/%{kernel_version}
-%{_includedir}/%{name}/%{kernel_version}/*
-%endif
+# don't include package for FILES_ko_modules
 
 # ===========================================================================
 %package lib
@@ -1435,24 +1428,24 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%config %{_initrddir}/*
-%config %{_configdir}/*
-%config %{_modutildir}/*
+%{_initrddir}/../*
+%{_configdir}/*
+%{_modutildir}/*
 %endif
 
 %if %{FILES_ko_init}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%config %{_initrddir}/*
-%config %{_configdir}/*
+%{_initrddir}/../*
+%{_configdir}/*
 %endif
 
 %if %{FILES_noinit}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%config %{_modutildir}/*
+%{_modutildir}/*
 %endif
 
 %if %{FILES_ko_noinit}
@@ -1465,12 +1458,23 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.14  2005/04/02 03:23:38  brian
-# - build noarch rpm packages
+# Revision 1.1.6.17  2005/04/02 22:13:39  brian
+# - remove _streams macro from streams packages
 #
-# Revision 1.1.6.13  2005/03/29 17:16:28  brian
-# - Updated lsms and added LSM to distribution.
+# Revision 1.1.6.16  2005/04/02 16:47:25  brian
+# - improvements for arch indep build
 #
+# Revision 1.1.6.15  2005/04/02 16:24:59  brian
+# - more adjustments to arch indep build
+#
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.14  2005/04/02 03:23:38  brian
+- build noarch rpm packages
+
+* Tue Mar 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.13  2005/03/29 17:16:28  brian
+- Updated lsms and added LSM to distribution.
 
 * Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.12  2005/03/28 07:42:28  brian

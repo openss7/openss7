@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/26 22:12:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/02 16:27:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:36 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:27:18 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
 MANMACRO_PFX = strsctp
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 man_MANS = \
 	man7/npi_sctp.7 \
@@ -61,13 +64,17 @@ man_MANS = \
 	man8/strsctp_mknod.8
 
 if WITH_OPENSS7_SCTP
+## WITH_OPENSS7_SCTP
+## WITH_OPENSS7_SCTP
 else
+## ! WITH_OPENSS7_SCTP
 man_MANS += \
 	man3/xti_sctp.3 \
 	man4/sctp.4 \
 	man4/sctp_ioctl.4 \
 	man4/strsctp_soon.4 \
 	man7/tpi_sctp.7
+## ! WITH_OPENSS7_SCTP
 endif
 
 dist_noinst_MANS = \
@@ -80,6 +87,9 @@ dist_noinst_MANS = \
 	man7/strsctp_soon.7.man \
 	man8/sctp.8.man \
 	man8/strsctp_mknod.8.man
+
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/man.am
 

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/03/29 17:16:51 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/04/02 16:47:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:16:51 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,13 +56,18 @@
 # rpmbuild will not build a binary rpm when it has no %files section
 %global BUILD_modules 1
 %global BUILD_tools   1
+%global BUILD_noarch  1
+%global BUILD_arch    1
+%global BUILD_source  1
+%global BUILD_devs    1
+%global MAKE_devs     0
 %global BUILD_lis     1
 %global BUILD_lfs     0
 
 # there are three ways to pass kernel version to the build process:
-#    define _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
-#    define _kversion on the rpmbuild command line
-#    define PACKAGE_KVERSION environment variable
+#    global _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
+#    global _kversion on the rpmbuild command line
+#    global PACKAGE_KVERSION environment variable
 #    just let it default to `uname -r`
 #{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's|.*=||')}}
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
@@ -87,7 +92,7 @@
 %global infofiles   %{name} libxnet
 #global initfiles
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
+%{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
 %{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
@@ -101,7 +106,7 @@
 %endif
 
 %{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
-%{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/motutils}}
+%{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:     %{expand: %%global _kmoduledir   %%{_lib}/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
@@ -110,6 +115,9 @@
 %{?_without_devfs:   %{expand: %%global NEED_devs     1}}
 %{?_without_modules: %{expand: %%global BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%global BUILD_tools   0}}
+%{?_without_indep:   %{expand: %%global BUILD_noarch  0}}
+%{?_without_arch:    %{expand: %%global BUILD_arch    0}}
+%{?_without_public:  %{expand: %%global BUILD_source  0}}
 %{?_without_lis:     %{expand: %%global BUILD_lis     0}}
 %{?_without_lis:     %{expand: %%global BUILD_lfs     1}}
 %{?_without_lfs:     %{expand: %%global BUILD_lfs     0}}
@@ -118,6 +126,9 @@
 %{?_with_devfs:      %{expand: %%global NEED_devs     0}}
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%global BUILD_tools   1}}
+%{?_with_indep:      %{expand: %%global BUILD_noarch  1}}
+%{?_with_arch:       %{expand: %%global BUILD_arch    1}}
+%{?_with_public:     %{expand: %%global BUILD_source  1}}
 %{?_with_lis:        %{expand: %%global BUILD_lis     1}}
 %{?_with_lis:        %{expand: %%global BUILD_lfs     0}}
 %{?_with_lfs:        %{expand: %%global BUILD_lfs     1}}
@@ -126,19 +137,25 @@
 %define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
-%if %{BUILD_tools}
-%global BUILD_libs    1
+%if %{BUILD_arch}
+%global BUILD_source  0
+%endif
+
 %if %{NEED_devs}
-%global BUILD_devs    %newrpm
-%global MAKE_devs     %oldrpm
+%{expand: %%global BUILD_devs    %newrpm}
+%{expand: %%global MAKE_devs     %oldrpm}
 %else
 %global BUILD_devs    0
 %global MAKE_devs     0
 %endif
+
+%if %{BUILD_tools}
+%global BUILD_libs    1
 %else
 %global BUILD_libs    0
 %global BUILD_devs    0
 %global MAKE_devs     0
+%global BUILD_source  0
 %endif
 
 %global _streams lis
@@ -161,6 +178,99 @@
 %global _conflict streams
 %endif
 
+%if %{BUILD_modules}
+%global FILES_modules       1
+%global FILES_ko_modules    1
+%else
+%global FILES_modules       0
+%global FILES_ko_modules    0
+%endif
+
+%if %{BUILD_tools}
+%global FILES_libs          1
+%global FILES_nolibs        1
+%global FILES_tools         1
+%global FILES_makedev       1
+%global FILES_builddev      1
+%global FILES_doc           1
+%global FILES_doclibs       1
+%global FILES_source        1
+%global FILES_init          1
+%global FILES_ko_init       1
+%global FILES_noinit        1
+%global FILES_ko_noinit     1
+%else
+%global FILES_libs          0
+%global FILES_nolibs        0
+%global FILES_tools         0
+%global FILES_makedev       0
+%global FILES_builddev      0
+%global FILES_doc           0
+%global FILES_doclibs       0
+%global FILES_source        0
+%global FILES_init          0
+%global FILES_ko_init       0
+%global FILES_noinit        0
+%global FILES_ko_noinit     0
+%endif
+
+%if %{BUILD_arch}
+%else
+%global FILES_modules       0
+%global FILES_ko_modules    0
+%global FILES_libs          0
+%global FILES_nolibs        0
+%global FILES_tools         0
+%endif
+
+%if %{BUILD_noarch}
+%else
+%global FILES_makedev       0
+%global FILES_builddev      0
+%global FILES_doc           0
+%global FILES_doclibs       0
+%global FILES_source        0
+%global FILES_ko_init       0
+%global FILES_init          0
+%global FILES_ko_noinit     0
+%global FILES_noinit        0
+%endif
+
+%if %{BUILD_libs}
+%global FILES_nolibs        0
+%global FILES_doc           0
+%else
+%global FILES_libs          0
+%global FILES_doclibs       0
+%endif
+
+%if %{without_ko_modules}
+%global FILES_ko_modules    0
+%global FILES_ko_init       0
+%global FILES_ko_noinit     0
+%else
+%global FILES_modules       0
+%global FILES_init          0
+%global FILES_noinit        0
+%global FILES_makedev       0
+%global FILES_builddev      0
+%endif
+
+%if %{BUILD_devs}
+%global FILES_makedev       0
+%else
+%global FILES_builddev      0
+%endif
+
+%if %{have_initscripts}
+%global FILES_ko_noinit     0
+%global FILES_noinit        0
+%else
+%global FILES_ko_init       0
+%global FILES_init          0
+%endif
+
+
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
@@ -177,22 +287,14 @@ Version:        @VERSION@
 Release:        @PACKAGE_RPMRELEASE@
 License:        GPL
 Group:          System Environment/Kernel
-%if %{?url: 1}%{!?url: 0}
-URL:            %{url}
-%endif
-%if %{?_xpm_icon: 1}%{!?_xpm_icon: 0}
-Icon:           %{_xpm_icon}
-%endif
-%if %{?_gif_icon: 1}%{!?_gif_icon: 0}
-Icon:           %{_gif_icon}
-%endif
-ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
+%{?url:URL:            %{url}}
+%{?_xpm_icon:Icon:           %{_xpm_icon}}
+%{?_gif_icon:Icon:           %{_gif_icon}}
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
-%if %{?buildroot: 0}%{!?buildroot: 1}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
-%endif
+%{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 %if %{BUILD_modules}
 BuildRequires:  kernel-source = %{kernel_source}
 BuildRequires:  modutils >= 2.4.12
@@ -202,21 +304,23 @@ BuildRequires:  %{_streams}-devel >= %{_strvers}
 BuildRequires:  %{_streams}-%{info_name} >= %{_strvers}
 %buildreq_prov %{_streams}-devel %{_streams}-%{info_name}
 %endif
+
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
 %else
-%ifarch %{all_ppc}
+%ifarch %all_ppc
 BuildRequires:  gcc >= 2.96-75
 %else
-%if %{newgcc}
+%if %newgcc
 BuildRequires:  gcc >= 2.96-98
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
 %endif
 %endif
-%if %{newgcc}
+%if %newgcc
 BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
@@ -230,10 +334,12 @@ BuildRequires:  /usr/bin/refer
 BuildRequires:  /usr/bin/tbl
 BuildRequires:  /usr/bin/pic
 BuildRequires:  /usr/bin/gzip
+
 %if %{without_ko_modules}
 # to generate kernel symbols:
 BuildRequires:  /sbin/genksyms
 %endif
+
 # to build documentation
 #BuildRequires: transfig >= 3.2
 #BuildRequires: ImageMagick
@@ -265,7 +371,7 @@ for other architectures as well.
 
 preferred_cflags="%{optflags}"
 
-%ifarch %{ix86}
+%ifarch %ix86
 preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
 %endif
 
@@ -306,7 +412,9 @@ fi
     CONFIG_SITE="%{csite_file}" \
     MODPOST_CACHE="%{mpost_file}" \
     --cache-file="%{cache_file}" \
+%if %{BUILD_arch}
     --host=%{_target_platform} \
+%endif
     --prefix=%{_prefix} \
     --exec-prefix=%{_exec_prefix} \
     --bindir=%{_bindir} \
@@ -326,6 +434,10 @@ fi
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
     --with-base-major=%{majbase} \
+    %{?_with_arch:               '%enable %_with_arch'} \
+    %{?_without_arch:            '%disable %_without_arch'} \
+    %{?_with_indep:              '%enable %_with_indep'} \
+    %{?_without_indep:           '%disable %_without_indep'} \
     %{?_with_checks:             '%enable %_with_checks'} \
     %{?_without_checks:          '%disable %_without_checks'} \
     %{?_with_autotest:           '%enable %_with_autotest'} \
@@ -362,13 +474,12 @@ make check
 # in case it was not cleaned
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
-%if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
-# we are going to create debug packages, so we need to install unstripped binaries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
-%else
-# use libtoolized install-strip to strip binaries, modules, shared and static libraries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
-%endif
+# if we are going to create debug packages, we need to install unstripped
+# binaries; otherwise use libtoolized install-strip to strip binaries, modules,
+# shared and static libraries.
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
+    %{!?_enable_debug_packages: install-strip} \
+    %{?_enable_debug_packages: install}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -376,18 +487,22 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
 
-%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+function package_source() {
 # clean out binaries and auxilliary files
-make mostlyclean
-rm -fr include2
+    make mostlyclean
+    rm -fr include2
 # punch rpm release to Custom
-echo '.Custom.1'  > .rpmextra
+    echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
-mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+    mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
 # tar and move the sources for source release
-tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+    tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
 # create symbolic link
-ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
+    ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
+}
+
+%if %{BUILD_source}
+package_source
 %endif
 
 # stupid mandrake spec-helper will compress our macros files otherwise
@@ -419,12 +534,8 @@ Prereq:         /sbin/insmod
 Prereq:         /sbin/modprobe
 Prereq:         /usr/sbin/lsof
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
 Release:        %{fullrelease}
@@ -626,73 +737,21 @@ if [ $1 = 0 -or $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 
-%if %{BUILD_modules}
-%if %{without_ko_modules}
+%if %{FILES_modules}
 %files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/%{base}
 %attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
 /%{_lib}/modules/%{kernel_version}/%{base}/*
-%else
+%endif
+
+%if %{FILES_ko_modules}
 %files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/%{base}
 /%{_lib}/modules/%{kernel_version}/%{base}/*
-%endif
-%endif
-
-# ===========================================================================
-%package dev
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
-Group:          System Environment/Base
-Conflicts:      %{_conflict}-dev
-Requires:       dev >= 3.3
-Obsoletes:      %{name}-devs
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description dev
-The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
-%{stitle}.  The package is not required for devfs based systems.
-
-%if %{MAKE_devs}
-%post dev
-if [ $1 = 1 ] ; then : # fresh install
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
-    /usr/sbin/@STRMAKENODES@
-fi
-
-%preun dev
-if [ $1 = 0 ] ; then : # final removal
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
-    /usr/sbin/@STRMAKENODES@ --remove
-fi
-
-%endif
-
-# ---------------------------------------------------------------------------
-%if %{MAKE_devs}
-%files dev
-%defattr(-,root,root)
-%endif
-%if %{BUILD_devs}
-%files dev -f %{makedev}
-%defattr(-,root,root)
 %endif
 
 # ===========================================================================
@@ -706,12 +765,8 @@ Requires:       %{_streams}-lib >= %{_strvers}
 Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -751,13 +806,152 @@ if [ $1 = 0 -or $1 = 1 ] ; then
     /sbin/ldconfig
 fi
 
-%if %{BUILD_libs}
+%if %{FILES_libs}
 %files %{_streams}-lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
 %{_datadir}/locale/*
+%endif
+
+# ===========================================================================
+%package devel
+
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
+Group:          Development/System
+Prefix:         %{_libdir}
+Prefix:         %{_includedir}/%{name}
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description devel
+The %{name}-devel package contains library archives for static compilation,
+and headers files to develop OpenSS7 %{_STREAMS} STREAMS %{stitle} applications.
+This also includes the header files and static libraries required to compile
+OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.  In addition it
+contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
+STREAMS %{stitle} application programs.
+
+%if %{FILES_libs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.a
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+%if %{FILES_nolibs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+# ===========================================================================
+%package %{_streams}-util
+
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
+Group:          System Environment/Base
+Prefix:         %{_bindir}
+Prefix:         %{_sbindir}
+Prefix:         %{_libexecdir}
+Prefix:         %{_sysconfdir}
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{_streams}-lib >= %{_strvers}
+Obsoletes:      %{name}-%{_streams}-utils
+Obsoletes:      %{name}-utils
+Conflicts:      %{_conflict}-util
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_streams}-util
+The %{name}-%{_streams}-util package provides administrative and configuration
+test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
+%{stitle} package.
+
+%pre %{_streams}-util
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ]; then : # fresh install
+    # This is a fresh install, look for old non-rpm tools.
+    tools="%{tools}" ; for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+            eval "rm -f $location"
+            location="`which $tool 2>/dev/null`"
+            while [ -n "$location" -a -x "$location" ] ; do
+                eval "rm -f $location"
+                location="`which $tool 2>/dev/null`"
+            done
+        done
+    done
+fi
+
+%if %{FILES_tools}
+%files %{_streams}-util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#%{_bindir}/*
+%{_sbindir}/*
+%{_libexecdir}/*test*
+#%{_libexecdir}/*tst
+%endif
+
+# ===========================================================================
+%package dev
+
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
+Group:          System Environment/Base
+Conflicts:      %{_conflict}-dev
+Requires:       dev >= 3.3
+Obsoletes:      %{name}-devs
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description dev
+The %{name}-dev package contains the device definitions necessary to run
+applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
+%{stitle}.  The package is not required for devfs based systems.
+
+%if %{MAKE_devs}
+%post dev
+if [ $1 = 1 ] ; then : # fresh install
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    /usr/sbin/@STRMAKENODES@
+fi
+
+%preun dev
+if [ $1 = 0 ] ; then : # final removal
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    /usr/sbin/@STRMAKENODES@ --remove
+fi
+%endif
+
+%if %{FILES_makedev}
+%files dev
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%endif
+
+%if %{FILES_builddev}
+%files dev -f %{makedev}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
 %endif
 
 # ===========================================================================
@@ -772,12 +966,8 @@ Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
 Prereq:         /sbin/install-info
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -815,13 +1005,23 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     done
 fi
 
-%if %{BUILD_tools}
+%if %{FILES_doclibs}
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
 %doc ABOUT-NLS
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc LSM %{name}-%{version}.lsm
+%{_infodir}/*
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
+%{_mandir}/man*/*
 %endif
+
+%if %{FILES_doc}
+%files doc
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
@@ -831,54 +1031,14 @@ fi
 %endif
 
 # ===========================================================================
-%package devel
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
-Group:          Development/System
-Prefix:         %{_libdir}
-Prefix:         %{_includedir}/%{name}
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description devel
-The %{name}-devel package contains library archives for static compilation,
-and headers files to develop OpenSS7 %{_STREAMS} STREAMS %{stitle} applications.
-This also includes the header files and static libraries required to compile
-OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.  In addition it
-contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
-STREAMS %{stitle} application programs.
-
-%if %{BUILD_tools}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%if %{BUILD_libs}
-%{_libdir}/*.a
-%endif
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-# ===========================================================================
 %package source
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -887,7 +1047,7 @@ The %{name}-source package contains the source code necessary for building the
 %{name} release.  It includes the autoconf configuration utilities necessary
 to create and distribute this rpm.
 
-%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+%if %{FILES_source}
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
@@ -898,66 +1058,7 @@ to create and distribute this rpm.
 %endif
 
 # ===========================================================================
-%package %{_streams}-util
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
-Group:          System Environment/Base
-Prefix:         %{_bindir}
-Prefix:         %{_sbindir}
-Prefix:         %{_libexecdir}
-Prefix:         %{_sysconfdir}
-Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
-Requires:       %{_streams}-lib >= %{_strvers}
-Obsoletes:      %{name}-%{_streams}-utils
-Obsoletes:      %{name}-utils
-Conflicts:      %{_conflict}-util
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{_streams}-util
-The %{name}-%{_streams}-util package provides administrative and configuration
-test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
-%{stitle} package.
-
-%pre %{_streams}-util
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ]; then : # fresh install
-    # This is a fresh install, look for old non-rpm tools.
-    tools="%{tools}" ; for tool in $tools ; do
-        location="`which $tool 2>/dev/null`"
-        while [ -n "$location" -a -x "$location" ] ; do
-            eval "rm -f $location"
-            location="`which $tool 2>/dev/null`"
-            while [ -n "$location" -a -x "$location" ] ; do
-                eval "rm -f $location"
-                location="`which $tool 2>/dev/null`"
-            done
-        done
-    done
-fi
-
-%if %{BUILD_tools}
-%files %{_streams}-util
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-#%{_bindir}/*
-%{_sbindir}/*
-%{_libexecdir}/*test*
-#%{_libexecdir}/*tst
-%endif
-
-# ===========================================================================
 %package init
-
-%define _configdir  %{_sysconfdir}/sysconfig
-%define _modutildir %{_sysconfdir}/modutils
 
 Summary:    %{title} init scripts and config files
 Group:      System Environment/Base
@@ -969,12 +1070,8 @@ Prefix:     %{_modutildir}
 Obsoletes:  %{name}-inits
 Conflicts:  %{_conflict}-init
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -992,6 +1089,9 @@ function remove_depmods() {
         remove_depmods eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`"
     done
 }
+# This is an initial installation of the init subpackage.  We need to check for non-rpm
+# installations on the host and remove any entries that might later conflict with our entries.  We
+# treat every fresh installation like an upgrade from non-deb install.
 if [ $1 = 1 ] ; then : # fresh install
     # When performing a fresh install we want to go looking for non-rpm installations of LiS or
     # STREAMS or supplementary packages and perform what would otherwise have been the preun or
@@ -1052,16 +1152,16 @@ if [ $1 = 1 ] ; then : # fresh install
             for suffix in %name LiS lis streams STREAMS strxns strxnet strinet strsctp strss7 ; do
                 # This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
                 if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
-                    sed -e '/BEGIN '$suffix'/,/END '$suffix'/d'              $conf_new > $conf_tmp
+                    sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d'              $conf_new > $conf_tmp
                     mv -f -- $conf_tmp $conf_new
                 fi
                 # This is my newer technique with a prune and an if statement in the modules.conf
                 # file that was also used by davem in LiS-2.18.0.
                 if [ -f $dir/modules.$suffix ] ; then
                     rm -f -- $dir/modules.$suffix
-                    sed -e '/^prune[[:space:]].*modules.'$suffix'/d'         $conf_new > $conf_tmp
-                    sed -e '/^if[[:space:]].*modules.'$suffix'/,/^endif/d'   $conf_tmp > $conf_new
-                    sed -e '/^include[[:space:]].*modules.'$suffix'/d'       $conf_new > $conf_tmp
+                    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'         $conf_new > $conf_tmp
+                    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d'   $conf_tmp > $conf_new
+                    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'       $conf_new > $conf_tmp
                     mv -f -- $conf_tmp $conf_new
                 fi
                 # This is my newer latest technique with only an include statement in modules.conf
@@ -1070,7 +1170,7 @@ if [ $1 = 1 ] ; then : # fresh install
                 # Debian-style modules.conf.
                 if [ -f %_modutildir/$suffix ] ; then
                     rm -f -- %_modutildir/$suffix
-                    sed -e '/^include[[:space:]].*%_modutildir\/'$suffix'/d' $conf_new > $conf_tmp
+                    sed -e '\|^include[[:space:]].*%_modutildir/'$suffix'|d' $conf_new > $conf_tmp
                     mv -f -- $conf_tmp $conf_new
                 fi
             done
@@ -1088,7 +1188,7 @@ if [ $1 = 1 ] ; then : # fresh install
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        sed -e '/^[[:space:]]*streams/d' $prel_new > $prel_tmp
+        sed -e '\|^[[:space:]]*streams|d' $prel_new > $prel_tmp
         mv -f -- $prel_tmp $prel_new
         chmod --reference=$prel_old -- $prel_new
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
@@ -1120,29 +1220,29 @@ if [ $1 = 1 ] ; then : # fresh install
         conf_tmp=%_tmppath/modules.conf.tmp.$$
         conf_new=%_tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        ( sed -e '/^include[[:space:]].*%_modutildir\/%name/d' $conf_new
-          echo "include %_modutilsdir/%name" ) > $conf_tmp
+        ( sed -e '\|^include[[:space:]].*%_modutildir/%name|d' $conf_new
+          echo "include %_modutildir/%name" ) > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         chmod --reference=$conf_old $conf_new
         cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_preloads}
-    # At the end of a fresh install we need to add our preloads to the modules or modprobe.preload
-    # file, if it exists, and is necessary, and even if the lines are already there (in which case
-    # we remove the existing line.
 %if %{without_ko_modules}
     prel_old=%_sysconfdir/modules
 %else
     prel_old=%_sysconfdir/modprobe.preload
 %endif
+%if %{have_preloads}
+    # At the end of a fresh install we need to add our preloads to the modules or modprobe.preload
+    # file, if it exists, and is necessary, and even if the lines are already there (in which case
+    # we remove the existing line.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
         mods='%{preloads}' ; for m in $mods ; do
-            ( sed -e '/^[[:space:]]*'"$m"'[[:space:]]*$/d' $prel_new
+            ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new
               echo "$m" ) > $prel_tmp
             mv -f -- $prel_tmp $prel_new
         done
@@ -1161,20 +1261,20 @@ if [ $1 = 2 ] ; then : # upgrade
         conf_new=%_tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
         ( cat $conf_new
-          echo "include %_modutilsdir/%name" ) > $conf_tmp
+          echo "include %_modutildir/%name" ) > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         chmod --reference=$conf_old $conf_new
         cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_preloads}
-    # At the end of an upgrade we place just our preloads in the modules or modprobe.preload file.
 %if %{without_ko_modules}
     prel_old=%_sysconfdir/modules
 %else
     prel_old=%_sysconfdir/modprobe.preload
 %endif
+%if %{have_preloads}
+    # At the end of an upgrade we place just our preloads in the modules or modprobe.preload file.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -1209,28 +1309,28 @@ if [ $1 = 0 ] ; then : # final removal
         conf_tmp=%_tmppath/modules.conf.tmp.$$
         conf_new=%_tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        sed -e '/^include[[:space:]].*%_modutildir\/%name/d' $conf_new > $conf_tmp
+        sed -e '\|^include[[:space:]].*%_modutildir/%name|d' $conf_new > $conf_tmp
         mv -f -- $conf_tmp $conf_new
-        echo "include %_modutilsdir/%name" >> $conf_new
+        echo "include %_modutildir/%name" >> $conf_new
         chmod --reference=$conf_old $conf_new
         cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_preloads}
-    # When we are going away altogether we want to remove any of our preloads whatsoever from the
-    # modules or modprobe.preload file.
 %if %{without_ko_modules}
     prel_old=%_sysconfdir/modules
 %else
     prel_old=%_sysconfdir/modprobe.preload
 %endif
+%if %{have_preloads}
+    # When we are going away altogether we want to remove any of our preloads whatsoever from the
+    # modules or modprobe.preload file.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
         mods='%{preloads}' ; for m in $mods ; do
-            sed -e '/^[[:space:]]*'"$m"'[[:space:]]*$/d' $repl_new > $prel_tmp
+            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
             mv -f -- $prel_tmp $prel_new
         done
         chmod --reference=$prel_old -- $prel_new
@@ -1273,15 +1373,15 @@ b loop' $conf_new > $conf_tmp
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_preloads}
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
-    # modules or modprobe.preloads file that we placed in them in the post scriptlet.  We only
-    # adjust our lines and leave any lines added by the new package post scriptlet.
 %if %{without_ko_modules}
     prel_old=%_sysconfdir/modules
 %else
     prel_old=%_sysconfdir/modprobe.preload
 %endif
+%if %{have_preloads}
+    # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
+    # modules or modprobe.preloads file that we placed in them in the post scriptlet.  We only
+    # adjust our lines and leave any lines added by the new package post scriptlet.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -1306,26 +1406,50 @@ b loop' $prel_new > $prel_tmp
 %endif
 fi
 
-%if %{BUILD_tools}
+%if %{FILES_init}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{have_initscripts}
-%config %{_initrddir}/*
-%config %{_configdir}/*
+%{_initrddir}/../*
+%{_configdir}/*
+%{_modutildir}/*
 %endif
-%if %{without_ko_modules}
-%config %{_modutildir}/*
+
+%if %{FILES_ko_init}
+%files init
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_initrddir}/../*
+%{_configdir}/*
 %endif
+
+%if %{FILES_noinit}
+%files init
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_modutildir}/*
+%endif
+
+%if %{FILES_ko_noinit}
+%files init
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.81  2005/03/29 17:16:51  brian
-# - Updated lsms and added LSM to distribution.
+# Revision 0.9.2.83  2005/04/02 16:47:49  brian
+# - improvements for arch indep build
 #
+# Revision 0.9.2.82  2005/04/02 16:27:31  brian
+# - more adjustments to arch indep build
+#
+
+* Tue Mar 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.81  2005/03/29 17:16:51  brian
+- Updated lsms and added LSM to distribution.
 
 * Mon Mar 28 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.80  2005/03/28 07:42:30  brian

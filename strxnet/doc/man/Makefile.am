@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/07 11:51:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/02 16:27:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 11:51:27 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:27:37 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
 MANMACRO_PFX			= @PACKAGE_TARNAME@
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 tli_man_MANS	= \
 	man4/timod.4 \
@@ -273,10 +276,14 @@ sock_man_MANS	= \
 man_MANS	= $(xnet_man_MANS)
 
 if WITH_TLI
+## WITH_TLI
 man_MANS	+= $(tli_man_MANS)
+## WITH_TLI
 endif
 if WITH_SOCK
+## WITH_SOCK
 man_MANS	+= $(sock_man_MANS)
+## WITH_SOCK
 endif
 
 tli_dist_noinst_MANS	= \
@@ -499,6 +506,9 @@ dist_noinst_MANS	= \
 	$(tli_dist_noinst_MANS) \
 	$(xnet_dist_noinst_MANS) \
 	$(sock_dist_noinst_MANS)
+
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/man.am
 

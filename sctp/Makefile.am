@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/04/02 04:39:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/02 16:47:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 04:39:06 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,8 +54,6 @@
 ## General rules
 ##
 include am/openss7.am
-
-dist_sysconf_DATA =
 
 lib_LTLIBRARIES			=
 
@@ -292,8 +290,8 @@ if RPM_BUILD_USER
 
 SUBDIRS = include doc tests
 
-## RPM_BUILD_USER
-endif
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 if INSTALL_INITSCRIPTS
 ## INSTALL_INITSCRIPTS
@@ -303,20 +301,26 @@ if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_config_DATA		=
+
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_config_DATA		=
-
-dist_sysconf_DATA		+=
-
 ## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/24 02:11:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/02 16:47:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:11 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 16:47:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,13 +55,17 @@
 ##
 include am/openss7.am
 
-dist_sysconf_DATA 		=
-
 lib_LTLIBRARIES			=
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 if PUBLIC_RELEASE
+## PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
+
 libexec_PROGRAMS		= \
 				  ldltest
 
@@ -90,9 +94,11 @@ ldltest_LDADD			= $(STREAMS_LDADD)
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -146,11 +152,16 @@ libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## PUBLIC_RELEASE
 else
+## ! PUBLIC_RELEASE
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
+
 libexec_PROGRAMS		= \
 				  ldltest
 
@@ -179,9 +190,11 @@ ldltest_LDADD			= $(STREAMS_LDADD)
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= 
 ADDON_MODS			= 
@@ -234,8 +247,13 @@ libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+= 
 
+## RPM_BUILD_KERNEL
 endif
 
+## ! PUBLIC_RELEASE
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
@@ -267,8 +285,13 @@ kpre				= streams-
 
 include am/kernel.am
 
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
 				src/util/modutils/@PACKAGE_LCNAME@
+endif
+endif
 
 ##
 ## Rules for building libraries
@@ -298,33 +321,47 @@ include am/genksyms.am
 include am/strconf.am
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = src doc tests
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
-
-endif
 
 dist_config_DATA		=
 
-dist_sysconf_DATA		+=
+## ! WITH_RCSD_DIRECTORY
+endif
 
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms
