@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.6 2004/04/19 02:58:20 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.7 2004/04/19 12:03:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QPROCSOFF 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QPROCSOFF 9 "$Date: 2004/04/19 12:03:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -210,12 +210,13 @@ or
 as an argument.
 .PP
 See also
-.IR \*(lqCOMPATIBILITY\*(rq ,
+.RI \*(lq COMPATIBILITY \*(rq,
 below.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR qprocson (9),
 .BR qunbufcall (9),
 .BR quntimeout (9),
@@ -365,6 +366,37 @@ See
 .BR put (9)
 for more information.
 .IP \(em
+.BR qprocsoff ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR qprocsoff ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qprocsoff ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
 Symbol
 .BR lis_qprocsoff ()
 is provided for compatibility with LiS.  See
@@ -372,20 +404,6 @@ is provided for compatibility with LiS.  See
 .BR lis_qprocsoff ()
 simply calls
 .BR qprocsoff ().
-.IP \(em
-.IR UnixWare \(rg
-.[
-uw7spg
-.]
-and
-.IR SUPER-UX \(rg
-.[
-suxspg
-.]
-do not permit
-.BR qprocsoff ()
-to be called on a stream frozen with
-.BR freezestr (9).
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

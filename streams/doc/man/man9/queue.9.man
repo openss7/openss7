@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.6 2004/04/19 02:58:20 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.7 2004/04/19 12:03:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QUEUE 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QUEUE 9 "$Date: 2004/04/19 12:03:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -728,12 +728,8 @@ LiS structure by an LiS module or driver will result in binary incompatibility.
 LiS does not provide the SVR 4.2 EFT
 .I q_nband
 member.
-.PP
-Binary compatibility is provided of the other SVR 4.2 EFT members to LiS.
-.PP
-Binary compatibility to SVR 4.2 EFT MP and
-.IR Solaris \(rg
-is not guaranteed.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

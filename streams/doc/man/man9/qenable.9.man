@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.6 2004/04/19 02:58:20 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.7 2004/04/19 12:03:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QENABLE 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QENABLE 9 "$Date: 2004/04/19 12:03:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -192,6 +192,7 @@ procedure will not reschedule the service procedure.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR canenable (9),
 .BR noenable (9),
 .BR enableok (9).
@@ -206,16 +207,14 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR qenable ()
-is source-level compatible with
+is compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.IR LiS ,
-with the following considerations:
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR qenable ()
 only schedules the queue for later service.
@@ -227,9 +226,8 @@ flag is set, or whether
 .BR noenable (9)
 has been called for the queue,
 .IR q .
-.IP \(em
 Under
-.IR LiS,
+.IR LiS ,
 .[
 LiS
 .]
@@ -243,28 +241,34 @@ This is an
 bug.
 .IP \(em
 .BR qenable ()
-functions properly on a stream frozen with
+may be called on a stream frozen with
 .BR freezestr (9).
-.BR freezestr (9)
-does not block the setting of flags unless some other
-.I STREAMS
-sychronization mechanism is in place (such as perimeters).
-Under
-.IR UnixWare \(rg,
-.BR qenable ()
-called on a frozen stream will have indeterminate results.
-.IR UnixWare \(rg
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-uw7spg
+usldk
 .]
-and
+.IR Solaris \(rg,
+.[
+solspg
+.]
 .IR SUPER-UX \(rg
 .[
 suxspg
 .]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
 do not permit
 .BR qenable ()
 to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qenable ()
+on a stream frozen with
 .BR freezestr (9).
 .IP \(em
 .BR qenable ()
@@ -299,7 +303,7 @@ do not say that
 defeats
 .BR qenable ()
 either.
-.IR LiS
+.I LiS
 source code,
 .[
 LiS
@@ -323,7 +327,9 @@ function.
 .IP \(em
 Symbol
 .BR lis_qenable ()
-is provided for binary compatibility with LiS.  See
+is provided for binary compatibility with
+.IR LiS .
+See
 .BR lisbcm (9).
 .BR lis_qenable ()
 simply calls
@@ -339,41 +345,10 @@ for additional compatibility considerations.
 .SH CONFORMANCES
 .PP
 .PP
-.IR "SVR 4.2 MP DDI/DKI" ;
+.IR "SVR 4.2 MP DDI/DKI"
 .[
 usldk
 .]
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg
-and
-.IR UnixWare \(rg
-documentation;
-.[
-aixdoc
-.]
-.[
-hpuxdoc
-.]
-.[
-osfdoc
-.]
-.[
-soldoc
-.]
-.[
-uw7doc
-.]
-and
-.IR LiS 
-source code
-.[
-LiS
-.]
-(but see
-.IR \*(lqCOMPATIBILITY\*(rq ,
-above).
 .\"
 .\"
 .SH HISTORY

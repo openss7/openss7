@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.7 2004/04/19 02:58:18 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.8 2004/04/19 12:03:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:18 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FREEZESTR 9 "$Date: 2004/04/19 02:58:18 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH FREEZESTR 9 "$Date: 2004/04/19 12:03:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -132,11 +132,10 @@ and all synchronous callbacks,
 .BR qwriter (9),
 .BR mi_bufcall (9),
 .BR streams_put (9),
-.BR weldq (9),
-.BR unweldq (9),
-
-
-
+.BR weldq (9)
+and
+.BR unweldq (9).
+.PP
 .BR freezestr ()
 waits until all other threads in
 .BR qopen (9),
@@ -164,9 +163,9 @@ In addition, the queue specified by
 is locked and all other threads will be blocked from executing queue
 manipulation functions
 .BR appq (9),
-.BR bcanget (9),
+.\".BR bcanget (9),
 .BR bcanput (9),
-.BR canget (9),
+.\".BR canget (9),
 .BR canput (9),
 .BR flushband (9),
 .BR flushq (9),
@@ -179,10 +178,9 @@ manipulation functions
 .BR strqget (9)
 and
 .BR strqset (9)
-for the locked queue (including the calling thread) and local interrupts will
-be supressed.
+for the locked queue and local interrupts will be supressed.
 .PP
-A procedure that freezes as stream queue with
+A procedure that freezes a stream queue with
 .BR freezestr ()
 must thaw the stream queue with
 .BR unfreezestr (9)
@@ -208,6 +206,10 @@ returns
 .BR void .
 .PP
 For compatibility with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
 .IR SUPER-UX \(rg
 .[
 suxspg
@@ -260,6 +262,16 @@ The caller must guarantee validity from call outs, callbacks, soft interrupts
 and interrupt service routines not predicated on the queue pair to which
 .I q
 belongs.
+.PP
+Calling
+.BR freezestr ()
+from any context will disable local interrupts on the calling processor.  As
+local interrupts will remain disabled until
+.BR unfreezestr (9)
+is called, the period for which a driver or module freezes a stream is
+critical and has an impact on system performance.
+The caller should not call any functions which may cause the calling thread to
+sleep while it holds a frozen stream.
 .\"
 .\"
 .SH NOTICES
@@ -280,25 +292,23 @@ and
 .BR qprocsoff (9)
 which are separate facilities.
 .PP
-Calling
+Although calling
 .BR freezestr ()
-from any context will disable local interrupts on the calling processor.  As
-local interrupts will remain disabled until
-.BR unfreezestr (9)
-is called, the period for which a driver or module freezes a stream is
-critical and has an impact on system performance.
-.PP
-.BR freezestr ()
-called twice for the same queue will result in single-party deadlock of the
-calling processor.
+twice for the same queue will result in single-party deadlock of the calling
+processor for most
+.I STREAMS
+implementations,
+.B Linux Fast-STREAMS
+uses recursive locks and will not deadlock when called multiple times for the
+same queue.
 .PP
 The caller must not call queue
 .I STREAMS
 utility functions that manipulate queue state.  These functions include
-.BR bcanget (9),
+.\".BR bcanget (9),
 .BR bcanput (9),
 .BR bcanputnext (9),
-.BR canget (9),
+.\".BR canget (9),
 .BR canput (9),
 .BR canputnext (9),
 .BR enableok (9),
@@ -350,6 +360,29 @@ of the stream (qopen, qclose), and and queue procedures (insq, rmvq) on the
 frozen queue.
 .\"
 .\"
+.SH IMPLEMENTATION
+.PP
+.BR freezestr ()
+is implemented by taking a recursive write lock on the stream head with
+interrupt suppression.  This protects all of the
+.I q->q_next
+pointers in the entire stream.
+.BR freezestr ()
+also takes a recursive write lock on the queue structure referenced by
+.IR q .
+This protects all of the members of the queue structure as well as the
+.I mp->b_next
+pointers of messages on the queue.
+Note that
+.I q->q_flags
+are not protected by structure locks but are operated on using atomic bit
+operations.
+.PP
+Because recursive locks are taken, calling
+.BR freezestr ()
+for a frozen stream will not result in single-part deadlock.
+.\"
+.\"
 .SH EXAMPLES
 .PP
 Following is an example (but not a terribly useful one) of the use of
@@ -375,11 +408,11 @@ unfreezestr(q);
 .PP
 .BR allocq (9)
 .BR appq (9),
-.BR bcanget (9),
+.\".BR bcanget (9),
 .BR bcanput (9),
 .BR bcanputnext (9),
 .BR bufcall (9),
-.BR canget (9),
+.\".BR canget (9),
 .BR canput (9),
 .BR canputnext (9),
 .BR enableok (9),
@@ -432,6 +465,10 @@ and systems based on
 .IR "SVR 4 MP" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
 .IR Solaris \(rg,
 .[
 solspg
@@ -477,12 +514,35 @@ provides the function prototype:
 .BI "void freezestr(queue_t *" q ).
 All the others provide the prototype
 .BI "pl_t freezestr(queue_t *" q ).
+For compatibility with
+.IR Solaris \(rg,
+the software priority level otherwise returned by
+.BR freezestr ()
+is stored internally as well as being returned.
+.BR unfreezestr (9)
+will access this internal software priority level to restore when the
+.IR Solaris \(rg,
+version of
+.BR unfreezestr (9)
+is called.
 .IP \(em
-.I "SVR 4.2 MP DDI/DKI"
-.[
-usldk
-.]
-specifies that the following functions cannot be called on a frozen stream:
+.BR freezestr ()
+does not result in single-party deadlock on the calling processor when called
+twice for the same queue.
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+will result in single-party deadlock on the calling processor in the same
+circumstance.
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR freezestr ()
+for a stream that the caller has already frozen.
+.IP \(em
+Calling
 .BR bcanput (9),
 .BR bcanputnext (9),
 .BR canput (9),
@@ -493,7 +553,81 @@ specifies that the following functions cannot be called on a frozen stream:
 .BR getq (9),
 .BR noenable (9),
 .BR put (9),
-.BR putb (9),
+.BR putbq (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR putnext (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9),
+.BR putnextctl2 (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+or
+.BR SAMESTR (9)
+for a queue in a stream frozen by the caller will not result in single-party
+deadlock of the calling processor.
+.IR "SVR 4.2 MP" ,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+and
+.IR UnixWare \(rg
+will result in single-party deadlock in the same circumstance.
+Portable
+.I STREAMS
+drivers and modules will not attempt to call any of these restricted functions
+while it holds a stream frozen with
+.BR freezestr ().
+.IP \(em
+.BR freezestr ()
+blocks all threads except the calling thread from putting messages onto or
+taking message off of the queue specified by
+.IR q .
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+state that any thread currently within the stream will be blocked if it
+attempts to put messages onto or take messages off of
+.B any
+queue within the stream (with the sole exception of the caller).
+If the
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+or
+.IR UnixWare \(rg
+behavior is desired, the queue should establish per-stream synchronization
+(i.e. only allowing one thread of execution within the entire stream).
+.IP \(em
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+specify that the following functions cannot be called on a frozen stream:
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR noenable (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putnext (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9),
 .BR putq (9),
 .BR qenable (9),
 .BR qprocsoff (9),
@@ -502,16 +636,36 @@ specifies that the following functions cannot be called on a frozen stream:
 .BR qsize (9),
 .BR SAMESTR (9).
 .IP \(em
-.I "SVR 4.2 MP DDI/DKI"
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
-specifies that the following functions must have the stream frozen across the
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+specify that the following functions must have the stream frozen across the
 call:
 .BR insq (9),
 .BR rmvq (9),
 .BR strqget (9),
 .BR strqset (9).
+.IR Solaris \(rg
+specifies that these functions must have the queue protected with
+.I STREAMS
+functions or some other locking mechanism.
+.IP \(em
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+states that the stream cannot be frozen while calling
+.BR rmvq (9),
+but this is probably an error in the
+.IR SUPER-UX \(rg
+documentation.
+.[
+suxspg
+.]
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: noenable.9.man,v 0.9.2.5 2004/04/19 02:58:04 brian Exp $
+.\" @(#) $Id: noenable.9.man,v 0.9.2.6 2004/04/19 12:03:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NOENABLE 9 "$Date: 2004/04/19 02:58:04 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH NOENABLE 9 "$Date: 2004/04/19 12:03:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -256,6 +256,10 @@ safe for use on a write locked stream that has been frozen with
 .BR freezestr (9).
 .I LiS
 takes the queue spin lock and uses normal bit operations to set the flag.
+.IP \(em
+.BR noenable ()
+may be called on a stream frozen with
+.BR freezestr (9).
 .IR "SVR 4.2MP DDI/DKI" ,
 .[
 usldk

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.6 2004/04/19 02:58:20 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.7 2004/04/19 12:03:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTQ 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PUTQ 9 "$Date: 2004/04/19 12:03:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -193,6 +193,7 @@ A typical response would be to free the message using
 .SH "SEE ALSO"
 .PP
 .BR canput (9),
+.BR freezestr (9),
 .BR putnext (9),
 .BR getq (9).
 .\"
@@ -208,13 +209,11 @@ has no known bugs.
 .BR putq ()
 is compatible with 
 .IR "SVR 4.2 MP DDI/DKI" ,
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.IR LiS ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
 with the following porting considerations:
 .IP \(em \w'\(em\(em'u
 .BR putq ()
@@ -226,27 +225,46 @@ bugs in
 .BR putq (),
 see
 .BR lis_putq (9lis).
+.IP \(em
+.BR putq ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR putq ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putq ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
 Symbol
 .BR lis_putq ()
 is provided for compatibility with LiS.  See
 .BR lisbcm (9).
 .BR lis_putq ()
 simply calls
-.BR putq ().
-.IP \(em
-.IR UnixWare \(rg
-.[
-uw7spg
-.]
-and
-.IR SUPER-UX \(rg
-.[
-suxspg
-.]
-do not permit
 .BR putq ()
-to be called on a stream frozen with
-.BR freezestr (9).
+directly.
 .PP
 See
 .BR STREAMS (9)
@@ -255,40 +273,10 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 4.2 MP DDI/DKI" ;
+SVR 4.2 MP DDI/DKI
 .[
 usldk
 .]
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-.IR Solaris \(rg
-documentation;
-.[
-aixdoc
-.]
-.[
-hpuxdoc
-.]
-.[
-osfdoc
-.]
-.[
-uw7doc
-.]
-.[
-soldoc
-.]
-.I LiS
-source code
-.[
-LiS
-.]
-(but see
-.RI \*(lq COMPATIBILITY \*(rq,
-above).
 .\"
 .\"
 .SH HISTORY

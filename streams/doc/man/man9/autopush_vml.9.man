@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush_vml.9.man,v 0.9.2.4 2004/04/19 02:58:16 brian Exp $
+.\" @(#) $Id: autopush_vml.9.man,v 0.9.2.5 2004/04/19 12:03:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:16 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH_VML 9 "$Date: 2004/04/19 02:58:16 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH AUTOPUSH_VML 9 "$Date: 2004/04/19 12:03:41 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -115,6 +115,23 @@ STREAMS Adminstrative Driver.
 This function verifies that a module list is valid (loaded on the system).
 .\"
 .\"
+.SH USAGE
+.PP
+.BR autopush_vml ()
+is a
+.BR "Linux Fast-STREAMS" -specific
+function.
+.BR autopush_vml ()
+should not be used by portable
+.I STREAMS
+drivers or modules.  Instead, the
+user-space
+.I STREAMS
+autopush utility
+.BR sad (8)
+should be used instead.
+.\"
+.\"
 .SH RETURN
 .PP
 Upon success,
@@ -135,23 +152,6 @@ fails and returns a negative error number as follows:
 .RB [ EINVAL ]
 .I nmods
 is less than one (1).
-.\"
-.\"
-.SH USAGE
-.PP
-.BR autopush_vml ()
-is a
-.BR "Linux Fast-STREAMS" -specific
-function.
-.BR autopush_vml ()
-should not be used by portable
-.I STREAMS
-drivers or modules.  Instead, the
-user-space
-.I STREAMS
-autopush utility
-.BR sad (8)
-should be used instead.
 .\"
 .\"
 .SH CONTEXT

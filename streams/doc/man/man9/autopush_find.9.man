@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush_find.9.man,v 0.9.2.4 2004/04/19 02:58:16 brian Exp $
+.\" @(#) $Id: autopush_find.9.man,v 0.9.2.5 2004/04/19 12:03:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:16 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH_FIND 9 "$Date: 2004/04/19 02:58:16 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH AUTOPUSH_FIND 9 "$Date: 2004/04/19 12:03:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -177,6 +177,23 @@ permits a kernel module to find the autopush list within a
 table entry.
 .\"
 .\"
+.SH USAGE
+.PP
+.BR autopush_find ()
+is a
+.BR "Linux Fast-STREAMS" -specific
+function.
+.BR autopush_find ()
+should not be used by portable
+.I STREAMS
+drivers or modules.  Instead, the
+user-space
+.I STREAMS
+autopush utility
+.BR sad (8)
+should be used instead.
+.\"
+.\"
 .SH RETURN
 .PP
 Upon success,
@@ -199,23 +216,6 @@ when the autopush list associated with
 .I cdev
 is empty, or does not contain an entry for the character minor device number
 .IR minor .
-.\"
-.\"
-.SH USAGE
-.PP
-.BR autopush_find ()
-is a
-.BR "Linux Fast-STREAMS" -specific
-function.
-.BR autopush_find ()
-should not be used by portable
-.I STREAMS
-drivers or modules.  Instead, the
-user-space
-.I STREAMS
-autopush utility
-.BR sad (8)
-should be used instead.
 .\"
 .\"
 .SH CONTEXT

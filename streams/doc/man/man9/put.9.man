@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: put.9.man,v 0.9.2.6 2004/04/19 02:58:19 brian Exp $
+.\" @(#) $Id: put.9.man,v 0.9.2.7 2004/04/19 12:03:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:19 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUT 9 "$Date: 2004/04/19 02:58:19 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PUT 9 "$Date: 2004/04/19 12:03:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -197,17 +197,14 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR put ()
-is source-level compatible with SVR 4.2 DDI/DKI,
+is compatible with
+.IR "SVR 4.2 DDI/DKI" ,
 .[
 usldk
 .]
-.IR Solaris \(rg
-and
-LiS
-.[
-LiS
-.]
-with the following exceptions:
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 Under
 .IR OSF/1 \(rg
@@ -221,7 +218,8 @@ this function is called
 .IP \(em
 .BR put ()
 called with invalid arguments will have undefined results.
-LiS fails silently when
+.I LiS
+fails silently when
 .IR mp " or " q
 is
 .BR NULL ,
@@ -236,7 +234,8 @@ or
 .I q->q_info->qi_putp
 is
 .BR NULL .
-When LiS
+When
+.I LiS
 fails silently, it frees
 .I mp
 using
@@ -252,7 +251,8 @@ because no other queue has a references to the queue for which
 has been executed, or for which
 .BR qprocson (9)
 has not yet been executed.
-LiS discards messages passed to
+.I LiS
+discards messages passed to
 .BR lis_safe_putmsg ()
 when 
 .BR qprocsoff (9)
@@ -279,18 +279,21 @@ flag set or with the
 .B D_MTPUTSHARED
 flag set.
 .IP ""
-LiS holds an exclusive nesting queue procedures lock while calling
+.I LiS
+holds an exclusive nesting queue procedures lock while calling
 .BR put ().
 Unfortunately, these locks disable interrupts, meaning that interrupts are
 disabled while
 .BR put ()
 executes.
-LiS
+.I LiS
 .BR lis_safe_putnext (9)
 and
 .BR lis_safe_qreply (9)
-also call this function, meaning that all message passing functions in LiS
-lock out interrupts until the entire thread of execution completes.  LiS
+also call this function, meaning that all message passing functions in
+.I LiS
+lock out interrupts until the entire thread of execution completes.
+.I  LiS
 drivers and modules calling
 .BR put ()
 should notice superior interrupt service routine latency and performance.  It
@@ -299,41 +302,59 @@ MP-safe queue and message utility functions.  Also, most put procedures are
 inherently invoked single threaded (from a single-threaded serviec procedure).
 Lack of locking should not present a problem.
 .IP ""
-Because LiS also uses this lock for service procedures, this means that while
-the LiS scheduler is running (at kernel thread priority 50), interrupts,
+Because
+.I LiS
+also uses this lock for service procedures, this means that while the
+.I LiS
+scheduler is running (at kernel thread priority 50), interrupts,
 timeouts, bottom halves, hi tasklets and soft interrupts are indefinitely
 postponed.  This is not acceptable for soft-real-time performance.  Rewrite
-LiS put procedures to be MP-safe.
+.I LiS
+put procedures to be MP-safe.
 .IP \(em
-.IR UnixWare \(rg,
+.BR put ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-uw7spg
+usldk
 .]
-.IR Solaris \(rg
+.IR Solaris \(rg,
 .[
 solspg
 .]
-and
 .IR SUPER-UX \(rg
 .[
 suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
 .]
 do not permit
 .BR put ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.PP
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR put ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
 Symbol
 .BR lis_safe_putmsg ()
-is provided for binary compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR lisbcm (9).
 .BR lis_safe_putmsg ()
 simply calls
-.BR put ().
-.PP
-Binary compatibility with SVR 4.2 DDI/DKI and
-.IR Solaris \(rg
-is not guaranteed.
+.BR put ()
+directly.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -346,8 +367,6 @@ SVR 4.2 DDI/DKI,
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SAMESTR.9.man,v 0.9.2.7 2004/04/19 02:58:15 brian Exp $
+.\" @(#) $Id: SAMESTR.9.man,v 0.9.2.8 2004/04/19 12:03:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:15 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SAMESTR 9 "$Date: 2004/04/19 02:58:15 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH SAMESTR 9 "$Date: 2004/04/19 12:03:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -191,6 +191,7 @@ a kernel panic may occur.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR RD (9),
 .BR WR (9),
 .BR OTHER (9).
@@ -213,7 +214,7 @@ usldk
 and systems based on
 .IR "SVR 4 MP" ,
 with the following portability considerations:
-.IP \(em 3
+.IP \(em \w'\(em\(em'u
 .BR SAMESTR ()
 is defined for
 .IR UnixWare \(rg,
@@ -239,19 +240,26 @@ lis
 These systems also support
 .IR STREAMS -based
 .BR pipe "(4) and " fifo (4).
-.IP \(em \w'\(em\(em'u
-.IR UnixWare \(rg,
+.IP \(em
+.BR SAMESTR ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-uw7spg
+usldk
 .]
-.IR Solaris \(rg
+.IR Solaris \(rg,
 .[
 solspg
 .]
-and
 .IR SUPER-UX \(rg
 .[
 suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
 .]
 do not permit
 .BR SAMESTR ()
@@ -270,7 +278,12 @@ on the other hand, does not allow
 pointers to be manipulated directly and provides the
 .BR weldq (9)
 function to perform that action.
-.BR
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR bcanputnext ()
+on a stream frozen with
+.BR freezestr (9).
 .IP \(em
 .BR SAMESTR ()
 is not defined for

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.7 2004/04/19 02:58:16 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.8 2004/04/19 12:03:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:16 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ALLOCB 9 "$Date: 2004/04/19 02:58:16 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH ALLOCB 9 "$Date: 2004/04/19 12:03:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -152,6 +152,27 @@ svr4spg
 and later implementations.
 .\"
 .\"
+.SH USAGE
+.PP
+Priority
+.B BPRI_WAITOK
+is added for
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+compatibility and should not be used by portable
+.I STREAMS
+drivers or modules.
+.PP
+Portable
+.I STREAMS
+drivers and modules should not rely on any setting of priority and should
+assume that the implementation ignores the
+.I bpri
+argument.
+.\"
+.\"
 .SH RETURN
 .PP
 Upon success,
@@ -194,27 +215,6 @@ and
 .PP
 Failure to allocate a message block is typically followed by a call to
 .BR bufcall (9).
-.\"
-.\"
-.SH USAGE
-.PP
-Priority
-.B BPRI_WAITOK
-is added for
-.IR OSF/1 \(rg
-.[
-osfspg
-.]
-compatibility and should not be used by portable
-.I STREAMS
-drivers or modules.
-.PP
-Portable
-.I STREAMS
-drivers and modules should not rely on any setting of priority and should
-assume that the implementation ignores the
-.I bpri
-argument.
 .\"
 .\"
 .SH CONTEXT

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.5 2004/04/19 02:58:19 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.6 2004/04/19 12:03:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:19 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTBQ 9 "$Date: 2004/04/19 02:58:19 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PUTBQ 9 "$Date: 2004/04/19 12:03:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -196,6 +196,7 @@ possible indefinite looping.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR getq (9),
 .BR putq (9).
 .\"
@@ -209,17 +210,14 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR putbq ()
-is source-level compatible with SVR 4.2 DDI/DKI,
+is compatible with
+.IR "SVR 4.2 DDI/DKI" ,
 .[
 usldk
 .]
-.IR Solaris \(rg
-and
-LiS
-.[
-LiS
-.]
-with the following exceptions:
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 If
 .BR putbq ()
@@ -270,31 +268,47 @@ This is inconsistent with SVR 4.2 DDI/DKI and
 documentation.
 This is an LiS bug.
 .IP \(em
-.IR UnixWare \(rg
+.BR putbq ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-uw7spg
+usldk
 .]
-and
+.IR Solaris \(rg,
+.[
+solspg
+.]
 .IR SUPER-UX \(rg
 .[
 suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
 .]
 do not permit
 .BR putbq ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.PP
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putbq ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
 Symbol
 .BR lis_putbq ()
-is provided for binary compatibility with LiS.  See
+is provided for compatibility with LiS.  See
 .BR lisbcm (9).
 .BR lis_putbq ()
 simply calls
-.BR putbq ().
-.PP
-Binary compatibility with SVR 4.2 DDI/DKI and
-.IR Solaris \(rg
-is not guaranteed.
+.BR putbq ()
+directly.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -307,8 +321,6 @@ SVR 4.2 DDI/DKI,
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putctl1.9.man,v 0.9.2.5 2004/04/19 02:58:19 brian Exp $
+.\" @(#) $Id: putctl1.9.man,v 0.9.2.6 2004/04/19 12:03:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:19 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 12:03:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTCTL1 9 "$Date: 2004/04/19 02:58:19 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PUTCTL1 9 "$Date: 2004/04/19 12:03:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -151,6 +151,7 @@ is MP-safe; however, see the considerations listed under
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR put (9),
 .BR putctl (9),
 .BR putnextctl (9),
@@ -166,23 +167,22 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR putctl1 ()
-is source-level compatible with SVR 4.2 DDI/DKI,
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
-.IR Solaris \(rg
-and
-LiS
-.[
-LiS
-.]
-with the following exceptions:
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR putctl1 ()
-is not bug for bug compatible with LiS:
+is not bug for bug compatible with
+.IR LiS :
 .BR putctl1 ()
 returns failure when the operations fails.
-Under LiS,
+Under
+.IR LiS ,
 .BR putctl1 ()
 will return success even if the operation fails because of the following
 conditions:
@@ -203,33 +203,51 @@ has no put procedure; or the queue pointed to by
 is closing, or the queue has had put and service routine processing turned off
 (e.g. with
 .BR qprocsoff (9)).
-LiS should return failure when the operation fails.
+.I LiS
+should return failure when the operation fails.
 .IP \(em
-.IR UnixWare \(rg
+.BR putctl1 ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-uw7spg
+usldk
 .]
-and
+.IR Solaris \(rg,
+.[
+solspg
+.]
 .IR SUPER-UX \(rg
 .[
 suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
 .]
 do not permit
 .BR putctl1 ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.PP
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putctl1 ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
 Symbol
 .BR lis_putctl1 ()
-is provided for binary compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR lisbcm (9).
 .BR lis_putctl1 ()
 simply calls
 .BR putctl1 ().
-.PP
-Binary compatibility with SVR 4.2 DDI/DKI and
-.IR Solaris \(rg
-is not guaranteed.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)
@@ -238,12 +256,10 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 DDI/DKI,
+SVR 4.2 DDI/DKI.
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY
