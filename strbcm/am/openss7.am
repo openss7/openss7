@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/18 07:55:11 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/03/18 22:50:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/18 07:55:11 $ by $Author: brian $
+## Last Modified $Date: 2005/03/18 22:50:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -122,23 +122,26 @@ MY_PHONY		+= $(FORCED_TARGETS)
 $(RELEASE_DIRECTORIES)::
 	@test -d $@ || { $(ECHO) " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
 	
+release: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 release: $(RELEASE_DIRECTORIES) $(RELEASE)
 
 release-clean-local:
 	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $$target" ; \
-		$(MAKE) $(AM_MAKEFLAGS) $$target ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
 	done
 
-release-clean: release-clean-local
+release-clean-am: release-clean-local
 	@if test -n "$(RELEASECLEANFILES)" ; then \
 		$(ECHO) "rm -f -- $(RELEASECLEANFILES)" ; \
 		rm -f -- $(RELEASECLEANFILES) ; \
 	fi
 
+release-clean: release-clean-recursive release-clean-am
+
 MY_PHONY	+= release $(RELEASE)
 MY_PHONY	+= release-sign $(RELEASE_SIGN)
-MY_PHONY	+= release-clean $(RELEASE_CLEAN_LOCAL)
+MY_PHONY	+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
 FORCED_TARGETS	+= forced-release
 
 if MAINTAINER_MODE
@@ -160,11 +163,11 @@ $(MY_RECURSIVE_TARGETS):
 		else \
 			local_target="$$target" ; \
 		fi ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local_target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; \
 	if test "$$dot_seen" = "no" ; then \
-		$(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1 ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) "$$target-am" || exit 1 ; \
 	fi ; test -z "$$fail"
 
 MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
@@ -182,7 +185,35 @@ $(ALL_RECURSIVE_TARGETS):
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; test -z "$$fail"
 
-MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
+ALL_RECURSIVE_CLEAN_TARGETS =
+
+release-clean-recursive:
+	@failcom='exit 1' ; \
+	for f in x $$MAKEFLAGS ; do \
+		case $$f in \
+			*=* | --[!k]*) ;; \
+			*k*) failcom='fail=yes' ;; \
+		esac ; \
+	done ; \
+	dot_seen=no ; \
+	rev='' ; list='$(subdirs)' ; for subdir in $$list ; do \
+	    	if test "$$subdir" = "." ; then :; else \
+			rev="$$subdir $$rev" ; \
+		fi ; \
+	done ; \
+	target=`echo $@ | sed s/-recursive//` ; \
+	for subdir in $$rev ; do \
+		echo "Making $$target in $$subdir" ; \
+		if test "$$subdir" = "." ; then \
+			local_target="$$target-am" ; \
+		else \
+			local_target="$$target" ; \
+		fi ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local_target) \
+		|| eval $$failcom ; \
+	done && test -z "$$fail"
+
+MY_PHONY	+= $(ALL_RECURSIVE_TARGETS) release-clean-recursive
 
 if PERFORM_CHECKS
 dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
@@ -281,7 +312,7 @@ release: $(RELEASE)
 
 release-sign: $(RELEASE_SIGN)
 
-ALL_RECURSIVE_TARGETS += all-release all-release-sign all-release-clean
+ALL_RECURSIVE_TARGETS += all-release all-release-sign
 
 ##
 # Some logging targets for the head makefile targets.
@@ -292,8 +323,8 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 
 $(LOGGING_TARGETS): FORCE
 	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'` ; \
-	echo "$(MAKE) $(AM_MAKEFLAGS) $$target 2>&1 | tee $@" ; \
-	$(MAKE) $(AM_MAKEFLAGS) $$target 2>&1 | tee $@
+	echo "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target 2>&1 | tee $@" ; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target 2>&1 | tee $@
 
 configure.log: FORCE
 	(cd $(top_builddir); ./config.status --recheck; ./config.status)
