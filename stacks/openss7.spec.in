@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2004/12/30 21:22:24 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/01/10 18:59:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 21:22:24 $ by $Author: brian $
+# Last Modified $Date: 2005/01/10 18:59:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -953,46 +953,61 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %defattr(-,root,root)
 #%{_bindir}/*
 #%{_sbindir}/*
-%{_libexecdir}/*
+%{_libexecdir}/*test*
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.50  2004/12/30 21:22:24  brian
-# - Mandrake compresses info files with bzip2.
+# Revision 0.9.2.51  2005/01/10 18:59:19  brian
+# - mandrake places libexec files in /usr/lib, correct globbing
+# - updated change logs
 #
-# Revision 0.9.2.49  2004/12/30 08:05:58  brian
-# - Fix globbing on source package.
-#
-# Revision 0.9.2.48  2004/12/29 21:32:46  brian
-# - Straighten out cache and site files.
-#
-# Revision 0.9.2.47  2004/12/29 07:23:10  brian
-# - Added missing config_site macro definition.
-#
-# Revision 0.9.2.46  2004/12/21 22:22:17  brian
-# - Added automatic site configuration to rpm build.
-#
-# Revision 0.9.2.45  2004/12/19 15:11:48  brian
-# - Working up better spec files.
-#
-# Revision 0.9.2.44  2004/12/17 13:31:16  brian
-# - Cleared up build depdendencies, added info subpackage to LiS and streams.
-#
-# Revision 0.9.2.43  2004/12/17 04:02:40  brian
-# - Improving spec files.
-#
-# Revision 0.9.2.42  2004/12/15 15:25:33  brian
-# - avoid undefined debug macro
-#
-# Revision 0.9.2.41  2004/12/15 14:59:07  brian
-# - Update RPM build to build multiple distribution binary RPMs from a single SRPM.
-#
-# Revision 0.9.2.40  2004/12/15 14:35:51  brian
-# - Update RPM build to build multiple distribution binary RPMs from single SRPM.
-#
+
+* Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.50  2004/12/30 21:22:24  brian
+- Mandrake compresses info files with bzip2.
+
+* Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.49  2004/12/30 08:05:58  brian
+- Fix globbing on source package.
+
+* Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.48  2004/12/29 21:32:46  brian
+- Straighten out cache and site files.
+
+* Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.47  2004/12/29 07:23:10  brian
+- Added missing config_site macro definition.
+
+* Tue Dec 21 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.46  2004/12/21 22:22:17  brian
+- Added automatic site configuration to rpm build.
+
+* Sun Dec 19 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.45  2004/12/19 15:11:48  brian
+- Working up better spec files.
+
+* Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.44  2004/12/17 13:31:16  brian
+- Cleared up build depdendencies, added info subpackage to LiS and streams.
+
+* Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.43  2004/12/17 04:02:40  brian
+- Improving spec files.
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.42  2004/12/15 15:25:33  brian
+- avoid undefined debug macro
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.41  2004/12/15 14:59:07  brian
+- Update RPM build to build multiple distribution binary RPMs from a single SRPM.
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.40  2004/12/15 14:35:51  brian
+- Update RPM build to build multiple distribution binary RPMs from single SRPM.
 
 * Mon Dec 13 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.39  2004/12/13 10:52:09  brian

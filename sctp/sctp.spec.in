@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/30 21:22:21 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/10 18:59:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 21:22:21 $ by $Author: brian $
+# Last Modified $Date: 2005/01/10 18:59:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -603,7 +603,7 @@ installation and operation of the %{name} package.
 %files test
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_libexecdir}/test*
+%{_libexecdir}/*test*
 %endif
 
 # ===========================================================================
@@ -641,43 +641,59 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.11  2004/12/30 21:22:21  brian
-# - Mandrake compresses info files with bzip2.
+# Revision 0.9.2.12  2005/01/10 18:59:16  brian
+# - mandrake places libexec files in /usr/lib, correct globbing
+# - updated change logs
 #
-# Revision 1.11  2004/12/30 21:22:21  brian
-# - Mandrake compresses info files with bzip2.
+# Revision 1.12  2005/01/10 18:59:16  brian
+# - mandrake places libexec files in /usr/lib, correct globbing
+# - updated change logs
 #
-# Revision 1.10  2004/12/30 08:05:37  brian
-# - Fix globbing on source package.
-#
-# Revision 1.9  2004/12/30 07:42:05  brian
-# - Find the right kernel version for requires.
-# - Take care to handle compressed kernel modules if present.
-#
-# Revision 1.8  2004/12/29 21:32:03  brian
-# - Straighten out cache and site files.
-#
-# Revision 1.7  2004/12/24 18:30:12  brian
-# - Updated descriptions.
-#
-# Revision 1.6  2004/12/24 12:56:24  brian
-# - Get a few things in the right places.
-#
-# Revision 1.5  2004/12/24 12:17:30  brian
-# - Path error.
-#
-# Revision 1.4  2004/12/24 07:58:00  brian
-# - Added test package.
-#
-# Revision 1.3  2004/12/23 12:49:15  brian
-# - Corrections for first rpm build.
-#
-# Revision 1.2  2004/12/21 12:23:52  brian
-# - Proper install scriplets for SCTP package.
-#
-# Revision 1.1  2004/12/20 10:18:07  brian
-# - Big start on autoconf release of Linux Native SCTP.
-#
+
+* Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.11  2004/12/30 21:22:21  brian
+- Mandrake compresses info files with bzip2.
+
+* Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.10  2004/12/30 08:05:37  brian
+- Fix globbing on source package.
+
+* Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.9  2004/12/30 07:42:05  brian
+- Find the right kernel version for requires.
+- Take care to handle compressed kernel modules if present.
+
+* Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.8  2004/12/29 21:32:03  brian
+- Straighten out cache and site files.
+
+* Fri Dec 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.7  2004/12/24 18:30:12  brian
+- Updated descriptions.
+
+* Fri Dec 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.6  2004/12/24 12:56:24  brian
+- Get a few things in the right places.
+
+* Fri Dec 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.5  2004/12/24 12:17:30  brian
+- Path error.
+
+* Fri Dec 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.4  2004/12/24 07:58:00  brian
+- Added test package.
+
+* Thu Dec 23 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.3  2004/12/23 12:49:15  brian
+- Corrections for first rpm build.
+
+* Tue Dec 21 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.2  2004/12/21 12:23:52  brian
+- Proper install scriplets for SCTP package.
+
+* Mon Dec 20 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1  2004/12/20 10:18:07  brian
+- Big start on autoconf release of Linux Native SCTP.
 
 * Mon Dec 20 2004 Brian Bidulock <bidulock@openss7.org>
 - Begain this RPM build for Linux Native SCTP.
