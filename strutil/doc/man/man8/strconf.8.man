@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strconf.8.man,v 0.9.2.7 2005/01/17 05:33:19 brian Exp $
+.\" @(#) $Id: strconf.8.man,v 0.9.2.8 2005/01/19 07:35:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/17 05:33:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/19 07:35:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCONF 8 "$Date: 2005/01/17 05:33:19 $" "$Name:  $" "Linux STREAMS"
+.TH STRCONF 8 "$Date: 2005/01/19 07:35:21 $" "$Name:  $" "Linux STREAMS"
 .\"
 .\"
 .SH NAME
@@ -129,8 +129,37 @@ for major device numbers.
 .BI "-r " name
 .\"
 .\"
+.SH DIAGNOSTICS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strconf
+contains the
+.B strconf
+command.
+.\"
+.\"
 .SH "SEE ALSO"
 .BR strconf (5).
+.\"
+.\"
+.SH BUGS
+.PP
 .\"
 .\"
 .SH CAVEATS
@@ -141,7 +170,7 @@ This man page was shamelessly stolen directly from the
 .\"
 .SH COMPATIBILITY
 .PP
-.B strclean
+.B strconf
 is compatible with
 .B LiS
 .[
@@ -154,3 +183,17 @@ Options
 are provided for compatibility with GNU coding standards;
 .BR --copying ,
 OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/17 12:38:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/19 07:35:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/17 12:38:05 $ by $Author: brian $
+# Last Modified $Date: 2005/01/19 07:35:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,7 +99,6 @@ man_MANS = \
 	man8/fattach.8 \
 	man8/fdetach.8 \
 	man8/insf.8 \
-	man8/lisbcm.8 \
 	man8/scls.8 \
 	man8/soon.8 \
 	man8/strace.8 \
@@ -856,7 +855,6 @@ dist_noinst_MANS = \
 	man8/fattach.8.man \
 	man8/fdetach.8.man \
 	man8/insf.8.man \
-	man8/lisbcm.8.man \
 	man8/scls.8.man \
 	man8/soon.8.man \
 	man8/strace.8.man \

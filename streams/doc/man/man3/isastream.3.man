@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: isastream.3.man,v 0.9.2.5 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: isastream.3.man,v 0.9.2.6 2005/01/19 07:35:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/19 07:35:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,15 +89,28 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ISASTREAM 3 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH ISASTREAM 3 "$Date: 2005/01/19 07:35:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.\"
+.\"
 .SH NAME
 .B isastream
 \- determine whether an open file is \fISTREAMS\fR
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B "#include <stropts.h> "
 .HP
 .BI "int isastream( int " filedes " ); "
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I filedes
+File descriptor to test for candicacy as a STREAMS special file.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR isastream "() "
@@ -105,6 +118,8 @@ may be used to test whether or not an open file descriptor is for a
 .I STREAMS
 file (see
 .IR STREAMS "(4)).  "
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon successful completion,
@@ -112,6 +127,10 @@ Upon successful completion,
 returns 1 if the indicated file is a
 .IR STREAM ,
 and 0 if it is not.
+.\"
+.\"
+.SH ERRORS
+.PP
 If
 .I filedes
 does not identify a valid open file,
@@ -120,6 +139,8 @@ should return -1 with
 .I errno
 set to
 .BR EBADF .
+.\"
+.\"
 .SH "APPLICATION USAGE"
 .PP
 .BR isastream "() " 
@@ -161,12 +182,8 @@ library which provides it.  The Linux/GNU C library otherwise provides a stub
 supporting calls to
 .BR isastream "() "
 which only generates an error indicating that it is not implemented.
-.SH "CONFORMING TO"
-.PP
-UNIX\(rg\ System V Release 4 (SVR4)
-.[
-svr4
-.]
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR pipe "(2), "
@@ -176,6 +193,24 @@ svr4
 .BR fdetach "(8), "
 .BR fifo "(4), "
 .BR STREAMS "(4) "
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+UNIX\(rg\ System V Release 4 (SVR4)
+.[
+svr4
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
 .SH AUTHOR
 .PP
 John Boyd, protologos LLC.

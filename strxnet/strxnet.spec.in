@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/01/18 20:23:47 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/01/19 07:38:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 20:23:47 $ by $Author: brian $
+# Last Modified $Date: 2005/01/19 07:38:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -316,6 +316,10 @@ cd %{mybuilddir}
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
     --with-base-major=%{majbase} \
+    %{?_with_checks:             %enable %_with_checks} \
+    %{?_without_checks:          %disable %_without_checks} \
+    %{?_with_autotest:           %enable %_with_autotest} \
+    %{?_without_autotest:        %disable %_without_autotest} \
     %{?_with_k_optimize:         %_with_k_optimize} \
     %{?_with_cooked_manpages:    %_with_cooked_manpages} \
     %{?_without_cooked_manpages: %_without_cooked_manpages} \
@@ -926,6 +930,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
+# Revision 0.9.2.52  2005/01/19 07:38:47  brian
+# - Added checks and autotest options to configure.
+#
 # Revision 0.9.2.51  2005/01/18 20:23:47  brian
 # - Also reference makedev file one down.
 #

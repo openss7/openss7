@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipe.3.man,v 0.9.2.6 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: pipe.3.man,v 0.9.2.7 2005/01/19 07:35:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/19 07:35:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,15 +89,29 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PIPE 2 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH PIPE 2 "$Date: 2005/01/19 07:35:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.\"
+.\"
 .SH NAME
 .B pipe
 \- create a \fISTREAMS\fR \fIpipe\fR
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B "#include <unistd.h> "
 .HP
 .BI "int pipe( int " filedes "[2] ); "
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I filedes
+An pointer to two integer file descriptors into which to return the file
+descriptor for each end of the pipe.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR pipe "() "
@@ -139,7 +153,7 @@ Generally otherwise, a
 behaves as a pair of
 .I STREAMS
 files; e.g.,
-.ISTREAMS
+.I STREAMS
 .I modules
 may be pushed onto either end, etc..
 .sp
@@ -157,16 +171,24 @@ on one end of a pipe via
 .B I_SENDFD
 to the other end, where it may be received via
 .BR I_RECVFD .
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 Upon successful completion,
 .BR pipe "() "
 returns 0.
+.\"
+.\"
+.SH ERRORS
+.PP
 Upon failure,
 .BR pipe "() "
 returns -1, and
 .BR errno "(3) "
 is set to indicate the error causing the failure.
+.\"
+.\"
 .SH "APPLICATION USAGE"
 .PP
 The Linux kernel provides an independent implementation of
@@ -213,6 +235,8 @@ LiS
 .]
 library which provides it; otherwise,
 the Linux kernel version will be used via the Linux/GNU C library.
+.\"
+.\"
 .SH "FUTURE DIRECTIONS"
 .PP
 Under Linux,
@@ -236,12 +260,8 @@ of atomic reads and writes in
 pipes and fifos, common to most
 implementations of these mechanisms.  This issue will be addressed
 hopefully in the near future.
-.SH HISTORY
-.PP
-UNIX\(rg\ System V Release 4 (SVR4)
-.[
-svr4
-.]
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR pipemod "(4), "
@@ -249,6 +269,24 @@ svr4
 .BR errno "(3), "
 .BR fifo "(4), "
 .BR STREAMS "(4) "
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+UNIX\(rg\ System V Release 4 (SVR4)
+.[
+svr4
+.]
+.\"
+.\"
 .SH AUTHOR
 .PP
 John Boyd, protologos LLC.

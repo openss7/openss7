@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2005/01/18 13:31:07 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2005/01/19 07:38:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 13:31:07 $ by $Author: brian $
+# Last Modified $Date: 2005/01/19 07:38:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -234,6 +234,10 @@ cd %{mybuilddir}
     --with-gnu-ld \
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
+    %{?_with_checks:             %enable %_with_checks} \
+    %{?_without_checks:          %disable %_without_checks} \
+    %{?_with_autotest:           %enable %_with_autotest} \
+    %{?_without_autotest:        %disable %_without_autotest} \
     %{?_with_cooked_manpages:    %_with_cooked_manpages} \
     %{?_without_cooked_manpages: %_without_cooked_manpages} \
     %{?_with_public:             %enable %_with_public} \
@@ -288,6 +292,9 @@ cd %{_builddir}/%{name}-%{version}-%{fullrelease}
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.9  2005/01/19 07:38:17  brian
+# - Added checks and autotest options to configure.
+#
 # Revision 1.1.2.8  2005/01/18 13:31:07  brian
 # - Support multiple builds on same NFS mount.
 #

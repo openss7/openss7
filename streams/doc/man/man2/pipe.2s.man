@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipe.2s.man,v 0.9.2.6 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: pipe.2s.man,v 0.9.2.7 2005/01/19 07:35:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/19 07:35:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PIPE 2 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PIPE 2 "$Date: 2005/01/19 07:35:13 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -102,6 +102,14 @@ sort-adjacent-labels
 .B "#include <unistd.h> "
 .HP
 .BI "int pipe( int " filedes "[2] ); "
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I filedes
+A pointer to an array of two file descriptors into which to return the file
+descriptor for each end of the pipe.
 .\"
 .\"
 .SH DESCRIPTION
@@ -170,6 +178,10 @@ to the other end, where it may be received via
 Upon successful completion,
 .BR pipe ()
 returns 0.
+.\"
+.\"
+.SH ERRORS
+.PP
 Upon failure,
 .BR pipe ()
 returns -1, and
@@ -250,14 +262,6 @@ implementations of these mechanisms.  This issue will be addressed
 hopefully in the near future.
 .\"
 .\"
-.SH HISTORY
-.PP
-UNIX\(rg\ System V Release 4 (SVR4)
-.[
-svr4
-.]
-.\"
-.\"
 .SH "SEE ALSO"
 .PP
 .BR pipemod "(4), "
@@ -265,6 +269,22 @@ svr4
 .BR errno "(3), "
 .BR fifo "(4), "
 .BR STREAMS "(4) "
+.\"
+.\"
+.SH COMPATAIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+UNIX\(rg\ System V Release 4 (SVR4)
+.[
+svr4
+.]
 .\"
 .\"
 .SH AUTHOR
