@@ -32,7 +32,7 @@
  *    nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS mod.c 2.21 10/23/03 21:24:31 "
+#ident "@(#) LiS mod.c 2.22 11/22/03 23:01:43 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -764,12 +764,31 @@ lis_unregister_strmod(struct streamtab *strtab)
 } /* lis_unregister_strmod */
 
 /*  -------------------------------------------------------------------  */
-/* Find module name in lis_fmod_sw[] 
+/* Find module by name in lis_fmod_sw[] 
  */
 modID_t
 lis_findmod(const char *name)
 {
-	int i;
+    int id;
+    
+    if (!name || !*name)
+	return(LIS_NULL_MID) ;
+    
+    /* Look for the module */
+    for (id = lis_fmodcnt; id > 0; id--)
+	if (!strcmp(lis_fmod_sw[id].f_name, name))
+	    break ;
+
+    return (id > 0 ? id : LIS_NULL_MID);
+} /* lis_findmod */
+
+/*  -------------------------------------------------------------------  */
+/* Load module by name into lis_fmod_sw[]
+ */
+modID_t
+lis_loadmod(const char *name)
+{
+	int id = lis_findmod(name);
 	int err;
 	int configured;
 	const char *objname;
@@ -777,42 +796,34 @@ lis_findmod(const char *name)
 	char req[LIS_NAMESZ + 10];
 #endif
 
-	if (name == NULL || name[0] == 0)
-	    return(LIS_NULL_MID) ;
-
-	/* Look for the module */
-	for (i = lis_fmodcnt; i > 0; i--)
-		if (!strcmp(lis_fmod_sw[i].f_name, name))
-			break ;
-
-	if (i == 0)
+	if (id == LIS_NULL_MID)
 	    return LIS_NULL_MID;
 
 	/* Find object name of this module */
 	objname = name; /* default objname */
 	configured = 0;
-	if (lis_fmod_sw[i].f_objname[0])
+	if (lis_fmod_sw[id].f_objname[0])
 	{
-	    objname = lis_fmod_sw[i].f_objname ;
+	    objname = lis_fmod_sw[id].f_objname ;
 	    configured = 1;
 	}
 
-	if ((err = lis_down(&lis_fmod_sw[i].f_sem)) < 0)
+	if ((err = lis_down(&lis_fmod_sw[id].f_sem)) < 0)
 	   return(LIS_NULL_MID);
 
-	switch (lis_fmod_sw[i].f_state & LIS_MODSTATE_MASK)
+	switch (lis_fmod_sw[id].f_state & LIS_MODSTATE_MASK)
 	{
 	case LIS_MODSTATE_LINKED:
 	case LIS_MODSTATE_LOADED:
-	    lis_up(&lis_fmod_sw[i].f_sem) ;
-	    return i ;				/* found and loaded */
+	    lis_up(&lis_fmod_sw[id].f_sem) ;
+	    return id ;				/* found and loaded */
 
 	case LIS_MODSTATE_UNLOADED:		/* needs loading */
 	    break ;
 
 	case LIS_MODSTATE_LOADING:
 	    printk("Bad module state for %s (LOADING)\n", name) ;
-	    lis_up(&lis_fmod_sw[i].f_sem) ;
+	    lis_up(&lis_fmod_sw[id].f_sem) ;
 	    return(LIS_NULL_MID);
 	}
 
@@ -824,9 +835,9 @@ lis_findmod(const char *name)
 	 * be found the load succeeded, otherwise not.
 	 */
 	sprintf(req, "streams-%s", objname);
-	lis_fmod_sw[i].f_state &= ~LIS_MODSTATE_MASK ;
-	lis_fmod_sw[i].f_state |= LIS_MODSTATE_LOADING ;
-	if (request_module(req) < 0 || lis_fmod_sw[i].f_str == NULL)
+	lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
+	lis_fmod_sw[id].f_state |= LIS_MODSTATE_LOADING ;
+	if (request_module(req) < 0 || lis_fmod_sw[id].f_str == NULL)
 	{
 	    if (configured)
 		printk("Unable to demand load LiS objname %s, "
@@ -836,21 +847,22 @@ lis_findmod(const char *name)
 		printk("Unable to demand load STREAMS module %s\n",
 					       (name) ? name : "(null)");
 
-	    lis_fmod_sw[i].f_state &= ~LIS_MODSTATE_MASK ;
-	    lis_fmod_sw[i].f_state |= LIS_MODSTATE_UNLOADED ;
-	    lis_up(&lis_fmod_sw[i].f_sem) ;
+	    lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
+	    lis_fmod_sw[id].f_state |= LIS_MODSTATE_UNLOADED ;
+	    lis_up(&lis_fmod_sw[id].f_sem) ;
 	    return LIS_NULL_MID;
 	}
 
-	lis_fmod_sw[i].f_state &= ~LIS_MODSTATE_MASK ;
-	lis_fmod_sw[i].f_state |= LIS_MODSTATE_LOADED ;
+	lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
+	lis_fmod_sw[id].f_state |= LIS_MODSTATE_LOADED ;
 #else
 	printk("Cannot load %s, LIS_LOADABLE_SUPPORT not set\n", name) ;
+	id = LIS_NULL_MID;
 #endif
 
-	lis_up(&lis_fmod_sw[i].f_sem) ;
-	return LIS_NULL_MID;
-} /* lis_findmod */
+	lis_up(&lis_fmod_sw[id].f_sem) ;
+	return id;
+} /* lis_loadmod */
 
 /*  -------------------------------------------------------------------  */
 void
@@ -1149,7 +1161,7 @@ int lis_apush_set(struct strapush *ap)
 	 * only way to obtain their module id.
 	 */
 	for (i = 0; i < ap->sap_npush; ++i) {
-		j = lis_findmod(ap->sap_list[i]) ;
+		j = lis_loadmod(ap->sap_list[i]) ;
 		if (j <= 0) {
 			/* Unknown module */
 			FREE(a);

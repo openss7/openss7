@@ -34,7 +34,7 @@
 #ifndef _MOD_H
 #define _MOD_H 1
 
-#ident "@(#) LiS mod.h 2.5 10/23/03 21:24:57 "
+#ident "@(#) LiS mod.h 2.6 11/22/03 23:02:25 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -202,8 +202,9 @@ extern int lis_unregister_strdev(major_t major);
 /* Find streamtab of a device */
 extern streamtab_t *lis_find_strdev(major_t major);
 
-/* Find a module id by name */
+/* Find/load a module id by name */
 extern modID_t lis_findmod(const char *name);
+extern modID_t lis_loadmod(const char *name);
 
 /* Autopush */
 extern int lis_apushm(dev_t dev, const char *mods[]);
