@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/28 13:48:08 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/28 22:33:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/28 13:48:08 $ by $Author: brian $
+# Last Modified $Date: 2005/03/28 22:33:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,7 +150,7 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 }
 dist_get_release() {
 dnl AC_MSG_WARN([checking for release in $[1]])
-    echo "$[1]" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'
+    echo "$[1]" | head -1 | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'
 }
 dist_get_distrib() {
 dnl AC_MSG_WARN([checking for distrib in $[1]])
@@ -167,11 +167,11 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 }
 dist_get_codename() {
 dnl AC_MSG_WARN([checking for codename in $[1]])
-    echo "$[1]" | sed -e 's|^.*(|(|;s|).*|)|;s|^[[^(]]*||;s|[[^)]]*[$]||;s|^(||;s|)[$]||'
+    echo "$[1]" | head -1 | sed -e 's|^.*(|(|;s|).*|)|;s|^[[^(]]*||;s|[[^)]]*[$]||;s|^(||;s|)[$]||'
 }
 dist_get_cpu() {
 dnl AC_MSG_WARN([checking for cpu in $[1]])
-    echo "$[1]" | grep '\<for\>' | sed -e 's|^.*\<for\>[[[:space:]]]*||;s|[[[:space:]]].*[$]||'
+    echo "$[1]" | grep '\<for\>' | head -1 | sed -e 's|^.*\<for\>[[[:space:]]]*||;s|[[[:space:]]].*[$]||'
 }
 ])# _DISTRO_FUNCTIONS
 # =============================================================================
