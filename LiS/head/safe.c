@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS safe.c 2.8 5/30/03 21:40:39 "
+#ident "@(#) LiS safe.c 2.9 9/30/03 20:39:19 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -62,8 +62,7 @@ void lis_safe_noenable(queue_t *q, char *f, int l)
     lis_flags_t     psw;
     if (!lis_check_q_magic(q,f,l)) return ;
     LIS_QISRLOCK(q, &psw) ;
-    if (q == NULL) LOG(f, l, "NULL q in noenable");
-    else q->q_flag |= QNOENB;
+    q->q_flag |= QNOENB;
     LIS_QISRUNLOCK(q, &psw) ;
 }
 
@@ -72,15 +71,12 @@ void lis_safe_enableok(queue_t *q, char *f, int l)
     lis_flags_t     psw;
     if (!lis_check_q_magic(q,f,l)) return ;
     LIS_QISRLOCK(q, &psw) ;
-    if (q == NULL) LOG(f, l, "NULL q in enableok");
-    else q->q_flag &= ~QNOENB;
+    q->q_flag &= ~QNOENB;
     LIS_QISRUNLOCK(q, &psw) ;
 }
 
 int lis_safe_canenable(queue_t *q, char *f, int l)
 {
-    if (q == NULL) LOG(f, l, "NULL q in canenable");
-    else
     if (lis_check_q_magic(q,f,l))
 	return !(q->q_flag & QNOENB);
 
@@ -91,12 +87,12 @@ queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
-    if (q == NULL) LOG(f, l, "NULL q in OTHERQ");
-    else if (!lis_check_q_magic(q,f,l)) LOG(f, l, "bad magic in OTHERQ");
-    else
+    if (lis_check_q_magic(q,f,l))
+    {
 	oq = q->q_other;
-    if (oq != NULL && lis_check_q_magic(oq,f,l))
-	return (oq) ;
+	if (lis_check_q_magic(oq,f,l))
+	    return (oq) ;
+    }
 
     return NULL;
 }
@@ -105,15 +101,17 @@ queue_t *lis_safe_RD(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
-    if (q == NULL) LOG(f, l, "NULL q in RD");
-    else if (!lis_check_q_magic(q,f,l)) LOG(f, l, "bad magic in RD");
-    else if ((q->q_flag&QREADR))
-	oq = q ;
-    else
-	oq = q->q_other;
-    if (oq != NULL && lis_check_q_magic(oq,f,l))
-	return (oq) ;
+    if (lis_check_q_magic(q,f,l))
+    {
+	if ((q->q_flag&QREADR))
+	    oq = q ;
+	else
+	    oq = q->q_other;
 
+	if (lis_check_q_magic(oq,f,l))
+	    return (oq) ;
+
+    }
     return NULL;
 }
 
@@ -121,22 +119,22 @@ queue_t *lis_safe_WR(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
-    if (q == NULL) LOG(f, l, "NULL q in WR");
-    else if (!lis_check_q_magic(q,f,l)) LOG(f, l, "bad magic in WR");
-    else if ((q->q_flag&QREADR))
-	oq = q->q_other;
-    else
-	oq = q ;
-    if (oq != NULL && lis_check_q_magic(oq,f,l))
-	return (oq) ;
+    if (lis_check_q_magic(q,f,l))
+    {
+	if ((q->q_flag&QREADR))
+	    oq = q->q_other;
+	else
+	    oq = q ;
+
+	if (lis_check_q_magic(oq,f,l))
+	    return (oq) ;
+    }
 
     return NULL;
 }
 
 int lis_safe_SAMESTR(queue_t *q, char *f, int l)
 {
-    if (q == NULL) LOG(f, l, "NULL q in SAMESTR");
-    else
     if (   lis_check_q_magic(q,f,l)
 	&& q->q_next != NULL
 	&& lis_check_q_magic(q->q_next,f,l)
@@ -149,8 +147,7 @@ int lis_safe_SAMESTR(queue_t *q, char *f, int l)
 void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
 {
     if (   mp == NULL
-	|| q == NULL
-	|| (LIS_DEBUG_SAFE && !lis_check_q_magic(q,f,l))
+	|| !lis_check_q_magic(q,f,l)
 	|| q->q_qinfo == NULL
 	|| q->q_qinfo->qi_putp == NULL
        )
@@ -179,9 +176,8 @@ void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
     queue_t    *qnxt = NULL ;
 
     if (   mp == NULL
-	|| q == NULL
-	|| (LIS_DEBUG_SAFE && !lis_check_q_magic(q,f,l))
-	|| (qnxt = q->q_next) == NULL
+	|| !lis_check_q_magic(q,f,l)
+	|| !lis_check_q_magic(qnxt = q->q_next,f,l)
        )
     {
 	LOG(f, l, "NULL q, mp or q_next in putnext");
@@ -213,13 +209,6 @@ void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
     if (mp == NULL)
     {
 	LOG(f, l, "NULL msg in qreply");
-	return ;
-    }
-
-    if (q == NULL)
-    {
-	LOG(f, l, "NULL q in qreply");
-	freemsg(mp) ;
 	return ;
     }
 

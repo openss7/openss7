@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.109 7/15/03 19:58:21 "
+#ident "@(#) LiS linux-mdep.c 2.113 9/30/03 20:38:58 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -77,6 +77,9 @@
 #include <linux/pipe_fs_i.h>
 #ifdef KERNEL_2_3
 #include <linux/mount.h>
+#if defined(FATTACH_VIA_MOUNT)
+#include <linux/capability.h>
+#endif
 #endif
 #include <linux/time.h>
 
@@ -155,7 +158,11 @@ static int	lis_errnos[LIS_NR_CPUS] ;
 #define __NR_syscall_mknod	__NR_mknod
 #define __NR_syscall_unlink	__NR_unlink
 #define __NR_syscall_mount	__NR_mount
+#if defined(_ASM_IA64_UNISTD_H)
+#define __NR_syscall_umount2	__NR_umount
+#else
 #define __NR_syscall_umount2	__NR_umount2
+#endif
 
 static inline _syscall3(long,syscall_mknod,const char *,file,int,mode,int,dev)
 static inline _syscall1(long,syscall_unlink,const char *,file)
@@ -931,8 +938,8 @@ void lis_show_inode_aliases( struct inode *i )
     for (ent = i->i_dentry.prev;  ent != &(i->i_dentry);  ent = ent->prev) {
 	struct dentry *d = list_entry( ent, struct dentry, d_alias );
 
-	printk("    <= d@0x%p/%d%s \"%s\"\n",
-	       (int)d, D_COUNT(d),
+	printk("    <= d@%p/%d%s \"%s\"\n",
+	       d, D_COUNT(d),
 	       (D_IS_LIS(d)?" <LiS>":""),
 	       d->d_name.name );
     }
@@ -2971,7 +2978,7 @@ lis_ioc_fdetach( char *path )
     char *tmp = getname(path);
     int error = PTR_ERR(tmp);
 
-    if (!IS_ERR(tmp)) {
+    if (tmp && !IS_ERR(tmp)) {
 	if (strcmp( tmp, "*" ) == 0)
 	    lis_fdetach_all();
 	else
@@ -2992,11 +2999,43 @@ static lis_fattach_t *lis_fattach_new(struct file *f, const char *path)
 {
     lis_fattach_t *data = (lis_fattach_t *) ZALLOC(sizeof(lis_fattach_t));
     char *tmp = (data ? getname(path) : NULL);
+    struct nameidata nd;
+    int error = 0;
 
-    if (data && tmp) {
+    if (data && tmp && !IS_ERR(tmp)) {
 	data->file = f;
 	data->head = FILE_STR(f);
-	data->path = tmp;    /* keep a copy of path */
+
+	/*
+	 *  path may be relative (to current pwd) -
+	 *  convert it to absolute before saving it, since fdetach may
+	 *  happen from a different process and thus different pwd
+	 *
+	 *  Note that the path likely lengthens in this process.
+	 *  d_path return -ENAMETOOLONG in that case, but it's unlikely
+	 *  to happen if PATH_MAX is long, so the handling here (though
+	 *  not efficient) is for sake of completeness.  Note we're also
+	 *  assuming that PATH_MAX is the size of the buffer getname()
+	 *  allocates.
+	 */
+	error = user_path_walk(path, &nd);
+	if (!error) {
+	    data->path = d_path(nd.dentry, nd.mnt, tmp, PATH_MAX);
+	
+	    path_release(&nd);
+
+	    if (IS_ERR(data->path)) {
+		/*
+		 *  too long? do the getname again, since failing d_path
+		 *  will likely have clobbered it.  A relative path is
+		 *  better than no path at all.
+		 */
+		putname(tmp);
+		data->path = tmp = getname(path);
+	    }
+	} else
+	    data->path = tmp;  /* better than nothing */
+
 	lis_atomic_inc(&num_fattaches_allocd);
     }
     else if (data) {
@@ -3679,10 +3718,12 @@ void cleanup_module( void )
     lis_kill_qsched() ;			/* drivers/str/runq.c */
     lis_terminate_head();
 
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
     {
         extern void	lis_pci_cleanup(void) ;
         lis_pci_cleanup() ;
     } 
+#endif          /* S390 or S390X */
 
     unregister_chrdev(lis_major,"streams");
 #if defined(KERNEL_2_3)			/* 2.4 */
@@ -3944,7 +3985,7 @@ lis_thread_stop(pid_t pid)
  */
 int	lis_thread_runqueues(void *p)
 {
-    int			 cpu_id = (int) p ;
+    intptr_t		 cpu_id = (intptr_t) p ;
     int			 sig_cnt  = 0 ;
     unsigned long	 seconds = 0 ;
     lis_semaphore_t	*semp = &lis_runq_sems[cpu_id] ;
@@ -4431,6 +4472,59 @@ int	lis_unlink(char *name)
     return(ret < 0 ? -errno : ret) ;
 }
 
+
+#if defined(FATTACH_VIA_MOUNT)
+/*
+ *  The following is an adaptation of 'permission(inode, mask)'; we
+ *  need it because our argument is a path, not an inode.  Additionally,
+ *  however, we want to check ownership for non-superuser processes.
+ *
+ *  The semantics here are patterned after what Solaris does for fattach,
+ *  i.e., (root || (owner && write permission)).  It applies to both
+ *  fattach & fdetach (i.e., mount/umount).  We expect EPERM if not non-root
+ *  owner, otherwise EACCES if not write permission.
+ *                                                     - JB 9/26/03
+ */
+int mount_permission(char * path)
+{
+    int mask = MAY_WRITE;	/* read/exec access not needed */
+    int error = 0;
+    struct nameidata nd;
+    
+    /*
+     *  Always grant permission to superuser; no need for further checks
+     */
+    if (suser())  return 0;
+    
+    /*
+     *  Otherwise, we need to check the owner, and permissions, at the
+     *  path's inode.  The owner check we do is process effective user
+     *  (FIXME if this isn't appropriate).
+     */
+    error = user_path_walk(path, &nd);
+    if (!error) {
+	struct dentry *dentry = nd.dentry;
+	struct inode *inode   = (dentry ? dentry->d_inode : NULL);
+
+	/* 2.4.x kernels do something like the following... */
+	if (inode && inode->i_op && inode->i_op->revalidate)
+	    error = inode->i_op->revalidate(dentry);
+	
+	/* check process euid == inode uid */
+	if (!error && (current->euid != inode->i_uid))
+	    error = -EPERM;  /* Solaris uses this for 'Not owner' */
+	
+	/* check permission(s) */
+	if (!error)
+	    error = permission(inode, mask);
+	
+	path_release(&nd);
+    }
+
+    return error;
+}
+#endif
+
 /************************************************************************
 *                             lis_mount                                 *
 *************************************************************************
@@ -4446,15 +4540,30 @@ int	lis_mount(char *dev_name,
 {
     mm_segment_t	old_fs;
     int			ret;
+#if defined(FATTACH_VIA_MOUNT)
+    kernel_cap_t        cap = current->cap_effective;
+#endif
 
     old_fs = get_fs();
     set_fs(KERNEL_DS);
 
+#if defined(FATTACH_VIA_MOUNT)
+    if (!(ret = mount_permission(dir_name))) {
+
+	if (!cap_raise(current->cap_effective, CAP_SYS_ADMIN))
+	    ret = -EPERM;
+	else
+	    ret = syscall_mount(dev_name, dir_name, fstype, rwflag, data) ;
+
+	current->cap_effective = cap;
+    }
+#else
     ret = syscall_mount(dev_name, dir_name, fstype, rwflag, data) ;
+#endif
 
     set_fs(old_fs);
 
-    return(ret < 0 ? -errno : ret) ;
+    return(ret < 0 ? ret : -ret) ;
 }
 
 /************************************************************************
@@ -4471,15 +4580,30 @@ int	lis_umount2(char *path, int flags)
 {
     mm_segment_t	old_fs;
     int			ret;
+#if defined(FATTACH_VIA_MOUNT)
+    kernel_cap_t        cap = current->cap_effective;
+#endif
 
     old_fs = get_fs();
     set_fs(KERNEL_DS);
 
+#if defined(FATTACH_VIA_MOUNT)
+    if (!(ret = mount_permission(path))) {
+
+	if (!cap_raise(current->cap_effective, CAP_SYS_ADMIN))
+	    ret = -EPERM;
+	else
+	    ret = syscall_umount2(path, flags) ;
+
+	current->cap_effective = cap;
+    }
+#else
     ret = syscall_umount2(path, flags) ;
+#endif
 
     set_fs(old_fs);
 
-    return(ret < 0 ? -errno : ret) ;
+    return(ret < 0 ? ret : -ret) ;
 }
 
 /************************************************************************

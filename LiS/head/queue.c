@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS queue.c 2.31 5/30/03 21:40:39 "
+#ident "@(#) LiS queue.c 2.32 9/30/03 20:39:53 "
 
 
 
@@ -476,6 +476,12 @@ rmv_msg(queue_t *q, mblk_t *mp)
  */
 int	lis_check_q_magic(queue_t *q, char *file, int line)
 {
+    if (q == NULL)
+    {
+	printk("%s #%u: Queue pointer is NULL\n", file, line) ;
+	return(0) ;
+    }
+
     if (q->q_magic != Q_MAGIC)
     {
 	printk("%s #%u: Queue magic number is 0x%lx, should be 0x%lx\n",
@@ -499,8 +505,7 @@ lis_backq_fcn(queue_t *q, char *f, int l)
     queue_t	*oq ;
     queue_t	*nq ;
 
-    if (   !q
-	|| !lis_check_q_magic(q,f,l)
+    if (   !lis_check_q_magic(q,f,l)
 	|| !(oq = OTHER(q))
 	|| !(nq = oq->q_next)
        )
