@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/02/11 04:32:47 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/02/13 12:16:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/11 04:32:47 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 12:16:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -879,6 +879,7 @@ Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
+Prefix:         %{_sysconfdir}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Conflicts:      %{_conflict}-util
 Obsoletes:      %{name}-utils
@@ -895,6 +896,7 @@ Release:        %{fullrelease}
 %description util
 The %{name}-util package provides adminstrative and configuration test
 utilities and commands associated with the %{title} package.
+It also includes necessary init scripts and configuration files.
 
 %pre util
 # ---------------------------------------------------------------------------
@@ -930,6 +932,28 @@ else
 #   upgrade, let rpm do its job
 fi
 
+%post util
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then
+#   this is the end of a fresh install, add init scripts if we have chkconfig
+    if which chkconfig >/dev/null 2>&1 ; then
+        list='%{initfiles}' ; for i in $list ; do
+            chkconfig -add $i || :
+        done
+    fi
+fi
+
+%preun util
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ] ; then
+#   uninstalling for good, remove init scripts if we have chkconfig
+    if which chkconfig >/dev/null 2>&1 ; then
+        list='%{initfiles}' ; for i in $list ; do
+            chkconfig -del $i || :
+        done
+    fi
+fi
+
 %if %{BUILD_tools}
 %files util
 # ---------------------------------------------------------------------------
@@ -937,14 +961,18 @@ fi
 %{_bindir}/*
 %{_sbindir}/*
 %{_libexecdir}/*test*
+%{_sysconfdir}/*
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.70  2005/02/11 04:32:47  brian
-# - Added boot directory and module preloads.
+# Revision 0.9.2.71  2005/02/13 12:16:46  brian
+# - Added init scrip initialization and teardown.
+#
+# Revision 0.9.2.39  2005/02/13 12:16:46  brian
+# - Added init scrip initialization and teardown.
 #
 # Revision 0.9.2.38  2005/02/11 04:32:47  brian
 # - Added boot directory and module preloads.

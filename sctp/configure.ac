@@ -1,73 +1,76 @@
-dnl =========================================================================
+dnl =============================================================================
+dnl 
+dnl @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/13 12:14:11 $
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.9 2005/02/11 09:30:05 brian Exp $
+dnl -----------------------------------------------------------------------------
 dnl
-dnl =========================================================================
-dnl
-dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
-dnl Permission is granted to make and distribute verbatim copies of this
-dnl README file provided the copyright notice and this permission notice are
-dnl preserved on all copies.
-dnl 
-dnl Permission is granted to copy and distribute modified versions of this
-dnl manual under the conditions for verbatim copying, provided that the
-dnl entire resulting derived work is distributed under the terms of a
-dnl permission notice identical to this one
-dnl 
-dnl Since the Linux kernel and libraries are constantly changing, this README
-dnl file may be incorrect or out-of-date.  The author(s) assume no
-dnl responsibility for errors or omissions, or for damages resulting from the
-dnl use of the information contained herein.  The author(s) may not have
-dnl taken the same level of care in the production of this manual, which is
-dnl licensed free of charge, as they might when working professionally.
-dnl 
-dnl Formatted or processed versions of this manual, if unaccompanied by the
-dnl source, must acknowledge the copyright and authors of this work.
-dnl 
-dnl =========================================================================
-dnl 
+dnl This program is free software; you can redistribute it and/or modify it under
+dnl the terms of the GNU General Public License as published by the Free Software
+dnl Foundation; either version 2 of the License, or (at your option) any later
+dnl version.
+dnl
+dnl This program is distributed in the hope that it will be useful, but WITHOUT
+dnl ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+dnl FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+dnl details.
+dnl
+dnl You should have received a copy of the GNU General Public License along with
+dnl this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+dnl Ave, Cambridge, MA 02139, USA.
+dnl
+dnl -----------------------------------------------------------------------------
+dnl
 dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-dnl behalf of the U.S. Government ("Government"), the following provisions
-dnl apply to you.  If the Software is supplied by the Department of Defense
-dnl ("DoD"), it is classified as "Commercial Computer Software" under
-dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
-dnl Regulations ("DFARS") (or any successor regulations) and the Government is
-dnl acquiring only the license rights granted herein (the license rights
-dnl customarily provided to non-Government users).  If the Software is
-dnl supplied to any unit or agency of the Government other than DoD, it is
-dnl classified as "Restricted Computer Software" and the Government's rights
-dnl in the Software are defined in paragraph 52.227-19 of the Federal
-dnl Acquisition Regulations ("FAR") (or any success regulations) or, in the
-dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl behalf of the U.S. Government ("Government"), the following provisions apply
+dnl to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+dnl is classified as "Commercial Computer Software" under paragraph 252.227-7014
+dnl of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+dnl successor regulations) and the Government is acquiring only the license rights
+dnl granted herein (the license rights customarily provided to non-Government
+dnl users).  If the Software is supplied to any unit or agency of the Government
+dnl other than DoD, it is classified as "Restricted Computer Software" and the
+dnl Government's rights in the Software are defined in paragraph 52.227-19 of the
+dnl Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+dnl the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 dnl (or any successor regulations).
-dnl 
-dnl =========================================================================
-dnl 
-dnl Commercial licensing and support of this software is available from
-dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-dnl 
-dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/11 09:30:05 $ by $Author: brian $
-dnl 
-dnl =========================================================================
+dnl -----------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl -----------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2005/02/13 12:14:11 $ by $Author: brian $
+dnl
+dnl =============================================================================
 
-dnl
+dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.9 2005/02/11 09:30:05 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.10 2005/02/13 12:14:11 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([SCTP], [0.2.20], [bugs@openss7.org], [sctp])
 
-# Need to adjust directories if default
+dnl
+dnl Need to adjust directories if default
+dnl
 ac_default_prefix='/usr'
-if test :"$sysconfdir"    = :'${prefix}/etc'  ; then sysconfdir='/etc'              ; fi
-if test :"$localstatedir" = :'${prefix}/var'  ; then localstatedir='/var'           ; fi
-if test :"$infodir"       = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; fi
-if test :"$mandir"        = :'${prefix}/man'  ; then mandir='${prefix}/share/man'   ; fi
+if test :"$sysconfdir"    = :'${prefix}/etc'  ; then   sysconfdir='/etc'                 ; fi
+if test :"$localstatedir" = :'${prefix}/var'  ; then localstatdir='/var'                 ; fi
+if test :"$infodir"       = :'${prefix}/info' ; then      infodir='${prefix}/share/info' ; fi
+if test :"$mandir"        = :'${prefix}/man'  ; then       mandir='${prefix}/share/man'  ; fi
+dnl
+dnl Specify the real root of the install tree
+dnl
+if test :"$prefix" = :NONE ; then rootdir="$ac_default_prefix" ; else rootdir="$prefix" ; fi
+rootdir=`echo $rootdir | sed -e 's|/local$||;s|/usr$||'`
+AC_SUBST([rootdir])
 
 AC_CONFIG_SRCDIR([src/sctp.c])
 AC_CONFIG_HEADER([config.h include/linux/hooks.h])
@@ -90,9 +93,9 @@ fi
 
 AC_GNU_SOURCE
 
-#
-# Checks for programs.
-#
+dnl
+dnl Checks for programs.
+dnl
 AM_PROG_AS
 AC_PROG_AWK
 AC_PROG_CXX
@@ -109,37 +112,37 @@ AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
-#
-# Checks for libraries.
-#
+dnl
+dnl Checks for libraries.
+dnl
 sctp_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
 LIBS="$sctp_save_LIBS"
 
-#
-# Checks for header files.
-#
+dnl
+dnl Checks for header files.
+dnl
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
 
-#
-# Checks for typedefs, structures, and compiler characteristics.
-#
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
 AC_C_CONST
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 
-#
-# Checks for library functions.
-#
+dnl
+dnl Checks for library functions.
+dnl
 AC_FUNC_ERROR_AT_LINE
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
 AC_FUNC_REALLOC
 AC_TYPE_SIGNAL
@@ -158,4 +161,4 @@ AC_CONFIG_FILES([Makefile
 
 AC_OUTPUT
 
-# vim: ft=config sw=4
+dnl vim: ft=config sw=4 et
