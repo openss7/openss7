@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/03/30 05:37:55 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/03/31 02:59:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/30 05:37:55 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 02:59:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -93,9 +93,9 @@ linux_kernel_env_push() {
     linux_flags_push
 dnl We need safe versions of these flags without warnings or strange optimizations
 dnl but with module flags included
-    CPPFLAGS=`echo " $KERNEL_MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
-    CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
-    LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
+    CPPFLAGS=`echo " $KERNEL_MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
+    CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
+    LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS="$CFLAGS -Werror"
 }
 ])# _LINUX_KERNEL_ENV_FUNCTIONS
@@ -442,7 +442,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 	linux_cv_k_boot=no
 	linux_cv_k_base="$kversion"
 	case "$target_vendor" in
-	    (whitebox|redhat)
+	    (centos|whitebox|redhat)
 		case "${kversion}" in
 		    # redhat boot kernels
 		    (*BOOT)	    linux_cv_k_boot=BOOT	;;
@@ -590,7 +590,7 @@ dnl *** ])
 dnl 		fi
 dnl 	    else
 dnl 		case "$target_vendor" in
-dnl 		    (redhat|whitebox)
+dnl 		    (redhat|centos|whitebox)
 dnl dnl
 dnl dnl			Unfortunately the redhat system map files are unreliable
 dnl dnl			because the are not unique for each architecture.
@@ -691,6 +691,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 	    eval "k_build_search_path=\"
 		${kmoduledir:+${DESTDIR}${kmoduledir}/build}
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/build
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}${rootdir}/usr/src/linux-obj
 		${DESTDIR}${rootdir}/usr/src/kernel-headers-${knumber}
@@ -700,6 +701,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}${rootdir}/usr/src/linux
 		${DESTDIR}/lib/modules/${kversion}/build
+		${DESTDIR}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}/usr/src/linux-obj
 		${DESTDIR}/usr/src/kernel-headers-${knumber}
@@ -801,12 +803,16 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}${rootdir}/usr/src/linux
+		${DESTDIR}${rootdir}/lib/modules/${kversion}/source
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/kernel-source-${kversion}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
 		${DESTDIR}/usr/src/linux-${knumber}
 		${DESTDIR}/usr/src/linux-${kmajor}.${kminor}
-		${DESTDIR}/usr/src/linux\""
+		${DESTDIR}/usr/src/linux
+		${DESTDIR}/lib/modules/${kversion}/source
+		${DESTDIR}/usr/src/kernels/${kversion}\""
 	    k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
 	    linux_cv_k_source=
 	    for linux_dir in $k_source_search_path ; do
@@ -889,7 +895,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 			case "$target_vendor" in
 			    (mandrake)
 				;;
-			    (redhat|whitebox|debian|suse|*)
+			    (redhat|centos|whitebox|debian|suse|*)
 				AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -989,7 +995,7 @@ dnl				image name approach with the Redhat kernel version number in the
 dnl				kernel image name approach to yeild reliable system map files.
 dnl
 				;;
-			    (redhat|whitebox|debian|suse|*)
+			    (redhat|centos|whitebox|debian|suse|*)
 dnl
 dnl				Unfortunately the redhat system map files are unreliable because the
 dnl				are not unique for each architecture.  The system map file has to be
@@ -1447,7 +1453,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 		fi
 		linux_cv_k_version="${linux_ver:-unknown}"
 		;;
-	    (mandrake|redhat|whitebox|suse|*)
+	    (mandrake|redhat|centos|whitebox|suse|*)
 		linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_cv_k_sysmap 2>/dev/null`
 		linux_cv_k_version="${linux_ver:-unknown}"
 		;;
@@ -1484,7 +1490,7 @@ dnl
 		    linux_cv_vers="${linux_cv_vers:+$linux_cv_vers }'$linux_ver'"
 		done
 		;;
-	    (redhat|whitebox|suse)
+	    (redhat|centos|whitebox|suse)
 dnl
 dnl		Redhat and variants can have a mismatch in kernel architecture.
 dnl
@@ -1559,7 +1565,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude2 | -I${kbuilddir}/include2 |g"`
 	fi
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9]]* | $linux_cflags |"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9s]]* | $linux_cflags |"`
 dnl
 dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
 dnl	to CFLAGS instead of CPPFLAGS, which is just plain wrong, but that's
