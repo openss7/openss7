@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/02/22 07:27:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/02/22 19:53:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/22 07:27:50 $ by $Author: brian $
+# Last Modified $Date: 2004/02/22 19:53:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1245,6 +1245,9 @@ devices.lst: Config.master $(STRCONF_SCRIPT)
 
 ss7makenodes.c: Config.master $(STRCONF_SCRIPT)
 	$(STRCONF) --makenodes=ss7makenodes.c Config.master
+
+clean-local:
+	rm -f Config.master conf.modules strconf.h devices.lst ss7makenodes.c
 
 $(libSS7mods_a_OBJECTS): strconf.h
 
