@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.11 2004/05/24 12:48:49 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.12 2004/08/17 11:43:58 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,10 +53,11 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/24 12:48:49 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/17 11:43:58 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
+m4_include([m4/openss7.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/genksyms.m4])
@@ -71,6 +72,7 @@ m4_include([m4/strconf.m4])
 # AC_SS7
 # -------------------------------------------------------------------------
 AC_DEFUN([AC_SS7], [dnl
+    _OPENSS7_PACKAGE([SS7], [OpenSS7 SS7 Stack])
     ac_default_prefix='/usr'
     _SS7_OPTIONS
     _MAN_CONVERSION

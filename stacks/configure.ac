@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.9 2004/08/16 11:44:47 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.10 2004/08/17 11:43:58 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/16 11:44:47 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/17 11:43:58 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -160,9 +160,6 @@ AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify bzero getcwd gethostbyname gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo setlocale socket stpcpy strcasecmp strchr strcspn strdup strerror strstr strtol strtoul])
-
-PACKAGE_TITLE='OpenSS7 Stacks'
-AC_SUBST([PACKAGE_TITLE])
 
 AC_SS7
 

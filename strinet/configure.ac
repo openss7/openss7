@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/08/16 11:40:40 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.6 2004/08/17 11:43:52 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/16 11:40:40 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/17 11:43:52 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -158,9 +158,6 @@ AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([bzero gettimeofday memset strerror strtol])
-
-PACKAGE_TITLE='OpenSS7 INET Networking'
-AC_SUBST([PACKAGE_TITLE])
 
 AC_INET
 

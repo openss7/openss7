@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/08/07 11:00:54 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/08/17 11:45:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/07 11:00:54 $ by $Author: brian $
+# Last Modified $Date: 2004/08/17 11:45:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,6 +76,10 @@
 %define majbase @STRCONF_MAJBASE@
 %define makedev @STRCONF_MAKEDEV@
 %define base @PACKAGE_TARNAME@
+%define extrainfo STREAMS SPG porting
+%define title @PACKAGE_TITLE@
+%define stitle @PACKAGE_SHORTTITLE@
+%define libname streams
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -85,13 +89,25 @@
 %{?_with_modules:    %{expand: %%define BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%define BUILD_tools   1}}
 
+%if %{BUILD_tools}
+%define BUILD_libs    1
+%define BUILD_devs    1
+%else
+%define BUILD_libs    0
+%define BUILD_devs    0
+%endif
+
+%define _ksubdir %{base}
+%define _kmodext %{base}
+%define _conflict LiS
+
 # we have some more options that control configure for the build
 
-Summary:        Linux Fast STREAMS (SVR 4.2 MP STREAMS)
+Summary:        %{title} (SVR 4.2 MP STREAMS)
 %if %{?_without_public: 0}%{!?_without_public: 1}
-Name:           @PACKAGE_TARNAME@
+Name:           @PACKAGE_NAME@
 %else
-Name:           @PACKAGE_TARNAME@-bin
+Name:           @PACKAGE_NAME@-bin
 %endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
@@ -115,11 +131,12 @@ ExclusiveOs:    Linux
 Source:         %{name}-%{version}-%{release}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
-Obsoletes:      LiS STREAMS
+Obsoletes:      %{_conflict} STREAMS
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
-Provides:       LfS STREAMS
+Provides:       %{name} STREAMS
+Conflicts:      %{_conflict}
 %if %{BUILD_modules}
 BuildRequires:  kernel-source >= 2.4
 %endif
@@ -133,7 +150,7 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-BuildConflicts: LiS
+BuildConflicts: %{_conflict}
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
@@ -143,9 +160,8 @@ development environment for the development and execution of System V Release
 4.2 MP STREAMS modules and drivers developed for Linux.  In addition (source)
 compatibility modules are provided for AIX, HP-UX, LiS, OSF, Solaris, SVR 4
 and UnixWare 7.  This distribution is only currently applicable to 2.4 kernels
-with the Linux Fast STREAMS patch applied and selected, and was targetted at
-ix86 architectures but should build and install for other architectures as
-well.
+and was targetted at ix86 and ppc architectures, but should build and install
+for other architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -214,8 +230,8 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
     --with-base-major=%{majbase} \
-    %{?_with_cooked_manpages:     %{_with_cooked_manpages}} \
-    %{?_without_cooked_manpages:  %{_without_cooked_manpages}} \
+    %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
+    %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
     %{?_with_public:              --enable-public} \
     %{?_without_public:           --disable-public} \
     %{?_with_k_debug:             --enable-k-debug} \
@@ -259,10 +275,12 @@ make
 
 # take our configured source and move it for the source package
 mkdir -p $RPM_BUILD_ROOT
+%if %{?_without_public: 0}%{!?_without_public: 1}
 mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
+%endif
 
 # add a directory for our devices
-mkdir -p $RPM_BUILD_ROOT/dev/streams
+mkdir -p $RPM_BUILD_ROOT/dev/%{base}
 
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
@@ -303,11 +321,11 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 # ===========================================================================
 %package %{core_name}
 
-Summary:        Linux Fast STREAMS core kernel modules.
+Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       kernel = %{kernel_version}
-Conflicts:      LiS
+Conflicts:      %{_conflict}
 Prereq:         /sbin/depmod
 Prereq:         /sbin/lsmod
 Prereq:         /sbin/insmod
@@ -358,32 +376,65 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
-#   Check that our line is in the modules.conf file
-    if ( grep -q 'include.*modules.streams' /etc/modules.conf ) ; then
-        :
-    else
+#   Check that our line is in the modules.%{base} file
+    conf_old=/etc/modules.conf
+    if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
+        streams_dir=/%{_lib}/modules/%{kernel_version}/%{_ksubdir}
+        streams_prf=/%{_lib}/modules/preferred/%{_ksubdir}
+        conf_new=%{_tmppath}/modules.conf.new.$$
+        cp -f $conf_old $conf_new
 #       if not, check for an old non-rpm LiS
-        if ( grep -q 'BEGIN LiS' /etc/modules.conf ) ; then
-            sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
-        else
-            cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
+        if ( grep -q 'BEGIN LiS' $conf_old ) ; then
+            conf_tmp=%{_tmppath}/modules.conf.tmp.$$
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
+            for p in $list ; do
+                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
+                mv -f $conf_tmp $conf_new
+#               Remove conflicting modules.
+                rm -f $streams_dir/$m.o
+                rm -f $streams_prf/$m.o
+            done
         fi
-        echo 'prune modules.streams' >> /etc/modules.conf.tmp.$$
-        echo 'if -f /lib/modules/`uname -r`/modules.streams' >> /etc/modules.conf.tmp.$$
-        echo 'include /lib/modules/`uname -r`/modules.streams' >> /etc/modules.conf.tmp.$$
-        echo 'endif' >> /etc/modules.conf.tmp.$$
-        chmod --referenc=/etc/modules.conf /etc/modules.conf.tmp.$$
-        cp -fb --suffix=.rpmsave /etc/modules.conf.tmp.$$ /etc/modules.conf
-        rm -f /etc/modules.conf.tmp.$$
+#       check for forced over installs of older LiS or LfS rpm installations
+#       or installs over older LiS or LfS autoconf installations
+        streams_old=/%{_lib}/modules/%{kernel_version}/modules.%{_kmodext}
+        if [ -d $streams_dir -a -f $streams_old ] ; then
+            streams_new=%{_tmppath}/modules.%{_kmodext}.new.$$
+            streams_tmp=%{_tmppath}/modules.%{_kmodext}.tmp.$$
+            cp -f $streams_old $streams_new
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
+            for p in $list ; do
+                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' $streams_new > $streams_tmp
+                mv -f $streams_tmp $streams_new
+#               Remove conflicting modules.
+                rm -f $streams_dir/$m.o
+                rm -f $streams_prf/$m.o
+            done
+#           can't make backups in modules directory
+            chmod --reference=$streams_old $streams_new
+            cp -f $streams_new $streams_old
+            rm -f $streams_new
+        fi
+        echo 'prune modules.%{base}' >> $conf_new
+        echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
+        echo 'include /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
+        echo 'endif' >> $conf_new
+        chmod --reference=$conf_old $conf_new
+        cp -fb --suffix=.rpmsave $conf_new $conf_old
+        rm -f $conf_new
     fi
-    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+fi
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   this is a running kernel, do a /sbin/depmod on the modules directory for
-        /sbin/depmod -ae
-    else
+    /sbin/depmod -ae
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
 #   non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
-        UNAME_MACHINE=%{_target_cpu} \
-        /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
-    fi
+    UNAME_MACHINE=%{_target_cpu} \
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
 fi
 
 %preun %{core_name}
@@ -419,23 +470,23 @@ if [ $1 = 0 ]; then
 #   this is the last stage of a removal we are going away: we need to see if
 #   we need to remove our line from modules.conf and remove our devices
     remove_line=yes
-    for file in /lib/modules/*/modules.streams ; do
+    for file in /lib/modules/*/modules.%{base} ; do
         if [ -f $file ] ; then
             remove_line=no
             break
         fi
     done
     if [ ":$remove_line" = :yes ] ; then
-        sed -e '/prune modules.streams/,/endif/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
-        chmod --reference=/etc/modules.conf /etc/modules.conf.tmp.$$
-        cp -fb --suffix=.rpmorig /etc/modules.conf.tmp.$$ /etc/modules.conf
-        rm -f /etc/modules.conf.tmp.$$
+        sed -e '/prune modules.%{base}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
+        chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f %{_tmppath}/modules.conf.tmp.$$
     fi
 fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   this is a running kernel, do a /sbin/depmod on the modules directory for
     /sbin/depmod -ae
-else
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
 #   non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
     /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
@@ -477,18 +528,19 @@ fi
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/streams
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.streams
-/%{_lib}/modules/%{kernel_version}/streams/*
+%dir /%{_lib}/modules/%{kernel_version}/%{base}
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
+/%{_lib}/modules/%{kernel_version}/%{base}/*
 %endif
 
 # ===========================================================================
 %package dev
 
-Summary:        Linux Fast STREAMS devices.
+Summary:        %{title} devices.
 Group:          System Environment/Base
-Conflicts:      LiS
+Conflicts:      %{_conflict}
 Requires:       dev >= 3.3
+Obsoletes:      %{name}-devs
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -497,9 +549,9 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description dev
 The %{name}-dev package contains the device definitions necessary to run
-applications programs developed for Linux Fast STREAMS.
+applications programs and utilities developed for %{title}.
 
-%if %{BUILD_tools}
+%if %{BUILD_devs}
 # ---------------------------------------------------------------------------
 %files dev -f %{makedev}
 %defattr(-,root,root)
@@ -508,9 +560,12 @@ applications programs developed for Linux Fast STREAMS.
 # ===========================================================================
 %package lib
 
-Summary:        Linux Fast STREAMS run-time libraries.
+Summary:        %{title} run-time libraries.
 Group:          System Environment/Libraries
-Conflicts:      LiS
+Prefix:         %{_libdir}
+Prefix:         %{_datadir}/locale
+Obsoletes:      %{name}-libs
+Conflicts:      %{_conflict}
 Prereq:         /sbin/ldconfig
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
@@ -520,14 +575,14 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description lib
 The %{name}-lib package contains the run-time shared libraries necessary to
-run applications programs developed for Linux Fast STREAMS.
+run applications programs developed for %{title}.
 
 %pre lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then
 #   this is supposed to be a fresh install
 #   see if there are any libraries hanging around from a non-rpm install
-    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*LiS\> | cut '-d ' -f4 ) 2>/dev/null`"
+    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*%{libname}\> | cut '-d ' -f4 ) 2>/dev/null`"
     if [ -n "$old_libs" ] ; then
 #       old libraries hanging around, delete them
         echo "warning: Deleting old non-rpm libraries $old_libs" >&2
@@ -558,7 +613,7 @@ fi
 # whether complete removal or upgrade, do a load config
 /sbin/ldconfig
 
-%if %{BUILD_tools}
+%if %{BUILD_libs}
 %files lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
@@ -570,13 +625,14 @@ fi
 # ===========================================================================
 %package doc
 
-Summary:        Linux Fast STREAMS manpages and docs.
+Summary:        %{title} manpages and docs.
 Group:          Documentation
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Conflicts:      texinfo < 3.11
-Conflicts:      LiS-doc
-Conflicts:      LiS-docs
+Conflicts:      %{_conflict}-doc
+Conflicts:      %{_conflict}-docs
+Obsoletes:      %{name}-docs
 Prereq:         /sbin/install-info
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
@@ -586,7 +642,7 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description doc
 The %{name}-doc package contains html documentation for the development of
-Linux Fast STREAMS applications, modules and drivers.
+%{title} applications, modules and drivers.
 
 %pre doc
 # ---------------------------------------------------------------------------
@@ -596,7 +652,7 @@ Linux Fast STREAMS applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} STREAMS SPG porting ; do
+    for n in %{base} %{extrainfo} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -609,7 +665,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} STREAMS SPG porting ; do
+    for n in %{base} %{extrainfo} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -637,14 +693,14 @@ fi
 # ===========================================================================
 %package devel
 
-Summary:        Linux Fast STREAMS headers, libs and docs.
+Summary:        %{title} headers, libs and docs.
 Group:          Development/System
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
 #Requires:       %{name}-lib = %{epoch}:%{version}-%{release}
 #Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
-Conflicts:      LiS
+Conflicts:      %{_conflict}
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -653,10 +709,10 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description devel
 The %{name}-devel package contains library archives for static compilation,
-and headers files to develop Linux Fast STREAMS modules and drivers.  This
+and headers files to develop %{title} modules and drivers.  This
 also includes the header files and static libraries required to compile
-Linux Fast STREAMS applications programs.  In addition it contains all of the
-manual pages necessary for developing Linux Fast STREAMS application programs.
+%{title} applications programs.  In addition it contains all of the
+manual pages necessary for developing %{title} application programs.
 
 %pre devel
 # ---------------------------------------------------------------------------
@@ -678,12 +734,16 @@ manual pages necessary for developing Linux Fast STREAMS application programs.
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%if %{BUILD_libs}
 %{_libdir}/*.a
+%endif
 %{_includedir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
-%{_mandir}/man2/*
+#%{_mandir}/man2/*
+%if %{BUILD_libs}
 %{_mandir}/man3/*
+%endif
 %{_mandir}/man4/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -693,7 +753,7 @@ manual pages necessary for developing Linux Fast STREAMS application programs.
 # ===========================================================================
 %package source
 
-Summary:        Linux Fast STREAMS source package.
+Summary:        %{title} source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
@@ -736,14 +796,15 @@ to create and distribute this rpm.
 # ===========================================================================
 %package util
 
-Summary:        Linux Fast STREAMS admin utilities.
+Summary:        %{title} admin utilities.
 Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
 Prefix:         %{_libexecdir}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{release}
-Conflicts:      LiS
+Conflicts:      %{_conflict}
+Obsoletes:      %{name}-utils
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -752,7 +813,7 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description util
 The %{name}-util package provides adminstrative and configuration test
-utilities and commands associated with the Linux Fast STREAMS package.
+utilities and commands associated with the %{title} package.
 
 %pre util
 # ---------------------------------------------------------------------------
@@ -768,7 +829,7 @@ if [ $1 = 0 ]; then
             done
         done
     fi
-# old non-rpm distro puts some man pagest in the wrong place, clean them out
+# old non-rpm distro puts some man pages in the wrong place, clean them out
     if [ -f /usr/man/man3/fattach.3 ] ; then
         rm -f /usr/man/man3/fattach.3 2>/dev/null
         rm -f /usr/man/man3/detach.3 2>/dev/null
@@ -784,7 +845,7 @@ if [ $1 = 0 ]; then
         rmdir -p /usr/man 2>/dev/null
     fi
 else
-#  upgrade, let rpm do its job
+# upgrade, let rpm do its job
     :
 fi
 
@@ -817,24 +878,32 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.31  2004/08/07 11:00:54  brian
-# - More rational provides structure.
+# Revision 0.9.2.32  2004/08/17 11:45:25  brian
+# - Upgraded spec files.
 #
-# Revision 1.31  2004/08/07 11:00:54  brian
-# - More rational provides structure.
+# Revision 1.32  2004/08/17 11:45:25  brian
+# - Upgraded spec files.
 #
-# Revision 1.30  2004/07/11 08:47:49  brian
-# - Correct symbolic links again.
-#
-# Revision 1.29  2004/06/28 19:40:26  brian
-# - Do not package up debug files on recent rpmbuild.
-#
-# Revision 1.28  2004/06/28 11:33:11  brian
-# - Support binary release.
-#
-# Revision 1.27  2004/06/28 09:01:17  brian
-# - Updated spec files.
-#
+
+* Sat Aug  7 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.31  2004/08/07 11:00:54  brian
+- More rational provides structure.
+
+* Sun Jul 11 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.30  2004/07/11 08:47:49  brian
+- Correct symbolic links again.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.29  2004/06/28 19:40:26  brian
+- Do not package up debug files on recent rpmbuild.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.28  2004/06/28 11:33:11  brian
+- Support binary release.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.27  2004/06/28 09:01:17  brian
+- Updated spec files.
 
 * Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.26  2004/06/27 03:06:30  brian

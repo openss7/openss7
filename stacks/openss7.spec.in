@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/08/07 11:00:50 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/08/17 11:45:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/07 11:00:50 $ by $Author: brian $
+# Last Modified $Date: 2004/08/17 11:45:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,10 @@
 %define majbase @STRCONF_MAJBASE@
 %define makedev @STRCONF_MAKEDEV@
 %define base @PACKAGE_TARNAME@
+%define extrainfo
+%define title @PACKAGE_TITLE@
+%define stitle @PACKAGE_SHORTTITLE@
+%define libname ss7
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -96,6 +100,14 @@
 %{?_with_lfs:        %{expand: %%define BUILD_lfs     1}}
 %{?_with_lfs:        %{expand: %%define BUILD_lis     0}}
 
+%if %{BUILD_tools}
+%define BUILD_libs    0
+%define BUILD_devs    1
+%else
+%define BUILD_libs    0
+%define BUILD_devs    0
+%endif
+
 %define _streams lis
 %define _ksubdir lis
 %define _kmodext lis
@@ -113,14 +125,16 @@
 %define _kmodext lis
 %define _conflict streams
 %endif
+# FIXME: there are way more modules that this
+%define _modules    x400 x100
 
 # we have some more options that control configure for the build
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 for Linux
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux
 %if %{?_without_public: 0}%{!?_without_public: 1}
-Name:           @PACKAGE_TARNAME@
+Name:           @PACKAGE_NAME@
 %else
-Name:           @PACKAGE_TARNAME@-bin
+Name:           @PACKAGE_NAME@-bin
 %endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
@@ -144,7 +158,7 @@ ExclusiveOs:    Linux
 Source:         %{name}-%{version}-%{release}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
-Obsoletes:      SS7 SIGTRAN H323 ISDN
+Obsoletes:      %{stitle} SIGTRAN H323 ISDN
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
@@ -154,7 +168,7 @@ Requires:       %{_streams} >= 0.7a
 %if %{BUILD_lis}
 Requires:       %{_streams} >= 2:2.16.18
 %endif
-Provides:       SS7 SIGTRAN H323 ISDN
+Provides:       %{stitle} SIGTRAN H323 ISDN
 %if %{BUILD_modules}
 BuildRequires:  kernel-source >= 2.4
 %endif
@@ -174,6 +188,7 @@ BuildRequires:  %{_streams}-devel >= 0.7a
 %if %{BUILD_lis}
 BuildRequires:  %{_streams}-devel >= 2:2.16.18
 %endif
+BuildRequires:  strxns-devel >= %{epoch}:0.9.2
 BuildRequires:  strxnet-devel >= %{epoch}:0.9.2
 BuildRequires:  strinet-devel >= %{epoch}:0.9.2
 BuildRequires:  strsctp-devel >= %{epoch}:0.9.2
@@ -258,8 +273,8 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
     --with-base-major=%{majbase} \
-    %{?_with_cooked_manpages:     %{_with_cooked_manpages}} \
-    %{?_without_cooked_manpages:  %{_without_cooked_manpages}} \
+    %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
+    %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
     %{?_with_public:              --enable-public} \
     %{?_without_public:           --disable-public} \
     %{?_with_k_debug:             --enable-k-debug} \
@@ -274,8 +289,8 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
     %{?_without_tools:            --disable-tools} \
     %{?_with_modules:             --enable-modules} \
     %{?_without_modules:          --disable-modules} \
-    %{?_with_lis:                 %{_with_lis}} \
-    %{?_with_lfs:                 %{_with_lfs}}
+    %{?_with_lis:                %{_with_lis}} \
+    %{?_with_lfs:                %{_with_lfs}}
 
 make
 
@@ -289,15 +304,14 @@ make
 
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
-mkdir -p $RPM_BUILD_ROOT
-
-%if %{?_without_public: 0}%{!?_without_public: 1}
 # take our configured source and move it for the source package
+mkdir -p $RPM_BUILD_ROOT
+%if %{?_without_public: 0}%{!?_without_public: 1}
 mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
 %endif
 
 # add a directory for our devices
-#mkdir -p $RPM_BUILD_ROOT/dev/%{name}
+#mkdir -p $RPM_BUILD_ROOT/dev/%{base}
 
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
@@ -338,7 +352,7 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 # ===========================================================================
 %package %{_streams}-%{core_name}
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 core kernel modules.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       kernel = %{kernel_version}
@@ -364,10 +378,10 @@ Provides:       %{name}-%{_streams}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_R
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{core_name}
-The %{name}-%{_streams}-%{core_name} package contains the kernel modules that
-provide the Linux kernel SS7 %{_STREAMS} STREAMS drivers and modules.  This
-also includes assorted drivers and modules for additiona protocol stacks such
-as SIGTRAN, ISDN and VoIP.  This package is heavily tied to the kernel for
+The %{name}-%{_streams}-%{core_name} package contains the kernel modules
+that provide the Linux kernel %{stitle} %{_STREAMS} STREAMS drivers and modules.
+This also includes assorted drivers and modules for additional protocol stacks
+such as SIGTRAN, ISDN and VoIP.  This package is heavily tied to the kernel for
 which it and the %{_STREAMS} STREAMS facility was compiled.  This package
 applies to kernel version %{kernel_version} and requires a %{_STREAMS} STREAMS
 package compiled for the same kernel.
@@ -378,25 +392,31 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
 #   installing new on the running kernel, we have to worry about previous
 #   loaded modules for the old version or a non-rpm version
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-#   modules running, kick the stack
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    fdetach -a 2>/dev/null
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    /usr/sbin/lsof | while read -a tokens; do
-        if [ :"$tokens[4]" = :"CHR" ]; then
-            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge %{majbase} ]; then
-                eval "kill -HUP $tokens[1]"
+    for m in %{_modules} ; do
+        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+#           module running, kick the stack
+            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                fdetach -a 2>/dev/null
+                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /usr/sbin/lsof | while read -a tokens; do
+                        if [ :"$tokens[4]" = :"CHR" ]; then
+                            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ $major -eq %{majbase} ]; then
+                                eval "kill -HUP $tokens[1]"
+                            fi
+                        fi
+                    done
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                        echo "Cannot install or upgrade with streams-$m module running." >&2
+                        exit 1
+                    fi
+                fi
             fi
         fi
     done
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    echo 'Cannot install or upgrade with streams modules running.' >&2
-    exit 1
 fi
 
 %post %{_streams}-%{core_name}
@@ -469,25 +489,31 @@ fi
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
 #   worry about which modules are running
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-#   modules running, kick the stack
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    fdetach -a
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    /usr/sbin/lsof | while read -a tokens; do
-        if [ :"$tokens[4]" = :"CHR" ]; then
-            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge %{majbase} ]; then
-                eval "kill -KILL $tokens[1]"
+    for m in %{_modules} ; do
+        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+#           modules running, kick the stack
+            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                fdetach -a
+                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /usr/sbin/lsof | while read -a tokens; do
+                        if [ :"$tokens[4]" = :"CHR" ]; then
+                            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ $major -eq %{majbase} ]; then
+                                eval "kill -KILL $tokens[1]"
+                            fi
+                        fi
+                    done
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                        echo "Cannot uninstall with streams-$m module running." >&2
+                        exit 1
+                    fi
+                fi
             fi
         fi
     done
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    echo "Cannot uninstall with streams modules running." >&2
-    exit 1
 fi
 
 %postun %{_streams}-%{core_name}
@@ -504,16 +530,16 @@ if [ $1 = 0 ]; then
         fi
     done
     if [ ":$remove_line" = :yes ] ; then
-        sed -e '/prune modules.%{base}/,/endif/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
-        chmod --reference=/etc/modules.conf /etc/modules.conf.tmp.$$
-        cp -fb --suffix=.rpmorig /etc/modules.conf.tmp.$$ /etc/modules.conf
-        rm -f /etc/modules.conf.tmp.$$
+        sed -e '/prune modules.%{base}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
+        chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f %{_tmppath}/modules.conf.tmp.$$
     fi
 fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   this is a running kernel, do a /sbin/depmod on the modules directory for
     /sbin/depmod -ae
-else
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
 #   non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
     /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
@@ -521,34 +547,44 @@ fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   one more kick at killing any loaded modules on uninstall, last stage of
 #   the upgrade on a running kernel for upgrade.
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-#   modules running, kick the stack
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    fdetach -a
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    /sbin/insmod -ar streams
-    /usr/sbin/lsof | while read -a tokens; do
-        if [ :"$tokens[4]" = :"CHR" ]; then
-            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge %{majbase} ]; then
-                if [ $1 = 0 ] ; then
-#                   extreme prejudice for removal
-                    eval "kill -KILL $tokens[1]"
-                else
-#                   try to get them to reload for 
-                    eval "kill -HUP $tokens[1]"
+    reboot='no'
+    for m in %{_modules} ; do
+        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+#           modules running, kick the stack
+            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                fdetach -a
+                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /sbin/insmod -ar "streams-$m"
+                    /usr/sbin/lsof | while read -a tokens; do
+                        if [ :"$tokens[4]" = :"CHR" ]; then
+                            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ $major -eq %{majbase} ]; then
+                                if [ $1 = 0 ] ; then
+#                                   extreme prejudice for removal
+                                    eval "kill -KILL $tokens[1]"
+                                else
+#                                   try to get them to reload for 
+                                    eval "kill -HUP $tokens[1]"
+                                fi
+                            fi
+                        fi
+                    done
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                        echo "Error: modules may be still loaded" >&2
+                        /sbin/lsmod | grep "^streams-$m" >&2
+                        reboot='yes'
+                    fi
                 fi
             fi
         fi
     done
-    /sbin/modprobe -r `/sbin/lsmod | grep '^streams' | cut -f1 '-d '`
-    ( /sbin/lsmod | grep -q '^streams' ) || exit 0
-    echo "Error: modules may be still loaded" >&2
-    /sbin/lsmod | grep '^streams' >&2
-    echo "you may have to reboot" >&2
-    exit 1
+    if [ "$reboot" = 'yes' ]; then
+        echo "you may have to reboot" >&2
+        exit 1
+    fi
 fi
 
 %if %{BUILD_modules}
@@ -563,7 +599,7 @@ fi
 # ===========================================================================
 %package dev
 
-Summary:        OpenSS7 devices.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
 Group:          System Environment/Base
 Requires:       dev >= 3.3
 Autoreq:        true
@@ -574,9 +610,10 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description dev
 The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for OpenSS7.
+applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
+%{stitle}.
 
-%if %{BUILD_tools}
+%if %{BUILD_devs}
 # ---------------------------------------------------------------------------
 %files dev -f %{makedev}
 %defattr(-,root,root)
@@ -585,7 +622,7 @@ applications programs and utilities developed for OpenSS7.
 # ===========================================================================
 %package %{_streams}-lib
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 run-time libraries.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_datadir}/locale
@@ -605,14 +642,14 @@ Icon:           %{_icon}
 %description %{_streams}-lib
 The %{name}-%{_streams}-lib package contains the run-time shared libraries
 necessary to run applications programs and utilities developed for OpenSS7
-%{_STREAMS} STREAMS SS7.
+%{_STREAMS} STREAMS %{stitle}.
 
 %pre %{_streams}-lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then
 #   this is supposed to be a fresh install
 #   see if there are any libraries hanging around from a non-rpm install
-    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*ss7\> | cut '-d ' -f4 ) 2>/dev/null`"
+    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*%{libname}\> | cut '-d ' -f4 ) 2>/dev/null`"
     if [ -n "$old_libs" ] ; then
 #       old libraries hanging around, delete them
         echo "warning: Deleting old non-rpm libraries $old_libs" >&2
@@ -643,26 +680,32 @@ fi
 # whether complete removal or upgrade, do a load config
 /sbin/ldconfig
 
-#%if %{BUILD_tools}
-%if 0
+%if %{BUILD_libs}
 %files %{_streams}-lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%{_libdir}/*.so*
-#%{_libdir}/*.la
-#%{_datadir}/locale/*
+%{_libdir}/*.so*
+%{_libdir}/*.la
+%{_datadir}/locale/*
 %endif
 
 # ===========================================================================
 %package doc
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 manpages and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} manpages and doc.
 Group:          Documentation
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
+#%if %{BUILD_lfs}
+#Requires:       %{_streams}-doc >= 0.7a
+#%endif
+#%if %{BUILD_lis}
+#Requires:       %{_streams}-doc >= 2:2.16.18
+#%endif
+#Requires:       strxns-doc >= %{epoch}:0.9.2
+#Requires:       strxnet-doc >= %{epoch}:0.9.2
 #Requires:       strinet-doc >= %{epoch}:0.9.2
 #Requires:       strsctp-doc >= %{epoch}:0.9.2
-#Requires:       strxnet-doc >= %{epoch}:0.9.2
 Conflicts:      texinfo < 3.11
 Prereq:         /sbin/install-info
 Autoreq:        true
@@ -673,7 +716,7 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description doc
 The %{name}-doc package contains html documentation for the development of
-OpenSS7 %{_STREAMS} STREAMS SS7 applications, modules and drivers.
+OpenSS7 %{_STREAMS} STREAMS %{stitle} applications, modules and drivers.
 
 %pre doc
 # ---------------------------------------------------------------------------
@@ -683,7 +726,7 @@ OpenSS7 %{_STREAMS} STREAMS SS7 applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} ; do
+    for n in %{base} %{extrainfo} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -696,7 +739,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} ; do
+    for n in %{base} %{extrainfo} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -713,7 +756,7 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if 0
+%if %{BUILD_libs}
 %doc ABOUT-NLS
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
@@ -725,13 +768,17 @@ fi
 # ===========================================================================
 %package devel
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 headers, lib and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
 Group:          Development/System
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
 #Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
 #Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
+#Requires:       strxns-%{_streams}-lib >= %{epoch}:0.9.2
+#Requires:       strxns-doc >= %{epoch}:0.9.2
+#Requires:       strxnet-%{_streams}-lib >= %{epoch}:0.9.2
+#Requires:       strxnet-doc >= %{epoch}:0.9.2
 #Requires:       strinet-%{_streams}-lib >= %{epoch}:0.9.2
 #Requires:       strinet-doc >= %{epoch}:0.9.2
 #Requires:       strsctp-%{_streams}-lib >= %{epoch}:0.9.2
@@ -750,11 +797,11 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description devel
 The %{name}-devel package contains library archives for static compilation,
-and headers files to develop OpenSS7 %{_STREAMS} STREAMS SS7 applications.
+and headers files to develop OpenSS7 %{_STREAMS} STREAMS %{stitle} applications.
 This also includes the header files and static libraries required to compile
-OpenSS7 %{_STREAMS} STREAMS SS7 applications programs.  In addition it
+OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.  In addition it
 contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
-STREAMS SS7 application programs.
+STREAMS %{stitle} application programs.
 
 %pre devel
 # ---------------------------------------------------------------------------
@@ -776,12 +823,16 @@ STREAMS SS7 application programs.
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%{_libdir}/*.a
+%if %{BUILD_libs}
+%{_libdir}/*.a
+%endif
 %{_includedir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 #%{_mandir}/man2/*
+%if %{BUILD_libs}
 %{_mandir}/man3/*
+%endif
 %{_mandir}/man4/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -791,7 +842,7 @@ STREAMS SS7 application programs.
 # ===========================================================================
 %package source
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 source package.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
@@ -834,14 +885,13 @@ to create and distribute this rpm.
 # ===========================================================================
 %package %{_streams}-util
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS SS7 admin utilities.
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
 Group:          System Environment/Base
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
 Prefix:         %{_libexecdir}
-#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
-Requires:       strxnet-%{_streams}-lib >= %{epoch}:0.9.2
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
 %if %{BUILD_lfs}
 Requires:       %{_streams}-lib >= 0.7a
 %endif
@@ -859,7 +909,7 @@ Icon:           %{_icon}
 %description %{_streams}-util
 The %{name}-%{_streams}-util package provides adminstrative and configuration
 test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
-SS7 package.
+%{stitle} package.
 
 %pre %{_streams}-util
 # ---------------------------------------------------------------------------
@@ -894,24 +944,33 @@ SS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.29  2004/08/07 11:00:50  brian
-# - More rational provides structure.
+# Revision 0.9.2.30  2004/08/17 11:45:22  brian
+# - Upgraded spec files.
 #
-# Revision 0.9.2.28  2004/07/11 08:47:29  brian
-# - Correct symbolic links again.
-#
-# Revision 0.9.2.27  2004/06/28 19:40:23  brian
-# - Do not package up debug files on recent rpmbuild.
-#
-# Revision 0.9.2.26  2004/06/28 11:33:10  brian
-# - Support binary release.
-#
-# Revision 0.9.2.25  2004/06/28 10:10:55  brian
-# - Changes to compile.
-#
-# Revision 0.9.2.24  2004/06/28 09:01:19  brian
-# - Updated spec files.
-#
+
+* Sat Aug  7 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.29  2004/08/07 11:00:50  brian
+- More rational provides structure.
+
+* Sun Jul 11 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.28  2004/07/11 08:47:29  brian
+- Correct symbolic links again.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.27  2004/06/28 19:40:23  brian
+- Do not package up debug files on recent rpmbuild.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.26  2004/06/28 11:33:10  brian
+- Support binary release.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.25  2004/06/28 10:10:55  brian
+- Changes to compile.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.24  2004/06/28 09:01:19  brian
+- Updated spec files.
 
 * Mon Jun 21 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.23  2004/06/21 18:08:36  brian
