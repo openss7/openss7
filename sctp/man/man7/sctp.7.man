@@ -1,10 +1,10 @@
 .\" -*- nroff -*-
 .\"
-.\" @(#) $Id: sctp.7.man,v 0.9.2.2 2001/05/15 15:46:10 brian Exp $
+.\" @(#) $Id: sctp.7.man,v 0.9.2.3 2002/05/08 13:06:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" This manpage is Copyright (C) 2001  OpenSS7 Corp. <www.openss7.com>
+.\" This manpage is Copyright (C) 2001-2002  OpenSS7 Corp. <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -30,10 +30,10 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2001/05/15 15:46:10 $ by $Author: brian $
+.\" Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.TH SCTP 7 "15 Mar 2001" "Linux Man Page" "Linux Programmer's Manual"
+.TH SCTP 7 "8 May 2002" "Linux Man Page" "Linux Programmer's Manual"
 .SH "NAME"
 sctp \- SCTP protocol.
 .SH "SYNOPSIS"
@@ -68,14 +68,14 @@ association with another SCTP endpoint.  To receive incoming associations
 \fBbind\fR(2) the socket first to a number of local addresses and a port and
 then call \fBlisten\fR(2) to put the socket into listening state.  After that a
 new socket for each incoming association can be accepted using \fBaccept\fR(2).
-A socket which has had \fBaccept\fR or \fBconnect\fR successfully called on it
+A socket which has had \fBaccept\fR(2) or \fBconnect\fR(2) successfully called on it
 is fully specified and may transmit data.  Data cannot be transmitted on
 listening or not yet connected sockets.
 
-SCTP supports large TCP windows to support links with high latency or bandwidth.
-Large SCTP windows can be used by increasing the send and receive buffer sizes.
-They can be set globally with the \fBnet.core.wmem_default\fR and
-\fBnet.core.rmem_default\fR sysctls, or on individual sockets by using the
+SCTP supports large TCP windows to support links with high latency or
+bandwidth.  Large SCTP windows can be used by increasing the send and receive
+buffer sizes.  They can be set globally with the \fBnet.core.wmem_default\fR
+and \fBnet.core.rmem_default\fR sysctls, or on individual sockets by using the
 \fBSO_SNDBUF\fR and \fBSO_RCVBUF\fR socket options.  The maximum sizes for
 socket buffers are limitied by the global \fBnet.core.wmem_max\fR and
 \fBnet.core.rmem_max\fR sysctls.  See \fBsocket\fR(7) for more information.
@@ -88,6 +88,11 @@ selection policies for transmission and retransmission.  The stream upon which
 to send the data can also be set with the \fISCTP_SID\fR socket option on a
 socket basis with \fBsetsockopt\fR(2) or on a per-message basis with
 \fBsendmsg\fR(2).
+.PP
+For \fISOCK_SEQPACKET\fR socket, send operations may also use the
+\fBMSG_MORE\fR flag when sending with \fBsendmsg\fR(2) to indicate that the
+next write operation will provide additional data belonging to the same
+packet.
 .PP
 For \fISOCK_SEQPACKET\fR and \fISOCK_RDM\fR sockets, all receive operations
 return only one packet, or a portion of one packet.  When the packet is
@@ -136,41 +141,57 @@ SCTP supports multiple-stream point-to-point communication within multi-homed
 associations; broadcasting and multicasting are not supported.
 .PP
 In addition to normal IP addressing, SCTP provides extensions on the
-\fBbind\fR(2), \fBconnect\fR(2), \fBgetsockname\fR(2), and
+\fBbind\fR(2), \fBaccept\fR, \fBconnect\fR(2), \fBgetsockname\fR(2), and
 \fBgetpeername\fR(2) system calls.  These functions normally take or return a
 single \fIsockaddr_in\fR as an address argument.  When used in conjunction
 with a SCTP socket on or to a multi-homed host, these calls will accept or
 return an array of \fIsockaddr_in\fR structures.  The number of addresses in
 the structure is indicated by the length of the structure and the protocol
 family of the socket.  SCTP will only support one port number being specified
-in the address list.  (Note: Linux 2.2.12 only provides MAX_SOCK_ADDR as a
-maximum size of the socket address length.  This is current 128 bytes or 8
+in the address list.  (Note: Linux only provides MAX_SOCK_ADDR as a maximum
+size of the socket address length.  This is current 128 bytes or 8
 \fIsockaddr_in\fR structures.)
 
 Multiple addresses provided to the \fBbind\fR(2) system call will be
 interpreted as multiple local addresses to provide to the peer at connection
 time as well as the local address/port combinations upon which a listening
-socket will accept incoming associations.  Multiple addresses provided to the
-\fBconnect\fR(2) system call will be interpreted as multiple destination
-address/port combinations to which to form an association. The
+socket will accept incoming associations.  A call to \fBaccept\fR(2)
+requesting the source address of the peer will return multiple transport
+addresses if the connecting peer is multihomed.  Multiple addresses provided
+to the \fBconnect\fR(2) system call will be interpreted as multiple
+destination address/port combinations to which to form an association. The
 \fBgetpeername\fR(2) system call returns the list of destination address/port
 combinations to which the socket is connected.  The \fBgetsockname\fR(2)
 system call returnes the list of local address/port combinations to which the
 socket is bound.
 .SH "SYSCTLS"
 These sysctls can be accessed by the \fB/proc/sys/net/ipv4/*\fR files or with
-the \fBsysctl\fR(2) interface.  In addition, most IP sysctls also apply to SCTP;
-see \fBip\fR(7).
+the \fBsysctl\fR(2) interface.  In addition, most SCOKET and IP sysctls also
+apply to SCTP; see \fBsocket\fR(7) and \fBip\fR(7).
+.TP
+\fBsctp_max_istreams\fR
+Defines the default maximum number of inbound SCTP streams that will be
+requested when forming or receiving connections on an SCTP socket.  This is a
+default value.  The actual value used by a socket for both ougoing and
+incoming connections can be changed with the SCTP option
+\fISCTP_ISTREAMS\fR before a call to \fBlisten\fR(2) or \fBconnect\fR(2).
+.TP
+\fBsctp_req_ostreams\fR
+Defines the default requested number of outbound SCTP streams that will be
+requested when forming or receiving connections on an SCTP socket.  This is a
+default value.  The actual value used by a socket for both ougoing and
+incoming connections can be changed with the SCTP option
+\fISCTP_OSTREAMS\fR before a call to \fBlisten\fR(2) or \fBconnect\fR(2).
 .TP
 \fBsctp_rto_initial\fR
 Defines the time interval (in milliseconds) which will be used as an initial RTO
-(Retransmission Time Out) value send sending packets to a destination for the
-first time.  Valid values must be the number of milliseconds in a tick (1000/HZ)
-or greater and must be within the range from \fIsctp_rto_min\fR to
-\fIsctp_rto_max\fR.  The default value is the value recommended in RFC 2960
-(3,000 milliseconds).  (Note: this is only a default value which will be
-assigned to new destinations.  Each destination can be controlled with the
-socket option \fISCTP_RTO\fR described below under \fISOCKET OPTIONS\fR.)
+(Retransmission Time Out) value when sending packets to a destination for the
+first time.  Valid values are zero or greater and must be within the range
+from \fIsctp_rto_min\fR to \fIsctp_rto_max\fR.  The default value is the value
+recommended in RFC 2960 (3,000 milliseconds).  (Note: this is only a default
+value which will be assigned to new destinations.  Each destination can be
+controlled with the socket option \fISCTP_RTO\fR or \fISCTP_RTO_INITIAL\fR
+described below under \fBSOCKET OPTIONS\fR.)
 .TP
 \fBsctp_rto_min\fR
 Defines the time interval (in milliseconds) which will be used as a RTO
@@ -179,8 +200,8 @@ number of milliseconds in a tick (1000/HZ) or greater and must be less than or
 equal to the value of \fIsctp_rto_max\fR. The default value is the value
 recommended in RFC 2960 (1,000 milliseconds).  (Note: this is only a default
 value which will be assigned to new destinations.  Each destination can be
-controlled with the socket option \fISCTP_RTO\fR described below under \fISOCKET
-OPTIONS\fR.)
+controlled with the socket option \fISCTP_RTO\fR or \fISCTP_RTO_MIN\fR
+described below under \fBSOCKET OPTIONS\fR.)
 .TP
 \fBsctp_rto_max\fR
 Defines the time interval (in milliseconds) which will be used as a RTO
@@ -189,20 +210,24 @@ number of milliseconds in a tick (1000/HZ) or greater and must be greater than
 or equal to the value of \fIsctp_rto_min\fR.  The default value is the value
 recommended in RFC 2960 (60,000 milliseconds).  (Note: this is only a default
 value which will be assigned to new destinations.  Each destination can be
-controlled with the socket option \fISCTP_RTO\fR described below under \fISOCKET
-OPTIONS\fR.)
+controlled with the socket option \fISCTP_RTO\fR or \fISCTP_RTO_MAX\fR
+described below under \fBSOCKET OPTIONS\fR.)
 .TP
 \fBsctp_valid_cookie_life\fR
 Defines the time interval (in seconds) beyond which a COOKIE ECHO with a cookie
 sent in an INIT ACK will no longer be accepted.  Valid values are 1 second or
 greater.  The default value is the value recommended in RFC 2960 (60 seconds).
+The value for a given socket can be changed with the socket option
+\fISCTP_COOKIE_LIFE\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 \fBsctp_max_sack_delay\fR
-Defines the absolute amount of time (in milliseconds) that the sending endpoint
+Defines the interval of time (in milliseconds) that the sending endpoint
 is permitted to delay an acknowledgement of a received data chunk.  Valid values
 are in the range from 1 to 500 milliseconds.  (RFC 2960 forbids setting this
 value larger than 500 milliseconds.)  The default value is the value recommended
 in RFC 2960 (200 milliseconds).
+The value for a given socket can be changed with the socket option
+\fISCTP_SACK_DELAY\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 \fBsctp_path_max_retrans\fR
 Defines the number of times that the sending SCTP endpoint will attempt
@@ -211,8 +236,8 @@ considers that destination transport address inactive.  Valid values include
 zero.  The default value is the value recommended in RFC 2960 (5 retries).
 (Note: this is only a default value which will be assigned to new destinations.
 Each destination can be controlled with the socket option \fISCTP_RTO\fR
-described below under \fISOCKET OPTIONS\fR.)
-.TP
+or \fISCTP_PATH_MAX_RETRANS\fR
+described below under \fBSOCKET OPTIONS\fR.)
 .TP
 \fBsctp_assoc_max_retrans\fR
 Defines the number of times that the sending SCTP endpoint will attempt
@@ -220,11 +245,15 @@ retransmitting a packet on a given association before it aborts the association.
 Valid values include zero.  The default value is the value recommended in RFC
 2960 (10 retries).  This value should be larger than the sum of all of the
 \fIpath_max_retrans\fR values of each of the destinations.
+The value for a given socket can be changed with the socket option
+\fISCTP_ASSOC_MAX_RETRANS\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 \fBsctp_max_init_retries\fR
 The number of times that an SCTP INIT or COOKIE ECHO will be resent before
 abandoning the association intialization.  Valid values include zero.  The
 default value is the value recommended in RFC 2960 (8 retries).
+The value for a given socket can be changed with the socket option
+\fISCTP_MAX_INIT_RETRIES\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 \fBsctp_heartbeat_itvl\fR
 Defines the interval (in seconds) between successive HEARTBEAT messages used to
@@ -232,7 +261,8 @@ probe destination transport address for RTT calculation and activity.  Valid
 valids are 1 second or greater.  The default value is the value recommended in
 RFC 2960 (30 seconds).  (Note: This is only the default value which will be
 assigned to new destinations.  Each destination can be controlled with the
-socket option \fISCTP_HB\fR described below under \fISOCKET OPTIONS\fR.)
+socket option \fISCTP_HB\fR or \fISCTP_HEARTBEAT_ITVL\fR
+described below under \fBSOCKET OPTIONS\fR.)
 
 If the kernel configuration parameter \fICONFIG_SCTP_THROTTLE_HEARTBEATS\fR is
 set, then half this value is also used for throttling heartbeats.  Then only two
@@ -249,12 +279,17 @@ signature.  There is no required value here for RFC 2960.  The default value is
 well on little-endian machines.  Whether either of these can be selected depends
 on the kernel configuration parameters \fICONFIG_SCTP_HMAC_SHA1\fR and
 \fICONFIG_SCTP_HMAC_MD5\fR.
+The MAC for a given socket can be changed before the \fBlisten\fR(2) call with
+the socket option \fISCTP_MAC_TYPE\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 \fBsctp_cookie_inc\fR
 Defines the time increment (in milliseconds) which will be added to the lifespan
 of the cookie in an INIT ACK if the received INIT requests cookie preservative
 to lengthen the lifespan of the cookie.  Valid values include zero.  The
 default value is the value recommended in RFC 2960 5.2.6 (1 second).
+The cookie lifetime increment for a given socket can be changed before the
+\fBlisten\fR(2) call with the socket option \fISCTP_COOKIE_INC\fR as described
+under \fBSOCKET OPTIONS\fR.
 .TP
 \fBsctp_throttle_itvl\fR
 Defines the interval (in milliseconds) within which the SCTP receiver will not
@@ -265,11 +300,33 @@ ECHO messages.  When SCTP is compiled with
 \fICONFIG_SCTP_THROTTLE_PASSIVEOPENS\fR, this permits the throttling of INIT and
 COOKIE ECHO messages.  Only one INIT and one COOKIE ECHO message will be
 accepted in the interval set by this control.
+The throttle interval for a given socket can be changed before the
+\fBlisten\fR(2) call with the socket option \fISCTP_THROTTLE_ITVL\fR as
+described under \fBSOCKET OPTIONS\fR.
+.TP
+\fBsctp_checksum_algorithm\fR
+Defines the checksum algorithm which will be used when checksumming packets.
+Valie values are \fISCTP_CSUM_ADLER_32\fR for the RFC 2960 Appendix B
+algorithm and \fISCTP_CSUM_CRC_32C\fR for the draft-ietf-tsvwg-sctpcsum-06.txt
+CRC-32C checksum algorithm.  This value may also be set for a given socket
+using the \fISCTP_CKSUM_TYPE\fR socket option described below.
+.TP
+\fBsctp_wmem
+Defines three values (lower, default, upper) for the socket write buffer.  The
+value associated with a given socket can also be changed with
+the \fISO_SNDBUF\fR option, see \fBsocket\fR(7).
+.TP
+\fBsctp_rmem
+Defines three values (lower, default, upper) for the socket read buffer.  The
+value associated with a given socket can also be changed with
+the \fISO_RCVBUF\fR option, see \fBsocket\fR(7).
 .SH "SOCKET_OPTIONS"
 To set or get a SCTP socket option, call \fBgetsockopt\fR(2) to read or
 \fBsetsockopt\fR(2) to write the option with the socket family argument set to
-\fBSOL_SCTP\fR.  In addition, most \fBSOL_IP\fR socket options are valid on SCTP
-sockets.  For more information see \fBip\fR(7).
+\fBSOL_SCTP\fR.  In addition, most \fBSOL_SOCKET\fR and \fBSOL_IP\fR socket
+options are valid on SCTP sockets.  For more information see \fBsocket\fR(7)
+and
+\fBip\fR(7).
 .TP
 .B SCTP_NODELAY
 Turn the Nagle algorithm off.  This means that packets are always sent as soon
@@ -355,7 +412,7 @@ address to which the heartbeat setting applies.  \fIactive\fR is an integer
 boolean activation flag indicating whether heartbeat is active on the
 destination.  \fIitvl\fR is the integer heartbeat interval in milliseconds.
 .TP
-.SH SCTP_RTO
+.B SCTP_RTO
 Set or receive the retransmission timeout parameters associated with the
 specified desination address.  The expected value is a \fBsctp_rtoval\fR
 structure.
@@ -379,6 +436,132 @@ integer initial retransmission timeout value in milliseconds.  \fIrto_min\fR is
 the integer minimum retransmission timeout value in milliseconds.  \fIrto_max\fR
 is the integer maximum retransmission timeout value in milliseconds.
 \fImax_retrans\fR is the integer maximum number of retransmissions.
+.TP
+.B SCTP_COOKIE_LIFE
+Sets or gets the cookie lifetime associated with a socket.  This is the amount
+of time that cookies sent to a peer endpoint in an INIT-ACK message will be
+valid.  For Linux SCTP this also limits the maximum for which the HMAC secret
+key for the cookie will be valid.  The value is a integer time interval in
+milliseconds.  Valid values are from 0 to MAXINT.  The default value is set by
+the sysctl \fIsctp_cookie_life\fR.  This socket option must be set before the
+call to \fBlisten\fR(2).
+.TP
+.B SCTP_SACK_DELAY
+Sets or gets the maximum SACK delay as the interval of time (in milliseconds)
+that the sending enpoint will delay an acknowledgement of a received data
+chunk.  Valid values are in the range from 0 to MAXINT, however, the value of
+the maximum SACK delay should not exceed the maximum RTO as set by
+\fISCTP_RTO_MAX\fR.  The default value is set by the sysctl
+\fIsctp_sack_delay\fR.  socket option may be set at any time during the life
+of the socket.
+.TP
+.B SCTP_PATH_MAX_RETRANS
+Sets or gets the number of times that the sending SCTP endpoint will attempt
+retransmitting a packet to a given destination transport address before it
+consideres that desstination transport address inactive.  Valid values include
+zero.  The default values is set by the sysctl \fIsctp_path_max_retrans\fR.
+This is the default value assigned to destinations before the call to
+\fBlisten\fR(2) or \fBconnect\fR(2).  Active destinations can be controlled
+with the \fBSCTP_RTO\fR socket option.
+.TP
+.B SCTP_ASSOC_MAX_RETRANS
+Sets or gets the number of times that the sending SCTP endpoint will attempt
+retransmitting a packet on a given association before it aborts the
+association.  Valid values include zero.  The default value is set by the
+sysctl \fIsctp_assoc_max_retrans\fR.  This valie should be larger than the
+sumof all the \fISCTP_PATH_MAX_RETRANS\fR values of each of the destinations.
+This value can be changed on an idle or active association (connection) using
+this socket option.
+.TP
+.B SCTP_MAX_INIT_RETRIES
+Sets or gets the number of times that an SCTP INIT or COOKIE ECHO will be
+resent before abandoning the association initialization.  Valid values include
+zero.  The default value is set by the sysctl \fIsctp_max_init_retries\fR.
+This socket option must be set before the call to \fBlisten\fR(2) or
+\fBconnect\fR(2).
+.TP
+.B SCTP_HEARTBEAT_ITVL
+Sets or gets the interval (in seconds) between successive HEARTBEAT messages
+use to probe destination transport addresses for RTT calculation and activity.
+Valid valis are 1 second or greater.  The default value is set by the sysctl
+\fIsctp_heartbeat_itvl\fR.  This is the default value which will be assigned
+to new destinations.  Active destinations can be controlled with the socket
+option \fISCTP_HB\fR.  This socket option must be set before the call to
+\fBlisten\fR(2) or \fBconnect\fR(2).
+.TP
+.B SCTP_RTO_INITIAL
+Sets or gets the time interval (in milliseconds) which will be used as an
+initial RTO (Retransmission Time Out) value when sending packets to a
+destination for the first time.  Value values are zero or greater and must be
+within the range from \fISCTP_RTO_MIN\fR to \fISCTP_RTO_MAX\fR.  The default
+value is the value set by \fIsctp_rto_initial\fR.  This socket option must be
+set before the call to \fBlisten\fR(2) or \fBconnect\fR(2), but the value may
+be controlled on active destination with the \fISCTP_RTO\fR socket option.
+.TP
+.B SCTP_RTO_MIN
+Sets of gest the time interval (in milliseconds) which will be used as a
+minimum RTO (Retransmission Time Out) value when sending packets.  Valid
+values are zero or greater and must be less than or equal to the value of
+\fISCTP_RTO_MAX\fR.  The default value is set by the sysctl
+\fIsctp_rto_min\fR.  This socket option must be set before the call to
+\fBlisten\fR(2) or \fBconnect\fR(2), but the value associated with active
+destinations can be controlled using the \fISCTP_RTO\fR socket option.
+.TP
+.B SCTP_RTO_MAX
+Sets of gest the time interval (in milliseconds) which will be used as a
+maximum RTO (Retransmission Time Out) value when sending packets.  Valid
+values are zero or greater and must be greater than or equal to the value of
+\fISCTP_RTO_MIN\fR.  The default value is set by the sysctl
+\fIsctp_rto_max\fR.  This socket option must be set before the call to
+\fBlisten\fR(2) or \fBconnect\fR(2), but the value associated with active
+destinations can be controlled using the \fISCTP_RTO\fR socket option.
+.TP
+.B SCTP_OSTREAMS
+Sets the number of requested outbound streams or gets the actual number of
+outbound streams associated with a connection.  Valid values are from 1 to
+16,736.  The default value is set by the sysctl \fIsctp_req_ostreams\fR.  This
+socket option must be set before or after the call to \fBlisten\fR(2) or
+\fBconnect\fR(2) but can be read at any time.
+.TP
+.B SCTP_ISTREAMS
+Sets the maximum number inbound streams or gets the actual number of inbound
+streams associated with a connection.  Valid values are from 1 to 16,736.  The
+default value is set by the sysctl \fIsctp_max_istreams\fR.  This socket
+option must be set before or after the call to \fBlisten\fR(2) or \fBconnect\fR(2) but
+can be read at any time.
+.TP
+.B SCTP_COOKIE_INC
+Sets or gets the time increment (in milliseconds) which will be added to the
+lifespan of the cookie in an INIT ACK if the receive INIT request cookie
+preservation to lengthen the lifespan of the cookie.  Valid values include
+zero.  The default value is set by the sysctl \fIsctp_cookie_inc\fR.
+This socket option must be set before or after the call to \fBlisten\fR(2) but
+can be read at any time.
+.TP
+.B SCTP_THROTTLE_ITVL
+Sets or gets the interval (in milliseconds) within which the SCTP receive will
+not accept more than one INIT or COOKIE ECHO.  Zero (don't throttle) is a
+valid value.  The default is set by the sysctl \fIsctp_throttle_itvl\fR.  This
+socket option must be set before or after the call to \fBlisten\fR(2).
+.TP
+.B SCTP_MAC_TYPE
+Sets or gets the MAC (Message Authentication Code) type which will be used
+when signing cookies in INIT ACK messages.  Valid values are
+\fISCTP_HMAC_SHA_1\fR, \fISCTP_HMAC_MD5\fR, and \fISCTP_HMAC_NONE\fR.  The
+default value is set by the sysctl \fIsctp_mac_type\fR.  This socket option
+must be set before or after the call to \fBlisten\fR(2).
+.TP
+.B SCTP_CKSUM_TYPE
+Sets or gets the checksum algorithm associated with socket.  Valid values are
+\fISCTP_CSUM_ADLER_32\fR and \fISCTP_CSUM_CRC_32C\fR.  The default value is
+set by the sysctl \fIsctp_csum_algorithm\fR.  This socket option must be set
+before the call to \fBlisten\fR(2) or \fBconnect\fR(2).
+.TP
+.B SCTP_DEBUG_OPTIONS
+(tbd)
+.TP
+.B SCTP_STATUS
+(tbd)
 
 .SH "IOCTLS"
 These ioctls can be accessed using
@@ -392,18 +575,18 @@ The correct syntax is:
 .fi
 .RE
 .TP
-\fBTIOCINQ\fR, \fBFIONREAD\fR
+.B SIOCINQ
 Returns the amount of queued unread data in the receive buffer.  Argument is a
 pointer to an integer.
 .TP
 .B SIOCATMARK
-Returns true when all urgent data has already been received by the user program.
-This is used together with \fBSO_OOBINLINE\fR.  Argument is a pointer to an
-integer for the test result.
+Returns true when all urgent data has already been received by the user
+program.  This is used together with \fBSO_OOBINLINE\fR.  Argument is a
+pointer to an integer for the test result.
 .TP
-.B TIOCOUTQ
-Returns the amount of unsent data in the socket send queue in the passed integer
-value pointer.
+.B SIOCOUTQ
+Returns the amount of unsent data in the socket send queue in the passed
+integer value pointer.
 .SH "ERROR HANDLING"
 When a network error occurs, SCTP tries to resend the packet.  If it doesn't
 succeed after some time, either \fBETIMEDOUT\fR or the last received error on
@@ -439,8 +622,8 @@ The other end didn't acknowledge retransmitted data after some time.
 .B EAFNOTSUPPORT
 Passed socket address type in \fIsin_family\fR was not \fBAF_INET\fR.
 .PP
-Any errors defined for \fBip\fR(7) or the generic socket layer may also be
-returned for SCTP.
+Any errors defined for \fBip\fR(7) or the generic \fBsocket\fR(7) layer may
+also be returned for SCTP.
 .PP
 
 .SH "BUGS"
@@ -450,11 +633,31 @@ IPv6 is not described.
 .PP
 Transparent proxy options are not described.
 .SH "VERSIONS"
-This interface is new in Linux 2.2.
+This interface was new in Linux 2.2.
 .B IP_RECVERR
 is a new feature in Linux 2.2.
 .B SCTP_CORK
 is new in 2.2.
+The socket options
+.BR SCTP_COOKIE_LIFE ,
+.BR SCTP_SACK_DELAY ,
+.BR SCTP_PATH_MAX_RETRANS ,
+.BR SCTP_ASSOC_MAX_RETRANS ,
+.BR SCTP_MAX_INIT_RETRIES ,
+.BR SCTP_HEARTBEAT_ITVL ,
+.BR SCTP_RTO_INITIAL ,
+.BR SCTP_RTO_MIN ,
+.BR SCTP_RTO_MAX ,
+.BR SCTP_OSTREAMS ,
+.BR SCTP_ISTREAMS ,
+.BR SCTP_COOKIE_INC ,
+.BR SCTP_THROTTLE_ITVL ,
+.BR SCTP_MAC_TYPE ,
+.BR SCTP_CKSUM_TYPE ,
+.BR SCTP_DEBUG_OPTIONS ,
+and
+.B SCTP_STATUS
+are new for 2.4.
 .SH "SEE ALSO"
 .BR socket (7),
 .BR socket (2),
@@ -465,10 +668,13 @@ is new in 2.2.
 .BR getsockname (2),
 and
 .BR getpeername (2).
-.br
+
 RFC2960 for the SCTP specification.
 .br
 draft-stewart-sctpsocket-01.txt
 for the description of a TCP-compatible SCTP API for sockets.
 .br
 RFC1122 for a description of the Nagle algorithm.
+.br
+draft-ietf-tsvwg-sctpcsum-06.txt
+for a description of the CRC-32c checksum algorithm.

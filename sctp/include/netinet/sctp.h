@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.1 2001/06/06 17:09:42 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.2 2002/05/08 13:06:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 2000  OpenSS7 Corporation.  All Rights Reserved.
-
+     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
 
                                   PUBLIC LICENSE
 
@@ -26,113 +25,150 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2001/06/06 17:09:42 $ by $Author: brian $
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
 
- $Log: sctp.h,v $
- Revision 0.9.2.1  2001/06/06 17:09:42  brian
- Added common user header file.
+ -----------------------------------------------------------------------------
 
- Revision 0.1  2001/06/06 17:09:42  brian
- Added common user header file.
+ Last Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+
 #include <features.h>
 #include <sys/types.h>
 
-__BEGIN_DECLS
-
-enum
-{
-        SCTP_ESTABLISHED = 1,
-        SCTP_COOKIE_WAIT,
-        SCTP_COOKIE_ECHOED,
-        SCTP_SHUTDOWN_PENDING,
-        SCTP_SHUTDOWN_SENT,
-        SCTP_UNREACHABLE,
-        SCTP_CLOSED,
-        SCTP_SHUTDOWN_RECEIVED,
-        SCTP_SHUTDOWN_ACK_SENT2,
-        SCTP_LISTEN,
-        SCTP_SHUTDOWN_ACK_SENT1
-};
-
-/*
- *  User SCTP_HDR socket option structure
- */
-struct sctpchdr {
-        uint8_t     type;       /* Chunk type, always DATA      */
-        uint8_t     flags;      /* Chunk flags                  */
-        uint16_t    len;        /* Chunk length                 */
-};
-struct sctp_data {
-        struct sctpchdr ch;
-        uint32_t        tsn;    /* Transmit Sequence Number     */
-        uint16_t        sid;    /* Stream Identifier            */
-        uint16_t        ssn;    /* Stream Sequence Number       */
-        uint32_t        ppi;    /* Payload Protocol Identifier  */
+__BEGIN_DECLS enum {
+	SCTP_ESTABLISHED = 1,
+	SCTP_COOKIE_WAIT,
+	SCTP_COOKIE_ECHOED,
+	SCTP_SHUTDOWN_PENDING,
+	SCTP_SHUTDOWN_SENT,
+	SCTP_UNREACHABLE,
+	SCTP_CLOSED,
+	SCTP_SHUTDOWN_RECEIVED,
+	SCTP_SHUTDOWN_RECVWAIT,
+	SCTP_LISTEN,
+	SCTP_SHUTDOWN_ACK_SENT
 };
 
 /*
  *  User SCTP_HB socket option structure
  */
 struct sctp_hbitvl {
-        struct sockaddr_in
-		dest;       /* destination IP address */
-	uint	active;     /* activation flag */
-        uint	itvl;       /* interval in milliseconds */
+	struct sockaddr_in
+	 dest;				/* destination IP address       */
+	uint hb_act;			/* activation flag              */
+	uint hb_itvl;			/* interval in milliseconds     */
 };
 /*
  *  User SCTP_RTO socket option structure
  */
 struct sctp_rtoval {
 	struct sockaddr_in
-		dest;		/* destination IP address	*/
-	uint	rto_initial;	/* RTO.Initial (milliseconds)	*/
-	uint	rto_min;	/* RTO.Min     (milliseconds)	*/
-	uint	rto_max;	/* RTO.Max     (milliseconds)	*/
-	uint	max_retrans;	/* Path.Max.Retrans (retires)	*/
+	 dest;				/* destination IP address       */
+	uint rto_initial;		/* RTO.Initial (milliseconds)   */
+	uint rto_min;			/* RTO.Min     (milliseconds)   */
+	uint rto_max;			/* RTO.Max     (milliseconds)   */
+	uint max_retrans;		/* Path.Max.Retrans (retires)   */
+};
+/*
+ *  User SCTP_STATUS socket option structure
+ */
+struct sctp_dstat {
+	struct sockaddr_in
+	 dest;				/* destination IP address       */
+	uint dst_cwnd;			/* congestion window            */
+	uint dst_unack;			/* unacknowledged chunks        */
+	uint dst_srtt;			/* smoothed round trip time     */
+	uint dst_rvar;			/* rtt variance                 */
+	uint dst_rto;			/* current rto                  */
+	uint dst_sst;			/* slow start threshold         */
+};
+struct sctp_astat {
+	uint assoc_rwnd;		/* receive window               */
+	uint assoc_rbuf;		/* receive buffer               */
+	uint assoc_nrep;		/* destinations reported        */
 };
 
 /*
  *  User-settable options (used with setsockopt).
  */
-#define SCTP_NODELAY    0x01    /* don't delay send to defrag or bundle chunks */
-#define SCTP_MAXSEG     0x02    /* set artificial path MTU */
-#define SCTP_CORK       0x03    /* control sending of partial chunks */
-#define SCTP_RECVSID    0x04    /* control addition of stream id ancillary data */
-#define SCTP_RECVPPI    0x05    /* control addition of payload proto id ancillary data */
-#define SCTP_RECVHDR    0x06    /* control addition of DATA chunk header */
-#define SCTP_SID        0x07    /* stream id default and ancillary data */
-#define SCTP_PPI        0x08    /* payload protocol id default and ancillary data */
-#define SCTP_HB         0x09    /* control heartbeat setting and interval */
-#define SCTP_RTO        0x0A    /* control and check RTO values */
-#define SCTP_HDR        0x0B    /* DATA chunk header ancillary data */
+#define SCTP_NODELAY		 1	/* don't delay send to defrag or bundle chunks */
+#define SCTP_MAXSEG		 2	/* set artificial path MTU */
+#define SCTP_CORK		 3	/* control sending of partial chunks */
+#define SCTP_RECVSID		 4	/* control addition of stream id ancillary data */
+#define SCTP_RECVPPI		 5	/* control addition of payload proto id ancillary data */
+#define SCTP_RECVSSN		 6
+#define SCTP_RECVTSN		 7
+#define SCTP_SID		 8	/* stream id default and ancillary data */
+#define SCTP_PPI		 9	/* payload protocol id default and ancillary data */
+#define SCTP_SSN		10
+#define SCTP_TSN		11
+#define SCTP_HB			12	/* control heartbeat setting and interval */
+#define SCTP_RTO		13	/* control and check RTO values */
+#define SCTP_COOKIE_LIFE	14
+#define SCTP_SACK_DELAY		15
+#define SCTP_PATH_MAX_RETRANS	16
+#define SCTP_ASSOC_MAX_RETRANS	17
+#define SCTP_MAX_INIT_RETRIES	18
+#define SCTP_HEARTBEAT_ITVL	19
+#define SCTP_RTO_INITIAL	20
+#define SCTP_RTO_MIN		21
+#define SCTP_RTO_MAX		22
+#define SCTP_OSTREAMS		23
+#define SCTP_ISTREAMS		24
+#define SCTP_COOKIE_INC		25
+#define SCTP_THROTTLE_ITVL	26
+#define SCTP_MAC_TYPE		27
+#define SCTP_CKSUM_TYPE		28
+#define SCTP_DEBUG_OPTIONS	29
+#define SCTP_STATUS		30
 
 /*
- *  Additional CMSG flags for use with sendmsg/recvmsg.
+ *  HMAC settings for cookie verification for use with SCTP_MAC_TYPE socket
+ *  option.
  */
-#define SCTP_CMSGF_RECVSID  0x01
-#define SCTP_CMSGF_RECVPPI  0x02
-#define SCTP_CMSGF_RECVHDR  0x04
+#define SCTP_HMAC_NONE		0	/* no hmac (all one's)              */
+#define SCTP_HMAC_SHA_1		1	/* SHA-1 coded hmac                 */
+#define SCTP_HMAC_MD5		2	/* MD5   coded hmac                 */
 
 /*
- *  HMAC settings for cookie verification.
+ *  CSUM settings for checksum algorithm selection with SCTP_CHKSUM_TYPE
+ *  socket option.
  */
-#define SCTP_HMAC_NONE      0
-#define SCTP_HMAC_SHA_1     1
-#define SCTP_HMAC_MD5       2
+#define SCTP_CSUM_ADLER32	0	/* Adler32 checksum output          */
+#define SCTP_CSUM_CRC32C	1	/* CRC-32c checksum output          */
+
+/*
+ *  Debugging flags for use with SCTP_DEBUG_OPTIONS socket option.
+ */
+#define SCTP_OPTION_DROPPING	0x01	/* stream will drop packets                 */
+#define SCTP_OPTION_BREAK	0x02	/* stream will break dest #1 and 2 one way  */
+#define SCTP_OPTION_DBREAK	0x04	/* stream will break dest both ways         */
+#define SCTP_OPTION_RANDOM	0x08	/* stream will drop packets at random       */
 
 /* this should be in in.h */
 #ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP        132     /* Stream Control Transmission Protocol */
+#define IPPROTO_SCTP        132	/* Stream Control Transmission Protocol */
 #endif
 
-#define SOL_SCTP            132     /* SCTP level */
+#define SOL_SCTP            132	/* SCTP level */
 
 __END_DECLS
-
-#endif  /* _NETINET_SCTP_H */
+#endif				/* _NETINET_SCTP_H */

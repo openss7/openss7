@@ -1,10 +1,10 @@
 # *****************************************************************************
 # 
-# $Id: RELEASE-NOTES,v 0.9.2.2 2001/05/15 19:33:19 brian Exp $
+# $Id: RELEASE-NOTES,v 0.9.2.3 2002/05/08 13:06:13 brian Exp $
 # 
 # *****************************************************************************
 # 
-# Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (C) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
 # 
 # All Rights Reserved.
 # 
@@ -24,9 +24,33 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2001/05/15 19:33:19 $ by $Author: brian $
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
 # 
 # *****************************************************************************
+# 
+# Last Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
+# 
+# *****************************************************************************
+
+Release linxu-sctp-0.2:  (Prerelease2)
+
+    Here's what works well:
+
+	The code handles socket semantics for SOCK_STREAM and SOCK_SEQPACKET
+	will and performs orderly establishment and teardown of associations
+	correctly.  All of the socket semantics tested by the test program
+	work correctly.  Multihoming and Nagle work correctly.  Multiple
+	checksums and HMAC algorithms work correctly.  Gap reports, sacks,
+	communication under noise, multihoming failover, all work well.
+	TCP compatible sockets works well.
+
+    Here's what down't work so well:
+
+	Again, don't set CONFIG_SCTP_EXTENDED_IP_SUPPORT yet.  This is still a
+	place-saver for extended Linux IP capabilities.  Don't turn it on.
+	Partial copy and checksum improvements as well as hardware checksum
+	support doesn't quite work yet.
 
 Release linux-sctp-0.1:  (Prerelease1)
 
