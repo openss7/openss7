@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.2 2004/05/12 10:14:53 brian Exp $
+.\" @(#) $Id: xti_sctp.3.man,v 0.9.2.3 2004/11/07 06:46:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/12 10:14:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/11/07 06:46:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-SCTP 3 "$Date: 2004/05/12 10:14:53 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-SCTP 3 "$Date: 2004/11/07 06:46:52 $" "$Name:  $" "X/Open Transport Interface"
 .\"
 .\"
 .SH NAME
@@ -1242,9 +1242,9 @@ current transport connection.
 .TP
 .B T_SCTP_ALI
 This option determines the adaptation layer information
-(described in draft-ietf-tsvwg-addip-sctp-07.txt)
+(described in draft-ietf-tsvwg-addip-sctp-08.txt)
 .[
-draft-ietf-tsvwg-addip-sctp-07.txt
+draft-ietf-tsvwg-addip-sctp-08.txt
 .]
 to be used in the INIT
 or INIT-ACK on all passive or active connection attempts on the transport
@@ -1269,18 +1269,18 @@ adaptation layer information was present during the connection, or returns
 the adaptation layer information bits if provided by the peer.
 .sp
 This option supports the adaptation layer information features described in
-draft-ietf-tsvwg-addip-sctp-07.txt.
+draft-ietf-tsvwg-addip-sctp-08.txt.
 .[
-draft-ietf-tsvwg-addip-sctp-07.txt
+draft-ietf-tsvwg-addip-sctp-08.txt
 .]
 .\"
 .\"
 .TP
 .B T_SCTP_PR
 This option determines whether partial reliability (described in
-draft-ietf-tsvwg-prsctp-00.txt)
+RFC 3758)
 .[
-draft-ietf-tsvwg-prsctp-00.txt
+RFC 3758
 .]
 will be supported or required on transport connection establishment, or gets
 the indication of support for partial reliability provided by the peer on a
@@ -1329,9 +1329,9 @@ or when a passive connection indication is accepted with
 .B T_SCTP_MAX_BURST
 This option determines the number of MTUs of data that will be sent in a
 single burst, as defined in
-draft-ietf-tsvwg-sctpimpguide-08.txt.
+draft-ietf-tsvwg-sctpimpguide-10.txt.
 .[
-draft-ietf-tsvwg-sctpimpguide-08.txt
+draft-ietf-tsvwg-sctpimpguide-10.txt
 .]
 The option value is formatted as a
 .BR t_scalar_t .
@@ -1451,7 +1451,7 @@ RFC 2960
 .]
 or the partial reliability timed reliability lifetime
 .[
-draft-ietf-tsvwg-prsctp-00.txt
+RFC 3758
 .]
 associated with message that are sent on this transport endpoint.
 The option value is formatted as a
@@ -1464,9 +1464,9 @@ that contains the lifetime (in milliseconds).
 This option determines whether the transport endpoint will support the add IP
 extension
 .RB ( ADD-IP " and " DEL-IP )
-described in draft-ietf-tsvwg-addip-sctp-07.txt.
+described in draft-ietf-tsvwg-addip-sctp-08.txt.
 .[
-draft-ietf-tsvwg-addip-sctp-07.txt
+draft-ietf-tsvwg-addip-sctp-08.txt
 .]
 The option value is formatted as a
 .B t_scalar_t
@@ -1544,9 +1544,9 @@ or equivalent commands.
 This option determines whether the transport endpoint will support the add IP
 extensions
 .RB ( SET-PRIMARY )
-described in draft-ietf-tsvwg-addip-sctp-07.txt.
+described in draft-ietf-tsvwg-addip-sctp-08.txt.
 .[
-draft-ietf-tsvwg-addip-sctp-07.txt
+draft-ietf-tsvwg-addip-sctp-08.txt
 .]
 The option value is formatted as a
 .B t_scalar_t

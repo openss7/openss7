@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/10/13 09:47:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/11/07 07:30:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,12 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 09:47:10 $ by $Author: brian $
+# Last Modified $Date: 2004/11/07 07:30:06 $ by $Author: brian $
 #
 # =============================================================================
+
+ALL_LOCAL		=
+CLEAN_LOCAL		=
 
 info_TEXINFOS		= openss7.texi libxnet.texi
 
@@ -64,5 +67,8 @@ EXTRA_info_TEXINFOS	= \
 EXTRA_DIST		=
 
 include ../../am/info.am
+
+all-local: $(ALL_LOCAL)
+clean-local: $(CLEAN_LOCAL)
 
 # vim: ft=automake

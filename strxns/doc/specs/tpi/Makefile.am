@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/11/05 00:30:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/11/07 07:10:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,12 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/05 00:30:26 $ by $Author: brian $
+# Last Modified $Date: 2004/11/07 07:10:07 $ by $Author: brian $
 #
 # =============================================================================
+
+ALL_LOCAL		=
+CLEAN_LOCAL		=
 
 info_TEXINFOS		= tpi.texi tpi_tcap.texi
 
@@ -79,5 +82,8 @@ TBL_TBLS		= \
 EXTRA_DIST		=
 
 include ../../../am/info.am
+
+all-local: $(ALL_LOCAL)
+clean-local: $(CLEAN_LOCAL)
 
 # vim: ft=automake

@@ -3105,6 +3105,20 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-prsctp-00.txt
 
+%L RFC 3758
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Michael Tuxen
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP) Partial Reliability Extension
+%R RFC 3758
+%D May 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3758.txt
+
 %K addip-07
 %L ADDIP07
 %A Randall R. Stewart
@@ -3121,6 +3135,23 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-07.txt
+
+%K addip-08
+%L ADDIP08
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Ian Rytina
+%A Maria-Carmen Belinchon
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%Q Internet Engineering Task Force - Transport Area Working Group
+%T Stream Control Transmission Protocol (SCTP) Dynamic Address Reconfiguration
+%R draft-ietf-tsvwg-addip-sctp-08.txt
+%D September 24, 2003
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-08.txt
 
 %K sctpig-08
 %L SCTPIG08
@@ -3139,6 +3170,22 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-08.txt
+
+%K sctpig-10
+%L SCTPIG10
+%A Randall R. Stewart
+%A Ivan Arias-Rodriguez
+%A Kacheong Poon
+%A Armando L. Caro Jr.
+%A Michael Tuxen
+%E Randall R. Stewart
+%Q Internet Engineering Task Force - Transport Area Working Group
+%T Stream Control Transmission Protocol (SCTP) Implementor's Guide
+%R draft-ietf-tsvwg-sctpimpguide-10.txt
+%D November 13, 2003
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt
 
 %K capi20
 %L CAPI 2.0
