@@ -21,7 +21,10 @@ CC += -DLiS $(OPT) $(XOPTS)
 OBJS := fifo loop relay clone minimux printk timod tirdwr sad pipemod
 
 # Object names only known to the Linux kernel target.
-TOBJS := ip_strm_mod ldl connld ip_to_dlpi mtdrv
+TOBJS := ip_strm_mod ldl connld mtdrv
+ifneq ($(KVER_MAJORMINOR),2.2)
+TOBJS += ip_to_dlpi
+endif
 
 # Similar to TOBJS, but non-streams modules
 ZOBJS := liskmod
