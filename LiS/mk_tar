@@ -1,0 +1,7 @@
+. version
+. files
+
+cd ..
+tar czf LiS-$LISVER.tgz $FILES
+
+echo "made LiS-$LISVER.tgz"
