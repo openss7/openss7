@@ -28,7 +28,9 @@
 #ifndef _CMD_ERR_H
 #define _CMD_ERR_H 1
 
-#ident "@(#) LiS cmn_err.h 2.2 7/10/00 15:39:07 "
+#ident "@(#) LiS cmn_err.h 2.5 10/01/04 15:07:57 "
+
+#include <sys/LiS/genconf.h>
 
 #define	CE_CONT		0		/* continue printing */
 #define	CE_NOTE		1		/* NOTICE */
@@ -37,7 +39,8 @@
 
 #ifdef __KERNEL__
 
-void	lis_cmn_err(int err_lvl, char *fmt, ...) ;
+void    lis_cmn_err_init(void) ;	/* not exported */
+void	lis_cmn_err(int err_lvl, char *fmt, ...) _RP;
 #define	cmn_err		lis_cmn_err
 
 typedef      void  (*lis_print_trace_t)   (char *bfrp) ;

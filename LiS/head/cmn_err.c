@@ -31,7 +31,7 @@
  * 
  */
 
-#ident "@(#) LiS cmn_err.c 2.10 8/14/02 20:17:44 "
+#ident "@(#) LiS cmn_err.c 2.12 10/01/04 15:07:57 "
 
 #include <sys/strport.h>
 #include <sys/cmn_err.h>
@@ -83,17 +83,23 @@
 
 #endif
 
-lis_print_trace_t      lis_print_trace;
 
+lis_spin_lock_t	 lis_cmn_err_lock ;
 char	    lis_cmn_err_buf[4096];
 #define	buf lis_cmn_err_buf
 
-void	lis_cmn_err(int err_lvl, char *fmt, ...)
+void	lis_cmn_err_init(void)
 {
-    extern int	 vsprintf (char *, const char *, va_list);
+    lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock") ;
+}
+
+void	_RP lis_cmn_err(int err_lvl, char *fmt, ...)
+{
     va_list	 args;
+    lis_flags_t  psw;
     char	*p ;
 
+    lis_spin_lock_irqsave(&lis_cmn_err_lock, &psw) ;
     switch (err_lvl)
     {
     case CE_CONT:		/* continue printing */
@@ -109,12 +115,11 @@ void	lis_cmn_err(int err_lvl, char *fmt, ...)
 	strcpy(buf, PRE_NL KERN_EMERG "PANIC: ") ;
 	break ;
     default:
-	sprintf(buf, "\n" KERN_NOTICE
+	lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw) ;
+	printk("\n" KERN_NOTICE
 		     "cmn_err:  Called with invalid arguments "
 		     "(0x%lx, 0x%lx)\n",
 		     (long) err_lvl, (long) fmt) ;
-	if ( lis_print_trace )
-	    (*lis_print_trace) (buf);
 	return ;
     }
 
@@ -136,7 +141,8 @@ void	lis_cmn_err(int err_lvl, char *fmt, ...)
     if (err_lvl == CE_PANIC)
 	PANIC(buf);
     else
-	if ( lis_print_trace )
-	    (*lis_print_trace) (buf);
+	printk("%s", buf) ;
+
+    lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw) ;
 
 } /* lis_cmn_err */

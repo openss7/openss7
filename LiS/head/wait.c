@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es
  */
 
-#ident "@(#) LiS wait.c 2.18 12/15/02 22:53:54 "
+#ident "@(#) LiS wait.c 2.25 10/01/04 15:06:54 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -49,8 +49,8 @@
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
 
-#define	AINC(v)		lis_atomic_inc(&(v))
-#define	ADEC(v)		lis_atomic_dec(&(v))
+#define	AINC(v)		K_ATOMIC_INC(&(v))
+#define	ADEC(v)		K_ATOMIC_DEC(&(v))
 
 /*  -------------------------------------------------------------------  */
 /*				 Global vars                             */
@@ -80,10 +80,10 @@ lis_sleep_on_close_wt(void *q_str)
 
     lis_clear_and_save_sigs(sd);		/* undo pending signals */
     lis_sleep_on_close_wt_cnt++ ;
-    lis_atomic_dec(&lis_in_syscall) ;		/* "done" with a system call */
+    K_ATOMIC_DEC(&lis_in_syscall) ;		/* "done" with a system call */
     lis_runqueues();
     rslt = lis_down(&sd->sd_close_wt);
-    lis_atomic_inc(&lis_in_syscall) ;		/* processing a system call */
+    K_ATOMIC_INC(&lis_in_syscall) ;		/* processing a system call */
     lis_restore_sigs(sd);			/* restore old signals */
     return(rslt) ;
 
@@ -106,14 +106,14 @@ lis_wakeup_close_wt(void *q_str)
 }/*lis_wakeup_close_wt*/
 /*  -------------------------------------------------------------------  */
 int 
-lis_sleep_on_wioc(struct stdata * sd)
+lis_sleep_on_wioc(struct stdata * sd, char *f,int l)
 {
     int		rslt ;
 
-    lis_atomic_dec(&lis_in_syscall) ;		/* "done" with a system call */
+    K_ATOMIC_DEC(&lis_in_syscall) ;		/* "done" with a system call */
     lis_runqueues();
-    rslt = lis_down(&sd->sd_wioc);
-    lis_atomic_inc(&lis_in_syscall) ;		/* processing a system call */
+    rslt = lis_down_fcn(&sd->sd_wioc,f,l);
+    K_ATOMIC_INC(&lis_in_syscall) ;		/* processing a system call */
     return(rslt) ;
 
 }/*lis_sleep_on_wioc*/
@@ -130,17 +130,18 @@ lis_sleep_on_wwrite(struct stdata * sd)
 
     AINC(sd->sd_wrcnt) ;
     lis_unlockq(sd->sd_wq) ;
-    lis_atomic_dec(&lis_in_syscall) ;		/* "done" with a system call */
+    K_ATOMIC_DEC(&lis_in_syscall) ;		/* "done" with a system call */
     lis_runqueues();
     if ((ret = lis_down(&sd->sd_wwrite)) < 0)
-    {
-	lis_lockq(sd->sd_wq) ;
 	ADEC(sd->sd_wrcnt) ;
+    else					/* no error */
+    if ((ret = lis_lockq(sd->sd_wq)) < 0)	/* relock queue */
+    {
+	ADEC(sd->sd_wrcnt) ;			/* back out */
+	lis_up(&sd->sd_wwrite) ;
     }
-    else
-	lis_lockq(sd->sd_wq) ;
 
-    lis_atomic_inc(&lis_in_syscall) ;		/* processing a system call */
+    K_ATOMIC_INC(&lis_in_syscall) ;		/* processing a system call */
     return(ret) ;
 
 }/*lis_sleep_on_wwrite*/
@@ -148,8 +149,15 @@ lis_sleep_on_wwrite(struct stdata * sd)
 void 
 lis_wake_up_wwrite(struct stdata * sd)
 {
-    lis_lockq(sd->sd_wq) ;
-    if (lis_atomic_read(&sd->sd_wrcnt) > 0)
+    int	err ;
+
+    if ((err = lis_lockq(sd->sd_wq)) < 0)
+    {
+	lis_stream_error(sd, err, err) ;
+	return ;
+    }
+
+    if (K_ATOMIC_READ(&sd->sd_wrcnt) > 0)
     {
 	ADEC(sd->sd_wrcnt) ;
 	lis_unlockq(sd->sd_wq) ;
@@ -163,15 +171,14 @@ lis_wake_up_wwrite(struct stdata * sd)
 void 
 lis_wake_up_all_wwrite(struct stdata * sd)
 {
-    lis_lockq(sd->sd_wq) ;
-    while (lis_atomic_read(&sd->sd_wrcnt) > 0)
+    /*
+     * No queue locking, just wake up everybody and let them contend
+     */
+    while (K_ATOMIC_READ(&sd->sd_wrcnt) > 0)
     {
 	ADEC(sd->sd_wrcnt) ;
-	lis_unlockq(sd->sd_wq) ;
 	lis_up(&sd->sd_wwrite);
-	lis_lockq(sd->sd_wq) ;
     }
-    lis_unlockq(sd->sd_wq) ;
 
 }/*lis_wake_up_all_wwrite*/
 /*  -------------------------------------------------------------------  */
@@ -182,13 +189,19 @@ lis_sleep_on_wread(struct stdata * sd)
 
     AINC(sd->sd_rdcnt) ;			/* inc while q locked */
     lis_unlockq(sd->sd_rq) ;			/* unlock to let rsrv run */
-    lis_atomic_dec(&lis_in_syscall) ;		/* "done" with a system call */
+    K_ATOMIC_DEC(&lis_in_syscall) ;		/* "done" with a system call */
     lis_runqueues();
-    if ((ret = lis_down(&sd->sd_wread)) < 0)	/* now sleep */
-	ADEC(sd->sd_rdcnt) ;
 
-    lis_atomic_inc(&lis_in_syscall) ;		/* processing a system call */
-    lis_lockq(sd->sd_rq) ;			/* relock b4 returning */
+    if ((ret = lis_down(&sd->sd_wread)) < 0)
+	ADEC(sd->sd_rdcnt) ;
+    else					/* no error */
+    if ((ret = lis_lockq(sd->sd_rq)) < 0)	/* relock queue */
+    {
+	ADEC(sd->sd_rdcnt) ;			/* back out */
+	lis_up(&sd->sd_wread) ;
+    }
+
+    K_ATOMIC_INC(&lis_in_syscall) ;		/* processing a system call */
     return(ret) ;
 
 }/*lis_sleep_on_wread*/
@@ -196,8 +209,14 @@ lis_sleep_on_wread(struct stdata * sd)
 void 
 lis_wake_up_wread(struct stdata * sd)
 {
-    lis_lockq(sd->sd_rq) ;
-    if (lis_atomic_read(&sd->sd_rdcnt) > 0)		/* someone is reading */
+    int	err ;
+
+    if ((err = lis_lockq(sd->sd_rq)) < 0)
+    {
+	lis_stream_error(sd, err, err) ;
+	return ;
+    }
+    if (K_ATOMIC_READ(&sd->sd_rdcnt) > 0)		/* someone is reading */
     {
 	ADEC(sd->sd_rdcnt) ;
 	lis_unlockq(sd->sd_rq) ;
@@ -211,15 +230,14 @@ lis_wake_up_wread(struct stdata * sd)
 void 
 lis_wake_up_all_wread(struct stdata * sd)
 {
-    lis_lockq(sd->sd_rq) ;
-    while (lis_atomic_read(&sd->sd_rdcnt) > 0)
+    /*
+     * No queue locking, just wake up everybody and let them contend
+     */
+    while (K_ATOMIC_READ(&sd->sd_rdcnt) > 0)
     {
 	ADEC(sd->sd_rdcnt) ;
-	lis_unlockq(sd->sd_rq) ;
 	lis_up(&sd->sd_wread);
-	lis_lockq(sd->sd_rq) ;
     }
-    lis_unlockq(sd->sd_rq) ;
 
 }/*lis_wake_up_all_wread*/
 /*  -------------------------------------------------------------------  */
@@ -239,7 +257,7 @@ lis_sleep_on_read_sem(struct stdata * sd)
 void 
 lis_wake_up_read_sem(struct stdata * sd)
 {
-    if (lis_atomic_read(&sd->sd_rdsemcnt) > 0)		/* someone is reading */
+    if (K_ATOMIC_READ(&sd->sd_rdsemcnt) > 0)		/* someone is reading */
     {
 	ADEC(sd->sd_rdsemcnt) ;
 	lis_up(&sd->sd_read_sem);
@@ -250,7 +268,7 @@ lis_wake_up_read_sem(struct stdata * sd)
 void 
 lis_wake_up_all_read_sem(struct stdata * sd)
 {
-    while (lis_atomic_read(&sd->sd_rdsemcnt) > 0)
+    while (K_ATOMIC_READ(&sd->sd_rdsemcnt) > 0)
     {
 	ADEC(sd->sd_rdsemcnt) ;
 	lis_up(&sd->sd_read_sem);
@@ -264,10 +282,10 @@ lis_sleep_on_wiocing(struct stdata * sd)
 {
     int		ret ;
 
-    lis_atomic_dec(&lis_in_syscall) ;		/* "done" with a system call */
+    K_ATOMIC_DEC(&lis_in_syscall) ;		/* "done" with a system call */
     lis_runqueues();
     ret = lis_down(&sd->sd_wiocing);
-    lis_atomic_inc(&lis_in_syscall) ;		/* processing a system call */
+    K_ATOMIC_INC(&lis_in_syscall) ;		/* processing a system call */
     return(ret) ;
 
 }/*lis_sleep_on_wiocing*/
