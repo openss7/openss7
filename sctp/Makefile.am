@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/12/20 16:32:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/12/21 00:14:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/20 16:32:30 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 00:14:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,7 @@ sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)
 
 nodist_libSCTPmodl_a_SOURCES	= $(sctp_source_FILES)
 
-libSCTPmodl_a_DEPENDENCIES	= config.h
+libSCTPmodl_a_DEPENDENCIES	= config.h include/linux/hooks.h
 libSCTPmodl_a_CPPFLAGS		= \
 				  -I./src \
 				  -I$(srcdir)/src \
