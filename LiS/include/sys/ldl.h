@@ -5,7 +5,7 @@
 #if 0 /* Now defined in the LiS configuration */
 #define LDL_MAJOR	58 /* Driver major device number	*/
 #endif
-#define LDL_N_MINOR	16 /* Number of minors			*/
+#define LDL_N_MINOR	256 /* Number of minors			*/
 
 #ident "@(#) LiS ldl.h 2.9 12/19/00 21:08:37 "
 
