@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/30 21:52:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/30 21:52:37 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/30 21:52:37 $";
 
 #include "compat.h"
 
@@ -65,12 +65,14 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION		"LfS $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/08/29 20:25:32 $"
+#define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2004/08/30 21:52:37 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define MX_SDL_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MX_SDL_LICENSE		"GPL"
 #define MX_SDL_BANNER		MX_SDL_DESCRIP		"\n" \
+				MX_SDL_EXTRA		"\n" \
 				MX_SDL_REVISION		"\n" \
 				MX_SDL_COPYRIGHT	"\n" \
 				MX_SDL_DEVICE		"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:26 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:26 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:32 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -19939,16 +19939,15 @@ sccp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	/* 
-	   allocate a new device */
+	/* allocate a new device */
 	cminor = SCCP_CMINOR_FREE;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *scp; scp = &(*scp)->next) {
-		ushort dmajor = (*scp)->u.dev.cmajor;
+		major_t dmajor = (*scp)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*scp)->u.dev.cminor;
+			minor_t dminor = (*scp)->u.dev.cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)

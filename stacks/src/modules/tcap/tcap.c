@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 06:19:39 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -93,18 +93,20 @@ static char const ident[] =
 //#include <sys/xti_tc.h>
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
-#define TCAP_REVISION	"LfS $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $"
+#define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:35 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TCAP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
+#define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCAP_LICENSE	"GPL"
 #define TCAP_BANNER	TCAP_DESCRIP	"\n" \
+			TCAP_EXTRA	"\n" \
 			TCAP_REVISION	"\n" \
 			TCAP_COPYRIGHT	"\n" \
 			TCAP_DEVICE	"\n" \
-			TCAP_CONTACT	"\n"
-#define TCAP_SPLASH	TCAP_DEVICE	" - " \
-			TCAP_REVISION	"\n"
+			TCAP_CONTACT
+#define TCAP_SPLASH	TCAP_DESCRIP	"\n" \
+			TCAP_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(TCAP_CONTACT);
@@ -112,7 +114,7 @@ MODULE_DESCRIPTION(TCAP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TCAP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TCAP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifndef FIXME
@@ -9767,19 +9769,21 @@ sccp_w_prim(queue_t *q, mblk_t *mp)
  *  OPEN and CLOSE
  *
  *  =========================================================================
- *
+ */
+STATIC int tcap_majors[CMAJORS] = { CMAJOR_0, };
+
+/*
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int tcap_majors[CMAJORS] = { CMAJOR_0, };
 STATIC int
 tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	struct tcap *tcap, **tcapp = &master.tcap.list;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -9799,11 +9803,11 @@ tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = TCAP_CMINOR_FREE;
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *tcapp; tcapp = &(*tcapp)->next) {
-		ushort dmajor = (*tcapp)->u.dev.cmajor;
+		major_t dmajor = (*tcapp)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*tcapp)->u.dev.cminor;
+			minor_t dminor = (*tcapp)->u.dev.cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)

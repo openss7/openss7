@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:17 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 00:53:17 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:17 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:17 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -84,18 +84,20 @@ static char const ident[] =
 #endif
 
 #define MX_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
-#define MX_X400P_REVISION	"LfS $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/27 00:53:17 $"
+#define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linx Fast-STREAMS."
+#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_X400P_LICENSE	"GPL"
 #define MX_X400P_BANNER		MX_X400P_DESCRIP	"\n" \
+				MX_X400P_EXTRA		"\n" \
 				MX_X400P_REVISION	"\n" \
 				MX_X400P_COPYRIGHT	"\n" \
 				MX_X400P_DEVICE		"\n" \
-				MX_X400P_CONTACT	"\n"
-#define MX_X400P_SPLASH		MX_X400P_DEVICE		" - " \
-				MX_X400P_REVISION	"\n"
+				MX_X400P_CONTACT
+#define MX_X400P_SPLASH		MX_X400P_DESCRIP	"\n" \
+				MX_X400P_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(MX_X400P_CONTACT);
@@ -103,7 +105,7 @@ MODULE_DESCRIPTION(MX_X400P_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MX_X400P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MX_X400P_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -111,11 +113,7 @@ MODULE_LICENSE(MX_X400P_LICENSE);
 #define MX_X400P_DRV_NAME	CONFIG_STREAMS_MX_X400P_NAME
 #define MX_X400P_CMAJORS	CONFIG_STREAMS_MX_X400P_NMAJORS
 #define MX_X400P_CMAJOR_0	CONFIG_STREAMS_MX_X400P_MAJOR
-#define MX_X400P_NMINOR		CONFIG_STREAMS_MX_X400P_NMINORS
-#endif
-
-#ifndef MX_X400P_NMINOR
-#define MX_X400P_NMINOR		255
+#define MX_X400P_UNITS		CONFIG_STREAMS_MX_X400P_NMINORS
 #endif
 
 /*
@@ -126,44 +124,50 @@ MODULE_LICENSE(MX_X400P_LICENSE);
  *  =======================================================================
  */
 
-STATIC struct module_info xp_rinfo = {
-	mi_idnum:MX_X400P_DRV_ID,	/* Module ID number */
-	mi_idname:MX_X400P_DRV_NAME "-rd",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1024,			/* Hi water mark */
-	mi_lowat:0			/* Lo water mark */
+#define DRV_ID		MX_X400P_DRV_ID
+#define DRV_NAME	MX_X400P_DRV_NAME
+#define CMAJORS		MX_X400P_CMAJORS
+#define CMAJOR_0	MX_X400P_CMAJOR_0
+#define UNITS		MX_X400P_UNITS
+#ifdef MODULE
+#define DRV_BANNER	MX_X400P_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	MX_X400P_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info xp_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1024,		/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_info xp_winfo = {
-	mi_idnum:MX_X400P_DRV_ID,	/* Module ID number */
-	mi_idname:MX_X400P_DRV_NAME "-wr",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1024,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
-};
+STATIC struct module_stat xp_mstat = { 0, };
 
 STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
-	qi_putp:ss7_oput,		/* Read put (message from below) */
-	qi_srvp:ss7_osrv,		/* Read queue service */
-	qi_qopen:xp_open,		/* Each open */
-	qi_qclose:xp_close,		/* Last close */
-	qi_minfo:&xp_rinfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = xp_open,		/* Each open */
+	.qi_qclose = xp_close,		/* Last close */
+	.qi_minfo = &xp_minfo,		/* Information */
+	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
 STATIC struct qinit xp_winit = {
-	qi_putp:ss7_iput,		/* Write put (message from above) */
-	qi_srvp:ss7_isrv,		/* Write queue service */
-	qi_minfo:&xp_winfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_minfo = &xp_minfo,		/* Information */
+	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
-STATIC struct streamtab xp_info = {
-	st_rdinit:&xp_rinit,		/* Upper read queue */
-	st_wrinit:&xp_winit,		/* Upper write queue */
+STATIC struct streamtab mx_x400pinfo = {
+	.st_rdinit = &xp_rinit,		/* Upper read queue */
+	.st_wrinit = &xp_winit,		/* Upper write queue */
 };
 
 /*
@@ -4954,6 +4958,7 @@ tx_table_valueN(int state, uint8_t byte, int len)
 	}
 	return result;
 }
+
 STATIC tx_entry_t
 tx_table_value(int state, uint8_t byte)
 {
@@ -5175,11 +5180,13 @@ rx_table_valueN(int state, uint8_t byte, int len)
 	}
 	return result;
 }
+
 STATIC rx_entry_t
 rx_table_value7(int state, uint8_t byte)
 {
 	return rx_table_valueN(state, byte, 7);
 }
+
 STATIC rx_entry_t
 rx_table_value8(int state, uint8_t byte)
 {
@@ -5260,30 +5267,30 @@ xp_init_tables(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocated bc_table\n", __FUNCTION__);
 		goto bc_failed;
 	}
-	printd(("%s: allocated BC table size %u kernel pages\n", MX_X400P_DRV_NAME, 1 << bc_order));
+	printd(("%s: allocated BC table size %u kernel pages\n", DRV_NAME, 1 << bc_order));
 	length = SDT_TX_TABLE_LENGTH * sizeof(tx_entry_t);
 	for (tx_order = 0; PAGE_SIZE << tx_order < length; tx_order++) ;
 	if (!(tx_table = (tx_entry_t *) __get_free_pages(GFP_KERNEL, tx_order))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocated tx_table\n", __FUNCTION__);
 		goto tx_failed;
 	}
-	printd(("%s: allocated Tx table size %u kernel pages\n", MX_X400P_DRV_NAME, 1 << tx_order));
+	printd(("%s: allocated Tx table size %u kernel pages\n", DRV_NAME, 1 << tx_order));
 	length = 2 * (SDT_RX_TABLE_LENGTH * sizeof(rx_entry_t));
 	for (rx_order = 0; PAGE_SIZE << rx_order < length; rx_order++) ;
 	if (!(rx_table = (rx_entry_t *) __get_free_pages(GFP_KERNEL, rx_order))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocated rx_table\n", __FUNCTION__);
 		goto rx_failed;
 	}
-	printd(("%s: allocated Rx table size %u kernel pages\n", MX_X400P_DRV_NAME, 1 << rx_order));
+	printd(("%s: allocated Rx table size %u kernel pages\n", DRV_NAME, 1 << rx_order));
 	rx_table7 = (rx_entry_t *) (((uint8_t *) rx_table) + (PAGE_SIZE << (rx_order - 1)));
 	bc_table_generate();
-	printd(("%s: generated BC table\n", MX_X400P_DRV_NAME));
+	printd(("%s: generated BC table\n", DRV_NAME));
 	tx_table_generate();
-	printd(("%s: generated 8-bit Tx table\n", MX_X400P_DRV_NAME));
+	printd(("%s: generated 8-bit Tx table\n", DRV_NAME));
 	rx_table_generate8();
-	printd(("%s: generated 8-bit Rx table\n", MX_X400P_DRV_NAME));
+	printd(("%s: generated 8-bit Rx table\n", DRV_NAME));
 	rx_table_generate7();
-	printd(("%s: generated 7-bit Rx table\n", MX_X400P_DRV_NAME));
+	printd(("%s: generated 7-bit Rx table\n", DRV_NAME));
 	return (0);
       rx_failed:
 	free_pages((unsigned long) tx_table, xchg(&tx_order, 0));
@@ -5294,15 +5301,16 @@ xp_init_tables(void)
       bc_failed:
 	return (-ENOMEM);
 }
-STATIC void
+STATIC int
 xp_free_tables(void)
 {
 	free_pages((unsigned long) bc_table, bc_order);
-	printd(("%s: freed BC table kernel pages\n", MX_X400P_DRV_NAME));
+	printd(("%s: freed BC table kernel pages\n", DRV_NAME));
 	free_pages((unsigned long) tx_table, tx_order);
-	printd(("%s: freed Tx table kernel pages\n", MX_X400P_DRV_NAME));
+	printd(("%s: freed Tx table kernel pages\n", DRV_NAME));
 	free_pages((unsigned long) rx_table, rx_order);
-	printd(("%s: freed Rx table kernel pages\n", MX_X400P_DRV_NAME));
+	printd(("%s: freed Rx table kernel pages\n", DRV_NAME));
+	return (0);
 }
 
 /*
@@ -6024,12 +6032,12 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
-		ptrace(("%s: ERROR: primitive too small = %d bytes\n", MX_X400P_DRV_NAME,
+		ptrace(("%s: ERROR: primitive too small = %d bytes\n", DRV_NAME,
 			mp->b_wptr - mp->b_rptr));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
-		ptrace(("%s: ERROR: interface out of state\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: interface out of state\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 	xp->i_state = LMI_ATTACH_PENDING;
@@ -6038,17 +6046,17 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	card = (ppa >> 12) & 0x0f;
 	for (cd = x400p_cards; cd && cd->card != card; cd = cd->next) ;
 	if (!cd) {
-		ptrace(("%s: ERROR: invalid card %d\n", MX_X400P_DRV_NAME, card));
+		ptrace(("%s: ERROR: invalid card %d\n", DRV_NAME, card));
 		goto lmi_badppa;
 	}
 	/* check span */
 	span = (ppa >> 8) & 0x0f;
 	if (span < 0 || span > X400_SPANS - 1) {
-		ptrace(("%s: ERROR: invalid span %d\n", MX_X400P_DRV_NAME, span));
+		ptrace(("%s: ERROR: invalid span %d\n", DRV_NAME, span));
 		goto lmi_badppa;
 	}
 	if (!(sp = cd->spans[span])) {
-		ptrace(("%s: ERROR: unallocated span %d\n", MX_X400P_DRV_NAME, span));
+		ptrace(("%s: ERROR: unallocated span %d\n", DRV_NAME, span));
 		goto lmi_badppa;
 	}
 	if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1) {
@@ -6062,19 +6070,19 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
 			if (chan < 1 || chan > 31) {
-				ptrace(("%s: ERROR: invalid chan %d\n", MX_X400P_DRV_NAME, chan));
+				ptrace(("%s: ERROR: invalid chan %d\n", DRV_NAME, chan));
 				goto lmi_badppa;
 			}
 			slot = xp_e1_chan_map[chan - 1];
 			if (sp->slots[slot]) {
-				ptrace(("%s: ERROR: slot %d in use\n", MX_X400P_DRV_NAME, slot));
+				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				MX_X400P_DRV_NAME, card, span, chan, slot));
+				DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = xp_get(xp);
@@ -6105,19 +6113,19 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			return (QR_DONE);
 		case SDL_GTYPE_T1:
 			if (chan < 1 || chan > 24) {
-				ptrace(("%s: ERROR: invalid chan %d\n", MX_X400P_DRV_NAME, chan));
+				ptrace(("%s: ERROR: invalid chan %d\n", DRV_NAME, chan));
 				goto lmi_badppa;
 			}
 			slot = xp_t1_chan_map[chan - 1];
 			if (sp->slots[slot]) {
-				ptrace(("%s: ERROR: slot %d in use\n", MX_X400P_DRV_NAME, slot));
+				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				MX_X400P_DRV_NAME, card, span, chan, slot));
+				DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = xp_get(xp);
@@ -6155,14 +6163,13 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]); c++)
 				if (sp->slots[xp_e1_chan_map[c]]) {
 					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						MX_X400P_DRV_NAME, c));
+						DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
-			printd(("%s: attaching card %d, entire span %d\n", MX_X400P_DRV_NAME, card,
-				span));
+			printd(("%s: attaching card %d, entire span %d\n", DRV_NAME, card, span));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]);
@@ -6199,7 +6206,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			for (c = 0; c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0])); c++)
 				if (sp->slots[xp_t1_chan_map[c]]) {
 					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						MX_X400P_DRV_NAME, c));
+						DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
@@ -6208,7 +6215,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				printd(("%s: attaching card %d, entire span %d\n",
-					MX_X400P_DRV_NAME, card, span));
+					DRV_NAME, card, span));
 				for (c = 0;
 				     c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0]));
 				     c++) {
@@ -6314,32 +6321,31 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	struct sp *sp;
 	/* validate enable */
 	if (xp->i_state != LMI_DISABLED) {
-		ptrace(("%s: ERROR: out of state: state = %ld\n", MX_X400P_DRV_NAME, xp->i_state));
+		ptrace(("%s: ERROR: out of state: state = %ld\n", DRV_NAME, xp->i_state));
 		goto lmi_outstate;
 	}
 	if (!(sp = xp->sp)) {
-		ptrace(("%s: ERROR: out of state: no span pointer\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: out of state: no span pointer\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 	if (!(cd = sp->cd)) {
-		ptrace(("%s: ERROR: out of state: no card pointer\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: out of state: no card pointer\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 #ifdef _DEBUG
 	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1) {
-		ptrace(("%s: ERROR: card group type = %lu\n", MX_X400P_DRV_NAME,
-			cd->config.ifgtype));
+		ptrace(("%s: ERROR: card group type = %lu\n", DRV_NAME, cd->config.ifgtype));
 		return m_error(q, xp, EFAULT);
 	}
 #endif
 	if (xp->sdl.config.ifflags & SDL_IF_UP) {
-		ptrace(("%s: ERROR: out of state: device already up\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: out of state: device already up\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 	if ((err = lmi_enable_con(q, xp)))
 		return (err);
 	/* commit enable */
-	printd(("%s: performing enable\n", MX_X400P_DRV_NAME));
+	printd(("%s: performing enable\n", DRV_NAME));
 	xp->i_state = LMI_ENABLE_PENDING;
 	xp->sdl.config.ifname = sp->config.ifname;
 	xp->sdl.config.ifflags |= SDL_IF_UP;
@@ -6388,7 +6394,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_E1:
 		{
 			psw_t flags = 0;
-			printd(("%s: performing enable on E1 span %d\n", MX_X400P_DRV_NAME, span));
+			printd(("%s: performing enable on E1 span %d\n", DRV_NAME, span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
@@ -6467,7 +6473,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			int byte, val, c;
 			unsigned short mask = 0;
 			psw_t flags = 0;
-			printd(("%s: performing enable on T1 span %d\n", MX_X400P_DRV_NAME, span));
+			printd(("%s: performing enable on T1 span %d\n", DRV_NAME, span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
@@ -7611,7 +7617,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 				case SDL_GTYPE_E1:
 				{
 					printd(("%s: performing reconfiguration of E1 span %d\n",
-						MX_X400P_DRV_NAME, span));
+						DRV_NAME, span));
 					/* Tell ISR to re-evaluate the sync source */
 					cd->eval_syncsrc = 1;
 					tcr1 = 0x09;	/* TCR1: TSiS mode */
@@ -7651,7 +7657,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 					int byte, val, c;
 					unsigned short mask = 0;
 					printd(("%s: performing reconfiguration of T1 span %d\n",
-						MX_X400P_DRV_NAME, span));
+						DRV_NAME, span));
 					/* Tell ISR to re-evaluate the sync source */
 					cd->eval_syncsrc = 1;
 					/* Enable F bits pattern */
@@ -8660,7 +8666,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		switch (cmd) {
 		default:
-			ptrace(("%s: ERROR: Unknown IOCTL %d\n", MX_X400P_DRV_NAME, cmd));
+			ptrace(("%s: ERROR: Unknown IOCTL %d\n", DRV_NAME, cmd));
 		case I_STR:
 		case I_LINK:
 		case I_PLINK:
@@ -8671,7 +8677,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		ptrace(("%s: ERROR: Unsupported STREAMS ioctl\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unsupported STREAMS ioctl\n", DRV_NAME));
 		ret = -EOPNOTSUPP;
 		break;
 	}
@@ -8798,7 +8804,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		if (count < size || xp->i_state == LMI_UNATTACHED) {
 			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %ld\n",
-				MX_X400P_DRV_NAME, count, size, xp->i_state));
+				DRV_NAME, count, size, xp->i_state));
 			ret = -EINVAL;
 			break;
 		}
@@ -8855,7 +8861,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = sdl_ioccconntx(q, mp);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported SDL ioctl\n", MX_X400P_DRV_NAME));
+			ptrace(("%s: ERROR: Unsupported SDL ioctl\n", DRV_NAME));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -9111,14 +9117,18 @@ xp_w_prim(queue_t *q, mblk_t *mp)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
-struct xp *x400p_list = NULL;
+STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
+STATIC struct xp *xp_list = NULL;
+STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
 STATIC int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int cmajor = getmajor(*devp);
-	int cminor = getminor(*devp);
-	struct xp *xp, **xpp = &x400p_list;
+	psw_t flags;
+	int mindex = 0;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	struct xp *xp, **xpp = &xp_list;
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
@@ -9126,54 +9136,67 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: Can't open as module\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
 	if (!cminor)
 		sflag = CLONEOPEN;
 	if (sflag == CLONEOPEN) {
-		printd(("%s: Clone open in effect on major %d\n", MX_X400P_DRV_NAME, cmajor));
+		printd(("%s: Clone open in effect on major %d\n", DRV_NAME, cmajor));
 		cminor = 1;
 	}
-	for (; *xpp && (*xpp)->u.dev.cmajor < cmajor; xpp = &(*xpp)->next) ;
-	for (; *xpp && cminor <= MX_X400P_NMINOR; xpp = &(*xpp)->next) {
-		ushort dminor = (*xpp)->u.dev.cminor;
-		if (cminor < dminor)
+	spin_lock_irqsave(&xp_lock, flags);
+	for (; *xpp; xpp = &(*xpp)->next) {
+		major_t dmajor = (*xpp)->u.dev.cmajor;
+		if (cmajor != dmajor)
 			break;
-		if (cminor == dminor) {
-			if (sflag != CLONEOPEN) {
-				ptrace(("%s: ERROR: Requested device in use\n", MX_X400P_DRV_NAME));
-				MOD_DEC_USE_COUNT;
-				return (ENXIO);
+		if (cmajor == dmajor) {
+			minor_t dminor = (*xpp)->u.dev.cminor;
+			if (cminor < dminor)
+				break;
+			if (cminor > dminor)
+				continue;
+			if (cminor == dminor) {
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = xp_majors[mindex]))
+						break;
+					cminor = 0;
+				}
+				continue;
 			}
-			cminor++;
 		}
 	}
-	if (cminor > MX_X400P_NMINOR) {
-		ptrace(("%s: ERROR: No device minors left\n", MX_X400P_DRV_NAME));
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
+		spin_unlock_irqrestore(&xp_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: Opened character device %d:%d\n", MX_X400P_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(xp = xp_alloc_priv(q, xpp, devp, crp))) {
-		ptrace(("%s: ERROR: No memory\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
+		spin_unlock_irqrestore(&xp_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
+	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
 STATIC int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);
+	psw_t flags;
 	(void) flag;
 	(void) crp;
 	(void) xp;
-	printd(("%s: Closed character device %d:%d\n", MX_X400P_DRV_NAME, xp->u.dev.cmajor,
+	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, xp->u.dev.cmajor,
 		xp->u.dev.cminor));
+	spin_lock_irqsave(&xp_lock, flags);
 	xp_free_priv(xp);
+	spin_unlock_irqrestore(&xp_lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -9206,7 +9229,7 @@ xp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized device private structure cache\n", MX_X400P_DRV_NAME));
+		printd(("%s: initialized device private structure cache\n", DRV_NAME));
 	if (!xp_span_cachep &&
 	    !(xp_span_cachep =
 	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -9216,7 +9239,7 @@ xp_init_caches(void)
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized span private structure cache\n", MX_X400P_DRV_NAME));
+		printd(("%s: initialized span private structure cache\n", DRV_NAME));
 	if (!xp_card_cachep &&
 	    !(xp_card_cachep =
 	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -9227,7 +9250,7 @@ xp_init_caches(void)
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized card private structure cache\n", MX_X400P_DRV_NAME));
+		printd(("%s: initialized card private structure cache\n", DRV_NAME));
 	if (!xp_xbuf_cachep &&
 	    !(xp_xbuf_cachep =
 	      kmem_cache_create("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -9239,37 +9262,42 @@ xp_init_caches(void)
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized card read/write buffer cache\n", MX_X400P_DRV_NAME));
+		printd(("%s: initialized card read/write buffer cache\n", DRV_NAME));
 	return (0);
 }
-STATIC void
+STATIC int
 xp_term_caches(void)
 {
+	int err = 0;
 	if (xp_xbuf_cachep) {
-		if (kmem_cache_destroy(xp_xbuf_cachep))
+		if (kmem_cache_destroy(xp_xbuf_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_xbuf_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_xbuf_cache to zero\n", MX_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_xbuf_cache to zero\n", DRV_NAME));
 	}
 	if (xp_card_cachep) {
-		if (kmem_cache_destroy(xp_card_cachep))
+		if (kmem_cache_destroy(xp_card_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_card_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_card_cache to zero\n", MX_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_card_cache to zero\n", DRV_NAME));
 	}
 	if (xp_span_cachep) {
-		if (kmem_cache_destroy(xp_span_cachep))
+		if (kmem_cache_destroy(xp_span_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_span_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_span_cache to zero\n", MX_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_span_cache to zero\n", DRV_NAME));
 	}
 	if (xp_priv_cachep) {
-		if (kmem_cache_destroy(xp_priv_cachep))
+		if (kmem_cache_destroy(xp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_priv_cache to zero\n", MX_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_priv_cache to zero\n", DRV_NAME));
 	}
-	return;
+	return (err);
 }
 
 /*
@@ -9281,7 +9309,7 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 {
 	struct xp *xp;
 	if ((xp = kmem_cache_alloc(xp_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: allocated device private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: allocated device private structure\n", DRV_NAME));
 		bzero(xp, sizeof(*xp));
 		xp_get(xp);	/* first get */
 		spin_lock_init(&xp->lock);	/* "xp-priv-lock" */
@@ -9302,7 +9330,7 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 			xp->next->prev = &xp->next;
 		xp->prev = xpp;
 		*xpp = xp_get(xp);
-		printd(("%s: linked device private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: linked device private structure\n", DRV_NAME));
 		/* LMI configuration defaults */
 		xp->option = lmi_default_e1_chan;
 		/* SDL configuration defaults */
@@ -9317,10 +9345,9 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 		bufq_init(&xp->sl.tb);
 		bufq_init(&xp->sl.rtb);
 		xp->sl.config = sl_default_e1_chan;
-		printd(("%s: setting device private structure defaults\n", MX_X400P_DRV_NAME));
+		printd(("%s: setting device private structure defaults\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate device private structure\n",
-			MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate device private structure\n", DRV_NAME));
 	return (xp);
 }
 
@@ -9359,8 +9386,7 @@ xp_free_priv(struct xp *xp)
 						xp_put(xchg(&sp->slots[slot], NULL));
 			}
 			sp_put(xchg(&xp->sp, NULL));
-			printd(("%s: unlinked device private structure from span\n",
-				MX_X400P_DRV_NAME));
+			printd(("%s: unlinked device private structure from span\n", DRV_NAME));
 		}
 		ss7_unbufcall((str_t *) xp);
 		xp_timer_stop(xp, tall);
@@ -9405,7 +9431,7 @@ xp_put(struct xp *xp)
 {
 	if (atomic_dec_and_test(&xp->refcnt)) {
 		kmem_cache_free(xp_priv_cachep, xp);
-		printd(("%s: freed device private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: freed device private structure\n", DRV_NAME));
 	}
 }
 
@@ -9418,7 +9444,7 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 {
 	struct sp *sp;
 	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
-		printd(("%s: allocated span private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: allocated span private structure\n", DRV_NAME));
 		bzero(sp, sizeof(*sp));
 		cd_get(cd);	/* first get */
 		spin_lock_init(&sp->lock);	/* "sp-priv-lock" */
@@ -9426,17 +9452,16 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 		cd->spans[span] = sp_get(sp);
 		sp->cd = cd_get(cd);
 		/* fill out span structure */
-		printd(("%s: linked span private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: linked span private structure\n", DRV_NAME));
 		sp->iobase = cd->iobase + (span << 8);
 		sp->span = span;
 		sp->config = cd->config;
 		sp->config.ifflags = 0;
 		sp->config.ifalarms = 0;
 		sp->config.ifrxlevel = 0;
-		printd(("%s: set span private structure defaults\n", MX_X400P_DRV_NAME));
+		printd(("%s: set span private structure defaults\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate span private structure\n",
-			MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate span private structure\n", DRV_NAME));
 	return (sp);
 }
 
@@ -9452,7 +9477,7 @@ xp_free_sp(struct sp *sp)
 		sp_put(xchg(&cd->spans[sp->span], NULL));
 		cd_put(xchg(&sp->cd, NULL));
 		sp->span = 0;
-		printd(("%s: unlinked span private structure from card\n", MX_X400P_DRV_NAME));
+		printd(("%s: unlinked span private structure from card\n", DRV_NAME));
 		/* remove channel linkage */
 		for (slot = 0; slot < 32; slot++) {
 			struct xp *xp;
@@ -9461,9 +9486,9 @@ xp_free_sp(struct sp *sp)
 				xp_put(xchg(&sp->slots[slot], NULL));
 			}
 		}
-		printd(("%s: unlinked span private structure from slots\n", MX_X400P_DRV_NAME));
+		printd(("%s: unlinked span private structure from slots\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: spans cannot exist without cards\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: spans cannot exist without cards\n", DRV_NAME));
 }
 STATIC struct sp *
 sp_get(struct sp *sp)
@@ -9476,7 +9501,7 @@ STATIC void
 sp_put(struct sp *sp)
 {
 	if (atomic_dec_and_test(&sp->refcnt)) {
-		printd(("%s: freed span private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: freed span private structure\n", DRV_NAME));
 		kmem_cache_free(xp_span_cachep, sp);
 	}
 }
@@ -9492,14 +9517,14 @@ xp_alloc_cd(void)
 	if ((cd = kmem_cache_alloc(xp_card_cachep, SLAB_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
-		printd(("%s: allocated card private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: allocated card private structure\n", DRV_NAME));
 		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
-			ptrace(("%s: could not allocate write buffer\n", MX_X400P_DRV_NAME));
+			ptrace(("%s: could not allocate write buffer\n", DRV_NAME));
 			kmem_cache_free(xp_card_cachep, cd);
 			return (NULL);
 		}
 		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
-			ptrace(("%s: could not allocate read buffer\n", MX_X400P_DRV_NAME));
+			ptrace(("%s: could not allocate read buffer\n", DRV_NAME));
 			kmem_cache_free(xp_xbuf_cachep, wbuf);
 			kmem_cache_free(xp_card_cachep, cd);
 			return (NULL);
@@ -9515,10 +9540,9 @@ xp_alloc_cd(void)
 		cd->wbuf = wbuf;
 		cd->rbuf = rbuf;
 		tasklet_init(&cd->tasklet, NULL, 0);
-		printd(("%s: linked card private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: linked card private structure\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate card private structure\n",
-			MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate card private structure\n", DRV_NAME));
 	return (cd);
 }
 
@@ -9549,7 +9573,7 @@ xp_free_cd(struct cd *cd)
 		cd->next = NULL;
 		cd->prev = &cd->next;
 		cd_put(cd);
-		printd(("%s: unlinked card private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: unlinked card private structure\n", DRV_NAME));
 	}
 	spin_unlock_irqrestore(&cd->lock, flags);
 	cd_put(cd);		/* final put */
@@ -9566,7 +9590,7 @@ cd_put(struct cd *cd)
 {
 	if (atomic_dec_and_test(&cd->refcnt)) {
 		kmem_cache_free(xp_card_cachep, cd);
-		printd(("%s: freed card private structure\n", MX_X400P_DRV_NAME));
+		printd(("%s: freed card private structure\n", DRV_NAME));
 	}
 }
 
@@ -9601,34 +9625,34 @@ xp_remove(struct pci_dev *dev)
 	}
 	if (cd->irq) {
 		free_irq(cd->irq, cd);
-		printd(("%s: freed irq\n", MX_X400P_DRV_NAME));
+		printd(("%s: freed irq\n", DRV_NAME));
 	}
 	if (cd->xlb_region) {
 		release_mem_region(cd->xlb_region, cd->xlb_length);
-		printd(("%s: released xlb region %lx length %ld\n", MX_X400P_DRV_NAME,
+		printd(("%s: released xlb region %lx length %ld\n", DRV_NAME,
 			cd->xlb_region, cd->xlb_length));
 	}
 	if (cd->xll_region) {
 		release_mem_region(cd->xll_region, cd->xll_length);
-		printd(("%s: released xll region %lx length %ld\n", MX_X400P_DRV_NAME,
+		printd(("%s: released xll region %lx length %ld\n", DRV_NAME,
 			cd->xll_region, cd->xll_length));
 	}
 	if (cd->plx_region) {
 		release_mem_region(cd->plx_region, cd->plx_length);
-		printd(("%s: released plx region %lx length %ld\n", MX_X400P_DRV_NAME,
+		printd(("%s: released plx region %lx length %ld\n", DRV_NAME,
 			cd->plx_region, cd->plx_length));
 	}
 	if (cd->xlb) {
 		iounmap((void *) cd->xlb);
-		printd(("%s: unmapped xlb memory at %p\n", MX_X400P_DRV_NAME, cd->xlb));
+		printd(("%s: unmapped xlb memory at %p\n", DRV_NAME, cd->xlb));
 	}
 	if (cd->xll) {
 		iounmap((void *) cd->xll);
-		printd(("%s: unmapped xll memory at %p\n", MX_X400P_DRV_NAME, cd->xll));
+		printd(("%s: unmapped xll memory at %p\n", DRV_NAME, cd->xll));
 	}
 	if (cd->plx) {
 		iounmap((void *) cd->plx);
-		printd(("%s: unmapped plx memory at %p\n", MX_X400P_DRV_NAME, cd->plx));
+		printd(("%s: unmapped plx memory at %p\n", DRV_NAME, cd->plx));
 	}
 	xp_free_cd(cd);
       disable:
@@ -9648,24 +9672,24 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	int span, b;
 	struct cd *cd;
 	if (!dev || !id) {
-		ptrace(("%s: ERROR: Device or id is null!\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Device or id is null!\n", DRV_NAME));
 		return (-ENXIO);
 	}
 	if (id->driver_data != X400PSS7 && id->driver_data != X400P) {
-		ptrace(("%s: ERROR: Driver does not support device type %ld\n", MX_X400P_DRV_NAME,
+		ptrace(("%s: ERROR: Driver does not support device type %ld\n", DRV_NAME,
 			id->driver_data));
 		return (-ENXIO);
 	}
 	if (dev->irq < 1) {
-		ptrace(("%s: ERROR: No IRQ allocated for device\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: No IRQ allocated for device\n", DRV_NAME));
 		return (-ENXIO);
 	}
-	printd(("%s: device allocated IRQ %d\n", MX_X400P_DRV_NAME, dev->irq));
+	printd(("%s: device allocated IRQ %d\n", DRV_NAME, dev->irq));
 	if (pci_enable_device(dev)) {
-		ptrace(("%s: ERROR: Could not enable pci device\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not enable pci device\n", DRV_NAME));
 		return (-ENODEV);
 	}
-	printd(("%s: enabled x400p-ss7 pci device type %ld\n", MX_X400P_DRV_NAME, id->driver_data));
+	printd(("%s: enabled x400p-ss7 pci device type %ld\n", DRV_NAME, id->driver_data));
 	if (!(cd = xp_alloc_cd()))
 		return (-ENOMEM);
 	pci_set_drvdata(dev, cd);
@@ -9673,49 +9697,49 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	    || !(cd->plx_region = pci_resource_start(dev, 0))
 	    || !(cd->plx_length = pci_resource_len(dev, 0))
 	    || !(cd->plx = ioremap(cd->plx_region, cd->plx_length))) {
-		ptrace(("%s: ERROR: Invalid PLX 9030 base resource\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Invalid PLX 9030 base resource\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", MX_X400P_DRV_NAME, cd->plx_length,
+	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length,
 		cd->plx_region, cd->plx));
 	if ((pci_resource_flags(dev, 2) & IORESOURCE_IO)
 	    || !(cd->xll_region = pci_resource_start(dev, 2))
 	    || !(cd->xll_length = pci_resource_len(dev, 2))
 	    || !(cd->xll = ioremap(cd->xll_region, cd->xll_length))) {
-		ptrace(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", MX_X400P_DRV_NAME, cd->xll_length,
+	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length,
 		cd->xll_region, cd->xll));
 	if ((pci_resource_flags(dev, 3) & IORESOURCE_IO)
 	    || !(cd->xlb_region = pci_resource_start(dev, 3))
 	    || !(cd->xlb_length = pci_resource_len(dev, 3))
 	    || !(cd->xlb = ioremap(cd->xlb_region, cd->xlb_length))) {
-		ptrace(("%s: ERROR: Invalid Xilinx 8-bit base resource\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Invalid Xilinx 8-bit base resource\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", MX_X400P_DRV_NAME, cd->xlb_length,
+	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length,
 		cd->xlb_region, cd->xlb));
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve PLX memory\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unable to reserve PLX memory\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: plx region %lx reserved %ld bytes\n", MX_X400P_DRV_NAME, cd->plx_region,
+	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region,
 		cd->plx_length));
 	if (!request_mem_region(cd->xll_region, cd->xll_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", MX_X400P_DRV_NAME, cd->xll_region,
+	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region,
 		cd->xll_length));
 	if (!request_mem_region(cd->xlb_region, cd->xlb_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", MX_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xlb region %lx reserved %ld bytes\n", MX_X400P_DRV_NAME, cd->xlb_region,
+	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region,
 		cd->xlb_length));
-	__printd(("%s: card detected %s at 0x%lx/0x%lx irq %d\n", MX_X400P_DRV_NAME,
+	__printd(("%s: card detected %s at 0x%lx/0x%lx irq %d\n", DRV_NAME,
 		  cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq));
 #ifdef X400P_DOWNLOAD_FIRMWARE
 	{
@@ -9727,12 +9751,12 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		*data |= GPIO_WRITE;
 		*data &= ~GPIO_PROGRAM;
 		while (*data & (GPIO_INIT | GPIO_DONE)) ;
-		printd(("%s: Xilinx Firmware Load: Init and done are low\n", MX_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Init and done are low\n", DRV_NAME));
 		*data |= GPIO_PROGRAM;
 		while (!(*data & GPIO_INIT)) ;
-		printd(("%s: Xilinx Firmware Load: Init is high\n", MX_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Init is high\n", DRV_NAME));
 		*data &= ~GPIO_WRITE;
-		printd(("%s: Xilinx Firmware Load: Loading\n", MX_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Loading\n", DRV_NAME));
 		for (byte = 0; byte < sizeof(x400pfw); byte++) {
 			*cd->xlb = *f++;
 			if (*data & GPIO_DONE)
@@ -9741,25 +9765,25 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 				break;
 		}
 		if (!(*data & GPIO_INIT)) {
-			printd(("%s: ERROR: Xilinx Firmware Load: Failed\n", MX_X400P_DRV_NAME));
+			printd(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
 			goto error_remove;
 		}
-		printd(("%s: Xilinx Firmware Load: Loaded %d bytes\n", MX_X400P_DRV_NAME, byte));
+		printd(("%s: Xilinx Firmware Load: Loaded %d bytes\n", DRV_NAME, byte));
 		timeout = jiffies + 20 * HZ / 1000;
 		while (jiffies < timeout) ;
 		*data |= GPIO_WRITE;
-		printd(("%s: Xilinx Firmware Load: Done\n", MX_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Done\n", DRV_NAME));
 		timeout = jiffies + 20 * HZ / 1000;
 		while (jiffies < timeout) ;
 		if (!(*data & GPIO_INIT)) {
-			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", MX_X400P_DRV_NAME));
+			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
 			goto error_remove;
 		}
 		if (!(*data & GPIO_DONE)) {
-			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", MX_X400P_DRV_NAME));
+			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
 			goto error_remove;
 		}
-		printd(("%s: Xilinx Firmware Load: Successful\n", MX_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Successful\n", DRV_NAME));
 	}
 #endif
 	cd->plx[INTCSR] = 0;	/* disable interrupts */
@@ -9768,7 +9792,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->xlb[LEDREG] = 0xff;
 	if ((b = cd->xlb[0x00f]) & 0x80) {
 		int word;
-		__printd(("%s: E400P-SS7 (%s Rev. %d)\n", MX_X400P_DRV_NAME,
+		__printd(("%s: E400P-SS7 (%s Rev. %d)\n", DRV_NAME,
 			  xp_e1_framer[(b & 0x30) >> 4], b & 0xf));
 		for (word = 0; word < 256; word++) {
 			int ebuf;
@@ -9780,17 +9804,16 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config = sdl_default_e1_chan;
 		if (request_irq
 		    (dev->irq, xp_e1_interrupt, SA_INTERRUPT | SA_SHIRQ, "x400p-ss7", cd)) {
-			ptrace(("%s: ERROR: Unable to request IRQ %d\n", MX_X400P_DRV_NAME,
-				dev->irq));
+			ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));
 			goto error_remove;
 		}
 		cd->irq = dev->irq;
-		printd(("%s: acquired IRQ %ld for E400P-SS7 card\n", MX_X400P_DRV_NAME, cd->irq));
+		printd(("%s: acquired IRQ %ld for E400P-SS7 card\n", DRV_NAME, cd->irq));
 		cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 		tasklet_init(&cd->tasklet, &xp_e1_card_tasklet, (unsigned long) cd);
 	} else {
 		int word;
-		__printd(("%s: T100P-SS7 (%s Rev. %d)\n", MX_X400P_DRV_NAME,
+		__printd(("%s: T100P-SS7 (%s Rev. %d)\n", DRV_NAME,
 			  xp_t1_framer[(b & 0x30) >> 4], b & 0xf));
 		for (word = 0; word < 256; word++) {
 			int ebuf;
@@ -9802,12 +9825,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config = sdl_default_t1_chan;
 		if (request_irq
 		    (dev->irq, xp_t1_interrupt, SA_INTERRUPT | SA_SHIRQ, "x400p-ss7", cd)) {
-			ptrace(("%s: ERROR: Unable to request IRQ %d\n", MX_X400P_DRV_NAME,
-				dev->irq));
+			ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));
 			goto error_remove;
 		}
 		cd->irq = dev->irq;
-		printd(("%s: acquired IRQ %ld for T400P-SS7 card\n", MX_X400P_DRV_NAME, cd->irq));
+		printd(("%s: acquired IRQ %ld for T400P-SS7 card\n", DRV_NAME, cd->irq));
 		cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 		tasklet_init(&cd->tasklet, &xp_t1_card_tasklet, (unsigned long) cd);
 	}
@@ -9872,106 +9894,168 @@ xp_pci_init(void)
  *  configured, we need to stop the boards and deallocate the board-level
  *  resources and structures.
  */
-STATIC INLINE void
+STATIC INLINE int
 xp_pci_cleanup(void)
 {
-	return pci_unregister_driver(&xp_driver);
-}
-
-/*
- *  =========================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =========================================================================
- */
-STATIC int xp_initialized = 0;
-STATIC int xp_majors[MX_X400P_CMAJORS] = { 0, };
-STATIC void
-xp_init(void)
-{
-	int err, major;
-	unless(xp_initialized, return);
-	cmn_err(CE_NOTE, MX_X400P_BANNER);	/* console splash */
-	if ((err = xp_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Could not allocate caches", MX_X400P_DRV_NAME);
-		xp_initialized = err;
-		return;
-	}
-	if ((err = xp_pci_init()) < 0) {
-		cmn_err(CE_WARN, "%s: ERROR: No PCI devices found", MX_X400P_DRV_NAME);
-		xp_term_caches();
-		xp_initialized = err;
-		return;
-	}
-	if ((err = xp_init_tables()) < 0) {
-		cmn_err(CE_PANIC, "%s: ERROR: Could not allocate tables", MX_X400P_DRV_NAME);
-		xp_pci_cleanup();
-		xp_term_caches();
-		xp_initialized = err;
-		return;
-	}
-	ss7_bufpool_init(&xp_bufpool);
-	for (major = 0; major < MX_X400P_CMAJORS; major++) {
-		if ((err =
-		     lis_register_strdev(MX_X400P_CMAJOR_0 + major, &xp_info, MX_X400P_NMINOR,
-					 MX_X400P_DRV_NAME)) <= 0) {
-			cmn_err(CE_WARN, "%s: ERROR: couldn't register driver for major %d",
-				MX_X400P_DRV_NAME, major + MX_X400P_CMAJOR_0);
-			xp_initialized = err;
-			for (major -= 1; major >= 0; major--)
-				lis_unregister_strdev(xp_majors[major]);
-			ss7_bufpool_term(&xp_bufpool);
-			xp_free_tables();
-			xp_pci_cleanup();
-			xp_term_caches();
-			return;
-		} else
-			xp_majors[major] = err;
-	}
-	xp_initialized = MX_X400P_CMAJOR_0;
-	return;
-}
-STATIC void
-xp_terminate(void)
-{
-	int err, major;
-	ensure(xp_initialized, return);
-	for (major = 0; major < MX_X400P_CMAJORS; major++) {
-		if (xp_majors[major]) {
-			if ((err = lis_unregister_strdev(xp_majors[major])))
-				cmn_err(CE_PANIC, "%s: couldn't unregister driver for major %d\n",
-					MX_X400P_DRV_NAME, xp_majors[major]);
-			else
-				xp_majors[major] = err;
-		}
-	}
-	xp_initialized = 0;
-	ss7_bufpool_term(&xp_bufpool);
-	xp_free_tables();
-	xp_pci_cleanup();
-	xp_term_caches();
-	return;
-}
-
-/*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
- */
-int
-init_module(void)
-{
-	xp_init();
-	if (xp_initialized < 0)
-		return xp_initialized;
+	pci_unregister_driver(&xp_driver);
 	return (0);
 }
 
-void
-cleanup_module(void)
+/*
+ *  =========================================================================
+ *
+ *  Registration and initialization
+ *
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the X400P-MX driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the X400P-MX driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw xp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &mx_x400pinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+xp_register_strdev(major_t major)
 {
-	xp_terminate();
+	int err;
+	if ((err = register_strdev(&xp_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+STATIC int
+xp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = unregister_strdev(&xp_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+xp_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &mx_x400pinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+xp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+mx_x400pterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (xp_majors[mindex]) {
+			if ((err = xp_unregister_strdev(xp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					xp_majors[mindex]);
+			if (mindex)
+				xp_majors[mindex] = 0;
+		}
+	}
+	ss7_bufpool_term(&xp_bufpool);
+	if ((err = xp_free_tables()))
+		cmn_err(CE_WARN, "%s: could not free tables", DRV_NAME);
+	if ((err = xp_pci_cleanup()))
+		cmn_err(CE_WARN, "%s: could not cleanup pci device", DRV_NAME);
+	if ((err = xp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+mx_x400pinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = xp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		mx_x400pterminate();
+		return (err);
+	}
+	if ((err = xp_pci_init())) {
+		cmn_err(CE_WARN, "%s: no PCI devices found, err = %d", DRV_NAME, err);
+		mx_x400pterminate();
+		return (err);
+	}
+	if ((err = xp_init_tables())) {
+		cmn_err(CE_WARN, "%s: could not allocate tables, err = %d", DRV_NAME, err);
+		mx_x400pterminate();
+		return (err);
+	}
+	ss7_bufpool_init(&xp_bufpool);
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = xp_register_strdev(xp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					xp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				mx_x400pterminate();
+				return (err);
+			}
+		}
+		if (xp_majors[mindex] == 0)
+			xp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = xp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(mx_x400pinit);
+module_exit(mx_x400pterminate);
+
+#endif				/* LINUX */

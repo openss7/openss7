@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:02 $
+ @(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/30 21:52:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:15:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __TUA_H__
 #define __TUA_H__
 
-#ident "@(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:02 $"
+#ident "@(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/30 21:52:36 $"
 
 #include "../ua/ua.h"
-#include "../../include/ss7/tcap.h"
-#include "../../include/ss7/tcap_ioctl.h"
+#include <ss7/tcap.h>
+#include <ss7/tcap_ioctl.h>
 
-#ifndef TUA_CMAJOR
-#define TUA_CMAJOR 243
-#endif
-#define TUA_NMINOR 255
-
-#define TUA_MODULE_ID ('U'<<8|TCAP_IOC_MAGIC)
+//#define TUA_MODULE_ID ('U'<<8|TCAP_IOC_MAGIC)
 
 extern ops_t tua_lmq_u_ops;
 extern ops_t tua_ss7_u_ops;

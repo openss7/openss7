@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 00:53:17 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:41 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 00:53:17 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 00:53:17 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:41 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 00:53:17 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:41 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -70,7 +70,6 @@ static char const ident[] =
 #include "bufpool.h"
 #endif				/* LINUX */
 
-
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
 #include <ss7/sdli.h>
@@ -88,59 +87,44 @@ static char const ident[] =
 #include "x400p-ss7/x400pfw.h"	/* X400P-SS7 firmware load */
 #endif
 
-#define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
-#define SL_X400P_REVISION	"LfS $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/27 00:53:17 $"
-#define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
-#define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SL_X400P_LICENSE	"GPL"
-#define SL_X400P_BANNER		SL_X400P_DESCRIP	"\n" \
-				SL_X400P_REVISION	"\n" \
-				SL_X400P_COPYRIGHT	"\n" \
-				SL_X400P_DEVICE		"\n" \
-				SL_X400P_CONTACT	"\n"
-#define SL_X400P_SPLASH		SL_X400P_DEVICE		" - " \
-				SL_X400P_REVISION	"\n"
+#define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
+#define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:41 $"
+#define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
+#define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define X400P_LICENSE		"GPL"
+#define X400P_BANNER		X400P_DESCRIP		"\n" \
+				X400P_EXTRA		"\n" \
+				X400P_REVISION		"\n" \
+				X400P_COPYRIGHT		"\n" \
+				X400P_DEVICE		"\n" \
+				X400P_CONTACT
+#define X400P_SPLASH		X400P_DESCRIP		"\n" \
+				X400P_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(SL_X400P_CONTACT);
-MODULE_DESCRIPTION(SL_X400P_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SL_X400P_DEVICE);
+MODULE_AUTHOR(X400P_CONTACT);
+MODULE_DESCRIPTION(X400P_DESCRIP);
+MODULE_SUPPORTED_DEVICE(X400P_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(SL_X400P_LICENSE);
-#endif
+MODULE_LICENSE(X400P_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define SL_X400P_DRV_ID		CONFIG_STREAMS_SL_X400P_MODID
-#define SL_X400P_DRV_NAME	CONFIG_STREAMS_SL_X400P_NAME
-#define SL_X400P_CMAJORS	CONFIG_STREAMS_SL_X400P_NMAJORS
-#define SL_X400P_CMAJOR_0	CONFIG_STREAMS_SL_X400P_MAJOR
-#define SL_X400P_NMINOR		CONFIG_STREAMS_SL_X400P_NMINORS
+#define X400P_DRV_ID		CONFIG_STREAMS_X400P_MODID
+#define X400P_DRV_NAME		CONFIG_STREAMS_X400P_NAME
+#define X400P_CMAJORS		CONFIG_STREAMS_X400P_NMAJORS
+#define X400P_CMAJOR_0		CONFIG_STREAMS_X400P_MAJOR
+#define X400P_UNITS		CONFIG_STREAMS_X400P_NMINORS
 #endif
 
-unsigned short modid = SL_X400P_DRV_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for SL-X400P. (0 for allocation.)");
-
-unsigned short major = SL_X400P_CMAJOR_0;
-MODULE_PARM(major, "h");
-MODULE_PARM_DESC(major, "Module device number for SL-X400P. (0 for allocation.)");
-
-#ifndef SL_X400P_NMINOR
-#define SL_X400P_NMINOR 255
-#endif
-
-#define X400P_CMINOR_SDLI	0
-#define X400P_CMINOR_CHI	1
-#define X400P_CMINOR_MXI	2
-#define X400P_CMINOR_LMI	3
-#define X400P_CMINOR_FREE	4
-
-#define XP_STYLE_SDLI	X400P_CMINOR_SDLI
-#define XP_STYLE_CHI	X400P_CMINOR_CHI
-#define XP_STYLE_MXI	X400P_CMINOR_MXI
-#define XP_STYLE_LMI	X400P_CMINOR_LMI
+#define X400P_CMINOR_SDLI	1
+#define X400P_CMINOR_CHI	2
+#define X400P_CMINOR_MXI	3
+#define X400P_CMINOR_LMI	4
+#define X400P_CMINOR_FREE	5
 
 /*
  *  =======================================================================
@@ -150,44 +134,50 @@ MODULE_PARM_DESC(major, "Module device number for SL-X400P. (0 for allocation.)"
  *  =======================================================================
  */
 
-STATIC struct module_info xp_rinfo = {
-	mi_idnum:SL_X400P_DRV_ID,	/* Module ID number */
-	mi_idname:SL_X400P_DRV_NAME "-rd",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1024,			/* Hi water mark */
-	mi_lowat:0			/* Lo water mark */
+#define DRV_ID		X400P_DRV_ID
+#define DRV_NAME	X400P_DRV_NAME
+#define CMAJORS		X400P_CMAJORS
+#define CMAJOR_0	X400P_CMAJOR_0
+#define UNITS		X400P_UNITS
+#ifdef MODULE
+#define DRV_BANNER	X400P_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	X400P_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info xp_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1024,		/* Hi water mark */
+	.mi_lowat = 0			/* Lo water mark */
 };
 
-STATIC struct module_info xp_winfo = {
-	mi_idnum:SL_X400P_DRV_ID,	/* Module ID number */
-	mi_idname:SL_X400P_DRV_NAME "-wr",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1024,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
-};
+STATIC struct module_stat xp_mstat = { 0, };
 
 STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
-	qi_putp:ss7_oput,		/* Read put (message from below) */
-	qi_srvp:ss7_osrv,		/* Read queue service */
-	qi_qopen:xp_open,		/* Each open */
-	qi_qclose:xp_close,		/* Last close */
-	qi_minfo:&xp_rinfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = xp_open,		/* Each open */
+	.qi_qclose = xp_close,		/* Last close */
+	.qi_minfo = &xp_minfo,		/* Information */
+	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
 STATIC struct qinit xp_winit = {
-	qi_putp:ss7_iput,		/* Write put (message from above) */
-	qi_srvp:ss7_isrv,		/* Write queue service */
-	qi_minfo:&xp_winfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_minfo = &xp_minfo,		/* Information */
+	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
-STATIC struct streamtab xp_info = {
-	st_rdinit:&xp_rinit,		/* Upper read queue */
-	st_wrinit:&xp_winit,		/* Upper write queue */
+STATIC struct streamtab x400pinfo = {
+	.st_rdinit = &xp_rinit,		/* Upper read queue */
+	.st_wrinit = &xp_winit,		/* Upper write queue */
 };
 
 /*
@@ -232,7 +222,7 @@ typedef struct xp {
 } xp_t;
 #define XP_PRIV(__q) ((struct xp *)(__q)->q_ptr)
 
-STATIC struct xp *xp_alloc_priv(queue_t *, struct xp **, dev_t *, cred_t *, ushort);
+STATIC struct xp *xp_alloc_priv(queue_t *, struct xp **, dev_t *, cred_t *, minor_t);
 STATIC void xp_free_priv(struct xp *);
 STATIC struct xp *xp_get(struct xp *);
 STATIC void xp_put(struct xp *);
@@ -433,7 +423,7 @@ STATIC int xp_resume(struct pci_dev *pdev);
 #endif
 
 STATIC struct pci_driver xp_driver = {
-	name:SL_X400P_DRV_NAME,
+	name:DRV_NAME,
 	probe:xp_probe,
 	remove:__devexit_p(xp_remove),
 	id_table:xp_pci_tbl,
@@ -988,12 +978,12 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
-		ptrace(("%s: ERROR: primitive too small = %d bytes\n", SL_X400P_DRV_NAME,
+		ptrace(("%s: ERROR: primitive too small = %d bytes\n", DRV_NAME,
 			mp->b_wptr - mp->b_rptr));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
-		ptrace(("%s: ERROR: interface out of state\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: interface out of state\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 	xp->i_state = LMI_ATTACH_PENDING;
@@ -1002,17 +992,17 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	card = (ppa >> 12) & 0x0f;
 	for (cd = x400p_cards; cd && cd->card != card; cd = cd->next) ;
 	if (!cd) {
-		ptrace(("%s: ERROR: invalid card %d\n", SL_X400P_DRV_NAME, card));
+		ptrace(("%s: ERROR: invalid card %d\n", DRV_NAME, card));
 		goto lmi_badppa;
 	}
 	/* check span */
 	span = (ppa >> 8) & 0x0f;
 	if (span < 0 || span > X400_SPANS - 1) {
-		ptrace(("%s: ERROR: invalid span %d\n", SL_X400P_DRV_NAME, span));
+		ptrace(("%s: ERROR: invalid span %d\n", DRV_NAME, span));
 		goto lmi_badppa;
 	}
 	if (!(sp = cd->spans[span])) {
-		ptrace(("%s: ERROR: unallocated span %d\n", SL_X400P_DRV_NAME, span));
+		ptrace(("%s: ERROR: unallocated span %d\n", DRV_NAME, span));
 		goto lmi_badppa;
 	}
 	if (sp->config.ifgtype != SDL_GTYPE_E1 && sp->config.ifgtype != SDL_GTYPE_T1) {
@@ -1026,19 +1016,19 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
 			if (chan < 1 || chan > 31) {
-				ptrace(("%s: ERROR: invalid chan %d\n", SL_X400P_DRV_NAME, chan));
+				ptrace(("%s: ERROR: invalid chan %d\n", DRV_NAME, chan));
 				goto lmi_badppa;
 			}
 			slot = xp_e1_chan_map[chan - 1];
 			if (sp->slots[slot]) {
-				ptrace(("%s: ERROR: slot %d in use\n", SL_X400P_DRV_NAME, slot));
+				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				SL_X400P_DRV_NAME, card, span, chan, slot));
+				DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = ts_get(xp_alloc_ts(xp, sp, slot));
@@ -1060,19 +1050,19 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			return (QR_DONE);
 		case SDL_GTYPE_T1:
 			if (chan < 1 || chan > 24) {
-				ptrace(("%s: ERROR: invalid chan %d\n", SL_X400P_DRV_NAME, chan));
+				ptrace(("%s: ERROR: invalid chan %d\n", DRV_NAME, chan));
 				goto lmi_badppa;
 			}
 			slot = xp_t1_chan_map[chan - 1];
 			if (sp->slots[slot]) {
-				ptrace(("%s: ERROR: slot %d in use\n", SL_X400P_DRV_NAME, slot));
+				ptrace(("%s: ERROR: slot %d in use\n", DRV_NAME, slot));
 				goto lmi_badppa;
 			}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
 			printd(("%s: attaching card %d, span %d, chan %d, slot %d\n",
-				SL_X400P_DRV_NAME, card, span, chan, slot));
+				DRV_NAME, card, span, chan, slot));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				sp->slots[slot] = ts_get(xp_alloc_ts(xp, sp, slot));
@@ -1101,14 +1091,13 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]); c++)
 				if (sp->slots[xp_e1_chan_map[c]]) {
 					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						SL_X400P_DRV_NAME, c));
+						DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
 				return (err);
 			/* commit attach */
-			printd(("%s: attaching card %d, entire span %d\n", SL_X400P_DRV_NAME, card,
-				span));
+			printd(("%s: attaching card %d, entire span %d\n", DRV_NAME, card, span));
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				for (c = 0; c < sizeof(xp_e1_chan_map) / sizeof(xp_e1_chan_map[0]);
@@ -1136,7 +1125,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			for (c = 0; c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0])); c++)
 				if (sp->slots[xp_t1_chan_map[c]]) {
 					ptrace(("%s: ERROR: slot in use for chan %d\n",
-						SL_X400P_DRV_NAME, c));
+						DRV_NAME, c));
 					goto lmi_badppa;
 				}
 			if ((err = lmi_ok_ack(q, xp, LMI_DISABLED, LMI_ATTACH_REQ)))
@@ -1145,7 +1134,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 			spin_lock_irqsave(&xp->lock, flags);
 			{
 				printd(("%s: attaching card %d, entire span %d\n",
-					SL_X400P_DRV_NAME, card, span));
+					DRV_NAME, card, span));
 				for (c = 0;
 				     c < (sizeof(xp_t1_chan_map) / sizeof(xp_t1_chan_map[0]));
 				     c++) {
@@ -1242,32 +1231,31 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	struct sp *sp;
 	/* validate enable */
 	if (xp->i_state != LMI_DISABLED) {
-		ptrace(("%s: ERROR: out of state: state = %ld\n", SL_X400P_DRV_NAME, xp->i_state));
+		ptrace(("%s: ERROR: out of state: state = %ld\n", DRV_NAME, xp->i_state));
 		goto lmi_outstate;
 	}
 	if (!(sp = xp->sp)) {
-		ptrace(("%s: ERROR: out of state: no span pointer\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: out of state: no span pointer\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 	if (!(cd = sp->cd)) {
-		ptrace(("%s: ERROR: out of state: no card pointer\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: out of state: no card pointer\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 #ifdef _DEBUG
 	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1) {
-		ptrace(("%s: ERROR: card group type = %lu\n", SL_X400P_DRV_NAME,
-			cd->config.ifgtype));
+		ptrace(("%s: ERROR: card group type = %lu\n", DRV_NAME, cd->config.ifgtype));
 		return m_error(q, xp, EFAULT);
 	}
 #endif
 	if (xp->obj.sdl.config.ifflags & SDL_IF_UP) {
-		ptrace(("%s: ERROR: out of state: device already up\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: out of state: device already up\n", DRV_NAME));
 		goto lmi_outstate;
 	}
 	if ((err = lmi_enable_con(q, xp)))
 		return (err);
 	/* commit enable */
-	printd(("%s: performing enable\n", SL_X400P_DRV_NAME));
+	printd(("%s: performing enable\n", DRV_NAME));
 	xp->i_state = LMI_ENABLE_PENDING;
 	xp->obj.sdl.config.ifname = sp->config.ifname;
 	xp->obj.sdl.config.ifflags |= SDL_IF_UP;
@@ -1316,7 +1304,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		case SDL_GTYPE_E1:
 		{
 			psw_t flags = 0;
-			printd(("%s: performing enable on E1 span %d\n", SL_X400P_DRV_NAME, span));
+			printd(("%s: performing enable on E1 span %d\n", DRV_NAME, span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
@@ -1395,7 +1383,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			int byte, val, c;
 			unsigned short mask = 0;
 			psw_t flags = 0;
-			printd(("%s: performing enable on T1 span %d\n", SL_X400P_DRV_NAME, span));
+			printd(("%s: performing enable on T1 span %d\n", DRV_NAME, span));
 			spin_lock_irqsave(&cd->lock, flags);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
 			/* Tell ISR to re-evaluate the sync source */
@@ -2133,7 +2121,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 				case SDL_GTYPE_E1:
 				{
 					printd(("%s: performing reconfiguration of E1 span %d\n",
-						SL_X400P_DRV_NAME, span));
+						DRV_NAME, span));
 					/* Tell ISR to re-evaluate the sync source */
 					cd->eval_syncsrc = 1;
 					tcr1 = 0x09;	/* TCR1: TSiS mode */
@@ -2173,7 +2161,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 					int byte, val, c;
 					unsigned short mask = 0;
 					printd(("%s: performing reconfiguration of T1 span %d\n",
-						SL_X400P_DRV_NAME, span));
+						DRV_NAME, span));
 					/* Tell ISR to re-evaluate the sync source */
 					cd->eval_syncsrc = 1;
 					/* Enable F bits pattern */
@@ -3358,7 +3346,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		switch (cmd) {
 		default:
-			ptrace(("%s: ERROR: Unknown IOCTL %d\n", SL_X400P_DRV_NAME, cmd));
+			ptrace(("%s: ERROR: Unknown IOCTL %d\n", DRV_NAME, cmd));
 		case I_STR:
 		case I_LINK:
 		case I_PLINK:
@@ -3369,7 +3357,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = -EINVAL;
 			break;
 		}
-		ptrace(("%s: ERROR: Unsupported STREAMS ioctl\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unsupported STREAMS ioctl\n", DRV_NAME));
 		ret = -EOPNOTSUPP;
 		break;
 	}
@@ -3377,7 +3365,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		if (count < size || xp->i_state == LMI_UNATTACHED) {
 			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %ld\n",
-				SL_X400P_DRV_NAME, count, size, xp->i_state));
+				DRV_NAME, count, size, xp->i_state));
 			ret = -EINVAL;
 			break;
 		}
@@ -3434,7 +3422,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = sdl_ioccconntx(q, mp);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported SDL ioctl\n", SL_X400P_DRV_NAME));
+			ptrace(("%s: ERROR: Unsupported SDL ioctl\n", DRV_NAME));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -3460,154 +3448,53 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
  *  M_PROTO, M_PCPROTO Handling
  *  -------------------------------------------------------------------------
  */
+
 STATIC int
-xp_w_proto(queue_t *q, mblk_t *mp)
+sdl_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	ulong prim;
 	struct xp *xp = XP_PRIV(q);
 	ulong oldstate = xp->i_state;
-	switch (xp->i_style) {
-	case XP_STYLE_LMI:
-		switch ((prim = *(ulong *) mp->b_rptr)) {
-		default:
-			rtn = -EOPNOTSUPP;
-			break;
-		}
+	switch ((prim = *(ulong *) mp->b_rptr)) {
+	case SDL_BITS_FOR_TRANSMISSION_REQ:
+		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ\n", DRV_NAME, xp));
+		rtn = sdl_bits_for_transmission_req(q, mp);
 		break;
-	case XP_STYLE_SDLI:
-		switch ((prim = *(ulong *) mp->b_rptr)) {
-		case SDL_BITS_FOR_TRANSMISSION_REQ:
-			printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ\n", SL_X400P_DRV_NAME,
-				xp));
-			rtn = sdl_bits_for_transmission_req(q, mp);
-			break;
-		case SDL_CONNECT_REQ:
-			printd(("%s: %p: -> SDL_CONNECT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = sdl_connect_req(q, mp);
-			break;
-		case SDL_DISCONNECT_REQ:
-			printd(("%s: %p: -> SDL_DISCONNECT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = sdl_disconnect_req(q, mp);
-			break;
-		case LMI_INFO_REQ:
-			printd(("%s: %p: -> LMI_INFO_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = lmi_info_req(q, mp);
-			break;
-		case LMI_ATTACH_REQ:
-			printd(("%s: %p: -> LMI_ATTACH_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = lmi_attach_req(q, mp);
-			break;
-		case LMI_DETACH_REQ:
-			printd(("%s: %p: -> LMI_DETACH_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = lmi_detach_req(q, mp);
-			break;
-		case LMI_ENABLE_REQ:
-			printd(("%s: %p: -> LMI_ENABLE_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = lmi_enable_req(q, mp);
-			break;
-		case LMI_DISABLE_REQ:
-			printd(("%s: %p: -> LMI_DISABLE_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = lmi_disable_req(q, mp);
-			break;
-		case LMI_OPTMGMT_REQ:
-			printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = lmi_optmgmt_req(q, mp);
-			break;
-		default:
-			rtn = -EOPNOTSUPP;
-			break;
-		}
+	case SDL_CONNECT_REQ:
+		printd(("%s: %p: -> SDL_CONNECT_REQ\n", DRV_NAME, xp));
+		rtn = sdl_connect_req(q, mp);
 		break;
-	case XP_STYLE_CHI:
-		switch ((prim = *(ulong *) mp->b_rptr)) {
-		case CH_INFO_REQ:
-			printd(("%s: %p: --> CH_INFO_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_info_req(q, mp);
-			break;
-		case CH_OPTMGMT_REQ:
-			printd(("%s: %p: --> CH_OPTMGMT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_optmgmt_req(q, mp);
-			break;
-		case CH_ATTACH_REQ:
-			printd(("%s: %p: --> CH_ATTACH_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_attach_req(q, mp);
-			break;
-		case CH_ENABLE_REQ:
-			printd(("%s: %p: --> CH_ENABLE_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_enable_req(q, mp);
-			break;
-		case CH_CONNECT_REQ:
-			printd(("%s: %p: --> CH_CONNECT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_connect_req(q, mp);
-			break;
-		case CH_DATA_REQ:
-			printd(("%s: %p: --> CH_DATA_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_data_req(q, mp);
-			break;
-		case CH_DISCONNECT_REQ:
-			printd(("%s: %p: --> CH_DISCONNECT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_disconnect_req(q, mp);
-			break;
-		case CH_DISABLE_REQ:
-			printd(("%s: %p: --> CH_DISABLE_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_disable_req(q, mp);
-			break;
-		case CH_DETACH_REQ:
-			printd(("%s: %p: --> CH_DETACH_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = ch_detach_req(q, mp);
-			break;
-		default:
-			rtn = -EOPNOTSUPP;
-			break;
-		}
+	case SDL_DISCONNECT_REQ:
+		printd(("%s: %p: -> SDL_DISCONNECT_REQ\n", DRV_NAME, xp));
+		rtn = sdl_disconnect_req(q, mp);
 		break;
-	case XP_STYLE_MXI:
-		switch ((prim = *(ulong *) mp->b_rptr)) {
-		case MX_INFO_REQ:
-			printd(("%s: %p: --> MX_INFO_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_info_req(q, mp);
-			break;
-		case MX_OPTMGMT_REQ:
-			printd(("%s: %p: --> MX_OPTMGMT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_optmgmt_req(q, mp);
-			break;
-		case MX_ATTACH_REQ:
-			printd(("%s: %p: --> MX_ATTACH_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_attach_req(q, mp);
-			break;
-		case MX_ENABLE_REQ:
-			printd(("%s: %p: --> MX_ENABLE_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_enable_req(q, mp);
-			break;
-		case MX_CONNECT_REQ:
-			printd(("%s: %p: --> MX_CONNECT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_connect_req(q, mp);
-			break;
-		case MX_DATA_REQ:
-			printd(("%s: %p: --> MX_DATA_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_data_req(q, mp);
-			break;
-		case MX_DISCONNECT_REQ:
-			printd(("%s: %p: --> MX_DISCONNECT_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_disconnect_req(q, mp);
-			break;
-		case MX_DISABLE_REQ:
-			printd(("%s: %p: --> MX_DISABLE_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_disable_req(q, mp);
-			break;
-		case MX_DETACH_REQ:
-			printd(("%s: %p: --> MX_DETACH_REQ\n", SL_X400P_DRV_NAME, xp));
-			rtn = mx_detach_req(q, mp);
-			break;
-		default:
-			rtn = -EOPNOTSUPP;
-			break;
-		}
+	case LMI_INFO_REQ:
+		printd(("%s: %p: -> LMI_INFO_REQ\n", DRV_NAME, xp));
+		rtn = lmi_info_req(q, mp);
+		break;
+	case LMI_ATTACH_REQ:
+		printd(("%s: %p: -> LMI_ATTACH_REQ\n", DRV_NAME, xp));
+		rtn = lmi_attach_req(q, mp);
+		break;
+	case LMI_DETACH_REQ:
+		printd(("%s: %p: -> LMI_DETACH_REQ\n", DRV_NAME, xp));
+		rtn = lmi_detach_req(q, mp);
+		break;
+	case LMI_ENABLE_REQ:
+		printd(("%s: %p: -> LMI_ENABLE_REQ\n", DRV_NAME, xp));
+		rtn = lmi_enable_req(q, mp);
+		break;
+	case LMI_DISABLE_REQ:
+		printd(("%s: %p: -> LMI_DISABLE_REQ\n", DRV_NAME, xp));
+		rtn = lmi_disable_req(q, mp);
+		break;
+	case LMI_OPTMGMT_REQ:
+		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", DRV_NAME, xp));
+		rtn = lmi_optmgmt_req(q, mp);
 		break;
 	default:
-		swerr();
-		rtn = -EFAULT;
+		rtn = -EOPNOTSUPP;
 		break;
 	}
 	if (rtn < 0)
@@ -3615,25 +3502,127 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-/*
- *  M_DATA Handling
- *  -------------------------------------------------------------------------
- */
 STATIC int
-xp_w_data(queue_t *q, mblk_t *mp)
+ch_w_proto(queue_t *q, mblk_t *mp)
 {
+	int rtn;
+	ulong prim;
 	struct xp *xp = XP_PRIV(q);
-	switch (xp->i_style) {
+	ulong oldstate = xp->i_state;
+	switch ((prim = *(ulong *) mp->b_rptr)) {
+	case CH_INFO_REQ:
+		printd(("%s: %p: --> CH_INFO_REQ\n", DRV_NAME, xp));
+		rtn = ch_info_req(q, mp);
+		break;
+	case CH_OPTMGMT_REQ:
+		printd(("%s: %p: --> CH_OPTMGMT_REQ\n", DRV_NAME, xp));
+		rtn = ch_optmgmt_req(q, mp);
+		break;
+	case CH_ATTACH_REQ:
+		printd(("%s: %p: --> CH_ATTACH_REQ\n", DRV_NAME, xp));
+		rtn = ch_attach_req(q, mp);
+		break;
+	case CH_ENABLE_REQ:
+		printd(("%s: %p: --> CH_ENABLE_REQ\n", DRV_NAME, xp));
+		rtn = ch_enable_req(q, mp);
+		break;
+	case CH_CONNECT_REQ:
+		printd(("%s: %p: --> CH_CONNECT_REQ\n", DRV_NAME, xp));
+		rtn = ch_connect_req(q, mp);
+		break;
+	case CH_DATA_REQ:
+		printd(("%s: %p: --> CH_DATA_REQ\n", DRV_NAME, xp));
+		rtn = ch_data_req(q, mp);
+		break;
+	case CH_DISCONNECT_REQ:
+		printd(("%s: %p: --> CH_DISCONNECT_REQ\n", DRV_NAME, xp));
+		rtn = ch_disconnect_req(q, mp);
+		break;
+	case CH_DISABLE_REQ:
+		printd(("%s: %p: --> CH_DISABLE_REQ\n", DRV_NAME, xp));
+		rtn = ch_disable_req(q, mp);
+		break;
+	case CH_DETACH_REQ:
+		printd(("%s: %p: --> CH_DETACH_REQ\n", DRV_NAME, xp));
+		rtn = ch_detach_req(q, mp);
+		break;
 	default:
-	case XP_STYLE_SDLI:
-		return sdl_m_data(q, mp);
-	case XP_STYLE_CHI:
-		return ch_m_data(q, mp);
-	case XP_STYLE_MXI:
-		return mx_m_data(q, mp);
-	case XP_STYLE_LMI:
-		return lm_m_data(q, mp);
+		rtn = -EOPNOTSUPP;
+		break;
 	}
+	if (rtn < 0)
+		xp->i_state = oldstate;
+	return (rtn);
+}
+
+STATIC int
+mx_w_proto(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+	ulong prim;
+	struct xp *xp = XP_PRIV(q);
+	ulong oldstate = xp->i_state;
+	switch ((prim = *(ulong *) mp->b_rptr)) {
+	case MX_INFO_REQ:
+		printd(("%s: %p: --> MX_INFO_REQ\n", DRV_NAME, xp));
+		rtn = mx_info_req(q, mp);
+		break;
+	case MX_OPTMGMT_REQ:
+		printd(("%s: %p: --> MX_OPTMGMT_REQ\n", DRV_NAME, xp));
+		rtn = mx_optmgmt_req(q, mp);
+		break;
+	case MX_ATTACH_REQ:
+		printd(("%s: %p: --> MX_ATTACH_REQ\n", DRV_NAME, xp));
+		rtn = mx_attach_req(q, mp);
+		break;
+	case MX_ENABLE_REQ:
+		printd(("%s: %p: --> MX_ENABLE_REQ\n", DRV_NAME, xp));
+		rtn = mx_enable_req(q, mp);
+		break;
+	case MX_CONNECT_REQ:
+		printd(("%s: %p: --> MX_CONNECT_REQ\n", DRV_NAME, xp));
+		rtn = mx_connect_req(q, mp);
+		break;
+	case MX_DATA_REQ:
+		printd(("%s: %p: --> MX_DATA_REQ\n", DRV_NAME, xp));
+		rtn = mx_data_req(q, mp);
+		break;
+	case MX_DISCONNECT_REQ:
+		printd(("%s: %p: --> MX_DISCONNECT_REQ\n", DRV_NAME, xp));
+		rtn = mx_disconnect_req(q, mp);
+		break;
+	case MX_DISABLE_REQ:
+		printd(("%s: %p: --> MX_DISABLE_REQ\n", DRV_NAME, xp));
+		rtn = mx_disable_req(q, mp);
+		break;
+	case MX_DETACH_REQ:
+		printd(("%s: %p: --> MX_DETACH_REQ\n", DRV_NAME, xp));
+		rtn = mx_detach_req(q, mp);
+		break;
+	default:
+		rtn = -EOPNOTSUPP;
+		break;
+	}
+	if (rtn < 0)
+		xp->i_state = oldstate;
+	return (rtn);
+}
+
+STATIC int
+lm_w_proto(queue_t *q, mblk_t *mp)
+{
+	int rtn;
+	ulong prim;
+	struct xp *xp = XP_PRIV(q);
+	ulong oldstate = xp->i_state;
+	switch ((prim = *(ulong *) mp->b_rptr)) {
+	default:
+		rtn = -EOPNOTSUPP;
+		break;
+	}
+	if (rtn < 0)
+		xp->i_state = oldstate;
+	return (rtn);
 }
 
 /*
@@ -3648,18 +3637,79 @@ xp_r_prim(queue_t *q, mblk_t *mp)
 {
 	return (QR_PASSFLOW);
 }
+
 STATIC INLINE int
-xp_w_prim(queue_t *q, mblk_t *mp)
+sdl_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
-		return xp_w_data(q, mp);
+		return sdl_m_data(q, mp);
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
-		return xp_w_data(q, mp);
+		return sdl_m_data(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
-		return xp_w_proto(q, mp);
+		return sdl_w_proto(q, mp);
+	case M_FLUSH:
+		return ss7_w_flush(q, mp);
+	case M_IOCTL:
+		return xp_w_ioctl(q, mp);
+	}
+	return (QR_PASSFLOW);
+}
+
+STATIC INLINE int
+ch_w_prim(queue_t *q, mblk_t *mp)
+{
+	/* Fast Path */
+	if (mp->b_datap->db_type == M_DATA)
+		return ch_m_data(q, mp);
+	switch (mp->b_datap->db_type) {
+	case M_DATA:
+		return ch_m_data(q, mp);
+	case M_PROTO:
+	case M_PCPROTO:
+		return ch_w_proto(q, mp);
+	case M_FLUSH:
+		return ss7_w_flush(q, mp);
+	case M_IOCTL:
+		return xp_w_ioctl(q, mp);
+	}
+	return (QR_PASSFLOW);
+}
+
+STATIC INLINE int
+mx_w_prim(queue_t *q, mblk_t *mp)
+{
+	/* Fast Path */
+	if (mp->b_datap->db_type == M_DATA)
+		return mx_m_data(q, mp);
+	switch (mp->b_datap->db_type) {
+	case M_DATA:
+		return mx_m_data(q, mp);
+	case M_PROTO:
+	case M_PCPROTO:
+		return mx_w_proto(q, mp);
+	case M_FLUSH:
+		return ss7_w_flush(q, mp);
+	case M_IOCTL:
+		return xp_w_ioctl(q, mp);
+	}
+	return (QR_PASSFLOW);
+}
+
+STATIC INLINE int
+lm_w_prim(queue_t *q, mblk_t *mp)
+{
+	/* Fast Path */
+	if (mp->b_datap->db_type == M_DATA)
+		return lm_m_data(q, mp);
+	switch (mp->b_datap->db_type) {
+	case M_DATA:
+		return lm_m_data(q, mp);
+	case M_PROTO:
+	case M_PCPROTO:
+		return lm_w_proto(q, mp);
 	case M_FLUSH:
 		return ss7_w_flush(q, mp);
 	case M_IOCTL:
@@ -3677,9 +3727,9 @@ xp_w_prim(queue_t *q, mblk_t *mp)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
-STATIC int xp_majors[SL_X400P_CMAJORS] = { SL_X400P_CMAJOR_0, };
+STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct xp *xp_list = NULL;
-STATIC spinlock_t xp_lock;
+STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
 /*
  *  OPEN
@@ -3690,9 +3740,9 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
-	ushort cmajor = getmajor(*devp);
-	ushort cminor = getminor(*devp);
-	ushort bminor = cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	minor_t bminor = cminor;
 	struct xp *xp, **xpp = &xp_list;
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
@@ -3701,11 +3751,11 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: Can't open as module\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
-	if (cmajor != SL_X400P_CMAJOR_0 || cminor >= X400P_CMINOR_FREE) {
+	if (cmajor != CMAJOR_0 || cminor >= X400P_CMINOR_FREE) {
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -3713,19 +3763,18 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	cminor = X400P_CMINOR_FREE;
 	spin_lock_irqsave(&xp_lock, flags);
 	for (; *xpp; xpp = &(*xpp)->next) {
-		ushort dmajor = (*xpp)->u.dev.cmajor;
+		major_t dmajor = (*xpp)->u.dev.cmajor;
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
-			ushort dminor = (*xpp)->u.dev.cminor;
+			minor_t dminor = (*xpp)->u.dev.cminor;
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= SL_X400P_NMINOR) {
-					if (++mindex >= SL_X400P_CMAJORS
-					    || !(cmajor = xp_majors[mindex]))
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = xp_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -3733,16 +3782,16 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (mindex >= SL_X400P_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", SL_X400P_DRV_NAME));
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&xp_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", SL_X400P_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(xp = xp_alloc_priv(q, xpp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: No memory\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&xp_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -3763,7 +3812,7 @@ xp_close(queue_t *q, int flag, cred_t *crp)
 	(void) flag;
 	(void) crp;
 	(void) xp;
-	printd(("%s: closing character device %d:%d\n", SL_X400P_DRV_NAME, xp->u.dev.cmajor,
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, xp->u.dev.cmajor,
 		xp->u.dev.cminor));
 	spin_lock_irqsave(&xp_lock, flags);
 	xp_free_priv(xp);
@@ -3790,40 +3839,46 @@ STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
  *  Cache allocation
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC int
 xp_term_caches(void)
 {
+	int err = 0;
 	if (xp_xbuf_cachep) {
-		if (kmem_cache_destroy(xp_xbuf_cachep))
+		if (kmem_cache_destroy(xp_xbuf_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_xbuf_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_xbuf_cache to zero\n", SL_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_xbuf_cache to zero\n", DRV_NAME));
 	}
 	if (xp_card_cachep) {
-		if (kmem_cache_destroy(xp_card_cachep))
+		if (kmem_cache_destroy(xp_card_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_card_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_card_cache to zero\n", SL_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_card_cache to zero\n", DRV_NAME));
 	}
 	if (xp_slot_cachep) {
-		if (kmem_cache_destroy(xp_slot_cachep))
+		if (kmem_cache_destroy(xp_slot_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_slot_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_slot_cache to zero\n", SL_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_slot_cache to zero\n", DRV_NAME));
 	}
 	if (xp_span_cachep) {
-		if (kmem_cache_destroy(xp_span_cachep))
+		if (kmem_cache_destroy(xp_span_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_span_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_span_cache to zero\n", SL_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_span_cache to zero\n", DRV_NAME));
 	}
 	if (xp_priv_cachep) {
-		if (kmem_cache_destroy(xp_priv_cachep))
+		if (kmem_cache_destroy(xp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: shrunk xp_priv_cache to zero\n", SL_X400P_DRV_NAME));
+			err = -EBUSY;
+		} else
+			printd(("%s: shrunk xp_priv_cache to zero\n", DRV_NAME));
 	}
-	return;
+	return (err);
 }
 STATIC int
 xp_init_caches(void)
@@ -3836,7 +3891,7 @@ xp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		goto error;
 	} else
-		printd(("%s: initialized device private structure cache\n", SL_X400P_DRV_NAME));
+		printd(("%s: initialized device private structure cache\n", DRV_NAME));
 	if (!xp_slot_cachep &&
 	    !(xp_slot_cachep =
 	      kmem_cache_create("xp_slot_cachep", sizeof(struct ts), 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -3845,7 +3900,7 @@ xp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_slot_cachep", __FUNCTION__);
 		goto error;
 	} else
-		printd(("%s: initialized span private structure cache\n", SL_X400P_DRV_NAME));
+		printd(("%s: initialized span private structure cache\n", DRV_NAME));
 	if (!xp_span_cachep &&
 	    !(xp_span_cachep =
 	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -3854,7 +3909,7 @@ xp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		goto error;
 	} else
-		printd(("%s: initialized span private structure cache\n", SL_X400P_DRV_NAME));
+		printd(("%s: initialized span private structure cache\n", DRV_NAME));
 	if (!xp_card_cachep &&
 	    !(xp_card_cachep =
 	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -3863,7 +3918,7 @@ xp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		goto error;
 	} else
-		printd(("%s: initialized card private structure cache\n", SL_X400P_DRV_NAME));
+		printd(("%s: initialized card private structure cache\n", DRV_NAME));
 	if (!xp_xbuf_cachep &&
 	    !(xp_xbuf_cachep =
 	      kmem_cache_create("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL,
@@ -3872,7 +3927,7 @@ xp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		goto error;
 	} else
-		printd(("%s: initialized card read/write buffer cache\n", SL_X400P_DRV_NAME));
+		printd(("%s: initialized card read/write buffer cache\n", DRV_NAME));
 	return (0);
       error:
 	xp_term_caches();
@@ -3884,11 +3939,11 @@ xp_init_caches(void)
  *  -------------------------------------------------------------------------
  */
 STATIC struct xp *
-xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp, ushort bminor)
+xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	struct xp *xp;
 	if ((xp = kmem_cache_alloc(xp_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated device private structure\n", SL_X400P_DRV_NAME, xp));
+		printd(("%s: %p: allocated device private structure\n", DRV_NAME, xp));
 		bzero(xp, sizeof(*xp));
 		xp_get(xp);	/* first get */
 		xp->priv_put = &xp_put;
@@ -3898,30 +3953,42 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp, ushort bmin
 		(xp->oq = RD(q))->q_ptr = xp_get(xp);
 		(xp->iq = WR(q))->q_ptr = xp_get(xp);
 		spin_lock_init(&xp->qlock);	/* "xp-queue-lock" */
-		xp->o_prim = &xp_r_prim;
-		xp->o_wakeup = NULL;
-		xp->i_prim = &xp_w_prim;
-		xp->i_wakeup = NULL;
 		switch (bminor) {
 		default:
-		case XP_STYLE_SDLI:
+		case X400P_CMINOR_SDLI:
+			xp->o_prim = &xp_r_prim;
+			xp->o_wakeup = NULL;
+			xp->i_prim = &sdl_w_prim;
+			xp->i_wakeup = NULL;
 			xp->i_state = LMI_UNATTACHED;
-			xp->i_style = XP_STYLE_SDLI;
+			xp->i_style = LMI_STYLE2;
 			xp->i_version = 1;
 			break;
-		case XP_STYLE_CHI:
+		case X400P_CMINOR_CHI:
+			xp->o_prim = &xp_r_prim;
+			xp->o_wakeup = NULL;
+			xp->i_prim = &ch_w_prim;
+			xp->i_wakeup = NULL;
 			xp->i_state = 0;
-			xp->i_style = XP_STYLE_CHI;
+			xp->i_style = CH_STYLE2;
 			xp->i_version = 1;
 			break;
-		case XP_STYLE_MXI:
+		case X400P_CMINOR_MXI:
+			xp->o_prim = &xp_r_prim;
+			xp->o_wakeup = NULL;
+			xp->i_prim = &mx_w_prim;
+			xp->i_wakeup = NULL;
 			xp->i_state = 0;
-			xp->i_style = XP_STYLE_MXI;
+			xp->i_style = MX_STYLE2;
 			xp->i_version = 1;
 			break;
-		case XP_STYLE_LMI:
+		case X400P_CMINOR_LMI:
+			xp->o_prim = &xp_r_prim;
+			xp->o_wakeup = NULL;
+			xp->i_prim = &lm_w_prim;
+			xp->i_wakeup = NULL;
 			xp->i_state = 0;
-			xp->i_style = XP_STYLE_LMI;
+			xp->i_style = LMI_STYLE2;
 			xp->i_version = 1;
 		}
 		spin_lock_init(&xp->lock);	/* "xp-priv-lock" */
@@ -3929,11 +3996,10 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp, ushort bmin
 			xp->next->prev = &xp->next;
 		xp->prev = xpp;
 		*xpp = xp_get(xp);
-		printd(("%s: linked device private structure\n", SL_X400P_DRV_NAME));
-		printd(("%s: setting device private structure defaults\n", SL_X400P_DRV_NAME));
+		printd(("%s: linked device private structure\n", DRV_NAME));
+		printd(("%s: setting device private structure defaults\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate device private structure\n",
-			SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate device private structure\n", DRV_NAME));
 	return (xp);
 }
 
@@ -3972,8 +4038,7 @@ xp_free_priv(struct xp *xp)
 						xp_free_ts(xchg(&sp->slots[slot], NULL));
 			}
 			sp_put(xchg(&xp->sp, NULL));
-			printd(("%s: unlinked device private structure from span\n",
-				SL_X400P_DRV_NAME));
+			printd(("%s: unlinked device private structure from span\n", DRV_NAME));
 		}
 		ss7_unbufcall((str_t *) xp);
 		ss7_bufpool_release(&xp_bufpool, 2);
@@ -4002,7 +4067,7 @@ xp_put(struct xp *xp)
 {
 	if (atomic_dec_and_test(&xp->refcnt)) {
 		kmem_cache_free(xp_priv_cachep, xp);
-		printd(("%s: freed device private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: freed device private structure\n", DRV_NAME));
 	}
 }
 
@@ -4015,7 +4080,7 @@ xp_alloc_ts(struct xp *xp, struct sp *sp, uint8_t slot)
 {
 	struct ts *ts;
 	if ((ts = kmem_cache_alloc(xp_slot_cachep, SLAB_ATOMIC))) {
-		printd(("%s: allocated slot private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: allocated slot private structure\n", DRV_NAME));
 		bzero(ts, sizeof(*ts));
 		ts_get(ts);	/* first get */
 		spin_lock_init(&ts->lock);	/* "ts-priv-lock" */
@@ -4024,15 +4089,14 @@ xp_alloc_ts(struct xp *xp, struct sp *sp, uint8_t slot)
 		ts->xp = xp_get(xp);
 		ts->sp = sp_get(sp);
 		/* fill out slot structure */
-		printd(("%s: linked slot private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: linked slot private structure\n", DRV_NAME));
 		ts->slot = slot;
 		bufq_init(&ts->tx.buf);
 		bufq_init(&ts->rx.buf);
 		ss7_bufpool_reserve(&xp_bufpool, 2);
-		printd(("%s: set slot private structure defaults\n", SL_X400P_DRV_NAME));
+		printd(("%s: set slot private structure defaults\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocat slot private structure\n",
-			SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocat slot private structure\n", DRV_NAME));
 	return (ts);
 }
 STATIC void
@@ -4070,7 +4134,7 @@ STATIC void
 ts_put(struct ts *ts)
 {
 	if (atomic_dec_and_test(&ts->refcnt)) {
-		printd(("%s: freed slot private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: freed slot private structure\n", DRV_NAME));
 		kmem_cache_free(xp_slot_cachep, ts);
 	}
 }
@@ -4084,7 +4148,7 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 {
 	struct sp *sp;
 	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
-		printd(("%s: allocated span private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: allocated span private structure\n", DRV_NAME));
 		bzero(sp, sizeof(*sp));
 		cd_get(cd);	/* first get */
 		spin_lock_init(&sp->lock);	/* "sp-priv-lock" */
@@ -4092,17 +4156,16 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 		cd->spans[span] = sp_get(sp);
 		sp->cd = cd_get(cd);
 		/* fill out span structure */
-		printd(("%s: linked span private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: linked span private structure\n", DRV_NAME));
 		sp->iobase = cd->iobase + (span << 8);
 		sp->span = span;
 		sp->config = cd->config;
 		sp->config.ifflags = 0;
 		sp->config.ifalarms = 0;
 		sp->config.ifrxlevel = 0;
-		printd(("%s: set span private structure defaults\n", SL_X400P_DRV_NAME));
+		printd(("%s: set span private structure defaults\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate span private structure\n",
-			SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate span private structure\n", DRV_NAME));
 	return (sp);
 }
 
@@ -4118,7 +4181,7 @@ xp_free_sp(struct sp *sp)
 		sp_put(xchg(&cd->spans[sp->span], NULL));
 		cd_put(xchg(&sp->cd, NULL));
 		sp->span = 0;
-		printd(("%s: unlinked span private structure from card\n", SL_X400P_DRV_NAME));
+		printd(("%s: unlinked span private structure from card\n", DRV_NAME));
 		/* remove channel linkage */
 		for (slot = 0; slot < 32; slot++) {
 			struct xp *xp;
@@ -4127,9 +4190,9 @@ xp_free_sp(struct sp *sp)
 				xp_free_ts(xchg(&sp->slots[slot], NULL));
 			}
 		}
-		printd(("%s: unlinked span private structure from slots\n", SL_X400P_DRV_NAME));
+		printd(("%s: unlinked span private structure from slots\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: spans cannot exist without cards\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: spans cannot exist without cards\n", DRV_NAME));
 }
 STATIC struct sp *
 sp_get(struct sp *sp)
@@ -4142,7 +4205,7 @@ STATIC void
 sp_put(struct sp *sp)
 {
 	if (atomic_dec_and_test(&sp->refcnt)) {
-		printd(("%s: freed span private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: freed span private structure\n", DRV_NAME));
 		kmem_cache_free(xp_span_cachep, sp);
 	}
 }
@@ -4158,14 +4221,14 @@ xp_alloc_cd(void)
 	if ((cd = kmem_cache_alloc(xp_card_cachep, SLAB_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
-		printd(("%s: allocated card private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: allocated card private structure\n", DRV_NAME));
 		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
-			ptrace(("%s: could not allocate write buffer\n", SL_X400P_DRV_NAME));
+			ptrace(("%s: could not allocate write buffer\n", DRV_NAME));
 			kmem_cache_free(xp_card_cachep, cd);
 			return (NULL);
 		}
 		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
-			ptrace(("%s: could not allocate read buffer\n", SL_X400P_DRV_NAME));
+			ptrace(("%s: could not allocate read buffer\n", DRV_NAME));
 			kmem_cache_free(xp_xbuf_cachep, wbuf);
 			kmem_cache_free(xp_card_cachep, cd);
 			return (NULL);
@@ -4181,10 +4244,9 @@ xp_alloc_cd(void)
 		cd->wbuf = wbuf;
 		cd->rbuf = rbuf;
 		tasklet_init(&cd->tasklet, NULL, 0);
-		printd(("%s: linked card private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: linked card private structure\n", DRV_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate card private structure\n",
-			SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not allocate card private structure\n", DRV_NAME));
 	return (cd);
 }
 
@@ -4215,7 +4277,7 @@ xp_free_cd(struct cd *cd)
 		cd->next = NULL;
 		cd->prev = &cd->next;
 		cd_put(cd);
-		printd(("%s: unlinked card private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: unlinked card private structure\n", DRV_NAME));
 	}
 	spin_unlock_irqrestore(&cd->lock, flags);
 	cd_put(cd);		/* final put */
@@ -4232,7 +4294,7 @@ cd_put(struct cd *cd)
 {
 	if (atomic_dec_and_test(&cd->refcnt)) {
 		kmem_cache_free(xp_card_cachep, cd);
-		printd(("%s: freed card private structure\n", SL_X400P_DRV_NAME));
+		printd(("%s: freed card private structure\n", DRV_NAME));
 	}
 }
 
@@ -4267,34 +4329,34 @@ xp_remove(struct pci_dev *dev)
 	}
 	if (cd->irq) {
 		free_irq(cd->irq, cd);
-		printd(("%s: freed irq\n", SL_X400P_DRV_NAME));
+		printd(("%s: freed irq\n", DRV_NAME));
 	}
 	if (cd->xlb_region) {
 		release_mem_region(cd->xlb_region, cd->xlb_length);
-		printd(("%s: released xlb region %lx length %ld\n", SL_X400P_DRV_NAME,
+		printd(("%s: released xlb region %lx length %ld\n", DRV_NAME,
 			cd->xlb_region, cd->xlb_length));
 	}
 	if (cd->xll_region) {
 		release_mem_region(cd->xll_region, cd->xll_length);
-		printd(("%s: released xll region %lx length %ld\n", SL_X400P_DRV_NAME,
+		printd(("%s: released xll region %lx length %ld\n", DRV_NAME,
 			cd->xll_region, cd->xll_length));
 	}
 	if (cd->plx_region) {
 		release_mem_region(cd->plx_region, cd->plx_length);
-		printd(("%s: released plx region %lx length %ld\n", SL_X400P_DRV_NAME,
+		printd(("%s: released plx region %lx length %ld\n", DRV_NAME,
 			cd->plx_region, cd->plx_length));
 	}
 	if (cd->xlb) {
 		iounmap((void *) cd->xlb);
-		printd(("%s: unmapped xlb memory at %p\n", SL_X400P_DRV_NAME, cd->xlb));
+		printd(("%s: unmapped xlb memory at %p\n", DRV_NAME, cd->xlb));
 	}
 	if (cd->xll) {
 		iounmap((void *) cd->xll);
-		printd(("%s: unmapped xll memory at %p\n", SL_X400P_DRV_NAME, cd->xll));
+		printd(("%s: unmapped xll memory at %p\n", DRV_NAME, cd->xll));
 	}
 	if (cd->plx) {
 		iounmap((void *) cd->plx);
-		printd(("%s: unmapped plx memory at %p\n", SL_X400P_DRV_NAME, cd->plx));
+		printd(("%s: unmapped plx memory at %p\n", DRV_NAME, cd->plx));
 	}
 	xp_free_cd(cd);
       disable:
@@ -4314,24 +4376,24 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	int span, b;
 	struct cd *cd;
 	if (!dev || !id) {
-		ptrace(("%s: ERROR: Device or id is null!\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Device or id is null!\n", DRV_NAME));
 		return (-ENXIO);
 	}
 	if (id->driver_data != X400PSS7 && id->driver_data != X400P) {
-		ptrace(("%s: ERROR: Driver does not support device type %ld\n", SL_X400P_DRV_NAME,
+		ptrace(("%s: ERROR: Driver does not support device type %ld\n", DRV_NAME,
 			id->driver_data));
 		return (-ENXIO);
 	}
 	if (dev->irq < 1) {
-		ptrace(("%s: ERROR: No IRQ allocated for device\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: No IRQ allocated for device\n", DRV_NAME));
 		return (-ENXIO);
 	}
-	printd(("%s: device allocated IRQ %d\n", SL_X400P_DRV_NAME, dev->irq));
+	printd(("%s: device allocated IRQ %d\n", DRV_NAME, dev->irq));
 	if (pci_enable_device(dev)) {
-		ptrace(("%s: ERROR: Could not enable pci device\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Could not enable pci device\n", DRV_NAME));
 		return (-ENODEV);
 	}
-	printd(("%s: enabled x400p-ss7 pci device type %ld\n", SL_X400P_DRV_NAME, id->driver_data));
+	printd(("%s: enabled x400p-ss7 pci device type %ld\n", DRV_NAME, id->driver_data));
 	if (!(cd = xp_alloc_cd()))
 		return (-ENOMEM);
 	pci_set_drvdata(dev, cd);
@@ -4339,49 +4401,49 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	    || !(cd->plx_region = pci_resource_start(dev, 0))
 	    || !(cd->plx_length = pci_resource_len(dev, 0))
 	    || !(cd->plx = ioremap(cd->plx_region, cd->plx_length))) {
-		ptrace(("%s: ERROR: Invalid PLX 9030 base resource\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Invalid PLX 9030 base resource\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", SL_X400P_DRV_NAME, cd->plx_length,
+	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length,
 		cd->plx_region, cd->plx));
 	if ((pci_resource_flags(dev, 2) & IORESOURCE_IO)
 	    || !(cd->xll_region = pci_resource_start(dev, 2))
 	    || !(cd->xll_length = pci_resource_len(dev, 2))
 	    || !(cd->xll = ioremap(cd->xll_region, cd->xll_length))) {
-		ptrace(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", SL_X400P_DRV_NAME, cd->xll_length,
+	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length,
 		cd->xll_region, cd->xll));
 	if ((pci_resource_flags(dev, 3) & IORESOURCE_IO)
 	    || !(cd->xlb_region = pci_resource_start(dev, 3))
 	    || !(cd->xlb_length = pci_resource_len(dev, 3))
 	    || !(cd->xlb = ioremap(cd->xlb_region, cd->xlb_length))) {
-		ptrace(("%s: ERROR: Invalid Xilinx 8-bit base resource\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Invalid Xilinx 8-bit base resource\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", SL_X400P_DRV_NAME, cd->xlb_length,
+	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length,
 		cd->xlb_region, cd->xlb));
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve PLX memory\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unable to reserve PLX memory\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: plx region %lx reserved %ld bytes\n", SL_X400P_DRV_NAME, cd->plx_region,
+	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region,
 		cd->plx_length));
 	if (!request_mem_region(cd->xll_region, cd->xll_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xll region %lx reserved %ld bytes\n", SL_X400P_DRV_NAME, cd->xll_region,
+	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region,
 		cd->xll_length));
 	if (!request_mem_region(cd->xlb_region, cd->xlb_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", SL_X400P_DRV_NAME));
+		ptrace(("%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", DRV_NAME));
 		goto error_remove;
 	}
-	printd(("%s: xlb region %lx reserved %ld bytes\n", SL_X400P_DRV_NAME, cd->xlb_region,
+	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region,
 		cd->xlb_length));
-	__printd(("%s: card detected %s at 0x%lx/0x%lx irq %d\n", SL_X400P_DRV_NAME,
+	__printd(("%s: card detected %s at 0x%lx/0x%lx irq %d\n", DRV_NAME,
 		  cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq));
 #ifdef X400P_DOWNLOAD_FIRMWARE
 	{
@@ -4393,12 +4455,12 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		*data |= GPIO_WRITE;
 		*data &= ~GPIO_PROGRAM;
 		while (*data & (GPIO_INIT | GPIO_DONE)) ;
-		printd(("%s: Xilinx Firmware Load: Init and done are low\n", SL_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Init and done are low\n", DRV_NAME));
 		*data |= GPIO_PROGRAM;
 		while (!(*data & GPIO_INIT)) ;
-		printd(("%s: Xilinx Firmware Load: Init is high\n", SL_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Init is high\n", DRV_NAME));
 		*data &= ~GPIO_WRITE;
-		printd(("%s: Xilinx Firmware Load: Loading\n", SL_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Loading\n", DRV_NAME));
 		for (byte = 0; byte < sizeof(x400pfw); byte++) {
 			*cd->xlb = *f++;
 			if (*data & GPIO_DONE)
@@ -4407,25 +4469,25 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 				break;
 		}
 		if (!(*data & GPIO_INIT)) {
-			printd(("%s: ERROR: Xilinx Firmware Load: Failed\n", SL_X400P_DRV_NAME));
+			printd(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
 			goto error_remove;
 		}
-		printd(("%s: Xilinx Firmware Load: Loaded %d bytes\n", SL_X400P_DRV_NAME, byte));
+		printd(("%s: Xilinx Firmware Load: Loaded %d bytes\n", DRV_NAME, byte));
 		timeout = jiffies + 20 * HZ / 1000;
 		while (jiffies < timeout) ;
 		*data |= GPIO_WRITE;
-		printd(("%s: Xilinx Firmware Load: Done\n", SL_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Done\n", DRV_NAME));
 		timeout = jiffies + 20 * HZ / 1000;
 		while (jiffies < timeout) ;
 		if (!(*data & GPIO_INIT)) {
-			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", SL_X400P_DRV_NAME));
+			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
 			goto error_remove;
 		}
 		if (!(*data & GPIO_DONE)) {
-			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", SL_X400P_DRV_NAME));
+			ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
 			goto error_remove;
 		}
-		printd(("%s: Xilinx Firmware Load: Successful\n", SL_X400P_DRV_NAME));
+		printd(("%s: Xilinx Firmware Load: Successful\n", DRV_NAME));
 	}
 #endif
 	cd->plx[INTCSR] = 0;	/* disable interrupts */
@@ -4434,7 +4496,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->xlb[LEDREG] = 0xff;
 	if ((b = cd->xlb[0x00f]) & 0x80) {
 		int word;
-		__printd(("%s: E400P-SS7 (%s Rev. %d)\n", SL_X400P_DRV_NAME,
+		__printd(("%s: E400P-SS7 (%s Rev. %d)\n", DRV_NAME,
 			  xp_e1_framer[(b & 0x30) >> 4], b & 0xf));
 		for (word = 0; word < 256; word++) {
 			int ebuf;
@@ -4444,19 +4506,17 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		}
 		/* setup E1 card defaults */
 		cd->config = sdl_default_e1_chan;
-		if (request_irq
-		    (dev->irq, xp_e1_interrupt, SA_INTERRUPT | SA_SHIRQ, SL_X400P_DRV_NAME, cd)) {
-			ptrace(("%s: ERROR: Unable to request IRQ %d\n", SL_X400P_DRV_NAME,
-				dev->irq));
+		if (request_irq(dev->irq, xp_e1_interrupt, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, cd)) {
+			ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));
 			goto error_remove;
 		}
 		cd->irq = dev->irq;
-		printd(("%s: acquired IRQ %ld for E400P-SS7 card\n", SL_X400P_DRV_NAME, cd->irq));
+		printd(("%s: acquired IRQ %ld for E400P-SS7 card\n", DRV_NAME, cd->irq));
 		cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 		tasklet_init(&cd->tasklet, &xp_e1_card_tasklet, (unsigned long) cd);
 	} else {
 		int word;
-		__printd(("%s: T100P-SS7 (%s Rev. %d)\n", SL_X400P_DRV_NAME,
+		__printd(("%s: T100P-SS7 (%s Rev. %d)\n", DRV_NAME,
 			  xp_t1_framer[(b & 0x30) >> 4], b & 0xf));
 		for (word = 0; word < 256; word++) {
 			int ebuf;
@@ -4466,14 +4526,12 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		}
 		/* setup T1 card defaults */
 		cd->config = sdl_default_t1_chan;
-		if (request_irq
-		    (dev->irq, xp_t1_interrupt, SA_INTERRUPT | SA_SHIRQ, SL_X400P_DRV_NAME, cd)) {
-			ptrace(("%s: ERROR: Unable to request IRQ %d\n", SL_X400P_DRV_NAME,
-				dev->irq));
+		if (request_irq(dev->irq, xp_t1_interrupt, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, cd)) {
+			ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));
 			goto error_remove;
 		}
 		cd->irq = dev->irq;
-		printd(("%s: acquired IRQ %ld for T400P-SS7 card\n", SL_X400P_DRV_NAME, cd->irq));
+		printd(("%s: acquired IRQ %ld for T400P-SS7 card\n", DRV_NAME, cd->irq));
 		cd->config.ifflags = (SDL_IF_UP | SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
 		tasklet_init(&cd->tasklet, &xp_t1_card_tasklet, (unsigned long) cd);
 	}
@@ -4538,100 +4596,161 @@ xp_pci_init(void)
  *  configured, we need to stop the boards and deallocate the board-level
  *  resources and structures.
  */
-STATIC INLINE void
+STATIC INLINE int
 xp_pci_cleanup(void)
 {
-	return pci_unregister_driver(&xp_driver);
-}
-
-/*
- *  =========================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =========================================================================
- */
-STATIC int xp_initialized = 0;
-STATIC void
-xp_init(void)
-{
-	int rtn, major;
-	unless(xp_initialized, return);
-	cmn_err(CE_NOTE, SL_X400P_BANNER);	/* console splash */
-	if ((rtn = xp_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Could not allocate caches", SL_X400P_DRV_NAME);
-		xp_initialized = rtn;
-		return;
-	}
-	if ((rtn = xp_pci_init()) < 0) {
-		cmn_err(CE_WARN, "%s: ERROR: No PCI devices found", SL_X400P_DRV_NAME);
-		xp_term_caches();
-		xp_initialized = rtn;
-		return;
-	}
-	ss7_bufpool_init(&xp_bufpool);
-	for (major = 0; major < SL_X400P_CMAJORS; major++) {
-		if ((rtn =
-		     lis_register_strdev(xp_majors[major], &xp_info, SL_X400P_NMINOR,
-					 SL_X400P_DRV_NAME)) <= 0) {
-			if (!major) {
-				cmn_err(CE_PANIC, "%s: Could not register 1'st major %d",
-					SL_X400P_DRV_NAME, xp_majors[0]);
-				ss7_bufpool_term(&xp_bufpool);
-				xp_pci_cleanup();
-				xp_term_caches();
-				xp_initialized = rtn;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: Could not register %d'th major", SL_X400P_DRV_NAME,
-				major + 1);
-			xp_majors[major] = 0;
-		} else if (major)
-			xp_majors[major] = rtn;
-	}
-	spin_lock_init(&xp_lock);	/* "x400p-open-list-lock" */
-	xp_initialized = 1;
-	return;
-}
-STATIC void
-xp_terminate(void)
-{
-	int rtn, major;
-	ensure(xp_initialized, return);
-	for (major = 0; major < SL_X400P_CMAJORS; major++) {
-		if (xp_majors[major]) {
-			if ((rtn = lis_unregister_strdev(xp_majors[major])))
-				cmn_err(CE_PANIC, "%s: couldn't unregister driver for major %d\n",
-					SL_X400P_DRV_NAME, xp_majors[major]);
-			if (major)
-				xp_majors[major] = 0;
-		}
-	}
-	xp_initialized = 0;
-	ss7_bufpool_term(&xp_bufpool);
-	xp_pci_cleanup();
-	xp_term_caches();
-	return;
-}
-
-/*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
- */
-int
-init_module(void)
-{
-	xp_init();
-	if (xp_initialized < 0)
-		return xp_initialized;
+	pci_unregister_driver(&xp_driver);
 	return (0);
 }
 
-void
-cleanup_module(void)
+/*
+ *  =========================================================================
+ *
+ *  Registration and initialization
+ *
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the X400P driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the X400P driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw xp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &x400pinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+xp_register_strdev(major_t major)
 {
-	xp_terminate();
+	int err;
+	if ((err = register_strdev(&xp_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+STATIC int
+xp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = unregister_strdev(&xp_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+xp_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &x400pinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+xp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+x400pterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (xp_majors[mindex]) {
+			if ((err = xp_unregister_strdev(xp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					xp_majors[mindex]);
+			if (mindex)
+				xp_majors[mindex] = 0;
+		}
+	}
+	ss7_bufpool_term(&xp_bufpool);
+	if ((err = xp_pci_cleanup()))
+		cmn_err(CE_WARN, "%s: could not cleanup pci device", DRV_NAME);
+	if ((err = xp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+x400pinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = xp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		x400pterminate();
+		return (err);
+	}
+	if ((err = xp_pci_init())) {
+		cmn_err(CE_WARN, "%s: no PCI devices found, err = %d", DRV_NAME, err);
+		x400pterminate();
+		return (err);
+	}
+	ss7_bufpool_init(&xp_bufpool);
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = xp_register_strdev(xp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					xp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				x400pterminate();
+				return (err);
+			}
+		}
+		if (xp_majors[mindex] == 0)
+			xp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = xp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(x400pinit);
+module_exit(x400pterminate);
+
+#endif				/* LINUX */

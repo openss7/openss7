@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:32 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:36 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:36 $";
 
 #include "compat.h"
 
@@ -65,18 +65,20 @@ static char const ident[] =
 #include <ss7/chi_ioctl.h>
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
-#define CH_SDL_REVISION		"LfS $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:32 $"
+#define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:36 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CH_SDL_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CH_SDL_LICENSE		"GPL"
 #define CH_SDL_BANNER		CH_SDL_DESCRIP		"\n" \
+				CH_SDL_EXTRA		"\n" \
 				CH_SDL_REVISION		"\n" \
 				CH_SDL_COPYRIGHT	"\n" \
 				CH_SDL_DEVICE		"\n" \
-				CH_SDL_CONTACT		"\n"
-#define CH_SDL_SPLASH		CH_SDL_DEVICE		" - " \
-				CH_SDL_REVISION		"\n"
+				CH_SDL_CONTACT
+#define CH_SDL_SPLASH		CH_SDL_DEVICE		"\n" \
+				CH_SDL_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(CH_SDL_CONTACT);

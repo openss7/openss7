@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:16 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 21:52:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -79,18 +79,20 @@ static char const ident[] =
 #endif
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
-#define SDL_X400P_REVISION	"LfS $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:16 $"
+#define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2004/08/30 21:52:37 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_X400P_LICENSE	"GPL"
 #define SDL_X400P_BANNER	SDL_X400P_DESCRIP	"\n" \
+				SDL_X400P_EXTRA		"\n" \
 				SDL_X400P_REVISION	"\n" \
 				SDL_X400P_COPYRIGHT	"\n" \
 				SDL_X400P_DEVICE	"\n" \
-				SDL_X400P_CONTACT	"\n"
-#define SDL_X400P_SPLASH	SDL_X400P_DEVICE	" - " \
-				SDL_X400P_REVISION	"\n"
+				SDL_X400P_CONTACT
+#define SDL_X400P_SPLASH	SDL_X400P_DESCRIP	"\n" \
+				SDL_X400P_REVISION
 
 #ifdef LINUX
 MODULE_AUTHOR(SDL_X400P_CONTACT);
@@ -98,7 +100,7 @@ MODULE_DESCRIPTION(SDL_X400P_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SDL_X400P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDL_X400P_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -106,11 +108,7 @@ MODULE_LICENSE(SDL_X400P_LICENSE);
 #define SDL_X400P_DRV_NAME	CONFIG_STREAMS_SDL_X400P_NAME
 #define SDL_X400P_CMAJORS	CONFIG_STREAMS_SDL_X400P_NMAJORS
 #define SDL_X400P_CMAJOR_0	CONFIG_STREAMS_SDL_X400P_MAJOR
-#define SDL_X400P_NMINOR	CONFIG_STREAMS_SDL_X400P_NMINORS
-#endif
-
-#ifndef SDL_X400P_NMINOR
-#define SDL_X400P_NMINOR	255
+#define SDL_X400P_UNITS		CONFIG_STREAMS_SDL_X400P_NMINORS
 #endif
 
 /*
@@ -121,51 +119,50 @@ MODULE_LICENSE(SDL_X400P_LICENSE);
  *  =======================================================================
  */
 
-#ifndef SDL_X400P_DRV_ID
-#define SDL_X400P_DRV_ID	SDL_X400P_DRV_ID
-#endif
-#ifndef SDL_X400P_DRV_NAME
-#define SDL_X400P_DRV_NAME	SDL_X400P_DRV_NAME
-#endif
+#define DRV_ID		SDL_X400P_DRV_ID
+#define DRV_NAME	SDL_X400P_DRV_NAME
+#define CMAJORS		SDL_X400P_CMAJORS
+#define CMAJOR_0	SDL_X400P_CMAJOR_0
+#define UNITS		SDL_X400P_UNITS
+#ifdef MODULE
+#define DRV_BANNER	SDL_X400P_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SDL_X400P_SPLASH
+#endif				/* MODULE */
 
-STATIC struct module_info xp_rinfo = {
-	mi_idnum:SDL_X400P_DRV_ID,	/* Module ID number */
-	mi_idname:SDL_X400P_DRV_NAME "-rd",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:128,			/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
+STATIC struct module_info xp_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 280,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_info xp_winfo = {
-	mi_idnum:SDL_X400P_DRV_ID,	/* Module ID number */
-	mi_idname:SDL_X400P_DRV_NAME "-wr",	/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:280,			/* Max packet size accepted */
-	mi_hiwat:1,			/* Hi water mark */
-	mi_lowat:0,			/* Lo water mark */
-};
+STATIC struct module_stat xp_mstat = { 0, };
 
 STATIC int xp_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int xp_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit xp_rinit = {
-	qi_putp:ss7_oput,		/* Read put (message from below) */
-	qi_srvp:ss7_osrv,		/* Read queue service */
-	qi_qopen:xp_open,		/* Each open */
-	qi_qclose:xp_close,		/* Last close */
-	qi_minfo:&xp_rinfo,		/* Information */
+	.qi_putp = ss7_oput,		/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = xp_open,		/* Each open */
+	.qi_qclose = xp_close,		/* Last close */
+	.qi_minfo = &xp_minfo,		/* Information */
+	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
 STATIC struct qinit xp_winit = {
-	qi_putp:ss7_iput,		/* Write put (message from above) */
-	qi_srvp:ss7_isrv,		/* Write queue service */
-	qi_minfo:&xp_winfo,		/* Information */
+	.qi_putp = ss7_iput,		/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_minfo = &xp_minfo,		/* Information */
+	.qi_mstat = &xp_mstat,		/* Statistics */
 };
 
-STATIC struct streamtab xp_info = {
-	st_rdinit:&xp_rinit,		/* Upper read queue */
-	st_wrinit:&xp_winit,		/* Upper write queue */
+MODULE_STATIC struct streamtab sdl_x400pinfo = {
+	.st_rdinit = &xp_rinit,		/* Upper read queue */
+	.st_wrinit = &xp_winit,		/* Upper write queue */
 };
 
 /*
@@ -2452,14 +2449,18 @@ xp_r_prim(queue_t *q, mblk_t *mp)
  *  Open is called on the first open of a character special device stream
  *  head; close is called on the last close of the same device.
  */
-struct xp *x400p_list = NULL;
+STATIC spinlock_t xp_lock = SPIN_LOCK_UNLOCKED;
+STATIC struct xp *xp_list = NULL;
+STATIC major_t xp_majors[CMAJORS] = { CMAJOR_0, };
 
 STATIC int
 xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int cmajor = getmajor(*devp);
-	int cminor = getminor(*devp);
-	struct xp *xp, **xpp = &x400p_list;
+	psw_t flags;
+	int mindex = 0;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
+	struct xp *xp, **xpp = &xp_list;
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
@@ -2467,53 +2468,67 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("X400P-SS7: ERROR: Can't open as module\n"));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
 	if (!cminor)
 		sflag = CLONEOPEN;
 	if (sflag == CLONEOPEN) {
-		printd(("X400P-SS7: Clone open in effect on major %d\n", cmajor));
+		printd(("%s: Clone open in effect on major %d\n", DRV_NAME, cmajor));
 		cminor = 1;
 	}
-	for (; *xpp && (*xpp)->u.dev.cmajor < cmajor; xpp = &(*xpp)->next) ;
-	for (; *xpp && cminor <= SDL_X400P_NMINOR; xpp = &(*xpp)->next) {
-		ushort dminor = (*xpp)->u.dev.cminor;
-		if (cminor < dminor)
+	spin_lock_irqsave(&xp_lock, flags);
+	for (; *xpp; xpp = &(*xpp)->next) {
+		major_t dmajor = (*xpp)->u.dev.cmajor;
+		if (cmajor != dmajor)
 			break;
-		if (cminor == dminor) {
-			if (sflag != CLONEOPEN) {
-				ptrace(("X400P-SS7: ERROR: Requested device in use\n"));
-				MOD_DEC_USE_COUNT;
-				return (ENXIO);
+		if (cmajor == dmajor) {
+			minor_t dminor = (*xpp)->u.dev.cminor;
+			if (cminor < dminor)
+				break;
+			if (cminor > dminor)
+				continue;
+			if (cminor == dminor) {
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = xp_majors[mindex]))
+						break;
+					cminor = 0;
+				}
+				continue;
 			}
-			cminor++;
 		}
 	}
-	if (cminor > SDL_X400P_NMINOR) {
-		ptrace(("X400P-SS7: ERROR: No device minors left\n"));
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
+		spin_unlock_irqrestore(&xp_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("X400P-SS7: Opened character device %d:%d\n", cmajor, cminor));
+	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(xp = xp_alloc_priv(q, xpp, devp, crp))) {
-		ptrace(("X400P-SS7: ERROR: No memory\n"));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
+		spin_unlock_irqrestore(&xp_lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
+	spin_unlock_irqrestore(&xp_lock, flags);
 	return (0);
 }
 STATIC int
 xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);
+	psw_t flags;
 	(void) flag;
 	(void) crp;
 	(void) xp;
-	printd(("X400P-SS7: Closed character device %d:%d\n", xp->u.dev.cmajor, xp->u.dev.cminor));
+	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, xp->u.dev.cmajor,
+		xp->u.dev.cminor));
+	spin_lock_irqsave(&xp_lock, flags);
 	xp_free_priv(xp);
+	spin_unlock_irqrestore(&xp_lock, flags);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
@@ -2538,36 +2553,36 @@ STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
 STATIC int
 xp_init_caches(void)
 {
-	if (!xp_priv_cachep &&
-	    !(xp_priv_cachep =
-	      kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_priv_cachep
+	    && !(xp_priv_cachep =
+		 kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
 		printd(("X400P-SS7: initialized device private structure cache\n"));
-	if (!xp_span_cachep &&
-	    !(xp_span_cachep =
-	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_span_cachep
+	    && !(xp_span_cachep =
+		 kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
 		return (-ENOMEM);
 	} else
 		printd(("X400P-SS7: initialized span private structure cache\n"));
-	if (!xp_card_cachep &&
-	    !(xp_card_cachep =
-	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_card_cachep
+	    && !(xp_card_cachep =
+		 kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
 		return (-ENOMEM);
 	} else
 		printd(("X400P-SS7: initialized card private structure cache\n"));
-	if (!xp_xbuf_cachep &&
-	    !(xp_xbuf_cachep =
-	      kmem_cache_create("xp_xbuf_cachep", 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	if (!xp_xbuf_cachep
+	    && !(xp_xbuf_cachep =
+		 kmem_cache_create("xp_xbuf_cachep", 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_card_cachep, NULL));
 		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
@@ -2577,34 +2592,39 @@ xp_init_caches(void)
 		printd(("X400P-SS7: initialized card read/write buffer cache\n"));
 	return (0);
 }
-STATIC void
+STATIC int
 xp_term_caches(void)
 {
+	int err = 0;
 	if (xp_xbuf_cachep) {
-		if (kmem_cache_destroy(xp_xbuf_cachep))
+		if (kmem_cache_destroy(xp_xbuf_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_xbuf_cachep", __FUNCTION__);
-		else
+			err = -EBUSY;
+		} else
 			printd(("X400P-SS7: destroyed xp_xbuf_cache\n"));
 	}
 	if (xp_card_cachep) {
-		if (kmem_cache_destroy(xp_card_cachep))
+		if (kmem_cache_destroy(xp_card_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_card_cachep", __FUNCTION__);
-		else
+			err = -EBUSY;
+		} else
 			printd(("X400P-SS7: destroyed xp_card_cache\n"));
 	}
 	if (xp_span_cachep) {
-		if (kmem_cache_destroy(xp_span_cachep))
+		if (kmem_cache_destroy(xp_span_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_span_cachep", __FUNCTION__);
-		else
+			err = -EBUSY;
+		} else
 			printd(("X400P-SS7: destroyed xp_span_cache\n"));
 	}
 	if (xp_priv_cachep) {
-		if (kmem_cache_destroy(xp_priv_cachep))
+		if (kmem_cache_destroy(xp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_priv_cachep", __FUNCTION__);
-		else
+			err = -EBUSY;
+		} else
 			printd(("X400P-SS7: destroyed xp_priv_cache\n"));
 	}
-	return;
+	return (err);
 }
 
 /*
@@ -3202,95 +3222,159 @@ xp_pci_init(void)
  *  configured, we need to stop the boards and deallocate the board-level
  *  resources and structures.
  */
-STATIC INLINE void
+STATIC INLINE int
 xp_pci_cleanup(void)
 {
-	return pci_unregister_driver(&xp_driver);
-}
-
-/*
- *  =========================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =========================================================================
- */
-STATIC int xp_initialized = 0;
-STATIC int xp_majors[SDL_X400P_CMAJORS] = { 0, };
-STATIC void
-xp_init(void)
-{
-	int err, major;
-	unless(xp_initialized, return);
-	cmn_err(CE_NOTE, SDL_X400P_BANNER);	/* console splash */
-	if ((err = xp_init_caches())) {
-		cmn_err(CE_PANIC, "X400P-SS7: ERROR: Could not allocate caches");
-		xp_initialized = err;
-		return;
-	}
-	if ((err = xp_pci_init()) < 0) {
-		cmn_err(CE_WARN, "X400P-SS7: ERROR: No PCI devices found");
-		xp_term_caches();
-		xp_initialized = err;
-		return;
-	}
-	for (major = 0; major < SDL_X400P_CMAJORS; major++) {
-		if ((err =
-		     lis_register_strdev(SDL_X400P_CMAJOR_0 + major, &xp_info, SDL_X400P_NMINOR,
-					 SDL_X400P_DRV_NAME)) <= 0) {
-			cmn_err(CE_WARN, "X400P-SS7: ERROR: couldn't register driver for major %d",
-				major + SDL_X400P_CMAJOR_0);
-			xp_initialized = err;
-			for (major -= 1; major >= 0; major--)
-				lis_unregister_strdev(xp_majors[major]);
-			xp_pci_cleanup();
-			xp_term_caches();
-			return;
-		} else
-			xp_majors[major] = err;
-	}
-	xp_initialized = SDL_X400P_CMAJOR_0;
-	return;
-}
-STATIC void
-xp_terminate(void)
-{
-	int err, major;
-	ensure(xp_initialized, return);
-	for (major = 0; major < SDL_X400P_CMAJORS; major++) {
-		if (xp_majors[major]) {
-			if ((err = lis_unregister_strdev(xp_majors[major])))
-				cmn_err(CE_PANIC,
-					"X400P-SS7: couldn't unregister driver for major %d\n",
-					xp_majors[major]);
-			else
-				xp_majors[major] = err;
-		}
-	}
-	xp_initialized = 0;
-	xp_pci_cleanup();
-	xp_term_caches();
-	return;
-}
-
-/*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
- */
-int
-init_module(void)
-{
-	xp_init();
-	if (xp_initialized < 0)
-		return xp_initialized;
+	pci_unregister_driver(&xp_driver);
 	return (0);
 }
 
-void
-cleanup_module(void)
+/*
+ *  =========================================================================
+ *
+ *  Registration and initialization
+ *
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the X400-SDL driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the X400-SDL driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw xp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &sdl_x400pinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+xp_register_strdev(major_t major)
 {
-	xp_terminate();
+	int err;
+	if ((err = register_strdev(&xp_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+STATIC int
+xp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = unregister_strdev(&xp_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+xp_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &sdl_x400pinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+xp_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+sdl_x400pterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (xp_majors[mindex]) {
+			if ((err = xp_unregister_strdev(xp_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					xp_majors[mindex]);
+			if (mindex)
+				xp_majors[mindex] = 0;
+		}
+	}
+	if ((err = xp_pci_cleanup()))
+		cmn_err(CE_WARN, "%s: could not cleanup pci device", DRV_NAME);
+	if ((err = xp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+sdl_x400pinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = xp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		sdl_x400pterminate();
+		return (err);
+	}
+	if ((err = xp_pci_init())) {
+		cmn_err(CE_WARN, "%s: no PCI devices found, err = %d", DRV_NAME, err);
+		sdl_x400pterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = xp_register_strdev(xp_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					xp_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				sdl_x400pterminate();
+				return (err);
+			}
+		}
+		if (xp_majors[mindex] == 0)
+			xp_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = xp_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sdl_x400pinit);
+module_exit(sdl_x400pterminate);
+
+#endif				/* LINUX */
