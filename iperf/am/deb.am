@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/27 14:53:59 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/03/28 08:52:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/27 14:53:59 $ by $Author: brian $
+## Last Modified $Date: 2005/03/28 08:52:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -88,25 +88,25 @@ debian_cache_files	= $(debbuilddir)/*config.cache \
 			  $(debbuilddir)/*config.site \
 			  $(debbuilddir)/*modpost.cache
 
+debian_tar_file		= $(debbuilddir)/$(debianpkg).tar.gz
 debian_dsc_file		= $(debbuilddir)/$(debianpkg).dsc
 debian_sig_file		= $(debbuilddir)/$(debianpkg).dsc.sig
-debian_chg_file		= $(debbuilddir)/$(debianpkg)_%.changes
-debian_asc_file		= $(debbuilddir)/$(debianpkg)_%.changes.asc
-debian_tar_file		= $(debbuilddir)/$(debianpkg).tar.gz
-debian_source_files	= $(debian_dsc_file) $(debian_tar_file) $(debian_sig_file)
+debian_source_files	= $(debian_tar_file) $(debian_dsc_file) $(debian_sig_file)
+##debian_chg_file		= $(debbuilddir)/$(debianpkg)_%.changes
+##debian_asc_file		= $(debbuilddir)/$(debianpkg)_%.changes.asc
+debian_change_files	= $(debbuilddir)/$(debianpkg)_*.changes \
+			  $(debbuilddir)/$(debianpkg)_*.changes.asc
 debian_binary_files	= $(debbuilddir)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb
-debian_change_files	= $(debbuilddir)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes
-debian_signat_files	= $(debbuilddir)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes.asc
 
+debtop_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
 debtop_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
 debtop_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
+debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
 debtop_chg_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes
 debtop_asc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes.asc
-debtop_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
-debtop_source_files	= $(debtop_dsc_file) $(debtop_tar_file) $(debtop_sig_file)
+debtop_change_files	= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_*.changes \
+			  $(PACKAGE_DEBTOPDIR)/$(debianpkg)_*.changes.asc
 debtop_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb
-debtop_change_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes
-debtop_signat_files	= $(debbuilddir)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes.asc
 
 RELEASE_DIRECTORIES	+= $(PACKAGE_DEBTOPDIR)
 
@@ -172,7 +172,8 @@ AM_BINARY_TARGET = binary-arch
 # current target, we also build any defined AM_DEBTARGETS
 ##
 each-deb: $(debian_dir)
-	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
+	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
+#	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
 	@if test "$(PACKAGE_DEBTOPDIR)" != "$(debbuilddir)" ; then \
 		list="$(debian_binary_files) $(debian_change_files)" ; for f in $$list ; do \
 			test -f $$f || continue ; \
@@ -184,8 +185,6 @@ each-deb: $(debian_dir)
 		done ; \
 	fi
 
-##debs: $(debian_dir)
-##	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 $(DPKG_BUILDPACKAGE) -b -rfakeroot -uc $(DEBXOPTS) -nc )
 
 ##
 # This below is pretty obfuscated, but it is what we need to rebujild a deb once for LiS and another
@@ -195,21 +194,17 @@ each-deb: $(debian_dir)
 # conditionals WITH_LIS and WITH_LFS to be false and the plain rule above will be used instead.
 ##
 one-deb:
-@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' AM_BINARY_TARGET='binary-indep binary-arch' each-deb
+@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' AM_BINARY_TARGET='binary-indep binary-arch' each-deb
 
 lis-deb:
-@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='--with-lis --without-lfs' AM_BINARY_TARGET='binary-indep binary-lis' each-deb
+@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--with-lis --without-lfs' AM_BINARY_TARGET='binary-indep binary-lis' each-deb
 
 lfs-deb:
-@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='--with-lfs --without-lis' AM_BINARY_TARGET='binary-indep binary-lfs' each-deb
+@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--with-lfs --without-lis' AM_BINARY_TARGET='binary-indep binary-lfs' each-deb
 
-debs: lis-deb lfs-deb one-deb
+chg-deb: $(debtop_chg_file)
 
-# Another sneaky trick
-all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+debs: lis-deb lfs-deb one-deb chg-deb
 
 $(debtop_asc_file): $(debtop_chg_file)
 	@\
@@ -226,15 +221,19 @@ $(debtop_asc_file): $(debtop_chg_file)
 
 sigs: $(debtop_sig_file)
 
-csig:
-	@for file in $(debtop_change_files) ; do \
-		if test -f "$$file" ; then \
-			f=`echo "$$file" | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'` ; \
-			$(MAKE) $(AM_MAKEFLAGS) $$f ; \
-		fi ; \
-	done
+csig: $(debtop_asc_file)
 
-RELEASE			+= all-dsc all-one-deb all-lis-deb all-lfs-deb
+# Another sneaky trick
+all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+
+RELEASE			+= all-dsc all-lis-deb all-lfs-deb all-one-deb all-chg-deb
 RELEASE_SIGN		+= all-sigs all-csig
 RELEASE_DIRECTORIES	+= 
 
@@ -246,9 +245,8 @@ DISTCLEAN_LOCAL		+= distclean-deb
 DISTCLEANFILES		+= $(debian_cache_files) \
 			   $(debian_dir_stamp) \
 			   $(debian_source_files) \
-			   $(debian_binary_files) \
 			   $(debian_change_files) \
-			   $(debian_signat_files)
+			   $(debian_binary_files)
 
 release-clean-deb: distclean-deb
 
@@ -257,13 +255,11 @@ RELEASE_CLEAN_LOCAL	+= release-clean-deb
 RELEASECLEANFILES	+= $(debian_cache_files) \
 			   $(debian_dir_stamp) \
 			   $(debian_source_files) \
-			   $(debian_binary_files) \
 			   $(debian_change_files) \
-			   $(debian_signat_files) \
+			   $(debian_binary_files) \
 			   $(debtop_source_files) \
-			   $(debtop_binary_files) \
 			   $(debtop_change_files) \
-			   $(debtop_signat_files)
+			   $(debtop_binary_files)
 
 MY_PHONY		+= dsc debs each-deb one-deb lis-deb lfs-deb sigs csig
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-sigs
