@@ -18,7 +18,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS strtst.c 2.28 5/30/03 21:38:45 "
+#ident "@(#) LiS strtst.c 2.30 10/4/03 17:51:31 "
 
 #define	inline			/* make disappear */
 
@@ -5585,7 +5585,7 @@ int	mt_await_state(int statenr)
 {
     int		st ;
 
-    while ((st = mt_get_state()) != statenr && st >= 0)
+    while ((st = mt_get_state()) < statenr && st >= 0)
 	sleep(1) ;
 
     return(st) ;
@@ -5605,7 +5605,7 @@ int	mt_ioctl(int fd, int cmd, int arg)
 
 void	*mt_thread(void *arg)
 {
-    int		thrno = (int) arg ;
+    intptr_t	thrno = (intptr_t) arg ;
     int		state = 0 ;
     int		prev_state ;
     int		fd = -1 ;
@@ -5653,7 +5653,7 @@ void	*mt_thread(void *arg)
 		break ;
 	    }
 
-	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 200) < 0)
+	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 300) < 0)
 	    {
 		perror("ioctl: MTDRV_SET_OPEN_SLEEP") ;
 		mt_set_state(-1) ;
@@ -5774,7 +5774,7 @@ void	*mt_thread(void *arg)
 		break ;
 	    }
 
-	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 200) < 0)
+	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 300) < 0)
 	    {
 		perror("ioctl: MTDRV_SET_OPEN_SLEEP") ;
 		mt_set_state(-1) ;
@@ -5810,7 +5810,7 @@ void	*mt_thread(void *arg)
 
 	    if (thrno == 1)
 	    {
-		mt_await_state(-1) ;
+		mt_await_state(6) ;
 		break ;
 	    }
 
@@ -5835,6 +5835,11 @@ void	*mt_thread(void *arg)
 	    close(fdc) ;
 	    fdc = -1 ;
 	    sleep(1) ;			/* give thread 1 some time */
+	    mt_set_state(6) ;
+	    break ;
+
+	case 6:
+	    sleep(1) ;
 	    mt_set_state(-1) ;
 	    break ;
 	}
