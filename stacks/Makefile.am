@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/07 17:43:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/28 10:10:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/07 17:43:10 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 10:10:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,12 +57,6 @@ if RPM_BUILD_USER
 libexec_PROGRAMS		= \
 				  test-m2pa \
 				  test-q781 \
-				  test-sctp \
-				  test-sctp \
-				  test-sctp_n \
-				  test-sctp_nc \
-				  test-sctp_ns \
-				  test-sctp_t \
 				  test-tcpc \
 				  test-tcps \
 				  test-udpc \
@@ -79,12 +73,6 @@ EXTRA_PROGRAMS			= \
 				  test-q781 \
 				  test-q781-pipe \
 				  test-q784 \
-				  test-sctp \
-				  test-sctp \
-				  test-sctp_n \
-				  test-sctp_nc \
-				  test-sctp_ns \
-				  test-sctp_t \
 				  test-tcpc \
 				  test-tcps \
 				  test-timod \
@@ -147,31 +135,6 @@ test_m2pa_CFLAGS		= $(USER_CFLAGS)
 #perftest_LDFLAGS		= -lLiS
 #perftest_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #perftest_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_SOURCES		= src/test/sctp/test-sctp.c
-test_sctp_LDFLAGS		= -lLiS
-test_sctp_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_n_SOURCES		= src/test/sctp/test-sctp_n.c
-test_sctp_n_LDFLAGS		= -lLiS
-test_sctp_n_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_n_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_nc_SOURCES		= src/test/sctp/test-sctp_nc.c
-test_sctp_nc_LDFLAGS		= -lLiS
-test_sctp_nc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_ns_SOURCES		= src/test/sctp/test-sctp_ns.c
-test_sctp_ns_LDFLAGS		= -lLiS
-test_sctp_ns_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_t_SOURCES		= src/test/sctp/test-sctp_t.c
-test_sctp_t_LDFLAGS		= -lLiS
-test_sctp_t_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
 test_q781_LDFLAGS		= -lLiS
@@ -237,11 +200,11 @@ endif
 
 if RPM_BUILD_KERNEL
 
-ADDON_LIBS			= libSS7sctp.a
-ADDON_OBJS			= streams-sctp.o
+ADDON_LIBS			= 
+ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= libSS7sctp.a
+EXTRA_LIBRARIES			= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/inet/inet.c \
@@ -298,7 +261,6 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/x400p-ss7/ch_x400p.c \
 #				  src/modules/x400p-ss7/mx_x400p.c \
 #				  src/modules/x400p-ss7/x400p_mx.c \
-#				  src/modules/sctp/sctp2.c
 #				  src/modules/cd/cd.c \
 #				  src/modules/cd/cd.h \
 #				  src/modules/cd/cd_daed.c \
@@ -338,40 +300,6 @@ libSS7mods_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
-nodist_EXTRA_libSS7sctp_a_SOURCES = \
-				  src/modules/sctp/sctp.c \
-				  src/modules/sctp/sctp_cache.c \
-				  src/modules/sctp/sctp_cookie.c \
-				  src/modules/sctp/sctp_hash.c \
-				  src/modules/sctp/sctp_input.c \
-				  src/modules/sctp/sctp_msg.c \
-				  src/modules/sctp/sctp_n.c \
-				  src/modules/sctp/sctp_output.c \
-				  src/modules/sctp/sctp_route.c \
-				  src/modules/sctp/sctp_t.c \
-				  src/modules/sctp/sctp_cache.h \
-				  src/modules/sctp/sctp_cookie.h \
-				  src/modules/sctp/sctp_defs.h \
-				  src/modules/sctp/sctp.h \
-				  src/modules/sctp/sctp_hash.h \
-				  src/modules/sctp/sctp_input.h \
-				  src/modules/sctp/sctp_msg.h \
-				  src/modules/sctp/sctp_n.h \
-				  src/modules/sctp/sctp_output.h \
-				  src/modules/sctp/sctp_route.h \
-				  src/modules/sctp/sctp_t.h \
-				  strconf.h
-sctp_source_FILES		= $(nodist_EXTRA_libSS7sctp_a_SOURCES)
-nodist_libSS7sctp_a_SOURCES	= $(sctp_source_FILES)
-
-libSS7sctp_a_DEPENDENCIES	= config.h strconf.h
-libSS7sctp_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/sctp -I$(srcdir)/src/modules/sctp -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
-libSS7sctp_a_CFLAGS		= $(KERNEL_CFLAGS)
-libSS7sctp_a_OBJECTS:		$(libSS7sctp_a_DEPENDENCIES)
-
-streams-sctp.o: $(libSS7sctp_a_OBJECTS)
-	$(LD) -r -o $@ $^
-
 KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
@@ -387,12 +315,6 @@ libexec_PROGRAMS		= \
 				  test-q781 \
 				  test-q781-pipe \
 				  test-q784 \
-				  test-sctp \
-				  test-sctp \
-				  test-sctp_n \
-				  test-sctp_nc \
-				  test-sctp_ns \
-				  test-sctp_t \
 				  test-tcpc \
 				  test-tcps \
 				  test-udpc \
@@ -417,12 +339,6 @@ EXTRA_PROGRAMS			= \
 				  test-q781 \
 				  test-q781-pipe \
 				  test-q784 \
-				  test-sctp \
-				  test-sctp \
-				  test-sctp_n \
-				  test-sctp_nc \
-				  test-sctp_ns \
-				  test-sctp_t \
 				  test-tcpc \
 				  test-tcps \
 				  test-timod \
@@ -485,31 +401,6 @@ perftest_SOURCES		= src/test/perftest.c
 perftest_LDFLAGS		= -lLiS
 perftest_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 perftest_CFLAGS			= $(USER_CFLAGS)
-
-test_sctp_SOURCES		= src/test/sctp/test-sctp.c
-test_sctp_LDFLAGS		= -lLiS
-test_sctp_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_n_SOURCES		= src/test/sctp/test-sctp_n.c
-test_sctp_n_LDFLAGS		= -lLiS
-test_sctp_n_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_n_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_nc_SOURCES		= src/test/sctp/test-sctp_nc.c
-test_sctp_nc_LDFLAGS		= -lLiS
-test_sctp_nc_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_ns_SOURCES		= src/test/sctp/test-sctp_ns.c
-test_sctp_ns_LDFLAGS		= -lLiS
-test_sctp_ns_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
-
-test_sctp_t_SOURCES		= src/test/sctp/test-sctp_t.c
-test_sctp_t_LDFLAGS		= -lLiS
-test_sctp_t_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 
 test_q781_SOURCES		= src/test/sl/test-q781.c
 test_q781_LDFLAGS		= -lLiS
@@ -575,11 +466,11 @@ endif
 
 if RPM_BUILD_KERNEL
 
-ADDON_LIBS			= libSS7sctp.a
-ADDON_OBJS			= streams-sctp.o
+ADDON_LIBS			= 
+ADDON_OBJS			= 
 
 noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
-EXTRA_LIBRARIES			= libSS7sctp.a libSS7sscop.a libSS7m3ua.a libSS7sua.a libSS7tua.a libSS7tali.a
+EXTRA_LIBRARIES			= libSS7sscop.a libSS7m3ua.a libSS7sua.a libSS7tua.a libSS7tali.a
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/cd/cd.c \
@@ -646,7 +537,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
 				  strconf.h
-#				  src/modules/sctp/sctp2.c  # later
 
 mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
 
@@ -674,40 +564,6 @@ libSS7mods_a_DEPENDENCIES	= config.h strconf.h
 libSS7mods_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules -I$(srcdir)/src/modules -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
-
-nodist_EXTRA_libSS7sctp_a_SOURCES = \
-				  src/modules/sctp/sctp.c \
-				  src/modules/sctp/sctp_cache.c \
-				  src/modules/sctp/sctp_cookie.c \
-				  src/modules/sctp/sctp_hash.c \
-				  src/modules/sctp/sctp_input.c \
-				  src/modules/sctp/sctp_msg.c \
-				  src/modules/sctp/sctp_n.c \
-				  src/modules/sctp/sctp_output.c \
-				  src/modules/sctp/sctp_route.c \
-				  src/modules/sctp/sctp_t.c \
-				  src/modules/sctp/sctp_cache.h \
-				  src/modules/sctp/sctp_cookie.h \
-				  src/modules/sctp/sctp_defs.h \
-				  src/modules/sctp/sctp.h \
-				  src/modules/sctp/sctp_hash.h \
-				  src/modules/sctp/sctp_input.h \
-				  src/modules/sctp/sctp_msg.h \
-				  src/modules/sctp/sctp_n.h \
-				  src/modules/sctp/sctp_output.h \
-				  src/modules/sctp/sctp_route.h \
-				  src/modules/sctp/sctp_t.h \
-				  strconf.h
-sctp_source_FILES		= $(nodist_EXTRA_libSS7sctp_a_SOURCES)
-nodist_libSS7sctp_a_SOURCES	= $(sctp_source_FILES)
-
-libSS7sctp_a_DEPENDENCIES	= config.h strconf.h
-libSS7sctp_a_CPPFLAGS		= -I./src/include/os7 -I$(srcdir)/src/include/os7 -I./src/modules/sctp -I$(srcdir)/src/modules/sctp -imacros strconf.h $(SS7_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
-libSS7sctp_a_CFLAGS		= $(KERNEL_CFLAGS)
-libSS7sctp_a_OBJECTS:		$(libSS7sctp_a_DEPENDENCIES)
-
-streams-sctp.o: $(libSS7sctp_a_OBJECTS)
-	$(LD) -r -o $@ $^
 
 nodist_EXTRA_libSS7m3ua_a_SOURCES = \
 				  src/modules/m3ua/m3ua_as.c \
@@ -932,7 +788,6 @@ endif
 endif
 
 ss7_source_FILES		= $(mods_source_FILES) \
-				  $(sctp_source_FILES) \
 				  $(sscop_source_FILES) \
 				  $(m3ua_source_FILES) \
 				  $(sua_source_FILES) \
@@ -951,8 +806,6 @@ EXTRA_DOCS = \
 	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.pdf \
 	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.ps \
 	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.txt \
-	doc/drafts/sctp/rfc2126.txt \
-	doc/drafts/sctp/rfc2960.txt \
 	doc/drafts/tua/draft-bidulock-sigtran-tua-03.pdf \
 	doc/drafts/tua/draft-bidulock-sigtran-tua-03.ps \
 	doc/drafts/tua/draft-bidulock-sigtran-tua-03.txt \
@@ -982,8 +835,8 @@ dist_noinst_SCRIPTS =
 EXTRA_SCRIPTS =
 
 KERNEL_MODCONF			= conf.modules
-KERNEL_SUBDIR			= ss7
-KMODCONF_EXT			= ss7
+KERNEL_SUBDIR			= openss7
+KMODCONF_EXT			= openss7
 
 include am/kernel.am
 
