@@ -55,6 +55,9 @@ char	nettest_dns_id[]="\
 #else /* NOSTDLIBH */
 #include <stdlib.h>
 #endif /* NOSTDLIBH */
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 
 #ifndef WIN32
 #include <sys/ipc.h>
@@ -881,13 +884,26 @@ scan_dns_args(int argc, char *argv[])
   
   struct hostent *hp;
 
+#ifdef _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+	{ "help",	no_argument,		NULL, 'h' },
+	{ "filename",	required_argument,	NULL, 'f' },
+	{ "hostname",	required_argument,	NULL, 'H' },
+  };
+#endif
+
   /* Go through all the command line arguments and break them */
   /* out. For those options that take two parms, specifying only */
   /* the first will set both to that value. Specifying only the */
   /* second will leave the first untouched. To change only the */
   /* first, use the form "first," (see the routine break_args.. */
   
+#ifdef _GNU_SOURCE
+  while ((c= getopt_long(argc, argv, DNS_ARGS, long_options, &option_index)) != EOF) {
+#else /* _GNU_SOURCE */
   while ((c= getopt(argc, argv, DNS_ARGS)) != EOF) {
+#endif /* _GNU_SOURCE */
     switch (c) {
     case '?':	
     case 'h':

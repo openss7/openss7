@@ -60,6 +60,9 @@ char	nettest_unix_id[]="\
 #  include <time.h>
 # endif
 #endif
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 #if ! defined(__bsdi__) && ! defined(_APPLE_)
 #include <malloc.h>
 #else
@@ -723,7 +726,7 @@ recv_stream_stream()
   struct	stream_stream_request_struct	*stream_stream_request;
   struct	stream_stream_response_struct	*stream_stream_response;
   struct	stream_stream_results_struct	*stream_stream_results;
-  
+
   stream_stream_request	= 
     (struct stream_stream_request_struct *)netperf_request.content.test_specific_data;
   stream_stream_response	= 
@@ -3361,6 +3364,19 @@ scan_unix_args(int argc, char *argv[])
   char	
     arg1[BUFSIZ],  /* argument holders		*/
     arg2[BUFSIZ];
+
+#ifdef _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+	{ "help",		no_argument,		NULL, 'h' },
+	{ "loc-msgsize",	required_argument,	NULL, 'm' },
+	{ "rem-msgsize",	required_argument,	NULL, 'M' },
+	{ "path",		required_argument,	NULL, 'p' },
+	{ "rrsize",		required_argument,	NULL, 'r' },
+	{ "loc-bufsize",	required_argument,	NULL, 's' },
+	{ "rem-bufsize",	required_argument,	NULL, 'S' },
+  };
+#endif /* _GNU_SOURCE */
   
   init_test_vars();
 
@@ -3370,7 +3386,11 @@ scan_unix_args(int argc, char *argv[])
   /* second will leave the first untouched. To change only the */
   /* first, use the form "first," (see the routine break_args.. */
   
+#ifdef _GNU_SOURCE
+  while ((c= getopt_long(argc, argv, UNIX_ARGS, long_options, &option_index)) != EOF) {
+#else /* _GNU_SOURCE */
   while ((c= getopt(argc, argv, UNIX_ARGS)) != EOF) {
+#endif /* _GNU_SOURCE */
     switch (c) {
     case '?':	
     case 'h':

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/10 04:24:25 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 06:30:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/10 04:24:25 $ by $Author: brian $
+ Last Modified $Date: 2004/08/12 06:30:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/10 04:24:25 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 06:30:23 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/10 04:24:25 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 06:30:23 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -135,6 +135,9 @@ char	nettest_id[]="\
 #if !defined(__VMS)
 #include <sys/ipc.h>
 #endif /* !defined(__VMS) */
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -19045,6 +19048,27 @@ scan_sockets_args(int argc, char *argv[])
   char	
     arg1[BUFSIZ],  /* argument holders		*/
     arg2[BUFSIZ];
+#ifdef _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+	{"help",	no_argument,		NULL, 'h'},
+	{"burst",	required_argument,	NULL, 'b'},
+	{"cork",	no_argument,		NULL, 'C'},
+	{"nodelay",	no_argument,		NULL, 'D'},
+	{"ipaddr",	required_argument,	NULL, 'I'},
+	{"loc-msgsize",	required_argument,	NULL, 'm'},
+	{"rem-msgsize",	required_argument,	NULL, 'M'},
+	{"portrange",	required_argument,	NULL, 'p'},
+	{"portnum",	required_argument,	NULL, 'P'},
+	{"rrsize",	required_argument,	NULL, 'r'},
+	{"loc-bufsize",	required_argument,	NULL, 's'},
+	{"rem-bufsize",	required_argument,	NULL, 'S'},
+	{"copyavoid",	no_argument,		NULL, 'V'},
+	{"rcv-width",	required_argument,	NULL, 'w'},
+	{"snd-width",	required_argument,	NULL, 'W'},
+	{"dummy",	no_argument,		NULL, 'z'},
+  };
+#endif				/* _GNU_SOURCE */
   
   /* Go through all the command line arguments and break them */
   /* out. For those options that take two parms, specifying only */

@@ -41,6 +41,9 @@ char	nettest_dlpi_id[]="\
 # endif
 #endif
 #include <malloc.h>
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 #if !defined _LIS_SOURCE && !defined _LFS_SOURCE
 #include <sys/stream.h>
 #endif
@@ -3728,6 +3731,21 @@ void
   
   char	arg1[BUFSIZ],  /* argument holders		*/
   arg2[BUFSIZ];
+
+#ifdef _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+	{ "help",	    no_argument,	NULL, 'h' },
+	{ "devices",	    required_argument,	NULL, 'D' },
+	{ "rem-msgsize",    required_argument,	NULL, 'M' },
+	{ "loc-msgsize",    required_argument,	NULL, 'm' },
+	{ "ppas",	    required_argument,	NULL, 'p' },
+	{ "rrsize",	    required_argument,	NULL, 'r' },
+	{ "sap",	    required_argument,	NULL, 's' },
+	{ "rem-window",	    required_argument,	NULL, 'W' },
+	{ "loc-window",	    required_argument,	NULL, 'w' },
+  };
+#endif /* _GNU_SOURCE */
   
   /* Go through all the command line arguments and break them */
   /* out. For those options that take two parms, specifying only */
@@ -3737,7 +3755,11 @@ void
   
 #define DLPI_ARGS "D:hM:m:p:r:s:W:w:"
   
+#ifdef _GNU_SOURCE
+  while ((c= getopt_long(argc, argv, DLPI_ARGS, long_options, &option_index)) != EOF) {
+#else /* _GNU_SOURCE */
   while ((c= getopt(argc, argv, DLPI_ARGS)) != EOF) {
+#endif /* _GNU_SOURCE */
     switch (c) {
     case '?':	
     case 'h':

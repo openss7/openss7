@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 10:40:45 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/12 06:30:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 10:40:45 $ by $Author: brian $
+ Last Modified $Date: 2004/08/12 06:30:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 10:40:45 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/12 06:30:26 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2004/08/06 10:40:45 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2004/08/12 06:30:26 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -120,6 +120,9 @@ char	nettest_xti_id[]="\
 #  include <time.h>
 # endif
 #endif
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 #include <malloc.h>
  /* xti.h should be included *after* in.h because there are name */
  /* conflicts!( Silly standards people... raj 2/95 fortuenately, the */
@@ -9445,6 +9448,23 @@ scan_xti_args(int argc, char *argv[])
   char	
     arg1[BUFSIZ],  /* argument holders		*/
     arg2[BUFSIZ];
+
+#ifdef _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+	{ "help",		no_argument,		NULL, 'h' },
+	{ "nodelay",		no_argument,		NULL, 'D' },
+	{ "loc-msgsize",	required_argument,	NULL, 'm' },
+	{ "rem-msgsize",	required_argument,	NULL, 'M' },
+	{ "rrsize",		required_argument,	NULL, 'r' },
+	{ "loc-bufsize",	required_argument,	NULL, 's' },
+	{ "rem-bufsize",	required_argument,	NULL, 'S' },
+	{ "copyavoid",		required_argument,	NULL, 'V' },
+	{ "rcv-width",		required_argument,	NULL, 'w' },
+	{ "snd-width",		required_argument,	NULL, 'W' },
+	{ "devices",		required_argument,	NULL, 'X' },
+  };
+#endif /* _GNU_SOURCE */
   
   /* Go through all the command line arguments and break them */
   /* out. For those options that take two parms, specifying only */
@@ -9452,7 +9472,11 @@ scan_xti_args(int argc, char *argv[])
   /* second will leave the first untouched. To change only the */
   /* first, use the form "first," (see the routine break_args.. */
   
+#ifdef _GNU_SOURCE
+  while ((c= getopt_long(argc, argv, XTI_ARGS, long_options, &option_index)) != EOF) {
+#else /* _GNU_SOURCE */
   while ((c= getopt(argc, argv, XTI_ARGS)) != EOF) {
+#endif /* _GNU_SOURCE */
     switch (c) {
     case '?':	
     case 'h':

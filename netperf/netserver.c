@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+ Last Modified $Date: 2004/08/12 08:56:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -166,6 +166,9 @@ char	netserver_id[]="\
 #include <tcpip$inetdef.h> 
 #include <unixio.h> 
 #endif /* __VMS */
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 #include "netlib.h"
 #include "nettest_bsd.h"
 
@@ -203,9 +206,9 @@ extern	char	*optarg;
 extern	int	optind, opterr;
 
 #ifndef WIN32
-#define SERVER_ARGS "dn:p:v:46"
+#define SERVER_ARGS "dn:p:v:46VC"
 #else
-#define SERVER_ARGS "dn:p:v:46I:i:"
+#define SERVER_ARGS "dn:p:v:46I:i:VC"
 #endif
 
  /* This routine implements the "main event loop" of the netperf	*/
@@ -755,6 +758,421 @@ void set_up_server(int af)
   // (And I doubt that the HP-UX author sees value in this effort).
 #endif
 
+
+void
+print_netserver_usage(int argc, char *argv[])
+{
+	fprintf(stderr, "\
+Usgae:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
+", argv[0]);
+}
+
+void
+print_netserver_help(int argc, char *argv[])
+{
+	fprintf(stdout, "\
+Usgae:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -h, --help\n\
+        display this message and exit\n\
+    -V, --version\n\
+        display version information and exit\n\
+    -C, --copying\n\
+        display copying permission and exit\n\
+    -4, --ipv4\n\
+	use ipv4 for the control socket (default)\n\
+    -6, --ipv6\n\
+	use ipv6 for the control socket\n\
+    -d, --debug\n\
+	debugging output\n\
+    -n, --numcpus=NUMCPUS\n\
+	set number of CPUs\n\
+    -p, --port=PORTNUM\n\
+	set port number of netserver [Default: 12865]\n\
+    -v, --verbose=VERBOSITY\n\
+	set output verbosity level\n\
+", argv[0]);
+}
+
+void
+print_netserver_version(int argc, char *argv[])
+{
+	int i = 0;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    COPYRIGHT (C) 2001-2004  OPENSS7 CORPORATION.  ALL RIGHTS RESERVED.\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+    See `%1$s --copying' for copying permissions.\n\
+", argv[0], ident);
+	fprintf(stdout, "\
+Compiled-in Test Names: (try `%1$s -t TESTNAME -- -h' for help):\n\
+", argv[0]);
+	fprintf(stdout, "    "); i = 4;
+#ifdef DO_SCTP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_MAERTS, ");
+#ifdef HAVE_SENDFILE
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_SENDFILE, ");
+#endif /* HAVE_SENDFILE */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+#ifdef DO_NBRR
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_NBRR, ");
+#endif /* DO_NBRR */
+	i += fprintf(stdout, "SCTP_CRR, ");
+#ifdef DO_1644
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_TRR, ");
+#endif /* DO_1644 */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTP_CC, ");
+#endif /* DO_SCTP */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_MAERTS, ");
+#ifdef HAVE_SENDFILE
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_SENDFILE, ");
+#endif /* HAVE_SENDFILE */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_RR, ");
+#ifdef DO_NBRR
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_NBRR, ");
+#endif /* DO_NBRR */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_CRR, ");
+#ifdef DO_1644
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_TRR, ");
+#endif /* DO_1644 */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCP_CC, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "UDP_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "UDP_RR, ");
+#ifdef DO_XTI
+#ifdef DO_XTI_SCTP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_SCTP_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_SCTP_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_SCTP_CRR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_SCTP_TRR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_SCTP_CC, ");
+#endif /* DO_XTI_SCTP */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_TCP_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_TCP_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_TCP_CRR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_TCP_CC, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_UDP_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "XTI_UDP_RR, ");
+#endif /* DO_XTI */
+#ifdef DO_IPV6
+#ifdef DO_IPV6_SCTP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTPIPV6_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTPIPV6_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTPIPV6_CRR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "SCTPIPV6_TRR, ");
+#endif /* DO_IPV6_SCTP */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCPIPV6_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCPIPV6_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "TCPIPV6_CRR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "UDPIPV6_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "UDPIPV6_RR, ");
+#endif /* DO_IPV6 */
+#ifdef DO_UNIX
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "STREAM_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "STREAM_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DG_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DG_RR, ");
+#endif /* DO_UNIX */
+#ifdef DO_DLPI
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DLCO_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DLCO_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DLCL_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DLCL_RR, ");
+#endif /* DO_DLPI */
+#ifdef DO_FORE
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "FORE_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "FORE_RR, ");
+#endif /* DO_FORE */
+#ifdef DO_HIPPI
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "HIPPI_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "HIPPI_RR, ");
+#endif /* DO_HIPPI */
+#ifdef DO_LWP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "LWPSTR_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "LWPSTR_RR, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "LWPDG_STREAM, ");
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "LWPDG_RR, ");
+#endif /* DO_LWP */
+#ifdef DO_DNS
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DNS_RR, ");
+#endif /* DO_DNS */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "LOC_CPU, ");
+	fprintf(stdout, "REM_CPU\n");
+	fprintf(stdout, "\
+Compiled-in Options:\n\
+");
+	fprintf(stdout, "    "); i = 4;
+#ifdef DIRTY
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DIRTY, ");
+#endif /* DIRTY */
+#ifdef DO_1644
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_1644, ");
+#endif /* DO_1644 */
+#ifdef DO_DLPI
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_DLPI, ");
+#endif /* DO_DLPI */
+#ifdef DO_DNS
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_DNS, ");
+#endif /* DO_DNS */
+#ifdef DO_FIRST_BURST
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_FIRST_BURST, ");
+#endif /* DO_FIRST_BURST */
+#ifdef DO_FORE
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_FORE, ");
+#endif /* DO_FORE */
+#ifdef DO_HIPPI
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_HIPPI, ");
+#endif /* DO_HIPPI */
+#ifdef DO_IPV6
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_IPV6, ");
+#endif /* DO_IPV6 */
+#ifdef DO_IPV6_SCTP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_IPV6_SCTP, ");
+#endif /* DO_IPV6_SCTP */
+#ifdef DO_NBRR
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_NBRR, ");
+#endif /* DO_NBRR */
+#ifdef DO_LWP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_LWP, ");
+#endif /* DO_LWP */
+#ifdef DO_SCTP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_SCTP, ");
+#endif /* DO_SCTP */
+#ifdef DO_SELECT
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_SELECT, ");
+#endif /* DO_SELECT */
+#ifdef DO_UNIX
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_UNIX, ");
+#endif /* DO_UNIX */
+#ifdef DO_XTI
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_XTI, ");
+#endif /* DO_XTI */
+#ifdef DO_XTI_SCTP
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DO_XTI_SCTP, ");
+#endif /* DO_XTI_SCTP */
+#ifdef DONT_WAIT
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "DONT_WAIT, ");
+#endif /* DONT_WAIT */
+#ifdef HAVE_SENDFILE
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "HAVE_SENDFILE, ");
+#endif /* HAVE_SENDFILE */
+#ifdef HISTOGRAM
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "HISTOGRAM, ");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "INTERVALS, ");
+#endif /* INTERVALS */
+#ifdef OLD_HISTOGRAM
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "OLD_HISTOGRAM, ");
+#endif /* HISTOGRAM */
+#ifdef USE_KSTAT
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "USE_KSTAT, ");
+#endif /* USE_KSTAT */
+#ifdef USE_LOOPER
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "USE_LOOPER, ");
+#endif /* USE_LOOPER */
+#ifdef USE_PERFSTAT
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "USE_PERFSTAT, ");
+#endif /* USE_PERFSTAT */
+#ifdef USE_PROC_STAT
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "USE_PROC_STAT, ");
+#endif /* USE_PROC_STAT */
+#ifdef USE_SYSCTL
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "USE_SYSCTL, ");
+#endif /* USE_SYSCTL */
+#ifdef _GNU_SOURCE
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	i += fprintf(stdout, "_GNU_SOURCE, ");
+#endif /* _GNU_SOURCE */
+	if (i > 64) { fprintf(stdout, "\n    "); i = 4; }
+	fprintf(stdout, "_XOPEN_SOURCE\n\n");
+}
+
+void
+print_netserver_copying(int argc, char *argv[])
+{
+	fprintf(stdout, "\
+\n\
+COPYRIGHT (C) 2001-2004 OPENSS7 CORPORATION <http://www.openss7.com/>\n\
+COPYRIGHT (C) 1997-2001 BRIAN F. G. BIDULOCK <bidulock@openss7.org>\n\
+\n\
+ALL RIGHTS RESERVED.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+\n\
+COPYRIGHT (C) 1993-2001 HEWLETT-PACKARD COMPANY
+\n\
+ALL RIGHTS RESERVED.
+\n\
+The  enclosed software and documention  includes  copyrighted  works of Hewlett-\n\
+Packard  Co. For as long as you  comply with the following  limitations, you are\n\
+hereby authorized to (i) use, reproduce, and modify  the software  and document-\n\
+ation, and to (ii) distribute the software and documentation,  including modifi-\n\
+cations, for non-commercial purposes only.\n\
+\n\
+1.  The enclosed  software and documentation is made  available at no  charge in\n\
+    order  to  advance  the general  development of  high-performance networking\n\
+    products.\n\
+\n\
+2.  You may not delete any  copyright notices contained in the software or docu-\n\
+    mentation.  All hard copies, and copies in source code or object  code form,\n\
+    of the software or  documentation (including  modifications) must contain at\n\
+    least one of the copyright notices.\n\
+\n\
+3.  The enclosed  software and documentation  has not been  subjected to testing\n\
+    and quality control  and is not a Hewlett-Packard Co. product.   At a future\n\
+    time, Hewlett-Packard Co. may or may not offer a version of the software and\n\
+    documentation as a product.\n\
+\n\
+4.  THE SOFTWARE AND DOCUMENTATION IS PROVIDED \"AS IS\".  HEWLETT-PACKARD COMPANY\n\
+    DOES NOT WARRANT THAT THE USE, REPRODUCTION, MODIFICATION OR DISTRIBUTION OF\n\
+    THE SOFTWARE OR DOCUMENTATION WILL NOT INFRINGE A THIRD PARTY'S INTELLECTUAL\n\
+    PROPERTY RIGHTS.  HP DOES NOT WARRANT THAT  THE SOFTWARE OR DOCUMENTATION IS\n\
+    ERROR FREE. HP DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, WITH REGARD TO\n\
+    THE SOFTWARE AND THE DOCUMENTATION. HP SPECIFICALLY DISCLAIMS ALL WARRANTIES\n\
+    OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.\n\
+\n\
+5.  HEWLETT-PACKARD COMPANY  WILL NOT IN  ANY EVENT BE  LIABLE  FOR  ANY  DIRECT,\n\
+    INDIRECT,  SPECIAL,  INCIDENTAL  OR  CONSEQUENTIAL  DAMAGES  (INCLUDING  LOST\n\
+    PROFITS) RELATED TO ANY USE,  REPRODUCTION,  MODIFICATION, OR DISTRIBUTION OF\n\
+    THE SOFTWARE OR DOCUMENTATION.\n\
+\n\
+");
+}
+
 int _cdecl
 main(int argc, char *argv[])
 {
@@ -766,6 +1184,21 @@ main(int argc, char *argv[])
 
 struct sockaddr name;
   int namelen = sizeof(name);
+
+#if defined _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+      {"debug",	    no_argument,	NULL, 'd'},
+      {"numcpus",   required_argument,	NULL, 'n'},
+      {"port",	    required_argument,	NULL, 'p'},
+      {"verbose",   required_argument,	NULL, 'v'},
+      {"ipv4",	    no_argument,	NULL, '4'},
+      {"ipv6",	    no_argument,	NULL, '6'},
+      {"help",	    no_argument,	NULL, 'h'},
+      {"version",   no_argument,	NULL, 'V'},
+      {"copying",   no_argument,	NULL, 'C'},
+  };
+#endif
   
 
 #ifdef WIN32
@@ -791,12 +1224,24 @@ struct sockaddr name;
   /* Scan the command line to see if we are supposed to set-up our own */
   /* listen socket instead of relying on inetd. */
 
+#if defined _GNU_SOURCE
+  while ((c = getopt_long(argc, argv, SERVER_ARGS, long_options, &option_index)) != EOF) {
+#else
   while ((c = getopt(argc, argv, SERVER_ARGS)) != EOF) {
+#endif
     switch (c) {
     case '?':
-    case 'h':
-      print_netserver_usage();
+      print_netserver_usage(argc, argv);
       exit(1);
+    case 'h':
+      print_netserver_help(argc, argv);
+      exit(0);
+    case 'V':
+      print_netserver_version(argc, argv);
+      exit(0);
+    case 'C':
+      print_netserver_copying(argc, argv);
+      exit(0);
     case 'd':
       /* we want to set the debug file name sometime */
       debug++;

@@ -56,6 +56,9 @@ char	nettest_ipv6_id[]="\
 # endif
 #endif
 #include <unistd.h>
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif /* _GNU_SOURCE */
 #else /* WIN32 */
 #include <process.h>
 #include <winsock2.h>
@@ -7527,6 +7530,24 @@ scan_ipv6_args(int argc, char *argv[])
   char	
     arg1[BUFSIZ],  /* argument holders		*/
     arg2[BUFSIZ];
+
+#ifdef _GNU_SOURCE
+  int option_index = 0;
+  static struct option long_options[] = {
+	{ "help",		no_argument,		NULL, 'h' },
+	{ "nodelay",		no_argument,		NULL, 'D' },
+	{ "hostname",		required_argument,	NULL, 'H' },
+	{ "loc-msgsize",	required_argument,	NULL, 'm' },
+	{ "rem-msgsize",	required_argument,	NULL, 'M' },
+	{ "portrange",		required_argument,	NULL, 'p' },
+	{ "rrsize",		required_argument,	NULL, 'r' },
+	{ "loc-bufsize",	required_argument,	NULL, 's' },
+	{ "rem-bufsize",	required_argument,	NULL, 'S' },
+	{ "copyavoid",		no_argument,		NULL, 'V' },
+	{ "rcv-width",		required_argument,	NULL, 'w' },
+	{ "snd-width",		required_argument,	NULL, 'W' },
+  };
+#endif /* _GNU_SOURCE */
   
   /* Go through all the command line arguments and break them */
   /* out. For those options that take two parms, specifying only */
@@ -7534,7 +7555,11 @@ scan_ipv6_args(int argc, char *argv[])
   /* second will leave the first untouched. To change only the */
   /* first, use the form "first," (see the routine break_args.. */
   
+#ifdef _GNU_SOURCE
+  while ((c= getopt_long(argc, argv, IPV6_ARGS, long_options, &option_index)) != EOF) {
+#else /* _GNU_SOURCE */
   while ((c= getopt(argc, argv, IPV6_ARGS)) != EOF) {
+#endif /* _GNU_SOURCE */
     switch (c) {
     case '?':	
     case 'h':
