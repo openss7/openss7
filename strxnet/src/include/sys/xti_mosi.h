@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.2 2004/08/06 08:48:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 08:48:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_MOSI_H
 #define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $ ($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation"
+
+#define T_AP_MAX_ADDR	128
 
 /*
    mosi address structure 
@@ -66,7 +68,7 @@ struct t_mosiaddr {
 	unsigned int osi_apt_len;
 	unsigned int osi_aeq_len;
 	unsigned int osi_paddr_len;
-	unsigned char osi_addr[MAX_ADDR];
+	unsigned char osi_addr[T_AP_MAX_ADDR];
 };
 
 #define T_ISO_APCO	0x0200

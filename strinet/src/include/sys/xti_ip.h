@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.5 2004/08/06 08:50:43 brian Exp $
+ @(#) $Id: xti_ip.h,v 0.9.2.2 2004/08/06 09:11:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,27 +46,54 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 08:50:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 09:11:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _XTI_H
-#define _XTI_H
+#ifndef _SYS_XTI_IP_H
+#define _SYS_XTI_IP_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/06 08:50:43 $"
+#ident "@(#) $RCSfile: xti_ip.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+/*
+ * IP level
+ */
+#define T_INET_IP		0	/* IP level (same as protocol number) */
 
-#include <sys/xti.h>
+/*
+ * IP level Options
+ */
+#define T_IP_OPTIONS		1	/* IP per-packet options */
+#define T_IP_TOS		2	/* IP per-packet type of service */
+#define T_IP_TTL		3	/* IP per-packet time to live */
+#define T_IP_REUSEADDR		4	/* allow local address reuse */
+#define T_IP_DONTROUTE		5	/* just use interface addresses */
+#define T_IP_BROADCAST		6	/* permit sending of broadcast msgs */
+#define T_IP_ADDR		7	/* dest/srce address of recv/sent packet */
 
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
+/*
+ *  IP_TOS precedence levels
+ */
+#define T_ROUTINE		0
+#define T_PRIORITY		1
+#define T_IMMEDIATE		2
+#define T_FLASH			3
+#define T_OVERRIDEFLASH		4
+#define T_CRITIC_ECP		5
+#define T_INETCONTROL		6
+#define T_NETCONTROL		7
 
-#endif				/* _XTI_H */
+/*
+ *  IP_TOS type of service
+ */
+#define T_NOTOS			0
+#define T_LDELAY		(1<<4)
+#define T_HITHRPT		(1<<3)
+#define T_HIREL			(1<<2)
+#define T_LOCOST		(1<<1)
+
+#define SET_TOS(prec, tos) \
+	(((0x7 & (prec)) << 5) | ((T_NOTOS|T_LDELAY|T_HITHRPT|T_HIREL|T_LOCOST) & (tos)))
+
+#endif				/* _SYS_XTI_IP_H */
+

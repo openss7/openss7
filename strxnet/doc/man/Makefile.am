@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/07/11 09:04:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/06 08:14:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/11 09:04:58 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 08:14:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -108,9 +108,6 @@ tli_man_MANS	= \
 	man7/T_ORDREL_REQ.7 \
 	man7/T_ordrel_req.7 \
 	man7/tpi.7 \
-	man7/tpi_ip.7 \
-	man7/tpi_tcp.7 \
-	man7/tpi_udp.7 \
 	man7/T_UDERROR_IND.7 \
 	man7/T_uderror_ind.7 \
 	man7/T_UNBIND_REQ.7 \
@@ -162,10 +159,7 @@ xnet_man_MANS	= \
 	man3/t_sysconf.3 \
 	man3/t_unbind.3 \
 	man3/xnet.3 \
-	man3/xti.3 \
-	man3/xti_ip.3 \
-	man3/xti_tcp.3 \
-	man3/xti_udp.3
+	man3/xti.3
 
 sock_man_MANS	= \
 	man3/accept.3 \
@@ -191,19 +185,13 @@ sock_man_MANS	= \
 	man4/sockmod.4 \
 	man4/socksys.4
 
-sctp_man_MANS	= man3/xti_sctp.3
-
 man_MANS	= $(xnet_man_MANS)
 
 if WITH_TLI
 man_MANS	+= $(tli_man_MANS)
-sctp_man_MANS	+= man7/tpi_sctp.7
 endif
 if WITH_SOCK
 man_MANS	+= $(sock_man_MANS)
-endif
-if WITH_OPENSS7_SCTP
-man_MANS	+= $(sctp_man_MANS)
 endif
 
 tli_dist_noinst_MANS	= \
@@ -262,9 +250,6 @@ tli_dist_noinst_MANS	= \
 	man7/T_ORDREL_REQ.7.man \
 	man7/T_ordrel_req.7.man \
 	man7/tpi.7.man \
-	man7/tpi_ip.7.man \
-	man7/tpi_tcp.7.man \
-	man7/tpi_udp.7.man \
 	man7/T_UDERROR_IND.7.man \
 	man7/T_uderror_ind.7.man \
 	man7/T_UNBIND_REQ.7.man \
@@ -316,10 +301,7 @@ xnet_dist_noinst_MANS	= \
 	man3/t_sysconf.3.man \
 	man3/t_unbind.3.man \
 	man3/xnet.3.man \
-	man3/xti.3.man \
-	man3/xti_ip.3.man \
-	man3/xti_tcp.3.man \
-	man3/xti_udp.3.man
+	man3/xti.3.man
 
 sock_dist_noinst_MANS	= \
 	man3/accept.3.man \
@@ -345,15 +327,10 @@ sock_dist_noinst_MANS	= \
 	man4/sockmod.4.man \
 	man4/socksys.4.man
 
-sctp_dist_noinst_MANS	= \
-	man7/tpi_sctp.7.man \
-	man3/xti_sctp.3.man
-
 dist_noinst_MANS	= \
 	$(tli_dist_noinst_MANS) \
 	$(xnet_dist_noinst_MANS) \
-	$(sock_dist_noinst_MANS) \
-	$(sctp_dist_noinst_MANS)
+	$(sock_dist_noinst_MANS)
 
 include ../../am/man.am
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/07/11 09:06:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/06 08:20:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,42 +46,52 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/11 09:06:20 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 08:20:15 $ by $Author: brian $
 #
 # =============================================================================
 
 tli_headers	= \
-	sys/ticlts.h \
-	sys/ticots.h \
-	sys/ticotsord.h \
 	sys/tihdr.h \
 	sys/timod.h \
 	sys/tirdwr.h \
 	sys/tiuser.h \
 	sys/tli.h \
 	sys/tpi.h \
-	ticlts.h \
-	ticots.h \
-	ticotsord.h \
 	tihdr.h \
 	timod.h \
 	tirdwr.h \
 	tiuser.h
 
+unix_headers	= \
+	sys/ticlts.h \
+	sys/ticots.h \
+	sys/ticotsord.h \
+	ticlts.h \
+	ticots.h \
+	ticotsord.h
+
 xnet_headers	= \
-	sys/xti_atm.h \
 	sys/xti.h \
+	sys/xti_local.h \
+	sys/xti_xti.h \
+	xti.h
+
+inet_headers	= \
 	sys/xti_inet.h \
 	sys/xti_ip.h \
-	sys/xti_local.h \
-	sys/xti_mosi.h \
-	sys/xti_osi.h \
-	sys/xti_sctp.h \
-	sys/xti_tcp.h \
 	sys/xti_udp.h \
-	sys/xti_xti.h \
-	xti.h \
+	sys/xti_tcp.h \
 	xti_inet.h
+
+osi_headers	= \
+	sys/xti_osi.h \
+	sys/xti_mosi.h
+
+atm_headers	= \
+	sys/xti_atm.h
+
+sctp_headers	= \
+	sys/xti_sctp.h
 
 sock_headers	= \
 	sys/sockmod.h
@@ -89,14 +99,24 @@ sock_headers	= \
 nobase_pkginclude_HEADERS = 
 
 if WITH_TLI
-nobase_pkginclude_HEADERS += $(tli_headers)
+nobase_pkginclude_HEADERS += $(tli_headers) $(unix_headers)
 endif
 if WITH_XNET
-nobase_pkginclude_HEADERS += $(xnet_headers)
+nobase_pkginclude_HEADERS += $(xnet_headers) $(inet_headers) $(sctp_headers) $(osi_headers) $(atm_headers)
 endif
 if WITH_SOCK
 nobase_pkginclude_HEADERS += $(sock_headers)
 endif
+
+dist_noinst_HEADERS = \
+	$(tli_headers) \
+	$(unix_headers) \
+	$(xnet_headers) \
+	$(inet_headers) \
+	$(osi_headers) \
+	$(atm_headers) \
+	$(sctp_headers) \
+	$(sock_headers)
 
 nobase_nodist_pkginclude_HEADERS = 
 #	sys/strxnet/modversions.h

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/06/27 10:08:31 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/08/06 09:12:44 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/27 10:08:31 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 09:12:44 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -165,6 +165,8 @@ AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
+		 src/Makefile
+		 src/include/Makefile
 		 src/drivers/lis.conf])
 
 AC_OUTPUT

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 08:48:13 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/08/06 08:48:13 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 08:48:13 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 08:48:13 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -122,8 +122,16 @@ static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9 
  *  the module can be removed correctly.
  */
 
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#elif HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>

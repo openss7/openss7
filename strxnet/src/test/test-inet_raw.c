@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 08:48:11 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:35 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/08/06 08:48:11 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.2  2004/08/06 08:48:11  brian
+ - Header file corrections.
+
  Revision 0.9.2.1  2004/05/16 04:12:35  brian
  - Updating strxnet release.
 
@@ -91,16 +94,25 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 08:48:11 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/16 04:12:35 $";
+    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 08:48:11 $";
 
 /* 
  *  Simple test program for INET streams.
  */
+
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#elif HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -123,7 +135,6 @@ static char const ident[] =
 
 #define NEED_T_USCALAR_T
 
-#include <sys/types.h>
 #include <tihdr.h>
 #include <xti.h>
 #include <xti_inet.h>

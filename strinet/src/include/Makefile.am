@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/27 05:47:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 09:11:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,74 +46,35 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 05:47:04 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 09:11:27 $ by $Author: brian $
 #
 # =============================================================================
-
-xti_headers	=
-
-xns_headers	= \
-	sys/cdi.h \
-	sys/dlpi.h \
-	sys/npi.h
 
 tli_headers	= \
 	sys/ticlts.h \
 	sys/ticots.h \
 	sys/ticotsord.h \
-	sys/tihdr.h \
-	sys/timod.h \
-	sys/tirdwr.h \
-	sys/tiuser.h \
-	sys/tli.h \
-	sys/tpi.h \
 	ticlts.h \
 	ticots.h \
-	ticotsord.h \
-	tihdr.h \
-	timod.h \
-	tirdwr.h \
-	tiuser.h
-
-inet_headers	=
+	ticotsord.h
 
 xnet_headers	= \
-	sys/xti_atm.h \
-	sys/xti.h \
 	sys/xti_inet.h \
 	sys/xti_ip.h \
-	sys/xti_local.h \
-	sys/xti_mosi.h \
-	sys/xti_osi.h \
-	sys/xti_sctp.h \
-	sys/xti_tcp.h \
 	sys/xti_udp.h \
-	sys/xti_xti.h \
+	sys/xti_tcp.h \
 	xti.h \
 	xti_inet.h
 
-sock_headers	= \
-	sys/sockmod.h
+sctp_headers	= \
+	sys/xti_sctp.h
 
-nobase_pkginclude_HEADERS = $(xti_headers)
-
-if WITH_XNS
-nobase_pkginclude_HEADERS += $(xns_headers)
-endif
-if WITH_TLI
-nobase_pkginclude_HEADERS += $(tli_headers)
-endif
-if WITH_INET
-nobase_pkginclude_HEADERS += $(inet_headers)
-endif
-if WITH_XNET
-nobase_pkginclude_HEADERS += $(xnet_headers)
-endif
-if WITH_SOCK
-nobase_pkginclude_HEADERS += $(sock_headers)
-endif
+nobase_pkginclude_HEADERS = \
+	$(tli_headers) \
+	$(xnet_headers) \
+	$(sctp_headers)
 
 nobase_nodist_pkginclude_HEADERS = 
-#	sys/strxnet/modversions.h
+#	sys/strinet/modversions.h
 
 # vim: ft=automake

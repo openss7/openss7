@@ -1,11 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.5 2004/08/06 08:50:43 brian Exp $
+ @(#) $Id: ticots.h,v 0.9.2.1 2004/08/06 09:11:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,14 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 08:50:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 09:11:27 $ by $Author: brian $
+
+ $Log: ticots.h,v $
+ Revision 0.9.2.1  2004/08/06 09:11:27  brian
+ - Added override header files for TLI and XTI
+
+ Revision 0.9.2.1  2004/05/16 04:12:32  brian
+ - Updating strxnet release.
+
+ Revision 0.9  2004/05/14 08:00:01  brian
+ - Updated xns, tli, inet, xnet and documentation.
+
+ Revision 0.9.2.1  2004/04/13 12:12:51  brian
+ - Rearranged header files.
 
  *****************************************************************************/
 
-#ifndef _XTI_H
-#define _XTI_H
+#ifndef _TICOTS_H
+#define _TICOTS_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/06 08:50:43 $"
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -61,7 +73,7 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/xti.h>
+#include <sys/ticots.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -69,4 +81,4 @@ __END_DECLS
 /* *INDENT-ON* */
 #endif
 
-#endif				/* _XTI_H */
+#endif				/* _TICOTS_H */

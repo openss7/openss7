@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.5 2004/08/06 08:50:43 brian Exp $
+ @(#) $Id: xti_udp.h,v 0.9.2.2 2004/08/06 09:11:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,27 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 08:50:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 09:11:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _XTI_H
-#define _XTI_H
+#ifndef _SYS_XTI_UDP_H
+#define _SYS_XTI_UDP_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/06 08:50:43 $"
+#ident "@(#) $RCSfile: xti_udp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+/* 
+ * UDP level
+ */
+#define T_INET_UDP		17	/* UDP level (same as protocol number) */
 
-#include <sys/xti.h>
+/* 
+ * UDP level Options
+ */
+#define T_UDP_CHECKSUM		1	/* checksum computation (???) */
 
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
+#endif				/* _SYS_XTI_UDP_H */
 
-#endif				/* _XTI_H */

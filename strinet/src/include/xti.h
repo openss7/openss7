@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.5 2004/08/06 08:50:43 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.2 2004/08/06 09:11:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 08:50:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 09:11:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/06 08:50:43 $"
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 09:11:27 $"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -62,6 +62,10 @@ __BEGIN_DECLS
 #endif
 
 #include <sys/xti.h>
+#include <sys/xti_inet.h>
+#include <sys/xti_atm.h>
+#include <sys/xti_osi.h>
+#include <sys/xti_mosi.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

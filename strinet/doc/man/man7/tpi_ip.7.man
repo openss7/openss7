@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi_tcp.7.man,v 0.9.2.1 2004/05/16 02:35:50 brian Exp $
+.\" @(#) $Id: tpi_ip.7.man,v 0.9.2.1 2004/08/06 09:10:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/16 02:35:50 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/06 09:10:10 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so strxnet.macros
+.so strinet.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database strxnet.refs
+database strinet.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -71,175 +71,10 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI-TCP 7 "$Date: 2004/05/16 02:35:50 $" "$Name:  $" "Transport Provider Interface"
+.TH TPI-IP 7 "$Date: 2004/08/06 09:10:10 $" "$Name:  $" "Transport Provider Interface"
 .SH NAME
-.B tpi_tcp
-\- Transport Provider Interface (TPI) \- Transmission Control Protocol (TCP) Corrigendum
-.SH SYNOPSIS
-.PP
-.B #include <sys/tihdr.h>
-.br
-.B #include <sys/tpi_ip.h>
-.br
-.B #include <sys/tpi_tcp.h>
-.HP
-.BI "int " tcp_stream " = open(" \fR\*(lq/dev/tcp\*(rq\fI ", " flags );
-.SH DESCRIPTION
-.PP
-.PP
-.B TPI-TCP
-provides a stream supporting the Transport Provider Interface,
-.BR tpi (7),
-to the Transmission Control Protocol,
-.BR tcp (7).
-This
-.IR STREAMS (4)
-interface provides the
-.BR tcp (7)
-protocol service interface using the T-primitives of the
-.BR tpi (7).
-This interface is intended solely for use by user programs or protocol modules
-requiring the common
-.BR tpi (7)
-interfae, such as the
-.BR xti (3)
-and
-.BR sockets (3)
-library.
-.SS "ADDRESS FORMATS"
-.PP
-.SH "OPTIONS"
-.PP
-.PP
-.B TPI-TCP
-provides options at the
-.B T_INET_TCP
-option level as described in the section that follow.  Of the
-.B T_INET_TCP
-level protocol options, none of the options are of end-to-end significance.
-.SS "T_TCP_NODELAY"
-.PP
-.PP
-.SS "T_TCP_MAXSEG"
-.PP
-.PP
-.SS "T_TCP_KEEPALIVE"
-.PP
-.PP
-.SH "LOCAL MANAGEMENT INTERFACE"
-.PP
-.PP
-.SS T_INFO_REQ
-.PP
-.PP
-.SS T_INFO_ACK
-.PP
-.PP
-.SS T_ADDR_REQ
-.PP
-.PP
-.SS T_ADDR_ACK
-.PP
-.PP
-.SS T_CAPABILITY_REQ
-.PP
-.PP
-.SS T_CAPABILITY_ACK
-.PP
-.PP
-.SS T_BIND_REQ
-.PP
-.PP
-.SS T_BIND_ACK
-.PP
-.PP
-.SS T_UNBIND_REQ
-.PP
-.PP
-.SS T_OK_ACK
-.PP
-.PP
-.SS T_ERROR_ACK
-.PP
-.PP
-.SS T_OPTMGMT_REQ
-.PP
-.PP
-.SS T_OPTMGMT_ACK
-.PP
-.PP
-.SH "PROTOCOL SERVICE INTERFACE"
-.PP
-.PP
-.SS T_UNITDATA_REQ
-.PP
-.PP
-.SS T_UNITDATA_IND
-.PP
-.PP
-.SS T_UDERROR_IND
-.PP
-.PP
-.SS T_CONN_REQ
-.PP
-.PP
-.SS T_CONN_CON
-.PP
-.PP
-.SS T_CONN_IND
-.PP
-.PP
-.SS T_CONN_RES
-.PP
-.PP
-.SS T_DATA_REQ
-.PP
-.PP
-.SS T_DATA_IND
-.PP
-.PP
-.SS T_EXDATA_REQ
-.PP
-.PP
-.SS T_EXDATA_IND
-.PP
-.PP
-.SS T_OPTDATA_REQ
-.PP
-.PP
-.SS T_OPTDATA_IND
-.PP
-.PP
-.SS T_DISCON_REQ
-.PP
-.PP
-.SS T_DISCON_IND
-.PP
-.PP
-.SS T_ORDREL_REQ
-.PP
-.PP
-.SS T_ORDREL_IND
-.PP
-.PP
-.SH "IOCTLS"
-.PP
-.PP
-.SH "ERROR HANDLING"
-.PP
-.PP
-.SH "ERRORS"
-.PP
-.PP
-.SH "CAVEATS"
-.PP
-.PP
-.SH "SEE ALSO"
-.PP
-.BR tcp (7),
-.BR tpi (7),
-.BR xti (3),
-.BR sockets (3).
+.B tpi_ip
+\- Transport Provider Interface (TPI) \- Internet Protocol (IP) Corrigendum
 .SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.

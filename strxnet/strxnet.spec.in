@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/07/11 08:48:30 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/06 08:15:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/11 08:48:30 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 08:15:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -567,7 +567,8 @@ The %{name}-dev package contains the device definitions necessary to run
 applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
 INET.
 
-%if %{BUILD_tools}
+%if 0
+#%if %{BUILD_tools}
 # ---------------------------------------------------------------------------
 %files dev -f %{makedev}
 %defattr(-,root,root)
@@ -880,18 +881,25 @@ XNET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.26  2004/07/11 08:48:30  brian
-# - Correct symbolic links again.
+# Revision 0.9.2.27  2004/08/06 08:15:35  brian
+# - Strapped out dev sub-package.
 #
-# Revision 0.9.2.25  2004/06/28 19:40:34  brian
-# - Do not package up debug files on recent rpmbuild.
-#
-# Revision 0.9.2.24  2004/06/28 11:33:15  brian
-# - Support binary release.
-#
-# Revision 0.9.2.23  2004/06/28 09:01:18  brian
-# - Updated spec files.
-#
+
+* Sun Jul 11 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.26  2004/07/11 08:48:30  brian
+- Correct symbolic links again.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.25  2004/06/28 19:40:34  brian
+- Do not package up debug files on recent rpmbuild.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.24  2004/06/28 11:33:15  brian
+- Support binary release.
+
+* Mon Jun 28 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.23  2004/06/28 09:01:18  brian
+- Updated spec files.
 
 * Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.22  2004/06/27 10:12:38  brian

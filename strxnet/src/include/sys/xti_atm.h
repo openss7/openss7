@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_atm.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
+ @(#) $Id: xti_atm.h,v 0.9.2.2 2004/08/06 08:48:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 08:48:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_ATM_H
 #define _SYS_XTI_ATM_H
 
-#ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_atm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -367,9 +367,9 @@ struct t_atm_caller_id {
  */
 struct t_atm_cause {
 	int8_t coding_standard;
-	uint8_r location;
-	uint8_r cause_value;
-	uint8_r diagnostics[4];
+	uint8_t location;
+	uint8_t cause_value;
+	uint8_t diagnostics[4];
 };
 
 /*
@@ -453,7 +453,7 @@ struct t_atm_qos {
  */
 struct t_atm_transit {
 	uint8_t length;
-	uint8_t network_id[];		/* variable-sized array */
+	uint8_t network_id[0];		/* variable-sized array */
 };
 
 #ifdef __END_DECLS

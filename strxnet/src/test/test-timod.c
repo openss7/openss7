@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 08:48:13 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/08/06 08:48:13 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 08:48:13 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 08:48:13 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -113,8 +113,16 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
  *  the module can be removed correctly.
  */
 
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#elif HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -133,7 +141,6 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
 
 #define NEED_T_USCALAR_T
 
-#include <sys/types.h>
 #include <xti.h>
 #include <tihdr.h>
 #include <timod.h>

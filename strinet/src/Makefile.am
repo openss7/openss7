@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 09:09:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/06 09:11:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,80 +46,8 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/06 09:09:54 $ by $Author: brian $
+# Last Modified $Date: 2004/08/06 09:11:24 $ by $Author: brian $
 #
 # =============================================================================
 
-MANMACRO_PFX			= @PACKAGE_TARNAME@
-
-man_MANS = \
-	man3/xti_ip.3 \
-	man3/xti_udp.3 \
-	man3/xti_tcp.3 \
-	man4/egp.4 \
-	man4/eth.4 \
-	man4/ggp.4 \
-	man4/icmp.4 \
-	man4/idp.4 \
-	man4/ifnet.4 \
-	man4/INET.4 \
-	man4/inet.4 \
-	man4/ip.4 \
-	man4/ipip.4 \
-	man4/pup.4 \
-	man4/rawip.4 \
-	man4/tcp.4 \
-	man4/tcp_ioctl.4 \
-	man4/ticlts.4 \
-	man4/ticots.4 \
-	man4/ticotsord.4 \
-	man4/udp.4 \
-	man4/udp_ioctl.4 \
-	man4/xtios.4 \
-	man7/tpi_ip.7 \
-	man7/tpi_udp.7 \
-	man7/tpi_tcp.7
-
-if WITH_OPENSS7_SCTP
-man_MANS += \
-	man3/xti_sctp.3 \
-	man4/sctp.4 \
-	man4/sctp_ioctl.4 \
-	man7/tpi_sctp.7
-endif
-
-dist_noinst_MANS = \
-	man3/xti_ip.3.man \
-	man3/xti_udp.3.man \
-	man3/xti_tcp.3.man \
-	man3/xti_sctp.3.man \
-	man4/egp.4.man \
-	man4/eth.4.man \
-	man4/ggp.4.man \
-	man4/icmp.4.man \
-	man4/idp.4.man \
-	man4/ifnet.4.man \
-	man4/inet.4.man \
-	man4/INET.4.man \
-	man4/ip.4.man \
-	man4/ipip.4.man \
-	man4/pup.4.man \
-	man4/rawip.4.man \
-	man4/sctp.4.man \
-	man4/sctp_ioctl.4.man \
-	man4/tcp.4.man \
-	man4/tcp_ioctl.4.man \
-	man4/ticlts.4.man \
-	man4/ticots.4.man \
-	man4/ticotsord.4.man \
-	man4/udp.4.man \
-	man4/udp_ioctl.4.man \
-	man4/xtios.4.man \
-	man7/tpi_ip.7.man \
-	man7/tpi_udp.7.man \
-	man7/tpi_tcp.7.man \
-	man7/tpi_sctp.7.man
-
-include ../../am/man.am
-
-# vim: ft=automake
+SUBDIRS = include
