@@ -61,12 +61,12 @@
  * ------------------------------------------------------------------- */
 
 const char usage_short[] = "\
-Usage: %s [-s|-c host] [-p port] [-t secs] [-w bytes] ...\n\
+Usage: %s [-s|-c host] [options]\n\
 Try `%s --help' for more information.\n";
 
 #ifdef WIN32
 const char usage_long1[] = "\
-Usage: iperf [-s|-c host] [-p port] [-t secs] [-w bytes] ...\n\
+Usage: iperf [-s|-c host] [options]\n\
        iperf [-h|--help] [-v|--version]\n\
 \n\
 Client/Server:\n\
@@ -79,27 +79,31 @@ Client/Server:\n\
   -u, --udp                use UDP rather than TCP\n\
   -w, --window    #[KM]    TCP window size (socket buffer size)\n\
   -B, --bind      <host>   bind to <host>, an interface or multicast address\n\
+  -C, --compatibility      for use with older versions does not sent extra msgs\n\
   -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
   -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm\n\
   -V, --IPv6Version        Set the domain to IPv6\n\
+\n\
 Server specific:\n\
   -s, --server             run in server mode\n\
   -D, --daemon             run the server as a daemon\n\
-  -R, --remove             remove service in win32\n\
+  -R, --remove             remove service in win32\n";
+
+const char usage_long2[] = "\
 \n\
 Client specific:\n\
   -b, --bandwidth #[KM]    for UDP, bandwidth to send at in bits/sec\n\
                            (default 1 Mbit/sec, implies -u)\n\
   -c, --client    <host>   run in client mode, connecting to <host>\n\
+  -d, --dualtest           Do a bidirectional test simultaneously\n\
   -n, --num       #[KM]    number of bytes to transmit (instead of -t)\n\
+  -r, --tradeoff           Do a bidirectional test individually\n\
   -t, --time      #        time in seconds to transmit for (default 10 secs)\n\
   -F, --fileinput <name>   input the data to be transmitted from a file\n\
   -I, --stdin              input the data to be transmitted from stdin\n\
+  -L, --listenport #       port to recieve bidirectional tests back on\n\
   -P, --parallel  #        number of parallel client threads to run\n\
   -T, --ttl       #        time-to-live, for multicast (default 1)\n\
-  -W, --windowSizeSuggest  Run the client so as to suggest a suitable window size (default off)\n";
-
-const char usage_long2[] = "\
 \n\
 Miscellaneous:\n\
   -h, --help               print this message and quit\n\
@@ -115,7 +119,7 @@ Report bugs to <dast@nlanr.net>\n";
 
 #else
 const char usage_long[] = "\
-Usage: iperf [-s|-c host] [-p port] [-t secs] [-w bytes] ...\n\
+Usage: iperf [-s|-c host] [options]\n\
        iperf [-h|--help] [-v|--version]\n\
 \n\
 Client/Server:\n\
@@ -127,9 +131,11 @@ Client/Server:\n\
   -u, --udp                use UDP rather than TCP\n\
   -w, --window    #[KM]    TCP window size (socket buffer size)\n\
   -B, --bind      <host>   bind to <host>, an interface or multicast address\n\
+  -C, --compatibility      for use with older versions does not sent extra msgs\n\
   -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
   -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm\n\
   -V, --IPv6Version        Set the domain to IPv6\n\
+\n\
 Server specific:\n\
   -s, --server             run in server mode\n\
   -D, --daemon             run the server as a daemon\n\
@@ -138,13 +144,15 @@ Client specific:\n\
   -b, --bandwidth #[KM]    for UDP, bandwidth to send at in bits/sec\n\
                            (default 1 Mbit/sec, implies -u)\n\
   -c, --client    <host>   run in client mode, connecting to <host>\n\
+  -d, --dualtest           Do a bidirectional test simultaneously\n\
   -n, --num       #[KM]    number of bytes to transmit (instead of -t)\n\
+  -r, --tradeoff           Do a bidirectional test individually\n\
   -t, --time      #        time in seconds to transmit for (default 10 secs)\n\
   -F, --fileinput <name>   input the data to be transmitted from a file\n\
   -I, --stdin              input the data to be transmitted from stdin\n\
+  -L, --listenport #       port to recieve bidirectional tests back on\n\
   -P, --parallel  #        number of parallel client threads to run\n\
   -T, --ttl       #        time-to-live, for multicast (default 1)\n\
-  -W, --windowSizeSuggest  Run the client so as to suggest a suitable window size (default off)\n\
 \n\
 Miscellaneous:\n\
   -h, --help               print this message and quit\n\
@@ -227,12 +235,18 @@ const char report_bw_header[] =
 const char report_bw_format[] =
 "[%3d] %4.1f-%4.1f sec  %ss  %ss/sec\n";
 
+const char report_sum_bw_format[] =
+"[SUM] %4.1f-%4.1f sec  %ss  %ss/sec\n";
+
 const char report_bw_jitter_loss_header[] =
 "[ ID] Interval       Transfer     Bandwidth       Jitter   Lost/Total \
 Datagrams\n";
 
 const char report_bw_jitter_loss_format[] =
 "[%3d] %4.1f-%4.1f sec  %ss  %ss/sec  %5.3f ms %4d/%5d (%.2g%%)\n";
+
+const char report_sum_bw_jitter_loss_format[] =
+"[SUM] %4.1f-%4.1f sec  %ss  %ss/sec  %5.3f ms %4d/%5d (%.2g%%)\n";
 
 const char report_outoforder[] =
 "[%3d] %4.1f-%4.1f sec  %d datagrams received out-of-order\n";
@@ -248,6 +262,9 @@ const char report_mss[] =
 
 const char report_datagrams[] =
 "[%3d] Sent %d datagrams\n";
+
+const char server_reporting[] =
+"[%3d] Server Report:\n";
 
 /* -------------------------------------------------------------------
  * warnings
@@ -283,8 +300,28 @@ const char opt_estimate[]=
 "Optimal Estimate\n";
 
 const char report_interval_small[] =
-"[%3d] %4.1f-%4.1f sec [Warning] Skipping report, interval too small\n";
+"WARNING: interval too small, increasing from %3.2f to 0.5 seconds.\n";
 
+const char warn_invalid_server_option[] =
+"WARNING: option -%c is not valid for server mode\n";
+
+const char warn_invalid_client_option[] =
+"WARNING: option -%c is not valid for client mode\n";
+
+const char warn_invalid_compatibility_option[] =
+"WARNING: option -%c is not valid in compatibility mode\n";
+
+const char warn_implied_udp[] =
+"WARNING: option -%c implies udp testing\n";
+
+const char warn_implied_compatibility[] =
+"WARNING: option -%c has implied compatibility mode\n";
+
+const char warn_buffer_too_small[] =
+"WARNING: the UDP buffer was increased to %d for proper operation\n";
+
+const char warn_invalid_single_threaded[] =
+"WARNING: option -%c is not valid in single threaded versions\n";
 
 #endif // LOCALE_H
 

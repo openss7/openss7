@@ -82,6 +82,7 @@ const struct option long_options[] =
 {
 {"bandwidth",  required_argument, NULL, 'b'},
 {"client",     required_argument, NULL, 'c'},
+{"dualtest",         no_argument, NULL, 'd'},
 {"format",     required_argument, NULL, 'f'},
 {"help",             no_argument, NULL, 'h'},
 {"interval",   required_argument, NULL, 'i'},
@@ -90,6 +91,7 @@ const struct option long_options[] =
 {"num",        required_argument, NULL, 'n'},
 {"output",     required_argument, NULL, 'o'},
 {"port",       required_argument, NULL, 'p'},
+{"tradeoff",         no_argument, NULL, 'r'},
 {"server",           no_argument, NULL, 's'},
 {"time",       required_argument, NULL, 't'},
 {"udp",              no_argument, NULL, 'u'},
@@ -98,11 +100,13 @@ const struct option long_options[] =
 
 // more esoteric options
 {"bind",       required_argument, NULL, 'B'},
+{"compatibility",    no_argument, NULL, 'C'},
 {"daemon",           no_argument, NULL, 'D'},
 {"file_input", required_argument, NULL, 'F'},
 {"stdin_input",      no_argument, NULL, 'I'},
 {"mss",        required_argument, NULL, 'M'},
 {"nodelay",          no_argument, NULL, 'N'},
+{"listenport", required_argument, NULL, 'L'},
 {"parallel",   required_argument, NULL, 'P'},
 {"remove",        no_argument, NULL, 'R'},
 {"tos",        required_argument, NULL, 'S'},
@@ -118,6 +122,7 @@ const struct option env_options[] =
 {
 {"IPERF_BANDWIDTH",  required_argument, NULL, 'b'},
 {"IPERF_CLIENT",     required_argument, NULL, 'c'},
+{"IPERF_DUALTEST",         no_argument, NULL, 'd'},
 {"IPERF_FORMAT",     required_argument, NULL, 'f'},
 // skip help
 {"IPERF_INTERVAL",   required_argument, NULL, 'i'},
@@ -125,6 +130,7 @@ const struct option env_options[] =
 {"IPERF_PRINT_MSS",        no_argument, NULL, 'm'},
 {"IPERF_NUM",        required_argument, NULL, 'n'},
 {"IPERF_PORT",       required_argument, NULL, 'p'},
+{"IPERF_TRADEOFF",         no_argument, NULL, 'r'},
 {"IPERF_SERVER",           no_argument, NULL, 's'},
 {"IPERF_TIME",       required_argument, NULL, 't'},
 {"IPERF_UDP",              no_argument, NULL, 'u'},
@@ -133,11 +139,13 @@ const struct option env_options[] =
 
 // more esoteric options
 {"IPERF_BIND",       required_argument, NULL, 'B'},
+{"IPERF_COMPAT",       no_argument, NULL, 'C'},
 {"IPERF_DAEMON",       no_argument, NULL, 'D'},
 {"IPERF_FILE_INPUT", required_argument, NULL, 'F'},
 {"IPERF_STDIN_INPUT",      no_argument, NULL, 'I'},
 {"IPERF_MSS",        required_argument, NULL, 'M'},
 {"IPERF_NODELAY",          no_argument, NULL, 'N'},
+{"IPERF_LISTENPORT", required_argument, NULL, 'L'},
 {"IPERF_PARALLEL",   required_argument, NULL, 'P'},
 {"IPERF_TOS",        required_argument, NULL, 'S'},
 {"IPERF_TTL",        required_argument, NULL, 'T'},
@@ -148,7 +156,7 @@ const struct option env_options[] =
 
 #define SHORT_OPTIONS()
 
-const char short_options[] = "b:c:f:hi:l:mn:o:p:st:uvw:B:DF:IM:NP:RS:T:VW";
+const char short_options[] = "b:c:df:hi:l:mn:o:p:rst:uvw:B:CDF:IL:M:NP:RS:T:VW";
 
 /* -------------------------------------------------------------------
  * defaults
@@ -166,41 +174,50 @@ const int  kDefault_UDPBufLen = 1470;      // -u  if set, read/write 1470 bytes
  * Initialize all settings to defaults.
  * ------------------------------------------------------------------- */
 
-Settings::Settings( void ) {
+Settings::Settings( ext_Settings *main ) {
+
+    mExtSettings = main;
+
     // option, default
-    mUDPRate    = 0;             // -b,  ie. TCP mode
-    mHost       = NULL;          // -c,  none, required for client
-    mFormat     = 'a';           // -f,  adaptive bits
-    // skip help                 // -h
-    mBufLenSet  = false;         // -l,	
-    mBufLen     = 8 * 1024;      // -l,  8 Kbyte
-    mInterval   = 0;             // -i,  ie. no periodic bw reports
-    mPrintMSS   = false;         // -m,  don't print MSS
-    // mAmount is time also      // -n,  N/A
-    mOutputFileName = NULL;      // -o,  filename
-    mPort       = 5001;          // -p,  ttcp port
-    mServerMode = kMode_Unknown; // -s,  or -c, none
-    mAmount     = -10;           // -t,  10 seconds
-    // mUDPRate > 0 means UDP    // -u,  N/A, see kDefault_UDPRate
-    // skip version              // -v,
-    mTCPWin     = 0;             // -w,  ie. don't set window
+    mExtSettings->mUDPRate    = 0;             // -b,  ie. TCP mode
+    mExtSettings->mHost       = NULL;          // -c,  none, required for client
+    mExtSettings->mMode       = kTest_Normal;  // -d,  mMode == kTest_DualTest
+    mExtSettings->mFormat     = 'a';           // -f,  adaptive bits
+    // skip help                               // -h,
+    mExtSettings->mBufLenSet  = false;         // -l,	
+    mExtSettings->mBufLen     = 8 * 1024;      // -l,  8 Kbyte
+    mExtSettings->mInterval   = 0;             // -i,  ie. no periodic bw reports
+    mExtSettings->mPrintMSS   = false;         // -m,  don't print MSS
+    // mAmount is time also                    // -n,  N/A
+    mExtSettings->mOutputFileName = NULL;      // -o,  filename
+    mExtSettings->mPort       = 5001;          // -p,  ttcp port
+    // mMode    = kTest_Normal;                // -r,  mMode == kTest_TradeOff
+    mExtSettings->mServerMode = kMode_Unknown; // -s,  or -c, none
+    mExtSettings->mAmount     = -1000;           // -t,  10 seconds
+    // mUDPRate > 0 means UDP                  // -u,  N/A, see kDefault_UDPRate
+    // skip version                            // -v,
+    mExtSettings->mTCPWin     = 0;             // -w,  ie. don't set window
 
     // more esoteric options
-    mLocalhost  = NULL;          // -B,  none
-    mDaemon     = false;         // -D,  run as a daemon
-    mFileInput  = false;         // -F,
-    mFileName   = NULL;          // -F,  filename 
-    mMSS        = 0;             // -M,  ie. don't set MSS
-    mNodelay    = false;         // -N,  don't set nodelay
-    mThreads    = 1;             // -P,  single client
-    mRemoveService = false;      // -R,
-    mTOS        = 0;             // -S,  ie. don't set type of service
-    mTTL        = 1;             // -T,  link-local TTL
-    mDomain     = kMode_IPv4;    // -V,
-    mSuggestWin = false;         // -W,  Suggest the window size.
+    mExtSettings->mLocalhost  = NULL;          // -B,  none
+    mExtSettings->mCompat     = false;         // -C,  run in Compatibility mode
+    mExtSettings->mDaemon     = false;         // -D,  run as a daemon
+    mExtSettings->mFileInput  = false;         // -F,
+    mExtSettings->mFileName   = NULL;          // -F,  filename 
+    mExtSettings->mStdin      = false;         // -I,  default not stdin
+    mExtSettings->mListenPort = 0;             // -L,  listen port
+    mExtSettings->mMSS        = 0;             // -M,  ie. don't set MSS
+    mExtSettings->mNodelay    = false;         // -N,  don't set nodelay
+    mExtSettings->mThreads    = 0;             // -P,
+    mExtSettings->mRemoveService = false;      // -R,
+    mExtSettings->mTOS        = 0;             // -S,  ie. don't set type of service
+    mExtSettings->mTTL        = 1;             // -T,  link-local TTL
+    mExtSettings->mDomain     = kMode_IPv4;    // -V,
+    mExtSettings->mSuggestWin = false;         // -W,  Suggest the window size.
 
-    mStdin = false;              // default not stdin
-    mStdout = true;              // default stdout
+    mExtSettings->mStdout = true;              // default stdout
+
+
 } // end Settings
 
 /* -------------------------------------------------------------------
@@ -208,10 +225,6 @@ Settings::Settings( void ) {
  * ------------------------------------------------------------------- */
 
 Settings::~Settings() {
-    DELETE_PTR( mHost      );
-    DELETE_PTR( mLocalhost );
-    DELETE_PTR( mFileName  );
-    DELETE_PTR( mOutputFileName );
 } // end ~Settings
 
 /* -------------------------------------------------------------------
@@ -257,24 +270,53 @@ void Settings::Interpret( char option, const char *optarg ) {
 
     switch ( option ) {
         case 'b': // UDP bandwidth
+            if ( mExtSettings->mUDPRate == 0 ) {
+                printf( warn_implied_udp, option );
+            }
+
+            if ( mExtSettings->mServerMode != kMode_Client ) {
+                printf( warn_invalid_server_option, option );
+                break;
+            }
+
             GetLowerCaseArg(optarg,outarg);
-            mUDPRate = byte_atof(outarg);
+            mExtSettings->mUDPRate = byte_atoi(outarg);
 
             // if -l has already been processed, mBufLenSet is true
             // so don't overwrite that value.
-            if ( ! mBufLenSet ) {
-                mBufLen = kDefault_UDPBufLen;
+            if ( ! mExtSettings->mBufLenSet ) {
+                mExtSettings->mBufLen = kDefault_UDPBufLen;
             }
             break;
 
         case 'c': // client mode w/ server host to connect to
-            mServerMode = kMode_Client;
-            mHost = new char[ strlen( optarg ) + 1 ];
-            strcpy( mHost, optarg );
+            if ( mExtSettings->mServerMode == kMode_Unknown ) {
+                mExtSettings->mServerMode = kMode_Client;
+                mExtSettings->mThreads = 1;
+            }
+
+            mExtSettings->mHost = new char[ strlen( optarg ) + 1 ];
+            strcpy( mExtSettings->mHost, optarg );
+            break;
+
+        case 'd': // Dual-test Mode
+            if ( mExtSettings->mServerMode != kMode_Client ) {
+                printf( warn_invalid_server_option, option );
+                break;
+            }
+            if ( mExtSettings->mCompat ) {
+                printf( warn_invalid_compatibility_option, option );
+            }
+#ifdef HAVE_THREAD
+            mExtSettings->mMode = kTest_DualTest;
+#else
+            printf( warn_invalid_single_threaded, option );
+            mExtSettings->mMode = kTest_TradeOff;
+#endif
             break;
 
         case 'f': // format to print in
-            mFormat = (*optarg);
+            mExtSettings->mFormat = (*optarg);
             break;
 
         case 'h': // print help and exit
@@ -288,54 +330,98 @@ void Settings::Interpret( char option, const char *optarg ) {
             break;
 
         case 'i': // specify interval between periodic bw reports
-            mInterval = atof( optarg );
+            mExtSettings->mInterval = atof( optarg );
+            if ( mExtSettings->mInterval < 0.5 ) {
+                printf (report_interval_small, mExtSettings->mInterval);
+                mExtSettings->mInterval = 0.5;
+            }
             break;
 
         case 'l': // length of each buffer
             GetUpperCaseArg(optarg,outarg);
-            mBufLen = (long) byte_atof(outarg );
-            mBufLenSet = true;
+            mExtSettings->mBufLen = byte_atoi( outarg );
+            mExtSettings->mBufLenSet = true;
+            if ( mExtSettings->mUDPRate == 0 &&
+                 mExtSettings->mBufLen < (int) sizeof( client_hdr ) &&
+                 !mExtSettings->mCompat ) {
+                mExtSettings->mCompat = true;
+                printf( warn_implied_compatibility, option );
+            } else if ( mExtSettings->mUDPRate > 0 ) {
+                if ( mExtSettings->mBufLen < (int) sizeof( UDP_datagram ) ) {
+                    mExtSettings->mBufLen = sizeof( UDP_datagram );
+                    printf( warn_buffer_too_small, mExtSettings->mBufLen );
+                } else if ( !mExtSettings->mCompat &&
+                            mExtSettings->mBufLen < (int) ( sizeof( UDP_datagram )
+                            + sizeof( client_hdr ) ) ) {
+                    mExtSettings->mCompat = true;
+                    printf( warn_implied_compatibility, option );
+                }
+            }
+
             break;
 
         case 'm': // print TCP MSS
-            mPrintMSS = true;
+            mExtSettings->mPrintMSS = true;
             break;
 
         case 'n': // bytes of data
             // positive indicates amount mode (instead of time mode)
             GetUpperCaseArg(optarg,outarg);
-            mAmount = +byte_atof( outarg );
+            mExtSettings->mAmount = +byte_atoi( outarg );
             break;
 
         case 'o' : // output the report and other messages into the file
-            mStdout = false;
-            mOutputFileName = new char[strlen(optarg)+1];
-            strcpy( mOutputFileName, optarg);
+            mExtSettings->mStdout = false;
+            mExtSettings->mOutputFileName = new char[strlen(optarg)+1];
+            strcpy( mExtSettings->mOutputFileName, optarg);
             break;
 
         case 'p': // server port
-            mPort = atoi( optarg );
+            mExtSettings->mPort = atoi( optarg );
+            break;
+
+        case 'r': // test mode tradeoff
+            if ( mExtSettings->mServerMode != kMode_Client ) {
+                printf( warn_invalid_server_option, option );
+                break;
+            }
+            if ( mExtSettings->mCompat ) {
+                printf( warn_invalid_compatibility_option, option );
+            }
+
+            mExtSettings->mMode = kTest_TradeOff;
             break;
 
         case 's': // server mode
-            mServerMode = kMode_Server;
+            if ( mExtSettings->mServerMode != kMode_Unknown ) {
+                printf( warn_invalid_client_option, option );
+                break;
+            }
+
+            mExtSettings->mServerMode = kMode_Server;
             break;
 
         case 't': // seconds to write for
             // negative indicates time mode (instead of amount mode)
-            mAmount = -atof( optarg );
+            mExtSettings->mAmount = (int) (-atof( optarg ) * 100);
             break;
 
         case 'u': // UDP instead of TCP
             // if -b has already been processed, UDP rate will
             // already be non-zero, so don't overwrite that value
-            if ( mUDPRate == 0 ) {
-                mUDPRate = kDefault_UDPRate;
+            if ( mExtSettings->mUDPRate == 0 ) {
+                mExtSettings->mUDPRate = kDefault_UDPRate;
             }
+
             // if -l has already been processed, mBufLenSet is true
             // so don't overwrite that value.
-            if ( ! mBufLenSet ) {
-                mBufLen = kDefault_UDPBufLen;
+            if ( ! mExtSettings->mBufLenSet ) {
+                mExtSettings->mBufLen = kDefault_UDPBufLen;
+            } else if ( mExtSettings->mBufLen < (int) ( sizeof( UDP_datagram ) 
+                        + sizeof( client_hdr ) ) &&
+                        !mExtSettings->mCompat ) {
+                mExtSettings->mCompat = true;
+                printf( warn_implied_compatibility, option );
             }
             break;
 
@@ -346,71 +432,108 @@ void Settings::Interpret( char option, const char *optarg ) {
 
         case 'w': // TCP window size (socket buffer size)
             GetUpperCaseArg(optarg,outarg);
-            mTCPWin = (long)byte_atof(outarg);
+            mExtSettings->mTCPWin = byte_atoi(outarg);
 
-            if ( mTCPWin < 2048 ) {
-                printf( warn_window_small, mTCPWin );
+            if ( mExtSettings->mTCPWin < 2048 ) {
+                printf( warn_window_small, mExtSettings->mTCPWin );
             }
             break;
 
             // more esoteric options
         case 'B': // specify bind address
-            mLocalhost = new char[ strlen( optarg ) + 1 ];
-            strcpy( mLocalhost, optarg );
+            mExtSettings->mLocalhost = new char[ strlen( optarg ) + 1 ];
+            strcpy( mExtSettings->mLocalhost, optarg );
+            break;
+
+        case 'C': // Run in Compatibility Mode
+            mExtSettings->mCompat = true;
+            if ( mExtSettings->mMode != kTest_Normal ) {
+                printf( warn_invalid_compatibility_option,
+                        ( mExtSettings->mMode == kTest_DualTest ?
+                          'd' : 'r' ) );
+                mExtSettings->mMode = kTest_Normal;
+            }
             break;
 
         case 'D': // Run as a daemon
-            mDaemon = true;
+            mExtSettings->mDaemon = true;
             break;
 
         case 'F' : // Get the input for the data stream from a file
-            mFileInput = true;
-            mFileName = new char[strlen(optarg)+1];
-            strcpy( mFileName, optarg);
+            if ( mExtSettings->mServerMode != kMode_Client ) {
+                printf( warn_invalid_server_option, option );
+                break;
+            }
+
+            mExtSettings->mFileInput = true;
+            mExtSettings->mFileName = new char[strlen(optarg)+1];
+            strcpy( mExtSettings->mFileName, optarg);
             break;
 
         case 'I' : // Set the stdin as the input source
-            mFileInput = true;
-            mStdin     = true;
-            mFileName = new char[strlen("<stdin>")+1];
-            strcpy( mFileName,"<stdin>");
+            if ( mExtSettings->mServerMode != kMode_Client ) {
+                printf( warn_invalid_server_option, option );
+                break;
+            }
+
+            mExtSettings->mFileInput = true;
+            mExtSettings->mStdin     = true;
+            mExtSettings->mFileName = new char[strlen("<stdin>")+1];
+            strcpy( mExtSettings->mFileName,"<stdin>");
+            break;
+
+        case 'L': // Listen Port (bidirectional testing client-side)
+            if ( mExtSettings->mServerMode != kMode_Client ) {
+                printf( warn_invalid_server_option, option );
+                break;
+            }
+
+            mExtSettings->mListenPort = atoi( optarg );
             break;
 
         case 'M': // specify TCP MSS (maximum segment size)
             GetUpperCaseArg(optarg,outarg);
 
-            mMSS = (long) byte_atof(outarg );
+            mExtSettings->mMSS = byte_atoi( outarg );
             break;
 
         case 'N': // specify TCP nodelay option (disable Jacobson's Algorithm)
-            mNodelay = true;
+            mExtSettings->mNodelay = true;
             break;
 
         case 'P': // number of client threads
-            mThreads = atoi( optarg );
+#ifdef HAVE_THREAD
+            mExtSettings->mThreads = atoi( optarg );
+#else
+            if ( mExtSettings->mServerMode != kMode_Server ) {
+                printf( warn_invalid_single_threaded, option );
+            } else {
+                mExtSettings->mThreads = atoi( optarg );
+            }
+#endif
             break;
 
         case 'R':
-            mRemoveService = true;
+            mExtSettings->mRemoveService = true;
             break;
 
         case 'S': // IP type-of-service
             // TODO use a function that understands base-2
             // the zero base here allows the user to specify
             // "0x#" hex, "0#" octal, and "#" decimal numbers
-            mTOS = strtol( optarg, NULL, 0 );
+            mExtSettings->mTOS = strtol( optarg, NULL, 0 );
             break;
 
         case 'T': // time-to-live for multicast
-            mTTL = atoi( optarg );
+            mExtSettings->mTTL = atoi( optarg );
             break;
 
         case 'V': // IPv6 Domain
-            mDomain = kMode_IPv6;
+            mExtSettings->mDomain = kMode_IPv6;
             break;
 
         case 'W' :
-            mSuggestWin = false;
+            mExtSettings->mSuggestWin = false;
             printf("The -W option is not available in this release\n");
             break;
 
@@ -438,3 +561,134 @@ const void Settings::GetLowerCaseArg(const char *inarg, char *outarg) {
          && (inarg[len-1] <= 'Z') )
         outarg[len-1]= outarg[len-1]-'A'+'a';
 }
+
+/*
+ * Settings::GenerateListenerSettings
+ * Called to generate the settings to be passed to the Listener
+ * instance that will handle dual testings from the client side
+ * this should only return an instance if it was called on 
+ * the ext_Settings instance generated from the command line 
+ * for client side execution 
+ */
+void Settings::GenerateListenerSettings( ext_Settings *old, ext_Settings **listener ) {
+
+    if ( !old->mCompat && 
+         (old->mMode == kTest_DualTest || old->mMode == kTest_TradeOff) ) {
+        *listener = new ext_Settings;
+        memcpy(*listener, old, sizeof( ext_Settings ));
+        (*listener)->mCompat     = true;
+        (*listener)->mDaemon     = false;
+        if ( old->mListenPort != 0 ) {
+            (*listener)->mPort   = old->mListenPort;
+        } else {
+            (*listener)->mPort   = old->mPort;
+        }
+        (*listener)->mFileName   = NULL;
+        (*listener)->mHost       = NULL;
+        (*listener)->mLocalhost  = NULL;
+        (*listener)->mOutputFileName = NULL;
+        (*listener)->mMode       = kTest_Normal;
+        (*listener)->mServerMode = kMode_Server;
+        if ( old->mHost != NULL ) {
+            (*listener)->mHost = new char[strlen( old->mHost ) + 1];
+            strcpy( (*listener)->mHost, old->mHost );
+        }
+        if ( old->mLocalhost != NULL ) {
+            (*listener)->mLocalhost = new char[strlen( old->mLocalhost ) + 1];
+            strcpy( (*listener)->mLocalhost, old->mLocalhost );
+        }
+    } else {
+        *listener = NULL;
+    }
+}
+
+/*
+ * Settings::GenerateSpeakerSettings
+ * Called to generate the settings to be passed to the Speaker
+ * instance that will handle dual testings from the server side
+ * this should only return an instance if it was called on 
+ * the ext_Settings instance generated from the command line 
+ * for server side execution. This should be an inverse operation
+ * of GenerateClientHdr. 
+ */
+void Settings::GenerateSpeakerSettings( ext_Settings *old, ext_Settings **speaker, 
+                                        client_hdr *hdr, sockaddr* peer ) {
+    int flags = ntohl(hdr->flags);
+    if ( (flags & HEADER_VERSION1) != 0 ) {
+        *speaker = new ext_Settings;
+        memcpy(*speaker, old, sizeof( ext_Settings ));
+        (*speaker)->mCompat     = true;
+        (*speaker)->mPort       = (unsigned short) ntohl(hdr->mPort);
+        (*speaker)->mThreads    = ntohl(hdr->numThreads);
+        if ( hdr->bufferlen != 0 ) {
+            (*speaker)->mBufLen = ntohl(hdr->bufferlen);
+        }
+        if ( hdr->mWinBand != 0 ) {
+            if ( old->mUDPRate == 0 ) {
+                (*speaker)->mTCPWin = ntohl(hdr->mWinBand);
+            } else {
+                (*speaker)->mUDPRate = ntohl(hdr->mWinBand);
+            }
+        }
+        (*speaker)->mAmount     = ntohl(hdr->mAmount);
+        (*speaker)->mFileName   = NULL;
+        (*speaker)->mHost       = NULL;
+        (*speaker)->mLocalhost  = NULL;
+        (*speaker)->mOutputFileName = NULL;
+        (*speaker)->mMode       = ((flags & RUN_NOW) == 0 ?
+                                   kTest_TradeOff : kTest_DualTest);
+        (*speaker)->mServerMode = kMode_Client;
+        if ( old->mLocalhost != NULL ) {
+            (*speaker)->mLocalhost = new char[strlen( old->mLocalhost ) + 1];
+            strcpy( (*speaker)->mLocalhost, old->mLocalhost );
+        }
+        (*speaker)->mHost = new char[REPORT_ADDRLEN];
+        if ( peer->sa_family == AF_INET ) {
+            inet_ntop( AF_INET, &((sockaddr_in*)peer)->sin_addr, 
+                       (*speaker)->mHost, REPORT_ADDRLEN);
+        }
+#ifdef IPV6
+          else {
+            inet_ntop( AF_INET6, &((sockaddr_in6*)peer)->sin6_addr, 
+                       (*speaker)->mHost, REPORT_ADDRLEN);
+        }
+#endif
+    } else {
+        *speaker = NULL;
+    }
+}
+
+/*
+ * Settings::GenerateClientHdr
+ * Called to generate the client header to be passed to the
+ * server that will handle dual testings from the server side
+ * This should be an inverse operation of GenerateSpeakerSettings
+ */
+void Settings::GenerateClientHdr( ext_Settings *old, client_hdr *hdr ) {
+    if ( old->mMode != kTest_Normal ) {
+        hdr->flags  = htonl(HEADER_VERSION1);
+    } else {
+        hdr->flags  = 0;
+    }
+    if ( old->mBufLenSet ) {
+        hdr->bufferlen = htonl(old->mBufLen);
+    } else {
+        hdr->bufferlen = 0;
+    }
+    if ( old->mUDPRate == 0 ) {
+        hdr->mWinBand  = htonl(old->mTCPWin);
+    } else {
+        hdr->mWinBand  = htonl(old->mUDPRate);
+    }
+    if ( old->mListenPort != 0 ) {
+        hdr->mPort  = htonl(old->mListenPort);
+    } else {
+        hdr->mPort  = htonl(old->mPort);
+    }
+    hdr->numThreads = htonl(old->mThreads);
+    hdr->mAmount    = htonl(old->mAmount);
+    if ( old->mMode == kTest_DualTest ) {
+        hdr->flags |= htonl(RUN_NOW);
+    }
+}
+
