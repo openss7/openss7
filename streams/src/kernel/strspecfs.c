@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/10 01:10:21 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -116,7 +116,6 @@ MODULE_LICENSE(SPECFS_LICENSE);
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
-#include "strargs.h"		/* for struct str_args */
 #include "strlookup.h"		/* for cdevsw_list */
 #include "strspecfs.h"		/* for own struct spec_sb_info */
 
@@ -257,6 +256,7 @@ MODULE_LICENSE(SPECFS_LICENSE);
  *  Shadow Special Filesystem Device node file operations.
  *  -------------------------------------------------------------------------
  */
+#if 0
 /**
  *  spec_dev_open: - open a stream from an internal character special device, fifo or socket
  *  @inode:	internal shadow special filesystem inode
@@ -296,6 +296,7 @@ struct file_operations spec_dev_f_ops = {
 	owner:THIS_MODULE,
 	open:&spec_dev_open,
 };
+#endif
 
 /* 
  *  =========================================================================
@@ -1150,7 +1151,8 @@ STATIC void spec_read_inode(struct inode *inode)
 			inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
 			inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 			// inode->i_op = &spec_dev_i_ops; /* leave at empty_iops */
-			inode->i_fop = &spec_dev_f_ops;
+			// inode->i_fop = &spec_dev_f_ops;
+			inode->i_fop = cdev->d_fop;
 			inode->i_rdev = to_kdev_t(dev);
 			inode->i_cdev = cdget(dev);
 			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
@@ -1220,7 +1222,8 @@ STATIC void spec_read_inode2(struct inode *inode, void *opaque)
 		inode->i_gid = sbi->sbi_gid;
 		inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
 		// inode->i_op = &spec_dev_i_ops; /* leave at empty_iops */
-		inode->i_fop = &spec_dev_f_ops;
+		// inode->i_fop = &spec_dev_f_ops;
+		inode->i_fop = cmin->n_dev->d_fop;
 		inode->i_rdev = to_kdev_t(dev);
 		inode->i_cdev = cdget(dev);
 	} else {

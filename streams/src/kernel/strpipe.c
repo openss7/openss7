@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/03 10:12:16 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/10 20:15:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:16 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/03 10:12:16 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/10 20:15:30 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/03 10:12:16 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/10 20:15:30 $";
 
 #define __NO_VERSION__
 
@@ -85,111 +85,153 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
 #endif
 
 #include <sys/stream.h>
+#include <sys/strsubr.h>
 #include <sys/strconf.h>
 
 #include "sys/config.h"
 #include "strdebug.h"
+#include "strlookup.h"		/* cdevsw_list, etc. */
 #include "strspecfs.h"		/* for struct spec_sb_info */
 #include "strpipe.h"		/* header verification */
 
 #if defined HAVE_KERNEL_PIPE_SUPPORT
-STATIC struct inode *get_spipe_inode(struct vfsmount *mnt)
+
+#ifndef O_CLONE
+#define O_CLONE (O_CREAT|O_EXCL)
+#endif
+
+/*
+ *  This is a variation on the theme of spec_open.
+ */
+STATIC struct file *pipe_file_open(void)
 {
+	int err;
+	struct file *file;
+	struct cdevsw *cdev;
+	struct dentry *parent, *dentry;
 	struct inode *inode;
-	if ((inode = new_inode(mnt->mnt_sb))) {
-		struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
-		inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
-		inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
-		inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
-		inode->u.generic_ip = NULL;
-		inode->i_mode = S_IFIFO | sbi->sbi_mode;
-		inode->i_fop = &spec_dev_f_ops;
-		inode->i_rdev = to_kdev_t(NODEV);
+	struct vfsmount *mnt;
+	ptrace(("%s: performing pipe open\n", __FUNCTION__));
+	file = ERR_PTR(-ENXIO);
+	if (!(cdev = cdev_find("pipe")))
+		goto exit;
+	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+	printd(("%s: open of driver %s\n", __FUNCTION__, cdev->d_name));
+	file = ERR_PTR(-ENOENT);
+	if (!(parent = dget(cdev->d_dentry)))
+		goto cput_exit;
+	printd(("%s: parent dentry %s\n", __FUNCTION__, parent->d_name.name));
+	file = ERR_PTR(-ENOMEM);
+	if (!(inode = parent->d_inode))
+		goto pput_exit;
+	printd(("%s: parent inode %ld\n", __FUNCTION__, inode->i_ino));
+	file = ERR_PTR(-ENODEV);
+	if (is_bad_inode(inode))
+		goto pput_exit;
+	/* lock the parent */
+	if ((err = down_interruptible(&inode->i_sem)) < 0) {
+		file = ERR_PTR(err);
+		goto pput_exit;
 	}
-	return (inode);
+	{
+		char buf[] = "0";
+		struct qstr name;
+		name.name = buf;
+		name.len = 1;
+		name.hash = full_name_hash(name.name, name.len);
+		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__,
+			0, name.name, name.len));
+		dentry = lookup_hash(&name, parent);
+	}
+	file = ERR_PTR(-ENOENT);		/* XXX */
+	if (!dentry) {
+		ptrace(("%s: dentry lookup is NULL\n", __FUNCTION__));
+		goto up_exit;
+	}
+	file = (typeof(file))dentry;
+	if (IS_ERR(dentry)) {
+		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -err));
+		goto up_exit;
+	}
+	/* we only fail to get an inode when memory allocation fails */
+	file = ERR_PTR(-ENOMEM);
+	if (!dentry->d_inode) {
+		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
+		goto dput_exit;
+	}
+	/* we only get a bad inode when there is no device entry */
+	file = ERR_PTR(-ENODEV);
+	if (is_bad_inode(dentry->d_inode)) {
+		ptrace(("%s: bad inode on lookup\n", __FUNCTION__));
+		goto dput_exit;
+	}
+	/* unlock the parent */
+	up(&inode->i_sem);
+	inode = NULL;
+	file = ERR_PTR(-ENODEV);
+	if (!(mnt = specfs_get())) {
+		ptrace(("%s: could not find specfs mount point\n", __FUNCTION__));
+		goto dput_exit;
+	}
+	printd(("%s: opening dentry %p\n", __FUNCTION__, dentry));
+	file = dentry_open(dentry, mntget(mnt), O_CLONE | 0x3);
+	specfs_put();
+	if (IS_ERR(file)) {
+		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__, -err));
+		goto pput_exit;
+	}
+	goto cput_exit;
+      dput_exit:
+	printd(("%s: putting dentry\n", __FUNCTION__));
+	dput(dentry);
+      up_exit:
+	if (inode) {
+		printd(("%s: releasing inode semaphore\n", __FUNCTION__));
+		up(&inode->i_sem);
+	}
+      pput_exit:
+	printd(("%s: putting parent dentry\n", __FUNCTION__));
+	dput(parent);
+      cput_exit:
+	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
+	cdev_put(cdev);
+      exit:
+	return (file);
 }
+
 long do_spipe(int *fds)
 {
-	struct qstr str1, str2;
 	struct file *file1, *file2;
-	struct inode *inode1, *inode2;
-	struct dentry *dentry1, *dentry2;
 	struct vfsmount *mnt;
-	char name[32];
 	int fd1, fd2;
 	int err;
-	err = -ENODEV;
-	if (!(mnt = specfs_get()))
-		goto no_mnt;
 	err = -ENFILE;
-	if (!(file1 = get_empty_filp()))
+	if (!(file1 = pipe_file_open()))
 		goto no_file1;
-	if (!(file2 = get_empty_filp()))
+	err = PTR_ERR(file1);
+	if (IS_ERR(file1))
+		goto no_file1;
+	if (!(file2 = pipe_file_open()))
 		goto no_file2;
-	if (!(inode1 = get_spipe_inode(mnt)))
-		goto no_inode1;
-	if (!(inode2 = get_spipe_inode(mnt)))
-		goto no_inode2;
+	err = PTR_ERR(file2);
+	if (IS_ERR(file2))
+		goto no_file2;
 	if ((fd1 = err = get_unused_fd()) < 0)
 		goto no_fd1;
 	if ((fd2 = err = get_unused_fd()) < 0)
 		goto no_fd2;
-	snprintf(name, sizeof(name), "[%lu]", inode1->i_ino);
-	str1.name = name;
-	str1.len = strlen(name);
-	str1.hash = inode1->i_ino;
-	if (!(dentry1 = d_alloc(mnt->mnt_sb->s_root, &str1)))
-		goto no_dentry1;
-	d_add(dentry1, inode1);
-	snprintf(name, sizeof(name), "[%lu]", inode2->i_ino);
-	str2.name = name;
-	str2.len = strlen(name);
-	str2.hash = inode1->i_ino;
-	if (!(dentry2 = d_alloc(mnt->mnt_sb->s_root, &str2)))
-		goto no_dentry2;
-	d_add(dentry2, inode2);
-	/* FIXME: need to call open for each dentry */
-	/* file 1 */
-	file1->f_vfsmnt = mntget(mnt);
-	file1->f_dentry = dget(dentry1);
-	file1->f_pos = 0;
-	file1->f_flags = O_RDWR;
-	file1->f_op = &spec_dev_f_ops;
-	file1->f_mode = 3;
-	file1->f_version = 0;
-	/* file 2 */
-	file2->f_vfsmnt = mntget(mnt);
-	file2->f_dentry = dget(dentry2);
-	file1->f_pos = 0;
-	file1->f_flags = O_RDWR;
-	file1->f_op = &spec_dev_f_ops;
-	file1->f_mode = 3;
-	file1->f_version = 0;
-	/* */
 	fd_install(fd1, file1);
 	fd_install(fd2, file2);
 	fds[0] = fd1;
 	fds[1] = fd2;
 	return (0);
-      no_dentry2:
-	dput(dentry1);
-      no_dentry1:
-	put_unused_fd(fd2);
       no_fd2:
 	put_unused_fd(fd1);
       no_fd1:
-	__unless(inode2->i_state == I_CLEAR, iput(inode2));
-      no_inode2:
-	__unless(inode1->i_state == I_CLEAR, iput(inode1));
-      no_inode1:
 	put_filp(file2);
       no_file2:
 	put_filp(file1);
       no_file1:
-	goto error;
-      no_mnt:
-	specfs_put();
-      error:
 	return (err);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 20:15:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 20:15:27 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 20:15:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -77,14 +77,14 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strargs.h"		/* for struct str_args */
+#include "strsched.h"		/* for allocsd */
 #include "strsad.h"		/* for autopush */
 #include "sth.h"
 #include "fifo.h"		/* extern verification */
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/10 01:10:18 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 20:15:27 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -315,17 +315,13 @@ static struct cdevsw fifo_cdev = {
 STATIC int fifo_open(struct inode *inode, struct file *file)
 {
 	int err;
-	struct str_args args;
+	dev_t dev = makedevice(fifo_cdev.d_modid, 0);
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
-	args.dev = makedevice(fifo_cdev.d_modid, 0);
-	args.oflag = make_oflag(file);
-	args.sflag = DRVOPEN;
-	args.crp = current_creds;
-	file->private_data = &args;
 	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
 	printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
 	fops_put(xchg(&file->f_op, fops_get(fifo_cdev.d_fop)));
+	file->private_data = &dev;
 	err = file->f_op->open(inode, file);
 	up(&inode->i_sem);
       exit:

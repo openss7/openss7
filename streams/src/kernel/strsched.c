@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/10 20:15:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/10 20:15:30 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/10 20:15:30 $";
 
 #define __NO_VERSION__
 
@@ -1235,7 +1235,7 @@ static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_
 		se->x.w.q3 = qget(q3);
 		se->x.w.q4 = qget(q4);
 		*xchg(&t->strevents_tail, &se->se_next) = se;
-		if (test_and_set_bit(strevents, &t->flags))
+		if (!test_and_set_bit(strevents, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
 		return (0);
 	}
@@ -1340,7 +1340,7 @@ int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *ar
 		se->x.p.perim = perim;
 		se->x.p.mp = mp;
 		*xchg(&t->strevents_tail, &se->se_next) = se;
-		if (test_and_set_bit(strevents, &t->flags))
+		if (!test_and_set_bit(strevents, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
 		return (0);
 	}
@@ -1930,7 +1930,7 @@ static inline void queuerun(struct strthread *t)
 void inline setqsched(void)
 {
 	struct strthread *t = this_thread;
-	if (test_and_set_bit(qrunflag, &t->flags))
+	if (!test_and_set_bit(qrunflag, &t->flags))
 		raise_softirq(STREAMS_SOFTIRQ);
 }
 EXPORT_SYMBOL_GPL(setqsched);
@@ -1967,7 +1967,7 @@ void sqsched(syncq_t *sq)
 		struct strthread *t = this_thread;
 		/* put ourselves on the run list */
 		*xchg(&t->sqtail, &sq->sq_link) = sq_get(sq);
-		if (test_and_set_bit(qsyncflag, &t->flags))
+		if (!test_and_set_bit(qsyncflag, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
 	}
 }

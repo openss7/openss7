@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:24 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $";
 
 //#define __NO_VERSION__
 
@@ -86,7 +86,6 @@ static char const ident[] =
 #include "sys/config.h"
 #include "strdebug.h"
 #include "strsched.h"		/* for allocsd */
-#include "strargs.h"		/* for str_args */
 #include "strreg.h"		/* for spec_open() */
 #include "strlookup.h"		/* for cmin_get() */
 #include "sth.h"		/* extern verification */
@@ -99,7 +98,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:24 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -592,7 +591,7 @@ static void strwakeopen(struct file *file, struct stdata *sd)
 		wake_up_interruptible(&sd->sd_waitq);
 }
 
-/**
+/*
  *  strwaitopen: - wait to open a stream head
  *  @file: user file pointer
  *  @sd: stream head
@@ -1911,28 +1910,36 @@ int strmmap(struct file *file, struct vm_area_struct *vma)
 	return (-ENODEV);
 }
 
+#ifndef O_CLONE
+#define O_CLONE (O_CREAT|O_EXCL)
+#endif
+
 /**
  *  stropen: - open file operation for a stream
  *  @inode: shadow special filesystem device inode
  *  @file: shadow special filesystem file pointer
  *
- *  stropen() can be called by spec_open() (or an inplace open) which was called on an extenal
- *  filesystem inode, or by spec_dev_open() which was called on the internal shadow special
- *  filesystem inode.  The @file and @inode represented here could be external or internal inode and
- *  file pointer.  Either way, the open arguments are passed in the file->private_data.
+ *  stropen() can be called by spec_open() (or an inplace open) which was called on an external
+ *  filesystem inode, or a direct open of a mounted internal shadow special filesystem inode.  The
+ *  @file and @inode represented here could be external or internal inode and file pointer.  For
+ *  external inodes, the file->private_data points to the cdevsw structure for the driver.  Internal
+ *  inodes do not.  Only fifo and socket inodes (regardless of S_IFMT) pass external inodes to this
+ *  function.
  */
 int stropen(struct inode *inode, struct file *file)
 {
-	int err = 0;
+	int err, sflag;
 	struct stdata *sd;
-	struct str_args *argp = file->private_data;
+	dev_t dev;
 	ptrace(("%s: opening stream\n", __FUNCTION__));
+	dev = file->private_data ? *((dev_t *)file->private_data) : inode->i_ino;
+	sflag = ((file->f_flags & O_CLONE) == O_CLONE) ? CLONEOPEN : DRVOPEN;
 	/* first find out of we already have a stream head, or we need a new one anyway */
-	if (argp->sflag == CLONEOPEN || !(sd = sd_get((struct stdata *)inode->i_pipe))) {
+	if (sflag == CLONEOPEN || !(sd = sd_get((struct stdata *) inode->i_pipe))) {
 		queue_t *q;
 		struct cdevsw *cdev;
 		printd(("%s: need new stream head\n", __FUNCTION__));
-		if (!(cdev = cdrv_get(getmajor(argp->dev))))
+		if (!(cdev = cdrv_get(getmajor(dev))))
 			return (-ENXIO);
 		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: allocating queues for %s\n", __FUNCTION__, cdev->d_name));
@@ -1952,6 +1959,7 @@ int stropen(struct inode *inode, struct file *file)
 		}
 		printd(("%s: initializing stream head for %s\n", __FUNCTION__, cdev->d_name));
 		/* initialization of the stream head */
+		sd->sd_dev = dev;
 		sd->sd_flag = STWOPEN;	/* hold open bit */
 		sd->sd_rq = q;
 		sd->sd_wq = q + 1;
@@ -1978,38 +1986,45 @@ int stropen(struct inode *inode, struct file *file)
 			printd(("%s: stream head is CHR\n", __FUNCTION__));
 			sd->sd_wropt = 0;	/* default write ops */
 			sd->sd_strtab = &str_info;	/* no driver yet */
-			setq(q, str_info.st_rdinit, str_info.st_wrinit);
+			setq(q, &str_rinit, &str_winit);
 			break;
 		}
-		if (argp->sflag == CLONEOPEN)
-			sd->sd_flag |= STRCLONE;
 		/* don't graft onto inode just yet */
 		sd->sd_file = file;
 		stri_lookup(file) = (void *) sd;
 		/* done setup, do the open */
 		printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 		cdrv_put(cdev);
-	} else
-		err = strwaitopen(file, sd);
-	if (!err) {
-		/* here we hold the STWOPEN bit - stream head open must clear */
-		int sflag = (sd->sd_flag & STRCLONE) ? CLONEOPEN : DRVOPEN;
-		printd(("%s: calling qopen for stream head\n", __FUNCTION__));
-		if (!(err = qopen(sd->sd_rq, &argp->dev, make_oflag(file), sflag, current_creds))) {
-			printd(("%s: qopen call for stream head successful\n", __FUNCTION__));
-			sd->sd_opens++;
-			sd->sd_readers += (file->f_mode & FREAD) ? 1 : 0;
-			sd->sd_writers += (file->f_mode & FWRITE) ? 1 : 0;
-			/* ok now we can link it to the inode */
-			sd->sd_clone = (void *) inode->i_pipe;
-			inode->i_pipe = (void *) sd;
-			strwakeopen(file, sd);	/* wake up anybody waiting on open bit */
-			return (0);
-		}
-		printd(("%s: waking up waiters on stream head\n", __FUNCTION__));
-		strwakeopen(file, sd);	/* wake up anybody waiting on open bit */
+	} else {
+		if ((err = strwaitopen(file, sd)))
+			goto sdput_exit;
 	}
-	sd_put(sd);
+	/* here we hold the STWOPEN bit - stream head open must clear */
+	printd(("%s: calling qopen for stream head\n", __FUNCTION__));
+	dev = sd->sd_dev;
+	if ((err = qopen(sd->sd_rq, &sd->sd_dev, make_oflag(file), sflag, current_creds)))
+		goto wakeup_exit;
+	printd(("%s: qopen call for stream head successful\n", __FUNCTION__));
+	sd->sd_opens++;
+	sd->sd_readers += (file->f_mode & FREAD) ? 1 : 0;
+	sd->sd_writers += (file->f_mode & FWRITE) ? 1 : 0;
+	if (!file->private_data && dev != sd->sd_dev) {
+		/* inode needs to change - select a new one */
+		inode = iget(file->f_vfsmnt->mnt_sb, sd->sd_dev);
+	} else {
+		/* current inode is ok - hold it while stream head attached */
+		igrab(inode);
+	}
+	/* ok now we can link it to the inode */
+	sd->sd_inode = inode;
+	sd->sd_clone = (void *) inode->i_pipe;
+	inode->i_pipe = (void *) sd;
+      wakeup_exit:
+	printd(("%s: waking up waiters on stream head\n", __FUNCTION__));
+	strwakeopen(file, sd);	/* clear STWOPEN bit - wake up anybody waiting on open bit */
+      sdput_exit:
+	if (err != 0)
+		sd_put(sd);
 	return (err <= 0 ? err : -err);
 }
 
@@ -2059,7 +2074,7 @@ int strclose(struct inode *inode, struct file *file)
 			cred_t *crp = current_creds;
 			printd(("%s: last close\n", __FUNCTION__));
 			/* last close */
-			if (!test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag)) {
+			if (test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag)) {
 				printd(("%s: already closing\n", __FUNCTION__));
 				goto put_exit;
 			}
@@ -2097,6 +2112,19 @@ int strclose(struct inode *inode, struct file *file)
 			printd(("%s: detaching driver queue %p\n", __FUNCTION__, (wq - 1)));
 			qdetach(wq - 1, oflag, crp);
 			sd->sd_rq = sd->sd_wq = NULL;
+			/* remove from the inode clone list */
+			{
+				struct stdata **sdp;
+				for (sdp = (struct stdata **) &(sd->sd_inode->i_pipe);
+				     *sdp && *sdp != sd; sdp = &((*sdp)->sd_clone)) ;
+				if (*sdp && *sdp == sd) {
+					*sdp = sd->sd_clone;
+					sd->sd_clone = NULL;
+				}
+				iput(sd->sd_inode);
+				sd->sd_inode = NULL;
+				sd_put(sd);
+			}
 		}
 	      put_exit:
 		printd(("%s: putting stream head%p\n", __FUNCTION__, sd));
@@ -3034,7 +3062,7 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #endif
 };
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL_GPL(strm_f_ops);
 #endif
 
@@ -3205,7 +3233,7 @@ int strrput(queue_t *q, mblk_t *mp)
 		int what = 0;
 		if (mp->b_rptr[0] != (typeof(mp->b_rptr[0])) NOERROR) {
 			sd->sd_rerror = mp->b_rptr[0];
-			if (test_and_set_bit(STRDERR_BIT, &sd->sd_flag)) {
+			if (!test_and_set_bit(STRDERR_BIT, &sd->sd_flag)) {
 				if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
 					wake_up_interruptible(&sd->sd_waitq);
 				what |= FLUSHR;
@@ -3216,7 +3244,7 @@ int strrput(queue_t *q, mblk_t *mp)
 		}
 		if (mp->b_rptr[1] != (typeof(mp->b_rptr[1])) NOERROR) {
 			sd->sd_werror = mp->b_rptr[1];
-			if (test_and_set_bit(STWRERR_BIT, &sd->sd_flag)) {
+			if (!test_and_set_bit(STWRERR_BIT, &sd->sd_flag)) {
 				if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag))
 					wake_up_interruptible(&sd->sd_waitq);
 				what |= FLUSHW;
@@ -3242,7 +3270,7 @@ int strrput(queue_t *q, mblk_t *mp)
 	}
 	case M_HANGUP:		/* up - report hangup */
 	{
-		if (test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
+		if (!test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
 			if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag))
 				wake_up_interruptible(&sd->sd_waitq);
 			if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag))
@@ -3448,12 +3476,13 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 STATIC int cdev_open(struct inode *inode, struct file *file)
 {
 	int err;
-	struct str_args args;
 	struct cdevsw *cdev;
 	struct devnode *cmin;
 	major_t major;
 	minor_t minor;
 	modID_t modid;
+	dev_t dev;
+	int sflag;
 	ptrace(("%s: opening character device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
@@ -3471,14 +3500,11 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	printd(("%s: major maps to base major %hu\n", __FUNCTION__, major));
 	modid = cdev->d_modid;
 	printd(("%s: major maps to internal major %hu\n", __FUNCTION__, modid));
-	args.dev = makedevice(modid, minor);
-	args.oflag = make_oflag(file);
-	args.sflag = (cmin = cmin_get(cdev, minor)) ?
+	dev = makedevice(modid, minor);
+	sflag = (cmin = cmin_get(cdev, minor)) ?
 	    ((cmin->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN) :
 	    ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
-	args.crp = current_creds;
-	file->private_data = &args;
-	err = spec_open(inode, file);
+	err = spec_open(inode, file, dev, sflag);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
       up_exit:

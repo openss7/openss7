@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,13 +75,12 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strargs.h"		/* for struct str_args */
 #include "strreg.h"		/* for spec_open() */
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/10 01:10:18 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -158,25 +157,18 @@ static struct streamtab clone_info = {
  */
 static int cloneopen(struct inode *inode, struct file *file)
 {
-	struct str_args *argp;
 	struct cdevsw *cdev;
+	dev_t dev = inode->i_ino;
 	int err;
 	ptrace(("%s: opening clone device\n", __FUNCTION__));
-	err = -EIO;
-	if (!(argp = file->private_data)) {
-		pswerr(("%s: no arguments passed\n", __FUNCTION__));
-		goto exit;
-	}
 	err = -ENOENT;
-	if (!(cdev = cdrv_get(getminor(argp->dev)))) {
-		printd(("%s: no driver for minor %hu\n", __FUNCTION__, getminor(argp->dev)));
+	if (!(cdev = cdrv_get(getminor(dev)))) {
+		printd(("%s: no driver for minor %hu\n", __FUNCTION__, getminor(dev)));
 		goto exit;
 	}
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-	argp->dev = makedevice(cdev->d_modid, 0);
-	argp->sflag = CLONEOPEN;
 	printd(("%s: opening cloned device internal major %hu, minor %hu\n", __FUNCTION__, cdev->d_modid, 0));
-	err = spec_open(inode, file);
+	err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
 exit:
@@ -229,7 +221,6 @@ static struct cdevsw clone_cdev = {
 STATIC int clone_open(struct inode *inode, struct file *file)
 {
 	int err;
-	struct str_args args;
 	struct cdevsw *cdev;
 	major_t major;
 	minor_t minor;
@@ -253,13 +244,8 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	}
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	instance = cdev->d_modid;
-	args.dev = makedevice(modid, instance);
-	args.oflag = make_oflag(file);
-	args.sflag = CLONEOPEN;
-	args.crp = current_creds;
-	file->private_data = &args;
 	printd(("%s: opening driver %s\n", __FUNCTION__, cdev->d_name));
-	err = spec_open(inode, file);
+	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
       up_exit:

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/06/10 20:15:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/06/10 01:10:21 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/06/10 20:15:30 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2004/06/10 01:10:21 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/06/10 20:15:30 $";
 
 #define __NO_VERSION__
 
@@ -89,7 +89,6 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strargs.h"		/* for struct str_args */
 #include "sth.h"		/* for stream operations */
 #include "strlookup.h"		/* cdevsw_list, etc. */
 #include "strspecfs.h"		/* for specfs_get and specfs_put */
@@ -672,72 +671,29 @@ STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
 	fput(f2);
 }
 
-/*
- *  dentry_open2: - simplified form of dentry_open()
- *  @dentry:	    the dentry to open
- *  @mnt:	    the vfsmount to open
- *  @cdev:	    the STREAMS device entry
- */
-STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct file *ext_file, struct cdevsw *cdev)
-{
-#ifdef HAVE_FILE_MOVE_ADDR
-	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+#ifndef O_CLONE
+#define O_CLONE (O_CREAT|O_EXCL)
 #endif
-	static LIST_HEAD(kill_list);
-	struct inode *inode = dentry->d_inode;
-	struct file *file;
-	int err;
-	struct vfsmount *mnt = specfs_get();
-	err = -ENFILE;
-	if (!(file = get_empty_filp()))
-		goto dput_error;
-	file->f_flags = ext_file->f_flags;
-	file->f_mode = (ext_file->f_flags + 1) & O_ACCMODE;
-	file->f_dentry = dentry;
-	file->f_vfsmnt = mnt;
-	file->f_pos = 0;
-	file->f_reada = 0;
-	file->f_op = fops_get(cdev->d_fop);
-	_file_move(file, &inode->i_sb->s_files);
-	file->f_iobuf = NULL;
-	file->f_iobuf_lock = 0;
-	file->private_data = ext_file->private_data;
-	if (file->f_op && file->f_op->open && (err = file->f_op->open(inode, file)))
-		goto error;
-	file->f_flags &= ~(O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC);
-	return (file);
-      error:
-	printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
-	fops_put(file->f_op);
-	_file_move(file, &kill_list);	/* out of the way.. */
-	file->f_dentry = NULL;
-	file->f_vfsmnt = NULL;
-	put_filp(file);
-      dput_error:
-	dput(dentry);
-	mntput(mnt);
-	return ERR_PTR(err);
-}
 
 /**
- *  spec_open:	- open a stream from an external character special device,
- *		fifo, or socket.  This is also used for nesting clone calls.
- *  @ext_inode:	external (or chaining) filesystem inode
- *  @ext_file:	external (or chaining) filesystem file pointer (user file pointer)
- *  @argp:	arguments to qopen
+ *  spec_open:	- chain open to an internal special device.
+ *  @i:	external (or chaining) filesystem inode
+ *  @f:	external (or chaining) filesystem file pointer (user file pointer)
+ *
+ *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
  */
-int spec_open(struct inode *ext_inode, struct file *ext_file)
+int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 {
 	struct dentry *parent, *dentry = NULL;
-	struct file *file;		/* next file pointer to use */
-	struct inode *inode = ext_inode;	/* next inode to use */
+	struct file *file;		/* new file pointer to use */
+	struct inode *inode;		/* parent inode */
 	int err;
 	struct cdevsw *cdev;
 	struct devnode *cmin;
-	struct str_args *argp = ext_file->private_data;
+	struct vfsmount *mnt;
 	ptrace(("%s: performing special open\n", __FUNCTION__));
 	err = ENXIO;
-	if (!(cdev = cdrv_get(getmajor(argp->dev))))
+	if (!(cdev = cdrv_get(getmajor(dev))))
 		goto exit;
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 	printd(("%s: open of driver %s\n", __FUNCTION__, cdev->d_name));
@@ -752,24 +708,29 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 	err = -ENODEV;
 	if (is_bad_inode(inode))
 		goto pput_exit;
+	/* lock the parent */
 	if ((err = down_interruptible(&inode->i_sem)) < 0)
 		goto pput_exit;
-	printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(argp->dev)));
-	if ((cmin = cmin_get(cdev, getminor(argp->dev)))) {
-		printd(("%s: found minor device %hu\n", __FUNCTION__, getminor(argp->dev)));
+	if (cdev->d_flag & D_CLONE)
+		sflag = CLONEOPEN;
+	printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(dev)));
+	if ((cmin = cmin_get(cdev, getminor(dev)))) {
+		printd(("%s: found minor device %hu\n", __FUNCTION__, getminor(dev)));
 		dentry = dget(cmin->n_dentry);
+		if (cmin->n_flag & D_CLONE)
+			sflag = CLONEOPEN;
 	} else {
 		char buf[32];
 		struct qstr name;
 		name.name = buf;
-		name.len = snprintf(buf, 32, "%u", getminor(argp->dev));
-		name.len = strnlen(buf, 32-1);
+		name.len = snprintf(buf, 32, "%u", getminor(dev));
+		name.len = strnlen(buf, 32 - 1);
 		name.hash = full_name_hash(name.name, name.len);
 		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__,
-			getminor(argp->dev), name.name, name.len));
+			getminor(dev), name.name, name.len));
 		dentry = lookup_hash(&name, parent);
 	}
-	err = -ENOENT; /* XXX */
+	err = -ENOENT;		/* XXX */
 	if (!dentry) {
 		ptrace(("%s: dentry lookup is NULL\n", __FUNCTION__));
 		goto up_exit;
@@ -791,22 +752,26 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 		ptrace(("%s: bad inode on lookup\n", __FUNCTION__));
 		goto dput_exit;
 	}
+	/* unlock the parent */
 	up(&inode->i_sem);
 	inode = NULL;
-	printd(("%s: opening dentry %p\n", __FUNCTION__, dentry));
-	file = dentry_open2(dentry, ext_file, cdev);
-	err = PTR_ERR(file);
-	if (IS_ERR(file)) {
-		ptrace(("%s: dentry_open2 returned error, errno %d\n", __FUNCTION__, -err));
+	err = -ENODEV;
+	if (!(mnt = specfs_get())) {
+		ptrace(("%s: could not find specfs mount point\n", __FUNCTION__));
 		goto dput_exit;
 	}
-	if (err == 0) {
-		printd(("%s: swapping file pointers\n", __FUNCTION__));
-		file_swap_put(ext_file, file);
-		goto cput_exit;
+	printd(("%s: opening dentry %p\n", __FUNCTION__, dentry));
+	file = dentry_open(dentry, mntget(mnt), f->f_flags | ((sflag == CLONEOPEN) ? O_CLONE : 0));
+	specfs_put();
+	err = PTR_ERR(file);
+	if (IS_ERR(file)) {
+		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__, -err));
+		goto pput_exit;
 	}
-	/* fifo returns 1 on exit to cleanup shadow pointer and use existing file pointer */
+	printd(("%s: swapping file pointers\n", __FUNCTION__));
+	file_swap_put(f, file);
 	err = 0;
+	goto cput_exit;
       dput_exit:
 	printd(("%s: putting dentry\n", __FUNCTION__));
 	dput(dentry);

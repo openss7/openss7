@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.15 2004/06/06 09:47:42 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.16 2004/06/10 20:15:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:42 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/06 09:47:42 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:25 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -148,10 +148,11 @@ typedef struct syncq {
 struct stdata {
 	queue_t *sd_rq;			/* rd queue for stream head */
 	queue_t *sd_wq;			/* wr queue for stream head */
+	dev_t sd_dev;			/* device number of driver */
 	mblk_t *sd_iocblk;		/* message to return for ioctl */
 	struct stdata *sd_other;	/* other stream head for pipes */
 	struct streamtab *sd_strtab;	/* driver streamtab */
-//      struct inode *sd_inode;         /* back pointer to inode */
+	struct inode *sd_inode;         /* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
 	struct file *sd_file;		/* back pointer to file */
 	ulong sd_flag;			/* stream head state */
@@ -241,7 +242,6 @@ enum {
 	STRISFIFO_BIT,
 	STRISPIPE_BIT,
 	STRISSOCK_BIT,
-	STRCLONE_BIT,
 	STFROZEN_BIT,
 };
 
@@ -264,7 +264,6 @@ enum {
 #define STRISFIFO   (1<<STRISFIFO_BIT)	/* stream is a fifo */
 #define STRISPIPE   (1<<STRISPIPE_BIT)	/* stream is a STREAMS pipe */
 #define STRISSOCK   (1<<STRISSOCK_BIT)	/* stream is a STREAMS socket */
-#define STRCLONE    (1<<STRCLONE_BIT)	/* stream must be cloned */
 #define STFROZEN    (1<<STFROZEN_BIT)	/* stream is frozen */
 
 /* unfortunately AIX appears to mix read and write option flags with stream head flags */

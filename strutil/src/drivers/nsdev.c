@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 01:10:18 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/10 20:15:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
+ Last Modified $Date: 2004/06/10 20:15:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 01:10:18 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/10 20:15:27 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 01:10:18 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/10 20:15:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,13 +79,12 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strargs.h"	    /* for struct str_args */
 #include "strreg.h"	    /* for spec_open() */
 #include "sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/10 01:10:18 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/10 20:15:27 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -166,20 +165,16 @@ static struct streamtab nsdev_info = {
  */
 static int nsdevopen(struct inode *inode, struct file *file)
 {
-	struct str_args *argp;
 	struct cdevsw *cdev;
-	if (!(argp = file->private_data))
-		return (-EIO);
+	int err;
 	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
 		return (-ENOENT);
 	printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
-	argp->dev = makedevice(cdev->d_modid, getminor(argp->dev));
-	// argp->oflag = argp->oflag;
-	// argp->sflag = argp->sflag;
-	// argp->crp = argp->crp;
+	err = spec_open(inode, file, makedevice(cdev->d_modid, getminor(inode->i_ino)),
+			(file->f_flags & (O_CREAT | O_EXCL)) ? CLONEOPEN : DRVOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
-	return spec_open(inode, file);
+	return (err);
 }
 
 struct file_operations nsdev_ops ____cacheline_aligned = {
@@ -231,7 +226,6 @@ static struct cdevsw nsdev_cdev = {
 STATIC int nsdev_open(struct inode *inode, struct file *file)
 {
 	int err;
-	struct str_args args;
 	struct cdevsw *cdev;
 	major_t major;
 	minor_t minor;
@@ -251,12 +245,7 @@ STATIC int nsdev_open(struct inode *inode, struct file *file)
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
 	instance = cdev->d_modid;
-	args.dev = makedevice(modid, instance);
-	args.oflag = make_oflag(file);
-	args.sflag = CLONEOPEN;
-	args.crp = current_creds;
-	file->private_data = &args;
-	err = spec_open(inode, file);
+	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
       cdev_put_exit:
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 	cdev_put(cdev);
