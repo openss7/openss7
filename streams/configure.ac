@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.8 2004/04/17 08:17:50 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.10 2004/04/24 21:27:04 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,19 +51,20 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/17 08:17:50 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/24 21:27:04 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.8 2004/04/17 08:17:50 brian Exp $])
-AC_PREREQ(2.57)
-AC_INIT([streams],[0.7a], [bugs@openss7.org])
+AC_REVISION([$Id: configure.ac,v 0.9.2.10 2004/04/24 21:27:04 brian Exp $])
+AC_PREREQ(2.59)
+AC_INIT([streams],[0.7a],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/timod.c])
 AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
+AC_CONFIG_MACRO_DIR([m4])
 
 auxdir="$ac_aux_dir"
 AC_SUBST(auxdir)
@@ -80,7 +81,6 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 AM_PROG_CC_C_O
-AM_PROG_CC_STDC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
@@ -155,6 +155,6 @@ AC_LFS
 dnl AC_CONFIG_FILES([Makefile doc/Makefile doc/man/Makefile doc/manual/Makefile])
 dnl AC_CONFIG_FILES([Makefile])
 
-AC_CONFIG_FILES([Makefile po/Makefile.in intl/Makefile m4/Makefile doc/Makefile doc/manual/Makefile])
+AC_CONFIG_FILES([Makefile include/Makefile po/Makefile.in intl/Makefile m4/Makefile doc/Makefile doc/man/Makefile doc/manual/Makefile])
 
 AC_OUTPUT

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/22 12:08:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/24 18:13:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,17 +46,40 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/22 12:08:31 $ by $Author: brian $
+# Last Modified $Date: 2004/04/24 18:13:41 $ by $Author: brian $
 #
 # =============================================================================
 
-nobase_pkginclude_HEADERS = stropts.h tihdr.h timod.h \
-	sys/aixddi.h sys/cmn_err.h sys/ddi.h sys/debug.h sys/dki.h \
-	sys/hpuxddi.h sys/kmem.h sys/lisddi.h sys/osfddi.h sys/sad.h \
+nobase_pkginclude_HEADERS = \
+	stropts.h \
+	tihdr.h \
+	timod.h \
+	sys/aixddi.h \
+	sys/cmn_err.h \
+	sys/ddi.h \
+	sys/debug.h \
+	sys/dki.h \
+	sys/hpuxddi.h \
+	sys/kmem.h \
+	sys/lisddi.h \
+	sys/osfddi.h \
+	sys/sad.h \
 	sys/sc.h \
-	sys/sockmod.h sys/spec_fs_i.h sys/strconf.h sys/strdebug.h \
-	sys/stream.h sys/strlog.h sys/stropts.h sys/strsubr.h sys/sunddi.h \
-	sys/svr4ddi.h sys/tihdr.h sys/timod.h sys/uw7ddi.h \
+	sys/sockmod.h \
+	sys/spec_fs_i.h \
+	sys/strconf.h \
+	sys/strdebug.h \
+	sys/stream.h \
+	sys/strlog.h \
+	sys/stropts.h \
+	sys/strsubr.h \
+	sys/sunddi.h \
+	sys/svr4ddi.h \
+	sys/tihdr.h \
+	sys/timod.h \
+	sys/uw7ddi.h
+
+nobase_nodist_pkginclude_HEADERS = \
 	sys/modversions.h \
 	sys/versions/aixcompat.ver \
 	sys/versions/hpuxcompat.ver \
@@ -68,9 +91,21 @@ nobase_pkginclude_HEADERS = stropts.h tihdr.h timod.h \
 	sys/versions/strpipe.ver \
 	sys/versions/strsyms.ver
 
-nobase_include_HEADERS = xti.h xti_inet.h \
-	xti/config.h xti/tihdr.h xti/timod.h xti/xti_atm.h xti/xti.h \
-	xti/xti_inet.h xti/xti_ip.h xti/xti_local.h xti/xti_mosi.h \
-	xti/xti_osi.h xti/xti_sctp.h xti/xti_tcp.h xti/xti_udp.h
+nobase_include_HEADERS = \
+	xti.h \
+	xti_inet.h \
+	xti/config.h \
+	xti/tihdr.h \
+	xti/timod.h \
+	xti/xti_atm.h \
+	xti/xti.h \
+	xti/xti_inet.h \
+	xti/xti_ip.h \
+	xti/xti_local.h \
+	xti/xti_mosi.h \
+	xti/xti_osi.h \
+	xti/xti_sctp.h \
+	xti/xti_tcp.h \
+	xti/xti_udp.h
 
 # vim: ft=automake
