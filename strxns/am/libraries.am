@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 12:48:47 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/11/06 09:16:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:47 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 09:16:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +80,7 @@ post-libraries:
 # temporary, unconfigured directory.)  This is for alien systems and embedded
 # targets that cannot build from packages.
 #
-install-exec-hook: post-libraries
+INSTALL_EXEC_HOOK += post-libraries
 
 #
 # Unfortunately, libtool is not smart enough to perform ld configuration for a
@@ -101,7 +101,7 @@ postun-libraries:
 # in a temporary, unconfigured directory.)  This is for alien systems and
 # embedded targets that cannot build from packages.
 #
-uninstall-hook: postun-libraries
+UNINSTALL_HOOK += postun-libraries
 
 endif
 

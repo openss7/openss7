@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/08/22 03:56:59 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/11/06 09:16:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/22 03:56:59 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 09:16:49 $ by $Author: brian $
 #
 # =============================================================================
 
 if RPM_BUILD_KERNEL
 
-kernel-all-am: $(KERNEL_MODULES)
+kernel-all: $(KERNEL_MODULES)
 
 STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 
@@ -77,7 +77,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 		$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT) ; \
 	fi
 
-install-exec-local: install-modules
+INSTALL_EXEC_LOCAL += install-modules
 
 #
 # The post-modules target checks for a fully configured install directory by checking for the
@@ -185,7 +185,7 @@ post-modules:
 # unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
 # target with install-exec-hook that runs after install-exec has completed.
 #
-install-exec-hook: post-modules
+INSTALL_EXEC_HOOK += post-modules
 
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
@@ -200,7 +200,7 @@ uninstall-modules:
 	echo "rm -f $$k/modules.$(KMODCONF_EXT)" ; \
 	rm -f "$$k/modules.$(KMODCONF_EXT)"
 
-uninstall-local: uninstall-modules
+UNINSTALL_LOCAL += uninstall-modules
 
 #
 # The postun-modules target checks for a fully configured uninstall directory by checking for the
@@ -255,16 +255,16 @@ postun-modules:
 # wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
 # runs after uninstall has completed.
 #
-uninstall-hook: postun-modules
+UNINSTALL_HOOK += postun-modules
 
 else
 
-kernel-all-am:
+kernel-all:
 
 endif
 
-all-am: kernel-all-am
+ALL_LOCAL += kernel-all
 
-.PHONY: kernel-all-am install-modules post-modules uninstall-modules postun-modules
+.PHONY: kernel-all install-modules post-modules uninstall-modules postun-modules
 
 # vim: ft=automake
