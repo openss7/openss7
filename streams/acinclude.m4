@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/07 13:39:49 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/03/07 23:42:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 13:39:49 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 23:42:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ AC_DEFUN([AC_LFS], [dnl
     USER_LDFLAGS="$LDFLAGS"
     _LFS_SETUP
     LFS_INCLUDES="-DLFS=1 -imacros ./config.h"
-dnl LFS_INCLUDES="$(LFS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+dnl LFS_INCLUDES="${LFS_INCLUDES}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     LFS_INCLUDES="${LFS_INCLUDES} -I./include -I${srcdir}/include"
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 	KERNEL_MODFLAGS="$KERNEL_MODFLAGS -include ./include/sys/streams/modversions.h"

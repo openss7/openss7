@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/07 06:09:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/03/07 23:20:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 06:09:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 23:20:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,8 +56,6 @@
 include am/openss7.am
 
 dist_sysconf_DATA 		=
-
-lib_LTLIBRARIES			=
 
 if PUBLIC_RELEASE
 
@@ -988,13 +986,6 @@ UNINSTALL_HOOK += uninstall-inet-devices
 
 .PHONY: install-inet-devices uninstall-inet-devices
 
-
-SUBDIRS = doc src
-
-if WITH_XNET
-SUBDIRS += intl m4 po
-endif
-
 PKGINCL				= include/sys/$(PACKAGE_NAME)
 
 AUTOCONFIG_H			= $(PKGINCL)/config.h
@@ -1022,7 +1013,11 @@ include am/strconf.am
 
 if RPM_BUILD_USER
 
-SUBDIRS = src doc
+SUBDIRS = src doc tests
+
+if WITH_XNET
+SUBDIRS += intl m4 po
+endif
 
 endif
 

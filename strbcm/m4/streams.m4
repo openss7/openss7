@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/07 12:20:25 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/07 23:10:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 12:20:25 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 23:10:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,8 +72,6 @@
 # _LINUX_STREAMS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])
-    AC_REQUIRE([_GENKSYMS])
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
     _LINUX_STREAMS_OUTPUT
@@ -288,28 +286,32 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
     fi
     AC_CACHE_CHECK([for streams lis sys/LiS/modversions.h], [streams_cv_lis_modversions], [dnl
 	streams_cv_lis_modversions='no'
-	if test -n "$streams_cv_lis_includes"
+dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume normal objects
+	if test :"${linux_cv_k_ko_modules:-no}" = :no
 	then
-	    for streams_dir in $streams_cv_lis_includes
-	    do
-		# old place for modversions
-		if test -f "$streams_dir/sys/LiS/modversions.h" 
-		then
-		    streams_cv_lis_modversions='yes'
-		    break
-		fi
-		# new place for modversions
-		if test -n $linux_cv_k_release 
-		then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" 
+	    if test -n "$streams_cv_lis_includes"
+	    then
+		for streams_dir in $streams_cv_lis_includes
+		do
+		    # old place for modversions
+		    if test -f "$streams_dir/sys/LiS/modversions.h" 
 		    then
-			streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
 			streams_cv_lis_modversions='yes'
 			break
 		    fi
-		fi
-	    done
+		    # new place for modversions
+		    if test -n $linux_cv_k_release 
+		    then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" 
+			then
+			    streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
+			    streams_cv_lis_modversions='yes'
+			    break
+			fi
+		    fi
+		done
+	    fi
 	fi
     ])
     AC_CACHE_CHECK([for streams lis sys/LiS/module.h], [streams_cv_lis_module], [dnl
@@ -405,6 +407,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     fi
     AC_CACHE_CHECK([for streams lfs sys/streams/modversions.h], [streams_cv_lfs_modversions], [dnl
 	streams_cv_lfs_modversions='no'
+dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no
 	then
 	    if test -n "$streams_cv_lfs_includes"
