@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.13 $) $Date: 2005/03/30 05:42:04 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.14 $) $Date: 2005/03/30 11:35:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/30 05:42:04 $ by $Author: brian $
+# Last Modified $Date: 2005/03/30 11:35:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -472,7 +472,8 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/pci.h>		/* for pci checks */
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
-			 num_online_cpus], [:], [:], [
+			 num_online_cpus \
+			 cpumask_scnprintf], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

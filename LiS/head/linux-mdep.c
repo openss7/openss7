@@ -4291,7 +4291,7 @@ int	lis_thread_runqueues(void *p)
 	    static int	msg_cnt ;
 	    char	buf[200] ;
 
-#if defined(KERNEL_2_5)
+#if HAVE_KFUNC_CPUMASK_SCNPRINTF || HAVE_KMACRO_CPUMASK_SCNPRINTF
 	    cpumask_scnprintf(buf, sizeof(buf), current->cpus_allowed) ;
 #else
 	    sprintf(buf, "0x%lx", current->cpus_allowed) ;

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/03/29 17:33:04 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/03/30 05:37:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:33:04 $ by $Author: brian $
+# Last Modified $Date: 2005/03/30 05:37:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -869,15 +869,16 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 	then
 	    if test ":${linux_cv_k_ko_modules:-no}" != :no
 	    then
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 *** 
 *** Configure could not find the module versions file for kernel version
 *** "$kversion".  The locations searched were:
 ***	    "$with_k_modver"
 ***	    "$k_modver_search_path"
 *** 
-*** Please specify the absolute location of your kernel's module versions file
-*** with option --with-k-modver before repeating.
+*** This can cause problems later.  Please specify the absolute location of
+*** your kernel's module versions file with option --with-k-modver before
+*** repeating.
 *** ])
 	    fi
 	else
@@ -2130,13 +2131,20 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     AS_VAR_PUSHDEF([linux_symbol_addr], [linux_cv_$1_addr])dnl
     AC_CACHE_CHECK([for kernel symbol $1 address], linux_symbol_addr, [dnl
-	if test -n "$ksysmap" -a -r "$ksysmap" 
+	linux_tmp=
+	if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"
 	then
-	    AS_VAR_SET([linux_symbol_addr], [`($EGREP '\<$1' $ksysmap | sed -e 's| .*||') 2>/dev/null`])
+	    linux_tmp="`($EGREP '\<$1\>' $ksyms | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
 	fi
-	linux_tmp=AS_VAR_GET([linux_symbol_addr]);
-	AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:+0x}$linux_tmp"])
-	linux_tmp=AS_VAR_GET([linux_symbol_addr]);
+	if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"
+	then
+	    linux_tmp="`($EGREP '\<$1\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+	fi
+	if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap" 
+	then
+	    linux_tmp="`($EGREP '\<$1\>' $ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+	fi
+	linux_tmp="${linux_tmp:+0x}$linux_tmp"
 	AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:-no}"]) ])
     linux_tmp=AS_VAR_GET([linux_symbol_addr])
     if test :"${linux_tmp:-no}" != :no 
@@ -2165,42 +2173,41 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     AS_VAR_PUSHDEF([linux_symbol_export], [linux_cv_$1_export])dnl
     AC_CACHE_CHECK([for kernel symbol $1 export], linux_symbol_export, [dnl
-	linux_tmp='no'
-	if test -n "$ksyms" -a -r "$ksyms"
+	linux_tmp=
+	if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"
 	then
 	    if ( $EGREP -q  '(\<$1_R(smp_)?........\>|\<$1\>)' $ksyms 2>/dev/null )
 	    then
 		linux_tmp="yes ($ksyms)"
 	    fi
-	else
-	    if test -n "$kallsyms" -a -r "$kallsyms"
+	fi
+	if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"
+	then
+	    if ( $EGREP -q '\<__ksymtab_$1\>' $kallsyms 2>/dev/null )
 	    then
-		if ( $EGREP -q '\<__ksymtab_$1\>' $kallsyms 2>/dev/null )
-		then
-		    linux_tmp="yes ($kallsyms)"
-		fi
-	    else
-		if test -n "$ksysmap" -a -r "$ksysmap" 
-		then
-		    if ( $EGREP -q '\<__ksymtab_$1\>' $ksysmap 2>/dev/null )
-		    then
-			linux_tmp="yes ($ksysmap)"
-		    fi
-		else
-		    _LINUX_KERNEL_ENV([dnl
-			AC_EGREP_CPP([\<yes_symbol_$1_is_exported\>], [
+		linux_tmp="yes ($kallsyms)"
+	    fi
+	fi
+	if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap" 
+	then
+	    if ( $EGREP -q '\<__ksymtab_$1\>' $ksysmap 2>/dev/null )
+	    then
+		linux_tmp="yes ($ksysmap)"
+	    fi
+	fi
+	if test -z "$linux_tmp" -a ":$linux_cv_k_ko_modules" != :yes
+	then
+	    _LINUX_KERNEL_ENV([dnl
+		AC_EGREP_CPP([\<yes_symbol_$1_is_exported\>], [
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/modversions.h>
 #include <linux/module.h>
 #ifdef $1
 	yes_symbol_$1_is_exported
 #endif
-			], [linux_tmp='yes (linux/modversions.h)']) ])
-		fi
-	    fi
+		], [linux_tmp='yes (linux/modversions.h)']) ])
 	fi
-	AS_VAR_SET([linux_symbol_export], ["$linux_tmp"]) ])
+	AS_VAR_SET([linux_symbol_export], ["${linux_tmp:-no}"]) ])
     linux_tmp=AS_VAR_GET([linux_symbol_export])
     if test :"${linux_tmp:-no}" != :no 
     then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_EXPORT), [1], [The symbol $1
