@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 1.1.4.2 2005/03/15 00:51:30 brian Exp $
+@c @(#) $Id: configure.texi,v 1.1.4.3 2005/03/15 12:06:38 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 00:51:30 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 12:06:38 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,54 +64,52 @@ In addition, the following @command{configure} options, specific to the
 @value{PACKAGE_TITLE} package are available:
 
 @table @command
-
 @item --enable-user-mode
-
+@itemx --disable-user-mode
 Enable user mode build.  The default is no.  Don't use this option, it hasn't
 been tested.
 
 @item --enable-broken-cpu-flags
-
+@itemx --disable-broken-cpu-flags
 Specify @code{int} instead of @code{long} interrupt flags.  Linux uses
 @code{long} interrupt flags exclusively.  The default is to use @code{long}
 interrupt flags.
 
-@item --enable-k-cache
-
-Invoke Linux kernel caching on primary structures.  This incresase speed and
-efficiency.  The default is to @strong{not} perform kernel caching on primary
-structures.
-
 @item --enable-k-timers
-
+@itemx --disable-k-timers
 Invoke Linux kernel cahcing on timer structures.  This increases speed and
 efficiency but is unsafe on SMP architectures and for buggy or high-speed
 drivers.  The default is to @strong{not} perform kernel caching on timer
 structures.
 
-@item --enable-atomic-stats
+@item --enable-k-cache
+@itemx --disable-k-cache
+Invoke Linux kernel caching on primary structures.  This incresase speed and
+efficiency.  The default is to @strong{not} perform kernel caching on primary
+structures.
 
-Enable atomic statistics elements for STREAMS statistics.
-The changes STREAMS statistics elements from the standard @code{int} to
-@code{atomic_t} to permit atomic increment of statistics structures.  This is
-not recommended and the default is to @strong{not} use @code{atomic_t} for
-statistics structures.
+@item --enable-atomic-stats
+@itemx --disable-atomic-stats
+Enable atomic statistics elements for STREAMS statistics.  The changes STREAMS
+statistics elements from the standard @code{int} to @code{atomic_t} to permit
+atomic increment of statistics structures.  This is not recommended and the
+default is to @strong{not} use @code{atomic_t} for statistics structures.
 
 @ignore
 @item --with-sctp
-
+@itemx --without-sctp
 Include xopen sctp driver in build.  [default=yes]  Unused.
 
 @item --with-sctp2
-
+@itemx --without-sctp2
 Include xopen sctp version 2 driver in build.  [default=no]  Unused.
 
 @item --with-xns
-
+@itemx --without-xns
 Include xopen xns headers in install.  [default=yes]
 
 @item --with-tli
-
+@itemx --without-tli
 Include xopen tli modules in build.  [default=yes] Build and package the TLI
 modules (@file{streams-timod.o} and @file{streams-tirdwr.o}).  These are needed
 by the XTI/XNS Unix98 libraries.  The default is to build and package TLI
@@ -120,35 +118,36 @@ modules.
 @pgindex streams-tirdwr.o
 
 @item --with-inet
-
+@itemx --without-inet
 Include xopen inet driver in build.  [default=yes] Build and package the INET
 driver (@file{streams-inet.o}).  This driver is needed for XTI/XNS Unix98
 compatibility.  The default is to build and package the INET driver.
 @pgindex streams-inet.o
 
 @item --with-xnet
-
-Include xopen xnet library in build.  [default=yes]
-Build and package the XTI/XNS library (@file{libxnet}).  This library is needed for
-XTI/XNS Unix98 compatiblity.  The default is to build and package the XNET
-library.
+@itemx --without-xnet
+Include xopen xnet library in build.  [default=yes] Build and package the
+XTI/XNS library (@file{libxnet}).  This library is needed for XTI/XNS Unix98
+compatiblity.  The default is to build and package the XNET library.
 @pgindex libxnet.a
 @pgindex libxnet.so
 
 @item --with-sock
-
+@itemx --without-sock
 Include xopen sock library in build.  [default=yes]
 @end ignore
 
 @item --with-solaris-consts
+@itemx --without-solaris-consts
+Attempt to be compatible with Solaris constants.  The default is to attempt to
+be compatible with SVR 4.2/Unixware constants.
 
-Use Unixware/Solaris compatible constants if yes, or use LiS backward compatible
-constants if no.  [default=yes]
-
-@item --with-solaris-cmn_err
-
-Use a Solaris-style cmn_err that puts a newline at the end of the line rather
-than the beginning [default=yes]
+@item --without-solaris-cmn_err
+@itemx --with-solaris-cmn_err
+Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style
+prints a newline at the end of each statement.  The SVR 4.2 style prints a
+newline at the beginning of each statement unless @code{CE_CONT} is specified.
+Linux kernel logs use the former, so this defaults to Solaris-style.
 
 @end table
 

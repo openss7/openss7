@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:14:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/15 12:06:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:14:15 $ by $Author: brian $
+# Last Modified $Date: 2005/03/15 12:06:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,10 +58,11 @@ EXTRA_info_TEXINFOS	= \
 			  configure.texi \
 			  releases.texi \
 			  rpm.texi \
+			  tree.texi \
+			  install.texi \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
-			  texi/install.texi \
 			  texi/lesser.texi
 
 include ../am/info.am

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 1.1.4.2 2005/03/15 00:51:31 brian Exp $
+@c @(#) $Id: rpm.texi,v 1.1.4.3 2005/03/15 12:06:38 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 00:51:31 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 12:06:38 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,10 +61,8 @@ In addition, the following @command{rpm} options, specific to the
 @value{PACKAGE_TITLE} package are available:
 
 @table @command
-
 @item --with solaris-cmn_err
 @itemx --without solaris-cmn_err
-
 Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style
 prints a newline at the end of each statement.  The SVR 4.2 style prints a
 newline at the beginning of each statement unless @code{CE_CONT} is specified.
@@ -72,34 +70,35 @@ Linux kernel logs use the former, so this defaults to Solaris-style.
 
 @item --with solaris-consts
 @itemx --without solaris-consts
-
 Attempt to be compatible with Solaris constants.  The default is to attempt to
 be compatible with SVR 4.2/Unixware constants.
 
 @item --with k-cache
 @itemx --without k-cache
-
 Invoke Linux kernel caching on primary structures.  This incresase speed and
 efficiency.  The default is to perform kernel caching on primary structures.
 
 @item --with k-timers
 @itemx --without k-timers
-
 Invoke Linux kernel cahcing on timer structures.  This increases speed and
 efficiency but is unsafe on SMP architectures and for buggy drivers.  The
 default is to perform kernel caching on timer structures.
 
 @item --with broken-cpu-flags
 @itemx --without broken-cpu-flags
-
 Specify @code{int} instead of @code{long} interrupt flags.  Linux uses
 @code{long} interrupt flags exclusively.  The default is to use @code{long}
 interrupt flags.
 
+@item --with atomic-stats
+@itemx --without atomic-stats
+Specify @code{atomic_t} element types for elements of the @code{module_stat}
+structure instead of @code{int} element types.  The default is to use @code{int}
+elements types for the @code{module_stat} structure.
+
 @ignore
 @item --with tli
 @itemx --without tli
-
 Build and package the TLI modules (@file{streams-timod.o} and
 @file{streams-tirdwr.o}).  These are needed by the XTI/XNS Unix98 libraries.
 The default is to build and package TLI modules.
@@ -108,7 +107,6 @@ The default is to build and package TLI modules.
 
 @item --with inet
 @itemx --without inet
-
 Build and package the INET driver (@file{streams-inet.o}).  This driver is
 needed for XTI/XNS Unix98 compatibility.  The default is to build and package
 the INET driver.
@@ -116,7 +114,6 @@ the INET driver.
 
 @item --with xnet
 @itemx --without xnet
-
 Build and package the XTI/XNS library (@file{libxnet}).  This library is needed for
 XTI/XNS Unix98 compatiblity.  The default is to build and package the XNET
 library.

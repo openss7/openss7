@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: clone.4.man,v 1.1.4.1 2005/03/09 23:13:57 brian Exp $
+.\" @(#) $Id: clone.4.man,v 1.1.4.2 2005/03/15 12:12:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:57 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/15 12:12:27 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,10 +71,14 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CLONE 4 "$Date: 2005/03/09 23:13:57 $" "$Name:  $" "Linux STREAMS"
+.TH CLONE 4 "$Date: 2005/03/15 12:12:27 $" "$Name:  $" "Linux STREAMS"
+.\"
+.\"
 .SH NAME
 .B /dev/clone
 \- the STREAMS clone driver
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/types.h>
@@ -86,16 +90,69 @@ sort-adjacent-labels
 .B #include <fcntl.h>
 .HP 8
 .IB s " = open(" /dev/xxx_clone ", " 0 );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+This driver is used to assist LiS in implementing the
+.I clone
+open function.  It appears under its
+own name as
+.BR /dev/clone_drvr .
+By convention, it is allocated the first major number of all the
+.IR STREAMS (4)
+drivers.
+
+To implement clone opens, one creates a node in the
+.B /dev
+directory for a device whose major number is set to that of the clone driver,
+and whose minor number is the major number of the driver to which the clone open
+is to be directed.
+
+The clone driver's open routine forwards the open call to the target driver,
+passing a unique flag that informs the driver that a clone open is being
+requested.  The target driver then allocated a minor device number to uniquely
+associate with this instance of the open operation.  The clone driver
+synthesizes a new major/minor
+.I device id
+to pass back to LiS.  LiS recognizes the change of major/minor from the original
+open and takes steps to allocate control structures unique to this open.
+
+The
+.I clone open
+operation is intended to make is easy to open one device from a pool of devices,
+such as pseudo ttys or logical connections.  It saves application programs from
+having to scan a list of device mnemonics issuing trial opens until one is found
+that succeeds.
+
+Note that the driver is named
+.B /dev/clone_drvr
+instead of the more traditional SVR4
+.BR /dev/clone .
+This is to avoid a conflict with another driver named
+.B /dev/clone
+on Linux systems.
+.\"
+.\"
 .SH CAVEATS
 .PP
+.\"
+.\"
 .SH BUGS
 .PP
+.\"
+.\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/clone_drvr
+The clone driver device.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.\"
+.\"
 .SH VERSIONS
 .PP
 .\"
@@ -120,5 +177,10 @@ LiS
 .[
 $LIST$
 .]
+.\"
+.SH AUTHOR
+.PP
+David Grothe
+.RB < dave@gcom.com >
 .\"
 .TI

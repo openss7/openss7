@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: args.texi.in,v 0.9.2.5 2005/03/15 03:19:03 brian Exp $
+@c @(#) $Id: args.texi.in,v 0.9.2.6 2005/03/15 12:10:33 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 03:19:03 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 12:10:33 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -102,7 +102,7 @@
 @set _prefix @prefix@
 @set _sbindir @prefix@/sbin
 @set _sharedstatedir @prefix@/com
-@set _sysconfdir @sysconfdir@
+@set _sysconfdir /etc
 
 @set _build @build@
 @set _build_alias @build_alias@

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.12 2005/03/15 00:56:41 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.13 2005/03/15 12:06:58 brian Exp $
 %
 % =========================================================================
 %
@@ -54,14 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 00:56:41 $ by $Author: brian $
+% Last Modified $Date: 2005/03/15 12:06:58 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename SPG.info
 @include texi/args.texi
-@set MANUAL_TITLE Linux Fast-STREAMS
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE STREAMS Programmer's Guide
 @settitle @value{MANUAL_TITLE}
 
@@ -73,14 +73,14 @@
 @defindex op
 
 @include texi/args.texi
-@set MANUAL_TITLE Linux Fast-STREAMS
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE STREAMS Programmer's Guide
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
@@ -110,7 +110,7 @@ another language, under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
-@set MANUAL_TITLE Linux Fast-STREAMS
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE STREAMS Programmer's Guide
 
 @ignore
@@ -170,7 +170,7 @@ another language, under the same conditions as for modified versions.
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @unnumbered About This Manual
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
 @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
@@ -192,12 +192,12 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 Acknowledgements
 
-* Sponsors::			Sponsors of Linux Fast-STREAMS
-* Contributors::		Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors of @value{PACKAGE_TITLE}
+* Contributors::		Contributors to @value{PACKAGE_TITLE}
 
 Overview
 
-* Introduction::		An Introduction to Linux Fast-STREAMS
+* Introduction::		An Introduction to @value{PACKAGE_TITLE}
 * Concepts::			STREAMS Concepts
 
 Reference
@@ -278,37 +278,37 @@ Indices
 @cindex credits
 
 @menu
-* Sponsors::			Sponsors of Linux Fast-STREAMS
-* Contributors::		Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors of @value{PACKAGE_TITLE}
+* Contributors::		Contributors to @value{PACKAGE_TITLE}
 @end menu
 
 @node Sponsors
-@unnumberedsec Sponsors of Linux Fast-STREAMS
+@unnumberedsec Sponsors of @value{PACKAGE_TITLE}
 @cindex sponsors
 
-Funding for completion of Linux Fast-STREAMS was provided by:
+Funding for completion of @value{PACKAGE_TITLE} was provided by:
 
 OpenSS7 Corporation
 
 Additional funding for The OpenSS7 Project was provided by:
 
 @node Contributors
-@unnumberedsec Contributors to Linux Fast-STREAMS
+@unnumberedsec Contributors to @value{PACKAGE_TITLE}
 @cindex contributors
 
-The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
+The primary contributor to @value{PACKAGE_TITLE} is Brian F. G. Bidulock.
 
 
 @node Overview
-@chapter Overview of Linux Fast-STREAMS
+@chapter Overview of @value{PACKAGE_TITLE}
 @cindex overview
 @menu
-* Introduction::		An Introduction to Linux Fast-STREAMS
+* Introduction::		An Introduction to @value{PACKAGE_TITLE}
 * Concepts::			STREAMS Concepts
 @end menu
 
 This manual documents how to develop and port STREAMS drivers and modules for
-Linux Fast-STREAMS.
+@value{PACKAGE_TITLE}.
 
 @node Introduction
 @section Introduction
@@ -448,7 +448,7 @@ Structures
 Registration
 @end menu
 
-@subsection Linux Fast-STREAMS Registration
+@subsection @value{PACKAGE_TITLE} Registration
 
 @subsubsection autopush_add(9)
 @fnindex autopush_add(9)
@@ -708,7 +708,7 @@ Extensions
 @subsubsection unweldq(9)
 @fnindex unweldq(9)
 
-@subsection Linux Fast-STREAMS Extensions
+@subsection @value{PACKAGE_TITLE} Extensions
 
 @subsubsection allocq(9)
 @fnindex allocq(9)
@@ -1224,7 +1224,7 @@ System Controls
 
 @subsection System Controls
 
-Linux Fast-STREAMS provides and supports a number of system controls that can
+@value{PACKAGE_TITLE} provides and supports a number of system controls that can
 be accessed using the /proc/sys/streams/* files, with the
 @iftex
 @b{sysctl}(2)
@@ -1240,8 +1240,7 @@ interface, or using
 @inforef{sysctl(8), , *manpages*}.
 @end ifnottex
 
-The following STREAMS specific system controls are provided by Linux
-Fast-STREAMS:
+The following STREAMS specific system controls are provided by @value{PACKAGE_TITLE}:
 
 @subsubsection sys.streams.cltime
 @vrindex sys.streams.cltime
@@ -1521,10 +1520,10 @@ Changing this value to a low value may have some use in debugging @i{STREAMS} dr
 * spec Filesystem::		Avoiding Device Numbering
 @end menu
 
-Linux Fast-STREAMS supports the concept of internal and external device numbering with base majors
+@value{PACKAGE_TITLE} supports the concept of internal and external device numbering with base majors
 and extended minors.
 
-Linux Fast-STREAMS uses several device numbering schemes intended to be compatible with SVR 4.2 MP
+@value{PACKAGE_TITLE} uses several device numbering schemes intended to be compatible with SVR 4.2 MP
 DDI/DKI and implementations based on SVR 4.2 including AIX, HP-UX, LiS, OSF/1, Solaris, SUPER-UX,
 UnixWare, and UXP/V.
 
@@ -1533,7 +1532,7 @@ UnixWare, and UXP/V.
 @cpindex external device numbers
 @cpindex device numbers, external
 
-Linux Fast-STREAMS provides real external device numbering using the functions
+@value{PACKAGE_TITLE} provides real external device numbering using the functions
 @iftex
 @b{getemajor}(9), @b{geteminor}(9) and @b{makedevice}(9).
 @end iftex
@@ -1593,7 +1592,7 @@ approach does not work well with demand loading of kernel modules because it rel
 @b{Linux} character device demand loading approach, or requires informing @dfn{STREAMS} of all
 devices and drivers when @dfn{STREAMS} is being compiled.
 
-@dfn{Linux Fast-STREAMS} supports the @b{Linux} character device module demand loading; however, the
+@dfn{@value{PACKAGE_TITLE}} supports the @b{Linux} character device module demand loading; however, the
 @b{Linux} mechanism requires prior knowledge of the character major device number.  Some of the
 administrative utilities above can load kernel modules and establish what major device number was
 assigned.  See the individual manual pages for more information.
@@ -1650,7 +1649,7 @@ transparent to the operation of the @b{clone}(4) driver and @samp{CLONEOPEN}.
 
 @subsection New Cloning
 
-@dfn{Linux Fast-STREAMS} supports the new cloning approach whereby a driver is permitted to alter
+@dfn{@value{PACKAGE_TITLE}} supports the new cloning approach whereby a driver is permitted to alter
 the device number returned in the @var{devp} argument to @b{qopen}(9) even though @var{sflag} is set
 to @samp{DRVOPEN} instead of @samp{CLONEOPEN}.  The driver, at its discretion, can treat any minor
 device number as a new style clone device, although normally minor device number zero (0) is usually
@@ -1669,7 +1668,7 @@ use.
 @cpindex named streams device
 
 The @b{nsdev}(4) driver provides for a @dfn{Named STREAMS Device}.  This is a device numbering
-approach unique to @dfn{Linux Fast-STREAMS}.  The @b{nsdev}(4) driver operates in a similar manner
+approach unique to @dfn{@value{PACKAGE_TITLE}}.  The @b{nsdev}(4) driver operates in a similar manner
 to the @b{clone}(4) driver, however, the major number is derived from the prefix name of the device
 and the minor number is taken directly from the minor number of the @b{nsdev}(4) device.
 
@@ -1713,7 +1712,7 @@ device and having the eternal (real) major and external (real) minor device numb
 
 The mounted @b{specfs}(5) file system also has the characteristic that if a device subdirectory
 @file{/dev/streams/@i{devname}/} does not exist, but an attempt is made to read such a directory,
-@dfn{Linux Fast-STREAMS} will attempt to load kernel module @file{streams-@i{devname}} into the
+@dfn{@value{PACKAGE_TITLE}} will attempt to load kernel module @file{streams-@i{devname}} into the
 kernel with @b{request_module}(9).  If the load is successful, the kernel module will register and
 the subdirectory will be created and read.
 

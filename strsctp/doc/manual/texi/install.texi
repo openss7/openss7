@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.10 2005/03/15 00:53:57 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.11 2005/03/15 12:03:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 00:53:57 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 12:03:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -63,100 +63,120 @@
 * Configuration::		Configuration of the package
 * Building::			Building the package
 * Installing::			Installing the package
-* Removal::			Removal of the package
+* Removing::			Removing the package
 * Loading::			Loading the package
 @end menu
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Downloading, Configuration, , Installation
+@node Downloading
 @section Downloading
 @cindex downloading
 
 The @value{PACKAGE_TITLE} package releases can be downloaded from the downloads
 page of @uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The
 package is available as a binary RPM (for popular architectures) a source RPM,
-or as a tar ball.  If you are using a browsable viewer, you can obtain the
-OpenSS7 release of @command{@value{PACKAGE_NAME}} from the links in the sections that
-follow.
+Debian binary DEB and source DSC, or as a tar ball.  If you are using a
+browsable viewer, you can obtain the OpenSS7 release of
+@command{@value{PACKAGE_NAME}} from the links in the sections that follow.
 
 By far the easiest form for installing and using
-@command{@value{PACKAGE}-@value{VERSION}} is to download and install
-binary RPM. If a binary RPM is not available for your distribution,  but your
-distribution supports RPM, the next best method for installing and using
-@command{@value{PACKAGE}-@value{VERSION}} is to download and rebuild the
-source RPM.  If your architecture does not support RPM at all, or you have
-special needs (such as cross-compiling for embedded targets), the final resort
-method is to download, configure, build and install from the source tarball.
+@command{@value{PACKAGE}-@value{VERSION}} is to download and install binary RPM.
+If a binary RPM is not available for your distribution,  but your distribution
+supports RPM, the next best method for installing and using
+@command{@value{PACKAGE}-@value{VERSION}} is to download and rebuild the source
+RPM.  If your architecture does not support RPM at all, or you have special
+needs (such as cross-compiling for embedded targets), the final resort method is
+to download, configure, build and install from the source tarball.
 
 @menu
 * Downloading the Binary RPM::		the easiest approach
+* Downloading the Debian DEB::		the easiest approach for Debian
 * Downloading the Source RPM::		the next best approach
+* Downloading the Debian DSC::		the next best approach for Debian
 * Downloading the Tar Ball::		last resort
 * Downloading from CVS::		mid-release download
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@node Downloading the Binary RPM, Downloading the Source RPM, , Downloading
+@node Downloading the Binary RPM
 @subsection Downloading the Binary RPM
 @cindex downloading, binary rpms
 @cindex binary rpms
 
 To install from binary RPM, you will need several of the RPM for a complete
-installation.  Binary RPM fall into three categories.  To download and install
-a complete package requires the appropriate RPM from each of the three
-categories below, as applicable.  Some release packages do not provide RPMs in
-each of the tree categories.
+installation.  Binary RPM fall into three categories.  To download and install a
+complete package requires the appropriate RPM from each of the three categories
+below, as applicable.  Some release packages do not provide RPMs in each of the
+three categories.
+
+To install from Binary RPM, you will need all of the following kernel
+indepdendent packages for your architecture, and one of the kernel-depdendent
+packages from the next section.
 
 @subsubheading Independent RPM
-Independent RPM are dependent on neither the Linux kernel version, nor the
-STREAM package.  For example, the source package
-@samp{@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm},
-is not dependent on kernel or STREAMS.
+Independent RPM are
+dependent on neither the Linux kernel version, nor the STREAMS package.
+For example, the
+source package
+@samp{@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm},
+is not dependent on
+kernel nor STREAMS package.
 
 @noindent
-All of the following kernel and STREAMS independent RPM are required for your
-architecture.  If you architecture is not on the list, you can build binary
-RPM from the source RPM (see @pxref{Building from the Source RPM}).
+All of the following kernel and STREAMS independent RPM are required for your architecture.
+Binary RPMs listed here are for example only: additional binary RPMs are
+available from the downloads site.  If your architecture is not available, you
+can build binary RPM from the source RPM (see @pxref{Building from the Source
+RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-dev} package@footnote{Note that not all release
-packages contain devices.  Only packages that provide STREAMS character device
-drivers need devices, and then only when the @samp{specfs} is not being used.}
-contains the device definitions necessary to run applications programs developed
-for @value{PACKAGE_TITLE}.
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-dev} package contains the device definitions necessary
+to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
+all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
+8.0 distribution which uses an older version of @command{rpm}.  Distributions
+that do not support the @samp{%dev} macro will build devices as a @samp{%post}
+operation.  Note also that not all release packages contain devices.  Only
+packages that provide STREAMS character device drivers need devices, and then
+only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-devel} package contains library archives for static
-compilation, header files to develop @value{PACKAGE_TITLE} STREAMS modules and
-drivers.  This also includes the header files and static libraries required to
-compile @value{PACKAGE_TITLE} applications programs.
+compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
+This also includes the header files and static libraries required to compile
+@value{PACKAGE_TITLE} applications programs.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-doc} package contains this manual in
-plaintext, postscript, PDF and HTML forms, along with the meta-information from
-the @file{@value{PACKAGE_NAME}} package.
-It also contains all of the manual pages necessary for developing
-@value{PACKAGE_TITLE} applications and @value{PACKAGE_TITLE} STREAMS modules or
-drivers.
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-doc} package contains this manual in plaintext,
+postscript, PDF and HTML forms, along with the meta-information from the
+@file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
+necessary for developing @value{PACKAGE_TITLE} applications and
+@value{PACKAGE_TITLE} STREAMS modules or drivers.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-lib} package@footnote{Note that not all release
-packages contain shared libraries, and, therefore, not all release packages
-contain this package.}
-contains the run-time shared libraries necessary to run application programs and
-utilities developed for the @file{@value{PACKAGE_NAME}} package.
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-lib} package contains the run-time shared libraries
+necessary to run application programs and utilities developed for the
+@file{@value{PACKAGE_NAME}} package.
+@footnote{Note that not all release packages contain shared libraries, and,
+therefore, not all release packages contain this package.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-source} package@footnote{Note that not all releases
-have source RPM packages.  Release packages that do not contain kernel modules
-do not generate a source RPM package.}
-contains the source code necessary for building the @value{PACKAGE_TITLE}
-release.  It includes the @command{autoconf} configuration utilities necessary
-to create and distribute this rpm.
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-source} package contains the source code necessary for
+building the @value{PACKAGE_TITLE} release.  It includes the @command{autoconf}
+configuration utilities necessary to create and distribute tarballs, rpms and
+deb/dscs.
+@footnote{Note that not all releases have source RPM packages.  Release packages
+that do not contain kernel modules do not generate a source RPM package.}
+
+@ignore
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-util} package provides administrative and
+configuration test utilities and commands associated with the
+@value{PACKAGE_TITLE} package.
+@end ignore
 @end table
 
 @subsubheading STREAMS-Dependent RPM
@@ -173,14 +193,14 @@ architecture.  If your architecture is not on the list, you can build binary RPM
 from the source RPM (see @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-LiS-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
 @file{@value{PACKAGE}-LiS-util} package if you have LiS installed.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-streams-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
@@ -196,63 +216,75 @@ kernel package version in the package name.
 
 One of the following Kernel-Dependent packages is required for your architecture
 and kernel version.  If your architecture or kernel version is not on the list,
-you can build binary RPM from the source RPM (see
-@pxref{Building from the Source RPM}).
+you can build binary RPM from the source RPM (see @pxref{Building from the
+Source RPM}).@footnote{Note that on @cite{Mandrakelinux}, unlike other RPM
+kernel distributions, kernel packages for the ix86 architectures are always
+placed in i586 architecture packages regardless of the true processor
+architecture of the kernel package.  @command{configure} detects this and builds
+the appropriate packages.}
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-core} package@footnote{Note that only release packages
-that contain kernel modules will contain a @file{core} subpackage.}
-contains the loadable kernel modules that depend only on the kernel.
-This package is heavily tied to the kernel for which it was compiled.  This
-particular package applies to kernel version @var{@value{_kversion}}.
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-core} package contains the loadable kernel modules
+that depend only on the kernel.  This package is heavily tied to the kernel for
+which it was compiled.  This particular package applies to kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.  Note also that only release
+packages that contain kernel modules will contain a @file{core} subpackage.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
-@file{info} subpackage.} contains the module symbol version information for the
-@file{core} subpackage, above.  It is possible to load this subpackage and
-compile modules that use the exported symbols without loaded the actual kernel
-modules (from the @file{core} subpackage above).
-This package is heavily tied to the kernel for which it was compiled.  This
-particular package applies to kernel verion @var{@value{_kversion}}.
+@file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
+kernels and is not necessary and not built for 2.6 series kernels.} contains the
+module symbol version information for the @file{core} subpackage, above.  It is
+possible to load this subpackage and compile modules that use the exported
+symbols without loading the actual kernel modules (from the @file{core}
+subpackage above).  This package is heavily tied to the kernel for which it was
+compiled.  This particular package applies to kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-LiS-core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.
-This package is heavily tied to the STREAMS package and kernel for which it was
-compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
-on kernel version @var{@value{_kversion}}.
+provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
+heavily tied to the STREAMS package and kernel for which it was compiled.  This
+particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
+version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-streams-core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.
-This package is heavily tied to the STREAMS package and kernel for which it was
-compiled.  This particular package applies to @file{streams} (@cite{Linux
-Fast-STREAMS}) on kernel version @var{@value{_kversion}}.
+provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
+heavily tied to the STREAMS package and kernel for which it was compiled.  This
+particular package applies to @file{streams} (@cite{Linux Fast-STREAMS}) on
+kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
+of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-LiS-info} package@footnote{Note that only release packages
-that contain kernel modules and that export versioned symbols will contain a
-@file{LiS-info} subpackage.} contains the module symbol version information for the
-@file{LiS-core} subpackage, above.  It is possible to load this subpackage and
-compile modules that use the exported symbols without loaded the actual kernel
-modules (from the @file{LiS-core} subpackage above).
-This package is heavily tied to the STREAMS package and kernel for which it was
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-LiS-info} package@footnote{Note that only release
+packages that contain kernel modules and that export versioned symbols will
+contain a @file{LiS-info} subpackage.} contains the module symbol version
+information for the @file{LiS-core} subpackage, above.  It is possible to load
+this subpackage and compile modules that use the exported symbols without loaded
+the actual kernel modules (from the @file{LiS-core} subpackage above).  This
+package is heavily tied to the STREAMS package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
-on kernel version @var{@value{_kversion}}.
+on kernel version @samp{@value{_kversion}}.@footnote{Note that the
+@samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm, @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-streams-info} package@footnote{Note that only release packages
-that contain kernel modules and that export versioned symbols will contain a
-@file{streams-info} subpackage.} contains the module symbol version information for the
-@file{streams-core} subpackage, above.  It is possible to load this subpackage and
-compile modules that use the exported symbols without loaded the actual kernel
-modules (from the @file{streams-core} subpackage above).
-This package is heavily tied to the STREAMS package and kernel for which it was
-compiled.  This particular package applies to @file{streams} (@cite{Linux
-Fast-STREAMS}) on kernel version @var{@value{_kversion}}.
-
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
+The @file{@value{PACKAGE}-streams-info} package@footnote{Note that only release
+packages that contain kernel modules and that export versioned symbols will
+contain a @file{streams-info} subpackage.} contains the module symbol version
+information for the @file{streams-core} subpackage, above.  It is possible to
+load this subpackage and compile modules that use the exported symbols without
+loaded the actual kernel modules (from the @file{streams-core} subpackage
+above).  This package is heavily tied to the STREAMS package and kernel for
+which it was compiled.  This particular package applies to @file{streams}
+(@cite{Linux Fast-STREAMS}) on kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.}
 @end table
 
 @subsubheading Configuration and Installation
@@ -261,7 +293,18 @@ RPM}.
 
 @c ----------------------------------------------------------------------------
 
-@node Downloading the Source RPM, Downloading the Tar Ball, Downloading the Binary RPM, Downloading
+@node Downloading the Debian DEB
+@subsection Downloading the Debian DEB
+@cindex downloading, debian debs
+@cindex binary debs
+
+@subsubheading Configuration and Installation
+To configure, build and install the Debian DEB, @xref{Configuring the Debian
+DEB}.
+
+@c ----------------------------------------------------------------------------
+
+@node Downloading the Source RPM
 @subsection Downloading the Source RPM
 @cindex downloading, source srpm
 @cindex source rpms
@@ -281,7 +324,17 @@ To configure the source RPM, @xref{Configuring the Source RPM}.
 
 @c ----------------------------------------------------------------------------
 
-@node Downloading the Tar Ball, Downloading from CVS, Downloading the Source RPM, Downloading
+@node Downloading the Debian DSC
+@subsection Downloading the Debian DSC
+@cindex downloading, debian dscs
+@cindex source dscs
+
+@subsubheading Configuration
+To configure the source RPM, @xref{Configuring the Debian DSC}.
+
+@c ----------------------------------------------------------------------------
+
+@node Downloading the Tar Ball
 @subsection Downloading the Tar Ball
 @cindex downloading, tar ball
 @cindex tar ball
@@ -295,7 +348,8 @@ the tarball as follows:
 These are the @command{tar} balls for the release.  These @command{tar} balls
 contain the @command{autoconf} distribution which includes all the source
 necessary for building and installing the package.  These tarballs will even
-build Source RPM and Binary RPM on RPM architectures.
+build Source RPM and Binary RPM on RPM architectures and Debian DSC and DEB on
+DPKG architectures.
 @end table
 
 The tar ball may be downloaded easily with @command{wget} as follows:
@@ -349,15 +403,15 @@ To configure and install the tar ball, @xref{Configuring the Tar Ball}.
 
 @c ----------------------------------------------------------------------------
 
-@node Downloading from CVS, , Downloading the Tar Ball, Downloading
+@node Downloading from CVS
 @subsection Downloading from CVS
 @cindex checkout, cvs
 @cindex cvs
 
 If you are a subscriber or sponsor of @uref{http://www.openss7.org/, The OpenSS7
 Project} with CVS archive access privileges then you can download release or
-mid-release versions of the @file{@value{PACKAGE_NAME}} package from the project CVS
-archive.
+mid-release versions of the @file{@value{PACKAGE_NAME}} package from the project
+CVS archive.
 
 The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE}}
 subdirectory of @file{/var/cvs}.  For release tag information, see
@@ -381,9 +435,9 @@ information, see @ref{cvs(1), cvs(1), cvs(1), *manpages*, The Manual Pages}.
 
 @subsubheading Preparing the CVS Working Directory
 
-Although public releases of the @file{@value{PACKAGE_NAME}} package do not require
-reconfiguration, creating a configurable directory from the CVS archive requires
-tools not normally distributed with the other releases.
+Although public releases of the @file{@value{PACKAGE_NAME}} package do not
+require reconfiguration, creating a configurable directory from the CVS archive
+requires tools not normally distributed with the other releases.
 
 The build host requires the following GNU tools:
 
@@ -398,10 +452,10 @@ The build host requires the following GNU tools:
 It should be stressed that, in particular, the @command{autoconf} and
 @command{automake} must be at version releases @command{2.59} and @command{1.9}.
 @emph{The versions normally distributed in mainstream GNU/Linux distributions
-are, in fact, much older than these versions.}  GNU version of these packages
-configured and installed to default directories will install in
-@file{/usr/local/} allowing them to coexist with distribution installed
-versions.
+are, in fact, much older than these versions.}@footnote{A notable exception is
+Debian.}  GNU version of these packages configured and installed to default
+directories will install in @file{/usr/local/} allowing them to coexist with
+distribution installed versions.
 
 In addition, the build host requires a complete tool chain for compiling for the
 target host, including kernel tools such as @command{genksyms} and others.
@@ -419,9 +473,7 @@ GNU autoconf system, execute the following commands on the working directory:
 where, @file{@value{PACKAGE}} is the name of the directory to where the working
 copy was checked out under the previous step.  This command generates the
 @command{configure} script and other missing pieces that are normally
-distributed with the release Tar Balls or RPMs.  The package can now be
-configured and built using the same instructions as are used for the Tar Ball,
-see @ref{Configuring the Tar Ball}, and @ref{Building from the Tar Ball}.
+distributed with the release Tar Balls, SRPMs and DSCs.
 
 Make sure that @samp{autoreconf --version} returns @samp{2.59}.  Otherwise, you
 may need to perform something like the following:
@@ -433,7 +485,16 @@ may need to perform something like the following:
 @end cartouche
 @end example
 
-When configuring the package in a working directory and while working an
+@noindent
+After reconfiguring the directory, the package can then be configured and built
+using the same instructions as are used for the Tar Ball, see @ref{Configuring
+the Tar Ball}, and @ref{Building from the Tar Ball}.
+
+Do note, however, that @command{make} will rebuild the documentation that is
+normally released with the package.  Additional tools may be necessary for
+building the documentation.
+
+When configuring the package in a working directory and while working a
 change-compile-test cycle that involves configuration macros or documentation, I
 find it of great advantage to invoke the GNU @command{configure} options
 @command{--enable-maintainer-mode} and @command{--enable-dependency-tracking}.
@@ -445,19 +506,21 @@ or documentation files will be automatically rebuilt.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Configuration, Building, Downloading, Installation
+@node Configuration
 @section Configuration
 @cindex configuration
 
 @menu
 * Configuring the Binary RPM::		the easiest approach
+* Configuring the Debian DEB::		the easiest approach for Debian
 * Configuring the Source RPM::		the next best approach
+* Configuring the Debian DSC::		the next best approach for Debian
 * Configuring the Tar Ball::		last resort
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@node Configuring the Binary RPM, Configuring the Source RPM, , Configuration
+@node Configuring the Binary RPM
 @subsection Configuring the Binary RPM
 @cindex configuring, binary rpms
 @cindex binary rpms
@@ -468,73 +531,90 @@ This allows some degree of customization.  Relocations that are available on the
 binary RPM are as follows:
 
 @table @file
-@item @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@itemx @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}/lib/modules/@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
-@value{PACKAGE_NAME} STREAMS drivers and modules.
+@value{PACKAGE_NAME} STREAMS core, drivers and modules.@footnote{Note that the
+@samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 @end table
 
-@item @value{PACKAGE}-LiS-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@itemx @value{PACKAGE}-streams-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-LiS-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-streams-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@itemx @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@table @asis
+@item @file{@value{_rootdir}/usr/include/@value{PACKAGE}/@value{_kversion}}
+This relocatable directory contains the kernel module exported symbol
+information that allows other kernel modules to be compiled against the correct
+version of the @value{PACKAGE} package.@footnote{Note that the @samp{_kversion}
+of @samp{@value{_kversion}} is only an example.  Also, note that the @samp{info}
+subpackage is only applicable to the 2.4 kernel series.}
+@end table
+
+@item @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 (not relocatable)
 
-@item @value{PACKAGE}-LiS-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@itemx @value{PACKAGE}-streams-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-LiS-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-streams-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
-@item @file{@value{_rootdir}@value{_includedir}}
-@item @file{@value{_rootdir}@value{_mandir}}
+This relocatable directory contains @value{PACKAGE} libraries.
+@item @file{@value{_rootdir}@value{_includedir}/@value{PACKAGE}}
+This relocatable directory contains @value{PACKAGE} header files.
 @end table
 
-@item @value{PACKAGE}-LiS-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@itemx @value{PACKAGE}-streams-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-LiS-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-streams-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_datadir}/doc}
+This relocatable directory contains all package specific documentation
+(including this manual).  The subdirectory in this directory is the
+@file{@value{PACKAGE}-@value{VERSION}} directory.
 @item @file{@value{_rootdir}@value{_infodir}}
+This relocatable directory contains info files (including the info version of
+this manual).
+@item @file{@value{_rootdir}@value{_mandir}}
+This relocatable directory contains manual pages.
 @end table
 
-@ignore
-@item @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@itemx @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@itemx @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains the run-time shared libraries necessary to
 run applications programs and utilities developed for @value{PACKAGE_TITLE}.
 @item @file{@value{_rootdir}@value{_datadir}/locale}
-This relocatable directory contains the locale information for shared library files.
+This relocatable directory contains the locale information for shared library
+files.
 @end table
-@end ignore
 
-@item @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_prefix}/src}
 This relocatable directory contains the source code.
 @end table
 
-@item @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@itemx @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
-@cindex @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+@item @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@itemx @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains binary programs and utilities.
 @item @file{@value{_rootdir}@value{_sbindir}}
 This relocatable directory contains system binary programs and utilities.
-@item @file{@value{_rootdir}@value{_mandir}}
-This relocatable directory contains manual pages.
 @item @file{@value{_rootdir}@value{_libexecdir}}
 This relocatable directory contains test programs.
+@item @file{@value{_rootdir}@value{_sysconfdir}}
+This relocatable directory contains init scripts and configuration information.
 @end table
 
 @end table
@@ -544,7 +624,17 @@ To install the binary RPM, @xref{Installing the Binary RPM}.
 
 @c ----------------------------------------------------------------------------
 
-@node Configuring the Source RPM, Configuring the Tar Ball, Configuring the Binary RPM, Configuration
+@node Configuring the Debian DEB
+@subsection Configuring the Debian DEB
+@cindex configuring, binary debs
+@cindex binary debs
+
+@subsubheading Installation
+To install the Debian DEB, @xref{Installing the Debian DEB}.
+
+@c ----------------------------------------------------------------------------
+
+@node Configuring the Source RPM
 @subsection Configuring the Source RPM
 @cindex configuring, source srpm
 @cindex source rpms
@@ -648,7 +738,7 @@ kernel-dependent packages.  This option can also be defined in an
 @end ignore
 
 @item --with autotest
-@item --without autotest
+@itemx --without autotest
 @opindex autotest
 Enable preinstall checks.  Each packages supports a number of preinstall checks
 that can be performed by invoking the @samp{check} target with @command{make}.
@@ -659,8 +749,8 @@ for build and installable programs, checking for documentation for built and
 installable programs.  Normally these checks are only run in maintainer mode,
 but can be enabled and disabled with this option.
 
-@item --without k-optimize
-@itemx --define "_with_k_optimize --with-k-optimize=HOW"
+@item --with k-optimize=HOW
+@itemx --without k-optimize
 @opindex k-optimize
 Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
 @var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
@@ -764,12 +854,22 @@ loaded on the build system and build accordingly.
 
 @include rpm.texi
 
+In general, the default values of these options are sufficient for most purposes
+and no options need be provided when rebuilding the Source RPMs.
+
 @subsubheading Build
 To build from the source RPM, @xref{Building from the Source RPM}.
 
 @c ----------------------------------------------------------------------------
 
-@node Configuring the Tar Ball, , Configuring the Source RPM, Configuration
+@node Configuring the Debian DSC
+@subsection Configuring the Debian DSC
+@cindex configuring, source dscs
+@cindex source dscs
+
+@c ----------------------------------------------------------------------------
+
+@node Configuring the Tar Ball
 @subsection Configuring the Tar Ball
 @cindex configuring, tar ball
 @cindex tar ball
@@ -785,7 +885,7 @@ tailor or customize the build and are described below.
 
 @c ----------------------------------------------------------------------------
 
-@node Configure Options, Environment Variables, , Configuring the Tar Ball
+@node Configure Options
 @subsubsection Configure Options
 @cindex configure options
 
@@ -1146,7 +1246,7 @@ the strconf scripts.
 
 @c ----------------------------------------------------------------------------
 
-@node Environment Variables, , Configure Options, Configuring the Tar Ball
+@node Environment Variables
 @subsubsection Environment Variables
 @cindex configure environment variables
 
@@ -1358,18 +1458,19 @@ To build from the tar ball, @xref{Building from the Tar Ball}.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Building, Installing, Configuration, Installation
+@node Building
 @section Building
 @cindex building
 
 @menu
 * Building from the Source RPM::	the next best approach
+* Building from the Debian DSC::	the next best approach for Debian
 * Building from the Tar Ball::		last resort
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@node Building from the Source RPM, Building from the Tar Ball, , Building
+@node Building from the Source RPM
 @subsection Building from the Source RPM
 @cindex building, source srpm
 @cindex source rpms
@@ -1405,6 +1506,7 @@ are provided on the @command{rpm} command line.  For example:
 @noindent
 will rebuild binary RPM for the @samp{@value{_kversion}} kernel for the
 @samp{athlon} architecture against the @cite{LiS} STREAMS package.
+@footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
 
@@ -1412,7 +1514,14 @@ To install the resulting binary RPM, @xref{Installing the Binary RPM}.
 
 @c ----------------------------------------------------------------------------
 
-@node Building from the Tar Ball, , Building from the Source RPM, Building
+@node Building from the Debian DSC
+@subsection Building from the Debian DSC
+@cindex building, source dscs
+@cindex source dscs
+
+@c ----------------------------------------------------------------------------
+
+@node Building from the Tar Ball
 @subsection Building from the Tar Ball
 @cindex building, tar ball
 @cindex tar ball
@@ -1574,7 +1683,9 @@ all:
         (cd drivers; $(MAKE))
         (cd utility; $(MAKE))
 #       uncomment for LiS build
-        (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
+#       (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
+#       uncomment for LfS build
+        (cd usr/src/streams; ./configure.nexusware; $(MAKE) install-strip)
 #       uncomment for @value{PACKAGE} build
 #       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
         (cd build/generic; $(MAKE))
@@ -1604,18 +1715,19 @@ build the @cite{NexusWare} flash image as normal:
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Installing, Removal, Building, Installation
+@node Installing
 @section Installing
 @cindex installing
 
 @menu
 * Installing the Binary RPM::		the easiest approach
+* Installing the Debian DEB::		the easiest approach for Debian
 * Installing the Tar Ball::		last resort
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@node Installing the Binary RPM, Installing the Tar Ball, , Installing
+@node Installing the Binary RPM
 @subsection Installing the Binary RPM
 @cindex installing, binary rpms
 @cindex binary rpms
@@ -1629,7 +1741,7 @@ rpm(8), *manpages*, The Manual Pages}.
 @example
 @cartouche
 % pushd RPMS/i686
-% rpm -ihv @value{PACKAGE}-*-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+% rpm -ihv @value{PACKAGE}-*-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @end cartouche
 @end example
 
@@ -1648,7 +1760,7 @@ will relocate the documentation and info directories:
 % rpm -ihv \ 
         --relocate '/usr/share/doc=/usr/local/share/doc' \ 
         --relocate '/usr/share/info=/usr/local/share/info' \ 
-        -- @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.i686.rpm
+        -- @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @end cartouche
 @end example
 
@@ -1659,7 +1771,14 @@ version.
 
 @c ----------------------------------------------------------------------------
 
-@node Installing the Tar Ball, , Installing the Binary RPM, Installing
+@node Installing the Debian DEB
+@subsection Installing the Debian DEB
+@cindex installing, binary debs
+@cindex binary debs
+
+@c ----------------------------------------------------------------------------
+
+@node Installing the Tar Ball
 @subsection Installing the Tar Ball
 @cindex installing, tar ball
 @cindex tar ball
@@ -1682,19 +1801,21 @@ target.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Removal, Loading, Installing, Installation
+@node Removing
 @section Removing
-@cindex removal
+@cindex removing
 
 @menu
 * Removing the Binary RPM::		the easiest approach
+* Removing the Debian DEB::		the easiest approach for Debian
 * Removing the Source RPM::		the next best approach
+* Removing the Debian DSC::		the next best approach for Debian
 * Removing the Tar Ball::		last resort
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@node Removing the Binary RPM, Removing the Source RPM, , Removal
+@node Removing the Binary RPM
 @subsection Removing the Binary RPM
 @cindex removing, binary rpms
 @cindex binary rpms
@@ -1714,7 +1835,14 @@ For more information on @command{rpm}, see @ref{rpm(8), rpm(8), rpm(8),
 
 @c ----------------------------------------------------------------------------
 
-@node Removing the Source RPM, Removing the Tar Ball, Removing the Binary RPM, Removal
+@node Removing the Debian DEB
+@subsection Removing the Debian DEB
+@cindex removing, binary debs
+@cindex binary debs
+
+@c ----------------------------------------------------------------------------
+
+@node Removing the Source RPM
 @subsection Removing the Source RPM
 @cindex removing, source srpm
 @cindex source rpms
@@ -1734,7 +1862,14 @@ should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.
 
 @c ----------------------------------------------------------------------------
 
-@node Removing the Tar Ball, , Removing the Source RPM, Removal
+@node Removing the Debian DSC
+@subsection Removing the Debian DSC
+@cindex removing, source dscs
+@cindex source dscs
+
+@c ----------------------------------------------------------------------------
+
+@node Removing the Tar Ball
 @subsection Removing the Tar Ball
 @cindex removing, tar ball
 @cindex tar ball
@@ -1762,7 +1897,7 @@ the Tar Ball}) except the final installation and then perform the steps above.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Loading, , Removal, Installation
+@node Loading
 @section Loading
 @cindex loading
 
@@ -1776,20 +1911,33 @@ configured for demand loading.  The @samp{install} and @samp{install-strip}
 @fnindex make install-strip
 targets will make the necessary changes to the @file{/etc/modules.conf} file and
 place the modules in an appropriate place in
-@file{/lib/modules/@var{@value{_kversion}}/@value{PACKAGE_LCNAME}}.  The @samp{make install}
-process should have copied the kernel module files @file{streams-*.o} to the
-directory @file{@var{DESTDIR}/lib/modules/@value{_kversion}/@value{PACKAGE_LCNAME}}.
+@file{@value{_rootdir}/lib/modules/@value{_kversion}/@value{PACKAGE_LCNAME}}.
+The @samp{make install} process should have copied the kernel module files
+@file{streams-*.o} to the directory
+@file{@value{_rootdir}/lib/modules/@value{_kversion}/@value{PACKAGE_LCNAME}}.
 This means that to load any of these modules, you can simply execute, for
-example, @samp{modprobe stream-@var{somedriver}}.
+example, @samp{modprobe stream-@var{somedriver}}.@footnote{Note that the
+@samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubsection Linux STREAMS Module Loading
 
+The @file{@value{PACKAGE}} demand load system supports both the old kerneld and
+the new kmod mechanisms for demand loading kernel modules.
+
+The convention for @file{@value{PACKAGE}} kernel loadable object files is:
+@itemize @bullet
+@item Their name start with "streams-".
+@item They are placed in @file{/lib/modules/@value{_kversion}/streams/}, where @samp{@value{_kversion}} is an example kernel version.
+@pgindex /lib/modules/@value{_kversion}/streams/
+@end itemize
+
 If your kernel has been built using the @file{kerneld} daemon, then
-@file{@value{PACKAGE_NAME}} kernel modules will automatically load as soon as the
-STREAMS module is pushed or the driver is opened.  The @samp{make install}
-process makes the necessary changes to the @file{@var{DESTDIR}/etc/modules.conf}
-file.  After the install, you will see lines like the following added to your
-@file{@var{DESTDIR}/etc/modules.conf} file:
+@file{@value{PACKAGE_NAME}} kernel modules will automatically load as soon as
+the STREAMS module is pushed or the driver is opened.  The @samp{make install}
+process makes the necessary changes to the
+@file{@value{_rootdir}/etc/modules.conf} file.  After the install, you will see
+lines like the following added to your @file{@value{_rootdir}/etc/modules.conf}
+file:
 
 @example
 @cartouche

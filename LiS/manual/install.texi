@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.10 2005/03/15 12:03:49 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.4.1 2005/03/15 12:05:37 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 12:03:49 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 12:05:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -107,10 +107,9 @@ to download, configure, build and install from the source tarball.
 @cindex binary rpms
 
 To install from binary RPM, you will need several of the RPM for a complete
-installation.  Binary RPM fall into three categories.  To download and install a
-complete package requires the appropriate RPM from each of the three categories
-below, as applicable.  Some release packages do not provide RPMs in each of the
-three categories.
+installation.  Binary RPM fall into two categories.  To download and install a
+complete package requires the appropriate RPM from each of the two categories
+below.
 
 To install from Binary RPM, you will need all of the following kernel
 indepdendent packages for your architecture, and one of the kernel-depdendent
@@ -118,15 +117,15 @@ packages from the next section.
 
 @subsubheading Independent RPM
 Independent RPM are
-dependent on neither the Linux kernel version, nor the STREAMS package.
+not dependent on the Linux kernel version.
 For example, the
 source package
 @samp{@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm},
 is not dependent on
-kernel nor STREAMS package.
+kernel.
 
 @noindent
-All of the following kernel and STREAMS independent RPM are required for your architecture.
+All of the following kernel independent RPM are required for your architecture.
 Binary RPMs listed here are for example only: additional binary RPMs are
 available from the downloads site.  If your architecture is not available, you
 can build binary RPM from the source RPM (see @pxref{Building from the Source
@@ -160,25 +159,28 @@ necessary for developing @value{PACKAGE_TITLE} applications and
 The @file{@value{PACKAGE}-lib} package contains the run-time shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
+@ignore
 @footnote{Note that not all release packages contain shared libraries, and,
 therefore, not all release packages contain this package.}
+@end ignore
 
 @item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @command{autoconf}
 configuration utilities necessary to create and distribute tarballs, rpms and
 deb/dscs.
+@ignore
 @footnote{Note that not all releases have source RPM packages.  Release packages
 that do not contain kernel modules do not generate a source RPM package.}
+@end ignore
 
-@ignore
 @item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.
-@end ignore
 @end table
 
+@ignore
 @subsubheading STREAMS-Dependent RPM
 STREAMS-Dependent RPM are dependent upon the specific STREAMS package being
 used, either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.  Packages
@@ -207,6 +209,7 @@ configuration test utilities and commands associated with the
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
 @file{@value{PACKAGE}-streams-util} package if you have streams installed.
 @end table
+@end ignore
 
 @subsubheading Kernel-Dependent RPM
 Kernel-Dependent RPM are dependent on specific Linux Kernel Binary RPM releases.
@@ -245,6 +248,7 @@ compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
+@ignore
 @item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
 The @file{@value{PACKAGE}-LiS-core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
@@ -285,6 +289,7 @@ which it was compiled.  This particular package applies to @file{streams}
 (@cite{Linux Fast-STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
+@end ignore
 @end table
 
 @subsubheading Configuration and Installation
@@ -315,8 +320,7 @@ you own binary RPM, download the following source RPM.
 @table @asis
 @item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm, @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to
-build binary RPM for any supported architecture and for any 2.4 or 2.6 kernel,
-for either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.
+build binary RPM for any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
 
 @subsubheading Configuration
@@ -531,21 +535,17 @@ This allows some degree of customization.  Relocations that are available on the
 binary RPM are as follows:
 
 @table @file
-@item @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}/lib/modules/@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
-@value{PACKAGE_NAME} STREAMS core, drivers and modules.@footnote{Note that the
+@value{PACKAGE_NAME} core, drivers and modules.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 @end table
 
-@item @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}/usr/include/@value{PACKAGE}/@value{_kversion}}
 This relocatable directory contains the kernel module exported symbol
@@ -582,10 +582,8 @@ this manual).
 This relocatable directory contains manual pages.
 @end table
 
-@item @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains the run-time shared libraries necessary to
@@ -602,10 +600,8 @@ files.
 This relocatable directory contains the source code.
 @end table
 
-@item @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@cindex @value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains binary programs and utilities.
@@ -714,10 +710,12 @@ do:
 --define "_with_someparm --with-someparm=somearg"
 @end example
 
+@ignore
 This is a generic description of common @command{rpmbuild} options.  Not all
 @command{rpmbuild} options are applicable to all SRPMs.  Options that are kernel
 module specific are only applicable to SRPMs that build kernel modules.  STREAMS
 options are only applicable to SRPMs that provide or require STREAMS.
+@end ignore
 
 @table @code
 @item --define "_kversion $PACKAGE_KVERSION"
@@ -837,6 +835,7 @@ build kernel module packages.  This option can be useful when rebuilding for
 multiple architectures and target kernels.  The @command{rebuild} automake
 target uses this feature to rebuild for all available architectures and kernels.
 
+@ignore
 @item --with lis
 @itemx --without lis
 @opindex lis
@@ -850,6 +849,7 @@ loaded on the build system and build accordingly.
 Specifies that the package is to be rebuilt against @cite{Linux Fast-STREAMS}.
 The default is to automatically identify whether @file{LiS} or @file{streams} is
 loaded on the build system and build accordingly.
+@end ignore
 @end table
 
 @include rpm.texi
@@ -889,11 +889,13 @@ tailor or customize the build and are described below.
 @subsubsection Configure Options
 @cindex configure options
 
+@ignore
 This is a generic description of common @command{configure} options.  Not all
 @command{configure} options are applicable to all release packages.  Options
 that are kernel module specific are only applicable to release packages that
 build kernel modules.  STREAMS options are only applicable to release packages
 that provide or require STREAMS.
+@end ignore
 
 Following are the additional @command{configure} options, their meaning and use:
 
@@ -950,7 +952,9 @@ to build and install kernel modules.  This option can be useful when rebuilding
 for multiple architectures and target kernels, particularly under rpm.  The
 @command{rebuild} automake target uses this feature to rebuild for all available
 architectures and kernels.
+@ignore
 This option has no effect if there are no kernel modules in the package.
+@end ignore
 
 @item --enable-arch
 @opindex arch
@@ -958,8 +962,10 @@ Specifies whether architectural dependent package components are to be built and
 installed.  This option can be useful when rebuilding for multiple architectures
 and target kernels, particularly under dpkg.  The default is to configure, build
 and install architecture dependent package components.
+@ignore
 This option has no effect if there are no architecture dependent components in
 the package.
+@end ignore
 
 @item --enable-indep
 @opindex indep
@@ -967,8 +973,10 @@ Specifies whether architecture independent package components are to be built
 and installed.  This option can be useful when rebuilding for multiple
 architectures and target kernels, particularly under dpkg.  The default is to
 configure, build and install architecture independent package components.
+@ignore
 This options has no effect if there are no architecture independent components
 in the package.
+@end ignore
 
 @item --enable-k-inline
 @opindex k-inline
@@ -976,7 +984,9 @@ Enable kernel inline functions.  Most Linux kernels build without
 @command{-finline-functions}.  This option adds the @command{-finline-functions}
 and @command{-Winline} flags to the compilation of kernel modules.  Use with
 care.
+@ignore
 This option has no effect if there are no kernel modules in the package.
+@end ignore
 
 @item --enable-k-safe
 @opindex k-safe
@@ -985,7 +995,9 @@ to be performed.  This option is mutually exclusive with
 @command{--enable-k-test} and @command{--enable-k-debug} below.  This has the
 effect of invoking some more pedantic assertion macros in the code.  The default
 is not to apply kernel safety.
+@ignore
 This option has no effect if there are no kernel modules in the package.
+@end ignore
 
 @item --enable-k-test
 @opindex k-test
@@ -995,7 +1007,9 @@ above and @command{--enable-k-debug} below.  This has the effect of remove
 @code{static} and @code{inline} attributes from functions and invoking most
 non-performance affecting debugging macros in the code.  The default is not to
 perform kernel testing.
+@ignore
 This option has no effect if there are no kernel modules in the package.
+@end ignore
 
 @item --enable-k-debug
 @opindex k-debug
@@ -1005,8 +1019,11 @@ to be performed.  This option is mutuallly exclusive with
 effect of removing @code{static} and @code{inline} attributes from functions and
 invoking all debuggin macros in the code (including performance-affecting debug
 macros).  The default is to not perform kernel debugging.
+@ignore
 This option has no effect if there are no kernel modules in the package.
+@end ignore
 
+@ignore
 @itemx --disable-k-modversions
 @opindex k-modversions
 Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies
@@ -1014,6 +1031,7 @@ whether kernel symbol versioning is to be used on symbols exported from built
 @command{@value{PACKAGE_NAME}} modules.  The default is to provide kernel symbol
 versioning on all exported symbols.
 This option has no effect if there are no kernel modules in the package.
+@end ignore
 
 @item --with-gpg-user=GNUPGUSER
 @opindex gpg-user
@@ -1204,6 +1222,7 @@ Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
 compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
 @code{-O0}.  The default is @var{normal}.  Use with care.
 
+@ignore
 @item --with-lis[=LIS-DIR]
 @itemx --without-lis
 @opindex lis
@@ -1225,20 +1244,25 @@ directory is normally located by the @command{configure} script and need only be
 provided for special cross-build environments or when requested by a
 @command{configure} script error message.
 This option has no effect on packages that do not use the STREAMS subsystem.
+@end ignore
 
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master
 file is written.  The default is @file{Config.master}.
+@ignore
 This option has no effect on packages that do not use the STREAMS subsystem and
 the strconf scripts.
+@end ignore
 
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
 Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is
 @samp{230}.
+@ignore
 This option has no effect on packages that do not use the STREAMS subsystem and
 the strconf scripts.
+@end ignore
 
 @end table
 
@@ -1499,13 +1523,13 @@ are provided on the @command{rpm} command line.  For example:
 @cartouche
 % rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
   --define "_kversion @value{_kversion}" \ 
-  --with lis -- @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
+  -- @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end cartouche
 @end example
 
 @noindent
 will rebuild binary RPM for the @samp{@value{_kversion}} kernel for the
-@samp{athlon} architecture against the @cite{LiS} STREAMS package.
+@samp{athlon} architecture.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
@@ -1682,10 +1706,6 @@ all:
         (cd usr/src/pti; $(MAKE))
         (cd drivers; $(MAKE))
         (cd utility; $(MAKE))
-#       uncomment for LiS build
-#       (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
-#       uncomment for LfS build
-        (cd usr/src/streams; ./configure.nexusware; $(MAKE) install-strip)
 #       uncomment for @value{PACKAGE} build
 #       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
         (cd build/generic; $(MAKE))
