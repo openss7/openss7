@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/03/08 13:09:35 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/03/13 12:15:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 13:09:35 $ by $Author: brian $
+# Last Modified $Date: 2005/03/13 12:15:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,6 +74,7 @@
 AC_DEFUN([_LINUX_STREAMS], [dnl
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
+    _LINUX_STREAMS_KERNEL
     _LINUX_STREAMS_OUTPUT
     AC_SUBST([STREAMS_CPPFLAGS])
     AC_SUBST([STREAMS_LDADD])
@@ -510,6 +511,23 @@ dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will jus
 	fi
     ])
 ])# _LINUX_STREAMS_LFS_CHECK_HEADERS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_STREAMS_KERNEL
+# -----------------------------------------------------------------------------
+# Need to know about irqreturn_t for os7/compat.h STREAMS compatibility file.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_KERNEL], [dnl
+    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+])
+])# _LINUX_STREAMS_KERNEL
 # =============================================================================
 
 # =============================================================================
