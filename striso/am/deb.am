@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/23 02:19:15 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/23 11:34:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/23 02:19:15 $ by $Author: brian $
+## Last Modified $Date: 2005/03/23 11:34:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -197,6 +197,7 @@ RELEASECLEANFILES	+= $(debian_source_files) \
 EXTRA_DIST		+= debian/changelog \
 			   debian/control \
 			   debian/rules \
+			   debian/copyright \
 			   .debrelease \
 			   .debepoch
 
