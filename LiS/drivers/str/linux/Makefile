@@ -1,20 +1,26 @@
+include .config_mk
+
 #
-#  Makefile for LiS drivers.
+#  Makefile for LiS drivers
 #
 #  This one builds drivers for the Linux kernel.
 #
-LIS_HOME = ../../..
-include $(LIS_HOME)/config.mk
-
--include $(LIS_HOME)/drvrconf.mk
+#  FIXME - some of these modules (e.g., relay3, inet) can now be moved
+#  to a pkg/ subdir of their own. since modules can now be built from
+#  there
+#
+-include $(SRCDIR)/drvrconf.mk
 
 OPT = -DLINUX -D__KERNEL__
 MODOPT = -DMODULE
+ifeq ($(KBUILD_NEEDS_MODNAME),y)
+  MODOPT += -DKBUILD_MODNAME=$(*F:%=streams-%)
+endif
 #ifeq ($(DBG_OPT),y)
 #  OPT += -DDEBUG
 #endif
 
-CC += -DLiS $(OPT) $(XOPTS)
+CC += -DLiS $(CCREGPARM) $(OPT) $(XOPTS)
 
 
 # Object names known to all targets
@@ -22,6 +28,21 @@ OBJS := fifo loop relay clone minimux printk timod tirdwr sad pipemod
 
 # Object names only known to the Linux kernel target.
 TOBJS := ip_strm_mod ldl connld mtdrv
+#
+# FIXME - move inet to the pkg/ directory in a subdir of its own; that
+# should work now...
+#
+ifeq ($(CONFIG_INET),y)
+ifeq ($(IPV6_MODULE),y)
+TOBJS += inet
+INET_INST=inet_install
+INET_CLEAN=inet_clean
+ifeq ($(DBG_OPT),y)
+XOPTS += -D_SAFE
+endif
+endif				# IPV6_MODULE
+endif				# CONFIG_INET
+
 ifneq ($(KVER_MAJORMINOR),2.2)
 TOBJS += ip_to_dlpi
 endif
@@ -33,7 +54,7 @@ TOBJS := connld
 endif
 
 # Similar to TOBJS, but non-streams modules
-ZOBJS := liskmod
+ZOBJS := 
 
 # Remove unknown object names
 LINKS := $(filter $(OBJS),$(MODCONF_LINKS))
@@ -41,6 +62,9 @@ LOADS := $(filter $(OBJS),$(MODCONF_LOADS))
 TLINKS := $(filter $(TOBJS),$(MODCONF_LINKS))
 TLOADS := $(filter $(TOBJS),$(MODCONF_LOADS))
 ZLOADS := $(ZOBJS)
+
+# Add back Linux-only modules not in the Config file
+TLOADS += relay3
 
 # Linked object file names
 DRVRS := $(LINKS:%=%.o)
@@ -60,99 +84,98 @@ ifdef CONFIG_MODVERSIONS
 OPT += -DMODVERSIONS
 endif 
 
-MODULES := $(MODLS:%=$(LIS_HOME)/modules/%) 
+# FIXME: are DMODLS and MODULES the same?
+
+MODULES	= $(MODLS) $(TMODLS) $(ZMODLS)
 
 else   # not CONFIG_MODULES
 
-ifneq ($(strip $(MODLS) $(TMODLS)),)
+ifneq ($(strip $(MODLS) $(TMODLS) $(ZMODLS)),)
 first_rule:
-	echo "Configured loadables, but no kernel module support." >&2
-	/bin/false
+	@echo "Configured loadables, but no kernel module support." >&2
+	@/bin/false
 endif  # ifdef MODLS
 
 endif  # ifdef CONFIG_MODULES
 
 
-#
-# Our default target
-#
-# We omit strinet.  Make it by hand if you need it.
-#
-default: drivers.o 
-#default: drivers.o strinet
-
-ifneq ($(strip $(MODLS) $(TMODLS)),)
-
-# A target that makes modules
-modules: $(MODLS) $(TMODLS) $(ZMODLS)
-	ln -s $(^:%=$(DRVROBJ)/%) $(LIS_HOME)/modules
-
-else  # No modules to be made here
-
-modules:
-
-endif
-
-#
-# Rules
-#
-clean: common-clean
-	-rm -f $(OBJS:%=streams-%.o)
-	-rm -f $(TOBJS:%=streams-%.o)
-	-rm -f $(ZOBJS:%=%.o)
-
-realclean: clean common-realclean
-	-rm -f .depend.modules
-
-install:	common-install
-
-uninstall:	common-uninstall
-
 # How to compile a loadable only known here ( $(TMODLS) )
 streams-%.o: %.c
-	$(CC) $(MODOPT) -DLIS_OBJNAME=$* -c -o $@ $^
+	$(Q_ECHO) $(qtag_CCm)$(relpwdtarget)
+	$(Q)$(CC) $(MODOPT) -DLIS_OBJNAME=$* -o $@ -c $<
 
 # How to compile a loadable known to all targets ( $(MODLS) )
 streams-%.o: $(DRVRDIR)/%.c
-	$(CC) $(MODOPT) -DLIS_OBJNAME=$* -c -o $@ $^
+	$(Q_ECHO) $(qtag_CCm)$(relpwdtarget)
+	$(Q)$(CC) $(MODOPT) -DLIS_OBJNAME=$* -o $@ -c $<
+
+%.o: %.c
+	$(Q_ECHO) $(qtag_CCm)$(relpwdtarget)
+	$(Q)$(CC) $(MODOPT) -DLIS_OBJNAME=$* -o $@ -c $<
+
+
+# the following uses variables, but defines targets and rules, including
+# a 'default' rule which should be first (with the exception of first_rule
+# above).
+#
+# so, variables should be defined before this include, as should rules to
+# override, but additional targets and rules after
+#
+include $(DRVRDIR)/mk.bdy
+
+
+# A target that makes modules
+
+modules: .modules
+	$(nothing)
+
+.modules: $(MODULES)
+	$(Q)echo $(relpwddeps) > $@
+
+
+clean: common-clean $(INET_CLEAN)
+	$(Q_ECHO) $(qtag_CLEAN)$(relpwd)
+	-$(Q)rm -f $(OBJS:%=streams-%.o)
+	-$(Q)rm -f $(TOBJS:%=streams-%.o)
+	-$(Q)rm -f $(ZOBJS:%=%.o)
+	-$(Q)rm -f .modules
+
+realclean: clean common-realclean
+	-$(Q)rm -f .depend.modules
+
+install: common-install $(INET_INST)
+	$(Q_ECHO) $(qtag_INSTALL)$(relpwd)
+
+uninstall:	common-uninstall
+	$(nothing)
 
 #
-# This would be the rule to compile modules in this directory,
-# but it gets overridden by the global rule -- or fails to
-# override it.  So the MODOPT does not get included.
+# Install and clean for inet
 #
-%.o: %.c
-	$(CC) $(MODOPT) -DLIS_OBJNAME=$* -c -o $@ $^
+inet_install:
+	$(Q_ECHO) $(qtag_INSTALL)"[inet]"
+	-$(Q)(cd $(SRCDIR)/scripts; ./inet_mkdev)
+
+inet_clean:
+	$(Q_ECHO) $tag_CLEAN)"[inet]"
+	-$(Q)(cd $(SRCDIR)/scripts; ./inet_rmdev)
+
 #
 # Common rules
 #
 
-# Here because the general rule is in-effective
-liskmod.o:	liskmod.c
-	$(CC) $(MODOPT) -DLIS_OBJNAME=$* -c -o $@ $^
 
 #
-# OPEN SS7 strinet package
+# Rule for relay3, a special compilation of relay.c
 #
-# You can make these targets by hand from here but they are
-# not made implicitly any more.
-#
-strinet:
-	cd ../strinet; ./make_strinet
+streams-relay3.o: relay3.c
+	$(Q_ECHO) $(qtag_CCm)$(relpwdtarget)
+	$(Q)$(CC) $(MODOPT) -DLIS_OBJNAME=$* -DRELAY3 -o $@ -c $<
+#	-$(Q)rm -f $<
 
-clean_strinet:
-	cd ../strinet; ./make_strinet clean
-
-realclean_strinet:
-	cd ../strinet; ./make_strinet realclean
-
-install_strinet:
-	cd ../strinet; ./make_strinet install
-
-uninstall_strinet:
-	cd ../strinet; ./make_strinet uninstall
-
-include $(DRVRDIR)/mk.bdy
+relay3.c: $(DRVRDIR)/relay.c
+#	-$(Q)rm -f $@
+	$(Q)cp $? $@
 
 #
 # Dependency stuff
@@ -160,11 +183,12 @@ include $(DRVRDIR)/mk.bdy
 
 -include .depend.modules
 
-dep: common-dep
+dep: relay3.c common-dep
+	$(Q_ECHO) $(qtag_DEP)$(relpwd)
 ifneq ($(strip $(MODLS) $(TMODLS)),)
-	$(CC) $(MODOPT) -M $(MODLS:streams-%.o=$(DRVRDIR)/%.c) \
+	$(Q)$(CC) $(MODOPT) -M $(MODLS:streams-%.o=$(DRVRDIR)/%.c) \
  $(TMODLS:streams-%.o=%.c) >.depend.modules
 else
-	>.depend.modules
+	$(Q)>.depend.modules
 endif
 
