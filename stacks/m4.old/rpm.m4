@@ -85,9 +85,9 @@ AC_DEFUN(_RPM_SPEC_OPTIONS,
     AC_ARG_WITH([rpm-release],
         AC_HELP_STRING([--with-rpm-release=RELEASE],
             [specify the RELEASE for the RPM spec file.
-            @<:@default=1@:>@]),
+            @<:@default=Custom@:>@]),
         [with_rpm_release=$withval],
-        [with_rpm_release='1'])
+        [with_rpm_release='Custom'])
 ])# _RPM_SPEC_OPTIONS
 # =========================================================================
 

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.2 2004/04/14 18:49:28 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.3 2004/04/15 10:19:09 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/14 18:49:28 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/15 10:19:09 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -284,6 +284,19 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT],
             _LINUX_STREAMS_LFS_DEFINES
             : ;;
     esac
+    STR_BASE_MAJOR=185
+    if test :"${with_base_major:+set}" = :set ; then
+        case "$with_base_major" in
+            no | No | nO | NO)
+                ;;
+            yes | Yes | YEs | YeS | YES)
+                ;;
+            *)
+                STR_BASE_MAJOR="$with_base_major"
+                ;;
+        esac
+    fi
+    AC_SUBST([STR_BASE_MAJOR])
 ])# _LINUX_STREAMS_OUTPUT
 # =========================================================================
 

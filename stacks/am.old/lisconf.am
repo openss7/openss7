@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/15 10:19:09 $
+# @(#) $RCSfile: lisconf.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/15 10:17:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,40 +47,52 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/15 10:19:09 $ by $Author: brian $
+# Last Modified $Date: 2004/04/15 10:17:27 $ by $Author: brian $
 #
 # =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.7 dist-bzip2 std-options -Wall readme-alpha
+#
+#   Automake makefile fragment for including LiS (Linux STREAMS) configuration
+#   targets and scripts.  This was previously part of the Makefile.am proper,
+#   but was removed here to accomodate configuring both for LiS (Linux
+#   STREAMS) and LfS (Linux Fast-STREAMS).
+#
 
-ACLOCAL_AMFLAGS = -I m4
+STRCONF_SCRIPT	    = $(auxdir)/strconf-sh
+STRCONF		    = $(SHELL) $(STRCONF_SCRIPT) -b$(STR_BASE_MAJOR)
+STRMAKENODES	    = ss7makenodes
 
-#
-# Have the makefile regenerate libtool if necessary
-#
-$(OBJECTS): libtool
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status --recheck
+Config.master: $(strconf_FILES)
+	cat /dev/null > Config.master
+	@list='$(strconf_FILES)' ; cat /dev/null > Config.master ; for f in $$list ; do \
+		if test -f "$$f" ; then d= ; else d="$(srcdir)/" ; fi ; \
+		echo "cat $$d$$f >> Config.master" ; \
+		cat $$d$$f >> Config.master ; \
+	done
 
-#
-# I use vim, not emacs.  The following triggers Automake 1.7 to include
-# targets for making vim tags files along with emacs TAGS files.
-#
-CTAGS = ctags
-AM_CTAGSFLAGS = --c-types=+px
+conf.modules: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --confmodules=$@ $<
 
-#
-# A rule to generate an ifnames.log file
-#
-ifnames:
-	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
+strconf.h: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --hconfig=$@ $<
 
-#
-# Collected phonys from other automake fragments.
-#
-.PHONY: install-modules post-modules uninstall-modules postun-modules \
-	post-libraries postun-libraries \
-	clean-local-manpages install-local-manpages uninstall-local-manpages \
-	srpm rpms 
+devices.lst: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --strmknods=$@ $<
+
+$(STRMAKENODES).c: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --makenodes=$@ $<
+
+clean-devices:
+	rm -f Config.master conf.modules strconf.h devices.lst $(STRMAKENODES).c
+
+all-am: conf.modules strconf.h devices.lst
+
+clean-local: clean-devices
+
+install-devices: $(STRMAKENODES)
+	$(STRMAKENODES)
+
+uninstall-devices: $(STRMAKENODES)
+	$(STRMAKENODES) --remove
 
 # vim: ft=automake

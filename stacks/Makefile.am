@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/14 10:33:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/15 10:18:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/14 10:33:02 $ by $Author: brian $
+# Last Modified $Date: 2004/04/15 10:18:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1201,6 +1201,8 @@ strconf_FILES = \
 	src/modules/tormenta/lis.conf \
 	src/modules/xti_sctp/lis.conf
 
+include am/lisconf.am
+
 #
 #   Need to override the following two automake rules to strip the first two
 #   path components (src/include) from the header file path name for install.
@@ -1223,43 +1225,6 @@ uninstall-nobase_includeHEADERS:
 		echo "rm -f $(DESTDIR)$(includedir)/$$f" ; \
 		rm -f $(DESTDIR)$(includedir)/$$f ; \
 	done
-
-STRCONF_SCRIPT	    = $(auxdir)/strconf-sh
-STRCONF		    = $(SHELL) $(STRCONF_SCRIPT) -b190
-STRMAKENODES	    = ss7makenodes
-
-Config.master: $(strconf_FILES)
-	cat /dev/null > Config.master
-	@list='$(strconf_FILES)' ; cat /dev/null > Config.master ; for f in $$list ; do \
-		if test -f "$$f" ; then d= ; else d="$(srcdir)/" ; fi ; \
-		echo "cat $$d$$f >> Config.master" ; \
-		cat $$d$$f >> Config.master ; \
-	done
-
-conf.modules: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --confmodules=conf.modules Config.master
-
-strconf.h: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --hconfig=strconf.h Config.master
-
-devices.lst: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --strmknods=devices.lst Config.master
-
-ss7makenodes.c: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --makenodes=ss7makenodes.c Config.master
-
-clean-local:
-	rm -f Config.master conf.modules strconf.h devices.lst ss7makenodes.c
-
-$(libSS7mods_a_OBJECTS): strconf.h
-
-install-devices: $(STRMAKENODES)
-	$(STRMAKENODES)
-
-uninstall-devices: $(STRMAKENODES)
-	$(STRMAKENODES) --remove
-
-all-am: conf.modules strconf.h devices.lst
 
 ss7_source_FILES		= $(mods_source_FILES) \
 				  $(sctp_source_FILES) \

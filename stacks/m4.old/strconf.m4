@@ -1,10 +1,13 @@
 dnl =========================================================================
+dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
+dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/04/15 10:18:45 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9 2004/04/15 10:17:32 brian Exp $
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -51,65 +54,15 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/15 10:18:45 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/15 10:17:32 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-# Process this file with autoconf to produce a configure script.
-
-AC_PREREQ(2.57)
-AC_INIT([openss7],[0.9a],[bugs@openss7.org])
-AC_CONFIG_SRCDIR([src/modules/ss7ip/sdt_tpi.c])
-AC_CONFIG_HEADER([config.h])
-
-AC_CONFIG_AUX_DIR([scripts])
-
-auxdir="$ac_aux_dir"
-AC_SUBST(auxdir)
-
-AC_CANONICAL_TARGET
-
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
-AM_MAINTAINER_MODE
-
-AC_GNU_SOURCE
-
-# Checks for programs.
-AM_PROG_AS
-AC_PROG_AWK
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_CC_C_O
-
-AC_PROG_INSTALL
-AM_PROG_INSTALL_STRIP
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
-AC_SUBST([LIBTOOL_DEPS])
-
-# Checks for libraries.
-
-# Checks for header files.
-AC_HEADER_MAJOR
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_UID_T
-AC_C_INLINE
-AC_TYPE_MODE_T
-AC_TYPE_OFF_T
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
-AC_C_VOLATILE
-
-# Checks for library functions.
-AC_HEADER_STDC
-AC_FUNC_MEMCMP
-AC_CHECK_FUNCS([bzero])
-
-AC_SS7
-
-AC_CONFIG_FILES([Makefile doc/Makefile doc/manual/Makefile])
-
-AC_OUTPUT
+dnl =========================================================================
+dnl 
+dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl 
+dnl =========================================================================
+dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
+dnl =========================================================================
