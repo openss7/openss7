@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/04 18:50:22 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/04/06 13:45:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/04 18:50:22 $ by $Author: brian $
+## Last Modified $Date: 2005/04/06 13:45:37 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -120,14 +120,19 @@ $(man9_MANS):: %.9: %.man $(man_MACROS)
 all-manmacros:
 
 install-manmacros:
+	@$(ECHO) "Making $@"
 
 uninstall-manmacros:
+	@$(ECHO) "Making $@"
 
 clean-manmacros:
+	@$(ECHO) "Making $@"
 
 distclean-manmacros:
+	@$(ECHO) "Making $@"
 
 maintainer-clean-manmacros:
+	@$(ECHO) "Making $@"
 
 ## COOKED_MANPAGES
 else
@@ -200,6 +205,7 @@ all-manmacros:
 # file in the mandir to be referenced by the uncooked manual pages.
 ##
 install-manmacros: $(man_MACROS)
+	@$(ECHO) "Making $@"
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(mandir)
 	@list="$(man_MACROS)" ; for f in $$list ; do \
@@ -209,6 +215,7 @@ install-manmacros: $(man_MACROS)
 	done
 
 uninstall-manmacros:
+	@$(ECHO) "Making $@"
 	@$(NORMAL_UNINSTALL)
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
@@ -219,6 +226,7 @@ uninstall-manmacros:
 # the srcdir and the builddir are different before removing.
 ##
 clean-manmacros:
+	@$(ECHO) "Making $@"
 	@if test "`(cd $(srcdir); pwd)`" != "`pwd`" ; then \
 		macros='$(man_MACROS)' ; for macro in $$macros ; do \
 			$(ECHO) "rm -f -- $$macro" ;  \
@@ -227,8 +235,10 @@ clean-manmacros:
 	fi
 
 distclean-manmacros:
+	@$(ECHO) "Making $@"
 
 maintainer-clean-manmacros:
+	@$(ECHO) "Making $@"
 
 ## ! COOKED_MANPAGES
 endif
@@ -240,13 +250,16 @@ all-manpages: $(man_MANS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) \
 # This is handled by automake.
 ##
 install-manpages:
+	@$(ECHO) "Making $@"
 
 ##
 # This is handled by automake.
 ##
 uninstall-manpages:
+	@$(ECHO) "Making $@"
 
 clean-manpages:
+	@$(ECHO) "Making $@"
 	@if test -n "$(man_MANS)" ; then \
 		$(ECHO) "rm -f -- $(man_MANS)" ; \
 		rm -f -- $(man_MANS) ; \
@@ -289,8 +302,10 @@ clean-manpages:
 	fi ;
 
 distclean-manpages:
+	@$(ECHO) "Making $@"
 
 maintainer-clean-manpages:
+	@$(ECHO) "Making $@"
 
 ALL_LOCAL		+= all-manmacros all-manpages
 
