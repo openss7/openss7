@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hooks.h.in,v 0.9.2.1 2005/01/11 04:23:26 brian Exp $
+ @(#) $Id: sctp_hooks.h.in,v 0.9.2.2 2005/02/04 12:55:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 04:23:26 $ by $Author: brian $
+ Last Modified $Date: 2005/02/04 12:55:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_SCTP_HOOKS_H__
 #define __LOCAL_SCTP_HOOKS_H__
 
-#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
@@ -66,6 +66,16 @@
    haven't defined it yet.  */
 #ifndef IPPROTO_SCTP
 #define IPPROTO_SCTP 132
+#endif
+
+#ifndef HAVE_SOCKADDR_STORAGE_SS_FAMILY
+#undef HAVE_SOCKADDR_STORAGE_SS_FAMILY
+#define _SS_MAXSIZE 128
+#define _SS_ALIGNSIZE (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+	sa_family_t	ss_family;
+	char		__data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
 #ifndef HAVE_ICMP_ERR_CONVERT_ADDR

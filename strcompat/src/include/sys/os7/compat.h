@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.5 2004/09/02 12:23:14 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.6 2005/02/04 12:54:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 12:23:14 $ by $Author: brian $
+ Last Modified $Date: 2005/02/04 12:54:14 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -84,6 +84,9 @@
 #ifdef LINUX
 #include <linux/errno.h>
 #include <linux/types.h>
+#include <linux/kernel.h>
+#include <linux/sched.h>
+#include <asm/system.h>
 #include <linux/interrupt.h>
 #include <linux/kdev_t.h>
 #endif				/* LINUX */
