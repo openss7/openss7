@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/22 08:31:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+## Last Modified $Date: 2005/02/22 08:31:31 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -91,17 +91,21 @@ RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR)
 # Otherwise, we will not move files into the release directory if they already exist there unless
 # force has been specified or a force release target has been invoked.
 ##
-$(archive_files): $(PACKAGE_DISTDIR)
+$(archive_files)::
 	@f=`echo "$@" | sed -e 's|$(PACKAGE_DISTDIR)/|./|'` ; \
-	test "$@" -ef "$$f"  && exit 0 ;  \
-	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
-	test ":$(FORCE)" != :force -a \( -f "$@" \) || cp -fauv -- $$f $@
+	test "$@" -ef "$$d$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		echo "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
+		echo "cp -f -- $$f $@" ; \
+		cp -f -- $$f $@ ; }
 
 ##
 # How to make an archive if we ask for one.  We do not make archives on demand if they already
 # exist.
 ##
-$(DIST_ARCHIVES):
+$(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist
 
 ##
@@ -115,14 +119,26 @@ DISTCLEANFILES		+= $(DIST_ARCHIVES)
 # generate a detached signature.  Redirect output to avoid gpg problems with existing files.  We
 # pipe in an environment variable for automated builds.
 ##
-%.asc : %
+$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc:: \
+$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1 ; then \
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
 		pass="$(GNUPGPASS)" ; pass="$${pass:+ --passphrase-fd 0}" ; \
 		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+echo "$$pipe" |}" ; \
-		echo "$(GPG) -ba$$user$$home$$pass --batch -o- -- $< > $@" ; \
-		eval "$$pipe $(GPG) -ba$$user$$home$$pass --batch -o- -- $< > $@" ; \
+		echo "$(GPG) -ba$$user$$home$$pass --batch -o- -- $< > $@ 2>/dev/null" ; \
+		eval "$$pipe $(GPG) -ba$$user$$home$$pass --batch -o- -- $< > $@ 2>/dev/null" ; \
+	else touch "$@" ; fi
+
+$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc:: \
+$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
+	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1 ; then \
+		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
+		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+		pass="$(GNUPGPASS)" ; pass="$${pass:+ --passphrase-fd 0}" ; \
+		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+echo "$$pipe" |}" ; \
+		echo "$(GPG) -ba$$user$$home$$pass --batch -o- -- $< > $@ 2>/dev/null" ; \
+		eval "$$pipe $(GPG) -ba$$user$$home$$pass --batch -o- -- $< > $@ 2>/dev/null" ; \
 	else touch "$@" ; fi
 
 ##

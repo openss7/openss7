@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/02/21 23:25:56 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/02/22 08:32:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/21 23:25:56 $ by $Author: brian $
+# Last Modified $Date: 2005/02/22 08:32:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,7 +109,6 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RELEASE@%%{extrarelease}}}
 %{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RELEASE@}}
-%{?extrarelease:  %{expand: %%global _builddir %{_builddir}/%%{extrarelease}}}
 
 Summary:        %{title} (SVR 4.2 MP STREAMS)
 %if %{?_without_public: 0}%{!?_without_public: 1}
@@ -970,31 +969,41 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.74  2005/02/21 23:25:56  brian
-# - Working up new makefile fragments.
+# Revision 0.9.2.75  2005/02/22 08:32:03  brian
+# - spec changes for updated makefile fragments
 #
-# Revision 0.9.2.42  2005/02/21 23:25:56  brian
-# - Working up new makefile fragments.
+# Revision 0.9.2.43  2005/02/22 08:32:03  brian
+# - spec changes for updated makefile fragments
 #
-# Revision 0.9.2.41  2005/02/19 12:06:52  brian
-# - rpm-epoch to pkg-epoch, rpm-release to pkg-release
-# - proper quotation of configure options
-#
-# Revision 0.9.2.40  2005/02/15 14:15:30  brian
-# - Remove link before linking.
-#
-# Revision 0.9.2.39  2005/02/13 12:16:46  brian
-# - Added init scrip initialization and teardown.
-#
-# Revision 0.9.2.38  2005/02/11 04:32:47  brian
-# - Added boot directory and module preloads.
-#
-# Revision 0.9.2.37  2005/02/10 12:56:33  brian
-# - Minor adjustments for compressed modules.
-#
-# Revision 0.9.2.36  2005/02/07 22:23:17  brian
-# - Updated changelog.
-#
+
+* Mon Feb 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.42  2005/02/21 23:25:56  brian
+- Working up new makefile fragments.
+
+* Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.41  2005/02/19 12:06:52  brian
+- rpm-epoch to pkg-epoch, rpm-release to pkg-release
+- proper quotation of configure options
+
+* Tue Feb 15 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.40  2005/02/15 14:15:30  brian
+- Remove link before linking.
+
+* Sun Feb 13 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.39  2005/02/13 12:16:46  brian
+- Added init scrip initialization and teardown.
+
+* Fri Feb 11 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.38  2005/02/11 04:32:47  brian
+- Added boot directory and module preloads.
+
+* Thu Feb 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.37  2005/02/10 12:56:33  brian
+- Minor adjustments for compressed modules.
+
+* Mon Feb  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.36  2005/02/07 22:23:17  brian
+- Updated changelog.
 
 * Thu Feb  3 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.35  2005/02/03 12:34:54  brian

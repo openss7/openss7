@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/19 12:06:51 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/22 08:32:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 12:06:51 $ by $Author: brian $
+# Last Modified $Date: 2005/02/22 08:32:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -138,8 +138,8 @@
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
-%global fullrelease @PACKAGE_RELEASE@%{extrarelease}
-%global _builddir %{_builddir}/%{extrarelease}
+%{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RELEASE@%%{extrarelease}}}
+%{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RELEASE@}}
 
 # a macro to build require one package of the same version as another
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
@@ -992,22 +992,30 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.11  2005/02/19 12:06:51  brian
-# - rpm-epoch to pkg-epoch, rpm-release to pkg-release
-# - proper quotation of configure options
+# Revision 0.9.2.12  2005/02/22 08:32:03  brian
+# - spec changes for updated makefile fragments
 #
-# Revision 0.9.2.10  2005/02/15 14:15:27  brian
-# - Remove link before linking.
-#
-# Revision 0.9.2.9  2005/02/11 04:18:54  brian
-# - Added boot directory.
-#
-# Revision 0.9.2.8  2005/02/10 12:56:29  brian
-# - Minor adjustments for compressed modules.
-#
-# Revision 0.9.2.7  2005/02/07 22:23:14  brian
-# - Updated changelog.
-#
+
+* Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.11  2005/02/19 12:06:51  brian
+- rpm-epoch to pkg-epoch, rpm-release to pkg-release
+- proper quotation of configure options
+
+* Tue Feb 15 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.10  2005/02/15 14:15:27  brian
+- Remove link before linking.
+
+* Fri Feb 11 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.9  2005/02/11 04:18:54  brian
+- Added boot directory.
+
+* Thu Feb 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.8  2005/02/10 12:56:29  brian
+- Minor adjustments for compressed modules.
+
+* Mon Feb  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.7  2005/02/07 22:23:14  brian
+- Updated changelog.
 
 * Thu Feb  3 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.6  2005/02/03 12:34:54  brian

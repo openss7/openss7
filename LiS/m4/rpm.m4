@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/02/22 08:31:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+# Last Modified $Date: 2005/02/22 08:31:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -222,7 +222,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # topdir.  The am/rpm.am makefile fragment will override rpm macros with these
 # values.  Note that the names stay nicely out of the way of autoconf directory
 # names, but all nicely end in dir so we will define them in the same way.
-# (Yes, autoconf does not define `builddir' because it is always `.'.
+# (Yes, autoconf defines `builddir' even though it is always `.'.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
@@ -246,20 +246,37 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 	esac
     ])
     topdir="$rpm_cv_topdir"
-    # set defaults for the rest
-    sourcedir='$(PACKAGE_DISTDIR)'
-    # builddir needs to be absolute
-    builddir="`(cd $ac_top_builddir; `pwd`)`"
-dnl builddir='$(top_builddir)'
-    rpmdir='$(topdir)/RPMS'
-    srcrpmdir='$(topdir)/SRPMS'
-    specdir='$(PACKAGE_DISTDIR)'
-    # tell automake about them
     AC_SUBST([topdir])dnl
+    # set defaults for the rest
+    AC_CACHE_CHECK([for rpm SOURCES directory], [rpm_cv_sourcedir], [dnl
+	rpm_cv_sourcedir='$(PACKAGE_DISTDIR)'
+    ])
+    sourcedir="$rpm_cv_sourcedir"
     AC_SUBST([sourcedir])dnl
-    AC_SUBST([builddir])dnl
+    AC_CACHE_CHECK([for rpm BUILD directory], [rpm_cv_builddir], [dnl
+	# rpmbuilddir needs to be absolute
+	if test -z "${rpm_cv_dist_extra}" ; then
+	    rpm_cv_builddir="`pwd`"
+	else
+	    rpm_cv_builddir="`pwd`/$rpm_cv_dist_extra"
+	fi
+    ])
+    rpmbuilddir="$rpm_cv_builddir"
+    AC_SUBST([rpmbuilddir])dnl
+    AC_CACHE_CHECK([for rpm RPMS directory], [rpm_cv_rpmdir], [dnl
+	rpm_cv_rpmdir='$(topdir)/RPMS'
+    ])
+    rpmdir=$rpm_cv_rpmdir
     AC_SUBST([rpmdir])dnl
+    AC_CACHE_CHECK([for rpm SRPMS directory], [rpm_cv_srcrpmdir], [dnl
+	rpm_cv_srcrpmdir='$(topdir)/SRPMS'
+    ])
+    srcrpmdir=$rpm_cv_srcrpmdir
     AC_SUBST([srcrpmdir])dnl
+    AC_CACHE_CHECK([for rpm SPECS directory], [rpm_cv_specdir], [dnl
+	rpm_cv_specdir='$(PACKAGE_DISTDIR)'
+    ])
+    specdir=$rpm_cv_specdir
     AC_SUBST([specdir])dnl
 ])# _RPM_SPEC_SETUP_TOPDIR
 # =============================================================================

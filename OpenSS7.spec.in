@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: OpenSS7.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/19 12:06:38 $
+# @(#) $RCSfile: OpenSS7.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/22 08:32:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 12:06:38 $ by $Author: brian $
+# Last Modified $Date: 2005/02/22 08:32:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -130,8 +130,9 @@
 %define _modules    x400 x100
 
 # we have some more options that control configure for the build
-%{?disturl:%{!?url:%{expand: %%define url %{disturl}}}}
-%define fullrelease @PACKAGE_RELEASE@%{extrarelease}
+%{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
+%{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RELEASE@%%{extrarelease}}}
+%{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RELEASE@}}
 
 # a macro to build require one package of the same version as another
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
@@ -971,28 +972,38 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: OpenSS7.spec.in,v $
-# Revision 0.9.2.2  2005/02/19 12:06:38  brian
-# - rpm-epoch to pkg-epoch, rpm-release to pkg-release
-# - proper quotation of configure options
+# Revision 0.9.2.3  2005/02/22 08:32:02  brian
+# - spec changes for updated makefile fragments
 #
-# Revision 0.9.2.1  2004/12/17 21:52:43  brian
-# - Building up master package.
-#
-# Revision 0.9.2.44  2004/12/17 13:31:16  brian
-# - Cleared up build depdendencies, added info subpackage to LiS and streams.
-#
-# Revision 0.9.2.43  2004/12/17 04:02:40  brian
-# - Improving spec files.
-#
-# Revision 0.9.2.42  2004/12/15 15:25:33  brian
-# - avoid undefined debug macro
-#
-# Revision 0.9.2.41  2004/12/15 14:59:07  brian
-# - Update RPM build to build multiple distribution binary RPMs from a single SRPM.
-#
-# Revision 0.9.2.40  2004/12/15 14:35:51  brian
-# - Update RPM build to build multiple distribution binary RPMs from single SRPM.
-#
+
+* Sat Feb 19 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.2  2005/02/19 12:06:38  brian
+- rpm-epoch to pkg-epoch, rpm-release to pkg-release
+- proper quotation of configure options
+
+* Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2004/12/17 21:52:43  brian
+- Building up master package.
+
+* Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.44  2004/12/17 13:31:16  brian
+- Cleared up build depdendencies, added info subpackage to LiS and streams.
+
+* Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.43  2004/12/17 04:02:40  brian
+- Improving spec files.
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.42  2004/12/15 15:25:33  brian
+- avoid undefined debug macro
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.41  2004/12/15 14:59:07  brian
+- Update RPM build to build multiple distribution binary RPMs from a single SRPM.
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.40  2004/12/15 14:35:51  brian
+- Update RPM build to build multiple distribution binary RPMs from single SRPM.
 
 * Mon Dec 13 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.39  2004/12/13 10:52:09  brian

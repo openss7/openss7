@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/02/22 08:31:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+## Last Modified $Date: 2005/02/22 08:31:31 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -93,7 +93,7 @@ RPMOPTS		= \
 		$(PACKAGE_RPMOPTIONS) \
 		--define "_topdir $(topdir)" \
 		--define "_sourcedir $(sourcedir)" \
-		--define "_builddir $(builddir)" \
+		--define "_builddir $(rpmbuilddir)" \
 		--define "_rpmdir $(rpmdir)" \
 		--define "_srcrpmdir $(srcrpmdir)" \
 		--define "_specdir $(specdir)"
@@ -104,11 +104,10 @@ RPMOPTS		= \
 ##
 rpm_directories	= \
 		$(topdir)/SOURCES $(sourcedir) \
-		$(topdir)/BUILD   $(builddir) \
+		$(topdir)/BUILD   $(rpmbuilddir) \
 		$(topdir)/RPMS    $(rpmdir) \
 		$(topdir)/SRPMS   $(srcrpmdir) \
-		$(topdir)/SPECS   $(specdir) \
-		$(builddir)/$(PACKAGE_RPMEXTRA)
+		$(topdir)/SPECS   $(specdir)
 
 ##
 # These are the same directories as rpm_directories with common archive directories stripped out.
@@ -118,8 +117,7 @@ RELEASE_DIRECTORIES += \
 		$(topdir)/BUILD \
 		$(topdir)/RPMS \
 		$(topdir)/SRPMS \
-		$(topdir)/SPECS \
-		$(builddir)/$(PACKAGE_RPMEXTRA)
+		$(topdir)/SPECS
 
 ##
 # Options for building source rpms.  We have separate fig and xpm macros from the binary rpms to
@@ -178,7 +176,7 @@ RPMXOPTS	=
 RPMTARGET	= $(target)
 
 rpm_source_files = \
-		$(sourcedir)/$(PACKAGE)-$(VERSION).spec \
+		$(specdir)/$(PACKAGE)-$(VERSION).spec \
 		$(sourcedir)/$(PACKAGE)-$(VERSION).gif \
 		$(sourcedir)/$(PACKAGE)-$(VERSION).xpm \
 		$(sourcedir)/$(PACKAGE)-$(VERSION).tar.gz \
@@ -192,17 +190,38 @@ rpm_source_files = \
 ##$(rpm_source_files): $(sourcedir)
 ##	@f=`echo "$@" | sed -e 's|$(sourcedir)|$(PACKAGE_DISTDIR)|'` ; \
 ##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
-##	test -f "$@" -a ":$(FORCE)" != :force || cp -fauv -- $$f $$@
+##	test -f "$@" -a ":$(FORCE)" != :force || cp -fv -- $$f $@
 
 rpm_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
-rpm_gif_file	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif
-rpm_xpm_file	= $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 
-$(rpm_spec_file) $(rpm_gif_file) $(rpm_xpm_file):
+$(sourcedir)/$(PACKAGE)-$(VERSION).tar.gz \
+$(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2::
+	@f=`echo "$@" | sed -e 's|.*/||'` ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		echo "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
+	} ;  \
+	d= ; test -f $$f || d='$(srcdir)/' ; \
+	test "$@" -ef "$$d$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
+		echo "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; \
+	}
+
+$(specdir)/$(PACKAGE)-$(VERSION).spec \
+$(sourcedir)/$(PACKAGE)-$(VERSION).gif \
+$(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
 	@f=`echo "$@" | sed -e 's|.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
-	if test ! -f $$f ; then d= ; else d='$(srcdir)/' ; fi ; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$d$$f" \) || { d= ; $(MAKE) $(AM_MAKEFLAGES) -- $$f ; } \
-	test ":$(FORCE)" != :force -a \( -f "$@" \) || cp -fauv -- $$d$$f $$@
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		echo "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
+	} ;  \
+	d= ; test -f $$f || d='$(srcdir)/' ; \
+	test "$@" -ef "$$d$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
+		echo "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; \
+	}
 
 ####
 ### Note that normally sourcedir and specdir are the same directory (and both the same as
@@ -212,7 +231,7 @@ $(rpm_spec_file) $(rpm_gif_file) $(rpm_xpm_file):
 ##$(rpm_spec_file): $(specdir)
 ##	@f=`echo "$@" | sed -e 's|$(specdir)|$(sourcedir)|'` ; \
 ##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
-##	test -f "$@" -a ":$(FORCE)" != :force || cp -fauv -- $$f $$@
+##	test -f "$@" -a ":$(FORCE)" != :force || cp -fv -- $$f $@
 
 ##
 # This builds an SRPM for the current target.
@@ -341,9 +360,9 @@ distclean-rpm:
 DISTCLEAN_LOCAL	+= distclean-rpm
 
 DISTCLEANFILES	+= \
-		$(builddir)/$(PACKAGE_RPMEXTRA)/*config.cache \
-		$(builddir)/$(PACKAGE_RPMEXTRA)/*config.site \
-		$(builddir)/$(PACKAGE_RPMEXTRA)/$(PACKAGE_TARNAME)
+		$(rpmbuilddir)/*config.cache \
+		$(rpmbuilddir)/*config.site \
+		$(rpmbuilddir)/$(PACKAGE_TARNAME)
 
 ##
 # Removing the sources and the spec file is removing from the distribution directory which, if
