@@ -1,11 +1,12 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.1 2004/07/04 01:43:53 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.2 2004/08/14 12:35:56 brian Exp $
 %
 % =========================================================================
 %
 % Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -53,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/07/04 01:43:53 $ by $Author: brian $
+% Last Modified $Date: 2004/08/14 12:35:56 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -61,28 +62,28 @@
 @setfilename strxns.info
 @settitle OpenSS7 XNS Package
 @setchapternewpage odd
+@footnotestyle separate
 
-@dircategory OpenSS7
+@dircategory Kernel
 @direntry
 * OpenSS7 XNS: (strxns).      An Open STREAMS XNS/XTI Networking Package.
 @end direntry
 
 @set xref-automatic-section-title
 
-@set EDITION 0.9.2
-@set VERSION 0.9.2
-@set UPDATED 2004-04-05
+@include args.texi
 
 @defindex op
 
 @ifinfo
-This file document the OpenSS7 XNS Networking Package.
+This file documents the @value{PACKAGE_TITLE} package.
 
-This is Edition @value{EDITION}, last updated @value{UPDATE}, of
-@cite{The OpenSS7 XNS Networking Package}, for Version
-@value{VERSION}.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
+@cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
 
 Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@@openss7.org>
 
 All Rights Reserved.
 
@@ -98,7 +99,7 @@ relevant to the printed manual).
 
 @end ignore
 Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copyring, provided the entire resulting
+under the conditions for verbatim copying, provided the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
@@ -107,582 +108,1745 @@ another language, under the above conditions for modified versions.
 @end ifinfo
 
 @titlepage
-@title OpenSS7 XNS Reference Manual
-@subtitle Edition @value{EDITION} for OpenSS7 version @value{VERSION}
-@subtitle @value{UPDATED}
+@title @value{PACKAGE_TITLE}
+@subtitle Installation and Reference Manual
+@subtitle Edition @value{PACKAGE_VERSION} for @value{PACKAGE_TITLE}
+@subtitle Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
 @author Brian Bidulock @cite{@email<bidulock@@openss7.org>}
 
 @page
 @vskip 0pt plus 1filll
 Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @email{bidulock@@openss7.org} @*
 All Rights Reserved. @*
 
+@noindent
 Published by OpenSS7 Corporation @*
 1469 Jefferys Crescent @*
 Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
+@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
 
+@noindent
 Permission is granted to copy and distribute modified versions of this manual
 under the conditions for verbatim copying, provided that the entire resulting
-derived work is distribtued under the terms of a permission notice identical
+derived work is distributed under the terms of a permission notice identical
 to this one.
 
+@noindent
 Permission is granted to copy and distribute translations of this manual into
 another language, under the same conditions as for modified versions.
 @end titlepage
 @page
 
 @ifnottex
-@node Top, Acknowledgements, (dir), (dir)
-@top Main Menu
+@node Top, , (dir), (dir)
+@top @value{PACKAGE_TITLE}
 @end ifnottex
+@comment  node-name,  next,  previous,  up
 @unnumbered About This Manual
-This is Edition @value{EDITION}, last updated @value{UPDATED}, of
-@cite{The OpenSS7 XNS Networking Reference Manual}, for Version
-@value{VERSION} of the OpenSS7 XNS Networking Package.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{PACKAGE_TITLE} Installation and Reference Manual}, for
+Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
+@value{PACKAGE_TITLE} package.
 
 @menu
-* Acknowledgements::		Sponsors and Contributors
-* Introduction::		Introduction to OpenSS7 XNS
-* Reference::			Reference to OpenSS7 XNS Components
-* Conformance::			Conformance of OpenSS7 XNS Components
-* Installation::		Package Installation
-* Development Schedule::	Development Schedule for Future Components
-* Bugs::			Known Bugs
+* Acknowledgments::		Sponsors and Contributors
 
-* Public License::		GNU General Public License
-* Documentation License::	GNU Free Dcoumentation License
+* Introduction::		Introduction to the package
+* Installation::		Installation of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Bugs::			Known bugs
+* Schedule::			Development schedule
 
-* Concept Index::		Index of Concepts
-* Type Index::			Index of Types
-* Function Index::		Index of Functions
-* Variable Index::		Index of Variables
-* File Index::			Index of Files
+* GPL::				GNU General Public License
+* LGPL::			Lesser GNU General Public License
+* GFDL::			GNU Free Documentation License
 
- --- The Detailed Node Listing ---
+* Indices::			Index of Indices
 
-Acknowledgements
+  ----- detailed node listing -----
 
-* Sponsors::			Sponsors of the OpenSS7 XNS Package.
-* Contributors::		People who contributed to the development of
-				the OpenSS7 XNS Package..
+Introduction
 
-Reference
-
-* Overview::			Overview of OpenSS7 components
-* Components::			Detailed component descriptions
-
-Conformance
+* Notice::			Notices
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
 
 Installation
 
-Bugs
+* Releases::			Releases of the package
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removal::			Removal of the package
+* Loading::			Loading the package
 
-Development Schedule
+Reference
 
+* Header Files::		Header Files
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
+
+Conformance
+
+Indices
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
 @end menu
 
 @c --------------------------------------------------------------------------
 
-@ifnottex
-@node Acknowledgements, Sponsors, Top, Top
-@end ifnottex
-@unnumbered Acknowledgements
+@node Acknowledgments, Introduction, , Top
+@unnumbered Acknowledgments
 @cindex credits
 
+As with most open source projects, this project would not have been possible
+without the valiant efforts and productive software of the @cite{Free Software
+Foundation} and the @cite{Linux Kernel Community}.
+
 @menu
-* Sponsors::			Sponsors of the OpenSS7 XNS Package.
-* Contributors::		People who contributed to the development of
-				the OpenSS7 XNS Package..
+* Sponsors::			Sponsors
+* Contributors::		Contributors
 @end menu
 
-@node Sponsors, Contributors, Acknowledgements, Acknowledgements
-@unnumberedsec Sponsors of the OpenSS7 XNS Package
+@node Sponsors, Contributors, , Acknowledgments
+@unnumberedsec Sponsors
 @cindex sponsors
 
-Funding for completion of the OpenSS7 XNS Package was provided by:
+Funding for completion of the OpenSS7 XNS Package was provided in part by:
 
-@table @var
+@itemize
 @item Lockheed Martin
 @item Performance Technologies
 @item Motorola
 @item HOB International
-@end table
+@item Comverse
+@item Sonus Networks
+@end itemize
 
-@node Contributors, Introduction, Sponsors, Acknowledgements
-@unnumberedsec Contributors to the OpenSS7 XNS Package
+@node Contributors, , Sponsors, Acknowledgments
+@unnumberedsec Contributors
 @cindex contributors
 
 The primary contributor to the OpenSS7 XNS Package is Brian F. G. Bidulock.
-
 The following is a list of significant contributors to the project:
 
-@table @var
+@itemize
 @item Per Berquist
 @item John Boyd
 @item Chuck Winters
+@item Peter Courtney
 @item Tom Chandler
-@item Others
-@end table
+@item Gurol Akman
+@end itemize
 
-@node Introduction, Reference, Contributors, Top
-@chapter Introduction to the OpenSS7 XNS Package
+@node Introduction, Installation, Acknowledgments, Top
+@chapter Introduction
 @cindex introduction
 
-This manual documents the design, implementation, installation, operation and
-future development schedule of the OpenSS7 XNS Package.
-
-@node Reference, Overview, Introduction, Top
-@chapter Reference
-@cpindex reference
+@c ----------------------------------------------------------------------------
 
 @menu
-* Overview::			An overview of the OpenSS7 XNS package.
-* Components::			Reference of OpenSS7 XNS components.
-
- --- The Detailed Node Listing ---
-
-Components
-
-* Applications::		OpenSS7 Applications
-* SS7 Stack::			Signalling System No. 7 Stack
-* ISDN Stack::			Integrated Services Digital Network Stack
-* SIGTRAN Stack::		Signalling Transport Stack
-* VoIP Stack::			Voice over IP Stack
-* MG Stack::			Media Gateway Stack
-* Transport Stack::		Data Transport Stack
-* Device Drivers::		Hardware Device Drivers
-
-Applications
-
-SS7 Stack
-
-* SDL::				Signalling Data Link
-* SDT::				Signalling Data Terminal
-* SL::				Signalling Link
-* MTP::				Message Transfer Part
-* SCCP::			Signalling Connection Control Part
-* TCAP::			Transaction Capabilities Application Part
-* BSSAP::			Base Station System Application Part
-
-ISDN Stack
-
-* HDLC::			High-Level Data Link Control
-* ISDN LAPB::			ISDN Link Access Procedure (Balanced)
-* X.25 LAPB::			X.25 Link Access Procedure (Balanced)
-* ISDN LAPD::			ISDN Link Access Procedure (D-Channel)
-* ISDN LAPF::			ISDN Link Access Procedure (Frame Relay)
-* ISDN Q.931::			ISDN Level 3 Q.931
-* ISDN Frame Relay::		ISDN Frame Relay
-* X.213::			ISO Network Protocol X.213
-* V5.2::			ESTI V5.2
-* GR-303::			Telcordia GR-303-CORE
-* DPNSS::			PNOC DPNSS Layer 2
-* IDLC::			Integrated Digital Loop Carrier
-* DPNSS/DASS::			PNOC DPNSS/DASS Layer 3
-
-SIGTRAN Stack
-
-* IPSS7::			SS7 over IP
-* M2PA::			MTP Level 2 Peer-to-Perr Adatpataion Layer
-* M2UA::			MTP Level 2 User Adaptation Layer
-* M3UA::			MTP Level 3 user Adaptation Layer
-* ISUA::			ISUP User Adaptation Layer
-* BUA::				BICC User Adaptation Layer
-* SUA::				SCCP User Adaptation Layer
-* TUA::				TCAP User Adaptation Layer
-* IUA::				ISDN Q.921 User Adpatation Layer
-* GR303UA::			GR-303 User Adpatation Layer
-* V5UA::			V5.2 User Adaptation Layer
-* DUA::				DPNSS/DASS User Adaptation Layer
-* TALI::			Tekelec's Adaptation Layer Interface
-
-VoIP Stack
-
-* H225::			H.225.0
-* BICC::			Bearer Indexed Call Control
-* SIPT::			Session Initiation Protocol - Transport
-
-MG Stack
-
-* MGCP::			Media Gateway Control Protocol
-* H.248::			MEGACO/H.248
-* MX::				Multiplex
-* CH::				Channel
-
-Transport Stack
-
-* IP::				Internet Protocol
-* UDP::				User Datagram Protocol
-* TCP::				Transmission Control Protocol
-* SCTP::			Stream Control Transmission Protocol
-* RTP/RTCP::			Real-Time (Control) Protocol
-* SSCOP::			Service Specific Connection Oriented Protocol
-
-Device Drivers
-
-* X400P-SS7::			E400P/T400P Driver
-* ACB56::			SeaLevel ACB56 Driver
-* CPC384::			PTI CPC-384 Drivers
-* CPC388::			PTI CPC-388 Drivers
-
+* Notice::			Notices
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
 @end menu
 
-@node Overview,  Components,  Reference, Reference
+@node Notice, Overview, , Introduction
+@section Notice
+@cindex notice
+
+This version of  @command{strxns} is a version modified by
+@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and
+modules previously part of
+@cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS) Installation and Reference Manual}.}.
+In stark contrast to many other software packages released by
+@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains
+code mostly developed by other parties.
+@cindex licensing
+This package is released and distributed under the @cite{GNU Public License}
+(@pxref{GPL}).  Please note, however, that there are different licensing terms
+for the manual pages and some of the documentation (derived from X/Open
+publications and other sources).  Consult the permission notices contained in
+the documentation for more information.  This document, is released under the
+@cite{GNU Free Documentation License} (@pxref{GFDL}) with all sections
+invariant.
+
+
+@node Overview, Organization, Notice, Introduction
 @section Overview
-@cpindex overview
+@cindex overview
 
+This manual documents the design, implementation, installation, operation and
+future development of the OpenSS7 X/Open Networking Services (XNS) package.
+
+The OpenSS7 XNS Package is an X/Open Networking Services (XNS) package for
+Linux that can be used with
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
+or
+@cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+It includes development tools, header files and manual pages for
+
+@itemize
+@item @cite{Communications Device Interface (CDI)},
+@item @cite{Data Link Provider Interface (DLPI)} and
+@item @cite{Network Provider Interface (NPI)}.
+@end itemize
+
+@noindent
+In addition, it provides STREAMS drivers and modules for DLPI including:
+
+@itemize
+@item Linux Data Link (@file{streams-ldl.o}),
+@item IP to DLPI (@file{streams-ip_to_dlpi.o}), and
+@item (@file{streams-ip_strm_mod.o}).
+@end itemize
+
+The OpenSS7 XNS Package is essential to the development and support of XNS
+STREAMS netowrking modules and drivers and provides a fundamental set of
+X/Open header files and manual pages for such development.
+
+The OpenSS7 XNS Package does @emph{not} provide the X/Open Transport Interface
+(XTI), Transport Provider Interface (TPI) or Transport Layer Interface (TLI)
+components.  See the OpenSS7
+@command{strxnet}@footnote{@xref{Top, OpenSS7 XTI/TLI, About This Manual, strxnet, OpenSS7 XTI/TLI Library Reference Manual}}
+and
+@command{strinet}@footnote{@xref{Top, OpenSS7 INET, About This Manual, strinet, OpenSS7 INET Reference Manual}}
+packages.
+
+@node Organization, Conventions, Overview, Introduction
+@section Organization of this Document
+@cindex organization
+
+This document is organized (loosely) into several sections as follows:
+
+@ifnottex
 @menu
+  Introduction::		This introduction
+* Installation::		Installation of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Bugs::			Known bugs
+* Schedule::			Development schedule
 @end menu
-
-@node Components,  Applications,  Overview, Reference
-@section Components
-@cpindex components
-
-@menu
-* Applications::		OpenSS7 Applications
-* SS7 Stack::			Signalling System No. 7 Stack
-* ISDN Stack::			Integrated Services Digital Network Stack
-* SIGTRAN Stack::		Signalling Transport Stack
-* VoIP Stack::			Voice over IP Stack
-* MG Stack::			Media Gateway Stack
-* Transport Stack::		Data Transport Stack
-* Device Drivers::		Hardware Device Drivers
-@end menu
-
-@page
-@node Applications, SS7 Stack,  Components, Reference
-@subsection Applications
-@cpindex applications
-
-@menu
-@end menu
-
-@page
-@node SS7 Stack,  SDL,  Applications, Reference
-@subsection SS7 Protocol Stack
-@cpindex ss7 protocol stack
-
-@menu
-* SDL::				Signalling Data Link
-* SDT::				Signalling Data Terminal
-* SL::				Signalling Link
-* MTP::				Message Transfer Part
-* SCCP::			Signalling Connection Control Part
-* TCAP::			Transaction Capabilities Application Part
-* BSSAP::			Base Station System Application Part
-@end menu
-
-@node SDL, SDT, SS7 Stack, SS7 Stack
-@subsubsection Signalling Data Link (SDL)
-
-@node SDT, SL, SDL, SS7 Stack
-@subsubsection Signalling Data Terminal (SDT)
-
-@node SL, MTP, SDT, SS7 Stack
-@subsubsection Signalling Link (SL)
-
-@node MTP, SCCP, SL, SS7 Stack
-@subsubsection Message Transfer Part (MTP)
-
-@node SCCP, TCAP, MTP, SS7 Stack
-@subsubsection Signalling Connection Control Part (SCCP)
-
-@node TCAP, BSSAP, SCCP, SS7 Stack
-@subsubsection Transaction Capabilities Application Part (TCAP)
-
-@node BSSAP, ISDN Stack, TCAP, SS7 Stack
-@subsubsection Base Station System Application Part (BSSAP)
-
-@page
-@node ISDN Stack, HDLC,  BSSAP, Reference
-@subsection ISDN Protocol Stack
-@cpindex ISDN protocol stack
-
-@menu
-* HDLC::			High-Level Data Link Control
-* ISDN LAPB::			ISDN Link Access Procedure (Balanced)
-* X.25 LAPB::			X.25 Link Access Procedure (Balanced)
-* ISDN LAPD::			ISDN Link Access Procedure (D-Channel)
-* ISDN LAPF::			ISDN Link Access Procedure (Frame Relay)
-* ISDN Q.931::			ISDN Level 3 Q.931
-* ISDN Frame Relay::		ISDN Frame Relay
-* X.213::			ISO Network Protocol X.213
-* V5.2::			ESTI V5.2
-* GR-303::			Telcordia GR-303-CORE
-* DPNSS::			PNOC DPNSS Layer 2
-* IDLC::			Integrated Digital Loop Carrier
-* DPNSS/DASS::			PNOC DPNSS/DASS Layer 3
-@end menu
-
-@node HDLC,  ISDN LAPB,  ISDN Stack, ISDN Stack
-@subsubsection  High-Level Data Link Communication
-
-@node ISDN LAPB,  X.25 LAPB,  HDLC, ISDN Stack
-@subsubsection ISDN Link Access Procedure (Balanced)
-
-@node X.25 LAPB,  ISDN LAPD,  ISDN LAPB, ISDN Stack
-@subsubsection X.25 Link Access Procedure (Balanced)
-
-@node ISDN LAPD,  ISDN LAPF,  X.25 LAPB, ISDN Stack
-@subsubsection ISDN Link Access Procedure (D-Channel)
-
-@node ISDN LAPF,  ISDN Q.931,  ISDN LAPD, ISDN Stack
-@subsubsection ISDN Link Access Procedure (Frame Relay)
-
-@node ISDN Q.931,  ISDN Frame Relay,  ISDN LAPF, ISDN Stack
-@subsubsection ISDN Level 3 Q.931
-
-@node ISDN Frame Relay,  X.213,  ISDN Q.931, ISDN Stack
-@subsubsection ISDN Frame Relay
-
-@node X.213, V5.2,  ISDN Frame Relay, ISDN Stack
-@subsubsection ISO/OSI NP X.213
-
-@node V5.2, GR-303,  X.213, ISDN Stack
-@subsubsection ETSI V5.2
-
-@node GR-303, DPNSS,  V5.2, ISDN Stack
-@subsubsection Telcordia GR-303-CORE
-
-@node DPNSS, IDLC,  GR-303, ISDN Stack
-@subsubsection PNOC DPNSS (Link)
-
-@node IDLC, DPNSS/DASS,  DPNSS, ISDN Stack
-@subsubsection IDLC
-
-@node DPNSS/DASS, SIGTRAN Stack,  IDLC, ISDN Stack
-@subsubsection PNOC DPNSS/DASS (Level 3)
-
-@page
-@node SIGTRAN Stack,  IPSS7,  DPNSS/DASS, Reference
-@subsection SIGTRAN Protocol Stack
-@cpindex SIGTRAN protocol stack
-
-@menu
-* IPSS7::			SS7 over IP
-* M2PA::			MTP Level 2 Peer-to-Perr Adatpataion Layer
-* M2UA::			MTP Level 2 User Adaptation Layer
-* M3UA::			MTP Level 3 user Adaptation Layer
-* ISUA::			ISUP User Adaptation Layer
-* BUA::				BICC User Adaptation Layer
-* SUA::				SCCP User Adaptation Layer
-* TUA::				TCAP User Adaptation Layer
-* IUA::				ISDN Q.921 User Adpatation Layer
-* GR303UA::			GR-303 User Adpatation Layer
-* V5UA::			V5.2 User Adaptation Layer
-* DUA::				DPNSS/DASS User Adaptation Layer
-* TALI::			Tekelec's Adaptation Layer Interface
-@end menu
-
-@node IPSS7,  M2PA,  SIGTRAN Stack, SIGTRAN Stack
-@subsubsection SS7 over IP
-
-@node M2PA,  M2UA,  IPSS7, SIGTRAN Stack
-@subsubsection MTP Level 2 Peer-to-Peer Adaptation Layer
-
-@node M2UA,  M3UA,  M2PA, SIGTRAN Stack
-@subsubsection MTP Level 2 User Adaptation Layer
-
-@node M3UA,  ISUA,  M2UA, SIGTRAN Stack
-@subsubsection MTP Level 3 User Adaptation Layer
-
-@node ISUA,  BUA,  M3UA, SIGTRAN Stack
-@subsubsection ISUP User Adaptation Layer
-
-@node BUA,  SUA,  ISUA, SIGTRAN Stack
-@subsubsection BICC User Adaptation Layer
-
-@node SUA,  TUA,  BUA, SIGTRAN Stack
-@subsubsection SCCP User Adaptation Layer
-
-@node TUA,  IUA,  SUA, SIGTRAN Stack
-@subsubsection TCAP User Adaptation Layer
-
-@node IUA,  GR303UA,  TUA, SIGTRAN Stack
-@subsubsection ISDN Q.921 User Adaptation Layer
-
-@node GR303UA,  V5UA,  IUA, SIGTRAN Stack
-@subsubsection GR-303 User Adaptation Layer
-
-@node V5UA,  DUA,  GR303UA, SIGTRAN Stack
-@subsubsection V5.2 User Adaptation Layer
-
-@node DUA,  TALI,  V5UA, SIGTRAN Stack
-@subsubsection DPNSS/DASS User Adaptation Layer
-
-@node TALI,  VoIP Stack,  DUA, SIGTRAN Stack
-@subsubsection Tekelec Adaptation Layer Interface
-
-@page
-@node VoIP Stack,  H225,  TALI, Reference
-@subsection VoIP Protocol Stack
-@cpindex VoIP protocol stack
-
-@menu
-* H225::			H.225.0
-* BICC::			Bearer Indexed Call Control
-* SIPT::			Session Initiation Protocol - Transport
-@end menu
-
-@node H225,  BICC,  VoIP Stack, VoIP Stack
-@subsubsection H.225
-
-@node BICC,  SIPT,  H225, VoIP Stack
-@subsubsection Bearer Indexed Call Control (BICC)
-
-@node SIPT,  MG Stack,  BICC, VoIP Stack
-@subsubsection Session Initiation Protocol (SIP) Transport (SIP-T)
-
-@page
-@node MG Stack,  MGCP,  SIPT, Reference
-@subsection Media Gateway Protocol Stack
-@cpindex media gateway protocol stack
-
-@menu
-* MGCP::			Media Gateway Control Protocol
-* H.248::			MEGACO/H.248
-* MX::				Multiplex
-* CH::				Channel
-@end menu
-
-@node MGCP,  H.248,  MG Stack, MG Stack
-@subsubsection Media Gateway Control Protocol
-
-@node H.248,  MX,  MGCP, MG Stack
-@subsubsection MEGACO/H.248
-
-@node MX,  CH,  H.248, MG Stack
-@subsubsection Multiplex (MX)
-
-@node CH,  Transport Stack,  MX, MG Stack
-@subsubsection Channel (CH)
-
-@page
-@node Transport Stack,  IP,  CH, Reference
-@subsection Transport Protocol Stack
-@cpindex transport
-
-@menu
-* IP::				Internet Protocol
-* UDP::				User Datagram Protocol
-* TCP::				Transmission Control Protocol
-* SCTP::			Stream Control Transmission Protocol
-* RTP/RTCP::			Real-Time (Control) Protocol
-* SSCOP::			Service Specific Connection Oriented Protocol
-@end menu
-
-@node IP,  UDP,  Transport Stack, Transport Stack
-@subsubsection Internet Protocol
-
-@node UDP,  TCP,  IP, Transport Stack
-@subsubsection User Datagram Protocol
-
-@node TCP,  SCTP,  UDP, Transport Stack
-@subsubsection Transmission Control Protocol
-
-@node SCTP,  RTP/RTCP,  TCP, Transport Stack
-@subsubsection Signalling Connection Transport Protocol
-
-@node RTP/RTCP,  SSCOP,  SCTP, Transport Stack
-@subsubsection Real-time Transport (Control) Protocol
-
-@node SSCOP,  Device Drivers,  RTP/RTCP, Transport Stack
-@subsubsection Service Specific Connection Oriented Protocol
-
-@page
-@node Device Drivers,  X400P-SS7,  SSCOP, Reference
-@subsection Device Drivers
-@cpindex device drivers
-@cpindex device
-@cpindex drivers
-
-@menu
-* X400P-SS7::			E400P/T400P Driver
-* ACB56::			SeaLevel ACB56 Driver
-* CPC384::			PTI CPC-384 Drivers
-* CPC388::			PTI CPC-388 Drivers
-@end menu
-
-@node X400P-SS7, ACB56, Device Drivers, Device Drivers
-@subsubsection Digium Drivers
-@cindex x400p t400p t100p e400p e100p te405p te410p
-
-@node ACB56, CPC384, X400P-SS7, Device Drivers
-@subsubsection SeaLevel ACB56 Drivers
-
-@node CPC384, CPC388, ACB56, Device Drivers
-@subsubsection PTI CPC 384 Driver
-
-@node CPC388, Conformance, CPC384, Device Drivers
-@subsubsection PTI CPC 388 Driver
-
-
-@page
-@node Conformance, Installation, CPC388, Top
-@chapter Conformance
-@cindex conformance
-
-@page
-@node Installation, Development Schedule, Conformance, Top
+@end ifnottex
+@iftex
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Bugs}.
+@tab Known bugs in the package
+@item @ref{Schedule}.
+@tab Development schedule for the package
+@end multitable
+@end iftex
+
+
+@node Conventions, , Organization,  Introduction
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+@c ----------------------------------------------------------------------------
+
+@node Installation, Reference, Introduction, Top
 @chapter Installation
 @cindex installation
 
-@page
-@node Development Schedule, Bugs, Installation, Top
-@chapter Development Schedule
-@cindex development schedule
-@cindex development
-@cindex schedule
+@menu
+* Releases::			Releases of the package
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removal::			Removal of the package
+* Loading::			Loading the package
 
-@page
-@node Bugs, Public License, Development Schedule, Top
+  ----- detailed node listing -----
+
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Release Notes::		Release Notes
+* Compatibility::		Compatibility Issues
+
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Releases, Downloading, ,  Installation
+@section Releases
+@cindex releases
+
+This is the OpenSS7 Release of the X/Open XNS networking tools, drivers and
+modules used with the @cite{Linux Fast-STREAMS} or @cite{Linux STREAMS} SVR
+4.2 STREAMS utility for Linux.  The purpose of providing a separate release of
+this package was to separate the X/Open Networking Services tools, headers,
+drivers and modules from the @cite{Linux STREAMS} package for use with both
+@cite{Linux STREAMS} and @cite{Linux Fast-STREAMS} in preparation for
+replacement of the former by the later.
+
+The following sections provide information on OpenSS7 XNS releases as well as
+compatibility information of OpenSS7 release to the original GCOM releases of
+these modules and drivers, as well as Linux kernel compatibility.
+
+@menu
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Prerequisites, Compatibility, , Installation
+@subsection Prerequisites
+@cindex prerequisites
+
+@c ----------------------------------------------------------------------------
+
+@node Compatibility, Release Notes, Prerequisites, Releases
+@subsection Compatibility
+@cindex compatibility
+
+@menu
+* Linux Kernel::
+* Linux STREAMS::
+* Linux Fast-STREAMS::
+@end menu
+
+@node Linux Kernel, Linux STREAMS, , Compatibility
+@subsubsection Kernel
+@cindex Kernel
+
+@node Linux STREAMS, Linux Fast-STREAMS, Linux Kernel, Compatibility
+@subsubsection Linux STREAMS
+@cindex Linux STREAMS
+
+@node Linux Fast-STREAMS, , Linux STREAMS, Compatibility
+@subsubsection Linux Fast-STREAMS
+@cindex Linux Fast-STREAMS
+
+@c ----------------------------------------------------------------------------
+@node Release Notes, , Compatibility, Releases
+@subsection Release Notes
+@cindex release notes
+
+The sections that follow provide information on OpenSS7 releases of the X/Open
+Networking Services (XNS) package.
+
+@menu
+* strxns-0.9.2-1::		Release 1
+@end menu
+
+@node strxns-0.9.2-1, , , Release Notes
+@subsubsection strxns-0.9.2-1
+@cindex strxns-0.9.2-1
+
+Initial autoconf/RPM packaging of the OpenSS7 @command{strxns} release.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Downloading, Configuration, Releases, Installation
+@section Downloading
+@cindex downloading
+
+The OpenSS7 XNS package releases can be downloaded from the downloads page of
+@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The package
+is available as a binary RPM (for popular architectures) a source RPM, or as a
+tar ball.  If you are using a browsable viewer, you can obtain the OpenSS7
+release of @command{strxns} from the links in the sections that follow.
+
+By far the easiest form for installing and using @command{strxns-0.9.2} is to
+download and install binary RPM. If a binary RPM is not available for your
+distribution,  but your distribution supports RPM, the next best method for
+installing and using @command{strxns-0.9.2} is to download adn rebuild the
+source RPM.  If your architecture does not support RPM at all, or you have
+special needs (such as cross-compiling for embedded targets), the final resort
+method is to download, configure, build and install from the source tarball.
+
+@menu
+* Downloading the Binary RPM::		the easiest approach
+* Downloading the Source RPM::		the next best approach
+* Downloading the Tar Ball::		last resort
+@end menu
+
+@node Downloading the Binary RPM, Downloading the Source RPM, , Downloading
+@subsection Downloading the Binary RPM
+@cindex downloading, binary rpms
+@cindex binary rpms
+
+To install from binary RPM, you will need several of the RPM for a complete
+installation.  Binary RPM fall into three categories.  To download and install
+a complete package requires the appropriate RPM from each of the three
+categories below.
+
+@subsubheading Independent RPM
+Independent RPM are dependent on neither the Linux kernel version, nor the
+STREAM package.  For example, the source package
+@samp{strxns-source-0.9.2-1.i686.rpm}, is not dependent on kernel or STREAMS.
+
+@noindent
+All of the following kernel and STREAMS independent RPM are required for your
+architecture.  If you architecture is not on the list, you can build binary
+RPM from the source RPM (see @pxref{Building from the Source RPM}).
+
+@table @asis
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-dev-0.9.2-1.i686.rpm, strxns-dev-0.9.2-1.i686.rpm}
+The @file{strxns-dev} package contains the device definitions necessary to run
+applications programs developed for X/Open Networking Services.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-devel-0.9.2-1.i686.rpm, strxns-devel-0.9.2-1.i686.rpm}
+The @file{strxns-devel} package contains library archives for static
+compilation, heade files to develop XNS STREAMS modules and drivers.  This
+also includes the header files and static libraries required to compile
+XNS applications programs.  It also contains all of the manual pages necessary
+for developing XNS applications and XNS STREAMS modules or drivers.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-doc-0.9.2-1.i686.rpm, strxns-doc-0.9.2-1.i686.rpm}
+The @file{strxns-doc} package contains this manual in postscript, PDF and HTML
+forms, along with the meta-information from the @file{strxns} package.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-source-0.9.2-1.i686.rpm, strxns-source-0.9.2-1.i686.rpm}
+The @file{strxns-source} package contains the souce code necessary for
+building the OpenSS7 XNS release.  It includes the @command{autoconf}c
+onfiguration utilities necessary to create and distribute this rpm.
+@end table
+
+@subsubheading STREAMS-Dependent RPM
+STREAMS-Dependent RPM are dependent upon the specific STREAMS package being
+used, either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.  Packages
+dependent upon @cite{Linux STREAMS} will have @file{LiS} in the package name.
+Packages dependent upon @cite{Linux Fast-STREAMS} will have @file{streams} in
+the package name.  Note that some STREAMS-Dependent RPM are also
+Kernel-Dependent RPM as described below.
+
+@noindent
+One of the following STREAMS-Dependent packages is required for your
+architecture.  If your architecture is not on the list, you can build binary
+RPM from the source RPM (see @pxref{Building from the Source RPM}).
+
+@table @asis
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-LiS-util-0.9.2-1.i686.rpm, strxns-LiS-util-0.9.2-1.i686.rpm}
+The @file{strxns-LiS-util} package provides administrative and configuration test
+utilities and commands associated with the XNS package.  Because this package
+must link a STREAMS-specific library, it is a STREAMS-Dependent package.
+Use the @file{strxns-LiS-util} package if you have LiS installed.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-streams-util-0.9.2-1.i686.rpm, strxns-streams-util-0.9.2-1.i686.rpm}
+The @file{strxns-streams-util} package provides administrative and configuration test
+utilities and commands associated with the XNS package.  Because this package
+must link a STREAMS-specific library, it is a STREAMS-Dependent package.
+Use the @file{strxns-streams-util} package if you have streams installed.
+@end table
+
+@subsubheading Kernel-Dependent RPM
+Kernel-Dependent RPM are dependent on specific Linux Kernel Binary RPM
+releases.  Packages are provided for popular released @cite{RedHat} kernels.
+Packages dependent upon @cite{RedHat} or other kernel RPM will have the kernel
+package version (e.g. @samp{2.4.20-28.7}) in the package name.
+
+One of the following Kernel-Dependent packages is required for your
+architecture and kernel version.  If your architecture or kernel version is
+not on the list, you can build binary RPM from the source RPM (see
+@pxref{Building from the Source RPM}).
+
+@table @asis
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-LiS-core-2.4.20-28.7-0.9.2-1.i686.rpm, strxns-LiS-core-2.4.20-28.7-0.9.2-1.i686.rpm}
+The @file{strxns-LiS-core} package contains the kernel modules that provide
+the XNS STREAMS modules and drivers.  This package is heavily tied to the
+STREAMS package and Kernel for which it was compiled.  This particular package
+applies to @file{LiS} (@cite{Linux STREAMS}) on kernel version @file{2.4.20-28.7}.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/strxns-streams-core-2.4.20-28.7-0.9.2-1.i686.rpm, strxns-streams-core-2.4.20-28.7-0.9.2-1.i686.rpm}
+The @file{strxns-streams-core} package contains the kernel modules that provide
+the XNS STREAMS modules and drivers.  This package is heavily tied to the
+STREAMS package and Kernel for which it was compiled.  This particular package
+applies to @file{streams} (@cite{Linux Fast-STREAMS}) on kernel version @file{2.4.20-28.7}.
+@end table
+
+@subsubheading Configuration and Installation
+To configure, build and install the binary RPM, @xref{Configuring the Binary
+RPM}.
+
+@node Downloading the Source RPM, Downloading the Tar Ball, Downloading the Binary RPM, Downloading
+@subsection Downloading the Source RPM
+@cindex downloading, source srpm
+@cindex source rpms
+
+If you cannot obtain a binary RPM for your architecture, or would like to roll
+you own binary RPM, download the following source RPM.
+
+@table @asis
+@item @uref{http://www.openss7.org/rpms/SRPMS/strxns-0.9.2-1.src.rpm, strxns-0.9.2-1.src.rpm}
+This is the source RPM for the package.  From this source RPM it is possible
+to build binary RPM for any supported architecture and for any 2.4 kernel,
+for either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.
+@end table
+
+@subsubheading Configuration
+To configure the source RPM, @xref{Configuring the Source RPM}.
+
+@node Downloading the Tar Ball, , Downloading the Source RPM, Downloading
+@subsection Downloading the Tar Ball
+@cindex downloading, tar ball
+@cindex tar ball
+
+For non-RPM architectures, such as @cite{NexusWare} embedded target, download
+the tarball as follows:
+
+@table @asis
+@item @uref{http://www.openss7.org/strxns-0.9.2-1.tar.gz, strxns-0.9.2-1.tar.gz}
+@itemx @uref{http://www.openss7.org/strxns-0.9.2-1.tar.bz2, strxns-0.9.2-1.tar.bz2}
+These are the @command{tar} balls for the release.  These @command{tar} balls
+contain the @command{autoconf} distribution which includes all the source
+necessary for building and installing the package.  These tarballs will even
+build Source RPM and Binary RPM on RPM architectures.
+@end table
+
+The tar ball may be downloaded easily with @command{wget} as follows:
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.bz2
+@end example
+
+@noindent
+or
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.gz
+@end example
+
+@subsubheading  Unpacking the Archive
+
+After downloading one of the tar balls, unpack the archive using one of the
+following commands:
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.gz
+% tar -xzvf strxns-0.9.2-1.tar.gz
+@end example
+
+@noindent
+or
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.bz2
+% tar -xjvf strxns-0.9.2-1.tar.bz2
+@end example
+
+@noindent
+Either will create a subdirectory name @file{strxns-0.9.2-1} containing all of
+the files and subdirectories for the @command{strxns} package.
+
+
+@subsubheading Configuration
+To configure and install the tar ball, @xref{Configuring the Tar Ball}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Configuration, Building, Downloading, Installation
+@section Configuration
+@cindex configuration
+
+@menu
+* Configuring the Binary RPM::		the easiest approach
+* Configuring the Source RPM::		the next best approach
+* Configuring the Tar Ball::		last resort
+@end menu
+
+@node Configuring the Binary RPM, Configuring the Source RPM, , Configuration
+@subsection Configuring the Binary RPM
+@cindex configuring, binary rpms
+@cindex binary rpms
+
+In general the binary RPM do not require any configuration, however, during
+installation it is possible to relocate some of the installation directories.
+This allows some degree of customization.  Relocations that are available on
+the binary RPM are as follows:
+
+@table @file
+@item strxns-LiS-core-2.4.20-28.7-0.9.2-1.i686.rpm
+@cindex strxns-LiS-core-2.4.20-28.7-0.9.2-1.i686.rpm
+@table @file
+@item /lib/modules/2.4.20-28.7
+@end table
+@item strxns-LiS-util-0.9.2-1.i686.rpm
+@cindex strxns-LiS-util-0.9.2-1.i686.rpm
+@table @file
+@item /usr/bin
+@item /usr/sbin
+@item /usr/share/man
+@item /usr/libexec
+@end table
+@item strxns-LiS-dev-0.9.2-1.i686.rpm
+@cindex strxns-LiS-dev-0.9.2-1.i686.rpm
+(not relocatable)
+@item strxns-LiS-devel-0.9.2-1.i686.rpm
+@cindex strxns-LiS-devel-0.9.2-1.i686.rpm
+@table @file
+@item /usr/lib
+@item /usr/include
+@item /usr/share/man
+@end table
+@item strxns-LiS-doc-0.9.2-1.i686.rpm
+@cindex strxns-LiS-doc-0.9.2-1.i686.rpm
+@table @file
+@item /usr/share/doc
+@item /usr/share/info
+@end table
+@item strxns-source-0.9.2-1.i686.rpm
+@cindex strxns-source-0.9.2-1.i686.rpm
+@table @file
+@item /usr/share/doc
+@item /usr/share/info
+@end table
+@end table
+
+@subsubheading Installation
+To install the binary RPM, @xref{Installing the Binary RPM}.
+
+@node Configuring the Source RPM, Configuring the Tar Ball, Configuring the Binary RPM, Configuration
+@subsection Configuring the Source RPM
+@cindex configuring, source srpm
+@cindex source rpms
+
+When building from the source RPM (@pxref{Building from the Source RPM}), the
+rebuild process uses a number of macros from the user's @file{.rpmmacros}
+file as described in @ref{DESCRIPTION, rpm(8), rpm(8), *manpages*, rpm(8)}.
+
+Following is an example of the @file{~/.rpmmacros} file that I use for
+rebuilding RPMS:
+
+@example
+#
+# RPM macros for building rpms
+#
+
+%_topdir /usr/src/openss7.rpms
+
+%_vendor openss7
+%_os linux
+%_gnu -gnu
+%_icon openss7-logo-small.gif
+%_distribution OpenSS7 0.9
+%disturl http://www.openss7.org/
+
+%_signature gpg
+%_gpg_path /home/brian/.gnupg
+%_gpg_name openss7@@openss7.org
+%_gpgbin /usr/bin/gpg
+
+%_packager Brian Bidulock <bidulock@@openss7.org>
+%_target_platform %@{_target_cpu@}-redhat-linux
+
+%_source_payload w9.bzdio
+%_binary_payload w9.bzdio
+
+%_unpackaged_files_terminate_build 0
+%_missing_doc_files_terminate_build 0
+%__debug_package 0
+
+# %_kversion 2.4.20-28.7
+
+@end example
+
+
+When building from the source RPM (@pxref{Building from the Source RPM}), it
+is possible to pass a number of additional configuration options to the
+@command{rpmbuild} process.
+
+The additional configuration options are described below.
+
+@table @code
+@item --define "_kversion $PACKAGE_KVERSION"
+@vindex PACKAGE_KVERSION
+@opindex --with-k-release
+@opindex --without-k-release
+
+Specifies the kernel version other than the running kernel for which to build.
+If @command{_kversion} is not defined when rebuilding, the environment
+varibale @var{PACKAGE_KVERSION} is used.  If the environment variable
+@var{PACKAGE_KVERSION} is not defined, then the version of the running kernel
+(i.e. discovered with @samp{uname -r}) is used as the target version for
+kernel-dependent packages.
+This option can also be defined in an @file{.rpmspec} file using the macro
+name @samp{_kversion}.
+
+@item --with modules
+@itemx --without modules
+@opindex --enable-modules
+@opindex --disable-modules
+
+Specifies whether kernel modules packages are to be built.  The default is
+to build kernel module packages.  This option can be useful when rebuilding
+for multiple architectures and target kernels.  The @command{rebuild} automake
+target uses this feature to rebuild for all available architectures and
+kernels.
+
+@item --with tools
+@itemx --without tools
+@opindex --enable-tools
+@opindex --disable-tools
+
+Specifies whether user space packages are to be built.  The default is to
+build user space packages.  This option can be useful when rebuilding for
+multiple architectures and target kernels.  The @command{rebuild} automake
+target uses this feature when rebuilding for all available architectures and
+kernels, to rebuild user packages once per architecture instead of once per
+kernel.
+
+@item --with cooked-manpages
+@itemx --without cooked-manpages
+@opindex --enable-cooked-manpages
+@opindex --disable-cooked-manpages
+
+Some systems do not like @command{grefer} references in manpages.@footnote{In
+particular, some @cite{Debian} systems do not load the @command{groff}
+extensions package and do not have @command{grefer} installed.  Although this
+is an oversight on the configuration of the particular @cite{Debian} system,
+we accomodate such misconfiguration with this feature.}  This option will cook
+@command{soelim}, @command{refer}, @command{tbl} and @command{pic} commands
+from the manpages and also strip @command{groff} comments.  The default is to
+leave manpages uncooked: they are actually smaller that way.
+
+@item --with public
+@itemx --without public
+@opindex --enable-public
+@opindex --disable-public
+
+Release public packages or private packages.  This option has no effect on the
+@file{strxns} package.  The default is to release public packages.
+
+@item --with k-debug
+@itemx --without k-debug
+@opindex --enable-k-debug
+@opindex --disable-k-debug
+
+Specifies whether kernel debugging is to be performed on the build kernel
+modules.  Mutually exclusive with @code{test} and @code{safe} below.  This has
+the effect of removing static and inline attributes from functions and
+invoking all debugging macros in the code.  The default is to not perform
+kernel debugging.
+
+@item --with k-test
+@itemx --without k-test
+@opindex --enable-k-test
+@opindex --disable-k-test
+
+Specifies whether kernel testing is to be performed.  Mutually exclusive with
+@code{debug} above and @code{safe} below.  This has the effect of removing
+static and inline attributes from functions and invoking most debugging macros
+in the code.  The default is to not perform kernel testing.
+
+@item --with k-safe
+@itemx --without k-safe
+@opindex --enable-k-safe
+@opindex --disable-k-safe
+
+Specifies whether kernel saftey is to be performed.  Mutually exclusive with
+@code{debug} and @code{test} above.  This has the effect of invoking some more
+pedantic assertion macros in the code.  The default is not to apply kernel
+safety.
+
+@item --with k-inline
+@itemx --without k-inline
+@opindex --enable-k-inline
+@opindex --disable-k-inline
+
+Specifies whether kernel @code{inline} functions are to be place inline.  This
+has the effect of adding the @command{-finline-functions} flag to @var{CFLAGS}
+for compiling kernel modules.  Linux 2.4 kernels are normally compiled
+@command{-O2} which does not respect the @code{inline} directive.  This
+compiles kernel modules with @command{-finline-functions} to get closer to
+@command{-O3} optimization.  For better optimization controls,
+@xref{Configuring the Tar Ball}.
+
+@item --with k-modversion
+@itemx --without k-modversions
+@opindex --enable-k-modversions
+@opindex --disable-k-modversions
+
+Specifies whether kernel symbol versioning is to be applied to symbols
+exported by package kernel modules.  The default is to version exported module
+symbols.  This package does not export symbols so this option has no effect.
+
+@item --with lis
+@itemx --without lis
+@opindex --with-lis
+@opindex --without-lis
+
+Specifies that the package is to be rebuilt against @cite{Linux STREAMS}.  The
+default is to automatically identify whether @file{LiS} or @file{streams} is
+loaded on the build system and build accordingly.
+
+@item --with lfs
+@itemx --without lfs
+@opindex --with-lfs
+@opindex --without-lfs
+
+Specifies that the package is to be rebuilt against @cite{Linux Fast-STREAMS}.
+The default is to automatically identify whether @file{LiS} or @file{streams}
+is loaded on the build system and build accordingly.
+@end table
+
+@subsubheading Build
+To build from the source RPM, @xref{Building from the Source RPM}.
+
+@node Configuring the Tar Ball, , Configuring the Source RPM, Configuration
+@subsection Configuring the Tar Ball
+@cindex configuring, tar ball
+@cindex tar ball
+
+All of the normal GNU @command{autoconf} configuration options and environment
+variables apply.  Additional options and environment variables are provided to
+tailor or customize the build and are described below.
+
+@menu
+* Configure Options::		Options to @command{configure}
+* Environment Variables::	Environment variables to @command{configure}
+@end menu
+
+@node Environment Variables, , Configure Options, Configuring the Tar Ball
+@subsubsection Configure Options
+@cindex configure options
+
+Following are the additional @command{configure} options, their meaning and
+use:
+
+@table @command
+@item --disable-compress-manpages
+@opindex --enable-compress-manpages
+
+Compress manpages with @samp{gzip -9} or leave them uncompressed.  The
+default is to compress manpages with @samp{gzip -9} if a single compressed
+manpage exists in the target installation directory (@command{--mandir}).
+This disables automatic compression.
+
+@item --disable-public
+@opindex --disable-public
+
+Disable public release.  Has no effect on the @file{strxns} release.  No
+private components exist in @file{strxns} releases.
+
+@item --enable-tools
+@opindex --enable-tools
+
+Specifies whether user space programs and libraries are to be built and
+installed.  The default is to build and install user space programs and
+libraries.  This option can be useful when rebuilding for multiple
+architectures and target kernels.  The @command{rebuild} target uses this
+feature when rebuilding RPMs for all available architectures and kernels, to
+rebuild user packages once per architecture instead of once per kernel.
+
+@item --enable-modules
+@opindex --enable-modules
+
+Specifies whether kernel modules are to be built and installed.  The default
+is to build and install kernel modules.  This option can be useful when
+rebuilding for multiple architectures and target kernels.  The
+@command{rebuild} automake target uses this feature to rebuild for all
+available architectures and kernels.
+
+@item --disable-modules
+@opindex --disable-modules
+
+Disable kernel modules, prepare object for linking into the kernel.  The
+default is to build as kernel modules.  This option is not yet fully
+implemented.
+
+@item --enable-k-inline
+@opindex --enable-k-inline
+
+Enable kernel inline functions.  Most Linux kernel s build without
+@command{-finline-functions}.  This option adds the
+@command{-finline-functions} and @command{-Winline} flags to the compilation
+of kernel modules.  Use with care.
+
+@item --enable-k-safe
+@opindex --enable-k-safe
+
+Enable kernel module run-time safety checks.  Specifies whether kernel safety
+is to be performed.  This option is mutually exclusive with
+@command{--enable-k-test} and @command{--enable-k-debug} below.  This has the
+effect of invoking some more pedantic assertion macros in the code.  The
+default is not to apply kernel safety.
+
+@item --enable-k-test
+@opindex --enable-k-test
+
+Enable kernel module run-teim testing.  Specifies whether kernel testing is to
+be performed.  This option is mutually exclusive with
+@command{--enable-k-safe} above and @command{--enable-k-debug} below.  This
+has the effect of remove @code{static} and @code{inline} attributes from
+functions and invoking most non-performance affecting debugging macros in the
+code.  The default is not to perform kernel testing.
+
+@item --enable-k-debug
+@opindex --enable-k-debug
+
+Enable kernel module run-time debugging.  Specifies whether kernel debugging
+is to be performed.  This option is mutuallly exclusive with
+@command{--enable-k-safe} and @command{--enable-k-test} above.  This has the
+effect of removing @code{static} and @code{inline} attributes from functions
+and invoking all debuggin macros in the code (including performance-affecting
+debug macros).  The default is to not perform kernel debugging.
+
+@itemx --disable-k-modversion
+@opindex --disable-k-modversion
+
+Disable module versions on @command{strxns} symbols.  Specifies whether kernel
+symbol versioning is to be used on symbols exported from built
+@command{strxns} modules.  The default is to provide kernel symbol versioning
+on all exported symbols.
+
+@item --with-cooked-manpages
+@opindex --with-cooked-manpages
+
+Convert manual pages to remove macro dependencies and @command{grefer}
+references.
+Some systems do not like @command{grefer} references in manpages.@footnote{In
+particular, some @cite{Debian} systems do not load the @command{groff}
+extensions package and do not have @command{grefer} installed.  Although this
+is an oversight on the configuration of the particular @cite{Debian} system,
+we accomodate such misconfiguration with this feature.}  This option will cook
+@command{soelim}, @command{refer}, @command{tbl} and @command{pic} commands
+from the manpages and also strip @command{groff} comments.  The default is to
+leave manpages uncooked (they are actually smaller that way).
+
+@item --with-rpm-epoch=PACKAGE_EPOCH
+@opindex --with-rpm-epoch
+
+Specify the @samp{PACKAGE_EPOCH} for the RPM spec file.  The default is to use the RPM
+epoch conatined in the file @file{.rpmepoch}.
+
+@item --with-rpm-release=PACKAGE_RELEASE
+@opindex --with-rpm-release
+
+Specify the @samp{PACKAGE_RELEASE} for the RPM rspec file.  The default is to use
+the RPM release contained in the file @file{.rpmrelease}.
+
+@item --with-gpg-user=GNUPGUSER
+@opindex --with-gpg-user
+
+Specify the @command{gpg} @samp{GNUPGUSER} for signing RPMs and tarballs.  The
+default is the content of the environment variable @var{GNUPGUSER}.  If
+unspecified, the @command{gpg} program will normally use the user name of the
+account invoking the @command{gpg} program.
+For building source RPMs, the RPM macro @samp{_gpg_name} will override this
+setting.
+
+@item --with-gpg-home=GNUPGHOME
+@opindex --with-gpg-home
+
+Specify the @samp{GNUPGHOME} directory for signing RPMs and tarballs.  The
+default is the user's @file{~/.gpg} directory.
+For building source RPMs, the RPM macro @samp{_gpg_path} will override this
+setting.
+
+@item --with-k-release=PACKAGE_KRELEASE
+@opindex --with-k-release
+
+Specify the @samp{PACKAGE_KRELEASE} release of the linux kernel for which the build
+is targetted.  When not cross compiling, if this option is not set, the build
+will be targetted at the kernel running in the build environment (e.g.,
+@samp{uname -r}).  When cross-comipling this option must be specified or the
+configure script will generate an error and terminate.
+
+@item --with-k-prefix=K-PREFIX-DIR
+@opindex --with-k-prefix
+
+Specify the @samp{K-PREFIX-DIR} kernel directory prefix for install.  The
+default is the root directory (@file{/}) of the build machine.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-rootdir=K-ROOTDIR
+@opindex --with-k-rootdir
+
+Specify the @samp{K-ROOTDIR} root directory for configure.  The default is the
+setting of environment variable @var{DESTDIR}, and if @var{DESTDIR} is not
+set, the root directory (@file{/}) of the build machine.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-modules=K-MODULES-DIR
+@opindex --with-k-modules
+
+
+Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be
+installed.  The default is based on the option @command{--with-k-release},
+@command{--with-k-prefix} and @command{--with-k-rootdir}.  The default is
+@file{DESTDIR}/@file{K-MODULES-DIR} which is typically
+@file{@var{DESTDIR}/lib/modules/@var{PACKAGE_KRELEASE}/}.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-build=K-BUILD-DIR
+@opindex --with-k-build
+
+Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured kernel source
+resides.  The default is @file{@var{DESTDIR}/@var{K-MODULES-DIR}/build}.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-sysmap=K-SYSMAP-FILE
+@opindex --with-k-sysmap
+
+Specify the @samp{K-SYSMAP-FILE} kernel system map file.  The default is
+@file{@var{K-BUILD-DIR}/System.map}.
+This file is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-includes=K-INCLUDES-DIR
+@opindex --with-k-includes
+
+Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the build is targetted.
+The default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/include}.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-archdir=K-ARCHDIR
+@opindex --with-k-archdir
+
+Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.
+The default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/arch}.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-machdir=K-MACHDIR
+@opindex --with-k-machdir
+
+Specify the @samp{K-MACHDIR} kernel source machine specific directory.
+The default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/@var{target_cpu}}.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-optimize=HOW
+@opindex --with-k-optimize
+
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or @var{quick}.
+@var{size} compiles kernel modules @code{-Os},
+@var{speed} compiles kernel modules @code{-O3}, and @var{quick} compiles kernel
+modules @code{-O0}.
+The default is @var{normal}.
+Use with care.
+
+@item --with-lis[=LIS-DIR]
+@itemx --without-lis
+@opindex --with-lis
+@opindex --without-lis
+
+Specify the @samp{LIS-DIR} directory in which to find LiS headers.
+Also specifies that the build is to be made against Linux STREAMS.
+The default is @file{/usr/include/LiS} if it exists, @samp{no} otherwise.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-lfs[=LFS-DIR]
+@itemx --without-lfs
+@opindex --with-lfs
+@opindex --without-lfs
+
+Specify the @samp{LFS-DIR} directory in which to find LfS headers.
+Also specifies that the build is to be made against Linux Fast-STREAMS.
+The default is @file{/usr/include/streams} if it exists, @samp{no} otherwise.
+This directory is normally located by the @command{configure} script and need
+only be provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-strconf-master=STRCONF_CONFIG
+@opindex --with-strconf-master
+
+Specify the @samp{STRCONF_CONFIG} file name to which the configuration master
+file is written.  The default is @file{Config.master}.
+
+@item --with-base-major=STRCONF_MAJBASE
+@opindex --with-base-major
+
+Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is
+
+@samp{230}.
+
+@end table
+
+@node Configure Options, Environment Variables, , Configuring the Tar Ball
+@subsubsection Environment Variables
+@cindex configure environment variables
+
+Following are additional environment variables to @command{configure}, their
+meaning and use:
+
+@vtable @var
+@item SOELIM
+
+Roff source elminiation command.
+This is only necessary when the option @command{--with-cooked-manpages} has
+been specified and @command{configure} cannot find the proper @command{soelim}
+command.
+By default, @command{configure} will search for this tool.
+
+@item REFER
+
+Roff references command.
+This is only necessary when the option @command{--with-cooked-manpages} has
+been specified and @command{configure} cannot find the proper @command{refer}
+command.
+By default, @command{configure} will search for this tool.
+
+@item TBL
+
+Roff table command.
+This is only necessary when the option @command{--with-cooked-manpages} has
+been specified and @command{configure} cannot find the proper @command{tbl}
+command.
+By default, @command{configure} will search for this tool.
+
+@item PIC
+
+Roff picture command.
+This is only necessary when the option @command{--with-cooked-manpages} has
+been specified and @command{configure} cannot find the proper @command{pic}
+command.
+By default, @command{configure} will search for this tool.
+
+@item GZIP
+
+Manpages compression commands.
+This is only necessary when the option @command{--without-compressed-manpages}
+has @emph{not} been specified and @command{configure} cannot find the proper
+@command{gzip} command.
+By default, @command{configure} will search for this tool.
+
+@item RPM
+
+Rpm command.
+This is only necessary for RPM builds.
+By default, @command{configure} will search for this tool.
+
+@item RPMBUILD
+
+Build rpms command.
+This is only necessary for RPM builds.
+By default, @command{configure} will search for this tool.
+@command{rpm} will be used instead of @command{rpmbuild} only if
+@command{rpmbuild} cannot be found.
+
+@item GPG
+
+GPG signature command.
+This is used for signing distributions by the maintainer.
+By default, @command{configure} will search for this tool.
+
+@item GNUPGUSER
+
+GPG user name.
+This is used for signing distributions by the maintainer.
+
+@item GNUPGHOME
+
+GPG home directory.
+This is used for signing distributions by the maintainer.
+
+@item LDCONFIG
+
+Configure loader command.
+Command used to configure the loader when libraries are installed.
+By default, @command{configure} will search for this tool.
+
+@item DESTDIR
+
+Cross build root directory.
+Specifies the root directory for build and installation.  For example, for
+@cite{NexusWare} cross-builds, this is set to environment variable
+@var{NEXUSWARE_PREFIX} on configuration to point to the root of the
+cross-build tree for both configuration and installation.
+
+@item DEPMOD
+
+Build kernel module dependencies command.
+This is used during installation of kernel modules to a running kernel to
+rebuild the modules dependency database.
+By default, @command{configure} will search for this tool.
+
+@item MODPROBE
+
+Probe kernel module dependencies command.
+This is used during installation of kernel modules to a running kernel to
+remove old modules.
+By default, @command{configure} will search for this tool.
+
+@item LSMOD
+
+List kernel modules command.
+This is used during installation of kernel modules to a running kernel to
+detect old modules for removal.
+By default, @command{configure} will search for this tool.
+
+@item LSOF
+
+List open files command.
+This is used during installation of kernel modules to a running kernel to
+detect old modules for removal.  Processes owning the old kernel modules will
+be killed and the module removed.  If the process restarts, the new module
+will be demand loaded.
+By default, @command{configure} will search for this tool.
+
+@item GENKSYMS
+
+Generate kernel symbols command.
+This is used for generating module symbol versions during build.
+By default, @command{configure} will search for this tool.
+@end vtable
+
+@subsubsection Build
+To build from the tar ball, @xref{Building from the Tar Ball}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Building, Installing, Configuration, Installation
+@section Building
+@cindex building
+
+@menu
+* Building from the Source RPM::	the next best approach
+* Building from the Tar Ball::		last resort
+@end menu
+
+@node Building from the Source RPM, Building from the Tar Ball, , Building
+@subsection Building from the Source RPM
+@cindex building, source srpm
+@cindex source rpms
+
+If you have downloaded the necessary source RPM (@pxref{Downloading the Source
+RPM}), then the following instructions will rebuild the binary RPMs on your
+system.  Once the binary RPMs are rebuilt, you may install them as described
+above (@pxref{Installing the Binary RPM}).
+
+@noindent
+The source RPM is rebuilt to binary RPMs as follows:
+
+@example
+% wget http://www.openss7.org/rpms/SRPMS/strxns-0.9.2-1.src.rpm
+% rpmbuild strxns-0.9.2-1.src.rpm
+@end example
+
+@noindent
+The rebuild process can also recognize a number of options that can be used to
+tweak the resulting binaries, @xref{Configuring the Source RPM}.  These
+options are provided on the @command{rpm} command line.  For example:
+
+@example
+% rpmbuild -vv --target athlon-redhat-linux \ 
+  --define "_kversion 2.4.20-28.7" \ 
+  --with lis -- strxns-0.9.2-1.src.rpm
+@end example
+
+@noindent
+will rebuild binary RPM for the @samp{2.4.20-28.7} kernel for the
+@samp{athlon} architecture against the @cite{LiS} STREAMS package.
+
+@subsubheading Installation
+
+To install the resulting binary RPM, @xref{Installing the Binary RPM}.
+
+@node Building from the Tar Ball, , Building from the Source RPM, Building
+@subsection Building from the Tar Ball
+@cindex building, tar ball
+@cindex tar ball
+
+If you have downloaded the tar ball (@pxref{Downloading the Tar Ball}), then
+the following instructions will rebuild the package on your system.  (Note
+that the build process does not required @command{root} privilege.)
+
+@subsubsection Native Build
+
+Folowing is an example of a native build against the running kernel:
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.bz2
+% tar -xjvf strxns-0.9.2-1.tar.bz2
+% pushd strxns-0.9.2-1
+% ./configure
+% make
+% popd
+@end example
+
+@subsubsection Cross-Build
+
+Following is an example for a cross-build.  The kernel release version must
+always be specified for a cross-build.@footnote{Because it @emph{is} a
+cross-build, the kernel version on the build machine is unlikely to be the
+kernel version of the target machine, except by coincidence.}  If you are
+cross-building, specify the root for the build with environment variable
+@var{DESTDIR}.  The cross-compile host must also be specified if different
+from the build host.  Either the compiler and other tools must be in the usual
+places where GNU @command{autoconf} can find them, or they must be specified
+with declarations such as @samp{CC=/u5/NexusWare24/ppc-linux/gcc} on the
+@command{configure} command line.  Look in the file @file{configure.nexusware}
+in the release package for an example.
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.bz2
+% tar -xjvf strxns-0.9.2-1.tar.bz2
+% pushd strxns-0.9.2-1
+% ./configure DESTDIR="/some/other/root" \ 
+	--with-k-release=2.4.18 --host sparc-linux
+% make
+% popd
+@end example
+
+@subsubsection NexusWare Build
+
+Additional support is provided for cross-building for the @cite{Performance
+Technologies Inc.} @cite{NexusWare} embedded target for the CPC-384, CPC-388
+and CPC-396 cards.  A configuration script wrapper
+(@file{configure.nexusware}) is provided to simplify the cross-build operation
+for these targets.  The following steps describe the process:
+
+@enumerate
+@item Follow the normal @cite{NexusWare} instructions for rebuilding a
+@file{generic} kernel and flash impage as follows:  (Note that I keep my
+@cite{NexusWare} build in @file{/u5/NexusWare24}.)
+
+@example
+% pushd /u5/NexusWare24
+% source SETUP.sh
+% make
+% popd
+@end example
+
+@item Next download, unpack
+(@pxref{Downloading the Tar Ball})
+and configure
+(@pxref{Configuring the Tar Ball})
+using the provided
+@file{configure.nexusware} wrapper for @command{configure}.  This wrapper
+simply tells the @command{configure} script where to find the @cite{NexusWare}
+sources and which @cite{NexusWare} cross-building tools to use for a
+cross-compile.@footnote{Although I have not tried it, because we use GNU
+@command{autoconf} for configuration, these instructions should work equally
+well for the Solaris @cite{NexusWare} cross-building environment as it does
+for the Linux @cite{NexusWare} cross-building environment.}
+
+Any of the normal @command{configure} script options (@pxref{Configuring the
+Tar Ball}) can be used on the same line as @samp{./configure.nexusware}.  One
+of paticular interest to embedded targets is @samp{--with-k-optimize=size} to
+attempt to reduce the size of the kernel modules.
+
+@item Install as normal (@pxref{Installing the Tar Ball}), however, for
+embedded targets the @command{install-strip} target should be used instead of
+the @command{install} target.  The @command{install-strip} target will strip
+unnecessary symbols from kernel modules and further reduce the size in the
+root filesystem flash image.
+
+@end enumerate
+
+Following is what I use for configuration and installation: (My
+@cite{NexusWare} tree is rooted at @file{/u5/NexusWare}.)
+
+@example
+% pushd /u5/NexusWare24
+% source SETUP.sh
+% make
+% popd
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.bz2
+% tar -xjvf strxns-0.9.2-1.tar.bz2
+% pushd strxns-0.9.2-1
+% ./configure.nexusware --with-k-optimize=size
+% make
+% make install-strip
+% popd
+@end example
+
+Once built and installed in the @cite{NexusWare} directory, you will have to
+(currently) hadn edit a @file{.spec} file to include the components you want
+in the @cite{NexusWare} root file system.  If you are cross-building for
+@cite{NexusWare} you should already know what that means.  Objects that you
+might be interested in copying to the root file system are kernel modules that
+were installed in @file{@var{$NEXUSWARE_PREFIX}/lib/modules/2.4.18/strxns},
+libraries installed in
+@file{@var{$NEXUSWARE_PREFIX}/usr/lib}
+and utility functions installed in
+@file{@var{$NEXUSWARE_PREFIX}/usr/bin}
+and
+@file{@var{$NEXUSWARE_PREFIX}/usr/sbin}
+and test programs in
+@file{@var{$NEXUSWARE_PREFIX}/usr/libexec}.
+If you would prefer that these programs be installed in
+@file{@var{$NEXUSWARE_PREFIX}/lib},
+@file{@var{$NEXUSWARE_PREFIX}/bin},
+@file{@var{$NEXUSWARE_PREFIX}/sbin}
+and
+@file{@var{$NEXUSWARE_PREFIX}/libexec},
+(say because you want to remote mount the @file{/usr} directory after boot),
+then specify the @samp{--exec-prefix=/} option to
+@samp{./configure.nexusware}.
+
+In addition, because @cite{NexusWare} does not include an
+@file{/etc/modules.conf} file by default, it will be necessary to add one or
+edit your @file{rc.4} file to @command{insmod} the necessary @file{strxns}
+modules at boot time.
+
+Once you have completed the necessary @file{.spec} and @file{rc.4} file
+entries, you need to rebuild the @samp{generic} kernel flash image once more
+for these objects to be included in the flash file system.  It is important
+that this second build of the kernel image be the same as the first.
+
+When modifying and rebuilding a @cite{NexusWare} kernel, it will be necessary
+to rebuild and install @file{strxns}.  Simply perform the last @samp{make
+install-strip} stage or start again with @samp{./configure.nexusware}.  You
+can place the unpacked tarball in
+@file{@var{$NEXUSWARE_PREFIX}/usr/src/strxns}, and add the following to the
+top-level @cite{NexusWare} @file{Makefile} to make the build process a single
+step process instead of dual pass:
+
+@example
+all:
+...
+	(cd kernels/generic; $(MAKE) depend)
+	(cd usr/src/pcmcia-cs-3.2.1; $(MAKE) config)
+	(cd kernels/generic; $(MAKE))
+	(cd usr/src/pcmcia-cs-3.2.1; $(MAKE) pti)
+	(cd usr/src/pti; $(MAKE))
+	(cd drivers; $(MAKE))
+	(cd utility; $(MAKE))
+#	uncomment for LiS build
+	(cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
+#	uncomment for strxns build
+#	(cd usr/src/strxns; ./configure.nexusware; $(MAKE) install-strip)
+	(cd build/generic; $(MAKE))
+...
+@end example
+
+Another, perhaps simpler approach, is to make the necessary edits to the
+@cite{NexusWare} top-level @file{Makefile} and @file{.spec} and @file{rc.4}
+files, download and unpack the tar ball into the @cite{NexusWare} directory,
+and build the @cite{NexusWare} flash image as normal:
+
+@example
+% wget http://www.openss7.org/strxns-0.9.2-1.tar.bz2
+% pushd /u5/NexusWare24
+% source SETUP.sh
+% pushd usr/src
+% tar -xjvf $@{DIRSTACK[2]@}/strxns-0.9.2-1.tar.bz2
+% ln -sf strxns-0.9.2-1 strxns
+% popd
+% make
+% popd
+@end example
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installing, Removal, Building, Installation
+@section Installing
+@cindex installing
+
+@menu
+* Installing the Binary RPM::		the easiest approach
+* Installing the Tar Ball::		last resort
+@end menu
+
+@node Installing the Binary RPM, Installing the Tar Ball, , Installing
+@subsection Installing the Binary RPM
+@cindex installing, binary rpms
+@cindex binary rpms
+
+If you have downloaded the necessary binary RPMs (@pxref{Downloading the
+Binary RPM}), or have rebuilt binary RPMs using the source RPM (@pxref{Building
+from the Source RPM}), then the following instructions will install the RPMs
+on your system. For additional information on @command{rpm}, see @ref{rpm(8),
+rpm(8), rpm(8), *manpages*, The Manual Pages}.
+
+@example
+% pushd RPMS/i686
+% rpm -ihv strxns-*-0.9.2-1.i686.rpm
+@end example
+
+@noindent
+You must have the correct binary RPMs downloaded or built for this to be
+successbuf.
+
+Some of the packages are relocatable and can have final installation
+directories altered with the @samp{--relocate} option to @command{rpm}, see
+@ref{rpm, rpm(8), rpm(8), rpm(8), *manpages*, The Manual Pages}.  For example,
+the following will relocate the documentation and info directories:
+
+@example
+% pushd RPMS/i686
+% rpm -ihv \ 
+	--relocate '/usr/share/doc=/usr/local/share/doc' \ 
+	--relocate '/usr/share/info=/usr/local/share/info' \ 
+	-- strxns-doc-0.9.2-1.i686.rpm
+@end example
+
+@noindent
+The previous example will install the @file{strxns-doc} package by will
+relocate the documentation an info directory contents to the @file{/usr/local}
+version.
+
+@node Installing the Tar Ball, , Installing the Binary RPM, Installing
+@subsection Installing the Tar Ball
+@cindex installing, tar ball
+@cindex tar ball
+
+AFter the build process (@pxref{Building from the Tar Ball}), installation
+only requires execution of one of two @command{make} targets:
+
+@table @asis
+@item @samp{make install}
+The @samp{install} @command{make} target will install all the components of
+the package.
+Root privilege is required to successfully invoke this target.
+@item @samp{make install-strip}
+The @samp{install-strip} @command{make} target will install all the components of
+the package, but will strip unnecessary information out of the objects and
+compress manual pages.
+Root privilege is required to successfully invoke this target.
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Removal, Loading, Installing, Installation
+@section Removing
+@cindex removal
+
+@menu
+* Removing the Binary RPM::		the easiest approach
+* Removing the Source RPM::		the next best approach
+* Removing the Tar Ball::		last resort
+@end menu
+
+@node Removing the Binary RPM, Removing the Source RPM, , Removal
+@subsection Removing the Binary RPM
+@cindex removing, binary rpms
+@cindex binary rpms
+
+To remove an installed version of the binary RPMs (whether obtained from the
+OpenSS7 binary RPM releases, or whether created by the source RPM), execute
+the following command:
+
+@example
+% rpm -evv `rpm -qa | grep '^strxns-'`
+@end example
+
+For more information on @command{rpm}, @ref{rpm, rpm(8), rpm(8), *manpages*, The Manual Pages}.
+
+@node Removing the Source RPM, Removing the Tar Ball, Removing the Binary RPM, Removal
+@subsection Removing the Source RPM
+@cindex removing, source srpm
+@cindex source rpms
+
+To remove all the installed binary RPM build from the source RPM, @ref{Removing
+the Binary RPM}.  Then simply remove the binary RPM package files and source
+RPM file.  A command such as:
+
+@example
+% find / -name 'strxns-*.rpm' -type f -print0 | xargs --null rm -f
+@end example
+
+@noindent
+should remove all @file{strxns} RPMs from your system.
+
+@node Removing the Tar Ball, , Removing the Source RPM, Removal
+@subsection Removing the Tar Ball
+@cindex removing, tar ball
+@cindex tar ball
+
+To remove a version installed from tar ball, change to the build directory
+where the package was built and use the @samp{uninstall} @command{make} target
+as follows:
+
+@example
+% cd /usr/src/strxns
+% make uninstall
+% cd ..
+% rm -fr strxns-0.9.2-1
+% rm -f strxns-0.9.2-1.tar.gz
+% rm -f strxns-0.9.2-1.tar.bz2
+@end example
+
+If you have inadvertently removed the build directory and, therefore, no
+longer have a configured directory from which to execute @samp{make
+uninstall}, then perform all of the steps for configuration and installation
+(@pxref{Installing the Tar Ball}) except the final installation and then
+perform the steps above.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Loading, , Removal, Installation
+@section Loading
+@cindex loading
+
+@c ----------------------------------------------------------------------------
+
+@node Reference, Conformance, Installation, Top
+@chapter Reference
+@cindex reference
+
+@menu
+* Header Files::		Header Files
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Header Files, Drivers, , Reference
+@section Header Files
+@cindex headers
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers, Modules, Header Files, Reference
+@section Drivers
+@cindex drivers
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules, Utilities, Drivers, Reference
+@section Modules
+@cindex modules
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities, Development, Modules, Reference
+@section Utilities
+@cindex utilities
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Development, , Utilities, Reference
+@section Development
+@cindex developing
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance, Bugs, Reference, Top
+@chapter Conformance
+@cindex conformance
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Bugs, Schedule, Conformance, Top
 @chapter Bugs
 @cindex bugs
 
-@node Public License, Documentation License, Bugs, Top
-@appendix Public License
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Schedule, GPL, Bugs, Top
+@chapter Development Schedule
+@cindex schdule
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node GPL, LGPL, Schedule, Top
+@appendix GPL
+@cindex license GPL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 @include gpl.texi
 
-@node Documentation License, Concept Index, Public License, Top
-@appendix Documentation License
+@node LGPL, GFDL, GPL, Top
+@appendix LGPL
+@cindex license LGPL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include lesser.texi
+
+@node GFDL, Indices, LGPL, Top
+@appendix GFDL
+@cindex license GFDL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 @include fdl.texi
 
-@page
-@node Concept Index, Type Index, Documentation License, Top
+@node Indices, , GFDL, Top
 @appendix Indices
-@appendixsec Concept Index
+@cindex indices
 
+@c ----------------------------------------------------------------------------
+
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+@end menu
+
+@node Concept Index, Type Index, , Indices
+@appendixsec Index of Concepts
 @printindex cp
 
-@page
-@node Type Index, Function Index, Concept Index, Top
-@appendixsec Type Index
-
+@node Type Index, Function Index, Concept Index, Indices
+@appendixsec Index of Data Types
 @printindex tp
 
-@page
-@node Function Index, Variable Index, Type Index, Top
-@appendixsec Function and Macro Index
-
+@node Function Index, Variable Index, Type Index, Indices
+@appendixsec Index of Functions and Macros
 @printindex fn
 
-@page
-@node Variable Index, File Index, Function Index, Top
-@appendixsec Variable and Constant Macro Index
-
+@node Variable Index, File Index, Function Index, Indices
+@appendixsec Index of Variables and Constants
 @printindex vr
 
-@page
-@node File Index, , Variable Index, Top
-@appendixsec Program and File Index
-
+@node File Index, Option Index, Variable Index, Indices
+@appendixsec Index of Files and Programs
 @printindex pg
+
+@node Option Index, , File Index, Indices
+@appendixsec Index of Configuration Options
+@printindex op
+
+@c ----------------------------------------------------------------------------
 
 @page
 @shortcontents
@@ -690,6 +1854,4 @@ Device Drivers
 @contents
 @bye
 
-
-
-
+@c ============================================================================

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 03:05:11 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/14 12:35:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/04 03:05:11 $ by $Author: brian $
+# Last Modified $Date: 2004/08/14 12:35:53 $ by $Author: brian $
 #
 # =============================================================================
 
 if RPM_BUILD_KERNEL
 
-all-am: $(KERNEL_MODULES)
+kernel-all-am: $(KERNEL_MODULES)
 
 STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 
@@ -255,8 +255,14 @@ postun-modules:
 #
 uninstall-hook: postun-modules
 
+else
+
+kernel-all-am:
+
 endif
 
-.PHONY: install-modules post-modules uninstall-modules postun-modules
+all-am: kernel-all-am
+
+.PHONY: kernel-all-am install-modules post-modules uninstall-modules postun-modules
 
 # vim: ft=automake

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 01:44:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/14 12:35:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,20 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/04 01:44:29 $ by $Author: brian $
+# Last Modified $Date: 2004/08/14 12:35:56 $ by $Author: brian $
 #
 # =============================================================================
 
+info_TEXINFOS		= strxns.texi
 
-info_TEXINFOS	= strxns.texi
-DVIS		= strxns.dvi
-PSS		= strxns.ps
-PDFS		= strxns.pdf
-HTMLS		= strxns.html
-INFO_DEPS	= $(srcdir)/strxns.info
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
-MAKEINFOHTML	= $(MAKEINFO) --html --no-split
+EXTRA_DIST		= args.texi gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
 
-EXTRA_DIST = gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+all-local: info ps pdf html
 
 # vim: ft=automake

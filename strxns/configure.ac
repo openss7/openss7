@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/07/13 23:46:39 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/08/14 12:35:51 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/07/13 23:46:39 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/14 12:35:51 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -130,6 +130,9 @@ AC_FUNC_MEMCMP
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS([alarm gettimeofday inet_ntoa memset strtol strtoul])
 
+PACKAGE_TITLE='OpenSS7 XNS Networking'
+AC_SUBST([PACKAGE_TITLE])
+
 AC_XNS
 
 AC_CONFIG_FILES([Makefile
@@ -137,6 +140,7 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/Makefile])
+		 doc/manual/Makefile
+		 doc/manual/args.texi])
 
 AC_OUTPUT
