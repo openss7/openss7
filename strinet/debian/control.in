@@ -30,24 +30,6 @@ Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  applies to kernel version @kversion@ and requires an STREAMS package
  compiled for the same kernel.
 
-Package: @PACKAGE_LCNAME@-lis-lib-@VERSION@
-Architecture: any
-Section: base
-Priority: optional
-Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-lis-lib
-Description: Shared libraries for @PACKAGE_TITLE@ for LiS
- Run-time shared libraries necessary to run applications programs and utilities
- developed for @PACKAGE_SHORTTITLE@ for LiS.
-
-Package: @PACKAGE_LCNAME@-streams-lib-@VERSION@
-Architecture: any
-Section: base
-Priority: optional
-Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-streams-lib
-Description: Shared libraries for @PACKAGE_TITLE@ for STREAMS
- Run-time shared libraries necessary to run applications programs and utilities
- developed for @PACKAGE_SHORTTITLE@ for STREAMS.
-
 Package: @PACKAGE_LCNAME@-lis-util-@VERSION@
 Architecture: any
 Section: base

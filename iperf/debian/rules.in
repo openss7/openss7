@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/21 11:49:54 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/03/22 02:28:20 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,13 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/21 11:49:54 $ by $Author: brian $
+## Last Modified $Date: 2005/03/22 02:28:20 $ by $Author: brian $
 ##
 ## =============================================================================
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
 VERSION = @VERSION@
+PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
 PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
 mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
@@ -161,7 +162,7 @@ build-stamp:
 		--mandir=$(mandir) \
 		--infodir=$(infodir) \
 		--disable-maintainer-mode \
-		--disable-dependency-tracking \
+		--enable-dependency-tracking \
 		--with-gnu-ld \
 		$(PACKAGE_DEBOPTIONS) \
 		$(BUILD_CFGOPTIONS) \
@@ -233,6 +234,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.4  2005/03/22 02:28:20  brian
+# - a workable set of debian rules
+#
 # Revision 1.1.2.3  2005/03/21 11:49:54  brian
 # - updating debian packaging
 #

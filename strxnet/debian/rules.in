@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/21 12:01:14 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/22 02:28:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,13 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/21 12:01:14 $ by $Author: brian $
+## Last Modified $Date: 2005/03/22 02:28:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
 VERSION = @VERSION@
+PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
 PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
 mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
@@ -115,23 +116,34 @@ have_init_files = 0
 have_libraries = 0
 have_preloads = 0
 
+pkg_lis_control_files =
+
+pkg_lfs_control_files =
+
 pkg_control_files =
 
-@WITH_LFS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-streams-core-$(kversion)-$(VERSION).install
+pkg_lfs_control_files += debian/$(PACKAGE_LCNAME)-streams-$(core_name)-$(VERSION).install
 
-debian/$(PACKAGE_LCNAME)-streams-core-$(kversion)-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-streams-$(core_name)-$(VERSION).install:
 	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-@WITH_LIS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-lis-core-$(kversion)-$(VERSION).install
+pkg_lis_control_files += debian/$(PACKAGE_LCNAME)-lis-$(core_name)-$(VERSION).install
 
-debian/$(PACKAGE_LCNAME)-lis-core-$(kversion)-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-lis-$(core_name)-$(VERSION).install:
 	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install
+pkg_lfs_control_files += debian/$(PACKAGE_LCNAME)-streams-lib-$(VERSION).install
 
-debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-streams-lib-$(VERSION).install:
+	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_lis_control_files += debian/$(PACKAGE_LCNAME)-lis-lib-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-lis-lib-$(VERSION).install:
 	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
 	  echo '$(mytmpdir)$(libdir)/*.la' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
@@ -179,7 +191,7 @@ debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install:
 #	( echo '$(mytmpdir)/usr/src/*' ) \
 #	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-@WITH_LFS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-streams-util-$(VERSION).install
+pkg_lfs_control_files += debian/$(PACKAGE_LCNAME)-streams-util-$(VERSION).install
 
 debian/$(PACKAGE_LCNAME)-streams-util-$(VERSION).install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
@@ -189,7 +201,7 @@ debian/$(PACKAGE_LCNAME)-streams-util-$(VERSION).install:
 @INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
 @INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
 
-@WITH_LIS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-lis-util-$(VERSION).install
+pkg_lis_control_files += debian/$(PACKAGE_LCNAME)-lis-util-$(VERSION).install
 
 debian/$(PACKAGE_LCNAME)-lis-util-$(VERSION).install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
@@ -206,6 +218,7 @@ mpost_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
 build: build-stamp
 build-stamp:
 	dh_testdir
+	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
 	./configure \
 		CC='$(CC)' \
 		CFLAGS='$(CFLAGS)' \
@@ -268,6 +281,123 @@ install: build
 	$(MAKE) -f debian/rules $(pkg_control_files)
 	dh_install -v
 
+build-lis: build-lis-stamp
+build-lis-stamp:
+	dh_testdir
+	rm -f build-lfs-stamp build-stamp
+	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
+	./configure \
+		CC='$(CC)' \
+		CFLAGS='$(CFLAGS)' \
+		LDFLAGS='$(LDFLAGS)' \
+		CPPFLAGS='$(CPPFLAGS)' \
+		CPP='$(CPP)' \
+		CXX='$(CXX)' \
+		CXXFLAGS='$(CXXFLAGS)' \
+		CXXCPP='$(CXXCPP)' \
+		CONFIG_SITE="$(csite_file)" \
+		MODPOST_CACHE="$(mpost_file)" \
+		--cache-file="$(cache_file)" \
+		--host="$(DEB_HOST_GNU_ARCH)" \
+		--prefix=$(prefix) \
+		--exec_prefix=$(exec_prefix) \
+		--bindir=$(bindir) \
+		--sbindir=$(sbindir) \
+		--sysconfdir=$(sysconfdir) \
+		--datadir=$(datadir) \
+		--includedir=$(includedir) \
+		--libdir=$(libdir) \
+		--libexecdir=$(libexecdir) \
+		--localstatedir=$(localstatedir) \
+		--sharedstatedir=$(sharedstatedir) \
+		--mandir=$(mandir) \
+		--infodir=$(infodir) \
+		--disable-maintainer-mode \
+		--enable-dependency-tracking \
+		--with-gnu-ld \
+		--with-k-release=$(kversion) \
+		--with-k-modules=$(kmoduledir) \
+		--with-base-major=$(majbase) \
+		$(PACKAGE_DEBOPTIONS) \
+		$(BUILD_CFGOPTIONS) \
+		--disable-initscripts \
+		--with-lis \
+		--without-lfs \
+		|| { rm -f $(cache_file) ; exit 1 ; }
+	$(MAKE) -f Makefile
+	$(MAKE) -f Makefile check
+	chmod +x debian/rules
+	touch build-lis-stamp
+
+install-lis: DH_OPTIONS =
+install-lis: build-lis
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_lis_control_files)
+	dh_install -v
+
+build-lfs: build-lfs-stamp
+build-lfs-stamp:
+	dh_testdir
+	rm -f build-lis-stamp build-stamp
+	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
+	./configure \
+		CC='$(CC)' \
+		CFLAGS='$(CFLAGS)' \
+		LDFLAGS='$(LDFLAGS)' \
+		CPPFLAGS='$(CPPFLAGS)' \
+		CPP='$(CPP)' \
+		CXX='$(CXX)' \
+		CXXFLAGS='$(CXXFLAGS)' \
+		CXXCPP='$(CXXCPP)' \
+		CONFIG_SITE="$(csite_file)" \
+		MODPOST_CACHE="$(mpost_file)" \
+		--cache-file="$(cache_file)" \
+		--host="$(DEB_HOST_GNU_ARCH)" \
+		--prefix=$(prefix) \
+		--exec_prefix=$(exec_prefix) \
+		--bindir=$(bindir) \
+		--sbindir=$(sbindir) \
+		--sysconfdir=$(sysconfdir) \
+		--datadir=$(datadir) \
+		--includedir=$(includedir) \
+		--libdir=$(libdir) \
+		--libexecdir=$(libexecdir) \
+		--localstatedir=$(localstatedir) \
+		--sharedstatedir=$(sharedstatedir) \
+		--mandir=$(mandir) \
+		--infodir=$(infodir) \
+		--disable-maintainer-mode \
+		--disable-dependency-tracking \
+		--with-gnu-ld \
+		--with-k-release=$(kversion) \
+		--with-k-modules=$(kmoduledir) \
+		--with-base-major=$(majbase) \
+		$(PACKAGE_DEBOPTIONS) \
+		$(BUILD_CFGOPTIONS) \
+		--disable-initscripts \
+		--with-lfs \
+		--without-lis \
+		|| { rm -f $(cache_file) ; exit 1 ; }
+	$(MAKE) -f Makefile
+	$(MAKE) -f Makefile check
+	chmod +x debian/rules
+	touch build-lfs-stamp
+
+install-lfs: DH_OPTIONS =
+install-lfs: build-lfs
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_lfs_control_files)
+	dh_install -v
+
+
 binary-common:
 	dh_testdir -v
 	dh_testroot -v
@@ -293,8 +423,18 @@ binary-indep: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
 # Build architecture-dependent files here.
-binary-arch: build install
-	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+binary-lis: build-lis install-lis
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name)-$(VERSION) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib-$(VERSION) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-util-$(VERSION) binary-common
+
+binary-lfs: build-lfs install-lfs
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name)-$(VERSION) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib-$(VERSION) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-util-$(VERSION) binary-common
+
+binary-arch: binary-lis binary-lfs build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel-$(VERSION) binary-common
 
 binary: binary-indep binary-arch
 
@@ -308,6 +448,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.4  2005/03/22 02:28:42  brian
+# - a workable set of debian rules
+#
 # Revision 0.9.2.3  2005/03/21 12:01:14  brian
 # - updated debian rules
 #

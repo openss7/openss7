@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/21 11:50:22 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/22 02:28:34 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,13 +47,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/21 11:50:22 $ by $Author: brian $
+## Last Modified $Date: 2005/03/22 02:28:34 $ by $Author: brian $
 ##
 ## =============================================================================
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
 VERSION = @VERSION@
+PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
 PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
 mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
@@ -117,15 +118,15 @@ have_preloads = 0
 
 pkg_control_files =
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-core-$(kversion)-$(VERSION).install
+pkg_control_files += debian/$(PACKAGE_LCNAME)-$(core_name)-$(VERSION).install
 
-debian/$(PACKAGE_LCNAME)-core-$(kversion)-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-$(core_name)-$(VERSION).install:
 	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-@WITH_KO_MODULES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-info-$(kversion)-$(VERSION).install
+@WITH_KO_MODULES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-$(info_name)-$(VERSION).install
 
-debian/$(PACKAGE_LCNAME)-info-$(kversion)-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-$(info_name)-$(VERSION).install:
 	( echo '$(mytmpdir)$(pkgincludedir)/$(kversion)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
@@ -223,7 +224,7 @@ build-stamp:
 		--mandir=$(mandir) \
 		--infodir=$(infodir) \
 		--disable-maintainer-mode \
-		--disable-dependency-tracking \
+		--enable-dependency-tracking \
 		--with-gnu-ld \
 		--with-k-release=$(kversion) \
 		--with-k-modules=$(kmoduledir) \
@@ -298,6 +299,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.5  2005/03/22 02:28:34  brian
+# - a workable set of debian rules
+#
 # Revision 0.9.2.4  2005/03/21 11:50:22  brian
 # - updating debian packaging
 #
