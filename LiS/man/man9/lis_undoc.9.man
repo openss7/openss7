@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.4 2005/03/31 11:32:19 brian Exp $
+.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.5 2005/04/02 22:14:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/31 11:32:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/02 22:14:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -422,28 +422,64 @@ These are undocumented LiS symbols:
 .BR lis_rw_lock_init_fcn ,
 .TP
 .BR lis_rw_read_lock_fcn ,
+do not use this function, use the linux kernel
+.BR read_lock (9)
+function instead.
 .TP
 .BR lis_rw_read_lock_irq_fcn ,
+do not use this function, use the linux kernel
+.BR read_lock_irq (9)
+function instead.
 .TP
 .BR lis_rw_read_lock_irqsave_fcn ,
+do not use this function, use the linux kernel
+.BR read_lock_irqsave (9)
+function instead.
 .TP
 .BR lis_rw_read_unlock_fcn ,
+do not use this function, use the linux kernel
+.BR read_unlock (9)
+function instead.
 .TP
 .BR lis_rw_read_unlock_irq_fcn ,
+do not use this function, use the linux kernel
+.BR read_unlock_irq (9)
+function instead.
 .TP
 .BR lis_rw_read_unlock_irqrestore_fcn ,
+do not use this function, use the linux kernel
+.BR read_unlock_irqrestore (9)
+function instead.
 .TP
 .BR lis_rw_write_lock_fcn ,
+do not use this function, use the linux kernel
+.BR write_lock (9)
+function instead.
 .TP
 .BR lis_rw_write_lock_irq_fcn ,
+do not use this function, use the linux kernel
+.BR write_lock_irq (9)
+function instead.
 .TP
 .BR lis_rw_write_lock_irqsave_fcn ,
+do not use this function, use the linux kernel
+.BR write_lock_irqsave (9)
+function instead.
 .TP
 .BR lis_rw_write_unlock_fcn ,
+do not use this function, use the linux kernel
+.BR write_unlock (9)
+function instead.
 .TP
 .BR lis_rw_write_unlock_irq_fcn ,
+do not use this function, use the linux kernel
+.BR write_unlock_irq (9)
+function instead.
 .TP
 .BR lis_rw_write_unlock_irqrestore_fcn ,
+do not use this function, use the linux kernel
+.BR write_unlock_irqrestore (9)
+function instead.
 .TP
 .BR lis_safe_putmsg ,
 .TP
