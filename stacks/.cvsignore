@@ -6,3 +6,5 @@ autom4te.cache
 config.h.in
 configure
 intl
+COPYING
+INSTALL

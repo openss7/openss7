@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.3 2004/08/22 04:26:13 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.4 2004/12/19 15:15:14 brian Exp $
 %
 % =========================================================================
 %
@@ -54,22 +54,19 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/22 04:26:13 $ by $Author: brian $
+% Last Modified $Date: 2004/12/19 15:15:14 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename strinet.info
+@include texi/args.texi
 @settitle @value{PACKAGE_TITLE}
-@setchapternewpage odd
-@footnotestyle separate
 
 @dircategory Kernel
 @direntry
 * INET: (strinet).   		An Internet Protocol driver for STREAMS.
 @end direntry
-
-@set xref-automatic-section-title
 
 @include texi/args.texi
 
@@ -78,7 +75,7 @@
 @ifinfo
 This file documents the @value{PACKAGE_TITLE} package.
 
-This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
 @cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 

@@ -14,3 +14,5 @@ netperf.info-4
 _build
 _install
 scripts
+COPYING
+INSTALL

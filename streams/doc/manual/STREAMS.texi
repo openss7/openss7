@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.8 2004/12/17 04:02:46 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.9 2004/12/19 15:15:02 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/12/17 04:02:46 $ by $Author: brian $
+% Last Modified $Date: 2004/12/19 15:15:02 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -61,12 +61,12 @@
 @setfilename STREAMS.info
 @settitle Linux Fast-STREAMS
 
-@include texi/args.texi
-
 @dircategory STREAMS
 @direntry
 * STREAMS: (STREAMS).		STREAMS Manual
 @end direntry
+
+@include texi/args.texi
 
 @defindex op
 

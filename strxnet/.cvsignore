@@ -6,3 +6,5 @@ config.h.in
 configure
 intl
 *.log
+COPYING
+INSTALL
