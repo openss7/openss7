@@ -1,11 +1,11 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tcapi.7.man,v 0.9.2.3 2004/10/25 10:31:18 brian Exp $
+.\" @(#) $Id: tci_ansi.7.man,v 0.9.2.1 2004/10/25 10:30:99 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" This manpage is Copyright (C) 1997-2001  Brian Bidulock.
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -31,44 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/10/25 10:31:18 $ by $Author: brian $
-.\"
-.\" $Log: tcapi.7.man,v $
-.\" Revision 0.9.2.3  2004/10/25 10:31:18  brian
-.\" - Fixes for TCI documentation.
-.\"
-.\" Revision 0.9.2.2  2004/04/17 23:05:36  brian
-.\" - Updating manual pages.
-.\"
-.\" Revision 0.9.2.1  2004/04/17 21:17:48  brian
-.\" - Converted to cooked manpages.
-.\"
-.\" Revision 0.9  2004/01/17 08:01:29  brian
-.\" - Added files for 0.9 baseline autoconf release.
-.\"
-.\" Revision 0.8.2.3  2003/07/20 17:29:53  brian
-.\" Reworking man files.
-.\"
-.\" Revision 0.8.2.2  2003/07/18 20:38:45  brian
-.\" A lot of minor embellishments.
-.\"
-.\" Revision 0.8.2.1  2003/07/08 11:25:31  brian
-.\" Updated some files.
-.\"
-.\" Revision 0.8  2002/04/02 08:22:37  brian
-.\" Started Linux 2.4 development branch.
-.\"
-.\" Revision 0.7.8.1  2001/12/11 13:16:09  brian
-.\" Branched for new development.
-.\"
-.\" Revision 0.7.6.1  2001/02/18 12:11:15  brian
-.\" New working branch for next release.
-.\"
-.\" Revision 0.7.4.1  2001/02/18 09:44:48  brian
-.\" Added new working branch.
-.\"
-.\" Revision 0.7.2.1  2001/01/14 11:07:53  brian
-.\" Changed headers back to GPL.
+.\" Modified $Date: 2004/10/25 10:30:99 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -86,40 +49,89 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TCAPI 7 "$Date: 2004/10/25 10:31:18 $" "$Name:  $" "OpenSS7 TCAP Interface"
+.TH TCI-ANSI 7 "$Date: 2004/10/25 10:30:99 $" "$Name:  $" "Transaction Component Interface (TCI)"
 .SH NAME
-.B tcapi
-\- Transaction Capabilities Application Part (TCAP) Interface (TCAPI)
+.PP
+.B TCI-ANSI
+\- Transaction Component Interface \(em Corrigendum for ANSI T1.114 Conformance
 .SH SYNOPSIS
 .PP
+.B #include <ss7/tr.h>
+.PD 0
+.PP
+.B #include <ss7/tc.h>
+.PP
+.B #include <ss7/tc_itu.h>
+.PD
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.
+.
 .SH DESCRIPTION
 .PP
-There is no TCAPI interface for TCAP.  See
-.BR tri (7)
-or
-.BR tci (7).
-.SH BUGS
-.PP
-This manpage is under construction.
-.XX
+.B TCI-ANSI
+provides a
+.I stream
+supporting the Transaction Component Interface
+.BR "" ( tci (7))
 .[
-q771
+tci
 .]
-.[
-q772
-.]
-.[
-q773
-.]
-.[
-q774
-.]
-.[
-q775
-.]
+to the Transaction Capabilities Application Part
+.BR "" ( tcap (4))
+for ANSI T1.114/1992
 .[
 t1.114
 .]
+operation.
+This
+.IR STREAMS (4)
+interface provides the
+.BR tcap (4)
+protocol service interface using the TC-primitives of the
+.BR tci (7).
+This interface is intended solely for use by user programs or protocol modules requiring the
+.BR tci (7)
+interface, such as
+.BR map (4).
+.
+.
+.SH "ADDRESS FORMATS"
+.PP
+.SH "QUALITY OF SERVICE"
+.PP
+.SH "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+.SH "DIALOGUE HANDLING PRIMITIVES"
+.PP
+.SH "COMPONENT HANDLING PRIMITIVES"
+.PP
+.SH IOCTLS
+.PP
+.SH "ERROR HANDLING"
+.PP
+.SH ERRORS
+.PP
+.SH CAVEATS
+.PP
+.SH BUGS
+.PP
+.B THIS MANPAGE IS UNDER CONSTRUCTION AND INCOMPLETE
+.AU
+.VR
+.SH "SEE ALSO"
+.PP
+.BR tcap (4),
+.BR tua (4),
+.BR tci (7),
+.BR tpi (7),
+.BR streamio (2),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR putpmsg (2),
+.BR getpmsg (2),
+.BR read (2),
+.BR write (2).
 .[
 $LIST$
 .]

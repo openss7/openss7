@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_tcap.3.man,v 0.9.2.2 2004/04/17 21:26:03 brian Exp $
+.\" @(#) $Id: xti_tcap.3.man,v 0.9.2.3 2004/10/25 10:31:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:26:03 $ by $Author: brian $
+.\" Last Modified $Date: 2004/10/25 10:31:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XTI-TCAP 3 "$Date: 2004/04/17 21:26:03 $" "$Name:  $" "X/Open Transport Interface"
+.TH XTI-TCAP 3 "$Date: 2004/10/25 10:31:18 $" "$Name:  $" "X/Open Transport Interface"
 .\"
 .\"
 .SH "NAME"
@@ -87,6 +87,8 @@ sort-adjacent-labels
 .B #include <xti_sccp.h>
 .br
 .B #include <xti_tcap.h>
+.br
+.B #include <xti_mosi.h>
 .\"
 .\"
 .HP
