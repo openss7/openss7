@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 0.9.2.2 2005/03/14 09:27:44 brian Exp $
+@c @(#) $Id: configure.texi,v 0.9.2.3 2005/03/15 00:51:35 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/14 09:27:44 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 00:51:35 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -117,49 +117,49 @@ The default is to create the driver as a separate loadable kernel module.
 Enable @file{log} driver linked into @file{streams} object.
 The default is to create the driver as a separate loadable kernel module.
 
-@item --enable-compat-svr4
+@item --disable-compat-svr4
 @opindex compat-svr4
 Disable source compatibility with SVR 4.2 MP variants.
 This option disables the SVR 4.2 MP compatibility functions that are included in the separate
 kernel module @file{streams-svr4compat.o}.
 The default for this feature is enabled.
 
-@item --enable-compat-sol8
+@item --disable-compat-sol8
 @opindex compat-sol8
 Disable source compatibility with Solaris 8 variants.
 This option disables the Solaris 8 compatibility functions that are included in the separate
 kernel module @file{streams-suncompat.o}.
 The default for this feature is enabled.
 
-@item --enable-compat-uw7
+@item --disable-compat-uw7
 @opindex compat-uw7
 Disable source compatibility with UnixWare 7 variants.
 This option disables the UnixWare 7 compatibility functions that are included in the separate
 kernel module @file{streams-uw7compat.o}.
 The default for this feature is enabled.
 
-@item --enable-compat-osf
+@item --disable-compat-osf
 @opindex compat-osf
 Disable source compatibility with OSF/1.2 variants.
 This option disables the OSF/1.2 compatibility functions that are included in the separate
 kernel module @file{streams-osfcompat.o}.
 The default for this feature is enabled.
 
-@item --enable-compat-aix
+@item --disable-compat-aix
 @opindex compat-aix
 Disable source compatibility with AIX 4 variants.
 This option disables the AIX 4 compatibility functions that are included in the separate
 kernel module @file{streams-aixcompat.o}.
 The default for this feature is enabled.
 
-@item --enable-compat-hpux
+@item --disable-compat-hpux
 @opindex compat-hpux
 Disable source compatibility with HPUX variants.
 This option disables the HPUX compatibility functions that are included in the separate
 kernel module @file{streams-hpuxcompat.o}.
 The default for this feature is enabled.
 
-@item --enable-compat-lis
+@item --disable-compat-lis
 @opindex compat-lis
 Disable source compatibility with LiS variants.
 This option disables the LiS compatibility functions that are included in the separate
@@ -170,10 +170,5 @@ The default for this feature is enabled.
 @opindex streams-fifos
 Enable override of system fifos with STREAMS-based fifos.
 The default for this feature is disabled.
-
-@item --enable-autotest
-@opindex autotest
-Disable pre- and post-install testing.
-The default for this feature is enabled.
 
 @end table

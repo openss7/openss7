@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 0.9.2.1 2004/11/06 10:24:35 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.2 2005/03/15 00:51:38 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2004/11/06 10:24:35 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 00:51:38 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,52 +64,163 @@ In addition, the following @command{rpm} options, specific to the
 
 @item --without compat-svr4
 @opindex compat-svr4
-Disable source compatibility with SVR 4.2 MP variants.
-This option disables the SVR 4.2 MP compatibility functions that are included in the separate
-kernel module @file{streams-svr4compat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with SVR 4.2 MP variants.  This option disables the
+SVR 4.2 MP compatibility functions that are included in the separate kernel
+module @file{streams-svr4compat.o}.  This option defaults to enabled.
 
 @item --without compat-sol8
 @opindex compat-sol8
-Disable source compatibility with Solaris 8 variants.
-This option disables the Solaris 8 compatibility functions that are included in the separate
-kernel module @file{streams-suncompat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with Solaris 8 variants.  This option disables the
+Solaris 8 compatibility functions that are included in the separate kernel
+module @file{streams-suncompat.o}.  This option defaults to enabled.
 
 @item --without compat-uw7
 @opindex compat-uw7
-Disable source compatibility with UnixWare 7 variants.
-This option disables the UnixWare 7 compatibility functions that are included in the separate
-kernel module @file{streams-uw7compat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with UnixWare 7 variants.  This option disables the
+UnixWare 7 compatibility functions that are included in the separate kernel
+module @file{streams-uw7compat.o}.  This option defaults to enabled.
 
 @item --without compat-osf
 @opindex compat-osf
-Disable source compatibility with OSF/1.2 variants.
-This option disables the OSF/1.2 compatibility functions that are included in the separate
-kernel module @file{streams-osfcompat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with OSF/1.2 variants.  This option disables the
+OSF/1.2 compatibility functions that are included in the separate kernel module
+@file{streams-osfcompat.o}.  This option defaults to enabled.
 
 @item --without compat-aix
 @opindex compat-aix
-Disable source compatibility with AIX 4 variants.
-This option disables the AIX 4 compatibility functions that are included in the separate
-kernel module @file{streams-aixcompat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with AIX 4 variants.  This option disables the AIX
+4 compatibility functions that are included in the separate kernel module
+@file{streams-aixcompat.o}.  This option defaults to enabled.
 
 @item --without compat-hpux
 @opindex compat-hpux
-Disable source compatibility with HPUX variants.
-This option disables the HPUX compatibility functions that are included in the separate
-kernel module @file{streams-hpuxcompat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with HPUX variants.  This option disables the HPUX
+compatibility functions that are included in the separate kernel module
+@file{streams-hpuxcompat.o}.  This option defaults to enabled.
 
 @item --without compat-lis
 @opindex compat-lis
-Disable source compatibility with LiS variants.
-This option disables the LiS compatibility functions that are included in the separate
-kernel module @file{streams-liscompat.o}.
-This option defaults to enabled.
+
+Disable source compatibility with LiS variants.  This option disables the LiS
+compatibility functions that are included in the separate kernel module
+@file{streams-liscompat.o}.  This option defaults to enabled.
+
+@item --with module-sth
+@itemx --without module-sth
+@opindex module-sth
+
+Enable building @file{sth} (stream head) module linked into @file{streams}
+object instead built as a separate loadable kernel module.  The default is to
+create the module as a separate loadable kernel module.
+
+@item --with module-pipemod
+@itemx --without module-pipemod
+@opindex module-pipemod
+
+Enable building @file{pipemod} module linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the module
+as a separate loadable kernel module.
+
+@item --with module-connld
+@itemx --without module-connld
+@opindex module-connld
+
+Enable building @file{connld} module linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the module
+as a separate loadable kernel module.
+
+@item --with module-sc
+@itemx --without module-sc
+@opindex module-sc
+
+Enable building @file{sc} module linked into @file{streams} object instead built
+as a separate loadable kernel module.  The default is to create the module as a
+separate loadable kernel module.
+
+@item --with driver-clone
+@itemx --without driver-clone
+@opindex driver-clone
+
+Enable building @file{clone} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-fifo
+@itemx --without driver-fifo
+@opindex driver-fifo
+
+Enable building @file{fifo} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-loop
+@itemx --without driver-loop
+@opindex driver-loop
+
+Enable building @file{loop} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-sad
+@itemx --without driver-sad
+@opindex driver-sad
+
+Enable building @file{sad} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-nsdev
+@itemx --without driver-nsdev
+@opindex driver-nsdev
+
+Enable building @file{nsdev} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-echo
+@itemx --without driver-echo
+@opindex driver-echo
+
+Enable building @file{echo} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-nuls
+@itemx --without driver-nuls
+@opindex driver-nuls
+
+Enable building @file{nuls} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-pipe
+@itemx --without driver-pipe
+@opindex driver-pipe
+
+Enable building @file{pipe} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with driver-log
+@itemx --without driver-log
+@opindex driver-log
+
+Enable building @file{log} driver linked into @file{streams} object instead
+built as a separate loadable kernel module.  The default is to create the driver
+as a separate loadable kernel module.
+
+@item --with streams-fifos
+@itemx --without streams-fifos
+@opindex streams-fifos
+
+Enable override of system fifos with STREAMS-based fifos.
+The default for this feature is disabled.
 
 @end table
 

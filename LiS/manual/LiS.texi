@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.2 2005/03/14 01:25:36 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.4 2005/03/15 00:56:39 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/14 01:25:36 $ by $Author: brian $
+% Last Modified $Date: 2005/03/15 00:56:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -80,7 +80,7 @@
 @ifinfo
 This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
@@ -123,7 +123,7 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Package @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@subtitle Package @value{PACKAGE}-@value{VERSION}
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
@@ -142,7 +142,7 @@ Canada @*
 
 @noindent
 This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
-documentation, and is consistent with @value{PACKAGE_TARNAME} @value{PACKAGE_VERSION}.
+documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
 This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
 Project} and was funded in part by
 @uref{http://www.hob.de/, HOB International}.
@@ -199,7 +199,7 @@ another language, under the same conditions as for modified versions.
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @unnumbered About This Manual
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
 @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
@@ -1809,119 +1809,160 @@ The source RPM is rebuilt to binary RPMs as follows:
 The rebuild process can also recognize a number of options that can be used to
 tweak the resulting binaries.  They are as follows:
 
-@table @code
-@item --define "_kversion $PACKAGE_KVERION"
-
-Specifies a kernel version other than the running kernel for which to build.  If
-@code{_kversion} is not defined when the RPM is rebuilt, the environment
-variable @code{PACKAGE_KVERSION} is used.  If the environment variable is not
-defined, then the verion of the running kernel is used as the target version for
-Linux STREAMS kernel modules.
-
-@item --with modules, --without modules
-
-Specifies whether kernel modules packages are to be rebuilt.  The default is to
-build kernel modules.
-This option can be useful when rebuilding for multiple architectures and target
-kernels.  The @code{rebuild} automake taret uses this feature to rebuild for all
-available architectures and kernels.
-
-@item --with tools, --without tools
-
-Specifies whether user space packages are to be rebuilt.  The default is to
-build user space packages.
-This option can be useful when rebuilding for multiple architectures and target
-kernels.  The @code{rebuild} automake taret uses this feature when rebuilding
-for all available architectures and kernels, to rebuild user packages once per
-architecture instead of once per kernel.
-
-@item --with cooked-manpages, --without cooked-manpages
-
-Some systems do not like @code{grefer} references in manpages.  This option will
-cook @code{soelim}, @code{refer}, @code{tbl}, and @code{pic} commands from the
-manpages and also strip roff comments.  The default is to leave manpages
-uncooked (they are actually smaller tha way).
-
-@item --with public, --without public
-
-Release public packages or private packages.  This option has no effect.  The
-default is to release public packages.
-
-@item --with k-debug, --without k-debug
-
-Specifies whether kernel debugging is to be perforemed.  Mutually exclusive with
-test and safe below.  This has the effect of removing static and inline
-attributes from functions and invoking all debugging macros in the code.  The
-default is to not perform kernel debugging.
-
-@item --with k-test, --without k-test
-
-Specifies whether kernel testing is to be perforemed.  Mutually exclusive with
-debug above and safe below.  This has the effect of removing static and inline
-attributes from functions and invoking most debugging macros in the code.  The
-default is to not perform kernel testing.
-
-@item --with k-safe, --without k-safe
-
-Specifies whether kernel safety is to be performed.  Mutually exclusive with
-debug and test above.  This has the effect of invoking some more pedantic
-assertion macros in the code.  The default is to not apply kernel safety.
-
-@item --with solaris-cmn_err, --without solaris-cmn_err
-
-Specifies whether Solaris-style @code{cmn_err} is used.  The Solaris style
-prints a newline at the end of each statement.  The SVR 4.2 style prints a
-newline at the beginning of each statement unless @code{CE_CONT} is specified.
-Linux kernel logs use the former, so this defaults to Solaris-style.
-
-@item --with solaris-consts, --without solaris-consts
-
-Attempt to be compatible with Solaris constants.  The default is to attempt to
-be compatible with SVR 4.2/Unixware constants.
-
-@item --with k-cache, --without k-cache
-
-Invoke Linux kernel caching on primary structures.  This incresase speed and
-efficiency.  The default is to perform kernel caching on primary structures.
-
-@item --with k-timers, --without k-timers
-
-Invoke Linux kernel cahcing on timer structures.  This increases speed and
-efficiency but is unsafe on SMP architectures and for buggy drivers.  The
-default is to perform kernel caching on timer structures.
-
-@item --with broken-cpu-flags, --without broken-cpu-flags
-
-Specify @code{int} instead of @code{long} interrupt flags.  Linux uses
-@code{long} interrupt flags exclusively.  The default is to use @code{long}
-interrupt flags.
+Note that distributions that use older versions of rpm do not have the
+@samp{--with} or @samp{--without} options defined.  To acheive the same effect
+as:
+@example
+--with someparm=somearg
+@end example
+do:
+@example
+--define "_with_someparm --with-someparm=somearg"
+@end example
 
 @ignore
-@item --with tli, --without tli
-
-Build and package the TLI modules (@file{streams-timod.o} and
-@file{streams-tirdwr.o}).  These are needed by the XTI/XNS Unix98 libraries.
-The default is to build and package TLI modules.
-@pgindex streams-timod.o
-@pgindex streams-tirdwr.o
-
-@item --with inet, --without inet
-
-Build and package the INET driver (@file{streams-inet.o}).  This driver is
-needed for XTI/XNS Unix98 compatibility.  The default is to build and package
-the INET driver.
-@pgindex streams-inet.o
-
-@item --with xnet, --without xnet
-
-Build and package the XTI/XNS library (@file{libxnet}).  This library is needed for
-XTI/XNS Unix98 compatiblity.  The default is to build and package the XNET
-library.
-@pgindex libxnet.a
-@pgindex libxnet.so
+This is a generic description of common @command{rpmbuild} options.  Not all
+@command{rpmbuild} options are applicable to all SRPMs.  Options that are kernel
+module specific are only applicable to SRPMs that build kernel modules.  STREAMS
+options are only applicable to SRPMs that provide or require STREAMS.
 @end ignore
 
+@table @code
+@item --define "_kversion $PACKAGE_KVERSION"
+@vindex PACKAGE_KVERSION
+@opindex k-release
+Specifies the kernel version other than the running kernel for which to build.
+If @command{_kversion} is not defined when rebuilding, the environment variable
+@var{PACKAGE_KVERSION} is used.  If the environment variable
+@var{PACKAGE_KVERSION} is not defined, then the version of the running kernel
+(i.e. discovered with @samp{uname -r}) is used as the target version for
+kernel-dependent packages.  This option can also be defined in an
+@file{.rpmspec} file using the macro name @samp{_kversion}.
+
+@ignore
+@item --with checks
+@itemx --without checks
+@opindex checks
+@end ignore
+
+@item --with autotest
+@item --without autotest
+@opindex autotest
+Enable preinstall checks.  Each packages supports a number of preinstall checks
+that can be performed by invoking the @samp{check} target with @command{make}.
+These currently consist of checking each kernel module for unresolved kernel
+symbols, checking for documentation for exported kernel module symbols, checking
+for documentation for exported library symbols, checking for standard options
+for build and installable programs, checking for documentation for built and
+installable programs.  Normally these checks are only run in maintainer mode,
+but can be enabled and disabled with this option.
+
+@itemx --with k-optimize=HOW
+@item --without k-optimize
+@opindex k-optimize
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
+@var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
+compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
+@code{-O0}.  The default is @var{normal}.  Use with care.
+
+@item --with cooked-manpages
+@itemx --without cooked-manpages
+@opindex cooked-manpages
+Some systems do not like @command{grefer} references in manpages.@footnote{In
+particular, some @cite{Debian} systems do not load the @command{groff}
+extensions package and do not have @command{grefer} installed.  Although this is
+an oversight on the configuration of the particular @cite{Debian} system, we
+accomodate such misconfiguration with this feature.}  This option will cook
+@command{soelim}, @command{refer}, @command{tbl} and @command{pic} commands from
+the manpages and also strip @command{groff} comments.  The default is to leave
+manpages uncooked: they are actually smaller that way.
+
+@item --with public
+@itemx --without public
+@opindex public
+Release public packages or private packages.  This option has no effect on the
+@file{@value{PACKAGE_NAME}} package.  The default is to release public packages.
+
+@item --with k-debug
+@itemx --without k-debug
+@opindex k-debug
+Specifies whether kernel debugging is to be performed on the build kernel
+modules.  Mutually exclusive with @code{test} and @code{safe} below.  This has
+the effect of removing static and inline attributes from functions and invoking
+all debugging macros in the code.  The default is to not perform kernel
+debugging.
+
+@item --with k-test
+@itemx --without k-test
+@opindex k-test
+Specifies whether kernel testing is to be performed.  Mutually exclusive with
+@code{debug} above and @code{safe} below.  This has the effect of removing
+static and inline attributes from functions and invoking most debugging macros
+in the code.  The default is to not perform kernel testing.
+
+@item --with k-safe
+@itemx --without k-safe
+@opindex k-safe
+Specifies whether kernel saftey is to be performed.  Mutually exclusive with
+@code{debug} and @code{test} above.  This has the effect of invoking some more
+pedantic assertion macros in the code.  The default is not to apply kernel
+safety.
+
+@item --with k-inline
+@itemx --without k-inline
+@opindex k-inline
+Specifies whether kernel @code{inline} functions are to be place inline.  This
+has the effect of adding the @command{-finline-functions} flag to @var{CFLAGS}
+for compiling kernel modules.  Linux 2.4 kernels are normally compiled
+@command{-O2} which does not respect the @code{inline} directive.  This compiles
+kernel modules with @command{-finline-functions} to get closer to @command{-O3}
+optimization.  For better optimization controls, @xref{Configuring the Tar
+Ball}.
+
+@ignore
+@item --with k-modversions
+@itemx --without k-modversions
+@opindex k-modversions
+Specifies whether kernel symbol versioning is to be applied to symbols exported
+by package kernel modules.  The default is to version exported module symbols.
+This package does not export symbols so this option has no effect.
+@end ignore
+
+@item --with k-tools
+@itemx --without k-tools
+@opindex k-tools
+Specifies whether user space packages are to be built.  The default is to build
+user space packages.  This option can be useful when rebuilding for multiple
+architectures and target kernels.  The @command{rebuild} automake target uses
+this feature when rebuilding for all available architectures and kernels, to
+rebuild user packages once per architecture instead of once per kernel.
+
+@item --with k-modules
+@itemx --without k-modules
+@opindex k-modules
+Specifies whether kernel modules packages are to be built.  The default is to
+build kernel module packages.  This option can be useful when rebuilding for
+multiple architectures and target kernels.  The @command{rebuild} automake
+target uses this feature to rebuild for all available architectures and kernels.
+
+@ignore
+@item --with lis
+@itemx --without lis
+@opindex lis
+Specifies that the package is to be rebuilt against @cite{Linux STREAMS}.  The
+default is to automatically identify whether @file{LiS} or @file{streams} is
+loaded on the build system and build accordingly.
+
+@item --with lfs
+@itemx --without lfs
+@opindex lfs
+Specifies that the package is to be rebuilt against @cite{Linux Fast-STREAMS}.
+The default is to automatically identify whether @file{LiS} or @file{streams} is
+loaded on the build system and build accordingly.
+@end ignore
 @end table
+
+@include rpm.texi
 
 In general, the default values of these options are sufficient for most purposes
 and no options need be provided when rebuilding the Source RPMs.
@@ -2077,373 +2118,595 @@ variables apply.  Additional options and environment variables are provided to
 tailor or customize the build and are described below.
 
 @subsubsection Configure Options
+@cindex configure options
 
-Following are the additional @code{configure} options, their meaning and use:
+@ignore
+This is a generic description of common @command{configure} options.  Not all
+@command{configure} options are applicable to all release packages.  Options
+that are kernel module specific are only applicable to release packages that
+build kernel modules.  STREAMS options are only applicable to release packages
+that provide or require STREAMS.
+@end ignore
 
-@table @code
+Following are the additional @command{configure} options, their meaning and use:
+
+@table @command
+@ignore
+@item --enable-checks
+@opindex checks
+@end ignore
+
+@item --enable-autotest
+@itemx --disable-autotest
+@opindex autotest
+Enable preinstall checks.  Each packages supports a number of preinstall checks
+that can be performed by invoking the @samp{check} target with @command{make}.
+These currently consist of checking each kernel module for unresolved kernel
+symbols, checking for documentation for exported kernel module symbols, checking
+for documentation for exported library symbols, checking for standard options
+for build and installable programs, checking for documentation for built and
+installable programs.  Normally these checks are only run in maintainer mode,
+but can be enabled and disabled with this option.
 
 @item --disable-compress-manpages
-
-Compress manpges with gzip -9 or leave them uncompressed.  The default is to
-compress manpages with gzip -9 if a single compressed manpage exists in the
-target installation directory.  This disables automatic compression.
+@opindex compress-manpages
+Compress manpages with @samp{gzip -9} or @samp{bzip2 -9} or leave them
+uncompressed.  The default is to compress manpages with @samp{gzip -9}
+or @samp{bzip2 -9} if a single compressed manpage exists in the target
+installation directory (@command{--mandir}).  This disables automatic
+compression.
 
 @item --disable-public
+@opindex public
+Disable public release.  Has no effect on the @file{@value{PACKAGE_NAME}} release.
+No private components exist in @file{@value{PACKAGE_NAME}} releases.
 
-Disable public release.  Has no effect on LiS releases.  No private components
-exist in LiS releases.
+@item --disable-initscripts
+@opindex initscripts
+Disables the installation of init scripts.
+The default is to configure and install init scripts and their associated
+configuration files.
 
 @item --enable-tools
-
+@opindex tools
 Specifies whether user space programs and libraries are to be built and
 installed.  The default is to build and install user space programs and
 libraries.  This option can be useful when rebuilding for multiple architectures
-and target kernels.  The @code{rebuild} automake taret uses this feature when
-rebuilding RPMs for all available architectures and kernels, to rebuild user
-packages once per architecture instead of once per kernel.
+and target kernels, particularly under rpm.  The @command{rebuild} target uses
+this feature when rebuilding RPMs for all available architectures and kernels,
+to rebuild user packages once per architecture instead of once per kernel.
 
 @item --enable-modules
-
+@opindex modules
 Specifies whether kernel modules are to be built and installed.  The default is
 to build and install kernel modules.  This option can be useful when rebuilding
-for multiple architectures and target kernels.  The @code{rebuild} automake
-target uses this feature to rebuild for all available architectures and kernels.
-
-@item --enable-user-mode
-
-Enable user mode build.  The default is no.  Don't use this option, it hasn't
-been tested.
-
-@item --disable-modules
-
-Disable kernel modules, prepare object for linking into the kernel.  The default
-is to build as kernel modules.  This option is not fully implemented yet.
-
-@item --enable-k-inline
-
-Enable kernel inline functions.  Most Linux kernels build without
--finline-functions.  This option adds the -finline-functions and -Winline flags
-to the compilation of kernel modules.  Use with care.
-
-@item --enable-k-safe
-
-Enable kernel module run-time safety checks.
-Specifies whether kernel safety is to be performed.  Mutually exclusive with
-test and debug below.  This has the effect of invoking some more pedantic
-assertion macros in the code.  The default is to not apply kernel safety.
-
-@item --enable-k-test
-
-Enable kernel module run-time testing.
-Specifies whether kernel testing is to be perforemed.  Mutually exclusive with
-debug below and safe above.  This has the effect of removing static and inline
-attributes from functions and invoking most debugging macros in the code.  The
-default is to not perform kernel testing.
-
-@item --enable-k-debug
-
-Enable kernel module run-time debugging.
-Specifies whether kernel debugging is to be perforemed.  Mutually exclusive with
-safe and test above.  This has the effect of removing static and inline
-attributes from functions and invoking all debugging macros in the code.  The
-default is to not perform kernel debugging.
-
-@item --disable-k-modversions
-
-Disable module versions on LiS symbols.
-Specifies whether kernel symbol versioning is to be used on symbols exported
-from built LiS modules.  The default is to provide kernel symbol versioning on
-all exported symbols.
-
-@item --enable-broken-cpu-flags
-
-Specify @code{int} instead of @code{long} interrupt flags.  Linux uses
-@code{long} interrupt flags exclusively.  The default is to use @code{long}
-interrupt flags.
-
-@item --enable-k-cache
-
-Invoke Linux kernel caching on primary structures.  This incresase speed and
-efficiency.  The default is to @strong{not} perform kernel caching on primary
-structures.
-
-@item --enable-k-timers
-
-Invoke Linux kernel cahcing on timer structures.  This increases speed and
-efficiency but is unsafe on SMP architectures and for buggy or high-speed
-drivers.  The default is to @strong{not} perform kernel caching on timer
-structures.
-
-@item --enable-atomic-stats
-
-Enable atomic statistics elements for STREAMS statistics.
-The changes STREAMS statistics elements from the standard @code{int} to
-@code{atomic_t} to permit atomic increment of statistics structures.  This is
-not recommended and the default is to @strong{not} use @code{atomic_t} for
-statistics structures.
-
-@item --with-cooked-manpages
-
-Convert manual pages to remove macro dependencies and grefer references.
-Some systems do not like @code{grefer} references in manpages.  This option will
-cook @code{soelim}, @code{refer}, @code{tbl}, and @code{pic} commands from the
-manpages and also strip roff comments.  The default is to leave manpages
-uncooked (they are actually smaller tha way).
-
-@item --with-rpm-epoch=EPOCH
-
-Specify the @code{EPOCH} for the RPM spec file.  [default=1]
-
-@item --with-rpm-release=RELEASE
-
-Specify the @code{RELEASE} for the RPM spec file.  [default=Custom]
-
-@item --with-gpg-user=USERNAME
-
-Specify the @code{USERNAME} for signing RPMs and tarballs.  [default=$@{GNUPGUSER@}]
-
-@item --with-gpg-home=HOMEDIR
-
-Specify the @code{HOMEDIR} directory for signing RPMs and tarballs.
-[default=$@{GNUPGHOME:-~/.gnupg@}]
-
-@item --with-k-release=UTSRELEASE
-
-Specify the UTS release of the linux kernel for which the build is targetted.
-When not cross compiling, if this option is not set, the build will be targetted
-at the kernel running in the build environment.  [default=`uname -r`]  When
-cross-comipling this option must be specified or the configure script will
-generate an error.
-
-@item --with-k-prefix=DIR
-
-Specify the kernel directory prefix for install.  [default=/]
-
-@item --with-k-rootdir=DIR
-
-Specify the root directory for configure.  [default=$@{DESTDIR:-/@}]
-
-@item --with-k-modules=DIR
-
-Specify the directory to which kernel modules will be installed.
-[default=/lib/modules/K-RELEASE/misc]
-
-@item --with-k-build=DIR
-
-Specify the base kernel build directory in which configured kernel source
-resides.  [default=K-MODULES-DIR/build]
-
-@item --with-k-sysmap=MAP
-
-Specify the kernel system map file.  [default=K-BUILD-DIR/System.map]
-
-@item --with-k-includes=DIR
-
-Specify the include directory of the kernel for which the build is targetted.
-[default=K-BUILD-DIR/include]
-
-@item --with-k-archdir=DIR
-
-Specify the kernel source architecture specific directory.
-[default=K-BUILD-DIR/arch]
-
-@item --with-k-machdir=DIR
-
-Specify the kernel source machine specific directory. [default=K-ARCHDIR/ARCH]
-
-@item --with-k-optimize=HOW
-
-Specify optimization, @var{normal}, @var{size}, @var{speed} or @var{quick}.
-[default=@var{normal}] @var{size} compiles kernel modules @code{-Os},
-@var{speed} compiles kernel modules @code{-O3}, and @var{quick} compiles kernel
-modules @code{-O0}.
-
+for multiple architectures and target kernels, particularly under rpm.  The
+@command{rebuild} automake target uses this feature to rebuild for all available
+architectures and kernels.
 @ignore
-@item --with-sctp
-
-Include xopen sctp driver in build.  [default=yes]  Unused.
-
-@item --with-sctp2
-
-Include xopen sctp version 2 driver in build.  [default=no]  Unused.
-
-@item --with-xns
-
-Include xopen xns headers in install.  [default=yes]
-
-@item --with-tli
-
-Include xopen tli modules in build.  [default=yes] Build and package the TLI
-modules (@file{streams-timod.o} and @file{streams-tirdwr.o}).  These are needed
-by the XTI/XNS Unix98 libraries.  The default is to build and package TLI
-modules.
-@pgindex streams-timod.o
-@pgindex streams-tirdwr.o
-
-@item --with-inet
-
-Include xopen inet driver in build.  [default=yes] Build and package the INET
-driver (@file{streams-inet.o}).  This driver is needed for XTI/XNS Unix98
-compatibility.  The default is to build and package the INET driver.
-@pgindex streams-inet.o
-
-@item --with-xnet
-
-Include xopen xnet library in build.  [default=yes]
-Build and package the XTI/XNS library (@file{libxnet}).  This library is needed for
-XTI/XNS Unix98 compatiblity.  The default is to build and package the XNET
-library.
-@pgindex libxnet.a
-@pgindex libxnet.so
-
-@item --with-sock
-
-Include xopen sock library in build.  [default=yes]
+This option has no effect if there are no kernel modules in the package.
 @end ignore
 
-@item --with-solaris-consts
+@item --enable-arch
+@opindex arch
+Specifies whether architectural dependent package components are to be built and
+installed.  This option can be useful when rebuilding for multiple architectures
+and target kernels, particularly under dpkg.  The default is to configure, build
+and install architecture dependent package components.
+@ignore
+This option has no effect if there are no architecture dependent components in
+the package.
+@end ignore
 
-Use Unixware/Solaris compatible constants if yes, or use LiS backward compatible
-constants if no.  [default=yes]
+@item --enable-indep
+@opindex indep
+Specifies whether architecture independent package components are to be built
+and installed.  This option can be useful when rebuilding for multiple
+architectures and target kernels, particularly under dpkg.  The default is to
+configure, build and install architecture independent package components.
+@ignore
+This options has no effect if there are no architecture independent components
+in the package.
+@end ignore
 
-@item --with-solaris-cmn_err
+@item --enable-k-inline
+@opindex k-inline
+Enable kernel inline functions.  Most Linux kernels build without
+@command{-finline-functions}.  This option adds the @command{-finline-functions}
+and @command{-Winline} flags to the compilation of kernel modules.  Use with
+care.
+@ignore
+This option has no effect if there are no kernel modules in the package.
+@end ignore
 
-Use a Solaris-style cmn_err that puts a newline at the end of the line rather
-than the beginning [default=yes]
+@item --enable-k-safe
+@opindex k-safe
+Enable kernel module run-time safety checks.  Specifies whether kernel safety is
+to be performed.  This option is mutually exclusive with
+@command{--enable-k-test} and @command{--enable-k-debug} below.  This has the
+effect of invoking some more pedantic assertion macros in the code.  The default
+is not to apply kernel safety.
+@ignore
+This option has no effect if there are no kernel modules in the package.
+@end ignore
 
-@item --with-strconf-master=FILENAME
+@item --enable-k-test
+@opindex k-test
+Enable kernel module run-teim testing.  Specifies whether kernel testing is to
+be performed.  This option is mutually exclusive with @command{--enable-k-safe}
+above and @command{--enable-k-debug} below.  This has the effect of remove
+@code{static} and @code{inline} attributes from functions and invoking most
+non-performance affecting debugging macros in the code.  The default is not to
+perform kernel testing.
+@ignore
+This option has no effect if there are no kernel modules in the package.
+@end ignore
 
-Specify the file name to which the configuration master file is written
-[default=Config.master]
+@item --enable-k-debug
+@opindex k-debug
+Enable kernel module run-time debugging.  Specifies whether kernel debugging is
+to be performed.  This option is mutuallly exclusive with
+@command{--enable-k-safe} and @command{--enable-k-test} above.  This has the
+effect of removing @code{static} and @code{inline} attributes from functions and
+invoking all debuggin macros in the code (including performance-affecting debug
+macros).  The default is to not perform kernel debugging.
+@ignore
+This option has no effect if there are no kernel modules in the package.
+@end ignore
 
-@item --with-base-major=MAJOR specify the base major device number from which to
+@ignore
+@itemx --disable-k-modversions
+@opindex k-modversions
+Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies
+whether kernel symbol versioning is to be used on symbols exported from built
+@command{@value{PACKAGE_NAME}} modules.  The default is to provide kernel symbol
+versioning on all exported symbols.
+@ignore
+This option has no effect if there are no kernel modules in the package.
+@end ignore
+@end ignore
 
-Start numbering major devices [default=230]
+@item --with-gpg-user=GNUPGUSER
+@opindex gpg-user
+Specify the @command{gpg} @samp{GNUPGUSER} for signing RPMs and tarballs.  The
+default is the content of the environment variable @var{GNUPGUSER}.  If
+unspecified, the @command{gpg} program will normally use the user name of the
+account invoking the @command{gpg} program.  For building source RPMs, the RPM
+macro @samp{_gpg_name} will override this setting.
+
+@item --with-gpg-home=GNUPGHOME
+@opindex gpg-home
+Specify the @samp{GNUPGHOME} directory for signing RPMs and tarballs.  The
+default is the user's @file{~/.gpg} directory.  For building source RPMs, the
+RPM macro @samp{_gpg_path} will override this setting.
+
+@item --with-pkg-epoch=EPOCH
+@opindex pkg-epoch
+Specifies the epoch for the package.  This is neither used for RPM nor Debian
+packages, it applies to the tarball release as a whole.  The default is the
+contents of the @file{.pkgepoch} file in the source directory or, if that file
+does not exist, zero (0).
+
+@item --with-pkg-release=RELEASE
+@opindex pkg-release
+Specifies the release for the package.  This is neither used for RPM nor Debian
+packages, it applies to the tarball release as a whole.  The default is the
+contents of the @file{.pkgrelease} file in the source directory or, if that file
+does not exist, one (1).  This is the number after the last point in ther
+package version number.
+
+@item --with-pkg-distdir=DIR
+@opindex pkg-distdir
+Specifies the distribution directory for the package.  This is used by the
+maintainer for building distributions of tarballs.  This is the directory into
+which archives are copied for distribution.  The default is the top build
+directory.
+
+@item --with-cooked-manpages
+@opindex cooked-manpages
+Convert manual pages to remove macro dependencies and @command{grefer}
+references.  Some systems do not like @command{grefer} references in
+manpages.@footnote{In particular, some @cite{Debian} systems do not load the
+@command{groff} extensions package and do not have @command{grefer} installed.
+Although this is an oversight on the configuration of the particular
+@cite{Debian} system, we accomodate such misconfiguration with this feature.}
+This option will cook @command{soelim}, @command{refer}, @command{tbl} and
+@command{pic} commands from the manpages and also strip @command{groff}
+comments.  The default is to leave manpages uncooked (they are actually smaller
+that way).
+
+@item --with-rpm-epoch=PACKAGE_EPOCH
+@opindex rpm-epoch
+Specify the @samp{PACKAGE_EPOCH} for the RPM spec file.  The default is to use
+the RPM epoch conatined in the file @file{.rpmepoch}.
+
+@item --with-rpm-release=PACKAGE_RPMRELEASE
+@opindex rpm-release
+Specify the @samp{PACKAGE_RPMRELEASE} for the RPM rspec file.  The default is to
+use the RPM release contained in the file @file{.rpmrelease}.
+
+@item --with-rpm-extra=PACKAGE_RPMEXTRA
+@opindex rpm-extra
+Specify the @samp{PACKAGE_RPMEXTRA} extra release information for the RPM spec
+file.  The default is to use the RPM extra release information contained in the
+file @file{.rpmextra}.  Otherwise, this value will be determined from automatic
+detection of the RPM distribution.
+
+@item --with-rpm-topdir=PACKAGE_RPMTOPDIR
+@opindex rpm-topdir
+Specify the @samp{PACKAGE_RPMTOPDIR} top directory for RPMs.  If specified
+with a null @samp{PACKAGE_RPMTOPDIR}, the default directory for the RPM
+distribution will be used.  If this option is not provided on the command line,
+the build directory will be used as the RPM top directory as well.
+
+@item --with-deb-epoch=EPOCH
+@opindex deb-epoch
+
+@item --with-deb-release=RELEASE
+@opindex deb-release
+
+@item --with-deb-topdir=DIR
+@opindex deb-topdir
+
+@item --with-k-release=PACKAGE_KRELEASE
+@opindex k-release
+Specify the @samp{PACKAGE_KRELEASE} release of the Linux kernel for which the
+build is targeted.  When not cross compiling, if this option is not set, the
+build will be targeted at the kernel running in the build environment (e.g.,
+@samp{uname -r}).  When cross-compiling this option must be specified or the
+configure script will generate an error and terminate.
+
+@ignore
+@item --with-k-prefix=K-PREFIX-DIR
+@opindex k-prefix
+Specify the @samp{K-PREFIX-DIR} kernel directory prefix for install.  The
+default is the root directory (@file{/}) of the build machine.  This directory
+is normally located by the @command{configure} script and need only be provided
+for special cross-build environments or when requested by a @command{configure}
+script error message.
+
+@item --with-k-rootdir=K-ROOTDIR
+@opindex k-rootdir
+Specify the @samp{K-ROOTDIR} root directory for configure.  The default is the
+setting of environment variable @var{DESTDIR}, and if @var{DESTDIR} is not set,
+the root directory (@file{/}) of the build machine.  This directory is normally
+located by the @command{configure} script and need only be provided for special
+cross-build environments or when requested by a @command{configure} script error
+message.
+@end ignore
+
+@item --with-k-linkage=PACKAGE_KLINKAGE
+@opindex k-linkage
+Specify the @samp{PACKAGE_KLINKAGE} for kernel module linkage.  This can be one
+of the following:
+@itemize
+@item @samp{loadable}
+-- loadable kernel modules
+@item @samp{linkable}
+-- linkable kernel objects
+@end itemize
+The default is to build loadable kernel modules.
+
+@item --with-k-modules=K-MODULES-DIR
+@opindex k-modules
+Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be
+installed.  The default is based on the option @command{--with-k-release},
+@command{--with-k-prefix} and @command{--with-k-rootdir}.  The default is
+@file{DESTDIR}/@file{K-MODULES-DIR} which is typically
+@file{@var{DESTDIR}/lib/modules/@var{PACKAGE_KRELEASE}/}.  This directory is
+normally located by the @command{configure} script and need only be provided for
+special cross-build environments or when requested by a @command{configure}
+script error message.
+
+@item --with-k-build=K-BUILD-DIR
+@opindex k-build
+Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured
+kernel source resides.  The default is
+@file{@var{DESTDIR}/@var{K-MODULES-DIR}/build}.  This directory is normally
+located by the @command{configure} script and need only be provided for special
+cross-build environments or when requested by a @command{configure} script error
+message.
+
+@item --with-k-sysmap=K-SYSMAP-FILE
+@opindex k-sysmap
+Specify the @samp{K-SYSMAP-FILE} kernel system map file.  The default is
+@file{@var{K-BUILD-DIR}/System.map}.  This file is normally located by the
+@command{configure} script and need only be provided for special cross-build
+environments or when requested by a @command{configure} script error message.
+
+@item --with-k-includes=K-INCLUDES-DIR
+@opindex k-includes
+Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the
+build is targeted.  The default is
+@file{@var{DESTDIR}/@var{K-BUILD-DIR}/include}.  This directory is normally
+located by the @command{configure} script and need only be provided for special
+cross-build environments or when requested by a @command{configure} script error
+message.
+
+@item --with-k-archdir=K-ARCHDIR
+@opindex k-archdir
+Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The
+default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/arch}.  This directory is
+normally located by the @command{configure} script and need only be provided for
+special cross-build environments or when requested by a @command{configure}
+script error message.
+
+@item --with-k-machdir=K-MACHDIR
+@opindex k-machdir
+Specify the @samp{K-MACHDIR} kernel source machine specific directory.  The
+default is @file{@var{DESTDIR}/@var{K-BUILD-DIR}/@var{target_cpu}}.  This
+directory is normally located by the @command{configure} script and need only be
+provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+
+@item --with-k-config=K-CONFIG
+@opindex k-config
+Specify the @samp{K-CONFIG} kernel configuration file.  The default is
+@file{@var{BOOT}/config-@var{K-RELEASE}}.  This configuration file is normally
+located by the @command{configure} script and need only be provided forspecial
+cross-build environments or when requested by a @command{configure} script error
+message.
+
+@item --with-k-optimize=HOW
+@itemx --without-k-optimize
+@opindex k-optimize
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or
+@var{quick}.  @var{size} compiles kernel modules @code{-Os}, @var{speed}
+compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
+@code{-O0}.  The default is @var{normal}.  Use with care.
+
+@ignore
+@item --with-lis[=LIS-DIR]
+@itemx --without-lis
+@opindex lis
+Specify the @samp{LIS-DIR} directory in which to find LiS headers.  Also
+specifies that the build is to be made against Linux STREAMS.  The default is
+@file{/usr/include/LiS} if it exists, @samp{no} otherwise.  This directory is
+normally located by the @command{configure} script and need only be provided for
+special cross-build environments or when requested by a @command{configure}
+script error message.
+This option has no effect on packages that do not use the STREAMS subsystem.
+
+@item --with-lfs[=LFS-DIR]
+@itemx --without-lfs
+@opindex lfs
+Specify the @samp{LFS-DIR} directory in which to find LfS headers.  Also
+specifies that the build is to be made against Linux Fast-STREAMS.  The default
+is @file{/usr/include/streams} if it exists, @samp{no} otherwise.  This
+directory is normally located by the @command{configure} script and need only be
+provided for special cross-build environments or when requested by a
+@command{configure} script error message.
+This option has no effect on packages that do not use the STREAMS subsystem.
+@end ignore
+
+@item --with-strconf-master=STRCONF_CONFIG
+@opindex strconf-master
+Specify the @samp{STRCONF_CONFIG} file name to which the configuration master
+file is written.  The default is @file{Config.master}.
+@ignore
+This option has no effect on packages that do not use the STREAMS subsystem and
+the strconf scripts.
+@end ignore
+
+@item --with-base-major=STRCONF_MAJBASE
+@opindex base-major
+Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is
+@samp{230}.
+@ignore
+This option has no effect on packages that do not use the STREAMS subsystem and
+the strconf scripts.
+@end ignore
 
 @end table
+
+@include configure.texi
+
+@c ----------------------------------------------------------------------------
 
 @subsubsection Environment Variables
+@cindex configure environment variables
 
-Following are the additional environment variables to @code{configure}, their
+Following are additional environment variables to @command{configure}, their
 meaning and use:
 
-@table @code
-
-@item SOELIM
-
-Roff source elminiation command.
-This is only necessary when the option @code{--with-cooked-manpages} has been
-specified.
-By default, the configuration script will search for this tool.
-
-@item REFER
-
-Roff references command.
-This is only necessary when the option @code{--with-cooked-manpages} has been
-specified.
-By default, the configuration script will search for this tool.
-
-@item TBL
-
-Roff table command.
-This is only necessary when the option @code{--with-cooked-manpages} has been
-specified.
-By default, the configuration script will search for this tool.
-
-@item PIC
-
-Roff picture command.
-This is only necessary when the option @code{--with-cooked-manpages} has been
-specified.
-By default, the configuration script will search for this tool.
-
-@item GZIP
-
-Manpages compression command.
-This is only necessary when the option @code{--without-compressed-manpages} has
-@emph{not} been specified.
-By default, the configuration script will search for this tool.
-
-@item RPM
-
-Rpm command.
-This is only necessary for RPM builds.
-By default, the configuration script will search for this tool.
-
-@item RPMBUILD
-
-Build rpms command.
-This is only necessary for RPM builds.
-By default, the configuration script will search for this tool.
-@code{rpm} will be used instead of @code{rpmbuild} if @code{rpmbuild} cannot be
-found.
-
+@vtable @var
 @item GPG
-
-GPG signature command.
-This is used for signing distributions by the maintainer.
-By default, the configuration script will search for this tool.
+GPG signature command.  This is used for signing distributions by the
+maintainer.  By default, @command{configure} will search for this tool.
 
 @item GNUPGUSER
-
-GPG user name.
-This is used for signing distributions by the maintainer.
+GPG user name.  This is used for signing distributions by the maintainer.
 
 @item GNUPGHOME
+GPG home directory.  This is used for signing distributions by the maintainer.
 
-GPG home directory.
-This is used for signing distributions by the maintainer.
+@item GPGPASSWD
+GPG password for signing.  This is used for signing distributions by the
+maintainer.  This environment variable is not maintained by the
+@command{configure} script and should only be used on an isolated system.
+
+@item SOELIM
+Roff source elimination command.  This is only necessary when the option
+@command{--with-cooked-manpages} has been specified and @command{configure}
+cannot find the proper @command{soelim} command.  By default,
+@command{configure} will search for this tool.
+
+@item REFER
+Roff references command.  This is only necessary when the option
+@command{--with-cooked-manpages} has been specified and @command{configure}
+cannot find the proper @command{refer} command.  By default, @command{configure}
+will search for this tool.
+
+@item TBL
+Roff table command.  This is only necessary when the option
+@command{--with-cooked-manpages} has been specified and @command{configure}
+cannot find the proper @command{tbl} command.  By default, @command{configure}
+will search for this tool.
+
+@item PIC
+Roff picture command.  This is only necessary when the option
+@command{--with-cooked-manpages} has been specified and @command{configure}
+cannot find the proper @command{pic} command.  By default, @command{configure}
+will search for this tool.
+
+@item GZIP
+Default compression options provided to @command{GZIP_CMD}.
+
+@item GZIP_CMD
+Manpages (and kernel modules) compression commands.  This is only necessary when
+the option @command{--without-compressed-manpages} has @emph{not} been specified
+and @command{configure} cannot find the proper @command{gzip} command.  By
+default, @command{configure} will search for this tool.
+
+@item BZIP2
+Default compression options provided to @command{BZIP2_CMD}
+
+@item BZIP2_CMD
+Manpages compression commands.  This is only necessary when the option
+@command{--without-compressed-manpages} has @emph{not} been specified and
+@command{configure} cannot find the proper @command{bzip2} command.  By default,
+@command{configure} will search for this tool.
+
+@item MAKEWHATIS
+Manpages apropros database rebuild command.  By default, @command{configure}
+will search for this tool.  By default, @command{configure} will search for this
+tool.
+
+@item CHKCONFIG
+Chkconfig command.  This was used for installation of init scripts.  All
+pacakges now come with @command{init_install} and @command{init_remove} scripts
+used to install and remove init scripts on both RPM and debian systems.
+
+@item RPM
+Rpm command.  This is only necessary for RPM builds.  By default,
+@command{configure} will search for this tool.
+
+@item RPMBUILD
+Build RPM command.  This is only necessary for RPM builds.  By default,
+@command{configure} will search for this tool.  @command{rpm} will be used
+instead of @command{rpmbuild} only if @command{rpmbuild} cannot be found.
+
+@item DPKG
+Dpkg comand.
+This command is used for building debian packages.
+By default, @command{configure} will search for this tool.
+
+@item DPKG_SOURCE
+Dpkg-source command.
+This command is used for building debian dsc packages.
+By default, @command{configure} will search for this tool.
+
+@item DPKG_BUILDPACKAGE
+Dpkg-buildpackage command.
+This command is used for building debian deb packages.
+By default, @command{configure} will search for this tool.
+
+@item DEB_BUILD_ARCH
+Debian build architecture.
+This variable is used for building debian packages.
+The default is the autoconf build architecutre.
+
+@item DEB_BUILD_GNU_CPU
+Debian build cpu.
+This variable is used for building debian packages.
+The default is the autoconf build cpu.
+
+@item DEB_BUILD_GNU_SYSTEM
+Debian build os.
+This variable is used for building debian packages.
+The default is the autoconf build os.
+
+@item DEB_BUILD_GNU_TYPE
+Debian build alias.
+This variable is used for building debian packages.
+The default is the autoconf build alias.
+
+@item DEB_HOST_ARCH
+Debian host architecture.
+This variable is used for building debian packages.
+The default is the autoconf host architecture.
+
+@item DEB_HOST_GNU_CPU
+Debian host cpu.
+This variable is used for building debian packages.
+The default is the autoconf host cpu.
+
+@item DEB_HOST_GNU_SYSTEM
+Debian host os.
+This variable is used for building debian packages.
+The default is the autoconf host os.
+
+@item DEB_HOST_GNU_TYPE
+Debian host alias.
+This variable is used for building debian packages.
+The default is the autoconf host alias.
 
 @item LDCONFIG
-
-Configure loader command.
-Command used to configure the loader when libraries are installed.
-By default, the configuration script will search for this tool.
+Configure loader command.  Command used to configure the loader when libraries
+are installed.  By default, @command{configure} will search for this tool.
 
 @item DESTDIR
-
 Cross build root directory.  Specifies the root directory for build and
-installation.  e.g. for NexusWare cross-builds, this is set to
-@code{$NEXUWARE_PREFIX} on configuration to point to the root of the cross-build
-tree for both configuration and installation.
+installation.  For example, for @cite{NexusWare} cross-builds, this is set to
+environment variable @var{NEXUSWARE_PREFIX} on configuration to point to the
+root of the cross-build tree for both configuration and installation.
 
 @item DEPMOD
-
-Build kernel module dependencies command.
-This is used during installation of kernel modules to a running kernel to
-rebuild the modules dependency database.
-By default, the configuration script will search for this tool.
+Build kernel module dependencies command.  This is used during installation of
+kernel modules to a running kernel to rebuild the modules dependency database.
+By default, @command{configure} will search for this tool.
 
 @item MODPROBE
-
-Probe kernel module dependencies command.
-This is used during installation of kernel modules to a running kernel to
-remove old modules.
-By default, the configuration script will search for this tool.
+Probe kernel module dependencies command.  This is used during installation of
+kernel modules to a running kernel to remove old modules.  By default,
+@command{configure} will search for this tool.
 
 @item LSMOD
-
-List kernel modules command.
-This is used during installation of kernel modules to a running kernel to detect
-old modules for removal.
-By default, the configuration script will search for this tool.
+List kernel modules command.  This is used during installation of kernel modules
+to a running kernel to detect old modules for removal.  By default,
+@command{configure} will search for this tool.
 
 @item LSOF
-
-List open files command.
-This is used during installation of kernel modules to a running kernel to detect
-old modules for removal.  Processes owning the old kernel modules will be killed
-and the module removed.  If the process restarts, the new module will be demand
-loaded.
-By default, the configuration script will search for this tool.
+List open files command.  This is used during installation of kernel modules to
+a running kernel to detect old modules for removal.  Processes owning the old
+kernel modules will be killed and the module removed.  If the process restarts,
+the new module will be demand loaded.  By default, @command{configure} will
+search for this tool.
 
 @item GENKSYMS
+Generate kernel symbols command.  This is used for generating module symbol
+versions during build.  By default, @command{configure} will search for this
+tool.
 
-Generate kernel symbols command.
-This is used when bulding generating module symbol versions during build.
-By default, the configuration script will search for this tool.
+@item KGENKSYMS
+Linux 2.6 generate kernel symbols command.  This is used for generating module
+symbol version during build.  By default, @command{configure} will search for
+this tool.
 
-@end table
+@item OBJDUMP
+Object dumping command.  This is used for listing information about object
+files.  By default, @command{configure} will search for this tool.
+
+@item NM
+Object symbol listing command.  This is used for listing information about
+object files.
+By default, @command{configure} will search for this tool.
+
+@item MODPOST_CACHE
+Cache file for modpost.  The version of the @command{modpost.sh} script that
+ships with each package can cache information to a cache file to speed multiple
+builds.  This environment variable is used to specify a cache file.
+
+@item AUTOM4TE
+Autom4te command.
+This is the executable used by autotest for pre- and post-installation checks.
+By default, @command{configure} will search for this tool.
+
+@item AUTOTEST
+Autotest macro build command.
+This is the executable used by autotest for pre- and post-installation checks.
+By default, @command{configure} will search for this tool.
+@end vtable
 
 @node Old LiS Installation Instructions
 @section Old LiS Installation Instructions

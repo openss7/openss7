@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.5 2005/02/17 20:00:09 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.7 2005/03/15 00:56:49 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/02/17 20:00:09 $ by $Author: brian $
+% Last Modified $Date: 2005/03/15 00:56:49 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -123,7 +123,7 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Package @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@subtitle Package @value{PACKAGE}-@value{VERSION}
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
@@ -569,7 +569,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.5 $); $Date: 2005/02/17 20:00:09 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/03/15 00:56:49 $.
 
 @subsubheading AUTHOR
 @format
@@ -733,7 +733,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.5 $); $Date: 2005/02/17 20:00:09 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/03/15 00:56:49 $.
 @end flushleft
 @end format
 
