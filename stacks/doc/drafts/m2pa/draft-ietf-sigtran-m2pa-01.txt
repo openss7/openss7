@@ -1,0 +1,1971 @@
+Network Working Group                                      Tom George
+INTERNET-DRAFT                                                Alcatel
+                                                            Ram Dantu
+                                                             IPmobile
+                                                      Malleswar Kalla
+                                                            Telcordia
+                                           Hanns Juergen Schwarzbauer
+                                                              Siemens
+                                                      Greg Sidebottom
+                                                      Nortel Networks
+                                                        Ken Morneault
+                                                        Cisco Systems
+
+                                                              
+Expires May 2001                                    November 22, 2000
+
+
+             SS7 MTP2-User Peer-to-Peer Adaptation Layer
+                  <draft-ietf-sigtran-m2pa-01.txt>
+
+
+Status of This Memo
+
+This document is an Internet-Draft and is in full conformance with all 
+provisions of Section 10 of RFC 2026. Internet-Drafts are working
+documents of the Internet Engineering Task Force (IETF), its areas,
+and its working groups.  Note that other groups may also distribute
+working documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time.  It is inappropriate to use Internet-Drafts as reference
+material or to cite them other than as 'work in progress.'
+
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html.
+
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet- Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe),
+munnari.oz.au (Pacific Rim), ftp.ietf.org (US East Coast), or
+ftp.isi.edu (US West Coast).
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                 [Page 1]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+
+Abstract
+
+This Internet Draft defines a protocol supporting the transport of SS7
+MTP Layer 3 signaling messages over IP using the services of the
+Stream Control Transmission Protocol (SCTP).  This protocol would be
+used between SS7 Signaling Points employing the MTP Level 3
+protocol. The SS7 Signaling Points may also employ standard SS7 links
+using the SS7 Message Transfer Part (MTP) Layer 2 to provide transport
+of MTP Layer 3 signaling messages.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                 [Page 2]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+
+
+                        TABLE OF CONTENTS
+
+1.  Introduction............................................. 4
+  1.1  Scope................................................. 4
+  1.2  Terminology........................................... 4
+  1.3  Abbreviations......................................... 5
+  1.4  Conventions........................................... 5
+  1.5  Signaling Transport Architecture...................... 6
+  1.6  Services Provided by M2PA............................. 7
+  1.7  Functions Provided by M2PA............................ 8
+  1.8  Definition of the M2PA Boundaries..................... 9
+  1.9  Differences Between M2PA and M2UA.....................10
+2.  Protocol Elements........................................12
+  2.1  Common Message Header.................................12
+  2.2  M2PA Messages.........................................13
+3.  M2PA Link States.........................................15
+4.  Procedures...............................................17
+  4.1  Procedures to Support MTP2 Features...................17
+  4.2  Procedures to Support the MTP3/MTP2 Interface.........21
+5.  Examples of M2PA Procedures..............................24
+  5.1  Link Initialization (Alignment).......................24
+  5.2  Message Transmission and Reception....................26
+  5.3  Link Status Indication................................26
+  5.4  Link Status Message (Processor Outage)................27
+  5.5  Congestion Notification to Upper layer................28
+  5.6  Link Deactivation.....................................29
+  5.7  Link Changeover.......................................30
+6.  Security.................................................32
+7.  IANA Considerations......................................32
+8.  Acknowledgements.........................................32
+9.  References...............................................33
+10. Author's Addresses.......................................34
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                 [Page 3]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+1. Introduction
+
+1.1 Scope
+
+There is a need for Switched Circuit Network (SCN) signaling protocol
+delivery over an IP network.  This includes delivery from a Signalling
+Gateway (SG) to a Media Gateway Controller (MGC) or IP Signaling
+Point, as described in the Framework Architecture for Signalling
+Transport [1]. This could allow for convergence of some signaling
+and data networks. SCN Signaling nodes would have access to databases
+and other devices in the IP network domain that do not employ SS7
+signaling links. There may also be operational cost and performance
+advantages when traditional signaling links are replaced by IP network
+"connections".
+
+The delivery mechanism described in this document allows for full MTP3
+message handling and network management capabilities between any two
+SS7 nodes, communicating over an IP network. An SS7 node equipped with
+an IP network connection is called an IP Signaling Point (IPSP). The
+IPSPs function as traditional SS7 nodes using the IP network instead
+of SS7 links.
+
+The delivery mechanism should
+
+   * Support seamless operation of MTP3 protocol peers over an IP
+     network connection.
+
+   * Support the MTP Level 2 / MTP Level 3 interface boundary.
+
+   * Support management of SCTP transport associations and traffic
+     instead of MTP2 Links.
+
+   * Support asynchronous reporting of status changes to management.
+
+
+1.2 Terminology
+
+MTP - The Message Transfer Part of the SS7 protocol [2]. 
+
+MTP2 - MTP Level 2, the MTP signaling link layer.
+
+MTP3 - MTP Level 3, the MTP signaling network layer.
+
+MTP2-User - A protocol that normally uses the services of MTP Level
+2. The only MTP2 user is MTP3.
+
+Signaling End Point (SEP) - A node in an SS7 network that originates
+or terminates signaling messages.  One example is a central office
+switch.
+
+IP Signaling Point (IPSP) - An SS7 Signaling Point with an IP
+network connection used for SS7 over IP. 
+
+George, et al                                                 [Page 4]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+Signaling Gateway (SG) - A signaling agent that receives/sends SCN
+native signaling at the edge of the IP network [4]. In this context,
+an SG is an SS7 Signaling Point that has both an IP network connection
+used for SS7 over IP, and a traditional (non-IP) link to an SS7
+network.
+
+Signaling Transfer Point (STP) - A node in an SS7 network that routes
+signaling messages based on their destination point code in the SS7
+network.
+
+Association - An association refers to a SCTP association [5]. The
+association provides the transport for MTP3 protocol data units and
+M2PA adaptation layer peer messages.
+
+Network Byte Order - Most significant byte first, also known as "Big
+Endian".
+
+Stream - A stream refers to a SCTP stream [5].  
+
+
+1.3 Abbreviations
+
+BSNT   - Backward Sequence Number to be Transmitted
+
+FSNC   - Forward Sequence Number of last message accepted by 
+         remote level 2
+
+MSU    - Message Signal Unit
+
+SCN    - Switched Circuit Network
+
+SCTP   - Stream Control Transmission Protocol
+
+SIF    - Signaling Information Field
+
+SIO    - Service Information Octet
+
+SLC    - Signaling Link Code
+
+SS7    - Signaling System 7
+
+SSN    - Stream Sequence Number
+
+
+1.4 Conventions
+
+The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL, when they
+appear in this document, are to be interpreted as described in
+[8].
+
+
+George, et al                                                 [Page 5]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+1.5 Signaling Transport Architecture
+
+The architecture that has been defined [4] for Switched Circuit
+Network (SCN) signaling transport over IP uses multiple components,
+including an IP transport protocol, the Stream Control Transmission
+Protocol (SCTP), and an adaptation module to support the services
+expected by a particular SCN signaling protocol from its underlying
+protocol layer.
+
+Within this framework architecture, this document defines an SCN
+adaptation module that is suitable for the transport of SS7 MTP3
+messages.
+
+Figure 1 shows the seamless interworking at the MTP3 layer.  MTP3 is
+adapted to the SCTP layer using the MTP2 User Peer-to-peer Adaptation
+Layer (M2PA).  All the primitives between MTP3 and MTP2 are supported
+by M2PA.  The SCTP association acts as one SS7 link between the IPSPs.
+
+
+
+            ********   IP   ********
+            * IPSP *--------* IPSP *
+            ********        ********
+            		    
+            +------+        +------+
+            | MTP3 |        | MTP3 | 
+            +------+        +------+    
+            | M2PA |        | M2PA |    
+            +------+        +------+    
+            | SCTP |        | SCTP | 
+            +------+        +------+
+            | IP   |        | IP   |
+            +------+        +------+
+
+    IP    - Internet Protocol
+    IPSP  - IP Signaling Point
+    SCTP  - Stream Control Transmission Protocol
+            (see Reference [5])
+
+         Figure 1:  M2PA Symmetrical Peer-to-Peer Architecture
+
+
+An IPSP may have SCCP and other SS7 layers above MTP3. Figure 2 shows
+an example. The Signaling Gateway is an IPSP equipped with both
+traditional SS7 and IP network connections.  In effect, the Signaling
+Gateway acts as an STP.  Any of the nodes in the diagram could have
+SCCP or other SS7 layers. STPs may or may not be present in the SS7
+path between the SEP and the SG.
+
+
+
+
+
+George, et al                                                 [Page 6]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+    ********  SS7   ***************   IP   ********
+    * SEP  *--------*     SG      *--------* IPSP *
+    ********        ***************        ********
+
+    +------+                               +------+
+    | TCAP |                               | TCAP |
+    +------+                               +------+
+    | SCCP |                               | SCCP |
+    +------+        +-------------+        +------+
+    | MTP3 |        |    MTP3     |        | MTP3 | 
+    +------+        +------+------+        +------+    
+    | MTP2 |        | MTP2 | M2PA |        | M2PA |    
+    +------+        +------+------+        +------+    
+    | MTP1 |        | MTP1 | SCTP |        | SCTP | 
+    |      |        |      +------+        +------+
+    |      |        |      | IP   |        | IP   |
+    +------+        +------+------+        +------+
+
+    SEP   - SS7 Signaling Endpoint
+
+         Figure 2:  M2PA in IP Signaling Gateway
+
+
+Figure 2 is only an example. Other configurations are possible. For
+example, IPSPs without traditional SS7 links could use the protocol
+layers MTP3/M2PA/SCTP/IP to route SS7 messages in a network with all
+IP links.
+
+Another example, related to Figure 2, is that two SGs could be
+connected over an IP network to form an SG mated pair similar to the
+way STPs are provisioned in traditional SS7 networks.
+
+
+1.5.1  Point Code Representation
+
+The MTP specification requires that each node with an MTP3 layer is
+represented by an SS7 point code. In particular, each IPSP must have
+its own SS7 point code.
+
+1.6 Services Provided by M2PA
+
+The SS7 MTP3/MTP2 (MTP2-User) interface is retained in the IPSP. The
+M2PA protocol layer is required to provide the equivalent set of
+services to its user as provided by MTP Level 2 to MTP Level 3.
+
+These services are described in the following subsections.
+
+1.6.1 Support for MTP Level 2 / MTP Level 3 interface boundary
+
+This interface is the same as the MTP2/MTP3 interface described in
+[2], with the addition of support for larger sequence numbers in
+[7]. 
+
+George, et al                                                 [Page 7]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+Because SCTP uses larger sequence numbers than MTP, the MTP3
+Changeover procedure must use the Extended Changeover Order and
+Extended Changeover Acknowledgment messages described in [7]. This
+will allow for use of the SCTP stream sequence numbers in the
+changeover messages.
+
+1.6.2 Support for peer-to-peer communication
+
+In SS7, MTP Level 2 sends three types of messages, known as signal
+units: Message Signal Units (MSUs), Link Status Signal Units (LSSUs),
+and Fill-In Signal Units (FISUs).
+
+MSUs originate at a higher level than MTP2, and are destined for a
+peer at another node. Likewise, M2PA passes these messages from MTP3
+to SCTP as data for transport across a link. These are called User
+Data messages in M2PA.
+
+LSSUs allow peer MTP2 layers to exchange status information. Analogous
+messages are needed for M2PA. The Link Status message serves this
+purpose.
+
+FISUs are sent when no other signal units are waiting to be sent. This
+purpose is served by the heartbeat messages in SCTP. FISUs also carry
+acknowledgment of messages. This function is performed by
+SCTP. Therefore, it is unnecessary for M2PA to provide a protocol unit
+like the FISU.
+
+1.7 Functions Provided by M2PA
+
+1.7.1 Support of MTP3/MTP2 Primitives
+
+M2PA receives the primitives sent from MTP3 to its lower layer. M2PA
+processes these primitives or maps them to appropriate primitives at
+the M2PA/SCTP interface. Likewise, M2PA sends primitives to MTP3 like
+those used in the MTP3/MTP2 interface.
+
+1.7.2 MTP2 Functionality
+
+M2PA provides MTP2 functionality that is not provided by SCTP. This
+includes
+
+   - Data retrieval to support the MTP3 changeover procedure
+
+   - Reporting of link status changes to MTP3
+
+   - Processor outage procedure
+
+   - Link alignment procedure
+
+
+
+
+George, et al                                                 [Page 8]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+1.7.3 Mapping of SS7 and IP Entities
+
+For each IP link, the M2PA layer must maintain a map of the SS7 link
+to its SCTP association and its corresponding IP destination.
+ 
+1.7.3 SCTP Stream Management
+
+SCTP allows a user-specified number of streams to be opened during the
+initialization.  It is the responsibility of the M2PA layer to ensure
+proper management of the streams allowed within each association.
+
+1.7.4  Retention of MTP3 in the SS7 Network 
+
+M2PA allows MTP3 to perform all of its Message Handling and Network
+Management functions with IPSPs as with other SS7 nodes.
+
+
+1.8 Definition of the M2PA Boundaries
+
+1.8.1 Definition of the M2PA / MTP Level 3 boundary
+
+The upper layer primitives provided by M2PA are the same as those
+provided by MTP2 to MTP3. Following is a list of these primitives.
+
+Primitives sent from MTP3 to M2PA:
+
+Data Request - Used to send a Data Message for transmission.
+
+Start Request - Used to establish a link.
+
+Stop Request - Used to release a link.
+
+Retrieve BSNT Request - Request the BSNT for the changeover procedure.
+
+Retrieval Request and FSNC - Request retrieval of unacknowledged and
+unsent messages. This request includes the FSNC received from the
+remote end.
+
+Flush Buffers Request - Requests that all transmit and receive
+buffers be emptied.
+
+Continue Request - Requests that processing resume after a processor
+outage.
+
+Emergency Request - This is ignored by M2PA.
+
+Emergency Ceases Request - This is ignored by M2PA.
+
+
+Primitives sent from M2PA to MTP3:
+
+Data Indication - Used to deliver received Data Message to MTP3.
+
+George, et al                                                 [Page 9]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+Congestion Indication - Indicates change in congestion level. The
+indication includes the congestion level, if the protocol is using the
+optional congestion levels.
+
+In Service Indication - Indicates that the link is in service.
+
+Out of Service Indication - Indicates that the link is out of service.
+
+Retrieved Messages Indication - Indicates delivery of unacknowledged
+and unsent messages.
+
+Retrieval Complete Indication - Indicates that delivery of
+unacknowledged and unsent messages is complete.
+
+BSNT Confirm - Replies to the BSNT Request. The confirmation includes
+the BSNT.
+
+BSNT Not Retrievable Confirm - Replies to the BSNT Request when the
+BSNT cannot be determined.
+
+Remote Processor Outage Indication - Indicates processor outage at
+remote end.
+
+Remote Processor Recovered Indication - Indicates recovery from
+processor outage at remote end.
+
+
+1.8.2 Definition of the Lower Layer Boundary between M2PA and SCTP
+
+The upper layer primitives provided by SCTP are described in Reference
+[5] Section 10 "Interface with Upper Layer".
+
+
+1.9 Differences Between M2PA and M2UA
+
+The MTP2 User Adaptation Layer (M2UA) [6] also adapts the MTP3 layer
+to the SCTP/IP stack. It does so through a backhauling architecture
+[4]. This section intends to clarify some of the differences between
+the M2PA and M2UA approaches.
+
+A possible M2PA architecture is shown in Figure 3. Here the IPSP's
+MTP3 uses its underlying M2PA as a replacement for
+MTP2. Commmunication between the two layers MTP3/M2PA is defined by
+the same primitives as in SS7 MTP3/MTP2. M2PA performs functions
+similar to MTP2.
+
+A comparable architecture for M2UA is shown in Figure 4. In M2UA, the
+MGC's MTP3 uses the SG's MTP2 as its lower SS7 layer. In SS7,
+commmunication between the MTP3 and MTP2 layers is defined by
+primitives. In M2UA, the MTP3/MTP2 communication is defined as M2UA
+messages and sent over the IP connection.
+
+George, et al                                                [Page 10]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+    ********  SS7   ***************   IP   ********
+    * SEP  *--------*     SG      *--------* IPSP *
+    ********        ***************        ********
+
+    +------+        +-------------+        +------+
+    | SCCP |        |    SCCP     |        | SCCP |
+    +------+        +-------------+        +------+
+    | MTP3 |        |    MTP3     |        | MTP3 | 
+    +------+        +------+------+        +------+    
+    | MTP2 |        | MTP2 | M2PA |        | M2PA |    
+    +------+        +------+------+        +------+    
+    | MTP1 |        | MTP1 | SCTP |        | SCTP | 
+    |      |        |      +------+        +------+
+    |      |        |      | IP   |        | IP   |
+    +------+        +------+------+        +------+
+
+
+         Figure 3:  M2PA in IP Signaling Gateway
+
+
+
+    ********  SS7   ***************   IP   ********
+    * SEP  *--------*     SG      *--------* MGC  *
+    ********        ***************        ********
+
+    +------+                               +------+
+    | SCCP |                               | SCCP |
+    +------+                               +------+
+    | MTP3 |             (NIF)             | MTP3 | 
+    +------+        +------+------+        +------+    
+    | MTP2 |        | MTP2 | M2UA |        | M2UA |    
+    +------+        +------+------+        +------+    
+    | MTP1 |        | MTP1 | SCTP |        | SCTP | 
+    |      |        |      +------+        +------+
+    |      |        |      | IP   |        | IP   |
+    +------+        +------+------+        +------+
+
+       NIF   - Nodal Interworking Function
+
+
+         Figure 4:  M2UA in IP Signaling Gateway
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 11]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+M2PA and M2UA are similar in that:
+
+   a. Both transport MTP3 data messages.
+
+   b. Both present an MTP2 upper interface to MTP3.
+
+Differences between M2PA and M2UA include:
+
+   a. M2PA: IPSP processes MTP3-to-MTP2 primitives.
+      M2UA: MGC transports MTP3-to-MTP2 primitives to SG's MTP2 
+            (via the NIF) for processing.
+
+   b. M2PA: SG-IPSP connection is an SS7 link.
+      M2UA: SG-MGC connection is not an SS7 link.
+
+   c. M2PA: SG is an SS7 node with a point code.
+      M2UA: SG is not an SS7 node and has no point code.
+
+   d. M2PA: SG can have upper SS7 layers, e.g., SCCP.
+      M2UA: SG does not have upper SS7 layers since it has no MTP3.
+
+Potential users of M2PA and M2UA should be aware of these differences
+when deciding how to use them for SS7 signaling transport over IP
+networks.
+
+
+2.  Protocol Elements
+
+This section describes the format of various messages used in this 
+protocol.
+
+All fields in an M2PA message must be transmitted in the network byte
+order, i.e., most significant byte first, unless otherwise stated.
+
+
+2.1 Common Message Header
+
+The protocol messages for M2PA require a message header structure
+which contains a version, message type and message length.  This
+message header is common among all SCN adaptation layers. The 
+header structure is shown in Figure 5.
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 12]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |    Version    |     Spare     |         Message Type          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Message Length                         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                                                               |
+
+
+                 Figure 5:  Common Message Header
+
+
+2.1.1  Version
+
+The version field (vers) contains the version of the M2PA adapation
+layer.  The supported versions are:
+
+      01   Release 1.0 of M2PA protocol
+
+2.1.2  Message Type
+
+The valid message types are defined below and the message contents are
+described in Section 2.2.  Each message can contain parameters.
+
+The following list contains the message types for the defined messages.
+
+
+     MTP2 User Adaptatation Messages
+
+        Type                     Value (Hex)
+
+        User Data                0601
+        Link Status              0602
+
+       
+2.1.3  Message Length
+
+The Message length defines the length of the message in octets, not 
+including the header.
+
+2.2 M2PA Messages
+
+The following section defines the messages and parameter contents.  An
+M2PA message consists of a Common Message Header followed by the data
+appropriate to the message.
+
+
+
+
+
+
+George, et al                                                [Page 13]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                 ...
+   |                     Common Message Header                     |
+                                 ...
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                 ...
+   |                         Message Data                          |
+                                 ...
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+2.2.1 User Data 
+
+The User Data is the data sent from the MTP3 in the form of the
+contiguous LI, SIO, and SIF octets of the MSU ([2] Q.703, section 2.2
+Signal Unit Format). The LI octet includes the two undefined bits
+between the SIO and LI fields.
+
+The format for the User Data message is as follows:
+
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                 ...
+   |                            Data                               |
+                                 ...
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+No padding is added to the MTP3 message.
+
+Note that the Data field contains only the LI, SIF, and SIO
+octets. The other components of the message transmitted by MTP2 (the
+Flag, BSN, BIB, FSN, FIB, CK) are not included in M2PA.
+
+Note: The two spare bits in the LI octet are used in a national
+version of SS7 by MTP3 as a Priority field. See [9], section 14
+"Common Characteristics of message signal unit formats", section 14.2
+(A) Priority Indicator (PRI).
+
+
+2.2.2  Link Status
+
+The MTP2 Link Status message can be sent between M2PA peers to
+indicate link status. This message performs a function similar to the
+the Link Status Signal Unit in MTP2.
+
+
+
+
+
+
+George, et al                                                [Page 14]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                            State                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+The valid values for State are shown in the following table. 
+
+    Value  Description
+
+     1     In Service
+     2     Processor Outage
+     3     Processor Outage Ended
+     4     Busy
+     5     Busy Ended
+
+
+3.  M2PA Link States
+
+The M2PA link moves from one state to another in response to various
+events.  The events that may result in a change of state include:
+
+   - MTP3 primitive requests
+
+   - SCTP notifications
+
+   - Receipt of Status messages from the peer M2PA
+
+   - Expiration of certain timers
+
+Figure 6 illustrates state changes together with the causing events.
+Note that some of the error conditions are not shown in the state
+diagram.
+
+Following is a list of the M2PA Link States and a description of each.
+
+IDLE - State of link during power-up initialization.
+
+OOS - Out Of Service. Power-up initialization is complete. 
+
+AIP - Alignment In Progress. M2PA is attempting to establish SCTP
+association.
+
+INS-LOCAL - In Service Local. Association is established. M2PA is
+waiting for peer to verify that it is In Service.
+
+INS - In Service. Link is ready for traffic.
+
+RETRIEVAL - Link no longer carries traffic. M2PA is waiting for
+request for message retrieval from MTP3.
+
+George, et al                                                [Page 15]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+                           +-----------+
+                           |   IDLE    |
+                           +-----------+
+                                 |
+                                 | Power On
+                                 |
+                                 V
+                           +-----------+
+                  +------->|    OOS    |---------+
+                  |        +-----------+         |
+                  |              |               |
+                  |              | Client AND    | Server AND
+                  |              | MTP3 Start    | MTP3 Start
+                  |              |               |
+                  |              V               |
+                  |        +-----------+         |
+                  |        |    AIP    |<--------+
+                  |        +-----------+
+                  |              |                                
+                  |              | SCTP 			     
+                  |              | Communication Up		     
+                  |              |                                
+                  |              V                                
+                  |        +-----------+			     
+                  |        | INS-LOCAL |			     
+                  |        +-----------+			     
+                  |              |                                
+                  |              | Link Status		     
+                  |              | In Service received	     
+                  |              |                                
+                  |              V                                
+                  |        +-----------+			     
+                  |        |    INS    |			     
+                  |        +-----------+			     
+                  |              |                                
+        Retrieval |              | MTP3 Stop                      
+        Complete  |              | OR SCTP Communication Error    
+                  |              | OR SCTP Communication Lost     
+                  |              | OR T6 Expiration               
+                  |              |                                
+                  |              V                                
+                  |        +-----------+                          
+                  +--------| RETRIEVAL |
+                           +-----------+
+
+
+                Figure 6: M2PA Link State Transition Diagram.
+
+
+
+
+
+George, et al                                                [Page 16]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+4.  Procedures
+
+4.1 Procedures to Support MTP2 Features
+
+4.1.1 Signal Unit Format, Delimitation, Acceptance
+
+Messages for transmission across the network must follow the format
+described in section 2.
+
+SCTP provides reliable, in-sequence delivery. Therefore the related
+functionality of MTP2 is not needed. SCTP does not provide functions
+related to Link State Control in MTP2. These functions must be
+provided by M2PA.
+
+
+4.1.2 Link Alignment
+
+Link alignment includes the establishment of an SCTP association and a
+handshaking procedure between the M2PA peers to verify that the
+association is ready to be used as a link.
+
+To prevent duplicate associations from being established, it must be
+decided in advance which endpoint initiates the establishment of the
+association. In a pair of endpoints, the endpoint that initiates the
+establishment of the association is called the client. The other
+endpoint is the server. An endpoint may be a client in its
+relationship with one endpoint, and a server in its relationship with
+another endpoint. The designations of client and server are needed
+only to decide which endpoint initiates the establishment of the
+association. After that, the endpoints function as peers.
+
+The client initiates the association using the server's IP address and
+the M2PA well-known port number as the destination endpoint. In order
+to allow for multiple links between the two endpoints, the client uses
+a different local port number for each link. It must be decided in
+advance which local ports are used by the client. Each of these client
+ports must be known to the server. Each combination of client IP
+address/port and server IP address/port must be mapped to the same
+Signaling Link Code (SLC) in the client and server, so that each
+endpoint knows which link is being created at the time the SCTP
+association is established. However, M2PA does not do any processing
+based on the SLC.
+
+An example of the relationships between the associations and the SLCs
+is shown in Figure 7 and Table 1. Note that a link is an SCTP
+association identified by two endpoints, in this case a client and
+server. Each endpoint is identified by an IP address and port
+number. Each association is mapped to an SLC. Table 1 is only
+conceptual. The actual method for mapping the SCTP associations to the
+SLCs is implementation dependent.
+
+
+
+George, et al                                                [Page 17]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+                 Client                       Server
+
+                  IPA                           IPB
+            +-------------+               +-------------+
+            |             |	SCTP      |             |
+            |   SLC = a   | association 1 |   SLC = a   |
+            |  port = P1  +---------------+  port = PW  |
+            |             |	          |             |
+            |             |	          |             |
+            |             |	          |             |
+            |             |	SCTP      |             |
+            |   SLC = b   | association 2 |   SLC = b   |
+            |  port = P2  +---------------+  port = PW  |
+            |             |	          |             |
+            |             |	          |             |
+            +-------------+               +-------------+
+
+      IPA    = IP address of Client
+      IPB    = IP address of Server
+      P1, P2 = Pre-selected port numbers for Client
+      PW     = Well-known port number for M2PA
+
+                Figure 7: Associations and SLCs
+
+
+     +-------------+---------------------------------------+-----+
+     | Association |      Client       |      Server       | SLC |
+     |             +------------+------+------------+------+     |
+     |             | IP address | Port | IP address | Port |     |
+     +=============+============+======+============+======+=====+
+     |      1      |    IPA     |  P1  |    IPB     |  PW  |  a  |
+     +-------------+------------+------+------------+------+-----+
+     |      2      |    IPA     |  P2  |    IPB     |  PW  |  b  |
+     +-------------+------------+------+------------+------+-----+
+
+                  Table 1: Associations and SLCs
+
+
+The association shall contain two streams in each direction. Stream 0
+is designated for Link Status messages. Stream 1 is designated for
+User Data messages.
+
+If the SCTP association is not established, the client M2PA sends the
+ASSOCIATE primitive to SCTP. The client should attempt to establish
+the association periodically until it is successful.
+
+If SCTP fails to establish the association, and M2PA had received a
+Start Request from its MTP3, then M2PA shall report to MTP3 that the
+link is out of service. If M2PA has an SCTP association ID for that
+association, it should ABORT the association. The association ID is a
+number provided by the SCTP used to identify an association.
+
+
+George, et al                                                [Page 18]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+Once the association is established, M2PA invokes the GETSRTTREPORT
+primitive to determine the Smooth Round Trip Time (SRTT) from SCTP. If
+the SRTT exceeds its maximum allowed value (which is implementation
+dependent), M2PA should use the ABORT primitive to end the
+association.  If M2PA had received a Start Request from its MTP3, then
+M2PA shall report to MTP3 that the link is out of service.
+
+Once M2PA has received a Start Request from MTP3, the association is
+established, the SRTT is determined to be satisfactory, and if MTP3
+has not deactivated the link, then:
+
+   (a) If there is no local processor outage condition, M2PA sends a
+       Link Status of In Service to its peer. 
+
+   (b) If there is a local processor outage condition, M2PA sends Link
+       Status Processor Outage to its peer. When MTP3 sends Local
+       Processor Recovered, then M2PA sends Link Status Processor
+       Outage Ended to its peer, followed by Link Status In Service.
+
+If M2PA has not received a Link Status In Service from its peer at the
+time it sends the Link Status In Service, M2PA starts timer T1. Timer
+T1 is stopped when M2PA receives Link Status In Service from its
+peer. If M2PA does not receive Link Status In Service from its peer
+before T1 expires, then M2PA reports to MTP3 that the link is out of
+service. Then M2PA uses the ABORT primitive to end the association.
+
+Recommended value of T1 is 5-150 seconds.
+
+Note that if the server M2PA has not received a Start Request from its
+MTP3, it will not send the Link Status In Service message to the
+client. Eventually the client will ABORT the association. The client
+will then attempt to establish the association.
+
+When the association is established, M2PA has sent Link Status In
+Service to its peer, and has received Link Status In Service from its
+peer, and there is no local processor outage condition, then M2PA
+sends Link In Service to its MTP3. 
+
+If M2PA receives a Link Status of Processor Outage during alignment,
+and M2PA had received a Start Request from its MTP3, M2PA shall report
+Remote Processor Outage to MTP3.
+
+M2PA shall ignore the Emergency and Emergency Ceases commands from
+MTP3.
+
+4.1.3 Processor Outage
+
+A processor outage occurs when M2PA cannot transfer messages because
+of a condition at a higher layer than M2PA.
+
+When M2PA detects a local processor outage, it sends a Link Status
+message to its peer with status Processor Outage. M2PA shall discard
+
+George, et al                                                [Page 19]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+any User Data messages received. M2PA shall also cease sending User
+Data messages to SCTP for transmission.
+
+The peer M2PA, upon receiving the Link Status Processor Outage
+message, shall report Remote Processor Outage to its MTP3. M2PA ceases
+sending User Data messages.
+
+When the processor outage ceases, MTP3 sends a Local Processor
+Recovered indication to M2PA. The local M2PA notifies its peer by
+sending a Link Status message with status Processor Outage Ended.  The
+peer notifies its MTP3 that the remote processor outage has ceased.
+
+4.1.4 Level 2 Flow Control
+
+Notification of receive congestion from SCTP to M2PA is implementation
+dependent. This section assumes that there is some form of receive
+congestion notification from SCTP to M2PA.
+
+If M2PA receives notification from its lower layer SCTP that SCTP is
+in receive congestion for an association, M2PA shall send a Link
+Status Busy message to its peer on that association.
+
+When the peer M2PA receives the Link Status Busy message, it shall
+cease transmitting User Data messages from its upper layer MTP3. (User
+Data messages already given to the lower layer SCTP are transmitted as
+the SCTP protocol allows.) M2PA shall start the Remote Congestion
+timer T6. If timer T6 expires, M2PA shall use the ABORT primitive to
+end the association and take the link out of service.
+
+If M2PA receives notification from its lower layer SCTP that SCTP is
+no longer in receive congestion for the association, M2PA shall send a
+Link Status Busy Ended message to its peer on that association.
+
+When the peer M2PA receives the Link Status Busy Ended message, it
+shall stop timer T6 and resume transmitting User Data messages from
+its upper layer MTP3.
+
+Recommended value of T6 is 1-6 seconds.
+
+4.1.5 Error Monitoring
+
+If M2PA loses the SCTP association for a link, M2PA shall report to
+MTP3 that the link is out of service.
+
+4.1.6  Transmission Priorities
+
+In MTP, Link Status messages have priority over User Data messages
+([2] Q.703, section 11.2). To achieve this in M2PA, Link Status and
+User Data messages shall be sent via SCTP on separate streams. All
+messages are sent using the ordered delivery option.
+
+M2PA should give higher priority to reading the Link Status stream
+
+George, et al                                                [Page 20]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+over the User Data stream.
+
+M2PA should give higher priority to receiving notifications from SCTP
+over reading either the Link Status stream or the User Data stream.
+
+Implementation Note: If the SCTP implementation allows streams to have
+different priorities for sending messages, then M2PA should set the
+Link Status stream to a higher priority than the User Data stream.
+
+
+4.2 Procedures to Support the MTP3/MTP2 Interface
+
+4.2.1  Sending/receiving messages
+
+When MTP3 sends a message for transmission to M2PA, M2PA passes the
+corresponding M2PA message to SCTP using the SEND primitive.
+
+M2PA Link Status messages are passed to SCTP using the SEND primitive.
+
+Link Status and User Data messages shall be sent via SCTP on separate
+streams.
+
+When M2PA receives a Data message from SCTP, M2PA passes the message
+to MTP3.
+
+4.2.2  Link activation and restoration
+
+When MTP3 requests that M2PA activate or restore a link by a Start
+Request, M2PA shall follow the alignment procedure in section 4.1.2.
+
+4.2.3  Link deactivation
+
+When MTP3 requests that M2PA deactivate a link by a Stop command, M2PA
+shall send an ABORT primitive to SCTP.
+
+4.2.4  Flush buffers
+
+If M2PA receives a Flush Buffers command from MTP3, M2PA:
+
+   (a) shall not transmit any messages to SCTP that are currently
+       waiting to be transmitted to SCTP. 
+   (b) shall discard all messages currently waiting to be passed 
+       to MTP3.
+
+4.2.5 MTP3 Signaling Link Congestion
+
+Notification of transmit congestion from SCTP to its upper layer
+(M2PA) is implementation dependent. Nevertheless, M2PA should receive
+notification from SCTP adequate to allow MTP3 to meet its requirements
+for signaling link transmit congestion in [2] Q.704, section 3.8.
+
+M2PA shall notify its upper layer MTP3 when transmit buffer occupancy
+
+George, et al                                                [Page 21]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+crosses the congestion onset, discard, and abatement thresholds. For
+national networks with multiple congestion threshold levels, M2PA
+shall notify MTP3 when transmit buffer occupancy crosses each level of
+the congestion onset, discard, and abatement thresholds.
+
+4.2.6 Changeover
+
+The objective of the changeover is to ensure that signaling traffic
+carried by the unavailable signaling link is diverted to the
+alternative signaling link(s) as quickly as possible while avoiding
+message loss, duplication, or mis-sequencing.  For this purpose, the
+changeover procedure includes data retrieval, which is performed
+before opening the alternative signaling links to the diverted
+traffic.  Data retrieval consists of these steps:
+
+   (1) buffer updating, i.e., identifying all those User Data 
+       messages in the retransmission buffer of the unavailable
+       signaling link which have not been received by the far end
+       SCTP, as well as untransmitted messages, and
+
+   (2) transferring those messages to the transmission buffers of the
+       alternate links.
+
+Note that only User Data messages are retrieved and transmitted over
+the alternate links. Link Status messages shall not be retrieved and
+transmitted over the alternate links. References to stream sequence
+numbers in this section refer only to the User Data stream's stream
+sequence numbers.
+
+In order to support changeover in M2PA, the SCTP Stream Sequence
+Numbers must be used in place of the Forward and Backward Sequence
+Numbers (FSN/BSN) of SS7.
+
+Stream Sequence Numbers used by SCTP are 16 bits long.  MTP2's Forward
+and Backward Sequence Numbers are only seven bits long.  Hence it is
+necessary for MTP3 to accomodate the larger SSNs. This is done through
+the use of the Extended Changeover Order (XCO) and Extended Changeover
+Acknowledgement (XCA) messages instead of the Changeover Order (COO)
+and Changeover Acknowledgement (COA) messages. The XCO and XCA
+messages are specified in Reference [7] section 9.8.1. Only the XCO
+and XCA messages from [7] are used. These messages have a 24-bit field
+for the sequence number. The upper 8 bits of the 24 bit field should
+be set to 0, and the SSN placed in the lower 16 bits.
+
+(Note that the Stream Sequence Numbers are used instead of the
+Transmission Sequence Numbers. The Transmission Sequence Numbers are
+32 bits long, and therefore would not fit in the XCO and XCA
+messages.)
+
+For data retrieval, MTP3 requests Backward Sequence Number (BSN) from
+M2PA.  This is the sequence number of the last message received by the
+local end.  Normally, SCTP delivers ordered messages to the
+
+George, et al                                                [Page 22]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+application.  However, during congestion or failure condition, the
+sequence numbers of the acknowledged messages may have gaps.  In
+particular, the SACK (selective acknowledgement message) message can
+have several of these gaps.  Hence, it is important to scan through
+these gaps and find the sequence number before the first gap.  This is
+the number from which the remote end has to transmit the messages.  So
+this is the number considered as the Backward Sequence Number and
+communicated to the remote end.  In a similar way, the remote end also
+detects the BSN and indicates to the local end. As soon as the MTP3 of
+the local end receives this BSN, MTP3 retrieves all the unacknowledged
+messages starting from BSN.  This is accomplished through a Retrieval
+Request and FSNC request.  After all the messages are sent from M2PA
+to MTP3, a Retrieval Complete indication is sent.
+
+Note that the sequence numbers and messages requested by MTP3 may be
+obtained by M2PA from SCTP via the Communication Lost primitive [5].
+Retrieval of messages is an optional feature in SCTP. To perform data
+retrieval, it is necessary that this option be implemented, and that
+the SSNs of the messages are identified. SCTP must retain the messages
+for retrieval by MTP3/M2PA whenever an association is aborted. SCTP
+must be able to return messages to M2PA so that M2PA can perform
+retrieval for MTP3. There are various ways that this can be
+implemented, such as:
+
+   (1) SCTP provides a way for M2PA to request retrieval of messages
+       for a specified stream and SSN(s).
+
+   (2) SCTP retrieves all messages and identifies the stream and SSN
+       of each message. M2PA then must select the appropriate messages
+       to pass up to MTP3.
+
+If M2PA receives a Retrieve BSNT request from MTP3, M2PA responds with
+the BSNT indication. The BSNT value is the SCTP stream sequence number
+of the last message received by SCTP User Data stream before any gaps
+in the stream sequence numbers.
+
+(Note that any messages with stream sequence number greater than this
+BSNT value have been acknowledged by the receiving SCTP, but have not
+been passed up to M2PA. These messages are discarded by the receiving
+SCTP and are not delivered to the upper layer M2PA. Therefore these
+messages should be retransmitted by the far end on the alternate
+link.)
+
+If M2PA receives a Retrieval Request and FSNC request from MTP3, M2PA
+retrieves from SCTP:
+
+       (a) any transmitted messages beginning with the first 
+	   unacknowledged message with stream sequence number greater
+	   than FSNC, and
+
+       (b) any untransmitted messages in SCTP.
+
+
+George, et al                                                [Page 23]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+Each of these messages is sent to MTP3, first (a), then (b). Then M2PA
+sends the Retrieval Complete indication to MTP3.
+
+Note: The changeover procedure makes it impossible for M2PA to have
+multiple User Data streams in a direction for one link. Buffer
+updating would have to be done for each User Data stream separately to
+avoid duplication of messages. But MTP3 provides for only one XCO
+message for sending the last-received SSN.
+
+
+5.  Examples of M2PA Procedures
+
+In general, messages passed between MTP3 and M2PA are the same as
+those passed between MTP3 and MTP2.  M2PA interprets messages from
+MTP3 and sends the appropriate message to SCTP. Likewise, messages
+from SCTP are used to generate a meaningful message to MTP3.
+
+Note that throughout this section, the primitives between MTP3 and
+M2PA are named using the MTP terminology [1][2]. Communications
+between M2PA and SCTP are named using SCTP terminology.
+
+
+5.1  Link Initialization (Alignment)
+
+An example of the message flow to bring an SS7 link in service is
+shown below. Alignment is done by both ends of the link. To simplify the
+diagram, alignment is shown on one end only. It is assumed in this
+example that SCTP has been initialized.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 24]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+     Out of Service
+     <------------
+
+     Emergency OR
+     Emergency Ceases
+     ------------>
+
+     Start
+     ------------>
+
+                 Associate
+                 ------------>
+
+                             (SCTP Association
+                              procedure)
+
+                 Communication Up        Communication Up
+                 <------------           ------------>
+
+
+Even though the SCTP association is established, it is important that
+M2PA not send MTP3 data at this point. It must be confirmed that both
+ends of the link are ready for traffic. Otherwise, messages could be
+lost. The endpoints must exchange In Service messages.
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+                 Get SRTT Report
+                 ------------>
+
+                 Link Status In Service
+                 ------------------------------------>
+
+                                Link Status In Service
+                 <------------------------------------
+
+     In Service                                      In Service
+     <------------                                   ------------>
+
+
+At this point, MTP3 may begin sending data messages.
+
+
+
+
+
+
+
+George, et al                                                [Page 25]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+5.2  Message Transmission and Reception
+
+Messages are transmitted using the Data Request primitive from MTP3 to
+M2PA. The diagram shows the case where the Link is In Service. The
+message is passed from MTP3 of the source to MTP3 of the destination.
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+     Message for 
+     transmission
+     ------------>
+
+                 Send
+                 (Data Message)
+                 ------------>
+
+                             (SCTP sends message)
+
+                                         Receive
+                                         ------------>
+
+                                                  Received message
+                                                     ------------>
+
+
+5.3  Link Status Indication
+
+If SCTP sends a Communication Lost primitive to M2PA, M2PA notifies
+MTP3 that the link is out of service. MTP3 responds in its usual way.
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+                 Communication Lost
+                 <------------
+
+     Out of Service
+     <------------
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 26]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+5.4  Link Status Message (Processor Outage)
+
+This example shows how M2PA responds to a local processor outage. M2PA
+sends a Link Status message to its peer. The peer M2PA notifies MTP3
+of the outage. MTP3 can then follow the processor outage procedures in
+[2].
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+             M2PA detects 
+             Local Processor 
+             Outage
+
+                 Link Status
+                 Processor Outage
+                 ------------>
+
+                             (SCTP sends message)
+
+                                         Receive
+                                         ------------>
+
+                                                  Remote Processor
+                                                  Outage
+                                                     ------------>
+
+                 Link Status
+                 Processor Outage
+                 Ended
+                 ------------>
+
+                             (SCTP sends message)
+
+                                         Receive
+                                         ------------>
+
+                                                  Remote Processor
+                                                  Outage Ceases
+                                                     ------------>
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 27]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+5.5  Congestion Notification to Upper layer
+
+MTP3 expects notification of link congestion. In this example, it is
+assumed that SCTP notifies M2PA of congestion onset and abatement. The
+notification includes the congestion level, if there are levels of
+congestion defined.
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+                 Implementation dependent 
+                 indication of congestion 
+                 onset (level)
+                 <------------
+
+     Congestion Indication
+     (level)
+     <------------
+
+                 Implementation dependent 
+                 indication of congestion 
+                 abatement (level)
+                 <------------
+
+     Congestion Indication
+     (level)
+     <------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 28]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+5.6  Link Deactivation
+
+The MTP3 can request that a SS7-IP link be taken out-of-service. M2PA
+uses the Abort message as shown below.
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+     Stop
+     ------------>
+
+                 Abort
+                 ------------>
+
+                           (SCTP performs its
+                           termination procedure)
+
+                 Communication Lost
+                 <------------
+
+     Out of Service
+     <------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 29]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+5.7  Link Changeover
+
+In this example, MTP3 performs a changeover because the link went out
+of service. MTP3 selects a different link for retransmitting the
+unacknowledged messages.
+
+Note that in this example, the sequence numbers and messages requested
+by MTP3 are sent from SCTP to M2PA in the Communication Lost
+primitive. In general, the retrieval of sequence numbers and messages
+is implementation dependent.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 30]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+
+    MTP3        M2PA        SCTP        SCTP        M2PA        MTP3
+    ----        ----        ----        ----        ----        ----
+
+                 Communication Lost
+                 <------------
+
+     Out of Service
+     <------------
+
+     Retrieve BSN
+     ------------>
+
+                 (M2PA locates
+                  first gap in
+                  received messages)
+
+     Indicate BSN
+     <------------
+
+     XCO (BSN) on another link
+     ------------------------------------------------------------>
+
+                                                      Retrieve BSN
+                                                     <------------
+
+                                                      Indicate BSN
+                                                     ------------>
+
+                                                         XCA (BSN)
+     <------------------------------------------------------------
+
+     Retrieval Request
+     and FSNC (FSNC = 
+     BSN from XCA message)
+     ------------>
+
+                 (M2PA locates
+                  first gap in
+                  acknowledgements)
+
+     Retrieved Message
+     <------------
+     
+     Retrieved Message
+     <------------
+
+     Retrieval Complete
+     <------------
+
+     Send messages on another link.
+
+
+George, et al                                                [Page 31]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+6. Security
+
+SCN adaptation layers rely on SCTP to provide security.
+ 
+
+7.  IANA Considerations
+
+The SCTP (and UDP/TCP) Registered User Port Number Assignment for M2PA
+is TBD.
+
+The value assigned by IANA for the Payload Protocol Identifier in the
+SCTP Payload Data chunk is 
+
+        M2PA     TBD
+
+The SCTP Payload Protocol Identifier is included in each SCTP Data
+chunk, to indicate which protocol the SCTP is carrying. This Payload
+Protocol Identifier is not directly used by SCTP but may be used by
+certain network entities to identify the type of information being
+carried in a Data chunk.
+
+The User Adaptation peer may use the Payload Protocol Identifier as a
+way of determining additional information about the data being
+presented to it by SCTP.
+
+8.  Acknowledgements
+
+The authors would like to thank Brian Tatum and Ian Rytina for their
+valuable comments and suggestions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 32]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+9.  References
+
+[1] ITU-T Recommendation Q.700, 'Introduction To ITU-T Signalling 
+    System No. 7 (SS7)'
+
+[2] ITU-T Recommendation Q.701-Q.705, 'Signalling System No. 7 
+    (SS7) - Message Transfer Part (MTP)'
+
+[3] Bellcore GR-246-CORE 'Bell Communications Research Specification
+    of Signaling System Number 7', Volume 1, December 1995
+
+[4] RFC 2719, Framework Architecture for Signaling Transport, 
+    October 1999
+
+[5] RFC 2960, Stream Control Transmission Protocol,
+    October 2000
+
+[6] SS7 MTP2-User Adaptation Layer, draft-ietf-sigtran-m2ua-05.txt, 
+    November 2000
+
+[7] ITU-T Recommendation Q.2210, 'Message transfer part level 3
+    functions and messages using the services of ITU-T 
+    Recommendation Q.2140'
+
+[8] Bradner, S. "Key words for use in RFCs to Indicate Requirement
+    Levels", BCP 14, RFC 2119, March 1997.
+
+[9] Telecommunication Technology Committee (TTC) Standard JT-Q704,
+    'Message Transfer Part Signaling Network Functions', 
+    April 28, 1992.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 33]
+
+
+Internet Draft  SS7 MTP2-User Peer-to-Peer Adaptation Layer   Nov 2000
+
+10.  Author's Addresses
+
+Tom George                                        Tel: +1-972-519-3168
+Alcatel USA                          EMail: tom.george@usa.alcatel.com
+1000 Coit Road          
+Plano, TX 75075    
+USA
+
+Ram Dantu, Ph.D.                    Tel: +1-972-234-6070 extension 211
+IPmobile                                    EMail: rdantu@ipmobile.com
+1651 North Glenville, Suite 216
+Richardson, TX 75081
+USA
+
+Malleswar Kalla                                   Tel: +1-973-829-5212
+Telcordia Technologies             EMail: kalla@research.telcordia.com
+MCC 1J211R
+445 South Street
+Morristown, NJ 07960
+USA
+
+Hanns Juergen Schwarzbauer                       Tel: +49-89-722-24236
+SIEMENS AG                    HannsJuergen.Schwarzbauer@icn.siemens.de
+Hofmannstr. 51
+81359 Munich
+Germany
+
+Greg Sidebottom                                   Tel: +1-613-763-7305
+Nortel Networks                     EMail: gregside@nortelnetworks.com
+3685 Richmond Rd,
+Nepean, Ontario 
+Canada  K2H5B7
+
+Ken Morneault                                     Tel: +1-703-484-3323
+Cisco Systems Inc.                           EMail: kmorneau@cisco.com
+13615 Dulles Technology Drive
+Herndon, VA. 20171
+USA
+
+
+This Internet Draft expires May 2001.
+
+
+
+
+
+
+
+
+
+
+
+
+George, et al                                                [Page 34]

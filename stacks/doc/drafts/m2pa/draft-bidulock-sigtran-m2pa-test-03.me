@@ -1,0 +1,4393 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) draft-bidulock-sigtran-m2pa-test-00.me,v 0.7.8.5 2001/12/17 11:47:22 brian Exp
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" (0.7.8.5) modified 2001/12/17 11:47:22 by brian
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X pp
+move-punctuation
+discard YZ
+join-authors ", " ", " ", "
+et-al " et al" 1 2
+# reverse A
+.R2
+.de $0
+.(x 0
+\\$2 \\$1
+.)x
+..
+.if '\*(.T'ascii' \{\
+.fo 'B. Bidulock'Version 0.3'FORMFEED[Page %]'
+.ds |x txt
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii 6n
+.nr pi 4n
+.nr po 3n
+.nr bi 2n
+.\}
+.if '\*(.T'ps' \{\
+.fo 'B. Bidulock'Version 0.3'Page %'
+.ds |x ps
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii 0.5i
+.nr pi 0.5i
+.nr po 0.25i
+.nr bi 0.25i
+.nr hi 0.5i
+.\}
+.dn &n
+.dn &p
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.de $1
+.ds &f Figure \\n($1-
+.\".if \\n(&n>1 .bp
+.nr &n 1
+.nr &p 0
+..
+.de $2
+.ds &f Figure \\n($1.\\n($2-
+.\".if \\n(&n>1 .bp
+.nr &n 1
+.nr &p 0
+..
+.de $3
+.ds &f Figure \\n($1.\\n($2.\\n($3-
+.\".if \\n(&n>1 .bp
+.nr &n 1
+.nr &p 0
+..
+.de $4
+.\".if \\n(&n>1 .bp
+..
+.de |f
+.fi
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 1
+\\*(&f\\n(&n \\$1
+.)x
+.nr &p \\n(&n
+.nr &n +1
+..
+.bp
+.he 'Internet Draft'M2PA-TEST'March 29, 2003'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 2
+Expires in six months;;March 29, 2003
+.bl 2
+.TE
+.(l C
+\fB\
+SS7 MTP2-User Peer-to-Peer Adaptation Layer
+Test Specifications
+M2PA-TEST
+<draft-bidulock-sigtran-m2pa-test-03.\*(|x>
+
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Internet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet Draft provides information for the Internet community on test
+cases for testing the SS7 M2P2-User Peer-to-Peer Adaptation Layer
+.[
+m2pa-07
+.]
+based on the conformance test specifications for SS7 MTP Level 2.
+.[
+q781
+.]
+.sh 1 "Introduction"
+.lp
+This draft provides a set of detailed tests of the SS7 MTP2-User Peer-to-Peer
+Adaptation Layer
+.[
+m2pa-07
+.]
+based on the test specifications for SS7 MTP Level 2.
+.[
+q781
+.]
+These tests are intended to validate the SS7 MTP2-User Peer-to-Peer Adaptation
+Layer (M2PA) protocol.
+.[
+m2pa-07
+.]
+.lp
+These tests attempt to completely validate the M2PA protocol without
+redundancy.  Each test is described as simply as possible to check precisely
+the elementary function of the protocol.  The tests are listed in no specific
+order\*#.
+.(d
+.ip \*#
+An implementation of M2PA which conforms to these test specifications and a
+test program which executes these tests are available from
+http://www.openss7.org/downloads.html/.
+.)d
+.sh 2 "Change History"
+.sh 3 "Changes from draft-bidulock-sigtran-m2pa-test-02"
+.np
+The test specification has been updated to M2PA Draft Revision 7,
+.[
+m2pa-07
+.]
+with anticipated changes for M2PA Draft Revision 8.
+.[
+m2pa-08
+.]
+.sh 3 "Changes from draft-bidulock-sigtran-m2pa-test-01"
+.np
+The test specification has been updated to M2PA Draft Revision 6,
+.[
+m2pa-06
+.]
+with anticipated changes for M2PA Draft Revision 7.
+.[
+m2pa-07
+.]
+.np
+M2PA Draft Revision 6
+.[
+m2pa-06
+.]
+provides for acknowledgment of DATA messages using a special DATA message
+which contains no data payload.  This message has been labeled "DATA-ACK" in
+the diagrams.
+
+This has resulted in changes to test cases 1.6, 2.1, 2.2, 2.3, 2.4, 3.2, 3.4,
+3.6, 3.8, 4.1, 8.1, 8.3, 8.4, 8.5, 8.9, 8.10, 8.11, 10.2
+.np
+Although M2PA Draft Revision 6
+.[
+m2pa-06
+.]
+specifies that the DATA-ACK message should have its Forward Sequence Number
+(FSN) incremented as with any other normal DATA message, this causes problems
+in that the DATA-ACK must them be acknowledged.  This test specification
+anticipates M2PA Draft Revision 7 by not incrementing FSN for DATA-ACK messages.
+.np
+M2PA Draft Revision 6
+.[
+m2pa-06
+.]
+provides FSN and BSN sequence numbers in STATUS messages as well as DATA
+messages.  It has been proposed that STATUS messages not contain FSN and BSN
+because they should essentially be ignored because of mis-ordering
+possibilities.  Therefore, FSN and BSN of STATUS messages are ignored in this
+version of the test specification in anticipation of M2PA Draft Revision 7.
+.sh 3 "Changes from draft-bidulock-sigtran-m2pa-test-00"
+.np
+The test specification has been updated to M2PA Draft Revision 4,
+.[
+m2pa-04
+.]
+with anticipated changes for M2PA Draft Revision 5.
+.[
+m2pa-05
+.]
+.np
+M2PA Draft Revision 4
+.[
+m2pa-04
+.]
+no longer contains a special proving message.  Status PROVING-NORMAL or
+PROVING-EMERGENCY messages are padded and sent repeatedly to accomplish
+proving during the proving period.  The occurrence of PROVING messages has been
+removed from the test cases to update this draft to match the M2PA draft revision 4.
+.[
+m2pa-04
+.]
+.np
+M2PA Draft Revision 4
+.[
+m2pa-04
+.]
+contains both forward and backward sequence numbers (FSN, BSN).  The test
+cases were updated to include the sequence numbers (where other than zero) and
+test cases were added for abnormal backward sequence numbers.
+.np
+M2PA Draft Revision 4
+.[
+m2pa-04
+.]
+has no formal method for acknowledging the receipt of a DATA message when
+there are no other messages to send (DATA or STATUS).  The Status of
+"In Service", for which no other use has been specified in the current draft,
+.[
+m2pa-04
+.]
+is used as such an explicit acknowledgment.  Another possibility would have
+been to send a DATA message with no data in it.
+The old "ACK" message is now labeled "IN-SERVICE".
+.np
+The status message previously labeled "IN-SERVICE" has been relabeled
+"READY" to better reflect the name of that status message in the draft and to
+not conflict with the new
+.[
+m2pa-04
+.]
+"IN-SERVICE" status message.
+.sh 1 "Test Environment"
+.sh 2 "Test Configurations"
+.dn |n
+.nr |n \n(&n+1
+.lp
+A single M2PA link is used in the tests.  \fI\*(&f\n(&n\fR and
+\fI\*(&f\n(|n\fR show a single link between IUT and PT.  In \fITest
+Configuration 1\fR as shown in \fI\*(&f\n(&n\fR, PT initiates the association.
+In \fITest Configuration 2\fR as shown in \fI\*(&f\n(|n\fR, IUT initiates the
+association.  Test specifications in both configurations are written to test
+the M2PA at IUT .
+.rr |n
+.(b C
+\fC\
+ ________            Link 1           ________\ 
+|        |       SCTP Association    |        |
+|   PT   |-------------------------->|  IUT   |
+|________|                           |________|
+NOTE:   PT initiates the association
+.|f "Test Configuration 1"
+.)b
+.(b C
+\fC\
+ ________            Link 1           ________\ 
+|        |       SCTP Association    |        |
+|   PT   |<--------------------------|  IUT   |
+|________|                           |________|
+NOTE: IUT  initiates the association
+.|f "Test Configuration 2"
+.)b
+.sh 2 "Recommended IUT Settings"
+.sh 3 "Timer Values"
+.lp
+It is recommended that the following timer values be configured at the IUT for
+the purposes of performing these validation tests:
+.(l I F
+.ip "T1"
+45 seconds
+.ip "T2"
+5 seconds
+.ip "T2l"
+20 seconds
+(not applicable)
+.ip "T2h"
+100 seconds
+(not applicable)
+.ip "T3"
+1 second
+.ip "T4n"
+8 seconds
+.ip "T4e"
+0.5 seconds
+.ip "T5"
+0.1 seconds
+(not applicable)
+.ip "T6"
+4 seconds
+.ip "T7"
+1 second
+.ip "T8"
+0.1 seconds
+(not applicable)
+.)l
+.sh 3 "Buffer Threshold Values"
+.lp
+It is recommended that the following buffer threshold values be configured at
+the IUT for the purpose of performing these validation tests:
+.(l I F
+.ip "N1"
+(not applicable)
+.ip "N2"
+127 messages
+.)l
+.sh 3 "MSU Length"
+.lp
+It is illustrated that all DATA messages which are sent have a payload length
+of 35 bytes.  This, however, is not essential to the correct performance of
+the tests and is an arbitrary choice.  Use of different valid MSU lengths
+should not have an affect of the results.
+.sh 1 "Tests"
+.sh 2 "Link State Control - Expected signal units/orders"
+.sh 3 "Initialization (Power-up)"
+.lp
+These tests check that the IUT enters the correct state upon establishment of
+the SCTP association.  Establishing the association at both peers is the
+equivalent to the Q.703 "Power On".  The correct behavior is for both M2PA
+peers to send a status "Out of Service" and enter the "Out of Service" state.
+These test are useful both for Validation and Compatibility testing.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.1(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|             :power on                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :power on              |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Initialization (Power-up)"
+.)b
+.ip "Test Description:"
+.np
+The test begins with both the PT and the IUT in the "Power Off" state.
+.np
+The "Power On" command is issued at the PT and then the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message enters and remains
+in the "Out of Service" state.
+.np
+Repeat the test in the opposite direction as shown below.
+.sh 4 "Reverse Direction"
+.lp
+This is the test repeated in the opposite direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.1(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :power on              |
+|                        <-----------------  OUT-OF-SERVICE         |
+|             :power on                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Initialization (Power-up)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both the PT and the IUT in the "Power Off" state.
+.np
+The "Power On" command is issued at the IUT and then the PT.
+.np
+Check that the IUT sends a status "Out of Service" message enters and remains
+in the "Out of Service" state.
+.sh 3 "Timer T2"
+.lp
+This test validates the T2 (Not Aligned) timer and procedure at the IUT.  This
+is the duration of time that the M2PA peer will wait to receive a status
+"Alignment" message after sending a status "Alignment" message.
+.(b C
+Reference:  Q.781/Test 1.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                              !                                    |
+|                              !  T2         5.0 <= T2 <= 150.0     |
+|                              !                                    |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(AERM)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Timer T2"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both the PT and the IUT in the "Out of Service" state.
+.np
+The "Start" command is issued at the IUT.
+.np
+Check that the IUT sends a status "Alignment" message.
+.np
+Check that the IUT sends a status "Out of Service" and issues an "Out of
+Service" indication to Level 3 with reason "Alignment Not Possible".
+.np
+Check that T2 is between 5.0 seconds and 150.0 seconds in duration.
+.np
+The IUT should stay in the "Out of Service" state.
+.sh 3 "Timer T3"
+.lp
+This test validates the T3 (Aligned) timer and procedure at the IUT.  This is
+the duration of time that the M2PA peer will wait to receive a status "Proving
+Normal" or status "Proving Emergency" message from the M2PA peer after sending
+status "Proving Normal" or status "Proving Emergency".
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                              !                                    |
+|                              !  T3         1.0 <= T3 <= 1.5       |
+|                              !                                    |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(AERM)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Timer T3"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both the PT and the IUT in the "Out of Service" state.
+.np
+The Level 3 "Start" command  is issued at the IUT.
+.np
+Check that the IUT sends a status "Alignment" message.
+.np
+Send a status "Alignment" message to the IUT.
+.np
+Check that the IUT response with a status "Proving Normal" message.
+.np
+Check that the link goes out of service for reason "Alignment Not Possible".
+.np
+Check that T3 is between 1.0 seconds and 1.5 seconds in duration.
+.sh 3 "Timer T1 & Timer T4 (Normal)"
+.lp
+This test validates the T4(Normal) (Proving) and T1 (Aligned Ready) timers and
+procedures at the IUT.  T4 is the duration of time that the M2PA peer will
+wait to complete proving.  T1 is the duration that the M2PA peer will wait to
+receive a status "Ready" or a status "Processor Outage" message from the
+M2PA peer after sending a status "Ready" or status "Processor Outage"
+message.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                              !                                    |
+|                              |  T4(Pn)     7.5 <= T4 <= 9.5       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                              !                                    |
+|                              !  T1         40.0 <= T1 <- 50.0     |
+|                              !                                    |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(T1)    |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Timer T1 & Timer T4 (Normal)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both the PT and the IUT in the "Out of Service" state.
+.np
+The Level 3 "Start" command is issued at the IUT.
+.np
+Check that the IUT sends a status "Alignment" message.
+.np
+Send a status "Alignment" message to the IUT and exchange status "Proving
+Normal" and proving data messages.
+.np
+Check that a status "Ready" message is received from the IUT within time
+T4.
+.np
+Check that T4 is between 7.5 seconds and 9.5 seconds in duration.
+.np
+Check that a status "Out of Service" message is received from the IUT within
+time T1 and that an "Out of Service" indication is given to Level 3 at the
+IUT with reason "T1 Timeout".
+.np
+Check that T1 is between 40.0 seconds and 50.0 seconds in duration.
+.sh 3 "Normal alignment procedure"
+.lp
+This test case validates the normal alignment procedure at the IUT.  This is a
+normal successful alignment procedure which results in the link going to and
+staying in the "Ready" state.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.5(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment procedure"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link "Out of Service".
+.np
+The Level 3 "Start" command is issued at the IUT and the PT.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends a status "Ready" message and indicates "In
+Service" to Level 3.
+.np
+Check that the link maintains the "In Service" state.
+.sh 4 "Reverse Direction"
+.lp
+The equivalent Q.781 test case is normally repeated with with 2-byte LSSUs
+instead of 1-byte LSSUs when testing Q.703 links.
+The effect of sending 2-byte LSSUs is simulated by adding a "filler" to the
+status message.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.5(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment procedure"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link "Out of Service".
+.np
+The Level 3 "Start" command is issued at the IUT and the PT.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends a status "Ready" message and indicates "In
+Service" to Level 3.
+.np
+Check that the link maintains the "In Service" state.
+.sh 3 "Normal alignment procedure - correct procedure (Data)"
+.lp
+The test case validates the normal alignment procedure at the IUT when a DATA
+message is used instead of a status "Ready" to complete the alignment
+procedure.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.6
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                        <--[0001, 0000]---  DATA-ACK               |
+|                                            !in service            |
+|                                            !msu                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment procedure (Data)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link "Out of Service".
+.np
+The Level 3 "Start" command is issued at the IUT and the PT.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends a status "Ready" message and indicates "In
+Service" to Level 3.
+.np
+Check that the IUT acknowledges the Data message with a status "Data Ack" message.
+.np
+The IUT should maintain the "In Service" state.
+.sh 3 "Status ""Alignment"" received during normal proving period"
+.lp
+This test case validates that the IUT restarts the alignment and proving
+procedure when receiving a status "Alignment" message in the "Proving" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.7
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                              !                                    |
+|                              !  T4(Pn)     7.5 <= T4 <= 9.5       |
+|                              !                                    |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Alignment"" during normal proving"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and the PT.
+.np
+When normal proving begins, wait for half the duration of T4 and
+then send the IUT a status "Alignment" message.
+.np
+Check that the IUT restarts the proving period and sends a status
+"Ready" message T4 after the last status "Alignment" message was sent to
+the IUT.
+.np
+Check that T4(Pn) is between 7.5 seconds and 9.5 seconds in duration.
+.sh 3 "Normal alignment with PO set"
+.lp
+This case tests the normal alignment procedure where one M2PA peer is
+experiencing a local processor outage before and during alignment.  The M2PA
+peers should still align and the link should go into service at Level 3.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.8(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment with PO set"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the IUT
+and the "Start" command at the PT.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends status "Processor Outage" message and indicates "In
+Service" to Level 3.
+.np
+Check that the link maintains the "In Service" state at the IUT.
+.sh 4 "Reverse Direction"
+.lp
+This case is the same test in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.8(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|              :set lpo                                             |
+|                :start                                             |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            !rpo                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment with PO set"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Local Processor Outage" and "Start" command at the PT and
+the "Start" command at the IUT.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends status "Ready" message and indicates "Remote
+Processor Outage" indication to Level 3.
+.np
+Check that the link maintains the "In Service" state at the IUT.
+.sh 3 "Normal alignment with PO set (Data)"
+.lp
+This test case validates the normal alignment procedure at the IUT in the
+"Processor Outage" state when a Data message is used instead of an
+"Ready" message to complete the alignment procedure.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.9(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment with PO set (Data)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the
+IUT.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends status "Processor Outage" message and send a Data
+message to the IUT to complete the alignment procedure.
+.np
+Check that the IUT does not acknowledge the Data message.
+.np
+Check that the IUT maintains the "Processor Outage" state.
+.sh 4 "Reverse Direction"
+.lp
+This is the same test in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.9(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|              :set lpo                                             |
+|                :start                                             |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                                            :msu                   |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|      PROCESSOR-OUTAGE  ---[0000, 0001]-->                         |
+|                                            !rpo                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment with PO set (Data)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the PT
+and the "Start" command at the IUT.
+.np
+Provide an MSU for transmission at the IUT before the proving period ends.
+.np
+Check that the IUT sends the message sequence illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT completes the proving process with the MSU and indicates
+"Remote Processor Outage" to Level 3.
+.np
+Check that the IUT maintains the "Processor Outage" state and does not require
+acknowledgment of the Data message used to complete alignment.
+.sh 3 "Normal alignment with PO set and cleared"
+.lp
+This case tests that if the local processor outage condition is set and
+cleared before the alignment procedure starts that normal alignment is
+performed and no status "Processor Outage" message is sent to the M2PA peer.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.10
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :clear lpo             |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Normal alignment with PO set and cleared"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage," "Clear Local Processor Outage"
+and "Start" commands at the IUT and "Start" command at the PT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT completes the alignment procedure and sends the status
+"Ready" message and indicates "In Service" to Level 3.
+.sh 3 "Set RPO when ""Aligned not ready"""
+.lp
+This test case validates the behavior of the IUT when processor outage
+condition is set at both the PT and the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.11
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|              :set lpo                                             |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            !rpo                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set RPO when ""Aligned Not Ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the IUT
+and PT.
+.np
+Check that the alignment procedure follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends status "Processor Outage" and indicates "Remote
+Processor Outage" to Level 3.
+.sh 3 "Status ""Out of Service"" received when ""Aligned not ready"""
+.lp
+These test cases validate the behavior of the IUT when it receives a status
+"Out of Service" message in the "Aligned Not Ready" state or sends a Status
+"Out of Service" message when the M2PA peer is in the "Aligned Not Ready"
+state.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.12(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                 :stop                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(SIOS)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Out of Service"" when ""Aligned not ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the IUT
+and the "Start" command at the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT sends a status "Processor Outage" message when it completes
+the initial alignment procedure and issue a Level 3 "Stop" command at the PT.
+.np
+Check that the IUT sends status "Out of Service" and indicates "Out of
+Service" to Level 3 with the reason "Received SIOS".
+.sh 4 "Reverse Direction"
+.lp
+The test is repeated in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.12(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|              :set lpo                                             |
+|                :start                                             |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                                            :stop                  |
+|                 READY  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Out of Service"" when ""Aligned not ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the sequence of events follows those illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT goes to the "In Service" state, issue the Level 3 "Stop" command
+at the IUT.
+.np
+Check that the IUT sends the status "Out of Service" message.
+.sh 3 "Status ""Alignment"" received when ""Aligned not ready"""
+.lp
+This test case validates the behavior of the IUT when it receives a status
+"Alignment" message in the "Aligned Not Ready" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.13
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(SIO)   |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Alignment"" when ""Aligned not ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the
+IUT and "Start" command at the PT.
+.np
+Check that the sequence of events follows the normal alignment procedure
+illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends the status "Processor Outage" message, send a status
+"Alignment" message to the IUT.
+.np
+Check that the IUT sends the status "Out of Service" message and indicates
+"Out of Service" to Level 3 with reason "Received SIO".
+.sh 3 "Set and clear LPO when ""Initial alignment"""
+.lp
+This test case validates the behavior of the IUT when it receives Level 3 "Set
+Local Processor Outage" and "Clear Local Processor Outage" commands in the
+"Initial Alignment" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.14
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                                            :set lpo               |
+|        PROVING-NORMAL  ----------------->                         |
+|                                            :clear lpo             |
+|                        <-----------------  READY                  |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set and clear LPO when ""Initial Alignment"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and PT.
+.np
+Issue the Level 3 "Set Local Processor Outage" command at the IUT when the IUT
+begins initial alignment.
+.np
+Issue the Level 3 "Clear Local Processor Outage" command at the IUT before the
+IUT completes initial alignment.
+.np
+Check that the IUT sends the status "Ready" message when it completes
+initial alignment and that the "In Service" indication is given to Level 3 at
+the IUT.
+.sh 3 "Set and clear LPO when ""Aligned ready"""
+.lp
+This test case validates the behavior of the IUT when it receives the Level 3
+"Set Local Processor Outage" and "Clear Local Processor Outage" commands in
+the "Aligned Ready" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.15
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                                            :set lpo               |
+|                 READY  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                                            !in service            |
+|                                            :clear lpo             |
+|                        <-----------------  PROCESSOR-OUTAGE-ENDED |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set and clear LPO when ""Aligned ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at both the IUT and the PT.
+.np
+Check that the IUT follows the normal alignment procedure and sequence of
+events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT has completed the initial alignment procedure, issues the Level 3
+"Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message and indicates "In
+Service" to Level 3 at the IUT.
+.np
+Issue the Level 3 "Clear Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage Ended" message and enters
+the "In Service" state.
+.sh 3 "Timer T1 in ""Aligned not ready"" state"
+.lp
+This test case validates the T1 timer and procedures at the IUT when the IUT
+is in the "Aligned Not Ready" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.16
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                              !                                    |
+|                              !  T1         40.0 <= T1 <= 50.0     |
+|                              !                                    |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(T1)    |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Timer T1 in ""Aligned not ready"" state"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the IUT
+and "Start" command at the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR
+while completing the initial alignment procedure.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 with reason "T1 Timeout".
+.np
+Check that T1 is between 40.0 seconds and 50.0 seconds in duration.
+.sh 3 "No status ""Alignment"" sent during normal proving period"
+.lp
+This test validates that the normal alignment procedure completes at the IUT
+when no status "Alignment" message is sent.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.17
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                              !                                    |
+|                              !  T3+T4(Pn)  7.5 <= T3+T4 <= 11.0   |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "No ""Alignment"" during normal proving period"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at both the IUT and the PT.
+.np
+Respond to status "Alignment" message sent by the IUT with a status "Proving
+Normal" message and continue proving.
+.np
+Check that the IUT sends a status "Ready" message within T4(Pn) plus T3.
+.np
+Check that the delay from the start of the proving period to the status
+"Ready" message T4(Pn)+T3 is between 7.5 seconds and 11.0 seconds in
+duration.
+.sh 3 "Set and cease emergency prior to ""start alignment"""
+.lp
+This test case validates the behavior of the IUT when the Level 3 "Set
+Emergency" and "Clear Emergency" commands are issued prior to the Level 3
+"Start" command at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.18
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set emergency         |
+|                                            :clear emergency       |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                              !                                    |
+|                              !  T4(Pn)     7.5 <= T4 <= 10.0      |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Toggle emergency before ""start alignment"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Emergency," "Clear Emergency" then "Start" commands at
+the IUT and "Start" command at the PT.
+.np
+Check that the sequence of events are as illustrated in
+\fI\*(&f\n(&p\fR.
+Check that the IUT sends a status "Proving Normal" message in response to the
+"Alignment" message.
+.np
+Check that the IUT sends a status "Ready" message.
+.np
+Check that the IUT uses a normal proving period by timing the delay from the
+status "Proving Normal" message to the status "Ready" message sent by the
+IUT.
+.np
+Check that T4 is between 7.5 seconds and 10.0 seconds in duration.
+.sh 3 "Set emergency while in ""not aligned"" state"
+.lp
+This test case validates the behavior of the IUT when the Level 3 "Set
+Emergency" command is issued at the IUT immediately after the Level 3 "Start"
+command (when the IUT is in the "Not Aligned" state).
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.19
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                                            :set emergency         |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-EMERGENCY      |
+|     PROVING-EMERGENCY  ----------------->                         |
+|                              !                                    |
+|                              !  T4(Pe)     0.4 <= T4 <= 0.6       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set emergency in ""not aligned"" state"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" and "Set Emergency" commands at the IUT and "Start"
+command at the PT.
+.np
+Check that the sequence of events are as illustrated in
+\fI\*(&f\n(&p\fR.
+Check that the IUT sends a status "Proving Emergency" message in response to
+the "Alignment" message.
+.np
+Check that the IUT sends a status "Ready" message.
+.np
+Check that the IUT uses an emergency proving period by timing the delay from
+the status "Proving Emergency" message to the status "Ready" message sent
+by the IUT.
+.np
+Check that T4 is between 0.4 seconds and 0.6 seconds in duration.
+.sh 3 "Set emergency when ""aligned"""
+.lp
+This test case validates the response of the IUT to the Level 3 "Set
+Emergency" command when issued in the "Aligned" state at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.20
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                                            :set emergency         |
+|                        <-----------------  PROVING-EMERGENCY      |
+|                              !                                    |
+|                              !  T4(Pe)     0.4 <= T4 <= 0.6       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set emergency when ""aligned"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the normal alignment procedure starts as illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Before the normal proving period completes, issue the Level 3 "Set Emergency"
+command at the ITU.
+.np
+Check that the IUT sends a status "Proving Emergency" message and later
+follows with a status "Ready" message.
+.np
+Check that the IUT begins an emergency proving period by timing the delay from
+the status "Proving Emergency" message to the status "Ready" message.
+.np
+Check that T4 is between 0.4 seconds and 0.6 seconds in duration.
+.sh 3 "Both ends set emergency."
+.lp
+This test case validates the IUT behavior when the Level 3 "Set Emergency"
+command is issued at both ends of the link before the Level 3 "Start" command.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.21
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set emergency         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-EMERGENCY      |
+|     PROVING-EMERGENCY  ----------------->                         |
+|                              !                                    |
+|                              !  T4(Pe)     0.4 <= T4 <= 0.6       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Both ends set emergency"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Emergency" and "Start" commands at the IUT and the
+"Start" command at the PT.
+.np
+Check that the IUT starts the emergency alignment procedure by sending a
+status "Proving Emergency" message.
+.np
+Check that the IUT follows the sequence of events as illustrated in
+\fI\*(&f\n(&p\fR.
+Check that the IUT completes the alignment
+procedure and sends a status "Ready" message.
+.np
+Check that the IUT uses an emergency proving period by timing the delay
+between sending the status "Proving Normal" message and the status
+"Ready" message.
+.np
+Check that T4 is between 0.4 seconds and 0.6 seconds in duration.
+.sh 3 "Individual end sets emergency"
+.lp
+This test case validates the behavior of the IUT when emergency is
+individually set at the PT before the initial alignment procedure begins.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.22
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|            :set emerg                                             |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|     PROVING-EMERGENCY  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                              !                                    |
+|                              !  T4(Pe)     0.4 <= T4 <= 0.6       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Individual end sets emergency"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Emergency" and "Start" commands at the PT and the
+"Start" command at the IUT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Check that the IUT uses the emergency proving period by timing the delay
+between the status "Proving Normal" message and the status "Ready"
+message.
+.np
+Check that T4 is between 0.4 seconds and 0.6 seconds in duration.
+.sh 3 "Set emergency during normal proving"
+.lp
+This test case validates the IUT behavior when it receives a Level 3 "Set
+Emergency" command after it has already commenced normal proving.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.23
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                                            :set emergency         |
+|                        <-----------------  PROVING-EMERGENCY      |
+|                              !                                    |
+|                              !  T4(Pe)     0.4 <= T4 <= 0.6       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set emergency during normal proving"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Before the normal proving period completes at the IUT, issue the Level 3 "Set
+Emergency" command at the IUT.
+.np
+Check that the IUT sends a status "Proving Emergency" message and continues
+proving.
+.np
+Check that the IUT sends a status "Ready" message.
+.np
+Check that the IUT uses an emergency proving period by timing the delay
+between the status "Proving Emergency" message and the status "Ready"
+message.
+.np
+Check that T4 is between 0.4 seconds and 0.6 seconds in duration.
+.sh 3 "No status ""Alignment"" sent during emergency alignment"
+.lp
+This test case validates the response of the IUT to receiving a status "Proving
+Normal" without a status "Alignment" during initial alignment using an
+emergency proving period.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.24
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set emergency         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|     PROVING-EMERGENCY  ----------------->                         |
+|                        <-----------------  PROVING-EMERGENCY      |
+|                              !                                    |
+|                              !  T4(Pe)     0.4 <= T4 <= 0.6       |
+|                              !                                    |
+|                        <-----------------  READY                  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "No ""Alignment"" during emergency alignment"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Emergency" and "Start" commands at both the IUT and PT.
+.np
+Check that the IUT sends a status "Proving Emergency" message and starts
+proving.
+.np
+Check that the IUT completes proving and sends a status "Ready" message.
+.np
+Check that the IUT uses an emergency proving period by timing the delay
+between the status "Proving Emergency" message and the status "Ready"
+message.
+.np
+Check that T4 is between 0.4 seconds and 0.6 seconds in duration.
+.sh 3 "Deactivation during initial alignment"
+.lp
+This test case validates the behavior of the IUT in response to the Level 3
+"Stop" command issued during the "Initial Alignment" state at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.25
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivate during initial alignment"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT.
+.np
+Before timer T2 expires, issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and stays in the
+"Out of Service" state.
+.sh 3 "Deactivation during aligned state"
+.lp
+This test case validates the behavior of the IUT in response to the Level 3
+"Stop" command issued during "Aligned" state at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.26
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivate during aligned state"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+Issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and stays in the
+"Out of Service" state.
+.sh 3 "Deactivation during aligned not ready"
+.lp
+This test case validates the behavior of the IUT in response to the Level 3
+"Stop" command issued during the "Aligned Not Ready" state at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.27
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivate during aligned not ready"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the IUT
+and the "Start" command at the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR
+and sends a status "Processor Outage" message.
+.np
+Issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and stays in the
+"Out of Service" state.
+.sh 3 "Status ""alignment"" received during link in service"
+.lp
+This test case validates the IUT response to receiving a status "Alignment"
+message in the "In Service" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.28
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(SIO)   |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Alignment"" during link in service"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send a status "Alignment" to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 with reason "Received SIO".
+.sh 3 "Status ""out of service"" received during link in service"
+.lp
+This test case validates the response of the IUT to sending or receiving a
+status "Out of Service" message in the "In Service" state.
+.sh 4 "Forward Direction"
+.lp
+The test case is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.29(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                 :stop                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(SIOS)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Out of service"" during link in service"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Stop" command at the PT and send a status "Out of Service"
+message to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to the Level 3 at the IUT with reason "Received SIOS".
+.sh 4 "Reverse Direction"
+.lp
+The test case is repeated in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.29(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Out of service"" during link in service"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and stays in the
+"Out of Service" state.
+.sh 3 "Deactivation during LPO"
+.lp
+These test cases validate the response of the IUT to sending a status "Out
+of Service" message while in the "Processor Outage" state with LPO set, or
+receiving an "Out of Service" message from an M2PA peer in the "Processor
+Outage" state with RPO set.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.30(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivation during LPO"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and stays in the
+"Out of Service" state.
+.sh 4 "Reverse Direction"
+.lp
+The test is repeated in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.30(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|              :set lpo                                             |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                 :stop                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !rpo                   |
+|                                            !out of service(SIOS)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivation during LPO"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Stop" commands at the PT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Received SIOS".
+.sh 3 "Deactivation during RPO"
+.lp
+These test cases validate the response of the IUT to sending a status "Out of
+Service" message while in the "Processor Outage" state with RPO set, or
+receiving an "Out of Service" message from an M2PA peer in the "Processor
+Outage" state with LPO set.
+.sh 4 "Forward Direction"
+.lp
+The test is performed in the forward direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.31(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivation during RPO"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" command at the PT and send a
+status "Processor Outage" message to the IUT.
+.np
+Issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends the status "Out of Service" message and remains in
+the "Out of Service" state.
+.sh 4 "Reverse Direction"
+.lp
+The test is repeated in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.31(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                 :stop                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivation during RPO"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Issue the Level 3 "Stop" command at the PT and send the status "Out of
+Service" message.
+.np
+Check that the IUT does not indicate "Out of Service" until the local
+processor outage condition recovers.
+.sh 3 "Deactivation during the proving period"
+.lp
+These test cases validate the response of the IUT to deactivation (sending or
+receiving a status "Out of Service" message) during the proving period.
+.sh 4 "Forward Direction"
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.32(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                 :stop                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(AERM)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivation during the proving period"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+During the proving period, issue the Level 3 "Stop" command at the PT and send
+status "Out of Service" to the ITU.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Alignment Not Possible".
+.sh 4 "Reverse Direction"
+.lp
+The test is repeated in the reverse direction.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.32(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                :start                                             |
+|                                            :start                 |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                        <-----------------  ALIGNMENT              |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Deactivation during the proving period"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue the Level 3 "Start" command at the PT and the IUT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+During the proving period, issue a Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and remains in the
+"Out of Service" state.
+.sh 3 "Status ""Alignment"" received instead of status ""Ready"""
+.lp
+This test case validates the response of the IUT to receiving a status
+"Alignment" message instead of a status "Ready" or "Processor Outage"
+message at the completion of initial alignment.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.33
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(SIO)   |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Alignment"" instead of ""In Service"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue a Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends a status "Ready" message, send a status "Alignment"
+message to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Received SIO".
+.sh 3 "Status ""Out of Service"" received instead of status ""Ready"""
+.lp
+This test case validates the response of the IUT to receiving a status "Out of
+Service" message instead of a status "Ready" or "Processor Outage"
+message at the completion of initial alignment.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.34
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                 :stop                                             |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(SIOS)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Out of Service"" instead of ""In Service"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue a Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends a status "Ready" message, send a status "Out of
+Service" message to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Received SIOS".
+.sh 3 "Status ""Processor Outage"" received instead of status ""Ready"""
+.lp
+This test case validates the response of the IUT to receiving a status
+"Processor Outage" message instead of a status "Ready" message at the
+completion of initial alignment.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 1.35
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|              :set lpo                                             |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            !rpo                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f """Processor Outage"" instead of ""In Service"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "Out of Service" state.
+.np
+Issue a Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the sequence of events follows that illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends a status "Ready" message, issue a Level 3 "Set Local
+Processor Outage" command at the PT and send a status "Processor Outage"
+message to the IUT.
+.np
+Check that the IUT indicates "Remote Processor Outage" to Level 3 at the IUT.
+.sh 2 "Link State Control - Unexpected signal units/orders"
+.lp
+This suite of test cases test the response of the Implementation Under Test to
+unexpected sequences Level 3 requests and received M2PA messages in various
+states.  These test cases validates the robustness of the implementation
+in responding to unusual circumstances.
+.sh 3 "Unexpected signal units/orders in ""Out of service"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 requests and receipt of unexpected M2PA messages while in the "Out of
+Service" state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|             ALIGNMENT  ----------------->                         |
+|        PROVING-NORMAL  ----------------->                         |
+|     PROVING-EMERGENCY  ----------------->                         |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|PROCESSOR-OUTAGE-ENDED  ----------------->                         |
+|                 READY  ----------------->                         |
+|            BUSY-ENDED  ----------------->                         |
+|              DATA-ACK  ---[0000, 0000]-->                         |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                            :stop                  |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events in the ""Out of Service"" State"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both M2PA peers in the "Out of Service" state.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Out of Service"
+- Status "Alignment"
+- Status "Proving Normal"
+- Status "Proving Emergency"
+- Status "Processor Outage"
+- Status "Busy"
+- Status Invalid
+- Status "Processor Outage Ended"
+- Status "Busy Ended"
+- Status "Ready"
+- Data Ack
+- Data
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Stop" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+The Level 3 "Start" command is then issued.
+.np
+Check that the link aligns normally.
+.np
+Check that link alignment uses normal alignment procedures.
+.np
+Check that the link goes in service and stays in service without local or
+remote processor outage indications to Level 3.
+.sh 3 "Unexpected signal units/orders in ""Not Aligned"" state"
+.lp
+This test case validates the response of the IUT to the receipt of unexpected Level
+3 requests and receipt of unexpected M2PA messages while in the "Not Aligned"
+state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|        OUT-OF-SERVICE  ----------------->                         |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|                 READY  ----------------->                         |
+|              DATA-ACK  ---[0000, 0000]-->                         |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                            :clear emergency       |
+|                                            :start                 |
+|             ALIGNMENT  ---[0001, 0000]-->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ---[0001, 0000]-->                         |
+|                        <-----------------  READY                  |
+|                 READY  ---[0001, 0000]-->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""not aligned"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both M2PA peers in the "Out of Service" state.
+.np
+The Level 3 "Start" command is issued to IUT to place the IUT in the "Not
+Aligned" state.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Out of Service"
+- Status "Processor Outage"
+- Status "Busy"
+- Status Invalid
+- Status "Ready"
+- Data Ack
+- Data
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Clear Emergency" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+A status "Alignment" is then sent to the IUT.
+.np
+Check that the IUT aligns as usual and performs the normal alignment
+procedures.
+.np
+Check that the IUT places the link in service and that no local or remote
+processor outage indications are given to Level 3 at the IUT.
+.sh 3 "Unexpected signal units/orders in ""Aligned"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 request and receipt of unexpected M2PA messages while in the "Aligned"
+state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|             ALIGNMENT  ----------------->                         |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|                 READY  ----------------->                         |
+|PROCESSOR-OUTAGE-ENDED  ----------------->                         |
+|            BUSY-ENDED  ----------------->                         |
+|              DATA-ACK  ---[0000, 0000]-->                         |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                            :clear emergency       |
+|                                            :start                 |
+|        PROVING-NORMAL  ---[0001, 0000]-->                         |
+|                        <-----------------  READY                  |
+|                 READY  ---[0001, 0000]-->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""aligned"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "Out of Service" state.
+.np
+The IUT is brought to the "Aligned" state using normal procedures.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Alignment"
+- Status "Processor Outage"
+- Status "Busy"
+- Status Invalid
+- Status "Ready"
+- Status "Processor Outage Ended"
+- Status "Busy Ended"
+- Data Ack
+- Data
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Clear Emergency" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+Check that the IUT aligns as usual and performs the normal alignment
+procedure.
+.np
+Check that the IUT places the link in service and that no local or remote
+processor outage indications are given to Level 3 at the IUT.
+.sh 3 "Unexpected signal units/orders in ""Proving"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 request and receipt of unexpected M2PA messages while in the
+"Proving" state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|PROCESSOR-OUTAGE-ENDED  ----------------->                         |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|            BUSY-ENDED  ----------------->                         |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|                 READY  ----------------->                         |
+|              DATA-ACK  ---[0000, 0000]-->                         |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                            :clear emergency       |
+|                                            :start                 |
+|                        <-----------------  READY                  |
+|                 READY  ---[0001, 0000]-->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""proving"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "Out of Service" state.
+.np
+The IUT is brought to the "Proving" state using normal procedures.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Processor Outage Ended"
+- Status "Processor Outage"
+- Status "Busy Ended"
+- Status "Busy"
+- Status Invalid
+- Status "Ready"
+- Data Ack
+- Data
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Clear Emergency" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+Check that the IUT aligns as usual and performs the normal alignment
+procedure.
+.np
+Check that the IUT places the link in service and that no local or remote
+processor outage indications are given to Level 3 at the IUT.
+.sh 3 "Unexpected signal units/orders in ""Aligned Ready"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 request and receipt of unexpected M2PA messages while in the
+"Aligned Ready" state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.5
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|                                            :set emergency         |
+|                                            :clear emergency       |
+|                                            :clear lpo             |
+|                                            :start                 |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""aligned ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "Out of Service" state.
+.np
+The IUT is brought to the "Aligned Ready" state using normal procedures.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Busy"
+- Status Invalid
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Set Emergency" command
+- Level 3 "Clear Emergency" command
+- Level 3 "Clear Local Processor Outage" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+Check that the IUT aligns as usual and performs the normal alignment
+procedure.
+.np
+Check that the IUT places the link in service and that no local or remote
+processor outage indications are given to Level 3 at the IUT.
+.sh 3 "Unexpected signal units/orders in ""Aligned Not Ready"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 request and receipt of unexpected M2PA messages while in the
+"Aligned Not Ready" state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.6
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|                                            :set emergency         |
+|                                            :clear emergency       |
+|                                            :set lpo               |
+|                                            :start                 |
+|                 READY  ----------------->                         |
+|                                            !in service            |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""aligned not ready"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "Out of Service" state.
+.np
+The IUT is brought to the "Aligned Not Ready" state using normal procedures.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Busy"
+- Status Invalid
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Set Emergency" command
+- Level 3 "Clear Emergency" command
+- Level 3 "Set Local Processor Outage" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+Check that the IUT places the link in service.
+.sh 3 "Unexpected signal units/orders in ""In Service"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 request and receipt of unexpected M2PA messages while in the
+"In Service" state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.7
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|      [INVALID-STATUS]  ----------------->                         |
+|                                            :set emergency         |
+|                                            :clear emergency       |
+|                                            :clear lpo             |
+|                                            :start                 |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""in service"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "In Service" state.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status Invalid
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Set Emergency" command
+- Level 3 "Clear Emergency" command
+- Level 3 "Clear Local Processor Outage" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+Check that the IUT retains the link in the in service state and that no local
+or remote processor outage indications are given to Level 3 at the IUT.
+.sh 3 "Unexpected signal units/orders in ""Processor Outage"" state"
+.lp
+This case validates the response of the IUT to the receipt of unexpected Level
+3 request and receipt of unexpected M2PA messages while in the
+"Processor Outage" state.
+All of the unexpected sequences in this test case must be ignored by the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 2.8
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|                  BUSY  ----------------->                         |
+|      [INVALID-STATUS]  ----------------->                         |
+|                                            :set emergency         |
+|                                            :clear emergency       |
+|                                            :start                 |
+|                 READY  ----------------->                         |
+|PROCESSOR-OUTAGE-ENDED  ----------------->                         |
+|            BUSY-ENDED  ----------------->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Unexpected events while ""processor outage"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "In Service" state.
+.np
+The IUT is brought to the "Processor Outage" state using normal procedures.
+.np
+A sequence of unexpected M2PA messages are sent to the IUT.  These unexpected
+messages are:
+.(l I
+- Status "Busy"
+- Status Invalid
+- Status "Ready"
+- Status "Processor Outage Ended"
+- Status "Busy Ended"
+.)l
+.np
+A sequence of unexpected Level 3 commands are issued at the IUT.  These
+unexpected Level 3 commands are:
+.(l I
+- Level 3 "Set Emergency" command
+- Level 3 "Clear Emergency" command
+- Level 3 "Start" command
+.)l
+.np
+Check that the IUT ignores the unexpected M2PA messages/Level 3 commands.
+.np
+Check that the IUT keeps the link in service and that no local or remote
+processor outage indications are given to Level 3 at the IUT.
+.sh 2 "Transmission Failure"
+.lp
+This set of test cases validate specific transmission path failures and
+anomalies.  Specifically transmission path failures, corrupt acknowledgments
+and invalid sequencing.  Because SCTP does not have a transmission path that
+is separate from a receive path, the Q.781 tests that validate response to
+breaking the transmission path are simulated by aborting the association.
+Because M2PA does not have forward indicator bits, the Q.781 tests that
+validate response to abnormal forward indicator bits are simulated by invalid
+"Data Ack" messages.
+.sh 3 "Link aligned ready (Abort)"
+.lp
+This case validates the response of the IUT to aborting the SCTP association
+when the IUT is in the "Aligned Ready" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  READY                  |
+|             :tx break                                             |
+|                                            !out of service(SUERM) |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link aligned ready (Abort)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "Out of Service" state.
+.np
+Issue a Level 3 "Start" command at the IUT and the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends a status "Ready" message, abort the SCTP association.
+.np
+Check that the IUT indicates "Out of Service" to Level 3 at the IUT with
+reason "Excessive error rate SUERM" and stays in the "Out of Service" state.
+.sh 3 "Link aligned ready (Invalid Acks)"
+.lp
+This test case validates the response of the IUT to receiving two consecutive
+invalid "Data Ack" messages in the "Aligned Ready" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(FIBR)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link aligned ready (Invalid Acks)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both IUT and PT in the "Out of Service" state.
+.np
+Send two consecutive "Data Ack" messages to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Abnormal FIBR" and stays in the
+"Out of Service" state.
+.sh 3 "Link aligned not ready (Abort)"
+.lp
+This test case validates the response of the IUT to aborting the SCTP
+association when the IUT is in the "Aligned Not Ready" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|             :tx break                                             |
+|                                            !out of service(SUERM) |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link aligned not ready (Abort)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both  PT and IUT in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the
+IUT and the "Start" command at the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends a status "Processor Outage" message, abort the SCTP
+association.
+.np
+Check that the IUT indicates "Out of Service" to Level 3 at the IUT with
+reason "Excessive Error Rate/SUERM" and stays in the "Out of Service" state.
+.sh 3 "Link aligned not ready (Invalid Acks)"
+.lp
+This test case validates the response of the IUT to the receipt of two
+consecutive invalid "Data Ack" messages in the "Aligned Not Ready" state.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                        <-----------------  OUT-OF-SERVICE         |
+|        OUT-OF-SERVICE  ----------------->                         |
+|                                            :set lpo               |
+|                                            :start                 |
+|                        <-----------------  ALIGNMENT              |
+|                :start                                             |
+|             ALIGNMENT  ----------------->                         |
+|                        <-----------------  PROVING-NORMAL         |
+|        PROVING-NORMAL  ----------------->                         |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(FIBR)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link aligned not ready (Invalid Acks)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with both PT and IUT in the "Out of Service" state.
+.np
+Issue the Level 3 "Set Local Processor Outage" and "Start" commands at the IUT
+and the "Start" command at the PT.
+.np
+Check that the IUT follows the sequence of events illustrated in
+\fI\*(&f\n(&p\fR.
+.np
+When the IUT sends a status "Processor Outage" message, send two consecutive
+invalid "Data Ack" messages to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Abnormal FIBR" and remains in
+the "Out of Service" state.
+.sh 3 "Link in service (Abort)"
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.5
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|             :tx break                                             |
+|                                            !out of service(SUERM) |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link in service (Abort)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Abort the SCTP association.
+.np
+Check that the IUT indicates "Out of Service" to Level 3 at the IUT with
+reason "Excessive Error Rate/SUERM" and stays in the "Out of Service" state.
+.sh 3 "Link in service (Invalid Acks)"
+.lp
+This test case validates the response of the IUT to two consecutive invalid
+"Data Ack" messages in the "In Service" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.6
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(FIBR)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link in service (Invalid Acks)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send two consecutive invalid "Data Ack" messages to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Abnormal FIBR" and stays in the
+"Out of Service" state.
+.sh 3 "Link in processor outage (Abort)"
+.lp
+This test case validates the response of the IUT to aborting the SCTP
+association when the IUT is in the "Processor Outage" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.7
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|             :tx break                                             |
+|                                            !out of service(SUERM) |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link in processor outage (Abort)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issues the Level 3 "Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Abort the SCTP association.
+.np
+Check that the IUT indicates "Out of Service" to Level 3 at the IUT with
+reason "Excessive Error Rate/SUERM" and stays in the "Out of Service" state.
+.sh 3 "Link in processor outage (Invalid Acks)"
+.lp
+This test case validates the response of the IUT to receiving two consecutive
+Invalid "Data Ack" messages while in the "Processor Outage" state.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 3.8
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|              DATA-ACK  ---[ffff, 0000]-->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service(FIBR)  |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Link in processor outage (Invalid Acks)"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issues a Level 3 "Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Send two consecutive invalid "Data Ack" messages to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "Abnormal FIBR" and stays in the
+"Out of Service" state.
+.sh 2 "Processor Outage Control"
+.sh 3 "Set and clear LPO while link in service"
+.lp
+This test case validates the response of the IUT to a local processor outage
+condition and recovery with buffer clearing.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 4.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :msu                   |
+|                                            :msu                   |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|              DATA-ACK  ---[0000, 0001]-->                         |
+|                        <--[0000, 0002]---  DATA [   35 bytes]     |
+|                                            :set lpo               |
+|  [ 35 bytes]     DATA  ---[0001, 0002]-->                         |
+|                        <--[0000, 0002]---  PROCESSOR-OUTAGE       |
+|                                            :clear buffers         |
+|                                            :msu                   |
+|                                            :clear lpo             |
+|                        <--[0000, 0003]---  DATA [   35 bytes]     |
+|              DATA-ACK  ---[0001, 0003]-->                         |
+|                        <--[0000, 0003]---  PROCESSOR-OUTAGE-ENDED |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Set and clear LPO while link in service"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send two MSUs from the IUT and then issue a Level 3 "Set Local Processor
+Outage" command at the IUT.
+.np
+Check that the IUT sends two Data messages and a status "Processor Outage"
+message.
+.np
+Acknowledge one data message with a "Data Ack" message at the PT and send a Data
+message from the PT to the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Check that the IUT does not require an acknowledgments to the second Data
+message by waiting longer than timer T7 at the IUT.
+.np
+At the IUT, issue a Level 3 "Clear Buffers" command, send an MSU, and then
+issue a Level 3 "Clear Local Processor Outage".
+.np
+Check that the IUT sends a Data message and send a "Data Ack" message to the IUT in
+response.
+Check that the IUT sends a "Processor Outage Ended" message.
+.np
+To ensure that the IUT is not expecting another acknowledgments, wait for
+longer than T7 and check that the IUT sends no further status messages and
+remains in the "In Service" state.
+.sh 3 "RPO during LPO"
+.lp
+This test case validates the response of the IUT to receiving a status
+"Processor Outage" message and status "Processor Outage Ended" message while in
+the "Processor Outage" state with LPO set at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 4.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|              set lpo:                                             |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            !rpo                   |
+|            clear lpo:                                             |
+|PROCESSOR-OUTAGE-ENDED  ----------------->                         |
+|                                            !rpr                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "RPO during LPO"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue a Level 3 "Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Issue a Level 3 "Set Local Processor Outage" command at the PT and send a
+status "Processor Outage" message to the IUT.
+.np
+Check that the IUT indicates "Remote Processor Outage" to Level 3 at the IUT.
+.np
+Issue a level 3 "Clear Local Processor Outage" command at the PT and send a
+status "Processor Outage Ended" message to the IUT.
+.np
+Check that the IUT indicates "Remote Processor Recovered" to Level 3 at the
+IUT.
+.sh 3 "Clear LPO when ""Both processor outage"""
+.lp
+This test case validates the response of the IUT to the receipt of a Level 3
+"Clear Local Processor Outage" command when the IUT is in the "Processor
+Outage" state with both processors marked PO.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 4.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :set lpo               |
+|                        <-----------------  PROCESSOR-OUTAGE       |
+|              :set lpo                                             |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            !rpo                   |
+|                                            :clear lpo             |
+|                        <-----------------  PROCESSOR-OUTAGE-ENDED |
+|                                            !rpo                   |
+|            :clear lpo                                             |
+|PROCESSOR-OUTAGE-ENDED  ----------------->                         |
+|                                            !rpr                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Clear LPO when ""Both processor outage"""
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Issue a Level 3 "Set Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Outage" message.
+.np
+Issue a Level 3 "Set Local Processor Outage" command at the PT and send a
+status "Processor Outage" message to the IUT.
+.np
+Check that the ITU indicates "Remote Processor Outage" to Level 3 at the IUT.
+.np
+Issue a Level 3 "Clear Local Processor Outage" command at the IUT.
+.np
+Check that the IUT sends a status "Processor Ended" message.
+.np
+Issue a Level 3 "Clear Local Processor Outage" command at the PT and send a
+status "Processor Outage Ended" message to the IUT.
+.np
+Check that the IUT indicates "Remote Processor Recovered" to Level 3 at the
+IUT and remains in the "In Service" state.
+.sh 2 "SU delimitation, alignment, error detection and correction"
+.lp
+Most of the test cases in this section are not applicable to M2PA operation.
+.sh 3 "More than 7 ones between MSU opening and closing flags"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:" 12
+.np
+Not applicable.
+.sh 3 "Greater than maximum signal unit length"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:" 12
+.np
+Not applicable.
+.sh 3 "Below minimum signal unit length"
+.lp
+This test case validates the IUT response to a Data message with a payload
+below the minimum MSU length.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|  [  1 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Below minimum signal unit length"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send a Data message with one byte of payload to the IUT.
+.np
+Check that the IUT does not acknowledge the Data message and remains in the
+"In Service" state.
+.sh 3 "Reception of single and multiple flags between FISUs"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.4(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.4(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Reception of single and multiple flags between MSUs"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.5(a)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 5.5(b)
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 2 "SUERM check"
+.lp
+The test cases in this section
+are not applicable to M2PA.  These tests might have
+corresponding tests at the SCTP layer, however, that is the topic of an SCTP
+test specification rather than an M2PA test specification.
+.sh 3 "Error rate of 1 in 256 - Link remains in service"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 6.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Error rate of 1 in 254 - Link out of service"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 6.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Consecutive corrupt SUs"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 6.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Time controlled break of the link"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 6.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 2 "AERM check"
+.lp
+The test cases in this section
+are not applicable to M2PA.  These test might have corresponding test at the
+SCTP layer, however, that is the topic of an SCTP test specification rather
+than an M2PA test specification.
+.sh 3 "Error rate below the normal threshold"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 7.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Error rate at the normal threshold"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 7.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Error rate above the normal threshold"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 7.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Error rate at the emergency threshold"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 7.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 2 "Transmission and reception control (Basic)"
+.lp
+A number of test cases in this section are not applicable to M2PA.  Some may
+be the topic of a test specification for SCTP but are not applicable to M2PA.
+Test cases that are applicable in this section validate the basic
+transmission, reception and acknowledgments of Data messages with status "In
+Service"
+messages.
+.sh 3 "Data transmission and reception"
+.lp
+This test case validates the IUT response to the sending and receipt of Data
+and "Data Ack" messages.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                        <--[0001, 0000]---  DATA-ACK               |
+|                                            !msu                   |
+|                                            :msu                   |
+|                        <--[0001, 0001]---  DATA [   35 bytes]     |
+|              DATA-ACK  ---[0001, 0001]-->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Data transmission and reception"
+.)b
+.ip "Test Description:" 12
+.np
+This test begins with the link in the "In Service" state.
+.np
+Send a Data message to the IUT.
+.np
+Check that the IUT sends a "Data Ack" message acknowledging the received Data
+message and delivers the received MSU to Level 3 at the IUT.
+.np
+Issue a Level 3 MSU to the IUT.
+.np
+Check that the IUT sends a Data message.
+.np
+Send a "Data Ack" message to the IUT acknowledging the data message.
+.np
+Check that the IUT receives the acknowledgments by waiting longer than time T7
+and ensuring that the IUT stays in the "In Service" state.
+.sh 3 "Negative acknowledgments of an MSU"
+.lp
+M2PA does not perform negative acknowledgments at the M2PA layer.  Negative
+acknowledgments are performed as necessary by the underlying SCTP transport.
+As such, test cases involving negative acknowledgments are not applicable.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Check RTB full"
+.lp
+This test case validates the IUT response to an RTB full condition at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :msu                   |
+|                                            :msu                   |
+|                                            :msu                   |
+|                                                    .              |
+|                                                    .              |
+|                                                    .              |
+|                                                    Ct=  254       |
+|                                                                   |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|                        <--[0000, 0002]---  DATA [   35 bytes]     |
+|                        <--[0000, 0003]---  DATA [   35 bytes]     |
+|                                                    .              |
+|                                                    .              |
+|                                                    .              |
+|                                                    Ct=  127       |
+|              DATA-ACK  ---[0000, 007f]-->                         |
+|                        <--[0000, 0080]---  DATA [   35 bytes]     |
+|                        <--[0000, 0081]---  DATA [   35 bytes]     |
+|                        <--[0000, 0082]---  DATA [   35 bytes]     |
+|                                                    .              |
+|                                                    .              |
+|                                                    .              |
+|                                                    Ct=  127       |
+|              DATA-ACK  ---[0000, 00fe]-->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Check RTB full"
+.)b
+.ip "Test Description:" 12
+.np
+This test begins with the link in the "In Service" state.
+.np
+Send 2 x N2 MSUs at the IUT.
+.np
+Check that the IUT sends N2 Data messages and then stops sending Data messages
+(RTB Full condition).
+.np
+Acknowledge the N2 Data messages in a single "Data Ack" message.
+.np
+Check that the IUT sends another N2 Data messages.
+.np
+Acknowledge the N2 Data messages in a single "Data Ack" message.
+.np
+Check that the IUT remains in the "In Service" state longer than time T7.
+.sh 3 "Single invalid Ack"
+.lp
+This test case validates the response of the IUT to a single invalid
+"Data Ack"
+message.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|              DATA-ACK  ---[0000, 0000]-->                         |
+|                                            :msu                   |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|              DATA-ACK  ---[0000, 0001]-->                         |
+|  [ 35 bytes]     DATA  ---[0001, 0001]-->                         |
+|                        <--[0001, 0001]---  DATA-ACK               |
+|                                            !msu                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Single invalid Ack"
+.)b
+.ip "Test Description:" 12
+.np
+This test begins with the link in the "In Service" state.
+.np
+Send an invalid "Data Ack" message to the IUT.
+.np
+Send an MSU at the IUT.
+.np
+Check that the IUT sends a Data message.
+.np
+Acknowledge the Data message with a "Data Ack" message to the IUT
+.np
+Send an Data message to the IUT.
+.np
+Check that the IUT acknowledges the Data message with a "Data Ack" message and
+delivers an MSU to Level 3 at the IUT.
+.sh 3 "Duplicated FSN"
+.lp
+This test validates the response of the IUT to a single Data message which
+has a repeated Forward Sequence Number.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.5
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                        <--[0001, 0000]---  DATA-ACK               |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                                            !msu                   |
+|  [ 35 bytes]     DATA  ---[0002, 0000]-->                         |
+|                        <--[0002, 0000]---  DATA-ACK               |
+|                                            !msu                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Duplicated FSN"
+.)b
+.ip "Test Description:"
+.np
+This test begins with the link in the "In Service" state.
+.np
+Send an valid Data message to the IUT.
+.np
+Check that the IUT acknowledges the Data message and delivers an M3U to Level
+3 at the IUT.
+.np
+Send an invalid Data message that contains the same FSN as the previous Data
+message to the IUT.
+.np
+Check that the IUT does not deliver an MSU to Level 3 at the IUT.
+.np
+Send a valid Data message to the IUT.
+.np
+Check that the IUT acknowledges the Data message and delivers an M3U to Level
+3 at the IUT.
+.np
+Check that the IUT maintains the "In Service" state.
+.sh 3 "Erroneous retransmission - Single MSU"
+.lp
+Retransmission of DATA messages is performed by SCTP for M2PA and as such the
+related Q.781 tests are not applicable.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.6
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Erroneous retransmission - Multiple FISUs"
+.lp
+Retransmission of DATA messages is performed by SCTP for M2PA and as such the
+related Q.781 tests are not applicable.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.7
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Single FISU with corrupt FIB"
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.8
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "In Service prior to RPO being set"
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.9
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|              :set lpo                                             |
+|      PROCESSOR-OUTAGE  ----------------->                         |
+|                                            !rpo                   |
+|  [ 35 bytes]     DATA  ---[0001, 0000]-->                         |
+|                        <--[0001, 0000]---  DATA-ACK               |
+|                                            !msu                   |
+|  [ 35 bytes]     DATA  ---[0002, 0000]-->                         |
+|                        <--[0002, 0000]---  DATA-ACK               |
+|                                            !msu                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "In service prior to RPO being set"
+.)b
+.ip "Test Description:" 12
+.np
+The test beings with the link in the "In Service" state.
+.np
+Issue a Level 3 "Set Local Processor Outage" command at the PT and send a
+status "Processor Outage" message to the IUT.
+.np
+Check that the IUT indicates "Remote Processor Outage" to Level 3 at the IUT.
+.np
+Send two consecutive Data messages to the IUT.
+.np
+Check that the IUT acknowledges both Data messages with a "Data Ack" and that two
+MSUs are delivered to Level 3 at the IUT.
+.sh 3 "Abnormal BSN - single Data message"
+.lp
+This test validates the behavior of the IUT to receiving a single abnormal
+Backward Sequence Number in a Data message.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.10
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|  [ 35 bytes]     DATA  ---[0001, 3fff]-->                         |
+|                        <--[0001, 0000]---  DATA-ACK               |
+|                                            !msu                   |
+|  [ 35 bytes]     DATA  ---[0002, 0000]-->                         |
+|                        <--[0002, 0000]---  DATA-ACK               |
+|                                            !msu                   |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Abnormal BSN - single Data message"
+.)b
+.ip "Test Description:"
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send a Data message to the IUT with an abnormal Backwards Sequence Number.
+.np
+Check that the IUT acknowledges the Data message delivers an MSU to Level 3 at the IUT.
+.np
+Send a Data message to the IUT with an normal Backwards Sequence Number.
+.np
+Check that the IUT acknowledges the Data message delivers an MSU to Level 3 at the IUT.
+.np
+Check that the IUT maintains the "In Service" state.
+.sh 3 "Abnormal BSN - two consecutive messages"
+.lp
+This test validates the reponse of the IUT to receiving two consecutive
+abnormal Backward Sequence Numbers.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.11
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|              DATA-ACK  ---[0000, 3fff]-->                         |
+|              DATA-ACK  ---[0000, 3fff]-->                         |
+|              DATA-ACK  ---[0000, 0000]-->                         |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                            !out of service        |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Abnormal BSN - two consecutive messages"
+.)b
+.ip "Test Description:"
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send two "Data Ack" messages with an abnormal Backward Sequence Number.
+.np
+Send a "Data Ack" message with an normal Backward Sequence Number.
+.np
+Check that the IUT responds with a status "Out of Service" message and
+indicates "Out of Service" to Level 3 at the IUT.
+.sh 3 "Excessive delay of acknowledgments"
+.lp
+This test case validates the IUT response to a excessively delayed
+acknowledgment.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.12
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :msu                   |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|                              !                                    |
+|                              !  T7         0.5 <= T7 <= 2.0       |
+|                              !                                    |
+|                        <--[0000, 0001]---  OUT-OF-SERVICE         |
+|                                            !out of service(T7)    |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Excessive delay of acknowledgments"
+.)b
+.ip "Test Description:" 12
+.np
+This test case begins with the link in the "In Service" state.
+.np
+Send an MSU from the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 at the IUT with reason "T7 Timeout" and that the link
+remains in the "Out of Service" state.
+.np
+Check that the T7 is between 0.5 seconds and 2.0 seconds in duration.
+.sh 3 "Level 3 Stop command"
+.lp
+This test case validates the response of the IUT to the Level 3 "Stop"
+command while in the "In Service" state.
+.lp
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 8.13
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :stop                  |
+|                        <-----------------  OUT-OF-SERVICE         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Level 3 Stop command"
+.)b
+.ip "Test Description:" 12
+.np
+This test begins with the link in the "In Service" state.
+.np
+Issue the Level 3 "Stop" command at the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and remains in the
+"Out of Service" state.
+.sh 2 "Transmission and Reception Control (PCR)"
+.lp
+M2PA does not perform Preventative Cyclic Retranmission and, therefore, the
+test cases in this section are not applicable to M2PA.
+.sh 3 "MSU transmission and reception"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Priority control"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Forced retransmission with the value N1"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Forced retransmission with the value N2"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.4
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Forced retransmission cancel"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.5
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Reception of forced retransmission"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.6
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "MSU transmission while RPO set"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.7
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Abnormal BSN - Single MSU"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.8
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Abnormal BSN - Two MSUs"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.9
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Unexpected FSN"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.10
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Excessive delay of acknowledgments"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.11
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "FISU with FSN expected for MSU"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.12
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 3 "Level 3 Stop command"
+.lp
+This test case is not applicable to M2PA.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 9.13
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                                                   |
+|                          NOT APPLICABLE                           |
+|___________________________________________________________________|
+.|f "Not Applicable"
+.)b
+.ip "Test Description:"
+.np
+Not applicable.
+.sh 2 "Congestion Control"
+.sh 3 "Congestion abatement"
+.lp
+This test case validates the response of the IUT to the Level 3 "Congestion"
+and "Congestion Ceases" conditions.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 10.1
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :make cong discard     |
+|                        <-----------------  BUSY                   |
+|                                            :clear congestion      |
+|                        <-----------------  BUSY-ENDED             |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Congestion abatement"
+.)b
+.ip "Test Description:" 12
+.np
+This test begins with the link in the "In Service" state.
+.np
+Generate a local Level 3 "Congestion" condition at the IUT.
+.np
+Check that the IUT sends a status "Busy" message.
+.np
+Generate a local Level 3 "Congestion Ceases" condition at the IUT.
+.np
+Check that the IUT sends a status "Busy Ended" message.
+.sh 3 "Timer T7"
+.lp
+This test case validates timer T7 and procedures at the ITU.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 10.2
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :msu                   |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|                  BUSY  ---[0000, 0001]-->                         |
+|                              !                                    |
+|                              !  T7         0.5 <= T7 <= 2.0       |
+|                              !                                    |
+|              DATA-ACK  ---[0000, 0001]-->                         |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Timer T7"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send an MSU at the IUT.
+.np
+Wait for less than T7 and then acknowledge the Data message to the IUT with a
+"Data Ack" message.
+.np
+Check that the IUT sends no further status messages and remains in the "In
+Service" state.
+.sh 3 "Timer T6"
+.lp
+This case validates timer T6 and procedures at the IUT.
+The expected sequence of events is illustrated \fI\*(&f\n(&n\fR.
+.(b C
+Reference:  Q.781/Test 10.3
+\fC\
+ ___________________________________________________________________\ 
+|                                                                   |
+|                    PT                      IUT                    |
+|                                                                   |
+|                                            :msu                   |
+|                        <--[0000, 0001]---  DATA [   35 bytes]     |
+|                  BUSY  ---[0000, 0001]-->                         |
+|                              !                                    |
+|                              !  T6         3.0 <= T6 <= 6.0       |
+|                              !                                    |
+|                        <--[0000, 0001]---  OUT-OF-SERVICE         |
+|                                            !out of service(T6)    |
+|                                                                   |
+|___________________________________________________________________|
+.|f "Timer T6"
+.)b
+.ip "Test Description:" 12
+.np
+The test begins with the link in the "In Service" state.
+.np
+Send an MSU at the IUT.
+.np
+Send a status "Busy" messages to the IUT.
+.np
+Check that the IUT sends a status "Out of Service" message and indicates "Out
+of Service" to Level 3 with reason "T6 Timeout" and remains in the "Out of
+Service" state.
+.np
+Check that T6 is between 3.0 seconds and 6.0 seconds in duration.
+.bp
+.sh 1 "Security Considerations"
+.lp
+There are no security considerations for this draft.
+.sh 1 "Acknowledgments"
+.sh 1 "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-780-490-1140
+OpenSS7 Corporation;Email: bidulock@openss7.org
+1469 Jeffreys Crescent;URL: http://www.openss7.org/
+Edmonton, AB  T6L 6T1;
+Canada;
+.TE
+.bl 3
+.lp
+This Internet Draft expires October 2003.
+.bp
+.nr ii 0.5i
+.uh "End Notes"
+.pd
+.de ]<
+.uh "References"
+.ad l
+.hy 0
+.rm (f )f
+..
+.(l L
+.[
+$LIST$
+.]
+.)l
+.bp
+.ce 1
+.uh "List of Illustrations"
+.(l I
+.xp 1
+.)l
+.bp
+.ce 1
+.uh "Table of Contents"
+.(l I
+.xp 0
+.)l
+.bp
+.uh "Copyright Statement"
+.lp
+Copyright (C) The Internet Society (2002).  All Rights Reserved.
+.lp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.lp
+The limited permission granted above are perpetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.lp
+This document and the information contained herein is provided on an "AS IS"
+basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS
+OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.

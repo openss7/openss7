@@ -1,0 +1,734 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-m2pa-mib-00.me,v 0.9 2004/02/17 09:40:47 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9 $) modified $Date: 2004/02/17 09:40:47 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+no-annotate
+database ../idrefs
+move-punctuation
+discard Y
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+search-truncate 10
+separate-label-second-parts ""
+bracket-label " [" "]" ", "
+abbreviate-label-ranges ".."
+sort Z*L*R*
+sort-adjacent-labels
+# sort A+
+# reverse A
+.R2
+.de ]<
+.\".sh 1 References
+.rm (f )f
+..
+.dn &r
+.nr &r 2
+.de [4
+.if \\n(&r=2 \{\
+.if '\\*([Z'1' \{\
+.uh Normative\ References
+.nr &r 1
+.\}
+.\}
+.if '\\*([Z'1' \{\
+.rm [Z
+.\}
+.if \\n(&r=1 \{\
+.if '\\*([Z'2' \{\
+.uh Informative\ References
+.nr &r 0
+.\}
+.\}
+.if '\\*([Z'2' \{\
+.rm [Z
+.\}
+.if !'\\*([F'' \{\
+.(f
+.lp
+[\\fB\\*([F\\fR]\0
+.ix +\\n(iiu
+.if !'\\*([A'' \\*([A, \c
+\\fI\\*(lq\\*([T,\\*(rq\\fR
+\\fB\\*([R\\fR\c
+.if !'\\*([G'' \& <\\*([G\c
+.if !'\\*([I'' , \\*([I\c
+.if !'\\*([C'' , \\*([C\c
+ (\\*([D).
+.if !'\\*([O'' \\fI\\*([O\\fR
+.)f
+.\}
+..
+.de [0
+.if \\n(&r=2 \{\
+.if '\\*([Z'1' \{\
+.uh Normative\ References
+.nr &r 1
+.\}
+.\}
+.if '\\*([Z'1' \{\
+.rm [Z
+.\}
+.if \\n(&r=1 \{\
+.if '\\*([Z'2' \{\
+.uh Informative\ References
+.nr &r 0
+.\}
+.\}
+.if '\\*([Z'2' \{\
+.rm [Z
+.\}
+.if !'\\*([F'' \{\
+.(f
+.lp
+[\\fB\\*([F\\fR]\0
+.ix +\\n(iiu
+.if !'\\*([A'' \\*([A, \c
+\\fI\\*(lq\\*([T,\\*(rq\\fR
+\\fB\\*([R\\fR\c
+.if !'\\*([G'' \& <\\*([G\c
+.if !'\\*([I'' , \\*([I\c
+.if !'\\*([C'' , \\*([C\c
+ (\\*([D).
+.if !'\\*([O'' \\fI\\*([O\\fR
+.)f
+.\}
+..
+.de $0
+.if \\$3<4 \{\
+.(x 0
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.)x
+.\}
+..
+.if '\*(.T'latin1' \{\
+.fo 'B. Bidulock'$Revision: 0.9 $'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr si 0
+.nr ii 3n
+.nr pi 3n
+.nr po 2n
+.nr bi 2n
+.nr hi 6n
+.nr qi 4n
+.nr ps 1v
+.nr bt 30v
+.de #v
+.ad l
+.hy 0
+..
+.\}
+.if '\*(.T'ascii' \{\
+.fo 'B. Bidulock'$Revision: 0.9 $'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr si 0
+.nr ii 3n
+.nr pi 3n
+.nr po 2n
+.nr bi 2n
+.nr hi 6n
+.nr qi 4n
+.nr ps 1v
+.nr bt 30v
+.de #v
+.ad l
+.hy 0
+..
+.\}
+.if '\*(.T'ps' \{\
+.fo 'B. Bidulock'$Revision: 0.9 $'Page %'
+.ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr si 0
+.nr ii 0.5i
+.nr pi 0
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr pp 10
+.nr qp 9
+.nr fp 8
+.nr gp 8
+.nr sp 12
+.nr tp 10
+.de #v
+.ad b
+.hy 6
+..
+.\}
+.dn &a
+.dn &b
+.dn &n
+.dn &p
+.nr &a 1
+.nr &b 0
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.ds &t Table\ 
+.\".de $1
+.\".ds &f Figure \\n($1-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $2
+.\".ds &f Figure \\n($1.\\n($2-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $3
+.\".ds &f Figure \\n($1.\\n($2.\\n($3-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.de #f
+.nr bs 0
+.lp
+.(l C
+.sz \\n(pp
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+.#v
+\\*(&f\\n(&n \\$1
+.)x
+.)l
+.nr bs 1v
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #t
+.nr bs 0
+.(l C
+.sz \\n(pp
+\fI\\*(&t\\n(&a.\fR \\$1
+.(x 3
+.#v
+\\*(&t\\n(&a \\$1
+.)x
+.)l
+.nr bs 1v
+.nr &b \\n(&a
+.nr &a +1
+..
+.de #e
+.if \\n($d>1 \{\
+.(l
+.nr ii 0.5i
+.uh Notes\ for\ Section\ \\\\n($1
+.pd
+.)l
+.\}
+..
+.ds a \a
+.bp
+.he 'Internet-Draft'M2UA AS'\\\\*(td'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 2
+Expires in six months;;\*(td
+.bl 2
+.TE
+.(l C
+\fB\
+SS7 MTP2-User Peer-to-Peer Adaptation Layer (M2PA)
+Management Information Base (MIB)
+M2PA-MIB
+<draft-bidulock-sigtran-m2pa-mib-00.\*(|x> 
+.)l
+.rr |x
+.ne 4
+.\"
+.\"
+.uh Status\ of\ this\ Memo
+.pp
+This document is an Internet-Draft and is subject to all provisions of Section
+10 of RFC2026.
+.\".pp
+.\"This document is an Internet-Draft and is subject to all provisions of Section
+.\"10 of RFC2026 except that the right to produce derivative works is not
+.\"granted.
+.\".pp
+.\"This document is an Internet-Draft and is \fBNOT\fR offered in accordance
+.\"with Section 10 or RFC2026, and the author does not provide the IETF with any
+.\"rights other than to publish as an Internet-Draft.
+.pp
+Internet-Drafts are working documents of the Internet Engineering Task Force
+(IETF), its areas, and its working groups.  Note that other groups may also
+distribute working documents as Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.\"
+.\"
+.uh Abstract
+.pp
+The \fISS7 MTP2 User Peer-to-Peer Adaptation Layer (M2PA)\fR 
+.[
+m2pa-09
+%Z 1
+.]
+is a protocol supporting the transport of Signalling System No. 7 (SS7)
+.[
+q700
+%Z 2
+.]
+Message Transfer Part (MTP) Level 3
+.[
+q701
+%Z 2
+.]
+signalling messages over Internet Protocol (IP) using the services of the
+Stream Control Transmission Protocol (SCTP).
+.[
+rfc 2960
+%Z 1
+.]
+This protocol would be used between SS7 Signalling Points using the MTP Level
+3 protocol.  The SS7 Signalling Points may also use standard SS7 links using
+the SS7 MTP Level 2
+.[
+q701
+.]
+to provide transport of MTP Level 3 signalling messages.  The protocol
+operates in a manner similar to MTP Level 2 so as to provide peer-to-peer
+communication between SS7 endpoints.
+.pp
+This memo defines the Management Information Base (MIB) module which describes
+the minimum amount of objects needed to manage the implementation of the M2PA.
+.\"
+.\"
+.sh 1 Introduction
+.pp
+This memo defines the Management Information Base (MIB) module that describes
+managed objects for the implementation of the M2PA.
+.\"
+.\"
+.sh 2 Scope
+.pp
+The document starts with a brief summary description of the SNMP framework and
+continues with the MIB explanation and security considerations among others.
+.\"
+.\"
+.sh 2 Terminology
+.pp
+This memo supplements the terminology used in SCTP
+.[
+rfc 2960
+.]
+and M2PA
+.[
+m2pa-09
+.]
+by adding the following terms:
+.\"
+.\"
+.sh 2 Abbreviations
+.pp
+This memo supplements the abbreviates used in SCTP
+.[
+rfc 2960
+.]
+and M2PA
+.[
+m2pa-09
+.]
+by adding the following abbreviations:
+.lp
+\fBMIB\fR \(em
+.ix +\n(iiu
+Management Information Base
+.lp
+\fBSMI\fR \(em
+.ix +\n(iiu
+Structure of Management Information
+.lp
+\fBSNMP\fR \(em
+.ix +\n(iiu
+Simple Network Management Protocol
+.\"
+.\"
+.sh 2 Conventions
+.pp
+The keywords \fBMUST\fR, \fBMUST NOT\fR, \fBREQUIRED\fR, \fBSHALL\fR,
+\fBSHALL NOT\fR, \fBSHOULD\fR, \fBSHOULD NOT\fR, \fBRECOMMENDED\fR,
+\fBNOT RECOMMENDED\fR, \fBMAY\fR, and \fBOPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in RFC 2119.
+.[
+rfc 2119
+%Z 1
+.]
+.\"
+.\"
+.sh 2 Overview
+.pp
+The SNMP Management Framework presently consists of five major components:
+.bu
+An overall architecture, described in RFC 2271.
+.[
+RFC 2271
+%Z 2
+.]
+
+.bu
+Mechanisms for describing and naming objects and events for the purpose of
+management,
+Structure of Management Information (SMI) Version 1
+.[
+RFC 1155
+%Z 1
+.]
+and
+Structure of Management Information (SMI) Version 2
+.[
+RFC 1902
+%Z 1
+.]
+.[
+RFC 1903
+%Z 1
+.]
+.[
+RFC 1904
+%Z 1
+.]
+
+.bu
+Message protocols for transferring management information.  The first version
+of SNMP message protocol is called SNMPv1.
+.[
+RFC 1157
+%Z 1
+.]
+The second version of the SNMP message protocol, which is not an Internet
+standards track protocol, is called SNMPv2c.
+.[
+RFC 1901
+%Z 1
+.]
+.[
+RFC 1906
+%Z 1
+.]
+The third version of the message protocol is called SNMPv3.
+.[
+RFC 1906
+.]
+.[
+RFC 2272
+%Z 1
+.]
+.[
+RFC 2574
+%Z 1
+.]
+
+.bu
+Protocol operations for accessing management information.  The first set of
+protocol operations and associated PDU formats is described in SNMPv1.
+.[
+RFC 1157
+.]
+A second set of protocol operations and assocaited PDU formats is described in
+SNMPv2.
+.[
+RFC 1905
+%Z 1
+.]
+
+.bu
+A set of fundamental applications
+.[
+RFC 2273
+%Z 1
+.]
+and view-based access control mechanism.
+.[
+RFC 2575
+%Z 1
+.]
+.pp
+Managed objects are accessed from a virtual informaiton store, termed the
+Management Information Base (MIB).  Objects in the MIB are defined using the
+mechanisms defined in the SMI.  This memo specifies a MIB module that is
+compliant to SMIv2.  A MIB conforming to the SMIv1 can be produced through the
+appropriate translations.  The resulting translated MIB must be semantically
+equivalent, except where objects or events are omitted because no translation
+is possible (use of Counter64).  Some machine-readable information in SMIv2
+will be converted into textual descriptions in SMIv1 during the translation
+process.  However, this loss of machine-readable information is not considered
+to change the semantics of the MIB.
+.sh 3 Structure\ of\ the\ MIB
+.pp
+Also
+.[
+q751.1
+%Z 1
+.]
+.[
+t1.116.1
+%Z 1
+.]
+.[
+q752
+%Z 1
+.]
+.[
+t1.116.2
+%Z 1
+.]
+.pp
+For a detailed overview of the documents that describ the current
+Internet-Standard Management Framework, please refer to section 7 of
+RFC 3410.
+.[
+RFC 3410
+%Z 1
+.]
+.pp
+Managed objects are accessed from a virtual information store, termed the
+Management Information Base (MIB).  MIB objects are generally access through
+the Simple Network Management Protocol (SNMP).  Objects in the MIB are defined
+using the mechanisms defined in the Structure and Identification of Management
+Information (SMI).  This memo specifies a MIB module that is compliant to the
+SMIv2.
+.[
+RFC 2578
+%Z 1
+.]
+.[
+RFC 2579
+%Z 1
+.]
+.[
+RFC 2580
+%Z 1
+.]
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.sh 1 Definitions
+.nf
+.fi
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.uh Security\ Considerations
+.uh IANA\ Considerations
+.nr ii 0.5i
+.uh Notes
+.pd
+.[
+$LIST$
+.]
+.\".uh Acknowledgments
+.\".pp
+.\"The author would like to thank
+.\"for their valuable comments and suggestions.
+.(b
+.uh Author's\ Addresses
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Tel: +1-780-490-1141
+OpenSS7 Corporation;Email: bidulock@openss7.org
+1469 Jeffreys Crescent;URL: http//www.openss7.org/
+Edmonton, AB  T6L 6T1;
+Canada;
+.TE
+.bl 3
+.lp
+This Internet draft expires July, 2003.
+.)b
+.bl 3
+.uh Change\ History
+.pp
+This section will be removed from the document when the document is finalized.
+.(l L
+.nf
+.sz -2
+\fC\
+$Log: draft-bidulock-sigtran-m2pa-mib-00.me,v $
+Revision 0.9  2004/02/17 09:40:47  brian
+- Baseline for documentation.
+
+Revision 0.8  2003/07/26 19:14:06  brian
+Added mib draft.
+
+
+.)l
+.bp
+.(b
+.ce
+.uh List\ of\ Tables
+.(l I
+.xp 3
+.)l
+.)b
+.(b
+.ce
+.uh List\ of\ Illustrations
+.(l I
+.xp 2
+.)l
+.)b
+.(b
+.ce
+.uh Table\ of\ Contents
+.(l I
+.xp 0
+.)l
+.)b
+.bp
+.uh Copyright\ Statement
+.lp
+\fBCopyright \(co The Internet Society (2003).  All Rights Reserved.\fR
+.pp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.pp
+The limited permission granted above are perpetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.pp
+This document and the information contained herein is provided on an \(lqAS
+IS\(rq basis and \fBTHE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK
+FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY
+RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+PARTICULAR PURPOSE.
+

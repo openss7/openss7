@@ -1,0 +1,682 @@
+Network Working Group                                      Tom George
+INTERNET-DRAFT                                        Monique Bernard
+                                                          Jeff Copley
+                                                          Wayne Davis
+                                                         Cliff Thomas
+                                                              Alcatel
+
+Expires May 2002                                     November 9, 2001
+
+               M2PA Interoperability Test Results and Issues
+                <draft-george-sigtran-m2pa-interop-00.txt>
+
+Status of This Memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of RFC 2026. Internet-Drafts are working
+documents of the Internet Engineering Task Force (IETF), its areas,
+and its working groups.  Note that other groups may also distribute
+working documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time.  It is inappropriate to use Internet-Drafts as reference
+material or to cite them other than as 'work in progress.'
+
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html.
+
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe),
+munnari.oz.au (Pacific Rim), ftp.ietf.org (US East Coast), or
+ftp.isi.edu (US West Coast).
+
+
+Abstract
+
+This document captures problems and issues discovered on the SIGTRAN
+mailing list and at M2PA Interoperability Tests. This document will be
+updated after each interoperability test to include any new
+issues. Two basic sets of problems are identified by this draft: (1)
+issues that need to be addressed in the next revision of the M2PA
+draft, and (2) issues that were found that are strictly implementation
+problems.
+
+
+                        TABLE OF CONTENTS
+
+1.  Introduction.............................................
+2.  Specification Issues .................................... 
+  2.1  SCTP Acknowledgement .................................
+  2.2  Link Status Out of Service Message ................... 
+  2.3  Aborting an Association for Performance ..............
+  2.4  Aborting an Association for MTP3 Stop ................
+  2.5  Failing a Link .......................................
+  2.6  Order of Transmission ................................
+  2.7  Local Processor Outage and Link Status Ready .........
+  2.8  Proper Stream for Proving Data Messages ..............
+  2.9  Tuning SCTP Parameters ...............................
+  2.10 M2PA Keep Alive Message ..............................
+  2.11 Emergency Changeover for Japanese SS7 ................
+  2.12 Eliminate Client/Server Distinction ..................
+  2.13 Resolving Normal and Emergency Proving ...............
+  2.14 Need Reference for Busy ..............................
+  2.15 Processor Outage and Busy in Various States ..........
+3.  Implementation Issues ...................................
+  3.1 None ..................................................
+4.  Acknowledgements.........................................
+5.  Authors Addresses........................................
+6.  References...............................................
+
+
+
+
+
+1. Introduction
+
+This document captures problems and issues discovered on the SIGTRAN
+email list and at M2PA Interoperability Tests. This document will be
+updated after each interoperability test to include any new issues.
+Two categories of problems will be identified in this draft: 
+
+   (1) issues that need to be addressed in the next revision of the
+       M2PA draft.
+
+   (2) issues that were found that are strictly implementation
+       problems.
+
+This document is intended to provoke discussion of M2PA issues with
+the goal of improving the protocol.
+
+Section 2 of this document details specification issues that need to
+be addressed in the next revision of the M2PA draft. Section 3 details
+implemenation problems with the current version of the M2PA
+draft. Both sections will use the following format for each issue:
+
+    Problem/Issue: A summary description of the problem/issue.
+
+    Description: A detailed description of the problem.
+
+    Advice/Solution: A synopsis of the solution that needs to be applied
+    to the specification or implementation.
+
+    Found at: The bakeoff that this issue arose at or when on the
+    mailing list the issue was raised.
+
+
+
+2. Specification Issues
+
+This section captures issues that need to be addressed in the next
+revision of the M2PA draft.  Each problem is described, along with a
+suggested action to resolve the problem. All changes here are
+suggestions that are subject to full working group review.
+
+
+2.1 SCTP Acknowledgement
+
+Problem/Issue: 
+
+SCTP acknowledges messages independent of delivery to upper
+layer. This can result in message loss during Processor Outage or Busy
+condition.
+
+Description: 
+
+In MTP2, detection of LPO (or Busy) causes the MTP2 layer to stop
+acknowledgement of incoming messages immediately. This forces the
+sending MTP to keep these messages in case they are needed for
+changeover.
+
+In M2PA/SCTP, there is no mechanism for immediately stopping
+acknowledgement of incoming messages. If M2PA detects LPO, it informs
+the peer, who then stops transmitting. While the Link Status Processor
+Outage messages traverses the link, numerous messages could be sent to
+the SCTP receive queue at the LPO end. These messages are removed from
+the sending SCTP's transmit queue. In the event of a failure at the
+receiver requiring a changeover, these messages would be lost. 
+
+Several possible solutions have been suggested for this problem:
+
+(1) M2PA ABORTs the association when it detects Local Processor
+    Outage. 
+
+(2) M2PA tells SCTP to set its a_rwnd = 0 when it detects Local
+    Processor Outage or Busy.
+
+(3) SCTP sends a "GAP ACK with no gap": SCTP acknowledges received data
+    chunks immediately but doesn't advance the cumulative TSN until
+    M2PA tells it to. This may result in the first GAP ACK block
+    starting immediately after the Cumulative TSN (GAP ack block start
+    = 0).
+
+(4) M2PA level ack - SCTP does not ack a message until M2PA gives
+    permission.
+
+(5) M2PA sequence numbers and queues - M2PA would have its own set of
+    sequence numbers for the User Data messages. These messages would
+    be acked at the M2PA level. M2PA would retain a sent message until
+    it received acknowledgement from the receiving M2PA. The M2PA
+    sequence numbers would be used for retrieval during changeover.
+
+Some comments about these possible solutions:
+
+Idea (1) is suitable for dealing with Local Processor Outage. It is
+not a good way to handle a Busy condition. If this is used for LPO,
+another method (such as 2) would be needed for Busy.
+
+It is not clear if (2) prevents packet loss effectively. Some
+clarification from the TSV Working Group is needed.
+
+A problem with (2) is that it stops Link Status as well as User Data
+messages. This would be bad for M2PA, since the M2PA peers would not
+be able to communicate status changes.
+
+Idea (3) appears to be the best choice from a technical point of
+view. The sender would retain a copy of the message until the
+cumulative TSN Ack is received. This would prevent message
+loss. Before using this idea, though, it should be discussed on the
+TSVWG mail list to make sure that it is compatible with the SCTP RFC.
+
+Idea (4) could cause problems with SCTP parameters. SCTP expects
+acknowledgement within certain time limits. Introducing a delay to
+receive approval from an upper layer could cause unnecessary
+retransmissions or even association loss. 
+
+Idea (5) fixes the problem. It requires no changes to the SCTP
+protocol. But it would be a big change to the m2PA protocol.
+
+Advice/Solution: 
+
+Seek clarification on (2) and (3) in TSVWG.
+
+Found at: 
+
+This problem has been discussed on the SIGTRAN e-mail list. See the
+following threads:
+
+"SCTP socket API and M2PA changeover" - beginning 10/30/01
+"M2PA: Acknowledgement Problem" - beginning 05/25/01
+
+The problem was discussed at the 1st M2PA Interoperability Test.
+
+
+2.2  Link Status Out of Service Message
+
+Problem/Issue: 
+
+There is no Link Status Out of Service message.
+
+Description: 
+
+If M2PA keeps an association up when the link is out of service, there
+should be a Link Status Out of Service message. M2PA could then inform
+its peer that it is in the Out of Service state.
+
+Advice/Solution: 
+
+Add another value to the list in 2.2.2  Link Status.
+
+Add advice on when to send the message.
+
+Found at: 
+
+This was suggested on the SIGTRAN e-mail list.
+
+
+2.3  Aborting an Association for Performance 
+
+Problem/Issue: 
+
+The M2PA draft does not give clear advice on when to abort an
+association because of poor association performance.
+
+Description: 
+
+The M2PA draft suggests that M2PA should abort an association when its
+performance is unsatisfactory. However, there are no firm guidelines
+for deciding if the association performance is unsatisfactory.
+
+It should be possible to set SCTP parameters so that SCTP monitors its
+own performance and decides if the association should be terminated.
+
+Advice/Solution: 
+
+Remove text from 4.1.6 Error Monitoring recommending that M2PA ABORT
+an association for performance reasons.
+
+Remove references to this in several places in the draft.
+
+Found at: 
+
+This was discussed at the 1st 1st M2PA Interoperability Test.
+
+
+2.4  Aborting an Association for MTP3 Stop
+
+Problem/Issue: 
+
+The M2PA draft does not give clear advice on when to abort an
+association because of an MTP3 Stop command.
+
+Description: 
+
+The M2PA draft [M2PAv3] recommends that M2PA not ABORT an association
+during the alignment procedure. If M2PA receives MTP3 Stop during
+alignment, M2PA should leave the association up and return to the Out
+of Service state.
+
+Furthermore, the draft states that M2PA should ABORT the association
+if MTP3 Stop is received while the link is In Service. This was
+thought to be necessary to stop SCTP transmission and do data
+retrieval for changeover.
+
+However, M2PA should be able to leave the association up even when it
+receives the MTP3 Stop command. Some care has to be taken to make sure
+that User Data messages are not transmitted while the link is out of
+service.
+
+The association should be aborted when:
+
+   a. SCTP aborts the association (Communication Lost).
+
+   b. Layer Management aborts the association (e.g., to re-initialize
+      SCTP parameters).
+
+There is no need for M2PA to abort the association.
+
+Advice/Solution: 
+
+Remove text from 4.1.6 Error Monitoring recommending that M2PA ABORT
+an association for performance reasons.
+
+Remove references to this in several places in the draft.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.5  Failing a Link
+
+Problem/Issue: 
+
+When should the link be failed?
+
+Description: 
+
+This is related to the questions about aborting the association and
+the Link Status OOS message. 
+
+Advice/Solution: 
+
+Since the link should have an OOS state and the association should not
+be aborted for MTP3 Stop or association performance, M2PA should only
+fail the link when:
+
+   a. MTP3 Stop
+
+   b. SCTP Communication Lost
+
+   c. M2PA receives Link Status OOS
+
+In none of these cases should M2PA ABORT the association. 
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.6 Order of Transmission
+
+Problem/Issue: 
+
+There has been some confusion about the transmission order of the MTP3
+message within the M2PA packet. 
+
+Description: 
+
+M2PA draft 3 contains some explanation of this, but it needs to be
+more explicit.
+
+Octets given from MTP3 to M2PA should be transmitted in the same order
+as specified in the SS7 standards.
+
+Advice/Solution: 
+
+Add more sample fields to the example picture at the end of 2.2.1. 
+
+Reverse the order of the bits in the Spare/PRI octet. 
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.7  Local Processor Outage and Link Status Ready
+
+Problem/Issue: 
+
+If M2PA receives a Local Processor Outage (LPO) while it is sending
+Link Status Ready messages, what should it do?
+
+Description: 
+
+The philosophy here is to continue the alignment/proving procedure so
+that the link is ready for service. So M2PA should continue sending
+its Link Status Ready messages periodically.
+
+However, M2PA should not allow the peer to begin sending User Data
+messages if it has an LPO. So M2PA should also send the Link Status
+Processor Outage message periodically. 
+
+Advice/Solution: 
+
+Clarify this in the M2PA section on Alignment.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.8  Proper Stream for Proving Data Messages
+
+Problem/Issue: 
+
+On which stream should Proving Data messages be sent?
+
+Description: 
+
+A problem can arise from sending Proving Data messages on the Data
+stream, as is required by M2PA draft 3. The Proving Data messages
+cause the Stream Sequence Number (SSN) on the Data Stream to be
+incremented. This could cause problems verifying which SSN belongs to
+which message.
+
+Advice/Solution: 
+
+Send the Proving Data on the Status stream. 
+
+This eliminates the need for separate Link Status Proving and Proving
+Data messages. Only the Link Status message is needed. An option can
+be allowed to add bytes to the Link Status message.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.9 Tuning SCTP Parameters
+
+Problem/Issue: 
+
+M2PA needs values for SCTP parameters different from the values
+recommended in the SCTP RFC. 
+
+Description: 
+
+Some of the SCTP parameter values recommended in [RFC2960] would be
+unsuitable for SS7 use. SS7 needs to detect failure conditions
+quickly. 
+
+Advice/Solution: 
+
+There should be some discussion of these values on the SIGTRAN
+list. The values should be documented in an applicability statement.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.10 M2PA Keep Alive Message
+
+Problem/Issue: 
+
+Does M2PA need a Keep Alive message?
+
+Description: 
+
+There is a concern that there may be a conflict between these two
+goals:
+
+   a. Making SCTP parameters tight enough that M2PA is informed of
+      association failure in a timely manner, and
+
+   b. Not making SCTP parameters so tight that they abort an
+      association because of brief glitches in the IP network.
+
+A Keep Alive message between M2PA peers was suggested to avoid this
+problem. M2PA would periodically send an unordered Keep Alive message
+on the Status stream. If M2PA did not receive a Keep Alive message
+from its peer for a certain time period, it would fail the link. 
+
+Advice/Solution: 
+
+If SCTP parameters can be set to monitor association performance
+adequately, then a Keep Alive message would not be necessary. This
+issue is shelved until the issue with the SCTP parameters is resolved.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.11 Emergency Changeover for Japanese SS7
+
+Problem/Issue: 
+
+There is a requirement in Japanese SS7 that MTP be able to retrieve
+all messages (unsent and unacked) for changeover.
+
+Description: 
+
+This was omitted from [M2PAv3] inadvertently.
+
+Advice/Solution: 
+
+Add this option to 4.2.6.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.12 Eliminate Client/Server Distinction
+
+Problem/Issue: 
+
+The distinction between Client and Server, even for initiating an
+association, may not be necessary. A Client and Server were designated
+in [M2PAv3] to prevent duplicate associations from being created.
+
+Description: 
+
+If both ends of the link know the source and destination IP address
+and port number, then SCTP will prevent the duplicate associations
+from being created.
+
+It is necessary that the SCTP at (at least) one of the endpoints be
+listening on the port that the other end is attempting to begin the
+association with. In practice, this would probably mean that at least
+one end's SCTP would be listening on the M2PA registered port.
+
+Advice/Solution: 
+
+Remove the Client/Server distinction and replace it with advice about
+beginning the association.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.13 Resolving Normal and Emergency Proving
+
+Problem/Issue: 
+
+How should M2PA proceed if one end wants to do Emergency Proving and
+the other wants to do Normal Proving?
+
+Description: 
+
+The two endpoints need to agree on which time will be used for the
+proving period. For example, what should happen when one M2PA begins
+Normal proving, and then its peer begins Emergency proving?
+
+This is addressed in the MTP specifications. Emergency proving takes
+precedence over Normal. 
+
+In the example, the end doing Normal proving would adjust its timer to
+the Emergency value, but continue sending Normal proving messages.
+
+Advice/Solution: 
+
+Clarify this in the M2PA draft.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.14 Need Reference for Busy
+
+Problem/Issue: 
+
+The M2PA draft 4.1.5 "Level 2 Flow Control" does not refer to a
+specific section of [RFC2960].
+
+Description: 
+
+Congestion control is described in section 7 of [RFC2960]. 
+
+Advice/Solution: 
+
+Refer to section 7 of [RFC2960]. 
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+2.15  Processor Outage and Busy in Various States
+
+Problem/Issue: 
+
+Can Link Status Processor Outage and Busy be received in all states?
+Is the behavior the same in all cases?
+
+Description: 
+
+The M2PA draft states requirements for Processor Outage and Busy
+without mentioning anything about the M2PA state. It is possible that
+the behavior may be different in some states. 
+
+Advice/Solution: 
+
+Some investigation is needed to see how Processor Outage and Busy are
+treated differently in various states.
+
+Found at: 
+
+This was discussed at the 1st M2PA Interoperability Test.
+
+
+3. Implementation Issues 
+
+This section presents implementation issues discovered at various
+interoperability tests. These issues do NOT require or indicate
+changes needed to the M2PA draft. Instead, these issues provide
+guidance to future implementors and provide input to applicability
+documents where appropriate.
+
+3.1 None
+
+
+4. Acknowledgements
+
+The authors would like to thank the following people for their
+participation in the 1st M2PA Interoperability Test (October 29 -
+November 1, 2001 at Alcatel in Plano):
+
+   Avi Chibotaro (Airslide Systems)
+   Ronen Katav (Airslide Systems)
+   Billy Chang (Catapult Communications)
+   Loren Chao (Catapult Communications)
+   Richard Mott (Catapult Communications)
+   Vijay Patel (Catapult Communications)
+   Ron Spiker (Catapult Communications)
+   Julien Dauverd (Cisco Systems)
+   Wayne Taylor (Cisco Systems)
+   Alex Katchourine (Inet)
+   Ushit Kumar (Inet)
+   Steve Tsao (Inet)
+   Brian Bidulock (OpenSS7)
+   Andrew Bidulock (OpenSS7)
+   Heinz Prantner (RadiSys)
+   Deepa Tonse (RadiSys)
+   Cheryl Baringer (Alcatel)
+   Robert Shull (Alcatel)
+   Lydia Huang (Alcatel)
+   Sandeep Dilwali
+
+
+5. Authors Addresses
+
+Tom George   
+Alcatel USA, Inc. 
+1000 Coit Road          
+Plano, TX 75075    
+USA
+EMail: Tom.George@alcatel.com
+Tel: +1-972-519-3168
+
+Monique Bernard
+Alcatel USA, Inc. 
+1000 Coit Road          
+Plano, TX 75075    
+USA
+EMail: Monique.Bernard@alcatel.com
+Tel: +1-972-519-3775
+
+Jeff Copley
+Alcatel USA, Inc. 
+1000 Coit Road          
+Plano, TX 75075    
+USA
+EMail: Jeff.Copley@alcatel.com
+Tel: +1-972-519-3758
+
+Wayne Davis
+Alcatel USA, Inc. 
+1000 Coit Road          
+Plano, TX 75075    
+USA
+EMail: Wayne.Davis@alcatel.com
+Tel: +1-972-477-8395
+
+Cliff Thomas
+Alcatel USA, Inc. 
+1000 Coit Road          
+Plano, TX 75075    
+USA
+EMail: Cliff.Thomas@alcatel.com
+Tel: +1-972-477-7015
+
+
+6. References
+
+[RFC2960] - Stewart, R.,Xie Q., et. al. - "Stream Control Transmission
+Protocol", RFC 2960, October 2000.
+
+[M2PAv3] - George, Tom, et. al. - "SS7 MTP2-User Peer-to-Peer
+Adaptation Layer", draft-ietf-sigtran-m2pa-03a.txt, July 20, 2001.
+
+
+
+This Internet Draft expires May 2002.
+
