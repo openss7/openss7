@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/14 12:15:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/22 01:31:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/14 12:15:09 $ by $Author: brian $
+# Last Modified $Date: 2004/05/22 01:31:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -145,7 +145,10 @@ endif
 
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/streams/modversions.h \
+	sys/streams/modversions.h
+
+if KERNEL_VERSIONS
+nobase_nodist_pkginclude_HEADERS += \
 	sys/streams/versions/aixcompat.ver \
 	sys/streams/versions/hpuxcompat.ver \
 	sys/streams/versions/liscompat.ver \
@@ -162,5 +165,6 @@ nobase_nodist_pkginclude_HEADERS = \
 	sys/streams/versions/strutil.ver \
 	sys/streams/versions/strsyms.ver \
 	sys/streams/versions/sth.ver
+endif
 
 # vim: ft=automake

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.23 2004/05/20 18:20:30 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.24 2004/05/22 01:31:56 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/20 18:20:30 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/22 01:31:56 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -330,9 +330,9 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [
 AC_DEFUN([_LFS_CHECK_XNS], [
     AC_ARG_WITH([xns],
         AS_HELP_STRING([--with-xns],
-            [include xns headers in install.  @<:@default=no@:>@]),
+            [include xns headers in install.  @<:@default=yes@:>@]),
         [with_xns="$withval"],
-        [with_xns='no'])
+        [with_xns='yes'])
     AC_MSG_CHECKING([for package xns headers])
     AC_MSG_RESULT([$with_xns])
     if test :"$with_xns" = :yes ; then :;
@@ -348,9 +348,9 @@ AC_DEFUN([_LFS_CHECK_XNS], [
 AC_DEFUN([_LFS_CHECK_TLI], [
     AC_ARG_WITH([tli],
         AS_HELP_STRING([--with-tli],
-            [include tli modules in build.  @<:@default=no@:>@]),
+            [include tli modules in build.  @<:@default=yes@:>@]),
         [with_tli="$withval"],
-        [with_tli='no'])
+        [with_tli='yes'])
     AC_MSG_CHECKING([for package tli modules])
     AC_MSG_RESULT([$with_tli])
     if test :"$with_tli" = :yes ; then :;
@@ -366,9 +366,9 @@ AC_DEFUN([_LFS_CHECK_TLI], [
 AC_DEFUN([_LFS_CHECK_INET], [
     AC_ARG_WITH([inet],
         AS_HELP_STRING([--with-inet],
-            [include inet driver in build.  @<:@default=no@:>@]),
+            [include inet driver in build.  @<:@default=yes@:>@]),
         [with_inet="$withval"],
-        [with_inet='no'])
+        [with_inet='yes'])
     AC_MSG_CHECKING([for package inet driver])
     AC_MSG_RESULT([$with_inet])
     if test :"$with_inet" = :yes ; then :;
@@ -384,9 +384,9 @@ AC_DEFUN([_LFS_CHECK_INET], [
 AC_DEFUN([_LFS_CHECK_XNET], [
     AC_ARG_WITH([xnet],
         AS_HELP_STRING([--with-xnet],
-            [include xnet library in build.  @<:@default=no@:>@]),
+            [include xnet library in build.  @<:@default=yes@:>@]),
         [with_xnet="$withval"],
-        [with_xnet='no'])
+        [with_xnet='yes'])
     AC_MSG_CHECKING([for package xnet library])
     AC_MSG_RESULT([$with_xnet])
     if test :"$with_xnet" = :yes ; then :;
@@ -402,9 +402,9 @@ AC_DEFUN([_LFS_CHECK_XNET], [
 AC_DEFUN([_LFS_CHECK_SOCK], [
     AC_ARG_WITH([sock],
         AS_HELP_STRING([--with-sock],
-            [include sock library in build.  @<:@default=no@:>@]),
+            [include sock library in build.  @<:@default=yes@:>@]),
         [with_sock="$withval"],
-        [with_sock='no'])
+        [with_sock='yes'])
     AC_MSG_CHECKING([for package socket library])
     AC_MSG_RESULT([$with_sock])
     if test :"$with_sock" = :yes ; then :;

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2004/05/20 18:20:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2004/05/22 01:31:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/20 18:20:30 $ by $Author: brian $
+# Last Modified $Date: 2004/05/22 01:31:55 $ by $Author: brian $
 #
 # =============================================================================
+
+if RPM_BUILD_USER
 
 bin_PROGRAMS			= \
 				strchg \
@@ -111,6 +113,10 @@ if WITH_XNET
 lib_LTLIBRARIES			+= libxnet.la
 
 endif
+
+endif
+
+if RPM_BUILD_KERNEL
 
 noinst_LIBRARIES		= \
 				libLfSkernel.a \
@@ -222,7 +228,6 @@ if WITH_SOCK
 
 libLfSmodules_a_SOURCES		+= \
 				src/modules/sockmod.c
-
 endif
 
 libLfSmodules_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
@@ -258,9 +263,13 @@ $(libLfScompat_a_OBJECTS): $(libLfScompat_a_DEPENDENCIES)
 streams.o: $(libLfSkernel_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
+endif
+
 EXTRA_DIST =
 dist_noinst_SCRIPTS =
 EXTRA_SCRIPTS =
+
+if RPM_BUILD_KERNEL
 
 KERNEL_MODULES			= streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
@@ -269,7 +278,29 @@ KMODCONF_EXT			= streams
 
 include am/kernel.am
 
+endif
+
 include am/libraries.am
+
+if RPM_BUILD_KERNEL
+if RPM_BUILD_USER
+install-exec-hook: post-modules post-libraries
+uninstall-hook: postun-modules postun-libraries
+else
+install-exec-hook: post-modules
+uninstall-hook: postun-modules
+endif
+else
+if RPM_BUILD_USER
+install-exec-hook: post-libraries
+uninstall-hook: postun-libraries
+else
+install-exec-hook:
+uninstall-hook:
+endif
+endif
+
+if RPM_BUILD_USER
 
 libstreams_la_SOURCES		= \
 				lib/libc/fattach.c \
@@ -359,11 +390,11 @@ strace_CFLAGS			= $(USER_CFLAGS)
 #strclean_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 #strclean_CFLAGS		= $(USER_CFLAGS)
 
-@srcdir@/src/util/strclean.c:
-	touch $@
+#@srcdir@/src/util/strclean.c:
+#	touch $@
 
-@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
-	touch $@
+#@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
+#	touch $@
 
 strerr_SOURCES			= src/util/strerr.c include/sys/config.h
 strerr_DEPENDENCIES		= include/sys/config.h
@@ -383,11 +414,11 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 #strload_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 #strload_CFLAGS			= $(USER_CFLAGS)
 
-@srcdir@/src/util/strload.c:
-	touch $@
+#@srcdir@/src/util/strload.c:
+#	touch $@
 
-@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
-	touch $@
+#@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
+#	touch $@
 
 #strsetup_SOURCES		= src/util/strsetup.c include/sys/config.h
 #strsetup_DEPENDENCIES		= include/sys/config.h
@@ -395,11 +426,11 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 #strsetup_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 #strsetup_CFLAGS		= $(USER_CFLAGS)
 
-@srcdir@/src/util/strsetup.c:
-	touch $@
+#@srcdir@/src/util/strsetup.c:
+#	touch $@
 
-@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
-	touch $@
+#@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
+#	touch $@
 
 strvf_SOURCES			= src/util/strvf.c include/sys/config.h
 strvf_DEPENDENCIES		= include/sys/config.h
@@ -459,6 +490,10 @@ test_xnet_thr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 
 endif
+
+endif
+
+if RPM_BUILD_KERNEL
 
 EXPORT_SRCFILES = \
 	src/compat/aix/aixcompat.c \
@@ -537,7 +572,13 @@ uninstall-devices: $(STRMAKENODES)
 
 endif
 
+endif
+
+if RPM_BUILD_USER
+
 SUBDIRS = include intl m4 po doc
+
+endif
 
 #
 # Rules for making rpms
