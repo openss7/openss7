@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/13 12:16:21 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/14 12:47:56 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -11,24 +11,24 @@
 # Redhat chkconfig init script conventions
 #
 # specfs:	mount and unmount specfs
-# chkconfig:	2345 55 88
+# chkconfig:	2345 01 98
 # lockfile:	/var/lock/subsys/specfs
 # config:	/etc/sysconfig/specfs
 # probe:	true
 # hide:		false
 # license:	GPL
-# description:	The SPECFS is a special shadow filesystem used for \
-#		Linux Fast-STREAMS.  The purpose of this init script \
-#		is to detect whether the specfs is supported for the \
-#		running kernel, and if it is, to configure and load \
-#		the kernel module associated with the special filesystem.
+# description:	The SPECFS is a special shadow filesystem used for Linux \
+#		Fast-STREAMS.  The purpose of this init script is to detect \
+#		whether the specfs is supported for the running kernel, and if \
+#		it is, to configure and load the kernel module associated with \
+#		the special filesystem.
 #
-# LSB init init script conventions
+# LSB init script conventions
 #
 ### BEGIN INIT INFO
 # Provides: specfs
-# Required-Start: $local_fs $network $remote_fs
-# Required-Stop: $local_fs $network $remote_fs
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 # Short-Description: mount and unmount specfs
@@ -42,61 +42,170 @@
 # Source init script functions library
 . /etc/init.d/functions
 
+name='specfs'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+
 # Specify defaults
 
-MOUNTPOINT="/dev/streams"
+SPECFS_MOUNTPOINT="/dev/streams"
+SPECFS_UID=
+SPECFS_GID=
+SPECFS_MODE=
 
 # Source redhat and/or debian config file
-[ -f /etc/specfs.conf ] && . /etc/specfs.conf
-[ -f /etc/default/specfs ] && . /etc/default/specfs
-[ -f /etc/sysconfig/specfs.conf ] && . /etc/sysconfig/specfs
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+# Build up the options string
 
 RETVAL=0
 
 umask 077
 
+SPECFS_OPTIONS=
+
 start() {
-    echo "Mounting SPECFS filesystem: "
-    [ -d /dev/streams ] || mkdir -p /dev/streams || return 1
-    mount -t specfs specfs $MOUNTPOINT
-    # FIXME: add options
+    if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+	[ -d "$SPECFS_MOUNTPOINT" ] || \
+	    action $"Creating mountpoint $SPECFS_MOUNTPOINT: " \
+		mkdir -p -- "$SPECFS_MOUNTPOINT"
+	RETVAL=$?
+	if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then :; else
+	    [ $RETVAL -eq 0 ] && \
+		action $"Mounting SPECFS filesystem on $SPECFS_MOUNTPOINT: " \
+		    mount -t specfs ${SPECFS_OPTIONS:+$SPECFS_OPTIONS }-- specfs "$SPECFS_MOUNTPOINT"
+	    RETVAL=$?
+	fi
+    fi
+    [ $RETVAL -eq 0 ] && touch $lockfile
     RETVAL=$?
-    echo ""
-    [ $RETVAL -eq 0 ] && touch /var/log/subsys/specfs
     return $RETVAL
 }
 
 stop() {
+    mount | grep ' on [^[:space:]]* type specfs' 2>/dev/null | \
+    while read -a tokens ; do
+	action $"Unmounting SPECFS filesystem from ${tokens[2]}: " \
+	    umount -- ${tokens[2]}
+    done
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
 }
 
-probe() {
-#
-#   subsystem unlocked, need to start
-#
-    [ ! -f /var/log/subsys/strace ] && { echo 'start' ; return 0 }
-#
-#   unmounted but subsystem locked, need to restart
-#
-    ( grep -q '\<specfs\>' /etc/mtab | grep -q '/dev/streams' ) 2>/dev/null \
-    || { echo 'restart' ; return 0 }
-#
-#   configuration files updated, need to reload
-#
-    [ -f /etc/sysconfig/specfs -a /etc/sysconfig/specfs -nt /var/lock/subsys/specfs ] \
-    && { echo 'reload' ; return 0 }
-    [ -f /etc/default/specfs   -a /etc/default/specfs   -nt /var/lock/subsys/specfs ] \
-    && { echo 'reload' ; return 0 }
-    [ -f /etc/specfs.conf      -a /etc/specfs.conf      -nt /var/lock/subsys/specfs ] \
-    && { echo 'reload' ; return 0 }
-#
-#   do not need to do anything
-#
+restart() {
+    stop
+    start
     return $?
 }
-
+
+reload() {
+    [ -n "$SPECFS_MOUNTPOINT" ] || return 0
+    SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
+    action $"Remounting SPECFS on $SPECFS_MOUNTPOINT: " \
+	mount -t specfs ${SPECFS_OPTIONS} -- specfs $SPECFS_MOUNTPOINT
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	[ -n "$SPECFS_UID" ] && \
+	    SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
+	[ -n "$SPECFS_GID" ] && \
+	    SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
+	[ -n "$SPECFS_MODE" ] && \
+	    SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
+	$1 || RETVAL=$?
+	;;
+    (status)
+	# First check for mount
+	if grep '\<specfs\>' /etc/mtab >/dev/null 2>&1 ; then
+	    # mounted
+	    if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+		# mounted in the right place
+		echo $"$name ($SPECFS_MOUNTPOINT) is mounted..."
+		RETVAL=0
+	    else
+		# mounted in the wrong place
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    echo $"$name is mounted in wrong place"
+		    RETVAL=1
+		else
+		    echo $"$name should not be mounted"
+		    RETVAL=1
+		fi
+	    fi
+	else
+	    # See if lockfile exists
+	    if [ -f $lockfile ] ; then
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    echo $"$name not mounted but subsys locked"
+		    RETVAL=2
+		else
+		    echo $"$name is not mounted..."
+		    RETVAL=0
+		fi
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
+	;;
+    (condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	if grep '\<specfs\>' /etc/mtab >/dev/null 2>&1 ; then
+	    # mounted
+	    if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+		# mounted in the right place
+		if [ ! -f $lockfile ] ; then
+		    # mounted in the right place but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # mounted in the right place and subsystem locked
+		    for file in $config ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updated, need to reload
+			    echo 'reload'
+			    break;
+			fi
+		    done
+		fi
+	    else
+		# mounted, but in the wrong place (or should not be mounted), need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unmounted
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    # unmounted (wrong) but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/13 12:16:21 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/14 12:47:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -142,7 +251,7 @@ probe() {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/13 12:16:21 $ by $Author: brian $
+# Last Modified $Date: 2005/02/14 12:47:56 $ by $Author: brian $
 #
 # =============================================================================
 
