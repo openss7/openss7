@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strmod_add.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
+.\" @(#) $Id: strmod_add.9.man,v 0.9.2.4 2004/03/15 07:58:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/15 07:58:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRMOD_ADD 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRMOD_ADD 9 "$Date: 2004/03/15 07:58:57 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -87,7 +87,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/strconf.h>
 .HP
-dev_t \fBstrmod_add\fR(dev_t \fIdev\fR, struct streamtab *\fIstr\fR, struct streamadm *\fIsa\fR);
+dev_t \fBstrmod_add\fR(dev_t \fIdev\fR, struct streamtab *\fIst\fR, struct streamadm *\fIsa\fR);
 .\"
 .\"
 .SH ARGUMENTS
@@ -99,7 +99,7 @@ The external device number to use when adding a driver.  If
 is used, the first available slot is used.  This parameter is ignored for
 modules.
 .TP
-.I str
+.I st
 A pointer to the
 .B streamtab
 structure describing the
@@ -120,8 +120,58 @@ module.  This structure does not have to be statically allocated.
 .SH DESCRIPTION
 .PP
 .BR strmod_add ()
+is used to configure
+.I STREAMS
+modules and drivers into the kernel.  It allows
+.I STREAMS
+drivers to add entry points in character device switch tables.  Modules are
+added to the
+.I STREAMS
+module switch.
+.PP
+When adding a driver only,
+.BR strmod_add ()
+takes a device number, which is used to determine the device switch slot for
+the entry points.  A
+.I STREAMS
+driver can supply
+.B NODEV
+insead of a device number.  In this case,
+.BR strmod_add ()
+finds the first available device switch slot and returns the number actually
+used.  If a device switch lot is already in use or if there are not slots
+available,
+.B NODEV
+is returned.
+.PP
+.I st
+is a pointer to a traditional
+.[
+svr3
+.]
+.B streamtab
+structure.  The structure contains pointers to entry points for the module's
+read and write queue routines.
+.PP
+.I sa
+points to a
+.B streamadm
+structure providing additional information that is required under
+.IR OSF/1 \(rg.
 .\"
 .SS CONFIGURATION
+.PP
+The
+.B streamadm
+structure defines additional configuration information for
+.I STREAMS
+modules and drivers.
+.IR OSF \(rg
+uses this structure in addition to the traditional
+.B streamtab
+structure when configuring a
+.I STREAMS
+module or driver.
 .PP
 .nf
 \fC\s-1
@@ -140,20 +190,86 @@ struct streamadm {
 Version of the
 .B streamadm
 structure.
+This field is for forward and backward compatibility.
+.IP ""
+This field is ignored by
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
 .TP
 .B sa_flags
+Flags specifying additional characteristics of the module or driver being
+added.  The flags are a bitwise OR of one or more of the following flags:
 .RS
 .TP
 .B STR_IS_DEVICE
+The
+.I STREAMS
+module being registered is a device driver.  For drivers, the
+.I dev
+argument to
+.BR strmod_add ()
+and the return value
+are significant.
+One, and only one, of
+.B STR_IS_DEVICE
+or
+.B STR_IS_MODULE
+can be specified.
 .TP
 .B STR_IS_MODULE
+The
+.I STREAMS
+module being registered is a pushable module.  For pushable modules, the
+.I dev
+argument to
+.BR strmod_add ()
+and the return value
+are ignored.
+One, and only one, of
+.B STR_IS_DEVICE
+or
+.B STR_IS_MODULE
+can be specified.
 .TP
 .B STR_SYSV4_OPEN
+The
+.I STREAMS
+module or driver being registered follows
+.I SVR 4
+.BR qopen (9)
+semantics.  If this flag is not set, the
+module or driver obeys
+.I SVR 3
+.BR qopen (9)
+semantics.
 .TP
 .B STR_QSAFETY
+When this flag is set, it indicates that the module or driver requires
+interrupt-safe callback functions.  Setting this flag causes the
+.I STREAMS
+executive to suppress interrupts while executing all asynchronous callback
+functions.
 .RE
 .TP
 .B sa_name
+The unique name of the module or driver.  Modules and drivers share a common
+name space.  The maximum length for a name is set by
+.BR FMNAMESZ ,
+which is typically set to eight (8) characters.
+.IP ""
+This name is used to register character devices for device drivers, and is the
+name that must be used as the argument of an
+.B I_PUSH
+IO control
+.RB (see streamio (7))
+for a pushable module.  It is also used as the name for verification of module
+presence for both modules and drivers with the
+.BR sad (4)
+driver and the
+.BR autopush (8)
+utility.
 .TP
 .B sa_ttys
 A pointer to the
@@ -169,26 +285,65 @@ structure.  If the driver is not a
 .BR tty ,
 this field is set to
 .BR NULL .
+.IP ""
+This field is ignored by
+.BR "Linux Fast-STREAMS" .
 .TP
 .B sa_sync_level
+This field specifies the synchronization level to be used with the module or
+drivers.  The syncrhonization level specifies the number of concurrent thread
+of execution that can be within a scope.
+For additional information concerning the synchornization of
+.I STREAMS
+modules and drivers, see
+.BR mt-streams (9).
+The scope can be specified at one of
+a number of levels as follows:
 .RS
 .TP
 .B SQLVL_DEFAULT
+Default level synchronization.
+.IP ""
+.IR OSF \(rg
+specifies
+.[
+osfspg
+.]
+that the default level is the same as
+.BR SQLVL_GLOBAL ,
+below.
 .TP
 .B SQLVL_GLOBAL
+Global level syncrhonization.
 .TP
 .B SQLVL_ELSEWHERE
+Arbitrary level sychronization.
 .TP
 .B SQLVL_MODULE
+Module level synchronization.
 .TP
 .B SQLVL_QUEUEPAIR
+Queue pair level synchronization.
 .TP
 .B SQLVL_QUEUE
+Queue level synchronization.
 .TP
 .B SQLVL_NOP
+No synchronization.
+.IP ""
+This level is not provided by
+.IR OSF \(rg.
+.[
+osfspg
+.]
 .RE
 .TP
 .B sa_sync_info
+A pointer to synchronization data.  This field is relevant only if
+.I sa_sync_level
+is set to
+.BR SQLVL_ELSEWHERE
+and specifies the arbitrary scope of synchronization.
 .\"
 .\"
 .SH RETURN
@@ -219,6 +374,9 @@ can be called from
 .\"
 .SH NOTICES
 .PP
+The device number can be constructed from the major number with
+.BR makedevice (9).
+.PP
 .BR strmod_add ()
 is a
 .IR OSF \(rg-specific
@@ -233,6 +391,12 @@ defined.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR qopen (9),
+.BR streamio (7),
+.BR sad (4),
+.BR autopush (8),
+.BR mt-streams (9),
+.BR makedevice (9),
 .BR STREAMS (9).
 .\"
 .\"
@@ -249,6 +413,53 @@ is compatible with
 .IR OSF \(rg
 with the following portablity considerations:
 .IP \(em \w'\ \(em\ 'u
+.BR strmod_add ()
+ignores the
+.I sa_version
+field of the
+.B streamadm
+structure, unlike
+.IR OSF \(rg.
+.[
+osfdoc
+.]
+.IP \(em
+.BR strmod_add ()
+ignores the
+.I sa_ttys
+field of the
+.B streamadm
+structure, unlike
+.IR OSF \(rg.
+.[
+osfdoc
+.]
+.IP \(em
+Specifying
+.B SQLVL_DEFAULT
+in the
+.I sa_sync_level
+field of the
+.B streamadm
+structure is equivalent to
+.B SQLVL_MODULE
+instead of
+.B SQLVL_GLOBAL
+as specified in
+.IR OSF \(rg
+documentation.
+.[
+osfdoc
+.]
+.IP \(em
+.BR strmod_add ()
+recognizes the
+.B SQLVL_NOP
+setting in the
+.I sa_sync_level
+field, whereas,
+.IR OSF \(rg
+does not document this level.
 .IP \(em
 .IP \(em
 .IP \(em

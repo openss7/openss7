@@ -1,0 +1,1022 @@
+% -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
+% =========================================================================
+%
+% @(#) $Id: porting.texi,v 0.9.2.1 2004/03/15 07:59:39 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/03/15 07:59:39 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename porting.info
+@settitle Linux Fast-STREAMS Porting Guide
+@setchapternewpage odd
+
+@dircategory STREAMS
+@direntry
+* Porting: (porting).		STREAMS Porting Guide
+@end direntry
+
+@set xref-automatic-section-title
+
+@set EDITION 0.9.1
+@set VERSION 0.9.1
+@set UPDATED 2004-03-12
+
+@defindex op
+
+@ifinfo
+This file provides the Linux Fast-STREAMS Manual.
+
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{Linux Fast-STREAMS Porting Guide}, for Version @value{VERSION}.
+
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@@openss7.org>
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant ot the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@iftex
+@shorttitlepage Linux Fast-STREAMS Porting Guide
+@end iftex
+@titlepage
+@title Linux Fast-STREAMS Porting Guide
+@subtitle Edition @value{EDITION} for version @value{VERSION}
+@subtitle @value{UPDATED}
+@author Brian Bidulock  @cite{@email{bidulock@@openss7.org}}
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @email{bidulock@@openss7.org} @*
+All Rights Reserved. @*
+
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+@end titlepage
+@page
+
+@node Top, Acknowledgements, (dir), (dir)
+@ifnottex
+@top Main Menu
+@end ifnottex
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{Linux Fast-STREAMS Manual}, for Version @value{VERSION}.
+
+@menu
+* Acknowledgements::
+* Overview::
+* Porting::
+* Appendices::
+
+ --- The Detailed Node Listing ---
+
+Acknowledgements
+
+* Sponsors::                    Sponsors of Linux Fast-STREAMS
+* Contributors::                Contributors to Linux Fast-STREAMS
+
+Overview
+
+* Introduction::                An Introduction to Linux Fast-STREAMS
+* Concepts::                    STREAMS Concepts
+
+Porting
+
+* Porting from SVR 4.2 MP::
+* Porting from AIX 5L Version 5.1::
+* Porting from HP-UX 11.0i v2::
+* Porting from OSF/1 1.2/Digital UNIX::
+* Porting from UnixWare 7.1.3 (OpenUnix 8)::
+* Porting from Solaris 9/SunOS 5.9::
+* Porting from Super/UX::
+* Porting from UX/P::
+* Porting from Linux STREAMS (LiS) 2.16.18::
+
+Appendices
+
+* Copying::                     Copying information for this Software
+* Documentation License::       Copying information for this Manual
+* Indices::                     Indices
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@iftex
+@node Acknowledgements
+@end iftex
+@ifnottex
+@node Acknowledgements, Overview, Top, Top
+@end ifnottex
+@unnumbered Acknowledgements
+@cindex credits
+
+@menu
+* Sponsors::                    Sponsors of Linux Fast-STREAMS
+* Contributors::                Contributors to Linux Fast-STREAMS
+@end menu
+
+@node Sponsors,  ,  , Acknowledgements
+@unnumberedsec Sponsors of Linux Fast-STREAMS
+@cindex sponsors
+
+Funding for completion of Linux Fast-STREAMS was provided by:
+
+OpenSS7 Corporation
+
+Additional funding for The OpenSS7 Project was provided by:
+
+@node Contributors,  ,  , Acknowledgements
+@unnumberedsec Contributors to Linux Fast-STREAMS
+@cindex contributors
+
+The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
+
+@node Overview, Porting, Acknowledgements, Top
+@chapter Overview of Linux Fast-STREAMS
+@cindex overview
+@menu
+* Introduction::                An Introduction to Linux Fast-STREAMS
+* Concepts::                    STREAMS Concepts
+@end menu
+
+This manual documents how to develop and port STREAMS drivers and modules for
+Linux Fast-STREAMS.
+
+@node Introduction, Concepts, , Overview
+@section Introduction
+@cpindex introduction
+@menu
+* Q and A::			Questions and Answers
+@end menu
+
+@node Q and A, , , Introduction
+@subsection Questions and Answers
+@cpindex questions
+@cpindex answers
+@cpindex FAQ
+
+@subsubsection What is STREAMS?
+
+@subsubsection Doesn't Linux have STREAMS?
+
+@subsubsection Why STREAMS?
+
+@subsubsection Why Fast?
+
+@subsubsection Why Linux?
+
+@subsubsection Why Compatibility?
+
+@node Concepts, , Introduction, Overview
+@section Concepts
+@cpindex concepts
+
+@node Porting, Appendices, Overview, Top
+@chapter Porting
+@cindex porting
+
+Although each of the manual pages of supported functions and structures
+provides compatiblity and porting information, this document attempts to
+gather together pertinent information concerning porting from various UNIX
+operating system supporting STREAMS.
+
+The porting information is organized by the operating system from which
+porting is being attempted.  Note that, aside from configuration details, any
+system not listed here that is based on SVR 4.2 MP or on a another of the
+implementations, should start with that implementation's portability
+information.
+
+Porting information is organized into sections as follows:
+
+@menu
+* Porting from SVR 4.2 MP::
+* Porting from AIX 5L Version 5.1::
+* Porting from HP-UX 11.0i v2::
+* Porting from OSF/1 1.2/Digital UNIX::
+* Porting from UnixWare 7.1.3 (OpenUnix 8)::
+* Porting from Solaris 9/SunOS 5.9::
+* Porting from Super/UX::
+* Porting from UX/P::
+* Porting from Linux STREAMS (LiS) 2.16.18::
+@end menu
+
+@section Base Functions
+@cindex Base Functions
+
+@table @asis
+@item @b{adjmsg}(9)
+@fnindex adjmsg(9)
+@item @b{allocb}(9)
+@fnindex allocb(9)
+@item @b{bufcall}(9)
+@fnindex bufcall(9)
+@item @b{copyb}(9)
+@fnindex copyb(9)
+@item @b{copymsg}(9)
+@fnindex copymsg(9)
+@item @b{datamsg}(9)
+@fnindex datamsg(9)
+@item @b{dupb}(9)
+@fnindex dupb(9)
+@item @b{dupmsg}(9)
+@fnindex dupmsg(9)
+@item @b{esballoc}(9)
+@fnindex esballoc(9)
+@item @b{freeb}(9)
+@fnindex freeb(9)
+@item @b{freemsg}(9)
+@fnindex freemsg(9)
+@item @b{linkb}(9)
+@fnindex linkb(9)
+@item @b{msgdsize}(9)
+@fnindex msgdsize(9)
+@item @b{msgpullup}(9)
+@fnindex msgpullup(9)
+@item @b{pcmsg}(9)
+@fnindex pcmsg(9)
+@item @b{pullupmsg}(9)
+@fnindex pullupmsg(9)
+@item @b{rmvb}(9)
+@fnindex rmvb(9)
+@item @b{testb}(9)
+@fnindex testb(9)
+@item @b{unbufcall}(9)
+@fnindex unbufcall(9)
+@item @b{unlinkb}(9)
+@fnindex unlinkb(9)
+@end table
+
+@table @asis
+@item @b{backq}(9)
+@fnindex backq(9)
+@item @b{bcanput}(9)
+@fnindex bcanput(9)
+@item @b{canenable}(9)
+@fnindex canenable(9)
+@item @b{enableok}(9)
+@fnindex enableok(9)
+@item @b{flushband}(9)
+@fnindex flushband(9)
+@item @b{flushq}(9)
+@fnindex flushq(9)
+@item @b{getq}(9)
+@fnindex getq(9)
+@item @b{insq}(9)
+@fnindex insq(9)
+@item @b{noenable}(9)
+@fnindex noenable(9)
+@item @b{OTHERQ}(9)
+@fnindex OTHERQ(9)
+@item @b{putbq}(9)
+@fnindex putbq(9)
+@item @b{putctl}(9)
+@fnindex putctl(9)
+@item @b{putctl1}(9)
+@fnindex putctl1(9)
+@item @b{putq}(9)
+@fnindex putq(9)
+@item @b{qenable}(9)
+@fnindex qenable(9)
+@item @b{qreply}(9)
+@fnindex qreply(9)
+@item @b{qsize}(9)
+@fnindex qsize(9)
+@item @b{RD}(9)
+@fnindex RD(9)
+@item @b{rmvq}(9)
+@fnindex rmvq(9)
+@item @b{SAMESTR}(9)
+@fnindex SAMESTR(9)
+@item @b{WR}(9)
+@fnindex WR(9)
+@end table
+
+@table @asis
+@item @b{bcanputnext}(9)
+@fnindex bcanputnext(9)
+@item @b{canputnext}(9)
+@fnindex canputnext(9)
+@item @b{freezestr}(9)
+@fnindex freezestr(9)
+@item @b{put}(9)
+@fnindex put(9)
+@item @b{putnext}(9)
+@fnindex putnext(9)
+@item @b{putnextctl1}(9)
+@fnindex putnextctl1(9)
+@item @b{putnextctl}(9)
+@fnindex putnextctl(9)
+@item @b{qprocsoff}(9)
+@fnindex qprocsoff(9)
+@item @b{qprocson}(9)
+@fnindex qprocson(9)
+@item @b{strqget}(9)
+@fnindex strqget(9)
+@item @b{strqset}(9)
+@fnindex strqset(9)
+@item @b{unfreezestr}(9)
+@fnindex unfreezestr(9)
+@end table
+
+@table @asis
+@item @b{kmem_alloc}(9)
+@fnindex kmem_alloc(9)
+@item @b{kmem_free}(9)
+@fnindex kmem_free(9)
+@item @b{kmem_zalloc}(9)
+@fnindex kmem_zalloc(9)
+@item @b{cmn_err}(9)
+@fnindex cmn_err(9)
+@item @b{bcopy}(9)
+@fnindex bcopy(9)
+@item @b{bzero}(9)
+@fnindex bzero(9)
+@item @b{copyin}(9)
+@fnindex copyin(9)
+@item @b{copyout}(9)
+@fnindex copyout(9)
+@item @b{delay}(9)
+@fnindex delay(9)
+@item @b{drv_getparm}(9)
+@fnindex drv_getparm(9)
+@item @b{drv_hztomsec}(9)
+@fnindex drv_hztomsec(9)
+@item @b{drv_htztousec}(9)
+@fnindex drv_htztousec(9)
+@item @b{drv_msectohz}(9)
+@fnindex drv_msectohz(9)
+@item @b{drv_priv}(9)
+@fnindex drv_priv(9)
+@item @b{drv_usectohz}(9)
+@fnindex drv_usectohz(9)
+@item @b{drv_usecwait}(9)
+@fnindex drv_usecwait(9)
+@item @b{min}(9)
+@fnindex min(9)
+@item @b{max}(9)
+@fnindex max(9)
+@item @b{getmajor}(9)
+@fnindex getmajor(9)
+@item @b{getminor}(9)
+@fnindex getminor(9)
+@item @b{makedevice}(9)
+@fnindex makedevice(9)
+@item @b{mknod}(9)
+@fnindex mknod(9)
+@item @b{mount}(9)
+@fnindex mount(9)
+@item @b{strlog}(9)
+@fnindex strlog(9)
+@item @b{timeout}(9)
+@fnindex timeout(9)
+@item @b{umount}(9)
+@fnindex umount(9)
+@item @b{unlink}(9)
+@fnindex unlink(9)
+@item @b{untimeout}(9)
+@fnindex untimeout(9)
+@end table
+
+@table @asis
+@item @b{linkmsg}(9)
+@fnindex linkmsg(9)
+@item @b{putctl2}(9)
+@fnindex putctl2(9)
+@item @b{putnextctl2}(9)
+@fnindex putnextctl2(9)
+@item @b{weldq}(9)
+@fnindex weldq(9)
+@item @b{unweldq}(9)
+@fnindex unweldq(9)
+@end table
+
+@table @asis
+@item @b{allocq}(9)
+@fnindex allocq(9)
+@item @b{bcanget}(9)
+@fnindex bcanget(9)
+@item @b{canget}(9)
+@fnindex canget(9)
+@item @b{freeq}(9)
+@fnindex freeq(9)
+@item @b{qattach}(9)
+@fnindex qattach(9)
+@item @b{qclose}(9)
+@fnindex qclose(9)
+@item @b{qdetach}(9)
+@fnindex qdetach(9)
+@item @b{qopen}(9)
+@fnindex qopen(9)
+@item @b{setq}(9)
+@fnindex setq(9)
+@end table
+
+@table @asis
+@item @b{appq}(9)
+@fnindex appq(9)
+@item @b{esbbcall}(9)
+@fnindex esbbcall(9)
+@item @b{isdatablk}(9)
+@fnindex isdatablk(9)
+@item @b{isdatamsg}(9)
+@fnindex isdatamsg(9)
+@item @b{kmem_zalloc_node}(9)
+@fnindex kmem_zalloc_node(9)
+@item @b{msgsize}(9)
+@fnindex msgsize(9)
+@item @b{qcountstrm}(9)
+@fnindex qcountstrm(9)
+@item @b{xmsgsize}(9)
+@fnindex xmsgsize(9)
+@end table
+
+
+@node Porting from SVR 4.2 MP, Porting from AIX 5L Version 5.1, , Porting
+@section Porting from SVR 4.2 MP
+@cindex Porting from SVR 4.2 MP
+
+This section captures portability information for SVR 4.2 MP based systems.
+If the operating system from which you are porting more closely fits one of
+the other portability sections, please see that section.
+
+@subsection Differences from SVR 4.2 MP
+@subsection Commonalities with SVR 4.2 MP
+@subsection Compatibility functions for SVR 4.2 MP
+
+@table @asis
+@item @b{itimeout}(9)
+@fnindex itimeout(9)
+perform a timeout at an interrupt level
+@item @b{LOCK}(9)
+@fnindex LOCK(9)
+lock a basic lock
+@item @b{LOCK_ALLOC}(9)
+@fnindex LOCK_ALLOC(9)
+allocate a basic lock
+@item @b{LOCK_DEALLOC}(9)
+@fnindex LOCK_DEALLOC(9)
+deallocate a basic lock
+@item @b{major}(9)
+@fnindex major(9)
+get the internal major number of a device
+@item @b{makedev}(9)
+@fnindex makedev(9)
+make a device number from internal major and minor device numbers
+@item @b{minor}(9)
+@fnindex minor(9)
+get the internal minor number of a device
+@item @b{sleep}(9)
+@fnindex sleep(9)
+put a process to sleep
+@item @b{spl0}(9)
+@fnindex spl0(9)
+set priority level 0
+@item @b{spl1}(9)
+@fnindex spl1(9)
+set priority level 1
+@item @b{spl2}(9)
+@fnindex spl2(9)
+set priority level 2
+@item @b{spl3}(9)
+@fnindex spl3(9)
+set priority level 3
+@item @b{spl4}(9)
+@fnindex spl4(9)
+set priority level 4
+@item @b{spl5}(9)
+@fnindex spl5(9)
+set priority level 5
+@item @b{spl6}(9)
+@fnindex spl6(9)
+set priority level 6
+@item @b{spl7}(9)
+@fnindex spl7(9)
+set priority level 7
+@item @b{spl}(9)
+@fnindex spl(9)
+set priority level
+@item @b{splx}(9)
+@fnindex splx(9)
+set priority level x
+@item @b{SV_ALLOC}(9)
+@fnindex SV_ALLOC(9)
+allocate a basic condition variable
+@item @b{SV_BROADCAST}(9)
+@fnindex SV_BROADCAST(9)
+broadcast a basic condition variable
+@item @b{SV_DEALLOC}(9)
+@fnindex SV_DEALLOC(9)
+deallocate a basic condition variable
+@item @b{SV_SIGNAL}(9)
+@fnindex SV_SIGNAL(9)
+signal a basic condition variable
+@item @b{SV_WAIT}(9)
+@fnindex SV_WAIT(9)
+wait on a basic condition variable
+@item @b{SV_WAIT_SIG}(9)
+@fnindex SV_WAIT_SIG(9)
+interruptible wait on a basic condition variable
+@item @b{TRYLOCK}(9)
+@fnindex TRYLOCK(9)
+try to lock a basic lock
+@item @b{UNLOCK}(9)
+@fnindex UNLOCK(9)
+unlock a basic lock
+@item @b{vtop}(9)
+@fnindex vtop(9)
+convert virtual to physical address
+@item @b{wakeup}(9)
+@fnindex wakeup(9)
+wake a process
+@end table
+
+@subsection Configuration ala SVR 4.2 MP
+
+@node Porting from AIX 5L Version 5.1, Porting from HP-UX 11.0i v2, Porting from SVR 4.2 MP, Porting
+@section Porting from AIX 5L Version 5.1
+@cindex Porting from AIX 5L Version 5.1
+
+@subsection Differences from AIX 5L Version 5.1
+@subsection Commonalities with AIX 5L Version 5.1
+@subsection Compatibility Functions for AIX 5L Version 5.1
+
+@table @asis
+@item @b{mi_bufcall}(9)
+@fnindex mi_bufcall(9)
+reliable alternative to @b{buffcall}(9)
+@item @b{mi_close_comm}(9)
+@fnindex mi_close_comm(9)
+@i{STREAMS} common minor device close utility
+@item @b{mi_next_ptr}(9)
+@fnindex mi_next_ptr(9)
+@i{STREAMS} common minor device list traversal
+@item @b{mi_open_comm}(9)
+@fnindex mi_open_comm(9)
+@i{STREAMS} common minor device open utility
+@item @b{putctl2}(9)
+@fnindex putctl2(9)
+puts a 2 byte control message on a @i{STREAMS}
+@item @b{splstr}(9)
+@fnindex splstr(9)
+@item @b{splx}(9)
+@fnindex splx(9)
+@item @b{str_install}(9)
+@fnindex str_install(9)
+install a @i{STREAMS} module or driver
+@item @b{unweldq}(9)
+@fnindex unweldq(9)
+unweld two pairs of streams queues
+@item @b{wantio}(9)
+@fnindex wantio(9)
+perform direct I/O from a @i{STREAMS} driver
+@item @b{wantmsg}(9)
+@fnindex wantmsg(9)
+provide a filter of wanted messages from a @i{STREAMS} module
+@item @b{weldq}(9)
+@fnindex weldq(9)
+weld together two paris of streams queues
+@end table
+
+@subsection Configuration ala AIX 5L Version 5.1
+
+@node Porting from HP-UX 11.0i v2, Porting from OSF/1 1.2/Digital UNIX, Porting from AIX 5L Version 5.1, Porting
+@section Porting from HP-UX 11.0i v2
+@cindex Porting from HP-UX 11.0i v2
+
+@subsection Differences from HP-UX 11.0i v2
+@subsection Commonalities with HP-UX 11.0i v2
+
+@subsection Compatibility Functions for HP-UX 11.0i v2
+
+@table @asis
+@item @b{putctl2}(9)
+@fnindex putctl2(9)
+puts a 2 byte control message on a @i{STREAMS} message queue
+@item @b{putnextctl2}(9)
+@fnindex putnextctl2(9)
+puts a 2 byte control message on the downstream @i{STREAMS} message queue
+@item @b{str_install}(9)
+@fnindex str_install(9)
+install a @i{STREAMS} module or driver
+@item @b{str_uninstall}(9)
+@fnindex str_uninstall(9)
+uninstall a @i{STREAMS} module or driver
+@item @b{streams_get_sleep_lock}(9)
+@fnindex streams_get_sleep_lock(9)
+@item @b{streams_put}(9)
+@fnindex streams_put(9)
+@item @b{unweldq}(9)
+@fnindex unweldq(9)
+unweld two pairs of streams queues
+@item @b{weldq}(9)
+@fnindex weldq(9)
+weld together two paris of streams queues
+@end table
+
+@subsection Configuration ala HP-UX 11.0i v2
+
+@node Porting from OSF/1 1.2/Digital UNIX, Porting from UnixWare 7.1.3 (OpenUnix 8), Porting from HP-UX 11.0i v2, Porting
+@section Porting from OSF/1 1.2/Digital UNIX
+@cindex Porting from OSF/1 1.2/Digital UNIX
+
+@subsection Differences from OSF/1 1.2/Digial UNIX
+@subsection Commonalities with OSF/1 1.2/Digial UNIX
+
+@subsection Compatibility Functions for OSF/1 1.2/Digial UNIX
+
+@table @asis
+@item @b{lbolt}(9)
+@fnindex lbolt(9)
+@item @b{puthere}(9)
+@fnindex puthere(9)
+@item @b{streams_open_comm}(9)
+@fnindex streams_open_comm(9)
+@item @b{streams_open_ocomm}(9)
+@fnindex streams_open_ocomm(9)
+@item @b{streams_close_comm}(9)
+@fnindex streams_close_comm(9)
+@item @b{strmod_add}(9)
+@fnindex strmod_add(9)
+@item @b{strmod_del}(9)
+@fnindex strmod_del(9)
+@item @b{time}(9)
+@fnindex time(9)
+@item @b{unweldq}(9)
+@fnindex unweldq(9)
+unweld two pairs of streams queues
+@item @b{weldq}(9)
+@fnindex weldq(9)
+weld together two paris of streams queues
+@end table
+
+@subsection Configuration ala OSF/1 1.2/Digial UNIX
+
+@node Porting from UnixWare 7.1.3 (OpenUnix 8), Porting from Solaris 9/SunOS 5.9, Porting from OSF/1 1.2/Digital UNIX, Porting
+@section Porting from UnixWare 7.1.3 (OpenUnix 8)
+@cindex Porting from UnixWare 7.1.3 (OpenUnix 8)
+
+@subsection Differences from UnixWare 7.1.3 (OpenUnix 8)
+@subsection Commonalities with UnixWare 7.1.3 (OpenUnix 8)
+
+@subsection Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)
+
+The following compatibility functions are in addition to all SVR 4.2
+compatibility functions.
+
+@table @asis
+@item @b{allocb_physreq}(9)
+@fnindex allocb_physreq(9)
+@item @b{ATOMIC_INT_ADD}(9)
+@fnindex ATOMIC_INT_ADD(9)
+@item @b{ATOMIC_INT_ALLOC}(9)
+@fnindex ATOMIC_INT_ALLOC(9)
+@item @b{ATOMIC_INT_DEALLOC}(9)
+@fnindex ATOMIC_INT_DEALLOC(9)
+@item @b{ATOMIC_INT_DECR}(9)
+@fnindex ATOMIC_INT_DECR(9)
+@item @b{ATOMIC_INT_INCR}(9)
+@fnindex ATOMIC_INT_INCR(9)
+@item @b{ATOMIC_INT_INIT}(9)
+@fnindex ATOMIC_INT_INIT(9)
+@item @b{ATOMIC_INT_READ}(9)
+@fnindex ATOMIC_INT_READ(9)
+@item @b{ATOMIC_INT_SUB}(9)
+@fnindex ATOMIC_INT_SUB(9)
+@item @b{ATOMIC_INT_WRITE}(9)
+@fnindex ATOMIC_INT_WRITE(9)
+@item @b{emajor}(9)
+@fnindex emajor(9)
+@item @b{eminor}(9)
+@fnindex eminor(9)
+@item @b{etoimajor}(9)
+@fnindex etoimajor(9)
+@item @b{getemajor}(9)
+@fnindex getemajor(9)
+@item @b{geteminor}(9)
+@fnindex geteminor(9)
+@item @b{itoemajor}(9)
+@fnindex itoemajor(9)
+@item @b{LOCK_OWNED}(9)
+@fnindex LOCK_OWNED(9)
+@item @b{MPSTR_QLOCK}(9)
+@fnindex MPSTR_QLOCK(9)
+@item @b{MPSTR_QRELE}(9)
+@fnindex MPSTR_QRELE(9)
+@item @b{MPSTR_STPLOCK}(9)
+@fnindex MPSTR_STPLOCK(9)
+@item @b{MPSTR_STPRELE}(9)
+@fnindex MPSTR_STPRELE(9)
+@item @b{msgphysreq}(9)
+@fnindex msgphysreq(9)
+@item @b{msgpullup_physreq}(9)
+@fnindex msgpullup_physreq(9)
+@item @b{msgscgth}(9)
+@fnindex msgscgth(9)
+@item @b{RW_ALLOC}(9)
+@fnindex RW_ALLOC(9)
+@item @b{RW_DEALLOC}(9)
+@fnindex RW_DEALLOC(9)
+@item @b{RW_RDLOCK}(9)
+@fnindex RW_RDLOCK(9)
+@item @b{RW_TRYRDLOCK}(9)
+@fnindex RW_TRYRDLOCK(9)
+@item @b{RW_TRYWRLOCK}(9)
+@fnindex RW_TRYWRLOCK(9)
+@item @b{RW_UNLOCK}(9)
+@fnindex RW_UNLOCK(9)
+@item @b{RW_WRLOCK}(9)
+@fnindex RW_WRLOCK(9)
+@item @b{SLEEP_ALLOC}(9)
+@fnindex SLEEP_ALLOC(9)
+@item @b{SLEEP_DEALLOC}(9)
+@fnindex SLEEP_DEALLOC(9)
+@item @b{SLEEP_LOCK}(9)
+@fnindex SLEEP_LOCK(9)
+@item @b{SLEEP_LOCKAVAIL}(9)
+@fnindex SLEEP_LOCKAVAIL(9)
+@item @b{SLEEP_LOCKOWNED}(9)
+@fnindex SLEEP_LOCKOWNED(9)
+@item @b{SLEEP_LOCK_SIG}(9)
+@fnindex SLEEP_LOCK_SIG(9)
+@item @b{SLEEP_TRYLOCK}(9)
+@fnindex SLEEP_TRYLOCK(9)
+@item @b{SLEEP_UNLOCK}(9)
+@fnindex SLEEP_UNLOCK(9)
+@item @b{strioccall}(9)
+@fnindex strioccall(9)
+@end table
+
+@subsection Configuration ala UnixWare 7.1.3 (OpenUnix 8)
+
+@node Porting from Solaris 9/SunOS 5.9, Porting from Super/UX, Porting from UnixWare 7.1.3 (OpenUnix 8), Porting
+@section Porting from Solaris 9/SunOS 5.9
+@cindex Porting from Solaris 9/SunOS 5.9
+
+@subsection Differences from Solaris 9/SunOS 5.9
+@subsection Commonalities with Solaris 9/SunOS 5.9
+
+@subsection Compatibility Functions for Solaris 9/SunOS 5.9
+
+@table @asis
+@item @b{ddi_create_minor_node}(9)
+@fnindex ddi_create_minor_node(9)
+@item @b{ddi_driver_major}(9)
+@fnindex ddi_driver_major(9)
+@item @b{ddi_driver_name}(9)
+@fnindex ddi_driver_name(9)
+@item @b{ddi_get_cred}(9)
+@fnindex ddi_get_cred(9)
+@item @b{ddi_getiminor}(9)
+@fnindex ddi_getiminor(9)
+@item @b{ddi_get_instance}(9)
+@fnindex ddi_get_instance(9)
+@item @b{ddi_get_lbolt}(9)
+@fnindex ddi_get_lbolt(9)
+@item @b{ddi_get_pid}(9)
+@fnindex ddi_get_pid(9)
+@item @b{ddi_get_soft_state}(9)
+@fnindex ddi_get_soft_state(9)
+@item @b{ddi_get_time}(9)
+@fnindex ddi_get_time(9)
+@item @b{ddi_remove_minor_node}(9)
+@fnindex ddi_remove_minor_node(9)
+@item @b{ddi_removing_power}(9)
+@fnindex ddi_removing_power(9)
+@item @b{ddi_soft_state}(9)
+@fnindex ddi_soft_state(9)
+@item @b{ddi_soft_state_fini}(9)
+@fnindex ddi_soft_state_fini(9)
+@item @b{ddi_soft_state_free}(9)
+@fnindex ddi_soft_state_free(9)
+@item @b{ddi_soft_state_init}(9)
+@fnindex ddi_soft_state_init(9)
+@item @b{ddi_soft_state_zalloc}(9)
+@fnindex ddi_soft_state_zalloc(9)
+@item @b{ddi_umem_alloc}(9)
+@fnindex ddi_umem_alloc(9)
+@item @b{ddi_umem_free}(9)
+@fnindex ddi_umem_free(9)
+@item @b{mod_info}(9)
+@fnindex mod_info(9)
+@item @b{mod_install}(9)
+@fnindex mod_install(9)
+@item @b{mod_remove}(9)
+@fnindex mod_remove(9)
+@item @b{qbufcall}(9)
+@fnindex qbufcall(9)
+@item @b{queclass}(9)
+@fnindex queclass(9)
+@item @b{qtimeout}(9)
+@fnindex qtimeout(9)
+@item @b{qunbufcall}(9)
+@fnindex qunbufcall(9)
+@item @b{quntimeout}(9)
+@fnindex quntimeout(9)
+@item @b{qwait}(9)
+@fnindex qwait(9)
+@item @b{qwait_sig}(9)
+@fnindex qwait_sig(9)
+@item @b{qwriter}(9)
+@fnindex qwriter(9)
+@end table
+
+@subsection Configuration ala Solaris 9/SunOS 5.9
+
+@node Porting from Super/UX, Porting from UX/P, Porting from Solaris 9/SunOS 5.9, Porting
+@section Porting from Super/UX
+@cindex Porting from Super/UX
+
+@subsection Differences from Super/UX
+@subsection Commonalities with Super/UX
+@subsection Configuration ala Super/UX
+
+@node Porting from UX/P, Porting from Linux STREAMS (LiS) 2.16.18, Porting from Super/UX, Porting
+@section Porting from UX/P
+@cindex Porting from UX/P
+
+@subsection Differences from UX/P
+@subsection Commonalities with UX/P
+@subsection Configuration ala UX/P
+
+@node Porting from Linux STREAMS (LiS) 2.16.18, , Porting from UX/P, Porting
+@section Porting from Linux STREAMS (LiS) 2.16.18
+@cindex Porting from Linux STREAMS (LiS) 2.16.18
+
+@subsection Differences from LiS 2.16.18
+@subsection Commonalities with LiS 2.16.18
+
+@subsection Compatibility Functions for LiS 2.16.18
+
+@table @asis
+@item @b{lis_date}(9)
+@fnindex lis_date(9)
+@item @b{lis_esbbcall}(9)
+@fnindex lis_esbbcall(9)
+@item @b{lis_find_strdev}(9)
+@fnindex lis_find_strdev(9)
+@item @b{lis_mknod}(9)
+@fnindex lis_mknod(9)
+@item @b{lis_mount}(9)
+@fnindex lis_mount(9)
+@item @b{lis_OTHER}(9)
+@fnindex lis_OTHER(9)
+@item @b{lis_register_strdev}(9)
+@fnindex lis_register_strdev(9)
+@item @b{lis_register_strmod}(9)
+@fnindex lis_register_strmod(9)
+@item @b{lis_umount2}(9)
+@fnindex lis_umount2(9)
+@item @b{lis_umount}(9)
+@fnindex lis_umount(9)
+@item @b{lis_unregister_strdev}(9)
+@fnindex lis_unregister_strdev(9)
+@item @b{lis_unregsiter_strmod}(9)
+@fnindex lis_unregsiter_strmod(9)
+@item @b{lis_version}(9)
+@fnindex lis_version(9)
+@end table
+
+@subsection Configuration ala LiS 2.16.18
+
+@node Appendices, , Porting, Top
+@appendix Appendices
+@menu
+* Copying::                     Copying information for this Software
+* Documentation License::       Copying information for this Manual
+* Indices::                     Indices
+@end menu
+
+@node Copying, Documentation License, , Appendices
+@unnumbered Copying
+@include gpl.texi
+
+@node Documentation License, Indices, Copying, Appendices
+@unnumbered Documentation License
+@include fdl.texi
+
+@node Indices, , Documentation License, Appendices
+@unnumbered Indices
+@menu
+* Concept Index::               Concept Index
+* Type Index::                  Type Index
+* Function Index::              Function Index
+* Variable Index::              Variable Index
+* File Index::                  File Index
+@end menu
+
+@node Concept Index, Type Index, , Indices
+@unnumbered Concept Index
+
+@printindex cp
+
+@node Type Index, Function Index, Concept Index, Indices
+@unnumbered Type Index
+
+@printindex tp
+
+@node Function Index, Variable Index, Type Index, Indices
+@unnumbered Function and Macro Index
+
+@printindex fn
+
+@node Variable Index, File Index, Function Index, Indices
+@unnumbered Variable and Constant Macro Index
+
+@printindex vr
+
+@node File Index, , Variable Index, Indices
+@unnumbered Program and File Index
+
+@printindex pg
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+

@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qband.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: qband.9.man,v 0.9.2.2 2004/03/15 07:58:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/15 07:58:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,50 +71,321 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QBAND 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QBAND 9 "$Date: 2004/03/15 07:58:57 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
+.B qband
+\- queue band structure
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <sys/stream.h>
+.PP
+.nf
+\fC\s-1
+typedef struct qband {
+    struct qband *qb_next;      /* next (lower) priority band */
+    size_t qb_count;            /* number of bytes queued */
+    struct msgb *qb_first;      /* first queue message in this band */
+    struct msgb *qb_last;       /* last queued message in this band */
+    size_t qb_hiwat;            /* hi water mark for flow control */
+    size_t qb_lowat;            /* lo water mark for flow control */
+    uint qb_flag;               /* flags */
+    long qb_pad1;               /* OSF: reserved */
+    /* Linux fast-STREAMS specific members */
+    ssize_t qb_msgs;            /* messages in band */
+    struct qband *qb_prev;      /* prev (higher) priority band */
+    unsigned char qb_band;      /* band */
+    unsigned char __pad[sizeof(long) - 1];      /* padding */
+} qband_t;
+\s+1\fP
+.fi
 .\"
 .\"
 .SH MEMBERS
 .PP
+The following members correspond to
+.I SVR 4.2 EFT
+members:
+.TP \w'\ qb_hiwat\ 'u
+.I qb_next
+A pointer to the
+.B qband
+structure corresponding to the the next lower priority band (or
+.B NULL
+if there is no lower priority band).
+.TP
+.I qb_count
+The number of bytes queued to the band.
+.TP
+.I qb_first
+A pointer to a
+.BR msgb (9)
+structure representing the first message block queued to the band.
+.TP
+.I qb_last
+A pointer to a
+.BR msgb (9)
+structure representing the last message block queued to the band.
+.TP
+.I qb_hiwat
+The high water mark in bytes that represents the number of bytes queued to the
+band beyond which band flow controls will be initiated.
+.TP
+.I qb_lowat
+The low water mark in bytes that represents the number of bytes queue to the
+band beneath which band flow controls will be ceased.
+.TP
+.I qb_flag
+Flags for the queue band.  These are a bitwise OR of any of the following
+flags:
+.RS
+.TP \w'\ QB_WANTW\ 'u
+.B QB_FULL
+This bit is set when the queue band is full
+.RI ( qb_count " > " qb_hiwat )
+and subject to flow control.
+.TP
+.B QB_WANTW
+This bit is set when the queue band requires a back enable.
+This occurs when
+.BR bcanput (9)
+or
+.BR bcanputnext (9)
+has previously failed for the queue band.
+.TP
+.B QB_BACK
+For
+.IR UnixWare \(rg,
+.IR Solaris \(rg
+and
+.IR UXP/V \(rg
+compatibility.  This bit is set when the queue band is back enabled.
+.RE
+.TP
+.I qb_pad1
+Padding for compatibility with
+.IR OSF \(rg.
+.[
+osfspg
+.]
+.PP
+The following members are
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+specific members:
+.TP \w'\ qb_hiwat\ 'u
+.I qb_msgs
+The count of the number of messages queued to the band.
+.TP
+.I qb_prev
+A pointer to the
+.B qband
+structure corresponding to the previous higher priority band (or
+.B NULL
+if there is no previous higher priority band).
+.TP
+.I qb_band
+The priority of this band.
+.TP
+.I __pad
+Padding to pad the structure to the size of the
+.I "SVR 4.2"
+Extended Funadmental Type.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.PP
+The following queue band utility functions are provided:
+.PP
+.TP \w'\ bcanputnext(9)\ \-\ 'u
+\fBbcanput\fP(9) \-
+test band for flow control for a queue
+.PD 0
+.TP
+\fBbcanputnext\fP(9) \-
+test band for flow control for a queue
+.TP
+\fBcanput\fP(9) \-
+test for flow control for a queue
+.TP
+\fBcanputnext\fP(9) \-
+test for flow control for next queue
+.TP
+\fBflushband\fP(9) \-
+flush messages from a band of a queue
+.TP
+\fBflushq\fP(9) \-
+flush messages from a queue
+.TP
+\fBput\fP(9) \-
+put a message to a queue's put procedure
+.TP
+\fBputbq\fP(9) \-
+put a message back on a queue
+.TP
+\fBputnext\fP(9) \-
+put a message on the next queue
+.TP
+\fBputq\fP(9) \-
+put a message on a queue
+.TP
+\fBqcountstrm\fP(9) \-
+count the data bytes on all queues in a stream
+.TP
+\fBstrqget\fP(9) \-
+get a parameter for a queue
+.TP
+\fBstrqset\fP(9) \-
+set a parameter for a queue
+.PD
+.PP
+See also
+.BR queue (9).
 .\"
 .\"
 .SH CONTEXT
 .PP
+Functions that operate on a queue band can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.PP
+The queue band pointers and members, with the exception of the
+.I qb_flag
+member, are protected by the queue read write lock,
+.RI ( q_rwlock )
+in the parent
+.BR queue (9)
+structure.
+The
+.I qb_flag
+member is protected using atomic bit operations.
+.PP
+Because the queue read write lock
+.RI ( q_rwlock )
+is not a nesting lock, function that take the queue write lock cannot be
+invoked again by the same thread, or cause the invocation of another function
+that takes the queue write lock by the same thread or single-party deadlock
+will result.
 .\"
 .\"
 .SH NOTICES
 .PP
+Members of the
+.B qband
+structure should not be accessed directly by
+.I STREAMS
+modules or drivers.  Portable
+.I STREAMS
+modules and drivers should use the facilities provided by
+.BR strqget (9)
+and
+.BR strqset (9)
+for implementation and architecture independency.
+.PP
+The
+.B qband
+structure is only a subset of the
+.B qbinfo
+structure used by the
+.I STREAMS
+scheduler.  Additional hidden fields are present in the
+.B qbinfo
+structure.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR put (9),
+.BR putbq (9),
+.BR putnext (9),
+.BR putq (9),
+.BR qcountstrm (9),
+.BR strqget (9),
+.BR strqset (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B qband
+structure is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2"
+with the following portability considerations:
+.IP \(em \w'\ \(em\ 'u
+.IP \(em
+.IR "Mac OT" \(rg
+has type
+.B short
+for
+.I qb_flag
+and
+.I qb_pad1
+fields of the
+.B qband
+structure.
+.IP \(em
+.IR OSF \(rg
+has types
+.B long
+and
+.B ulong
+for all members of the
+.B qband
+structure.
+.IP \(em
+Only
+.IR "SVR 4.2 MP"
+.[
+usldk
+.]
+.B Extended Fundamental Types
+are supported.
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+The
+.B qband
+structure is provided for source compatibility with
+.IR "SVR 4.2 EFT" .
+Binary compatibility is not guaranteed.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+SVR 4.2 EFT.
+.[
+svr42
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B qband
+structure was introduced in SVR 4.
+.[
+svr4spg
+.]
 .\"
 .\"
 .[

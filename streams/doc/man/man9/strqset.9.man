@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strqset.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 0.9.2.4 2004/03/15 07:58:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/15 07:58:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRQSET 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRQSET 9 "$Date: 2004/03/15 07:58:57 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "int strqset(queue_t *" q ", qfields_t " what ", unsigned char " band ", long " val );
+int \fBstrqset\fR(queue_t *\fIq\fR, qfields_t \fIwhat\fR, unsigned char \fIband\fR, long \fIval\fR);
 .\"
 .\"
 .SH ARGUMENTS
@@ -138,7 +138,7 @@ specifies the queue (or queue band if
 is non-zero) attribute to be set.
 .I what
 can be one of the following values.
-.TP
+.TP \w'\ QMINPSZ\ 'u
 .B QHIWAT
 Sets the high water mark associated with the
 .I q
@@ -186,48 +186,48 @@ The
 .B queue
 structure contains at least the following members:
 .HP
-.BI "ulong " q_hiwat
+.BI "size_t " q_hiwat
 \- the high water mark for the queue.
 .HP
-.BI "ulong " q_lowat
+.BI "size_t " q_lowat
 \- the low water mark for the queue.
 .HP
-.BI "long " q_maxpsz
+.BI "ssize_t " q_maxpsz
 \- the maximum message size accepted by the queue.
 .HP
-.BI "long " q_minpsz
+.BI "ssize_t " q_minpsz
 \- the minimum message size accepted by the queue.
 .PP
 The
 .B qband
 structure contains at least the following members:
 .HP
-.BI "ulong " qb_hiwat
+.BI "size_t " qb_hiwat
 \- the high water mark for the band.
 .HP
-.BI "ulong " qb_lowat
+.BI "size_t " qb_lowat
 \- the low water mark for the band.
+.\"
+.\"
+.SH USAGE
+.PP
 .\"
 .\"
 .SH RETURN
 .PP
 Upon success,
 .BR strqset ()
-returns zero (0) and sets the appropriate attribute to the appropriate value.
-.PP
-Upon failure,
-.BR strqset ()
-returns a non-zero error number.
-The requested attribute is remains unchanged.
+returns zero (0) and sets the appropriate attribute to the appropriate value;
+upon failure, a non-zero error number.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .BR strqset ()
-fails,
+fails, the requested attribute remains unchanged, and
 it returns one of the following errors:
-.TP
+.TP \w'\ [EINVAL]\ 'u
 .RB [ EINVAL ]
 The queue pointer
 .I q

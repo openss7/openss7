@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strmod_del.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
+.\" @(#) $Id: strmod_del.9.man,v 0.9.2.4 2004/03/15 07:58:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/15 07:58:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXX 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRMOD_DEL 9 "$Date: 2004/03/15 07:58:57 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
 .B strmod_del
-\-
+\- delete a \fISTREAMS\fR module or driver from the kernel
 .\"
 .\"
 .SH SYNOPSIS
@@ -103,6 +103,37 @@ int \fBstrmod_del\fR(dev_t \fIdev\fR, struct streamtab *\fIstr\fR, struct stream
 .SH DESCRIPTION
 .PP
 .BR strmod_del ()
+is an
+.IR OSF \(rg-specific
+.I STREAMS
+module and driver deregistration facility.
+.PP
+.RS
+.nf
+\fC\s-1
+struct streamadm {
+    uint sa_version;
+    uint sa_flags;
+    char sa_name[FMNAMESZ + 1];
+    caddr_t sa_ttys;
+    uint sa_sync_level;
+    caddr_t sa_sync_info;
+};
+\s+1\fP
+.fi
+.TP
+.I sa_version
+.TP
+.I sa_flags
+.TP
+.I sa_name
+.TP
+.I sa_ttys
+.TP
+.I sa_sync_level
+.TP
+.I sa_sync_info
+.RE
 .\"
 .\"
 .SH RETURN
