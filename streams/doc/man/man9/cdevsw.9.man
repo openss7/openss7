@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cdevsw.9.man,v 0.9.2.2 2004/03/14 08:56:35 brian Exp $
+.\" @(#) $Id: cdevsw.9.man,v 0.9.2.4 2004/03/16 08:01:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/16 08:01:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CDEVSW 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH CDEVSW 9 "$Date: 2004/03/16 08:01:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -108,7 +108,7 @@ struct cdevsw {
 The
 .B cdevsw
 structure contains the following members:
-.TP
+.TP \w'\ d_plinks\ 'u
 .I d_name
 .TP
 .I d_str
@@ -166,7 +166,7 @@ to zero before registration.
 .\"
 .SS Flags
 .PP
-.TP
+.TP \w'\ D_MTOUTEPERIM\ 'u
 .B D_REOPEN
 .TP
 .B D_CLONE
@@ -186,14 +186,14 @@ to zero before registration.
 The following flags are provided for
 .IR Solaris \(rg
 compatibility:
-.TP
+.TP \w'\ D_MTOUTEPERIM\ 'u
 .B D_MP
 specifies that the driver is MT-SAFE.
 .PP
 The following inner perimeter flags are provided for
 .IR Solaris \(rg
 compatibility:
-.TP
+.TP \w'\ D_MTOUTEPERIM\ 'u
 .B D_MTPERMOD
 specifies that an inner perimeter exists and that the inner perimeter encircles all queue pairs in the
 module.
@@ -232,7 +232,7 @@ are set (i.e. there is no inner perimeter).
 .PP
 The following outer perimeter flags are provided for
 .IR Solaris \(rg:
-.TP
+.TP \w'\ D_MTOUTEPERIM\ 'u
 .B D_MTOUTEPERIM
 specifies that an outer perimeter exists and that the outer perimeter encircles all queue pairs in the module.
 Only one of

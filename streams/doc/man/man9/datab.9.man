@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datab.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: datab.9.man,v 0.9.2.2 2004/03/16 01:58:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/16 01:58:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,44 +71,512 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DATAB 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DATAB 9 "$Date: 2004/03/16 01:58:32 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
 .B datab, dblk_t
-\- \fISTREAMS\fP data block
+\- \fISTREAMS\fP data block structure
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <sys/stream.h>
+.nf
+\fC\s-1
+typedef struct free_rtn {
+    void (*free_func) (caddr_t);
+    caddr_t free_arg;
+} frtn_t;
+
+typedef struct datab {
+    union {
+        struct datab *freep;
+        struct free_rtn *frtnp;
+    } db_f;
+#define         db_freep db_f.freep
+#define         db_frtnp db_f.frtnp
+    unsigned char *db_base;
+    unsigned char *db_lim;
+    unsigned char db_ref;       /* shadow reference count */
+    unsigned char db_type;
+    unsigned char db_iswhat;    /* Mac OT */
+    unsigned char db_filler2;   /* Mac OT */
+    uint db_size;               /* Mac OT */
+    unsigned char *db_msgaddr;  /* Mac OT */
+    long db_filler;             /* Mac OT */
+    /* Linux Fast-STREAMS specific members */
+    atomic_t db_users;          /* actual reference count */
+} dblk_t;
+/* 18 bytes on 32 bit, 30 on 64 bit */
+
+#define DBLK_REFMIN     0x01    /* Solaris */
+
+#define DB_WASDUPED     0x01    /* UnixWare */
+#define DB_2PIECE       0x02    /* UnixWare */
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The following members correspond to
+.I SVR 4.2 EFT
+members:
+.TP \w'\ db_msgaddr\ 'u
+.I db_freep
+When the data block was allocated with
+.BR allocb (9),
+then this member points to the data buffer that was allocated.
+For allocations of data blocks with message sizes less than
+.BR FASTBUF ,
+this is a pointer to the internal data buffer following the data block.
+.TP
+.I db_frtnp
+When the data block was allocated with
+.BR esballoc (9),
+then this member points to the internal data buffer where the
+.B free_rtn
+structure containing the 
+.BR free_func ()
+and
+.B free_arg
+are located.
+.TP
+.I db_base
+A pointer to the data buffer, whether internal or external.
+.TP
+.I db_lim
+A pointer one past the end of the data buffer, whether internal or external.
+.TP
+.I db_ref
+The number of references to this data block (from message blocks).
+.TP
+.I db_type
+The type of data block.  The type can be one of the following values:
+.RS
+.PP
+The following are normal messages:
+.TP \w'\ M_PCSETOPTS\ 'u
+.B QNORM
+normal message start
+.PD 0
+.TP
+.B M_DATA
+data message
+.TP
+.B M_PROTO
+normal protocol message
+.TP
+.B M_BREAK
+break message
+.TP
+.B M_PASSFP
+pass file pointer message
+.TP
+.B M_EVENT
+event message
+.TP
+.B M_SIG
+signal message
+.TP
+.B M_DELAY
+delay message
+.TP
+.B M_CTL
+control message
+.TP
+.B M_IOCTL
+IO control message
+.TP
+.B M_SETOPTS
+set stream head options message
+.TP
+.B M_RSE
+normal reserved message
+.TP
+.B M_TRAIL
+trail message
+.TP
+.B M_BACKWASH
+backwash direct I/O message
+.PD
+.PP
+The following are priority messages:
+.TP \w'\ M_PCSETOPTS\ 'u
+.B QPCTL
+priority message start
+.PD 0
+.TP
+.B M_IOCACK
+IO control acknowledgement message
+.TP
+.B M_IOCNAK
+IO control negative acknowledgement message
+.TP
+.B M_PCPROTO
+priority protocol message
+.TP
+.B M_PCSIG
+priority signal message
+.TP
+.B M_READ
+read message
+.TP
+.B M_FLUSH
+flush message
+.TP
+.B M_STOP
+stop output message
+.TP
+.B M_START
+start output message
+.TP
+.B M_HANGUP
+hangup message
+.TP
+.B M_ERROR
+error message
+.TP
+.B M_COPYIN
+copyin message
+.TP
+.B M_COPYOUT
+copyout message
+.TP
+.B M_IOCDATA
+IO control data message
+.TP
+.B M_PCRSE
+priority reserved message
+.TP
+.B M_STOPI
+stop input message
+.TP
+.B M_STARTI
+start intput message
+.TP
+.B M_PCCTL
+priority control message
+.TP
+.B M_PCSETOPTS
+prioirty stream head set options message
+.TP
+.B M_PCEVENT
+prioirty event
+.TP
+.B M_UNHANGUP
+undo hangup message
+.TP
+.B M_NOTIFY
+notification message
+.TP
+.B M_HPDATA
+high priority data message
+.TP
+.B M_LETSPLAY
+let's play direct I/O message
+.TP
+.B M_DONTPLAY
+don't play direct I/O message
+.TP
+.B M_BACKDONE
+backwash done direct I/O message
+.PD
+.RE
+.TP
+.I db_iswhat
+Indicates whether the message is a normal or priority message.
+.TP
+.I db_filler2
+Padding.
+.TP
+.I db_size
+The size of the data buffer.  This should be the same as the difference
+between the
+.I db_lim
+and
+.I db_base
+members.
+.TP
+.I db_msgaddr
+.TP
+.I db_filler
+Padding.
+.PP
+The following members are
+.B Linux Fast-STREAMS
+specific members:
+.TP \w'\ db_msgaddr\ 'u
+.I db_users
+Because
+.B Linux
+does not have character sized atomic types, this is an integer atomic type
+count equivalent to the
+.I db_ref
+member.  This private member is used for atomic operations on the reference
+count, and then it is copied from here to
+.IR db_ref .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .\"
 .\"
+.SH CONTEXT
+.PP
+Functions that operate on a message or data block can be called from any
+context.  However, it is the caller's responsibility to ensure that the
+calling thread has exclusive access to the message block.  When the message
+block and associated data block have just been removed from a
+.BR queue (9)
+in a
+.BR put (9)
+or
+.BR srv (9)
+procedure of the queue, message exclusivity is normally guaranteed.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Functions that access the
+.B datab
+structure are MP-safe.  However, it is the caller's responsibility to ensure
+that exclusive access to the structure before altering any of the members of
+the structure.
+.PP
+Data blocks allocated with
+.BR esballoc (9)
+may also require the caller to ensure exclusive access to the external data
+buffer supplied to the
+.BR esballoc (9)
+call.
+.PP
+Duplication of message blocks without copying the data block with functions
+such as
+.BR dupb (9)
+or
+.BR dupmsg (9),
+may result in multiple threads of execution holding a reference to the same
+data block.
+To ensure that this condition does not exist, the
+.I db_refs
+member can be examined to determine whether the reference count is one (1)
+indicating that no duplication has occured, or greater, indicating that
+duplication has occured.
+.\"
+.\"
 .SH NOTICES
 .PP
+Members of the
+.B datab
+structure should not be accessed directy by
+.I STREAMS
+modules or drivers.  Portable
+.I STREAMS
+modules and drivers should, where possible, use the facilities provided for
+implementation and architectural independence.
+.PP
+The
+.I db_ref
+member is unreliable and should not be read or written by portable
+.I STREAMS
+modules or drivers.
+The
+.IR db_base ", " db_lim " and " db_size
+fields should be treated as read-only, and should not be read or written by
+portable
+.I STREAMS
+modules or drivers.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .\"
 .\"
-.SH BUGS
-.PP
-.\"
-.\"
 .SH COMPATIBLITY
 .PP
+The
+.B datab
+structure is compatible with
+.IR "SVR 4.2 MP EFT" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\ \(em\ 'u
+Only
+.IR Solaris \(rg
+.[
+solspg
+.]
+documents the
+.BR M_EVENT " and " M_PCEVENT
+data block types.
+These data block types are provided for source compatibility with drivers
+written for
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _SUN_SOURCE
+before including
+.B sys/stream.h
+to expose these symbols.
+.IP \(em
+Only
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+documents the
+.BR M_TRAIL ", " M_PCCTL " and " M_PCSETOPTS
+data block types.
+These data block types are provided for source compatibility with drivers
+written for
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to defined
+.B _UW7_SOURCE
+before including
+.B sys/stream.h
+to expose these symbols.
+.IP \(em
+Only
+.IR AIX \(rg
+.[
+aixspg
+.]
+documents the
+.BR M_BACKWASH ", " M_LETSPLAY ", " M_DONTPLAY " and " M_BACKDONE
+data block types.
+These data block types are provided for source compatibility with drivers
+written for
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _AIX_SOURCE
+before including
+.B sys/stream.h
+to expose these symbols.
+.IP \(em
+Only
+.IR OSF \(rg
+.[
+osfspg
+.]
+and
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+document the
+.B M_NOTIFY
+data block type.
+This data block type is provided for source compatibility with drivers written
+for
+.IR OSF \(rg
+.[
+osfdoc
+.]
+or
+.IR HP-UX \(rg
+.[
+hpuxdoc
+.]
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _OSF_SOURCE
+or
+.B _HPUX_SOURCE
+before including
+.B sys/stream.h
+to expose this symbol.
+.IP \(em
+Only
+.IR HP-UX \(rg
+and
+.IR "Mac OT" \(rg
+document the
+.B M_HPDATA
+data block type.
+This data block type is provided for source compatibility with drivers written
+for
+.IR HP-UX \(rg
+and
+.IR "Mac OT" \(rg,
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _HPUX_SOURCE
+before including
+.B sys/stream.h
+to expose this symbol.
+.IP \(em
+Only
+.IR OSF \(rg
+and
+.IR Solaris \(rg
+document the
+.B M_UNHANGUP
+data block type.
+This data block type is provided for source compatibility with drivers written
+for
+.IR OSF \(rg
+and
+.IR Solaris \(rg,
+and should not be used by portable
+.I STREAMS
+modules and drivers.
+It might be necessary to define
+.B _OSF_SOURCE
+or
+.B _SUN_SOURCE
+before including
+.B sys/stream.h
+to expose this symbol.
+.IP \(em
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2 EFT" .
+.[
+svr42
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B datab
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[

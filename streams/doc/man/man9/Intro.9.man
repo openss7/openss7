@@ -1,1 +1,1 @@
-.so LiS.9
+.so LfS.9.man

@@ -1,1 +1,1 @@
-.so drv_hztomsec.9
+.so drv_hztomsec.9.man

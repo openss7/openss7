@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.5 2004/03/16 08:01:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/16 08:01:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FREEZESTR 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH FREEZESTR 9 "$Date: 2004/03/16 08:01:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -191,7 +191,7 @@ before returning.
 .\"
 .SH RETURN
 .PP
-For compatiblity with
+For compatibility with
 .IR Solaris \(rg,
 .[
 solspg
@@ -424,12 +424,12 @@ has no known bugs.
 .PP
 .BR freezestr ()
 is compatible with
-.BR "SVR 4.2 MP DDI/DKI"
+.IR "SVR 4.2 MP DDI/DKI"
 .[
 usldk
 .]
 and systems based on
-.BR "SVR 4 MP" ,
+.IR "SVR 4 MP" ,
 with the following portability considerations:
 .IP \(em \w'\ \(em\ 'u
 .IR Solaris \(rg,
@@ -478,7 +478,10 @@ provides the function prototype:
 All the others provide the prototype
 .BI "pl_t freezestr(queue_t *" q ).
 .IP \(em
-.B "SVR 4.2 MP DDI/DKI"
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
 specifies that the following functions cannot be called on a frozen stream:
 .BR bcanput (9),
 .BR bcanputnext (9),
@@ -499,7 +502,10 @@ specifies that the following functions cannot be called on a frozen stream:
 .BR qsize (9),
 .BR SAMESTR (9).
 .IP \(em
-.BR "SVR 4.2 MP DDI/DKI"
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
 specifies that the following functions must have the stream frozen across the
 call:
 .BR insq (9),

@@ -1,1 +1,1 @@
-.so lis_mount.9
+.so lis_mount.9.man

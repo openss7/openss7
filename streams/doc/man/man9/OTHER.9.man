@@ -1,1 +1,1 @@
-.so OTHERQ.9
+.so OTHERQ.9.man

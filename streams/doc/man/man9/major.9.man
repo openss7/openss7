@@ -1,1 +1,1 @@
-.so getmajor.9
+.so getmajor.9.man

@@ -1,1 +1,1 @@
-.so queue.9
+.so queue.9.man

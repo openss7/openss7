@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: install_driver.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
+.\" @(#) $Id: install_driver.9.man,v 0.9.2.4 2004/03/16 01:58:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/16 01:58:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH INSTALL_DRIVER 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH INSTALL_DRIVER 9 "$Date: 2004/03/16 01:58:32 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -128,7 +128,7 @@ typedef struct drv_info {
 } drv_info_t;
 \s+1\fP
 .fi
-.TP
+.TP \w'\ di_cdio_private\ 'u
 .I di_name
 .PD 0
 .TP
@@ -176,7 +176,7 @@ typedef struct drv_ops {
 } drv_ops_t;
 \s+1\fP
 .fi
-.TP
+.TP \w'\ d_strategy\ 'u
 .I d_open
 .PD 0
 .TP

@@ -1,1 +1,1 @@
-.so msgb.9
+.so msgb.9.man

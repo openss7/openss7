@@ -1,1 +1,1 @@
-.so physreq.9
+.so physreq.9.man
