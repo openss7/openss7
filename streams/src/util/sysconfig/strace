@@ -1,0 +1,74 @@
+#
+# This is an example system configuration file for strace.  It goes in
+# /etc/sysconfig/strace.  For more information see the /etc/init.d/strace init
+# script and strace(8).
+#
+
+# Additional command line options to pass to strace(8):
+STRACEOPTIONS=""
+# Directory for trace logs (default /var/log/streams).
+DIRECTORY="/var/log/streams"
+# Basename for trace log files (default trace).
+BASENAME="trace"
+# Output file name (default $BASENAME.pid).
+OUTFILE=""
+# Error file name (default $BASENAME.error).
+ERRFILE=""
+# Log device (default /dev/strlog, /dev/streams/log, /dev/log).
+LOGDEVICE="/dev/streams/log"
+# Modules: triplets of <mod> <sub> <pri>, see strace(8)
+MODULES=""
+
+
+# =============================================================================
+# 
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/06 19:38:22 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/02/06 19:38:22 $ by $Author: brian $
+#
+# =============================================================================
+# vim ft=sh sw=4
