@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/24 02:09:14 $
+# @(#) $RCSfile: streams-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 03:11:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,24 +48,10 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:09:14 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 03:11:24 $ by $Author: brian $
 #
 # =============================================================================
-set -e
-
-rootdir=@rootdir@
-kversion=@kversion@
-kmoduledir=@kmoduledir@
-sysconfdir=@sysconfdir@
-STRCONF_CONFMOD=@STRCONF_CONFMOD@
-STRCONF_MAJBASE=@STRCONF_MAJBASE@
-KERNEL_PRELOADS="specfs streams streams-sth streams-clone"
-KERNEL_MODULES="specfs streams streams-clone streams-fifo streams-sad streams-nsdev streams-echo streams-nuls streams-pipe streams-log streams-sth streams-pipemod streams-connld streams-sc streams-svr4compat streams-suncompat streams-uw7compat streams-osfcompat streams-aixcompat streams-hpuxcompat streams-liscompat"
-KERNEL_MODCONF=@STRCONF_CONFMOD@
-KERNEL_SUBDIR=@PACKAGE_LCNAME@
-KMODCONF_EXT=@PACKAGE_LCNAME@
-base=@PACKAGE_LCNAME@
-tmppath=/var/tmp
+@mscript_header@
 
 function postrm_preload() {
     @WITH_KO_MODULES_FALSE@preloads=modules
@@ -150,6 +136,9 @@ esac
 # =============================================================================
 #
 # $Log: streams-core.postrm.in,v $
+# Revision 0.9.2.2  2005/03/26 03:11:24  brian
+# - Reworking maintainance scripts
+#
 # Revision 0.9.2.1  2005/03/24 02:09:14  brian
 # - improved debian build
 #

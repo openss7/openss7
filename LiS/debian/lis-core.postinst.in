@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.postinst.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/24 01:38:17 $
+# @(#) $RCSfile: lis-core.postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 03:11:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,26 +48,10 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 01:38:17 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 03:11:21 $ by $Author: brian $
 #
 # =============================================================================
-set -e
-
-rootdir=@rootdir@
-kversion=@kversion@
-kmoduledir=@kmoduledir@
-sysconfdir=@sysconfdir@
-STRCONF_CONFMOD=@STRCONF_CONFMOD@
-STRCONF_MAJBASE=@STRCONF_MAJBASE@
-KERNEL_PRELOADS="streams streams-liskmod streams-mtdrv streams-pipemod"
-KERNEL_MODULES="streams streams-clone streams-pipemod streams-sad streams-liskmod streams-connld streams-mtdrv"
-KERNEL_MODCONF=@STRCONF_CONFMOD@
-KERNEL_SUBDIR=@PACKAGE_LCNAME@
-KMODCONF_EXT=@PACKAGE_LCNAME@
-ksubdir=@PACKAGE_LCNAME@
-kmodext=@PACKAGE_LCNAME@
-base=@PACKAGE_LCNAME@
-tmppath=/var/tmp
+@mscript_header@
 
 function postinst_modconf() {
 #   Check that our line is in the modules.$base file
@@ -209,6 +193,9 @@ esac
 # =============================================================================
 #
 # $Log: lis-core.postinst.in,v $
+# Revision 1.1.2.2  2005/03/26 03:11:21  brian
+# - Reworking maintainance scripts
+#
 # Revision 1.1.2.1  2005/03/24 01:38:17  brian
 # - better debian build
 #

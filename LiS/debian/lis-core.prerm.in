@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/24 01:38:17 $
+# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 03:11:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,24 +48,10 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 01:38:17 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
 #
 # =============================================================================
-set -e
-
-rootdir=@rootdir@
-kversion=@kversion@
-kmoduledir=@kmoduledir@
-sysconfdir=@sysconfdir@
-STRCONF_CONFMOD=@STRCONF_CONFMOD@
-STRCONF_MAJBASE=@STRCONF_MAJBASE@
-KERNEL_PRELOADS="streams streams-liskmod streams-mtdrv streams-pipemod"
-KERNEL_MODULES="streams streams-clone streams-pipemod streams-sad streams-liskmod streams-connld streams-mtdrv"
-KERNEL_MODCONF=@STRCONF_CONFMOD@
-KERNEL_SUBDIR=@PACKAGE_LCNAME@
-KMODCONF_EXT=@PACKAGE_LCNAME@
-base=@PACKAGE_LCNAME@
-tmppath=/var/tmp
+@mscript_header@
 
 #
 # If we are upgrading and the upgrade is for the running kernel, or we are installing new on the
@@ -128,27 +114,27 @@ echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 
 case "$1" in
 
-    (remove)
+    (remove) :
 	# remove-prerm remove
 	# conflict-prerm remove in-favour package new-version
 	prerm_modules
 	prerm_preload
 	;;
 
-    (upgrade)
+    (upgrade) :
 	# old-prerm upgrade new-version
 	prerm_modules
 	prerm_preload
 	;;
 
-    (failed-upgrade)
+    (failed-upgrade) :
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade old-version
 	prerm_oldmods
 	prerm_preload
 	;;
 
-    (deconfigure)
+    (deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
 	prerm_modules
 	prerm_preload
@@ -167,6 +153,9 @@ esac
 # =============================================================================
 #
 # $Log: lis-core.prerm.in,v $
+# Revision 1.1.2.2  2005/03/26 03:11:22  brian
+# - Reworking maintainance scripts
+#
 # Revision 1.1.2.1  2005/03/24 01:38:17  brian
 # - better debian build
 #

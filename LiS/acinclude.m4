@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.9 $) $Date: 2005/03/24 14:05:24 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.10 $) $Date: 2005/03/26 03:11:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 14:05:24 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 03:11:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,12 +77,25 @@ AC_DEFUN([AC_LIS], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    AC_CONFIG_FILES([debian/lis-core.preinst
-		     debian/lis-core.postinst
-		     debian/lis-core.prerm
+    AC_CONFIG_FILES([debian/lis-core.postinst
 		     debian/lis-core.postrm
-		     util/modutils/streams
-		     debian/lis-lib.preinst])
+		     debian/lis-core.preinst
+		     debian/lis-core.prerm
+		     debian/lis-devel.preinst
+		     debian/lis-dev.postinst
+		     debian/lis-dev.preinst
+		     debian/lis-dev.prerm
+		     debian/lis-doc.postinst
+		     debian/lis-doc.preinst
+		     debian/lis-doc.prerm
+		     debian/lis-init.postinst
+		     debian/lis-init.postrm
+		     debian/lis-init.preinst
+		     debian/lis-init.prerm
+		     debian/lis-lib.preinst
+		     debian/lis-source.preinst
+		     debian/lis-util.preinst
+		     util/modutils/streams])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
