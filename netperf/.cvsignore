@@ -1,9 +1,15 @@
+.*
+ABOUT-NLS
 Makefile.in
 aclocal.m4
 autom4te.cache
 config.h.in
 configure
 configure.scan
+intl
+COPYING
+INSTALL
+*.log
 netperf-2.1.pdf
 netperf-2.1.ps
 netperf.info
@@ -14,5 +20,3 @@ netperf.info-4
 _build
 _install
 scripts
-COPYING
-INSTALL

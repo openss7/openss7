@@ -1,12 +1,15 @@
+.*
+ABOUT-NLS
 Makefile.in
 aclocal.m4
 autom4te.cache
 config.h.in
 configure
 configure.scan
-*.log
+intl
 COPYING
 INSTALL
+*.log
 Makefile
 config.cache
 config.h

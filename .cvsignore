@@ -5,8 +5,8 @@ aclocal.m4
 autom4te.cache
 config.h.in
 configure
+configure.scan
 intl
 COPYING
 INSTALL
 *.log
-configure.scan
