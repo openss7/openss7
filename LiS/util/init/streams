@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -78,10 +78,10 @@ RETVAL=0
 umask 077
 
 start() {
-    for module in streams streams-clone streams-sth ; do
+    for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
-		insmod -k -q -- $module
+		modprobe -k -q -- $module
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || return $RETVAL
 	fi
@@ -149,7 +149,7 @@ case "$1" in
 	;;
     (status)
 	LOADED='yes'
-	for module in streams streams-clone streams-sth ; do
+	for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -175,7 +175,7 @@ case "$1" in
 	;;
     (probe)
 	LOADED='yes'
-	for module in streams streams-clone streams-sth ; do
+	for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -225,7 +225,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -271,7 +271,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/13 06:28:07 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 05:20:20 $ by $Author: brian $
 #
 # =============================================================================
 

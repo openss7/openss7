@@ -1,12 +1,28 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
 # permissions.
+#
+# These are arguments to update-rc.d ala chkconfig and lsb.  They are recognized
+# by openss7 install_initd and remove_initd scripts.  Each line specifies
+# arguments to add and remove links after the the name argument:
+#
+# streams:	start and stop streams subsystem
+# update-rc.d:	start 33 S . stop 33 0 6 .
+# config:	/etc/default/streams
+# probe:	false
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
+#		It is responsible for ensuring that the necessary STREAMS \
+#		character devices are present in the /dev directory and \
+#		that the STREAMS subsystem is configured and loaded.
+#
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='specfs'
@@ -36,10 +52,10 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
-    for module in streams streams-clone streams-sth ; do
+    for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    echo -n "$module "
-	    insmod -k -q -- $module $redir
+	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
 	fi
     done
@@ -99,7 +115,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -145,7 +161,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/13 06:28:07 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 05:20:20 $ by $Author: brian $
 #
 # =============================================================================
 
