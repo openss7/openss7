@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.36 2004/11/08 19:59:36 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.37 2005/01/01 20:57:54 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/08 19:59:36 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/01 20:57:54 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -100,6 +100,8 @@ AC_DEFUN([AC_LFS], [dnl
     CPPFLAGS=
     CFLAGS=
     _LFS_STRCONF
+    AM_CONDITIONAL(WITH_LFS, false)dnl
+    AM_CONDITIONAL(WITH_LIS, false)dnl
     _AUTOTEST
 ])# AC_LFS
 # =========================================================================
