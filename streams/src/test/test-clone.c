@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/16 23:09:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/01/16 23:09:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: test-clone.c,v $
- Revision 0.9.2.3  2004/08/22 06:17:55  brian
- - Checkin on new working branch.
+ Revision 0.9.2.4  2005/01/16 23:09:05  brian
+ - Added --copying options.
+
+ Revision 0.9.2.2  2005/01/16 23:09:05  brian
+ - Added --copying options.
 
  Revision 0.9.2.1  2004/08/22 06:17:55  brian
  - Checkin on new working branch.
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:55 $"
+#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/16 23:09:05 $"
 
-static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:55 $";
+static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/16 23:09:05 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -1418,7 +1421,7 @@ void splash(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -1471,7 +1474,7 @@ void version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -1485,8 +1488,9 @@ void usage(int argc, char *argv[])
 	fprintf(stderr, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s {-h, --help}\n\
-    %1$s {-V, --version}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
@@ -1497,8 +1501,9 @@ void help(int argc, char *argv[])
 	fprintf(stdout, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s {-h, --help}\n\
-    %1$s {-V, --version}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -1524,9 +1529,11 @@ Options:\n\
         Increase verbosity or set to LEVEL [default: 1]\n\
         This option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        Prints this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        Prints version and exit\n\
+    -C, --copying\n\
+        Prints copying permissions and exit\n\
 ", argv[0], devname);
 }
 
@@ -1560,13 +1567,14 @@ int main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "d:el::f::so:t:mqvhV?");
+		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -1686,6 +1694,9 @@ int main(int argc, char *argv[])
 			exit(0);
 		case 'V':
 			version(argc, argv);
+			exit(0);
+		case 'C':
+			splash(argc, argv);
 			exit(0);
 		case '?':
 		default:
