@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.13 2004/11/05 00:57:16 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.14 2004/12/17 13:30:33 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/05 00:57:16 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/17 13:30:33 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -170,6 +170,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
+		 doc/manual/texi/args.texi
 		 doc/projects/Makefile
 		 doc/specs/Makefile
 		 doc/specs/tri/Makefile

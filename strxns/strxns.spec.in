@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/12/17 04:02:58 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/12/17 13:31:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/17 04:02:58 $ by $Author: brian $
+# Last Modified $Date: 2004/12/17 13:31:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,10 +70,11 @@
 %{!?_kversion:%{expand: %%define _kversion %(uname -r)}}
 
 %define kernel_version %{_kversion}
-%define kernel_source %(echo %{_kversion} | sed -e 's|BOOT||')
+%define kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||')
 %define kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %define kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
 %define core_name core-%{_kversion}
+%define info_name info-%{_kversion}
 %define epoch @PACKAGE_EPOCH@
 %define majbase @STRCONF_MAJBASE@
 %define makedev @STRCONF_MAKEDEV@
@@ -132,6 +133,10 @@
 %{?disturl:%{!?url:%{expand: %%define url %{disturl}}}}
 %define fullrelease @PACKAGE_RELEASE@%{extrarelease}
 
+# a macro to build require one package of the same version as another
+%define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux
 %if %{?_without_public: 0}%{!?_without_public: 1}
 Name:           @PACKAGE_NAME@
@@ -155,23 +160,22 @@ Icon:           %{_gif}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
 Source:         %{name}-%{version}-%{release}.tar.bz2
-Obsoletes:      %{base}
-Obsoletes:      %{name}
-Obsoletes:      %{stitle}
 %if %{?buildroot: 0}%{!?buildroot: 1}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
 %endif
-Requires:       kernel >= 2.4.7
-Requires:       kernel < 2.5
-%if %{BUILD_lfs}
-Requires:       %{_streams} >= 0.7a
+%if %{BUILD_modules}
+BuildRequires:  kernel-source = %{kernel_source}
+BuildRequires:  modutils >= 2.4.18
 %endif
 %if %{BUILD_lis}
-Requires:       %{_streams} >= 2:2.16.18
+BuildRequires:  LiS-%{info_name} >= 2:2.16.18
+BuildRequires:  LiS-devel >= 2:2.16.18
+%buildreq_prov LiS-devel LiS-%{info_name}
 %endif
-Provides:       %{stitle}
-%if %{BUILD_modules}
-BuildRequires:  kernel-source >= 2.4
+%if %{BUILD_lfs}
+BuildRequires:  streams-%{info_name} >= 0.7a
+BuildRequires:  streams-devel >= 0.7a
+%buildreq_prov streams-devel streams-%{info_name}
 %endif
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
@@ -183,12 +187,6 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-%if %{BUILD_lfs}
-BuildRequires:  %{_streams}-devel >= 0.7a
-%endif
-%if %{BUILD_lis}
-BuildRequires:  %{_streams}-devel >= 2:2.16.18
-%endif
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
@@ -655,10 +653,6 @@ else
 #   upgrade, wait for old postun
 fi
 
-%preun %{_streams}-lib
-# ---------------------------------------------------------------------------
-# noting really
-
 %postun %{_streams}-lib
 # ---------------------------------------------------------------------------
 # whether complete removal or upgrade, do a load config
@@ -702,10 +696,6 @@ Release:        %{fullrelease}
 The %{name}-doc package contains html documentation for the development of
 OpenSS7 %{_STREAMS} STREAMS %{stitle} applications, modules and drivers.
 
-%pre doc
-# ---------------------------------------------------------------------------
-# nothing really
-
 %post doc
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
@@ -732,10 +722,6 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     done
 fi
 
-%postun doc
-# ---------------------------------------------------------------------------
-# nothing really
-
 %if %{BUILD_tools}
 %files doc
 # ---------------------------------------------------------------------------
@@ -745,7 +731,7 @@ fi
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual
-%{_infodir}/*
+#%{_infodir}/*
 %endif
 
 # ===========================================================================
@@ -782,36 +768,20 @@ OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.  In addition it
 contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
 STREAMS %{stitle} application programs.
 
-%pre devel
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%post devel
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%preun devel
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%postun devel
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
 %if %{BUILD_tools}
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
-%{_libdir}/*.a
-%endif
-%{_includedir}/*
+#%if %{BUILD_libs}
+#%{_libdir}/*.a
+#%endif
+#%{_includedir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 #%{_mandir}/man2/*
-%if %{BUILD_libs}
-%{_mandir}/man3/*
-%endif
+#%if %{BUILD_libs}
+#%{_mandir}/man3/*
+#%endif
 %{_mandir}/man4/*
 #%{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -838,22 +808,6 @@ Release:        %{fullrelease}
 The %{name}-source package contains the source code necessary for building the
 %{name} release.  It includes the autoconf configuration utilities necessary
 to create and distribute this rpm.
-
-%pre source
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%post source
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%preun source
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%postun source
-# ---------------------------------------------------------------------------
-# let rpm do its job
 
 %if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
 %files source
@@ -898,29 +852,13 @@ The %{name}-%{_streams}-util package provides adminstrative and configuration
 test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %{stitle} package.
 
-%pre %{_streams}-util
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%post %{_streams}-util
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%preun %{_streams}-util
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
-%postun %{_streams}-util
-# ---------------------------------------------------------------------------
-# let rpm do its job
-
 %if %{BUILD_tools}
 %files %{_streams}-util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #%{_bindir}/*
-%{_sbindir}/*
-%{_libexecdir}/*
+#%{_sbindir}/*
+#%{_libexecdir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 #%{_mandir}/man1/*
@@ -931,6 +869,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.17  2004/12/17 13:31:17  brian
+# - Cleared up build depdendencies, added info subpackage to LiS and streams.
+#
 # Revision 0.9.2.16  2004/12/17 04:02:58  brian
 # - Improving spec files.
 #
