@@ -55,9 +55,10 @@ realclean: clean
 # You may have to be root to do the install and uninstall targets
 #
 install: all
-	cp $(CP_OPTS) $(LIB_SHARED) $(INST_LIB)/$(LIBFILE_SHARED)
-	cp $(CP_OPTS) $(LIB_PSHARED) $(INST_LIB)/$(LIBFILE_PSHARED)
-	cp $(CP_OPTS) $(LIB_STATIC) $(INST_LIB)/$(LIBFILE_STATIC)
+	install -d $(INST_LIB)
+	install	$(LIB_SHARED) $(INST_LIB)/$(LIBFILE_SHARED)
+	install	$(LIB_PSHARED) $(INST_LIB)/$(LIBFILE_PSHARED)
+	install	$(LIB_STATIC) $(INST_LIB)/$(LIBFILE_STATIC)
 	$(LIBDIR)/Install $(INST_LIB)/$(LIBFILE_PSHARED)
 
 #

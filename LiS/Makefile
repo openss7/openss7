@@ -1,4 +1,4 @@
-Makefile_ident="@(#) LiS Makefile 2.29 6/2/03"
+Makefile_ident="@(#) LiS Makefile 2.32 11/23/03"
 #
 # Makefile for the kernel STREAMS device drivers.
 #
@@ -10,7 +10,9 @@ Makefile_ident="@(#) LiS Makefile 2.29 6/2/03"
 #
 
 LIS_HOME = $(shell pwd)
+LIS_ROOT = /
 include config.mk
+include version
 GENCONF	 = $(LIS_HOME)/include/sys/LiS/genconf.h
 
 #
@@ -29,7 +31,7 @@ default: all
 # A rule to run the configuration script
 #
 configure:
-	./Configure "invoked from main makefile" config.in
+	$(LIS_HOME)/Configure "invoked from main makefile" config.in
 	$(MAKE) clean
 	$(MAKE) dep
 
@@ -42,7 +44,7 @@ configure:
 ifneq (config.in,$(wildcard config.in))
 
 $(LIS_HOME)/config.in:
-	./Configure "invoked from main makefile" config.in
+	$(LIS_HOME)/Configure "invoked from main makefile" config.in
 	$(MAKE) clean
 	$(MAKE) config
 
@@ -185,29 +187,46 @@ install: all
 	$(MAKE) -C $(LIBOBJ) $@
 	$(MAKE) -C $(UTILOBJ) $@
 	$(MAKE) -C $(DRVROBJ) $@
-	$(MAKE) -C man $@
+	$(MAKE) -C man $@ MANDIR=$(LIS_ROOT)/usr/share/man
+ifneq ($(LIS_PACK),1)
 	$(INST_SBIN)/strmakenodes
+endif
+	install -d $(LIS_ROOT)/usr/lib/LiS/include/sys/LiS
+	install -d $(LIS_ROOT)/usr/sbin
+	find include -type f -name "*.h" -print -exec install {} $(LIS_ROOT)/usr/lib/LiS/{} \;
+	install -m 555 strms_down strms_status strms_up $(LIS_ROOT)/usr/sbin
+
 
 modules_install: streams.o modules
 ifeq ($(CONFIG_STREAMS),m)
-	cp modules/*.o $(MOD_INST_DIR)
-	./update_conf.modules ./conf.modules
-	-/sbin/depmod -a
+	install -d $(LIS_ROOT)/$(MOD_INST_DIR)
+	install modules/*.o $(LIS_ROOT)/$(MOD_INST_DIR)
+ ifneq ($(LIS_PACK),1)
+	$(LIS_HOME)/update_conf.modules $(LIS_HOME)/conf.modules
+	/sbin/depmod -a
+ else
+	install -d $(LIS_ROOT)/etc
+	install $(LIS_HOME)/conf.modules $(LIS_ROOT)/etc/modules-LiS.conf
+ endif
 endif
 
 uninstall:
-	-$(INST_SBIN)/strmakenodes -r
+	-env LD_LIBRARY_PATH=$(INST_LIB):$(LD_LIBRARY_PATH) \
+		$(INST_SBIN)/strmakenodes -r
 	-$(MAKE) -C $(LIBOBJ) $@
 	-$(MAKE) -C $(UTILOBJ) $@
 	-$(MAKE) -C $(DRVROBJ) $@
-	-$(MAKE) -C man $@
+	-$(MAKE) -C man $@ MANDIR=$(LIS_ROOT)/usr/share/man
+	-(cd $(LIS_ROOT)/usr/sbin && rm -f strms_down strms_status strms_up)
 ifeq ($(CONFIG_STREAMS),m)
+ ifneq ($(LIS_PACK),1)
+	- $(LIS_HOME)/update_conf.modules
+ endif	
 	- ./update_conf.modules
 	- (cd $(MOD_INST_DIR); rm -f streams.o streams-*.o)
-	-/sbin/depmod -a
 endif
 
-else			# from LIS_TARG  == linux
+else		# from LIS_TARG  == linux
 
 install:
 	@echo "install target meaningful only for Linux kernel"
@@ -215,7 +234,7 @@ install:
 uninstall:
 	@echo "uninstall target meaningful only for Linux kernel"
 
-endif			# from LIS_TARG  == linux
+endif
 
 clean:
 	-rm -f streams.o 
@@ -224,7 +243,7 @@ clean:
 	-$(MAKE) -C $(HEADOBJ) $@
 	-$(MAKE) -C $(DRVROBJ) $@
 	-$(MAKE) -C $(UTILOBJ) $@
-	-$(MAKE) -C ./pkg $@
+	-$(MAKE) -C $(LIS_HOME)/pkg $@
 
 
 realclean: clean
@@ -242,6 +261,8 @@ realclean: clean
 	-rm -f config.in
 	-rm -f conf.modules.save
 	-rm -f kver
+	-find . \( -name "*.o" -o -name "*~" \) -print -exec rm -f {} \;
+	-rm -rf rpm-root/ RPMS/
 
 ifeq ($(LIS_TARG),linux)
 
@@ -327,3 +348,22 @@ tags:	files
 
 $(GENCONF):	$(LIS_HOME)/config.in
 	$(LIS_HOME)/mkgenconf
+
+#
+# Make a rpm out of a compile
+#
+
+rpm: all
+	rm -rf $(LIS_HOME)/rpm-root/
+	mkdir -p $(LIS_HOME)/rpm-root/
+	mkdir -p $(LIS_HOME)/rpm-root/usr/share/doc/LiS-$(LISVER) || exit 2
+	cp -rf COPYING LSM README VOLUNTEERS version htdocs/ \
+		$(LIS_HOME)/rpm-root/usr/share/doc/LiS-$(LISVER)
+	make install LIS_ROOT=$(LIS_HOME)/rpm-root/ LIS_PACK=1
+	make modules_install LIS_ROOT=$(LIS_HOME)/rpm-root/ LIS_PACK=1
+	# convert .spec to current value.
+	m4 -D LISROOT=$(LIS_HOME) -D LISVERSION=$(LISVER) \
+		util/linux/LiS.spec.in > LiS.spec
+	# Welcome RPMS..
+	mkdir -p $(LIS_HOME)/RPMS/i386 $(LIS_HOME)/RPMS/ia64
+	rpmbuild -bb LiS.spec

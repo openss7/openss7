@@ -2,7 +2,7 @@
 # This file includes and calculates some make variables that are useful
 # when compiling LiS and utilities.
 # The makefile that includes this one will have to define LIS_HOME to the
-# root of the LiS tree.
+# root of the LiS tree & LIS_ROOT to the supposed root filesystem.
 #
 # It must not contain any rules.
 #
@@ -19,11 +19,11 @@
 # versions of Linux process /etc/ld.so.preload *prior* to mounting
 # local file systems such as /usr.
 #
-INST_LIB = /lib
-INST_LIB = /usr/lib
-INST_BIN = /usr/bin
-INST_SBIN = /usr/sbin
-MANDIR = /usr/man
+INST_LIB = $(LIS_ROOT)/lib
+INST_LIB = $(LIS_ROOT)/usr/lib
+INST_BIN = $(LIS_ROOT)/usr/bin
+INST_SBIN = $(LIS_ROOT)/usr/sbin
+MANDIR = $(LIS_ROOT)/usr/share/man
 
 #
 # If we are cross compiling then the user needs to supply us with a
@@ -100,6 +100,8 @@ ifeq ($(CROSS_COMPILING),n)
 ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/)
 endif
  
+export ARCH
+
 #
 # This is where we have LiS specific includes
 #
@@ -134,11 +136,8 @@ XOPTS+= -fno-strict-aliasing -Wno-sign-compare -fno-common
 #
 # Compiler options for debugging and optimization.
 #
-# NOTE: gcc 2.96 [20000731 (Red Hat Linux 7.1 2.96-98)] generates bad
-# code that gets the SP out of whack with -O3.  So use -O2 for safety.
-#
 ifeq ($(DBG_OPT),y)
-XOPTS += -g -O -DINLINE="" -DSTATIC="" -DLIS_SRC=\"$(LIS_HOME)\"
+XOPTS += -DINLINE="" -DSTATIC="" -ggdb -O -DLIS_SRC=\"$(LIS_HOME)\"
 else
 XOPTS += $(CC_OPTIMIZE) -DINLINE=inline -DSTATIC=static -fomit-frame-pointer
 endif

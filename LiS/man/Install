@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Install man pages
 #
-MANDIR=${1:-/usr/man}
+set -x
+MANDIR=${1:-/usr/share/man}
 
 if [ ! -d $MANDIR/man3 ]; then
     mkdir -p $MANDIR/man3
@@ -14,8 +15,8 @@ if [ ! -d $MANDIR/man9 ]; then
     mkdir -p $MANDIR/man9
 fi
 
-cp -f man3/* $MANDIR/man3
-cp -f man8/* $MANDIR/man8
-cp -f man9/* $MANDIR/man9
+install man3/* $MANDIR/man3
+install man8/* $MANDIR/man8
+install man9/* $MANDIR/man9
 
 echo "LiS man pages installed"

@@ -16,7 +16,7 @@
 #if defined(LINUX) && !defined(OSIF_H)
 #define OSIF_H		/* file included */
 
-#ident "@(#) LiS osif.h 1.34 9/24/03"
+#ident "@(#) LiS osif.h 1.35 11/23/03"
 
 #ifndef LINUX_VERSION_CODE
 #include <linux/version.h>
@@ -508,6 +508,7 @@ extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg);
 extern size_t lis_osif_sg_dma_len(struct scatterlist *sg);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 extern void lis_osif_pci_unmap_page(struct pci_dev *hwdev,
 				dma_addr_t dma_address, size_t size,
 				int direction);
@@ -525,6 +526,7 @@ extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
 					dma64_addr_t dma_addr);
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 			    dma64_addr_t dma_addr, size_t len, int direction);
+#endif					/* S390 or S390X */
 #endif					/* 2.4.13 */
 
 

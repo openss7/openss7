@@ -11,6 +11,6 @@ LIBOBJS	= getpmsg.o putpmsg.o $(POLL)
 XOPTS	= -I.
 
 my_default:	all
-	cp $(LIBDIR)/lib$(LIBBASE).a .
+	install $(LIBDIR)/lib$(LIBBASE).a .
 
 include ../mk.bdy

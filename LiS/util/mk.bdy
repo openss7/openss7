@@ -2,8 +2,8 @@
 # This is the common part of the makefiles in the util directory.
 #
 # "make all" is the standard thing to do to make the utility programs.
-# "make install" will install them in $(BINDIR)
-# "make uninstall" will remove them from $(BINDIR)
+# "make install" will install them in $(INST_SBIN)
+# "make uninstall" will remove them from $(INST_SBIN)
 # "make clean" to clean up the object code
 #
 # Targets install and uninstall do nothing for user-land utilities.
@@ -11,7 +11,7 @@
 # Invoking makefile needs to include $(LIS_HOME)/config.mk and define:
 #
 # OPT         Target specific compiler options
-# BINDIR      where to install the utilities
+# INST_SBIN   where to install the utilities
 #
 
 ifeq ($(MAKINGSTRCONF),1)
@@ -32,11 +32,13 @@ ifneq ($(LIS_TARG),user)
 all: $(PGMS) $(UTILS) $(XUTILS)
 
 install: streams makenodes polltst timetst strtst $(XINST)
-	cp streams $(INST_SBIN)/streams
-	cp makenodes $(INST_SBIN)/strmakenodes
-	cp polltst $(INST_BIN)/polltst
-	cp timetst $(INST_BIN)/timetst
-	cp strtst $(INST_BIN)/strtst
+	install -d $(INST_SBIN)
+	install streams $(INST_SBIN)/streams
+	install makenodes $(INST_SBIN)/strmakenodes
+	install -d $(INST_BIN)
+	install polltst $(INST_BIN)/polltst
+	install timetst $(INST_BIN)/timetst
+	install strtst $(INST_BIN)/strtst
 
 uninstall:	dummy $(XUNINST)
 	-rm -f $(INST_SBIN)/streams

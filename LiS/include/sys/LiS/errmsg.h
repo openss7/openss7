@@ -42,32 +42,24 @@
 #ifndef _ERRMSG_H
 #define _ERRMSG_H 1
 
-#ident "@(#) LiS errmsg.h 2.1 4/4/99 11:34:28 "
+#ident "@(#) LiS errmsg.h 2.2 11/23/03 19:21:04 "
 
 #ifdef __KERNEL__
 
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
 
-enum lis_errclass_t { LIS_PANIC, LIS_ERROR, LIS_WARN, LIS_DEBUG };
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
-
-/* This function will report a msg w/ the error condition and take appropriate
- * actions depending on the error level. 
- * actions will be:
- * LIS_PANIC: issue a panic msg and panic the kernel
- * LIS_ERROR: issue an error.
- * LIS_WARN:  issue a warning msg.
- * LIS_DEBUG: issue a debug msg.
- * msg will be formatted like: 
- *      "some_msg_prefix (your_function_name): fmt_msg\n"
+/*
+ * lis_error
+ *
+ * Simple error print
  */
+#define lis_error(a,b,msg,arg)	printk("LiS:" msg, arg)
 
-extern void
-lis_error( int lvl, const char *fname, const char * fmt, ...);
 
 /*  -------------------------------------------------------------------  */
 #endif /* __KERNEL__ */

@@ -9,4 +9,9 @@ if [ `id -u` != "0" ]; then
     exit 0
 fi
 #
+#If LIS_PACK not set then =0 !
+
+if [ ${LIS_PACK-0} != 1 ] ;then 
 ldconfig
+fi
+

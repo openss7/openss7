@@ -2,7 +2,8 @@
 #
 # Uninstall LiS man pages
 #
-MANDIR=${1:-/usr/man}
+set -x
+MANDIR=${1:-/usr/share/man}
 
 (cd $MANDIR/man3; rm -f fattach.3 fdetach.3 isastream.3 pipe.3)
 (cd $MANDIR/man8; rm -f fattach.8 fdetach.8)

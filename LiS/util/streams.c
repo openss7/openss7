@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS streams.c 2.16 6/26/03 17:06:48 "
+#ident "@(#) LiS streams.c 2.17 11/23/03 18:32:59 "
 #include <sys/types.h>
 #undef GCOM_OPEN
 #include <sys/stropts.h>
@@ -255,17 +255,17 @@ int main( int argc, char *argv[])
     {
 	if (strcmp(argv[1], "start") == 0)
 	{
-	    exit( system("/usr/src/LiS/strms_up") );
+	    exit( system("/usr/sbin/strms_up") );
 	}
 
 	if (strcmp(argv[1], "stop") == 0)
 	{
-	    exit( system("/usr/src/LiS/strms_down") );
+	    exit( system("/usr/sbin/strms_down") );
 	}
 
 	if (strcmp(argv[1], "status") == 0)
 	{
-	    exit( system("/usr/src/LiS/strms_status") );
+	    exit( system("/usr/sbin/strms_status") );
 	}
     }
     
