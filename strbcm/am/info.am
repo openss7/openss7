@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/02/07 07:14:09 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/07 20:33:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 07:14:09 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 20:33:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,8 +128,8 @@ TBL_TXTS = $(TBL_TBLS:%.tbl=%.txt)
 .tbl.dvi: ; groff -t -Tdvi -ms $< > $@ || :
 
 $(TBL_PSS)  : %.ps  : %.tbl ; groff -t -Tps -ms $< > $@ 2>/dev/null || :
-$(TBL_EPSS) : %.eps : %.ps  ; ps2epsi $< $@
-$(TBL_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $<
+$(TBL_EPSS) : %.eps : %.ps  ; ps2epsi $< $@ || convert $< $@
+$(TBL_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $< || convert $< $@
 $(TBL_PNGS) : %.png : %.eps ; convert -antialias $< $@
 $(TBL_JPGS) : %.jpg : %.eps ; convert -antialias $< $@
 $(TBL_TXTS) : %.txt : %.tbl ; ( echo ""; groff -t -Tascii -ms -P-b -P-u -P-o $< | sed -e '/^[[:space:]]*$$/d'; echo "" ) > $@
@@ -154,8 +154,8 @@ PNG_JPGS = $(PNG_PNGS:%.png=%.jpg)
 PNG_TXTS = $(PNG_PNGS:%.png=%.txt)
 
 $(PNG_PSS)  : %.ps  : %.png ; convert -density 144 $< $@
-$(PNG_EPSS) : %.eps : %.ps  ; ps2epsi $< $@
-$(PNG_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $<
+$(PNG_EPSS) : %.eps : %.ps  ; ps2epsi $< $@ || convert $< $@
+$(PNG_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $< || convert $< $@
 $(PNG_JPGS) : %.jpg : %.png ; convert -density 144 $< $@
 
 $(PNG_PNGS) : pngs-am
@@ -167,8 +167,8 @@ PS_PNGS = $(PS_PSS:%.ps=%.png)
 PS_JPGS = $(PS_PSS:%.ps=%.jpg)
 PS_TXTS = $(PS_PSS:%.ps=%.txt)
 
-$(PS_EPSS): %.eps : %.ps  ; ps2epsi $< $@
-$(PS_PDFS): %.pdf : %.eps ; epstopdf --outfile=$@ $<
+$(PS_EPSS): %.eps : %.ps  ; ps2epsi $< $@ || convert $< $@
+$(PS_PDFS): %.pdf : %.eps ; epstopdf --outfile=$@ $< || convert $< $@
 $(PS_PNGS): %.png : %.eps ; convert -antialias $< $@
 $(PS_JPGS): %.jpg : %.eps ; convert -antialias $< $@
 
