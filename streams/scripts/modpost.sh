@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/29 17:21:57 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 06:25:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:21:57 $ by $Author: brian $
+# Last Modified $Date: 2005/03/30 06:25:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/29 17:21:57 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 06:25:23 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -504,12 +504,17 @@ else
     exec 3>/dev/null
 fi
 
+errors=0
+warnings=0
+
 command_error() {
     $ECHO "$program: E: ${1+$@}" >&3
+    ((errors++))
 }
 
 command_warn() {
     $ECHO "$program: W: ${1+$@}" >&3
+    ((warnings++))
 }
 
 command_info() {
@@ -611,7 +616,7 @@ _ACEOF
     eval "syms=\"\$mod_${token}_undefs\""
     for sym in $syms ; do
 	eval "crc=\"\$sym_${sym}_crc\""
-	test :"$crc" != : || { command_warn "symbol $sym remains uresolved" ; continue ; }
+	test :"$crc" != : || { command_error "symbol $sym remains uresolved" ; continue ; }
 	printf "\t{ 0x%08x, \"%s\" },\n" $crc $sym
 	case " $(eval '$ECHO "$mod_'${token}'_deps"') " in
 	    (*" `eval '$ECHO "$sym_'${sym}'_name"'` "*) ;;
@@ -1098,6 +1103,11 @@ case "$command" in
 	;;
 esac
 
-exit 0
+if test $errors -eq 0
+then
+    exit 0
+fi
+
+exit 1
 
 # vim: ft=sh sw=4
