@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.101 3/20/03 19:47:24 "
+#ident "@(#) LiS linux-mdep.c 2.102 4/24/03 16:54:37 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -199,6 +199,7 @@ static struct inode * lis_get_inode( mode_t mode, dev_t dev );
 lis_spin_lock_t			lis_setqsched_lock ; /* one qsched at a time */
 lis_semaphore_t			lis_runq_sems[LIS_NR_CPUS] ;
 lis_semaphore_t			lis_runq_kill_sems[LIS_NR_CPUS] ;
+volatile unsigned long		lis_runq_wakeups[LIS_NR_CPUS] ;
 int				lis_runq_sched ;     /* q's are scheduled */
 lis_atomic_t			lis_inode_cnt ;
 lis_atomic_t                    lis_mnt_cnt;   /* for lis_mnt only, for now */
@@ -4003,6 +4004,7 @@ int	lis_thread_runqueues(void *p)
 	else
 	    sig_cnt = 0 ;
 
+	lis_runq_wakeups[cpu_id]++ ;
 #ifdef KERNEL_2_3
 	if (cpu_id != smp_processor_id())
 	{

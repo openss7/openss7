@@ -59,7 +59,7 @@ extern "C" {
 #define	LIS_STROPTS_H_SOLARIS_UW_COMPATIBLE	1
 #endif
 
-#ident "@(#) LiS stropts.h 2.15 3/9/03 22:23:13 "
+#ident "@(#) LiS stropts.h 2.16 4/24/03 16:54:55 "
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -449,6 +449,7 @@ typedef struct
     unsigned long	queuerun_cnts[LIS_NR_CPUS] ;
     int			active_flags[LIS_NR_CPUS] ;
     int			runq_pids[LIS_NR_CPUS] ;
+    unsigned long	runq_wakeups[LIS_NR_CPUS] ;
     unsigned long	setqsched_cnts[LIS_NR_CPUS] ;
     unsigned long	setqsched_isr_cnts[LIS_NR_CPUS] ;
 

@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.111 4/14/03 14:38:46 "
+#ident "@(#) LiS head.c 2.114 4/24/03 16:54:37 "
 
 /* BEWARE: should check:
  * tty stuff
@@ -340,6 +340,7 @@ volatile unsigned long lis_setqsched_cnts[LIS_NR_CPUS] ;
 volatile unsigned long lis_setqsched_isr_cnts[LIS_NR_CPUS] ;
 lis_atomic_t	 lis_runq_active_flags[LIS_NR_CPUS] ;
 int		 lis_runq_pids[LIS_NR_CPUS] ;
+volatile unsigned long	 lis_runq_wakeups[LIS_NR_CPUS] ;
 
 int		 lis_nstrpush;	/* maximum # of pushed modules */
 int		 lis_strhold;	/* if not zero str hold feature's activated*/
@@ -361,6 +362,9 @@ extern lis_spin_lock_t	  lis_msg_lock ;/* msg.c */
 extern lis_spin_lock_t	  lis_bc_lock ; /* buffcall.c */
 extern lis_spin_lock_t	  lis_mem_lock ;/* strmdbg.c */
 extern lis_spin_lock_t	  lis_tlist_lock ; /* dki.c */
+extern lis_atomic_t       lis_spin_lock_count ;
+extern lis_atomic_t       lis_spin_lock_contention_count ;
+
 
 /*  -------------------------------------------------------------------  */
 /*			   Streams Queue Structures                      */
@@ -1283,7 +1287,6 @@ lis_alloc_stdata(void)
     lis_sem_init(&head->sd_read_sem, 1) ;
     lis_sem_init(&head->sd_wwrite, 0) ;		/* explicit init for emphasis */
     lis_sem_init(&head->sd_write_sem, 1) ;
-    lis_sem_init(&head->sd_wiocing, 0) ;	/* explicit init for emphasis */
     lis_sem_init(&head->sd_closing, 0) ;	/* explicit init for emphasis */
     lis_sem_init(&head->sd_opening, 1) ;
 
@@ -1377,7 +1380,6 @@ lis_free_stdata( struct stdata *hd )
     SEM_DESTROY(&hd->sd_read_sem) ;
     SEM_DESTROY(&hd->sd_wwrite) ;
     SEM_DESTROY(&hd->sd_write_sem) ;
-    SEM_DESTROY(&hd->sd_wiocing) ;
     SEM_DESTROY(&hd->sd_closing) ;
     SEM_DESTROY(&hd->sd_opening) ;
 
@@ -3068,36 +3070,33 @@ lis_wait_for_wiocing(stdata_t *hd, int tmout)
     if (tmout == 0)
 	tmout = LIS_DFLT_TIM ;
 
-    while( hd->sd_iocblk == NULL )
+    if ( F_ISSET(hd->sd_flag,(STRDERR|STWRERR)) )
+	return(-hd->sd_rerror) ;
+    SET_SD_FLAG(hd,STIOCTMR);
+    if (tmout != INFTIM)
+	lis_tmout(&tl,lis_do_tmout,(long)hd, SECS_TO(tmout));
+    CP(hd,tmout) ;
+    rslt = lis_sleep_on_wiocing(hd);
+    if (rslt < 0)
     {
-	if ( F_ISSET(hd->sd_flag,(STRDERR|STWRERR)) )
-	    return(-hd->sd_rerror) ;
-	SET_SD_FLAG(hd,STIOCTMR);
+	CP(hd,rslt) ;
 	if (tmout != INFTIM)
-	    lis_tmout(&tl,lis_do_tmout,(long)hd, SECS_TO(tmout));
-	CP(hd,tmout) ;
-	rslt = lis_sleep_on_wiocing(hd);	/* unlocks and relocks head */
-	if (rslt < 0)
-	{
-	    CP(hd,rslt) ;
-	    if (tmout != INFTIM)
-		lis_untmout(&tl);
-	    CLR_SD_FLAG(hd,STIOCTMR);
-	    return(rslt) ;
-	}
+	    lis_untmout(&tl);
+	CLR_SD_FLAG(hd,STIOCTMR);
+	return(rslt) ;
+    }
 
-	if (!F_ISSET(hd->sd_flag,STIOCTMR)) /* timer expired */
-	{
-	    CP(hd,-ETIME) ;
-	    return(-ETIME);
-	}
-	else
-	{
-	    CP(hd,0) ;
-	    if (tmout != INFTIM)
-		lis_untmout(&tl);
-	    CLR_SD_FLAG(hd,STIOCTMR);
-	}
+    if (!F_ISSET(hd->sd_flag,STIOCTMR)) /* timer expired */
+    {
+	CP(hd,-ETIME) ;
+	return(-ETIME);
+    }
+    else
+    {
+	CP(hd,0) ;
+	if (tmout != INFTIM)
+	    lis_untmout(&tl);
+	CLR_SD_FLAG(hd,STIOCTMR);
     }
     return(0);			/* got msg */
 }/*lis_wait_for_wiocing*/
@@ -3257,6 +3256,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 			lis_msg_type_name(mioc),
 			lis_queue_name(hd->sd_wq->q_next),
 			hd->sd_name, iocb->ioc_cmd) ;
+    lis_sem_init(&hd->sd_wiocing, 0) ;
     SET_SD_FLAG(hd,IOCWAIT);		/* for strrput */
     CLOCKADD() ;			/* exclude driver time */
     CP(hd,0) ;
@@ -3267,6 +3267,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
     CLOCKADD() ;
     CP(hd,0) ;
     err = lis_wait_for_wiocing(hd,ioc->ic_timout) ;
+    SEM_DESTROY(&hd->sd_wiocing) ;
     if (err < 0 || (mioc = hd->sd_iocblk) == NULL)	/* rtnd ioctl msg */
     {
 	CP(hd,err) ;
@@ -6449,6 +6450,8 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	memcpy(stats.active_flags, (void *)lis_runq_active_flags,
 						sizeof(stats.active_flags)) ;
 	memcpy(stats.runq_pids, (void *)lis_runq_pids, sizeof(stats.runq_pids));
+	memcpy(stats.runq_wakeups, (void *)lis_runq_wakeups,
+						sizeof(stats.runq_wakeups));
 	memcpy(stats.setqsched_cnts, (void *)lis_setqsched_cnts,
 					    sizeof(stats.setqsched_cnts));
 	memcpy(stats.setqsched_isr_cnts, (void *)lis_setqsched_isr_cnts,
@@ -6461,6 +6464,9 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	err = lis_check_umem(f,VERIFY_WRITE,(char*)arg, sizeof(lis_strstats)) ; 
 	if (err < 0)
 	    RTN(err);
+
+	lis_strstats[LOCKCNTS][TOTAL] = lis_spin_lock_count ;
+	lis_strstats[LOCKCNTS][FAILURES] = lis_spin_lock_contention_count ;
 
 	err = lis_copyout(f,lis_strstats,(char*)arg,sizeof(lis_strstats));
 	RTN(err);

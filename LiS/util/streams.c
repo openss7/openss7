@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS streams.c 2.12 11/14/02 15:30:32 "
+#ident "@(#) LiS streams.c 2.14 4/24/03 16:54:13 "
 #include <sys/types.h>
 #undef GCOM_OPEN
 #include <sys/stropts.h>
@@ -86,7 +86,8 @@ itemname_t lis_itemnames[] =
     {IOCTLTIME,		IOCTLTIMESTR},
     {GETMSGTIME,	GETMSGTIMESTR},
     {PUTMSGTIME,	PUTMSGTIMESTR},
-    {POLLTIME,		POLLTIMESTR}
+    {POLLTIME,		POLLTIMESTR},
+    {LOCKCNTS,		LOCKCNTSSTR}
 };
 
 char *lis_countnames[] =
@@ -155,15 +156,19 @@ void print_qrun_stats(void)
 	    qrun_stats.queues_running, qrun_stats.runq_req_cnt) ;
 
     printf(
-      "\nCPU   Qsched-Cnts Qsched-ISR Svc-Q-Cnts Qrun-Cnts Active Thread-PID\n"
+"\n"
+"CPU   Qsched-Cnts Qsched-ISR Svc-Q-Cnts Qrun-Wkups Qrun-Cnts Active Thread-PID"
+"\n"
           ) ;
     for (cpu = 0; cpu < qrun_stats.num_cpus; cpu++)
     {
-	printf("%3u   %11lu %10lu %10lu %9lu %6u %10u\n",
+	printf("%3u   %11lu %10lu %10lu %10lu %9lu %6u %10u\n",
 		cpu,
 		qrun_stats.setqsched_cnts[cpu],
 		qrun_stats.setqsched_isr_cnts[cpu],
-		qrun_stats.runq_cnts[cpu], qrun_stats.queuerun_cnts[cpu],
+		qrun_stats.runq_cnts[cpu],
+		qrun_stats.runq_wakeups[cpu],
+		qrun_stats.queuerun_cnts[cpu],
 		qrun_stats.active_flags[cpu], qrun_stats.runq_pids[cpu]) ;
     }
 }
