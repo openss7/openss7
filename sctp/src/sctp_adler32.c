@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $
+ @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:28:55 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $"
+#ident "@(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:18 $"
 
-static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $";
+static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#   include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
 #include <linux/fcntl.h>
@@ -74,7 +70,6 @@ static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 0
 #include <linux/mm.h>
 
 #ifdef CONFIG_SCTP_MODULE
-#include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <net/protocol.h>
 #endif

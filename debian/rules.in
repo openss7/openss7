@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/20 08:07:48 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/09 08:00:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,13 +47,12 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 08:07:48 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 08:00:25 $ by $Author: brian $
 #
 # =============================================================================
 
-PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_VERSION = @PACKAGE_VERSION@
-PACKAGE_RELEASE = @PACKAGE_RELEASE@
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
 
 export DH_VERBOSE=1
 export DH_OPTIONS
@@ -96,5 +95,5 @@ binary-arch: build-arch
 binary-indep: build-indep
 
 get-orig-source:
-	wget http://www.openss7.org/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).tar.bz
+	wget http://www.openss7.org/$(PACKAGE)-$(VERSION).tar.bz
 

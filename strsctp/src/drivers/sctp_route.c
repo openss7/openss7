@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:32:06 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/09 08:03:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:32:06 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:32:06 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/09 08:03:38 $"
 
-static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:32:06 $";
+static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/09 08:03:38 $";
 
 #define __NO_VERSION__
 
@@ -75,18 +75,7 @@ static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9
 #   include <linux/config.h>
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
-#	ifdef MODVERSIONS
-#	    include <linux/modversions.h>
-#	endif
 #	include <linux/module.h>
-#	include <linux/modversions.h>
-#	ifndef __GENKSYMS__
-#	    if defined HAVE_SYS_LIS_MODVERSIONS_H
-#		include <sys/LiS/modversions.h>
-#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#		include <sys/streams/modversions.h>
-#	    endif
-#	endif
 #	include <linux/init.h>
 #   else
 #	include <sys/LiS/module.h>

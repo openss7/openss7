@@ -58,7 +58,7 @@ dnl Process this file with autogen.sh to produce configure files
 dnl ===================================================================
 
 AC_PREREQ(2.59)
-AC_INIT([Iperf],[2.0.1],[bugs@openss7.org],[iperf])
+AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
 
 AC_CONFIG_SRCDIR([src/Client.cpp])
 AC_CONFIG_HEADER([config.h])

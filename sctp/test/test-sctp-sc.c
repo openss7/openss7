@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/18 04:34:31 $
+@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/09 08:03:19 $
 
 -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@ Corporation at a fee.  See http://www.openss7.com/
 
 -----------------------------------------------------------------------------
 
-Last Modified $Date: 2005/01/18 04:34:31 $ by <bidulock@openss7.org>
+Last Modified $Date: 2005/03/09 08:03:19 $ by <bidulock@openss7.org>
 
 *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/18 04:34:31 $"
+#ident "@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/09 08:03:19 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/18 04:34:31 $";
+    "$RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/09 08:03:19 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -68,7 +68,7 @@ static char const ident[] =
 #include <asm/ioctls.h>
 #include <linux/sockios.h>
 #include <netinet/in.h>
-#include <netinet/sctp.h>
+#include "include/netinet/sctp.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>

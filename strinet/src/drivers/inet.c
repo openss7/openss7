@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/09 08:03:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/07 12:21:03 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/09 08:03:32 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/09 08:03:32 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
    provider (NPI).  It provides a STREAMS-based encapsulation of the Linux IP stack. 
  */
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #if defined HAVE_OPENSS7_SCTP
 #if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
@@ -145,14 +145,17 @@ static char const ident[] =
 #define sock_clr_destroy(_sk)	(((struct sock *)_sk)->destroy = 0)
 #define sock_clr_broadcast(_sk)	(((struct sock *)_sk)->broadcast = 0)
 
+#undef inet_sk
 #define inet_sk(_sk)		(&(((struct sock *)_sk)->protinfo.af_inet))
+#undef tcp_sk
 #define tcp_sk(_sk)		(&(((struct sock *)_sk)->tp_pinfo.af_tcp))
+#undef sctp_sk
 #define sctp_sk(_sk)		(&(((struct sock *)_sk)->tp_pinfo.af_sctp))
 
 #define sock_saddr(_sk)		(((struct sock *)_sk)->saddr)
 #define sock_sport(_sk)		(((struct sock *)_sk)->sport)
 #define sock_daddr(_sk)		(((struct sock *)_sk)->daddr)
-#define sock_sport(_sk)		(((struct sock *)_sk)->sport)
+#define sock_dport(_sk)		(((struct sock *)_sk)->dport)
 
 #else
 
@@ -303,7 +306,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/07 12:21:03 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/09 08:03:32 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

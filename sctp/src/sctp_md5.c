@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $
+ @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:28:55 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $"
+#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:19 $"
 
-static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $";
+static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/09 08:03:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#   include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
 #include <linux/fcntl.h>

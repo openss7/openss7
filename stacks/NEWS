@@ -3,6 +3,8 @@ Copyright (c) 2001-2004  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Initial release  strss7-0.9a.3
+
 * Initial release  strss7-0.9a-1
 
   Initial autoconf/RPM packaging of the OpenSS7 strss7 package.

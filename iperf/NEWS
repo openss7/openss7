@@ -3,6 +3,8 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
+* Initial release iperf-2.0.2
+
 * Initial release iperf-2.0.1-1
 
   Initial autoconf/rpm packaging release of Iperf.

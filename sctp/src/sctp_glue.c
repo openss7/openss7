@@ -62,11 +62,7 @@ static char const ident[] = "sctp_glue.c,v LINUX-2-4-20-SCTP(1.1.6.3) 2004/02/09
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#   include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
 #include <linux/fcntl.h>

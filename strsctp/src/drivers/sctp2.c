@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:38:34 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $";
 
 #include "os7/compat.h"
 
@@ -163,7 +163,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -570,7 +570,7 @@ struct t_sctp_status_pair {
 };
 
 struct sctp_options {
-	unsigned char flags[8];		/* eight bytes of flags for 64 flags */
+	unsigned long flags[2];		/* at least 2 long words of flags for 64 flags */
 	struct {
 		t_uscalar_t debug[4];	/* XTI_DEBUG */
 		struct t_linger linger;	/* XTI_LINGER */
@@ -1023,7 +1023,15 @@ struct sctp_mib {
 	unsigned long __pad[0];
 } ____cacheline_aligned;
 
+#ifdef DEFINE_SNMP_STAT
+DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
+#else
 struct sctp_mib sctp_statistics[NR_CPUS * 2];
+#endif				/* DEFINE_SNMP_STAT */
+#else				/* HAVE_OPENSS7_SCTP */
+#ifdef DEFINE_SNMP_STAT
+DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
+#endif				/* DEFINE_SNMP_STAT */
 #endif				/* HAVE_OPENSS7_SCTP */
 
 #if SOCKETS
@@ -2402,7 +2410,6 @@ sctp_get(void)
 {
 	sctp_t *sp;
 	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, SLAB_ATOMIC))) {
-		MOD_INC_USE_COUNT;
 		bzero(sp, sizeof(*sp));
 		atomic_set(&sp->refcnt, 1);
 	}
@@ -2421,7 +2428,6 @@ sctp_put(sctp_t *sp)
 	if (sp)
 		if (atomic_dec_and_test(&sp->refcnt)) {
 			kmem_cache_free(sctp_sctp_cachep, sp);
-			MOD_DEC_USE_COUNT;
 		}
 }
 
@@ -2430,7 +2436,6 @@ sctp_dget(void)
 {
 	struct sctp_daddr *sd;
 	if ((sd = kmem_cache_alloc(sctp_dest_cachep, SLAB_ATOMIC))) {
-		MOD_INC_USE_COUNT;
 		bzero(sd, sizeof(*sd));
 		atomic_set(&sd->refcnt, 1);
 	}
@@ -2452,7 +2457,6 @@ sctp_dput(struct sctp_daddr *sd)
 				 (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff,
 				 (sd->daddr >> 16) & 0xff, (sd->daddr >> 24) & 0xff, sp));
 			kmem_cache_free(sctp_dest_cachep, sd);
-			MOD_DEC_USE_COUNT;
 			sctp_put(sp);
 		}
 }
@@ -4816,7 +4820,13 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
+#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
+#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
 			   and we must iterate along the b_cont pointer. */
@@ -4905,7 +4915,13 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->protocol = sp->protocol;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
+#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
+#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, &rt->u.dst, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 			/* For sockets the passed in sk_buff represents a single packet.  For
 			   STREAMS, the passed in mblk_t pointer is possibly a message buffer chain
 			   and we must iterate along the b_cont pointer. */
@@ -5033,7 +5049,13 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->protocol = sp->protocol;
 		iph->tot_len = htons(tlen);
 		skb->nh.iph = iph;
+#if HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 		__ip_select_ident(iph, sd->dst_cache);
+#elif HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+		__ip_select_ident(iph, sd->dst_cache, 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
 		/* For sockets, socket buffers representing chunks are chained together by control
 		   block pointers, however, each socket buffer in the chain is a complete chunk.
 		   For message blocks, blocks representing chunks are chained together with the
@@ -25640,6 +25662,21 @@ sctp_get_info(char *buffer, char **start, off_t offset, int length)
 }
 #endif				/* SOCKETS */
 
+#if HAVE_KINC_LINUX_PERCPU_H
+STATIC void
+sctp_init_stats(void)
+{
+	sctp_statistics[0] = alloc_percpu(struct sctp_mib);
+	sctp_statistics[1] = alloc_percpu(struct sctp_mib);
+}
+STATIC void
+sctp_term_stats(void)
+{
+	free_percpu(sctp_statistics[1]);
+	free_percpu(sctp_statistics[0]);
+}
+#endif				/* HAVE_KINC_LINUX_PERCPU_H */
+
 STATIC void
 sctp_init_procfs(void)
 {
@@ -26005,12 +26042,18 @@ sctp_init(void)
 #ifdef CONFIG_PROC_FS
 	sctp_init_procfs();
 #endif				/* CONFIG_PROC_FS */
+#if HAVE_KINC_LINUX_PERCPU_H
+	sctp_init_stats();
+#endif				/* HAVE_KINC_LINUX_PERCPU_H */
 	return;
 }
 
 STATIC void
 sctp_terminate(void)
 {
+#if HAVE_KINC_LINUX_PERCPU_H
+	sctp_term_stats();
+#endif				/* HAVE_KINC_LINUX_PERCPU_H */
 #ifdef CONFIG_PROC_FS
 	sctp_term_procfs();
 #endif				/* CONFIG_PROC_FS */
@@ -26033,6 +26076,7 @@ sctp_terminate(void)
  *  Kernel Module Initialization
  *
  *  =========================================================================
+ 
  */
 #ifdef SCTP_CONFIG_MODULE
 int

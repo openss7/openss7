@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.11 $) $Date: 2005/02/19 11:59:14 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.12 $) $Date: 2005/03/09 08:00:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:59:14 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 08:00:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,7 +71,7 @@ AC_CANONICAL_TARGET
 
 _DISTRO
 
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION-1)
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing

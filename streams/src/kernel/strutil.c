@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 19:31:42 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:42 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 19:31:42 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 19:31:42 $";
-
-#define __NO_VERSION__
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $";
 
 #include <linux/config.h>
 #include <linux/module.h>

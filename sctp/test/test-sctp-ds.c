@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp-ds.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/18 04:34:31 $
+ @(#) $RCSfile: test-sctp-ds.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/09 08:03:19 $
 
  -----------------------------------------------------------------------------
 
@@ -52,21 +52,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/18 04:34:31 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/03/09 08:03:19 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-ds.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/18 04:34:31 $"
+#ident "@(#) $RCSfile: test-sctp-ds.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/09 08:03:19 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp-ds.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/18 04:34:31 $";
+    "$RCSfile: test-sctp-ds.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/09 08:03:19 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netinet/sctp.h>
+#include "include/netinet/sctp.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>

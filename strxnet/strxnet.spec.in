@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/03/09 08:00:24 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/03/09 12:14:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 08:00:24 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 12:14:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -520,12 +520,12 @@ if [ $1 = 1 ] ; then
         rm -f $conf_new
     fi
 %endif
-%if %{have_preloads}
 %if %{without_ko_modules}
     preloads=modules
 %else
     preloads=modprobe.preload
 %endif
+%if %{have_preloads}
     if [ -f /etc/$preloads ] ; then
         cp -f /etc/$preloads %{_tmppath}/$preloads.new.$$
         pres="%{preloads}" ; for m in $pres ; do
@@ -1015,6 +1015,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
+# Revision 0.9.2.71  2005/03/09 12:14:24  brian
+# - Corrected problematic conditionals.
+#
 # Revision 0.9.2.70  2005/03/09 08:00:24  brian
 # - Updated revision numbering.
 #

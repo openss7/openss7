@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:41 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/09 08:03:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:41 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:41 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/09 08:03:31 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:41 $";
-
-#define __NO_VERSION__
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/09 08:03:31 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:47 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/09 08:03:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 19:31:47 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 08:03:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -420,6 +420,74 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 		    ])
 	])
     fi
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+#include <linux/ip.h>
+		[[void (*my_autoconf_function_pointer)(struct iphdr *, struct dst_entry *) = &__ip_select_ident;]]) ],
+		[linux_cv_have___ip_select_ident_2_args='yes'],
+		[linux_cv_have___ip_select_ident_2_args='no'])
+	])
+	if test :$linux_cv_have___ip_select_ident_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS], [1], [Define if function __ip_select_ident
+		       takes 2 arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel __ip_select_ident with 3 arguments], [linux_cv_have___ip_select_ident_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[void (*my_autoconf_function_pointer)(struct iphdr *, struct dst_entry *, int) = &__ip_select_ident;]]) ],
+		[linux_cv_have___ip_select_ident_3_args='yes'],
+		[linux_cv_have___ip_select_ident_3_args='no'])
+	])
+	if test :$linux_cv_have___ip_select_ident_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS], [1], [Define if function __ip_select_ident
+		       takes 3 arguments.])
+	fi
+	if test :"${linux_cv_have___ip_select_ident_2_args:-no}" = :no \
+	     -a :"${linux_cv_have___ip_select_ident_3_args:-no}" = :no
+	then
+	    AC_MSG_ERROR([
+***
+*** Configure cannot determine whether your __ip_select_ident function takes
+*** 2 arguments or whether it takes 3 arguments.
+*** ])
+	fi
+    ])
+    _LINUX_CHECK_HEADERS([linux/percpu.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+])
+
     AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
 dnl if test :"${sctp_cv_openss7_sctp:-no}" = :yes ; then
 dnl     with_sctp='no'
