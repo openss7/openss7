@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/03/31 10:23:09 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/04/01 03:20:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 10:23:09 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 03:20:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1431,7 +1431,6 @@ dnl
 	fi
 	AC_MSG_CHECKING([for kernel config file]) ])
     kconfig="$linux_cv_k_config"
-    cp -f "$kconfig" .config
     AC_SUBST([kconfig])dnl
 ])# _LINUX_CHECK_KERNEL_DOT_CONFIG
 # =========================================================================
@@ -1515,7 +1514,9 @@ dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
     AC_CACHE_CHECK([for kernel CFLAGS], [linux_cv_k_cflags], [dnl
+	cp -f "$kconfig" .config
 	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check`"
+	rm -f .config
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
 	    AS_HELP_STRING([--with-k-optimize=HOW],
@@ -1590,7 +1591,9 @@ dnl
 	linux_cv_k_more_cppflags="$linux_cppflags"
     ])
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
+	cp -f "$kconfig" .config
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check`"
+	rm -f .config
 	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
 dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
@@ -1605,7 +1608,9 @@ dnl
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
     ])
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
+	cp -f "$kconfig" .config
 	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check`"
+	rm -f .config
     ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"

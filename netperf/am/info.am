@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/30 02:24:44 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/01 03:18:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/30 02:24:44 $ by $Author: brian $
+## Last Modified $Date: 2005/04/01 03:18:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -95,9 +95,9 @@ FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
 
 MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
 
-$(FIG_PSS) : %.ps  : %.fig ; convert $< $@
-$(FIG_EPSS): %.eps : %.fig ; convert $< $@
-$(FIG_PDFS): %.pdf : %.fig ; convert $< $@
+$(FIG_PSS) : %.ps  : %.fig ; fig2dev -L  ps $< $@ || convert $< $@
+$(FIG_EPSS): %.eps : %.fig ; fig2dev -L eps $< $@ || convert $< $@
+$(FIG_PDFS): %.pdf : %.fig ; fig2dev -L pdf $< $@ || convert $< $@
 $(FIG_PNGS): %.png : %.eps ; convert -antialias $< $@
 $(FIG_JPGS): %.jpg : %.eps ; convert -antialias $< $@
 $(FIG_TXTS): txts-am

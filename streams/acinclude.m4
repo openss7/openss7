@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/03/31 20:21:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/04/01 09:52:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 20:21:15 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 09:52:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,7 +102,7 @@ AC_DEFUN([AC_LFS], [dnl
     USER_LDFLAGS="$LDFLAGS"
     _LFS_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-DLFS=1'
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(CONFIG_HEADER)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/include -I$(top_srcdir)/include'
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
@@ -814,8 +814,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device \
-			read_trylock write_trylock \
+			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
+			read_trylock write_trylock \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -948,6 +949,8 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
+	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq_irqoff])
 	_LINUX_KERNEL_ENV([dnl
 	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
 			   [linux_cv_have_iop_lookup_nameidata], [dnl
@@ -1062,9 +1065,8 @@ retval = do_settimeofday(&ts);]]) ],
 AC_DEFUN([_LFS_CONFIG_FATTACH], [dnl
     lfs_pipe=yes
     lfs_fattach=yes
-    _LINUX_KERNEL_SYMBOL_EXPORT([mount_sem])
+    _LINUX_KERNEL_SYMBOLS[[mount_sem, check_mnt])
     _LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt], [lfs_fattach=no; lfs_pipe=no])
-    _LINUX_KERNEL_SYMBOL_EXPORT([check_mnt], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([graft_tree], [lfs_fattach=no; lfs_pipe=no])
     _LINUX_KERNEL_SYMBOL_EXPORT([do_umount], [lfs_fattach=no; lfs_pipe=no])
     AC_CACHE_CHECK([for kernel symbol support for fattach/fdetach], [lfs_cv_fattach], [dnl
@@ -1088,7 +1090,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [dnl
 # =============================================================================
 _LFS_CONFIG_LIS
 # -----------------------------------------------------------------------------
-# symbols to rip for LiS support (without system call generation)
+# symbols to rip for STREAMS support (without system call generation)
 # -----------------------------------------------------------------------------
 # sys_unlink            <-- extern, not declared
 # sys_mknod             <-- extern, not declared

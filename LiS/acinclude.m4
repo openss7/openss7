@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.16 $) $Date: 2005/03/31 20:21:00 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.18 $) $Date: 2005/04/01 06:22:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 20:21:00 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 06:22:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,7 +102,7 @@ AC_DEFUN([AC_LIS], [dnl
     USER_LDFLAGS="$LDFLAGS"
     _LIS_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-DLIS=1'
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(CONFIG_HEADER)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/include -I$(top_srcdir)/include'
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
@@ -442,6 +442,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device \
+			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \

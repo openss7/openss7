@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/29 17:19:40 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/04/01 03:22:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:19:40 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 03:22:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -252,7 +252,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
-	    for streams_dir in $srcdir/LiS*/include $srcdir/lis*/include $srcdir/../LiS*/include $srcdir/../lis*/include
+	    for streams_dir in \
+		$srcdir/LiS*/include $srcdir/lis*/include \
+		$srcdir/../LiS*/include $srcdir/../lis*/include \
+		../_build/$srcdir/../../LiS*/include ../_build/$srcdir/../../lis*/include \
+		../_build/$srcdir/../../../LiS*/include ../_build/$srcdir/../../../lis*/include
 	    do
 		if test -d $streams_dir -a -r $streams_dir/$streams_what 
 		then
