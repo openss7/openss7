@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/03/20 23:01:36 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/03/23 09:17:20 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/20 23:01:36 $ by $Author: brian $
+## Last Modified $Date: 2005/03/23 09:17:20 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,8 +77,8 @@ if BUILD_RPMS
 ##
 # In the automake tradition, we print gobs of information.
 ##
-RPMFLAGS	= -vv
-SRPMFLAGS	= $(RPMFLAGS) --nodeps
+RPMFLAGS		= -vv
+SRPMFLAGS		= $(RPMFLAGS) --nodeps
 
 ##
 # These are general rpm options that we always include in all rpm commands.  The top directory and
@@ -89,40 +89,32 @@ SRPMFLAGS	= $(RPMFLAGS) --nodeps
 ## (or use the site default) from the /usr/lib/rpm/macros or ~/.rpmmacros file.  We bzip source and
 ## payload to try to crunch 'em down more.
 ##
-RPMOPTS		= \
-		$(PACKAGE_RPMOPTIONS) \
-		--define "_topdir $(topdir)" \
-		--define "_sourcedir $(sourcedir)" \
-		--define "_builddir $(rpmbuilddir)" \
-		--define "_rpmdir $(rpmdir)" \
-		--define "_srcrpmdir $(srcrpmdir)" \
-		--define "_specdir $(specdir)"
+RPMOPTS			= $(PACKAGE_RPMOPTIONS) \
+			  --define "_topdir $(topdir)" \
+			  --define "_sourcedir $(sourcedir)" \
+			  --define "_builddir $(rpmbuilddir)" \
+			  --define "_rpmdir $(rpmdir)" \
+			  --define "_srcrpmdir $(srcrpmdir)" \
+			  --define "_specdir $(specdir)"
 
 ##
 # Note that we created the usual rpm directories as well.  This is because rpm sometimes complains
 # if directories do not exist directly under topdir.
 ##
-rpm_directories	= \
-		$(topdir)/SOURCES $(sourcedir) \
-		$(topdir)/BUILD   $(rpmbuilddir) \
-		$(topdir)/RPMS    $(rpmdir) \
-		$(topdir)/SRPMS   $(srcrpmdir) \
-		$(topdir)/SPECS   $(specdir)
-
-##
-# These are the same directories as rpm_directories with common archive directories stripped out.
-##
-RELEASE_DIRECTORIES += $(rpm_directories)
+redhat_directories	= $(topdir)/SOURCES $(sourcedir) \
+			  $(topdir)/BUILD   $(rpmbuilddir) \
+			  $(topdir)/RPMS    $(rpmdir) \
+			  $(topdir)/SRPMS   $(srcrpmdir) \
+			  $(topdir)/SPECS   $(specdir)
 
 ##
 # Options for building source rpms.  We have separate fig and xpm macros from the binary rpms to
 # avoid warnings about the files being multiply included.  Another approach would be to name the
 # icons according to the individual package neames and avoid specific macros for them.
 ##
-RPMSOPTS	= \
-		$(RPMOPTS) \
-		--define "_gif_icon $(PACKAGE)-$(VERSION).gif" \
-		--define "_xpm_icon $(PACKAGE)-$(VERSION).xpm"
+RPMSOPTS		= $(RPMOPTS) \
+			  --define "_gif_icon $(PACKAGE)-$(VERSION).gif" \
+			  --define "_xpm_icon $(PACKAGE)-$(VERSION).xpm"
 
 ##
 # Options for building binary rpms.  We have separate fig an xpm macros from the source rpms to
@@ -134,12 +126,11 @@ RPMSOPTS	= \
 # included for the source rpm because the source rpm is applicable to all binary packages and
 # distributions. (Wow! -- that took some effort!)
 ##
-RPMBOPTS	= \
-		$(RPMOPTS) \
-		--define "extrarelease $(PACKAGE_RPMEXTRA)" \
-		--define "distribution $(PACKAGE_RPMDIST) (contrib)" \
-		--define "_gif $(PACKAGE)-$(VERSION).gif" \
-		--define "_xpm $(PACKAGE)-$(VERSION).xpm"
+RPMBOPTS		= $(RPMOPTS) \
+			  --define "extrarelease $(PACKAGE_RPMEXTRA)" \
+			  --define "distribution $(PACKAGE_RPMDIST) (contrib)" \
+			  --define "_gif $(PACKAGE)-$(VERSION).gif" \
+			  --define "_xpm $(PACKAGE)-$(VERSION).xpm"
 
 ##
 # Options for signing packages.  These can be combined with the source or binary options above.
@@ -147,54 +138,52 @@ RPMBOPTS	= \
 ## We used to uses the autoconf variables to set the signature specific macros for rpm, but that
 ## turned out to be a bad idea.  What we used to do was as follows:
 ##
-##RPMKOPTS	= $(RPMOPTS) \
-##		--define "_signature gpg" \
-##		--define "_gpg_path $(GNUPGHOME)" \
-##		--define "_gpg_name $(GNUPGUSER)" \
-##		--define "_gpgbin $(GPG)" \
-##		--define "__gpg $(GPG)"
+##RPMKOPTS		= $(RPMOPTS) \
+##			--define "_signature gpg" \
+##			--define "_gpg_path $(GNUPGHOME)" \
+##			--define "_gpg_name $(GNUPGUSER)" \
+##			--define "_gpgbin $(GPG)" \
+##			--define "__gpg $(GPG)"
 ##
 ## As it turns out, it is a better idea not to manipulate these here at all, because they override
 ## more sane settings in /usr/lib/rpm/macros and ~/.rpmmacros.  Define the appropriate macros in your
 ## /usr/lib/rpm/macros file or ~/.rpmmacros instead.  Examples of my ~/.rpmmacros file are included
 ## in the documentation.
 ##
-RPMKOPTS	= $(RPMOPTS)
+RPMKOPTS		= $(RPMOPTS)
+
+redhatpkg		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)
+redhat_dir		= $(rpmbuilddir)/$(PACKAGE)-$(VERSION)
+redhat_dir_stamp	= $(rpmbuilddir)/stamp-$(PACKAGE)-$(VERSION)
+redhat_src_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
+redhat_sig_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
+redhat_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
+redhat_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
+redhat_img_files	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
+redhat_source_files	= $(redhat_spec_file) $(redhat_img_files) $(redhat_src_file) $(redhat_tar_file) $(redhat_sig_file)
+redhat_binary_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+redhat_binary_files	= $(rpmdir)/*/$(redhat_binary_file)
+redhat_cache_files	= $(rpmbuilddir)/*config.cache \
+			  $(rpmbuilddir)/*config.site \
+			  $(rpmbuilddir)/*modpost.cache
+
+RELEASE_DIRECTORIES	+= $(topdir)
 
 ##
 # For the master build package it is sometime necessary to pass extra options down to configured
 # subdirectories for a master build.  These options will contain the passed down options from the
 # environment in that case.  See the recursive build targets below.
 ##
-RPMXOPTS	=
+RPMXOPTS		=
 
-RPMTARGET	= $(target)
+RPMTARGET		= $(target)
 
-rpm_source_files = \
-		$(specdir)/$(PACKAGE)-$(VERSION).spec \
-		$(sourcedir)/$(PACKAGE)-$(VERSION).gif \
-		$(sourcedir)/$(PACKAGE)-$(VERSION).xpm \
-		$(sourcedir)/$(PACKAGE)-$(VERSION).tar.gz \
-		$(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
 
-####
-### Note that normally sourcedir and PACKAGE_DISTDIR are the same directory, because that is where we
-### distribute tarballs.  Therefore, this target should never run unless these make variables were
-### overridden.
-####
-##$(rpm_source_files): $(sourcedir)
-##	@f=`$(ECHO) "$@" | sed -e 's|$(sourcedir)|$(PACKAGE_DISTDIR)|'` ; \
-##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
-##	test -f "$@" -a ":$(FORCE)" != :force || cp -fv -- $$f $@
-
-rpm_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
-
-$(sourcedir)/$(PACKAGE)-$(VERSION).tar.gz \
-$(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2::
-	@f=`$(ECHO) "$@" | sed -e 's|.*/||'` ; \
+$(redhat_tar_file)::
+	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
-		$(MAKE) $(AM_MAKEFLAGES) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
 	} ;  \
 	d= ; test -f $$f || d='$(srcdir)/' ; \
 	test "$@" -ef "$$d$$f" && exit 0 ; \
@@ -203,13 +192,11 @@ $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2::
 		cp -f -- $$d$$f $@ ; \
 	}
 
-$(specdir)/$(PACKAGE)-$(VERSION).spec \
-$(sourcedir)/$(PACKAGE)-$(VERSION).gif \
-$(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
-	@f=`$(ECHO) "$@" | sed -e 's|.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
+$(redhat_spec_file) $(redhat_img_files)::
+	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
-		$(MAKE) $(AM_MAKEFLAGES) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
 	} ;  \
 	d= ; test -f $$f || d='$(srcdir)/' ; \
 	test "$@" -ef "$$d$$f" && exit 0 ; \
@@ -217,16 +204,6 @@ $(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
 		$(ECHO) "cp -f -- $$d$$f $@" ; \
 		cp -f -- $$d$$f $@ ; \
 	}
-
-####
-### Note that normally sourcedir and specdir are the same directory (and both the same as
-### PACKAGE_DISTDIR), because we place specs and sources in the same place.  Therefore this target
-### should never run unless these make variables were overridden.
-####
-##$(rpm_spec_file): $(specdir)
-##	@f=`$(ECHO) "$@" | sed -e 's|$(specdir)|$(sourcedir)|'` ; \
-##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
-##	test -f "$@" -a ":$(FORCE)" != :force || cp -fv -- $$f $@
 
 ##
 # This builds an SRPM for the current target.
@@ -241,20 +218,16 @@ $(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
 # distribution.
 ##
 
-srpm		= $(srcrpmdir)/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE).src.rpm
-
-$(srpm): $(rpm_spec_file) $(rpm_source_files) $(rpm_directories)
+$(redhat_src_file): $(redhat_source_files) $(redhat_directories)
 	$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<
 
-srpm: $(srpm)
-
-RELEASE		+= srpm
+srpm: $(redhat_src_file)
 
 ##
 # This is the type of thing that needs to be included in the master makefile to build rpms for the
 # current target, we also build any defined AM_RPMTARGETS
 ##
-one-rpm: $(rpm_spec_file) $(rpm_source_files) $(rpm_directories)
+one-rpm: $(redhat_spec_file) $(redhat_source_files) $(redhat_directories)
 	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
 ##
@@ -271,19 +244,19 @@ lis-rpm:
 lfs-rpm:
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs"' one-rpm
 
-AM_RPMSMAKETARGETS =
+AM_RPMSMAKETARGETS	=
 
 if WITH_LIS
-AM_RPMSMAKETARGETS += lis-rpm
+AM_RPMSMAKETARGETS	+= lis-rpm
 endif
 if WITH_LFS
-AM_RPMSMAKETARGETS += lfs-rpm
+AM_RPMSMAKETARGETS	+= lfs-rpm
 endif
 if WITH_LIS
 else
 if WITH_LFS
 else
-AM_RPMSMAKETARGETS += one-rpm
+AM_RPMSMAKETARGETS	+= one-rpm
 endif
 endif
 
@@ -297,8 +270,6 @@ sign srpm-sign: $(srpm)
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
 	fi
-
-RELEASE_SIGN	+= srpm-sign
 
 ##
 #   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
@@ -324,11 +295,11 @@ rebuild:
 
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 resign: sign
-	@rpms="`find $(rpmdir) -name '$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild ; \
-		rpms="`find $(rpmdir) -name '$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+		rpms="`find $(rpmdir) -name '$(redhat_binary_file)' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -346,6 +317,10 @@ resign: sign
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
 
+RELEASE			+= srpm rebuild
+RELEASE_SIGN		+= srpm-sign resign
+RELEASE_DIRECTORIES	+= $(redhat_directories)
+
 ##
 # Because the build directory is in the autoconf top build directory on the local machine, it needs
 # to be cleaned when a distclean is performed.  We use rpm to do this for us, and rpm will complain
@@ -353,14 +328,15 @@ resign: sign
 # to do this too.  The same is true for build files.
 ##
 distclean-rpm:
-	$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
+	@if test -f $(redhat_spec_file) ; then \
+		echo '$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || :' ; \
+		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || : ; \
+	fi
 
-DISTCLEAN_LOCAL	+= distclean-rpm
+DISTCLEAN_LOCAL		+= distclean-rpm
 
-DISTCLEANFILES	+= \
-		$(rpmbuilddir)/*config.cache \
-		$(rpmbuilddir)/*config.site \
-		$(rpmbuilddir)/$(PACKAGE_TARNAME)
+DISTCLEANFILES		+= $(redhat_cache_files) \
+			   $(redhat_dir_stamp)
 
 ##
 # Removing the sources and the spec file is removing from the distribution directory which, if
@@ -368,35 +344,33 @@ DISTCLEANFILES	+= \
 # to remove these under exceptional circumstances (i.e. we are repeating a build during the release
 # cycle).  Therefore we provide a special set of release targets for this purpose.
 ##
-release-clean-rpm:
-	@if test -f $(rpm_spec_file) ; then \
-		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :' ; \
-		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || : ; \
+release-clean-rpm: distclean-rpm
+	@if test -f $(redhat_spec_file) ; then \
+		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || :' ; \
+		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || : ; \
 	fi
 
-RELEASECLEANFILES += \
-		$(srpm) \
-		$(rpmdir)/*/$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+RELEASE_CLEAN_LOCAL	+= release-clean-rpm
 
-RELEASE_CLEAN_LOCAL += \
-		release-clean-rpm
+RELEASECLEANFILES	+= $(redhat_source_files) \
+			   $(redhat_cache_files) \
+			   $(redhat_dir_stamp) \
+			   $(redhat_binary_files) \
+			   $(redhat_hdist_files)
 
-EXTRA_DIST	+= \
-		$(PACKAGE_TARNAME).spec \
-		$(PACKAGE_TARNAME).gif \
-		$(PACKAGE_TARNAME).xpm \
-		.pkgepoch \
-		.pkgrelease
+EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
+			   $(PACKAGE_TARNAME).gif \
+			   $(PACKAGE_TARNAME).xpm \
+			   .rpmrelease \
+			   .rpmepoch
 
-ALL_RECURSIVE_TARGETS += all-srpm all-rpms all-sign all-rebuild all-resign
-
-RELEASE		+= rebuild
-RELEASE_SIGN	+= resign
+MY_PHONY		+= srpm rpms one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign
+ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-sign all-rebuild all-resign
 
 endif
+## BUILD_RPMS
 
 endif
-
-.PHONY: srpm rpms one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign release-clean-rpm
+## MAINTAINER_MODE
 
 ## vim: ft=automake
