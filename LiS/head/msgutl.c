@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-#ident "@(#) LiS msgutl.c 2.11 5/30/03 21:40:40 "
+#ident "@(#) LiS msgutl.c 2.12 8/15/03 13:53:59 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -99,7 +99,7 @@ tmsgsize(mblk_t *mp, mblk_t **first)
     {
         if (mp->b_datap->db_type == type)
 	{
-	    short n = (short) (mp->b_wptr - mp->b_rptr);
+	    int n = (mp->b_wptr - mp->b_rptr);
 	    if (n > 0) rtn += n;
 	}
 	else /* different type; reset counter and count these */
@@ -161,7 +161,7 @@ lis_xmsgsize(mblk_t *mp)
     type = mp->b_datap->db_type;
     while (mp && mp->b_datap->db_type == type)
     {
-	short n = (short) (mp->b_wptr - mp->b_rptr) ;
+	int n = (mp->b_wptr - mp->b_rptr) ;
 	if (n > 0) rtn += n;
 	mp = mp->b_cont;
     }
@@ -238,11 +238,11 @@ mblk_t *
 lis_copyb(mblk_t *mp)
 {
     mblk_t *bp;
-    short msgsize, msglen;
+    int msgsize, msglen;
 
     if (mp == NULL ||
-	(msgsize = (short) (mp->b_datap->db_lim - mp->b_datap->db_base)) < 0 ||
-	(msglen  = (short) (mp->b_wptr - mp->b_rptr)) < 0)
+	(msgsize = (mp->b_datap->db_lim - mp->b_datap->db_base)) < 0 ||
+	(msglen  = (mp->b_wptr - mp->b_rptr)) < 0)
 	return NULL;
     if ((bp = allocb(msgsize, BPRI_LO)) == NULL)
 	return NULL;
