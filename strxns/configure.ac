@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.6 2004/08/21 23:14:41 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.7 2004/12/17 04:02:57 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/21 23:14:41 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/17 04:02:57 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -133,11 +133,11 @@ AC_CHECK_FUNCS([alarm gettimeofday inet_ntoa memset strtol strtoul])
 AC_XNS
 
 AC_CONFIG_FILES([Makefile
+		 scripts/texi/args.texi
 		 src/include/Makefile
 		 src/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/Makefile
-		 doc/manual/texi/args.texi])
+		 doc/manual/Makefile])
 
 AC_OUTPUT

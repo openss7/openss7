@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.7 2004/11/06 10:24:35 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.8 2004/12/17 04:02:46 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/11/06 10:24:35 $ by $Author: brian $
+% Last Modified $Date: 2004/12/17 04:02:46 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -74,7 +74,7 @@
 @ifinfo
 This file documents the @value{PACKAGE_TITLE} package.
 
-This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
 @cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
@@ -163,60 +163,61 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Indices::			Indices
 @end menu
 @ignore
-@menu
- ----- detailed node listing -----
-
-Acknowledgements
-
-* Sponsors::			Sponsors of the package
-* Contributors::		People who contributed to the development of
-				the package.
-Introduction
-
-* Notice::			Notice
-* Overview::			Overview
-* Organization::		Organization
-* Conventions::			Conventions
-
-Objective
-
-Reference
-
-* Files::			Files included in the package
-* Drivers::			Drivers included in the package
-* Modules::			Modules included in the package
-* Libraries::			Libraries includedi in the package
-* Utilities::			Utilities includedi in the package
-* Development::			Development against the package
-
-Conformance
-
-Releases
-
-* Prerequisites::		Prerequisite packages
-* Compatibility::		Compatibility Issues
-* Release Notes::		Release Notes
-* Bugs::			Known Bugs
-* Schedule::			Development and Bug Fix Schedule
-
-Installation
-
-* Downloading::			Downloading the package
-* Configuration::		Configuration of the package
-* Building::			Building the package
-* Installing::			Installing the package
-* Removal::			Removal of the package
-* Loading::			Loading the package
-
-Indices
-
-* Concept Index::		Index of Concepts
-* Type Index::			Index of Data Types
-* Function Index::		Index of Functions and Macros
-* Variable Index::		Index of Variables and Constants
-* File Index::			Index of Files and Programs
-* Option Index::		Index of Configuration Options
-@end menu
+@c @menu
+@c
+@c  ----- detailed node listing -----
+@c 
+@c Acknowledgements
+@c 
+@c * Sponsors::			Sponsors of the package
+@c * Contributors::		People who contributed to the development of
+@c 				the package.
+@c Introduction
+@c 
+@c * Notice::			Notice
+@c * Overview::			Overview
+@c * Organization::		Organization
+@c * Conventions::			Conventions
+@c 
+@c Objective
+@c 
+@c Reference
+@c 
+@c * Files::			Files included in the package
+@c * Drivers::			Drivers included in the package
+@c * Modules::			Modules included in the package
+@c * Libraries::			Libraries includedi in the package
+@c * Utilities::			Utilities includedi in the package
+@c * Development::			Development against the package
+@c 
+@c Conformance
+@c 
+@c Releases
+@c 
+@c * Prerequisites::		Prerequisite packages
+@c * Compatibility::		Compatibility Issues
+@c * Release Notes::		Release Notes
+@c * Bugs::			Known Bugs
+@c * Schedule::			Development and Bug Fix Schedule
+@c 
+@c Installation
+@c 
+@c * Downloading::			Downloading the package
+@c * Configuration::		Configuration of the package
+@c * Building::			Building the package
+@c * Installing::			Installing the package
+@c * Removal::			Removal of the package
+@c * Loading::			Loading the package
+@c 
+@c Indices
+@c 
+@c * Concept Index::		Index of Concepts
+@c * Type Index::			Index of Data Types
+@c * Function Index::		Index of Functions and Macros
+@c * Variable Index::		Index of Variables and Constants
+@c * File Index::			Index of Files and Programs
+@c * Option Index::		Index of Configuration Options
+@c @end menu
 @end ignore
 
 @c --------------------------------------------------------------------------
