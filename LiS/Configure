@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.68 6/2/03"
+Configure_version="2.70 6/6/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -396,6 +396,42 @@ get_kver()
     NKVER=`echo $KVER | sed -e 's/-.*//'`
 }
 
+
+#
+# Having dug out the kernel version from the kernel source info, now
+# verify that the currently running kernel has the same settings.
+#
+verify_kver()
+{
+    if [ ! -f /proc/sys/kernel/osrelease ]; then
+	echo
+	echo "The kernel version cannot be verified because there"
+	echo "is no /proc/sys/kernel/osrelease present on the system."
+	echo "Chances are that you will experience some kind of problem in"
+	echo "loading or running LiS.  This problem really should"
+	echo "be rectified before continuing with the installation."
+	echo
+	do_confirm
+	return
+    fi
+
+    PKVER=`cat /proc/sys/kernel/osrelease`
+    NPKVER=`echo $PKVER | sed -e 's/-.*//'`
+    if [ "$NKVER" != "$NPKVER" ]; then
+	echo
+	echo "Your kernel source is for kernel version $NKVER, but"
+	echo "your running kernel is version $NPKVER.  This is a"
+	echo "good indication that you are not running on the kernel"
+	echo "represented by the kernel source.  Please make the"
+	echo "running kernel the same as the one in kernel source and"
+	echo "then install LiS again."
+	echo
+	do_confirm
+	exit 1
+    fi
+    echo "Kernel version verified between kernel source and running kernel"
+}
+
 #
 # Red Hat helper for getting SMP info
 #
@@ -627,6 +663,64 @@ get_empty_inode_option()
     fi
 }
 
+#
+# check the compiler version used to compile the kernel against
+# the version info of various C compilers that are available.
+#
+C_compiler_version()
+{
+    if [ ! -x /usr/bin/$1 ]; then
+	return 1
+    fi
+
+    CC_VERS=`/usr/bin/$1 -v 2>&1 | \
+    	    grep 'gcc version' | \
+	    sed -e 's/^.*gcc version // ' -e 's/ .*//' -e 's/^.*-//'`
+
+    echo $CC_VERS
+}
+
+kernel_cc_version()
+{
+    V=`cat /proc/version | \
+    	    grep 'gcc version' | \
+	    sed -e 's/^.*gcc version // ' -e 's/ .*//' -e 's/^.*-//'`
+    echo $V
+}
+
+pick_a_c_compiler()
+{
+    KERN_CC_VERS=`kernel_cc_version`
+    if [ "$KERN_CC_VERS..." = "..." ]; then
+	return 1
+    fi
+
+    CC_VERS=`C_compiler_version kgcc`
+    if [ "$CC_VERS..." = "$KERN_CC_VERS..." ]; then
+	echo kgcc
+	return 0
+    fi
+
+    CC_VERS=`C_compiler_version gcc`
+    if [ "$CC_VERS..." = "$KERN_CC_VERS..." ]; then
+	echo gcc
+	return 0
+    fi
+
+    CC_VERS=`C_compiler_version gcc3`
+    if [ "$CC_VERS..." = "$KERN_CC_VERS..." ]; then
+	echo gcc3
+	return 0
+    fi
+
+    CC_VERS=`C_compiler_version cc`
+    if [ "$CC_VERS..." = "$KERN_CC_VERS..." ]; then
+	echo cc
+	return 0
+    fi
+
+    return 1
+}
 
 
 
@@ -806,6 +900,9 @@ the currently running kernel?"
     get_kver
     get_smp
     get_modules
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	verify_kver
+    fi
     if [ $NEED_KSMP -eq 1 -o $NEED_KMODULES -eq 1 ]; then
 	if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	    echo "Could not figure out whether or not your running kernel"
@@ -962,9 +1059,9 @@ Please enter y or n "
 		if [ ! -d $DEFAULT ]; then
 		    if [ `id -u` -eq 0 ]; then
 			DEFAULT=/lib/modules/$KVER/misc
-			if ! mkdir $DEFAULT 2>/dev/null; then
+			if ! mkdir -p $DEFAULT 2>/dev/null; then
 			    DEFAULT=/lib/modules/preferred/misc
-			    if ! mkdir $DEFAULT 2>/dev/null; then
+			    if ! mkdir -p $DEFAULT 2>/dev/null; then
 				DEFAULT=
 			    fi
 			fi
@@ -977,8 +1074,13 @@ Please enter y or n "
     else
 	DEFAULT=$MOD_INST_DIR
     fi
-    if [ "$USE_RUNNING_KERNEL..." = "y..." -a -d $DEFAULT ]; then
-	MOD_INST_DIR=$DEFAULT
+    if [ "$USE_RUNNING_KERNEL..." = "y..." -a "$DEFAULT..." != "..." ]; then
+	if [ -d $DEFAULT ]; then
+	    MOD_INST_DIR=$DEFAULT
+	else
+	    do_read_dir
+	    MOD_INST_DIR=$RESULT
+	fi
     else
 	do_read_dir
 	MOD_INST_DIR=$RESULT
@@ -1199,35 +1301,53 @@ get_cc_from_makefile()
         sed -e 's/ .*//'
 }
 
-CC_OPTIMIZE=-O3
 if   [ "$TARGET" = "l"  ]; then
-	if [ -x /usr/bin/kgcc ] && grep kgcc /proc/version; then
-	    CC_NAME=kgcc
-	elif [ -x /usr/bin/gcc3 ] && grep gcc3 /proc/version; then
-	    CC_NAME=gcc3
-	elif [ -x /usr/bin/egcs ] && grep egcs /proc/version; then
-	    CC_NAME=egcs
-	elif [ -x /usr/bin/kgcc ]; then
-	    CC_NAME=kgcc
-	elif [ -x /usr/bin/gcc3 ]; then
-	    CC_NAME=gcc3
-	elif [ -x /usr/bin/egcs ]; then
-	    CC_NAME=egcs
-	else
+    export KERN_CC_VERS=`kernel_cc_version`
+    if [ "$KERN_CC_VERS..." = "..." ]; then
+	echo
+	echo "Could not determine the version of C compiler that was used"
+	echo "to build your kernel.  Installation will proceed using the"
+	echo "standard gcc compiler version `C_compiler_version gcc`, but"
+	echo "there may be problems when you try to run LiS."
+	echo
+	do_confirm
+	CC_NAME=gcc
+	CC_VERS=`C_compiler_version gcc`
+    else
+	export CC_NAME=`pick_a_c_compiler`
+	if [ "$CC_NAME..." = "..." ]; then
+	    echo
+	    echo "Could not identify a C compiler of version $KERN_CC_VERS."
+	    echo "This compiler was used to compile your kernel and should"
+	    echo "be used to compile LiS.  Installation will proceed using"
+	    echo "the standard gcc compiler version `C_compiler_version gcc`,"
+	    echo "but there may be problems when you try to run LiS."
+	    echo
+	    do_confirm
 	    CC_NAME=gcc
-	    CC_OPTIMIZE=-O2
+	    CC_VERS=`C_compiler_version gcc`
+	else
+	    CC_VERS=`C_compiler_version cc`
 	fi
+    fi
+
+    case $CC_NAME in
+    kgcc)	CC_OPTIMIZE=-O3;;
+    egcs)	CC_OPTIMIZE=-O3;;
+    gcc3)	CC_OPTIMIZE=-O3;;
+    gcc)	CC_OPTIMIZE=-O2;;
+    cc)		CC_OPTIMIZE=-O2;;
+    *)		CC_OPTIMIZE=-O2;;
+    esac
 else
     echo
     echo "Non-Linux install.  Using cc as default C compiler."
     echo
     CC_NAME=cc
     CC_OPTIMIZE=-O
+    CC_VERS=`C_compiler_version cc`
 fi
 
-GCC_VERS=`$CC_NAME -v 2>&1 |tail -1`
-GCC_VERS=`arg3 $GCC_VERS`
-GCC_VERS=`echo $GCC_VERS | tr -d '[:alpha:]-'`
 if [ "$CC_VERS..." = "3.0.2..." ]; then
     echo
     echo "Compiler $CC_NAME $GCC_VERS is known to be buggy when"
@@ -1237,7 +1357,7 @@ if [ "$CC_VERS..." = "3.0.2..." ]; then
     do_confirm
 fi
 
-echo "Using \"$CC_NAME $CC_OPTIMIZE\" $GCC_VERS as the C compiler"
+echo "Using \"$CC_NAME $CC_OPTIMIZE\" $CC_VERS as the C compiler"
 
 #
 # Figure out which routine name to use for "get_empty_inode".
@@ -1309,7 +1429,7 @@ if [ "$TARGET" = "l" ]; then
     cfg_out RCVOID $RCVOID
     cfg_out MACHINE $MACHINE
     cfg_out CC_NAME $CC_NAME
-    cfg_out GCC_VERS $GCC_VERS
+    cfg_out CC_VERS $CC_VERS
     cfg_out CC_OPTIMIZE $CC_OPTIMIZE
     cfg_out MACHINE_INCL $MACHINE_INCL
     cfg_out_str GET_EMPTY_INODE $GET_EMPTY_INODE 

@@ -34,8 +34,8 @@
 #ident "@(#) LiS version.c 2.16 3/10/03 17:33:40 "
 
 
-char	lis_version[] = "2.16.10" ;
-char	lis_date[]    = "6/2/03" ;
+char	lis_version[] = "2.16.11" ;
+char	lis_date[]    = "6/6/03" ;
 
 #if 0
 
