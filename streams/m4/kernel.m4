@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/02/23 01:57:02 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/25 09:15:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/23 01:57:02 $ by $Author: brian $
+# Last Modified $Date: 2005/02/25 09:15:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,32 +63,54 @@ AC_DEFUN([_LINUX_KERNEL], [dnl
 	CFLAGS=
 	LDFLAGS=
 	_LINUX_KERNEL_SETUP
-	KERNEL_CPPFLAGS="$CPPFLAGS"
-	KERNEL_CFLAGS="$CFLAGS"
-	KERNEL_LDFLAGS="$LDFLAGS"
 	AC_SUBST([KERNEL_CPPFLAGS])dnl
 	AC_SUBST([KERNEL_CFLAGS])dnl
 	AC_SUBST([KERNEL_LDFLAGS])dnl
-    ])dnl
+	KERNEL_CPPFLAGS="$CPPFLAGS"
+	KERNEL_CFLAGS="$CFLAGS"
+	KERNEL_LDFLAGS="$LDFLAGS"])dnl
 ])# _LINUX_KERNEL
 # =============================================================================
 
 # =============================================================================
-# _LINUX_KERNEL_ENV_BARE([COMMANDS])
+# _LINUX_KERNEL_ENV_FUNCTIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
-	# move user flags out of the way temporarily
-	linux_tmp_cppflags="$CPPFLAGS"
-	linux_tmp_cflags="$CFLAGS"
-	linux_tmp_ldflags="$LDFLAGS"
+AC_DEFUN_ONCE([_LINUX_KERNEL_ENV_FUNCTIONS], [dnl
+linux_env_nest=0
+linux_kernel_env_push() {
+    if ! ((linux_env_nest))
+    then
+dnl	move user flags out of the way temporarily
+	linux_user_cppflags="$CPPFLAGS"
+	linux_user_cflags="$CFLAGS"
+	linux_user_ldflags="$LDFLAGS"
+    fi
 	CPPFLAGS="$KERNEL_CPPFLAGS"
 	CFLAGS="$KERNEL_CFLAGS"
 	LDFLAGS="$KERNEL_LDFLAGS"
+    ((linux_env_nest++))
+}
+linux_kernel_env_pop() {
+    ((linux_env_nest--))
+    if ! ((linux_env_nest))
+    then
+dnl	move user flags back where they were
+	CPPFLAGS="$linux_user_cppflags"
+	CFLAGS="$linux_user_cflags"
+	LDFLAGS="$linux_user_ldflags"
+    fi
+}dnl
+])# _LINUX_KERNEL_ENV_FUNCTIONS
+
+# =============================================================================
+# =============================================================================
+# _LINUX_KERNEL_ENV_BARE([COMMANDS])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
+    AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
+    linux_kernel_env_push
 $1
-	# move user flags back where they were
-	CPPFLAGS="$linux_tmp_cppflags"
-	CFLAGS="$linux_tmp_cflags"
-	LDFLAGS="$linux_tmp_ldflags"
+    linux_kernel_env_pop
 ])# _LINUX_KERNEL_ENV_BARE
 # =============================================================================
 
@@ -96,17 +118,10 @@ $1
 # _LINUX_KERNEL_ENV([COMMANDS])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_ENV], [dnl
-    # make sure we have kernel environment
+dnl make sure we have kernel environment
     AC_REQUIRE([_LINUX_KERNEL])dnl
-    # protect against nesting
-    if test :$linux_env != :kernel
-    then
-	linux_env='kernel'
-	_LINUX_KERNEL_ENV_BARE([$1])
-	linux_env='user'
-    else :;
-$1
-    fi
+dnl protect against nesting
+    _LINUX_KERNEL_ENV_BARE([$1])dnl
 ])# _LINUX_KERNEL_ENV
 # =============================================================================
 
@@ -136,22 +151,24 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_KSYMS
     _LINUX_CHECK_KERNEL_HEADERS
     _LINUX_CHECK_KERNEL_MARCH
-    _LINUX_CHECK_KERNEL_RHBOOT
     _LINUX_CHECK_KERNEL_ARCHDIR
     _LINUX_CHECK_KERNEL_MACHDIR
+    _LINUX_CHECK_KERNEL_CONFIGDIR
+    _LINUX_CHECK_KERNEL_BOOT
+    _LINUX_CHECK_KERNEL_DOT_CONFIG
     _LINUX_SETUP_KERNEL_CFLAGS
     _LINUX_SETUP_KERNEL_DEBUG
     _LINUX_CHECK_KERNEL_REGPARM
     _LINUX_CHECK_KERNEL_VERSIONS
     _LINUX_CHECK_KERNEL_MODVERSIONS
-    PACKAGE_KNUMBER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
+    PACKAGE_KNUMBER="${knumber}"
     AC_SUBST([PACKAGE_KNUMBER])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_KNUMBER], ["$PACKAGE_KNUMBER"], [The Linux
 	kernel version without EXTRAVERSION.])
     PACKAGE_KVERSION="${kversion}"
     AC_SUBST([PACKAGE_KVERSION])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_KVERSION], ["$PACKAGE_KVERSION"], [The Linux
-	kernel version for which the package was configured.])
+	kernel version for which the package was configured.])dnl
 ])# _LINUX_KERNEL_SETUP
 # =============================================================================
 
@@ -186,14 +203,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
 	AC_MSG_ERROR([
 *** 
 *** You have not specified --with-k-releease indicating that the build is for
-*** the running kernel, however, you are cross-compiling.  When
-*** cross-compiling, you must specify the kernel release that you are
-*** targetting using the --with-k-release option.  This option should specify
-*** the entire UTS_RELEASE of the kernel, including the EXTRAVERSION such as
-*** that associated with RedHat or Mandrake kernel releases.
+*** the running kernel, however, you are cross-compiling.  When cross-compiling,
+*** you must specify the kernel release that you are targetting using the
+*** --with-k-release option.  This option should specify the entire UTS_RELEASE
+*** of the kernel, including the EXTRAVERSION such as that associated with
+*** RedHat or Mandrake kernel releases.
 *** ])
     fi
-    # pull out versions from release number
+dnl pull out versions from release number
     AC_CACHE_CHECK([for kernel major release number], [linux_cv_k_major], [dnl
 	linux_cv_k_major="`echo $linux_cv_k_release | sed -e 's|[[^0-9]].*||'`" ])
     if test ${linux_cv_k_major:-0} -ne 2
@@ -235,6 +252,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
 	linux_cv_k_extra="`echo $linux_cv_k_release | sed -e 's|[[^-]]*-||'`" ])
     kversion="${linux_cv_k_release}"
     AC_SUBST([kversion])dnl
+    knumber="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
+    AC_SUBST([knumber])dnl
 ])# _LINUX_CHECK_KERNEL_RELEASE
 # =========================================================================
 
@@ -242,7 +261,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
 # _LINUX_CHECK_KERNEL_LINKAGE
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
-    AC_MSG_CHECKING([for kernel linkage])
+    AC_CACHE_CHECK([for kernel module/object linkage], [linux_cv_k_linkage], [dnl
 	AC_ARG_WITH([k-linkage],
 	    AS_HELP_STRING([--with-k-linkage=LINKAGE],
 		[specify the kernel LINKAGE, either 'loadable' for loadable modules or 'linkable'
@@ -255,13 +274,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
 	    [with_k_linkage='loadable'])
 	if test :${with_k_linkage:-loadable} = :linkable ; then
 	    linux_cv_k_linkage='linkable'
-	    linux_tmp='linkable objects'
 	else
 	    linux_cv_k_linkage='loadable'
-	    linux_tmp='loadable modules'
-	    KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
 	fi
-    AC_MSG_RESULT([$linux_tmp])
+    ])
+    if test :${linux_cv_k_linkage:-loadable} = :loadable
+    then
+	KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
+    fi
 ])# _LINUX_CHECK_KERNEL_LINKAGE
 # =========================================================================
 
@@ -311,25 +331,24 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 # directory.  Therefore, this directory does not need to exist.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
-    AC_MSG_CHECKING([for kernel modules directory])
-    AC_ARG_WITH([k-modules],
-	AS_HELP_STRING([--with-k-modules=DIR],
-	    [specify the directory to which kernel modules will be installed.
-	    @<:@default=/lib/modules/K-RELEASE/misc@:>@]),
-	[with_k_modules="$withval"],
-	[with_k_modules=])
-    if test :"${with_k_modules:-no}" != :no
-    then
-	linux_cv_k_modules="$with_k_modules"
-    else
-	linux_cv_k_modules='${rootdir}/lib/modules/${kversion}'
-    fi
-    eval "linux_tmp=\"$linux_cv_k_modules\""
-    AC_MSG_RESULT([${linux_tmp:-no}])
-    AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
-	if test -r $linux_tmp/modules.dep
+    AC_CACHE_CHECK([for kernel modules directory], [linux_cv_k_modules_eval], [dnl
+	AC_ARG_WITH([k-modules],
+	    AS_HELP_STRING([--with-k-modules=DIR],
+		[specify the directory to which kernel modules will be installed.
+		@<:@default=/lib/modules/K-RELEASE/misc@:>@]),
+	    [with_k_modules="$withval"],
+	    [with_k_modules=])
+	if test :"${with_k_modules:-no}" != :no
 	then
-	    if ( grep -q '\.o\.gz:' $linux_tmp/modules.dep )
+	    linux_cv_k_modules="$with_k_modules"
+	else
+	    linux_cv_k_modules='${rootdir}/lib/modules/${kversion}'
+	fi
+	eval "linux_cv_k_modules_eval=\"$linux_cv_k_modules\"" ])
+    AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
+	if test -r $linux_cv_k_modules_eval/modules.dep
+	then
+	    if ( grep -q '\.o\.gz:' $linux_cv_k_modules_eval/modules.dep )
 	    then
 		linux_cv_k_compress='yes'
 	    else
@@ -337,16 +356,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	    fi
 	else
 	    linux_cv_k_compress='unknown'
-	fi
-    ])
+	fi ])
     case $linux_cv_k_compress in
 	(yes)		COMPRESS_KERNEL_MODULES='gzip -9' ;;
 	(no)		COMPRESS_KERNEL_MODULES= ;;
 	(unknown|*)	COMPRESS_KERNEL_MODULES=
 	    AC_MSG_WARN([
 **** 
-**** Strange, the modules directory is $linux_tmp
-**** but the file $linux_tmp/modules.dep does
+**** Strange, the modules directory is $linux_cv_k_modules_eval
+**** but the file $linux_cv_k_modules_eval/modules.dep does
 **** not exist.  This could cause some problems later.
 **** ])
 	    ;;
@@ -364,72 +382,64 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 # kernel modules will be compiled.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
-    AC_ARG_WITH([k-build],
-	AS_HELP_STRING([--with-k-build=DIR],
-	    [specify the base kernel build directory in which configured
-	    kernel source resides.  @<:@default=K-MODULES-DIR/build@:>@]),
-	[with_k_build="$withval"],
-	[with_k_build=])
-    if test :"${with_k_build:-no}" != :no
-    then
-	linux_cv_k_build="$with_k_build"
-    else
-	eval "k_build_search_path=\"
-	    ${kmoduledir:+${DESTDIR}${kmoduledir}/build}
-	    ${DESTDIR}${rootdir}/lib/modules/${kversion}/build
-	    ${DESTDIR}${rootdir}/usr/src/linux-${kversion}
-	    ${DESTDIR}${rootdir}/usr/src/linux-2.4
-	    ${DESTDIR}${rootdir}/usr/src/linux
-	    ${DESTDIR}/lib/modules/${kversion}/build
-	    ${DESTDIR}/usr/src/linux-${kversion}
-	    ${DESTDIR}/usr/src/linux-2.4
-	    ${DESTDIR}/usr/src/linux\""
-	k_build_search_path=`echo "$k_build_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	linux_cv_k_build=
-	for linux_dir in $k_build_search_path ; do
-	    AC_MSG_CHECKING([for kernel build directory $linux_dir])
-	    if test -d "$linux_dir" -a -r "$linux_dir/include/linux/version.h"
-	    then
-		linux_cv_k_build="$linux_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    fi
-	    AC_MSG_RESULT([no])
-	done
-    fi
-    AC_MSG_CHECKING([for kernel build directory])
-    AC_MSG_RESULT([${linux_cv_k_build:-no}])
-    if test :"${linux_cv_k_build:-no}" = :no -o ! -d "$linux_cv_k_build" 
-    then
-	if test :"${linux_cv_k_build:-no}" = :no 
+    AC_CACHE_CHECK([for kernel build directory], [linux_cv_k_build], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-build],
+	    AS_HELP_STRING([--with-k-build=DIR],
+		[specify the base kernel build directory in which configured
+		kernel source resides.  @<:@default=K-MODULES-DIR/build@:>@]),
+	    [with_k_build="$withval"],
+	    [with_k_build=])
+	if test :"${with_k_build:-no}" != :no
 	then
-	    AC_MSG_ERROR([
+	    linux_cv_k_build="$with_k_build"
+	else
+	    eval "k_build_search_path=\"
+		${kmoduledir:+${DESTDIR}${kmoduledir}/build}
+		${DESTDIR}${rootdir}/lib/modules/${kversion}/build
+		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
+		${DESTDIR}${rootdir}/usr/src/linux-2.4
+		${DESTDIR}${rootdir}/usr/src/linux
+		${DESTDIR}/lib/modules/${kversion}/build
+		${DESTDIR}/usr/src/linux-${kversion}
+		${DESTDIR}/usr/src/linux-2.4
+		${DESTDIR}/usr/src/linux\""
+	    k_build_search_path=`echo "$k_build_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_build=
+	    for linux_dir in $k_build_search_path ; do
+		AC_MSG_CHECKING([for kernel build directory... $linux_dir])
+		if test -d "$linux_dir" -a -r "$linux_dir/include/linux/version.h"
+		then
+		    linux_cv_k_build="$linux_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :"${linux_cv_k_build:-no}" = :no -o ! -d "$linux_cv_k_build" 
+	then
+	    if test :"${linux_cv_k_build:-no}" = :no 
+	    then
+		AC_MSG_ERROR([
 ***
 *** This package does not support headless kernel build.  Install the
 *** appropriate built kernel source package for the target kernel
 *** "${kversion}" and then configure again.
 *** 
 *** The following directories do no exist in the build environment:
-***     ${DESTDIR}${kmoduledir}/build
-***     ${DESTDIR}${rootdir}/lib/modules/${kversion}/build
-***     ${DESTDIR}${rootdir}/usr/src/linux-${kversion}
-***     ${DESTDIR}${rootdir}/usr/src/linux-2.4
-***     ${DESTDIR}${rootdir}/usr/src/linux
-***     ${DESTDIR}${kmoduledir}/build
-***     ${DESTDIR}/lib/modules/${kversion}/build
-***     ${DESTDIR}/usr/src/linux-${kversion}
-***     ${DESTDIR}/usr/src/linux-2.4
-***     ${DESTDIR}/usr/src/linux
+***	"$with_k_build"
+***	"$k_build_search_path"
 *** 
 *** Check the settings of the following options before repeating:
 ***     --with-k-release ${kversion:-no}
 ***     --with-k-modules ${kmoduledir:-no}
 ***     --with-k-build   ${kversion:-no}
 *** ])
-	else
-	    if ! -d "$linux_cv_k_build" 
-	    then
-		AC_MSG_ERROR([
+	    else
+		if ! -d "$linux_cv_k_build" 
+		then
+		    AC_MSG_ERROR([
 ***
 *** This package does not support headless kernel build.  Install the
 *** appropriate built kernel source package for the target kernel
@@ -443,9 +453,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 ***     --with-k-modules ${kmoduledir:-no}
 ***     --with-k-build   ${kversion:-no}
 *** ])
+		fi
 	    fi
 	fi
-    fi
+	AC_MSG_CHECKING([for kernel build directory]) ])
+    kbuilddir="$linux_cv_k_build"
+    AC_SUBST([kbuilddir])dnl
 ])# _LINUX_CHECK_KERNEL_BUILD
 # =========================================================================
 
@@ -457,38 +470,77 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 # running kernel.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [dnl
-    AC_ARG_WITH([k-sysmap],
-	AS_HELP_STRING([--with-k-sysmap=MAP],
-	    [specify the kernel system map file.
-	    @<:@default=K-BUILD-DIR/System.map@:>@]),
-	[with_k_sysmap="$withval"],
-	[with_k_sysmap=])
-    if test :"${with_k_sysmap:-no}" != :no
-    then
-	linux_cv_k_sysmap="$with_k_sysmap"
-    else
-	eval "k_sysmap_search_path=\"
-	    $linux_cv_k_build/System.map-${kversion}
-	    $linux_cv_k_build/System.map
-	    ${DESTDIR}${rootdir}/boot/System.map-${kversion}
-	    ${DESTDIR}${rootdir}/boot/System.map
-	    ${DESTDIR}/boot/System.map-${kversion}
-	    ${DESTDIR}/boot/System.map\""
-	k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	linux_cv_k_sysmap=
-	for linux_file in $k_sysmap_search_path ; do
-	    AC_MSG_CHECKING([for kernel system map $linux_file])
-	    if test -r $linux_file 
+    AC_CACHE_CHECK([for kernel system map], [linux_cv_k_sysmap], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-sysmap],
+	    AS_HELP_STRING([--with-k-sysmap=MAP],
+		[specify the kernel system map file.
+		@<:@default=K-BUILD-DIR/System.map@:>@]),
+	    [with_k_sysmap="$withval"],
+	    [with_k_sysmap=])
+	if test :"${with_k_sysmap:-no}" != :no
+	then
+	    linux_cv_k_sysmap="$with_k_sysmap"
+	else
+dnl
+dnl	    There is a problem with using redhat /boot system maps.  Redhat
+dnl	    builds multiple kernels of the same name for different
+dnl	    architectures.  So, for example, there is a 2.4.21-15.EL kernel
+dnl	    built for i386, another built for i586, and yet another built for
+dnl	    i686.  These all have different system map files, but only one is
+dnl	    installed on a system.
+dnl
+	    eval "k_sysmap_search_path=\"
+		${kbuilddir}/System.map-${kversion}
+		${kbuilddir}/System.map
+		${DESTDIR}${rootdir}/boot/System.map-${kversion}
+		${DESTDIR}${rootdir}/boot/System.map
+		${DESTDIR}/boot/System.map-${kversion}
+		${DESTDIR}/boot/System.map\""
+	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_sysmap=
+	    for linux_file in $k_sysmap_search_path ; do
+		AC_MSG_CHECKING([for kernel system map... $linux_file])
+		if test -r $linux_file 
+		then
+		    linux_cv_k_sysmap="$linux_file"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :${linux_cv_k_sysmap:-no} = :no
+	then
+	    AC_MSG_ERROR([
+*** 
+*** Configure could not find the system map file for kernel version
+*** "$kversion".  The locations searched were:
+***	    "$with_k_sysmap"
+***	    "$k_sysmap_search_path"
+*** 
+*** Please specify the absolute location of you kernel's system map file with
+*** option --with-k-sysmap before repeating.
+*** ])
+	else
+	    if test :$linux_cv_k_running != :yes
 	    then
-		linux_cv_k_sysmap="$linux_file"
-		AC_MSG_RESULT([yes])
-		break
+		case "$linux_cv_k_sysmap" in
+		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
+			AC_MSG_WARN([
+*** 
+*** Configuration information is being read from an unreliable source:
+*** 
+***	"$linux_cv_k_sysmap"
+*** 
+*** This may cause problems later if you have mismatches between the target
+*** kernel and the kernel symbols contained in that file.
+*** ])
+			;;
+		esac
 	    fi
-	    AC_MSG_RESULT([no])
-	done
-    fi
-    AC_MSG_CHECKING([for kernel system map])
-    AC_MSG_RESULT([${linux_cv_k_sysmap:-no}])
+	fi
+	AC_MSG_CHECKING([for kernel system map]) ])
     ksysmap="$linux_cv_k_sysmap"
     AC_SUBST([ksysmap])dnl
 ])# _LINUX_CHECK_KERNEL_SYSMAP
@@ -498,18 +550,18 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [dnl
 # _LINUX_CHECK_KERNEL_KSYMS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_KSYMS], [dnl
-    AC_MSG_CHECKING([for kernel /proc/ksyms])
-    linux_cv_k_ksyms=
-    if test :"${linux_cv_k_running:-no}" = :yes -a -r /proc/ksyms
+    AC_CACHE_CHECK([for kernel /proc/ksyms], [linux_cv_k_ksyms], [dnl
+	linux_cv_k_ksyms=no
+	if test :"${linux_cv_k_running:-no}" = :yes -a -r /proc/ksyms
+	then
+	    linux_cv_k_ksyms=yes
+	fi ])
+    ksyms=
+    if test :"${linux_cv_k_ksyms:-no}" = :yes
     then
-	linux_cv_k_ksyms='/proc/ksyms'
+	ksyms="/proc/ksyms"
     fi
-    if test :"${linux_cv_k_ksyms:-no}" = :no
-    then
-	AC_MSG_RESULT([no])
-    else
-	AC_MSG_RESULT([yes])
-    fi
+    AC_SUBST([ksyms])dnl
 ])# _LINUX_CHECK_KERNEL_KSYMS
 # =========================================================================
 
@@ -521,30 +573,46 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KSYMS], [dnl
 # build or for the running kernel.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [dnl
-    AC_MSG_CHECKING([for kernel headers])
-    AC_ARG_WITH([k-includes],
-	AS_HELP_STRING([--with-k-includes=DIR],
-	    [specify the include directory of the kernel for which the build
-	    is targetted.  @<:@default=K-BUILD-DIR/include@:>@]),
-	[with_k_includes="$withval"],
-	[with_k_includes=])
-    if test :"${with_k_includes:-no}" != :no
-    then
-	linux_cv_k_includes="$with_k_includes"
-    else
-	linux_cv_k_includes="${linux_cv_k_build}/include"
-    fi
-    AC_MSG_RESULT([${linux_cv_k_includes:-no}])
-    if test ! -d "$linux_cv_k_includes"
-    then
-	AC_MSG_ERROR([
+    AC_CACHE_CHECK([for kernel headers], [linux_cv_k_includes], [dnl
+	AC_ARG_WITH([k-includes],
+	    AS_HELP_STRING([--with-k-includes=DIR],
+		[specify the include directory of the kernel for which the build
+		is targetted.  @<:@default=K-BUILD-DIR/include@:>@]),
+	    [with_k_includes="$withval"],
+	    [with_k_includes=])
+	if test :"${with_k_includes:-no}" != :no
+	then
+	    linux_cv_k_includes="$with_k_includes"
+	else
+dnl
+dnl	NOTE: This is for a redhat style build.  Amazingly, debian does not
+dnl	create a proper build directory link from /lib/modules so, k_build is
+dnl	really the /usr/src/linux directory on Debian.  It might be possible to
+dnl	use the /usr/include directory under Debian if the kernel-headers
+dnl	package of the right version is installed, but we need the top level
+dnl	Makefile in the kernel build tree to generate CFLAGS now.  Nevertheless,
+dnl	the Debian source package comes unconfigured (basically a tarball).  I
+dnl	still need to check if the kernel-headers package has modversions
+dnl	included (and whether Debian production kernels have kernel versions
+dnl	enabled at all).  If they don't or if the versions are included in the
+dnl	kernel-headers package it might be a better idea to Build-Depends the
+dnl	kernel-headers rather than requiring the builder to unpack and configure
+dnl	the kernel source.
+dnl
+	    linux_cv_k_includes="${kbuilddir}/include"
+	fi
+	if test ! -d "$linux_cv_k_includes"
+	then
+	    AC_MSG_ERROR([
 *** 
 *** Kernel headers directory:
 ***     "$linux_cv_k_includes"
 *** does not exit.  Specify a correct kernel header directory using the
 *** --with-k-includes option to configure before attempting again.
 *** ])
-    fi
+	fi ])
+    kincludedir="$linux_cv_k_includes"
+    AC_SUBST([kincludedir])dnl
 ])# _LINUX_CHECK_KERNEL_HEADERS
 # =========================================================================
 
@@ -569,209 +637,40 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [dnl
 		;;
 	    (i?86)		linux_cv_march=i386 ;;
 	esac ])
-    # fix up the target spec
-    # FIXME: I really don't know about doing this so late in the game
-    target_cpu="$linux_cv_march"
-    target="${target_cpu:-unknown}-${target_vendor:-unknown}-${target_os:-none}"
+    kmarch="$linux_cv_march"
+    AC_SUBST([kmarch])dnl
+    karch="$target_cpu"
+    AC_SUBST([karch])dnl
 ])# _LINUX_CHECK_KERNEL_MARCH
-# =========================================================================
-
-# =========================================================================
-# _LINUX_BAD_KERNEL_RHBOOT
-# -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
-    AC_REQUIRE([_DISTRO])
-    AC_MSG_ERROR([
-*** 
-*** Build is for $dist_cv_host_distrib $linux_cv_boot_kernel kernel but the machine architecture is
-*** $linux_cv_march.  $dist_cv_host_distrib $linux_cv_boot_kernel kernels cannot be compiled for $linux_cv_march machine
-*** architecture.  If you are automatically building with the rebuild make
-*** target this error is to be expected on a couple of kernel permutations.
-*** ])
-])# _LINUX_BAD_KERNEL_RHBOOT
-# =========================================================================
-
-# =========================================================================
-# _LINUX_CHECK_KERNEL_RHBOOT
-# -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
-    AC_REQUIRE([_DISTRO])
-    AC_CACHE_CHECK([for kernel $dist_cv_host_distrib boot], [linux_cv_boot_kernel], [dnl
-	linux_cv_boot_kernel=no
-	if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
-	then
-	    case "${kversion}" in
-		(*BOOT)		linux_cv_boot_kernel=BOOT ;;
-		(*smp)		linux_cv_boot_kernel=smp ;;
-		(*bigmem)	linux_cv_boot_kernel=bigmem ;;
-		(*hugemem)	linux_cv_boot_kernel=hugemem ;;
-		(*debug)	linux_cv_boot_kernel=debug ;;
-		(*enterprise)	linux_cv_boot_kernel=enterprise ;;
-		(*secure)	linux_cv_boot_kernel=secure ;;
-		(*i686-up-4GB)	linux_cv_boot_kernel=i686-up-4GB ;;
-		(*p3-smp-64GB)	linux_cv_boot_kernel=p3-smp-64GB ;;
-		(*)		linux_cv_boot_kernel=UP ;;
-	    esac
-	fi ])
-    if test :"${linux_cv_boot_kernel:-no}" != :no
-    then
-	AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for RedHat/Mandrake kernel.])
-	case "${linux_cv_boot_kernel:-no}" in
-	    BOOT)
-		AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for RedHat BOOT kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat)
-			case "$linux_cv_march" in
-			    (i386|alpha|sparc|sparc64|ia64) ;;
-			    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    smp)
-		AC_DEFINE([__BOOT_KERNEL_SMP], [1], [Define for RedHat/Mandrake SMP kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat)
-			case "$linux_cv_march" in
-			    (i386|alpha|sparc|sparc64|i686|i586|ia64|athlon|x86_64) ;;
-			    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (mandrake)
-			case "$linux_cv_march" in
-			    (i586) ;;
-			    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		esac ;;
-	    bigmem)
-		AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for RedHat BIGMEM kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat)
-			case "$linux_cv_march" in
-			    (i686) ;;
-			    (*) _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    hugemem)
-		AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for RedHat HUGEMEM kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat)
-			case "$linux_cv_march" in
-			    (i686) ;;
-			    (*) _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    debug)
-		AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for RedHat DEBUG kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat) ;;
-		    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    enterprise)
-		AC_DEFINE([__BOOT_KERNEL_ENTERPRISE], [1], [Define for RedHat/Mandrake ENTERPRISE kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat) ;;
-		    (mandrake)
-			case "$linux_cv_march" in
-			    (i686) ;;
-			    (i586|k6)
-				linux_cv_march=i686
-				target_cpu=i686
-				target="${target_cpu}-${target_vendor}-${target_os}"
-				;;
-			    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    secure)
-		AC_DEFINE([__BOOT_KERNEL_SECURE], [1], [Define for RedHat/Mandrake SECURE kernel.])
-		_LINUX_BAD_KERNEL_RHBOOT
-		;;
-	    i686-up-4GB)
-		AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for Mandrake I686_UP_4GB kernel.])
-		case "$target_vendor" in
-		    (mandrake)
-			case "$linux_cv_march" in
-			    (i686) ;;
-			    (i586|k6)
-				linux_cv_march=i686
-				target_cpu=i686
-				target="${target_cpu}-${target_vendor}-${target_os}"
-				;;
-			    (*) _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (*) _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    p3-smp-64GB)
-		AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for Mandrake P3_SMP_64GB  kernel.])
-		case "$target_vendor" in
-		    (mandrake)
-			case "$linux_cv_march" in
-			    (i686) ;;
-			    (i586|k6)
-				linux_cv_march=i686
-				target_cpu=i686
-				target="${target_cpu}-${target_vendor}-${target_os}"
-				;;
-			    (*) _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (*) _LINUX_BAD_KERNEL_RHBOOT ;;
-		esac ;;
-	    UP)
-		AC_DEFINE([__BOOT_KERNEL_UP], [1], [Define for RedHat/Mandrake UP kernel.])
-		case "$target_vendor" in
-		    (whitebox|redhat)
-			case "$linux_cv_march" in
-			    (i386|alpha|sparc|sparc64|i686|i586|ia64|athlon|x86_64) ;;
-			    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		    (mandrake)
-			case "$linux_cv_march" in
-			    (i586) ;;
-			    (*)  _LINUX_BAD_KERNEL_RHBOOT ;;
-			esac ;;
-		esac ;;
-	esac
-	case "$linux_cv_march" in
-	    i586)
-		AC_DEFINE([__MODULE_KERNEL_i586], [1], [Define for i586 RedHat/Mandrake kernel.])
-		;;
-	    i686)
-		AC_DEFINE([__MODULE_KERNEL_i686], [1], [Define for i686 RedHat/Mandrake kernel.])
-		;;
-	    i?86)
-		AC_DEFINE([__MODULE_KERNEL_i386], [1], [Define for i386 RedHat/Mandrake kernel.])
-		;;
-	    athlon)
-		AC_DEFINE([__MODULE_KERNEL_athlon], [1], [Define for athlon RedHat/Mandrake kernel.])
-		;;
-	esac
-    fi
-])# _LINUX_CHECK_KERNEL_RHBOOT
 # =========================================================================
 
 # =========================================================================
 # _LINUX_CHECK_KERNEL_ARCHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
-    AC_MSG_CHECKING([for kernel arch directory])
-    AC_ARG_WITH([k-archdir],
-	AS_HELP_STRING([--with-k-archdir=DIR],
-	    [specify the kernel source architecture specific directory.
-	    @<:@default=K-BUILD-DIR/arch@:>@]),
-	[with_k_archdir="$withval"],
-	[with_k_archdir=])
-    if test :"${with_k_archdir:-no}" != :no
-    then
-	linux_cv_k_archdir="$with_k_archdir"
-    else
-	linux_cv_k_archdir="${linux_cv_k_build}/arch"
-    fi
-    AC_MSG_RESULT([${linux_cv_k_archdir:-no}])
-    if test :"${linux_cv_k_archdir:-no}" != :no -a ! -d "$linux_cv_k_archdir"
-    then
-	AC_MSG_WARN([*** "$linux_cv_k_archdir" does not exist. ***])
-    fi
+    AC_CACHE_CHECK([for kernel arch directory], [linux_cv_k_archdir], [dnl
+	AC_ARG_WITH([k-archdir],
+	    AS_HELP_STRING([--with-k-archdir=DIR],
+		[specify the kernel source architecture specific directory.
+		@<:@default=K-BUILD-DIR/arch@:>@]),
+	    [with_k_archdir="$withval"],
+	    [with_k_archdir=])
+	if test :"${with_k_archdir:-no}" != :no
+	then
+	    linux_cv_k_archdir="$with_k_archdir"
+	else
+	    linux_cv_k_archdir="${kbuilddir}/arch"
+	fi
+	if test :"${linux_cv_k_archdir:-no}" != :no -a ! -d "$linux_cv_k_archdir"
+	then
+	    AC_MSG_ERROR([
+***
+*** Kernel architecture directory:
+***     "$linux_cv_k_archdir"
+*** does not exist.  Specify the correct kernel architecture directory using
+*** the --with-k-archdir option to configure before attempting again.
+*** ])
+	fi])dnl
 ])# _LINUX_CHECK_KERNEL_ARCHDIR
 # =========================================================================
 
@@ -779,79 +678,465 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
 # _LINUX_CHECK_KERNEL_MACHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
-    AC_MSG_CHECKING([for kernel mach directory])
-    AC_ARG_WITH([k-machdir],
-	AS_HELP_STRING([--with-k-machdir=DIR],
-	    [specify the kernel source machine specific directory.
-	    @<:@default=K-ARCHDIR/ARCH@:>@]),
-	[with_k_machdir="$withval"],
-	[with_k_machdir=])
-    if test :"${with_k_machdir:-no}" != :no
-    then
-	linux_cv_k_machdir="$with_k_machdir"
-    else
-	case "$linux_cv_march" in
-	    (alpha*)                 linux_cv_k_machdir="alpha"      ;;
-	    (arm*)                   linux_cv_k_machdir="arm"        ;;
-	    (cris*)                  linux_cv_k_machdir="cris"       ;;
-	    (i?86* | k6* | athlon*)  linux_cv_k_machdir="i386"       ;;
-	    (ia64)                   linux_cv_k_machdir="ia64"       ;;
-	    (m68*)                   linux_cv_k_machdir="m68k"       ;;
-	    (mips64*)                linux_cv_k_machdir="mips64"     ;;
-	    (mips*)                  linux_cv_k_machdir="mips"       ;;
-	    (hppa*)                  linux_cv_k_machdir="parisc"     ;;
-	    (ppc* | powerpc*)        linux_cv_k_machdir="ppc"        ;;
-	    (s390x*)                 linux_cv_k_machdir="s390x"      ;;
-	    (s390*)                  linux_cv_k_machdir="s390"       ;;
-	    (sh*)                    linux_cv_k_machdir="sh"         ;;
-	    (sparc64*)               linux_cv_k_machdir="sparc64"    ;;
-	    (sparc*)                 linux_cv_k_machdir="sparc"      ;;
-	    (*)                      linux_cv_k_machdir="$linux_cv_march" ;;
-	esac
-	linux_cv_k_machdir="${linux_cv_k_build}/arch/${linux_cv_k_machdir}"
-    fi
-    AC_MSG_RESULT([${linux_cv_k_machdir:-no}])
-    if test :"${linux_cv_k_machdir:-no}" != :no -a ! -d "$linux_cv_k_machdir"
-    then
-	AC_MSG_WARN([*** "$linux_cv_k_machdir" does not exist. ***])
-    fi
+    AC_CACHE_CHECK([for kernel mach directory], [linux_cv_k_machdir], [dnl
+	AC_ARG_WITH([k-machdir],
+	    AS_HELP_STRING([--with-k-machdir=DIR],
+		[specify the kernel source machine specific directory.
+		@<:@default=K-ARCHDIR/ARCH@:>@]),
+	    [with_k_machdir="$withval"],
+	    [with_k_machdir=])
+	if test :"${with_k_machdir:-no}" != :no
+	then
+	    linux_cv_k_machdir="$with_k_machdir"
+	else
+	    case "$karch" in
+		(alpha*)		linux_cv_k_machdir="alpha"	;;
+		(arm*|sa110)		linux_cv_k_machdir="arm"	;;
+		(cris*)			linux_cv_k_machdir="cris"	;;
+		(i?86*|k6*|athlon*)	linux_cv_k_machdir="i386"	;;
+		(ia64)			linux_cv_k_machdir="ia64"	;;
+		(m68*)			linux_cv_k_machdir="m68k"	;;
+		(mips64*)		linux_cv_k_machdir="mips64"	;;
+		(mips*)			linux_cv_k_machdir="mips"	;;
+		(hppa*)			linux_cv_k_machdir="parisc"	;;
+		(ppc*|powerpc*)		linux_cv_k_machdir="ppc"	;;
+		(s390x*)		linux_cv_k_machdir="s390x"	;;
+		(s390*)			linux_cv_k_machdir="s390"	;;
+		(sh*)			linux_cv_k_machdir="sh"		;;
+		(sparc64*|sun4u)	linux_cv_k_machdir="sparc64"	;;
+		(sparc*)		linux_cv_k_machdir="sparc"	;;
+		(*)			linux_cv_k_machdir="$karch"	;;
+	    esac
+	    linux_cv_k_machdir="${kbuilddir}/arch/${linux_cv_k_machdir}"
+	fi
+	if test :"${linux_cv_k_machdir:-no}" != :no -a \
+	    \( ! -d "$linux_cv_k_machdir" -o ! -f "$linux_cv_k_machdir/Makefile" \)
+	then
+	    AC_MSG_ERROR([
+***
+*** Kernel machine directory:
+***     "$linux_cv_k_machdir"
+*** does not exist, or there is no Makefile in the directory.  Specify the
+*** correct kernel machine directory using the --with-k-machdir option to
+*** configure before attempting again.
+*** ])
+	fi ])
+    kmachdir="$linux_cv_k_machdir"
+    AC_SUBST([kmachdir])dnl
 ])# _LINUX_CHECK_KERNEL_MACHDIR
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_CONFIGDIR
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIGDIR], [dnl
+    AC_CACHE_CHECK([for kernel config spec], [linux_cv_k_config_spec], [dnl
+	case "$target_vendor" in
+	    (whitebox|redhat)
+		linux_cv_k_config_spec='${kbuilddir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config'
+		;;
+	    (mandrake)
+		linux_cv_k_config_spec='${kmachdir}/defconfig${kboot:+-}${kboot}'
+		;;
+	    (suse)
+		linux_cv_k_config_spec=
+		;;
+	    (debian)
+		linux_cv_k_config_spec=
+		;;
+	    (*)
+		# try to figure out if we have a redhat or mandrake variant
+		test -f ${kmachdir}/defconfig-smp && \
+		    linux_cv_k_config_spec='${kmachdir}/defconfig${kboot:+-}${kboot}'
+		test -d ${kbuilddir}/configs && \
+		    linux_cv_k_config_spec='${kbuilddir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config'
+		;;
+	esac ])dnl
+])# _LINUX_CHECK_KERNEL_CONFIGDIR
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_BOOT
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
+    AC_REQUIRE([_DISTRO])
+    AC_CACHE_CHECK([for kernel $dist_cv_host_distrib boot], [linux_cv_k_boot], [dnl
+	linux_cv_k_boot=no
+	linux_cv_k_base="$kversion"
+dnl	all redhat variants use this file, even mandrake
+	if test -r "${kincludedir}/linux/rhconfig.h"
+	then
+	    case "${kversion}" in
+		(*bigmem)	linux_cv_k_boot=bigmem		;;
+		(*BOOT)		linux_cv_k_boot=BOOT		;;
+		(*debug)	linux_cv_k_boot=debug		;;
+		(*enterprise)	linux_cv_k_boot=enterprise	;;
+		(*hugemem)	linux_cv_k_boot=hugemem		;;
+		(*i686-up-4GB)	linux_cv_k_boot=i686-up-4GB	;;
+		(*maximum)	linux_cv_k_boot=maximum		;;
+		(*p3-smp-64GB)	linux_cv_k_boot=p3-smp-64GB	;;
+		(*secure)	linux_cv_k_boot=secure		;;
+		(*smp)		linux_cv_k_boot=smp		;;
+		(*)		linux_cv_k_boot=		;;
+	    esac
+	    linux_cv_k_base=`echo "$kversion" | sed -e s/$linux_cv_k_boot$//`
+	fi
+	kboot=
+	if test :"$linux_cv_k_boot" != :no
+	then
+dnl	    not all combinations are valid
+	    kboot="$linux_cv_k_boot"
+	    eval "linux_tmp=\"$linux_cv_k_config_spec\""
+	    linux_tmp=`echo "$linux_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    if test ! -f $linux_tmp
+	    then
+		if test -n "$kboot"
+		then
+		    AC_MSG_ERROR([
+*** 
+*** It appears as though you have a Redhat/Mandrake boot (production) kernel,
+*** however, the kernel configuration file
+***	"$linux_tmp"
+*** does not exist on your system.  This can happen in a couple of situations:
+*** 
+***   (1) you have specified a boot kernel version ($kversion),
+***       however, the kernel architecture ($karch) is wrong for the kernel.
+***       (This can happen sometimes in an automated build.)
+*** 
+***   (2) you have specified a kernel version ($kversion)
+***       that ends in a suffix ($kboot) normally used by boot kernels,
+***       but it is not a boot kernel.
+*** 
+*** Configure cannot proceed reliably under these conditions.
+*** ])
+		else
+		    AC_MSG_WARN([
+*** 
+*** It appears as though you have a Redhat/Mandrake boot (production) kernel
+*** based system, however, kernel configuration file
+*** 
+***	"$linux_tmp"
+*** 
+*** does not exist on your system.  This can happen if you are running a
+*** kernel.org kernel on an RedHat or Mandrake based system.  Configure is
+*** proceeding under the assumption that this is NOT a boot kernel.  This may
+*** cause problems later.
+*** ])
+		fi
+		linux_cv_k_boot=no
+		kboot=
+		linux_cv_k_base="$kversion"
+	    fi
+	fi
+dnl
+dnl	We make another series of checks here because there seem to be some
+dnl	people that cannot install a kernel rpm properly.
+dnl
+	if test :"$linux_cv_k_boot" != :no
+	then
+	    linux_tmp="${DESTDIR}/lib/modules/${kversion}/build"
+	    if test "$kbuilddir" != "$linux_tmp"
+	    then
+		if test -d "$linux_tmp"
+		then
+		    AC_MSG_ERROR([*** configure error])
+		else
+		    AC_MSG_ERROR([
+*** 
+*** Configure has detected a problem with your system.  Building for a
+*** "$dist_cv_host_distrib" "${kboot:-UP}" boot kernel, but the directory:
+*** 
+***	"$linux_tmp"
+*** 
+*** does not exist.  Please install kernel${kboot:+-$kboot}-${linux_cv_k_base}.${karch}.rpm
+*** and kernel-source-${linux_cv_k_base}.${kmarch}.rpm correctly.
+*** ])
+		fi
+	    fi
+	    linux_tmp="${DESTDIR}/boot/System.map-${kversion}"
+	    if test "$ksysmap" != "$linux_tmp"
+	    then
+		if test -f "$linux_tmp"
+		then
+		    AC_MSG_ERROR([*** configure error])
+		else
+		    AC_MSG_ERROR([
+*** 
+*** Configure has detected a problem with your system.  Building for a
+*** "$dist_cv_host_distrib" "${kboot:-UP}" boot kernel, but the file:
+*** 
+***	"$linux_tmp"
+*** 
+*** does not exist.  Please install kernel${kboot:+-$kboot}-${linux_cv_k_base}.${karch}.rpm
+*** correctly.
+*** ])
+		fi
+	    else
+dnl
+dnl		Unfortunately the redhat system map files are unreliable because
+dnl		the are not unique for each architecture.
+dnl
+		linux_opt=
+		test -n "${DESTDIR}" && linux_opt="--root ${DESTDIR}"
+		linux_arch=`rpm -q --whatprovides $linux_tmp --qf "%{ARCH}\n" 2>/dev/null`
+		if test "$linux_arch" != "$karch"
+		then
+		    AC_MSG_ERROR([
+*** 
+*** The system map file for "$dist_cv_host_distrib" "${kboot:-UP}" is
+*** 
+***	"$linux_tmp"
+*** 
+*** but the architecture of that file is "$linux_arch" instead of "$karch".
+*** Reconfigure with "--target=${linux_arch}-${target_vendor}-${target_os}".
+*** 
+*** ])
+		fi
+	    fi
+	fi ])
+    kboot=
+    if test :"$linux_cv_k_boot" != :no
+    then
+	AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for RedHat/Mandrake kernel.])
+	case "$linux_cv_k_boot" in
+	    (BOOT)	  AC_DEFINE([__BOOT_KERNEL_BOOT],	 [1], [Define for RedHat BOOT kernel.])			;;
+	    (smp)	  AC_DEFINE([__BOOT_KERNEL_SMP],	 [1], [Define for RedHat/Mandrake SMP kernel.])		;;
+	    (bigmem)	  AC_DEFINE([__BOOT_KERNEL_BIGMEM],	 [1], [Define for RedHat BIGMEM kernel.])		;;
+	    (hugemem)	  AC_DEFINE([__BOOT_KERNEL_HUGEMEM],	 [1], [Define for RedHat HUGEMEM kernel.])		;;
+	    (debug)	  AC_DEFINE([__BOOT_KERNEL_DEBUG],	 [1], [Define for RedHat DEBUG kernel.])		;;
+	    (enterprise)  AC_DEFINE([__BOOT_KERNEL_ENTERPRISE],  [1], [Define for RedHat/Mandrake ENTERPRISE kernel.])	;;
+	    (secure)	  AC_DEFINE([__BOOT_KERNEL_SECURE],	 [1], [Define for RedHat/Mandrake SECURE kernel.])	;;
+	    (i686-up-4GB) AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for Mandrake I686_UP_4GB kernel.])	;;
+	    (p3-smp-64GB) AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for Mandrake P3_SMP_64GB  kernel.])	;;
+	    (UP)	  AC_DEFINE([__BOOT_KERNEL_UP],		 [1], [Define for RedHat/Mandrake UP kernel.])		;;
+	esac
+	case "$linux_cv_k_boot" in
+	    enterprise)	    case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac ;;
+	    i686-up-4GB)    case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac ;;
+	    p3-smp-64GB)    case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac ;;
+	esac
+	case "$kmarch" in
+	    (alpha*)	  AC_DEFINE([__MODULE_KERNEL_alpha],	[1], [Define for alpha RedHat/Mandrake kernel.])   ;;
+	    (athlon)	  AC_DEFINE([__MODULE_KERNEL_athlon],	[1], [Define for athlon RedHat/Mandrake kernel.])  ;;
+	    (i586)	  AC_DEFINE([__MODULE_KERNEL_i586],	[1], [Define for i586 RedHat/Mandrake kernel.])	   ;;
+	    (i686)	  AC_DEFINE([__MODULE_KERNEL_i686],	[1], [Define for i686 RedHat/Mandrake kernel.])	   ;;
+	    (i?86)	  AC_DEFINE([__MODULE_KERNEL_i386],	[1], [Define for i386 RedHat/Mandrake kernel.])	   ;;
+	    (ia32e)	  AC_DEFINE([__MODULE_KERNEL_ia32e],	[1], [Define for ia32e RedHat/Mandrake kernel.])   ;;
+	    (ia64)	  AC_DEFINE([__MODULE_KERNEL_ia64],	[1], [Define for ia64 RedHat/Mandrake kernel.])	   ;;
+	    (powerpc64*)  AC_DEFINE([__MODULE_KERNEL_ppc64],	[1], [Define for ppc64 RedHat/Mandrake kernel.])   ;;
+	    (powerpc*)	  AC_DEFINE([__MODULE_KERNEL_ppc],	[1], [Define for ppc RedHat/Mandrake kernel.])	   ;;
+	    (s390x)	  AC_DEFINE([__MODULE_KERNEL_s390x],	[1], [Define for s390x RedHat/Mandrake kernel.])   ;;
+	    (s390)	  AC_DEFINE([__MODULE_KERNEL_s390],	[1], [Define for s390 RedHat/Mandrake kernel.])	   ;;
+	    (x86_64)	  AC_DEFINE([__MODULE_KERNEL_x86_64],	[1], [Define for x86_64 RedHat/Mandrake kernel.])  ;;
+	    (sparc64*)	  AC_DEFINE([__MODULE_KERNEL_sparc64],	[1], [Define for sparc64 RedHat/Mandrake kernel.]) ;;
+	    (sparc*)	  AC_DEFINE([__MODULE_KERNEL_sparc],	[1], [Define for sparc RedHat/Mandrake kernel.])   ;;
+	esac
+	kboot="$linux_cv_k_boot"
+    fi
+    AC_SUBST([kboot])dnl
+])# _LINUX_CHECK_KERNEL_BOOT
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_DOT_CONFIG
+# -------------------------------------------------------------------------
+# Find the kernel .config file so that we can use it to generate CFLAGS.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
+    AC_CACHE_CHECK([for kernel config file], [linux_cv_k_config], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-config],
+	    AS_HELP_STRING([--with-k-config=CONFIG],
+		[specify the kernel configuration file.
+		@<:@default=BOOT/config-K-RELEASE@:>@]),
+	    [with_k_config="$withval"],
+	    [with_k_config=])
+	if test :"${with_k_config:-no}" != :no
+	then
+	    linux_cv_k_config="$with_k_config"
+	else
+	    k_config_search_pathspec="
+		$k_config_search_pathspec
+		$linux_cv_k_config_spec"'
+		${kbuilddir}/.config'
+	    if test ":$linux_cv_k_running" = :yes ; then
+		k_config_search_pathspec="
+		    $k_config_search_pathspec"'
+		    ${DESTDIR}${rootdir}/boot/config-${kversion}
+		    ${DESTDIR}${rootdir}/boot/config
+		    ${DESTDIR}/boot/config-${kversion}
+		    ${DESTDIR}/boot/config'
+	    fi
+	    k_config_search_pathspec="
+		$k_config_search_pathspec"'
+		${DESTDIR}${rootdir}/usr/src/linux-${kversion}/.config
+		${DESTDIR}${rootdir}/usr/src/linux-2.4/.config
+		${DESTDIR}${rootdir}/usr/src/linux/.config
+		${DESTDIR}/usr/src/linux-${kversion}/.config
+		${DESTDIR}/usr/src/linux-2.4/.config
+		${DESTDIR}/usr/src/linux/.config'
+	    eval "k_config_search_path=\"$k_config_search_pathspec\""
+	    k_config_search_path=`echo "$k_config_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+    dnl
+    dnl	If we are configuring for the running kernel and DESTDIR is null, we can
+    dnl	check whether the /boot directories.  Otherwise this is dangerous.
+    dnl	Redhat puts different configuration files in the /boot directory
+    dnl	depending upon which architecture of kernel (with the same name) is
+    dnl	being booted.  In these other cases, the kernel configuration needs to
+    dnl	be obtained from the kernel source package.
+    dnl	/usr/src/linux-2.4/configs/*.config for RedHat/Fedora/EL3 and
+    dnl	/usr/src/linux-2.4/arch/MACHDIR/defconfig-* for Mandrake.  Debian and
+    dnl	Suse do not build multiple kernels from the same source package and in
+    dnl	their case the file will be in /usr/src/linux-2.4/.config.
+    dnl
+	    linux_cv_k_config=
+	    for linux_file in $k_config_search_path ; do
+		AC_MSG_CHECKING([for kernel config file... $linux_file])
+		if test -f $linux_file
+		then
+		    linux_cv_k_config="$linux_file"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :${linux_cv_k_config:-no} = :no
+	then
+	    AC_MSG_ERROR([
+*** 
+*** Configure cannot find the kernel configuration file.  The directories
+*** searched were:
+***	"$with_k_config"
+***	"$k_config_search_path"
+*** 
+*** Specify the absolute location of the kernel configuration files with the
+*** --with-k-config option to configure before attempting again.
+*** ])
+	else
+	    case "$linux_cv_k_config" in
+		(*/configs/*|*/arch/*/defconf*)
+		    ;;
+		(*/boot/*|*/usr/src/*|*/lib/modules/*)
+		    AC_MSG_WARN([
+*** 
+*** Configuration information is being read from an unreliable source:
+*** 
+***	"$linux_cv_k_config"
+*** 
+*** This may cause problems later if you have mismatches between the target
+*** kernel and the configuration information contained in that file.
+*** ])
+		    ;;
+	    esac
+	fi
+	AC_MSG_CHECKING([for kernel config file]) ])
+    kconfig="$linux_cv_k_config"
+    AC_SUBST([kconfig])dnl
+])# _LINUX_CHECK_KERNEL_DOT_CONFIG
 # =========================================================================
 
 # =========================================================================
 # _LINUX_SETUP_KERNEL_CFLAGS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
-    #
-    # FIXME: we need to check what is in CFLAGS before we go adding stuff to
-    # CFLAGS, that way the user can override these settings for better tuning.
-    #
-    # CFLAGS="-Wall -Wstrict-prototypes -Wno-trigraphs -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common"
+    AC_CACHE_CHECK([for kernel CFLAGS], [linux_cv_k_cflags], [dnl
+	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} cflag-check`"
+	linux_cflags=
+	AC_ARG_WITH([k-optimize],
+	    AS_HELP_STRING([--with-k-optimize=HOW],
+		[specify optimization, normal, size, speed or quick.
+		@<:@default=normal@:>@]),
+	    [with_k_optimize="$withval"],
+	    [with_k_optimize='normal'])
+	case "${with_k_optimize:-normal}" in
+	    (size)   linux_cflags="$linux_cflags${linux_cflags:+ }-Os" ;;
+	    (speed)  linux_cflags="$linux_cflags${linux_cflags:+ }-O3" ;;
+	    (quick)  linux_cflags="$linux_cflags${linux_cflags:+ }-O0" ;;
+	    (*)      linux_cflags="$linux_cflags${linux_cflags:+ }-O2" ;;
+	esac
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	then
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-system-headers"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wundef"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-endif-labels"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wbad-function-cast"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wcast-qual"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wcast-align"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wwrite-strings"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wconversion"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wsign-compare"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Waggregate-return"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wstrict-prototypes"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wmissing-prototypes"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wmissing-declarations"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wmissing-noreturn"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wmissing-format-attribute"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wpacked"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wpadded"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wredundant-decls"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wnested-externs"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wunreachable-code"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Winline"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
+	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror"
+	fi
+	AC_ARG_ENABLE([k-inline],
+	    AS_HELP_STRING([--enable-k-inline],
+		[enable kernel inline functions.  @<:@default=no@:>@]),
+	    [enable_k_inline="$enableval"],
+	    [enable_k_inline='no'])
+	if test :"${enable_k_inline:-no}" != :no 
+	then
+	    linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
+	fi
+	eval "linux_cv_k_cflags=`echo \"\$linux_cv_k_cflags\" | sed -e 's| -O[[0-9]]? | \$linux_cflags |'`" ])
+    CFLAGS="$linux_cv_k_cflags"
+    AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
+	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} cppflag-check`"
+	linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
+	linux_cv_k_cppflags="${linux_tmp:+-nostdinc -I${linux_tmp} }-DLINUX $linux_cv_k_cppflags" ])
+    CPPFLAGS="$linux_cv_k_cppflags"
+    AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
+	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} modflag-check`" ])
+    KERNEL_MODFLAGS="$linux_cv_k_modflags"][dnl
+])# _LINUX_SETUP_KERNEL_CFLAGS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_SETUP_KERNEL_CFLAGS_OLD
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS_OLD], [dnl
+dnl
+dnl FIXME: we need to check what is in CFLAGS before we go adding stuff to
+dnl CFLAGS, that way the user can override these settings for better tuning.
+dnl	
+dnl CFLAGS="-Wall -Wstrict-prototypes -Wno-trigraphs -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common"
     CFLAGS="-Wall -Wno-trigraphs"
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-system-headers"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wundef"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-endif-labels"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wbad-function-cast"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-qual"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-align"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wwrite-strings"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wconversion"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wsign-compare"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Waggregate-return"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wstrict-prototypes"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-prototypes"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-declarations"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-noreturn"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-format-attribute"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpacked"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpadded"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wredundant-decls"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wnested-externs"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wunreachable-code"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Winline"
-	#CFLAGS="${CFLAGS}${CFLAGS:+ }-Wdisabled-optimization"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-system-headers"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wundef"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-endif-labels"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wbad-function-cast"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-qual"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-align"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wwrite-strings"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wconversion"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wsign-compare"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Waggregate-return"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wstrict-prototypes"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-prototypes"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-declarations"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-noreturn"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-format-attribute"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpacked"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpadded"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wredundant-decls"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wnested-externs"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wunreachable-code"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Winline"
+dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wdisabled-optimization"
 	CFLAGS="${CFLAGS}${CFLAGS:+ }-Werror"
     fi
     AC_ARG_ENABLE([k-inline],
@@ -881,16 +1166,16 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	CFLAGS="$CFLAGS${CFLAGS:+ }-finline-functions"
     fi
     linux_k_defs='-D__KERNEL__ -DLINUX'
-    case "$linux_cv_march" in
+    case "$kmarch" in
 	(alpha*)
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -mno-fp-regs -ffixed=8"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=`echo $linux_cv_march | sed -e 's|^alpha||'` -Wa,-mev6"
+	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=`echo $kmarch | sed -e 's|^alpha||'` -Wa,-mev6"
 	    ;;
 	(arm*)
 	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fno-common||'`
 	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-fno-common -pipe -fomit-frame-pointer"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$linux_cv_march"
+	    CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
 	    AC_MSG_WARN([*** you need to set -mapcs and -mtune yourself in CFLAGS= ***])
 	    ;;
 	(cris*)
@@ -903,7 +1188,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	    then
 		CFLAGS="${CFLAGS}${CFLAGS:+ }-mpreferred-stack-boundary=2"
 	    fi
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$linux_cv_march"
+	    CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
 	    ;;
 	(k6*)
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe"
@@ -911,9 +1196,9 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	    then
 		CFLAGS="${CFLAGS}${CFLAGS:+ }-mpreferred-stack-boundary=2"
 	    fi
-	    if (`eval $CC $CFLAGS -march=$linux_cv_march -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
+	    if (`eval $CC $CFLAGS -march=$kmarch -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
 	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$linux_cv_march"
+		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
 	    else
 		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=i586"
 	    fi
@@ -924,9 +1209,9 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	    then
 		CFLAGS="${CFLAGS}${CFLAGS:+ }-mpreferred-stack-boundary=2"
 	    fi
-	    if (`eval $CC $CFLAGS -march=$linux_cv_march -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
+	    if (`eval $CC $CFLAGS -march=$kmarch -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
 	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$linux_cv_march"
+		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
 	    else
 		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=i686 -malign-functions=4"
 	    fi
@@ -940,25 +1225,25 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	    ;;
 	(m68*)
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -ffixed-a2"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-m${linux_cv_march}"
+	    CFLAGS="${CFLAGS}${CFLAGS:+ }-m${kmarch}"
 	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
 	    ;;
 	(mips64*)
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mabi=64 -G 0 -mno-abicalls -fno-pic -Wa,--trap --pipe"
-	    case "$linux_cv_march" in
+	    case "$kmarch" in
 		(*r4300*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4300 -mips3" ;;
 		(*r4?00*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips3" ;;
 		(*r5000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips4" ;;
 		(*r8000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips4" ;;
 		(*r10000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips4" ;;
 		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips3 -mmad" ;;
-		# guess nevada
+dnl		guess nevada
 	    esac
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-Wa,-32"
 	    ;;
 	(mips*)
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-G 0 -mno-abicalls -fno-pic"
-	    case "$linux_cv_march" in
+	    case "$kmarch" in
 		(*r3000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r3000 -mips1" ;;
 		(*r6000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r6000 -mips2" ;;
 		(*r4300*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4300 -mips2" ;;
@@ -979,7 +1264,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	(hppa*)
 	    linux_k_defs="${linux_k_defs}${linux_k_defs:+ }-D__linux__"
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -mno-space-regs -mfast-indirect-calls -mdisable-fpregs"
-	    case "$linux_cv_march" in
+	    case "$kmarch" in
 		(*1.1*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=1.1" ;;
 		(*2.0*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=2.0 -mschedule=8000" ;;
 		(*64*)		: ;;
@@ -997,14 +1282,14 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce"
 	    ;;
 	(sh*)
-	    case "$linux_cv_march" in
+	    case "$kmarch" in
 		(*el|shl)	CFLAGS="${CFLAGS}${CFLAGS:+ }-ml" ;;
 		(*eb|sh)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mb" ;;
 		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-mb"
 		AC_MSG_WARN([*** going big endian ***])
 		;;
 	    esac
-	    case "$linux_cv_march" in
+	    case "$kmarch" in
 		(sh3*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-m3" ;;
 		(sh4*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-m4 -mno-implicit-fp" ;;
 		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-m4 -mno-implicit-fp"
@@ -1039,8 +1324,8 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	    ;;
     esac
     linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
-    CPPFLAGS="${linux_k_defs}${linux_tmp:+ -nostdinc} -I${linux_cv_k_includes}${linux_tmp:+ -I}${linux_tmp}${CPPFLAGS:+ }${CPPFLAGS}"
-])# _LINUX_SETUP_KERNEL_CFLAGS
+    CPPFLAGS="${linux_k_defs}${linux_tmp:+ -nostdinc} -I${kincludedir}${linux_tmp:+ -I}${linux_tmp}${CPPFLAGS:+ }${CPPFLAGS}"][dnl
+])# _LINUX_SETUP_KERNEL_CFLAGS_OLD
 # =========================================================================
 
 # =========================================================================
@@ -1098,7 +1383,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
 	    debugging macros.])
 	    ;;
     esac
-    AC_MSG_RESULT([${linux_cv_debug:-no}])
+    AC_MSG_RESULT([${linux_cv_debug:-no}])dnl
 ])# _LINUX_SETUP_KERNEL_DEBUG
 # =========================================================================
 
@@ -1191,7 +1476,7 @@ if (sizeof ($1))
     return 0;])],
 	[AS_VAR_SET(linux_Type, yes)],
 	[AS_VAR_SET(linux_Type, no)])])
-    AS_IF([test AS_VAR_GET(linux_Type) = yes], [$2], [$3])[]dnl
+    AS_IF([test AS_VAR_GET(linux_Type) = yes], [$2], [$3])dnl
     AS_VAR_POPDEF([linux_Type])dnl
 ])# _LINUX_CHECK_TYPE_internal
 # =============================================================================
@@ -1219,8 +1504,7 @@ AC_DEFUN([_LINUX_CHECK_TYPE], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
 	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
-	_LINUX_CHECK_TYPE_internal([$1], [$2], [$3], [$4])
-	])
+	_LINUX_CHECK_TYPE_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_TYPE
 # =============================================================================
 
@@ -1231,8 +1515,7 @@ AC_DEFUN([_LINUX_CHECK_TYPES], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
 	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
-	_LINUX_CHECK_TYPES_internal([$1], [$2], [$3], [$4])
-	])
+	_LINUX_CHECK_TYPES_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_TYPES
 # =============================================================================
 
@@ -1246,7 +1529,7 @@ AC_DEFUN([_LINUX_CHECK_HEADER_internal], [dnl
 @%:@include <$1>])],
 	[AS_VAR_SET(linux_Header, yes)],
 	[AS_VAR_SET(linux_Header, no)])])
-    AS_IF([test AS_VAR_GET(linux_Header) = yes], [$2], [$3])[]dnl
+    AS_IF([test AS_VAR_GET(linux_Header) = yes], [$2], [$3])dnl
     AS_VAR_POPDEF([linux_Header])dnl
 ])# _LINUX_CHECK_HEADER_internal
 # =============================================================================
@@ -1276,8 +1559,7 @@ AC_DEFUN([_LINUX_CHECK_HEADER], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
 	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
-	_LINUX_CHECK_HEADER_internal([$1], [$2], [$3], [$4])
-	])
+	_LINUX_CHECK_HEADER_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_HEADER
 # =============================================================================
 
@@ -1288,27 +1570,8 @@ AC_DEFUN([_LINUX_CHECK_HEADERS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
 	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
-	_LINUX_CHECK_HEADERS_internal([$1], [$2], [$3], [$4])
-	])
+	_LINUX_CHECK_HEADERS_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_HEADERS
-# =============================================================================
-
-# =============================================================================
-# _LINUX_KERNEL_
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_], [dnl
-])# _LINUX_KERNEL_
-# =============================================================================
-
-# =============================================================================
-# _LINUX_KERNEL_
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
-    _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
-	])
-])# _LINUX_KERNEL_
 # =============================================================================
 
 # =============================================================================
@@ -1351,10 +1614,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
     _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel SuSE production kernel],
-	[CONFIG_REGPARM],
-	[linux_cv_k_regparm=yes # for historical reasons
-	 CFLAGS="${CFLAGS}${CFLAGS:+ }-mregparm=3"],
-	[linux_cv_k_regparm=no])
+	[CONFIG_REGPARM], [linux_cv_k_regparm=yes], [linux_cv_k_regparm=no])dnl
 ])# _LINUX_CHECK_KERNEL_REGPARM
 # =========================================================================
 
@@ -1363,14 +1623,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
     _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel symbol versioning],
-	[CONFIG_MODVERSIONS],
-	[linux_cv_k_versions=yes # for historical reasons
-	 KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODVERSIONS"],
-	[linux_cv_k_versions=no])
+	[CONFIG_MODVERSIONS], [linux_cv_k_versions=yes], [linux_cv_k_versions=no])
     AC_SUBST([KERNEL_MODFLAGS])dnl
     KERNEL_NOVERSION="-D__NO_VERSION__"
     AC_SUBST([KERNEL_NOVERSION])dnl
-dnl AM_CONDITIONAL([KERNEL_VERSIONS], [test x"$linux_cv_k_versions" = xyes])dnl
 ])# _LINUX_CHECK_KERNEL_VERSIONS
 # =========================================================================
 
@@ -1403,9 +1659,9 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     AS_VAR_PUSHDEF([linux_symbol_addr], [linux_cv_$1_addr])dnl
     AC_CACHE_CHECK([for kernel symbol $1 address], linux_symbol_addr, [dnl
-	if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" 
+	if test -n "$ksysmap" -a -r "$ksysmap" 
 	then
-	    AS_VAR_SET([linux_symbol_addr], [`($EGREP '\<$1' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`])
+	    AS_VAR_SET([linux_symbol_addr], [`($EGREP '\<$1' $ksysmap | sed -e 's| .*||') 2>/dev/null`])
 	fi
 	linux_tmp=AS_VAR_GET([linux_symbol_addr]);
 	AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:+0x}$linux_tmp"])
@@ -1439,18 +1695,18 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
     AS_VAR_PUSHDEF([linux_symbol_export], [linux_cv_$1_export])dnl
     AC_CACHE_CHECK([for kernel symbol $1 export], linux_symbol_export, [dnl
 	linux_tmp='no'
-	if test -n "$linux_cv_k_ksyms" -a -r "$linux_cv_k_ksyms"
+	if test -n "$ksyms" -a -r "$ksyms"
 	then
-	    if ( $EGREP -q  '(\<$1_R(smp_)?........\>|\<$1\>)' $linux_cv_k_ksyms 2>/dev/null )
+	    if ( $EGREP -q  '(\<$1_R(smp_)?........\>|\<$1\>)' $ksyms 2>/dev/null )
 	    then
-		linux_tmp="yes ($linux_cv_k_ksyms)"
+		linux_tmp="yes ($ksyms)"
 	    fi
 	else
-	    if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" 
+	    if test -n "$ksysmap" -a -r "$ksysmap" 
 	    then
-		if ( $EGREP -q '\<__ksymtab_$1\>' $linux_cv_k_sysmap 2>/dev/null )
+		if ( $EGREP -q '\<__ksymtab_$1\>' $ksysmap 2>/dev/null )
 		then
-		    linux_tmp="yes ($linux_cv_k_sysmap)"
+		    linux_tmp="yes ($ksysmap)"
 		fi
 	    else
 		_LINUX_KERNEL_ENV([dnl
@@ -1519,7 +1775,7 @@ $2
     else :;
 $3
     fi
-    AS_VAR_POPDEF([linux_symbol])
+    AS_VAR_POPDEF([linux_symbol])dnl
 ])# _LINUX_KERNEL_SYMBOL
 # =============================================================================
 

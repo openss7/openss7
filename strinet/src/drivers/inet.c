@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/16 14:42:29 $ by $Author: brian $
+ Last Modified $Date: 2005/02/25 02:16:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -211,7 +211,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/25 02:16:11 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -11573,6 +11573,7 @@ t_error_ack(queue_t *q, ulong prim, long error)
  *  T_OK_ACK            19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
+STATIC int ss_sock_recvmsg(queue_t *q, int flags);
 STATIC int
 t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 {
@@ -11624,6 +11625,8 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 					qenable(ss->rq);
 				}
 			}
+			/* make sure any data on the socket is delivered */
+			ss_sock_recvmsg(as->rq, 0);
 			break;
 		case TS_WACK_DREQ7:
 			ensure(cp, goto free_error);
