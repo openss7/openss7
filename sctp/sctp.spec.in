@@ -1,0 +1,887 @@
+# vim: ft=spec sw=4 et
+# =============================================================================
+# 
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/12/20 10:18:07 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/12/20 10:18:07 $ by $Author: brian $
+#
+# =============================================================================
+
+# default is to build kernel modules and tools
+# conditional builds of binary rpms relies on the sneaky spec trick that
+# rpmbuild will not build a binary rpm when it has no %files section
+%global BUILD_modules 1
+%global BUILD_tools   1
+
+#
+# there are three ways to pass kernel version to the build process:
+#    define _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
+#    define _kversion on the rpmbuild command line
+#    define PACKAGE_KVERSION environment variable
+#    just let it default to `uname -r`
+#
+%{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
+
+%global kernel_version %{_kversion}
+%global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|')
+%global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
+%global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
+%global core_name core-%{_kversion}
+%global info_name info-%{_kversion}
+%global epoch @PACKAGE_EPOCH@
+%global majbase @STRCONF_MAJBASE@
+%global makedev @STRCONF_MAKEDEV@
+%global base @PACKAGE_TARNAME@
+%global infofiles %{name} STREAMS SPG porting
+%global title @PACKAGE_TITLE@
+%global stitle @PACKAGE_SHORTTITLE@
+%global libname streams
+
+# because we only need to build the tools binaries once for each architecture,
+# but need to build the modules binaries once for each architecture and kernel
+# version, we accept the --with[out] options "modules" and "tools"
+%{?_without_modules: %{expand: %%global BUILD_modules 0}}
+%{?_without_tools:   %{expand: %%global BUILD_tools   0}}
+%{?_with_modules:    %{expand: %%global BUILD_modules 1}}
+%{?_with_tools:      %{expand: %%global BUILD_tools   1}}
+
+%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+
+%if %{BUILD_tools}
+%global BUILD_libs    1
+%global BUILD_devs    %newrpm
+%global MAKE_devs     %oldrpm
+%else
+%global BUILD_libs    0
+%global BUILD_devs    0
+%global MAKE_devs     0
+%endif
+
+%global _conflict LiS
+
+# we have some more options that control configure for the build
+%{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
+%global fullrelease @PACKAGE_RELEASE@%{extrarelease}
+
+Summary:        %{title} (SVR 4.2 MP STREAMS)
+%if %{?_without_public: 0}%{!?_without_public: 1}
+Name:           @PACKAGE_NAME@
+%else
+Name:           @PACKAGE_NAME@-bin
+%endif
+Epoch:          @PACKAGE_EPOCH@
+Version:        @PACKAGE_VERSION@
+Release:        @PACKAGE_RELEASE@
+License:        GPL
+Group:          System Environment/Kernel
+%if %{?url: 1}%{!?url: 0}
+URL:            %{url}
+%endif
+%if %{?_xpm_icon: 1}%{!?_xpm_icon: 0}
+Icon:           %{_xpm_icon}
+%endif
+%if %{?_gif_icon: 1}%{!?_gif_icon: 0}
+Icon:           %{_gif_icon}
+%endif
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
+ExclusiveOs:    Linux
+#Source:         %{name}-%{version}-%{release}.tar.bz2
+Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}-%{release}.tar.bz2
+%if %{?buildroot: 0}%{!?buildroot: 1}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
+%endif
+%if %{BUILD_modules}
+BuildRequires:  kernel-source = %{kernel_source}
+BuildRequires:  modutils >= 2.4.12
+%endif
+%define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+%ifarch s390 s390x
+BuildRequires:  gcc >= 2.95.3
+%else
+%ifarch %{all_ppc}
+BuildRequires:  gcc >= 2.96-75
+%else
+%if %{newgcc}
+BuildRequires:  gcc >= 2.96-98
+%else
+BuildRequires:  gcc = 2.95.3
+%endif
+%endif
+%endif
+%if %{newgcc}
+BuildRequires:  gcc >= 2.96
+%else
+BuildRequires:  gcc = 2.95.3
+%endif
+# these are some needs of the configure script
+# to manipulate manual pages:
+BuildRequires:  /usr/bin/soelim
+BuildRequires:  /usr/bin/refer
+BuildRequires:  /usr/bin/tbl
+BuildRequires:  /usr/bin/pic
+BuildRequires:  /usr/bin/gzip
+# to generate kernel symbols:
+BuildRequires:  /sbin/genksyms
+# find the rest automagically
+Autoreq:        true
+
+# ---------------------------------------------------------------------------
+%description
+The %{name} package includes kernel modules, libraries, utilities and
+development environment for the development and execution of System V Release
+4.2 MP STREAMS modules and drivers developed for Linux.  In addition (source)
+compatibility modules are provided for AIX, HP-UX, LiS, OSF, Solaris, SVR 4
+and UnixWare 7.  This distribution is only currently applicable to 2.4 kernels
+and was targetted at ix86 and ppc architectures, but should build and install
+for other architectures as well.
+
+%prep
+# ---------------------------------------------------------------------------
+
+%setup -q -n %{name}-%{version}-%{release}
+
+%build
+# ---------------------------------------------------------------------------
+
+preferred_cflags="%{optflags}"
+
+%ifarch %{ix86}
+preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
+%endif
+
+%ifarch sparc
+preferred_cflags="$preferred_cflags -fcall-used-g7"
+%endif
+
+%ifarch sparcv9
+preferred_cflags="$preferred_cflags -fcall-used-g7"
+%endif
+
+%ifarch sparc64
+preferred_cflags="$preferred_cflags -mvis -fcall-used-g7"
+%endif
+
+%ifnarch ia64 s390 s390x ppc ppciseries ppc64
+if test `gcc --version` != '2.95.3' ; then
+preferred_cflags="$preferred_cflags -freorder-blocks"
+fi
+%endif
+
+%define cache_file ../%{_target_platform}-%{kernel_version}-LiS.cache
+
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
+
+./configure \
+    CC="${CC}" \
+    CFLAGS="${CFLAGS:-$preferred_cflags}" \
+    LDFLAGS="${LDFLAGS}" \
+    CPPFLAGS="${CPPFLAGS}" \
+    CPP="${CPP}" \
+    CXX="${CXX:-$CC}" \
+    CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
+    CXXCPP="${CXXCPP:-$CPP}" \
+    --cache-file=%{cache_file} \
+    --build=%{_build} \
+    --host=%{_target_platform} \
+    --prefix=%{_prefix} \
+    --exec-prefix=%{_exec_prefix} \
+    --bindir=%{_bindir} \
+    --sbindir=%{_sbindir} \
+    --sysconfdir=%{_sysconfdir} \
+    --datadir=%{_datadir} \
+    --includedir=%{_includedir} \
+    --libdir=%{_libdir} \
+    --libexecdir=%{_libexecdir} \
+    --localstatedir=%{_localstatedir} \
+    --sharedstatedir=%{_sharedstatedir} \
+    --mandir=%{_mandir} \
+    --infodir=%{_infodir} \
+    --disable-maintainer-mode \
+    --enable-dependency-tracking \
+    --with-gnu-ld \
+    --with-k-release=%{kernel_version} \
+    --with-k-modules=/%{_lib}/modules/%{kernel_version} \
+    --with-rpm-epoch=%{epoch} \
+    --with-rpm-release=%{release} \
+    --with-base-major=%{majbase} \
+    %{?_with_k_optimize:         %_with_k_optimize} \
+    %{?_with_cooked_manpages:    %_with_cooked_manpages} \
+    %{?_without_cooked_manpages: %_without_cooked_manpages} \
+    %{?_with_public:             %enable %_with_public} \
+    %{?_without_public:          %disable %_without_public} \
+    %{?_with_k_debug:            %enable %_with_k_debug} \
+    %{?_without_k_debug:         %disable %_without_k_debug} \
+    %{?_with_k_test:             %enable %_with_k_test} \
+    %{?_without_k_test:          %disable %_without_k_test} \
+    %{?_with_k_safe:             %enable %_with_k_safe} \
+    %{?_without_k_safe:          %disable %_without_k_safe} \
+    %{?_with_k_inline:           %enable %_with_k_inline} \
+    %{?_without_k_inline:        %disable %_without_k_inline} \
+    %{?_with_tools:              %enable %_with_tools} \
+    %{?_without_tools:           %disable %_without_tools} \
+    %{?_with_modules:            %enable %_with_modules} \
+    %{?_without_modules:         %disable %_without_modules} \
+    %{?_with_compat_svr4:        %enable %_with_compat_svr4} \
+    %{?_without_compat_svr4:     %disable%_without_compat_svr4} \
+    %{?_with_compat_sol8:        %enable %_with_compat_sol8} \
+    %{?_without_compat_sol8:     %disable%_without_compat_sol8} \
+    %{?_with_compat_uw7:         %enable %_with_compat_uw7} \
+    %{?_without_compat_uw7:      %disable%_without_compat_uw7} \
+    %{?_with_compat_osf:         %enable %_with_compat_osf} \
+    %{?_without_compat_osf:      %disable%_without_compat_osf} \
+    %{?_with_compat_aix:         %enable %_with_compat_aix} \
+    %{?_without_compat_aix:      %disable%_without_compat_aix} \
+    %{?_with_compat_hpux:        %enable %_with_compat_hpux} \
+    %{?_without_compat_hpux:     %disable%_without_compat_hpux} \
+    %{?_with_compat_lis:         %enable %_with_compat_lis} \
+    %{?_without_compat_lis:      %disable%_without_compat_lis} \
+    || rm -f %{cache_file}
+
+make
+
+%install
+# ---------------------------------------------------------------------------
+
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+mkdir -p $RPM_BUILD_ROOT
+
+%if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
+# we are going to create debug packages, so we need to install unstripped binaries.
+make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install
+%else
+# use libtoolized install-strip to strip binaries, modules, shared and static libraries.
+make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install-strip
+%endif
+
+# get the installed info directory out of the build root
+[ -e "$RPM_BUILD_ROOT/%{_infodir}/dir" ] && rm -f "$RPM_BUILD_ROOT/%{_infodir}/dir"
+
+%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+# punch rpm release to Custom
+echo '.Custom.1'  > .rpmextra
+# create configured source directory for source package
+mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+# tar and move the sources for source release
+make clean ; tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+# create symbolic link
+ln -sf %{name}-%{version}-%{fullrelease} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
+%endif
+
+%clean
+# ---------------------------------------------------------------------------
+
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+# ===========================================================================
+%package %{core_name}
+
+Summary:        %{title} core kernel modules.
+Group:          System Environment/Kernel
+Prefix:         /%{_lib}/modules/%{kernel_version}
+Requires:       kernel = %{kernel_version}
+Conflicts:      %{_conflict}-%{core_name}
+Prereq:         /sbin/depmod
+Prereq:         /sbin/lsmod
+Prereq:         /sbin/insmod
+Prereq:         /sbin/modprobe
+Prereq:         /usr/sbin/lsof
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{core_name}
+The %{name}-%{core_name} package contains the kernel modules that provide the
+Linux kernel SVR 4.2 MP STREAMS facility.  This also includes assorted basic
+STREAMS drivers and modules such as pipes, fifos, echo, etc.  This package is
+heavily tied to the kernel for which it was compiled.  This package applies to
+kernel version %{kernel_version}.
+
+%pre %{core_name}
+# ---------------------------------------------------------------------------
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   if we are upgrading and the upgrade is for the running kernel, or we are
+#   installing new on the running kernel, we have to worry about previous
+#   loaded modules for the old version or a non-rpm version
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+#   modules running, kick the stack
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    fdetach -a 2>/dev/null
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    /usr/sbin/lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge %{majbase} ]; then
+                eval "kill -HUP $tokens[1]"
+            fi
+        fi
+    done
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    echo 'Cannot install or upgrade with sctp modules running.' >&2
+    exit 1
+fi
+
+%post %{core_name}
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then
+#   This is the end of a fresh install.
+#   Check that our line is in the modules.%{base} file
+    conf_old=/etc/modules.conf
+    if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
+        streams_dir=/%{_lib}/modules/%{kernel_version}/misc
+        streams_prf=/%{_lib}/modules/preferred/misc
+        conf_new=%{_tmppath}/modules.conf.new.$$
+        cp -f $conf_old $conf_new
+#       if not, check for an old non-rpm LiS
+        if ( grep -q 'BEGIN LiS' $conf_old ) ; then
+            conf_tmp=%{_tmppath}/modules.conf.tmp.$$
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
+            for p in $list ; do
+                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
+                mv -f $conf_tmp $conf_new
+#               Remove conflicting modules.
+                rm -f $streams_dir/$m.o
+                rm -f $streams_prf/$m.o
+            done
+        fi
+        echo 'prune modules.%{base}' >> $conf_new
+        echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
+        echo 'include /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
+        echo 'endif' >> $conf_new
+        chmod --reference=$conf_old $conf_new
+        cp -fb --suffix=.rpmsave $conf_new $conf_old
+        rm -f $conf_new
+    fi
+fi
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    /sbin/depmod -ae
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
+#   non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
+
+%preun %{core_name}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   We are about to uninstall for good on a running kernel then we have to
+#   worry about which modules are running
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+#   modules running, kick the stack
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    fdetach -a
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    /usr/sbin/lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge %{majbase} ]; then
+                eval "kill -KILL $tokens[1]"
+            fi
+        fi
+    done
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    echo "Cannot uninstall with sctp modules running." >&2
+    exit 1
+fi
+
+%postun %{core_name}
+# ---------------------------------------------------------------------------
+
+if [ $1 = 0 ]; then
+#   this is the last stage of a removal we are going away: we need to see if
+#   we need to remove our line from modules.conf and remove our devices
+    remove_line=yes
+    for file in /lib/modules/*/modules.%{base} ; do
+        if [ -f $file ] ; then
+            remove_line=no
+            break
+        fi
+    done
+    if [ ":$remove_line" = :yes ] ; then
+        sed -e '/prune modules.%{base}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
+        chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f %{_tmppath}/modules.conf.tmp.$$
+    fi
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    /sbin/depmod -ae
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
+#   non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   one more kick at killing any loaded modules on uninstall, last stage of
+#   the upgrade on a running kernel for upgrade.
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+#   modules running, kick the stack
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    fdetach -a
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    /sbin/insmod -ar sctp
+    /usr/sbin/lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge %{majbase} ]; then
+                if [ $1 = 0 ] ; then
+#                   extreme prejudice for removal
+                    eval "kill -KILL $tokens[1]"
+                else
+#                   try to get them to reload for 
+                    eval "kill -HUP $tokens[1]"
+                fi
+            fi
+        fi
+    done
+    /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
+    echo "Error: modules may be still loaded" >&2
+    /sbin/lsmod | grep '^sctp' >&2
+    echo "you may have to reboot" >&2
+    exit 1
+fi
+
+%if %{BUILD_modules}
+%files %{core_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir /%{_lib}/modules/%{kernel_version}/%{base}
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
+/%{_lib}/modules/%{kernel_version}/%{base}/*
+%endif
+
+# ===========================================================================
+%package %{info_name}
+
+Summary:        %{title} core kernel module symbol versions.
+Group:          System Environment/Kernel
+Prefix:         %{_includedir}/sctp
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{info_name}
+The %{name}-%{info_name} package contains the kernel modules symbol
+information for development of kernel modules against the core kernel modules
+included in the %{name}-core package.  This package is tied to the core kernel
+modules and kernel for which they were compiled.  This package applies to core
+kernel modules %{name}-%{core_name} for kernel version %{_kversion}.
+
+%if %{BUILD_modules}
+%files %{info_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_includedir}/sctp/%{kernel_version}/*
+%endif
+
+# ===========================================================================
+%package dev
+
+Summary:        %{title} devices.
+Group:          System Environment/Base
+Conflicts:      %{_conflict}-dev
+Requires:       dev >= 3.3
+Obsoletes:      %{name}-devs
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description dev
+The %{name}-dev package contains the device definitions necessary to run
+applications programs and utilities developed for %{title}.
+
+%if %{MAKE_devs}
+%post dev
+#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing
+#   rootless builds because they have no %%dev macro, so in that case we just run the makenodes
+#   program that was generated in the build to create devices.
+if [ $1 = 0 ] ; then
+    /usr/sbin/@STRMAKENODES@
+fi
+
+%preun dev
+#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing
+#   rootless builds because they have no %%dev macro, so in that case we just run the makenodes
+#   program that was generated in the build to create devices.
+if [ $1 = 0 ] ; then
+    /usr/sbin/@STRMAKENODES@ --remove
+fi
+
+%endif
+
+# ---------------------------------------------------------------------------
+%if %{MAKE_devs}
+%files dev
+%defattr(-,root,root)
+%endif
+%if %{BUILD_devs}
+%files dev -f %{makedev}
+%defattr(-,root,root)
+%endif
+
+# ===========================================================================
+%package lib
+
+Summary:        %{title} run-time libraries.
+Group:          System Environment/Libraries
+Prefix:         %{_libdir}
+Prefix:         %{_datadir}/locale
+Obsoletes:      %{name}-libs
+Prereq:         /sbin/ldconfig
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description lib
+The %{name}-lib package contains the run-time shared libraries necessary to
+run applications programs developed for %{title}.
+
+%pre lib
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ] ; then
+#   this is supposed to be a fresh install
+#   see if there are any libraries hanging around from a non-rpm install
+    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*%{libname}\> | cut '-d ' -f4 ) 2>/dev/null`"
+    if [ -n "$old_libs" ] ; then
+#       old libraries hanging around, delete them
+        echo "warning: Deleting old non-rpm libraries $old_libs" >&2
+        rm -f $old_libs
+    fi
+else
+    :
+#   upgrade, let RPM do its job
+fi
+
+%post lib
+# ---------------------------------------------------------------------------
+# do a load config
+if [ $1 = 0 ] ; then
+#   end of fresh install, do /sbin/ldconfig
+    /sbin/ldconfig >/dev/null
+else
+    :
+#   upgrade, wait for old postun
+fi
+
+%postun lib
+# ---------------------------------------------------------------------------
+# whether complete removal or upgrade, do a load config
+/sbin/ldconfig
+
+%if %{BUILD_libs}
+%files lib
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.so*
+%{_libdir}/*.la
+#%{_datadir}/locale/*
+%endif
+
+# ===========================================================================
+%package doc
+
+Summary:        %{title} manpages, manuals and docs.
+Group:          Documentation
+Prefix:         %{_docdir}
+Prefix:         %{_infodir}
+Prefix:         %{_mandir}
+Conflicts:      texinfo < 3.11
+Conflicts:      %{_conflict}-doc
+Conflicts:      %{_conflict}-docs
+Obsoletes:      %{name}-docs
+Prereq:         /sbin/install-info
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description doc
+The %{name}-doc package contains html documentation for the development of
+%{title} applications, modules and drivers.
+
+%post doc
+# ---------------------------------------------------------------------------
+if [ -x /sbin/install-info ] ; then
+    # older rpm versions do not compress info files
+    for n in %{infofiles} ; do
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        fi
+    done
+fi
+
+%preun doc
+# ---------------------------------------------------------------------------
+if [ "$1" = 0 -a -x /sbin/install-info ] ; then
+    # older rpm versions do not compress info files
+    for n in %{infofiles} ; do
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        fi
+    done
+fi
+
+%if %{BUILD_tools}
+%files doc
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%if %{BUILD_libs}
+%doc ABOUT-NLS
+%endif
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc doc/manual
+%{_infodir}/*
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
+%{_mandir}/man*/*
+%endif
+
+# ===========================================================================
+%package devel
+
+Summary:        %{title} headers, libs and docs.
+Group:          Development/System
+Prefix:         %{_libdir}
+Prefix:         %{_includedir}
+#Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+#Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
+#Conflicts:      %{_conflict}
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description devel
+The %{name}-devel package contains library archives for static compilation,
+and headers files to develop %{title} modules and drivers.  This
+also includes the header files and static libraries required to compile
+%{title} applications programs.  In addition it contains all of the
+manual pages necessary for developing %{title} application programs.
+
+%if %{BUILD_tools}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%if %{BUILD_libs}
+%{_libdir}/*.a
+%endif
+%dir %{_includedir}/sctp
+%{_includedir}/sctp/*.h
+%{_includedir}/sctp/sys/*
+%endif
+
+# ===========================================================================
+%package source
+
+Summary:        %{title} source package.
+Group:          Development/System
+Prefix:         %{_usrsrc}
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description source
+The %{name}-source package contains the source code necessary for building the
+%{name} release.  It includes the autoconf configuration utilities necessary
+to create and distribute this rpm.
+
+%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+%files source
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
+%{_usrsrc}/%{name}
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.*
+%endif
+
+# ===========================================================================
+%package util
+
+Summary:        %{title} admin utilities.
+Group:          System Environment/Base
+Prefix:         %{_bindir}
+Prefix:         %{_sbindir}
+Prefix:         %{_libexecdir}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{_conflict}-util
+Obsoletes:      %{name}-utils
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description util
+The %{name}-util package provides adminstrative and configuration test
+utilities and commands associated with the %{title} package.
+
+%pre util
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ]; then
+# this is a fresh install, look for old non-rpm tools
+    if [ -n "`which fattach 2>/dev/null`" ]; then
+        for prog in ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf sctp strmakenodes
+        do
+            location="`which $prog 2>/dev/null`"
+            while [ -n "$location" -a -x "$location" ] ; do
+                eval "rm -f $location"
+                location="`which $prog 2>/dev/null`"
+            done
+        done
+    fi
+# old non-rpm distro puts some man pages in the wrong place, clean them out
+    if [ -f /usr/man/man3/fattach.3 ] ; then
+        rm -f /usr/man/man3/fattach.3 2>/dev/null
+        rm -f /usr/man/man3/detach.3 2>/dev/null
+        rm -f /usr/man/man3/isastream.3 2>/dev/null
+        rmdir -p /usr/man/man3 2>/dev/null
+        rm -f /usr/man/man8/fattach.8 2>/dev/null
+        rm -f /usr/man/man8/fdetach.8 2>/dev/null
+        rmdir -p /usr/man/man8 2>/dev/null
+        rm -f /usr/man/man9/connld.9 2>/dev/null
+        rm -f /usr/man/man9/fifo.9 2>/dev/null
+        rm -f /usr/man/man9/pipemod.9 2>/dev/null
+        rmdir -p /usr/man/man9 2>/dev/null
+        rmdir -p /usr/man 2>/dev/null
+    fi
+else
+    :
+#   upgrade, let rpm do its job
+fi
+
+%if %{BUILD_tools}
+%files util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_bindir}/*
+%{_sbindir}/*
+%{_libexecdir}/*
+%endif
+
+# ===========================================================================
+%changelog
+# ---------------------------------------------------------------------------
+# $Log: sctp.spec.in,v $
+# Revision 0.9.2.1  2004/12/20 10:18:07  brian
+# - Big start on autoconf release of Linux Native SCTP.
+#
+# Revision 1.1  2004/12/20 10:18:07  brian
+# - Big start on autoconf release of Linux Native SCTP.
+#
+
+* Mon Dec 20 2004 Brian Bidulock <bidulock@openss7.org>
+- Begain this RPM build for Linux Native SCTP.
+- Borrowed heavily from the OpenSS7 STREAMS builds.
+
+# vim: ft=spec sw=4 et

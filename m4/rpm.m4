@@ -577,8 +577,8 @@ dnl          fi
 # _RPM_SPEC_OUTPUT
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).lsm)
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================
 

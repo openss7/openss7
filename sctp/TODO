@@ -1,0 +1,96 @@
+
+Things to do to convert to autoconf:
+
+- Check for IPPROTO_SCTP = 132 in /usr/include/netinet/in.h it should be there
+  on more recent releases.  It is there as a define as well as an enum.
+  Therefore it is enough to add #ifndef IPPROTO_SCTP to user files, but it is
+  not as a define in linux/in.h so we will have to run a check against kernel
+  headers.
+
+- we have our own linux/sctp.h  Our linux/sctp.h is not installed.  You will
+  find the lksctp linux/sctp.h in the headers for some more recent c headers.
+  It is lucky it is really in the wrong place: it should be in netinet/sctp.h
+  for user programs.  That is where we install the header file.
+
+- we need to override the struct sk_buff definition from linux/skbuff.h to
+  include the sctphdr in the h (transport header) union.  We are in real
+  trouble if the size of sctphdr exceeds the existing union.
+
+- we need to define SOL_SCTP that should be in linux/socket.h for the socket
+  layer.  Some lksctp kernels already have it defined.  It needs to be the
+  protoco number of 132 so there is no conflict there.
+
+- we need to add sysctl definitions for /proc/sys/net/ipv4 to linux/sysctl.h
+  Again, I added these to /proc/sys/net/ipv4 whereas lksctp adds to
+  /proc/sys/net/sctp.  So there is no conflict.  I don't know whether we
+  should jump the number high enough that it does not conflict with any latter
+  additions to /proc/sys/net/ipv4 or whether to determine the last index at
+  build time.  We should also override the /usr/include/linux/sysctl.h version
+  with a patched version.  It may be necessary to patch out conflicting SCTP
+  names.
+
+- we need definitions for inet_sctp_ops (struct proto_ops) and need external
+  definitions for inet_bind(), inet_multi_getname() and inet_ioctl() that are
+  all missing from net/inet_common.h
+
+- we have our own net/sctp.h  lksctp doesn't have one so we're ok there.
+
+- net/snmp.h needs definitions for SCTP mibs.  lksctp has stolen ours here but
+  have missed some definitions: SctpMaxAssoc and SctpDiscontinuityTime.
+  Fortunately we don't really use these two.  Unfortunately, lksctp versions
+  are not cacheline_aligned.  As it is only a structure definition, we don't
+  need to override it.
+
+- we need to override struct sock in net/sock.h to include sctp_opt for
+  af_sctp  On earlier kernels we can simply override the struct but must check
+  that the tp_pinfo union has sufficient size for our definitions.  On latter
+  kernels, lksctp includes there own definition here, but perhaps we can pull
+  some "define" tricks when CONFIG_IP_SCTP_MODULE was set to override them.
+
+- unexported netsyms: we will have to rip the following symbols if not
+  exported:
+
+	EXPORT_SYMBOL(sysctl_wmem_default)
+	EXPORT_SYMBOL(sysctl_rmem_default)
+	EXPORT_SYMBOL(inet_bind)
+	EXPORT_SYMBOL(inet_multi_getname)
+	EXPORT_SYMBOL(inet_ioctl)
+	EXPORT_SYMBOL(ip_cmsg_send);
+	EXPORT_SYMBOL(ip_getsockopt);
+	EXPORT_SYMBOL(ip_setsockopt);
+	EXPORT_SYMBOL(ip_options_echo);
+	EXPORT_SYMBOL(ip_rt_update_pmtu);
+	EXPORT_SYMBOL(ip_rt_mtu_expires);
+	EXPORT_SYMBOL(ip_rt_min_pmtu);
+	EXPORT_SYMBOL(ip_build_and_send_pkt);
+	EXPORT_SYMBOL(sysctl_ip_nonlocal_bind);
+	EXPORT_SYMBOL(icmp_err_convert);
+	EXPORT_SYMBOL(icmp_statistics);
+	#ifdef CONFIG_SYSCTL
+	extern int sysctl_ip_dynaddr;
+	EXPORT_SYMBOL(sysctl_ip_dynaddr);
+	#endif
+
+- we need to figure out what to do net/ipv4/af_inet.c to get sctp to autoload
+  correctly.  Also, we need to override any other loaded sctp.
+
+- lksctp doesn't adjust the ext_header_len in net/ipv4/ip_sockglue when IP
+  options are set on the socket.  We might have to find some way to intercept
+  socket option IP_OPTIONS.
+
+- reporting snmp statistics.  lksctp doesn't do this right (i.e. netstat
+  broken.)  Although we can generate our own sctp_get_info, we need to wrapper
+  snmp_get_info and afinet_get_info.  We can do this by ripping these symbols,
+  indexing into the proc directory structures and then stabbing them.  Or we
+  could destroy them and recreate them with the wrapper.  All we have to do is
+  print our SCTP info first and then call the wrappered function for both
+  snmp_get_info and afinet_get_info.
+
+- for sysctl we used to just add our entries to /proc/sys/net/ipv4 in the
+  kernel  We might be able to just jam the ipv4_table pointer in net_table
+  to point to a new table which includes the SCTP entries.
+
+... And that's it.  Just add compile our sctp.c file with our headers.  The
+    loading step might be the toughest.
+
+

@@ -1,0 +1,2 @@
+
+SUBDIRS = man manual specs
