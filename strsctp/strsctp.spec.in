@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/01/18 13:31:22 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/18 20:23:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 13:31:22 $ by $Author: brian $
+# Last Modified $Date: 2005/01/18 20:23:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -707,7 +707,7 @@ fi
 %defattr(-,root,root)
 %endif
 %if %{BUILD_devs}
-%files dev -f %{makedev}
+%files dev -f %{name}-%{version}-%{fullrelease}/%{makedev}
 %defattr(-,root,root)
 %endif
 
@@ -966,6 +966,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
+# Revision 0.9.2.24  2005/01/18 20:23:47  brian
+# - Also reference makedev file one down.
+#
 # Revision 0.9.2.23  2005/01/18 13:31:22  brian
 # - Support multiple builds on same NFS mount.
 #
