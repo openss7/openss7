@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/12 09:03:09 $ by $Author: brian $
+ Last Modified $Date: 2005/01/13 03:31:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -162,9 +162,9 @@ static char const ident[] =
 #include "linux/hooks.h"
 #include "netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.18 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.19 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -426,6 +426,8 @@ struct sctp_daddr {
 #define SCTP_DESTF_CONGESTD	0x0040	/* DEST congested */
 #define SCTP_DESTF_DROPPING	0x0080	/* DEST is dropping packets */
 #define SCTP_DESTF_FORWDTSN	0x0100	/* DEST has forward tsn outstanding */
+#define SCTP_DESTF_NEEDVRFY	0x0200	/* DEST needs to be verified SCTP IG 2.36 */
+#define SCTP_DESTF_ELIGIBLE	0x0400	/* DEST is eligible for FR */
 #define SCTP_DESTM_DONT_USE	(SCTP_DESTF_INACTIVE| \
 				 SCTP_DESTF_UNUSABLE| \
 				 SCTP_DESTF_ROUTFAIL| \
@@ -4901,11 +4903,11 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 	size_t dlen = ndups * sizeof(uint32_t);
 	size_t clen = sizeof(*m) + glen + dlen;
 	size_t plen = PADC(clen);
-	assert(sk);
 #ifdef SCTP_CONFIG_ECN
 	struct sctp_ecne *e;
 	size_t elen = ((sp->sackf & SCTP_SACKF_ECN) ? sizeof(*e) : 0);
 #endif				/* SCTP_CONFIG_ECN */
+	assert(sk);
 #ifdef SCTP_CONFIG_ECN
 	plen += PADC(elen);
 #endif				/* SCTP_CONFIG_ECN */
@@ -5315,7 +5317,7 @@ sctp_bundle_data_retrans(struct sock *sk,	/* association */
 			size_t plen = PADC(sizeof(struct sctp_data) + dlen);
 			if (plen > ckp->mrem && plen <= sd->dmps)
 				goto wait_for_next_packet;
-			if (dlen > ckp->swnd && cb->sacks != 4)
+			if (dlen > ckp->swnd && cb->sacks != SCTP_FR_COUNT)
 				goto congested;
 			cb->flags &= ~SCTPCB_FLAG_RETRANS;
 			ensure(sp->nrtxs > 0, sp->nrtxs = 1);
@@ -8182,6 +8184,10 @@ sctp_dest_calc(struct sock *sk)
 			sd->partial_ack = 0;
 			sd->flags &= ~SCTP_DESTF_DROPPING;
 		}
+		if (sd->flags & SCTP_DESTF_ELIGIBLE) {
+			rare();
+			sd->flags &= ~SCTP_DESTF_ELIGIBLE;
+		}
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 		sd->flags &= ~SCTP_DESTF_FORWDTSN;
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
@@ -8455,7 +8461,7 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 #ifdef SCTP_CONFIG_ECN
 	int is_ce = INET_ECN_is_ce(SCTP_IPH(skb)->tos);
 #endif				/* SCTP_CONFIG_ECN */
-	int newd, data;			/* number of new data chunks */
+	int newd, data, progress = 0;	/* number of new data chunks */
 	sctp_tcb_t *cb;
 	struct sctp_data *m;
 	printd(("Received DATA on socket %p\n", sk));
@@ -8619,6 +8625,7 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 				cb->next = (*gap)->tail->next;
 				(*gap)->tail->next = cb;
 				(*gap)->tail = cb;
+				progress = 1;
 			} else {
 				/* try next gap */
 				continue;
@@ -8629,6 +8636,7 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 				(*gap)->tail = cb->next->tail;
 				_usual(sp->ngaps);
 				sp->ngaps--;
+				progress = 1;
 			}
 			break;
 		}
@@ -8748,7 +8756,15 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 		}
 	}
 	/* RFC 2960 7.2.4 */
-	if (sp->ngaps) {
+	if (sp->ngaps && !progress) {
+		/* IMPLEMENTATION NOTE:- If we have gaps then we should send a SACK with gap
+		   reports immediately; however, it is better not to send so many SACKs and gap
+		   reports when the peer is making progress on filling the gaps.  Consider that a
+		   retransmission filling a gap is not so different than a retransmission that
+		   simply moves the cummulative ack point forward, and that in the latter case we
+		   do normal delayed acknowledgements.  So, when the peer is making progress on
+		   filling a gap, we do not issue a SACK immediately, but perform normal delayed
+		   acknowledgement. */
 		sp->sackf |= SCTP_SACKF_GAP;
 	}
 	/* RFC 2960 6.2 */
@@ -8885,7 +8901,7 @@ sctp_recv_sack(struct sock *sk, struct sk_buff *skb)
 			}
 		}
 	} else {
-		int growth = 0;
+		int eligible = 0;
 		{
 			struct sctp_daddr *sd;
 			/* We skip gap analysis if we are running ultra-fast destinations with data 
@@ -8908,19 +8924,40 @@ sctp_recv_sack(struct sock *sk, struct sk_buff *skb)
 			}
 			/* move to the acks */
 			skd = skb_peek(&sp->rtxq);
-			for (; skd && before(SCTP_SKB_CB(skd)->tsn, beg); skd = skb_next(skd))
-				SCTP_SKB_CB(skd)->flags |= SCTPCB_FLAG_NACK;
+			for (; skd && before(SCTP_SKB_CB(skd)->tsn, beg); skd = skb_next(skd)) {
+				sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+				struct sctp_daddr *sd = cb->daddr;
+				cb->flags |= SCTPCB_FLAG_NACK;
+				if (sd && !(sd->flags & SCTP_DESTF_ELIGIBLE)
+				    && (cb->flags & SCTPCB_FLAG_ACK)
+				    && !(cb->flags & SCTPCB_FLAG_SACKED)
+				    && (cb->sacks < SCTP_FR_COUNT)) {
+					sd->flags |= SCTP_DESTF_ELIGIBLE;
+					eligible++;
+				}
+			}
 			/* sack the acks */
-			for (; skd && !after(SCTP_SKB_CB(skd)->tsn, end); skd = skb_next(skd))
-				SCTP_SKB_CB(skd)->flags |= SCTPCB_FLAG_ACK;
+			for (; skd && !after(SCTP_SKB_CB(skd)->tsn, end); skd = skb_next(skd)) {
+				sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+				struct sctp_daddr *sd = cb->daddr;
+				cb->flags |= SCTPCB_FLAG_ACK;
+				if (sd && !(sd->flags & SCTP_DESTF_ELIGIBLE)
+				    && (cb->flags & SCTPCB_FLAG_NACK)
+				    && !(cb->flags & SCTPCB_FLAG_SACKED)
+				    && (cb->sacks < SCTP_FR_COUNT)) {
+					sd->flags |= SCTP_DESTF_ELIGIBLE;
+					eligible++;
+				}
+			}
 		}
 		/* walk the whole retrans buffer looking for holes and renegs */
 		for (skd = skb_peek(&sp->rtxq); skd; skd = skb_next(skd)) {
 			sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+			struct sctp_daddr *sd = cb->daddr;
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+			/* msg was dropped */
 			if ((cb->flags & SCTPCB_FLAG_DROPPED)) {
-				cb->flags &= ~SCTPCB_FLAG_ACK;
-				cb->flags &= ~SCTPCB_FLAG_NACK;
+				cb->flags &= ~(SCTPCB_FLAG_ACK | SCTPCB_FLAG_NACK);
 				continue;
 			}
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
@@ -8929,11 +8966,15 @@ sctp_recv_sack(struct sock *sk, struct sk_buff *skb)
 				cb->flags &= ~SCTPCB_FLAG_ACK;
 				if (cb->flags & SCTPCB_FLAG_NACK) {
 					cb->flags &= ~SCTPCB_FLAG_NACK;
-					if (cb->sacks < SCTP_FR_COUNT)
-						growth = 1;
+					if (sd && (sd->flags & SCTP_DESTF_ELIGIBLE)
+					    && !(cb->flags & SCTPCB_FLAG_SACKED)
+					    && (cb->sacks < SCTP_FR_COUNT)) {
+						sd->flags &= ~SCTP_DESTF_ELIGIBLE;
+						eligible--;
+					}
+
 				}
 				if (!(cb->flags & SCTPCB_FLAG_SACKED)) {
-					struct sctp_daddr *sd = cb->daddr;
 					cb->flags |= SCTPCB_FLAG_SACKED;
 					sp->nsack++;
 					/* RFC 2960 6.3.1 (C5) */
@@ -8970,10 +9011,17 @@ sctp_recv_sack(struct sock *sk, struct sk_buff *skb)
 			if (cb->flags & SCTPCB_FLAG_NACK) {
 				cb->flags &= ~SCTPCB_FLAG_NACK;
 				/* RFC 2960 7.2.4 */
-				if (!growth && !(cb->flags & SCTPCB_FLAG_RETRANS)
+				if (eligible > 0 && (!sd || (sd->flags & SCTP_DESTF_ELIGIBLE))
+				    && !(cb->flags & SCTPCB_FLAG_RETRANS)
 				    && ++(cb->sacks) == SCTP_FR_COUNT) {
+					/* IMPLEMENTATION NOTE:- Performing fast retransmission can
+					   be bad when large or many chunks have gotten reordered or
+					   delayed (and gap reported) yet progress on those gaps are
+					   (now) being reported, it indicates that reordered or
+					   delayed packets are now arriving and fast retransmission
+					   should not be considered, because the packets are not
+					   likely missing. */
 					size_t dlen = cb->dlen;
-					struct sctp_daddr *sd = cb->daddr;
 					/* RFC 2960 7.2.4 (1) */
 					cb->flags |= SCTPCB_FLAG_RETRANS;
 					sp->nrtxs++;
@@ -8993,7 +9041,6 @@ sctp_recv_sack(struct sock *sk, struct sk_buff *skb)
 				}
 				/* RFC 2960 6.3.2 (R4) (reneg) */
 				if (cb->flags & SCTPCB_FLAG_SACKED) {
-					struct sctp_daddr *sd = cb->daddr;
 					cb->flags &= ~SCTPCB_FLAG_SACKED;
 					ensure(sp->nsack, sp->nsack = 1);
 					sp->nsack--;
@@ -16805,13 +16852,13 @@ STATIC void
 sctp_term_protosw(void)
 {
 	struct sock *sk;
+	struct inet_protosw *s;
 	spin_lock_bh(&sctp_protolock);
 	for (sk = sctp_protolist; sk; sk = sk->next) {
 		sctp_discon_ind(sk, SCTP_ORIG_PROVIDER, -ECONNABORTED, NULL);
 		sctp_abort(sk, SCTP_ORIG_PROVIDER, -ECONNABORTED);
 	}
 	spin_unlock_bh(&sctp_protolock);
-	struct inet_protosw *s;
 	for (s = sctpsw_array; s < &sctpsw_array[SCTPSW_ARRAY_LEN]; ++s)
 		inet_unregister_protosw(s);
 	return;
