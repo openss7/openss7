@@ -97,11 +97,15 @@ AC_DEFUN([_RPM_SPEC_SETUP], [dnl
 # _RPM_SPEC_SETUP_DIST
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
-    AC_ARG_WITH([rpm-dist],
-        AS_HELP_STRING([--with-rpm-dist=DISTRO],
-            [specify the DISTRO for the RPM spec file. @<:@default=none@:>@]),
-        [with_rpm_distro="$withval"],
-        [with_rpm_distro=""])
+    AC_ARG_WITH([rpm-extra],
+        AS_HELP_STRING([--with-rpm-extra=EXTRA],
+            [override or disable the EXTRA release string for built RPMS. @<:@default=auto@:>@]),
+        [with_rpm_extra="$withval"],
+        [if test -r .rpmextra ; then d= ; else d="$srcdir/" ; fi
+         if test -r ${d}.rpmextra
+         then with_rpm_extra="`cat ${d}.rpmextra`"
+         else with_rpm_extra=""
+         fi])
     AC_CACHE_CHECK([for rpm distribution], [rpm_cv_dist_flavor], [dnl
         rpm_cv_dist_vendor=
         rpm_cv_dist_flavor=
@@ -287,64 +291,80 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
             rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
         fi
     ])
+    AC_CACHE_CHECK([for rpm extra release string], [rpm_cv_dist_extra], [dnl
+        case :${with_rpm_extra:-auto} in
+            :no)
+                rpm_cv_dist_extra=
+                ;;
+            :auto)
+                case "$rpm_cv_dist_flavor" in
+                    White?Box*)
+                        case $rpm_cv_dist_release in
+                            3.0)
+                                rpm_cv_dist_extra=".E3"
+                                ;;
+                            4.0)
+                                rpm_cv_dist_extra=".E4"
+                                ;;
+                        esac
+                        ;;
+                    Fedora?Core*)
+                        case $rpm_cv_dist_release in
+                            1)
+                                rpm_cv_dist_extra=".FC1"
+                                ;;
+                            2)
+                                rpm_cv_dist_extra=".FC2"
+                                ;;
+                            3)
+                                rpm_cv_dist_extra=".FC3"
+                                ;;
+                        esac
+                        ;;
+                    Red?Hat*)
+                        case $rpm_cv_dist_release in
+                            7.0|7.1|7.2|7.3)
+                                rpm_cv_dist_extra=".7.x"
+                                ;;
+                            8.0)
+                                rpm_cv_dist_extra=".8"
+                                ;;
+                            9)
+                                rpm_cv_dist_extra=".9"
+                                ;;
+                            2|2.?)
+                                rpm_cv_dist_extra=".EL"
+                                ;;
+                            3|3.0)
+                                rpm_cv_dist_extra=".E3"
+                                ;;
+                            4|4.0)
+                                rpm_cv_dist_extra=".E4"
+                                ;;
+                        esac
+                        ;;
+                    Mandrake*)
+                        rpm_tmp=`echo "$rpm_cv_dist_release" | sed -e 's|\.||g'`;
+                        rpm_cv_dist_extra=".${rpm_tmp}mdk"
+                        ;;
+                    SuSE*)
+                        rpm_cv_dist_extra=".${rpm_cv_dist_release:-SuSE}"
+                        ;;
+                esac
+                ;;
+            *)
+                rpm_cv_dist_extra="$with_rpm_extra"
+                ;;
+        esac
+    ])
     PACKAGE_RPMDIST="${rpm_cv_dist_flavor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
-    case $rpm_cv_dist_flavor in
-        White?Box*)
-            case $rpm_cv_dist_release in
-                3.0)
-                    PACKAGE_RPMEXTRA=".E3"
-                    ;;
-                4.0)
-                    PACKAGE_RPMEXTRA=".E4"
-                    ;;
-            esac
-            ;;
-        Fedora?Core*)
-            case $rpm_cv_dist_release in
-                1)
-                    PACKAGE_RPMEXTRA=".FC1"
-                    ;;
-                2)
-                    PACKAGE_RPMEXTRA=".FC2"
-                    ;;
-                3)
-                    PACKAGE_RPMEXTRA=".FC3"
-                    ;;
-            esac
-            ;;
-        Red?Hat*)
-            case $rpm_cv_dist_release in
-                7.0|7.1|7.2|7.3)
-                    PACKAGE_RPMEXTRA=".7.x"
-                    ;;
-                8.0)
-                    PACKAGE_RPMEXTRA=".8"
-                    ;;
-                9)
-                    PACKAGE_RPMEXTRA=".9"
-                    ;;
-                2|2.?)
-                    PACKAGE_RPMEXTRA=".EL"
-                    ;;
-                3|3.0)
-                    PACKAGE_RPMEXTRA=".E3"
-                    ;;
-                4|4.0)
-                    PACKAGE_RPMEXTRA=".E4"
-                    ;;
-            esac
-            ;;
-        Mandrake*)
-            PACKAGE_RPMEXTRA="mdk"
-            ;;
-        SuSE*)
-            PACKAGE_RPMEXTRA=""
-            ;;
-    esac
     AC_SUBST([PACKAGE_RPMDIST])dnl
-    AC_SUBST([PACKAGE_RPMEXTRA])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
-        defaults to none.])
+        defaults to automatic detection.])
+    PACKAGE_RPMEXTRA="${rpm_cv_dist_extra}"
+    AC_SUBST([PACKAGE_RPMEXTRA])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMEXTRA], ["$PACKAGE_RPMEXTRA"], [The RPM Extra Release string.
+        This defaults to automatic detection.])
 ])# _RPM_SPEC_SETUP_DIST
 # =========================================================================
 
@@ -354,7 +374,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
     AC_ARG_WITH([rpm-epoch],
         AS_HELP_STRING([--with-rpm-epoch=EPOCH],
-            [specify the EPOCH for the RPM spec file.  @<:@default=1@:>@]),
+            [specify the EPOCH for the RPM spec file.  @<:@default=auto@:>@]),
         [with_rpm_epoch="$withval"],
         [if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
          if test -r ${d}.rpmepoch
@@ -376,17 +396,16 @@ AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
     AC_ARG_WITH([rpm-release],
         AS_HELP_STRING([--with-rpm-release=RELEASE],
-            [specify the RELEASE for the RPM spec file.
-            @<:@default=Custom@:>@]),
+            [specify the RELEASE for the RPM spec file.  @<:@default=auto@:>@]),
         [with_rpm_release="$withval"],
         [if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
          if test -r ${d}.rpmrelease
          then with_rpm_release="`cat ${d}.rpmrelease`"
-         else with rpm_release='Custom'
+         else with rpm_release=1
          fi])
     AC_MSG_CHECKING([for rpm release])
-    AC_MSG_RESULT([${with_rpm_release:-Custom}])
-    PACKAGE_RELEASE="${with_rpm_release:-Custom}"
+    AC_MSG_RESULT([${with_rpm_release:-1}])
+    PACKAGE_RELEASE="${with_rpm_release:-1}"
     AC_SUBST([PACKAGE_RELEASE])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
         Release. This defaults to Custom.])
@@ -564,8 +583,6 @@ dnl          fi
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).lsm)
-    AC_CONFIG_FILES([.rpmextra])
-    AC_CONFIG_FILES([.rpmdist])
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================
 

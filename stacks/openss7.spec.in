@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2004/12/13 10:52:09 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2004/12/15 15:25:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/13 10:52:09 $ by $Author: brian $
+# Last Modified $Date: 2004/12/15 15:25:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -129,6 +129,8 @@
 %define _modules    x400 x100
 
 # we have some more options that control configure for the build
+%{?disturl:%{!?url:%{expand: %%define url %{disturl}}}}
+%define fullrelease @PACKAGE_RELEASE@%{extrarelease}
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux
 %if %{?_without_public: 0}%{!?_without_public: 1}
@@ -138,11 +140,11 @@ Name:           @PACKAGE_NAME@-bin
 %endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
-Release:        @PACKAGE_RELEASE@@PACKAGE_RPMEXTRA@
+Release:        @PACKAGE_RELEASE@
 License:        GPL
 Group:          System Environment/Kernel
-%if %{?disturl: 1}%{!?disturl: 0}
-URL:            %disturl
+%if %{?url: 1}%{!?url: 0}
+URL:            %{url}
 %endif
 %if %{?_xpm: 1}%{!?_xpm: 0}
 Icon:           %{_xpm}
@@ -152,11 +154,13 @@ Icon:           %{_gif}
 %endif
 ExclusiveArch:  i386 i686 i586 athlon x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
-Source:         %{name}-%{version}-@PACKAGE_RELEASE@.tar.bz2
+Source:         %{name}-%{version}-%{release}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      %{stitle} SIGTRAN H323 ISDN
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+%if %{?buildroot: 0}%{!?buildroot: 1}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
+%endif
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
 Requires:       modutils >= 2.4
@@ -218,7 +222,7 @@ install for other architectures as well.
 # ---------------------------------------------------------------------------
 # let rpm do its job (but tell it where to find things)
 
-%setup -q -n %{name}-%{version}-@PACKAGE_RELEASE@
+%setup -q -n %{name}-%{version}-%{release}
 
 %build
 # ---------------------------------------------------------------------------
@@ -279,7 +283,7 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
     --with-rpm-epoch=%{epoch} \
-    --with-rpm-release=@PACKAGE_RELEASE@ \
+    --with-rpm-release=%{release} \
     --with-base-major=%{majbase} \
     %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
     %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
@@ -328,18 +332,14 @@ make
 
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 
-# take our configured source and move it for the source package
 mkdir -p $RPM_BUILD_ROOT
-%if %{?_without_public: 0}%{!?_without_public: 1}
-mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
-%endif
 
 # add a directory for our devices
 #mkdir -p $RPM_BUILD_ROOT/dev/%{base}
 
-# Note: RH9 assembles debug information while stripping, so we install
-# unstripped if the __debug_package macro is defined
-%if %__debug_package
+# Note: RH9/EL3 assembles debug information while stripping, so we install
+# unstripped if the _enable_debug_packages macro is defined
+%if %{?_enable_debug_pckages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
 (cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install)
 %else
 (cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install-strip)
@@ -360,18 +360,19 @@ rm -rf build-%{_target_cpu}
 
 %if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
 # punch rpm release to Custom
-echo 'Custom' > .rpmrelease
+echo '.Custom.1'  > .rpmextra
 
+# take our configured source and move it for the source package
+mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{fullrelease}
 # tar and move the sources for source release
-tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
-ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
+tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+ln -sf %{name}-%{version}-%{fullrelease} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 %endif
 
 %clean
 # ---------------------------------------------------------------------------
 
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
-
 
 # ===========================================================================
 %package %{_streams}-%{core_name}
@@ -400,8 +401,9 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
-Provides:       %{name}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
-Provides:       %{name}-%{_streams}-core = %{epoch}:@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{core_name}
@@ -636,6 +638,7 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description dev
@@ -644,8 +647,8 @@ applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
 %{stitle}.
 
 %if %{BUILD_devs}
-# ---------------------------------------------------------------------------
 %files dev -f %{makedev}
+# ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %endif
 
@@ -670,6 +673,7 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-lib
@@ -748,6 +752,7 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
@@ -796,7 +801,7 @@ fi
 %doc ABOUT-NLS
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
-%doc doc/manual/*.pdf doc/manual/*.html # doc/manual/*.png
+%doc doc/manual/*.pdf doc/manual/*.html
 %doc doc/specs/*/*.pdf doc/specs/*/*.html doc/specs/*/*.png
 %doc doc/projects/*.pdf doc/projects/*.html doc/projects/*.png
 %doc doc/drafts/*/draft*.pdf doc/drafts/*/draft*.txt
@@ -811,8 +816,8 @@ Group:          Development/System
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
-#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
-#Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
+#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
+#Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 #Requires:       strxns-%{_streams}-lib >= %{epoch}:0.9.2
 #Requires:       strxns-doc >= %{epoch}:0.9.2
 #Requires:       strxnet-%{_streams}-lib >= %{epoch}:0.9.2
@@ -834,6 +839,7 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
@@ -893,6 +899,7 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description source
@@ -920,10 +927,10 @@ to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_usrsrc}/%{name}-%{version}-%{release}
+%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
 %{_usrsrc}/%{name}
-%{_usrsrc}/%{name}-%{version}-%{release}/*
-%{_usrsrc}/%{name}-%{version}-%{release}/.rpm*
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.rpm*
 %endif
 
 # ===========================================================================
@@ -935,7 +942,7 @@ Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
 Prefix:         %{_libexecdir}
-#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 %if %{BUILD_lfs}
 Requires:       %{_streams}-lib >= 0.7a
 %endif
@@ -951,6 +958,7 @@ Icon:           %{_xpm}
 %if %{?_gif: 1}%{!?_gif: 0}
 Icon:           %{_gif}
 %endif
+Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-util
@@ -991,11 +999,21 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.39  2004/12/13 10:52:09  brian
-# - Removed vendor specific headers. (Define these in your .rpmmacros file.)
-# - Added both .xpm and .gif icons into binary packages.
-# - Fixed extrainfo empty macro body warning once and for all.
+# Revision 0.9.2.42  2004/12/15 15:25:33  brian
+# - avoid undefined debug macro
 #
+# Revision 0.9.2.41  2004/12/15 14:59:07  brian
+# - Update RPM build to build multiple distribution binary RPMs from a single SRPM.
+#
+# Revision 0.9.2.40  2004/12/15 14:35:51  brian
+# - Update RPM build to build multiple distribution binary RPMs from single SRPM.
+#
+
+* Mon Dec 13 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.39  2004/12/13 10:52:09  brian
+- Removed vendor specific headers. (Define these in your .rpmmacros file.)
+- Added both .xpm and .gif icons into binary packages.
+- Fixed extrainfo empty macro body warning once and for all.
 
 * Wed Nov 24 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.38  2004/11/24 14:30:45  brian
