@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/20 09:54:40 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/02/25 12:11:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:54:40 $ by $Author: brian $
+# Last Modified $Date: 2005/02/25 12:11:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -374,9 +374,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			   __xfrm_sk_clone_policy])
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel struct sk_buff.cb size], [linux_cv_sk_buff_cb_size], [dnl
-	    CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
-	    CPPFLAGS=`echo "$CPPFLAGS" | sed -e 's| -Werror | |'`
-	    CFLAGS=`echo "$CFLAGS" | sed -e 's| -Werror | |'`
+	    CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $CPPFLAGS"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -435,9 +433,7 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
     esac
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel struct sock union size], [linux_cv_sock_size], [dnl
-	    CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
-	    CPPFLAGS=`echo "$CPPFLAGS" | sed -e 's| -Werror | |'`
-	    CFLAGS=`echo "$CFLAGS" | sed -e 's| -Werror | |'`
+	    CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $CPPFLAGS"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/config.h>
