@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $
+ @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/20 05:00:03 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2002/05/22 14:34:53 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $"
+#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $"
 
-static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $";
+static char const ident[] =
+    "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -77,17 +78,25 @@ static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.
 #include <stdlib.h>
 #include <string.h>
 
+#define MSG_LEN 64
+
 void usage(void)
 {
 	fprintf(stderr, "Usage:  test-tcps [options]\n");
 	fprintf(stderr, "Options:\n");
 	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
-	fprintf(stderr, "      port specifies both the local and remote port number\n");
+	fprintf(stderr,
+		"      port specifies both the local and remote port number\n");
 	fprintf(stderr, "  -l, --loc_host loc_host   (default: 0.0.0.0)\n");
-	fprintf(stderr, "      loc_host specifies the local (bind) host for the TCP\n");
+	fprintf(stderr,
+		"      loc_host specifies the local (bind) host for the TCP\n");
 	fprintf(stderr, "      socket with optional local port number\n");
 	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
 	fprintf(stderr, "      time give the time in seconds between reports\n");
+	fprintf(stderr, "  -w, --length              (default: %d)\n", MSG_LEN);
+	fprintf(stderr, "      packet length\n");
+	fprintf(stderr, "  -n, --nagle               (default: nonagle)\n");
+	fprintf(stderr, "      enable nagle algorithm\n");
 }
 
 #define HOST_BUF_LEN 256
@@ -131,17 +140,19 @@ static int start_timer(void)
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
-#define MSG_LEN 32
+int len = MSG_LEN;
+
+int nodelay = 1;
 
 int test_tcps(void)
 {
 	int lfd, fd;
-	int len = 0, offset = 0, mode = 0;
+	int offset = 0, mode = 0;
 	long inp_count = 0, out_count = 0;
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
 //      unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[MSG_LEN];
+	unsigned char ur_msg[len];
 	unsigned char *my_msg = ur_msg;
 
 	fprintf(stderr, "Opening socket\n");
@@ -151,7 +162,8 @@ int test_tcps(void)
 		goto dead1;
 	}
 
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
+		ntohs(loc_addr.sin_port));
 
 	if (bind(lfd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
@@ -169,13 +181,9 @@ int test_tcps(void)
 		perror("fcntl");
 		goto dead;
 	}
-	{
-		int val = 0;
-		int vlen = sizeof(val);
-		if (setsockopt(fd, SOL_TCP, TCP_NODELAY, &val, vlen) < 0) {
-			perror("setsockopt");
-			goto dead;
-		}
+	if (setsockopt(fd, SOL_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) < 0) {
+		perror("setsockopt");
+		goto dead;
 	}
 	if (start_timer()) {
 		perror("timer");
@@ -189,7 +197,8 @@ int test_tcps(void)
 		if (timer_timeout) {
 			printf
 			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
+			     out_bytes, inp_bytes, out_bytes + inp_bytes,
+			     inp_bytes - out_bytes);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -201,7 +210,7 @@ int test_tcps(void)
 			continue;
 		}
 		if (poll(&pfd[0], 1, -1) < 0) {
-			if (errno == EINTR)
+			if (errno == EINTR || errno == EAGAIN)
 				continue;
 			perror("poll");
 			goto dead;
@@ -209,8 +218,9 @@ int test_tcps(void)
 		if (mode) {
 			if (pfd[0].revents & POLLOUT) {
 				int rtn;
-				if ((rtn = send(fd, my_msg, offset, MSG_DONTWAIT)) < 0) {
-					if (errno == EINTR)
+				if ((rtn =
+				     send(fd, my_msg, offset, MSG_DONTWAIT)) < 0) {
+					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("send");
 					goto dead;
@@ -224,11 +234,15 @@ int test_tcps(void)
 						mode = 0;
 					}
 				}
+				continue;
 			}
 		} else {
 			if (pfd[0].revents & POLLIN) {
 				int rtn;
-				if ((rtn = recv(fd, ur_msg + offset, sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
+				if ((rtn =
+				     recv(fd, ur_msg + offset,
+					  sizeof(ur_msg) - offset,
+					  MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("recv");
@@ -237,12 +251,13 @@ int test_tcps(void)
 				if (rtn) {
 					inp_bytes += rtn;
 					offset += rtn;
-					if (offset == MSG_LEN) {
+					if (offset == len) {
 						my_msg = ur_msg;
 						inp_count++;
 						mode = 1;
 					}
 				}
+				continue;
 			}
 		}
 		if (pfd[0].revents & POLLERR) {
@@ -278,9 +293,12 @@ int main(int argc, char **argv)
 			{"loc_host", 1, 0, 'l'},
 			{"rep_time", 1, 0, 't'},
 			{"help", 0, 0, 'h'},
-			{"port", 1, 0, 'p'}
+			{"port", 1, 0, 'p'},
+			{"length", 1, 0, 'w'},
+			{"nagle", 0, 0, 'n'}
 		};
-		c = getopt_long(argc, argv, "l:r:t:hp:", long_options, &option_index);
+		c = getopt_long(argc, argv, "l:r:t:hp:w:n", long_options,
+				&option_index);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -300,6 +318,15 @@ int main(int argc, char **argv)
 			case 4:	/* port */
 				port = atoi(optarg);
 				break;
+			case 5:	/* length */
+				len = atoi(optarg);
+				if (len > 2048) {
+					len = 2048;
+				}
+				break;
+			case 6:	/* nagle */
+				nodelay = 0;
+				break;
 			default:
 				usage();
 				exit(1);
@@ -318,6 +345,14 @@ int main(int argc, char **argv)
 			exit(0);
 		case 'p':
 			port = atoi(optarg);
+			break;
+		case 'w':
+			len = atoi(optarg);
+			if (len > 2048)
+				len = 2048;
+			break;
+		case 'n':
+			nodelay = 0;
 			break;
 		default:
 			fprintf(stderr, "ERROR: Unrecognized option `%c'.\n", c);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $
+ @(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -52,18 +52,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/20 05:00:03 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2002/05/22 14:34:53 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $"
+#ident "@(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $"
 
-static char const ident[] = "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $";
+static char const ident[] = "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <asm/ioctls.h>
+#include <linux/sockios.h>
 #include <netinet/in.h>
 #include <netinet/sctp.h>
 #include <arpa/inet.h>
@@ -77,9 +79,11 @@ static char const ident[] = "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9
 #include <stdlib.h>
 #include <string.h>
 
+#define MSG_LEN 64
+
 void usage(void)
 {
-	fprintf(stderr, "Usage:  test-udpc [options]\n");
+	fprintf(stderr, "Usage:  test-sctpc [options]\n");
 	fprintf(stderr, "Options:\n");
 	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
 	fprintf(stderr, "      port specifies both the local and remote port number\n");
@@ -91,6 +95,10 @@ void usage(void)
 	fprintf(stderr, "      socket with optional remote port number\n");
 	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
 	fprintf(stderr, "      time give the time in seconds between reports\n");
+	fprintf(stderr, "  -w, --length              (default: %d)\n", MSG_LEN);
+	fprintf(stderr, "      packet length\n");
+	fprintf(stderr, "  -n, --nagle               (default: nonagle)\n");
+	fprintf(stderr, "      enable nagle algorithm\n");
 }
 
 #define HOST_BUF_LEN 256
@@ -136,19 +144,20 @@ static int start_timer(void)
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
-#define MSG_LEN 32
-
 int len = MSG_LEN;
 
-int test_udpc(void)
+int nodelay = 1;
+
+int test_sctpc(void)
 {
 	int fd;
-	int i, offset = 0, mode = 0;
+	int i, out_offset = 0, inp_offset = 0, mode = 0;
 	long rtt_delay = 0;
 	long inp_count = 0, out_count = 0;
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
-	unsigned char da_msg[] = "This is a good short test message that has some 64 bytes in it.\0"
+	unsigned char my_msg[] =
+	    "This is a good short test message that has some 64 bytes in it.\0"
 	    "This is a good short test message that has some 64 bytes in it.\0"
 	    "This is a good short test message that has some 64 bytes in it.\0"
 	    "This is a good short test message that has some 64 bytes in it.\0"
@@ -179,18 +188,13 @@ int test_udpc(void)
 	    "This is a good short test message that has some 64 bytes in it.\0"
 	    "This is a good short test message that has some 64 bytes in it.\0"
 	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[MSG_LEN];
-	unsigned char *my_msg = ur_msg;
-
+	unsigned char ur_msg[2048];
 	fprintf(stderr, "Opening socket\n");
-
 	if ((fd = socket(PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP)) < 0) {
 		perror("socket");
 		goto dead;
 	}
-
 	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
-
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
 		goto dead;
@@ -203,28 +207,41 @@ int test_udpc(void)
 		perror("fcntl");
 		goto dead;
 	}
-	{
-		int val = 0;
-		if (setsockopt(fd, SOL_SCTP, SCTP_NODELAY, &val, sizeof(val)) < 0) {
-			perror("setsockopt");
-			goto dead;
-		}
+	if (setsockopt(fd, SOL_SCTP, SCTP_NODELAY, &nodelay, sizeof(nodelay)) < 0) {
+		perror("setsockopt");
+		goto dead;
 	}
 	if (start_timer()) {
 		perror("timer");
 		goto dead;
 	}
-#if 0
 	for (;;) {
 		pfd[0].fd = fd;
-		pfd[0].events = POLLIN | POLLOUT | POLLERR | POLLHUP;
+		pfd[0].events = POLLOUT | POLLIN | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Bytes sent: %7ld, recv: %7ld, tot: %8ld, dif: %7ld\n", out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
+#if 0
+			int inq = 0, outq = 0;
+			if ((ioctl(fd, SIOCINQ, &inq)) < 0) {
+				perror("ioctl");
+				goto dead;
+			}
+			if ((ioctl(fd, SIOCOUTQ, &outq)) < 0) {
+				perror("ioctl");
+				goto dead;
+			}
+#endif
+			printf
+			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n",
+			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes, inp_count ? rtt_delay / inp_count : 0);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
 			out_bytes = 0;
+			rtt_delay = 0;
+#if 0
+			printf("In q: %d, Out q: %d\n", inq, outq);
+#endif
 			if (start_timer()) {
 				perror("timer");
 				goto dead;
@@ -232,146 +249,71 @@ int test_udpc(void)
 			continue;
 		}
 		if (poll(&pfd[0], 1, -1) < 0) {
-			if (errno == EINTR)
+			if (errno == EINTR || errno == EAGAIN)
 				continue;
 			perror("poll");
 			goto dead;
 		}
 		if (pfd[0].revents & POLLIN) {
 			int rtn;
-			if ((rtn = recv(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT)) < 0) {
-				if (errno == EINTR)
-					continue;
+			if ((rtn = recv(fd, ur_msg + inp_offset, len - inp_offset, MSG_DONTWAIT)) < 0) {
+				if (errno == EINTR || errno == EAGAIN)
+					goto skip_pollin;
 				perror("recv");
 				goto dead;
 			}
 			if (rtn) {
-				inp_count++;
 				inp_bytes += rtn;
-			}
-		}
-		if (pfd[0].revents & POLLOUT) {
-			int rtn;
-			if ((rtn = send(fd, my_msg, len, MSG_DONTWAIT)) < 0) {
-				if (errno == EINTR)
-					continue;
-				perror("send");
-				goto dead;
-			}
-			if (rtn) {
-				out_count++;
-				out_bytes += rtn;
-			}
-		}
-		if (pfd[0].revents & POLLERR) {
-			perror("POLLERR");
-			goto dead;
-		}
-		if (pfd[0].revents & POLLHUP) {
-			perror("POLLHUP");
-			goto dead;
-		}
-	}
-#endif
-
-	for (i = 0; i < 10; i++) {
-		int rtn;
-		struct timeval *tv = (struct timeval *) da_msg;
-		if (gettimeofday(tv, NULL) < 0) {
-			perror("gettimeofday");
-			goto dead;
-		}
-		if ((rtn = send(fd, da_msg, len, 0)) < 0) {
-			if (errno == EINTR || errno == EAGAIN)
-				continue;
-			perror("send1");
-			goto dead;
-		}
-	}
-	my_msg = ur_msg;
-	mode = 0;
-	offset = 0;
-	for (;;) {
-		pfd[0].fd = fd;
-		pfd[0].events = (mode ? POLLOUT : POLLIN) | POLLERR | POLLHUP;
-		pfd[0].revents = 0;
-		if (timer_timeout) {
-			printf("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n", out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes,
-			       inp_count ? rtt_delay / inp_count : 0);
-			inp_count = 0;
-			out_count = 0;
-			inp_bytes = 0;
-			out_bytes = 0;
-			rtt_delay = 0;
-			if (start_timer()) {
-				perror("timer");
-				goto dead;
+				inp_offset += rtn;
+				if (inp_offset >= len) {
+					struct timeval tnow;
+					struct timeval *tv = (struct timeval *) ur_msg;
+					if (gettimeofday(&tnow, NULL) < 0) {
+						perror("gettimeofday");
+						goto dead;
+					}
+					if (tnow.tv_sec < tv->tv_sec || (tnow.tv_sec == tv->tv_sec && tnow.tv_usec < tv->tv_usec))
+						fprintf(stderr, "time: %ld.%06ld before %ld.%06ld\n", tnow.tv_sec, tnow.tv_usec, tv->tv_sec, tv->tv_usec);
+					rtt_delay += (tnow.tv_sec - tv->tv_sec) * 1000000 + tnow.tv_usec - tv->tv_usec;
+					inp_count++;
+					inp_offset = 0;
+				}
 			}
 			continue;
 		}
-		if (poll(&pfd[0], 1, -1) < 0) {
-			if (errno == EINTR)
-				continue;
-			perror("poll");
-			goto dead;
-		}
-		if (mode) {
-			if (pfd[0].revents & POLLOUT) {
-				int rtn;
+	      skip_pollin:
+		if (pfd[0].revents & POLLOUT) {
+			int rtn;
+			if (!out_offset) {
 				struct timeval *tv = (struct timeval *) my_msg;
 				if (gettimeofday(tv, NULL) < 0) {
 					perror("gettimeofday");
 					goto dead;
 				}
-				if ((rtn = send(fd, my_msg, offset, MSG_DONTWAIT)) < 0) {
-					if (errno == EINTR || errno == EAGAIN)
-						continue;
-					perror("send");
-					goto dead;
-				}
-				if (rtn) {
-					out_bytes += rtn;
-					offset = offset > rtn ? offset - rtn : 0;
-					my_msg += rtn;
-					if (!offset) {
-						out_count++;
-						my_msg = ur_msg;
-						mode = 0;
-					}
-				}
-				continue;
 			}
-		} else {
-			if (pfd[0].revents & POLLIN) {
-				int rtn;
-				if ((rtn = recv(fd, my_msg, sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
-					if (errno == EINTR || errno == EAGAIN)
-						continue;
-					perror("recv");
-					goto dead;
-				}
-				if (rtn) {
-					inp_bytes += rtn;
-					offset += rtn;
-					my_msg += rtn;
-					if (offset == MSG_LEN) {
-						struct timeval tnow;
-						struct timeval *tv = (struct timeval *) ur_msg;
-						if (gettimeofday(&tnow, NULL) < 0) {
-							perror("gettimeofday");
-							goto dead;
-						}
-						my_msg = ur_msg;
-						inp_count++;
-						if (tnow.tv_sec < tv->tv_sec || (tnow.tv_sec == tv->tv_sec && tnow.tv_usec < tv->tv_usec))
-							fprintf(stderr, "time: %ld.%06ld before %ld.%06ld\n", tnow.tv_sec, tnow.tv_usec, tv->tv_sec, tv->tv_usec);
-						rtt_delay += (tnow.tv_sec - tv->tv_sec) * 1000000 + tnow.tv_usec - tv->tv_usec;
-						mode = 1;
-					}
-				}
-				continue;
+			if ((rtn = send(fd, my_msg + out_offset, len - out_offset, MSG_DONTWAIT)) < 0) {
+				if (errno == EINTR || errno == EAGAIN)
+					goto skip_pollout;
+				perror("send");
+				fprintf(stderr, "rtn = %d, ", rtn);
+				fprintf(stderr, "fd = %d, ", fd);
+				fprintf(stderr, "my_msg = %p, ", my_msg);
+				fprintf(stderr, "out_offset = %d, ", out_offset);
+				fprintf(stderr, "len = %d, ", len);
+				fprintf(stderr, "flags = %d\n", MSG_DONTWAIT);
+				goto dead;
 			}
+			if (rtn) {
+				out_bytes += rtn;
+				out_offset += rtn;
+				if (out_offset >= len) {
+					out_count++;
+					out_offset = 0;
+				}
+			}
+			continue;
 		}
+	      skip_pollout:
 		if (pfd[0].revents & POLLERR) {
 			perror("POLLERR");
 			goto dead;
@@ -406,9 +348,10 @@ int main(int argc, char **argv)
 			{"rep_time", 1, 0, 't'},
 			{"help", 0, 0, 'h'},
 			{"port", 1, 0, 'p'},
-			{"length", 1, 0, 'w'}
+			{"length", 1, 0, 'w'},
+			{"nagle", 0, 0, 'n'}
 		};
-		c = getopt_long(argc, argv, "l:r:t:hp:w:", long_options, &option_index);
+		c = getopt_long(argc, argv, "l:r:t:hp:w:n", long_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -435,9 +378,12 @@ int main(int argc, char **argv)
 				break;
 			case 5:	/* length */
 				len = atoi(optarg);
-				if (len > 1024) {
-					len = 1024;
+				if (len > 2048) {
+					len = 2048;
 				}
+				break;
+			case 6:	/* nagle */
+				nodelay = 0;
 				break;
 			default:
 				usage();
@@ -465,8 +411,11 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			len = atoi(optarg);
-			if (len > 1024)
-				len = 1024;
+			if (len > 2048)
+				len = 2048;
+			break;
+		case 'n':
+			nodelay = 0;
 			break;
 		default:
 			fprintf(stderr, "ERROR: Unrecognized option `%c'.\n", c);
@@ -493,5 +442,5 @@ int main(int argc, char **argv)
 	rem_addr.sin_port = htons(port);
 	rem_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
-	return test_udpc();
+	return test_sctpc();
 }

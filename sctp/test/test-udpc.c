@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $
+ @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/20 05:00:03 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2002/05/22 14:34:53 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $"
+#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $"
 
-static char const ident[] = "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:00:03 $";
+static char const ident[] =
+    "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -76,164 +77,155 @@ static char const ident[] = "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.
 #include <stdlib.h>
 #include <string.h>
 
-void
-usage(void) {
-	fprintf(stderr,"Usage:  test-udpc [options]\n");
-	fprintf(stderr,"Options:\n");
-	fprintf(stderr,"  -p, --port port           (default: 10000)\n");
-	fprintf(stderr,"      port specifies both the local and remote port number\n");
-	fprintf(stderr,"  -l, --loc_host loc_host   (default: 127.0.0.1)\n");
-	fprintf(stderr,"      loc_host specifies the local (bind) host for the UDP\n");
-	fprintf(stderr,"      socket with optional local port number\n");
-	fprintf(stderr,"  -r, --rem_host rem_host   (default: 127.0.0.2)\n");
-	fprintf(stderr,"      rem_host specifies the remote (sendto) address for the UDP\n");
-	fprintf(stderr,"      socket with optional remote port number\n");
-	fprintf(stderr,"  -t, --rep_time time       (default: 1 second)\n");
-	fprintf(stderr,"      time give the time in seconds between reports\n");
+void usage(void)
+{
+	fprintf(stderr, "Usage:  test-udpc [options]\n");
+	fprintf(stderr, "Options:\n");
+	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
+	fprintf(stderr,
+		"      port specifies both the local and remote port number\n");
+	fprintf(stderr, "  -l, --loc_host loc_host   (default: 127.0.0.1)\n");
+	fprintf(stderr,
+		"      loc_host specifies the local (bind) host for the UDP\n");
+	fprintf(stderr, "      socket with optional local port number\n");
+	fprintf(stderr, "  -r, --rem_host rem_host   (default: 127.0.0.2)\n");
+	fprintf(stderr,
+		"      rem_host specifies the remote (sendto) address for the UDP\n");
+	fprintf(stderr, "      socket with optional remote port number\n");
+	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
+	fprintf(stderr, "      time give the time in seconds between reports\n");
 }
 
 #define HOST_BUF_LEN 256
 
 int rep_time = 1;
 
-static int
-timer_timeout = 0;
+static int timer_timeout = 0;
 
-static void
-timer_handler(int signum) {
-	if ( signum == SIGALRM )
+static void timer_handler(int signum)
+{
+	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int
-timer_sethandler(void) {
+static int timer_sethandler(void)
+{
 	sigset_t mask;
 	struct sigaction act;
 	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART|SA_ONESHOT;
+	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
 	sigemptyset(&act.sa_mask);
-	if ( sigaction(SIGALRM, &act, NULL) )
+	if (sigaction(SIGALRM, &act, NULL))
 		return -1;
 	sigemptyset(&mask);
-	sigaddset(&mask,SIGALRM);
-	sigprocmask(SIG_UNBLOCK,&mask,NULL);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	return 0;
 }
 
-static int
-start_timer(void)
+static int start_timer(void)
 {
-	struct itimerval setting = { { 0, 0 }, { rep_time, 0 } };
-	if ( timer_sethandler() )
+	struct itimerval setting = { {0, 0}, {rep_time, 0} };
+	if (timer_sethandler())
 		return -1;
-	if ( setitimer(ITIMER_REAL, &setting, NULL) )
+	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return -1;
 	timer_timeout = 0;
 	return 0;
 }
 
-static struct sockaddr_in loc_addr = { AF_INET, 0, { INADDR_ANY }, };
-static struct sockaddr_in rem_addr = { AF_INET, 0, { INADDR_ANY }, };
+static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
+static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
 int len = 32;
 
 int test_udpc(void)
 {
 	int fd;
-	long inp_count=0, out_count=0;
-	struct pollfd pfd[1] = { { 0, POLLIN|POLLOUT|POLLERR|POLLHUP, 0 } };
-	unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
+	long inp_count = 0, out_count = 0;
+	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
+	unsigned char my_msg[] =
+	    "This is a good short test message that has some 64 bytes in it.";
 	unsigned char ur_msg[100];
 
 	fprintf(stderr, "Opening socket\n");
 
-	if ( (fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0 )
-	{
+	if ((fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
 		perror("socket");
 		goto dead;
 	}
 
 	fprintf(stderr, "Binding socket to %s:%d\n",
-			inet_ntoa(loc_addr.sin_addr),
-			ntohs(loc_addr.sin_port));
+		inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 
-	if ( bind(fd, (struct sockaddr *)&loc_addr, sizeof(loc_addr)) < 0 )
-	{
+	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
 		goto dead;
 	}
 
-	if ( start_timer() )
-	{
+	if (start_timer()) {
 		perror("timer");
 		goto dead;
 	}
 
-	for (;;)
-	{
+	for (;;) {
 		pfd[0].fd = fd;
-		pfd[0].events = POLLIN|POLLOUT|POLLERR|POLLHUP;
+		pfd[0].events = POLLIN | POLLOUT | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
-		if ( timer_timeout )
-		{
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-					inp_count, out_count, inp_count+out_count, out_count-inp_count,
-					8*(42+len)*(inp_count+out_count));
+		if (timer_timeout) {
+			printf
+			    ("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
+			     inp_count, out_count, inp_count + out_count,
+			     out_count - inp_count,
+			     8 * (42 + len) * (inp_count + out_count));
 			inp_count = 0;
 			out_count = 0;
-			if ( start_timer() )
-			{
+			if (start_timer()) {
 				perror("timer");
 				goto dead;
 			}
 		}
-		if ( poll(&pfd[0], 1, -1) < 0 )
-		{
-			if ( errno == EINTR )
+		if (poll(&pfd[0], 1, -1) < 0) {
+			if (errno == EINTR)
 				continue;
 			perror("poll");
 			goto dead;
 		}
-		if ( pfd[0].revents & POLLIN )
-		{
-			if ( recvfrom(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT,
-					NULL, NULL) < 0 )
-			{
+		if (pfd[0].revents & POLLIN) {
+			if (recvfrom(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT,
+				     NULL, NULL) < 0) {
 				perror("recvfrom");
 				goto dead;
 			}
 			inp_count++;
 		}
-		if ( pfd[0].revents & POLLOUT )
-		{
-			if ( sendto(fd, my_msg, len, MSG_DONTWAIT|MSG_NOSIGNAL,
-					(struct sockaddr *)&rem_addr, sizeof(rem_addr)) < 0 )
-			{
+		if (pfd[0].revents & POLLOUT) {
+			if (sendto(fd, my_msg, len, MSG_DONTWAIT | MSG_NOSIGNAL,
+				   (struct sockaddr *) &rem_addr,
+				   sizeof(rem_addr)) < 0) {
 				perror("sendto");
 				goto dead;
 			}
 			out_count++;
 		}
-		if ( pfd[0].revents & POLLERR )
-		{
+		if (pfd[0].revents & POLLERR) {
 			perror("POLLERR");
 			goto dead;
 		}
-		if ( pfd[0].revents & POLLHUP )
-		{
+		if (pfd[0].revents & POLLHUP) {
 			perror("POLLHUP");
 			goto dead;
 		}
 	}
-dead:
+      dead:
 	close(fd);
-	return(0);
+	return (0);
 }
 
-int
-main(int argc, char**argv) {
+int main(int argc, char **argv)
+{
 	int c;
 	char *hostl = "127.0.0.1";
 	char *hostr = "127.0.0.2";
@@ -245,101 +237,99 @@ main(int argc, char**argv) {
 	struct hostent *haddr;
 	while (1) {
 		int option_index = 0;
-		static struct option long_options[] =
-		{
-			{   "loc_host",	    1, 0, 'l' },
-			{   "rem_host",	    1, 0, 'r' },
-			{   "rep_time",	    1, 0, 't' },
-			{   "help",	    0, 0, 'h' },
-			{   "port",	    1, 0, 'p' },
-			{   "length",	    1, 0, 'w' }
+		static struct option long_options[] = {
+			{"loc_host", 1, 0, 'l'},
+			{"rem_host", 1, 0, 'r'},
+			{"rep_time", 1, 0, 't'},
+			{"help", 0, 0, 'h'},
+			{"port", 1, 0, 'p'},
+			{"length", 1, 0, 'w'}
 		};
-		c = getopt_long(argc,argv,"l:r:t:hp:w:",long_options,&option_index);
-		if ( c == -1 )
+		c = getopt_long(argc, argv, "l:r:t:hp:w:", long_options,
+				&option_index);
+		if (c == -1)
 			break;
-		switch ( c ) {
-			case 0:
-				switch ( option_index ) {
-					case 0: /* loc_host */
-						strncpy(hostbufl,optarg,HOST_BUF_LEN);
-						hostl = hostbufl;
-						hostlp = &hostl;
-						break;
-					case 1: /* rem_host */
-						strncpy(hostbufr,optarg,HOST_BUF_LEN);
-						hostr = hostbufr;
-						hostrp = &hostr;
-						break;
-					case 2: /* rep_time */
-						rep_time = atoi(optarg);
-						break;
-					case 3: /* help */
-						usage();
-						exit(0);
-					case 4: /* port */
-						port = atoi(optarg);
-						break;
-					case 5: /* length */
-						len = atoi(optarg);
-						if ( len > 1024 )
-						{
-							len = 1024;
-						}
-						break;
-					default:
-						usage();
-						exit(1);
-				}
-				break;
-			case 'l':
-				strncpy(hostbufl,optarg,HOST_BUF_LEN);
+		switch (c) {
+		case 0:
+			switch (option_index) {
+			case 0:	/* loc_host */
+				strncpy(hostbufl, optarg, HOST_BUF_LEN);
 				hostl = hostbufl;
 				hostlp = &hostl;
 				break;
-			case 'r':
-				strncpy(hostbufr,optarg,HOST_BUF_LEN);
+			case 1:	/* rem_host */
+				strncpy(hostbufr, optarg, HOST_BUF_LEN);
 				hostr = hostbufr;
 				hostrp = &hostr;
 				break;
-			case 't':
+			case 2:	/* rep_time */
 				rep_time = atoi(optarg);
 				break;
-			case 'h':
+			case 3:	/* help */
 				usage();
 				exit(0);
-			case 'p':
+			case 4:	/* port */
 				port = atoi(optarg);
 				break;
-			case 'w':
+			case 5:	/* length */
 				len = atoi(optarg);
-				if ( len > 1024 )
+				if (len > 1024) {
 					len = 1024;
+				}
 				break;
 			default:
-				fprintf(stderr,"ERROR: Unrecognized option `%c'.\n",c);
 				usage();
 				exit(1);
+			}
+			break;
+		case 'l':
+			strncpy(hostbufl, optarg, HOST_BUF_LEN);
+			hostl = hostbufl;
+			hostlp = &hostl;
+			break;
+		case 'r':
+			strncpy(hostbufr, optarg, HOST_BUF_LEN);
+			hostr = hostbufr;
+			hostrp = &hostr;
+			break;
+		case 't':
+			rep_time = atoi(optarg);
+			break;
+		case 'h':
+			usage();
+			exit(0);
+		case 'p':
+			port = atoi(optarg);
+			break;
+		case 'w':
+			len = atoi(optarg);
+			if (len > 1024)
+				len = 1024;
+			break;
+		default:
+			fprintf(stderr, "ERROR: Unrecognized option `%c'.\n", c);
+			usage();
+			exit(1);
 		}
 	}
-	if ( optind < argc ) {
+	if (optind < argc) {
 		fprintf(stderr, "ERROR: Option syntax: ");
-		while ( optind < argc )
-			fprintf(stderr, "%s ",argv[optind++]);
-		fprintf(stderr,"\n");
+		while (optind < argc)
+			fprintf(stderr, "%s ", argv[optind++]);
+		fprintf(stderr, "\n");
 		usage();
 		exit(1);
 	}
 
 	haddr = gethostbyname(*hostlp);
 	loc_addr.sin_family = AF_INET;
-	loc_addr.sin_port   = 0;
-	loc_addr.sin_addr.s_addr = *(uint32_t *)(haddr->h_addr);
+	loc_addr.sin_port = 0;
+	loc_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
 	haddr = gethostbyname(*hostrp);
 	rem_addr.sin_family = AF_INET;
-	rem_addr.sin_port   = htons(port);
-	rem_addr.sin_addr.s_addr = *(uint32_t *)(haddr->h_addr);
+	rem_addr.sin_port = htons(port);
+	rem_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
 	return test_udpc();
 }
-
