@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/01/01 11:17:54 $
+ @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/01 11:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/11 08:28:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/01/01 11:17:54 $"
+#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/01/01 11:17:54 $";
+static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/11 08:28:55 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -105,11 +105,7 @@ static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
 
-#include "net/sock.h"
-#include "net/snmp.h"
-#include "net/sctp.h"
-#include "os7_namespace.h"
-
+#include "sctp_debug.h"
 #include "sctp_md5.h"
 #include "sctp_hmac_md5.h"
 

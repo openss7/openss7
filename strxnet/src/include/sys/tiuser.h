@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.1 2004/05/16 04:12:33 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.2 2005/01/11 08:47:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
+ Last Modified $Date: 2005/01/11 08:47:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* 
  * The following are the events returned from t_look().
@@ -65,6 +65,11 @@
 #define T_ERROR		0x0020	/* fatal error */
 #define T_UDERR		0x0040	/* datagram error indication */
 #define T_ORDREL	0x0080	/* orderly release indication */
+/*
+ * The following are added.
+ */
+#define T_GODATA	0x0100	/* */
+#define T_GOEXDATA	0x0200	/* */
 #define T_EVENTS	0x00ff	/* event mask */
 
 /* 
@@ -82,6 +87,7 @@ struct t_info {
 	t_scalar_t discon;		/* max data allowed on t_snddis(), t_rcvdis(),
 					   t_sndreldata() and t_rcvreldata() functions. */
 	t_scalar_t servtype;		/* Service type supported by transport provider. */
+	t_scalar_t flags;		/* service flags */
 };
 
 /* 
@@ -165,7 +171,7 @@ struct t_uderr {
 #define T_ADDR		0x01	/* address */
 #define T_OPT		0x02	/* options */
 #define T_UDATA		0x04	/* user data */
-#define T_ALL		0x07	/* all the above fields */
+#define T_ALL		0xffff	/* all the above fields */
 
 /* 
  * The following are the states for the user.
@@ -178,7 +184,38 @@ struct t_uderr {
 #define T_DATAXFER	5	/* data transfer */
 #define T_OUTREL	6	/* outgoing release pending */
 #define T_INREL		7	/* incoming release pending */
-#define T_BADSTATE	8	/* illegal state */
+#define T_FAKE		8	/* illegal state */
+#define T_NOSTATES	9
+
+/*
+ * User-level events.
+ */
+#define T_OPEN		0
+#define T_BIND		1
+#define T_OPTMGMT	2
+#define T_UNBIND	3
+#define T_CLOSE		4
+#define T_SNDUDATA	5
+#define T_RCVUDATA	6
+#define T_RCVUDERR	7
+#define T_CONNECT1	8
+#define T_CONNECT2	9
+#define T_RCVCONNECT	10
+#define T_LISTN		11
+#define T_ACCEPT1	12
+#define T_ACCEPT2	13
+#define T_ACCEPT3	14
+#define T_SND		15
+#define T_RCV		16
+#define T_SNDDIS1	17
+#define T_SNDDIS2	18
+#define T_RCVDIS1	19
+#define T_RCVDIS2	20
+#define T_RCVDIS3	21
+#define T_SNDREL	22
+#define T_RCVREL	23
+#define T_PASSCON	24
+#define T_NOEVENTS	25
 
 #ifndef __KERNEL__
 

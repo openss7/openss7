@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticots.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
+ @(#) $Id: ticots.h,v 0.9.2.2 2005/01/11 08:47:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
+ Last Modified $Date: 2005/01/11 08:47:24 $ by $Author: brian $
 
  $Log: ticots.h,v $
+ Revision 0.9.2.2  2005/01/11 08:47:24  brian
+ - Minor additions and corrections.
+
  Revision 0.9.2.1  2004/05/16 04:12:32  brian
  - Updating strxnet release.
 
@@ -62,7 +65,7 @@
 #ifndef _SYS_TICOTS_H
 #define _SYS_TICOTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #if 0
 #if !defined _TICOTS_H && !defined __KERNEL__
@@ -75,9 +78,10 @@
 #endif
 
 #define TCO_NOPEER		ECONNREFUSED	/* destiniation address is not listening */
-#define TCO_PEERBADSTATE	ECONNREFUSED	/* transport peer in incorrect state */
 #define TCO_PEERNOROMMONQ	ECONNREFUSED	/* no room on connection indication queue */
+#define TCO_PEERBADSTATE	ECONNREFUSED	/* transport peer in incorrect state */
 #define TCO_PEERINITIATED	ECONNRESET	/* transport peer user-initiated disconnect */
-#define TCO_PROVIDERINITIATED	ECONNRESET	/* transport peer provider-initiated disconnect */
+#define TCO_PROVIDERINITIATED	ECONNABORTED	/* transport peer provider-initiated disconnect */
+#define TCO_DEFAULTADDRSZ	4
 
 #endif				/* _SYS_TICOTS_H */

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.19 2005/01/01 11:16:52 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.20 2005/01/11 08:28:49 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/01 11:16:52 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/11 08:28:49 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -73,27 +73,32 @@ AC_DEFUN([AC_SCTP], [dnl
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _RPM_SPEC
-    SCTP_INCLUDES="-I- -imacros ./config.h"
-    AC_SUBST([SCTP_INCLUDES])dnl
-    USER_CPPFLAGS="$CPPFLAGS"
-    USER_CFLAGS="$CFLAGS"
-    USER_LDFLAGS="$LDFLAGS"
+    # user CPPFLAGS and CFLAGS
+    USER_CPPFLAGS="${CPPFLAGS}"
+    USER_CFLAGS="${CFLAGS}"
+    USER_LDFLAGS="${LDADD}"
     _LINUX_KERNEL
-    _SCTP_SETUP
-    AC_MSG_NOTICE([final user CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final user INCLUDES  = $SCTP_INCLUDES])
-    AC_MSG_NOTICE([final kern MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kern NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kern CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final kern LDFLAGS   = $KERNEL_LDFLAGS])
+
+
+
+    SCTP_INCLUDES="-I- -imacros ./config.h"
+    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
+    AC_MSG_NOTICE([final user    INCLUDES  = $SCTP_INCLUDES])
+    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
+dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+    AC_SUBST([SCTP_INCLUDES])dnl
     AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     CPPFLAGS=
     CFLAGS=
+    _SCTP_SETUP
 dnl _AUTOTEST
     _SCTP_OUTPUT dnl
     AM_CONDITIONAL(WITH_LFS, false)dnl
@@ -112,28 +117,27 @@ AC_DEFUN([_SCTP_OPTIONS], [dnl
 # _SCTP_SETUP_DEBUG
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
-    AC_DEFINE_UNQUOTED([CONFIG_SCTP_MODULE], [], [Always define this for the
-                        autoconf configuration.])
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     case "$linux_cv_debug" in
     _DEBUG)
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_DEBUG], [], [Define to perform
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_DEBUG], [], [Define to perform
                             internal structure tracking within SCTP as well as
                             to provide additional /proc filesystem files for
                             examining internal structures.])
         ;;
     _TEST)
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_TEST], [], [Define to perform
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_TEST], [], [Define to perform
                             performance testing with debugging.  This mode
                             does not dump massive amounts of information into
                             system logs, but peforms all assertion checks.])
         ;;
     _SAFE)
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_SAFE], [], [Define to perform
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_SAFE], [], [Define to perform
                             fundamental assertion checks.  This is a safer
                             mode of operation.])
         ;;
     _NONE | *)
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_NONE], [], [Define to perform no
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_NONE], [], [Define to perform no
                             assertion checks but report software errors.  This
                             is the smallest footprint, highest performance
                             mode of operation.])
@@ -143,11 +147,69 @@ AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
 # =========================================================================
 
 # =========================================================================
+# _SCTP_OTHER_SCTP
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_OTHER_SCTP], [dnl
+    sctp_cv_other_sctp='no'
+    sctp_cv_lksctp_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
+    if test :"$linux_cv_CONFIG_IP_SCTP" = :"yes" ; then
+        sctp_cv_other_sctp='lksctp'
+        sctp_cv_lksctp_sctp='yes'
+        AC_MSG_ERROR([
+**** 
+**** Configure has detected a kernel with the deprecated lksctp compiled in.
+**** This is NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on
+**** such a bastardized kernel will most likely result in an unstable
+**** situation.  Try a different kernel, or try recompiling your kernel with
+**** lksctp removed (or at least compiled as a module).
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_IP_SCTP_MODULE" = :"yes" ; then
+        sctp_cv_other_sctp='lksctp'
+        sctp_cv_lksctp_sctp='yes'
+        AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
+            greater kernels have this poorman version of SCTP included in the
+            kernel.  Define this symbol if you have such a bastardized kernel.
+            When we have such a kernel we need to define lksctp's header
+            wrapper defines so that none of the lksctp header files are
+            included (we use our own instead).])
+    fi
+    sctp_cv_openss7_sctp='no'
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp compiled in], [CONFIG_SCTP])
+    if test :"$linux_cv_CONFIG_SCTP" = :"yes" ; then
+        sctp_cv_other_sctp='openss7'
+        sctp_cv_openss7_sctp='yes'
+        AC_MSG_WARN([
+**** 
+**** Configure has detected a kernel with OpenSS7 SCTP compiled in.  This is
+**** NOT a recommended situation.  Installing OpenSS7 STREAMS SCTP on such a
+**** kernel can lead to difficulties.  Try a different kernel, or try
+**** recompiling with OpenSS7 SCTP compiled as a module, and perhaps removed.
+**** ])
+    fi
+    _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp module], [CONFIG_SCTP_MODULE])
+    if test :"$linux_cv_CONFIG_SCTP_MODULE" = :"yes" ; then
+        sctp_cv_other_sctp='openss7'
+        sctp_cv_openss7_sctp='yes'
+        AC_DEFINE([HAVE_OPENSS7_SCTP], [1], [Define if your kernel supports
+            the OpenSS7 Linux Kernel Sockets SCTP patches.  This enables
+            support in the SCTP driver for STREAMS on top of the OpenSS7 Linux
+            Kernel Sockets SCTP implementation.])
+    fi
+    AM_CONDITIONAL([WITH_LKSCTP_SCTP], [ test :"${sctp_cv_lksctp_sctp:-no}"  = :yes])dnl
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], [test :"${sctp_cv_openss7_sctp:-no}" = :yes])dnl
+])# _SCTP_OTHER_SCTP
+# =========================================================================
+
+# =========================================================================
 # _SCTP_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_SETUP], [dnl
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
+    _SCTP_OTHER_SCTP
     _SCTP_SETUP_MODULE
     _SCTP_CHECK_KERNEL
     _SCTP_SETUP_DEBUG
@@ -158,12 +220,13 @@ AC_DEFUN([_SCTP_SETUP], [dnl
 # _SCTP_SETUP_MODULE
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     if test :"${linux_cv_modules:-yes}" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MODULE], [], [When defined, STREAMS
-            is being compiled as a loadable kernel module.])
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_MODULE], [], [When defined, SCTP is
+                            being compiled as a loadable kernel module.])
     else
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS], [], [When defined, STREAMS is
-            being compiled as a kernel linkable object.])
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG], [], [When defined, SCTP is being
+                            compiled as a kernel linkable object.])
     fi
 ])# _SCTP_SETUP_MODULE
 # =========================================================================
@@ -172,39 +235,6 @@ AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
 # _SCTP_CHECK_KERNEL
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
-    sctp_cv_other_sctp='no'
-    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP], [
-        sctp_cv_other_sctp='yes'
-        AC_MSG_ERROR([
-**** 
-**** Configure has detected a kernel with the deprecated lksctp compiled in.
-**** This is NOT a recommended situation.  Installing OpenSS7 SCTP on such a
-**** bastadized kernel will most likely result in an unstable situation.  Try
-**** a different kernel, or try recompiling your kernel with lksctp set to no.
-**** ])
-    ])
-    _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp as module], [CONFIG_IP_SCTP_MODULE],
-                               [sctp_cv_other_sctp='yes'])
-    if test :$sctp_cv_other_sctp = :yes ; then
-        AC_DEFINE_UNQUOTED([HAVE_LKSCTP_SCTP], [], [Some more recent 2.4.25
-            and greater kernels have this poorman version of SCTP included in
-            the kernel.  Define this symbol if you have such a bastardized
-            kernel.  When we have such a kernel we need to define lksctp's
-            header wrapper defines so that none of the lksctp header files are
-            included (we use our own instead).])
-    else
-        _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp patched in], [CONFIG_SCTP],
-                                   [sctp_cv_other_sctp='yes'])
-        _LINUX_CHECK_KERNEL_CONFIG([for kernel with openss7 sctp as module], [CONFIG_SCTP_MODULE],
-                                   [sctp_cv_other_sctp='yes'])
-        if test :$sctp_cv_other_sctp = :yes ; then
-            AC_DEFINE_UNQUOTED([HAVE_OPENSS7_SCTP], [], [Some kernels may
-                already have the premium OpenSS7 implementation of SCTP
-                included.  A number of kernel rpms were released this way and
-                some distros have picked up OpenSS7 patches.  If this is the
-                case you are done.])dnl
-        fi
-    fi
     _LINUX_KERNEL_ENV([dnl
         AC_CACHE_CHECK([for kernel ip_route_output], [linux_cv_have_ip_route_output], [dnl
             CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
@@ -461,6 +491,7 @@ if (s3 < s4 + s5 - s2 - s6) {
             alloc_skb,
             create_proc_entry,
             del_timer,
+            dev_base_lock,
             dev_base,
             do_softirq,
             free_pages,
@@ -471,6 +502,7 @@ if (s3 < s4 + s5 - s2 - s6) {
             inet_add_protocol,
             inet_addr_type,
             inet_del_protocol,
+            inetdev_lock,
             inet_family_ops,
             inet_getsockopt,
             inet_recvmsg,
@@ -494,6 +526,7 @@ if (s3 < s4 + s5 - s2 - s6) {
             kill_proc,
             kmem_cache_alloc,
             kmem_cache_create,
+            kmem_cache_destroy,
             kmem_cache_free,
             kmem_find_general_cachep,
             __lock_sock,
@@ -506,9 +539,14 @@ if (s3 < s4 + s5 - s2 - s6) {
             panic,
             __pollwait,
             printk,
+            proc_dointvec_jiffies,
+            proc_dointvec_minmax,
+            proc_dointvec,
+            proc_doulongvec_ms_jiffies_minmax,
             proc_net,
             ___pskb_trim,
             put_cmsg,
+            register_sysctl_table,
             __release_sock,
             remove_proc_entry,
             remove_wait_queue,
@@ -528,8 +566,12 @@ if (s3 < s4 + s5 - s2 - s6) {
             sock_no_sendpage,
             sock_no_socketpair,
             sock_wake_async,
-            sock_wfree,
             sprintf,
+            sysctl_intvec,
+            sysctl_ip_default_ttl,
+            sysctl_jiffies,
+            sysctl_local_port_range,
+            unregister_sysctl_table,
             __wake_up], [], [dnl
             AC_MSG_WARN([
 **** 
@@ -551,7 +593,7 @@ AC_DEFUN([_SCTP_OUTPUT], [dnl
 # _SCTP_CONFIG
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_CONFIG], [dnl
-# CONFIG_SCTP_SLOW_VERIFICATION
+# SCTP_CONFIG_SLOW_VERIFICATION
     AC_MSG_CHECKING([for sctp slow verification])
     AC_ARG_ENABLE([sctp-slow-verification],
         AS_HELP_STRING([--enable-sctp-slow-verification],
@@ -559,7 +601,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_slow_verification="$enableval"],
         [sctp_cv_slow_verification='no'])
     if test :"${sctp_cv_slow_verification:-no}" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_SLOW_VERIFICATION], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_SLOW_VERIFICATION], [], [
             When a message comes from an SCTP endpoint with the correct
             verification tag, it is not necessary to check ports or addresses
             to identify the SCTP association to which it belongs.  When
@@ -570,7 +612,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             operation.  If in doubt, leave this undefined.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_slow_verification])
-# CONFIG_SCTP_THROTTLE_HEARTBEATS
+# SCTP_CONFIG_THROTTLE_HEARTBEATS
     AC_MSG_CHECKING([for sctp throttle heartbeats])
     AC_ARG_ENABLE([sctp-throttle-heartbeats],
         AS_HELP_STRING([--enable-sctp-throttle-heartbeats],
@@ -578,7 +620,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_throttle_heartbeats="$enableval"],
         [sctp_cv_throttle_heartbeats='no'])
     if test :"${sctp_cv_throttle_heartbeats:-no}" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_THROTTLE_HEARTBEATS], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_THROTTLE_HEARTBEATS], [], [
             Special feature of OpenSS7 SCTP which is not mentioned in RFC
             2960.  When defined, SCTP will throttle the rate at which it
             responds to heartbeats to the system control sctp_heartbeat_itvl.
@@ -588,6 +630,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     fi
     AC_MSG_RESULT([$sctp_cv_throttle_heartbeats])
     AC_MSG_CHECKING([for sctp dicard out-of-the-blue])
+    AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
     AC_ARG_ENABLE([sctp-discard-ootb],
         AS_HELP_STRING([--enable-sctp-discard-ootb],
             [enable discard out-of-the-blue packets. @<:@default=no@:>@]),
@@ -598,7 +641,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             sctp_cv_discard_ootb='no'
          fi])
     if test :"$sctp_cv_discard_ootb" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_DISCARD_OOTB], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_DISCARD_OOTB], [], [
             RFC 2960 requires the implementation to send ABORT to some OOTB
             packets (packets for which no SCTP association exists).  Sending
             ABORT chunks to unverified source addreses with the T bit set
@@ -612,7 +655,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             undefined.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_discard_ootb])
-# CONFIG_SCTP_EXTENDED_IP_SUPPORT
+# SCTP_CONFIG_EXTENDED_IP_SUPPORT
     AC_MSG_CHECKING([for sctp extended ip support])
     AC_ARG_ENABLE([sctp-extended-ip-support],
         AS_HELP_STRING([--enable-sctp-extended-ip-support],
@@ -620,7 +663,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_extended_ip_support="$enableval"],
         [sctp_cv_extended_ip_support='no'])
     if test :"${sctp_cv_extended_ip_support:-no}" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_EXTENDED_IP_SUPPORT], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_EXTENDED_IP_SUPPORT], [], [
             This provides extended IP support for SCTP for things like IP
             Transparent Proxy and IP Masquerading.  This is experimental
             stuff.])dnl
@@ -630,7 +673,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_be_machine='yes'; sctp_cv_le_machine='no'],
         [sctp_cv_be_machine='no'; sctp_cv_le_machine='yes'],
         [sctp_cv_be_machine='yes'; sctp_cv_le_machine='yes'])
-# CONFIG_SCTP_HMAC_SHA1
+# SCTP_CONFIG_HMAC_SHA1
     AC_MSG_CHECKING([for sctp hmac sha-1])
     AC_ARG_ENABLE([sctp-hmac-sha1],
         AS_HELP_STRING([--disable-sctp-hmac-sha1],
@@ -638,7 +681,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_hmac_sha1="$enableval"],
         [sctp_cv_hmac_sha1="$sctp_cv_be_machine"])
     if test :"$sctp_cv_hmac_sha1" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_HMAC_SHA1], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_HMAC_SHA1], [], [
             When defined, this provides the ability to sue the FIPS 180-1
             (SHA-1) message authentication code in SCTP cookies.  When
             defined and the appropriate sysctl and option is set, SCTP will
@@ -648,7 +691,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     fi
     AM_CONDITIONAL([WITH_HMAC_SHA1], [test :"$sctp_cv_hmac_sha1" = :yes])dnl
     AC_MSG_RESULT([$sctp_cv_hmac_sha1])
-# CONFIG_SCTP_HMAC_MD5
+# SCTP_CONFIG_HMAC_MD5
     AC_MSG_CHECKING([for sctp hmac md5])
     AC_ARG_ENABLE([sctp-hmac-md5],
         AS_HELP_STRING([--disable-sctp-hmac-md5],
@@ -656,7 +699,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_hmac_md5="$enableval"],
         [sctp_cv_hmac_md5="$sctp_cv_le_machine"])
     if test :"$sctp_cv_hmac_md5" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_HMAC_MD5], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_HMAC_MD5], [], [
             When defined, this provides the ability to use the MD5 (RFC 1321)
             message authentication code in SCTP cookies.  If you define this
             macro, when the appropriate system control and stream option is
@@ -666,7 +709,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     fi
     AM_CONDITIONAL([WITH_HMAC_MD5], [test :"$sctp_cv_hmac_md5" = :yes])dnl
     AC_MSG_RESULT([$sctp_cv_hmac_md5])
-# CONFIG_SCTP_ADLER_32
+# SCTP_CONFIG_ADLER_32
     AC_MSG_CHECKING([for sctp Adler32 checksum])
     AC_ARG_ENABLE([sctp-adler32],
         AS_HELP_STRING([--enable-sctp-adler32],
@@ -674,14 +717,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_adler32="$enableval"],
         [sctp_cv_adler32='no'])
     if test :"$sctp_cv_adler32" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_ADLER_32], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADLER_32], [], [
             This provides the ability to use the older RFC 2960 Adler32
-            checksum.  If CONFIG_SCTP_CRC_32 below is not selected, the Adler32
+            checksum.  If SCTP_CONFIG_CRC_32 below is not selected, the Adler32
             checksum is always provided.])dnl
     fi
     AM_CONDITIONAL([WITH_ADLER_32], [test :"$sctp_cv_adler32" = :yes])dnl
     AC_MSG_RESULT([$sctp_cv_adler32])
-# CONFIG_SCTP_CRC_32C
+# SCTP_CONFIG_CRC_32C
     AC_MSG_CHECKING([for sctp CRC-32C checksum])
     AC_ARG_ENABLE([sctp-crc32c],
         AS_HELP_STRING([--disable-sctp-crc32c],
@@ -692,15 +735,15 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         sctp_cv_crc32c='yes'
     fi
     if test :"$sctp_cv_crc32c" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_CRC_32C], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_CRC_32C], [], [
             This provides the ability to use the newer CRC-32c checksum as
             described in RFC 3309.  When this is selected and
-            CONFIG_SCTP_ADLER_32 is not selected above, then the only checksum
+            SCTP_CONFIG_ADLER_32 is not selected above, then the only checksum
             that will be used is the CRC-32c checksum.])dnl
     fi
     AM_CONDITIONAL([WITH_CRC_32C], [test :"$sctp_cv_crc32c" = :yes])dnl
     AC_MSG_RESULT([$sctp_cv_crc32c])
-# CONFIG_SCTP_THROTTLE_PASSIVEOPENS
+# SCTP_CONFIG_THROTTLE_PASSIVEOPENS
     AC_MSG_CHECKING([for sctp throttle passive opens])
     AC_ARG_ENABLE([sctp-throttle-passiveopens],
         AS_HELP_STRING([--enable-sctp-throttle-passiveopens],
@@ -708,7 +751,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_throttle_passiveopens="$enableval"],
         [sctp_cv_throttle_passiveopens='no'])
     if test :"$sctp_cv_throttle_passiveopens" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_THROTTLE_PASSIVEOPENS], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_THROTTLE_PASSIVEOPENS], [], [
             Special feature of Linux SCTP not mentioned in RFC 2960.  When
             secure algorithms are used for signing cookies, the implementation
             becomes vulnerable to INIT and COOKIE ECHO flooding.  If defined,
@@ -718,7 +761,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             undefined, each INIT and COOKIE ECHO will be processed.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_throttle_passiveopens])
-# CONFIG_SCTP_ECN
+# SCTP_CONFIG_ECN
     AC_MSG_CHECKING([for sctp ecn])
     AC_ARG_ENABLE([sctp-ecn],
         AS_HELP_STRING([--enable-sctp-ecn],
@@ -726,14 +769,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_ecn="$enableval"],
         [sctp_cv_ecn='no'])
     if test :"$sctp_cv_ecn" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_ECN], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_ECN], [], [
             This enables support for Explicit Congestion Notification (ECN)
             chunks in SCTP messages as defined in RFC 2960 and RFC 3168.  It
             also adds syctl (/proc/net/ipv4/sctp_ecn) which allows ECN for SCTP
             to be disabled at runtime.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_ecn])
-# CONFIG_SCTP_LIFETIMES
+# SCTP_CONFIG_LIFETIMES
     AC_MSG_CHECKING([for sctp lifetimes])
     AC_ARG_ENABLE([sctp-lifetimes],
         AS_HELP_STRING([--enable-sctp-lifetimes],
@@ -741,14 +784,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_lifetimes="$enableval"],
         [sctp_cv_lifetimes='no'])
     if test :"$sctp_cv_lifetimes" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_LIFETIMES], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_LIFETIMES], [], [
             This enables support for message lifetimes as described in RFC 2960.
             When enabled, message lifetimes can be set on messages.  See
             sctp(7).  This feature is always enabled when Partial Reliability
             Support is set.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_lifetimes])
-# CONFIG_SCTP_ADD_IP
+# SCTP_CONFIG_ADD_IP
     AC_MSG_CHECKING([for sctp add ip])
     AC_ARG_ENABLE([sctp-add-ip],
         AS_HELP_STRING([--enable-sctp-add-ip],
@@ -756,14 +799,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_add_ip="$enableval"],
         [sctp_cv_add_ip='no'])
     if test :"$sctp_cv_add_ip" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_ADD_IP], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADD_IP], [], [
             This enables support for ADD-IP as described in
             draft-ietf-tsvwg-addip-sctp-07.txt.  This allows the addition and
             removal of IP addresses from existing connections.  This is
             experimental stuff.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_add_ip])
-# CONFIG_SCTP_ADAPTATION_LAYER_INFO
+# SCTP_CONFIG_ADAPTATION_LAYER_INFO
     AC_MSG_CHECKING([for sctp adaptation layer info])
     AC_ARG_ENABLE([sctp-adaptation-layer-info],
         AS_HELP_STRING([--enable-sctp-adaptation-layer-info],
@@ -771,14 +814,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_adaptation_layer_info="$enableval"],
         [sctp_cv_adaptation_layer_info='no'])
     if test :"$sctp_cv_adaptation_layer_info" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_ADAPTATION_LAYER_INFO], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADAPTATION_LAYER_INFO], [], [
             This enables support for the Adaptation Layer Information parameter
             described in draft-ietf-tsvwg-addip-sctp-07.txt for communicating
             application layer information bits at initialization.  This is
             experimental stuff.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_adaptation_layer_info])
-# CONFIG_SCTP_PARTIAL_RELIABILITY
+# SCTP_CONFIG_PARTIAL_RELIABILITY
     AC_MSG_CHECKING([for sctp partial reliability])
     AC_ARG_ENABLE([sctp-partial-reliability],
         AS_HELP_STRING([--enable-sctp-partial-reliability],
@@ -786,14 +829,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_partial_reliability="$enableval"],
         [sctp_cv_partial_reliability='no'])
     if test :"$sctp_cv_partial_reliability" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_PARTIAL_RELIABILITY], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_PARTIAL_RELIABILITY], [], [
             This enables support for PR-SCTP as described in
             draft-stewart-tsvwg-prsctp-03.txt.  This allows for partial
             reliability of message delivery on a "timed reliability" basis.
             This is experimental stuff.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_partial_reliability])
-# CONFIG_SCTP_ERROR_GENERATOR
+# SCTP_CONFIG_ERROR_GENERATOR
     AC_MSG_CHECKING([for sctp error generator])
     AC_ARG_ENABLE([sctp-error-generator],
         AS_HELP_STRING([--disable-sctp-error-generator],
@@ -801,14 +844,14 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_error_generator="$enableval"],
         [sctp_cv_error_generator='yes'])
     if test :"$sctp_cv_error_generator" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_ERROR_GENERATOR], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_ERROR_GENERATOR], [], [
             This provides an internal error generator that can be accessed with
             socket options for testing SCTP operation under packet loss.  You
             will need this option to run some of the test programs distributed
             with the SCTP module.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_error_generator])
-# CONFIG_SCTP_TCP_COMPATIBLE
+# SCTP_CONFIG_TCP_COMPATIBLE
     AC_MSG_CHECKING([for sctp tcp compatibility])
     AC_ARG_ENABLE([sctp-tcp-compatible],
         AS_HELP_STRING([--disable-tcp-compatible],
@@ -816,13 +859,13 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_tcp_compatible="$enableval"],
         [sctp_cv_tcp_compatible='yes'])
     if test :"$sctp_cv_tcp_compatible" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_TCP_COMPATIBLE], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_TCP_COMPATIBLE], [], [
             This enables support for SOCK_STREAM type TCP compatible sockets
             in addition to the normal SCTP SOCK_SEQPACKET sockets.  These work
             good and are normally enabled.  Define this symbol.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_tcp_compatible])
-# CONFIG_SCTP_UDP_COMPATIBLE
+# SCTP_CONFIG_UDP_COMPATIBLE
     AC_MSG_CHECKING([for sctp rudp compatibility])
     AC_ARG_ENABLE([sctp-udp-compatible],
         AS_HELP_STRING([--enable-udp-compatible],
@@ -830,7 +873,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
         [sctp_cv_udp_compatible="$enableval"],
         [sctp_cv_udp_compatible='no'])
     if test :"$sctp_cv_udp_compatible" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_SCTP_UDP_COMPATIBLE], [], [
+        AC_DEFINE_UNQUOTED([SCTP_CONFIG_UDP_COMPATIBLE], [], [
             This enables support for SOCK_RDM type RUDP compatible sockets in
             addition to the normal SCTP SOCK_SEQPACKET sockets.  These have
             not been tested.  This is experimental stuff.])dnl

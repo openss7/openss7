@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9.2.1 2004/05/16 04:12:32 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.2 2005/01/11 08:47:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:32 $ by $Author: brian $
+ Last Modified $Date: 2005/01/11 08:47:24 $ by $Author: brian $
 
  $Log: ticlts.h,v $
+ Revision 0.9.2.2  2005/01/11 08:47:24  brian
+ - Minor additions and corrections.
+
  Revision 0.9.2.1  2004/05/16 04:12:32  brian
  - Updating strxnet release.
 
@@ -62,7 +65,7 @@
 #ifndef _SYS_TICLTS_H
 #define _SYS_TICLTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #if 0
 #if !defined _TICLTS_H && !defined __KERNEL__
@@ -78,5 +81,6 @@
 #define TCL_BADOPT	    EINVAL	/* bad options format or illegal options values */
 #define TCL_NOPEER	    EFAULT	/* destination address is not bound */
 #define TCL_PEERBADSTATE    EPROTO	/* transport peer in incorrect state */
+#define TCL_DEFAULTADDRSZ   4
 
 #endif				/* _SYS_TICLTS_H */

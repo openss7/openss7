@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.7 2004/12/24 07:58:07 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.8 2005/01/11 08:28:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/24 07:58:07 $ by $Author: brian $
+ Last Modified $Date: 2005/01/11 08:28:52 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
+#ifndef __KERNEL__
 #include <features.h>
 #include <sys/types.h>
+#else				/* __KERNEL__ */
+#include <linux/types.h>
+#endif				/* __KERNEL__ */
 
+#ifndef __KERNEL__
 __BEGIN_DECLS
+#endif
 
 enum {
 	__OS7_SCTP_ESTABLISHED = 1,
@@ -355,6 +361,8 @@ struct __os7_sctp_astat {
 #define SCTP_TSN			__OS7_SCTP_TSN
 #define SCTP_UNREACHABLE		__OS7_SCTP_UNREACHABLE
 
+#ifndef __KERNEL__
 __END_DECLS
+#endif
 
 #endif				/* _NETINET_SCTP_H */
