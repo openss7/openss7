@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 06:58:18 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/28 11:32:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 06:58:18 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 11:32:56 $ by $Author: brian $
 #
 # =============================================================================
 
+if PUBLIC_RELEASE
+
 rpmdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
+
+else
+
+rpmdir = $(PACKAGE_NAME)-bin-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
+
+endif
 
 RPM_ARCHIVES = $(rpmdir).tar.gz $(rpmdir).tar.bz2
 
