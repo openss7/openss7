@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/08/22 07:28:53 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2004/08/31 04:49:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/22 07:28:53 $ by $Author: brian $
+# Last Modified $Date: 2004/08/31 04:49:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -628,7 +628,7 @@ The %{name}-doc package contains html documentation for the development of
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} %{extrainfo} ; do
+    for n in %{name} %{?extrainfo:%{extrainfo}} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -641,7 +641,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} %{extrainfo} ; do
+    for n in %{name} %{?extrainfo:%{extrainfo}} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -854,12 +854,16 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.34  2004/08/22 07:28:53  brian
-# - Converted to shared common files.
+# Revision 0.9.2.35  2004/08/31 04:49:04  brian
+# - Avoid empty macro body error on extrainfo.
 #
-# Revision 0.9.2.2  2004/08/22 07:28:53  brian
-# - Converted to shared common files.
+# Revision 0.9.2.3  2004/08/31 04:49:04  brian
+# - Avoid empty macro body error on extrainfo.
 #
+
+* Sun Aug 22 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.2  2004/08/22 07:28:53  brian
+- Converted to shared common files.
 
 * Sun Aug 22 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.1  2004/08/22 06:17:38  brian

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2004/08/23 21:32:26 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/08/31 09:17:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/23 21:32:26 $ by $Author: brian $
+# Last Modified $Date: 2004/08/31 09:17:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -188,10 +188,10 @@ BuildRequires:  %{_streams}-devel >= 0.7a
 %if %{BUILD_lis}
 BuildRequires:  %{_streams}-devel >= 2:2.16.18
 %endif
-BuildRequires:  strxns-devel >= %{epoch}:0.9.2
-BuildRequires:  strxnet-devel >= %{epoch}:0.9.2
-BuildRequires:  strinet-devel >= %{epoch}:0.9.2
-BuildRequires:  strsctp-devel >= %{epoch}:0.9.2
+#BuildRequires:  strxns-devel >= %{epoch}:0.9.2
+#BuildRequires:  strxnet-devel >= %{epoch}:0.9.2
+#BuildRequires:  strinet-devel >= %{epoch}:0.9.2
+#BuildRequires:  strsctp-devel >= %{epoch}:0.9.2
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
@@ -742,7 +742,7 @@ OpenSS7 %{_STREAMS} STREAMS %{stitle} applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} %{extrainfo} ; do
+    for n in %{name} %{?extrainfo:%{extrainfo}} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -755,7 +755,7 @@ fi
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{base} %{extrainfo} ; do
+    for n in %{name} %{?extrainfo:%{extrainfo}} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -960,12 +960,20 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.31  2004/08/23 21:32:26  brian
-# - Modifications for common build.
+# Revision 0.9.2.33  2004/08/31 09:17:20  brian
+# - Strap out excessive build dependencies.
 #
-# Revision 0.9.2.30  2004/08/17 11:45:22  brian
-# - Upgraded spec files.
+# Revision 0.9.2.32  2004/08/31 04:49:04  brian
+# - Avoid empty macro body error on extrainfo.
 #
+
+* Mon Aug 23 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.31  2004/08/23 21:32:26  brian
+- Modifications for common build.
+
+* Tue Aug 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.30  2004/08/17 11:45:22  brian
+- Upgraded spec files.
 
 * Sat Aug  7 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.29  2004/08/07 11:00:50  brian
